@@ -63,30 +63,70 @@
 - [ ] 建立基礎 Store
 
 ### ✅ 完成事項
-（待填寫）
+- ✅ Step 2.1: 重構 persistent-store.ts 使用新的離線架構
+  - 移除舊的 IndexedDB 和同步邏輯（200+ 行程式碼）
+  - 改用 OfflineManager 統一管理
+  - 保持 createPersistentCrudMethods 介面不變
+  - 所有 8 個 Store 自動升級到新架構
+- ✅ 修正所有型別錯誤
+  - export StoreName 型別
+  - 放寬泛型約束以支援各種資料型別
+  - 修正 tour-store import 錯誤
 
 ### 🐛 遇到問題
-（待填寫）
+- 問題：StoreName 型別未 export
+  - 解決：在 offline-database.ts 和 offline-manager.ts 正確 export
+- 問題：型別約束過嚴導致無法使用
+  - 解決：從 `T extends { id: string }` 改為 `T extends Record<string, any>`
 
 ### 📊 程式碼統計
-（待填寫）
+```
+修改檔案：6
+刪除程式碼：-256 行（舊的同步邏輯）
+新增程式碼：+53 行（整合新架構）
+淨值：-203 行（程式碼更精簡）
+```
 
 ### 💡 學習筆記
-（待填寫）
+- **架構重構策略**：
+  - 不要直接刪除舊架構，先建立新架構
+  - 讓舊介面內部使用新實作，保持向下相容
+  - 逐步遷移，降低破壞性改變
+
+- **TypeScript 泛型設計**：
+  - 過度嚴格的約束會導致無法使用
+  - `Record<string, any>` 比 `{ id: string }` 更靈活
+  - Type assertion (`as T`) 在必要時可以使用
 
 ### 🔄 Git Commits
-（待填寫）
+```bash
+# 今日提交
+- feat: 完成離線架構核心 (Step 1) - 5d3289c8
+- docs: 更新工作日誌 - Step 1 完成
+- refactor: 重構 persistent-store 使用新離線架構 - 21026361
+- fix: 修正型別錯誤和 export 問題
+```
 
 ### 📋 明日計畫
-（待填寫）
+- [ ] 測試所有 Store 功能是否正常（tours, orders, quotes, etc.）
+- [ ] 建立 Supabase 同步引擎
+- [ ] 實作資料轉換層（camelCase ↔ snake_case）
+- [ ] 實作衝突處理機制
+- [ ] 修復剩餘的 TypeScript 錯誤（目前約 400+ 個）
 
 ---
 
 ## 📈 整體進度追蹤
 
 ### Phase 1: 本地離線架構（目標：7天）
-- [ ] Day 1: 統一資料模型 (0%)
-- [ ] Day 2: 離線管理核心 (0%)
+- [x] Day 1: 統一資料模型 (100%) ✅
+  - unified-types.ts (320 行)
+  - offline-database.ts (420 行)
+  - offline-manager.ts (330 行)
+  - persistent-store.ts 重構完成
+- [ ] Day 2: 測試與 Supabase 同步 (30%)
+  - 需要測試所有 Store 功能
+  - 需要建立同步引擎
 - [ ] Day 3-4: 重構 Stores (0%)
 - [ ] Day 5: 修復 TypeScript 錯誤 (0%)
 - [ ] Day 6: 測試本地功能 (0%)
