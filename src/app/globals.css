@@ -28,36 +28,36 @@
   --border-muted: var(--morandi-container);
 }
 
-/* 現代深色主題 */
+/* Discord 風格深色主題 */
 [data-theme="modern-dark"] {
-  /* 主色系 - 使用 Slate 色系 */
-  --morandi-primary: #f1f5f9;       /* slate-100 - 主要文字 */
-  --morandi-secondary: #94a3b8;      /* slate-400 - 次要文字 */
-  --morandi-gold: #3b82f6;           /* blue-500 - 主要強調色 */
-  --morandi-gold-hover: #2563eb;     /* blue-600 - hover 狀態 */
-  --morandi-green: #10b981;          /* emerald-500 - 成功/正面 */
-  --morandi-red: #ef4444;            /* red-500 - 錯誤/負面 */
-  --morandi-container: #334155;      /* slate-700 - 容器背景 */
-  --morandi-muted: #64748b;          /* slate-500 - 淡化文字 */
+  /* 主色系 - Discord 風格柔和配色 */
+  --morandi-primary: #dcddde;        /* 主要文字 - 柔和白 */
+  --morandi-secondary: #b9bbbe;      /* 次要文字 - 灰白 */
+  --morandi-gold: #5865f2;           /* 主要強調色 - Discord 紫藍 */
+  --morandi-gold-hover: #4752c4;     /* hover 狀態 - 深紫藍 */
+  --morandi-green: #3ba55d;          /* 成功/正面 - 柔和綠 */
+  --morandi-red: #ed4245;            /* 錯誤/負面 - 柔和紅 */
+  --morandi-container: #2f3136;      /* 容器背景 - 次要背景 */
+  --morandi-muted: #72767d;          /* 淡化文字 - 深灰 */
 
   /* 背景色 */
-  --background: #0f172a;              /* slate-900 - 主背景 */
-  --card: #1e293b;                   /* slate-800 - 卡片背景 */
-  --border: #D4C4B0;                  /* 莫蘭迪邊框色 */
-  --popover: #1e293b;                /* slate-800 - 下拉選單背景 */
-  --popover-foreground: #f1f5f9;     /* slate-100 - 下拉選單文字 */
-  --accent: #334155;                 /* slate-700 - 強調背景 */
-  --accent-foreground: #f1f5f9;      /* slate-100 - 強調文字 */
+  --background: #36393f;             /* 主背景 - 深灰帶藍 */
+  --card: #2f3136;                   /* 卡片背景 - 更深灰 */
+  --border: #202225;                 /* 邊框 - 深色 */
+  --popover: #2f3136;                /* 下拉選單背景 */
+  --popover-foreground: #dcddde;     /* 下拉選單文字 */
+  --accent: #4f545c;                 /* 強調背景 - 較亮灰 */
+  --accent-foreground: #dcddde;      /* 強調文字 */
 
   /* 設定對應變數 */
-  --foreground: #f1f5f9;
-  --card-foreground: #f1f5f9;
-  --border-muted: #475569;
+  --foreground: #dcddde;
+  --card-foreground: #dcddde;
+  --border-muted: #2f3136;
 }
 
-/* 深色主題的漸層背景 */
+/* 深色主題的純色背景（Discord 風格不用漸層） */
 [data-theme="modern-dark"] body {
-  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  background: #36393f;
   min-height: 100vh;
 }
 
