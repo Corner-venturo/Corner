@@ -53,6 +53,7 @@ export const DB_CONFIG = {
   }
 } as const;
 
+// Export StoreName type
 export type StoreName = keyof typeof DB_CONFIG.stores;
 
 // ===========================

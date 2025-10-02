@@ -68,7 +68,7 @@ export const createPersistentCrudMethods = <T extends { id?: string }>(
         }
 
         // 使用 OfflineManager 建立資料
-        const newItem = await offlineManager.create<T>(storeName, data);
+        const newItem = await offlineManager.create<T>(storeName, data as Partial<T>);
 
         // 更新 Zustand store
         const state = get();

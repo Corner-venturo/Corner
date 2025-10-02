@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Tour, Order, Customer, Payment, Member, TourAddOn } from './types';
 import { generateTourCode } from '@/lib/utils';
-import { createPersistentStore, createPersistentCrudMethods } from '@/lib/persistent-store';
+import { createPersistentCrudMethods } from '@/lib/persistent-store';
 
 interface TourState {
   tours: Tour[];

@@ -8,8 +8,12 @@
  * - 提供統一的 CRUD 介面
  */
 
-import { getOfflineDB, StoreName } from './offline-database';
+import { getOfflineDB } from './offline-database';
+import type { StoreName } from './offline-database';
 import { generateUUID, toSupabase, fromSupabase } from './unified-types';
+
+// Re-export StoreName for convenience
+export type { StoreName } from './offline-database';
 
 // ===========================
 // 同步佇列項目
@@ -38,12 +42,12 @@ export class OfflineManager {
   /**
    * 建立資料 (新增)
    */
-  async create<T extends { id?: string }>(
+  async create<T extends Record<string, any>>(
     storeName: StoreName,
-    data: Omit<T, 'id' | 'createdAt' | 'updatedAt' | 'synced' | 'version'>
+    data: Partial<T>
   ): Promise<T> {
     const now = new Date().toISOString();
-    const record = {
+    const record: any = {
       ...data,
       id: generateUUID(),
       createdAt: now,
@@ -52,40 +56,40 @@ export class OfflineManager {
       lastSyncedAt: undefined,
       syncError: undefined,
       version: 1
-    } as T;
+    };
 
     // 儲存到 IndexedDB
     await this.db.add(storeName, record);
 
     // 加入同步佇列
-    await this.addToSyncQueue('create', storeName, record.id as string, record);
+    await this.addToSyncQueue('create', storeName, record.id, record);
 
     console.log(`✅ 建立資料:`, storeName, record.id);
-    return record;
+    return record as T;
   }
 
   /**
    * 更新資料
    */
-  async update<T extends { id: string; version?: number }>(
+  async update<T extends Record<string, any>>(
     storeName: StoreName,
     id: string,
     updates: Partial<T>
   ): Promise<T> {
     // 讀取現有資料
-    const existing = await this.db.get<T>(storeName, id);
+    const existing = await this.db.get<any>(storeName, id);
     if (!existing) {
       throw new Error(`找不到資料: ${id}`);
     }
 
     // 合併更新
-    const updated = {
+    const updated: any = {
       ...existing,
       ...updates,
       updatedAt: new Date().toISOString(),
       synced: false,
       version: (existing.version || 1) + 1
-    } as T;
+    };
 
     // 儲存到 IndexedDB
     await this.db.update(storeName, updated);
@@ -94,7 +98,7 @@ export class OfflineManager {
     await this.addToSyncQueue('update', storeName, id, updated);
 
     console.log(`✅ 更新資料:`, storeName, id);
-    return updated;
+    return updated as T;
   }
 
   /**
@@ -138,30 +142,30 @@ export class OfflineManager {
   /**
    * 批次建立
    */
-  async createBatch<T extends { id?: string }>(
+  async createBatch<T extends Record<string, any>>(
     storeName: StoreName,
-    dataList: Omit<T, 'id' | 'createdAt' | 'updatedAt' | 'synced' | 'version'>[]
+    dataList: Partial<T>[]
   ): Promise<T[]> {
     const now = new Date().toISOString();
-    const records = dataList.map(data => ({
+    const records: any[] = dataList.map(data => ({
       ...data,
       id: generateUUID(),
       createdAt: now,
       updatedAt: now,
       synced: false,
       version: 1
-    })) as T[];
+    }));
 
     // 批次儲存到 IndexedDB
     await this.db.addBatch(storeName, records);
 
     // 批次加入同步佇列
     for (const record of records) {
-      await this.addToSyncQueue('create', storeName, (record as any).id, record);
+      await this.addToSyncQueue('create', storeName, record.id, record);
     }
 
     console.log(`✅ 批次建立 ${records.length} 筆資料:`, storeName);
-    return records;
+    return records as T[];
   }
 
   /**
