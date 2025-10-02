@@ -1,0 +1,268 @@
+@import "tailwindcss";
+
+/* 莫蘭迪主題（預設） */
+:root,
+[data-theme="morandi"] {
+  /* 主色系 */
+  --morandi-primary: #3A3633;
+  --morandi-secondary: #8B8680;
+  --morandi-gold: #C4A572;
+  --morandi-gold-hover: #A08968;
+  --morandi-green: #9FA68F;
+  --morandi-red: #C08374;
+  --morandi-container: #E8E5E0;
+  --morandi-muted: #B8B2AA;
+
+  /* 背景色 */
+  --background: #F6F4F1;
+  --card: #FFFFFF;
+  --border: #D4C4B0;
+  --popover: #FFFFFF;
+  --popover-foreground: #3A3633;
+  --accent: #E8E5E0;
+  --accent-foreground: #3A3633;
+
+  /* 設定對應變數 */
+  --foreground: var(--morandi-primary);
+  --card-foreground: var(--morandi-primary);
+  --border-muted: var(--morandi-container);
+}
+
+/* 現代深色主題 */
+[data-theme="modern-dark"] {
+  /* 主色系 - 使用 Slate 色系 */
+  --morandi-primary: #f1f5f9;       /* slate-100 - 主要文字 */
+  --morandi-secondary: #94a3b8;      /* slate-400 - 次要文字 */
+  --morandi-gold: #3b82f6;           /* blue-500 - 主要強調色 */
+  --morandi-gold-hover: #2563eb;     /* blue-600 - hover 狀態 */
+  --morandi-green: #10b981;          /* emerald-500 - 成功/正面 */
+  --morandi-red: #ef4444;            /* red-500 - 錯誤/負面 */
+  --morandi-container: #334155;      /* slate-700 - 容器背景 */
+  --morandi-muted: #64748b;          /* slate-500 - 淡化文字 */
+
+  /* 背景色 */
+  --background: #0f172a;              /* slate-900 - 主背景 */
+  --card: #1e293b;                   /* slate-800 - 卡片背景 */
+  --border: #D4C4B0;                  /* 莫蘭迪邊框色 */
+  --popover: #1e293b;                /* slate-800 - 下拉選單背景 */
+  --popover-foreground: #f1f5f9;     /* slate-100 - 下拉選單文字 */
+  --accent: #334155;                 /* slate-700 - 強調背景 */
+  --accent-foreground: #f1f5f9;      /* slate-100 - 強調文字 */
+
+  /* 設定對應變數 */
+  --foreground: #f1f5f9;
+  --card-foreground: #f1f5f9;
+  --border-muted: #475569;
+}
+
+/* 深色主題的漸層背景 */
+[data-theme="modern-dark"] body {
+  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  min-height: 100vh;
+}
+
+/* 深色主題的卡片陰影調整 */
+[data-theme="modern-dark"] .morandi-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="modern-dark"] .morandi-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-border-muted: var(--border-muted);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* 莫蘭迪色系 */
+  --color-morandi-primary: var(--morandi-primary);
+  --color-morandi-secondary: var(--morandi-secondary);
+  --color-morandi-gold: var(--morandi-gold);
+  --color-morandi-gold-hover: var(--morandi-gold-hover);
+  --color-morandi-green: var(--morandi-green);
+  --color-morandi-red: var(--morandi-red);
+  --color-morandi-container: var(--morandi-container);
+  --color-morandi-muted: var(--morandi-muted);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 全站滾動條規範 - 完全隱藏，只在需要滾動且正在滾動時顯示 */
+
+/* 預設完全隱藏所有滾動條 */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* 只有當內容真的需要滾動時才顯示滾動條 */
+.scrollable-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollable-content::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* 滾動中時才顯示 */
+.scrollable-content.scrolling::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollable-content.scrolling::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable-content.scrolling::-webkit-scrollbar-thumb {
+  background: rgba(139, 134, 128, 0.6);
+  border-radius: 3px;
+}
+
+.scrollable-content.scrolling {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 134, 128, 0.6) transparent;
+}
+
+/* 莫蘭迪色系工具類 */
+
+/* 背景色 */
+.bg-morandi-container { background-color: var(--morandi-container); }
+
+/* 文字色 */
+.text-morandi-primary { color: var(--morandi-primary); }
+.text-morandi-secondary { color: var(--morandi-secondary); }
+.text-morandi-muted { color: var(--morandi-muted); }
+
+/* 功能色 - 背景 */
+.bg-morandi-gold {
+  background: linear-gradient(to bottom right, #d4c5a9, #c9b896, #bfad87);
+}
+.bg-morandi-gold-hover:hover {
+  background: linear-gradient(to bottom right, #c9b896, #bfad87, #b5a378);
+}
+.bg-morandi-red { background-color: var(--morandi-red); }
+.bg-morandi-green { background-color: var(--morandi-green); }
+
+/* 功能色 - 文字 */
+.text-morandi-gold { color: var(--morandi-gold); }
+.text-morandi-red { color: var(--morandi-red); }
+.text-morandi-green { color: var(--morandi-green); }
+
+/* 功能色 - 邊框 */
+.border-morandi-gold { border-color: var(--morandi-gold); }
+.border-morandi-red { border-color: var(--morandi-red); }
+.border-morandi-green { border-color: var(--morandi-green); }
+
+/* 莫蘭迪卡片樣式 */
+.morandi-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(58, 54, 51, 0.1), 0 1px 2px 0 rgba(58, 54, 51, 0.06);
+  transition: all 0.2s ease-in-out;
+}
+
+.morandi-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(58, 54, 51, 0.1), 0 2px 4px -1px rgba(58, 54, 51, 0.06);
+  border-color: var(--morandi-gold);
+}
+
+/* 表格美化邊框 - 不碰到上下邊界 */
+.table-divider {
+  position: relative;
+}
+
+.table-divider::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 1px;
+  background-color: var(--border);
+}
+
+/* 主題切換動畫 */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 全域分割線樣式 - 水平分割線左右留白 */
+.divider-inset,
+.border-t-inset,
+.border-b-inset {
+  position: relative;
+}
+
+/* 上邊框留白 */
+.border-t-inset {
+  border-top: none !important;
+}
+
+.border-t-inset::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* 下邊框留白 */
+.border-b-inset {
+  border-bottom: none !important;
+}
+
+.border-b-inset::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Divider 組件樣式 */
+.divider-inset {
+  height: 1px;
+  background: linear-gradient(to right,
+    transparent 0.75rem,
+    var(--border) 0.75rem,
+    var(--border) calc(100% - 0.75rem),
+    transparent calc(100% - 0.75rem)
+  );
+  border: none;
+}

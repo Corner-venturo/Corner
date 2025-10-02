@@ -1,0 +1,144 @@
+import { BaseService, StoreOperations } from '@/core/services/base.service';
+import { Account, Transaction, Category } from '@/stores/accounting-types';
+import { useAccountingStore } from '@/stores/accounting-store';
+import { ValidationError } from '@/core/errors/app-errors';
+
+class AccountingService extends BaseService<Account> {
+  protected resourceName = 'accounts';
+
+  protected getStore(): StoreOperations<Account> {
+    const store = useAccountingStore.getState();
+    return {
+      getAll: () => store.accounts,
+      getById: (id: string) => store.accounts.find(a => a.id === id),
+      add: async (account: Account) => {
+        await store.addAccount(account as any);
+        return account;
+      },
+      update: async (id: string, data: Partial<Account>) => {
+        await store.updateAccount(id, data);
+      },
+      delete: async (id: string) => {
+        await store.deleteAccount(id);
+      }
+    };
+  }
+
+  protected validate(data: Partial<Account>): void {
+    if (data.name && data.name.trim().length === 0) {
+      throw new ValidationError('name', '帳戶名稱不能為空');
+    }
+
+    if (data.balance !== undefined && isNaN(data.balance)) {
+      throw new ValidationError('balance', '餘額格式錯誤');
+    }
+  }
+
+  // ========== 業務邏輯方法 ==========
+
+  getAccountBalance(accountId: string): number {
+    const store = useAccountingStore.getState();
+    return store.getAccountBalance(accountId);
+  }
+
+  getCategoryTotal(categoryId: string, startDate?: string, endDate?: string): number {
+    const store = useAccountingStore.getState();
+    return store.getCategoryTotal(categoryId, startDate, endDate);
+  }
+
+  calculateStats(): void {
+    const store = useAccountingStore.getState();
+    store.calculateStats();
+  }
+
+  getAccountsByType(type: Account['type']): Account[] {
+    const store = useAccountingStore.getState();
+    return store.accounts.filter(a => a.type === type);
+  }
+
+  getTotalAssets(): number {
+    const store = useAccountingStore.getState();
+    return store.stats.totalAssets;
+  }
+
+  getMonthlyIncome(): number {
+    const store = useAccountingStore.getState();
+    return store.stats.monthlyIncome;
+  }
+
+  getMonthlyExpense(): number {
+    const store = useAccountingStore.getState();
+    return store.stats.monthlyExpense;
+  }
+
+  getNetWorth(): number {
+    const store = useAccountingStore.getState();
+    return store.stats.netWorth;
+  }
+
+  // Transaction 相關
+  addTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>): string {
+    const store = useAccountingStore.getState();
+    return store.addTransaction(transaction);
+  }
+
+  updateTransaction(id: string, transaction: Partial<Transaction>): void {
+    const store = useAccountingStore.getState();
+    store.updateTransaction(id, transaction);
+  }
+
+  deleteTransaction(id: string): void {
+    const store = useAccountingStore.getState();
+    store.deleteTransaction(id);
+  }
+
+  getTransactionsByAccount(accountId: string): Transaction[] {
+    const store = useAccountingStore.getState();
+    return store.transactions.filter(t =>
+      t.accountId === accountId || t.toAccountId === accountId
+    );
+  }
+
+  getTransactionsByDateRange(startDate: string, endDate: string): Transaction[] {
+    const store = useAccountingStore.getState();
+    return store.transactions.filter(t =>
+      t.date >= startDate && t.date <= endDate
+    );
+  }
+}
+
+class CategoryService extends BaseService<Category> {
+  protected resourceName = 'categories';
+
+  protected getStore(): StoreOperations<Category> {
+    const store = useAccountingStore.getState();
+    return {
+      getAll: () => store.categories,
+      getById: (id: string) => store.categories.find(c => c.id === id),
+      add: async (category: Category) => {
+        await store.addCategory(category as any);
+        return category;
+      },
+      update: async (id: string, data: Partial<Category>) => {
+        await store.updateCategory(id, data);
+      },
+      delete: async (id: string) => {
+        await store.deleteCategory(id);
+      }
+    };
+  }
+
+  protected validate(data: Partial<Category>): void {
+    if (data.name && data.name.trim().length === 0) {
+      throw new ValidationError('name', '分類名稱不能為空');
+    }
+  }
+
+  getCategoriesByType(type: Category['type']): Category[] {
+    const store = useAccountingStore.getState();
+    return store.categories.filter(c => c.type === type);
+  }
+}
+
+export const accountingService = new AccountingService();
+export const categoryService = new CategoryService();

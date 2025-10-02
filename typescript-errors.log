@@ -1,0 +1,437 @@
+src/app/calendar/page.tsx(8,25): error TS2305: Module '"@fullcalendar/core"' has no exported member 'DateClickArg'.
+src/app/calendar/page.tsx(366,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 4 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/calendar/page.tsx(420,12): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: CalendarOptions, context: any): FullCalendar', gave the following error.
+    Type '(info: any) => boolean' is not assignable to type 'MoreLinkAction | undefined'.
+      Type '(info: any) => boolean' is not assignable to type 'MoreLinkHandler'.
+        Type 'boolean' is not assignable to type 'string | void'.
+  Overload 2 of 2, '(props: CalendarOptions, context: any): FullCalendar', gave the following error.
+    Type '(arg: any) => "block" | "list-item"' is not assignable to type 'string'.
+  Overload 2 of 2, '(props: CalendarOptions, context: any): FullCalendar', gave the following error.
+    Type '(a: CalendarEvent, b: CalendarEvent) => number' is not assignable to type 'FieldSpecInput<unknown> | OrderSpec<unknown>[] | undefined'.
+      Type '(a: CalendarEvent, b: CalendarEvent) => number' is not assignable to type 'FieldSpecInputFunc<unknown>'.
+        Types of parameters 'a' and 'a' are incompatible.
+          Type 'unknown' is not assignable to type 'CalendarEvent'.
+src/app/calendar/page.tsx(435,28): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/app/customers/page.tsx(186,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 7 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/database/activities/page.tsx(121,11): error TS2322: Type 'string | number | undefined' is not assignable to type 'string | number'.
+  Type 'undefined' is not assignable to type 'string | number'.
+src/app/database/activities/page.tsx(122,11): error TS2322: Type 'string | number | undefined' is not assignable to type 'string | number'.
+  Type 'undefined' is not assignable to type 'string | number'.
+src/app/database/activities/page.tsx(199,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 7 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/database/activities/page.tsx(224,11): error TS2322: Type '{ columns: TableColumn[]; data: ActivityOption[]; onSort: (column: string, direction: "asc" | "desc") => void; onFilter: (filters: Record<string, string>) => void; cellSelection: boolean; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'cellSelection' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'. Did you mean 'selection'?
+src/app/database/regions/page.tsx(198,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 7 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/database/regions/page.tsx(223,11): error TS2322: Type '{ columns: TableColumn[]; data: RegionData[]; onSort: (column: string, direction: "asc" | "desc") => void; onFilter: (filters: Record<string, string>) => void; cellSelection: boolean; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'cellSelection' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'. Did you mean 'selection'?
+src/app/database/suppliers/page.tsx(81,17): error TS2345: Argument of type '{ name: string; type: Supplier["type"]; contact: { contactPerson: string; phone: string; email: string; address: string; website: string; }; status: Supplier["status"]; note: string; }' is not assignable to parameter of type 'Omit<Supplier, "id" | "createdAt" | "updatedAt">'.
+  Property 'priceList' is missing in type '{ name: string; type: Supplier["type"]; contact: { contactPerson: string; phone: string; email: string; address: string; website: string; }; status: Supplier["status"]; note: string; }' but required in type 'Omit<Supplier, "id" | "createdAt" | "updatedAt">'.
+src/app/database/suppliers/page.tsx(126,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 7 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/database/transport/page.tsx(143,11): error TS2322: Type 'string | number | boolean | undefined' is not assignable to type 'string | number | boolean'.
+  Type 'undefined' is not assignable to type 'string | number | boolean'.
+src/app/database/transport/page.tsx(144,11): error TS2322: Type 'string | number | boolean | undefined' is not assignable to type 'string | number | boolean'.
+  Type 'undefined' is not assignable to type 'string | number | boolean'.
+src/app/database/transport/page.tsx(160,34): error TS18048: 'transport.isGroupCost' is possibly 'undefined'.
+src/app/database/transport/page.tsx(220,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 7 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/database/transport/page.tsx(245,11): error TS2322: Type '{ columns: TableColumn[]; data: TransportOption[]; onSort: (column: string, direction: "asc" | "desc") => void; onFilter: (filters: Record<string, string>) => void; cellSelection: boolean; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'cellSelection' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'. Did you mean 'selection'?
+src/app/emergency-fix/page.tsx(27,17): error TS2345: Argument of type '{ permissions: string[]; }' is not assignable to parameter of type 'never'.
+src/app/finance/payments/new/page.tsx(123,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; breadcrumb: { ...; }[]; showBackButton: true; onBack: () => void; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/finance/payments/page.tsx(224,9): error TS2322: Type '{ data: Payment[]; columns: ({ key: string; label: string; sortable: boolean; render: (value: string) => Element; } | { key: string; label: string; sortable: boolean; render: (value: number) => Element; })[]; emptyState: Element; defaultSort: { ...; }; searchable: true; searchPlaceholder: string; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'defaultSort' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'.
+src/app/finance/reports/page.tsx(20,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; breadcrumb: { ...; }[]; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/finance/requests/page.tsx(191,20): error TS7053: Element implicitly has an 'any' type because expression of type '"pending" | "processing" | "confirmed" | "paid"' can't be used to index type '{ pending: string; confirmed: string; completed: string; }'.
+  Property 'processing' does not exist on type '{ pending: string; confirmed: string; completed: string; }'.
+src/app/finance/requests/page.tsx(192,20): error TS7053: Element implicitly has an 'any' type because expression of type '"pending" | "processing" | "confirmed" | "paid"' can't be used to index type '{ pending: string; confirmed: string; completed: string; }'.
+  Property 'processing' does not exist on type '{ pending: string; confirmed: string; completed: string; }'.
+src/app/finance/requests/page.tsx(344,7): error TS2353: Object literal may only specify known properties, and 'isSpecialBilling' does not exist in type 'Omit<PaymentRequest, "id" | "createdAt" | "updatedAt" | "requestNumber">'.
+src/app/finance/requests/page.tsx(350,34): error TS2345: Argument of type '{ category: "住宿" | "交通" | "餐食" | "門票" | "導遊" | "其他"; supplierId: string; supplierName: string; description: string; unitPrice: number; quantity: number; note: string; sortOrder: number; }' is not assignable to parameter of type 'Omit<PaymentRequestItem, "id" | "createdAt" | "updatedAt" | "requestId" | "itemNumber">'.
+  Property 'subtotal' is missing in type '{ category: "住宿" | "交通" | "餐食" | "門票" | "導遊" | "其他"; supplierId: string; supplierName: string; description: string; unitPrice: number; quantity: number; note: string; sortOrder: number; }' but required in type 'Omit<PaymentRequestItem, "id" | "createdAt" | "updatedAt" | "requestId" | "itemNumber">'.
+src/app/finance/requests/page.tsx(380,14): error TS7053: Element implicitly has an 'any' type because expression of type '"pending" | "processing" | "confirmed" | "paid"' can't be used to index type '{ pending: string; confirmed: string; completed: string; }'.
+  Property 'processing' does not exist on type '{ pending: string; confirmed: string; completed: string; }'.
+src/app/finance/requests/page.tsx(381,14): error TS7053: Element implicitly has an 'any' type because expression of type '"pending" | "processing" | "confirmed" | "paid"' can't be used to index type '{ pending: string; confirmed: string; completed: string; }'.
+  Property 'processing' does not exist on type '{ pending: string; confirmed: string; completed: string; }'.
+src/app/finance/requests/page.tsx(401,11): error TS2322: Type '{ columns: TableColumn[]; data: PaymentRequest[]; onSort: (column: string, direction: "asc" | "desc") => void; onFilter: (filters: Record<string, string>) => void; cellSelection: boolean; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'cellSelection' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'. Did you mean 'selection'?
+src/app/finance/treasury/disbursement/page.tsx(158,9): error TS2322: Type '({ key: string; label: Element; width: string; render: (_value: any, row: any) => Element; sortable?: undefined; } | { key: string; label: string; sortable: true; render: (value: any) => Element; width?: undefined; } | { ...; })[]' is not assignable to type 'TableColumn[]'.
+  Type '{ key: string; label: Element; width: string; render: (_value: any, row: any) => Element; sortable?: undefined; } | { key: string; label: string; sortable: true; render: (value: any) => Element; width?: undefined; } | { ...; }' is not assignable to type 'TableColumn'.
+    Type '{ key: string; label: Element; width: string; render: (_value: any, row: any) => Element; sortable?: undefined; }' is not assignable to type 'TableColumn'.
+      Types of property 'label' are incompatible.
+        Type 'Element' is not assignable to type 'string'.
+src/app/finance/treasury/disbursement/page.tsx(538,25): error TS2322: Type 'Element' is not assignable to type 'string'.
+src/app/login/page-backup.tsx(84,39): error TS2345: Argument of type '{ id: string; employeeNumber: string; englishName: string; chineseName: string; personalInfo: any; jobInfo: any; salaryInfo: any; permissions: string[]; attendance: any; contracts: any[]; status: "active" | "inactive" | "suspended"; }' is not assignable to parameter of type 'User'.
+  Types of property 'status' are incompatible.
+    Type '"active" | "inactive" | "suspended"' is not assignable to type '"probation" | "active" | "leave" | "terminated"'.
+      Type '"inactive"' is not assignable to type '"probation" | "active" | "leave" | "terminated"'. Did you mean '"active"'?
+src/app/login/page-backup.tsx(88,24): error TS2339: Property 'id' does not exist on type 'never'.
+src/app/login/page-backup.tsx(89,36): error TS2339: Property 'employee_number' does not exist on type 'never'.
+src/app/login/page-backup.tsx(90,33): error TS2339: Property 'english_name' does not exist on type 'never'.
+src/app/login/page-backup.tsx(91,33): error TS2339: Property 'chinese_name' does not exist on type 'never'.
+src/app/login/page-backup.tsx(92,34): error TS2339: Property 'personal_info' does not exist on type 'never'.
+src/app/login/page-backup.tsx(93,29): error TS2339: Property 'job_info' does not exist on type 'never'.
+src/app/login/page-backup.tsx(94,32): error TS2339: Property 'salary_info' does not exist on type 'never'.
+src/app/login/page-backup.tsx(95,33): error TS2339: Property 'permissions' does not exist on type 'never'.
+src/app/login/page-backup.tsx(96,32): error TS2339: Property 'attendance' does not exist on type 'never'.
+src/app/login/page-backup.tsx(97,31): error TS2339: Property 'contracts' does not exist on type 'never'.
+src/app/login/page-backup.tsx(98,28): error TS2339: Property 'status' does not exist on type 'never'.
+src/app/login/page-backup.tsx(99,28): error TS2339: Property 'avatar' does not exist on type 'never'.
+src/app/login/page-backup.tsx(105,33): error TS2339: Property 'permissions' does not exist on type 'never'.
+src/app/login/page-backup.tsx(106,34): error TS2339: Property 'personal_info' does not exist on type 'never'.
+src/app/login/page-backup.tsx(107,29): error TS2339: Property 'job_info' does not exist on type 'never'.
+src/app/login/page-backup.tsx(108,32): error TS2339: Property 'salary_info' does not exist on type 'never'.
+src/app/orders/[orderId]/documents/page.tsx(222,11): error TS2322: Type '{ columns: TableColumn[]; data: any[]; onSort: (column: string, direction: "asc" | "desc") => void; onFilter: (filters: Record<string, string>) => void; cellSelection: boolean; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'cellSelection' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'. Did you mean 'selection'?
+src/app/orders/[orderId]/payment/page.tsx(191,11): error TS2322: Type '{ columns: TableColumn[]; data: any[]; onSort: (column: string, direction: "asc" | "desc") => void; onFilter: (filters: Record<string, string>) => void; cellSelection: boolean; }' is not assignable to type 'IntrinsicAttributes & EnhancedTableProps'.
+  Property 'cellSelection' does not exist on type 'IntrinsicAttributes & EnhancedTableProps'. Did you mean 'selection'?
+src/app/orders/page.tsx(48,11): error TS7034: Variable 'result' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/app/orders/page.tsx(94,12): error TS7005: Variable 'result' implicitly has an 'any[]' type.
+src/app/orders/page.tsx(104,14): error TS2345: Argument of type '{ code: string; tourName: string; paymentStatus: "未收款" | "部分收款" | "已收款"; remainingAmount: number; orderNumber: string; tourId: string; contactPerson: string; salesPerson: string; assistant: string; totalAmount: number; paidAmount: number; }' is not assignable to parameter of type 'Omit<Order, "id" | "createdAt" | "updatedAt">'.
+  Property 'memberCount' is missing in type '{ code: string; tourName: string; paymentStatus: "未收款" | "部分收款" | "已收款"; remainingAmount: number; orderNumber: string; tourId: string; contactPerson: string; salesPerson: string; assistant: string; totalAmount: number; paidAmount: number; }' but required in type 'Omit<Order, "id" | "createdAt" | "updatedAt">'.
+src/app/orders/page.tsx(131,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 6 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/quotes/[id]/page.tsx(84,32): error TS2339: Property 'saveQuoteVersion' does not exist on type 'QuoteState'.
+src/app/quotes/[id]/page.tsx(118,28): error TS2554: Expected 1 arguments, but got 0.
+src/app/quotes/[id]/page.tsx(173,33): error TS2552: Cannot find name 'calculateGuideCost'. Did you mean 'calculatedGuideCost'?
+src/app/quotes/[id]/page.tsx(647,7): error TS2353: Object literal may only specify known properties, and 'isSpecial' does not exist in type 'Omit<Tour, "id" | "createdAt" | "updatedAt">'.
+src/app/quotes/[id]/page.tsx(764,34): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & ButtonHTMLAttributes<HTMLButtonElement> & { isOpen?: boolean | undefined; onOpenChange?: ((open: boolean) => void) | undefined; } & RefAttributes<...>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & ButtonHTMLAttributes<HTMLButtonElement> & { isOpen?: boolean | undefined; onOpenChange?: ((open: boolean) => void) | undefined; } & RefAttributes<...>'.
+src/app/quotes/[id]/page.tsx(777,34): error TS2322: Type '{ children: (false | Element | undefined)[]; align: string; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributes<HTMLDivElement> & { isOpen?: boolean | undefined; onOpenChange?: ((open: boolean) => void) | undefined; } & RefAttributes<...>'.
+  Property 'align' does not exist on type 'IntrinsicAttributes & HTMLAttributes<HTMLDivElement> & { isOpen?: boolean | undefined; onOpenChange?: ((open: boolean) => void) | undefined; } & RefAttributes<...>'.
+src/app/quotes/[id]/page.tsx(1092,37): error TS2322: Type 'TransportOption[] | ActivityOption[]' is not assignable to type 'ComboboxOption<any>[]'.
+  Type 'TransportOption[]' is not assignable to type 'ComboboxOption<any>[]'.
+    Type 'TransportOption' is missing the following properties from type 'ComboboxOption<any>': value, label
+src/app/quotes/page.tsx(177,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 10 more ...; actions: Element; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/quotes/page.tsx(300,55): error TS2345: Argument of type '(prev: { name: string; status: "提案"; groupSize: number; }) => { status: "提案" | "最終版本"; name: string; groupSize: number; }' is not assignable to parameter of type 'SetStateAction<{ name: string; status: "提案"; groupSize: number; }>'.
+  Type '(prev: { name: string; status: "提案"; groupSize: number; }) => { status: "提案" | "最終版本"; name: string; groupSize: number; }' is not assignable to type '(prevState: { name: string; status: "提案"; groupSize: number; }) => { name: string; status: "提案"; groupSize: number; }'.
+    Call signature return types '{ status: "提案" | "最終版本"; name: string; groupSize: number; }' and '{ name: string; status: "提案"; groupSize: number; }' are incompatible.
+      The types of 'status' are incompatible between these types.
+        Type '"提案" | "最終版本"' is not assignable to type '"提案"'.
+          Type '"最終版本"' is not assignable to type '"提案"'.
+src/app/settings/page.tsx(94,91): error TS2339: Property 'password_hash' does not exist on type 'never'.
+src/app/settings/page.tsx(106,17): error TS2345: Argument of type '{ password_hash: string; }' is not assignable to parameter of type 'never'.
+src/app/supabase-test/page.tsx(82,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "users", never, "POST">', gave the following error.
+    Argument of type '{ employee_number: string; english_name: string; chinese_name: string; status: string; personal_info: { nationalId: string; birthday: string; gender: string; phone: string; email: string; address: string; emergencyContact: { ...; }; }; job_info: { ...; }; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "users", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'employee_number' does not exist in type 'never[]'.
+src/app/supabase-test/page.tsx(140,17): error TS2345: Argument of type '{ deleted_at: string; }' is not assignable to parameter of type 'never'.
+src/app/timebox/components/box-selector.tsx(129,48): error TS2345: Argument of type 'number' is not assignable to parameter of type 'SetStateAction<60 | 30>'.
+src/app/timebox/components/statistics-panel.tsx(20,27): error TS18048: 'stats.totalWorkoutSessions' is possibly 'undefined'.
+src/app/timebox/components/statistics-panel.tsx(98,67): error TS18048: 'stats.totalWorkoutSessions' is possibly 'undefined'.
+src/app/timebox/components/time-grid.tsx(21,9): error TS7034: Variable 'timeSlots' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/app/timebox/components/time-grid.tsx(200,14): error TS7005: Variable 'timeSlots' implicitly has an 'any[]' type.
+src/app/timebox/page.tsx(50,9): error TS2322: Type '{ children: Element; title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; breadcrumb: { ...; }[]; onAdd: () => void; addLabel: string; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/tours/page.tsx(87,11): error TS2339: Property 'data' does not exist on type '{ tours: Tour[]; orders: Order[]; customers: Customer[]; payments: Payment[]; members: Member[]; tourAddOns: TourAddOn[]; selectedTour: Tour | null; ... 26 more ...; updateTourStatus: (tourId: string, status: "提案" | ... 3 more ... | "特殊團", reason?: string | undefined) => Promise<...>; }'.
+src/app/tours/page.tsx(87,24): error TS2339: Property 'totalCount' does not exist on type '{ tours: Tour[]; orders: Order[]; customers: Customer[]; payments: Payment[]; members: Member[]; tourAddOns: TourAddOn[]; selectedTour: Tour | null; ... 26 more ...; updateTourStatus: (tourId: string, status: "提案" | ... 3 more ... | "特殊團", reason?: string | undefined) => Promise<...>; }'.
+src/app/tours/page.tsx(87,36): error TS2339: Property 'loading' does not exist on type '{ tours: Tour[]; orders: Order[]; customers: Customer[]; payments: Payment[]; members: Member[]; tourAddOns: TourAddOn[]; selectedTour: Tour | null; ... 26 more ...; updateTourStatus: (tourId: string, status: "提案" | ... 3 more ... | "特殊團", reason?: string | undefined) => Promise<...>; }'.
+src/app/tours/page.tsx(87,45): error TS2339: Property 'error' does not exist on type '{ tours: Tour[]; orders: Order[]; customers: Customer[]; payments: Payment[]; members: Member[]; tourAddOns: TourAddOn[]; selectedTour: Tour | null; ... 26 more ...; updateTourStatus: (tourId: string, status: "提案" | ... 3 more ... | "特殊團", reason?: string | undefined) => Promise<...>; }'.
+src/app/tours/page.tsx(87,52): error TS2339: Property 'actions' does not exist on type '{ tours: Tour[]; orders: Order[]; customers: Customer[]; payments: Payment[]; members: Member[]; tourAddOns: TourAddOn[]; selectedTour: Tour | null; ... 26 more ...; updateTourStatus: (tourId: string, status: "提案" | ... 3 more ... | "特殊團", reason?: string | undefined) => Promise<...>; }'.
+src/app/tours/page.tsx(87,73): error TS2554: Expected 0 arguments, but got 1.
+src/app/tours/page.tsx(128,38): error TS7006: Parameter 'tour' implicitly has an 'any' type.
+src/app/tours/page.tsx(566,13): error TS2322: Type '{ tour: Tour; triggerAdd: boolean; onTriggerAddComplete: () => void; }' is not assignable to type 'IntrinsicAttributes & TourCostsProps'.
+  Property 'triggerAdd' does not exist on type 'IntrinsicAttributes & TourCostsProps'.
+src/app/tours/page.tsx(595,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 5 more ...; onTabChange: (tab: string) => void; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/app/tours/page.tsx(656,23): error TS2339: Property 'mode' does not exist on type 'DialogState<unknown>'.
+src/app/tours/page.tsx(915,45): error TS2339: Property 'currentParticipants' does not exist on type 'Tour'.
+src/app/tours/page.tsx(939,49): error TS2339: Property 'currentParticipants' does not exist on type 'Tour'.
+src/app/tours/page.tsx(941,63): error TS2339: Property 'currentParticipants' does not exist on type 'Tour'.
+src/app/tours/page.tsx(1087,22): error TS2339: Property 'currentParticipants' does not exist on type 'Tour'.
+src/app/visas/page.tsx(194,32): error TS2345: Argument of type '{ name: string; departureDate: string; returnDate: string; status: "特殊團"; location: string; price: number; maxParticipants: number; contractStatus: "未簽署"; totalRevenue: number; totalCost: number; profit: number; }' is not assignable to parameter of type 'Omit<Tour, "id" | "createdAt" | "updatedAt">'.
+  Property 'code' is missing in type '{ name: string; departureDate: string; returnDate: string; status: "特殊團"; location: string; price: number; maxParticipants: number; contractStatus: "未簽署"; totalRevenue: number; totalCost: number; profit: number; }' but required in type 'Omit<Tour, "id" | "createdAt" | "updatedAt">'.
+src/app/visas/page.tsx(224,43): error TS2339: Property 'code' does not exist on type 'Tour | Promise<Tour>'.
+  Property 'code' does not exist on type 'Promise<Tour>'.
+src/app/visas/page.tsx(227,30): error TS2339: Property 'id' does not exist on type 'Tour | Promise<Tour>'.
+  Property 'id' does not exist on type 'Promise<Tour>'.
+src/app/visas/page.tsx(228,28): error TS2339: Property 'code' does not exist on type 'Tour | Promise<Tour>'.
+  Property 'code' does not exist on type 'Promise<Tour>'.
+src/app/visas/page.tsx(229,32): error TS2339: Property 'name' does not exist on type 'Tour | Promise<Tour>'.
+  Property 'name' does not exist on type 'Promise<Tour>'.
+src/app/visas/page.tsx(267,30): error TS2339: Property 'id' does not exist on type 'Tour | Promise<Tour>'.
+  Property 'id' does not exist on type 'Promise<Tour>'.
+src/app/visas/page.tsx(268,28): error TS2339: Property 'code' does not exist on type 'Tour | Promise<Tour>'.
+  Property 'code' does not exist on type 'Promise<Tour>'.
+src/app/visas/page.tsx(401,9): error TS2322: Type '{ title: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 5 more ...; onTabChange: Dispatch<...>; }' is not assignable to type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & ResponsiveHeaderProps'.
+src/components/accounting/add-account-dialog.tsx(68,11): error TS2367: This comparison appears to be unintentional because the types '"cash"' and '"credit"' have no overlap.
+src/components/accounting/add-account-dialog.tsx(159,16): error TS2367: This comparison appears to be unintentional because the types '"cash"' and '"credit"' have no overlap.
+src/components/accounting/add-account-dialog.tsx(173,14): error TS2367: This comparison appears to be unintentional because the types '"cash"' and '"credit"' have no overlap.
+src/components/accounting/add-account-dialog.tsx(181,12): error TS2367: This comparison appears to be unintentional because the types '"cash"' and '"credit"' have no overlap.
+src/components/hr/add-employee-form.tsx(104,15): error TS2345: Argument of type '{ employee_number: string; english_name: string; chinese_name: string; password_hash: string; personal_info: { national_id: string; birthday: string; gender: "male" | "female"; phone: string; email: string; address: string; emergency_contact: { ...; }; }; job_info: { ...; }; salary_info: { ...; }; permissions: never...' is not assignable to parameter of type 'Omit<User, "id" | "createdAt" | "updatedAt">'.
+  Type '{ employee_number: string; english_name: string; chinese_name: string; password_hash: string; personal_info: { national_id: string; birthday: string; gender: "male" | "female"; phone: string; email: string; address: string; emergency_contact: { ...; }; }; job_info: { ...; }; salary_info: { ...; }; permissions: never...' is missing the following properties from type 'Omit<User, "id" | "createdAt" | "updatedAt">': employeeNumber, chineseName, englishName, personalInfo, and 4 more.
+src/components/hr/employee-expanded-view.tsx(131,27): error TS2322: Type '{ ref: RefObject<{ handleSave: () => void; } | null>; employee: User; isEditing: boolean; setIsEditing: Dispatch<SetStateAction<boolean>>; }' is not assignable to type 'IntrinsicAttributes & SalaryTabProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & SalaryTabProps'.
+src/components/hr/employee-expanded-view.tsx(135,31): error TS2322: Type '{ ref: RefObject<{ handleSave: () => void; } | null>; employee: User; isEditing: boolean; setIsEditing: Dispatch<SetStateAction<boolean>>; }' is not assignable to type 'IntrinsicAttributes & AttendanceTabProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & AttendanceTabProps'.
+src/components/hr/employee-expanded-view.tsx(137,30): error TS2322: Type '{ ref: RefObject<{ handleSave: () => void; } | null>; employee: User; isEditing: boolean; setIsEditing: Dispatch<SetStateAction<boolean>>; }' is not assignable to type 'IntrinsicAttributes & ContractsTabProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & ContractsTabProps'.
+src/components/hr/tabs/basic-info-tab.tsx(62,15): error TS2339: Property 'employeeNumber' does not exist on type '{ chineseName: string; englishName: string; personalInfo: { nationalId: string; birthday: string; gender: "male" | "female"; phone: string; email: string; address: string; emergencyContact: { ...; }; }; jobInfo: { ...; }; }'.
+src/components/hr/tabs/basic-info-tab.tsx(126,17): error TS2345: Argument of type '{ password_hash: string; }' is not assignable to parameter of type 'never'.
+src/components/members/excel-member-table.tsx(70,9): error TS2353: Object literal may only specify known properties, and 'isNew' does not exist in type '{ id: string; orderId: string; name: string; nameEn: string; birthday: string; passportNumber: string; passportExpiry: string; idNumber: string; gender: "" | "M" | "F"; age: number; assignedRoom?: string | undefined; ... 6 more ...; updatedAt: string; }'.
+src/components/members/excel-member-table.tsx(85,44): error TS2322: Type 'Promise<string>' is not assignable to type 'string'.
+src/components/members/excel-member-table.tsx(106,73): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'string'.
+src/components/members/member-table.tsx(57,9): error TS2353: Object literal may only specify known properties, and 'isNew' does not exist in type '{ id: string; orderId: string; name: string; nameEn: string; birthday: string; passportNumber: string; passportExpiry: string; idNumber: string; gender: "" | "M" | "F"; age: number; assignedRoom?: string | undefined; ... 6 more ...; updatedAt: string; }'.
+src/components/members/member-table.tsx(114,44): error TS2322: Type 'Promise<string>' is not assignable to type 'string'.
+src/components/members/member-table.tsx(186,11): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(188,22): error TS2304: Cannot find name 'startEditing'.
+src/components/members/member-table.tsx(196,30): error TS2304: Cannot find name 'addNewRow'.
+src/components/members/member-table.tsx(200,30): error TS2304: Cannot find name 'saveChanges'.
+src/components/members/member-table.tsx(201,16): error TS2304: Cannot find name 'Save'.
+src/components/members/member-table.tsx(204,30): error TS2304: Cannot find name 'cancelEditing'.
+src/components/members/member-table.tsx(205,16): error TS2304: Cannot find name 'X'.
+src/components/members/member-table.tsx(224,18): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(230,16): error TS2304: Cannot find name 'displayMembers'.
+src/components/members/member-table.tsx(230,36): error TS7006: Parameter 'member' implicitly has an 'any' type.
+src/components/members/member-table.tsx(230,44): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/members/member-table.tsx(239,36): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(246,24): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(249,44): error TS2304: Cannot find name 'updateEditingMember'.
+src/components/members/member-table.tsx(258,24): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(261,44): error TS2304: Cannot find name 'updateEditingMember'.
+src/components/members/member-table.tsx(270,24): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(274,44): error TS2304: Cannot find name 'updateEditingMember'.
+src/components/members/member-table.tsx(299,24): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(302,44): error TS2304: Cannot find name 'updateEditingMember'.
+src/components/members/member-table.tsx(314,24): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(317,44): error TS2304: Cannot find name 'updateEditingMember'.
+src/components/members/member-table.tsx(329,24): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(333,44): error TS2304: Cannot find name 'updateEditingMember'.
+src/components/members/member-table.tsx(340,22): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(343,42): error TS2304: Cannot find name 'deleteEditingMember'.
+src/components/members/member-table.tsx(355,17): error TS2304: Cannot find name 'isEditing'.
+src/components/members/member-table.tsx(355,30): error TS2304: Cannot find name 'displayMembers'.
+src/components/members/member-table.tsx(365,8): error TS2304: Cannot find name 'isEditing'.
+src/components/orders/expandable-order-table.tsx(314,31): error TS2322: Type '(ref: MemberTableRef | null) => MemberTableRef | null' is not assignable to type 'Ref<MemberTableRef> | undefined'.
+  Type '(ref: MemberTableRef | null) => MemberTableRef | null' is not assignable to type '(instance: MemberTableRef | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MemberTableRef | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/orders/order-kanban.tsx(35,35): error TS2367: This comparison appears to be unintentional because the types '"未收款" | "部分收款" | "已收款"' and 'PaymentStatus' have no overlap.
+src/components/orders/order-kanban.tsx(48,38): error TS2322: Type 'PaymentStatus' is not assignable to type '"未收款" | "部分收款" | "已收款" | undefined'.
+  Type '"待確認"' is not assignable to type '"未收款" | "部分收款" | "已收款" | undefined'.
+src/components/orders/order-kanban.tsx(103,92): error TS2367: This comparison appears to be unintentional because the types '"未收款" | "部分收款" | "已收款"' and '"已付款"' have no overlap.
+src/components/shared/react-datasheet-wrapper.tsx(608,10): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: DataSheetProps<any, string>, context: any): ReactDataSheet<any, string>', gave the following error.
+    Type '(cell: any, row: number, col: number) => React.JSX.Element | null' is not assignable to type 'ValueRenderer<any, string>'.
+      Type 'Element | null' is not assignable to type 'string | number | void | null'.
+        Type 'Element' is not assignable to type 'string | number | void | null'.
+  Overload 2 of 2, '(props: DataSheetProps<any, string>, context: any): ReactDataSheet<any, string>', gave the following error.
+    Type '(start: { i: number; j: number; }, end?: { i: number; j: number; }) => void' is not assignable to type '(selection: Selection) => void'.
+      Types of parameters 'start' and 'selection' are incompatible.
+        Type 'Selection' is missing the following properties from type '{ i: number; j: number; }': i, j
+src/components/shared/react-datasheet-wrapper.tsx(623,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/shared/react-datasheet-wrapper.tsx(630,25): error TS7006: Parameter 'props' implicitly has an 'any' type.
+src/components/shared/react-datasheet-wrapper.tsx(654,26): error TS7006: Parameter 'props' implicitly has an 'any' type.
+src/components/todos/todo-card-groups.tsx(265,29): error TS2339: Property 'description' does not exist on type 'Todo'.
+src/components/todos/todo-card-groups.tsx(267,33): error TS2339: Property 'description' does not exist on type 'Todo'.
+src/components/todos/todo-card-groups.tsx(287,32): error TS2367: This comparison appears to be unintentional because the types '"order" | "group" | "quote" | "invoice" | "receipt"' and '"tour"' have no overlap.
+src/components/todos/todo-card-groups.tsx(289,32): error TS2367: This comparison appears to be unintentional because the types '"order" | "group" | "quote" | "invoice" | "receipt"' and '"payment"' have no overlap.
+src/components/todos/todo-card-groups.tsx(290,32): error TS2367: This comparison appears to be unintentional because the types '"order" | "group" | "quote" | "invoice" | "receipt"' and '"visa"' have no overlap.
+src/components/tours/tour-costs.tsx(150,36): error TS2339: Property 'category' does not exist on type 'Payment'.
+src/components/tours/tour-costs.tsx(198,49): error TS2339: Property 'category' does not exist on type 'Payment'.
+src/components/tours/tour-costs.tsx(199,67): error TS2339: Property 'category' does not exist on type 'Payment'.
+src/components/tours/tour-costs.tsx(232,29): error TS2339: Property 'vendor' does not exist on type 'Payment'.
+src/components/tours/tour-members.tsx(135,31): error TS2345: Argument of type '{ id?: string | undefined; orderId: string; name: string; nameEn: string; birthday: string; passportNumber: string; passportExpiry: string; idNumber: string; gender: string; age: number; assignedRoom?: string | undefined; }' is not assignable to parameter of type 'Omit<Member, "id" | "createdAt" | "updatedAt">'.
+  Types of property 'gender' are incompatible.
+    Type 'string' is not assignable to type '"" | "M" | "F"'.
+src/components/tours/tour-members.tsx(138,44): error TS2322: Type 'Promise<string>' is not assignable to type 'string'.
+src/components/tours/tour-members.tsx(142,31): error TS2345: Argument of type '{ id?: string | undefined; orderId: string; name: string; nameEn: string; birthday: string; passportNumber: string; passportExpiry: string; idNumber: string; gender: string; age: number; assignedRoom?: string | undefined; }' is not assignable to parameter of type 'Partial<Member>'.
+  Types of property 'gender' are incompatible.
+    Type 'string' is not assignable to type '"" | "M" | "F" | undefined'.
+src/components/tours/tour-overview.tsx(24,29): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/components/tours/tour-payments.tsx(204,50): error TS2339: Property 'method' does not exist on type 'Payment'.
+src/components/tours/tour-payments.tsx(206,57): error TS2339: Property 'method' does not exist on type 'Payment'.
+src/components/ui/checkbox.tsx(12,17): error TS2339: Property 'indeterminate' does not exist on type 'Omit<CheckboxProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/components/ui/checkbox.tsx(19,27): error TS2339: Property 'indeterminate' does not exist on type 'HTMLButtonElement'.
+src/components/ui/combobox.tsx(284,19): error TS2322: Type '(el: HTMLButtonElement | null) => HTMLButtonElement | null' is not assignable to type 'Ref<HTMLButtonElement> | undefined'.
+  Type '(el: HTMLButtonElement | null) => HTMLButtonElement | null' is not assignable to type '(instance: HTMLButtonElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'HTMLButtonElement | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/ui/enhanced-table.tsx(274,21): error TS2322: Type '{ checked: boolean; indeterminate: boolean; onCheckedChange: () => void; }' is not assignable to type 'IntrinsicAttributes & Omit<CheckboxProps & RefAttributes<HTMLButtonElement>, "ref"> & RefAttributes<...>'.
+  Property 'indeterminate' does not exist on type 'IntrinsicAttributes & Omit<CheckboxProps & RefAttributes<HTMLButtonElement>, "ref"> & RefAttributes<...>'.
+src/components/workspace/BulletinBoard.tsx(84,7): error TS2322: Type '"announcement" | "notice" | "event"' is not assignable to type '"announcement"'.
+  Type '"notice"' is not assignable to type '"announcement"'.
+src/components/workspace/ChannelChat.tsx(104,5): error TS2339: Property 'updateChannel' does not exist on type 'WorkspaceState'.
+src/components/workspace/ChannelChat.tsx(105,5): error TS2339: Property 'deleteChannel' does not exist on type 'WorkspaceState'.
+src/components/workspace/ChannelChat.tsx(192,10): error TS2554: Expected 1 arguments, but got 2.
+src/components/workspace/ChannelChat.tsx(663,41): error TS2551: Property 'chineseName' does not exist on type '{ id: string; chinese_name: string; avatar?: string | undefined; }'. Did you mean 'chinese_name'?
+src/components/workspace/ChannelChat.tsx(671,44): error TS2551: Property 'chineseName' does not exist on type '{ id: string; chinese_name: string; avatar?: string | undefined; }'. Did you mean 'chinese_name'?
+src/components/workspace/PersonalCanvas.tsx(54,5): error TS2339: Property 'richDocuments' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(55,5): error TS2339: Property 'personalCanvases' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(57,5): error TS2339: Property 'loadRichDocuments' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(58,5): error TS2339: Property 'createRichDocument' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(59,5): error TS2339: Property 'updateRichDocument' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(60,5): error TS2339: Property 'deleteRichDocument' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(61,5): error TS2339: Property 'loadPersonalCanvases' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(62,5): error TS2339: Property 'createPersonalCanvas' does not exist on type 'WorkspaceState'.
+src/components/workspace/PersonalCanvas.tsx(82,47): error TS7006: Parameter 'canvas' implicitly has an 'any' type.
+src/components/workspace/PersonalCanvas.tsx(118,50): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/components/workspace/PersonalCanvas.tsx(129,53): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/components/workspace/PersonalCanvas.tsx(333,37): error TS7006: Parameter 'canvas' implicitly has an 'any' type.
+src/components/workspace/PersonalCanvas.tsx(426,23): error TS2322: Type 'unknown' is not assignable to type 'Key | null | undefined'.
+src/components/workspace/PersonalCanvas.tsx(426,33): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[] | undefined'.
+src/components/workspace/PersonalCanvas.tsx(426,45): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/workspace/PersonalCanvas.tsx(481,36): error TS7006: Parameter 'document' implicitly has an 'any' type.
+src/components/workspace/PersonalCanvas.tsx(536,60): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+src/components/workspace/QuickTools.tsx(151,18): error TS7053: Element implicitly has an 'any' type because expression of type '"TWD" | "JPY" | "EUR"' can't be used to index type '{ TWD: number; EUR: number; JPY: number; } | { USD: number; EUR: number; JPY: number; } | { USD: number; TWD: number; JPY: number; } | { USD: number; TWD: number; EUR: number; }'.
+  Property 'TWD' does not exist on type '{ TWD: number; EUR: number; JPY: number; } | { USD: number; EUR: number; JPY: number; } | { USD: number; TWD: number; JPY: number; } | { USD: number; TWD: number; EUR: number; }'.
+src/constants/styles.ts(16,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/core/services/base.service.ts(39,21): error TS2345: Argument of type 'Omit<T, keyof BaseEntity>' is not assignable to parameter of type 'Partial<T>'.
+  Type 'keyof T' is not assignable to type 'Exclude<keyof T, keyof BaseEntity>'.
+    Type 'string | number | symbol' is not assignable to type 'Exclude<keyof T, keyof BaseEntity>'.
+      Type 'string' is not assignable to type 'Exclude<keyof T, keyof BaseEntity>'.
+src/features/accounting/services/accounting.service.ts(9,13): error TS2425: Class 'BaseService<Account>' defines instance member property 'getStore', but extended class 'AccountingService' defines it as instance member function.
+src/features/accounting/services/accounting.service.ts(113,13): error TS2425: Class 'BaseService<Category>' defines instance member property 'getStore', but extended class 'CategoryService' defines it as instance member function.
+src/features/customers/services/customer.service.ts(9,13): error TS2425: Class 'BaseService<Customer>' defines instance member property 'getStore', but extended class 'CustomerService' defines it as instance member function.
+src/features/customers/services/customer.service.ts(40,14): error TS2339: Property 'idNumber' does not exist on type 'Partial<Customer>'.
+src/features/customers/services/customer.service.ts(40,53): error TS2339: Property 'idNumber' does not exist on type 'Partial<Customer>'.
+src/features/customers/services/customer.service.ts(67,9): error TS2339: Property 'idNumber' does not exist on type 'Customer'.
+src/features/customers/services/customer.service.ts(74,47): error TS2339: Property 'customerId' does not exist on type 'Order'.
+src/features/customers/services/customer.service.ts(80,42): error TS2339: Property 'isVIP' does not exist on type 'Customer'.
+src/features/index.ts(42,3): error TS2305: Module '"@/stores/types"' has no exported member 'Account'.
+src/features/index.ts(43,3): error TS2305: Module '"@/stores/types"' has no exported member 'Transaction'.
+src/features/index.ts(44,3): error TS2305: Module '"@/stores/types"' has no exported member 'Category'.
+src/features/orders/hooks/useOrders.ts(34,39): error TS2339: Property 'status' does not exist on type 'Order'.
+src/features/orders/services/order.service.ts(9,13): error TS2425: Class 'BaseService<Order>' defines instance member property 'getStore', but extended class 'OrderService' defines it as instance member function.
+src/features/orders/services/order.service.ts(44,35): error TS2339: Property 'status' does not exist on type 'Order'.
+src/features/orders/services/order.service.ts(46,39): error TS2339: Property 'status' does not exist on type 'Order'.
+src/features/orders/services/order.service.ts(51,39): error TS2339: Property 'customerId' does not exist on type 'Order'.
+src/features/orders/services/order.service.ts(57,22): error TS2339: Property 'status' does not exist on type 'Order'.
+src/features/orders/services/order.service.ts(57,44): error TS2339: Property 'status' does not exist on type 'Order'.
+src/features/payments/services/payment.service.ts(9,13): error TS2425: Class 'BaseService<PaymentRequest>' defines instance member property 'getStore', but extended class 'PaymentService' defines it as instance member function.
+src/features/quotes/services/quote.service.ts(10,13): error TS2425: Class 'BaseService<Quote>' defines instance member property 'getStore', but extended class 'QuoteService' defines it as instance member function.
+src/features/quotes/services/quote.service.ts(29,14): error TS2339: Property 'title' does not exist on type 'Partial<Quote>'.
+src/features/quotes/services/quote.service.ts(29,28): error TS2339: Property 'title' does not exist on type 'Partial<Quote>'.
+src/features/quotes/services/quote.service.ts(50,26): error TS2339: Property 'title' does not exist on type 'Quote'.
+src/features/quotes/services/quote.service.ts(72,18): error TS2322: Type 'QuoteVersion | { id: string; createdAt: string; data: { id: string; quoteNumber?: string | undefined; name: string; status: "提案" | "最終版本"; tourId?: string | undefined; customerName?: string | undefined; ... 14 more ...; updatedAt: string; }; }' is not assignable to type 'QuoteVersion'.
+  Type '{ id: string; createdAt: string; data: { id: string; quoteNumber?: string | undefined; name: string; status: "提案" | "最終版本"; tourId?: string | undefined; customerName?: string | undefined; contactPerson?: string | undefined; ... 13 more ...; updatedAt: string; }; }' is missing the following properties from type 'QuoteVersion': version, categories, totalCost
+src/features/quotes/services/quote.service.ts(72,47): error TS2739: Type '{ id: string; createdAt: string; data: { id: string; quoteNumber?: string | undefined; name: string; status: "提案" | "最終版本"; tourId?: string | undefined; customerName?: string | undefined; contactPerson?: string | undefined; ... 13 more ...; updatedAt: string; }; }' is missing the following properties from type 'QuoteVersion': version, categories, totalCost
+src/features/suppliers/hooks/useSuppliers.ts(49,49): error TS2339: Property 'category' does not exist on type 'Supplier'.
+src/features/suppliers/services/supplier.service.ts(9,13): error TS2425: Class 'BaseService<Supplier>' defines instance member property 'getStore', but extended class 'SupplierService' defines it as instance member function.
+src/features/suppliers/services/supplier.service.ts(32,14): error TS2339: Property 'email' does not exist on type 'Partial<Supplier>'.
+src/features/suppliers/services/supplier.service.ts(32,47): error TS2339: Property 'email' does not exist on type 'Partial<Supplier>'.
+src/features/suppliers/services/supplier.service.ts(36,14): error TS2339: Property 'phone' does not exist on type 'Partial<Supplier>'.
+src/features/suppliers/services/supplier.service.ts(36,47): error TS2339: Property 'phone' does not exist on type 'Partial<Supplier>'.
+src/features/suppliers/services/supplier.service.ts(51,45): error TS2339: Property 'category' does not exist on type 'Supplier'.
+src/features/suppliers/services/supplier.service.ts(53,42): error TS2339: Property 'category' does not exist on type 'Supplier'.
+src/features/suppliers/services/supplier.service.ts(58,42): error TS2339: Property 'isActive' does not exist on type 'Supplier'.
+src/features/suppliers/services/supplier.service.ts(66,9): error TS2339: Property 'contactPerson' does not exist on type 'Supplier'.
+src/features/suppliers/services/supplier.service.ts(67,9): error TS2339: Property 'email' does not exist on type 'Supplier'.
+src/features/todos/services/todo.service.ts(9,13): error TS2425: Class 'BaseService<Todo>' defines instance member property 'getStore', but extended class 'TodoService' defines it as instance member function.
+src/features/tours/hooks/useTours-advanced.ts(116,7): error TS2322: Type '(id: string) => Promise<void>' is not assignable to type '(id: string) => Promise<boolean>'.
+  Type 'Promise<void>' is not assignable to type 'Promise<boolean>'.
+    Type 'void' is not assignable to type 'boolean'.
+src/features/tours/services/tour.service.ts(16,13): error TS2425: Class 'BaseService<Tour>' defines instance member property 'getStore', but extended class 'TourService' defines it as instance member function.
+src/features/tours/services/tour.service.ts(157,47): error TS2339: Property 'currentParticipants' does not exist on type 'Tour'.
+src/features/tours/services/tour.service.ts(181,11): error TS2367: This comparison appears to be unintentional because the types '"提案" | "進行中" | "待結案" | "結案" | "特殊團"' and '"cancelled"' have no overlap.
+src/features/tours/services/tour.service.ts(185,11): error TS2367: This comparison appears to be unintentional because the types '"提案" | "進行中" | "待結案" | "結案" | "特殊團"' and '"completed"' have no overlap.
+src/features/tours/services/tour.service.ts(212,11): error TS2367: This comparison appears to be unintentional because the types '"提案" | "進行中" | "待結案" | "結案" | "特殊團"' and '"cancelled"' have no overlap.
+src/hooks/useCrudOperations.ts(7,21): error TS2352: Conversion of type 'Omit<T, "id" | "createdAt" | "updatedAt"> & { id: string; createdAt: string; updatedAt: string; }' to type 'T' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  'Omit<T, "id" | "createdAt" | "updatedAt"> & { id: string; createdAt: string; updatedAt: string; }' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint '{ id: string; }'.
+src/lib/error-handler.ts(77,29): error TS2339: Property 'field' does not exist on type 'ValidationError'.
+src/lib/error-handler.ts(81,30): error TS2339: Property 'resource' does not exist on type 'NotFoundError'.
+src/lib/error-handler.ts(81,53): error TS2339: Property 'id' does not exist on type 'NotFoundError'.
+src/lib/offline/sync-manager.ts(432,35): error TS2304: Cannot find name 'supabase'.
+src/lib/offline/sync-manager.ts(457,35): error TS2304: Cannot find name 'supabase'.
+src/lib/offline/sync-manager.ts(480,35): error TS2304: Cannot find name 'supabase'.
+src/lib/persistent-store.ts(104,23): error TS2352: Conversion of type 'Omit<T, "id" | "createdAt" | "updatedAt"> & { id: string; createdAt: string; updatedAt: string; }' to type 'T' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  'Omit<T, "id" | "createdAt" | "updatedAt"> & { id: string; createdAt: string; updatedAt: string; }' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint '{ id?: string | undefined; }'.
+src/lib/supabase/api.ts(94,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, string, never, "POST">', gave the following error.
+    Argument of type 'any[]' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, string, never, "POST">', gave the following error.
+    Argument of type 'any[]' is not assignable to parameter of type 'never[]'.
+      Type 'any' is not assignable to type 'never'.
+src/lib/supabase/api.ts(202,17): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+src/lib/supabase/api.ts(236,47): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+src/lib/supabase/api.ts(338,65): error TS2345: Argument of type '{ query: string; params: any[]; }' is not assignable to parameter of type 'undefined'.
+src/middleware.ts(32,35): error TS18048: 'authToken' is possibly 'undefined'.
+src/middleware.ts(41,29): error TS18047: 'user' is possibly 'null'.
+src/middleware.ts(89,39): error TS18047: 'user' is possibly 'null'.
+src/services/offline-auth.service.ts(303,47): error TS2304: Cannot find name 'supabase'.
+src/stores/accounting-store.ts(65,35): error TS2554: Expected 2 arguments, but got 1.
+src/stores/accounting-store.ts(74,7): error TS2322: Type '(id: string, accountData: Partial<Account>) => Promise<any> | undefined' is not assignable to type '(id: string, account: Partial<Account>) => Promise<Account | undefined>'.
+  Type 'Promise<any> | undefined' is not assignable to type 'Promise<Account | undefined>'.
+    Type 'undefined' is not assignable to type 'Promise<Account | undefined>'.
+src/stores/accounting-store.ts(77,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string & Omit<Account, "id" | "createdAt" | "updatedAt">'.
+  Type 'string' is not assignable to type 'Omit<Account, "id" | "createdAt" | "updatedAt">'.
+src/stores/accounting-store.ts(86,7): error TS2322: Type '(id: string) => false | Promise<any>' is not assignable to type '(id: string) => Promise<boolean>'.
+  Type 'false | Promise<any>' is not assignable to type 'Promise<boolean>'.
+    Type 'boolean' is not assignable to type 'Promise<boolean>'.
+src/stores/accounting-store.ts(96,35): error TS2554: Expected 2 arguments, but got 1.
+src/stores/accounting-store.ts(107,24): error TS2554: Expected 2 arguments, but got 0.
+src/stores/accounting-store.ts(114,26): error TS2554: Expected 2 arguments, but got 1.
+src/stores/accounting-store.ts(121,7): error TS2322: Type '(id: string, categoryData: Partial<Category>) => Promise<any> | undefined' is not assignable to type '(id: string, category: Partial<Category>) => Promise<Category | undefined>'.
+  Type 'Promise<any> | undefined' is not assignable to type 'Promise<Category | undefined>'.
+    Type 'undefined' is not assignable to type 'Promise<Category | undefined>'.
+src/stores/accounting-store.ts(124,41): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string & Omit<Category, "id" | "createdAt" | "updatedAt">'.
+  Type 'string' is not assignable to type 'Omit<Category, "id" | "createdAt" | "updatedAt">'.
+src/stores/accounting-store.ts(131,7): error TS2322: Type '(id: string) => false | Promise<any>' is not assignable to type '(id: string) => Promise<boolean>'.
+  Type 'false | Promise<any>' is not assignable to type 'Promise<boolean>'.
+    Type 'boolean' is not assignable to type 'Promise<boolean>'.
+src/stores/accounting-store.ts(139,26): error TS2554: Expected 2 arguments, but got 1.
+src/stores/accounting-store.ts(148,24): error TS2554: Expected 2 arguments, but got 0.
+src/stores/accounting-store.ts(165,17): error TS2551: Property 'updateAccountBalances' does not exist on type 'AccountingStore'. Did you mean 'getAccountBalance'?
+src/stores/accounting-store.ts(186,19): error TS2339: Property 'reverseAccountBalances' does not exist on type 'AccountingStore'.
+src/stores/accounting-store.ts(190,19): error TS2551: Property 'updateAccountBalances' does not exist on type 'AccountingStore'. Did you mean 'getAccountBalance'?
+src/stores/accounting-store.ts(202,19): error TS2339: Property 'reverseAccountBalances' does not exist on type 'AccountingStore'.
+src/stores/auth-store.ts(82,3): error TS2345: Argument of type 'StateCreator<AuthState, [], [["zustand/persist", { user: User | null; isAuthenticated: boolean; currentProfile: LocalProfile | null; sidebarCollapsed: boolean; isOfflineMode: boolean; }]]>' is not assignable to parameter of type 'StateCreator<AuthState, [], []>'.
+  Type 'StateCreator<AuthState, [], [["zustand/persist", { user: User | null; isAuthenticated: boolean; currentProfile: LocalProfile | null; sidebarCollapsed: boolean; isOfflineMode: boolean; }]]>' is not assignable to type '{ $$storeMutators?: [] | undefined; }'.
+    Types of property '$$storeMutators' are incompatible.
+      Type '[["zustand/persist", { user: User | null; isAuthenticated: boolean; currentProfile: LocalProfile | null; sidebarCollapsed: boolean; isOfflineMode: boolean; }]] | undefined' is not assignable to type '[] | undefined'.
+        Type '[["zustand/persist", { user: User | null; isAuthenticated: boolean; currentProfile: LocalProfile | null; sidebarCollapsed: boolean; isOfflineMode: boolean; }]]' is not assignable to type '[]'.
+          Source has 1 element(s) but target allows only 0.
+src/stores/auth-store.ts(139,15): error TS2322: Type '"active" | "inactive" | "suspended"' is not assignable to type '"probation" | "active" | "leave" | "terminated"'.
+  Type '"inactive"' is not assignable to type '"probation" | "active" | "leave" | "terminated"'. Did you mean '"active"'?
+src/stores/auth-store.ts(197,15): error TS2322: Type '"active" | "inactive" | "suspended"' is not assignable to type '"probation" | "active" | "leave" | "terminated"'.
+  Type '"inactive"' is not assignable to type '"probation" | "active" | "leave" | "terminated"'. Did you mean '"active"'?
+src/stores/order-store.ts(18,19): error TS2739: Type '{ orders: never[]; }' is missing the following properties from type 'OrderState': addOrder, updateOrder, deleteOrder, loadOrders
+src/stores/payment-store.ts(53,7): error TS2322: Type '(requestData: Omit<PaymentRequest, "id" | "createdAt" | "updatedAt" | "requestNumber">) => PaymentRequest' is not assignable to type '(request: Omit<PaymentRequest, "id" | "createdAt" | "updatedAt" | "requestNumber">) => Promise<PaymentRequest>'.
+  Type 'PaymentRequest' is missing the following properties from type 'Promise<PaymentRequest>': then, catch, finally, [Symbol.toStringTag]
+src/stores/quote-store.ts(29,7): error TS2322: Type '(id: string) => Promise<Quote> | undefined' is not assignable to type '(id: string) => Quote | undefined'.
+  Type 'Promise<Quote> | undefined' is not assignable to type 'Quote | undefined'.
+    Type 'Promise<Quote>' is missing the following properties from type 'Quote': id, name, status, groupSize, and 5 more.
+src/stores/quote-store.ts(36,32): error TS2339: Property 'title' does not exist on type 'Quote'.
+src/stores/quote-store.ts(37,13): error TS2322: Type '"草稿"' is not assignable to type '"提案" | "最終版本"'.
+src/stores/quote-store.ts(50,7): error TS2322: Type '(id: string, updates: Partial<Quote>) => Promise<Quote | undefined> | undefined' is not assignable to type '(id: string, updates: Partial<Quote>) => Quote | undefined'.
+  Type 'Promise<Quote | undefined> | undefined' is not assignable to type 'Quote | undefined'.
+    Type 'Promise<Quote | undefined>' is missing the following properties from type 'Quote': id, name, status, groupSize, and 5 more.
+src/stores/quote-store.ts(63,24): error TS2322: Type 'QuoteVersion | { id: string; createdAt: string; data: { id: string; quoteNumber?: string | undefined; name: string; status: "提案" | "最終版本"; tourId?: string | undefined; customerName?: string | undefined; ... 14 more ...; updatedAt: string; }; }' is not assignable to type 'QuoteVersion'.
+  Type '{ id: string; createdAt: string; data: { id: string; quoteNumber?: string | undefined; name: string; status: "提案" | "最終版本"; tourId?: string | undefined; customerName?: string | undefined; contactPerson?: string | undefined; ... 13 more ...; updatedAt: string; }; }' is missing the following properties from type 'QuoteVersion': version, categories, totalCost
+src/stores/quote-store.ts(63,53): error TS2739: Type '{ id: string; createdAt: string; data: { id: string; quoteNumber?: string | undefined; name: string; status: "提案" | "最終版本"; tourId?: string | undefined; customerName?: string | undefined; contactPerson?: string | undefined; ... 13 more ...; updatedAt: string; }; }' is missing the following properties from type 'QuoteVersion': version, categories, totalCost
+src/stores/supplier-store.ts(30,19): error TS2739: Type '{ setSelectedSupplier: (supplier: Supplier | null) => unknown; addPriceListItem: (supplierId: string, itemData: Omit<PriceListItem, "id" | "createdAt">) => void; ... 6 more ...; selectedSupplier: null; }' is missing the following properties from type 'SupplierState': addSupplier, updateSupplier, deleteSupplier, loadSuppliers
+src/stores/timebox-store-supabase.ts(411,5): error TS2322: Type 'Date | null' is not assignable to type 'Date'.
+  Type 'null' is not assignable to type 'Date'.
+src/stores/timebox-store.ts(283,13): error TS2322: Type 'Date | null' is not assignable to type 'Date'.
+  Type 'null' is not assignable to type 'Date'.
+src/stores/todo-store.ts(21,5): error TS2345: Argument of type '(set: { (partial: TodoState | Partial<TodoState> | ((state: TodoState) => TodoState | Partial<TodoState>), replace?: false | undefined): unknown; (state: TodoState | ((state: TodoState) => TodoState), replace: true): unknown; }, get: () => TodoState) => { ...; }' is not assignable to parameter of type 'StateCreator<TodoState, [["zustand/persist", unknown]], []>'.
+  Type '(set: { (partial: TodoState | Partial<TodoState> | ((state: TodoState) => TodoState | Partial<TodoState>), replace?: false | undefined): unknown; (state: TodoState | ((state: TodoState) => TodoState), replace: true): unknown; }, get: () => TodoState) => { ...; }' is not assignable to type '(setState: { (partial: TodoState | Partial<TodoState> | ((state: TodoState) => TodoState | Partial<TodoState>), replace?: false | undefined): unknown; (state: TodoState | ((state: TodoState) => TodoState), replace: true): unknown; }, getState: () => TodoState, store: WithPersist<...>) => TodoState'.
+    Call signature return types '{ todos: never[]; addTodo: (data: Omit<Todo, "id" | "visibility" | "createdAt" | "updatedAt" | "creator">) => Promise<Todo>; updateTodo: (id: string, updates: Partial<...>) => Promise<...>; deleteTodo: ((data: Omit<...>) => Promise<...>) | ((id: string, data: Partial<...>) => Promise<...>); loadTodos: (userId?: stri...' and 'TodoState' are incompatible.
+      The types of 'deleteTodo' are incompatible between these types.
+        Type '((data: Omit<Todo, "id" | "createdAt" | "updatedAt">) => Promise<Todo>) | ((id: string, data: Partial<Todo>) => Promise<any>)' is not assignable to type '(id: string) => Promise<boolean>'.
+          Type '(data: Omit<Todo, "id" | "createdAt" | "updatedAt">) => Promise<Todo>' is not assignable to type '(id: string) => Promise<boolean>'.
+            Types of parameters 'data' and 'id' are incompatible.
+              Type 'string' is not assignable to type 'Omit<Todo, "id" | "createdAt" | "updatedAt">'.
+src/stores/todo-store.ts(105,23): error TS2339: Property 'progress' does not exist on type 'Partial<Todo>'.
+src/stores/todo-store.ts(126,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string & Omit<Todo, "id" | "createdAt" | "updatedAt">'.
+  Type 'string' is not assignable to type 'Omit<Todo, "id" | "createdAt" | "updatedAt">'.
+src/stores/todo-store.ts(158,25): error TS2339: Property 'deleted' does not exist on type 'Todo'.
+src/stores/tour-store.ts(5,10): error TS2305: Module '"@/lib/persistent-store"' has no exported member 'createPersistentStore'.
+src/stores/tour-store.ts(57,3): error TS2345: Argument of type 'StateCreator<TourState, [], [["zustand/persist", TourState]]>' is not assignable to parameter of type 'StateCreator<TourState, [], []>'.
+  Type 'StateCreator<TourState, [], [["zustand/persist", TourState]]>' is not assignable to type '{ $$storeMutators?: [] | undefined; }'.
+    Types of property '$$storeMutators' are incompatible.
+      Type '[["zustand/persist", TourState]] | undefined' is not assignable to type '[] | undefined'.
+        Type '[["zustand/persist", TourState]]' is not assignable to type '[]'.
+          Source has 1 element(s) but target allows only 0.
+src/stores/tour-store.ts(58,19): error TS2740: Type '{ setSelectedTour: (tour: Tour | null) => unknown; createTourFromQuote: (quoteId: string, tourData: Partial<Tour>) => string; updateOrderMemberCount: (orderId: string) => unknown; ... 6 more ...; selectedTour: null; }' is missing the following properties from type 'TourState': addTour, updateTour, deleteTour, loadTours, and 20 more.
+src/stores/tour-store.ts(81,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Date'.
+src/stores/visa-store.ts(20,19): error TS2739: Type '{ getVisaById: (id: string) => Visa | undefined; getVisasByTour: (tourId: string) => Visa[]; getVisasByStatus: (status: "待送件" | "已送件" | "已下件" | "已取件" | "退件") => Visa[]; batchUpdateStatus: (ids: string[], status: "待送件" | ... 3 more ... | "退件", date: string | undefined) => void; visas: never[]; }' is missing the following properties from type 'VisaStore': addVisa, updateVisa, deleteVisa, loadVisas
