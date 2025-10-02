@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { MainLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { AutoSyncProvider } from "@/lib/offline/auto-sync-provider";
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -33,9 +34,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <MainLayout>
-            {children}
-          </MainLayout>
+          <AutoSyncProvider enabled={true} interval={30000}>
+            <MainLayout>
+              {children}
+            </MainLayout>
+          </AutoSyncProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { useOfflineSync } from '@/lib/offline/sync-manager';
+import { useAutoSync } from '@/lib/offline/auto-sync-provider';
 import { Wifi, WifiOff } from 'lucide-react';
 
 interface MenuItem {
@@ -147,7 +147,9 @@ export function Sidebar() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showSyncTooltip, setShowSyncTooltip] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { isOnline, hasPendingChanges, pendingCount } = useOfflineSync();
+  const { syncStatus, isOnline } = useAutoSync();
+  const pendingCount = syncStatus?.pendingCount || 0;
+  const hasPendingChanges = pendingCount > 0;
 
   // 確保組件已掛載
   useEffect(() => {
