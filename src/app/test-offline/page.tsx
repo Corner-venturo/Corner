@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getOfflineManager } from '@/lib/offline/offline-manager'
-import { Database, CheckCircle, XCircle, Loader2, Trash2 } from 'lucide-react'
+import { getSyncEngine, SyncStatus } from '@/lib/offline/sync-engine'
+import { Database, CheckCircle, XCircle, Loader2, Trash2, RefreshCw } from 'lucide-react'
 
 interface TestResult {
   name: string
@@ -16,13 +17,17 @@ interface TestResult {
 export default function TestOfflinePage() {
   const [results, setResults] = useState<TestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [stats, setStats] = useState<any>(null)
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [offlineManager, setOfflineManager] = useState<any>(null)
+  const [syncEngine, setSyncEngine] = useState<any>(null)
 
   useEffect(() => {
-    // 只在客戶端初始化 OfflineManager
+    // 只在客戶端初始化 OfflineManager 和 SyncEngine
     if (typeof window !== 'undefined') {
       setOfflineManager(getOfflineManager())
+      setSyncEngine(getSyncEngine())
     }
   }, [])
 
@@ -157,12 +162,44 @@ export default function TestOfflinePage() {
     }
   }
 
+  const handleSync = async () => {
+    if (!syncEngine) {
+      alert('SyncEngine 尚未初始化')
+      return
+    }
+
+    setIsSyncing(true)
+    try {
+      const status = await syncEngine.manualSync()
+      setSyncStatus(status)
+
+      // 更新統計資料
+      if (offlineManager) {
+        const newStats = await offlineManager.getStats()
+        setStats(newStats)
+      }
+
+      if (status.completedCount > 0) {
+        alert(`✅ 同步完成：${status.completedCount} 筆成功`)
+      } else if (status.pendingCount === 0) {
+        alert('✅ 沒有待同步項目')
+      }
+    } catch (error) {
+      alert('同步失敗: ' + (error instanceof Error ? error.message : '未知錯誤'))
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
   useEffect(() => {
-    // 載入初始統計資料
+    // 載入初始統計資料和同步狀態
     if (offlineManager) {
       offlineManager.getStats().then(setStats)
     }
-  }, [offlineManager])
+    if (syncEngine) {
+      syncEngine.getStatus().then(setSyncStatus)
+    }
+  }, [offlineManager, syncEngine])
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -227,6 +264,25 @@ export default function TestOfflinePage() {
                 </>
               ) : (
                 '開始測試'
+              )}
+            </Button>
+            <Button
+              onClick={handleSync}
+              disabled={isSyncing}
+              variant="outline"
+              className="w-full"
+              size="lg"
+            >
+              {isSyncing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  同步中...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  手動同步
+                </>
               )}
             </Button>
             <Button

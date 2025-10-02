@@ -72,6 +72,12 @@ export class OfflineDatabase {
    * 初始化資料庫
    */
   private async init(): Promise<void> {
+    // 檢查是否在瀏覽器環境
+    if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+      console.warn('⚠️ IndexedDB 不可用（非瀏覽器環境）')
+      return Promise.resolve()
+    }
+
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
 

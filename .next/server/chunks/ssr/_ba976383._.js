@@ -345,37 +345,13 @@ class OfflineDatabase {
     /**
    * 初始化資料庫
    */ async init() {
-        return new Promise((resolve, reject)=>{
-            const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
-            request.onerror = ()=>{
-                console.error('❌ IndexedDB 初始化失敗:', request.error);
-                reject(request.error);
-            };
-            request.onsuccess = ()=>{
-                this.db = request.result;
-                console.log('✅ IndexedDB 初始化成功');
-                resolve();
-            };
-            request.onupgradeneeded = (event)=>{
-                const db = event.target.result;
-                // 建立所有 Object Stores 和索引
-                Object.entries(DB_CONFIG.stores).forEach(([storeName, config])=>{
-                    if (!db.objectStoreNames.contains(storeName)) {
-                        const objectStore = db.createObjectStore(storeName, {
-                            keyPath: config.keyPath,
-                            autoIncrement: false
-                        });
-                        // 建立索引
-                        config.indexes.forEach((indexName)=>{
-                            objectStore.createIndex(indexName, indexName, {
-                                unique: false
-                            });
-                        });
-                        console.log(`✅ 建立 ObjectStore: ${storeName}`);
-                    }
-                });
-            };
-        });
+        // 檢查是否在瀏覽器環境
+        if ("TURBOPACK compile-time truthy", 1) {
+            console.warn('⚠️ IndexedDB 不可用（非瀏覽器環境）');
+            return Promise.resolve();
+        }
+        //TURBOPACK unreachable
+        ;
     }
     /**
    * 確保資料庫已初始化
@@ -617,7 +593,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$uni
 ;
 class OfflineManager {
     db = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$offline$2d$database$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getOfflineDB"])();
-    localStorage = window.localStorage;
+    localStorage = ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : null;
     /**
    * 建立資料 (新增)
    */ async create(storeName, data) {
@@ -779,6 +755,7 @@ class OfflineManager {
     /**
    * 儲存設定到 localStorage
    */ saveSetting(key, value) {
+        if (!this.localStorage) return;
         try {
             this.localStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
@@ -788,6 +765,7 @@ class OfflineManager {
     /**
    * 從 localStorage 讀取設定
    */ getSetting(key, defaultValue) {
+        if (!this.localStorage) return defaultValue || null;
         try {
             const value = this.localStorage.getItem(key);
             return value ? JSON.parse(value) : defaultValue || null;
@@ -799,6 +777,7 @@ class OfflineManager {
     /**
    * 刪除 localStorage 設定
    */ removeSetting(key) {
+        if (!this.localStorage) return;
         this.localStorage.removeItem(key);
     }
     // ===========================
@@ -842,6 +821,238 @@ function getOfflineManager() {
     return offlineManager;
 }
 }),
+"[project]/src/lib/offline/sync-engine.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * 🔄 Venturo v4.0 - 同步引擎
+ *
+ * 功能：
+ * - 處理同步佇列
+ * - 上傳本地變更到 Supabase
+ * - 下載雲端變更到本地
+ * - 衝突處理
+ */ __turbopack_context__.s([
+    "SyncEngine",
+    ()=>SyncEngine,
+    "clearSyncQueue",
+    ()=>clearSyncQueue,
+    "getSyncEngine",
+    ()=>getSyncEngine,
+    "manualSync",
+    ()=>manualSync
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$offline$2d$manager$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/offline/offline-manager.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$unified$2d$types$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/offline/unified-types.ts [app-ssr] (ecmascript)");
+;
+;
+const DEFAULT_CONFIG = {
+    enableAutoSync: false,
+    syncInterval: 30000,
+    batchSize: 10,
+    maxRetries: 3
+};
+class SyncEngine {
+    offlineManager = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$offline$2d$manager$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getOfflineManager"])();
+    config = DEFAULT_CONFIG;
+    syncTimer = null;
+    isSyncing = false;
+    hasSupabase = false;
+    constructor(config){
+        if (config) {
+            this.config = {
+                ...DEFAULT_CONFIG,
+                ...config
+            };
+        }
+        // 檢查 Supabase 是否配置
+        this.checkSupabaseAvailability();
+    }
+    /**
+   * 檢查 Supabase 是否可用
+   */ checkSupabaseAvailability() {
+        if ("TURBOPACK compile-time truthy", 1) return;
+        //TURBOPACK unreachable
+        ;
+        const supabaseUrl = undefined;
+        const supabaseKey = undefined;
+    }
+    /**
+   * 開始自動同步
+   */ startAutoSync() {
+        if (this.syncTimer) return;
+        console.log('🔄 啟動自動同步，間隔:', this.config.syncInterval / 1000, '秒');
+        this.syncTimer = setInterval(()=>{
+            this.syncAll().catch((error)=>{
+                console.error('自動同步失敗:', error);
+            });
+        }, this.config.syncInterval);
+        // 立即執行一次
+        this.syncAll().catch((error)=>{
+            console.error('初始同步失敗:', error);
+        });
+    }
+    /**
+   * 停止自動同步
+   */ stopAutoSync() {
+        if (this.syncTimer) {
+            clearInterval(this.syncTimer);
+            this.syncTimer = null;
+            console.log('⏸️ 停止自動同步');
+        }
+    }
+    /**
+   * 同步所有待處理項目
+   */ async syncAll() {
+        if (this.isSyncing) {
+            console.log('⏳ 同步進行中，跳過本次');
+            return this.getStatus();
+        }
+        this.isSyncing = true;
+        const status = {
+            isSyncing: true,
+            lastSyncTime: new Date().toISOString(),
+            pendingCount: 0,
+            completedCount: 0,
+            failedCount: 0,
+            errors: []
+        };
+        try {
+            // 取得待同步項目
+            const pendingItems = await this.offlineManager.getPendingSyncItems();
+            status.pendingCount = pendingItems.length;
+            if (pendingItems.length === 0) {
+                console.log('✅ 沒有待同步項目');
+                return status;
+            }
+            console.log(`🔄 開始同步 ${pendingItems.length} 筆資料`);
+            // 批次處理
+            const batches = this.createBatches(pendingItems, this.config.batchSize);
+            for (const batch of batches){
+                for (const item of batch){
+                    try {
+                        await this.syncItem(item);
+                        status.completedCount++;
+                    } catch (error) {
+                        status.failedCount++;
+                        status.errors.push(`${item.tableName}/${item.recordId}: ${error instanceof Error ? error.message : '未知錯誤'}`);
+                    }
+                }
+            }
+            // 清理已完成的同步項目
+            await this.offlineManager.clearCompletedSync();
+            console.log(`✅ 同步完成: ${status.completedCount} 成功, ${status.failedCount} 失敗`);
+            return status;
+        } catch (error) {
+            console.error('❌ 同步過程發生錯誤:', error);
+            status.errors.push(error instanceof Error ? error.message : '未知錯誤');
+            return status;
+        } finally{
+            this.isSyncing = false;
+        }
+    }
+    /**
+   * 同步單個項目
+   */ async syncItem(item) {
+        if (!this.hasSupabase) {
+            // 模擬同步模式：直接標記為完成
+            await this.offlineManager.markSyncCompleted(item.id);
+            console.log(`✅ [模擬] 同步完成:`, item.operation, item.tableName, item.recordId);
+            return;
+        }
+        // 真實 Supabase 同步邏輯
+        try {
+            // 轉換資料格式：camelCase -> snake_case
+            const supabaseData = item.data ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$unified$2d$types$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toSupabase"])(item.data) : null;
+            switch(item.operation){
+                case 'create':
+                    if (supabaseData) {
+                        // await supabase.from(item.tableName).insert(supabaseData)
+                        console.log(`✅ 建立:`, item.tableName, item.recordId);
+                    }
+                    break;
+                case 'update':
+                    if (supabaseData) {
+                        // await supabase.from(item.tableName).update(supabaseData).eq('id', item.recordId)
+                        console.log(`✅ 更新:`, item.tableName, item.recordId);
+                    }
+                    break;
+                case 'delete':
+                    // await supabase.from(item.tableName).delete().eq('id', item.recordId)
+                    console.log(`✅ 刪除:`, item.tableName, item.recordId);
+                    break;
+            }
+            // 標記為完成
+            await this.offlineManager.markSyncCompleted(item.id);
+        } catch (error) {
+            // 重試邏輯
+            if (item.retryCount < this.config.maxRetries) {
+                await this.offlineManager.markSyncFailed(item.id, error instanceof Error ? error.message : '未知錯誤');
+            } else {
+                console.error(`❌ 同步失敗（已達最大重試次數）:`, item.tableName, item.recordId);
+                throw error;
+            }
+        }
+    }
+    /**
+   * 取得同步狀態
+   */ async getStatus() {
+        const pendingItems = await this.offlineManager.getPendingSyncItems();
+        return {
+            isSyncing: this.isSyncing,
+            lastSyncTime: undefined,
+            pendingCount: pendingItems.length,
+            completedCount: 0,
+            failedCount: 0,
+            errors: []
+        };
+    }
+    /**
+   * 手動觸發同步
+   */ async manualSync() {
+        console.log('🔄 手動觸發同步');
+        return await this.syncAll();
+    }
+    /**
+   * 建立批次
+   */ createBatches(items, batchSize) {
+        const batches = [];
+        for(let i = 0; i < items.length; i += batchSize){
+            batches.push(items.slice(i, i + batchSize));
+        }
+        return batches;
+    }
+    /**
+   * 清空所有待同步項目（僅用於測試）
+   */ async clearAllPending() {
+        const pendingItems = await this.offlineManager.getPendingSyncItems();
+        for (const item of pendingItems){
+            await this.offlineManager.markSyncCompleted(item.id);
+        }
+        await this.offlineManager.clearCompletedSync();
+        console.log(`🗑️ 清空 ${pendingItems.length} 筆待同步項目`);
+        return pendingItems.length;
+    }
+}
+// ===========================
+// 單例模式
+// ===========================
+let syncEngine = null;
+function getSyncEngine(config) {
+    if (!syncEngine) {
+        syncEngine = new SyncEngine(config);
+    }
+    return syncEngine;
+}
+async function clearSyncQueue() {
+    const engine = getSyncEngine();
+    return await engine.clearAllPending();
+}
+async function manualSync() {
+    const engine = getSyncEngine();
+    return await engine.manualSync();
+}
+}),
 "[project]/src/app/test-offline/page.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -854,12 +1065,15 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/button.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/card.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$offline$2d$manager$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/offline/offline-manager.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$offline$2f$sync$2d$engine$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/offline/sync-engine.ts [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$database$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Database$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/database.js [app-ssr] (ecmascript) <export default as Database>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2d$big$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-check-big.js [app-ssr] (ecmascript) <export default as CheckCircle>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__XCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-x.js [app-ssr] (ecmascript) <export default as XCircle>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.js [app-ssr] (ecmascript) <export default as Loader2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.js [app-ssr] (ecmascript) <export default as Trash2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$refresh$2d$cw$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__RefreshCw$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/refresh-cw.js [app-ssr] (ecmascript) <export default as RefreshCw>");
 'use client';
+;
 ;
 ;
 ;
@@ -869,10 +1083,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 function TestOfflinePage() {
     const [results, setResults] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [isRunning, setIsRunning] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isSyncing, setIsSyncing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [stats, setStats] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [syncStatus, setSyncStatus] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [offlineManager, setOfflineManager] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [syncEngine, setSyncEngine] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        // 只在客戶端初始化 OfflineManager
+        // 只在客戶端初始化 OfflineManager 和 SyncEngine
         if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
         ;
     }, []);
@@ -1050,13 +1267,42 @@ function TestOfflinePage() {
             alert('清空失敗: ' + (error instanceof Error ? error.message : '未知錯誤'));
         }
     };
+    const handleSync = async ()=>{
+        if (!syncEngine) {
+            alert('SyncEngine 尚未初始化');
+            return;
+        }
+        setIsSyncing(true);
+        try {
+            const status = await syncEngine.manualSync();
+            setSyncStatus(status);
+            // 更新統計資料
+            if (offlineManager) {
+                const newStats = await offlineManager.getStats();
+                setStats(newStats);
+            }
+            if (status.completedCount > 0) {
+                alert(`✅ 同步完成：${status.completedCount} 筆成功`);
+            } else if (status.pendingCount === 0) {
+                alert('✅ 沒有待同步項目');
+            }
+        } catch (error) {
+            alert('同步失敗: ' + (error instanceof Error ? error.message : '未知錯誤'));
+        } finally{
+            setIsSyncing(false);
+        }
+    };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        // 載入初始統計資料
+        // 載入初始統計資料和同步狀態
         if (offlineManager) {
             offlineManager.getStats().then(setStats);
         }
+        if (syncEngine) {
+            syncEngine.getStatus().then(setSyncStatus);
+        }
     }, [
-        offlineManager
+        offlineManager,
+        syncEngine
     ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "container mx-auto p-6 max-w-6xl",
@@ -1071,14 +1317,14 @@ function TestOfflinePage() {
                                 className: "h-8 w-8"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 172,
+                                lineNumber: 208,
                                 columnNumber: 11
                             }, this),
                             "離線架構測試"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/test-offline/page.tsx",
-                        lineNumber: 171,
+                        lineNumber: 207,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1086,13 +1332,13 @@ function TestOfflinePage() {
                         children: "測試 OfflineManager 的 CRUD 操作、索引查詢、同步佇列等功能"
                     }, void 0, false, {
                         fileName: "[project]/src/app/test-offline/page.tsx",
-                        lineNumber: 175,
+                        lineNumber: 211,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/test-offline/page.tsx",
-                lineNumber: 170,
+                lineNumber: 206,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1106,20 +1352,20 @@ function TestOfflinePage() {
                                         children: "資料統計"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/test-offline/page.tsx",
-                                        lineNumber: 183,
+                                        lineNumber: 219,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "IndexedDB 儲存狀態"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/test-offline/page.tsx",
-                                        lineNumber: 184,
+                                        lineNumber: 220,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 182,
+                                lineNumber: 218,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1134,7 +1380,7 @@ function TestOfflinePage() {
                                                     children: "Tours:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 190,
+                                                    lineNumber: 226,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1145,13 +1391,13 @@ function TestOfflinePage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 191,
+                                                    lineNumber: 227,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                            lineNumber: 189,
+                                            lineNumber: 225,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1162,7 +1408,7 @@ function TestOfflinePage() {
                                                     children: "Orders:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 194,
+                                                    lineNumber: 230,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1173,13 +1419,13 @@ function TestOfflinePage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 195,
+                                                    lineNumber: 231,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 229,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1190,7 +1436,7 @@ function TestOfflinePage() {
                                                     children: "Quotes:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 198,
+                                                    lineNumber: 234,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1201,13 +1447,13 @@ function TestOfflinePage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 199,
+                                                    lineNumber: 235,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                            lineNumber: 197,
+                                            lineNumber: 233,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1218,7 +1464,7 @@ function TestOfflinePage() {
                                                     children: "待同步:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 202,
+                                                    lineNumber: 238,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1229,37 +1475,37 @@ function TestOfflinePage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 203,
+                                                    lineNumber: 239,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                            lineNumber: 201,
+                                            lineNumber: 237,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                    lineNumber: 188,
+                                    lineNumber: 224,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-muted-foreground",
                                     children: "載入中..."
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                    lineNumber: 207,
+                                    lineNumber: 243,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 186,
+                                lineNumber: 222,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/test-offline/page.tsx",
-                        lineNumber: 181,
+                        lineNumber: 217,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1270,20 +1516,20 @@ function TestOfflinePage() {
                                         children: "測試控制"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/test-offline/page.tsx",
-                                        lineNumber: 214,
+                                        lineNumber: 250,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "執行測試或清空資料"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/test-offline/page.tsx",
-                                        lineNumber: 215,
+                                        lineNumber: 251,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 213,
+                                lineNumber: 249,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1300,7 +1546,7 @@ function TestOfflinePage() {
                                                     className: "mr-2 h-4 w-4 animate-spin"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 226,
+                                                    lineNumber: 262,
                                                     columnNumber: 19
                                                 }, this),
                                                 "測試執行中..."
@@ -1308,7 +1554,41 @@ function TestOfflinePage() {
                                         }, void 0, true) : '開始測試'
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/test-offline/page.tsx",
-                                        lineNumber: 218,
+                                        lineNumber: 254,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                        onClick: handleSync,
+                                        disabled: isSyncing,
+                                        variant: "outline",
+                                        className: "w-full",
+                                        size: "lg",
+                                        children: isSyncing ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                    className: "mr-2 h-4 w-4 animate-spin"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/test-offline/page.tsx",
+                                                    lineNumber: 278,
+                                                    columnNumber: 19
+                                                }, this),
+                                                "同步中..."
+                                            ]
+                                        }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$refresh$2d$cw$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__RefreshCw$3e$__["RefreshCw"], {
+                                                    className: "mr-2 h-4 w-4"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/test-offline/page.tsx",
+                                                    lineNumber: 283,
+                                                    columnNumber: 19
+                                                }, this),
+                                                "手動同步"
+                                            ]
+                                        }, void 0, true)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/test-offline/page.tsx",
+                                        lineNumber: 269,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1321,32 +1601,32 @@ function TestOfflinePage() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                                lineNumber: 239,
+                                                lineNumber: 294,
                                                 columnNumber: 15
                                             }, this),
                                             "清空所有資料"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/test-offline/page.tsx",
-                                        lineNumber: 233,
+                                        lineNumber: 288,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 217,
+                                lineNumber: 253,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/test-offline/page.tsx",
-                        lineNumber: 212,
+                        lineNumber: 248,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/test-offline/page.tsx",
-                lineNumber: 180,
+                lineNumber: 216,
                 columnNumber: 7
             }, this),
             results.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1357,7 +1637,7 @@ function TestOfflinePage() {
                                 children: "測試結果"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 249,
+                                lineNumber: 304,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -1368,13 +1648,13 @@ function TestOfflinePage() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/test-offline/page.tsx",
-                                lineNumber: 250,
+                                lineNumber: 305,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/test-offline/page.tsx",
-                        lineNumber: 248,
+                        lineNumber: 303,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1390,21 +1670,21 @@ function TestOfflinePage() {
                                                     className: "h-5 w-5 animate-spin text-blue-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 261,
+                                                    lineNumber: 316,
                                                     columnNumber: 23
                                                 }, this),
                                                 result.status === 'success' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2d$big$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle$3e$__["CheckCircle"], {
                                                     className: "h-5 w-5 text-green-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 264,
+                                                    lineNumber: 319,
                                                     columnNumber: 23
                                                 }, this),
                                                 result.status === 'error' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__XCircle$3e$__["XCircle"], {
                                                     className: "h-5 w-5 text-red-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 267,
+                                                    lineNumber: 322,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1414,7 +1694,7 @@ function TestOfflinePage() {
                                                             children: result.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                                            lineNumber: 270,
+                                                            lineNumber: 325,
                                                             columnNumber: 23
                                                         }, this),
                                                         result.message && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1422,19 +1702,19 @@ function TestOfflinePage() {
                                                             children: result.message
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                                            lineNumber: 272,
+                                                            lineNumber: 327,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                                    lineNumber: 269,
+                                                    lineNumber: 324,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                            lineNumber: 259,
+                                            lineNumber: 314,
                                             columnNumber: 19
                                         }, this),
                                         result.duration !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1445,35 +1725,35 @@ function TestOfflinePage() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/test-offline/page.tsx",
-                                            lineNumber: 277,
+                                            lineNumber: 332,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, index, true, {
                                     fileName: "[project]/src/app/test-offline/page.tsx",
-                                    lineNumber: 255,
+                                    lineNumber: 310,
                                     columnNumber: 17
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/src/app/test-offline/page.tsx",
-                            lineNumber: 253,
+                            lineNumber: 308,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/test-offline/page.tsx",
-                        lineNumber: 252,
+                        lineNumber: 307,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/test-offline/page.tsx",
-                lineNumber: 247,
+                lineNumber: 302,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/test-offline/page.tsx",
-        lineNumber: 169,
+        lineNumber: 205,
         columnNumber: 5
     }, this);
 }
@@ -1935,6 +2215,65 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.js [app-ssr] (ecmascript)");
 }),
+"[project]/node_modules/lucide-react/dist/esm/icons/refresh-cw.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * @license lucide-react v0.544.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */ __turbopack_context__.s([
+    "__iconNode",
+    ()=>__iconNode,
+    "default",
+    ()=>RefreshCw
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$createLucideIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/createLucideIcon.js [app-ssr] (ecmascript)");
+;
+const __iconNode = [
+    [
+        "path",
+        {
+            d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8",
+            key: "v9h5vc"
+        }
+    ],
+    [
+        "path",
+        {
+            d: "M21 3v5h-5",
+            key: "1q7to0"
+        }
+    ],
+    [
+        "path",
+        {
+            d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16",
+            key: "3uifl3"
+        }
+    ],
+    [
+        "path",
+        {
+            d: "M8 16H3v5",
+            key: "1cv678"
+        }
+    ]
+];
+const RefreshCw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$createLucideIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])("refresh-cw", __iconNode);
+;
+ //# sourceMappingURL=refresh-cw.js.map
+}),
+"[project]/node_modules/lucide-react/dist/esm/icons/refresh-cw.js [app-ssr] (ecmascript) <export default as RefreshCw>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "RefreshCw",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$refresh$2d$cw$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$refresh$2d$cw$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/refresh-cw.js [app-ssr] (ecmascript)");
+}),
 ];
 
-//# sourceMappingURL=_008a2108._.js.map
+//# sourceMappingURL=_ba976383._.js.map

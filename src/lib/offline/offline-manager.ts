@@ -37,7 +37,7 @@ export interface SyncQueueItem {
 
 export class OfflineManager {
   private db = getOfflineDB();
-  private localStorage = window.localStorage;
+  private localStorage = typeof window !== 'undefined' ? window.localStorage : null;
 
   /**
    * 建立資料 (新增)
@@ -270,6 +270,7 @@ export class OfflineManager {
    * 儲存設定到 localStorage
    */
   saveSetting(key: string, value: any): void {
+    if (!this.localStorage) return;
     try {
       this.localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
@@ -281,6 +282,7 @@ export class OfflineManager {
    * 從 localStorage 讀取設定
    */
   getSetting<T>(key: string, defaultValue?: T): T | null {
+    if (!this.localStorage) return defaultValue || null;
     try {
       const value = this.localStorage.getItem(key);
       return value ? JSON.parse(value) : (defaultValue || null);
@@ -294,6 +296,7 @@ export class OfflineManager {
    * 刪除 localStorage 設定
    */
   removeSetting(key: string): void {
+    if (!this.localStorage) return;
     this.localStorage.removeItem(key);
   }
 
