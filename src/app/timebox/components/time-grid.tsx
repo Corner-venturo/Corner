@@ -108,10 +108,24 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   }
 
   // 獲取單元格中的箱子（起始時段）
-  const getBoxInCell = (dayOfWeek: number, timeSlot: string) => {
-    return scheduledBoxes.find(box =>
-      box.dayOfWeek === dayOfWeek && box.startTime === timeSlot
-    )
+  const getBoxesInCell = (dayOfWeek: number, timeSlot: string) => {
+    // 30 分鐘視圖：只返回精確匹配的箱子
+    if (timeInterval === 30) {
+      const box = scheduledBoxes.find(box =>
+        box.dayOfWeek === dayOfWeek && box.startTime === timeSlot
+      )
+      return box ? [box] : []
+    }
+
+    // 60 分鐘視圖：返回這個小時內所有開始的箱子
+    const currentMinutes = timeToMinutes(timeSlot)
+    const nextHourMinutes = currentMinutes + 60
+
+    return scheduledBoxes.filter(box => {
+      if (box.dayOfWeek !== dayOfWeek) return false
+      const boxStartMinutes = timeToMinutes(box.startTime)
+      return boxStartMinutes >= currentMinutes && boxStartMinutes < nextHourMinutes
+    })
   }
 
   // 檢查時段是否被任何箱子佔用
@@ -220,13 +234,13 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
         {weekDays.map((day, dayIndex) => (
           <div key={dayIndex} className="border-r border-border last:border-r-0 relative bg-card">
             {timeSlots.map((timeSlot, timeIndex) => {
-              const existingBox = getBoxInCell(dayIndex, timeSlot)
+              const boxesInCell = getBoxesInCell(dayIndex, timeSlot)
               const occupyingBox = getOccupyingBox(dayIndex, timeSlot)
               const isOccupied = !!occupyingBox
-              const isStartTime = !!existingBox
+              const hasBoxes = boxesInCell.length > 0
 
-              // 如果時段被佔用，渲染箱子的對應部分
-              if (isOccupied && !isStartTime) {
+              // 如果時段被佔用但不是起始格（30分鐘視圖的中間部分），渲染佔位
+              if (isOccupied && !hasBoxes && timeInterval === 30) {
                 const baseBox = boxes.find(b => b.id === occupyingBox.boxId)
                 const positionType = getBoxPositionType(occupyingBox, timeSlot)
 
@@ -236,7 +250,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                 return (
                   <div
                     key={`${dayIndex}-${timeIndex}`}
-                    className={`${timeInterval === 30 ? 'h-8' : 'h-16'} border-b border-border/50 relative cursor-pointer ${borderRadius}`}
+                    className={`h-8 border-b border-border/50 relative cursor-pointer ${borderRadius}`}
                     style={{ backgroundColor: baseBox?.color }}
                     onClick={() => {
                       // 點擊中間部分，通過 window 事件通知打開對話框
@@ -271,18 +285,20 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                   onDrop={(e) => handleDrop(e, dayIndex, timeSlot)}
                   onDragOver={handleDragOver}
                 >
-                  {isStartTime && (
+                  {/* 渲染這個格子內所有的箱子 */}
+                  {boxesInCell.map((box) => (
                     <div
-                      data-box-id={existingBox.id}
+                      key={box.id}
+                      data-box-id={box.id}
                       className="relative h-full w-full"
                     >
                       <ScheduledBoxItem
-                        scheduledBox={existingBox}
-                        height={getBoxHeight(existingBox.duration)}
-                        topOffset={getBoxTopOffset(existingBox.startTime)}
+                        scheduledBox={box}
+                        height={getBoxHeight(box.duration)}
+                        topOffset={getBoxTopOffset(box.startTime)}
                       />
                     </div>
-                  )}
+                  ))}
 
                   {/* 提示文字 - 只在空白時段顯示 */}
                   {!isOccupied && selectedCell?.dayOfWeek === dayIndex && selectedCell?.startTime === timeSlot && (
