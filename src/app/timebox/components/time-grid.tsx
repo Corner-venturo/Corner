@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+
 import { useTimeboxStore } from '@/stores/timebox-store'
+
 import BoxSelector from './box-selector'
 import ScheduledBoxItem from './scheduled-box-item'
 
@@ -18,7 +20,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   } | null>(null)
 
   // 生成時間段
-  const timeSlots = []
+  const timeSlots: string[] = []
   for (let hour = 6; hour < 24; hour++) {
     if (timeInterval === 30) {
       timeSlots.push(`${hour.toString().padStart(2, '0')}:00`)
@@ -153,11 +155,15 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     return 'middle'
   }
 
-  // 計算箱子高度
+  // 計算箱子高度（支援任意時長，包括半格）
   const getBoxHeight = (duration: number) => {
-    const slotHeight = timeInterval === 30 ? 32 : 64 // 每個時段的高度（px）- 適配 h-8/h-12
-    const slotsNeeded = duration / timeInterval
-    return slotsNeeded * slotHeight
+    // 基礎時段高度：30分鐘 = 32px (h-8)，使用 Tailwind 的實際像素值
+    const baseSlotHeight = 32 // h-8 的像素值
+    const baseInterval = 30   // 基礎時段 30 分鐘
+
+    // 計算實際高度：duration / 30 * 32
+    // 例如：30分鐘 = 32px, 60分鐘 = 64px, 90分鐘 = 96px
+    return (duration / baseInterval) * baseSlotHeight
   }
 
   // 處理拖放
@@ -252,7 +258,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                   {isStartTime && (
                     <div
                       data-box-id={existingBox.id}
-                      className="h-full w-full"
+                      className="relative h-full w-full"
                     >
                       <ScheduledBoxItem
                         scheduledBox={existingBox}

@@ -1,11 +1,14 @@
 'use client'
 
 import { useState, memo, useEffect } from 'react'
-import { useTimeboxStore, ScheduledBox } from '@/stores/timebox-store'
+
 import { Dumbbell, MessageSquare, Package, Check } from 'lucide-react'
-import WorkoutDialog from './box-dialogs/workout-dialog'
-import ReminderDialog from './box-dialogs/reminder-dialog'
+
+import { useTimeboxStore, ScheduledBox } from '@/stores/timebox-store'
+
 import BasicDialog from './box-dialogs/basic-dialog'
+import ReminderDialog from './box-dialogs/reminder-dialog'
+import WorkoutDialog from './box-dialogs/workout-dialog'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -52,10 +55,11 @@ function ScheduledBoxItem({ scheduledBox, height }: ScheduledBoxItemProps) {
 
   return (
     <div
-      className={`h-full w-full rounded-t-md shadow-sm border-l-4 p-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
+      className={`absolute top-0 left-0 right-0 w-full rounded-t-md shadow-sm border-l-4 p-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
         scheduledBox.completed ? 'opacity-75' : ''
       }`}
       style={{
+        height: `${height}px`,
         backgroundColor: box.color,
         borderLeftColor: scheduledBox.completed ? '#10B981' : box.color,
       }}
