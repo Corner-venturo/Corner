@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTimeboxStore, WorkoutData, ScheduledBox } from '@/stores/timebox-store'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+
 import { Check, Clock, Dumbbell, Trash2 } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { useTimeboxStore, WorkoutData, ScheduledBox } from '@/stores/timebox-store'
 
 interface WorkoutDialogProps {
   scheduledBox: ScheduledBox
@@ -13,14 +15,14 @@ interface WorkoutDialogProps {
 }
 
 export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogProps) {
-  const { boxes, toggleSetCompletion, toggleBoxCompletion, removeScheduledBox } = useTimeboxStore()
-  const [editingBox, setEditingBox] = useState(false)
+  const { boxes, toggleSetCompletion, toggleBoxCompletion, removeScheduledBox, updateBox } = useTimeboxStore()
+  const [isEditing, setIsEditing] = useState(false)
   const [boxData, setBoxData] = useState({
     name: '',
     equipment: '',
     weight: 0,
     reps: 0,
-    sets: 3
+    sets: 3,
   })
 
   const box = boxes.find(b => b.id === scheduledBox.boxId)
@@ -33,27 +35,42 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
         equipment: box.equipment || '',
         weight: box.weight || 0,
         reps: box.reps || 0,
-        sets: box.sets || 3
+        sets: box.sets || 3,
       })
     }
   }, [box])
+
+  // 儲存修改
+  const handleSave = () => {
+    if (box) {
+      updateBox(box.id, {
+        equipment: boxData.equipment,
+        weight: boxData.weight,
+        reps: boxData.reps,
+        sets: boxData.sets,
+      })
+    }
+    setIsEditing(false)
+  }
 
   // 獲取組別完成狀態
   const getWorkoutProgress = () => {
     const workoutData = scheduledBox.data as WorkoutData
     if (!workoutData || !workoutData.setsCompleted) {
       // 初始化狀態
-      return Array(boxData.sets).fill(false).map((_, index) => ({
-        completed: false,
-        completedAt: null,
-        setNumber: index + 1
-      }))
+      return Array(boxData.sets)
+        .fill(false)
+        .map((_, index) => ({
+          completed: false,
+          completedAt: null,
+          setNumber: index + 1,
+        }))
     }
 
     return workoutData.setsCompleted.map((completed, index) => ({
       completed,
       completedAt: workoutData.completedSetsTime?.[index] || null,
-      setNumber: index + 1
+      setNumber: index + 1,
     }))
   }
 
@@ -72,14 +89,14 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
 
   // 刪除排程
   const handleDelete = () => {
-    const confirmMessage = `確定要移除此訓練排程嗎？\n\n箱子：${box?.name}\n動作：${boxData.equipment}\n重量：${boxData.weight}kg x ${boxData.reps}次 x ${boxData.sets}組`;
+    const confirmMessage = `確定要移除此訓練排程嗎？\n\n箱子：${box?.name}\n動作：${boxData.equipment}\n重量：${boxData.weight}kg x ${boxData.reps}次 x ${boxData.sets}組`
 
     if (!confirm(confirmMessage)) {
-      return;
+      return
     }
 
-    removeScheduledBox(scheduledBox.id);
-    onClose();
+    removeScheduledBox(scheduledBox.id)
+    onClose()
   }
 
   // 計算總訓練量
@@ -112,64 +129,130 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* 運動資訊 */}
+          {/* 運動資訊 - 一列顯示可編輯 */}
           <div className="bg-morandi-container/10 rounded-lg p-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-morandi-secondary">器材:</span>
-                <p className="font-medium">{boxData.equipment || '未設定'}</p>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium">訓練參數</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                className="text-morandi-gold"
+              >
+                {isEditing ? '儲存' : '編輯'}
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-morandi-secondary">器材</label>
+                {isEditing ? (
+                  <Input
+                    value={boxData.equipment}
+                    onChange={(e) => setBoxData(prev => ({ ...prev, equipment: e.target.value }))}
+                    placeholder="例: 槓鈴"
+                    className="mt-1"
+                  />
+                ) : (
+                  <p className="font-medium mt-1">{boxData.equipment || '未設定'}</p>
+                )}
               </div>
-              <div>
-                <span className="text-morandi-secondary">重量:</span>
-                <p className="font-medium">{boxData.weight} kg</p>
+
+              <div className="w-24">
+                <label className="text-xs text-morandi-secondary">重量 (kg)</label>
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    value={boxData.weight}
+                    onChange={(e) => setBoxData(prev => ({ ...prev, weight: Number(e.target.value) }))}
+                    className="mt-1"
+                  />
+                ) : (
+                  <p className="font-medium mt-1">{boxData.weight} kg</p>
+                )}
               </div>
-              <div>
-                <span className="text-morandi-secondary">次數:</span>
-                <p className="font-medium">{boxData.reps} 次</p>
+
+              <div className="w-20">
+                <label className="text-xs text-morandi-secondary">次數</label>
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    value={boxData.reps}
+                    onChange={(e) => setBoxData(prev => ({ ...prev, reps: Number(e.target.value) }))}
+                    className="mt-1"
+                  />
+                ) : (
+                  <p className="font-medium mt-1">{boxData.reps}</p>
+                )}
               </div>
-              <div>
-                <span className="text-morandi-secondary">組數:</span>
-                <p className="font-medium">{boxData.sets} 組</p>
+
+              <div className="w-20">
+                <label className="text-xs text-morandi-secondary">組數</label>
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    value={boxData.sets}
+                    onChange={(e) => setBoxData(prev => ({ ...prev, sets: Number(e.target.value) }))}
+                    min={1}
+                    max={10}
+                    className="mt-1"
+                  />
+                ) : (
+                  <p className="font-medium mt-1">{boxData.sets}</p>
+                )}
               </div>
             </div>
           </div>
 
-          {/* 進度追蹤 */}
+          {/* 進度追蹤 - 橫向框框 */}
           <div>
             <h3 className="font-medium mb-3 flex items-center justify-between">
-              <span>進度追蹤</span>
+              <span>完成進度</span>
               <span className="text-sm text-morandi-secondary">
-                {completedSets}/{boxData.sets} 組完成
+                {completedSets}/{boxData.sets} 組
               </span>
             </h3>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 flex-wrap">
               {workoutProgress.map((setProgress, index) => (
-                <Button
+                <button
                   key={index}
-                  variant={setProgress.completed ? "default" : "outline"}
-                  className={`h-16 flex flex-col items-center justify-center space-y-1 ${
-                    setProgress.completed ? 'bg-morandi-green text-white' : ''
-                  }`}
                   onClick={() => handleSetComplete(index)}
+                  className={`
+                    relative w-14 h-14 rounded-lg border-2 transition-all
+                    flex flex-col items-center justify-center
+                    ${setProgress.completed
+                      ? 'bg-morandi-green border-morandi-green text-white shadow-md'
+                      : 'border-morandi-container hover:border-morandi-gold bg-white'
+                    }
+                  `}
+                  title={setProgress.completedAt
+                    ? `完成於 ${new Date(setProgress.completedAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
+                    : `點擊完成第 ${setProgress.setNumber} 組`
+                  }
                 >
-                  <div className="flex items-center space-x-1">
-                    {setProgress.completed && <Check className="h-4 w-4" />}
-                    <span className="font-medium">第 {setProgress.setNumber} 組</span>
-                  </div>
+                  {setProgress.completed ? (
+                    <Check className="h-6 w-6" />
+                  ) : (
+                    <span className="text-lg font-semibold text-morandi-secondary">
+                      {setProgress.setNumber}
+                    </span>
+                  )}
 
                   {setProgress.completed && setProgress.completedAt && (
-                    <div className="flex items-center text-xs opacity-80">
-                      <Clock className="h-3 w-3 mr-1" />
+                    <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-morandi-secondary whitespace-nowrap">
                       {new Date(setProgress.completedAt).toLocaleTimeString('zh-TW', {
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
                       })}
-                    </div>
+                    </span>
                   )}
-                </Button>
+                </button>
               ))}
             </div>
+
+            {/* 完成時間提示的額外空間 */}
+            <div className="h-5"></div>
           </div>
 
           {/* 統計 */}
@@ -202,7 +285,10 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                 關閉
               </Button>
               {completedSets === boxData.sets && !scheduledBox.completed && (
-                <Button onClick={handleComplete} className="bg-morandi-gold hover:bg-morandi-gold/90">
+                <Button
+                  onClick={handleComplete}
+                  className="bg-morandi-gold hover:bg-morandi-gold/90"
+                >
                   標記完成
                 </Button>
               )}
