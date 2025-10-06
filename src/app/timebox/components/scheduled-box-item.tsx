@@ -19,9 +19,10 @@ const typeIcons = {
 interface ScheduledBoxItemProps {
   scheduledBox: ScheduledBox
   height: number
+  topOffset?: number
 }
 
-function ScheduledBoxItem({ scheduledBox, height }: ScheduledBoxItemProps) {
+function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxItemProps) {
   const { boxes } = useTimeboxStore()
   const [showDialog, setShowDialog] = useState(false)
 
@@ -55,10 +56,11 @@ function ScheduledBoxItem({ scheduledBox, height }: ScheduledBoxItemProps) {
 
   return (
     <div
-      className={`absolute top-0 left-0 right-0 w-full rounded-t-md shadow-sm border-l-4 p-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
+      className={`absolute left-0 right-0 w-full rounded-t-md shadow-sm border-l-4 p-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
         scheduledBox.completed ? 'opacity-75' : ''
       }`}
       style={{
+        top: `${topOffset}px`,
         height: `${height}px`,
         backgroundColor: box.color,
         borderLeftColor: scheduledBox.completed ? '#10B981' : box.color,

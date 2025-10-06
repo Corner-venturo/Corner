@@ -164,6 +164,24 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     return slotsNeeded * slotHeight
   }
 
+  // 計算箱子在格子內的 top 偏移量
+  const getBoxTopOffset = (startTime: string) => {
+    // 在 30 分鐘視圖下，每個箱子都在格子頂部
+    if (timeInterval === 30) return 0
+
+    // 在 60 分鐘視圖下，需要計算箱子在整點格子內的偏移
+    const [hour, minute] = startTime.split(':').map(Number)
+
+    // 如果是整點（:00），在格子頂部
+    if (minute === 0) return 0
+
+    // 如果是半點（:30），在格子中間（偏移 32px）
+    if (minute === 30) return 32
+
+    // 其他情況按比例計算
+    return (minute / 60) * 64
+  }
+
   // 處理拖放
   const handleDrop = (e: React.DragEvent, dayOfWeek: number, timeSlot: string) => {
     e.preventDefault()
@@ -261,6 +279,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                       <ScheduledBoxItem
                         scheduledBox={existingBox}
                         height={getBoxHeight(existingBox.duration)}
+                        topOffset={getBoxTopOffset(existingBox.startTime)}
                       />
                     </div>
                   )}
