@@ -155,15 +155,18 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     return 'middle'
   }
 
-  // 計算箱子高度（支援任意時長，包括半格）
+  // 計算箱子高度（根據當前視圖的 timeInterval 動態計算）
   const getBoxHeight = (duration: number) => {
-    // 基礎時段高度：30分鐘 = 32px (h-8)，使用 Tailwind 的實際像素值
-    const baseSlotHeight = 32 // h-8 的像素值
-    const baseInterval = 30   // 基礎時段 30 分鐘
+    // 每個時段的實際高度（px）
+    const slotHeight = 32 // h-8 的像素值，固定使用 32px
 
-    // 計算實際高度：duration / 30 * 32
-    // 例如：30分鐘 = 32px, 60分鐘 = 64px, 90分鐘 = 96px
-    return (duration / baseInterval) * baseSlotHeight
+    // 計算佔用幾個時段
+    // timeInterval = 30: 30分鐘箱子佔1格, 60分鐘箱子佔2格
+    // timeInterval = 60: 30分鐘箱子佔0.5格, 60分鐘箱子佔1格
+    const slotsNeeded = duration / timeInterval
+
+    // 最終高度 = 時段數 × 每時段高度
+    return slotsNeeded * slotHeight
   }
 
   // 處理拖放
