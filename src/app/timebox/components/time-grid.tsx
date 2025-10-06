@@ -287,17 +287,12 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                 >
                   {/* 渲染這個格子內所有的箱子 */}
                   {boxesInCell.map((box) => (
-                    <div
+                    <ScheduledBoxItem
                       key={box.id}
-                      data-box-id={box.id}
-                      className="relative h-full w-full"
-                    >
-                      <ScheduledBoxItem
-                        scheduledBox={box}
-                        height={getBoxHeight(box.duration)}
-                        topOffset={getBoxTopOffset(box.startTime)}
-                      />
-                    </div>
+                      scheduledBox={box}
+                      height={getBoxHeight(box.duration)}
+                      topOffset={getBoxTopOffset(box.startTime)}
+                    />
                   ))}
 
                   {/* 提示文字 - 只在空白時段顯示 */}
