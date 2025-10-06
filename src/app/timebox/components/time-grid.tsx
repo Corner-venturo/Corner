@@ -19,11 +19,13 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     startTime: string
   } | null>(null)
 
-  // 生成時間段 - 永遠以 30 分鐘為基礎網格
+  // 生成時間段 - 根據 timeInterval 動態生成
   const timeSlots: string[] = []
   for (let hour = 6; hour < 24; hour++) {
     timeSlots.push(`${hour.toString().padStart(2, '0')}:00`)
-    timeSlots.push(`${hour.toString().padStart(2, '0')}:30`)
+    if (timeInterval === 30) {
+      timeSlots.push(`${hour.toString().padStart(2, '0')}:30`)
+    }
   }
 
   // 檢查時間衝突
@@ -151,16 +153,13 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     return 'middle'
   }
 
-  // 計算箱子高度（永遠基於 30 分鐘網格）
+  // 計算箱子高度
   const getBoxHeight = (duration: number) => {
-    // 基礎格子高度
-    const baseSlotHeight = timeInterval === 30 ? 32 : 64 // 30分鐘視圖=32px, 60分鐘視圖=64px
+    // 每格的高度（根據視圖模式）
+    const slotHeight = timeInterval === 30 ? 32 : 64 // 30分=32px, 60分=64px
 
-    // 永遠以 30 分鐘為基礎單位計算
-    const slotsNeeded = duration / 30
-
-    // 在 60 分鐘視圖下，每個 30 分鐘格子的視覺高度是 32px（因為兩格合併顯示）
-    const slotHeight = timeInterval === 30 ? 32 : 32
+    // 計算佔用幾格
+    const slotsNeeded = duration / timeInterval
 
     return slotsNeeded * slotHeight
   }
@@ -189,20 +188,14 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       <div className="grid grid-cols-8 min-h-[600px]">
         {/* 時間軸 */}
         <div className="border-r border-border bg-morandi-container/10">
-          {timeSlots.map((timeSlot, index) => {
-            // 60 分鐘視圖：只在整點顯示標籤，半點顯示空白
-            const isHalfHour = timeSlot.endsWith(':30')
-            const shouldShowLabel = timeInterval === 30 || !isHalfHour
-
-            return (
-              <div
-                key={timeSlot}
-                className="h-8 sm:h-12 flex items-center justify-center text-xs sm:text-sm text-morandi-secondary border-b border-border/50"
-              >
-                {shouldShowLabel ? timeSlot : ''}
-              </div>
-            )
-          })}
+          {timeSlots.map((timeSlot) => (
+            <div
+              key={timeSlot}
+              className={`${timeInterval === 30 ? 'h-8' : 'h-16'} flex items-center justify-center text-xs sm:text-sm text-morandi-secondary border-b border-border/50`}
+            >
+              {timeSlot}
+            </div>
+          ))}
         </div>
 
         {/* 日期列 */}
@@ -225,7 +218,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                 return (
                   <div
                     key={`${dayIndex}-${timeIndex}`}
-                    className={`h-8 sm:h-12 border-b border-border/50 relative cursor-pointer ${borderRadius}`}
+                    className={`${timeInterval === 30 ? 'h-8' : 'h-16'} border-b border-border/50 relative cursor-pointer ${borderRadius}`}
                     style={{ backgroundColor: baseBox?.color }}
                     onClick={() => {
                       // 點擊中間部分，通過 window 事件通知打開對話框
@@ -247,7 +240,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
               return (
                 <div
                   key={`${dayIndex}-${timeIndex}`}
-                  className={`h-8 sm:h-12 border-b border-border/50 relative cursor-pointer hover:bg-morandi-container/20 transition-colors duration-150 ${
+                  className={`${timeInterval === 30 ? 'h-8' : 'h-16'} border-b border-border/50 relative cursor-pointer hover:bg-morandi-container/20 transition-colors duration-150 ${
                     selectedCell?.dayOfWeek === dayIndex && selectedCell?.startTime === timeSlot
                       ? 'bg-morandi-gold/10 border-morandi-gold/30'
                       : ''
