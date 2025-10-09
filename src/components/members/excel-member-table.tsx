@@ -10,7 +10,7 @@ import {
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper';
 
 interface MemberTableProps {
-  orderId: string;
+  order_id: string;
   departureDate: string;
   memberCount: number;
 }
@@ -31,7 +31,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([]);
 
   const orderMembers = useMemo(() =>
-    members.filter(member => member.orderId === orderId),
+    members.filter(member => member.order_id === orderId),
     [members, orderId]
   );
 
@@ -97,9 +97,9 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       const processed = { ...member };
 
       // 從身分證號自動計算性別和年齡
-      if (processed.idNumber) {
-        processed.gender = getGenderFromIdNumber(processed.idNumber);
-        processed.age = calculateAge(processed.idNumber, departureDate);
+      if (processed.id_number) {
+        processed.gender = getGenderFromIdNumber(processed.id_number);
+        processed.age = calculateAge(processed.id_number, departureDate);
       }
       // 從生日計算年齡
       else if (processed.birthday) {

@@ -25,12 +25,12 @@ class PaymentService extends BaseService<PaymentRequest> {
   }
 
   protected validate(data: Partial<PaymentRequest>): void {
-    if (data.totalAmount !== undefined && data.totalAmount < 0) {
+    if (data.total_amount !== undefined && data.total_amount < 0) {
       throw new ValidationError('totalAmount', '金額不能為負數');
     }
 
-    if (data.requestDate) {
-      const requestDate = new Date(data.requestDate);
+    if (data.request_date) {
+      const requestDate = new Date(data.request_date);
       if (isNaN(requestDate.getTime())) {
         throw new ValidationError('requestDate', '請款日期格式錯誤');
       }
@@ -43,9 +43,9 @@ class PaymentService extends BaseService<PaymentRequest> {
     const year = new Date().getFullYear();
     const store = usePaymentStore.getState();
     const existingNumbers = store.paymentRequests
-      .filter(r => r.requestNumber.startsWith(`REQ-${year}`))
+      .filter(r => r.request_number.startsWith(`REQ-${year}`))
       .map(r => {
-        const numPart = r.requestNumber.split('-')[1];
+        const numPart = r.request_number.split('-')[1];
         return parseInt(numPart.substring(4)) || 0;
       });
 
@@ -74,7 +74,7 @@ class PaymentService extends BaseService<PaymentRequest> {
     return nextThursday.toISOString().split('T')[0];
   }
 
-  async createFromQuote(tourId: string, quoteId: string, requestDate: string): Promise<string> {
+  async createFromQuote(tour_id: string, quote_id: string, request_date: string): Promise<string> {
     const store = usePaymentStore.getState();
     return store.createPaymentRequestFromQuote(tourId, quoteId, requestDate);
   }
@@ -98,9 +98,9 @@ class PaymentService extends BaseService<PaymentRequest> {
     const year = new Date().getFullYear();
     const store = usePaymentStore.getState();
     const existingNumbers = store.disbursementOrders
-      .filter(order => order.orderNumber.startsWith(`CD-${year}`))
+      .filter(order => order.order_number.startsWith(`CD-${year}`))
       .map(order => {
-        const numPart = order.orderNumber.split('-')[1];
+        const numPart = order.order_number.split('-')[1];
         return parseInt(numPart.substring(4)) || 0;
       });
 
@@ -108,12 +108,12 @@ class PaymentService extends BaseService<PaymentRequest> {
     return `CD-${year}${nextNumber.toString().padStart(3, '0')}`;
   }
 
-  createDisbursementOrder(paymentRequestIds: string[], note?: string): string {
+  createDisbursementOrder(payment_request_ids: string[], note?: string): string {
     const store = usePaymentStore.getState();
     return store.createDisbursementOrder(paymentRequestIds, note);
   }
 
-  confirmDisbursementOrder(id: string, confirmedBy: string): void {
+  confirmDisbursementOrder(id: string, confirmed_by: string): void {
     const store = usePaymentStore.getState();
     store.confirmDisbursementOrder(id, confirmedBy);
   }
@@ -123,7 +123,7 @@ class PaymentService extends BaseService<PaymentRequest> {
     return store.getCurrentWeekDisbursementOrder();
   }
 
-  addToCurrentDisbursementOrder(paymentRequestIds: string[]): void {
+  addToCurrentDisbursementOrder(payment_request_ids: string[]): void {
     const store = usePaymentStore.getState();
     store.addToCurrentDisbursementOrder(paymentRequestIds);
   }

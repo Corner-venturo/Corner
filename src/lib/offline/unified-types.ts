@@ -48,7 +48,7 @@ export interface Tour extends Timestamps, SyncMetadata {
   childCount: number;
   infantCount: number;
   status: 'planning' | 'confirmed' | 'completed' | 'cancelled';
-  totalCost: number;
+  total_cost: number;
   totalRevenue: number;
   profitMargin: number;
   leadGuide?: string;
@@ -60,16 +60,16 @@ export interface Tour extends Timestamps, SyncMetadata {
 // ===========================
 
 export interface Order extends Timestamps, SyncMetadata {
-  orderNumber: string;
-  tourId: string;
+  order_number: string;
+  tour_id: string;
   customerId: string;
-  customerName: string;
+  customer_name: string;
   customerPhone: string;
   customerEmail?: string;
   adultCount: number;
   childCount: number;
   infantCount: number;
-  totalAmount: number;
+  total_amount: number;
   paidAmount: number;
   status: 'pending' | 'confirmed' | 'paid' | 'cancelled';
   paymentMethod?: 'cash' | 'transfer' | 'credit_card';
@@ -81,9 +81,9 @@ export interface Order extends Timestamps, SyncMetadata {
 // ===========================
 
 export interface Quote extends Timestamps, SyncMetadata {
-  quoteNumber: string;
+  quote_number: string;
   customerId?: string;
-  customerName: string;
+  customer_name: string;
   customerEmail?: string;
   customerPhone?: string;
   destination: string;
@@ -93,11 +93,11 @@ export interface Quote extends Timestamps, SyncMetadata {
   adultCount: number;
   childCount: number;
   infantCount: number;
-  totalCost: number;
+  total_cost: number;
   profitMargin: number;
   sellingPrice: number;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired';
-  validUntil: string;
+  valid_until: string;
   notes?: string;
 }
 
@@ -106,10 +106,10 @@ export interface Quote extends Timestamps, SyncMetadata {
 // ===========================
 
 export interface PaymentRequest extends Timestamps, SyncMetadata {
-  requestNumber: string;
+  request_number: string;
   tourId?: string;
   supplierId?: string;
-  supplierName: string;
+  supplier_name: string;
   category: 'accommodation' | 'transport' | 'meals' | 'tickets' | 'guide' | 'other';
   description: string;
   amount: number;
@@ -148,7 +148,7 @@ export interface Todo extends Timestamps, SyncMetadata {
 export interface Supplier extends Timestamps, SyncMetadata {
   name: string;
   category: 'hotel' | 'restaurant' | 'transport' | 'attraction' | 'insurance' | 'other';
-  contactPerson: string;
+  contact_person: string;
   phone: string;
   email?: string;
   address?: string;

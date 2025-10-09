@@ -45,7 +45,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
     name: '',
     type: 'cash' as const,
     balance: '',
-    creditLimit: '', // 信用額度
+    credit_limit: '', // 信用額度
     color: '#10B981',
     description: '',
   });
@@ -62,12 +62,12 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       currency: 'TWD',
       icon: selectedType?.icon.name || 'Wallet',
       color: formData.color,
-      isActive: true,
+      is_active: true,
       description: formData.description.trim(),
       // 信用卡相關欄位
       ...(formData.type === 'credit' && {
-        creditLimit: parseFloat(formData.creditLimit) || 0,
-        availableCredit: (parseFloat(formData.creditLimit) || 0) + (parseFloat(formData.balance) || 0),
+        credit_limit: parseFloat(formData.credit_limit) || 0,
+        available_credit: (parseFloat(formData.credit_limit) || 0) + (parseFloat(formData.balance) || 0),
       }),
     };
 
@@ -81,7 +81,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       name: '',
       type: 'cash',
       balance: '',
-      creditLimit: '',
+      credit_limit: '',
       color: '#10B981',
       description: '',
     });
@@ -185,8 +185,8 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-morandi-secondary">NT$</span>
                 <Input
                   type="number"
-                  value={formData.creditLimit}
-                  onChange={(e) => setFormData(prev => ({ ...prev, creditLimit: e.target.value }))}
+                  value={formData.credit_limit}
+                  onChange={(e) => setFormData(prev => ({ ...prev, credit_limit: e.target.value }))}
                   onKeyDown={handleKeyDown}
                   placeholder="50000"
                   className="pl-12"

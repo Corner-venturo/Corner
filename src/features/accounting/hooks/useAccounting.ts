@@ -34,7 +34,7 @@ export const useAccounting = () => {
       return accountingService.getAccountsByType(type);
     },
 
-    getAccountBalance: (accountId: string) => {
+    getAccountBalance: (account_id: string) => {
       return accountingService.getAccountBalance(accountId);
     },
 
@@ -59,7 +59,7 @@ export const useAccounting = () => {
       return categoryService.getCategoriesByType(type);
     },
 
-    getCategoryTotal: (categoryId: string, startDate?: string, endDate?: string) => {
+    getCategoryTotal: (category_id: string, startDate?: string, endDate?: string) => {
       return accountingService.getCategoryTotal(categoryId, startDate, endDate);
     },
 
@@ -76,7 +76,7 @@ export const useAccounting = () => {
       accountingService.deleteTransaction(id);
     },
 
-    getTransactionsByAccount: (accountId: string) => {
+    getTransactionsByAccount: (account_id: string) => {
       return accountingService.getTransactionsByAccount(accountId);
     },
 

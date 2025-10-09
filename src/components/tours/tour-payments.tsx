@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, usePaymentStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -18,7 +18,8 @@ interface TourPaymentsProps {
 }
 
 export const TourPayments = React.memo(function TourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete }: TourPaymentsProps) {
-  const { orders, payments, addPayment } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const { items: payments, create: addPayment } = usePaymentStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // 監聽外部觸發新增
@@ -41,7 +42,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
     if (orderFilter) {
       return order.id === orderFilter;
     }
-    return order.tourId === tour.id;
+    return order.tour_id === tour.id;
   });
 
   // 獲取所有相關的收款記錄（根據 orderFilter 過濾）
@@ -49,11 +50,11 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
     if (payment.type !== '收款') return false;
 
     if (orderFilter) {
-      return payment.orderId === orderFilter;
+      return payment.order_id === orderFilter;
     }
 
-    return payment.tourId === tour.id ||
-           tourOrders.some(order => order.id === payment.orderId);
+    return payment.tour_id === tour.id ||
+           tourOrders.some(order => order.id === payment.order_id);
   });
 
   const handleAddPayment = () => {
@@ -61,8 +62,8 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
 
     addPayment({
       type: '收款',
-      tourId: tour.id,
-      orderId: selectedOrderId || undefined,
+      tour_id: tour.id,
+      order_id: selectedOrderId || undefined,
       ...newPayment
     });
 
@@ -84,7 +85,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
   const totalPayments = totalConfirmed + totalPending;
 
   // 計算應收金額 (基於訂單)
-  const totalOrderAmount = tourOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+  const totalOrderAmount = tourOrders.reduce((sum, order) => sum + order.total_amount, 0);
   const remainingAmount = Math.max(0, totalOrderAmount - totalConfirmed);
 
   const getStatusBadge = (status: string) => {
@@ -174,12 +175,12 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
             <tbody>
               {tourPayments.length > 0 ? (
                 tourPayments.map((payment) => {
-                  const relatedOrder = tourOrders.find(order => order.id === payment.orderId);
+                  const relatedOrder = tourOrders.find(order => order.id === payment.order_id);
 
                   return (
                     <tr key={payment.id} className="border-b border-border/30">
                       <td className="py-3 px-4 text-morandi-primary">
-                        {new Date(payment.createdAt).toLocaleDateString()}
+                        {new Date(payment.created_at).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center space-x-2">
@@ -207,7 +208,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                         </span>
                       </td>
                       <td className="py-3 px-4 text-morandi-primary">
-                        {relatedOrder ? relatedOrder.orderNumber : '-'}
+                        {relatedOrder ? relatedOrder.order_number : '-'}
                       </td>
                       <td className="py-3 px-4">
                         <span className={cn(
@@ -251,7 +252,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                 <option value="">- 不關聯特定訂單 -</option>
                 {tourOrders.map(order => (
                   <option key={order.id} value={order.id}>
-                    {order.orderNumber} - {order.contactPerson}
+                    {order.order_number} - {order.contact_person}
                   </option>
                 ))}
               </select>

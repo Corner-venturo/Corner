@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/williamchien/Desktop/Venturo/venturo-new/src/app/accounting/layout.tsx"],"sourcesContent":["export default function AccountingLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <div className=\"fixed top-0 right-0 bottom-0 left-16 bg-white overflow-auto\">\n      {children}\n    </div>\n  );\n}"],"names":[],"mappings":";;;;;;AAAe,SAAS,iBAAiB,EACvC,QAAQ,EAGT;IACC,qBACE,8OAAC;QAAI,WAAU;kBACZ;;;;;;AAGP","debugId":null}}]
-}

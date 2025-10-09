@@ -357,7 +357,7 @@ export function LegacyCombobox({
           {option.data && (
             <span className="text-xs text-morandi-secondary">
               {option.data.pricePerGroup ? (
-                option.data.isGroupCost
+                option.data.is_group_cost
                   ? `團體 NT$${option.data.pricePerGroup}`
                   : `個人 NT$${option.data.pricePerPerson}`
               ) : option.data.pricePerPerson ? (

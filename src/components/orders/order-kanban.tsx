@@ -32,7 +32,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
   const [draggedOrder, setDraggedOrder] = useState<Order | null>(null);
 
   const getOrdersByStatus = (status: PaymentStatus) => {
-    return orders.filter(order => order.paymentStatus === status);
+    return orders.filter(order => order.payment_status === status);
   };
 
   const handleDragStart = (order: Order) => {
@@ -51,18 +51,18 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
   };
 
   const getTourInfo = (order: Order) => {
-    return tours.find(t => t.id === order.tourId);
+    return tours.find(t => t.id === order.tour_id);
   };
 
   const getPaymentProgress = (order: Order) => {
-    if (order.totalAmount === 0) return 0;
-    return (order.paidAmount / order.totalAmount) * 100;
+    if (order.total_amount === 0) return 0;
+    return (order.paid_amount / order.total_amount) * 100;
   };
 
   const getDaysUntilDeparture = (tour: Tour | undefined) => {
     if (!tour) return null;
     const today = new Date();
-    const departure = new Date(tour.departureDate);
+    const departure = new Date(tour.departure_date);
     const days = Math.ceil((departure.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return days;
   };
@@ -100,7 +100,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                 const tour = getTourInfo(order);
                 const progress = getPaymentProgress(order);
                 const daysUntil = getDaysUntilDeparture(tour);
-                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.paymentStatus !== '已付款';
+                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.payment_status !== '已付款';
 
                 return (
                   <div
@@ -124,12 +124,12 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
 
                     {/* 訂單編號 */}
                     <div className="font-mono text-xs text-morandi-secondary mb-2">
-                      {order.orderNumber}
+                      {order.order_number}
                     </div>
 
                     {/* 客戶名稱 */}
                     <div className="font-semibold text-morandi-primary mb-2 text-lg">
-                      {order.contactPerson}
+                      {order.contact_person}
                     </div>
 
                     {/* 旅遊團資訊 */}
@@ -140,7 +140,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                           <span>{tour.location}</span>
                         </div>
                         <div className="text-xs">
-                          {new Date(tour.departureDate).toLocaleDateString('zh-TW')}
+                          {new Date(tour.departure_date).toLocaleDateString('zh-TW')}
                         </div>
                       </div>
                     )}
@@ -148,7 +148,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                     {/* 人數 */}
                     <div className="flex items-center space-x-2 text-sm text-morandi-primary mb-3">
                       <Users size={14} className="text-morandi-secondary" />
-                      <span>{order.memberCount} 人</span>
+                      <span>{order.member_count} 人</span>
                     </div>
 
                     {/* 金額資訊 */}
@@ -156,20 +156,20 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                       <div className="flex justify-between text-sm">
                         <span className="text-morandi-secondary">總金額</span>
                         <span className="font-medium text-morandi-primary">
-                          ${order.totalAmount.toLocaleString()}
+                          ${order.total_amount.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-morandi-secondary">已收</span>
                         <span className="font-medium text-morandi-green">
-                          ${order.paidAmount.toLocaleString()}
+                          ${order.paid_amount.toLocaleString()}
                         </span>
                       </div>
-                      {order.remainingAmount > 0 && (
+                      {order.remaining_amount > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-morandi-secondary">未收</span>
                           <span className="font-medium text-morandi-red">
-                            ${order.remainingAmount.toLocaleString()}
+                            ${order.remaining_amount.toLocaleString()}
                           </span>
                         </div>
                       )}
@@ -196,7 +196,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex items-center space-x-1 text-xs text-morandi-secondary">
                         <User size={12} />
-                        <span>{order.salesPerson || '未指派'}</span>
+                        <span>{order.sales_person || '未指派'}</span>
                       </div>
                     </div>
                   </div>

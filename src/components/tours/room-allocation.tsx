@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Tour, Member } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
-import { usePaymentStore } from '@/stores/payment-store';
+import { useOrderStore, useMemberStore, usePaymentRequestStore } from '@/stores';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Bed, Users, AlertTriangle, Home } from 'lucide-react';
@@ -15,7 +14,7 @@ interface RoomAllocationProps {
 interface RoomOption {
   value: string;
   label: string;
-  roomType: string;
+  room_type: string;
   capacity: number;
   currentCount: number;
 }
@@ -25,20 +24,21 @@ interface MemberWithRoom extends Member {
 }
 
 export function RoomAllocation({ tour }: RoomAllocationProps) {
-  const { orders, members } = useTourStore();
-  const { paymentRequests } = usePaymentStore();
+  const { items: orders } = useOrderStore();
+  const { items: members } = useMemberStore();
+  const { items: paymentRequests } = usePaymentRequestStore();
   const [roomOptions, setRoomOptions] = useState<RoomOption[]>([]);
   const [membersWithRooms, setMembersWithRooms] = useState<MemberWithRoom[]>([]);
 
   // 獲取屬於這個旅遊團的所有訂單和團員
-  const tourOrders = orders.filter(order => order.tourId === tour.id);
+  const tourOrders = orders.filter(order => order.tour_id === tour.id);
   const tourMembers = members.filter(member =>
-    tourOrders.some(order => order.id === member.orderId)
+    tourOrders.some(order => order.id === member.order_id)
   );
 
   // 從請款單解析房間配額，生成房間選項
   const generateRoomOptions = (): RoomOption[] => {
-    const tourPaymentRequests = paymentRequests.filter(request => request.tourId === tour.id);
+    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id);
     const roomOptions: RoomOption[] = [];
 
     tourPaymentRequests.forEach(request => {
@@ -74,11 +74,11 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
   };
 
   // 根據房型名稱推算容量
-  const getRoomCapacity = (roomType: string): number => {
-    if (roomType.includes('單人')) return 1;
-    if (roomType.includes('雙人')) return 2;
-    if (roomType.includes('三人')) return 3;
-    if (roomType.includes('四人')) return 4;
+  const getRoomCapacity = (room_type: string): number => {
+    if (room_type.includes('單人')) return 1;
+    if (room_type.includes('雙人')) return 2;
+    if (room_type.includes('三人')) return 3;
+    if (room_type.includes('四人')) return 4;
     return 2; // 預設雙人房
   };
 

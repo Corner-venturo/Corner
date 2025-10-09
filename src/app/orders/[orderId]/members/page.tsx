@@ -4,19 +4,20 @@ import React, { useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, useTourStore } from '@/stores';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table';
 
 export default function MemberDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.orderId as string;
-  const { orders, tours } = useTourStore();
+  const orderId = params.order_id as string;
+  const { items: orders } = useOrderStore()
+  const { items: tours } = useTourStore();
   const memberTableRef = useRef<MemberTableRef | null>(null);
 
   const order = orders.find(o => o.id === orderId);
-  const tour = tours.find(t => t.id === order?.tourId);
+  const tour = tours.find(t => t.id === order?.tour_id);
 
   if (!order) {
     return (
@@ -35,7 +36,7 @@ export default function MemberDetailPage() {
   return (
     <div className="space-y-6 ">
       <ResponsiveHeader
-        title={`成員管理 - ${order.orderNumber}`}
+        title={`成員管理 - ${order.order_number}`}
         onAdd={() => memberTableRef.current?.addRow()}
         addLabel="新增成員"
       >
@@ -43,15 +44,15 @@ export default function MemberDetailPage() {
         <div className="flex items-center space-x-6 text-sm text-morandi-secondary">
           <div className="flex items-center space-x-2">
             <span>旅遊團:</span>
-            <span className="text-morandi-primary font-medium">{order.tourName}</span>
+            <span className="text-morandi-primary font-medium">{order.tour_name}</span>
           </div>
           <div className="flex items-center space-x-2">
             <span>聯絡人:</span>
-            <span className="text-morandi-primary font-medium">{order.contactPerson}</span>
+            <span className="text-morandi-primary font-medium">{order.contact_person}</span>
           </div>
           <div className="flex items-center space-x-2">
             <span>預定人數:</span>
-            <span className="text-morandi-primary font-medium">{order.memberCount}人</span>
+            <span className="text-morandi-primary font-medium">{order.member_count}人</span>
           </div>
           <Button
             onClick={() => router.push('/orders')}
@@ -70,8 +71,8 @@ export default function MemberDetailPage() {
           <ExcelMemberTable
             ref={memberTableRef}
             orderId={orderId}
-            departureDate={tour?.departureDate || ''}
-            memberCount={order.memberCount}
+            departureDate={tour?.departure_date || ''}
+            memberCount={order.member_count}
           />
         </div>
       </div>

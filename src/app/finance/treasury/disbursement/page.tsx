@@ -112,7 +112,7 @@ export default function DisbursementPage() {
   const selectedAmount = useMemo(() => {
     return selectedRequests.reduce((sum, requestId) => {
       const request = pendingRequests.find(r => r.id === requestId);
-      return sum + (request?.totalAmount || 0);
+      return sum + (request?.total_amount || 0);
     }, 0);
   }, [selectedRequests, pendingRequests]);
 
@@ -344,7 +344,7 @@ export default function DisbursementPage() {
   // 獲取本週出帳的請款單詳情
   const currentOrderRequests = useMemo(() => {
     if (!currentOrder) return [];
-    return currentOrder.paymentRequestIds.map(id =>
+    return currentOrder.payment_request_ids.map(id =>
       paymentRequests.find(r => r.id === id)
     ).filter(Boolean) as PaymentRequest[];
   }, [currentOrder, paymentRequests]);
@@ -415,16 +415,16 @@ export default function DisbursementPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-morandi-primary">
-                    {currentOrder.orderNumber}
+                    {currentOrder.order_number}
                   </h3>
                   <p className="text-sm text-morandi-secondary">
-                    出帳日期：{currentOrder.disbursementDate} • {currentOrder.paymentRequestIds.length} 筆請款單
+                    出帳日期：{currentOrder.disbursement_date} • {currentOrder.payment_request_ids.length} 筆請款單
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <p className="text-2xl font-bold text-morandi-primary">
-                      NT$ {currentOrder.totalAmount.toLocaleString()}
+                      NT$ {currentOrder.total_amount.toLocaleString()}
                     </p>
                   </div>
                   {currentOrder.status === 'pending' && (
@@ -510,7 +510,7 @@ export default function DisbursementPage() {
                         <span className="font-bold text-morandi-primary ml-1">
                           NT$ {selectedRequestsForNew.reduce((sum, id) => {
                             const request = pendingRequests.find(r => r.id === id);
-                            return sum + (request?.totalAmount || 0);
+                            return sum + (request?.total_amount || 0);
                           }, 0).toLocaleString()}
                         </span>
                       </span>

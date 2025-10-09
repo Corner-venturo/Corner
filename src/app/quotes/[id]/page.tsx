@@ -40,7 +40,7 @@ interface CostItem {
   id: string;
   name: string;
   quantity: number;
-  unitPrice: number;
+  unit_price: number;
   total: number;
   note?: string;
   // 住宿專用：天數和房型數據
@@ -88,7 +88,7 @@ export default function QuoteDetailPage() {
   const quote = quotes.find(q => q.id === quoteId);
 
   // 檢查是否為特殊團報價單
-  const relatedTour = quote?.tourId ? tours.find(t => t.id === quote.tourId) : null;
+  const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null;
   const isSpecialTour = relatedTour?.status === '特殊團';
   const isReadOnly = isSpecialTour; // 特殊團報價單設為唯讀
 
@@ -100,8 +100,8 @@ export default function QuoteDetailPage() {
       total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0)
     }));
   });
-  const [accommodationDays, setAccommodationDays] = useState<number>(quote?.accommodationDays || 0);
-  const [groupSize, setGroupSize] = useState<number>(quote?.groupSize || 1);
+  const [accommodationDays, setAccommodationDays] = useState<number>(quote?.accommodation_days || 0);
+  const [groupSize, setGroupSize] = useState<number>(quote?.group_size || 1);
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '');
   const [showVersionHistory, setShowVersionHistory] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
@@ -141,7 +141,7 @@ export default function QuoteDetailPage() {
     }
   }, []);
 
-  const handleAddRow = useCallback((categoryId: string) => {
+  const handleAddRow = useCallback((category_id: string) => {
     if (categoryId === 'accommodation') {
       // 住宿用專用函數
       handleAddAccommodationRoomType();
@@ -152,7 +152,7 @@ export default function QuoteDetailPage() {
       id: Date.now().toString(),
       name: '',
       quantity: 0,
-      unitPrice: 0,
+      unit_price: 0,
       total: 0,
       note: ''
     };
@@ -169,14 +169,14 @@ export default function QuoteDetailPage() {
   }, []);
 
   // 新增導遊項目
-  const handleAddGuideRow = (categoryId: string) => {
+  const handleAddGuideRow = (category_id: string) => {
     const calculatedGuideCost = calculateGuideCost();
 
     const newItem: CostItem = {
       id: Date.now().toString(),
       name: '領隊分攤',
       quantity: 1,
-      unitPrice: calculatedGuideCost,
+      unit_price: calculatedGuideCost,
       total: Math.ceil(calculatedGuideCost),
       note: '自動計算：住宿第一房型 + 個人交通'
     };
@@ -203,11 +203,11 @@ export default function QuoteDetailPage() {
       id: `accommodation-day${newDayCount}-${timestamp}`,
       name: '',
       quantity: 0,
-      unitPrice: 0,
+      unit_price: 0,
       total: 0,
       note: '',
       day: newDayCount,
-      roomType: ''
+      room_type: ''
     };
 
     setCategories(prev => prev.map(cat => {
@@ -234,11 +234,11 @@ export default function QuoteDetailPage() {
         id: `accommodation-day${day}-${timestamp}`,
         name: '',
         quantity: 0,
-        unitPrice: 0,
+        unit_price: 0,
         total: 0,
         note: '',
         day: day,
-        roomType: ''
+        room_type: ''
       });
     }
 
@@ -254,7 +254,7 @@ export default function QuoteDetailPage() {
   }, [accommodationDays]);
 
 
-  const handleUpdateItem = (categoryId: string, itemId: string, field: keyof CostItem, value: any) => {
+  const handleUpdateItem = (category_id: string, itemId: string, field: keyof CostItem, value: any) => {
     setCategories(prev => {
       const newCategories = prev.map(cat => {
         if (cat.id === categoryId) {
@@ -262,33 +262,33 @@ export default function QuoteDetailPage() {
             if (item.id === itemId) {
               const updatedItem = { ...item, [field]: value };
               // 自動計算總價
-              if (field === 'quantity' || field === 'unitPrice' || field === 'isGroupCost') {
+              if (field === 'quantity' || field === 'unit_price' || field === 'is_group_cost') {
                 // 數量預設為 1，只有當用戶輸入時才使用輸入值
                 const effectiveQuantity = updatedItem.quantity === 0 ? 1 : (updatedItem.quantity || 1);
 
                 if (categoryId === 'accommodation') {
                   // 住宿特殊邏輯：小計 = 單價 ÷ 人數
-                  updatedItem.total = effectiveQuantity > 0 ? Math.ceil((updatedItem.unitPrice || 0) / effectiveQuantity) : 0;
-                } else if ((categoryId === 'transport' || categoryId === 'guide') && updatedItem.isGroupCost && groupSize > 1) {
+                  updatedItem.total = effectiveQuantity > 0 ? Math.ceil((updatedItem.unit_price || 0) / effectiveQuantity) : 0;
+                } else if ((categoryId === 'transport' || categoryId === 'guide') && updatedItem.is_group_cost && groupSize > 1) {
                   // 交通和領隊導遊的團體分攤邏輯：小計 = (數量 × 單價) ÷ 團體人數
-                  const totalCost = effectiveQuantity * (updatedItem.unitPrice || 0);
+                  const totalCost = effectiveQuantity * (updatedItem.unit_price || 0);
                   updatedItem.total = Math.ceil(totalCost / groupSize);
                 } else if (categoryId === 'group-transport') {
                   // 團體分攤分類：自動執行團體分攤邏輯
                   if (updatedItem.name === '領隊分攤') {
                     // 領隊分攤：直接使用單價作為每人費用，不再除以人數
-                    updatedItem.total = Math.ceil(updatedItem.unitPrice || 0);
+                    updatedItem.total = Math.ceil(updatedItem.unit_price || 0);
                   } else if (groupSize > 1) {
                     // 其他團體分攤項目：執行一般團體分攤邏輯
-                    const totalCost = effectiveQuantity * (updatedItem.unitPrice || 0);
+                    const totalCost = effectiveQuantity * (updatedItem.unit_price || 0);
                     updatedItem.total = Math.ceil(totalCost / groupSize);
                   } else {
                     // 人數為1時，不分攤
-                    updatedItem.total = Math.ceil(effectiveQuantity * (updatedItem.unitPrice || 0));
+                    updatedItem.total = Math.ceil(effectiveQuantity * (updatedItem.unit_price || 0));
                   }
                 } else {
                   // 一般邏輯：小計 = 數量 × 單價
-                  updatedItem.total = Math.ceil(effectiveQuantity * (updatedItem.unitPrice || 0));
+                  updatedItem.total = Math.ceil(effectiveQuantity * (updatedItem.unit_price || 0));
                 }
               }
               return updatedItem;
@@ -325,7 +325,7 @@ export default function QuoteDetailPage() {
           if (item.name === '領隊分攤') {
             return {
               ...item,
-              unitPrice: newGuideCost,
+              unit_price: newGuideCost,
               total: Math.ceil(newGuideCost)
             };
           }
@@ -363,7 +363,7 @@ export default function QuoteDetailPage() {
       Object.keys(groupedByDay).forEach(dayStr => {
         const dayItems = groupedByDay[Number(dayStr)];
         if (dayItems.length > 0) {
-          dailyFirstRoomCost += dayItems[0].unitPrice || 0;
+          dailyFirstRoomCost += dayItems[0].unit_price || 0;
         }
       });
     }
@@ -374,8 +374,8 @@ export default function QuoteDetailPage() {
 
     if (transportCategory && transportCategory.items.length > 0) {
       personalTransportCost = transportCategory.items
-        .filter(item => !item.isGroupCost)
-        .reduce((sum, item) => sum + ((item.quantity || 1) * (item.unitPrice || 0)), 0);
+        .filter(item => !item.is_group_cost)
+        .reduce((sum, item) => sum + ((item.quantity || 1) * (item.unit_price || 0)), 0);
     }
 
     // 3. 計算領隊分攤 = (住宿第一房型總和 + 個人交通) ÷ 總人數
@@ -385,7 +385,7 @@ export default function QuoteDetailPage() {
   };
 
 
-  const handleRemoveItem = useCallback((categoryId: string, itemId: string) => {
+  const handleRemoveItem = useCallback((category_id: string, itemId: string) => {
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
         const updatedItems = cat.items.filter(item => item.id !== itemId);
@@ -404,10 +404,10 @@ export default function QuoteDetailPage() {
     const transportCategory = categories.find(cat => cat.id === 'transport');
     if (!transportCategory || transportCategory.items.length === 0) return null;
 
-    const groupCostItems = transportCategory.items.filter(item => item.isGroupCost);
+    const groupCostItems = transportCategory.items.filter(item => item.is_group_cost);
     if (groupCostItems.length === 0) return null;
 
-    const totalGroupCost = groupCostItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const totalGroupCost = groupCostItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
     const perPersonCost = groupSize > 0 ? totalGroupCost / groupSize : 0;
 
     return {
@@ -438,7 +438,7 @@ export default function QuoteDetailPage() {
       Object.keys(groupedByDay).forEach(dayStr => {
         const dayItems = groupedByDay[Number(dayStr)];
         if (dayItems.length > 0) {
-          dailyFirstRoomCost += dayItems[0].unitPrice || 0;
+          dailyFirstRoomCost += dayItems[0].unit_price || 0;
         }
       });
     }
@@ -449,8 +449,8 @@ export default function QuoteDetailPage() {
 
     if (transportCategory && transportCategory.items.length > 0) {
       personalTransportCost = transportCategory.items
-        .filter(item => !item.isGroupCost)
-        .reduce((sum, item) => sum + ((item.quantity || 0) * (item.unitPrice || 0)), 0);
+        .filter(item => !item.is_group_cost)
+        .reduce((sum, item) => sum + ((item.quantity || 0) * (item.unit_price || 0)), 0);
     }
 
     // 3. 計算領隊分攤 = (住宿第一房型總和 + 個人交通) ÷ 總人數
@@ -460,23 +460,23 @@ export default function QuoteDetailPage() {
   }, [categories, groupSize]);
 
   // 處理下拉選單項目選擇
-  const handleOptionSelect = (categoryId: string, itemId: string, option: any) => {
+  const handleOptionSelect = (category_id: string, itemId: string, option: any) => {
     // 更新項目名稱
     handleUpdateItem(categoryId, itemId, 'name', option.name);
 
     // 根據選項類型設定價格和團體分攤狀態
-    if (option.pricePerGroup && option.isGroupCost) {
+    if (option.pricePerGroup && option.is_group_cost) {
       // 團體費用
-      handleUpdateItem(categoryId, itemId, 'unitPrice', option.pricePerGroup);
-      handleUpdateItem(categoryId, itemId, 'isGroupCost', true);
+      handleUpdateItem(categoryId, itemId, 'unit_price', option.pricePerGroup);
+      handleUpdateItem(categoryId, itemId, 'is_group_cost', true);
     } else if (option.pricePerPerson) {
       // 個人費用
-      handleUpdateItem(categoryId, itemId, 'unitPrice', option.pricePerPerson);
-      handleUpdateItem(categoryId, itemId, 'isGroupCost', false);
+      handleUpdateItem(categoryId, itemId, 'unit_price', option.pricePerPerson);
+      handleUpdateItem(categoryId, itemId, 'is_group_cost', false);
     } else if (option.adultPrice !== undefined) {
       // 活動門票 (使用成人價格)
-      handleUpdateItem(categoryId, itemId, 'unitPrice', option.adultPrice);
-      handleUpdateItem(categoryId, itemId, 'isGroupCost', false);
+      handleUpdateItem(categoryId, itemId, 'unit_price', option.adultPrice);
+      handleUpdateItem(categoryId, itemId, 'is_group_cost', false);
     }
   };
 
@@ -536,7 +536,7 @@ export default function QuoteDetailPage() {
   }, [categories]);
   // 住宿總成本 = 房型一總成本 + 房型二總成本 + ...
   const accommodationTotal = useMemo(() =>
-    accommodationSummary.reduce((sum, room) => sum + room.totalCost, 0)
+    accommodationSummary.reduce((sum, room) => sum + room.total_cost, 0)
   , [accommodationSummary]);
 
   // 更新住宿分類的總計為房型加總
@@ -582,7 +582,7 @@ export default function QuoteDetailPage() {
   // 載入特定版本
   const handleLoadVersion = useCallback((versionData: any) => {
     setCategories(versionData.categories);
-    setAccommodationDays(quote?.accommodationDays || 0);
+    setAccommodationDays(quote?.accommodation_days || 0);
     // 版本切換不改變基本資訊，只改變費用結構
   }, [quote]);
 
@@ -648,7 +648,7 @@ export default function QuoteDetailPage() {
       code: tourCode,
       contractStatus: '未簽署',
       totalRevenue: 0,
-      totalCost: totalCost,
+      total_cost: totalCost,
       profit: 0,
     });
 
@@ -784,7 +784,7 @@ export default function QuoteDetailPage() {
                 <div className="flex flex-col">
                   <span className="font-medium">版本 {quote?.version || 1} (當前)</span>
                   <span className="text-xs text-morandi-secondary">
-                    {quote?.updatedAt ? formatDateTime(quote.updatedAt) : ''}
+                    {quote?.updated_at ? formatDateTime(quote.updated_at) : ''}
                   </span>
                 </div>
                 <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">
@@ -806,7 +806,7 @@ export default function QuoteDetailPage() {
                         <div className="flex flex-col">
                           <span className="font-medium">版本 {version.version}</span>
                           <span className="text-xs text-morandi-secondary">
-                            {formatDateTime(version.createdAt)}
+                            {formatDateTime(version.created_at)}
                           </span>
                           {version.note && (
                             <span className="text-xs text-morandi-secondary italic">
@@ -815,7 +815,7 @@ export default function QuoteDetailPage() {
                           )}
                         </div>
                         <div className="text-xs text-morandi-secondary">
-                          NT$ {version.totalCost.toLocaleString()}
+                          NT$ {version.total_cost.toLocaleString()}
                         </div>
                       </DropdownMenuItem>
                     ))
@@ -1040,8 +1040,8 @@ export default function QuoteDetailPage() {
                                     <td className="py-2 px-4 text-sm text-morandi-secondary text-center table-divider">
                                       <input
                                         type="number"
-                                        value={item.unitPrice || ''}
-                                        onChange={(e) => handleUpdateItem(category.id, item.id, 'unitPrice', Number(e.target.value) || 0)}
+                                        value={item.unit_price || ''}
+                                        onChange={(e) => handleUpdateItem(category.id, item.id, 'unit_price', Number(e.target.value) || 0)}
                                         className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                         placeholder="單價"
                                       />
@@ -1112,8 +1112,8 @@ export default function QuoteDetailPage() {
                               <td className="py-2 px-4 text-sm text-morandi-secondary text-center table-divider">
                                 <input
                                   type="number"
-                                  value={item.unitPrice || ''}
-                                  onChange={(e) => handleUpdateItem(category.id, item.id, 'unitPrice', Number(e.target.value) || 0)}
+                                  value={item.unit_price || ''}
+                                  onChange={(e) => handleUpdateItem(category.id, item.id, 'unit_price', Number(e.target.value) || 0)}
                                   className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                               </td>
@@ -1200,7 +1200,7 @@ export default function QuoteDetailPage() {
                             └ {room.name} ({room.days}天總計)
                           </td>
                           <td className="py-1 px-4 text-right text-morandi-secondary text-xs">
-                            {room.totalCost.toLocaleString()}
+                            {room.total_cost.toLocaleString()}
                           </td>
                         </tr>
                       ))}

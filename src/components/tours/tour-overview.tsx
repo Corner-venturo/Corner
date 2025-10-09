@@ -31,19 +31,19 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
     },
     {
       title: '合約狀態',
-      value: tour.contractStatus,
-      icon: tour.contractStatus === '已簽署' ? CheckCircle : AlertCircle,
-      color: tour.contractStatus === '已簽署' ? 'text-morandi-green' : 'text-morandi-red'
+      value: tour.contract_status,
+      icon: tour.contract_status === '已簽署' ? CheckCircle : AlertCircle,
+      color: tour.contract_status === '已簽署' ? 'text-morandi-green' : 'text-morandi-red'
     },
     {
       title: '總收入',
-      value: `NT$ ${tour.totalRevenue.toLocaleString()}`,
+      value: `NT$ ${tour.total_revenue.toLocaleString()}`,
       icon: TrendingUp,
       color: 'text-morandi-green'
     },
     {
       title: '總支出',
-      value: `NT$ ${tour.totalCost.toLocaleString()}`,
+      value: `NT$ ${tour.total_cost.toLocaleString()}`,
       icon: TrendingUp,
       color: 'text-morandi-red'
     },
@@ -87,7 +87,7 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
               <div className="flex items-center">
                 <Calendar size={16} className="mr-3 text-morandi-secondary" />
                 <span className="text-morandi-primary">
-                  出發：{tour.departureDate} 至 {tour.returnDate}
+                  出發：{tour.departure_date} 至 {tour.return_date}
                 </span>
               </div>
               <div className="flex items-center">
@@ -165,7 +165,7 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
             </div>
             <div className="flex justify-between py-2 font-medium">
               <span className="text-morandi-primary">總收入</span>
-              <span className="text-morandi-green">NT$ {tour.totalRevenue.toLocaleString()}</span>
+              <span className="text-morandi-green">NT$ {tour.total_revenue.toLocaleString()}</span>
             </div>
           </div>
         </ContentContainer>
@@ -187,7 +187,7 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
             </div>
             <div className="flex justify-between py-2 font-medium">
               <span className="text-morandi-primary">總支出</span>
-              <span className="text-morandi-red">NT$ {tour.totalCost.toLocaleString()}</span>
+              <span className="text-morandi-red">NT$ {tour.total_cost.toLocaleString()}</span>
             </div>
           </div>
         </ContentContainer>

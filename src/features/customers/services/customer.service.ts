@@ -68,9 +68,9 @@ class CustomerService extends BaseService<Customer> {
     );
   }
 
-  getCustomersByTour(tourId: string): Customer[] {
+  getCustomersByTour(tour_id: string): Customer[] {
     const store = useTourStore.getState();
-    const tourOrders = store.orders.filter(o => o.tourId === tourId);
+    const tourOrders = store.orders.filter(o => o.tour_id === tourId);
     const customerIds = tourOrders.map(o => o.customerId);
     return store.customers.filter(c => customerIds.includes(c.id));
   }

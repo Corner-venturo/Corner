@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, useMemberStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,7 +21,7 @@ interface TourMembersProps {
 
 interface EditingMember {
   id?: string;
-  orderId: string;
+  order_id: string;
   name: string;
   nameEn: string;
   birthday: string;
@@ -42,7 +42,8 @@ interface EditingCell {
 }
 
 export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }: TourMembersProps) {
-  const { orders, members, addMember, updateMember, deleteMember } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const { items: members, create: addMember, update: updateMember, delete: deleteMember } = useMemberStore();
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([]);
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [draggedRow, setDraggedRow] = useState<number | null>(null);
@@ -54,20 +55,20 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
       if (orderFilter) {
         return order.id === orderFilter;
       }
-      return order.tourId === tour.id;
+      return order.tour_id === tour.id;
     });
   }, [orders, tour.id, orderFilter]);
 
   // 獲取所有團員，包含訂單信息
   useEffect(() => {
     const allTourMembers = members.filter(member =>
-      tourOrders.some(order => order.id === member.orderId)
+      tourOrders.some(order => order.id === member.order_id)
     ).map(member => {
-      const relatedOrder = tourOrders.find(order => order.id === member.orderId);
+      const relatedOrder = tourOrders.find(order => order.id === member.order_id);
       return {
         ...member,
-        orderNumber: relatedOrder?.orderNumber || '',
-        contactPerson: relatedOrder?.contactPerson || '',
+        order_number: relatedOrder?.order_number || '',
+        contact_person: relatedOrder?.contact_person || '',
         assignedRoom: member.assignedRoom
       };
     });
@@ -77,7 +78,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
 
   const totalMembers = tableMembers.length;
   const completedMembers = tableMembers.filter(member =>
-    member.name && member.idNumber
+    member.name && member.id_number
   ).length;
 
   // 點擊單元格開始編輯
@@ -100,14 +101,14 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
     const member = { ...updatedMembers[rowIndex] };
 
     if (field === 'idNumber') {
-      member.idNumber = value.toUpperCase();
+      member.id_number = value.toUpperCase();
       // 只有當性別欄位為空時才自動填入
       if (!member.gender) {
         member.gender = getGenderFromIdNumber(value);
       }
     } else if (field === 'birthday') {
       member.birthday = value;
-      member.age = calculateAge(value, tour.departureDate, tour.returnDate);
+      member.age = calculateAge(value, tour.departure_date, tour.return_date);
     } else if (field === 'gender') {
       // 手動輸入性別，轉換成 M/F 格式
       if (value === '男' || value.toLowerCase() === 'm' || value === '1') {
@@ -144,12 +145,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
   };
 
   // 新增成員到指定訂單
-  const addMemberToOrder = (orderId: string) => {
-    const relatedOrder = tourOrders.find(order => order.id === orderId);
+  const addMemberToOrder = (order_id: string) => {
+    const relatedOrder = tourOrders.find(order => order.id === order_id);
     if (!relatedOrder) return;
 
     const newMember: EditingMember = {
-      orderId,
+      order_id,
       name: '',
       nameEn: '',
       birthday: '',
@@ -159,8 +160,8 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
       gender: '',
       age: 0,
       isNew: true,
-      orderNumber: relatedOrder.orderNumber,
-      contactPerson: relatedOrder.contactPerson
+      orderNumber: relatedOrder.order_number,
+      contactPerson: relatedOrder.contact_person
     };
     setTableMembers([...tableMembers, newMember]);
   };
@@ -319,8 +320,8 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
             </thead>
             <tbody>
               {tableMembers.map((member, index) => {
-                const relatedOrder = tourOrders.find(order => order.id === member.orderId);
-                const orderIndex = tourOrders.findIndex(order => order.id === member.orderId);
+                const relatedOrder = tourOrders.find(order => order.id === member.order_id);
+                const orderIndex = tourOrders.findIndex(order => order.id === member.order_id);
                 const bgColor = orderIndex % 2 === 0 ? 'bg-white' : 'bg-blue-50/30';
 
                 return (
@@ -426,13 +427,13 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
           <h4 className="text-md font-medium text-morandi-primary mb-3">各訂單成員數</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {tourOrders.map(order => {
-              const orderMemberCount = tableMembers.filter(member => member.orderId === order.id).length;
+              const orderMemberCount = tableMembers.filter(member => member.order_id === order.id).length;
               return (
                 <div key={order.id} className="bg-card border border-border p-3 rounded-lg">
                   <div className="flex justify-between items-center">
                     <div>
-                      <div className="font-medium text-morandi-primary text-sm">{order.orderNumber}</div>
-                      <div className="text-xs text-morandi-secondary">{order.contactPerson}</div>
+                      <div className="font-medium text-morandi-primary text-sm">{order.order_number}</div>
+                      <div className="text-xs text-morandi-secondary">{order.contact_person}</div>
                     </div>
                     <div className="text-lg font-bold text-morandi-primary">{orderMemberCount}</div>
                   </div>

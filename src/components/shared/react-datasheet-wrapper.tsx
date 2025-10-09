@@ -34,7 +34,7 @@ export interface DataSheetProps {
   hiddenColumns?: string[];
   className?: string;
   orderFilter?: string;
-  roomOptions?: Array<{ value: string; label: string; capacity: number; roomType: string }>;
+  roomOptions?: Array<{ value: string; label: string; capacity: number; room_type: string }>;
   onRoomAssign?: (memberId: string, roomValue: string) => void;
   getRoomUsage?: (roomValue: string) => { bedCount: number; noBedCount: number; totalCount: number; capacity: number };
   isRoomFull?: (roomValue: string, excludeMemberId?: string) => boolean;

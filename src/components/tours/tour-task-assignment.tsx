@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { StarRating } from '@/components/ui/star-rating';
 import { EnhancedTable } from '@/components/ui/enhanced-table';
 import { Tour, Todo } from '@/stores/types';
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodoStore } from '@/stores';
 import { taskTemplates, getTemplatesByCategory, calculateDeadlineFromDeparture } from '@/lib/task-templates';
 import { cn } from '@/lib/utils';
 import { Plus, Eye, Calendar, User, CheckCircle, Clock } from 'lucide-react';
@@ -24,7 +24,7 @@ const employees = [
 ];
 
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
-  const { todos, addTodo, updateTodo } = useTodoStore();
+  const { items: todos, create: addTodo, update: updateTodo } = useTodoStore();
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [taskForm, setTaskForm] = useState({
     title: '',
@@ -41,18 +41,18 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
 
   useEffect(() => {
     // 根據出發日期設定預設期限
-    if (tour.departureDate) {
-      const defaultDeadline = calculateDeadlineFromDeparture(tour.departureDate, -7);
+    if (tour.departure_date) {
+      const defaultDeadline = calculateDeadlineFromDeparture(tour.departure_date, -7);
       setTaskForm(prev => ({ ...prev, deadline: defaultDeadline }));
     }
-  }, [tour.departureDate]);
+  }, [tour.departure_date]);
 
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId);
 
     if (templateId && taskTemplates[templateId]) {
       const template = taskTemplates[templateId];
-      const deadline = calculateDeadlineFromDeparture(tour.departureDate, template.defaultDeadlineDays);
+      const deadline = calculateDeadlineFromDeparture(tour.departure_date, template.defaultDeadlineDays);
 
       setTaskForm({
         title: template.title,
@@ -126,7 +126,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     setTaskForm({
       title: '',
       assignee: '',
-      deadline: calculateDeadlineFromDeparture(tour.departureDate, -7),
+      deadline: calculateDeadlineFromDeparture(tour.departure_date, -7),
       priority: 3,
       subTasks: ['']
     });
@@ -372,7 +372,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
             此團已指派的任務 ({tourTasks.length})
           </h3>
           <div className="text-sm text-morandi-secondary">
-            出發日期：{new Date(tour.departureDate).toLocaleDateString()}
+            出發日期：{new Date(tour.departure_date).toLocaleDateString()}
           </div>
         </div>
 

@@ -74,9 +74,9 @@ class QuoteService extends BaseService<Quote> {
     });
   }
 
-  getQuotesByTour(tourId: string): Quote[] {
+  getQuotesByTour(tour_id: string): Quote[] {
     const store = useQuoteStore.getState();
-    return store.quotes.filter(q => q.tourId === tourId);
+    return store.quotes.filter(q => q.tour_id === tourId);
   }
 
   getQuotesByStatus(status: Quote['status']): Quote[] {

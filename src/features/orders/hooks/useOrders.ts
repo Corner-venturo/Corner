@@ -27,7 +27,7 @@ export const useOrders = () => {
     },
 
     // ========== 業務方法 ==========
-    getOrdersByTour: (tourId: string) => {
+    getOrdersByTour: (tour_id: string) => {
       return orderService.getOrdersByTour(tourId);
     },
 

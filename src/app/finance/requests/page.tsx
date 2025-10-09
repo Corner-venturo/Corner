@@ -49,12 +49,12 @@ export default function RequestsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const [newRequest, setNewRequest] = useState({
-    tourId: '',
-    orderId: '',
-    requestDate: '',
+    tour_id: '',
+    order_id: '',
+    request_date: '',
     note: '',
     isSpecialBilling: false, // 特殊出帳標記
-    createdBy: '1' // 模擬當前用戶ID
+    created_by: '1' // 模擬當前用戶ID
   });
 
   // 搜尋相關狀態
@@ -66,18 +66,18 @@ export default function RequestsPage() {
   const [requestItems, setRequestItems] = useState<Array<{
     id: string;
     category: PaymentRequestItem['category'];
-    supplierId: string;
-    supplierName: string;
+    supplier_id: string;
+    supplier_name: string;
     description: string;
-    unitPrice: number;
+    unit_price: number;
     quantity: number;
   }>>([]);
 
   const [newItem, setNewItem] = useState({
     category: '住宿' as PaymentRequestItem['category'],
-    supplierId: '',
+    supplier_id: '',
     description: '',
-    unitPrice: 0,
+    unit_price: 0,
     quantity: 1
   });
 
@@ -168,24 +168,24 @@ export default function RequestsPage() {
 
       switch (column) {
         case 'requestNumber':
-          aValue = a.requestNumber;
-          bValue = b.requestNumber;
+          aValue = a.request_number;
+          bValue = b.request_number;
           break;
         case 'tourName':
-          aValue = a.tourName;
-          bValue = b.tourName;
+          aValue = a.tour_name;
+          bValue = b.tour_name;
           break;
         case 'orderNumber':
-          aValue = a.orderNumber || '';
-          bValue = b.orderNumber || '';
+          aValue = a.order_number || '';
+          bValue = b.order_number || '';
           break;
         case 'requestDate':
-          aValue = new Date(a.requestDate || 0);
-          bValue = new Date(b.requestDate || 0);
+          aValue = new Date(a.request_date || 0);
+          bValue = new Date(b.request_date || 0);
           break;
         case 'totalAmount':
-          aValue = a.totalAmount;
-          bValue = b.totalAmount;
+          aValue = a.total_amount;
+          bValue = b.total_amount;
           break;
         case 'status':
           aValue = statusLabels[a.status];
@@ -204,11 +204,11 @@ export default function RequestsPage() {
   const filterFunction = useCallback((data: PaymentRequest[], filters: Record<string, string>) => {
     return data.filter(request => {
       return (
-        (!filters.requestNumber || request.requestNumber.toLowerCase().includes(filters.requestNumber.toLowerCase())) &&
-        (!filters.tourName || request.tourName.toLowerCase().includes(filters.tourName.toLowerCase())) &&
-        (!filters.orderNumber || (request.orderNumber || '').toLowerCase().includes(filters.orderNumber.toLowerCase())) &&
-        (!filters.requestDate || (request.requestDate || '').includes(filters.requestDate)) &&
-        (!filters.totalAmount || request.totalAmount.toString().includes(filters.totalAmount)) &&
+        (!filters.request_number || request.request_number.toLowerCase().includes(filters.request_number.toLowerCase())) &&
+        (!filters.tour_name || request.tour_name.toLowerCase().includes(filters.tour_name.toLowerCase())) &&
+        (!filters.order_number || (request.order_number || '').toLowerCase().includes(filters.order_number.toLowerCase())) &&
+        (!filters.request_date || (request.request_date || '').includes(filters.request_date)) &&
+        (!filters.total_amount || request.total_amount.toString().includes(filters.total_amount)) &&
         (!filters.status || request.status === filters.status)
       );
     });
@@ -229,23 +229,23 @@ export default function RequestsPage() {
 
   // 添加項目到列表
   const addItemToList = useCallback(() => {
-    if (!newItem.supplierId || !newItem.description) return;
+    if (!newItem.supplier_id || !newItem.description) return;
 
-    const selectedSupplier = suppliers.find(s => s.id === newItem.supplierId);
+    const selectedSupplier = suppliers.find(s => s.id === newItem.supplier_id);
     if (!selectedSupplier) return;
 
     const itemId = Math.random().toString(36).substr(2, 9);
     setRequestItems(prev => [...prev, {
       id: itemId,
       ...newItem,
-      supplierName: selectedSupplier.name,
+      supplier_name: selectedSupplier.name,
     }]);
 
     setNewItem({
       category: '住宿',
-      supplierId: '',
+      supplier_id: '',
       description: '',
-      unitPrice: 0,
+      unit_price: 0,
       quantity: 1
     });
   }, [newItem, suppliers]);
@@ -257,7 +257,7 @@ export default function RequestsPage() {
 
   // 計算總金額
   const totalAmount = useMemo(() =>
-    requestItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0)
+    requestItems.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0)
   , [requestItems]);
 
   // 生成接下來8週的週四日期
@@ -293,7 +293,7 @@ export default function RequestsPage() {
 
       const tourCode = tour.code?.toLowerCase() || '';
       const tourName = tour.name?.toLowerCase() || '';
-      const departureDate = tour.departureDate || '';
+      const departureDate = tour.departure_date || '';
 
       // 提取日期中的數字 (例如: 2024-08-20 -> "0820")
       const dateNumbers = departureDate.replace(/\D/g, '').slice(-4); // 取最後4位數字 (MMDD)
@@ -307,25 +307,25 @@ export default function RequestsPage() {
   // 過濾訂單 - 可以搜尋訂單號、聯絡人
   const filteredOrders = useMemo(() =>
     orders.filter(order => {
-      if (!newRequest.tourId) return false; // 必須先選擇旅遊團
-      if (order.tourId !== newRequest.tourId) return false; // 只顯示當前團的訂單
+      if (!newRequest.tour_id) return false; // 必須先選擇旅遊團
+      if (order.tour_id !== newRequest.tour_id) return false; // 只顯示當前團的訂單
 
       const searchTerm = orderSearchValue.toLowerCase();
       if (!searchTerm) return true;
 
-      const orderNumber = order.orderNumber?.toLowerCase() || '';
-      const contactPerson = order.contactPerson?.toLowerCase() || '';
+      const orderNumber = order.order_number?.toLowerCase() || '';
+      const contactPerson = order.contact_person?.toLowerCase() || '';
 
       return orderNumber.includes(searchTerm) || contactPerson.includes(searchTerm);
     })
-  , [orders, newRequest.tourId, orderSearchValue]);
+  , [orders, newRequest.tour_id, orderSearchValue]);
 
 
   const handleAddRequest = async () => {
-    if (!newRequest.tourId || requestItems.length === 0) return;
+    if (!newRequest.tour_id || requestItems.length === 0) return;
 
-    const selectedTour = tours.find(t => t.id === newRequest.tourId);
-    const selectedOrder = orders.find(o => o.id === newRequest.orderId);
+    const selectedTour = tours.find(t => t.id === newRequest.tour_id);
+    const selectedOrder = orders.find(o => o.id === newRequest.order_id);
 
     if (!selectedTour) return;
 
@@ -333,40 +333,40 @@ export default function RequestsPage() {
 
     // 創建請款單
     const request = await createPaymentRequest({
-      tourId: newRequest.tourId,
+      tour_id: newRequest.tour_id,
       code: selectedTour.code,
-      tourName: selectedTour.name,
-      orderId: newRequest.orderId || undefined,
-      orderNumber: selectedOrder?.orderNumber,
-      requestDate: newRequest.requestDate,
+      tour_name: selectedTour.name,
+      order_id: newRequest.order_id || undefined,
+      order_number: selectedOrder?.order_number,
+      request_date: newRequest.request_date,
       status: 'pending', // 固定為草稿狀態
       note: newRequest.note,
       isSpecialBilling: newRequest.isSpecialBilling, // 特殊出帳標記
-      createdBy: newRequest.createdBy
+      created_by: newRequest.created_by
     });
 
     // 添加所有項目
     requestItems.forEach((item, index) => {
       addPaymentItem(request.id, {
         category: item.category,
-        supplierId: item.supplierId,
-        supplierName: item.supplierName,
+        supplier_id: item.supplier_id,
+        supplier_name: item.supplier_name,
         description: item.description,
-        unitPrice: item.unitPrice,
+        unit_price: item.unit_price,
         quantity: item.quantity,
         note: '', // 預設空白
-        sortOrder: index + 1
+        sort_order: index + 1
       });
     });
 
     // 重置表單
     setNewRequest({
-      tourId: '',
-      orderId: '',
-      requestDate: '',
+      tour_id: '',
+      order_id: '',
+      request_date: '',
       note: '',
       isSpecialBilling: false,
-      createdBy: '1'
+      created_by: '1'
     });
     setRequestItems([]);
     setTourSearchValue('');
@@ -444,8 +444,8 @@ export default function RequestsPage() {
                               onClick={() => {
                                 setNewRequest(prev => ({
                                   ...prev,
-                                  tourId: tour.id,
-                                  orderId: '' // 重置訂單選擇
+                                  tour_id: tour.id,
+                                  order_id: '' // 重置訂單選擇
                                 }));
                                 setTourSearchValue(`${tour.code} - ${tour.name}`);
                                 setOrderSearchValue(''); // 重置訂單搜尋
@@ -455,7 +455,7 @@ export default function RequestsPage() {
                             >
                               <div className="font-medium">{tour.code} - {tour.name}</div>
                               <div className="text-sm text-morandi-secondary">
-                                出發: {new Date(tour.departureDate).toLocaleDateString()}
+                                出發: {new Date(tour.departure_date).toLocaleDateString()}
                               </div>
                             </div>
                           ))
@@ -471,15 +471,15 @@ export default function RequestsPage() {
                   <label className="text-sm font-medium text-morandi-primary">選擇訂單（可選）</label>
                   <div className="relative">
                     <Input
-                      placeholder={newRequest.tourId ? "搜尋訂單號或聯絡人..." : "請先選擇旅遊團"}
+                      placeholder={newRequest.tour_id ? "搜尋訂單號或聯絡人..." : "請先選擇旅遊團"}
                       value={orderSearchValue}
                       onChange={(e) => setOrderSearchValue(e.target.value)}
-                      onFocus={() => newRequest.tourId && setShowOrderDropdown(true)}
+                      onFocus={() => newRequest.tour_id && setShowOrderDropdown(true)}
                       onBlur={() => setTimeout(() => setShowOrderDropdown(false), 200)}
                       className="mt-1 bg-background"
-                      disabled={!newRequest.tourId}
+                      disabled={!newRequest.tour_id}
                     />
-                    {showOrderDropdown && newRequest.tourId && (
+                    {showOrderDropdown && newRequest.tour_id && (
                       <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-[200px] overflow-y-auto">
                         {filteredOrders.length > 0 ? (
                           filteredOrders.map((order) => (
@@ -488,16 +488,16 @@ export default function RequestsPage() {
                               onClick={() => {
                                 setNewRequest(prev => ({
                                   ...prev,
-                                  orderId: order.id
+                                  order_id: order.id
                                 }));
-                                setOrderSearchValue(`${order.orderNumber} - ${order.contactPerson}`);
+                                setOrderSearchValue(`${order.order_number} - ${order.contact_person}`);
                                 setShowOrderDropdown(false);
                               }}
                               className="p-3 hover:bg-morandi-container/20 cursor-pointer border-b border-border last:border-b-0"
                             >
-                              <div className="font-medium">{order.orderNumber}</div>
+                              <div className="font-medium">{order.order_number}</div>
                               <div className="text-sm text-morandi-secondary">
-                                聯絡人: {order.contactPerson}
+                                聯絡人: {order.contact_person}
                               </div>
                             </div>
                           ))
@@ -522,7 +522,7 @@ export default function RequestsPage() {
                         setNewRequest(prev => ({
                           ...prev,
                           isSpecialBilling: e.target.checked,
-                          requestDate: '' // 清空已選日期
+                          request_date: '' // 清空已選日期
                         }));
                       }}
                       className="rounded border-border"
@@ -538,8 +538,8 @@ export default function RequestsPage() {
                     <div>
                       <Input
                         type="date"
-                        value={newRequest.requestDate}
-                        onChange={(e) => setNewRequest(prev => ({ ...prev, requestDate: e.target.value }))}
+                        value={newRequest.request_date}
+                        onChange={(e) => setNewRequest(prev => ({ ...prev, request_date: e.target.value }))}
                         className="bg-morandi-gold/10 border-morandi-gold/50"
                       />
                       <p className="text-xs text-morandi-gold mt-1">⚠️ 特殊出帳：可選擇任何日期</p>
@@ -548,8 +548,8 @@ export default function RequestsPage() {
                     // 一般出帳：只能選週四
                     <div>
                       <Select
-                        value={newRequest.requestDate}
-                        onValueChange={(value) => setNewRequest(prev => ({ ...prev, requestDate: value }))}
+                        value={newRequest.request_date}
+                        onValueChange={(value) => setNewRequest(prev => ({ ...prev, request_date: value }))}
                       >
                         <SelectTrigger className="bg-background">
                           <SelectValue placeholder="選擇請款日期 (週四)" />
@@ -586,7 +586,7 @@ export default function RequestsPage() {
                 <Button
                   type="button"
                   onClick={addItemToList}
-                  disabled={!newItem.supplierId || !newItem.description}
+                  disabled={!newItem.supplier_id || !newItem.description}
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-6"
                   size="lg"
                 >
@@ -614,7 +614,7 @@ export default function RequestsPage() {
 
                 <div className="col-span-3">
                   <label className="text-sm font-medium text-morandi-secondary">供應商</label>
-                  <Select value={newItem.supplierId} onValueChange={(value) => setNewItem(prev => ({ ...prev, supplierId: value }))}>
+                  <Select value={newItem.supplier_id} onValueChange={(value) => setNewItem(prev => ({ ...prev, supplier_id: value }))}>
                     <SelectTrigger className="mt-2 bg-background">
                       <SelectValue placeholder="選擇供應商" />
                     </SelectTrigger>
@@ -642,8 +642,8 @@ export default function RequestsPage() {
                   <label className="text-sm font-medium text-morandi-secondary">單價</label>
                   <Input
                     type="number"
-                    value={newItem.unitPrice}
-                    onChange={(e) => setNewItem(prev => ({ ...prev, unitPrice: parseFloat(e.target.value) || 0 }))}
+                    value={newItem.unit_price}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))}
                     placeholder="0"
                     className="mt-2"
                   />
@@ -666,7 +666,7 @@ export default function RequestsPage() {
                 <div className="bg-morandi-container/20 rounded px-4 py-2">
                   <span className="text-sm font-medium text-morandi-secondary mr-2">小計:</span>
                   <span className="text-lg font-semibold text-morandi-gold">
-                    NT$ {(newItem.unitPrice * newItem.quantity).toLocaleString()}
+                    NT$ {(newItem.unit_price * newItem.quantity).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -686,7 +686,7 @@ export default function RequestsPage() {
                         </div>
                         <div>
                           <span className="text-xs text-morandi-secondary">供應商:</span>
-                          <div className="font-medium">{item.supplierName}</div>
+                          <div className="font-medium">{item.supplier_name}</div>
                         </div>
                         <div>
                           <span className="text-xs text-morandi-secondary">項目:</span>
@@ -694,7 +694,7 @@ export default function RequestsPage() {
                         </div>
                         <div>
                           <span className="text-xs text-morandi-secondary">單價:</span>
-                          <div className="font-medium">NT$ {item.unitPrice.toLocaleString()}</div>
+                          <div className="font-medium">NT$ {item.unit_price.toLocaleString()}</div>
                         </div>
                         <div>
                           <span className="text-xs text-morandi-secondary">數量:</span>
@@ -702,7 +702,7 @@ export default function RequestsPage() {
                         </div>
                         <div>
                           <span className="text-xs text-morandi-secondary">小計:</span>
-                          <div className="font-semibold text-morandi-gold">NT$ {(item.unitPrice * item.quantity).toLocaleString()}</div>
+                          <div className="font-semibold text-morandi-gold">NT$ {(item.unit_price * item.quantity).toLocaleString()}</div>
                         </div>
                       </div>
                       <Button
@@ -735,12 +735,12 @@ export default function RequestsPage() {
                   setIsAddDialogOpen(false);
                   setRequestItems([]);
                   setNewRequest({
-                    tourId: '',
-                    orderId: '',
-                    requestDate: '',
+                    tour_id: '',
+                    order_id: '',
+                    request_date: '',
                     note: '',
                     isSpecialBilling: false,
-                    createdBy: '1'
+                    created_by: '1'
                   });
                   setTourSearchValue('');
                   setOrderSearchValue('');
@@ -750,7 +750,7 @@ export default function RequestsPage() {
               </Button>
               <Button
                 onClick={handleAddRequest}
-                disabled={!newRequest.tourId || requestItems.length === 0}
+                disabled={!newRequest.tour_id || requestItems.length === 0}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 新增請款單 (共 {requestItems.length} 項，NT$ {totalAmount.toLocaleString()})

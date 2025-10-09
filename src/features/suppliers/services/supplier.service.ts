@@ -63,7 +63,7 @@ class SupplierService extends BaseService<Supplier> {
     const term = searchTerm.toLowerCase();
     return store.suppliers.filter(s =>
       s.name.toLowerCase().includes(term) ||
-      s.contactPerson?.toLowerCase().includes(term) ||
+      s.contact_person?.toLowerCase().includes(term) ||
       s.email?.toLowerCase().includes(term)
     );
   }

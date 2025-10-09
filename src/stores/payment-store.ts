@@ -15,7 +15,7 @@ interface PaymentStore {
   deletePaymentRequest: (id: string) => Promise<boolean>;
   loadPaymentRequests: () => Promise<PaymentRequest[] | null>;
   setSelectedPaymentRequest: (request: PaymentRequest | null) => void;
-  createPaymentRequestFromQuote: (tourId: string, quoteId: string, requestDate: string) => string;
+  createPaymentRequestFromQuote: (tour_id: string, quote_id: string, request_date: string) => string;
 
   // PaymentRequestItem CRUD
   addPaymentItem: (requestId: string, item: Omit<PaymentRequestItem, 'id' | 'requestId' | 'itemNumber' | 'createdAt' | 'updatedAt'>) => string;
@@ -23,10 +23,10 @@ interface PaymentStore {
   deletePaymentItem: (requestId: string, itemId: string) => void;
 
   // DisbursementOrder CRUD
-  createDisbursementOrder: (paymentRequestIds: string[], note?: string) => string;
+  createDisbursementOrder: (payment_request_ids: string[], note?: string) => string;
   updateDisbursementOrder: (id: string, updates: Partial<DisbursementOrder>) => void;
-  confirmDisbursementOrder: (id: string, confirmedBy: string) => void;
-  addToCurrentDisbursementOrder: (paymentRequestIds: string[]) => void;
+  confirmDisbursementOrder: (id: string, confirmed_by: string) => void;
+  addToCurrentDisbursementOrder: (payment_request_ids: string[]) => void;
   removeFromDisbursementOrder: (disbursementId: string, paymentRequestId: string) => void;
   getCurrentWeekDisbursementOrder: () => DisbursementOrder | null;
 
@@ -61,7 +61,7 @@ export const usePaymentStore = create<PaymentStore>()(
             id,
             requestNumber,
             items: [],
-            totalAmount: 0,
+            total_amount: 0,
             createdAt: now,
             updatedAt: now,
           };
@@ -88,14 +88,14 @@ export const usePaymentStore = create<PaymentStore>()(
             return '';
           }
 
-          const itemNumber = `${request.requestNumber}-${String(request.items.length + 1).padStart(3, '0')}`;
+          const itemNumber = `${request.request_number}-${String(request.items.length + 1).padStart(3, '0')}`;
 
           const item: PaymentRequestItem = {
             ...itemData,
             id,
             requestId,
             itemNumber,
-            subtotal: itemData.unitPrice * itemData.quantity,
+            subtotal: itemData.unit_price * itemData.quantity,
             createdAt: now,
             updatedAt: now,
           };
@@ -132,7 +132,7 @@ export const usePaymentStore = create<PaymentStore>()(
                     items: request.items.map(item => {
                       if (item.id === itemId) {
                         const updatedItem = { ...item, ...itemData, updatedAt: now };
-                        updatedItem.subtotal = updatedItem.unitPrice * updatedItem.quantity;
+                        updatedItem.subtotal = updatedItem.unit_price * updatedItem.quantity;
                         return updatedItem;
                       }
                       return item;
@@ -175,9 +175,9 @@ export const usePaymentStore = create<PaymentStore>()(
       generateRequestNumber: () => {
         const year = new Date().getFullYear();
         const existingNumbers = get().paymentRequests
-          .filter(request => request.requestNumber.startsWith(`REQ-${year}`))
+          .filter(request => request.request_number.startsWith(`REQ-${year}`))
           .map(request => {
-            const numPart = request.requestNumber.split('-')[1];
+            const numPart = request.request_number.split('-')[1];
             return parseInt(numPart.substring(4)) || 0;
           });
 
@@ -216,18 +216,18 @@ export const usePaymentStore = create<PaymentStore>()(
 
           const totalAmount = paymentRequestIds.reduce((sum, requestId) => {
             const request = get().paymentRequests.find(r => r.id === requestId);
-            return sum + (request?.totalAmount || 0);
+            return sum + (request?.total_amount || 0);
           }, 0);
 
           const disbursementOrder: DisbursementOrder = {
             id,
             orderNumber,
             disbursementDate,
-            paymentRequestIds: [...paymentRequestIds],
+            payment_request_ids: [...payment_request_ids],
             totalAmount,
             status: 'pending',
             note,
-            createdBy: '1', // TODO: 使用實際用戶ID
+            created_by: '1', // TODO: 使用實際用戶ID
             createdAt: now,
             updatedAt: now,
           };
@@ -279,13 +279,13 @@ export const usePaymentStore = create<PaymentStore>()(
                     ...o,
                     status: 'confirmed' as const,
                     confirmedBy,
-                    confirmedAt: now,
+                    confirmed_at: now,
                     updatedAt: now
                   }
                 : o
             ),
             paymentRequests: state.paymentRequests.map(request =>
-              order.paymentRequestIds.includes(request.id)
+              order.payment_request_ids.includes(request.id)
                 ? { ...request, status: 'confirmed' as const, updatedAt: now }
                 : request
             )
@@ -300,15 +300,15 @@ export const usePaymentStore = create<PaymentStore>()(
           const currentOrder = get().getCurrentWeekDisbursementOrder();
 
           if (currentOrder && currentOrder.status === 'pending') {
-            const newPaymentRequestIds = [...currentOrder.paymentRequestIds, ...paymentRequestIds];
+            const newPaymentRequestIds = [...currentOrder.payment_request_ids, ...payment_request_ids];
             const newTotalAmount = newPaymentRequestIds.reduce((sum, requestId) => {
               const request = get().paymentRequests.find(r => r.id === requestId);
-              return sum + (request?.totalAmount || 0);
+              return sum + (request?.total_amount || 0);
             }, 0);
 
             get().updateDisbursementOrder(currentOrder.id, {
-              paymentRequestIds: newPaymentRequestIds,
-              totalAmount: newTotalAmount
+              payment_request_ids: newPaymentRequestIds,
+              total_amount: newTotalAmount
             });
           } else {
             get().createDisbursementOrder(paymentRequestIds);
@@ -337,16 +337,16 @@ export const usePaymentStore = create<PaymentStore>()(
             return;
           }
 
-          const newPaymentRequestIds = order.paymentRequestIds.filter(id => id !== paymentRequestId);
+          const newPaymentRequestIds = order.payment_request_ids.filter(id => id !== paymentRequestId);
           const newTotalAmount = newPaymentRequestIds.reduce((sum, requestId) => {
             const request = get().paymentRequests.find(r => r.id === requestId);
-            return sum + (request?.totalAmount || 0);
+            return sum + (request?.total_amount || 0);
           }, 0);
 
           set((state) => ({
             disbursementOrders: state.disbursementOrders.map(o =>
               o.id === disbursementId
-                ? { ...o, paymentRequestIds: newPaymentRequestIds, totalAmount: newTotalAmount, updatedAt: now }
+                ? { ...o, payment_request_ids: newPaymentRequestIds, total_amount: newTotalAmount, updatedAt: now }
                 : o
             ),
             paymentRequests: state.paymentRequests.map(request =>
@@ -363,7 +363,7 @@ export const usePaymentStore = create<PaymentStore>()(
       getCurrentWeekDisbursementOrder: () => {
         const nextThursday = get().getNextThursday();
         return get().disbursementOrders.find(order =>
-          order.disbursementDate === nextThursday && order.status === 'pending'
+          order.disbursement_date === nextThursday && order.status === 'pending'
         ) || null;
       },
 
@@ -371,9 +371,9 @@ export const usePaymentStore = create<PaymentStore>()(
       generateDisbursementNumber: () => {
         const year = new Date().getFullYear();
         const existingNumbers = get().disbursementOrders
-          .filter(order => order.orderNumber.startsWith(`CD-${year}`))
+          .filter(order => order.order_number.startsWith(`CD-${year}`))
           .map(order => {
-            const numPart = order.orderNumber.split('-')[1];
+            const numPart = order.order_number.split('-')[1];
             return parseInt(numPart.substring(4)) || 0;
           });
 
@@ -417,15 +417,15 @@ export const usePaymentStore = create<PaymentStore>()(
             requestNumber,
             tourId,
             code: 'AUTO-GEN',
-            tourName: '自動生成請款單',
+            tour_name: '自動生成請款單',
             quoteId,
             requestDate,
             items: [],
-            totalAmount: 0,
+            total_amount: 0,
             status: 'pending',
             note: '從報價單自動生成',
-            budgetWarning: false,
-            createdBy: '1', // TODO: 使用實際用戶ID
+            budget_warning: false,
+            created_by: '1', // TODO: 使用實際用戶ID
             createdAt: now,
             updatedAt: now,
           };

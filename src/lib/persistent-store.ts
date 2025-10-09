@@ -53,18 +53,18 @@ export const createPersistentCrudMethods = <T extends { id?: string }>(
     [`add${capitalizedName}`]: async (data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
         // 特殊處理：自動生成編號
-        if (tableName === 'quotes' && !(data as any).quoteNumber) {
+        if (tableName === 'quotes' && !(data as any).quote_number) {
           const year = new Date().getFullYear();
           const state = get();
           const existingQuotes = state[arrayKey] || [];
           const lastNumber = existingQuotes
-            .map((q: any) => q.quoteNumber)
+            .map((q: any) => q.quote_number)
             .filter((num: string) => num?.startsWith(`QUOTE-${year}`))
             .map((num: string) => parseInt(num.split('-')[2] || '0'))
             .sort((a: number, b: number) => b - a)[0] || 0;
 
           const newNumber = (lastNumber + 1).toString().padStart(4, '0');
-          (data as any).quoteNumber = `QUOTE-${year}-${newNumber}`;
+          (data as any).quote_number = `QUOTE-${year}-${newNumber}`;
         }
 
         // 使用 OfflineManager 建立資料

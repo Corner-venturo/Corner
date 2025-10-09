@@ -53,7 +53,7 @@ export const useCustomers = () => {
     /**
      * 獲取特定旅遊團的客戶
      */
-    getCustomersByTour: (tourId: string) => {
+    getCustomersByTour: (tour_id: string) => {
       return customerService.getCustomersByTour(tourId);
     },
 

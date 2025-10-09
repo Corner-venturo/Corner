@@ -35,7 +35,7 @@ export const useQuotes = () => {
       return await quoteService.createNewVersion(id, updates);
     },
 
-    getQuotesByTour: (tourId: string) => {
+    getQuotesByTour: (tour_id: string) => {
       return quoteService.getQuotesByTour(tourId);
     },
 

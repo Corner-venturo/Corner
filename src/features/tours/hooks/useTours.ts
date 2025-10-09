@@ -42,7 +42,7 @@ export const useTours = () => {
       store.setSelectedTour(tour);
     },
 
-    createTourFromQuote: (quoteId: string, tourData: Partial<Tour>) => {
+    createTourFromQuote: (quote_id: string, tourData: Partial<Tour>) => {
       return store.createTourFromQuote(quoteId, tourData);
     },
 
@@ -63,7 +63,7 @@ export const useTours = () => {
       return await store.loadOrders();
     },
 
-    updateOrderMemberCount: (orderId: string) => {
+    updateOrderMemberCount: (order_id: string) => {
       store.updateOrderMemberCount(orderId);
     },
 
@@ -127,11 +127,11 @@ export const useTours = () => {
       return await tourService.isTourCodeExists(code);
     },
 
-    calculateFinancialSummary: async (tourId: string) => {
+    calculateFinancialSummary: async (tour_id: string) => {
       return await tourService.calculateFinancialSummary(tourId);
     },
 
-    updateTourStatus: async (tourId: string, status: Tour['status'], reason?: string) => {
+    updateTourStatus: async (tour_id: string, status: Tour['status'], reason?: string) => {
       return await tourService.updateTourStatus(tourId, status, reason);
     },
   };

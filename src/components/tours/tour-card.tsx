@@ -27,7 +27,7 @@ export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: Tour
   };
 
   const profitColor = tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red';
-  const occupancyRate = tour.maxParticipants > 0 ? (actualMembers / tour.maxParticipants) * 100 : 0;
+  const occupancyRate = tour.max_participants > 0 ? (actualMembers / tour.max_participants) * 100 : 0;
   const occupancyColor = occupancyRate >= 80 ? 'text-morandi-green' : occupancyRate >= 50 ? 'text-morandi-gold' : 'text-morandi-red';
 
   return (
@@ -73,11 +73,11 @@ export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: Tour
         <div className="flex items-center space-x-2 text-sm">
           <Calendar className="text-morandi-secondary" size={16} />
           <span className="text-morandi-primary">
-            {new Date(tour.departureDate).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' })}
+            {new Date(tour.departure_date).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' })}
           </span>
           <span className="text-morandi-secondary">-</span>
           <span className="text-morandi-primary">
-            {new Date(tour.returnDate).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' })}
+            {new Date(tour.return_date).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' })}
           </span>
         </div>
 
@@ -94,7 +94,7 @@ export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: Tour
                 {actualMembers}
               </span>
               <span className="text-sm text-morandi-secondary">
-                / {tour.maxParticipants}
+                / {tour.max_participants}
               </span>
             </div>
             <div className="text-xs text-morandi-secondary">
@@ -109,7 +109,7 @@ export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: Tour
               <span className="text-xs">總收入</span>
             </div>
             <div className="text-lg font-bold text-morandi-primary">
-              ${tour.totalRevenue.toLocaleString()}
+              ${tour.total_revenue.toLocaleString()}
             </div>
             <div className="text-xs text-morandi-secondary">
               NT$
@@ -120,7 +120,7 @@ export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: Tour
           <div className="space-y-1">
             <div className="text-xs text-morandi-secondary">總成本</div>
             <div className="text-sm font-medium text-morandi-red">
-              ${tour.totalCost.toLocaleString()}
+              ${tour.total_cost.toLocaleString()}
             </div>
           </div>
 

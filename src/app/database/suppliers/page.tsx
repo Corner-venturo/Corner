@@ -65,7 +65,7 @@ export default function SuppliersPage() {
     name: '',
     type: 'hotel' as Supplier['type'],
     contact: {
-      contactPerson: '',
+      contact_person: '',
       phone: '',
       email: '',
       address: '',
@@ -76,7 +76,7 @@ export default function SuppliersPage() {
   });
 
   const handleAddSupplier = useCallback(() => {
-    if (!newSupplier.name.trim() || !newSupplier.contact.contactPerson.trim()) return;
+    if (!newSupplier.name.trim() || !newSupplier.contact.contact_person.trim()) return;
 
     addSupplier(newSupplier);
 
@@ -84,7 +84,7 @@ export default function SuppliersPage() {
       name: '',
       type: 'hotel',
       contact: {
-        contactPerson: '',
+        contact_person: '',
         phone: '',
         email: '',
         address: '',
@@ -304,7 +304,7 @@ export default function SuppliersPage() {
                     <div className="space-y-1 text-sm text-morandi-secondary">
                       <div className="flex items-center gap-2">
                         <UserCheck size={12} />
-                        {supplier.contact.contactPerson}
+                        {supplier.contact.contact_person}
                       </div>
                       {supplier.contact.phone && (
                         <div className="flex items-center gap-2">
@@ -334,8 +334,8 @@ export default function SuppliersPage() {
                       <div>總項目: {supplier.priceList.length} 個</div>
                       {supplier.priceList.length > 0 && (
                         <div>
-                          價格範圍: NT$ {Math.min(...supplier.priceList.map(p => p.unitPrice)).toLocaleString()} -
-                          NT$ {Math.max(...supplier.priceList.map(p => p.unitPrice)).toLocaleString()}
+                          價格範圍: NT$ {Math.min(...supplier.priceList.map(p => p.unit_price)).toLocaleString()} -
+                          NT$ {Math.max(...supplier.priceList.map(p => p.unit_price)).toLocaleString()}
                         </div>
                       )}
                     </div>
@@ -346,9 +346,9 @@ export default function SuppliersPage() {
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium text-morandi-primary">帳戶資訊</h4>
                       <div className="space-y-1 text-sm text-morandi-secondary">
-                        <div>{supplier.bankInfo.bankName}</div>
-                        <div>帳號: {supplier.bankInfo.accountNumber}</div>
-                        <div>戶名: {supplier.bankInfo.accountName}</div>
+                        <div>{supplier.bankInfo.bank_name}</div>
+                        <div>帳號: {supplier.bankInfo.account_number}</div>
+                        <div>戶名: {supplier.bankInfo.account_name}</div>
                       </div>
                     </div>
                   )}
@@ -424,10 +424,10 @@ export default function SuppliersPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">聯絡人 *</label>
                   <Input
-                    value={newSupplier.contact.contactPerson}
+                    value={newSupplier.contact.contact_person}
                     onChange={(e) => setNewSupplier(prev => ({
                       ...prev,
-                      contact: { ...prev.contact, contactPerson: e.target.value }
+                      contact: { ...prev.contact, contact_person: e.target.value }
                     }))}
                     placeholder="聯絡人姓名"
                     className="mt-1"

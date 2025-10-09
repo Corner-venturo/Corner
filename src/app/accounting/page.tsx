@@ -69,7 +69,7 @@ export default function AccountingPage() {
   const todayTransactions = useMemo(() =>
     transactions
       .filter(t => t.date === today)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 3)
   , [transactions, today]);
 
@@ -83,10 +83,10 @@ export default function AccountingPage() {
     if (!categoryData || !accountData) return;
 
     const transactionData = {
-      accountId: quickAccount,
-      accountName: accountData.name,
-      categoryId: quickCategory,
-      categoryName: categoryData.name,
+      account_id: quickAccount,
+      account_name: accountData.name,
+      category_id: quickCategory,
+      category_name: categoryData.name,
       type: 'expense' as const,
       amount: parseFloat(quickAmount),
       currency: 'TWD',
@@ -108,8 +108,8 @@ export default function AccountingPage() {
   }, [quickAmount, quickCategory, quickAccount, categories, accounts, today, addTransaction]);
 
   // 分類快速選擇
-  const handleQuickCategorySelect = useCallback((categoryId: string) => {
-    setQuickCategory(categoryId);
+  const handleQuickCategorySelect = useCallback((category_id: string) => {
+    setQuickCategory(category_id);
     setTimeout(() => {
       addButtonRef.current?.focus();
     }, 100);
@@ -139,7 +139,7 @@ export default function AccountingPage() {
       .reduce((sum, t) => sum + t.amount, 0)
   , [transactions, lastMonth, lastMonthYear]);
 
-  const expenseDifference = lastMonthExpense - stats.monthlyExpense;
+  const expenseDifference = lastMonthExpense - stats.monthly_expense;
   const daysToEndOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate() - new Date().getDate();
 
   // 主題配置
@@ -189,12 +189,12 @@ export default function AccountingPage() {
           <div className="text-center">
             <div className="text-white/80 text-sm mb-1">本月支出</div>
             <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-              NT$ {stats.monthlyExpense.toLocaleString()}
+              NT$ {stats.monthly_expense.toLocaleString()}
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-white/80">
               <div className="flex items-center space-x-1">
                 <TrendingUp size={14} />
-                <span>收入: NT$ {stats.monthlyIncome.toLocaleString()}</span>
+                <span>收入: NT$ {stats.monthly_income.toLocaleString()}</span>
               </div>
               {expenseDifference > 0 && (
                 <div className="flex items-center space-x-1 text-green-300">
@@ -326,16 +326,16 @@ export default function AccountingPage() {
           {todayTransactions.length > 0 ? (
             <div className="space-y-3">
               {todayTransactions.map((transaction) => {
-                const category = quickCategories.find(c => c.id === transaction.categoryId);
+                const category = quickCategories.find(c => c.id === transaction.category_id);
                 return (
                   <div key={transaction.id} className={cn("flex items-center justify-between p-3 sm:p-4 rounded-xl border",
                     theme === 'morandi' ? 'bg-white/60 border-[#E6DDD4]/50' : 'bg-slate-700 border-slate-600'
                   )}>
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
                       <div className="min-w-0 flex-1">
-                        <div className={cn("font-medium truncate", currentTheme.primary)}>{transaction.categoryName}</div>
+                        <div className={cn("font-medium truncate", currentTheme.primary)}>{transaction.category_name}</div>
                         <div className={cn("text-sm", currentTheme.secondary)}>
-                          {new Date(transaction.createdAt).toLocaleTimeString('zh-TW', {
+                          {new Date(transaction.created_at).toLocaleTimeString('zh-TW', {
                             hour: '2-digit',
                             minute: '2-digit'
                           })}

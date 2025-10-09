@@ -254,11 +254,11 @@ export class SyncManager {
       ...data,
       id: tempId,
       // 如果是訂單，使用「待編號」
-      ...(table === 'orders' && { orderNumber: '待編號' }),
+      ...(table === 'orders' && { order_number: '待編號' }),
       // 如果是旅遊團，使用「待編號」
       ...(table === 'tours' && { code: '待編號' }),
       // 如果是報價單，使用「待編號」
-      ...(table === 'quotes' && { quoteNumber: '待編號' }),
+      ...(table === 'quotes' && { quote_number: '待編號' }),
       syncStatus: 'pending',
       isOfflineDraft: true // 標記為離線草稿
     };
@@ -350,15 +350,15 @@ export class SyncManager {
           // 1. 如果需要伺服器編號，先取號
           let dataWithNumber = { ...operation.data };
 
-          if (operation.table === 'orders' && !operation.data.orderNumber) {
+          if (operation.table === 'orders' && !operation.data.order_number) {
             const orderNumber = await this.getNextOrderNumber();
-            dataWithNumber.orderNumber = orderNumber;
+            dataWithNumber.order_number = orderNumber;
           } else if (operation.table === 'tours' && !operation.data.code) {
             const code = await this.getNextTourCode();
             dataWithNumber.code = code;
-          } else if (operation.table === 'quotes' && !operation.data.quoteNumber) {
+          } else if (operation.table === 'quotes' && !operation.data.quote_number) {
             const quoteNumber = await this.getNextQuoteNumber();
-            dataWithNumber.quoteNumber = quoteNumber;
+            dataWithNumber.quote_number = quoteNumber;
           }
 
           // 2. 使用 VenturoAPI 插入（自動處理 camelCase -> snake_case）
@@ -421,7 +421,7 @@ export class SyncManager {
       console.log(`✅ 已同步 ${table}:`, {
         from: localId,
         to: remoteData.id,
-        number: remoteData.orderNumber || remoteData.code || remoteData.quoteNumber
+        number: remoteData.order_number || remoteData.code || remoteData.quote_number
       });
     }
   }
@@ -442,7 +442,7 @@ export class SyncManager {
     }
 
     // 解析編號並遞增
-    const match = data.orderNumber.match(/ORDER-(\d{4})-(\d{4})/);
+    const match = data.order_number.match(/ORDER-(\d{4})-(\d{4})/);
     if (match) {
       const year = new Date().getFullYear();
       const lastNumber = parseInt(match[2]);
@@ -488,7 +488,7 @@ export class SyncManager {
       return `QUOTE-${new Date().getFullYear()}-0001`;
     }
 
-    const match = data.quoteNumber.match(/QUOTE-(\d{4})-(\d{4})/);
+    const match = data.quote_number.match(/QUOTE-(\d{4})-(\d{4})/);
     if (match) {
       const year = new Date().getFullYear();
       const lastNumber = parseInt(match[2]);

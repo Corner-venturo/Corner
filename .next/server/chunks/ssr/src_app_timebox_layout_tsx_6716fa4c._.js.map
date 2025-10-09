@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/williamchien/Desktop/Venturo/venturo-new/src/app/timebox/layout.tsx"],"sourcesContent":["import type { Metadata } from 'next'\n\nexport const metadata: Metadata = {\n  title: '時間箱管理',\n  description: '智能時間管理系統',\n}\n\nexport default function TimeboxLayout({\n  children,\n}: {\n  children: React.ReactNode\n}) {\n  return children\n}"],"names":[],"mappings":";;;;;;AAEO,MAAM,WAAqB;IAChC,OAAO;IACP,aAAa;AACf;AAEe,SAAS,cAAc,EACpC,QAAQ,EAGT;IACC,OAAO;AACT","debugId":null}}]
-}

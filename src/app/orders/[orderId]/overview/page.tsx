@@ -4,18 +4,19 @@ import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, useTourStore } from '@/stores';
 import { ArrowLeft, BarChart3, Calendar, User, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function OrderOverviewPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.orderId as string;
-  const { orders, tours } = useTourStore();
+  const orderId = params.order_id as string;
+  const { items: orders } = useOrderStore()
+  const { items: tours } = useTourStore();
 
   const order = orders.find(o => o.id === orderId);
-  const tour = tours.find(t => t.id === order?.tourId);
+  const tour = tours.find(t => t.id === order?.tour_id);
 
   if (!order) {
     return (
@@ -43,7 +44,7 @@ export default function OrderOverviewPage() {
   return (
     <div className="space-y-6 ">
       <ResponsiveHeader
-        title={`訂單總覽 - ${order.orderNumber}`}
+        title={`訂單總覽 - ${order.order_number}`}
       >
         <Button
           onClick={() => router.push('/orders')}
@@ -66,11 +67,11 @@ export default function OrderOverviewPage() {
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">訂單編號</span>
-                <span className="text-morandi-primary font-medium">{order.orderNumber}</span>
+                <span className="text-morandi-primary font-medium">{order.order_number}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">旅遊團</span>
-                <span className="text-morandi-primary font-medium">{order.tourName}</span>
+                <span className="text-morandi-primary font-medium">{order.tour_name}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">團體代號</span>
@@ -78,21 +79,21 @@ export default function OrderOverviewPage() {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">建立時間</span>
-                <span className="text-morandi-primary">{new Date(order.createdAt).toLocaleDateString()}</span>
+                <span className="text-morandi-primary">{new Date(order.created_at).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">最後更新</span>
-                <span className="text-morandi-primary">{new Date(order.updatedAt).toLocaleDateString()}</span>
+                <span className="text-morandi-primary">{new Date(order.updated_at).toLocaleDateString()}</span>
               </div>
               {tour && (
                 <>
                   <div className="flex justify-between items-center py-2 border-b border-border/30">
                     <span className="text-morandi-secondary">出發日期</span>
-                    <span className="text-morandi-primary font-medium">{tour.departureDate}</span>
+                    <span className="text-morandi-primary font-medium">{tour.departure_date}</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-morandi-secondary">返回日期</span>
-                    <span className="text-morandi-primary font-medium">{tour.returnDate}</span>
+                    <span className="text-morandi-primary font-medium">{tour.return_date}</span>
                   </div>
                 </>
               )}
@@ -108,11 +109,11 @@ export default function OrderOverviewPage() {
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">聯絡人</span>
-                <span className="text-morandi-primary font-medium">{order.contactPerson}</span>
+                <span className="text-morandi-primary font-medium">{order.contact_person}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">業務</span>
-                <span className="text-morandi-primary font-medium">{order.salesPerson}</span>
+                <span className="text-morandi-primary font-medium">{order.sales_person}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">助理</span>
@@ -120,7 +121,7 @@ export default function OrderOverviewPage() {
               </div>
               <div className="flex justify-between items-center py-2">
                 <span className="text-morandi-secondary">預定人數</span>
-                <span className="text-morandi-primary font-medium">{order.memberCount}人</span>
+                <span className="text-morandi-primary font-medium">{order.member_count}人</span>
               </div>
             </div>
           </div>
@@ -134,28 +135,28 @@ export default function OrderOverviewPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-primary mb-1">
-                  NT$ {order.totalAmount.toLocaleString()}
+                  NT$ {order.total_amount.toLocaleString()}
                 </div>
                 <div className="text-morandi-secondary text-sm">總金額</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-green mb-1">
-                  NT$ {order.paidAmount.toLocaleString()}
+                  NT$ {order.paid_amount.toLocaleString()}
                 </div>
                 <div className="text-morandi-secondary text-sm">已收款</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-red mb-1">
-                  NT$ {order.remainingAmount.toLocaleString()}
+                  NT$ {order.remaining_amount.toLocaleString()}
                 </div>
                 <div className="text-morandi-secondary text-sm">待收款</div>
               </div>
               <div className="text-center">
                 <span className={cn(
                   'inline-flex items-center px-3 py-2 rounded text-sm font-medium',
-                  getPaymentBadge(order.paymentStatus)
+                  getPaymentBadge(order.payment_status)
                 )}>
-                  {order.paymentStatus}
+                  {order.payment_status}
                 </span>
                 <div className="text-morandi-secondary text-sm mt-1">付款狀態</div>
               </div>

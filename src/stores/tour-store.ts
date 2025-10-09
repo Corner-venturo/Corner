@@ -19,14 +19,14 @@ interface TourState {
   deleteTour: (id: string) => Promise<void>;
   loadTours: () => Promise<Tour[]>;
   setSelectedTour: (tour: Tour | null) => void;
-  createTourFromQuote: (quoteId: string, tourData: Partial<Tour>) => string;
+  createTourFromQuote: (quote_id: string, tourData: Partial<Tour>) => string;
 
   // Orders CRUD
   addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Order>;
   updateOrder: (id: string, order: Partial<Order>) => Promise<Order>;
   deleteOrder: (id: string) => Promise<void>;
   loadOrders: () => Promise<Order[]>;
-  updateOrderMemberCount: (orderId: string) => void;
+  updateOrderMemberCount: (order_id: string) => void;
 
   // Customers CRUD
   addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Customer>;
@@ -92,7 +92,7 @@ export const useTourStore = create<TourState>(
           maxParticipants: tourData.maxParticipants || 20,
           contractStatus: '未簽署',
           totalRevenue: 0,
-          totalCost: 0,
+          total_cost: 0,
           profit: 0,
           quoteId,
           quoteCostStructure: undefined,
@@ -109,7 +109,7 @@ export const useTourStore = create<TourState>(
       },
 
       updateOrderMemberCount: (orderId) => set((state) => {
-        const memberCount = state.members.filter(member => member.orderId === orderId).length;
+        const memberCount = state.members.filter(member => member.order_id === orderId).length;
         return {
           orders: state.orders.map(order =>
             order.id === orderId

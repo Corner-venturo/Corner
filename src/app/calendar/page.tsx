@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { useTourStore, useCalendarStore } from '@/stores'
+import { useTourStore, useOrderStore, useMemberStore, useCalendarStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { Tour } from '@/stores/types'
 
@@ -41,9 +41,9 @@ interface CalendarEvent {
     description?: string
     location?: string
     participants?: number
-    maxParticipants?: number
+    max_participants?: number
     status?: Tour['status']
-    tourId?: string
+    tour_id?: string
     code?: string
   }
 }
@@ -61,7 +61,9 @@ interface PersonalEvent {
 export default function CalendarPage() {
   const router = useRouter()
   const calendarRef = useRef<FullCalendar>(null)
-  const { tours, orders, members } = useTourStore()
+  const { items: tours } = useTourStore()
+  const { items: orders } = useOrderStore()
+  const { items: members } = useMemberStore()
 
   // CalendarStore
   const { user } = useAuthStore()
@@ -163,15 +165,15 @@ export default function CalendarPage() {
   const tourEvents: CalendarEvent[] = useMemo(() => {
     return (tours || []).map(tour => {
       const color = getEventColor('tour', tour.status)
-      const tourOrders = (orders || []).filter(order => order.tourId === tour.id)
+      const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
       const actualMembers = (members || []).filter(member =>
-        tourOrders.some(order => order.id === member.orderId)
+        tourOrders.some(order => order.id === member.order_id)
       ).length
 
       // 修正 FullCalendar 的多日事件顯示問題
       // 如果有 returnDate，則需要加一天才能正確顯示跨日事件
-      let endDate = tour.returnDate
-      if (endDate && endDate !== tour.departureDate) {
+      let endDate = tour.return_date
+      if (endDate && endDate !== tour.departure_date) {
         const returnDate = new Date(endDate)
         returnDate.setDate(returnDate.getDate() + 1)
         endDate = returnDate.toISOString().split('T')[0]
@@ -180,17 +182,17 @@ export default function CalendarPage() {
       return {
         id: `tour-${tour.id}`,
         title: `🛫 ${tour.name}`,
-        start: tour.departureDate,
+        start: tour.departure_date,
         end: endDate,
         backgroundColor: color.bg,
         borderColor: color.border,
         extendedProps: {
           type: 'tour' as const,
-          tourId: tour.id,
+          tour_id: tour.id,
           code: tour.code,
           location: tour.location,
           participants: actualMembers,
-          maxParticipants: tour.maxParticipants,
+          max_participants: tour.max_participants,
           status: tour.status,
         },
       }
@@ -268,7 +270,7 @@ export default function CalendarPage() {
             type: 'birthday' as const,
             memberId: member.id,
             memberName: member.name,
-            orderId: member.orderId,
+            order_id: member.order_id,
           },
         }
       })
@@ -379,7 +381,7 @@ export default function CalendarPage() {
     const eventType = info.event.extendedProps.type
 
     if (eventType === 'tour') {
-      const tourId = info.event.extendedProps.tourId
+      const tourId = info.event.extendedProps.tour_id
       router.push(`/tours/${tourId}`)
     } else if (eventType === 'birthday') {
       // 跳轉到會員資料頁面
@@ -453,7 +455,7 @@ export default function CalendarPage() {
 
   const handleDialogEventClick = (event: CalendarEvent) => {
     if (event.extendedProps.type === 'tour') {
-      router.push(`/tours/${event.extendedProps.tourId}`)
+      router.push(`/tours/${event.extendedProps.tour_id}`)
     }
     handleCloseDialog()
   }
@@ -901,7 +903,7 @@ export default function CalendarPage() {
                         )}
                         {event.extendedProps.participants && (
                           <span>
-                            {event.extendedProps.participants}/{event.extendedProps.maxParticipants}
+                            {event.extendedProps.participants}/{event.extendedProps.max_participants}
                             人
                           </span>
                         )}

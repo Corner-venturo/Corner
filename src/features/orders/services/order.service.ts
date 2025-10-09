@@ -25,20 +25,20 @@ class OrderService extends BaseService<Order> {
   }
 
   protected validate(data: Partial<Order>): void {
-    if (data.tourId && !data.tourId.trim()) {
+    if (data.tour_id && !data.tour_id.trim()) {
       throw new ValidationError('tourId', '必須關聯旅遊團');
     }
 
-    if (data.totalAmount !== undefined && data.totalAmount < 0) {
+    if (data.total_amount !== undefined && data.total_amount < 0) {
       throw new ValidationError('totalAmount', '訂單金額不能為負數');
     }
   }
 
   // ========== 業務邏輯方法 ==========
 
-  getOrdersByTour(tourId: string): Order[] {
+  getOrdersByTour(tour_id: string): Order[] {
     const store = useOrderStore.getState();
-    return store.orders.filter(o => o.tourId === tourId);
+    return store.orders.filter(o => o.tour_id === tourId);
   }
 
   getOrdersByStatus(status: Order['status']): Order[] {
@@ -55,7 +55,7 @@ class OrderService extends BaseService<Order> {
     const store = useOrderStore.getState();
     return store.orders
       .filter(o => o.status === '已確認' || o.status === '已完成')
-      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+      .reduce((sum, o) => sum + (o.total_amount || 0), 0);
   }
 
   getPendingOrders(): Order[] {

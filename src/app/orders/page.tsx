@@ -6,7 +6,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, useTourStore } from '@/stores';
 import { ShoppingCart, CreditCard, AlertCircle, CheckCircle, Clock, Kanban, List, Search } from 'lucide-react';
 import { ExpandableOrderTable } from '@/components/orders/expandable-order-table';
 import { OrderKanban } from '@/components/orders/order-kanban';
@@ -16,29 +16,30 @@ const statusFilters = ['全部', '未收款', '部分收款', '已收款'];
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { orders, tours, addOrder } = useTourStore();
+  const { items: orders, create: addOrder } = useOrderStore();
+  const { items: tours } = useTourStore();
   const [statusFilter, setStatusFilter] = useState('全部');
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newOrder, setNewOrder] = useState({
-    orderNumber: '',
-    tourId: '',
-    contactPerson: '',
+    order_number: '',
+    tour_id: '',
+    contact_person: '',
     salesPerson: '',
     assistant: '',
-    totalAmount: 0,
+    total_amount: 0,
     paidAmount: 0
   });
 
   const filteredOrders = orders.filter(order => {
-    const matchesStatus = statusFilter === '全部' || order.paymentStatus === statusFilter;
+    const matchesStatus = statusFilter === '全部' || order.payment_status === statusFilter;
 
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch = !searchQuery ||
-      order.orderNumber.toLowerCase().includes(searchLower) ||
-      order.contactPerson.toLowerCase().includes(searchLower) ||
-      order.tourName?.toLowerCase().includes(searchLower);
+      order.order_number.toLowerCase().includes(searchLower) ||
+      order.contact_person.toLowerCase().includes(searchLower) ||
+      order.tour_name?.toLowerCase().includes(searchLower);
 
     return matchesStatus && matchesSearch;
   });
@@ -50,43 +51,43 @@ export default function OrdersPage() {
     const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     orders.forEach(order => {
-      const tour = tours.find(t => t.id === order.tourId);
+      const tour = tours.find(t => t.id === order.tour_id);
       if (!tour) return;
 
-      const departureDate = new Date(tour.departureDate);
+      const departureDate = new Date(tour.departure_date);
       const daysUntilDeparture = Math.ceil((departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       // 1. 即將出發但未收齊款項
-      if (daysUntilDeparture <= 7 && daysUntilDeparture >= 0 && order.paymentStatus !== '已收款') {
+      if (daysUntilDeparture <= 7 && daysUntilDeparture >= 0 && order.payment_status !== '已收款') {
         result.push({
           type: 'payment',
           priority: 'high',
-          message: `${order.orderNumber} - ${daysUntilDeparture}天後出發，尚未收齊款項`,
-          orderId: order.id
+          message: `${order.order_number} - ${daysUntilDeparture}天後出發，尚未收齊款項`,
+          order_id: order.id
         });
       }
 
       // 2. 未收款超過30天
-      if (order.paymentStatus === '未收款') {
-        const orderDate = new Date(order.createdAt || today);
+      if (order.payment_status === '未收款') {
+        const orderDate = new Date(order.created_at || today);
         const daysOverdue = Math.ceil((today.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
         if (daysOverdue > 30) {
           result.push({
             type: 'overdue',
             priority: 'high',
-            message: `${order.orderNumber} - 訂單已${daysOverdue}天未收款`,
-            orderId: order.id
+            message: `${order.order_number} - 訂單已${daysOverdue}天未收款`,
+            order_id: order.id
           });
         }
       }
 
       // 3. 部分收款提醒
-      if (order.paymentStatus === '部分收款' && daysUntilDeparture <= 14 && daysUntilDeparture >= 0) {
+      if (order.payment_status === '部分收款' && daysUntilDeparture <= 14 && daysUntilDeparture >= 0) {
         result.push({
           type: 'partial',
           priority: 'medium',
-          message: `${order.orderNumber} - 尚有 NT$ ${order.remainingAmount.toLocaleString()} 未收`,
-          orderId: order.id
+          message: `${order.order_number} - 尚有 NT$ ${order.remaining_amount.toLocaleString()} 未收`,
+          order_id: order.id
         });
       }
     });
@@ -96,27 +97,27 @@ export default function OrdersPage() {
 
 
   const handleAddOrder = () => {
-    if (!newOrder.orderNumber || !newOrder.tourId || !newOrder.contactPerson) return;
+    if (!newOrder.order_number || !newOrder.tour_id || !newOrder.contact_person) return;
 
-    const selectedTour = tours.find(t => t.id === newOrder.tourId);
+    const selectedTour = tours.find(t => t.id === newOrder.tour_id);
     if (!selectedTour) return;
 
     addOrder({
       ...newOrder,
       code: selectedTour.code,
-      tourName: selectedTour.name,
-      paymentStatus: newOrder.paidAmount >= newOrder.totalAmount ? '已收款' :
-                    newOrder.paidAmount > 0 ? '部分收款' : '未收款',
-      remainingAmount: newOrder.totalAmount - newOrder.paidAmount
+      tour_name: selectedTour.name,
+      paymentStatus: newOrder.paid_amount >= newOrder.total_amount ? '已收款' :
+                    newOrder.paid_amount > 0 ? '部分收款' : '未收款',
+      remainingAmount: newOrder.total_amount - newOrder.paid_amount
     });
 
     setNewOrder({
-      orderNumber: '',
-      tourId: '',
-      contactPerson: '',
+      order_number: '',
+      tour_id: '',
+      contact_person: '',
       salesPerson: '',
       assistant: '',
-      totalAmount: 0,
+      total_amount: 0,
       paidAmount: 0
     });
     setIsAddDialogOpen(false);
@@ -173,7 +174,7 @@ export default function OrdersPage() {
                   className="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-morandi-container/20 transition-colors cursor-pointer"
                   onClick={() => {
                     // 可以跳轉到訂單詳情
-                    const order = orders.find(o => o.id === todo.orderId);
+                    const order = orders.find(o => o.id === todo.order_id);
                     if (order) {
                       // 展開該訂單或跳轉
                       // TODO: 實作訂單跳轉功能
@@ -223,8 +224,8 @@ export default function OrdersPage() {
             <div>
               <label className="text-sm font-medium text-morandi-primary">訂單編號</label>
               <Input
-                value={newOrder.orderNumber}
-                onChange={(e) => setNewOrder(prev => ({ ...prev, orderNumber: e.target.value }))}
+                value={newOrder.order_number}
+                onChange={(e) => setNewOrder(prev => ({ ...prev, order_number: e.target.value }))}
                 placeholder="輸入訂單編號"
                 className="mt-1"
               />
@@ -233,8 +234,8 @@ export default function OrdersPage() {
             <div>
               <label className="text-sm font-medium text-morandi-primary">選擇旅遊團</label>
               <select
-                value={newOrder.tourId}
-                onChange={(e) => setNewOrder(prev => ({ ...prev, tourId: e.target.value }))}
+                value={newOrder.tour_id}
+                onChange={(e) => setNewOrder(prev => ({ ...prev, tour_id: e.target.value }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="">請選擇旅遊團</option>
@@ -249,8 +250,8 @@ export default function OrdersPage() {
             <div>
               <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
               <Input
-                value={newOrder.contactPerson}
-                onChange={(e) => setNewOrder(prev => ({ ...prev, contactPerson: e.target.value }))}
+                value={newOrder.contact_person}
+                onChange={(e) => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
                 placeholder="輸入聯絡人姓名"
                 className="mt-1"
               />
@@ -260,7 +261,7 @@ export default function OrdersPage() {
               <div>
                 <label className="text-sm font-medium text-morandi-primary">業務</label>
                 <Input
-                  value={newOrder.salesPerson}
+                  value={newOrder.sales_person}
                   onChange={(e) => setNewOrder(prev => ({ ...prev, salesPerson: e.target.value }))}
                   placeholder="業務員"
                   className="mt-1"
@@ -282,8 +283,8 @@ export default function OrdersPage() {
                 <label className="text-sm font-medium text-morandi-primary">訂單金額</label>
                 <Input
                   type="number"
-                  value={newOrder.totalAmount}
-                  onChange={(e) => setNewOrder(prev => ({ ...prev, totalAmount: Number(e.target.value) }))}
+                  value={newOrder.total_amount}
+                  onChange={(e) => setNewOrder(prev => ({ ...prev, total_amount: Number(e.target.value) }))}
                   placeholder="0"
                   className="mt-1"
                 />
@@ -292,7 +293,7 @@ export default function OrdersPage() {
                 <label className="text-sm font-medium text-morandi-primary">已收款</label>
                 <Input
                   type="number"
-                  value={newOrder.paidAmount}
+                  value={newOrder.paid_amount}
                   onChange={(e) => setNewOrder(prev => ({ ...prev, paidAmount: Number(e.target.value) }))}
                   placeholder="0"
                   className="mt-1"
@@ -310,7 +311,7 @@ export default function OrdersPage() {
               </Button>
               <Button
                 type="submit"
-                disabled={!newOrder.orderNumber || !newOrder.tourId || !newOrder.contactPerson}
+                disabled={!newOrder.order_number || !newOrder.tour_id || !newOrder.contact_person}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 新增 <span className="ml-1 text-xs opacity-70">(Enter)</span>

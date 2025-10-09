@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, usePaymentStore } from '@/stores';
 import { Receipt, Calendar, FileText, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react';
 
 interface TourCostsProps {
@@ -15,7 +15,8 @@ interface TourCostsProps {
 }
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
-  const { payments, addPayment } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const { items: payments, create: addPayment } = usePaymentStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCost, setNewCost] = useState({
     amount: 0,
@@ -29,10 +30,10 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     if (payment.type !== '請款') return false;
 
     if (orderFilter) {
-      return payment.orderId === orderFilter;
+      return payment.order_id === orderFilter;
     }
 
-    return payment.tourId === tour.id;
+    return payment.tour_id === tour.id;
   });
 
   const handleAddCost = () => {
@@ -40,7 +41,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
     addPayment({
       type: '請款',
-      tourId: tour.id,
+      tour_id: tour.id,
       ...newCost
     });
 
@@ -55,13 +56,13 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   };
 
   // 獲取屬於這個旅遊團的所有訂單
-  const tourOrders = useTourStore().orders.filter(order => order.tourId === tour.id);
+  const tourOrders = orders.filter(order => order.tour_id === tour.id);
 
   // 獲取所有相關的成本支出記錄
   const costPayments = payments.filter(payment =>
     payment.type === '請款' &&
-    (payment.tourId === tour.id ||
-     tourOrders.some(order => order.id === payment.orderId))
+    (payment.tour_id === tour.id ||
+     tourOrders.some(order => order.id === payment.order_id))
   );
 
   const getCategoryIcon = (category: string) => {
@@ -134,7 +135,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
           </div>
           <div className="bg-morandi-container p-4 rounded-lg">
             <div className="text-2xl font-bold text-morandi-red">
-              NT$ {Math.max(0, tour.totalRevenue - totalCosts).toLocaleString()}
+              NT$ {Math.max(0, tour.total_revenue - totalCosts).toLocaleString()}
             </div>
             <div className="text-sm text-morandi-secondary">預估利潤</div>
           </div>
@@ -197,14 +198,14 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
             {costPayments.map((cost) => {
               const Icon = getCategoryIcon(cost.category || '');
               const displayCategory = getCategoryDisplayName(cost.category || '');
-              const relatedOrder = tourOrders.find(order => order.id === cost.orderId);
+              const relatedOrder = tourOrders.find(order => order.id === cost.order_id);
 
               return (
                 <div key={cost.id} className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg">
                   <div className="col-span-2">
                     <div className="flex items-center text-sm text-morandi-primary">
                       <Calendar size={14} className="mr-1" />
-                      {new Date(cost.createdAt).toLocaleDateString()}
+                      {new Date(cost.created_at).toLocaleDateString()}
                     </div>
                   </div>
 
@@ -229,7 +230,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
                   <div className="col-span-2">
                     <div className="text-sm text-morandi-primary">
-                      {cost.vendor || relatedOrder?.orderNumber || '-'}
+                      {cost.vendor || relatedOrder?.order_number || '-'}
                     </div>
                   </div>
 

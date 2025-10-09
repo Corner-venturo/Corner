@@ -37,7 +37,7 @@ export default function CustomersPage() {
       ...newCustomer,
       orders: [],
       tours: [],
-      totalSpent: 0
+      total_spent: 0
     });
 
     setNewCustomer({
@@ -66,7 +66,7 @@ export default function CustomersPage() {
     const customerOrders = getCustomerOrders(customer.id);
     const customerTours = getCustomerTours(customer.id);
     const lastOrderDate = customerOrders.length > 0
-      ? new Date(Math.max(...customerOrders.map(o => new Date(o.createdAt).getTime())))
+      ? new Date(Math.max(...customerOrders.map(o => new Date(o.created_at).getTime())))
       : null;
 
     return {
@@ -75,7 +75,7 @@ export default function CustomersPage() {
       tourCount: customerTours.length,
       lastOrderDate: lastOrderDate?.toLocaleDateString(),
       avgOrderValue: customerOrders.length > 0
-        ? customerOrders.reduce((sum, o) => sum + o.totalAmount, 0) / customerOrders.length
+        ? customerOrders.reduce((sum, o) => sum + o.total_amount, 0) / customerOrders.length
         : 0
     };
   });
@@ -147,7 +147,7 @@ export default function CustomersPage() {
       render: (value, customer) => (
         <div className="text-sm">
           <div className="font-medium text-morandi-primary">
-            總計: NT$ {customer.totalSpent.toLocaleString()}
+            總計: NT$ {customer.total_spent.toLocaleString()}
           </div>
           {customer.avgOrderValue > 0 && (
             <div className="text-morandi-secondary">
@@ -176,7 +176,7 @@ export default function CustomersPage() {
 
   const totalCustomers = customers.length;
   const activeCustomers = customers.filter(c => c.orders.length > 0).length;
-  const totalSpent = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+  const totalSpent = customers.reduce((sum, c) => sum + c.total_spent, 0);
   const avgSpentPerCustomer = totalCustomers > 0 ? totalSpent / totalCustomers : 0;
 
   return (

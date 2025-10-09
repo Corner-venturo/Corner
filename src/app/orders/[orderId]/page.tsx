@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, useTourStore } from '@/stores';
 import { TourOverview } from '@/components/tours/tour-overview';
 import { TourMembers } from '@/components/tours/tour-members';
 import { TourOperations } from '@/components/tours/tour-operations';
@@ -29,12 +29,13 @@ const tabs = [
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { orders, tours } = useTourStore();
+  const { items: orders } = useOrderStore()
+  const { items: tours } = useTourStore();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const orderId = params.orderId as string;
+  const orderId = params.order_id as string;
   const order = orders.find(o => o.id === orderId);
-  const tour = order ? tours.find(t => t.id === order.tourId) : null;
+  const tour = order ? tours.find(t => t.id === order.tour_id) : null;
 
   if (!order) {
     return (
@@ -87,7 +88,7 @@ export default function OrderDetailPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title={`訂單 ${order.orderNumber} - ${tour.name}`}
+        title={`訂單 ${order.order_number} - ${tour.name}`}
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}

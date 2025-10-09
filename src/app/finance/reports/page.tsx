@@ -87,16 +87,16 @@ export default function ReportsPage() {
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <p className="text-morandi-secondary">收入</p>
-                  <p className="font-medium text-morandi-green">NT$ {tour.totalRevenue.toLocaleString()}</p>
+                  <p className="font-medium text-morandi-green">NT$ {tour.total_revenue.toLocaleString()}</p>
                 </div>
                 <div>
                   <p className="text-morandi-secondary">支出</p>
-                  <p className="font-medium text-morandi-red">NT$ {tour.totalCost.toLocaleString()}</p>
+                  <p className="font-medium text-morandi-red">NT$ {tour.total_cost.toLocaleString()}</p>
                 </div>
                 <div>
                   <p className="text-morandi-secondary">利潤率</p>
                   <p className="font-medium text-morandi-primary">
-                    {tour.totalRevenue > 0 ? ((tour.profit / tour.totalRevenue) * 100).toFixed(1) : 0}%
+                    {tour.total_revenue > 0 ? ((tour.profit / tour.total_revenue) * 100).toFixed(1) : 0}%
                   </p>
                 </div>
               </div>

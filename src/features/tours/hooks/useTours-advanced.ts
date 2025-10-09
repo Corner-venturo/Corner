@@ -120,7 +120,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 }
 
 // 專門用於單個旅遊團詳情的 hook
-export function useTourDetails(tourId: string) {
+export function useTourDetails(tour_id: string) {
   const [tour, setTour] = useState<Tour | null>(null);
   const [financials, setFinancials] = useState<any>(null);
   const [loading, setLoading] = useState(true);

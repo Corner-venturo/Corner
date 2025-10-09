@@ -84,7 +84,7 @@ export function TourDocuments({ tour, orderFilter }: TourDocumentsProps) {
   const mockDocuments = orderFilter
     ? allMockDocuments.filter(doc => {
         // 模擬：當有 orderFilter 時，只顯示部分文件
-        // 實際使用時會根據 doc.orderId === orderFilter 過濾
+        // 實際使用時會根據 doc.order_id === orderFilter 過濾
         return doc.type === '合約' || doc.type === '行程表';
       })
     : allMockDocuments;

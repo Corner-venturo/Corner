@@ -6,18 +6,19 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
 import { Button } from '@/components/ui/button';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, usePaymentStore } from '@/stores';
 import { ArrowLeft, CreditCard, Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PaymentDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.orderId as string;
-  const { orders, payments } = useTourStore();
+  const orderId = params.order_id as string;
+  const { items: orders } = useOrderStore()
+  const { items: payments } = usePaymentStore();
 
   const order = orders.find(o => o.id === orderId);
-  const orderPayments = payments.filter(p => p.orderId === orderId);
+  const orderPayments = payments.filter(p => p.order_id === orderId);
 
   if (!order) {
     return (
@@ -145,7 +146,7 @@ export default function PaymentDetailPage() {
   const filterFunction = (data: any[], filters: Record<string, string>) => {
     return data.filter(payment => {
       return (
-        (!filters.createdAt || new Date(payment.createdAt).toLocaleDateString().includes(filters.createdAt)) &&
+        (!filters.created_at || new Date(payment.created_at).toLocaleDateString().includes(filters.created_at)) &&
         (!filters.type || payment.type === filters.type) &&
         (!filters.amount || payment.amount.toString().includes(filters.amount)) &&
         (!filters.description || payment.description.toLowerCase().includes(filters.description.toLowerCase())) &&
@@ -163,13 +164,13 @@ export default function PaymentDetailPage() {
   return (
     <div className="space-y-6 ">
       <ResponsiveHeader
-        title={`付款記錄 - ${order.orderNumber}`}
+        title={`付款記錄 - ${order.order_number}`}
         onAdd={() => {/* TODO: 新增付款記錄 */}}
         addLabel="新增記錄"
       >
         <div className="flex items-center space-x-4">
           <div className="text-sm text-morandi-secondary">
-            聯絡人: <span className="text-morandi-primary font-medium">{order.contactPerson}</span>
+            聯絡人: <span className="text-morandi-primary font-medium">{order.contact_person}</span>
           </div>
           <Button
             onClick={() => router.push('/orders')}

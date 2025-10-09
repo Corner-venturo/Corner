@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useTourAddOnStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Trash2, ShoppingCart } from 'lucide-react';
@@ -15,7 +15,7 @@ interface TourAddOnsProps {
 }
 
 export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onTriggerAddComplete }: TourAddOnsProps) {
-  const { tourAddOns, addTourAddOn, updateTourAddOn, deleteTourAddOn } = useTourStore();
+  const { items: tourAddOns, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newAddOn, setNewAddOn] = useState({
     name: '',
@@ -32,17 +32,17 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
   }, [triggerAdd, onTriggerAddComplete]);
 
   // 獲取此旅遊團的加購項目
-  const addOns = tourAddOns.filter(addOn => addOn.tourId === tour.id);
+  const addOns = tourAddOns.filter(addOn => addOn.tour_id === tour.id);
 
   const handleAddNew = () => {
     if (!newAddOn.name.trim()) return;
 
     addTourAddOn({
-      tourId: tour.id,
+      tour_id: tour.id,
       name: newAddOn.name,
       price: newAddOn.price,
       description: newAddOn.description,
-      isActive: true,
+      is_active: true,
     });
 
     setNewAddOn({ name: '', price: 0, description: '' });
@@ -56,7 +56,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
   const toggleActive = (id: string) => {
     const addOn = addOns.find(item => item.id === id);
     if (addOn) {
-      updateTourAddOn(id, { isActive: !addOn.isActive });
+      updateTourAddOn(id, { is_active: !addOn.is_active });
     }
   };
 
@@ -157,12 +157,12 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                         onClick={() => toggleActive(addOn.id)}
                         className={cn(
                           'px-2 py-1 rounded text-xs font-medium cursor-pointer',
-                          addOn.isActive
+                          addOn.is_active
                             ? 'bg-morandi-green text-white'
                             : 'bg-morandi-container text-morandi-secondary'
                         )}
                       >
-                        {addOn.isActive ? '啟用' : '停用'}
+                        {addOn.is_active ? '啟用' : '停用'}
                       </button>
                     </td>
                     <td className="py-3 px-4">

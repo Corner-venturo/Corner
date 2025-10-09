@@ -15,13 +15,13 @@ interface SupplierState {
   setSelectedSupplier: (supplier: Supplier | null) => void;
 
   // Price List Management
-  addPriceListItem: (supplierId: string, item: Omit<PriceListItem, 'id' | 'createdAt'>) => void;
-  updatePriceListItem: (supplierId: string, itemId: string, item: Partial<PriceListItem>) => void;
-  deletePriceListItem: (supplierId: string, itemId: string) => void;
+  addPriceListItem: (supplier_id: string, item: Omit<PriceListItem, 'id' | 'createdAt'>) => void;
+  updatePriceListItem: (supplier_id: string, itemId: string, item: Partial<PriceListItem>) => void;
+  deletePriceListItem: (supplier_id: string, itemId: string) => void;
 
   // Utility functions
   getSuppliersByType: (type: Supplier['type']) => Supplier[];
-  getPriceListByCategory: (supplierId: string, category: string) => PriceListItem[];
+  getPriceListByCategory: (supplier_id: string, category: string) => PriceListItem[];
   searchSuppliers: (query: string) => Supplier[];
 }
 
@@ -118,7 +118,7 @@ export const useSupplierStore = create<SupplierState>()(
         const lowercaseQuery = query.toLowerCase();
         return get().suppliers.filter(supplier =>
           supplier.name.toLowerCase().includes(lowercaseQuery) ||
-          supplier.contact.contactPerson.toLowerCase().includes(lowercaseQuery) ||
+          supplier.contact.contact_person.toLowerCase().includes(lowercaseQuery) ||
           supplier.contact.email?.toLowerCase().includes(lowercaseQuery) ||
           supplier.priceList.some(item =>
             item.itemName.toLowerCase().includes(lowercaseQuery) ||

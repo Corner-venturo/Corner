@@ -2,12 +2,11 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore, useMemberStore, useTourAddOnStore, usePaymentRequestStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Users, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePaymentStore } from '@/stores/payment-store';
 import { calculateFormula, getMemberContext, getFieldCoordinate } from '@/lib/formula-calculator';
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper';
 
@@ -23,7 +22,7 @@ interface TourOperationsProps {
 
 interface EditingMember {
   id?: string;
-  orderId: string;
+  order_id: string;
   name: string;
   nameEn: string;
   birthday: string;
@@ -46,14 +45,16 @@ interface EditingMember {
 interface RoomOption {
   value: string;
   label: string;
-  roomType: string;
+  room_type: string;
   capacity: number;
   currentCount: number;
 }
 
 export const TourOperations = React.memo(function TourOperations({ tour, orderFilter, extraFields }: TourOperationsProps) {
-  const { orders, members, tourAddOns, updateMember } = useTourStore();
-  const { paymentRequests } = usePaymentStore();
+  const { items: orders } = useOrderStore();
+  const { items: members, update: updateMember } = useMemberStore();
+  const { items: tourAddOns } = useTourAddOnStore();
+  const { items: paymentRequests } = usePaymentRequestStore();
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([]);
   const [roomOptions, setRoomOptions] = useState<RoomOption[]>([]);
 
@@ -65,11 +66,11 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
   const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
 
   // 根據房型名稱推算容量
-  const getRoomCapacity = (roomType: string): number => {
-    if (roomType.includes('單人')) return 1;
-    if (roomType.includes('雙人')) return 2;
-    if (roomType.includes('三人')) return 3;
-    if (roomType.includes('四人')) return 4;
+  const getRoomCapacity = (room_type: string): number => {
+    if (room_type.includes('單人')) return 1;
+    if (room_type.includes('雙人')) return 2;
+    if (room_type.includes('三人')) return 3;
+    if (room_type.includes('四人')) return 4;
     return 2; // 預設雙人房
   };
 
@@ -177,20 +178,20 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
     if (orderFilter) {
       return order.id === orderFilter;
     }
-    return order.tourId === tour.id;
+    return order.tour_id === tour.id;
   });
 
   // 初始化團員
   useEffect(() => {
-    const tourOrdersFiltered = orders.filter(order => order.tourId === tour.id);
+    const tourOrdersFiltered = orders.filter(order => order.tour_id === tour.id);
     const allTourMembers = members.filter(member =>
-      tourOrdersFiltered.some(order => order.id === member.orderId)
+      tourOrdersFiltered.some(order => order.id === member.order_id)
     ).map(member => {
-      const relatedOrder = tourOrdersFiltered.find(order => order.id === member.orderId);
+      const relatedOrder = tourOrdersFiltered.find(order => order.id === member.order_id);
       return {
         ...member,
-        orderNumber: relatedOrder?.orderNumber || '',
-        contactPerson: relatedOrder?.contactPerson || '',
+        order_number: relatedOrder?.order_number || '',
+        contact_person: relatedOrder?.contact_person || '',
         // 保留現有的分房數據，不要覆蓋
         assignedRoom: member.assignedRoom,
         isChildNoBed: member.isChildNoBed
@@ -202,7 +203,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
 
   // 單獨處理房間選項
   useEffect(() => {
-    const tourPaymentRequests = paymentRequests.filter(request => request.tourId === tour.id);
+    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id);
     const roomOptions: RoomOption[] = [];
 
     tourPaymentRequests.forEach(request => {
@@ -239,7 +240,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
 
   const totalMembers = tableMembers.length;
   const completedMembers = tableMembers.filter(member =>
-    member.name && member.idNumber
+    member.name && member.id_number
   ).length;
 
 
@@ -374,7 +375,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
               ? `不佔床${member.assignedRoom ? ` - ${member.assignedRoom}` : ''}`
               : (member.assignedRoom || '未分配')
           }))}
-          tourAddOns={tourAddOns.filter(a => a.tourId === tour.id)}
+          tourAddOns={tourAddOns.filter(a => a.tour_id === tour.id)}
           tourPrice={tour.price}
           onDataUpdate={handleDataUpdate}
           onColumnHide={handleColumnHide}

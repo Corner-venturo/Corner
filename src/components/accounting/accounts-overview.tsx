@@ -100,14 +100,14 @@ export const AccountsOverview = React.memo(function AccountsOverview() {
       </div>
 
       {/* 支出分析 */}
-      {stats.categoryBreakdown.length > 0 && (
+      {stats.category_breakdown.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold text-morandi-primary mb-4">支出分析</h3>
           <div className="space-y-3">
-            {stats.categoryBreakdown.slice(0, 6).map((category) => (
-              <div key={category.categoryId} className="space-y-2">
+            {stats.category_breakdown.slice(0, 6).map((category) => (
+              <div key={category.category_id} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-morandi-primary font-medium">{category.categoryName}</span>
+                  <span className="text-morandi-primary font-medium">{category.category_name}</span>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-morandi-secondary">
                       {category.percentage.toFixed(1)}%
@@ -126,10 +126,10 @@ export const AccountsOverview = React.memo(function AccountsOverview() {
               </div>
             ))}
 
-            {stats.categoryBreakdown.length > 6 && (
+            {stats.category_breakdown.length > 6 && (
               <div className="text-center pt-3">
                 <button className="text-sm text-morandi-secondary hover:text-morandi-primary">
-                  查看全部分類 ({stats.categoryBreakdown.length - 6} 項)
+                  查看全部分類 ({stats.category_breakdown.length - 6} 項)
                 </button>
               </div>
             )}
@@ -144,13 +144,13 @@ export const AccountsOverview = React.memo(function AccountsOverview() {
           <div className="flex items-center justify-between">
             <span className="text-morandi-secondary">收入</span>
             <span className="font-semibold text-morandi-green">
-              +NT$ {stats.monthlyIncome.toLocaleString()}
+              +NT$ {stats.monthly_income.toLocaleString()}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-morandi-secondary">支出</span>
             <span className="font-semibold text-morandi-red">
-              -NT$ {stats.monthlyExpense.toLocaleString()}
+              -NT$ {stats.monthly_expense.toLocaleString()}
             </span>
           </div>
           <div className="h-px bg-border my-2" />
@@ -158,10 +158,10 @@ export const AccountsOverview = React.memo(function AccountsOverview() {
             <span className="font-medium text-morandi-primary">結餘</span>
             <span className={cn(
               "font-bold text-lg",
-              (stats.monthlyIncome - stats.monthlyExpense) >= 0 ? "text-morandi-green" : "text-morandi-red"
+              (stats.monthly_income - stats.monthly_expense) >= 0 ? "text-morandi-green" : "text-morandi-red"
             )}>
-              {(stats.monthlyIncome - stats.monthlyExpense) >= 0 ? '+' : ''}
-              NT$ {(stats.monthlyIncome - stats.monthlyExpense).toLocaleString()}
+              {(stats.monthly_income - stats.monthly_expense) >= 0 ? '+' : ''}
+              NT$ {(stats.monthly_income - stats.monthly_expense).toLocaleString()}
             </span>
           </div>
         </div>

@@ -9,13 +9,13 @@ export interface Account {
   currency: string;
   icon: string;
   color: string;
-  isActive: boolean;
+  is_active: boolean;
   description?: string;
   // 信用卡相關欄位
-  creditLimit?: number; // 信用額度
-  availableCredit?: number; // 可用額度
-  createdAt: string;
-  updatedAt: string;
+  credit_limit?: number; // 信用額度
+  available_credit?: number; // 可用額度
+  created_at: string;
+  updated_at: string;
 }
 
 // 交易分類
@@ -25,59 +25,59 @@ export interface Category {
   type: 'income' | 'expense' | 'transfer';
   icon: string;
   color: string;
-  parentId?: string; // 可以有子分類
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  parent_id?: string; // 可以有子分類
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // 交易記錄
 export interface Transaction {
   id: string;
-  accountId: string;
-  accountName: string;
-  categoryId: string;
-  categoryName: string;
+  account_id: string;
+  account_name: string;
+  category_id: string;
+  category_name: string;
   type: 'income' | 'expense' | 'transfer';
   amount: number;
   currency: string;
   description?: string;
   date: string; // 交易日期
   // 轉帳相關
-  toAccountId?: string; // 轉入帳戶ID（轉帳時使用）
-  toAccountName?: string;
+  to_account_id?: string; // 轉入帳戶ID（轉帳時使用）
+  to_account_name?: string;
   // 附件和標籤
   tags?: string[];
   attachments?: string[];
   // 系統欄位
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // 預算設定
 export interface Budget {
   id: string;
-  categoryId: string;
-  categoryName: string;
+  category_id: string;
+  category_name: string;
   amount: number;
   period: 'monthly' | 'yearly';
-  startDate: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  start_date: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // 統計資料
 export interface AccountingStats {
-  totalAssets: number;
-  totalIncome: number;
-  totalExpense: number;
-  monthlyIncome: number;
-  monthlyExpense: number;
-  netWorth: number;
-  categoryBreakdown: {
-    categoryId: string;
-    categoryName: string;
+  total_assets: number;
+  total_income: number;
+  total_expense: number;
+  monthly_income: number;
+  monthly_expense: number;
+  net_worth: number;
+  category_breakdown: {
+    category_id: string;
+    category_name: string;
     amount: number;
     percentage: number;
   }[];

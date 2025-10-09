@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useTourAddOnStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, CreditCard } from 'lucide-react';
@@ -16,7 +16,7 @@ interface TourRefundsProps {
 
 export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, onTriggerAddComplete }: TourRefundsProps) {
   // 使用 tourAddOns 相同的 store 結構，但用於退費項目管理
-  const { tourAddOns, addTourAddOn, updateTourAddOn, deleteTourAddOn } = useTourStore();
+  const { items: tourAddOns, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newRefund, setNewRefund] = useState({
     name: '',
@@ -34,18 +34,18 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
 
   // 獲取此旅遊團的退費項目 (使用 tourAddOns 但標記為退費類型)
   const refunds = tourAddOns.filter(item =>
-    item.tourId === tour.id && item.description?.includes('[REFUND]')
+    item.tour_id === tour.id && item.description?.includes('[REFUND]')
   );
 
   const handleAddNew = () => {
     if (!newRefund.name.trim()) return;
 
     addTourAddOn({
-      tourId: tour.id,
+      tour_id: tour.id,
       name: newRefund.name,
       price: -Math.abs(newRefund.price), // 退費金額為負值
       description: `[REFUND] ${newRefund.description}`, // 標記為退費項目
-      isActive: true,
+      is_active: true,
     });
 
     setNewRefund({ name: '', price: 0, description: '' });
@@ -59,7 +59,7 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
   const toggleActive = (id: string) => {
     const refund = refunds.find(item => item.id === id);
     if (refund) {
-      updateTourAddOn(id, { isActive: !refund.isActive });
+      updateTourAddOn(id, { is_active: !refund.is_active });
     }
   };
 
@@ -159,12 +159,12 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
                         onClick={() => toggleActive(refund.id)}
                         className={cn(
                           'px-2 py-1 rounded text-xs font-medium cursor-pointer',
-                          refund.isActive
+                          refund.is_active
                             ? 'bg-morandi-green text-white'
                             : 'bg-morandi-container text-morandi-secondary'
                         )}
                       >
-                        {refund.isActive ? '啟用' : '停用'}
+                        {refund.is_active ? '啟用' : '停用'}
                       </button>
                     </td>
                     <td className="py-3 px-4">

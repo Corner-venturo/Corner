@@ -105,7 +105,7 @@ export default function FinancePage() {
       sortable: true,
       render: (value, payment) => (
         <span className="text-sm text-morandi-secondary">
-          {new Date(payment.createdAt).toLocaleDateString()}
+          {new Date(payment.created_at).toLocaleDateString()}
         </span>
       )
     }
@@ -326,7 +326,7 @@ export default function FinancePage() {
                             </td>
                             <td className="py-4 px-4">
                               <span className="text-sm text-morandi-secondary">
-                                {payment.createdAt}
+                                {payment.created_at}
                               </span>
                             </td>
                           </tr>

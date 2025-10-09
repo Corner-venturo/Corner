@@ -63,7 +63,7 @@ export default function PaymentsPage() {
   // 過濾可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
     return orders.filter(order =>
-      order.paymentStatus === '未收款' || order.paymentStatus === '部分收款'
+      order.payment_status === '未收款' || order.payment_status === '部分收款'
     );
   }, [orders]);
 
@@ -126,7 +126,7 @@ export default function PaymentsPage() {
 
     // TODO: 保存收款單到 store 或 API
     console.log('儲存收款單', {
-      orderId: selectedOrderId,
+      order_id: selectedOrderId,
       receiptDate,
       paymentItems,
       totalAmount,
@@ -248,9 +248,9 @@ export default function PaymentsPage() {
                       {availableOrders.map(order => (
                         <SelectItem key={order.id} value={order.id}>
                           <div>
-                            <div className="font-medium">{order.orderNumber} - {order.tourName}</div>
+                            <div className="font-medium">{order.order_number} - {order.tour_name}</div>
                             <div className="text-sm text-morandi-secondary">
-                              {order.contactPerson} | 待收: NT$ {order.remainingAmount?.toLocaleString() || 0}
+                              {order.contact_person} | 待收: NT$ {order.remaining_amount?.toLocaleString() || 0}
                             </div>
                           </div>
                         </SelectItem>
@@ -281,7 +281,7 @@ export default function PaymentsPage() {
                   <div>
                     <label className="text-sm font-medium text-morandi-primary mb-2 block">待收金額</label>
                     <Input
-                      value={`NT$ ${selectedOrder.remainingAmount?.toLocaleString() || 0}`}
+                      value={`NT$ ${selectedOrder.remaining_amount?.toLocaleString() || 0}`}
                       disabled
                       className="bg-morandi-container/30"
                     />
@@ -474,7 +474,7 @@ export default function PaymentsPage() {
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">收款後狀態</label>
                   <Input
                     value={selectedOrder ?
-                      (totalAmount >= (selectedOrder.remainingAmount || 0) ? '已收款' : '部分收款')
+                      (totalAmount >= (selectedOrder.remaining_amount || 0) ? '已收款' : '部分收款')
                       : '請選擇訂單'}
                     disabled
                     className="bg-morandi-container/30"

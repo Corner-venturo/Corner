@@ -117,11 +117,11 @@ export default function ToursPage() {
 
   // 新增訂單狀態
   const [newOrder, setNewOrder] = useState({
-    contactPerson: '',
+    contact_person: '',
     salesPerson: '',
     assistant: '',
     memberCount: 1,
-    totalAmount: 0,
+    total_amount: 0,
   });
 
   // 根據狀態標籤和搜尋關鍵字篩選旅遊團
@@ -154,7 +154,7 @@ export default function ToursPage() {
         setNewTour(prev => ({
           ...prev,
           name: sourceQuote.name,
-          price: Math.round(sourceQuote.totalCost / sourceQuote.groupSize), // 計算單人價格
+          price: Math.round(sourceQuote.total_cost / sourceQuote.group_size), // 計算單人價格
         }));
 
         // 自動開啟新增旅遊團對話框
@@ -195,23 +195,23 @@ export default function ToursPage() {
       description: '',
     });
     setNewOrder({
-      contactPerson: '',
+      contact_person: '',
       salesPerson: '',
       assistant: '',
       memberCount: 1,
-      totalAmount: 0,
+      total_amount: 0,
     });
   }, []);
 
   const handleAddTour = useCallback(async () => {
-    if (!newTour.name.trim() || !newTour.departureDate || !newTour.returnDate) {
+    if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
       return;
     }
 
     try {
       setSubmitting(true);
 
-      const departureDate = new Date(newTour.departureDate);
+      const departureDate = new Date(newTour.departure_date);
       const code = await tourService.generateTourCode(newTour.location, departureDate, newTour.isSpecial);
 
       // 檢查是否從報價單創建
@@ -222,30 +222,30 @@ export default function ToursPage() {
         code,
         contractStatus: '未簽署' as const,
         totalRevenue: 0,
-        totalCost: 0,
+        total_cost: 0,
         profit: 0,
         currentParticipants: 0,
-        quoteId: fromQuoteId || undefined, // 如果從報價單創建，關聯報價單ID
+        quote_id: fromQuoteId || undefined, // 如果從報價單創建，關聯報價單ID
       };
 
       const createdTour = await actions.create(tourData);
 
       // 如果有填寫聯絡人，同時新增訂單
-      if (newOrder.contactPerson.trim()) {
+      if (newOrder.contact_person.trim()) {
         const orderNumber = `${code}${String(Date.now()).slice(-3)}`; // 生成訂單編號
         const orderData = {
           orderNumber,
-          tourId: createdTour.id,
+          tour_id: createdTour.id,
           code: code,
-          tourName: newTour.name,
-          contactPerson: newOrder.contactPerson,
-          salesPerson: newOrder.salesPerson || '',
+          tour_name: newTour.name,
+          contact_person: newOrder.contact_person,
+          salesPerson: newOrder.sales_person || '',
           assistant: newOrder.assistant || '',
-          memberCount: newOrder.memberCount,
+          memberCount: newOrder.member_count,
           paymentStatus: '未收款' as const,
-          totalAmount: newOrder.totalAmount || (newTour.price * newOrder.memberCount),
+          total_amount: newOrder.total_amount || (newTour.price * newOrder.member_count),
           paidAmount: 0,
-          remainingAmount: newOrder.totalAmount || (newTour.price * newOrder.memberCount),
+          remainingAmount: newOrder.total_amount || (newTour.price * newOrder.member_count),
         };
 
         addOrder(orderData);
@@ -254,7 +254,7 @@ export default function ToursPage() {
       // 如果是從報價單創建，更新報價單的 tourId
       if (fromQuoteId) {
         const { updateQuote } = useQuoteStore.getState();
-        updateQuote(fromQuoteId, { tourId: createdTour.id });
+        updateQuote(fromQuoteId, { tour_id: createdTour.id });
 
         // 清除 URL 參數
         router.replace('/tours');
@@ -270,7 +270,7 @@ export default function ToursPage() {
     }
   }, [newTour, newOrder, actions, addOrder, resetForm, closeDialog, searchParams, router]);
 
-  const toggleRowExpand = useCallback((tourId: string) => {
+  const toggleRowExpand = useCallback((tour_id: string) => {
     setExpandedRows(prev =>
       prev.includes(tourId)
         ? prev.filter(id => id !== tourId)
@@ -282,7 +282,7 @@ export default function ToursPage() {
     }
   }, [activeTabs]);
 
-  const setActiveTab = useCallback((tourId: string, tabId: string) => {
+  const setActiveTab = useCallback((tour_id: string, tabId: string) => {
     setActiveTabs(prev => ({ ...prev, [tourId]: tabId }));
   }, []);
 
@@ -315,23 +315,23 @@ export default function ToursPage() {
       key: 'departureDate',
       label: '出發日期',
       sortable: true,
-      render: (value, tour) => <span className="text-sm text-morandi-primary">{new Date(tour.departureDate).toLocaleDateString()}</span>,
+      render: (value, tour) => <span className="text-sm text-morandi-primary">{new Date(tour.departure_date).toLocaleDateString()}</span>,
     },
     {
       key: 'returnDate',
       label: '回程日期',
       sortable: true,
-      render: (value, tour) => <span className="text-sm text-morandi-primary">{tour.returnDate ? new Date(tour.returnDate).toLocaleDateString() : '-'}</span>,
+      render: (value, tour) => <span className="text-sm text-morandi-primary">{tour.return_date ? new Date(tour.return_date).toLocaleDateString() : '-'}</span>,
     },
     {
       key: 'participants',
       label: '人數',
       render: (value, tour) => {
-        const tourOrders = orders.filter(order => order.tourId === tour.id);
+        const tourOrders = orders.filter(order => order.tour_id === tour.id);
         const actualMembers = members.filter(member =>
-          tourOrders.some(order => order.id === member.orderId)
+          tourOrders.some(order => order.id === member.order_id)
         ).length;
-        return <span className="text-sm text-morandi-primary">{`${actualMembers}/${tour.maxParticipants}`}</span>;
+        return <span className="text-sm text-morandi-primary">{`${actualMembers}/${tour.max_participants}`}</span>;
       },
     },
     {
@@ -377,7 +377,7 @@ export default function ToursPage() {
 
   const renderActions = (tour: Tour) => {
     // 檢查是否有該旅遊團的報價單
-    const tourQuote = quotes.find(q => q.tourId === tour.id);
+    const tourQuote = quotes.find(q => q.tour_id === tour.id);
     const hasQuote = !!tourQuote;
 
     return (
@@ -528,9 +528,9 @@ export default function ToursPage() {
         )}
         {activeTabs[tour.id] === 'orders' && (
           <ExpandableOrderTable
-            orders={orders.filter(order => order.tourId === tour.id)}
+            orders={orders.filter(order => order.tour_id === tour.id)}
             showTourInfo={false}
-            tourDepartureDate={tour.departureDate}
+            tourDepartureDate={tour.departure_date}
           />
         )}
         {activeTabs[tour.id] === 'members' && (
@@ -692,13 +692,13 @@ export default function ToursPage() {
               <div>
                 <label className="text-sm font-medium text-morandi-primary">出發日期</label>
                 <SmartDateInput
-                  value={newTour.departureDate}
+                  value={newTour.departure_date}
                   onChange={(departureDate) => {
                     setNewTour(prev => {
                       // 如果回程日期早於新的出發日期，自動調整回程日期
-                      const newReturnDate = prev.returnDate && prev.returnDate < departureDate
+                      const newReturnDate = prev.return_date && prev.return_date < departureDate
                         ? departureDate
-                        : prev.returnDate;
+                        : prev.return_date;
 
                       return {
                         ...prev,
@@ -715,11 +715,11 @@ export default function ToursPage() {
               <div>
                 <label className="text-sm font-medium text-morandi-primary">返回日期</label>
                 <SmartDateInput
-                  value={newTour.returnDate}
+                  value={newTour.return_date}
                   onChange={(returnDate) => {
                     setNewTour(prev => ({ ...prev, returnDate }));
                   }}
-                  min={newTour.departureDate || new Date().toISOString().split('T')[0]}
+                  min={newTour.departure_date || new Date().toISOString().split('T')[0]}
                   className="mt-1"
                   required
                 />
@@ -740,7 +740,7 @@ export default function ToursPage() {
                 <label className="text-sm font-medium text-morandi-primary">最大人數</label>
                 <Input
                   type="number"
-                  value={newTour.maxParticipants}
+                  value={newTour.max_participants}
                   onChange={(e) => setNewTour(prev => ({ ...prev, maxParticipants: Number(e.target.value) }))}
                   className="mt-1"
                 />
@@ -778,8 +778,8 @@ export default function ToursPage() {
                   <div>
                     <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
                     <Input
-                      value={newOrder.contactPerson}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, contactPerson: e.target.value }))}
+                      value={newOrder.contact_person}
+                      onChange={(e) => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
                       className="mt-1"
                     />
                   </div>
@@ -787,7 +787,7 @@ export default function ToursPage() {
                   <div>
                     <label className="text-sm font-medium text-morandi-primary">業務人員</label>
                     <Input
-                      value={newOrder.salesPerson}
+                      value={newOrder.sales_person}
                       onChange={(e) => setNewOrder(prev => ({ ...prev, salesPerson: e.target.value }))}
                       className="mt-1"
                     />
@@ -806,7 +806,7 @@ export default function ToursPage() {
                     <label className="text-sm font-medium text-morandi-primary">團員人數</label>
                     <Input
                       type="number"
-                      value={newOrder.memberCount}
+                      value={newOrder.member_count}
                       onChange={(e) => setNewOrder(prev => ({ ...prev, memberCount: Number(e.target.value) }))}
                       className="mt-1"
                       min="1"
@@ -817,8 +817,8 @@ export default function ToursPage() {
                     <label className="text-sm font-medium text-morandi-primary">訂單金額</label>
                     <Input
                       type="number"
-                      value={newOrder.totalAmount}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, totalAmount: Number(e.target.value) }))}
+                      value={newOrder.total_amount}
+                      onChange={(e) => setNewOrder(prev => ({ ...prev, total_amount: Number(e.target.value) }))}
                       className="mt-1"
                     />
                   </div>
@@ -844,10 +844,10 @@ export default function ToursPage() {
             </Button>
             <Button
               onClick={handleAddTour}
-              disabled={submitting || !newTour.name.trim() || !newTour.departureDate || !newTour.returnDate}
+              disabled={submitting || !newTour.name.trim() || !newTour.departure_date || !newTour.return_date}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {submitting ? '建立中...' : (newOrder.contactPerson ? '新增旅遊團 & 訂單' : '新增旅遊團')}
+              {submitting ? '建立中...' : (newOrder.contact_person ? '新增旅遊團 & 訂單' : '新增旅遊團')}
             </Button>
           </div>
         </DialogContent>
@@ -903,25 +903,25 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
   const { orders, members } = useTourStore();
 
   // 找到該旅遊團的報價單（通常取最新的或最終版本）
-  const tourQuote = quotes.find(quote => quote.tourId === tour.id && quote.status === '最終版本') ||
-                   quotes.find(quote => quote.tourId === tour.id);
+  const tourQuote = quotes.find(quote => quote.tour_id === tour.id && quote.status === '最終版本') ||
+                   quotes.find(quote => quote.tour_id === tour.id);
 
   // 計算該旅遊團的訂單資訊
-  const tourOrders = orders.filter(order => order.tourId === tour.id);
-  const totalPaidAmount = tourOrders.reduce((sum, order) => sum + order.paidAmount, 0);
+  const tourOrders = orders.filter(order => order.tour_id === tour.id);
+  const totalPaidAmount = tourOrders.reduce((sum, order) => sum + order.paid_amount, 0);
 
   // 財務計算
-  const quotePrice = tourQuote?.totalCost || tour.price; // 報價單價格
+  const quotePrice = tourQuote?.total_cost || tour.price; // 報價單價格
   const expectedRevenue = quotePrice * tour.currentParticipants; // 應收帳款 = 報價單價格 × 團體人數
   const actualRevenue = totalPaidAmount; // 實收帳款
-  const grossProfit = actualRevenue - tour.totalCost; // 毛利 = 實收 - 總成本
+  const grossProfit = actualRevenue - tour.total_cost; // 毛利 = 實收 - 總成本
   const netProfit = grossProfit - (grossProfit * 0.05); // 淨利潤（假設5%稅費，可調整）
 
   // 準備預算vs實際支出的對比資料
   const { paymentRequests } = usePaymentStore();
 
   // 獲取該旅遊團的請款單
-  const tourPaymentRequests = paymentRequests.filter(req => req.tourId === tour.id);
+  const tourPaymentRequests = paymentRequests.filter(req => req.tour_id === tour.id);
 
   // 報價單中的類別預算
   const quoteBudget = tourQuote?.categories || [];
@@ -930,7 +930,7 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
   const actualExpenses = quoteBudget.map(category => {
     const categoryTotal = tourPaymentRequests.reduce((sum, request) => {
       const categoryItems = request.items?.filter(item => item.category === category.name) || [];
-      return sum + categoryItems.reduce((itemSum, item) => itemSum + (item.unitPrice * item.quantity), 0);
+      return sum + categoryItems.reduce((itemSum, item) => itemSum + (item.unit_price * item.quantity), 0);
     }, 0);
 
     return {
@@ -960,25 +960,25 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">出發日期:</span>
-              <span className="text-morandi-primary">{new Date(tour.departureDate).toLocaleDateString()}</span>
+              <span className="text-morandi-primary">{new Date(tour.departure_date).toLocaleDateString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">返回日期:</span>
-              <span className="text-morandi-primary">{new Date(tour.returnDate).toLocaleDateString()}</span>
+              <span className="text-morandi-primary">{new Date(tour.return_date).toLocaleDateString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">參與人數:</span>
               <span className="text-morandi-primary font-medium">{(() => {
-                const tourOrders = orders.filter(order => order.tourId === tour.id);
+                const tourOrders = orders.filter(order => order.tour_id === tour.id);
                 const actualMembers = members.filter(member =>
-                  tourOrders.some(order => order.id === member.orderId)
+                  tourOrders.some(order => order.id === member.order_id)
                 ).length;
                 return actualMembers;
-              })()}/{tour.maxParticipants}</span>
+              })()}/{tour.max_participants}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">建立時間:</span>
-              <span className="text-morandi-secondary text-sm">{new Date(tour.createdAt).toLocaleDateString()}</span>
+              <span className="text-morandi-secondary text-sm">{new Date(tour.created_at).toLocaleDateString()}</span>
             </div>
           </div>
         </div>
@@ -1028,7 +1028,7 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-morandi-secondary">總成本:</span>
-              <span className="text-morandi-red font-medium">NT$ {tour.totalCost.toLocaleString()}</span>
+              <span className="text-morandi-red font-medium">NT$ {tour.total_cost.toLocaleString()}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-border">
               <span className="text-morandi-secondary">毛利潤:</span>
@@ -1214,11 +1214,11 @@ function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFields }: 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 獲取屬於這個旅遊團的所有訂單
-  const tourOrders = orders.filter(order => order.tourId === tour.id);
+  const tourOrders = orders.filter(order => order.tour_id === tour.id);
 
   // 獲取團員數據
   const allTourMembers = members.filter(member =>
-    tourOrders.some(order => order.id === member.orderId)
+    tourOrders.some(order => order.id === member.order_id)
   );
 
   // 計算已分房人數

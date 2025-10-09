@@ -36,12 +36,12 @@ class AccountingService extends BaseService<Account> {
 
   // ========== 業務邏輯方法 ==========
 
-  getAccountBalance(accountId: string): number {
+  getAccountBalance(account_id: string): number {
     const store = useAccountingStore.getState();
     return store.getAccountBalance(accountId);
   }
 
-  getCategoryTotal(categoryId: string, startDate?: string, endDate?: string): number {
+  getCategoryTotal(category_id: string, startDate?: string, endDate?: string): number {
     const store = useAccountingStore.getState();
     return store.getCategoryTotal(categoryId, startDate, endDate);
   }
@@ -58,22 +58,22 @@ class AccountingService extends BaseService<Account> {
 
   getTotalAssets(): number {
     const store = useAccountingStore.getState();
-    return store.stats.totalAssets;
+    return store.stats.total_assets;
   }
 
   getMonthlyIncome(): number {
     const store = useAccountingStore.getState();
-    return store.stats.monthlyIncome;
+    return store.stats.monthly_income;
   }
 
   getMonthlyExpense(): number {
     const store = useAccountingStore.getState();
-    return store.stats.monthlyExpense;
+    return store.stats.monthly_expense;
   }
 
   getNetWorth(): number {
     const store = useAccountingStore.getState();
-    return store.stats.netWorth;
+    return store.stats.net_worth;
   }
 
   // Transaction 相關
@@ -92,10 +92,10 @@ class AccountingService extends BaseService<Account> {
     store.deleteTransaction(id);
   }
 
-  getTransactionsByAccount(accountId: string): Transaction[] {
+  getTransactionsByAccount(account_id: string): Transaction[] {
     const store = useAccountingStore.getState();
     return store.transactions.filter(t =>
-      t.accountId === accountId || t.toAccountId === accountId
+      t.account_id === accountId || t.to_account_id === accountId
     );
   }
 

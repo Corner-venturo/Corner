@@ -47,8 +47,8 @@ export const TransactionList = React.memo(function TransactionList() {
     // 搜尋篩選
     const matchesSearch = !searchText ||
       transaction.description?.toLowerCase().includes(searchText.toLowerCase()) ||
-      transaction.categoryName.toLowerCase().includes(searchText.toLowerCase()) ||
-      transaction.accountName.toLowerCase().includes(searchText.toLowerCase());
+      transaction.category_name.toLowerCase().includes(searchText.toLowerCase()) ||
+      transaction.account_name.toLowerCase().includes(searchText.toLowerCase());
 
     // 類型篩選
     const matchesType = filterType === 'all' || transaction.type === filterType;
@@ -180,33 +180,33 @@ export const TransactionList = React.memo(function TransactionList() {
                 {[
                   {
                     type: 'income',
-                    categoryName: '薪資收入',
-                    accountName: '台幣現金',
+                    category_name: '薪資收入',
+                    account_name: '台幣現金',
                     description: '2024年1月薪水',
                     amount: 45000,
                     date: new Date().toLocaleDateString('zh-TW')
                   },
                   {
                     type: 'expense',
-                    categoryName: '餐費',
-                    accountName: '信用卡',
+                    category_name: '餐費',
+                    account_name: '信用卡',
                     description: '午餐 - 便當',
                     amount: 120,
                     date: new Date().toLocaleDateString('zh-TW')
                   },
                   {
                     type: 'transfer',
-                    categoryName: '轉帳',
-                    accountName: '銀行帳戶',
-                    toAccountName: '投資帳戶',
+                    category_name: '轉帳',
+                    account_name: '銀行帳戶',
+                    to_account_name: '投資帳戶',
                     description: '定期投資',
                     amount: 10000,
                     date: new Date().toLocaleDateString('zh-TW')
                   },
                   {
                     type: 'expense',
-                    categoryName: '交通',
-                    accountName: '悠遊卡',
+                    category_name: '交通',
+                    account_name: '悠遊卡',
                     description: '捷運通勤',
                     amount: 30,
                     date: new Date().toLocaleDateString('zh-TW')
@@ -239,10 +239,10 @@ export const TransactionList = React.memo(function TransactionList() {
                         <div className="space-y-1">
                           <div className="flex items-center space-x-2">
                             <span className="font-medium text-morandi-primary">
-                              {transaction.categoryName}
+                              {transaction.category_name}
                             </span>
                             <span className="text-sm text-morandi-secondary">
-                              • {transaction.accountName}
+                              • {transaction.account_name}
                             </span>
                           </div>
                           <div className="text-sm text-morandi-secondary">
@@ -266,9 +266,9 @@ export const TransactionList = React.memo(function TransactionList() {
                           {transaction.type === 'transfer' && ''}
                           NT$ {transaction.amount.toLocaleString()}
                         </div>
-                        {transaction.type === 'transfer' && transaction.toAccountName && (
+                        {transaction.type === 'transfer' && transaction.to_account_name && (
                           <div className="text-xs text-morandi-secondary">
-                            轉至 {transaction.toAccountName}
+                            轉至 {transaction.to_account_name}
                           </div>
                         )}
                       </div>
@@ -313,10 +313,10 @@ export const TransactionList = React.memo(function TransactionList() {
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-morandi-primary">
-                        {transaction.categoryName}
+                        {transaction.category_name}
                       </span>
                       <span className="text-sm text-morandi-secondary">
-                        • {transaction.accountName}
+                        • {transaction.account_name}
                       </span>
                     </div>
                     <div className="text-sm text-morandi-secondary">
@@ -341,9 +341,9 @@ export const TransactionList = React.memo(function TransactionList() {
                       {transaction.type === 'transfer' && ''}
                       NT$ {transaction.amount.toLocaleString()}
                     </div>
-                    {transaction.type === 'transfer' && transaction.toAccountName && (
+                    {transaction.type === 'transfer' && transaction.to_account_name && (
                       <div className="text-xs text-morandi-secondary">
-                        轉至 {transaction.toAccountName}
+                        轉至 {transaction.to_account_name}
                       </div>
                     )}
                   </div>

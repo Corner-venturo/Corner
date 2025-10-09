@@ -24,7 +24,7 @@ export default function TransportPage() {
     pricePerPerson: 0,
     pricePerGroup: 0,
     capacity: 0,
-    isGroupCost: false
+    is_group_cost: false
   });
 
   const currentOptions = getRegionOptions(selectedRegion);
@@ -45,7 +45,7 @@ export default function TransportPage() {
       )
     },
     {
-      key: 'isGroupCost',
+      key: 'is_group_cost',
       label: '類型',
       sortable: true,
       filterable: true,
@@ -157,7 +157,7 @@ export default function TransportPage() {
       return (
         matchesSearch &&
         (!filters.name || transport.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.isGroupCost || transport.isGroupCost.toString() === filters.isGroupCost) &&
+        (!filters.is_group_cost || transport.is_group_cost.toString() === filters.is_group_cost) &&
         (!filters.pricePerPerson || (transport.pricePerPerson || 0).toString().includes(filters.pricePerPerson)) &&
         (!filters.pricePerGroup || (transport.pricePerGroup || 0).toString().includes(filters.pricePerGroup)) &&
         (!filters.capacity || (transport.capacity || 0).toString().includes(filters.capacity))
@@ -190,7 +190,7 @@ export default function TransportPage() {
       pricePerPerson: transport.pricePerPerson || 0,
       pricePerGroup: transport.pricePerGroup || 0,
       capacity: transport.capacity || 0,
-      isGroupCost: transport.isGroupCost || false
+      is_group_cost: transport.is_group_cost || false
     });
     setIsAddDialogOpen(true);
   };
@@ -207,7 +207,7 @@ export default function TransportPage() {
       pricePerPerson: 0,
       pricePerGroup: 0,
       capacity: 0,
-      isGroupCost: false
+      is_group_cost: false
     });
     setIsAddDialogOpen(false);
     setEditingTransport(null);
@@ -275,8 +275,8 @@ export default function TransportPage() {
             <div>
               <label className="text-sm font-medium text-morandi-primary">費用類型</label>
               <Select
-                value={newTransport.isGroupCost.toString()}
-                onValueChange={(value) => setNewTransport(prev => ({ ...prev, isGroupCost: value === 'true' }))}
+                value={newTransport.is_group_cost.toString()}
+                onValueChange={(value) => setNewTransport(prev => ({ ...prev, is_group_cost: value === 'true' }))}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />

@@ -6,15 +6,15 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
 import { Button } from '@/components/ui/button';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore } from '@/stores';
 import { ArrowLeft, FileText, Upload, Download, Eye, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function DocumentsDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.orderId as string;
-  const { orders } = useTourStore();
+  const orderId = params.order_id as string;
+  const { items: orders } = useOrderStore();
 
   const order = orders.find(o => o.id === orderId);
 
@@ -194,13 +194,13 @@ export default function DocumentsDetailPage() {
   return (
     <div className="space-y-6 ">
       <ResponsiveHeader
-        title={`文件管理 - ${order.orderNumber}`}
+        title={`文件管理 - ${order.order_number}`}
         onAdd={() => {/* TODO: 上傳文件 */}}
         addLabel="上傳文件"
       >
         <div className="flex items-center space-x-4">
           <div className="text-sm text-morandi-secondary">
-            旅遊團: <span className="text-morandi-primary font-medium">{order.tourName}</span>
+            旅遊團: <span className="text-morandi-primary font-medium">{order.tour_name}</span>
           </div>
           <Button
             onClick={() => router.push('/orders')}

@@ -9,7 +9,7 @@ interface VisaStore {
   updateVisa: (id: string, data: Partial<Visa>) => Promise<Visa | undefined>;
   deleteVisa: (id: string) => Promise<boolean>;
   getVisaById: (id: string) => Visa | undefined;
-  getVisasByTour: (tourId: string) => Visa[];
+  getVisasByTour: (tour_id: string) => Visa[];
   getVisasByStatus: (status: Visa['status']) => Visa[];
   batchUpdateStatus: (ids: string[], status: Visa['status'], date?: string) => void;
   loadVisas: () => Promise<Visa[] | null>;
@@ -28,7 +28,7 @@ export const useVisaStore = create<VisaStore>()(
   },
 
   getVisasByTour: (tourId) => {
-    return get().visas.filter((visa) => visa.tourId === tourId);
+    return get().visas.filter((visa) => visa.tour_id === tourId);
   },
 
   getVisasByStatus: (status) => {

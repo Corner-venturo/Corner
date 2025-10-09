@@ -18,36 +18,36 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
   const { accounts, categories, addTransaction } = useAccountingStore();
   const [transactionType, setTransactionType] = useState<'income' | 'expense' | 'transfer'>('expense');
   const [formData, setFormData] = useState({
-    accountId: accounts.length > 0 ? accounts[0].id : '',
-    categoryId: '',
+    account_id: accounts.length > 0 ? accounts[0].id : '',
+    category_id: '',
     amount: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
-    toAccountId: '', // 轉帳目標帳戶
+    to_account_id: '', // 轉帳目標帳戶
   });
 
   const handleSubmit = () => {
-    if (!formData.accountId || !formData.amount || (!formData.categoryId && transactionType !== 'transfer')) {
+    if (!formData.account_id || !formData.amount || (!formData.category_id && transactionType !== 'transfer')) {
       return;
     }
 
-    const account = accounts.find(acc => acc.id === formData.accountId);
-    const category = categories.find(cat => cat.id === formData.categoryId);
-    const toAccount = formData.toAccountId ? accounts.find(acc => acc.id === formData.toAccountId) : undefined;
+    const account = accounts.find(acc => acc.id === formData.account_id);
+    const category = categories.find(cat => cat.id === formData.category_id);
+    const toAccount = formData.to_account_id ? accounts.find(acc => acc.id === formData.to_account_id) : undefined;
 
     const transactionData = {
-      accountId: formData.accountId,
-      accountName: account?.name || '',
-      categoryId: transactionType === 'transfer' ? categories.find(c => c.type === 'transfer')?.id || '' : formData.categoryId,
-      categoryName: transactionType === 'transfer' ? '轉帳' : (category?.name || ''),
+      account_id: formData.account_id,
+      account_name: account?.name || '',
+      category_id: transactionType === 'transfer' ? categories.find(c => c.type === 'transfer')?.id || '' : formData.category_id,
+      category_name: transactionType === 'transfer' ? '轉帳' : (category?.name || ''),
       type: transactionType,
       amount: parseFloat(formData.amount),
       currency: 'TWD',
       description: formData.description,
       date: formData.date,
       ...(transactionType === 'transfer' && {
-        toAccountId: formData.toAccountId,
-        toAccountName: toAccount?.name || '',
+        to_account_id: formData.to_account_id,
+        to_account_name: toAccount?.name || '',
       }),
     };
 
@@ -58,12 +58,12 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
   const resetForm = () => {
     setFormData({
-      accountId: '',
-      categoryId: '',
+      account_id: '',
+      category_id: '',
       amount: '',
       description: '',
       date: new Date().toISOString().split('T')[0],
-      toAccountId: '',
+      to_account_id: '',
     });
     setTransactionType('expense');
   };
@@ -125,8 +125,8 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
               {transactionType === 'transfer' ? '從帳戶' : '帳戶'}
             </label>
             <select
-              value={formData.accountId}
-              onChange={(e) => setFormData(prev => ({ ...prev, accountId: e.target.value }))}
+              value={formData.account_id}
+              onChange={(e) => setFormData(prev => ({ ...prev, account_id: e.target.value }))}
               className="mt-1 w-full p-3 border border-border rounded-md bg-background"
             >
               <option value="">請選擇帳戶</option>
@@ -143,13 +143,13 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             <div>
               <label className="text-sm font-medium text-morandi-primary">轉入帳戶</label>
               <select
-                value={formData.toAccountId}
-                onChange={(e) => setFormData(prev => ({ ...prev, toAccountId: e.target.value }))}
+                value={formData.to_account_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, to_account_id: e.target.value }))}
                 className="mt-1 w-full p-3 border border-border rounded-md bg-background"
               >
                 <option value="">請選擇目標帳戶</option>
                 {accounts
-                  .filter(account => account.id !== formData.accountId)
+                  .filter(account => account.id !== formData.account_id)
                   .map((account) => (
                     <option key={account.id} value={account.id}>
                       {account.name} (NT$ {account.balance.toLocaleString()})
@@ -164,8 +164,8 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             <div>
               <label className="text-sm font-medium text-morandi-primary">分類</label>
               <select
-                value={formData.categoryId}
-                onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
+                value={formData.category_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
                 className="mt-1 w-full p-3 border border-border rounded-md bg-background"
               >
                 <option value="">請選擇分類</option>
@@ -226,7 +226,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!formData.accountId || !formData.amount || (!formData.categoryId && transactionType !== 'transfer') || (transactionType === 'transfer' && !formData.toAccountId)}
+              disabled={!formData.account_id || !formData.amount || (!formData.category_id && transactionType !== 'transfer') || (transactionType === 'transfer' && !formData.to_account_id)}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               新增交易

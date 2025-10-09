@@ -5,7 +5,7 @@ import { ValidationError } from '@/core/errors/app-errors';
 
 interface TourFinancialSummary {
   totalRevenue: number;
-  totalCost: number;
+  total_cost: number;
   profit: number;
   profitMargin: number;
 }
@@ -145,7 +145,7 @@ class TourService extends BaseService<Tour> {
   }
 
   // 計算團體財務摘要
-  async calculateFinancialSummary(tourId: string): Promise<TourFinancialSummary> {
+  async calculateFinancialSummary(tour_id: string): Promise<TourFinancialSummary> {
     try {
       const tour = await this.getById(tourId);
       if (!tour) {
@@ -161,7 +161,7 @@ class TourService extends BaseService<Tour> {
 
       return {
         totalRevenue,
-        totalCost: estimatedCost,
+        total_cost: estimatedCost,
         profit,
         profitMargin,
       };
@@ -171,7 +171,7 @@ class TourService extends BaseService<Tour> {
   }
 
   // 檢查團體是否可以取消
-  async canCancelTour(tourId: string): Promise<{ canCancel: boolean; reason?: string }> {
+  async canCancelTour(tour_id: string): Promise<{ canCancel: boolean; reason?: string }> {
     try {
       const tour = await this.getById(tourId);
       if (!tour) {
@@ -201,7 +201,7 @@ class TourService extends BaseService<Tour> {
   }
 
   // 更新團體狀態
-  async updateTourStatus(tourId: string, newStatus: Tour['status'], reason?: string): Promise<Tour> {
+  async updateTourStatus(tour_id: string, newStatus: Tour['status'], reason?: string): Promise<Tour> {
     try {
       const tour = await this.getById(tourId);
       if (!tour) {

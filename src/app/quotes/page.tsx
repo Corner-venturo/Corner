@@ -23,7 +23,7 @@ export default function QuotesPage() {
   const [newQuote, setNewQuote] = useState({
     name: '',
     status: '提案' as const,
-    groupSize: 1,
+    group_size: 1,
   });
 
   // 載入報價單資料
@@ -39,7 +39,7 @@ export default function QuotesPage() {
       sortable: true,
       render: (value, quote) => (
         <span className="text-sm text-morandi-secondary font-mono">
-          {quote.quoteNumber || '-'}
+          {quote.quote_number || '-'}
         </span>
       ),
     },
@@ -71,7 +71,7 @@ export default function QuotesPage() {
       render: (value, quote) => (
         <div className="flex items-center text-morandi-secondary">
           <Users size={14} className="mr-1" />
-          {quote.groupSize}人
+          {quote.group_size}人
         </div>
       ),
     },
@@ -81,7 +81,7 @@ export default function QuotesPage() {
       sortable: true,
       render: (value, quote) => (
         <span className="text-morandi-secondary">
-          NT$ {quote.totalCost.toLocaleString()}
+          NT$ {quote.total_cost.toLocaleString()}
         </span>
       ),
     },
@@ -91,7 +91,7 @@ export default function QuotesPage() {
       sortable: true,
       render: (value, quote) => (
         <span className="text-morandi-secondary">
-          {new Date(quote.createdAt).toLocaleDateString()}
+          {new Date(quote.created_at).toLocaleDateString()}
         </span>
       ),
     },
@@ -119,16 +119,16 @@ export default function QuotesPage() {
       // 新增報價單並取得完整物件
       const newQuoteObj = await addQuote({
         ...newQuote,
-        accommodationDays: 0,
+        accommodation_days: 0,
         categories: defaultCategories,
-        totalCost: 0,
+        total_cost: 0,
       });
 
       // 重置表單
       setNewQuote({
         name: '',
         status: '提案',
-        groupSize: 1,
+        group_size: 1,
       });
       setIsAddDialogOpen(false);
 
@@ -146,7 +146,7 @@ export default function QuotesPage() {
     router.push(`/quotes/${quote.id}`);
   };
 
-  const handleDuplicateQuote = async (quoteId: string, e: React.MouseEvent) => {
+  const handleDuplicateQuote = async (quote_id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       const duplicated = duplicateQuote(quoteId);
@@ -286,8 +286,8 @@ export default function QuotesPage() {
               <label className="text-sm font-medium text-morandi-primary">人數</label>
               <Input
                 type="number"
-                value={newQuote.groupSize}
-                onChange={(e) => setNewQuote(prev => ({ ...prev, groupSize: Number(e.target.value) || 0 }))}
+                value={newQuote.group_size}
+                onChange={(e) => setNewQuote(prev => ({ ...prev, group_size: Number(e.target.value) || 0 }))}
                 placeholder="1"
                 className="mt-1"
               />

@@ -50,16 +50,16 @@ export const OrderList = React.memo(function OrderList({ orders, showTourInfo = 
         {orders.map((order, index) => (
           <tr key={order.id} className="relative transition-colors hover:bg-morandi-container/30">
             <td className="py-4 px-4">
-              <div className="font-medium text-morandi-primary">{order.orderNumber}</div>
+              <div className="font-medium text-morandi-primary">{order.order_number}</div>
               <div className="text-xs text-morandi-secondary flex items-center">
                 <Calendar size={12} className="mr-1" />
-                {new Date(order.createdAt).toLocaleDateString()}
+                {new Date(order.created_at).toLocaleDateString()}
               </div>
             </td>
 
             {showTourInfo && (
               <td className="py-4 px-4">
-                <div className="font-medium text-morandi-primary">{order.tourName}</div>
+                <div className="font-medium text-morandi-primary">{order.tour_name}</div>
                 <div className="text-xs text-morandi-secondary">{order.code}</div>
               </td>
             )}
@@ -67,26 +67,26 @@ export const OrderList = React.memo(function OrderList({ orders, showTourInfo = 
             <td className="py-4 px-4">
               <div className="flex items-center">
                 <User size={14} className="mr-1 text-morandi-secondary" />
-                <span className="font-medium text-morandi-primary">{order.contactPerson}</span>
+                <span className="font-medium text-morandi-primary">{order.contact_person}</span>
               </div>
             </td>
 
             <td className="py-4 px-4">
-              <div className="text-sm text-morandi-primary">{order.salesPerson}</div>
+              <div className="text-sm text-morandi-primary">{order.sales_person}</div>
               <div className="text-xs text-morandi-secondary">{order.assistant}</div>
             </td>
 
             <td className="py-4 px-4">
               <div className="text-sm">
                 <div className="font-medium text-morandi-primary">
-                  NT$ {order.totalAmount.toLocaleString()}
+                  NT$ {order.total_amount.toLocaleString()}
                 </div>
                 <div className="text-morandi-green">
-                  已收: NT$ {order.paidAmount.toLocaleString()}
+                  已收: NT$ {order.paid_amount.toLocaleString()}
                 </div>
-                {order.remainingAmount > 0 && (
+                {order.remaining_amount > 0 && (
                   <div className="text-morandi-red">
-                    餘款: NT$ {order.remainingAmount.toLocaleString()}
+                    餘款: NT$ {order.remaining_amount.toLocaleString()}
                   </div>
                 )}
               </div>
@@ -95,9 +95,9 @@ export const OrderList = React.memo(function OrderList({ orders, showTourInfo = 
             <td className="py-4 px-4">
               <span className={cn(
                 'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                getPaymentBadge(order.paymentStatus)
+                getPaymentBadge(order.payment_status)
               )}>
-                {order.paymentStatus}
+                {order.payment_status}
               </span>
             </td>
 

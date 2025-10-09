@@ -29,7 +29,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
   const [activeTabs, setActiveTabs] = useState<Record<string, string>>({});
   const memberTableRefs = useRef<Record<string, MemberTableRef | null>>({});
 
-  const toggleOrderExpand = (orderId: string) => {
+  const toggleOrderExpand = (order_id: string) => {
     setExpandedOrders(prev =>
       prev.includes(orderId)
         ? prev.filter(id => id !== orderId)
@@ -40,7 +40,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
     }
   };
 
-  const setActiveTab = (orderId: string, tabId: string) => {
+  const setActiveTab = (order_id: string, tabId: string) => {
     setActiveTabs(prev => ({ ...prev, [orderId]: tabId }));
   };
 
@@ -56,7 +56,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
   const handleDeleteOrder = async (order: Order, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    const confirmMessage = `⚠️ 確定要刪除訂單「${order.orderNumber}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`;
+    const confirmMessage = `⚠️ 確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`;
 
     if (!confirm(confirmMessage)) {
       return;
@@ -148,32 +148,32 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                   )}
                 >
                   <td className="py-4 px-4">
-                    <div className="text-sm font-medium text-morandi-primary">{order.orderNumber}</div>
+                    <div className="text-sm font-medium text-morandi-primary">{order.order_number}</div>
                   </td>
 
                   {showTourInfo && (
                     <td className="py-4 px-4">
-                      <div className="text-sm font-medium text-morandi-primary">{order.tourName}</div>
+                      <div className="text-sm font-medium text-morandi-primary">{order.tour_name}</div>
                     </td>
                   )}
 
                   <td className="py-4 px-4">
                     <div className="flex items-center text-sm">
                       <User size={14} className="mr-1 text-morandi-secondary" />
-                      <span className="font-medium text-morandi-primary">{order.contactPerson}</span>
+                      <span className="font-medium text-morandi-primary">{order.contact_person}</span>
                     </div>
                   </td>
 
                   <td className="py-4 px-4">
-                    <div className="text-sm text-morandi-primary">{order.salesPerson}</div>
+                    <div className="text-sm text-morandi-primary">{order.sales_person}</div>
                   </td>
 
                   <td className="py-4 px-4">
                     <span className={cn(
                       'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                      getPaymentBadge(order.paymentStatus)
+                      getPaymentBadge(order.payment_status)
                     )}>
-                      {order.paymentStatus}
+                      {order.payment_status}
                     </span>
                   </td>
 
@@ -185,7 +185,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/finance/payments?orderId=${order.id}&orderNumber=${order.orderNumber}&contactPerson=${order.contactPerson}&amount=${order.remainingAmount}`);
+                          router.push(`/finance/payments?orderId=${order.id}&orderNumber=${order.order_number}&contactPerson=${order.contact_person}&amount=${order.remaining_amount}`);
                         }}
                         className="h-7 w-7 p-0 text-morandi-green hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
                         title="快速收款"
@@ -313,8 +313,8 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                             <ExcelMemberTable
                               ref={(ref) => (memberTableRefs.current[order.id] = ref)}
                               orderId={order.id}
-                              departureDate={tourDepartureDate || tours.find(t => t.id === order.tourId)?.departureDate || ''}
-                              memberCount={order.memberCount}
+                              departureDate={tourDepartureDate || tours.find(t => t.id === order.tour_id)?.departure_date || ''}
+                              memberCount={order.member_count}
                             />
                           ) : (
                             <div className="px-6 py-4">
@@ -325,19 +325,19 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                                     <div className="space-y-1">
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">訂單編號:</span>
-                                        <span className="text-morandi-primary">{order.orderNumber}</span>
+                                        <span className="text-morandi-primary">{order.order_number}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">建立時間:</span>
-                                        <span className="text-morandi-primary">{new Date(order.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-morandi-primary">{new Date(order.created_at).toLocaleDateString()}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">聯絡人:</span>
-                                        <span className="text-morandi-primary">{order.contactPerson}</span>
+                                        <span className="text-morandi-primary">{order.contact_person}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">業務:</span>
-                                        <span className="text-morandi-primary">{order.salesPerson}</span>
+                                        <span className="text-morandi-primary">{order.sales_person}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">助理:</span>
@@ -350,25 +350,25 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                                     <div className="space-y-1">
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">總金額:</span>
-                                        <span className="text-morandi-primary font-medium">NT$ {order.totalAmount.toLocaleString()}</span>
+                                        <span className="text-morandi-primary font-medium">NT$ {order.total_amount.toLocaleString()}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">已收款:</span>
-                                        <span className="text-morandi-green font-medium">NT$ {order.paidAmount.toLocaleString()}</span>
+                                        <span className="text-morandi-green font-medium">NT$ {order.paid_amount.toLocaleString()}</span>
                                       </div>
-                                      {order.remainingAmount > 0 && (
+                                      {order.remaining_amount > 0 && (
                                         <div className="flex justify-between">
                                           <span className="text-morandi-secondary">餘款:</span>
-                                          <span className="text-morandi-red font-medium">NT$ {order.remainingAmount.toLocaleString()}</span>
+                                          <span className="text-morandi-red font-medium">NT$ {order.remaining_amount.toLocaleString()}</span>
                                         </div>
                                       )}
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">付款狀態:</span>
                                         <span className={cn(
                                           'px-2 py-1 rounded text-xs font-medium',
-                                          getPaymentBadge(order.paymentStatus)
+                                          getPaymentBadge(order.payment_status)
                                         )}>
-                                          {order.paymentStatus}
+                                          {order.payment_status}
                                         </span>
                                       </div>
                                     </div>

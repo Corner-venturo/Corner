@@ -66,7 +66,7 @@ export default function TestOfflinePage() {
         childCount: 2,
         infantCount: 0,
         status: 'planning',
-        totalCost: 50000,
+        total_cost: 50000,
         totalRevenue: 80000,
         profitMargin: 30000
       })
@@ -128,9 +128,9 @@ export default function TestOfflinePage() {
       updateResult('批次建立 3 筆資料', 'pending')
       const startBatch = Date.now()
       const batchData = await offlineManager.createBatch('tours', [
-        { code: 'BATCH001', name: '批次測試1', destination: '台北', startDate: '2025-02-01', endDate: '2025-02-05', days: 4, nights: 3, adultCount: 10, childCount: 0, infantCount: 0, status: 'planning', totalCost: 40000, totalRevenue: 60000, profitMargin: 20000 },
-        { code: 'BATCH002', name: '批次測試2', destination: '台中', startDate: '2025-03-01', endDate: '2025-03-05', days: 4, nights: 3, adultCount: 8, childCount: 2, infantCount: 0, status: 'planning', totalCost: 35000, totalRevenue: 55000, profitMargin: 20000 },
-        { code: 'BATCH003', name: '批次測試3', destination: '高雄', startDate: '2025-04-01', endDate: '2025-04-05', days: 4, nights: 3, adultCount: 12, childCount: 1, infantCount: 0, status: 'planning', totalCost: 45000, totalRevenue: 70000, profitMargin: 25000 }
+        { code: 'BATCH001', name: '批次測試1', destination: '台北', startDate: '2025-02-01', endDate: '2025-02-05', days: 4, nights: 3, adultCount: 10, childCount: 0, infantCount: 0, status: 'planning', total_cost: 40000, totalRevenue: 60000, profitMargin: 20000 },
+        { code: 'BATCH002', name: '批次測試2', destination: '台中', startDate: '2025-03-01', endDate: '2025-03-05', days: 4, nights: 3, adultCount: 8, childCount: 2, infantCount: 0, status: 'planning', total_cost: 35000, totalRevenue: 55000, profitMargin: 20000 },
+        { code: 'BATCH003', name: '批次測試3', destination: '高雄', startDate: '2025-04-01', endDate: '2025-04-05', days: 4, nights: 3, adultCount: 12, childCount: 1, infantCount: 0, status: 'planning', total_cost: 45000, totalRevenue: 70000, profitMargin: 25000 }
       ])
       updateResult('批次建立 3 筆資料', 'success', `建立了 ${batchData.length} 筆`, Date.now() - startBatch)
 

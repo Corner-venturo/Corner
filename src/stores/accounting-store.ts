@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Account, Category, Transaction, Budget, AccountingStats } from './accounting-types';
+import { Account, TransactionCategory, Transaction, Budget, AccountingStats } from '@/types';
 import { createPersistentCrudMethods, generateId } from '@/lib/persistent-store';
 
 interface AccountingStore {
   // 資料狀態
   accounts: Account[];
-  categories: Category[];
+  categories: TransactionCategory[];
   transactions: Transaction[];
   budgets: Budget[];
 
@@ -14,26 +14,26 @@ interface AccountingStore {
   stats: AccountingStats;
 
   // 帳戶管理（統一方法）
-  addAccount: (account: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Account>;
+  addAccount: (account: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => Promise<Account>;
   updateAccount: (id: string, account: Partial<Account>) => Promise<Account | undefined>;
   deleteAccount: (id: string) => Promise<boolean>;
   loadAccounts: () => Promise<Account[] | null>;
 
   // 分類管理（統一方法）
-  addCategory: (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Category>;
-  updateCategory: (id: string, category: Partial<Category>) => Promise<Category | undefined>;
+  addCategory: (category: Omit<TransactionCategory, 'id' | 'created_at' | 'updated_at'>) => Promise<TransactionCategory>;
+  updateCategory: (id: string, category: Partial<TransactionCategory>) => Promise<TransactionCategory | undefined>;
   deleteCategory: (id: string) => Promise<boolean>;
-  loadCategories: () => Promise<Category[] | null>;
+  loadCategories: () => Promise<TransactionCategory[] | null>;
 
   // 交易記錄（保留自定義，因為有餘額計算）
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => string;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
 
   // 統計計算
   calculateStats: () => void;
-  getAccountBalance: (accountId: string) => number;
-  getCategoryTotal: (categoryId: string, startDate?: string, endDate?: string) => number;
+  getAccountBalance: (account_id: string) => number;
+  getCategoryTotal: (category_id: string, startDate?: string, endDate?: string) => number;
 }
 
 export const useAccountingStore = create<AccountingStore>()(
@@ -46,13 +46,13 @@ export const useAccountingStore = create<AccountingStore>()(
       budgets: [],
 
       stats: {
-        totalAssets: 0,
-        totalIncome: 0,
-        totalExpense: 0,
-        monthlyIncome: 0,
-        monthlyExpense: 0,
-        netWorth: 0,
-        categoryBreakdown: []
+        total_assets: 0,
+        total_income: 0,
+        total_expense: 0,
+        monthly_income: 0,
+        monthly_expense: 0,
+        net_worth: 0,
+        category_breakdown: []
       },
 
       // 帳戶管理（使用統一方法，加上計算邏輯）
@@ -88,7 +88,7 @@ export const useAccountingStore = create<AccountingStore>()(
           // 先刪除相關交易
           set((state) => ({
             transactions: state.transactions.filter(transaction =>
-              transaction.accountId !== id && transaction.toAccountId !== id
+              transaction.account_id !== id && transaction.to_account_id !== id
             ),
           }));
 
@@ -132,7 +132,7 @@ export const useAccountingStore = create<AccountingStore>()(
         try {
           // 先刪除該分類的交易
           set((state) => ({
-            transactions: state.transactions.filter(transaction => transaction.categoryId !== id),
+            transactions: state.transactions.filter(transaction => transaction.category_id !== id),
           }));
 
           const methods = createPersistentCrudMethods<Category>('categories', 'categories', set, get);
@@ -215,7 +215,7 @@ export const useAccountingStore = create<AccountingStore>()(
       updateAccountBalances: (transaction: Transaction) => {
         set((state) => ({
           accounts: state.accounts.map(account => {
-            if (account.id === transaction.accountId) {
+            if (account.id === transaction.account_id) {
               const balanceChange = transaction.type === 'income' ? transaction.amount : -transaction.amount;
               const newBalance = account.balance + balanceChange;
               const availableCredit = account.type === 'credit' && account.creditLimit
@@ -223,7 +223,7 @@ export const useAccountingStore = create<AccountingStore>()(
                 : account.availableCredit;
               return { ...account, balance: newBalance, availableCredit };
             }
-            if (transaction.toAccountId && account.id === transaction.toAccountId) {
+            if (transaction.to_account_id && account.id === transaction.to_account_id) {
               const newBalance = account.balance + transaction.amount;
               const availableCredit = account.type === 'credit' && account.creditLimit
                 ? account.creditLimit + newBalance
@@ -239,11 +239,11 @@ export const useAccountingStore = create<AccountingStore>()(
       reverseAccountBalances: (transaction: Transaction) => {
         set((state) => ({
           accounts: state.accounts.map(account => {
-            if (account.id === transaction.accountId) {
+            if (account.id === transaction.account_id) {
               const balanceChange = transaction.type === 'income' ? -transaction.amount : transaction.amount;
               return { ...account, balance: account.balance + balanceChange };
             }
-            if (transaction.toAccountId && account.id === transaction.toAccountId) {
+            if (transaction.to_account_id && account.id === transaction.to_account_id) {
               return { ...account, balance: account.balance - transaction.amount };
             }
             return account;
@@ -300,8 +300,8 @@ export const useAccountingStore = create<AccountingStore>()(
         transactions
           .filter(t => t.type === 'expense')
           .forEach(t => {
-            const current = categoryTotals.get(t.categoryId) || 0;
-            categoryTotals.set(t.categoryId, current + t.amount);
+            const current = categoryTotals.get(t.category_id) || 0;
+            categoryTotals.set(t.category_id, current + t.amount);
           });
 
         const categoryBreakdown = Array.from(categoryTotals.entries())
@@ -309,7 +309,7 @@ export const useAccountingStore = create<AccountingStore>()(
             const category = categories.find(c => c.id === categoryId);
             return {
               categoryId,
-              categoryName: category?.name || '未知分類',
+              category_name: category?.name || '未知分類',
               amount,
               percentage: totalExpense > 0 ? (amount / totalExpense) * 100 : 0
             };
@@ -330,16 +330,16 @@ export const useAccountingStore = create<AccountingStore>()(
       },
 
       // 工具方法
-      getAccountBalance: (accountId: string) => {
+      getAccountBalance: (account_id: string) => {
         const account = get().accounts.find(a => a.id === accountId);
         return account?.balance || 0;
       },
 
-      getCategoryTotal: (categoryId: string, startDate?: string, endDate?: string) => {
+      getCategoryTotal: (category_id: string, startDate?: string, endDate?: string) => {
         const { transactions } = get();
         return transactions
           .filter(t => {
-            if (t.categoryId !== categoryId) return false;
+            if (t.category_id !== categoryId) return false;
             if (startDate && t.date < startDate) return false;
             if (endDate && t.date > endDate) return false;
             return true;

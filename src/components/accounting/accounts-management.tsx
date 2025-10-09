@@ -36,13 +36,13 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
   const { accounts, updateAccount, deleteAccount } = useAccountingStore();
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
 
-  const handleToggleActive = (accountId: string, isActive: boolean) => {
-    updateAccount(accountId, { isActive: !isActive });
+  const handleToggleActive = (account_id: string, is_active: boolean) => {
+    updateAccount(account_id, { is_active: !is_active });
   };
 
-  const handleDeleteAccount = (accountId: string, accountName: string) => {
-    if (confirm(`確定要刪除帳戶「${accountName}」嗎？這個操作無法復原。`)) {
-      deleteAccount(accountId);
+  const handleDeleteAccount = (account_id: string, account_name: string) => {
+    if (confirm(`確定要刪除帳戶「${account_name}」嗎？這個操作無法復原。`)) {
+      deleteAccount(account_id);
     }
   };
 
@@ -60,7 +60,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold text-morandi-primary">帳戶管理</h3>
         <div className="text-sm text-morandi-secondary">
-          共 {accounts.length} 個帳戶 • 活躍 {accounts.filter(a => a.isActive).length} 個
+          共 {accounts.length} 個帳戶 • 活躍 {accounts.filter(a => a.is_active).length} 個
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                     key={account.id}
                     className={cn(
                       "border rounded-xl p-6 transition-all duration-200 hover:shadow-lg",
-                      account.isActive
+                      account.is_active
                         ? "border-border bg-white hover:border-morandi-gold/50"
                         : "border-morandi-container bg-morandi-container/30 opacity-75"
                     )}
@@ -119,7 +119,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
 
                       {/* 狀態指標 */}
                       <div className="flex items-center space-x-1">
-                        {account.isActive ? (
+                        {account.is_active ? (
                           <Eye size={16} className="text-morandi-green" />
                         ) : (
                           <EyeOff size={16} className="text-morandi-secondary" />
@@ -141,38 +141,38 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                     </div>
 
                     {/* 信用卡額度資訊 */}
-                    {account.type === 'credit' && account.creditLimit && (
+                    {account.type === 'credit' && account.credit_limit && (
                       <div className="mb-4 p-3 bg-morandi-container/20 rounded-lg">
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-sm text-morandi-secondary">信用額度</span>
                           <span className="text-sm font-medium text-morandi-primary">
-                            NT$ {account.creditLimit.toLocaleString()}
+                            NT$ {account.credit_limit.toLocaleString()}
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-morandi-secondary">可用額度</span>
                           <span className="text-sm font-semibold text-morandi-blue">
-                            NT$ {((account.creditLimit || 0) + account.balance).toLocaleString()}
+                            NT$ {((account.credit_limit || 0) + account.balance).toLocaleString()}
                           </span>
                         </div>
                         {/* 額度使用率條 */}
                         <div className="mt-3">
                           <div className="flex justify-between text-xs text-morandi-secondary mb-1">
                             <span>使用率</span>
-                            <span>{(((Math.abs(account.balance) / (account.creditLimit || 1)) * 100)).toFixed(1)}%</span>
+                            <span>{(((Math.abs(account.balance) / (account.credit_limit || 1)) * 100)).toFixed(1)}%</span>
                           </div>
                           <div className="w-full bg-morandi-container/30 rounded-full h-2">
                             <div
                               className={cn(
                                 "h-2 rounded-full transition-all duration-300",
-                                Math.abs(account.balance) / (account.creditLimit || 1) > 0.8
+                                Math.abs(account.balance) / (account.credit_limit || 1) > 0.8
                                   ? "bg-morandi-red"
-                                  : Math.abs(account.balance) / (account.creditLimit || 1) > 0.5
+                                  : Math.abs(account.balance) / (account.credit_limit || 1) > 0.5
                                   ? "bg-morandi-gold"
                                   : "bg-morandi-green"
                               )}
                               style={{
-                                width: `${Math.min(((Math.abs(account.balance) / (account.creditLimit || 1)) * 100), 100)}%`
+                                width: `${Math.min(((Math.abs(account.balance) / (account.credit_limit || 1)) * 100), 100)}%`
                               }}
                             />
                           </div>
@@ -186,15 +186,15 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleToggleActive(account.id, account.isActive)}
+                          onClick={() => handleToggleActive(account.id, account.is_active)}
                           className={cn(
                             "text-xs",
-                            account.isActive
+                            account.is_active
                               ? "text-morandi-secondary hover:text-morandi-red"
                               : "text-morandi-secondary hover:text-morandi-green"
                           )}
                         >
-                          {account.isActive ? (
+                          {account.is_active ? (
                             <>
                               <EyeOff size={12} className="mr-1" />
                               隱藏
@@ -231,7 +231,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
 
                     {/* 建立日期 */}
                     <div className="mt-3 text-xs text-morandi-secondary">
-                      建立於 {new Date(account.createdAt).toLocaleDateString('zh-TW')}
+                      建立於 {new Date(account.created_at).toLocaleDateString('zh-TW')}
                     </div>
                   </div>
                 ))}

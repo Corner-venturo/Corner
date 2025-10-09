@@ -51,11 +51,11 @@ export default function VisasPage() {
 
   // 新增簽證表單 - 聯絡人資訊
   const [contactInfo, setContactInfo] = useState({
-    tourId: '',
-    orderId: '', // 新增訂單ID欄位
+    tour_id: '',
+    order_id: '', // 新增訂單ID欄位
     applicantName: '',
-    contactPerson: '',
-    contactPhone: '',
+    contact_person: '',
+    contact_phone: '',
   });
 
   // 團號選項（轉換為 Combobox 格式）
@@ -68,21 +68,21 @@ export default function VisasPage() {
 
   // 訂單選項（根據選擇的團號過濾）
   const orderOptions: ComboboxOption[] = React.useMemo(() => {
-    if (!contactInfo.tourId) return [];
+    if (!contactInfo.tour_id) return [];
     const { orders } = useOrderStore.getState();
     return orders
-      .filter(order => order.tourId === contactInfo.tourId)
+      .filter(order => order.tour_id === contactInfo.tour_id)
       .map(order => ({
         value: order.id,
-        label: `${order.orderNumber} - ${order.contactPerson}`,
+        label: `${order.order_number} - ${order.contact_person}`,
       }));
-  }, [contactInfo.tourId]);
+  }, [contactInfo.tour_id]);
 
   // 當 tours 載入後，自動設定預設團號
   useEffect(() => {
     const defaultVisaTour = tours.find(t => t.code === 'SPC251231001');
-    if (defaultVisaTour && !contactInfo.tourId) {
-      setContactInfo(prev => ({ ...prev, tourId: defaultVisaTour.id }));
+    if (defaultVisaTour && !contactInfo.tour_id) {
+      setContactInfo(prev => ({ ...prev, tour_id: defaultVisaTour.id }));
     }
   }, [tours]);
 
@@ -181,7 +181,7 @@ export default function VisasPage() {
     let selectedTour;
 
     // 如果沒選團號，自動建立或使用預設的「簽證代辦團」
-    if (!contactInfo.tourId) {
+    if (!contactInfo.tour_id) {
       const currentYear = new Date().getFullYear();
       const defaultTourCode = `VISA-${currentYear}`;
 
@@ -201,12 +201,12 @@ export default function VisasPage() {
           maxParticipants: 9999,
           contractStatus: '未簽署' as const,
           totalRevenue: 0,
-          totalCost: 0,
+          total_cost: 0,
           profit: 0,
         });
       }
     } else {
-      selectedTour = tours.find(t => t.id === contactInfo.tourId);
+      selectedTour = tours.find(t => t.id === contactInfo.tour_id);
       if (!selectedTour) return;
     }
 
@@ -214,24 +214,24 @@ export default function VisasPage() {
     const totalFee = applicants.reduce((sum, a) => sum + calculateFee(a.country), 0);
     let targetOrder;
 
-    if (contactInfo.orderId) {
+    if (contactInfo.order_id) {
       // 如果有選擇訂單，使用現有訂單
       const { orders } = useOrderStore.getState();
-      targetOrder = orders.find(o => o.id === contactInfo.orderId);
+      targetOrder = orders.find(o => o.id === contactInfo.order_id);
       if (!targetOrder) return;
     } else {
       // 如果沒有選擇訂單，自動建立新訂單
       const orderNumber = `${selectedTour.code}-${String(Date.now()).slice(-6)}`;
       targetOrder = await addOrder({
         orderNumber,
-        tourId: selectedTour.id,
+        tour_id: selectedTour.id,
         code: selectedTour.code,
-        tourName: selectedTour.name,
-        contactPerson: contactInfo.contactPerson || contactInfo.applicantName,
+        tour_name: selectedTour.name,
+        contact_person: contactInfo.contact_person || contactInfo.applicantName,
         salesPerson: user.chineseName || '系統',
         assistant: user.chineseName || '系統',
         memberCount: applicants.filter(a => a.name).length,
-        totalAmount: totalFee,
+        total_amount: totalFee,
         paidAmount: 0,
         remainingAmount: totalFee,
         paymentStatus: '未收款' as const,
@@ -253,8 +253,8 @@ export default function VisasPage() {
       // 建立簽證記錄
       addVisa({
         applicantName: applicant.name,
-        contactPerson: contactInfo.contactPerson,
-        contactPhone: contactInfo.contactPhone,
+        contact_person: contactInfo.contact_person,
+        contact_phone: contactInfo.contact_phone,
         visaType: applicant.country, // 簽證類型
         country: applicant.country,   // 國家（保留相容性）
         submissionDate: applicant.submissionDate,
@@ -262,11 +262,11 @@ export default function VisasPage() {
         fee,
         cost: totalCost,
         status: '待送件',
-        orderId: targetOrder.id,
-        orderNumber: targetOrder.orderNumber,
-        tourId: selectedTour.id,
+        order_id: targetOrder.id,
+        order_number: targetOrder.order_number,
+        tour_id: selectedTour.id,
         code: selectedTour.code,
-        createdBy: user.id,
+        created_by: user.id,
         note: '',
       });
     });
@@ -274,11 +274,11 @@ export default function VisasPage() {
     // 重置表單（保持預設團號）
     const defaultVisaTour = tours.find(t => t.code === 'SPC251231001');
     setContactInfo({
-      tourId: defaultVisaTour?.id || '',
-      orderId: '',
+      tour_id: defaultVisaTour?.id || '',
+      order_id: '',
       applicantName: '',
-      contactPerson: '',
-      contactPhone: '',
+      contact_person: '',
+      contact_phone: '',
     });
     setApplicants([{
       id: '1',
@@ -480,9 +480,9 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
                   <Combobox
-                    value={contactInfo.tourId}
+                    value={contactInfo.tour_id}
                     onChange={(value) => {
-                      setContactInfo(prev => ({ ...prev, tourId: value, orderId: '' }));
+                      setContactInfo(prev => ({ ...prev, tour_id: value, order_id: '' }));
                     }}
                     options={tourOptions}
                     placeholder="請輸入或選擇團號（例如：0810）"
@@ -496,12 +496,12 @@ export default function VisasPage() {
                     選擇訂單 <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
                   </label>
                   <Combobox
-                    value={contactInfo.orderId}
-                    onChange={(value) => setContactInfo(prev => ({ ...prev, orderId: value }))}
+                    value={contactInfo.order_id}
+                    onChange={(value) => setContactInfo(prev => ({ ...prev, order_id: value }))}
                     options={orderOptions}
-                    placeholder={contactInfo.tourId ? "請選擇訂單或留空自動建立" : "請先選擇團號"}
+                    placeholder={contactInfo.tour_id ? "請選擇訂單或留空自動建立" : "請先選擇團號"}
                     className="mt-1"
-                    disabled={!contactInfo.tourId}
+                    disabled={!contactInfo.tour_id}
                     showSearchIcon
                     showClearButton
                   />
@@ -512,8 +512,8 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
                   <Input
-                    value={contactInfo.contactPerson}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, contactPerson: e.target.value }))}
+                    value={contactInfo.contact_person}
+                    onChange={(e) => setContactInfo(prev => ({ ...prev, contact_person: e.target.value }))}
                     className="mt-1"
                     placeholder="請輸入聯絡人"
                   />
@@ -530,8 +530,8 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
                   <Input
-                    value={contactInfo.contactPhone}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, contactPhone: e.target.value }))}
+                    value={contactInfo.contact_phone}
+                    onChange={(e) => setContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
                     className="mt-1"
                     placeholder="請輸入聯絡電話"
                   />

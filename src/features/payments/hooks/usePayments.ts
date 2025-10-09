@@ -29,7 +29,7 @@ export const usePayments = () => {
       store.setSelectedPaymentRequest(request);
     },
 
-    createFromQuote: async (tourId: string, quoteId: string, requestDate: string) => {
+    createFromQuote: async (tour_id: string, quote_id: string, request_date: string) => {
       return await paymentService.createFromQuote(tourId, quoteId, requestDate);
     },
 
@@ -47,7 +47,7 @@ export const usePayments = () => {
     },
 
     // ========== DisbursementOrder 操作 ==========
-    createDisbursementOrder: (paymentRequestIds: string[], note?: string) => {
+    createDisbursementOrder: (payment_request_ids: string[], note?: string) => {
       return paymentService.createDisbursementOrder(paymentRequestIds, note);
     },
 
@@ -55,11 +55,11 @@ export const usePayments = () => {
       store.updateDisbursementOrder(id, updates);
     },
 
-    confirmDisbursementOrder: (id: string, confirmedBy: string) => {
+    confirmDisbursementOrder: (id: string, confirmed_by: string) => {
       paymentService.confirmDisbursementOrder(id, confirmedBy);
     },
 
-    addToCurrentDisbursementOrder: (paymentRequestIds: string[]) => {
+    addToCurrentDisbursementOrder: (payment_request_ids: string[]) => {
       paymentService.addToCurrentDisbursementOrder(paymentRequestIds);
     },
 
