@@ -10,7 +10,7 @@
  */
 
 import { localDB } from '@/lib/db';
-import { User } from '@/types';
+import { Employee as User } from '@/stores/types';
 
 export async function verifyAndFix() {
   console.log('🔍 開始驗證系統狀態...\n');
@@ -18,13 +18,13 @@ export async function verifyAndFix() {
   try {
     // 1. 檢查 IndexedDB
     console.log('📊 檢查 IndexedDB...');
-    const users = await localDB.getAll<User>('users');
+    const users = await localDB.getAll<User>('employees');
     console.log(`   找到 ${users.length} 位員工`);
 
     if (users.length > 0) {
       console.log('   員工列表：');
       users.forEach(u => {
-        console.log(`   - ${u.chineseName} (${u.employee_number}) [${u.status}]`);
+        console.log(`   - ${u.display_name} (${u.employee_number}) [${u.status}]`);
       });
     }
 
@@ -33,7 +33,7 @@ export async function verifyAndFix() {
 
     if (william) {
       console.log('\n✅ William 帳號存在');
-      console.log(`   姓名: ${william.chineseName}`);
+      console.log(`   姓名: ${william.display_name}`);
       console.log(`   員工編號: ${william.employee_number}`);
       console.log(`   狀態: ${william.status}`);
       console.log(`   ID: ${william.id}`);
@@ -50,7 +50,7 @@ export async function verifyAndFix() {
     const newWilliam: User = {
       id: crypto.randomUUID(),
       employee_number: 'william01',
-      chineseName: 'William Chien',
+      display_name: 'William Chien',
       english_name: 'William Chien',
       permissions: [
         'super_admin',
@@ -64,8 +64,8 @@ export async function verifyAndFix() {
         'reports',
         'settings'
       ],
-      personalInfo: {
-        nationalId: '',
+      personal_info: {
+        national_id: '',
         birthday: '',
         gender: 'male',
         phone: '',
@@ -73,20 +73,20 @@ export async function verifyAndFix() {
         address: '',
         emergency_contact: { name: '', relationship: '', phone: '' }
       },
-      jobInfo: {
+      job_info: {
         department: '管理部',
         position: '系統管理員',
         hire_date: new Date().toISOString(),
-        employmentType: 'fulltime'
+        employment_type: 'fulltime'
       },
-      salaryInfo: {
-        baseSalary: 0,
+      salary_info: {
+        base_salary: 0,
         allowances: [],
-        salaryHistory: []
+        salary_history: []
       },
       attendance: {
-        leaveRecords: [],
-        overtimeRecords: []
+        leave_records: [],
+        overtime_records: []
       },
       contracts: [],
       status: 'active',
@@ -94,17 +94,17 @@ export async function verifyAndFix() {
       updated_at: new Date().toISOString()
     };
 
-    await localDB.create<User>('users', newWilliam);
+    await localDB.create<User>('employees', newWilliam);
 
     console.log('✅ William 帳號建立成功！');
     console.log(`   員工編號: william01`);
     console.log(`   密碼: 83212711`);
-    console.log(`   姓名: ${newWilliam.chineseName}`);
+    console.log(`   姓名: ${newWilliam.display_name}`);
     console.log(`   ID: ${newWilliam.id}`);
     console.log(`   權限: 超級管理員（所有權限）`);
 
     // 4. 驗證建立結果
-    const verify = await localDB.getAll<User>('users');
+    const verify = await localDB.getAll<User>('employees');
     console.log(`\n✅ 驗證完成，現有員工數量: ${verify.length}`);
 
     console.log('\n🎉 修復完成！請重新整理 HR 頁面查看');
@@ -124,7 +124,7 @@ export async function quickCheck() {
   console.log('🔍 快速檢查...\n');
 
   try {
-    const users = await localDB.getAll<User>('users');
+    const users = await localDB.getAll<User>('employees');
     const william = users.find(u => u.employee_number === 'william01');
 
     console.log(`📊 IndexedDB 狀態:`);
@@ -147,7 +147,7 @@ export async function quickCheck() {
     if (authStore) {
       const parsed = JSON.parse(authStore);
       console.log(`   已登入: ${parsed.state?.isAuthenticated || false}`);
-      console.log(`   使用者: ${parsed.state?.user?.chineseName || '無'}`);
+      console.log(`   使用者: ${parsed.state?.user?.display_name || '無'}`);
     }
 
     return { users, william, hasAuth: !!authStore };

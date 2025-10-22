@@ -11,7 +11,7 @@ import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-mem
 export default function MemberDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.order_id as string;
+  const orderId = params.orderId as string;
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore();
   const memberTableRef = useRef<MemberTableRef | null>(null);
@@ -70,9 +70,9 @@ export default function MemberDetailPage() {
         <div className="border border-border rounded-lg overflow-hidden bg-card">
           <ExcelMemberTable
             ref={memberTableRef}
-            orderId={orderId}
-            departureDate={tour?.departure_date || ''}
-            memberCount={order.member_count}
+            order_id={orderId}
+            departure_date={tour?.departure_date || ''}
+            member_count={order.member_count}
           />
         </div>
       </div>

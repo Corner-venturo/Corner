@@ -8,6 +8,7 @@ import { CanvasView } from './canvas-view';
 import { Button } from '@/components/ui/button';
 import type { Channel } from '@/stores/workspace-store';
 import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useAuthStore } from '@/stores/auth-store';
 
 import { cn } from '@/lib/utils';
 
@@ -16,21 +17,24 @@ interface ChannelViewProps {
 }
 
 export function ChannelView({ channel }: ChannelViewProps) {
-  const { 
-    messages, 
-    addMessage, 
+  const {
+    messages,
+    addMessage,
     updateMessage,
     deleteMessage,
     togglePinMessage,
     addReaction,
     activeCanvasTab,
-    setActiveCanvasTab 
+    setActiveCanvasTab
   } = useWorkspaceStore();
-  
+
+  // ✅ 從 auth-store 讀取當前登入者資訊
+  const { user } = useAuthStore();
+  const currentUserId = user?.id || '';
+  const currentUserName = user?.display_name || '未知使用者';
+
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const currentUserId = '1'; // TODO: 從 auth store 獲取
-  const currentUserName = '威廉'; // TODO: 從 auth store 獲取
   
   // 獲取該頻道的訊息
   const channelMessages = messages
@@ -38,7 +42,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   
   // 釘選的訊息
-  const pinnedMessages = channelMessages.filter(m => m.isPinned);
+  const pinnedMessages = channelMessages.filter(m => m.is_pinned);
   
   // 自動滾動到底部
   useEffect(() => {
@@ -47,15 +51,18 @@ export function ChannelView({ channel }: ChannelViewProps) {
   
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
-    
+
+    // ✅ 使用正確的 author 資料結構
     addMessage({
-      channelId: channel.id,
-      user_id: currentUserId,
-      userName: currentUserName,
+      channel_id: channel.id,
+      author_id: currentUserId,
       content: messageInput.trim(),
-      type: 'text',
+      author: {
+        id: currentUserId,
+        display_name: currentUserName,
+      },
     });
-    
+
     setMessageInput('');
   };
   
@@ -150,10 +157,10 @@ export function ChannelView({ channel }: ChannelViewProps) {
                 key={message.id}
                 className={cn(
                   'group relative',
-                  message.isPinned && 'bg-morandi-gold/5 -mx-2 px-2 py-1 rounded'
+                  message.is_pinned && 'bg-morandi-gold/5 -mx-2 px-2 py-1 rounded'
                 )}
               >
-                {message.isPinned && (
+                {message.is_pinned && (
                   <div className="absolute -left-6 top-2">
                     <Pin size={12} className="text-morandi-gold" />
                   </div>
@@ -162,14 +169,14 @@ export function ChannelView({ channel }: ChannelViewProps) {
                 <div className="flex items-start gap-3">
                   {/* 頭像 */}
                   <div className="w-8 h-8 rounded-full bg-morandi-gold/20 flex items-center justify-center text-sm font-medium text-morandi-primary flex-shrink-0">
-                    {message.userName[0]}
+                    {message.author?.display_name?.[0] || '?'}
                   </div>
-                  
+
                   {/* 訊息內容 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="font-medium text-sm text-morandi-primary">
-                        {message.userName}
+                        {message.author?.display_name || '未知使用者'}
                       </span>
                       <span className="text-xs text-morandi-secondary">
                         {formatTime(message.created_at)}
@@ -180,21 +187,21 @@ export function ChannelView({ channel }: ChannelViewProps) {
                     </div>
                     
                     {/* 反應 */}
-                    {message.reactions.length > 0 && (
+                    {Object.keys(message.reactions).length > 0 && (
                       <div className="flex items-center gap-1 mt-2">
-                        {message.reactions.map((reaction, i) => (
+                        {Object.entries(message.reactions).map(([emoji, users], i) => (
                           <button
                             key={i}
-                            onClick={() => addReaction(message.id, reaction.emoji, currentUserId)}
+                            onClick={() => addReaction(message.id, emoji, currentUserId)}
                             className={cn(
                               'px-2 py-0.5 rounded-full text-xs flex items-center gap-1 transition-colors',
-                              reaction.users.includes(currentUserId)
+                              users.includes(currentUserId)
                                 ? 'bg-morandi-gold/20 border border-morandi-gold/40'
                                 : 'bg-morandi-container/20 border border-border hover:border-morandi-gold/40'
                             )}
                           >
-                            <span>{reaction.emoji}</span>
-                            <span className="text-morandi-secondary">{reaction.users.length}</span>
+                            <span>{emoji}</span>
+                            <span className="text-morandi-secondary">{users.length}</span>
                           </button>
                         ))}
                       </div>
@@ -213,7 +220,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
                     <button
                       onClick={() => togglePinMessage(message.id)}
                       className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/20 rounded"
-                      title={message.isPinned ? '取消釘選' : '釘選'}
+                      title={message.is_pinned ? '取消釘選' : '釘選'}
                     >
                       <Pin size={14} />
                     </button>

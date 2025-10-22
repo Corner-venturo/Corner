@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & { indeterminate?: boolean }
 >(({ className, indeterminate, ...props }, ref) => {
   const checkboxRef = React.useRef<HTMLButtonElement>(null);
 
@@ -16,7 +16,7 @@ const Checkbox = React.forwardRef<
 
   React.useEffect(() => {
     if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = indeterminate ?? false;
+      (checkboxRef.current as any).indeterminate = indeterminate ?? false;
     }
   }, [indeterminate]);
 

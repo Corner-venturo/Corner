@@ -1,38 +1,38 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service';
 import { Quote } from '@/stores/types';
-import { useQuoteStore } from '@/stores/quote-store';
+import { useQuoteStore } from '@/stores';
 import { ValidationError } from '@/core/errors/app-errors';
-import { generateId } from '@/lib/persistent-store';
+import { generateId } from '@/lib/data/create-data-store';
 
 class QuoteService extends BaseService<Quote> {
   protected resourceName = 'quotes';
 
-  protected getStore(): StoreOperations<Quote> {
+  protected getStore = (): StoreOperations<Quote> => {
     const store = useQuoteStore.getState();
     return {
-      getAll: () => store.quotes,
-      getById: (id: string) => store.quotes.find(q => q.id === id),
+      getAll: () => store.items,
+      getById: (id: string) => store.items.find(q => q.id === id),
       add: async (quote: Quote) => {
-        await store.addQuote(quote as any);
-        return quote;
+        const result = await store.create(quote as any);
+        return result || quote;
       },
       update: async (id: string, data: Partial<Quote>) => {
-        await store.updateQuote(id, data);
+        await store.update(id, data);
       },
       delete: async (id: string) => {
-        await store.deleteQuote(id);
+        await store.delete(id);
       }
     };
   }
 
   protected validate(data: Partial<Quote>): void {
-    if (data.title && data.title.trim().length < 2) {
-      throw new ValidationError('title', '報價單標題至少需要 2 個字符');
+    if (data.name && data.name.trim().length < 2) {
+      throw new ValidationError('name', '報價單標題至少需要 2 個字符');
     }
 
     if (data.categories) {
-      const totalCost = data.categories.reduce((sum, cat) => sum + cat.total, 0);
-      if (totalCost < 0) {
+      const total_cost = data.categories.reduce((sum, cat) => sum + cat.total, 0);
+      if (total_cost < 0) {
         throw new ValidationError('categories', '總金額不能為負數');
       }
     }
@@ -42,15 +42,16 @@ class QuoteService extends BaseService<Quote> {
 
   async duplicateQuote(id: string): Promise<Quote | undefined> {
     const store = useQuoteStore.getState();
-    const original = store.quotes.find(q => q.id === id);
+    const original = store.items.find(q => q.id === id);
     if (!original) return undefined;
 
-    const duplicated = await store.addQuote({
-      ...original,
-      title: `${original.title} (副本)`,
-      status: '草稿',
-      version: 1,
-      versions: []
+    // 排除不應該傳入的欄位
+    const { id: _, created_at, updated_at, version, versions, ...rest } = original;
+
+    const duplicated = await store.create({
+      ...rest,
+      name: `${original.name} (副本)`,
+      status: '提案'
     } as any);
 
     return duplicated;
@@ -58,16 +59,18 @@ class QuoteService extends BaseService<Quote> {
 
   async createNewVersion(id: string, updates: Partial<Quote>): Promise<Quote | undefined> {
     const store = useQuoteStore.getState();
-    const current = store.quotes.find(q => q.id === id);
+    const current = store.items.find(q => q.id === id);
     if (!current) return undefined;
 
     const newVersion = {
       id: generateId(),
-      createdAt: new Date().toISOString(),
-      data: { ...current, ...updates }
+      version: (current.version || 1) + 1,
+      categories: current.categories,
+      total_cost: current.total_cost,
+      created_at: new Date().toISOString()
     };
 
-    return await store.updateQuote(id, {
+    return await store.update(id, {
       version: (current.version || 1) + 1,
       versions: [...(current.versions || []), newVersion],
       ...updates
@@ -76,12 +79,12 @@ class QuoteService extends BaseService<Quote> {
 
   getQuotesByTour(tour_id: string): Quote[] {
     const store = useQuoteStore.getState();
-    return store.quotes.filter(q => q.tour_id === tourId);
+    return store.items.filter(q => q.tour_id === tour_id);
   }
 
   getQuotesByStatus(status: Quote['status']): Quote[] {
     const store = useQuoteStore.getState();
-    return store.quotes.filter(q => q.status === status);
+    return store.items.filter(q => q.status === status);
   }
 
   calculateTotalCost(quote: Quote): number {

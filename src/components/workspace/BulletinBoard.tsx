@@ -19,7 +19,7 @@ interface Bulletin {
   type: 'announcement' | 'notice' | 'event';
   is_pinned: boolean;
   author?: {
-    chinese_name: string;
+    display_name: string;
     english_name: string;
   };
   created_at: string;
@@ -81,7 +81,7 @@ export function BulletinBoard() {
     setNewBulletin({
       title: bulletin.title,
       content: bulletin.content,
-      type: bulletin.type,
+      type: bulletin.type as any,
       is_pinned: bulletin.is_pinned
     });
     setEditingBulletin(bulletin);
@@ -121,8 +121,8 @@ export function BulletinBoard() {
     return labels[type as keyof typeof labels] || type;
   };
 
-  const getBorderColor = (type: string, isPinned: boolean) => {
-    if (isPinned) return 'border-morandi-gold';
+  const getBorderColor = (type: string, is_pinned: boolean) => {
+    if (is_pinned) return 'border-morandi-gold';
     switch (type) {
       case 'notice': return 'border-morandi-red/30';
       case 'event': return 'border-morandi-green/30';
@@ -204,7 +204,7 @@ export function BulletinBoard() {
 
                   <div className="flex items-center gap-4 text-sm text-morandi-secondary">
                     <span>
-                      {bulletin.author?.chinese_name || '系統'}
+                      {bulletin.author?.display_name || '系統'}
                     </span>
                     <span>
                       {format(new Date(bulletin.created_at), 'yyyy/MM/dd HH:mm')}

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useUserStore } from '@/stores/user-store';
+import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { Employee } from '@/stores/types';
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view';
 import { AddEmployeeForm } from '@/components/hr/add-employee-form';
@@ -21,22 +21,28 @@ const statusFilters = [
 ];
 
 export default function HRPage() {
-  const { users, searchUsers, getUsersByStatus, loadUsersFromDatabase, isLoading, updateUser, deleteUser } = useUserStore();
+  const { items: users, fetchAll, loading: isLoading, update: updateUser, delete: deleteUser } = useUserStore();
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  // 初始化時載入員工資料
+  // 初始化時載入員工資料（只在沒有資料時載入）
   useEffect(() => {
-    loadUsersFromDatabase();
-  }, [loadUsersFromDatabase]);
+    if (users.length === 0) {
+      fetchAll();
+    }
+  }, []);
 
-  const filteredEmployees = statusFilter === 'all'
-    ? (searchTerm ? searchUsers(searchTerm) : users)
-    : getUsersByStatus(statusFilter as Employee['status']).filter(emp =>
-        !searchTerm || searchUsers(searchTerm).includes(emp)
+  const filteredEmployees = useMemo(() => {
+    if (statusFilter === 'all') {
+      return searchTerm ? userStoreHelpers.searchUsers(searchTerm) : users;
+    } else {
+      return userStoreHelpers.getUsersByStatus(statusFilter as Employee['status']).filter((emp: Employee) =>
+        !searchTerm || userStoreHelpers.searchUsers(searchTerm).includes(emp)
       );
+    }
+  }, [users, statusFilter, searchTerm]);
 
   const getStatusColor = (status: Employee['status']) => {
     const colorMap = {
@@ -77,7 +83,7 @@ export default function HRPage() {
       e.stopPropagation();
     }
 
-    const confirmMessage = `⚠️ 確定要將員工「${employee.chineseName}」辦理離職嗎？\n\n離職後將無法登入系統，但歷史記錄會保留。`;
+    const confirmMessage = `⚠️ 確定要將員工「${employee.display_name || (employee as any).chinese_name || '未命名員工'}」辦理離職嗎？\n\n離職後將無法登入系統，但歷史記錄會保留。`;
 
     if (!confirm(confirmMessage)) {
       return;
@@ -99,7 +105,7 @@ export default function HRPage() {
       e.stopPropagation();
     }
 
-    const confirmMessage = `⚠️⚠️⚠️ 確定要刪除員工「${employee.chineseName}」嗎？\n\n此操作會：\n- 永久刪除員工所有資料\n- 移除所有歷史記錄\n- 無法復原\n\n建議使用「辦理離職」功能來保留歷史記錄。\n\n真的要刪除嗎？`;
+    const confirmMessage = `⚠️⚠️⚠️ 確定要刪除員工「${employee.display_name || (employee as any).chinese_name || '未命名員工'}」嗎？\n\n此操作會：\n- 永久刪除員工所有資料\n- 移除所有歷史記錄\n- 無法復原\n\n建議使用「辦理離職」功能來保留歷史記錄。\n\n真的要刪除嗎？`;
 
     if (!confirm(confirmMessage)) {
       return;
@@ -110,14 +116,16 @@ export default function HRPage() {
       if (expandedEmployee === employee.id) {
         setExpandedEmployee(null);
       }
+      alert(`✅ 員工「${employee.display_name || (employee as any).chinese_name || '未命名員工'}」已成功刪除`);
     } catch (err) {
       console.error('刪除員工失敗:', err);
-      alert('刪除失敗，請稍後再試');
+      const errorMessage = err instanceof Error ? err.message : '未知錯誤';
+      alert(`❌ 刪除失敗：${errorMessage}`);
     }
   };
 
   return (
-    <div className="p-6">
+    <>
       <ResponsiveHeader
         title="人資管理"
         showSearch={true}
@@ -197,7 +205,7 @@ export default function HRPage() {
                     {employee.avatar ? (
                       <img
                         src={employee.avatar}
-                        alt={employee.chineseName}
+                        alt={employee.display_name}
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     ) : (
@@ -205,30 +213,22 @@ export default function HRPage() {
                     )}
                   </div>
                   <h3 className="font-semibold text-morandi-primary text-center">
-                    {employee.chineseName}
+                    {employee.display_name || (employee as any).chinese_name || '未命名員工'}
                   </h3>
                   <p className="text-sm text-morandi-muted">
-                    {employee.employeeNumber}
+                    {employee.employee_number}
                   </p>
                 </div>
 
-                {/* 職務資訊 */}
+                {/* 聯絡資訊 */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm">
-                    <Building size={14} className="text-morandi-secondary" />
-                    <span className="text-morandi-primary">{employee.jobInfo.department}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Briefcase size={14} className="text-morandi-secondary" />
-                    <span className="text-morandi-primary">{employee.jobInfo.position}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
                     <Phone size={14} className="text-morandi-secondary" />
-                    <span className="text-morandi-primary">{employee.personalInfo.phone}</span>
+                    <span className="text-morandi-primary">{employee.personal_info?.phone || '未提供'}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail size={14} className="text-morandi-secondary" />
-                    <span className="text-morandi-primary truncate">{employee.personalInfo.email}</span>
+                    <span className="text-morandi-primary truncate">{employee.personal_info?.email || '未提供'}</span>
                   </div>
                 </div>
 
@@ -241,14 +241,14 @@ export default function HRPage() {
 
                   {/* 權限數量 */}
                   <div className="text-xs text-morandi-muted">
-                    {employee.permissions.length} 項權限
+                    {employee.permissions?.length || 0} 項權限
                   </div>
                 </div>
 
                 {/* 入職日期 */}
                 <div className="mt-2 pt-2 border-t border-border/50">
                   <p className="text-xs text-morandi-muted">
-                    入職：{new Date(employee.jobInfo.hireDate).toLocaleDateString()}
+                    入職：{employee.job_info?.hire_date ? new Date(employee.job_info.hire_date).toLocaleDateString() : '未設定'}
                   </p>
                 </div>
               </div>
@@ -259,126 +259,14 @@ export default function HRPage() {
 
         {/* 無資料狀態 */}
         {!isLoading && filteredEmployees.length === 0 && (
-          <div className="space-y-6">
-            {/* 空狀態提示 */}
-            <div className="text-center py-8 text-morandi-secondary">
-              <User size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium text-morandi-primary mb-2">
-                {statusFilter === 'all' ? '還沒有任何員工' : `沒有找到「${statusFilters.find(f => f.value === statusFilter)?.label}」狀態的員工`}
-              </p>
-              <p className="text-sm text-morandi-secondary">
-                {statusFilter === 'all' ? '點擊右上角「新增員工」開始建立' : '嘗試調整篩選條件或新增員工'}
-              </p>
-            </div>
-
-            {/* 示例員工卡片 */}
-            <div className="border-t border-border pt-6">
-              <h3 className="text-lg font-medium text-morandi-primary mb-4">預覽：員工卡片樣式</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  {
-                    chineseName: '王小明',
-                    employeeNumber: 'EMP001',
-                    department: '業務部',
-                    position: '資深業務專員',
-                    phone: '0912-345-678',
-                    email: 'wang@example.com',
-                    status: 'active',
-                    hireDate: '2023-01-15',
-                    permissions: ['訂單管理', '客戶管理']
-                  },
-                  {
-                    chineseName: '陳美玲',
-                    employeeNumber: 'EMP002',
-                    department: '行政部',
-                    position: '行政助理',
-                    phone: '0923-456-789',
-                    email: 'chen@example.com',
-                    status: 'probation',
-                    hireDate: '2024-01-01',
-                    permissions: ['文件管理']
-                  },
-                  {
-                    chineseName: '李大華',
-                    employeeNumber: 'EMP003',
-                    department: '財務部',
-                    position: '會計',
-                    phone: '0934-567-890',
-                    email: 'li@example.com',
-                    status: 'active',
-                    hireDate: '2022-06-10',
-                    permissions: ['財務管理', '報表檢視']
-                  }
-                ].map((employee, index) => {
-                  const StatusIcon = getStatusIcon(employee.status as Employee['status']);
-                  return (
-                    <div
-                      key={index}
-                      className="bg-white rounded-lg border border-border p-4 opacity-60"
-                    >
-                      {/* 員工頭像與基本資訊 */}
-                      <div className="flex flex-col items-center mb-4">
-                        <div className="w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center mb-2">
-                          <User size={32} className="text-morandi-secondary" />
-                        </div>
-                        <h3 className="font-semibold text-morandi-primary text-center">
-                          {employee.chineseName}
-                        </h3>
-                        <p className="text-sm text-morandi-muted">
-                          {employee.employeeNumber}
-                        </p>
-                      </div>
-
-                      {/* 職務資訊 */}
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Building size={14} className="text-morandi-secondary" />
-                          <span className="text-morandi-primary">{employee.department}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Briefcase size={14} className="text-morandi-secondary" />
-                          <span className="text-morandi-primary">{employee.position}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone size={14} className="text-morandi-secondary" />
-                          <span className="text-morandi-primary">{employee.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Mail size={14} className="text-morandi-secondary" />
-                          <span className="text-morandi-primary truncate">{employee.email}</span>
-                        </div>
-                      </div>
-
-                      {/* 狀態標示 */}
-                      <div className="flex items-center justify-between">
-                        <div className={cn('flex items-center gap-1 text-sm font-medium', getStatusColor(employee.status as Employee['status']))}>
-                          <StatusIcon size={14} />
-                          <span>{getStatusLabel(employee.status as Employee['status'])}</span>
-                        </div>
-
-                        {/* 權限數量 */}
-                        <div className="text-xs text-morandi-muted">
-                          {employee.permissions.length} 項權限
-                        </div>
-                      </div>
-
-                      {/* 入職日期 */}
-                      <div className="mt-2 pt-2 border-t border-border/50">
-                        <p className="text-xs text-morandi-muted">
-                          入職：{new Date(employee.hireDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-6 p-4 bg-morandi-container/10 rounded-lg text-center">
-                <p className="text-sm text-morandi-secondary">
-                  💡 以上為員工卡片樣式預覽，實際資料建立後將顯示真實內容
-                </p>
-              </div>
-            </div>
+          <div className="text-center py-12 text-morandi-secondary">
+            <User size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium text-morandi-primary mb-2">
+              {statusFilter === 'all' ? '還沒有任何員工' : `沒有找到「${statusFilters.find(f => f.value === statusFilter)?.label}」狀態的員工`}
+            </p>
+            <p className="text-sm text-morandi-secondary">
+              {statusFilter === 'all' ? '點擊右上角「新增員工」開始建立' : '嘗試調整篩選條件或新增員工'}
+            </p>
           </div>
         )}
       </div>
@@ -386,7 +274,7 @@ export default function HRPage() {
       {/* 員工詳細資料展開視圖 */}
       {expandedEmployee && (
         <EmployeeExpandedView
-          employeeId={expandedEmployee}
+          employee_id={expandedEmployee}
           onClose={() => setExpandedEmployee(null)}
         />
       )}
@@ -403,6 +291,6 @@ export default function HRPage() {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

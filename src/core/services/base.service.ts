@@ -36,13 +36,13 @@ export abstract class BaseService<T extends BaseEntity> {
   // CREATE
   async create(data: Omit<T, keyof BaseEntity>): Promise<T> {
     try {
-      this.validate(data);
+      this.validate(data as any);
 
       const entity: T = {
         ...data,
         id: this.generateId(),
-        createdAt: this.now(),
-        updatedAt: this.now(),
+        created_at: this.now(),
+        updated_at: this.now(),
       } as T;
 
       // 開發階段：直接更新 store
@@ -77,8 +77,8 @@ export abstract class BaseService<T extends BaseEntity> {
           const aVal = (a as any)[params.sortBy!];
           const bVal = (b as any)[params.sortBy!];
 
-          if (aVal < bVal) return params.sortOrder === 'desc' ? 1 : -1;
-          if (aVal > bVal) return params.sortOrder === 'desc' ? -1 : 1;
+          if (aVal < bVal) return (params as any).sort_order === 'desc' ? 1 : -1;
+          if (aVal > bVal) return (params as any).sort_order === 'desc' ? -1 : 1;
           return 0;
         });
       }
@@ -132,7 +132,7 @@ export abstract class BaseService<T extends BaseEntity> {
         ...existing,
         ...data,
         id, // 確保 ID 不會被覆蓋
-        updatedAt: this.now(),
+        updated_at: this.now(),
       } as T;
 
       store.update(id, updated);

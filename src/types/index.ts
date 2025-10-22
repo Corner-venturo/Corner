@@ -10,6 +10,8 @@
 // ============================================
 export type {
   BaseEntity,
+  SyncableEntity,
+  SyncStatus,
   PageRequest,
   PageResponse,
   Filter,
@@ -83,13 +85,12 @@ export type {
 } from './customer.types';
 
 // ============================================
-// 財務型別
+// 財務型別（使用 Store 統一型別）
 // ============================================
+// 注意：PaymentRequest, PaymentRequestItem, DisbursementOrder 現在從 @/stores/types 導出
+// 這裡保留其他財務相關型別的導出（舊的 finance.types 已 deprecated）
 export type {
   Payment,
-  PaymentRequest,
-  PaymentRequestItem,
-  DisbursementOrder,
   ReceiptOrder,
   ReceiptPaymentItem,
   PaymentMethod,
@@ -103,7 +104,7 @@ export type {
   CreateDisbursementOrderData,
   CreateReceiptOrderData,
   FinanceStats,
-} from './finance.types';
+} from './finance.types.deprecated';
 
 // ============================================
 // 報價單型別
@@ -210,6 +211,15 @@ export type {
   CreatePriceListItemData,
   UpdatePriceListItemData,
 } from './supplier.types';
+
+// ============================================
+// 地區管理型別
+// ============================================
+export type {
+  Region,
+  CreateRegionData,
+  UpdateRegionData,
+} from './region.types';
 
 // ============================================
 // 行事曆型別

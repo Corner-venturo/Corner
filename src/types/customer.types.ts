@@ -27,7 +27,7 @@ export interface Customer extends BaseEntity {
   gender?: string;           // 性別
   company?: string;          // 公司名稱
   tax_id?: string;           // 統編
-  is_vip: boolean;           // 是否為 VIP
+  is_vip: boolean;          // 是否為 VIP
   vip_level?: VipLevel;      // VIP 等級
   source?: CustomerSource;   // 客戶來源
   referred_by?: string;      // 推薦人

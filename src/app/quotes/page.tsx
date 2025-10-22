@@ -1,54 +1,106 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
-import { useQuoteStore } from '@/stores/quote-store';
+import { useQuotes } from '@/features/quotes/hooks/useQuotes';
+import { useTourStore } from '@/stores';
 import { Calculator, FileText, Users, Trash2, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 
 const statusFilters = ['全部', '提案', '最終版本'];
 
 export default function QuotesPage() {
   const router = useRouter();
-  const { quotes, addQuote, deleteQuote, duplicateQuote, loadQuotes } = useQuoteStore();
+  const searchParams = useSearchParams();
+  const { items: tours } = useTourStore();
+  const { quotes, addQuote, deleteQuote, duplicateQuote, loadQuotes } = useQuotes();
   const [statusFilter, setStatusFilter] = useState<string>('全部');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [newQuote, setNewQuote] = useState({
+  const [newQuote, setNewQuote] = useState<{
+    name: string;
+    status: '提案' | '最終版本';
+    group_size: number;
+  }>({
     name: '',
-    status: '提案' as const,
+    status: '提案',
     group_size: 1,
   });
 
-  // 載入報價單資料
+  // 載入報價單資料 - 延遲載入優化
   useEffect(() => {
-    loadQuotes();
-  }, [loadQuotes]);
+    const timer = setTimeout(() => {
+      loadQuotes();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []); // ✅ 只在組件掛載時執行一次
+
+  // 檢查 URL 參數，自動開啟新增對話框
+  useEffect(() => {
+    const tourId = searchParams.get('tour_id');
+    // 只在有 tour_id 且對話框未開啟時檢查（避免新增完後重複觸發）
+    if (tourId && !isAddDialogOpen) {
+      // 檢查該團是否已有報價單
+      const existingQuote = quotes.find(q => q.tour_id === tourId);
+      if (!existingQuote) {
+        // 沒有報價單，找到旅遊團資料並開啟對話框
+        const tour = tours.find(t => t.id === tourId);
+        if (tour) {
+          console.log('📋 自動開啟新增對話框，團名:', tour.name);
+          setNewQuote({
+            name: tour.name,
+            status: '提案',
+            group_size: tour.max_participants || 1,
+          });
+          setIsAddDialogOpen(true);
+        }
+      } else {
+        // 已有報價單，直接跳轉到該報價單
+        console.log('🔄 該團已有報價單，跳轉到:', existingQuote.id);
+        router.replace(`/quotes/${existingQuote.id}`);
+      }
+    }
+  }, [searchParams, quotes, tours, router, isAddDialogOpen]);
 
   // 表格配置
   const tableColumns: TableColumn[] = useMemo(() => [
     {
-      key: 'quoteNumber',
-      label: '報價單號',
+      key: 'quote_number',
+      label: '編號',
       sortable: true,
-      render: (value, quote) => (
-        <span className="text-sm text-morandi-secondary font-mono">
-          {quote.quote_number || '-'}
-        </span>
-      ),
+      render: (value, quote) => {
+        // 如果有關聯旅遊團，顯示旅遊團編號
+        if (quote.tour_id) {
+          const relatedTour = tours.find(t => t.id === quote.tour_id);
+          if (relatedTour?.code) {
+            return (
+              <span className="text-sm text-morandi-gold font-mono" title="旅遊團編號">
+                {relatedTour.code}
+              </span>
+            );
+          }
+        }
+        // 否則顯示報價單自己的編號
+        return (
+          <span className="text-sm text-morandi-secondary font-mono">
+            {(quote as any).code || '-'}
+          </span>
+        );
+      },
     },
     {
       key: 'name',
       label: '團體名稱',
       sortable: true,
       render: (value, quote) => (
-        <span className="font-medium text-morandi-primary">{quote.name}</span>
+        <span className="text-sm font-medium text-morandi-primary">{quote.name}</span>
       ),
     },
     {
@@ -57,40 +109,40 @@ export default function QuotesPage() {
       sortable: true,
       render: (value, quote) => (
         <span className={cn(
-          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-          getStatusBadge(quote.status)
+          'text-sm font-medium',
+          getStatusColor(quote.status)
         )}>
           {quote.status}
         </span>
       ),
     },
     {
-      key: 'groupSize',
+      key: 'group_size',
       label: '人數',
       sortable: true,
       render: (value, quote) => (
-        <div className="flex items-center text-morandi-secondary">
+        <div className="flex items-center text-sm text-morandi-secondary">
           <Users size={14} className="mr-1" />
           {quote.group_size}人
         </div>
       ),
     },
     {
-      key: 'totalCost',
+      key: 'total_cost',
       label: '總成本',
       sortable: true,
       render: (value, quote) => (
-        <span className="text-morandi-secondary">
+        <span className="text-sm text-morandi-secondary">
           NT$ {quote.total_cost.toLocaleString()}
         </span>
       ),
     },
     {
-      key: 'createdAt',
+      key: 'created_at',
       label: '建立時間',
       sortable: true,
       render: (value, quote) => (
-        <span className="text-morandi-secondary">
+        <span className="text-sm text-morandi-secondary">
           {new Date(quote.created_at).toLocaleDateString()}
         </span>
       ),
@@ -99,7 +151,15 @@ export default function QuotesPage() {
 
   const filteredQuotes = quotes.filter(quote => {
     const matchesStatus = statusFilter === '全部' || quote.status === statusFilter;
-    return matchesStatus;
+
+    // 搜尋 - 搜尋所有文字欄位
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = !searchTerm ||
+      quote.name.toLowerCase().includes(searchLower) ||
+      quote.quote_number?.toLowerCase().includes(searchLower) ||
+      quote.status.toLowerCase().includes(searchLower);
+
+    return matchesStatus && matchesSearch;
   });
 
   const handleAddQuote = async () => {
@@ -116,15 +176,22 @@ export default function QuotesPage() {
     ];
 
     try {
+      // 從 URL 取得 tour_id（如果有）
+      const tourId = searchParams.get('tour_id');
+
       // 新增報價單並取得完整物件
       const newQuoteObj = await addQuote({
         ...newQuote,
+        ...(tourId && { tour_id: tourId }), // 如果有 tour_id，加入報價單資料
         accommodation_days: 0,
         categories: defaultCategories,
         total_cost: 0,
       });
 
-      // 重置表單
+      console.log('✅ 新增報價單完成:', newQuoteObj);
+      console.log('報價單 ID:', newQuoteObj?.id);
+
+      // 重置表單並關閉對話框
       setNewQuote({
         name: '',
         status: '提案',
@@ -134,10 +201,14 @@ export default function QuotesPage() {
 
       // 直接跳轉到詳細頁面開始編輯
       if (newQuoteObj?.id) {
-        router.push(`/quotes/${newQuoteObj.id}`);
+        console.log('🔄 準備跳轉到:', `/quotes/${newQuoteObj.id}`);
+        // 使用 replace 避免返回時回到帶參數的列表頁
+        router.replace(`/quotes/${newQuoteObj.id}`);
+      } else {
+        console.error('❌ 報價單 ID 不存在，無法跳轉');
       }
     } catch (error) {
-      console.error('新增報價單失敗:', error);
+      logger.error('新增報價單失敗:', error);
       alert('新增報價單失敗，請重試');
     }
   };
@@ -149,29 +220,29 @@ export default function QuotesPage() {
   const handleDuplicateQuote = async (quote_id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const duplicated = duplicateQuote(quoteId);
-      if (duplicated) {
+      const duplicated = await duplicateQuote(quote_id);
+      if (duplicated && (duplicated as any).id) {
         // 跳轉到新報價單
-        router.push(`/quotes/${duplicated.id}`);
+        router.push(`/quotes/${(duplicated as any).id}`);
       } else {
         alert('複製報價單失敗，請重試');
       }
     } catch (error) {
-      console.error('❌ 複製報價單失敗:', error);
+      logger.error('❌ 複製報價單失敗:', error);
       alert('複製報價單失敗，請重試');
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, string> = {
-      '提案': 'bg-morandi-gold text-white',
-      '最終版本': 'bg-morandi-green text-white'
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      '提案': 'text-morandi-gold',
+      '最終版本': 'text-green-600'
     };
-    return badges[status] || 'bg-morandi-container text-morandi-secondary';
+    return colors[status] || 'text-morandi-secondary';
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="報價單管理"
         icon={Calculator}
@@ -192,16 +263,11 @@ export default function QuotesPage() {
         searchPlaceholder="搜尋報價單名稱..."
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增報價單"
-        actions={
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-morandi-secondary">
-              {filteredQuotes.length} 個報價單
-            </div>
-          </div>
-        }
       />
 
-      <EnhancedTable
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+        className="min-h-full"
         columns={tableColumns}
         data={filteredQuotes}
         searchableFields={['name']}
@@ -209,7 +275,7 @@ export default function QuotesPage() {
         onRowClick={(quote) => handleQuoteClick(quote)}
         bordered={true}
         actions={(quote) => (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -239,23 +305,8 @@ export default function QuotesPage() {
             </button>
           </div>
         )}
-        emptyState={
-          <div className="text-center py-8 text-morandi-secondary">
-            <Calculator size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium text-morandi-primary mb-2">
-              {statusFilter === '全部' ? '還沒有任何報價單' : `沒有「${statusFilter}」狀態的報價單`}
-            </p>
-            <p className="text-sm text-morandi-secondary mb-6">
-              {statusFilter === '全部' ? '點擊右上角「新增報價單」開始建立' : '切換到其他標籤或新增報價單'}
-            </p>
-            <div className="text-sm text-morandi-secondary space-y-1">
-              <p>• 報價單管理包含團體名稱、狀態、人數、總成本和建立時間</p>
-              <p>• 支援狀態篩選（提案/最終版本）和詳細的成本類別計算</p>
-              <p>• 可直接編輯報價內容或從報價單轉建立旅遊團</p>
-            </div>
-          </div>
-        }
       />
+      </div>
 
       {/* 新增報價單對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

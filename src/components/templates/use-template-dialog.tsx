@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTourStore, useOrderStore, usePaymentStore, useMemberStore } from '@/stores';
+import { useTourStore, useOrderStore, useMemberStore } from '@/stores';
+// TODO: usePaymentStore deprecated
 import { useTemplateStore } from '@/stores/template-store';
+import type { Tour, Order } from '@/stores/types';
 
 import { Template } from '@/types/template';
 
@@ -23,7 +25,8 @@ interface UseTemplateDialogProps {
 type Step = 'select-data' | 'fill-manual' | 'preview';
 
 export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateDialogProps) {
-  const { tours, orders } = useTourStore();
+  const { items: tours } = useTourStore();
+  const { items: orders } = useOrderStore();
   const { addDocument } = useTemplateStore();
 
   const [step, setStep] = useState<Step>('select-data');
@@ -65,9 +68,9 @@ export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateD
 
       // 儲存生成記錄
       await addDocument({
-        templateId: template.id,
-        templateName: template.name,
-        dataUsed: allData,
+        template_id: template.id,
+        template_name: template.name,
+        data_used: allData,
         file_type: 'pdf',
         created_by: 'current-user-id', // TODO: 使用實際的用戶 ID
       });
@@ -148,18 +151,18 @@ export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateD
                         )}
                       </label>
                       <Select
-                        onValueChange={(tourId) => {
-                          const tour = tours.find((t) => t.id === tourId);
-                          if (tour) handleSelectSource('tour', tourId, tour);
+                        onValueChange={(tour_id) => {
+                          const tour = tours.find((t: Tour) => t.id === tour_id);
+                          if (tour) handleSelectSource('tour', tour_id, tour);
                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="請選擇旅遊團" />
                         </SelectTrigger>
                         <SelectContent>
-                          {tours.map((tour) => (
+                          {tours.map((tour: Tour) => (
                             <SelectItem key={tour.id} value={tour.id}>
-                              {tour.code} - {tour.name} ({tour.start_date})
+                              {tour.code} - {tour.name} ({tour.departure_date})
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -177,16 +180,16 @@ export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateD
                         )}
                       </label>
                       <Select
-                        onValueChange={(orderId) => {
-                          const order = orders.find((o) => o.id === orderId);
-                          if (order) handleSelectSource('order', orderId, order);
+                        onValueChange={(order_id) => {
+                          const order = orders.find((o: Order) => o.id === order_id);
+                          if (order) handleSelectSource('order', order_id, order);
                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="請選擇訂單" />
                         </SelectTrigger>
                         <SelectContent>
-                          {orders.map((order) => (
+                          {orders.map((order: Order) => (
                             <SelectItem key={order.id} value={order.id}>
                               {order.order_number} - {order.contact_person}
                             </SelectItem>

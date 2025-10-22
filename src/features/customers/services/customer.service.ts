@@ -1,25 +1,25 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service';
-import { Customer } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { Customer } from '@/types/customer.types';
+import { useCustomerStore } from '@/stores';
 import { ValidationError } from '@/core/errors/app-errors';
 
 class CustomerService extends BaseService<Customer> {
   protected resourceName = 'customers';
 
-  protected getStore(): StoreOperations<Customer> {
-    const store = useTourStore.getState();
+  protected getStore = (): StoreOperations<Customer> => {
+    const store = useCustomerStore.getState();
     return {
-      getAll: () => store.customers,
-      getById: (id: string) => store.customers.find(c => c.id === id),
+      getAll: () => store.items,
+      getById: (id: string) => store.items.find(c => c.id === id),
       add: async (customer: Customer) => {
-        await store.addCustomer(customer as any);
+        await store.create(customer as any);
         return customer;
       },
       update: async (id: string, data: Partial<Customer>) => {
-        await store.updateCustomer(id, data);
+        await store.update(id, data);
       },
       delete: async (id: string) => {
-        await store.deleteCustomer(id);
+        await store.delete(id);
       }
     };
   }
@@ -37,8 +37,8 @@ class CustomerService extends BaseService<Customer> {
       throw new ValidationError('phone', '電話格式錯誤');
     }
 
-    if (data.idNumber && !this.isValidIdNumber(data.idNumber)) {
-      throw new ValidationError('idNumber', '身份證字號格式錯誤');
+    if (data.id_number && !this.isValidIdNumber(data.id_number)) {
+      throw new ValidationError('id_number', '身份證字號格式錯誤');
     }
   }
 
@@ -50,34 +50,36 @@ class CustomerService extends BaseService<Customer> {
     return /^[\d\s\-+()]{8,}$/.test(phone);
   }
 
-  private isValidIdNumber(idNumber: string): boolean {
+  private isValidIdNumber(id_number: string): boolean {
     // 台灣身份證或護照基本驗證
-    return /^[A-Z][12]\d{8}$/.test(idNumber) || /^[A-Z]{1,2}\d{6,9}$/.test(idNumber);
+    return /^[A-Z][12]\d{8}$/.test(id_number) || /^[A-Z]{1,2}\d{6,9}$/.test(id_number);
   }
 
   // ========== 業務邏輯方法 ==========
 
   searchCustomers(searchTerm: string): Customer[] {
-    const store = useTourStore.getState();
+    const store = useCustomerStore.getState();
     const term = searchTerm.toLowerCase();
-    return store.customers.filter(c =>
+    return store.items.filter(c =>
       c.name.toLowerCase().includes(term) ||
       c.email?.toLowerCase().includes(term) ||
       c.phone?.includes(term) ||
-      c.idNumber?.toLowerCase().includes(term)
+      c.id_number?.toLowerCase().includes(term)
     );
   }
 
   getCustomersByTour(tour_id: string): Customer[] {
-    const store = useTourStore.getState();
-    const tourOrders = store.orders.filter(o => o.tour_id === tourId);
-    const customerIds = tourOrders.map(o => o.customerId);
-    return store.customers.filter(c => customerIds.includes(c.id));
+    const store = useCustomerStore.getState();
+    // TODO: Order 類型需要加入 customer_id 欄位
+    // const tourOrders = useOrderStore.getState().items.filter(o => o.tour_id === tour_id);
+    // const customerIds = tourOrders.map(o => o.customer_id);
+    // return store.items.filter(c => customerIds.includes(c.id));
+    return []; // 暫時返回空陣列，等 Order 類型更新
   }
 
   getVIPCustomers(): Customer[] {
-    const store = useTourStore.getState();
-    return store.customers.filter(c => c.isVIP);
+    const store = useCustomerStore.getState();
+    return store.items.filter(c => c.is_vip);
   }
 }
 

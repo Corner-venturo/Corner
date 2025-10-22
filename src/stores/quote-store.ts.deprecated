@@ -1,0 +1,81 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { Quote } from './types';
+import { createDataStoreMethods, generateId } from '@/lib/data/create-data-store';
+import { logger } from '@/lib/utils/logger';
+
+interface QuoteState {
+  quotes: Quote[];
+
+  // CRUD 方法
+  addQuote: (quote: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>) => Promise<Quote>;
+  updateQuote: (id: string, quote: Partial<Quote>) => Promise<Quote>;
+  deleteQuote: (id: string) => Promise<boolean>;
+  loadQuotes: () => Promise<Quote[]>;
+
+  // 自定義方法
+  duplicateQuote: (id: string) => Promise<Quote | undefined>;
+  createNewVersion: (id: string, updates: Partial<Quote>) => Promise<Quote | undefined>;
+}
+
+export const useQuoteStore = create<QuoteState>()(
+  persist(
+    (set, get) => ({
+      quotes: [],
+
+      // 使用統一的 CRUD 方法 (新系統)
+      ...(createDataStoreMethods<Quote>('QUOTES', 'quotes', set, get) as any),
+
+      // 複製報價單
+      duplicateQuote: async (id) => {
+        try {
+          const original = get().quotes.find(q => q.id === id);
+          if (!original) return undefined;
+
+          // 排除不應該傳入的欄位
+          const { id: _, created_at, updated_at, version, versions, ...rest } = original;
+
+          const duplicated = await get().addQuote({
+            ...rest,
+            name: `${original.name} (副本)`,
+            status: '提案'
+          });
+
+          return duplicated;
+        } catch (error) {
+          logger.error('❌ 複製報價單失敗:', error);
+          return undefined;
+        }
+      },
+
+      // 建立新版本
+      createNewVersion: async (id, updates) => {
+        try {
+          const current = get().quotes.find(q => q.id === id);
+          if (!current) return undefined;
+
+          const newVersion = {
+            id: generateId(),
+            version: (current.version || 1) + 1,
+            categories: current.categories,
+            total_cost: current.total_cost,
+            created_at: new Date().toISOString()
+          };
+
+          return await get().updateQuote(id, {
+            version: (current.version || 1) + 1,
+            versions: [...(current.versions || []), newVersion],
+            ...updates
+          });
+        } catch (error) {
+          logger.error('❌ 建立新版本失敗:', error);
+          return undefined;
+        }
+      }
+    }),
+    {
+      name: 'venturo-quote-store',
+      version: 2, // 版本升級，清除舊資料
+    }
+  )
+);

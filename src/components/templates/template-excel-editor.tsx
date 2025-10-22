@@ -5,6 +5,7 @@ import { useRef, useEffect } from 'react';
 import { HotTable } from '@handsontable/react';
 import { registerLanguageDictionary, zhTW } from 'handsontable/i18n';
 import { registerAllModules } from 'handsontable/registry';
+import Handsontable from 'handsontable';
 
 import 'handsontable/dist/handsontable.full.css';
 import { TemplateField, RepeatableSection } from '@/types/template';
@@ -17,8 +18,8 @@ interface TemplateExcelEditorProps {
   data: any;
   onChange: (data: any) => void;
   onColumnWidthChange?: (widths: number[]) => void;
-  fieldMappings?: TemplateField[];
-  repeatableSections?: RepeatableSection[];
+  field_mappings?: TemplateField[];
+  repeatable_sections?: RepeatableSection[];
   highlightedSection?: RepeatableSection | null;
 }
 
@@ -27,10 +28,10 @@ export function TemplateExcelEditor({
   onChange,
   onColumnWidthChange,
   field_mappings,
-  repeatableSections = [],
+  repeatable_sections = [],
   highlightedSection
 }: TemplateExcelEditorProps) {
-  const hotRef = useRef(null);
+  const hotRef = useRef<any>(null);
 
   // 初始化空白資料（60 列 × 20 欄，給予足夠的欄位讓使用者調整）
   const initialData = (data && Array.isArray(data) && data.length > 0)
@@ -39,7 +40,7 @@ export function TemplateExcelEditor({
 
   // 檢查某一列是否在可重複區塊內
   const isRowInRepeatableSection = (row: number) => {
-    return repeatableSections.find(
+    return repeatable_sections.find(
       section => row >= section.range.start_row && row <= section.range.end_row
     );
   };
@@ -50,7 +51,7 @@ export function TemplateExcelEditor({
     if (!hot) return;
 
     // 添加樣式，讓變數欄位有特殊顏色
-    hot.addHook('afterRenderer', (TD, row, col, prop, value) => {
+    hot.addHook('afterRenderer', (TD: any, row: any, col: any, prop: any, value: any) => {
       // 變數高亮
       if (typeof value === 'string' && value.match(/\{.+?\}/)) {
         TD.style.background = '#fff3cd';
@@ -124,7 +125,7 @@ export function TemplateExcelEditor({
     return () => {
       window.removeEventListener('resize', drawA4Background);
     };
-  }, [repeatableSections, highlightedSection]);
+  }, [repeatable_sections, highlightedSection]);
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -177,7 +178,7 @@ export function TemplateExcelEditor({
               row: 0,
               col,
               className: 'htCenter htMiddle',
-              renderer: function(instance, td, row, col, prop, value, cellProperties) {
+              renderer: function(instance: any, td: any, row: any, col: any, prop: any, value: any, cellProperties: any) {
                 td.style.fontWeight = 'bold';
                 td.style.textAlign = 'center';
                 td.style.backgroundColor = '#f8f9fa';

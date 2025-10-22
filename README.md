@@ -1,6 +1,26 @@
 # Venturo 旅遊團管理系統
 
-> 📌 **AI 助手使用指南**：此文檔專為 Claude 和 Claude Code 設計，提供完整的專案理解框架。
+> 📌 **重要**：開發前請先閱讀 [專案核心規範](./docs/PROJECT_PRINCIPLES.md)
+
+## 📚 文件導航
+
+**建議按順序閱讀：**
+
+1. 🎯 **[PROJECT_PRINCIPLES.md](./docs/PROJECT_PRINCIPLES.md)** - 專案定位與設計理念
+   - 為什麼這樣設計？
+   - 核心決策說明
+   - 常見誤解澄清
+
+2. 📖 **[VENTURO_5.0_MANUAL.md](./docs/VENTURO_5.0_MANUAL.md)** - 技術實作細節
+   - 系統架構規範
+   - API 與資料流
+   - 開發檢查清單
+
+3. 🤖 **[CLAUDE.md](./.claude/CLAUDE.md)** - AI 助手工作規範
+   - 行為控制規範
+   - 快速參考資訊
+
+---
 
 ## 🎯 專案概述
 
@@ -254,26 +274,23 @@ ls -la src/app/                 # 頁面路由
 | 成員管理 | `/MEMBER_MANAGEMENT.md` | 成員管理設計 |
 | 開發規範 | `/CONVENTIONS.md` | 程式碼規範（建議建立） |
 
-## 🚀 下一步計劃
+## 🚀 開發待辦
 
-### Phase 1: 完善基礎架構（當前）
+### 基礎架構
 - [x] BaseService 實作
 - [x] TourService 範例
-- [ ] 修復 ID 生成邏輯
+- [x] Supabase 整合
+- [x] IndexedDB 本地快取
 - [ ] 完善類型定義
 
-### Phase 2: 擴展功能模組
-- [ ] OrderService
-- [ ] MemberService  
-- [ ] CustomerService
-- [ ] PaymentService
+### 功能模組
+- [x] OrderService
+- [x] MemberService
+- [x] CustomerService
+- [x] PaymentService
+- [x] 離線優先架構
 
-### Phase 3: 整合後端
-- [ ] API 客戶端建立
-- [ ] 資料持久化
-- [ ] 認證授權
-
-### Phase 4: 優化與測試
+### 優化與測試
 - [ ] 效能優化
 - [ ] 單元測試
 - [ ] E2E 測試

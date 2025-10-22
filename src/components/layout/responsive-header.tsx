@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 interface ResponsiveHeaderProps {
   title: string;
+  icon?: any;
   breadcrumb?: { label: string; href: string }[];
   tabs?: {
     value: string;
@@ -33,17 +34,23 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
 
   return (
     <div className={cn(
-      'fixed top-0 right-0 h-[72px] bg-background z-40 flex items-center justify-between px-6',
+      'fixed top-0 right-0 h-[72px] bg-background z-[200] flex items-center justify-between px-6',
       'left-16'
-    )}>
+    )}
+    >
       {/* 分割線 */}
-      <div className="absolute bottom-0 left-0 right-0" style={{ marginLeft: '24px', marginRight: '24px', borderTop: '1px solid var(--border)', height: '1px' }}></div>
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ marginLeft: '24px', marginRight: '24px', borderTop: '1px solid var(--border)', height: '1px' }}></div>
       {/* 左側 - 返回按鈕和主標題 */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 relative z-[300]">
         {props.showBackButton && (
           <button
-            onClick={props.onBack}
-            className="text-morandi-secondary hover:text-morandi-primary transition-colors"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              props.onBack?.();
+            }}
+            className="text-morandi-secondary hover:text-morandi-primary transition-colors p-2 hover:bg-morandi-container/50 rounded-md cursor-pointer"
+            type="button"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -54,7 +61,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
       </div>
 
       {/* 右側區域 - 功能、標籤頁和操作按鈕 - 統一無空白設計 */}
-      <div className="flex items-center">
+      <div className="flex items-center flex-shrink-0 pointer-events-auto">
         {/* 搜尋功能 - 最左邊 */}
         {props.showSearch && (
           <div className="flex items-center mr-4">
@@ -107,24 +114,17 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
           </div>
         )}
 
-        {/* 自定義操作區域 */}
-        {props.actions && (
-          <div className="mr-3">
-            {props.actions}
-          </div>
-        )}
-
         {/* 標籤頁和操作按鈕緊密排列 */}
         <div className="flex items-center">
           {/* 標籤頁 */}
           {props.tabs && props.tabs.length > 0 && (
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 pointer-events-auto">
               {props.tabs.map((tab) => (
                 <button
                   key={tab.value}
                   onClick={() => props.onTabChange?.(tab.value)}
                   className={cn(
-                    'relative px-3 py-2 text-sm font-medium transition-colors',
+                    'relative px-3 py-2 text-sm font-medium transition-colors pointer-events-auto',
                     'text-morandi-secondary hover:text-morandi-primary',
                     props.activeTab === tab.value
                       ? 'text-morandi-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-morandi-gold'
@@ -138,7 +138,11 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
           )}
 
           {/* 操作按鈕緊接在標籤頁後面 */}
-          {props.onAdd && (
+          {props.actions ? (
+            <div className="flex items-center gap-3 ml-3">
+              {props.actions}
+            </div>
+          ) : props.onAdd ? (
             <button
               onClick={props.onAdd}
               data-create-box
@@ -149,7 +153,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
               </svg>
               {props.addLabel || '新增'}
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Venturo 資料清理工具</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #C19A6B;
+      margin-bottom: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+    }
+    button {
+      background: #C19A6B;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #A88555;
+    }
+    button.danger {
+      background: #dc3545;
+    }
+    button.danger:hover {
+      background: #c82333;
+    }
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+    .success { color: #28a745; }
+    .error { color: #dc3545; }
+    .warning { color: #ffc107; }
+    .info { color: #17a2b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Venturo 資料清理工具</h1>
+
+    <!-- 清理無效旅遊團 -->
+    <div class="section">
+      <h2>🗑️ 清理無效旅遊團</h2>
+      <p>移除 departure_date 無效或空白的旅遊團資料</p>
+      <button onclick="scanInvalidTours()">1. 掃描無效資料</button>
+      <button class="danger" onclick="cleanInvalidTours()">2. 永久刪除</button>
+      <div id="tour-log" class="log"></div>
+    </div>
+
+    <!-- 檢查員工資料 -->
+    <div class="section">
+      <h2>👥 檢查員工資料</h2>
+      <p>查看系統中的員工資料狀態</p>
+      <button onclick="checkEmployees()">檢查員工資料</button>
+      <div id="employee-log" class="log"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
+
+    let invalidToursCache = [];
+
+    // 掃描無效旅遊團
+    window.scanInvalidTours = async () => {
+      const log = document.getElementById('tour-log');
+      log.innerHTML = '<span class="info">🔍 正在掃描...</span>\n';
+
+      try {
+        const db = await openDB('VenturoOfflineDB', 1);
+        const allTours = await db.getAll('tours');
+
+        log.innerHTML += `<span class="info">📊 總共找到 ${allTours.length} 筆旅遊團資料</span>\n\n`;
+
+        // 找出無效的
+        invalidToursCache = allTours.filter(tour => {
+          if (!tour.departure_date) return true;
+          const date = new Date(tour.departure_date);
+          return isNaN(date.getTime());
+        });
+
+        if (invalidToursCache.length === 0) {
+          log.innerHTML += '<span class="success">✅ 沒有找到無效的旅遊團資料</span>\n';
+          return;
+        }
+
+        log.innerHTML += `<span class="warning">⚠️ 找到 ${invalidToursCache.length} 筆無效資料：</span>\n\n`;
+        invalidToursCache.forEach((tour, index) => {
+          log.innerHTML += `<span class="error">${index + 1}. ID: ${tour.id}</span>\n`;
+          log.innerHTML += `   名稱: ${tour.name || '(無名稱)'}\n`;
+          log.innerHTML += `   出發日期: ${tour.departure_date || '(空白)'}\n`;
+          log.innerHTML += `   建立時間: ${tour.created_at || '(未知)'}\n\n`;
+        });
+
+        log.innerHTML += '<span class="warning">⚠️ 請點擊「永久刪除」按鈕來清除這些資料</span>\n';
+
+      } catch (error) {
+        log.innerHTML += `<span class="error">❌ 掃描失敗: ${error.message}</span>\n`;
+      }
+    };
+
+    // 清理無效旅遊團
+    window.cleanInvalidTours = async () => {
+      if (invalidToursCache.length === 0) {
+        alert('請先執行「掃描無效資料」');
+        return;
+      }
+
+      const confirmed = confirm(`確定要永久刪除 ${invalidToursCache.length} 筆無效資料嗎？\n\n此操作無法復原！`);
+      if (!confirmed) return;
+
+      const log = document.getElementById('tour-log');
+      log.innerHTML += '\n<span class="info">🗑️ 開始刪除...</span>\n';
+
+      try {
+        const db = await openDB('VenturoOfflineDB', 1);
+
+        for (const tour of invalidToursCache) {
+          await db.delete('tours', tour.id);
+          log.innerHTML += `<span class="success">✅ 已刪除: ${tour.name || tour.id}</span>\n`;
+        }
+
+        log.innerHTML += `\n<span class="success">✅ 成功刪除 ${invalidToursCache.length} 筆資料！</span>\n`;
+        log.innerHTML += '<span class="info">💡 請關閉此頁面，回到旅遊團頁面重新整理</span>\n';
+
+        invalidToursCache = [];
+
+      } catch (error) {
+        log.innerHTML += `<span class="error">❌ 刪除失敗: ${error.message}</span>\n`;
+      }
+    };
+
+    // 檢查員工資料
+    window.checkEmployees = async () => {
+      const log = document.getElementById('employee-log');
+      log.innerHTML = '<span class="info">🔍 正在檢查員工資料...</span>\n\n';
+
+      try {
+        const db = await openDB('VenturoOfflineDB', 1);
+        const allEmployees = await db.getAll('employees');
+
+        log.innerHTML += `<span class="info">📊 總共找到 ${allEmployees.length} 筆員工資料</span>\n\n`;
+
+        if (allEmployees.length === 0) {
+          log.innerHTML += '<span class="warning">⚠️ 沒有任何員工資料！</span>\n';
+          log.innerHTML += '<span class="info">💡 請先到「人資系統」新增員工</span>\n';
+          return;
+        }
+
+        // 統計狀態
+        const active = allEmployees.filter(emp => !emp._deleted && emp.status !== 'inactive');
+        const inactive = allEmployees.filter(emp => emp.status === 'inactive');
+        const deleted = allEmployees.filter(emp => emp._deleted);
+
+        log.innerHTML += `<span class="success">✅ 可用員工: ${active.length} 位</span>\n`;
+        log.innerHTML += `<span class="warning">⚠️ 停用員工: ${inactive.length} 位</span>\n`;
+        log.innerHTML += `<span class="error">❌ 已刪除: ${deleted.length} 位</span>\n\n`;
+
+        // 顯示可用員工列表
+        if (active.length > 0) {
+          log.innerHTML += '<span class="info">📋 可用員工列表：</span>\n\n';
+          active.forEach((emp, index) => {
+            log.innerHTML += `<span class="success">${index + 1}. ${emp.display_name || emp.name || '(無名稱)'}</span>\n`;
+            log.innerHTML += `   英文名: ${emp.english_name || '(未設定)'}\n`;
+            log.innerHTML += `   員工編號: ${emp.employee_number || '(未設定)'}\n`;
+            log.innerHTML += `   狀態: ${emp.status || '(未設定)'}\n\n`;
+          });
+        }
+
+        // 顯示問題員工
+        if (inactive.length > 0 || deleted.length > 0) {
+          log.innerHTML += '\n<span class="warning">⚠️ 以下員工無法在下拉選單中使用：</span>\n\n';
+
+          [...inactive, ...deleted].forEach((emp, index) => {
+            const reason = emp._deleted ? '已刪除' : '已停用';
+            log.innerHTML += `<span class="warning">${index + 1}. ${emp.display_name || emp.name || '(無名稱)'} - ${reason}</span>\n`;
+          });
+        }
+
+      } catch (error) {
+        log.innerHTML += `<span class="error">❌ 檢查失敗: ${error.message}</span>\n`;
+      }
+    };
+
+    // 自動執行掃描
+    window.addEventListener('load', () => {
+      window.scanInvalidTours();
+      window.checkEmployees();
+    });
+  </script>
+</body>
+</html>

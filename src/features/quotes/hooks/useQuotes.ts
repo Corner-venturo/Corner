@@ -1,4 +1,4 @@
-import { useQuoteStore } from '@/stores/quote-store';
+import { useQuoteStore } from '@/stores';
 import { quoteService } from '../services/quote.service';
 import { Quote } from '@/stores/types';
 
@@ -7,23 +7,23 @@ export const useQuotes = () => {
 
   return {
     // ========== 資料 ==========
-    quotes: store.quotes,
+    quotes: store.items,
 
     // ========== CRUD 操作 ==========
-    createQuote: async (data: Omit<Quote, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'versions'>) => {
-      return await store.addQuote(data);
+    addQuote: async (data: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>) => {
+      return await store.create(data as any);
     },
 
     updateQuote: async (id: string, data: Partial<Quote>) => {
-      return await store.updateQuote(id, data);
+      return await store.update(id, data);
     },
 
     deleteQuote: async (id: string) => {
-      return await store.deleteQuote(id);
+      return await store.delete(id);
     },
 
     loadQuotes: async () => {
-      return await store.loadQuotes();
+      return await store.fetchAll();
     },
 
     // ========== 業務方法 ==========
@@ -36,7 +36,7 @@ export const useQuotes = () => {
     },
 
     getQuotesByTour: (tour_id: string) => {
-      return quoteService.getQuotesByTour(tourId);
+      return quoteService.getQuotesByTour(tour_id);
     },
 
     getQuotesByStatus: (status: Quote['status']) => {

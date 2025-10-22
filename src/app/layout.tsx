@@ -1,9 +1,13 @@
+import { AuthProvider } from '@/lib/auth/auth-provider';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { MainLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/layout/theme-provider";
-import { AutoSyncProvider } from "@/lib/offline/auto-sync-provider";
+import { NetworkMonitorInitializer } from "@/components/network-monitor-initializer";
+import { ErrorLogger } from '@/components/ErrorLogger';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+// import { DevAutoLogin } from '@/components/dev-auto-login'; // 停用自動登入
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -33,13 +37,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <AutoSyncProvider enabled={true} interval={30000}>
+        <ErrorLogger />
+        <NetworkMonitorInitializer />
+        <ErrorBoundary>
+          <ThemeProvider>
             <MainLayout>
-              {children}
+              <AuthProvider>
+                {/* <DevAutoLogin /> 停用自動登入 */}
+                {children}
+              </AuthProvider>
             </MainLayout>
-          </AutoSyncProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

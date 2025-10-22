@@ -4,7 +4,7 @@
  */
 
 import { localDB } from '@/lib/db';
-import { User } from '@/types';
+import { Employee as User } from '@/stores/types';
 
 export async function initDefaultUser(): Promise<void> {
   try {
@@ -19,46 +19,44 @@ export async function initDefaultUser(): Promise<void> {
     if (count === 0) {
       console.log('⚠️ 沒有使用者，建立預設管理員...');
       
-      // 只建立 William 管理員帳號
+      // 只建立 William 管理員帳號（使用固定的 UUID 以便識別）
       const adminUser: User = {
-        id: 'admin-william-001',
+        id: '00000000-0000-0000-0000-000000000001',  // ✨ 改用 UUID 格式
         employee_number: 'william01',
         english_name: 'William',
-        chineseName: 'William Chien',
+        display_name: 'William Chien',
         status: 'active',
         
-        personalInfo: {
+        personal_info: {
+          national_id: 'A123456789',
           gender: 'male',
           birthday: '1990-01-01',
           phone: '0912-345-678',
           email: 'william@venturo.com',
           address: '台北市',
-          emergency_contact: '緊急聯絡人',
-          emergency_phone: '0912-345-678'
+          emergency_contact: {
+            name: '緊急聯絡人',
+            relationship: '家人',
+            phone: '0912-345-678'
+          }
         },
         
-        jobInfo: {
+        job_info: {
           department: '管理部',
           position: '系統管理員',
-          level: 'admin',
-          manager: '無',
           hire_date: '2024-01-01',
-          regularDate: '2024-01-01',
-          workLocation: '總公司'
+          employment_type: 'fulltime' as const
         },
         
-        salaryInfo: {
-          baseSalary: 0,
+        salary_info: {
+          base_salary: 0,
           allowances: [],
-          salaryHistory: []
+          salary_history: []
         },
-        
+
         attendance: {
-          annualLeave: 0,
-          sickLeave: 0,
-          personalLeave: 0,
-          leaveRecords: [],
-          overtimeRecords: []
+          leave_records: [],
+          overtime_records: []
         },
         
         permissions: [
@@ -67,8 +65,8 @@ export async function initDefaultUser(): Promise<void> {
         ],
         
         contracts: [],
-        notes: '系統管理員',
-        avatar: null,
+        // notes: '系統管理員', // Employee 類型不包含 notes 屬性
+        avatar: undefined,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

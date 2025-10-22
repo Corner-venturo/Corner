@@ -31,8 +31,8 @@ interface EditingMember {
   gender: string;
   age: number;
   isNew?: boolean;
-  orderNumber?: string;
-  contactPerson?: string;
+  order_number?: string;
+  contact_person?: string;
   assignedRoom?: string;
 }
 
@@ -67,10 +67,14 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
       const relatedOrder = tourOrders.find(order => order.id === member.order_id);
       return {
         ...member,
+        nameEn: member.name_en || '',
+        passportNumber: member.passport_number || '',
+        passportExpiry: member.passport_expiry || '',
+        idNumber: member.id_number || '',
         order_number: relatedOrder?.order_number || '',
         contact_person: relatedOrder?.contact_person || '',
-        assignedRoom: member.assignedRoom
-      };
+        assignedRoom: member.assigned_room
+      } as any;
     });
 
     setTableMembers(allTourMembers);
@@ -78,12 +82,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
 
   const totalMembers = tableMembers.length;
   const completedMembers = tableMembers.filter(member =>
-    member.name && member.id_number
+    member.name && member.idNumber
   ).length;
 
   // 點擊單元格開始編輯
   const startCellEdit = (rowIndex: number, field: keyof EditingMember) => {
-    if (field === 'age' || field === 'orderNumber' || field === 'contactPerson' || field === 'assignedRoom') return;
+    if (field === 'age' || field === 'order_number' || field === 'contact_person' || field === 'assignedRoom') return;
 
     setEditingCell({ rowIndex, field });
     setTimeout(() => {
@@ -101,7 +105,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
     const member = { ...updatedMembers[rowIndex] };
 
     if (field === 'idNumber') {
-      member.id_number = value.toUpperCase();
+      member.idNumber = value.toUpperCase();
       // 只有當性別欄位為空時才自動填入
       if (!member.gender) {
         member.gender = getGenderFromIdNumber(value);
@@ -130,17 +134,45 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
   };
 
   // 自動儲存成員
-  const autoSaveMember = (member: EditingMember, index: number) => {
+  const autoSaveMember = async (member: EditingMember, index: number) => {
     if (member.isNew && member.name.trim()) {
-      const { isNew, orderNumber, contactPerson, ...memberData } = member;
-      const newId = addMember(memberData);
+      const { isNew, order_number, contact_person, assignedRoom, ...memberData } = member;
+      const convertedData = {
+        ...memberData,
+        name_en: memberData.nameEn,
+        passport_number: memberData.passportNumber,
+        passport_expiry: memberData.passportExpiry,
+        id_number: memberData.idNumber,
+        assigned_room: assignedRoom
+      };
+      // 移除舊欄位
+      delete (convertedData as any).nameEn;
+      delete (convertedData as any).passportNumber;
+      delete (convertedData as any).passportExpiry;
+      delete (convertedData as any).idNumber;
+
+      const newMember = await addMember(convertedData as any);
 
       const updatedMembers = [...tableMembers];
-      updatedMembers[index] = { ...member, id: newId, isNew: false };
+      updatedMembers[index] = { ...member, id: newMember.id, isNew: false };
       setTableMembers(updatedMembers);
     } else if (member.id && !member.isNew) {
-      const { isNew, orderNumber, contactPerson, ...memberData } = member;
-      updateMember(member.id, memberData);
+      const { isNew, order_number, contact_person, assignedRoom, ...memberData } = member;
+      const convertedData = {
+        ...memberData,
+        name_en: memberData.nameEn,
+        passport_number: memberData.passportNumber,
+        passport_expiry: memberData.passportExpiry,
+        id_number: memberData.idNumber,
+        assigned_room: assignedRoom
+      };
+      // 移除舊欄位
+      delete (convertedData as any).nameEn;
+      delete (convertedData as any).passportNumber;
+      delete (convertedData as any).passportExpiry;
+      delete (convertedData as any).idNumber;
+
+      await updateMember(member.id, convertedData as any);
     }
   };
 
@@ -160,8 +192,8 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
       gender: '',
       age: 0,
       isNew: true,
-      orderNumber: relatedOrder.order_number,
-      contactPerson: relatedOrder.contact_person
+      order_number: relatedOrder.order_number,
+      contact_person: relatedOrder.contact_person
     };
     setTableMembers([...tableMembers, newMember]);
   };
@@ -233,7 +265,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
 
   const renderCell = (member: EditingMember, rowIndex: number, field: keyof EditingMember) => {
     const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.field === field;
-    const isAutoField = field === 'age' || field === 'orderNumber' || field === 'contactPerson' || field === 'assignedRoom';
+    const isAutoField = field === 'age' || field === 'order_number' || field === 'contact_person' || field === 'assignedRoom';
     let value = member[field] as string;
 
     // 格式化顯示值
@@ -359,8 +391,8 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
                     <td className="border border-gray-300">{renderCell(member, index, 'idNumber')}</td>
                     <td className="border border-gray-300">{renderCell(member, index, 'passportNumber')}</td>
                     <td className="border border-gray-300">{renderCell(member, index, 'passportExpiry')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'orderNumber')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'contactPerson')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'order_number')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'contact_person')}</td>
                     <td className="border border-gray-300">{renderCell(member, index, 'assignedRoom')}</td>
 
                     {/* 刪除按鈕 */}
@@ -399,17 +431,22 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         </div>
       </div>
 
-      {/* 整團統計 */}
+      {/* 統計區域 */}
       <div className="bg-morandi-container/20 p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div className={cn(
+          "grid gap-4",
+          orderFilter ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-4"
+        )}>
           <div className="text-center">
             <div className="text-2xl font-bold text-morandi-primary">{totalMembers}</div>
-            <div className="text-sm text-morandi-secondary">總成員數</div>
+            <div className="text-sm text-morandi-secondary">{orderFilter ? '訂單成員數' : '總成員數'}</div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-morandi-primary">{tourOrders.length}</div>
-            <div className="text-sm text-morandi-secondary">訂單數</div>
-          </div>
+          {!orderFilter && (
+            <div className="text-center">
+              <div className="text-2xl font-bold text-morandi-primary">{tourOrders.length}</div>
+              <div className="text-sm text-morandi-secondary">訂單數</div>
+            </div>
+          )}
           <div className="text-center">
             <div className="text-2xl font-bold text-morandi-primary">{completedMembers}</div>
             <div className="text-sm text-morandi-secondary">已完成資料</div>
@@ -422,26 +459,28 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
           </div>
         </div>
 
-        {/* 按訂單分組的統計 */}
-        <div className="mt-6">
-          <h4 className="text-md font-medium text-morandi-primary mb-3">各訂單成員數</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {tourOrders.map(order => {
-              const orderMemberCount = tableMembers.filter(member => member.order_id === order.id).length;
-              return (
-                <div key={order.id} className="bg-card border border-border p-3 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium text-morandi-primary text-sm">{order.order_number}</div>
-                      <div className="text-xs text-morandi-secondary">{order.contact_person}</div>
+        {/* 按訂單分組的統計 - 只在整團視圖顯示 */}
+        {!orderFilter && tourOrders.length > 1 && (
+          <div className="mt-6">
+            <h4 className="text-md font-medium text-morandi-primary mb-3">各訂單成員數</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {tourOrders.map(order => {
+                const orderMemberCount = tableMembers.filter(member => member.order_id === order.id).length;
+                return (
+                  <div key={order.id} className="bg-card border border-border p-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-morandi-primary text-sm">{order.order_number}</div>
+                        <div className="text-xs text-morandi-secondary">{order.contact_person}</div>
+                      </div>
+                      <div className="text-lg font-bold text-morandi-primary">{orderMemberCount}</div>
                     </div>
-                    <div className="text-lg font-bold text-morandi-primary">{orderMemberCount}</div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

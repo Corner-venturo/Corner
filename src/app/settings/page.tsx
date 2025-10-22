@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Palette, Monitor, Moon, Sun, Check, LogOut, User, Lock, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 
 // 強制客戶端渲染，不預取伺服器資料
 export const dynamic = 'force-dynamic';
@@ -80,9 +81,9 @@ export default function SettingsPage() {
 
       // 1. 驗證目前密碼
       const { data: userData, error: fetchError } = await supabase
-        .from('users')
+        .from('employees')
         .select('password_hash')
-        .eq('employee_number', user.employeeNumber)
+        .eq('employee_number', user.employee_number)
         .single();
 
       if (fetchError || !userData) {
@@ -91,7 +92,7 @@ export default function SettingsPage() {
         return;
       }
 
-      const isPasswordValid = await verifyPassword(passwordData.currentPassword, userData.password_hash);
+      const isPasswordValid = await verifyPassword(passwordData.currentPassword, (userData as any).password_hash);
       if (!isPasswordValid) {
         alert('目前密碼錯誤！');
         setPasswordUpdateLoading(false);
@@ -101,23 +102,56 @@ export default function SettingsPage() {
       // 2. 更新新密碼
       const hashedPassword = await hashPassword(passwordData.newPassword);
 
-      const { error } = await supabase
-        .from('users')
+      const result: any = await (supabase as any)
+        .from('employees')
         .update({ password_hash: hashedPassword })
-        .eq('employee_number', user.employeeNumber);
+        .eq('employee_number', user.employee_number);
+
+      const { error } = result;
 
       if (error) {
-        console.error('密碼更新失敗:', error);
+        logger.error('密碼更新失敗:', error);
         alert('密碼更新失敗：' + error.message);
         setPasswordUpdateLoading(false);
         return;
       }
 
-      alert('✅ 密碼更新成功！');
+      // 3. 清除角色卡（重要！否則舊密碼還能登入）
+      try {
+        const { useLocalAuthStore } = await import('@/lib/auth/local-auth-manager');
+        const localAuthStore = useLocalAuthStore.getState();
+
+        // 刪除當前用戶的角色卡
+        localAuthStore.removeProfile(user.id);
+        logger.log('🗑️ 已刪除角色卡，下次登入需從網路驗證');
+      } catch (profileError) {
+        logger.warn('⚠️ 清除角色卡失敗（不影響密碼更新）:', profileError);
+      }
+
+      // 4. 同步更新 IndexedDB 的密碼
+      try {
+        const { localDB } = await import('@/lib/db');
+        const { TABLES } = await import('@/lib/db/schemas');
+
+        const employee = await localDB.read(TABLES.EMPLOYEES, user.id) as any;
+        if (employee) {
+          await localDB.put(TABLES.EMPLOYEES, {
+            ...employee,
+            password_hash: hashedPassword,
+            last_password_change: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+          logger.log('✅ IndexedDB 密碼已更新');
+        }
+      } catch (dbError) {
+        logger.warn('⚠️ IndexedDB 更新失敗（不影響主要功能）:', dbError);
+      }
+
+      alert('✅ 密碼更新成功！下次登入需重新驗證。');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setShowPasswordSection(false);
     } catch (error) {
-      console.error('密碼更新過程中發生錯誤:', error);
+      logger.error('密碼更新過程中發生錯誤:', error);
       alert('密碼更新失敗，請稍後再試');
     } finally {
       setPasswordUpdateLoading(false);
@@ -144,11 +178,11 @@ export default function SettingsPage() {
       description: '深色背景，高對比度，現代感十足的設計',
       icon: Moon,
       preview: {
-        bg: 'linear-gradient(to bottom, #1e293b, #0f172a)',
-        primary: '#ffffff',
-        secondary: '#94a3b8',
-        accent: '#3b82f6',
-        card: '#334155',
+        bg: '#36393f',           // Discord 深灰背景
+        primary: '#dcddde',      // 主文字色（柔和白）
+        secondary: '#b9bbbe',    // 次文字色（灰白）
+        accent: '#5865f2',       // Discord 紫藍色
+        card: '#2f3136',         // 卡片背景
       },
     },
   ];
@@ -168,7 +202,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-2 px-3 py-2 bg-morandi-container rounded-lg">
                 <User className="h-4 w-4 text-morandi-secondary" />
                 <span className="text-sm font-medium text-morandi-primary">
-                  {user.chineseName}
+                  {user.display_name}
                 </span>
               </div>
             )}
@@ -197,7 +231,7 @@ export default function SettingsPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {themes.map((theme) => {
               const Icon = theme.icon;
-              const isActive = currentTheme === theme.id;
+              const is_active = currentTheme === theme.id;
 
               return (
                 <button
@@ -206,13 +240,13 @@ export default function SettingsPage() {
                   className={cn(
                     'relative group text-left transition-all duration-300',
                     'border-2 rounded-xl overflow-hidden',
-                    isActive
+                    is_active
                       ? 'border-morandi-gold shadow-lg scale-[1.02]'
                       : 'border-border hover:border-morandi-gold/50 hover:shadow-md'
                   )}
                 >
                   {/* 選中標記 */}
-                  {isActive && (
+                  {is_active && (
                     <div className="absolute top-3 right-3 z-10 bg-morandi-gold text-white rounded-full p-1">
                       <Check className="h-4 w-4" />
                     </div>

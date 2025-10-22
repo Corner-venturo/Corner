@@ -7,15 +7,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SmartDateInput } from '@/components/ui/smart-date-input';
-import { useTours } from '@/features/tours/hooks/useTours';
+import { useTours } from '@/features/tours/hooks/useTours-advanced';
 import { tourService } from '@/features/tours/services/tour.service';
 import { PageRequest } from '@/core/types/common';
-import { Calendar, FileText, MapPin, Calculator, BarChart3, ShoppingCart, Users, FileCheck, AlertCircle, Clipboard, Plus, Package, RefreshCw, FileX, Edit2, UserPlus, Search, Grid3x3, List, Trash2 } from 'lucide-react';
+import { Calendar, FileText, MapPin, Calculator, BarChart3, ShoppingCart, Users, FileCheck, AlertCircle, Clipboard, Plus, Package, RefreshCw, FileX, Edit2, UserPlus, Search, Grid3x3, List, Trash2, Archive, ArchiveRestore } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import { ExpandableOrderTable } from '@/components/orders/expandable-order-table';
-import { useTourStore } from '@/stores/tour-store';
-import { useQuoteStore } from '@/stores/quote-store';
-import { usePaymentStore } from '@/stores/payment-store';
+import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form';
+import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionStore } from '@/stores';
+import { useQuotes } from '@/features/quotes/hooks/useQuotes';
+import { Combobox } from '@/components/ui/combobox';
+// TODO: usePaymentStore deprecated - import { usePaymentStore } from '@/stores';
 import { Tour } from '@/stores/types';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { useDialog } from '@/hooks/useDialog';
@@ -27,7 +30,6 @@ import { TourPayments } from '@/components/tours/tour-payments';
 import { TourCosts } from '@/components/tours/tour-costs';
 import { TourTaskAssignment } from '@/components/tours/tour-task-assignment';
 import { TourCard } from '@/components/tours/tour-card';
-
 
 // 使用與詳細模式相同的標籤定義
 const tourTabs = [
@@ -45,26 +47,53 @@ const tourTabs = [
 
 interface NewTourData {
   name: string;
-  location: string;
-  departureDate: string;
-  returnDate: string;
+  countryCode: string;       // 國家代碼 (如: JPN, THI)
+  cityCode: string;          // 城市代碼 (如: TYO, BKK)
+  customCountry?: string;    // 自訂國家名稱
+  customLocation?: string;   // 自訂城市名稱
+  customCityCode?: string;   // 自訂城市代號
+  departure_date: string;
+  return_date: string;
   price: number;
   status: Tour['status'];
   isSpecial: boolean;
-  maxParticipants: number;
+  max_participants: number;
   description?: string;
 }
 
 export default function ToursPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setSelectedTour, orders, members, addOrder, deleteTour } = useTourStore();
-  const { quotes } = useQuoteStore();
+  const tourStore = useTourStore();
+  const orderStore = useOrderStore();
+  const { items: orders } = orderStore;
+  const addOrder = orderStore.create;
+  const { items: members } = useMemberStore();
+  const employeeStore = useEmployeeStore();
+  const { items: employees } = employeeStore;
+  const regionStore = useRegionStore();
+  const { items: regions } = regionStore;
+  const { quotes, updateQuote } = useQuotes();
   const { dialog, openDialog, closeDialog } = useDialog();
+
+  // 懶載入：打開新增對話框時才載入地區和員工資料
+  const handleOpenCreateDialog = useCallback(async (tour: any = null, fromQuoteId?: string) => {
+    // 只在資料為空時才載入（避免重複）
+    if (regions.length === 0) {
+      await regionStore.fetchAll();
+    }
+    if (employees.length === 0) {
+      await employeeStore.fetchAll();
+    }
+    openDialog('create', tour, fromQuoteId);
+  }, [regions.length, employees.length, regionStore, employeeStore, openDialog]);
+
+  // 選中的旅遊團
+  const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
 
   // 分頁和篩選狀態
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
@@ -89,6 +118,7 @@ export default function ToursPage() {
   // UI 狀態
   const [activeTabs, setActiveTabs] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // 展開模式分頁觸發狀態 - 對應每個旅遊團的觸發狀態
   const [triggerAddOnAdd, setTriggerAddOnAdd] = useState<Record<string, boolean>>({});
@@ -103,47 +133,143 @@ export default function ToursPage() {
     customFields: Array<{ id: string; name: string; }>;
   }>>({});
 
+  // 從 regions 取得國家列表
+  const activeCountries = React.useMemo(() => {
+    return regions
+      .filter(r => r.type === 'country' && r.status === 'active' && !r._deleted)
+      .map(r => ({ code: r.code, name: r.name }));
+  }, [regions]);
+
+  // 根據國家代碼取得城市列表
+  const getCitiesByCountryCode = React.useCallback((countryCode: string) => {
+    return regions
+      .filter(r => r.type === 'city' && r.country_code === countryCode && r.status === 'active' && !r._deleted)
+      .map(r => ({ code: r.code, name: r.name }));
+  }, [regions]);
+
   const [newTour, setNewTour] = useState<NewTourData>({
     name: '',
-    location: 'Tokyo',
-    departureDate: '',
-    returnDate: '',
+    countryCode: '',
+    cityCode: '',
+    departure_date: '',
+    return_date: '',
     price: 0,
     status: '提案',
     isSpecial: false,
-    maxParticipants: 20,
+    max_participants: 20,
     description: '',
   });
 
-  // 新增訂單狀態
-  const [newOrder, setNewOrder] = useState({
+  const [availableCities, setAvailableCities] = useState<any[]>([]);
+
+  // 初始化預設國家和城市
+  React.useEffect(() => {
+    if (activeCountries.length > 0 && !newTour.countryCode) {
+      const defaultCountry = activeCountries[0];
+      const defaultCities = getCitiesByCountryCode(defaultCountry.code);
+      const defaultCity = defaultCities[0];
+
+      setNewTour(prev => ({
+        ...prev,
+        countryCode: defaultCountry.code,
+        cityCode: defaultCity?.code || '',
+      }));
+      setAvailableCities(defaultCities);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 新增訂單狀態（使用 OrderFormData 類型）
+  const [newOrder, setNewOrder] = useState<Partial<OrderFormData>>({
     contact_person: '',
-    salesPerson: '',
+    sales_person: '',
     assistant: '',
-    memberCount: 1,
+    member_count: 1,
     total_amount: 0,
   });
 
   // 根據狀態標籤和搜尋關鍵字篩選旅遊團
-  const filteredTours = tours.filter(tour => {
+  const filteredTours = (tours || []).filter(tour => {
     // 狀態篩選
     const statusMatch = activeStatusTab === 'all' || tour.status === activeStatusTab;
 
-    // 搜尋篩選
+    // 搜尋篩選 - 搜尋所有文字欄位
     const searchLower = searchQuery.toLowerCase();
     const searchMatch = !searchQuery ||
       tour.name.toLowerCase().includes(searchLower) ||
       tour.code.toLowerCase().includes(searchLower) ||
-      tour.location.toLowerCase().includes(searchLower);
+      tour.location.toLowerCase().includes(searchLower) ||
+      tour.status.toLowerCase().includes(searchLower) ||
+      tour.description?.toLowerCase().includes(searchLower);
 
     return statusMatch && searchMatch;
   });
+
+  // 處理編輯模式：當 dialog 開啟且為編輯模式時，載入旅遊團資料
+  useEffect(() => {
+    if (dialog.type === 'edit' && dialog.data) {
+      const tour = dialog.data as Tour;
+      console.log('🔧 編輯模式：載入旅遊團資料', {
+        tourName: tour.name,
+        location: tour.location
+      });
+
+      // 從 location 反查國家和城市代碼
+      let countryCode = '';
+      let cityCode = '';
+
+      // 嘗試從 destinations 中找到匹配的城市
+      for (const country of activeCountries) {
+        const cities = getCitiesByCountryCode(country.code);
+        const matchedCity = cities.find(city => city.name === tour.location);
+        if (matchedCity) {
+          countryCode = country.code;
+          cityCode = matchedCity.code;
+          setAvailableCities(cities);
+          console.log('✅ 找到匹配的城市:', {
+            country: country.name,
+            city: matchedCity.name,
+            countryCode,
+            cityCode
+          });
+          break;
+        }
+      }
+
+      // 如果找不到，設為自訂
+      if (!countryCode) {
+        countryCode = '__custom__';
+        cityCode = '__custom__';
+        console.log('⚠️ 找不到匹配的城市，設為自訂:', tour.location);
+      }
+
+      setNewTour({
+        name: tour.name,
+        countryCode,
+        cityCode,
+        customLocation: countryCode === '__custom__' ? tour.location : undefined,
+        departure_date: tour.departure_date,
+        return_date: tour.return_date,
+        price: tour.price,
+        status: tour.status,
+        isSpecial: tour.status === '特殊團',
+        max_participants: tour.max_participants || 20,
+        description: tour.description || '',
+      });
+
+      console.log('📝 設定表單資料:', {
+        countryCode,
+        cityCode,
+        customLocation: countryCode === '__custom__' ? tour.location : undefined
+      });
+    }
+  }, [dialog.type, dialog.data, activeCountries, getCitiesByCountryCode]);
 
   // 處理從報價單跳轉來的情況
   useEffect(() => {
     const fromQuoteId = searchParams.get('fromQuote');
     const highlightId = searchParams.get('highlight');
-    const departureDate = searchParams.get('departureDate');
+    const departure_date = searchParams.get('departure_date');
     const shouldOpenDialog = searchParams.get('openDialog');
 
     if (fromQuoteId) {
@@ -158,17 +284,17 @@ export default function ToursPage() {
         }));
 
         // 自動開啟新增旅遊團對話框
-        openDialog('create', null, fromQuoteId);
+        handleOpenCreateDialog(null, fromQuoteId);
       }
     }
 
     // 處理從行事曆跳轉來的情況
-    if (departureDate && shouldOpenDialog === 'true') {
+    if (departure_date && shouldOpenDialog === 'true') {
       setNewTour(prev => ({
         ...prev,
-        departureDate: departureDate
+        departure_date: departure_date
       }));
-      openDialog('create');
+      handleOpenCreateDialog();
     }
 
     // 處理從待辦事項跳轉來的情況
@@ -180,51 +306,117 @@ export default function ToursPage() {
         [highlightId]: 'tasks'
       }));
     }
-  }, [searchParams, quotes, openDialog]);
+  }, [searchParams, quotes, handleOpenCreateDialog]);
 
   const resetForm = useCallback(() => {
+    const defaultCountry = activeCountries[0];
+    const defaultCities = defaultCountry ? getCitiesByCountryCode(defaultCountry.code) : [];
+    const defaultCity = defaultCities[0];
+
     setNewTour({
       name: '',
-      location: 'Tokyo',
-      departureDate: '',
-      returnDate: '',
+      countryCode: defaultCountry?.code || '',
+      cityCode: defaultCity?.code || '',
+      departure_date: '',
+      return_date: '',
       price: 0,
       status: '提案',
       isSpecial: false,
-      maxParticipants: 20,
+      max_participants: 20,
       description: '',
     });
+    setAvailableCities(defaultCities);
     setNewOrder({
       contact_person: '',
-      salesPerson: '',
+      sales_person: '',
       assistant: '',
-      memberCount: 1,
+      member_count: 1,
       total_amount: 0,
     });
-  }, []);
+    setFormError(null); // 清除表單錯誤
+  }, [activeCountries, getCitiesByCountryCode]);
 
   const handleAddTour = useCallback(async () => {
     if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
       return;
     }
 
+    // 檢查自訂目的地
+    if (newTour.countryCode === '__custom__') {
+      if (!newTour.customCountry?.trim()) {
+        alert('請填寫國家名稱');
+        return;
+      }
+      if (!newTour.customLocation?.trim()) {
+        alert('請填寫城市名稱');
+        return;
+      }
+      if (!newTour.customCityCode?.trim()) {
+        alert('請填寫城市代號');
+        return;
+      }
+      if (newTour.customCityCode.length !== 3) {
+        alert('城市代號必須是 3 碼');
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
+      setFormError(null); // 清除之前的錯誤
 
-      const departureDate = new Date(newTour.departure_date);
-      const code = await tourService.generateTourCode(newTour.location, departureDate, newTour.isSpecial);
+      const departure_date = new Date(newTour.departure_date);
+
+      // 決定要使用的城市代號和名稱
+      const cityCode = newTour.countryCode === '__custom__'
+        ? newTour.customCityCode!
+        : newTour.cityCode;
+      const cityName = newTour.countryCode === '__custom__'
+        ? newTour.customLocation!
+        : availableCities.find(c => c.code === newTour.cityCode)?.name || newTour.cityCode;
+
+      // 編輯模式：更新現有旅遊團
+      if (dialog.type === 'edit' && dialog.data) {
+        const existingTour = dialog.data as Tour;
+
+        const tourData = {
+          name: newTour.name,
+          location: cityName,
+          departure_date: newTour.departure_date,
+          return_date: newTour.return_date,
+          status: newTour.status,
+          price: newTour.price,
+          max_participants: newTour.max_participants,
+          description: newTour.description,
+        };
+
+        await actions.update(existingTour.id, tourData);
+        resetForm();
+        closeDialog();
+        return;
+      }
+
+      // 新增模式：創建新旅遊團
+      const code = await tourService.generateTourCode(cityCode, departure_date, newTour.isSpecial);
 
       // 檢查是否從報價單創建
       const fromQuoteId = searchParams.get('fromQuote');
 
+      // 🔧 只取 Tour 介面需要的欄位，避免傳入 cityCode 等額外欄位
       const tourData = {
-        ...newTour,
+        name: newTour.name,
+        location: cityName,  // 存城市名稱
+        departure_date: newTour.departure_date,
+        return_date: newTour.return_date,
+        status: newTour.status,
+        price: newTour.price,
+        max_participants: newTour.max_participants,
         code,
-        contractStatus: '未簽署' as const,
-        totalRevenue: 0,
+        contract_status: '未簽署' as const,
+        total_revenue: 0,
         total_cost: 0,
         profit: 0,
-        currentParticipants: 0,
+        current_participants: 0,
         quote_id: fromQuoteId || undefined, // 如果從報價單創建，關聯報價單ID
       };
 
@@ -232,20 +424,20 @@ export default function ToursPage() {
 
       // 如果有填寫聯絡人，同時新增訂單
       if (newOrder.contact_person.trim()) {
-        const orderNumber = `${code}${String(Date.now()).slice(-3)}`; // 生成訂單編號
+        const order_number = `${code}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`; // 生成訂單編號（使用隨機數而非時間戳記）
         const orderData = {
-          orderNumber,
+          order_number,
           tour_id: createdTour.id,
           code: code,
           tour_name: newTour.name,
           contact_person: newOrder.contact_person,
-          salesPerson: newOrder.sales_person || '',
+          sales_person: newOrder.sales_person || '',
           assistant: newOrder.assistant || '',
-          memberCount: newOrder.member_count,
-          paymentStatus: '未收款' as const,
+          member_count: newOrder.member_count,
+          payment_status: '未收款' as const,
           total_amount: newOrder.total_amount || (newTour.price * newOrder.member_count),
-          paidAmount: 0,
-          remainingAmount: newOrder.total_amount || (newTour.price * newOrder.member_count),
+          paid_amount: 0,
+          remaining_amount: newOrder.total_amount || (newTour.price * newOrder.member_count),
         };
 
         addOrder(orderData);
@@ -253,7 +445,6 @@ export default function ToursPage() {
 
       // 如果是從報價單創建，更新報價單的 tourId
       if (fromQuoteId) {
-        const { updateQuote } = useQuoteStore.getState();
         updateQuote(fromQuoteId, { tour_id: createdTour.id });
 
         // 清除 URL 參數
@@ -263,38 +454,40 @@ export default function ToursPage() {
       resetForm();
       closeDialog();
     } catch (err) {
-      // 錯誤已經在 hook 中處理了，這裡可以顯示 toast 或其他 UI 反饋
-      console.error('Failed to create tour:', err);
+      // 顯示錯誤訊息在表單內
+      const errorMessage = err instanceof Error ? err.message : dialog.type === 'edit' ? '更新旅遊團失敗' : '建立旅遊團失敗';
+      setFormError(errorMessage);
+      logger.error('Failed to create/update tour:', err);
     } finally {
       setSubmitting(false);
     }
-  }, [newTour, newOrder, actions, addOrder, resetForm, closeDialog, searchParams, router]);
+  }, [newTour, newOrder, availableCities, actions, addOrder, resetForm, closeDialog, searchParams, router, updateQuote, dialog.type, dialog.data]);
 
   const toggleRowExpand = useCallback((tour_id: string) => {
     setExpandedRows(prev =>
-      prev.includes(tourId)
-        ? prev.filter(id => id !== tourId)
-        : [...prev, tourId]
+      prev.includes(tour_id)
+        ? prev.filter(id => id !== tour_id)
+        : [...prev, tour_id]
     );
     // 設定預設分頁為總覽
-    if (!activeTabs[tourId]) {
-      setActiveTabs(prev => ({ ...prev, [tourId]: 'overview' }));
+    if (!activeTabs[tour_id]) {
+      setActiveTabs(prev => ({ ...prev, [tour_id]: 'overview' }));
     }
   }, [activeTabs]);
 
   const setActiveTab = useCallback((tour_id: string, tabId: string) => {
-    setActiveTabs(prev => ({ ...prev, [tourId]: tabId }));
+    setActiveTabs(prev => ({ ...prev, [tour_id]: tabId }));
   }, []);
 
-  const getStatusBadge = useCallback((status: string) => {
-    const badges: Record<string, string> = {
-      '提案': 'bg-[#E8EAF0]/60 text-[#6B7280] border border-[#D1D5DB]/30',
-      '進行中': 'bg-[#D4E8DC]/60 text-[#6B8E7F] border border-[#B8D4C5]/30',
-      '待結案': 'bg-[#F5E8D0]/60 text-[#9B7E4A] border border-[#E5D4B0]/30',
-      '結案': 'bg-[#E5E5E5]/60 text-[#8A8A8A] border border-[#D0D0D0]/30',
-      '特殊團': 'bg-[#F0D8D8]/60 text-[#A17676] border border-[#E0C8C8]/30'
+  const getStatusColor = useCallback((status: string) => {
+    const colors: Record<string, string> = {
+      '提案': 'text-[#6B7280]',
+      '進行中': 'text-[#6B8E7F]',
+      '待結案': 'text-[#9B7E4A]',
+      '結案': 'text-[#8A8A8A]',
+      '特殊團': 'text-[#A17676]'
     };
-    return badges[status] || 'bg-[#E5E5E5]/60 text-[#8A8A8A] border border-[#D0D0D0]/30';
+    return colors[status] || 'text-morandi-secondary';
   }, []);
 
   // 定義 EnhancedTable 欄位
@@ -312,26 +505,34 @@ export default function ToursPage() {
       render: (value) => <span className="text-sm text-morandi-primary">{value}</span>,
     },
     {
-      key: 'departureDate',
+      key: 'departure_date',
       label: '出發日期',
       sortable: true,
-      render: (value, tour) => <span className="text-sm text-morandi-primary">{new Date(tour.departure_date).toLocaleDateString()}</span>,
+      render: (value, tour) => {
+        if (!tour.departure_date) return <span className="text-sm text-morandi-red">未設定</span>;
+        const date = new Date(tour.departure_date);
+        return <span className="text-sm text-morandi-primary">{isNaN(date.getTime()) ? '無效日期' : date.toLocaleDateString()}</span>;
+      },
     },
     {
-      key: 'returnDate',
+      key: 'return_date',
       label: '回程日期',
       sortable: true,
-      render: (value, tour) => <span className="text-sm text-morandi-primary">{tour.return_date ? new Date(tour.return_date).toLocaleDateString() : '-'}</span>,
+      render: (value, tour) => {
+        if (!tour.return_date) return <span className="text-sm text-morandi-secondary">-</span>;
+        const date = new Date(tour.return_date);
+        return <span className="text-sm text-morandi-primary">{isNaN(date.getTime()) ? '無效日期' : date.toLocaleDateString()}</span>;
+      },
     },
     {
       key: 'participants',
       label: '人數',
       render: (value, tour) => {
-        const tourOrders = orders.filter(order => order.tour_id === tour.id);
-        const actualMembers = members.filter(member =>
-          tourOrders.some(order => order.id === member.order_id)
+        const tourOrders = orders.filter((order: any) => order.tour_id === tour.id);
+        const actualMembers = members.filter((member: any) =>
+          tourOrders.some((order: any) => order.id === member.order_id)
         ).length;
-        return <span className="text-sm text-morandi-primary">{`${actualMembers}/${tour.max_participants}`}</span>;
+        return <span className="text-sm text-morandi-primary">{actualMembers}</span>;
       },
     },
     {
@@ -340,8 +541,8 @@ export default function ToursPage() {
       sortable: true,
       render: (value, tour) => (
         <span className={cn(
-          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-          getStatusBadge(tour.status)
+          'text-sm font-medium',
+          getStatusColor(tour.status)
         )}>
           {tour.status}
         </span>
@@ -368,12 +569,21 @@ export default function ToursPage() {
     if (!deleteConfirm.tour) return;
 
     try {
-      await deleteTour(deleteConfirm.tour.id);
+      await actions.delete(deleteConfirm.tour.id);
       setDeleteConfirm({ isOpen: false, tour: null });
     } catch (err) {
-      console.error('刪除旅遊團失敗:', err);
+      logger.error('刪除旅遊團失敗:', err);
     }
-  }, [deleteConfirm.tour, deleteTour]);
+  }, [deleteConfirm.tour, actions]);
+
+  const handleArchiveTour = useCallback(async (tour: Tour) => {
+    try {
+      await actions.update(tour.id, { archived: !tour.archived });
+      logger.info(tour.archived ? '已解除封存旅遊團' : '已封存旅遊團');
+    } catch (err) {
+      logger.error('封存/解封旅遊團失敗:', err);
+    }
+  }, [actions]);
 
   const renderActions = (tour: Tour) => {
     // 檢查是否有該旅遊團的報價單
@@ -382,21 +592,17 @@ export default function ToursPage() {
 
     return (
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={(e) => {
             e.stopPropagation();
             openDialog('edit', tour);
           }}
-          className="h-8 w-8 p-0 text-morandi-gold hover:text-morandi-gold hover:bg-morandi-gold/10 transition-colors"
+          className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
           title="編輯"
         >
           <Edit2 size={14} />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+        </button>
+        <button
           onClick={(e) => {
             e.stopPropagation();
             setSelectedTour(tour);
@@ -404,27 +610,51 @@ export default function ToursPage() {
               // 有報價單：前往查看/編輯該報價單
               router.push(`/quotes/${tourQuote.id}`);
             } else {
-              // 沒有報價單：前往新增報價單頁面，並帶上 tourId
-              router.push(`/quotes/new?tourId=${tour.id}`);
+              // 沒有報價單：前往報價單列表頁，並帶上 tour_id 以開啟新增對話框
+              router.push(`/quotes?tour_id=${tour.id}`);
             }
           }}
-          className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 transition-colors"
+          className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
           title={hasQuote ? '查看報價單' : '新增報價單'}
         >
           <Calculator size={14} />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            // 跳轉到行程表編輯頁面，帶入旅遊團 ID
+            router.push(`/itinerary/${tour.id}`);
+          }}
+          className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
+          title="編輯行程表"
+        >
+          <FileText size={14} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleArchiveTour(tour);
+          }}
+          className={cn(
+            "p-1 rounded transition-colors",
+            tour.archived
+              ? "text-morandi-gold/60 hover:text-morandi-gold hover:bg-morandi-gold/10"
+              : "text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-container"
+          )}
+          title={tour.archived ? "解除封存" : "封存"}
+        >
+          {tour.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
+        </button>
+        <button
           onClick={(e) => {
             e.stopPropagation();
             setDeleteConfirm({ isOpen: true, tour });
           }}
-          className="h-8 w-8 p-0 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"
+          className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
           title="刪除"
         >
           <Trash2 size={14} />
-        </Button>
+        </button>
       </div>
     );
   };
@@ -436,14 +666,14 @@ export default function ToursPage() {
         {/* 左側：標籤列表 */}
         <div className="flex">
           {tourTabs.map((tab) => {
-            const isActive = activeTabs[tour.id] === tab.id;
+            const is_active = activeTabs[tour.id] === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tour.id, tab.id)}
                 className={cn(
                   'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors',
-                  isActive
+                  is_active
                     ? 'text-morandi-primary bg-white border-b-2 border-morandi-gold'
                     : 'text-morandi-secondary hover:text-morandi-primary'
                 )}
@@ -463,8 +693,8 @@ export default function ToursPage() {
               onClick={() => openDialog('edit', tour)}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
             >
-              <Plus size={14} className="mr-1" />
-              編輯項目
+              <Edit2 size={14} className="mr-1" />
+              編輯
             </button>
           )}
           {activeTabs[tour.id] === 'orders' && (
@@ -528,7 +758,7 @@ export default function ToursPage() {
         )}
         {activeTabs[tour.id] === 'orders' && (
           <ExpandableOrderTable
-            orders={orders.filter(order => order.tour_id === tour.id)}
+            orders={orders.filter((order: any) => order.tour_id === tour.id)}
             showTourInfo={false}
             tourDepartureDate={tour.departure_date}
           />
@@ -562,9 +792,11 @@ export default function ToursPage() {
         )}
         {activeTabs[tour.id] === 'costs' && (
           <TourCosts
-            tour={tour}
-            triggerAdd={triggerCostAdd[tour.id] || false}
-            onTriggerAddComplete={() => setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))}
+            {...{
+              tour,
+              triggerAdd: triggerCostAdd[tour.id] || false,
+              onTriggerAddComplete: () => setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))
+            } as any}
           />
         )}
         {activeTabs[tour.id] === 'documents' && (
@@ -589,37 +821,43 @@ export default function ToursPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="旅遊團管理"
-        icon={MapPin}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '旅遊團管理', href: '/tours' }
-        ]}
-        onAdd={() => openDialog('create')}
-        addLabel="新增旅遊團"
-        tabs={[
+        {...{
+          title: "旅遊團管理",
+          icon: MapPin,
+          breadcrumb: [
+            { label: '首頁', href: '/' },
+            { label: '旅遊團管理', href: '/tours' }
+          ],
+          showSearch: true,
+          searchTerm: searchQuery,
+          onSearchChange: setSearchQuery,
+          searchPlaceholder: "搜尋旅遊團...",
+          onAdd: handleOpenCreateDialog,
+          addLabel: "新增旅遊團",
+          tabs: [
           { value: 'all', label: '全部', icon: BarChart3 },
           { value: '提案', label: '提案', icon: FileText },
           { value: '進行中', label: '進行中', icon: Calendar },
           { value: '待結案', label: '待結案', icon: AlertCircle },
           { value: '結案', label: '結案', icon: FileCheck },
-        ]}
-        activeTab={activeStatusTab}
-        onTabChange={(tab) => {
-          setActiveStatusTab(tab);
-          setCurrentPage(1); // 切換標籤時重置頁碼
-        }}
+        ],
+          activeTab: activeStatusTab,
+          onTabChange: (tab: string) => {
+            setActiveStatusTab(tab);
+            setCurrentPage(1); // 切換標籤時重置頁碼
+          }
+        } as any}
       />
 
       {/* 旅遊團列表 */}
-      <div className="pb-6">
+      <div className="flex-1 overflow-auto">
         <EnhancedTable
+          className="min-h-full"
           columns={columns}
           data={filteredTours}
           loading={loading}
-          error={error}
           onSort={handleSortChange}
           expandable={{
             expanded: expandedRows,
@@ -629,132 +867,179 @@ export default function ToursPage() {
           actions={renderActions}
           onRowClick={handleRowClick}
           bordered={true}
-          emptyState={
-            <div className="text-center py-8 text-morandi-secondary">
-              <Calendar size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium text-morandi-primary mb-2">
-                {activeStatusTab === 'all' ? '還沒有任何旅遊團' : `沒有「${activeStatusTab}」狀態的旅遊團`}
-              </p>
-              <p className="text-sm text-morandi-secondary mb-6">
-                {activeStatusTab === 'all' ? '點擊右上角「新增旅遊團」開始建立' : '切換到其他標籤或新增旅遊團'}
-              </p>
-              <div className="text-sm text-morandi-secondary space-y-1">
-                <p>• 旅遊團資訊將包含團號、名稱、目的地、出發日期、人數和狀態</p>
-                <p>• 點擊可展開檢視總覽、訂單管理、團員名單、團務、加購、退費等詳細功能</p>
-                <p>• 支援按狀態篩選（提案、進行中、待結案、結案）和搜尋功能</p>
-              </div>
-            </div>
-          }
         />
       </div>
 
       {/* 新增/編輯旅遊團對話框 */}
-      <Dialog open={dialog.isOpen} onOpenChange={() => closeDialog()}>
-        <DialogContent className="max-w-6xl w-[90vw] h-[80vh] overflow-hidden">
+      <Dialog open={dialog.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          // 關閉對話框時重置表單
+          resetForm();
+          closeDialog();
+        }
+      }}>
+        <DialogContent className="max-w-6xl w-[90vw] h-[80vh] overflow-hidden" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>
-              {dialog.mode === 'edit' ? '編輯旅遊團' : '新增旅遊團 & 訂單'}
+              {dialog.type === 'edit' ? '編輯旅遊團' : '新增旅遊團 & 訂單'}
             </DialogTitle>
           </DialogHeader>
+
+          {/* 錯誤訊息 */}
+          {formError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+              <div className="flex items-start gap-2">
+                <AlertCircle size={18} className="mt-0.5 shrink-0" />
+                <div className="text-sm">{formError}</div>
+              </div>
+            </div>
+          )}
+
           <div className="flex h-full overflow-hidden">
             {/* 左半部 - 新增旅遊團 */}
             <div className="flex-1 pr-6 border-r border-border">
               <div className="h-full overflow-y-auto">
                 <h3 className="text-lg font-medium text-morandi-primary mb-4">旅遊團資訊</h3>
                 <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">旅遊團名稱</label>
-              <Input
-                value={newTour.name}
-                onChange={(e) => setNewTour(prev => ({ ...prev, name: e.target.value }))}
-                className="mt-1"
-              />
-            </div>
+                  <div>
+                    <label className="text-sm font-medium text-morandi-primary">旅遊團名稱</label>
+                    <Input
+                      value={newTour.name}
+                      onChange={(e) => setNewTour(prev => ({ ...prev, name: e.target.value }))}
+                      className="mt-1"
+                    />
+                  </div>
 
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">目的地</label>
-              <select
-                value={newTour.location}
-                onChange={(e) => setNewTour(prev => ({ ...prev, location: e.target.value }))}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
-              >
-                <option value="Tokyo">Tokyo 東京</option>
-                <option value="Okinawa">Okinawa 沖繩</option>
-                <option value="Osaka">Osaka 大阪</option>
-                <option value="Kyoto">Kyoto 京都</option>
-                <option value="Hokkaido">Hokkaido 北海道</option>
-                <option value="Fukuoka">Fukuoka 福岡</option>
-                <option value="Other">其他</option>
-              </select>
-            </div>
+                  {/* 目的地選擇 */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">國家/地區</label>
+                      <select
+                        value={newTour.countryCode}
+                        onChange={(e) => {
+                          const countryCode = e.target.value;
+                          const cities = countryCode === '__custom__' ? [] : getCitiesByCountryCode(countryCode);
+                          setAvailableCities(cities);
+                          setNewTour(prev => ({
+                            ...prev,
+                            countryCode,
+                            cityCode: countryCode === '__custom__' ? '__custom__' : cities[0]?.code || '',
+                          }));
+                        }}
+                        className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                      >
+                        {activeCountries.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.name}
+                          </option>
+                        ))}
+                        <option value="__custom__">+ 新增其他目的地</option>
+                      </select>
+                    </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">出發日期</label>
-                <SmartDateInput
-                  value={newTour.departure_date}
-                  onChange={(departureDate) => {
-                    setNewTour(prev => {
-                      // 如果回程日期早於新的出發日期，自動調整回程日期
-                      const newReturnDate = prev.return_date && prev.return_date < departureDate
-                        ? departureDate
-                        : prev.return_date;
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">城市</label>
+                      {newTour.countryCode === '__custom__' ? (
+                        <Input
+                          value={newTour.customLocation || ''}
+                          onChange={(e) => setNewTour(prev => ({ ...prev, customLocation: e.target.value }))}
+                          placeholder="輸入城市名稱 (如：曼谷)"
+                          className="mt-1"
+                        />
+                      ) : (
+                        <select
+                          value={newTour.cityCode}
+                          onChange={(e) => setNewTour(prev => ({ ...prev, cityCode: e.target.value }))}
+                          className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                        >
+                          {availableCities.map((city) => (
+                            <option key={city.code} value={city.code}>
+                              {city.name} ({city.code})
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
 
-                      return {
-                        ...prev,
-                        departureDate,
-                        returnDate: newReturnDate
-                      };
-                    });
-                  }}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">返回日期</label>
-                <SmartDateInput
-                  value={newTour.return_date}
-                  onChange={(returnDate) => {
-                    setNewTour(prev => ({ ...prev, returnDate }));
-                  }}
-                  min={newTour.departure_date || new Date().toISOString().split('T')[0]}
-                  className="mt-1"
-                  required
-                />
-              </div>
-            </div>
+                  {/* 自訂目的地詳細資訊 */}
+                  {newTour.countryCode === '__custom__' && (
+                    <>
+                      <div>
+                        <label className="text-sm font-medium text-morandi-primary">國家名稱</label>
+                        <Input
+                          value={newTour.customCountry || ''}
+                          onChange={(e) => setNewTour(prev => ({ ...prev, customCountry: e.target.value }))}
+                          placeholder="輸入國家名稱 (如：泰國)"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-morandi-primary">3 碼城市代號</label>
+                        <Input
+                          value={newTour.customCityCode || ''}
+                          onChange={(e) => {
+                            const value = e.target.value.toUpperCase().slice(0, 3);
+                            setNewTour(prev => ({ ...prev, customCityCode: value }));
+                          }}
+                          placeholder="輸入 3 碼代號 (如：BKK)"
+                          className="mt-1"
+                          maxLength={3}
+                        />
+                        <p className="text-xs text-morandi-secondary mt-1">
+                          💡 用於生成團號，建議使用國際機場代碼或城市縮寫
+                        </p>
+                      </div>
+                    </>
+                  )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">價格</label>
-                <Input
-                  type="number"
-                  value={newTour.price}
-                  onChange={(e) => setNewTour(prev => ({ ...prev, price: Number(e.target.value) }))}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">最大人數</label>
-                <Input
-                  type="number"
-                  value={newTour.max_participants}
-                  onChange={(e) => setNewTour(prev => ({ ...prev, maxParticipants: Number(e.target.value) }))}
-                  className="mt-1"
-                />
-              </div>
-            </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">出發日期</label>
+                      <SmartDateInput
+                        value={newTour.departure_date}
+                        onChange={(departure_date) => {
+                          setNewTour(prev => {
+                            // 如果回程日期早於新的出發日期，自動調整回程日期
+                            const newReturnDate = prev.return_date && prev.return_date < departure_date
+                              ? departure_date
+                              : prev.return_date;
 
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">描述</label>
-              <Input
-                value={newTour.description || ''}
-                onChange={(e) => setNewTour(prev => ({ ...prev, description: e.target.value }))}
-                className="mt-1"
-              />
-            </div>
+                            return {
+                              ...prev,
+                              departure_date,
+                              return_date: newReturnDate
+                            };
+                          });
+                        }}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">返回日期</label>
+                      <SmartDateInput
+                        value={newTour.return_date}
+                        onChange={(return_date) => {
+                          setNewTour(prev => ({ ...prev, return_date }));
+                        }}
+                        min={newTour.departure_date || new Date().toISOString().split('T')[0]}
+                        initialMonth={newTour.departure_date}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-morandi-primary">描述</label>
+                    <Input
+                      value={newTour.description || ''}
+                      onChange={(e) => setNewTour(prev => ({ ...prev, description: e.target.value }))}
+                      className="mt-1"
+                    />
+                  </div>
 
                   <div className="flex items-center space-x-2">
                     <input
@@ -774,60 +1059,17 @@ export default function ToursPage() {
             <div className="flex-1 pl-6">
               <div className="h-full overflow-y-auto">
                 <h3 className="text-lg font-medium text-morandi-primary mb-4">同時新增訂單（選填）</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
-                    <Input
-                      value={newOrder.contact_person}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
 
-                  <div>
-                    <label className="text-sm font-medium text-morandi-primary">業務人員</label>
-                    <Input
-                      value={newOrder.sales_person}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, salesPerson: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
+                <AddOrderForm
+                  tourId="embedded"
+                  value={newOrder}
+                  onChange={setNewOrder}
+                />
 
-                  <div>
-                    <label className="text-sm font-medium text-morandi-primary">助理</label>
-                    <Input
-                      value={newOrder.assistant}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, assistant: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-morandi-primary">團員人數</label>
-                    <Input
-                      type="number"
-                      value={newOrder.member_count}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, memberCount: Number(e.target.value) }))}
-                      className="mt-1"
-                      min="1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-morandi-primary">訂單金額</label>
-                    <Input
-                      type="number"
-                      value={newOrder.total_amount}
-                      onChange={(e) => setNewOrder(prev => ({ ...prev, total_amount: Number(e.target.value) }))}
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div className="bg-morandi-container/20 p-3 rounded-lg">
-                    <p className="text-xs text-morandi-secondary">
-                      提示：如果填寫了聯絡人，將會同時建立一筆訂單。如果留空，則只建立旅遊團。
-                    </p>
-                  </div>
+                <div className="bg-morandi-container/20 p-3 rounded-lg mt-4">
+                  <p className="text-xs text-morandi-secondary">
+                    提示：如果填寫了聯絡人，將會同時建立一筆訂單。如果留空，則只建立旅遊團。
+                  </p>
                 </div>
               </div>
             </div>
@@ -855,7 +1097,7 @@ export default function ToursPage() {
 
       {/* 刪除確認對話框 */}
       <Dialog open={deleteConfirm.isOpen} onOpenChange={(open) => !open && setDeleteConfirm({ isOpen: false, tour: null })}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-morandi-red">
               <AlertCircle size={20} />
@@ -899,46 +1141,55 @@ export default function ToursPage() {
 
 // 總覽分頁組件
 function TourOverviewTab({ tour }: { tour: Tour }) {
-  const { quotes } = useQuoteStore();
-  const { orders, members } = useTourStore();
+  const { quotes } = useQuotes();
+  const { items: orders } = useOrderStore();
+  const { items: members } = useMemberStore();
 
   // 找到該旅遊團的報價單（通常取最新的或最終版本）
-  const tourQuote = quotes.find(quote => quote.tour_id === tour.id && quote.status === '最終版本') ||
-                   quotes.find(quote => quote.tour_id === tour.id);
+  const tourQuote = quotes.find((quote: any) => quote.tour_id === tour.id && quote.status === '最終版本') ||
+                   quotes.find((quote: any) => quote.tour_id === tour.id);
 
   // 計算該旅遊團的訂單資訊
-  const tourOrders = orders.filter(order => order.tour_id === tour.id);
-  const totalPaidAmount = tourOrders.reduce((sum, order) => sum + order.paid_amount, 0);
+  const tourOrders = orders.filter((order: any) => order.tour_id === tour.id);
+  const totalPaidAmount = tourOrders.reduce((sum: any, order: any) => sum + order.paid_amount, 0);
+
+  // 計算當前參與人數（從團員統計）
+  const tourMembers = members.filter((member: any) =>
+    tourOrders.some((order: any) => order.id === member.order_id)
+  );
+  const currentParticipants = tourMembers.length;
 
   // 財務計算
   const quotePrice = tourQuote?.total_cost || tour.price; // 報價單價格
-  const expectedRevenue = quotePrice * tour.currentParticipants; // 應收帳款 = 報價單價格 × 團體人數
+  const expectedRevenue = quotePrice * currentParticipants; // 應收帳款 = 報價單價格 × 團體人數
   const actualRevenue = totalPaidAmount; // 實收帳款
   const grossProfit = actualRevenue - tour.total_cost; // 毛利 = 實收 - 總成本
   const netProfit = grossProfit - (grossProfit * 0.05); // 淨利潤（假設5%稅費，可調整）
 
   // 準備預算vs實際支出的對比資料
-  const { paymentRequests } = usePaymentStore();
+// TODO: usePaymentStore deprecated -   const paymentStore = usePaymentStore();
+  const paymentStore = { payment_requests: [] }; // TODO: usePaymentStore deprecated
+  const paymentRequests = paymentStore.payment_requests; // TODO: 從 paymentStore 取得
 
   // 獲取該旅遊團的請款單
-  const tourPaymentRequests = paymentRequests.filter(req => req.tour_id === tour.id);
+  const tourPaymentRequests = paymentRequests.filter((req: any) => req.tour_id === tour.id);
 
   // 報價單中的類別預算
   const quoteBudget = tourQuote?.categories || [];
 
   // 計算各類別的實際支出 (從請款單統計)
-  const actualExpenses = quoteBudget.map(category => {
-    const categoryTotal = tourPaymentRequests.reduce((sum, request) => {
-      const categoryItems = request.items?.filter(item => item.category === category.name) || [];
-      return sum + categoryItems.reduce((itemSum, item) => itemSum + (item.unit_price * item.quantity), 0);
+  const actualExpenses = quoteBudget.map((category: any) => {
+    const categoryTotal = tourPaymentRequests.reduce((sum: any, request: any) => {
+      const categoryItems = request.items?.filter((item: any) => item.category === category.name) || [];
+      return sum + categoryItems.reduce((itemSum: any, item: any) => itemSum + (item.unit_price * item.quantity), 0);
     }, 0);
 
     return {
       name: category.name,
       budgetPerPerson: category.total || 0, // 報價單中的單人預算
-      budgetTotal: (category.total || 0) * tour.currentParticipants, // 預算總額 = 單人預算 × 人數
+      budgetTotal: (category.total || 0) * currentParticipants, // 預算總額 = 單人預算 × 人數
       actualTotal: categoryTotal, // 實際支出
-      variance: categoryTotal - ((category.total || 0) * tour.currentParticipants) // 差額 (正數=超支，負數=節省)
+      variance: categoryTotal - ((category.total || 0) * currentParticipants) // 差額 (正數=超支，負數=節省)
     };
   });
 
@@ -1084,7 +1335,7 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold text-morandi-primary">預算 vs 實際支出明細</h3>
           <div className="text-sm text-morandi-secondary">
-            基準：{tour.currentParticipants}人團體
+            基準：{currentParticipants}人團體
           </div>
         </div>
 
@@ -1210,19 +1461,21 @@ function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFields }: 
   tourExtraFields: Record<string, any>;
   setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }) {
-  const { orders, members } = useTourStore();
+  const tourStore = useTourStore();
+  const orderStore = useOrderStore();
+  const memberStore = useMemberStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 獲取屬於這個旅遊團的所有訂單
-  const tourOrders = orders.filter(order => order.tour_id === tour.id);
+  const tourOrders = orderStore.items.filter((order: any) => order.tour_id === tour.id);
 
   // 獲取團員數據
-  const allTourMembers = members.filter(member =>
-    tourOrders.some(order => order.id === member.order_id)
+  const allTourMembers = memberStore.items.filter((member: any) =>
+    tourOrders.some((order: any) => order.id === member.order_id)
   );
 
   // 計算已分房人數
-  const assignedMembers = allTourMembers.filter(member => member.assignedRoom).length;
+  const assignedMembers = allTourMembers.filter((member: any) => member.assignedRoom).length;
 
   return (
     <>
@@ -1262,13 +1515,13 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
   setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }) {
   const handleOptionSelect = useCallback((option: string) => {
-    const tourId = tour.id;
+    const tour_id = tour.id;
 
     // 初始化該旅遊團的欄位狀態（如果還沒有）
-    if (!tourExtraFields[tourId]) {
+    if (!tourExtraFields[tour_id]) {
       setTourExtraFields(prev => ({
         ...prev,
-        [tourId]: {
+        [tour_id]: {
           addOns: false,
           refunds: false,
           customFields: []
@@ -1281,8 +1534,8 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
         // 啟用加購項目欄位
         setTourExtraFields(prev => ({
           ...prev,
-          [tourId]: {
-            ...prev[tourId],
+          [tour_id]: {
+            ...prev[tour_id],
             addOns: true
           }
         }));
@@ -1292,8 +1545,8 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
         // 啟用退費項目欄位
         setTourExtraFields(prev => ({
           ...prev,
-          [tourId]: {
-            ...prev[tourId],
+          [tour_id]: {
+            ...prev[tour_id],
             refunds: true
           }
         }));
@@ -1306,10 +1559,10 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
           const fieldId = Date.now().toString();
           setTourExtraFields(prev => ({
             ...prev,
-            [tourId]: {
-              ...prev[tourId],
+            [tour_id]: {
+              ...prev[tour_id],
               customFields: [
-                ...(prev[tourId]?.customFields || []),
+                ...(prev[tour_id]?.customFields || []),
                 { id: fieldId, name: fieldName.trim() }
               ]
             }
@@ -1350,7 +1603,7 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>新增項目</DialogTitle>
         </DialogHeader>

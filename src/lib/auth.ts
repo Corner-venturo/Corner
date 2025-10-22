@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_
 
 export interface AuthPayload {
   id: string;
-  employeeNumber: string;
+  employee_number: string;
   permissions: string[];
   role: string;
 }
@@ -72,8 +72,7 @@ export function getUserFromToken(token: string): AuthPayload | null {
 // 檢查權限
 export function hasPermission(userPermissions: string[], requiredPermission: string): boolean {
   return userPermissions.includes(requiredPermission) ||
-         userPermissions.includes('super_admin') ||
-         userPermissions.includes('admin');
+         userPermissions.includes('admin'); // 移除 super_admin，統一使用 admin
 }
 
 // 檢查角色

@@ -18,25 +18,13 @@ import {
   Tag
 } from 'lucide-react';
 import { RichTextEditor, RichTextViewer } from './RichTextEditor';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useWorkspaceStore, PersonalCanvas as PersonalCanvasType, RichDocument } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface PersonalCanvasProps {
   canvasId?: string;
-}
-
-interface RichDocument {
-  id: string;
-  canvas_id: string;
-  title: string;
-  content: string;
-  format_data: Record<string, any>;
-  tags: string[];
-  is_favorite: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 type ViewMode = 'grid' | 'list';
@@ -79,7 +67,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
   }, [activeCanvasId, loadRichDocuments]);
 
   // Get current canvas info
-  const currentCanvas = personalCanvases.find(canvas => canvas.id === activeCanvasId);
+  const currentCanvas = personalCanvases.find((canvas: PersonalCanvasType) => canvas.id === activeCanvasId);
 
   // Function to add new canvas
   const addNewCanvas = async () => {
@@ -115,7 +103,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
   };
 
   // Filter documents based on search and tags
-  const filteredDocuments = richDocuments.filter(doc => {
+  const filteredDocuments = richDocuments.filter((doc: RichDocument) => {
     const matchesSearch = !searchTerm ||
       doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.content.toLowerCase().includes(searchTerm.toLowerCase());
@@ -126,7 +114,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
   });
 
   // Get all unique tags
-  const allTags = [...new Set(richDocuments.flatMap(doc => doc.tags))];
+  const allTags = [...new Set(richDocuments.flatMap((doc: RichDocument) => doc.tags))];
 
   const handleCreateDocument = () => {
     setSelectedDocument(null);
@@ -330,7 +318,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {personalCanvases.map(canvas => (
+              {personalCanvases.map((canvas: PersonalCanvasType) => (
                 <div
                   key={canvas.id}
                   className="morandi-card p-6 transition-all hover:shadow-md cursor-pointer"
@@ -422,7 +410,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
             className="px-3 py-2 border border-border rounded-md text-sm"
           >
             <option value="">全部標籤</option>
-            {allTags.map(tag => (
+            {allTags.map((tag: string) => (
               <option key={tag} value={tag}>{tag}</option>
             ))}
           </select>
@@ -478,7 +466,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
               ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
               : "space-y-3"
           )}>
-            {filteredDocuments.map(document => (
+            {filteredDocuments.map((document: RichDocument) => (
               <div
                 key={document.id}
                 className={cn(
@@ -533,7 +521,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
                       <div className="flex items-center gap-2">
                         {document.tags.length > 0 && (
                           <div className="flex gap-1">
-                            {document.tags.slice(0, 2).map(tag => (
+                            {document.tags.slice(0, 2).map((tag: string) => (
                               <span
                                 key={tag}
                                 className="px-2 py-1 bg-morandi-container/30 text-morandi-secondary rounded-full text-xs"

@@ -19,7 +19,8 @@ export { useSuppliers } from './suppliers/hooks/useSuppliers';
 export { useCustomers } from './customers/hooks/useCustomers';
 
 // ========== Services ==========
-export { paymentService } from './payments/services/payment.service';
+// TODO: paymentService deprecated (moved to payment.service.deprecated.ts)
+// export { paymentService } from './payments/services/payment.service';
 export { quoteService } from './quotes/services/quote.service';
 export { orderService } from './orders/services/order.service';
 export { todoService } from './todos/services/todo.service';
@@ -39,7 +40,7 @@ export type {
   Tour,
   Supplier,
   Customer,
-  Account,
-  Transaction,
-  Category,
+  // Account,
+  // Transaction,
+  // Category,
 } from '@/stores/types';

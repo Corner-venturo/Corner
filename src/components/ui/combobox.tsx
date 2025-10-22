@@ -110,7 +110,7 @@ export function Combobox<T = any>({
   // 篩選選項
   const filteredOptions = React.useMemo(() => {
     return options.filter(option =>
-      option.label.toLowerCase().includes(searchValue.toLowerCase())
+      option.label?.toLowerCase().includes(searchValue.toLowerCase())
     );
   }, [options, searchValue]);
 
@@ -132,6 +132,13 @@ export function Combobox<T = any>({
     }
   };
 
+  // 處理輸入框點擊（打開下拉選單）
+  const handleInputClick = () => {
+    if (!disabled && !isOpen) {
+      setIsOpen(true);
+    }
+  };
+
   // 處理選項選擇
   const handleOptionSelect = (option: ComboboxOption<T>) => {
     if (option.disabled) return;
@@ -150,6 +157,17 @@ export function Combobox<T = any>({
     onChange("");
     setIsOpen(false);
     inputRef.current?.focus();
+  };
+
+  // 切換下拉選單
+  const handleToggleDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!disabled) {
+      setIsOpen(!isOpen);
+      if (!isOpen) {
+        inputRef.current?.focus();
+      }
+    }
   };
 
   // 鍵盤導航
@@ -240,6 +258,7 @@ export function Combobox<T = any>({
           value={searchValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onClick={handleInputClick}
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
@@ -259,13 +278,20 @@ export function Combobox<T = any>({
               <X size={14} className="text-morandi-secondary" />
             </Button>
           )}
-          <ChevronDown
-            size={16}
-            className={cn(
-              "text-morandi-secondary transition-transform",
-              isOpen && "transform rotate-180"
-            )}
-          />
+          <button
+            type="button"
+            onClick={handleToggleDropdown}
+            className="h-6 w-6 flex items-center justify-center hover:bg-morandi-container/50 rounded transition-colors"
+            disabled={disabled}
+          >
+            <ChevronDown
+              size={16}
+              className={cn(
+                "text-morandi-secondary transition-transform",
+                isOpen && "transform rotate-180"
+              )}
+            />
+          </button>
         </div>
       </div>
 
@@ -273,7 +299,7 @@ export function Combobox<T = any>({
       {isOpen && !disabled && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 z-50 mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
+          className="absolute top-full left-0 right-0 z-[100] mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
           style={{ maxHeight }}
         >
           <div className="overflow-y-auto" style={{ maxHeight }}>
@@ -281,7 +307,7 @@ export function Combobox<T = any>({
               filteredOptions.map((option, index) => (
                 <button
                   key={option.value}
-                  ref={el => optionRefs.current[index] = el}
+                  ref={el => { optionRefs.current[index] = el; }}
                   onClick={() => handleOptionSelect(option)}
                   disabled={option.disabled}
                   className={cn(
@@ -311,7 +337,7 @@ export function Combobox<T = any>({
 export interface LegacyComboboxOption {
   id: string;
   name: string;
-  pricePerPerson?: number;
+  price_per_person?: number;
   pricePerGroup?: number;
   isGroupCost?: boolean;
 }
@@ -356,12 +382,12 @@ export function LegacyCombobox({
           <span className="text-morandi-primary">{option.label}</span>
           {option.data && (
             <span className="text-xs text-morandi-secondary">
-              {option.data.pricePerGroup ? (
-                option.data.is_group_cost
-                  ? `團體 NT$${option.data.pricePerGroup}`
-                  : `個人 NT$${option.data.pricePerPerson}`
-              ) : option.data.pricePerPerson ? (
-                `NT$${option.data.pricePerPerson}`
+              {(option.data as any).pricePerGroup ? (
+                (option.data as any).isGroupCost
+                  ? `團體 NT$${(option.data as any).pricePerGroup}`
+                  : `個人 NT$${(option.data as any).price_per_person}`
+              ) : (option.data as any).price_per_person ? (
+                `NT$${(option.data as any).price_per_person}`
               ) : ''}
             </span>
           )}

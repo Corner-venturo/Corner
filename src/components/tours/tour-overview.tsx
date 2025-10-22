@@ -1,9 +1,11 @@
 'use client';
 
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ContentContainer } from '@/components/layout/content-container';
 import { Button } from '@/components/ui/button';
 import { Tour } from '@/stores/types';
+import { useOrderStore } from '@/stores';
 import {
   Calendar,
   MapPin,
@@ -22,7 +24,51 @@ interface TourOverviewProps {
 }
 
 export const TourOverview = React.memo(function TourOverview({ tour, orderFilter }: TourOverviewProps) {
-  const overviewCards = [
+  const { items: orders } = useOrderStore();
+
+  // 如果有 orderFilter，取得該訂單的資料
+  const order = orderFilter ? orders.find(o => o.id === orderFilter) : null;
+
+  // 根據是否為訂單視圖，顯示不同的卡片資料
+  const overviewCards = order ? [
+    {
+      title: '訂單金額',
+      value: `NT$ ${order.total_amount.toLocaleString()}`,
+      icon: DollarSign,
+      color: 'text-morandi-gold'
+    },
+    {
+      title: '付款狀態',
+      value: order.payment_status,
+      icon: order.payment_status === '已收款' ? CheckCircle : AlertCircle,
+      color: order.payment_status === '已收款' ? 'text-morandi-green' :
+             order.payment_status === '部分收款' ? 'text-morandi-gold' : 'text-morandi-red'
+    },
+    {
+      title: '已付金額',
+      value: `NT$ ${order.paid_amount.toLocaleString()}`,
+      icon: TrendingUp,
+      color: 'text-morandi-green'
+    },
+    {
+      title: '未付金額',
+      value: `NT$ ${order.remaining_amount.toLocaleString()}`,
+      icon: TrendingUp,
+      color: 'text-morandi-red'
+    },
+    {
+      title: '訂單人數',
+      value: `${order.member_count} 人`,
+      icon: Users,
+      color: 'text-morandi-gold'
+    },
+    {
+      title: '聯絡人',
+      value: order.contact_person,
+      icon: Users,
+      color: 'text-morandi-primary'
+    }
+  ] : [
     {
       title: '報價單價格',
       value: `NT$ ${tour.price.toLocaleString()}`,
@@ -54,9 +100,9 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
       color: tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red'
     },
     {
-      title: '團員人數',
-      value: '12 人', // 這裡應該從訂單中計算
-      icon: Users,
+      title: '總訂單數',
+      value: `${orders.filter(o => o.tour_id === tour.id).length} 筆`,
+      icon: FileText,
       color: 'text-morandi-gold'
     }
   ];
@@ -146,52 +192,15 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
         </div>
       </ContentContainer>
 
-      {/* 收支明細 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ContentContainer>
-          <h3 className="text-lg font-semibold text-morandi-primary mb-4">收入明細</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-morandi-secondary">訂單收款</span>
-              <span className="text-morandi-green">NT$ 300,000</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-morandi-secondary">額外費用</span>
-              <span className="text-morandi-green">NT$ 50,000</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-morandi-secondary">保險費用</span>
-              <span className="text-morandi-green">NT$ 30,000</span>
-            </div>
-            <div className="flex justify-between py-2 font-medium">
-              <span className="text-morandi-primary">總收入</span>
-              <span className="text-morandi-green">NT$ {tour.total_revenue.toLocaleString()}</span>
-            </div>
-          </div>
-        </ContentContainer>
-
-        <ContentContainer>
-          <h3 className="text-lg font-semibold text-morandi-primary mb-4">支出明細</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-morandi-secondary">交通費用</span>
-              <span className="text-morandi-red">NT$ 150,000</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-morandi-secondary">住宿費用</span>
-              <span className="text-morandi-red">NT$ 120,000</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-border">
-              <span className="text-morandi-secondary">餐食費用</span>
-              <span className="text-morandi-red">NT$ 80,000</span>
-            </div>
-            <div className="flex justify-between py-2 font-medium">
-              <span className="text-morandi-primary">總支出</span>
-              <span className="text-morandi-red">NT$ {tour.total_cost.toLocaleString()}</span>
-            </div>
-          </div>
-        </ContentContainer>
-      </div>
+      {/* 收支明細 - 實際數據由收款記錄和成本支出計算 */}
+      <ContentContainer>
+        <h3 className="text-lg font-semibold text-morandi-primary mb-4">收支說明</h3>
+        <div className="space-y-3 text-morandi-secondary text-sm">
+          <p>• 總收入：從「收款紀錄」頁面查看實際收款明細</p>
+          <p>• 總支出：從「成本支出」頁面查看實際支出明細</p>
+          <p>• 淨利潤：總收入 - 總支出</p>
+        </div>
+      </ContentContainer>
     </div>
   );
 });

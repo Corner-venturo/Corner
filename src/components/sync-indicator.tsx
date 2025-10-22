@@ -7,7 +7,7 @@
  * 可點擊手動觸發同步
  */
 
-import { useAutoSync } from '@/lib/offline/auto-sync-provider'
+// import { useAutoSync } from '@/lib/offline/auto-sync-provider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,7 +26,10 @@ import {
 } from '@/components/ui/tooltip'
 
 export function SyncIndicator() {
-  const { syncStatus, isOnline, triggerSync } = useAutoSync()
+  // TODO: 實作自動同步功能
+  return null;
+
+  /* const { syncStatus, isOnline, triggerSync } = useAutoSync()
 
   const handleSync = async () => {
     try {
@@ -93,5 +96,5 @@ export function SyncIndicator() {
         </Tooltip>
       </div>
     </TooltipProvider>
-  )
+  ) */
 }

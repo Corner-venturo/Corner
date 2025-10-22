@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useOfflineSync, useOfflineStore, syncManager } from '@/lib/offline/sync-manager';
+// TODO: 重新實作同步狀態指示器，使用 background-sync-service
+// import { useOfflineSync, useOfflineStore, syncManager } from '@/lib/offline/sync-manager';
+import { backgroundSyncService } from '@/lib/sync/background-sync-service';
 import {
   Wifi, WifiOff, Cloud, CloudOff,
   RefreshCw, AlertCircle, Clock,
@@ -13,11 +15,27 @@ import { zhTW } from 'date-fns/locale';
 
 // ===== 主要同步狀態指示器 =====
 export function SyncStatusIndicator() {
-  const { isOnline, hasPendingChanges, pendingCount, lastSyncTime } = useOfflineSync();
+  // TODO: 使用 navigator.onLine 和 background-sync-service 替代
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  // 監聽網路狀態
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -48,8 +66,9 @@ export function SyncStatusIndicator() {
 
     setIsSyncing(true);
     try {
-      await syncManager.syncAll();
+      await backgroundSyncService.syncAllTables();
       setShowNotification(true);
+      setLastSyncTime(new Date());
       setTimeout(() => setShowNotification(false), 3000);
     } catch (error) {
       console.error('手動同步失敗:', error);

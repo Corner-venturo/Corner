@@ -31,28 +31,32 @@ import {
   Link2,
   TrendingUp,
   Download,
-  ShoppingCart
+  ShoppingCart,
+  Wallet,
+  AlertTriangle
 } from 'lucide-react';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
+import { useCleanupOrphanChannels } from '@/hooks/use-cleanup-orphan-channels';
+import { ChannelSidebar } from './ChannelSidebar';
+import { ChannelTabs } from './ChannelTabs';
+import { ShareAdvanceDialog } from './ShareAdvanceDialog';
+import { AdvanceListCard } from './AdvanceListCard';
+import { FinanceAlertDialog } from './FinanceAlertDialog';
+import { FinanceAlertCard } from './FinanceAlertCard';
+import { ShareOrdersDialog } from './ShareOrdersDialog';
+import { OrderListCard } from './OrderListCard';
+import { CreateReceiptDialog } from './CreateReceiptDialog';
+import { CreatePaymentRequestDialog } from './CreatePaymentRequestDialog';
 
-// 本地模式下載檔案（暫時停用）
+
 const downloadFile = (path: string, bucket: string, fileName: string) => {
   console.log('📦 本地模式：檔案下載功能暫時停用', { path, bucket, fileName });
   alert('檔案下載功能目前僅支援線上模式');
 };
-
-interface Channel {
-  id: string;
-  workspace_id: string;
-  name: string;
-  description?: string;
-  type: 'public' | 'private' | 'direct';
-  created_by?: string;
-  created_at: string;
-}
 
 interface Message {
   id: string;
@@ -64,29 +68,39 @@ interface Message {
   edited_at?: string;
   author?: {
     id: string;
-    chinese_name: string;
+    display_name: string;
     avatar?: string;
   };
 }
 
 export function ChannelChat() {
-  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
+  // ❌ 移除本地 state，改用 store 管理
+  // const [selectedChannel, setSelectedChannel] = useState<any>(null);
   const [messageText, setMessageText] = useState('');
-  const [showChannelForm, setShowChannelForm] = useState(false);
-  const [newChannelName, setNewChannelName] = useState('');
   const [showMemberSidebar, setShowMemberSidebar] = useState(false);
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [channelMessages, setChannelMessages] = useState<Record<string, Message[]>>({});
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSwitching, setIsSwitching] = useState(false);
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showShareQuoteDialog, setShowShareQuoteDialog] = useState(false);
   const [showShareTourDialog, setShowShareTourDialog] = useState(false);
-  const [showNewOrderDialog, setShowNewOrderDialog] = useState(false);
   const [showNewPaymentDialog, setShowNewPaymentDialog] = useState(false);
   const [showNewReceiptDialog, setShowNewReceiptDialog] = useState(false);
   const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
+  const [showShareAdvanceDialog, setShowShareAdvanceDialog] = useState(false);
+  const [showShareOrdersDialog, setShowShareOrdersDialog] = useState(false);
+  const [showCreateReceiptDialog, setShowCreateReceiptDialog] = useState(false);
+  const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<any>(null);
+  const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('');
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showChannelForm, setShowChannelForm] = useState(false);
+  const [newChannelName, setNewChannelName] = useState('');
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [editChannelName, setEditChannelName] = useState('');
   const [editChannelDescription, setEditChannelDescription] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -99,38 +113,53 @@ export function ChannelChat() {
     messages,
     currentWorkspace,
     loading,
+    selectedChannel,      // ✨ 從 store 取得
+    selectChannel,        // ✨ 從 store 取得
     loadChannels,
     createChannel,
     updateChannel,
     deleteChannel,
     loadMessages,
     sendMessage,
-    updateMessageReactions
+    updateMessageReactions,
+    advanceLists,
+    sharedOrderLists,
+    loadAdvanceLists,
+    loadSharedOrderLists,
+    deleteAdvanceList,
+    processAdvanceItem,
+    updateOrderReceiptStatus
   } = useWorkspaceStore();
 
-  const { user } = useAuthStore();
+  const { user, currentProfile } = useAuthStore();
+
+
+  useAutoCreateTourChannels();
+
+
+  useCleanupOrphanChannels();
 
   useEffect(() => {
     console.log('ChannelChat - 用戶狀態:', user);
   }, [user]);
 
-  // 只在 workspace 改變時載入頻道
+
   useEffect(() => {
     if (currentWorkspace?.id) {
       console.log('載入頻道列表...');
       loadChannels(currentWorkspace.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [currentWorkspace?.id]);
 
   useEffect(() => {
     if (channels.length > 0 && !selectedChannel) {
-      const defaultChannel = channels.find(c => c.name === 'general') || channels[0];
-      setSelectedChannel(defaultChannel);
+      const defaultChannel = channels.find(c => c.name === '一般討論') || channels[0];
+      selectChannel(defaultChannel);  // ✨ 改用 store 的 selectChannel
     }
-  }, [channels, selectedChannel]);
+  }, [channels, selectedChannel, selectChannel]);
 
-  // 當打開設定對話框時，載入當前頻道資訊
+
   useEffect(() => {
     if (showSettingsDialog && selectedChannel) {
       setEditChannelName(selectedChannel.name);
@@ -138,18 +167,61 @@ export function ChannelChat() {
     }
   }, [showSettingsDialog, selectedChannel]);
 
-  // 只在頻道改變時載入訊息
+
   useEffect(() => {
     if (selectedChannel?.id) {
-      console.log('載入訊息列表...', selectedChannel.id);
-      loadMessages(selectedChannel.id);
+
+      if (!channelMessages[selectedChannel.id]) {
+        console.log('載入訊息列表...', selectedChannel.id);
+        setIsLoadingMessages(true);
+        Promise.all([
+          loadMessages(selectedChannel.id),
+          loadAdvanceLists(selectedChannel.id),
+          loadSharedOrderLists(selectedChannel.id)
+        ]).then(() => {
+          setIsLoadingMessages(false);
+
+          setChannelMessages(prev => ({
+            ...prev,
+            [selectedChannel.id]: messages
+          }));
+        });
+      } else {
+
+        Promise.all([
+          loadMessages(selectedChannel.id),
+          loadAdvanceLists(selectedChannel.id),
+          loadSharedOrderLists(selectedChannel.id)
+        ]).then(() => {
+
+          setChannelMessages(prev => ({
+            ...prev,
+            [selectedChannel.id]: messages
+          }));
+        });
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [selectedChannel?.id]);
+
+
+  useEffect(() => {
+    if (selectedChannel?.id && messages.length > 0) {
+      setChannelMessages(prev => ({
+        ...prev,
+        [selectedChannel.id]: messages
+      }));
+    }
+  }, [messages, selectedChannel?.id]);
+
+
+  const currentMessages = selectedChannel?.id 
+    ? (channelMessages[selectedChannel.id] || messages) 
+    : [];
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [currentMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -186,7 +258,7 @@ export function ChannelChat() {
         content: messageText.trim() || '（傳送了附件）',
         author: {
           id: user.id,
-          chinese_name: user.chineseName || '未知用戶',
+          display_name: currentProfile?.display_name || user.display_name || '未知用戶',
           avatar: undefined
         }
       }, attachedFiles.length > 0 ? attachedFiles : undefined);
@@ -260,8 +332,8 @@ export function ChannelChat() {
     }
   };
 
-  // 檔案驗證設定
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
   const ALLOWED_FILE_TYPES = {
     'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
     'application/pdf': ['.pdf'],
@@ -272,9 +344,9 @@ export function ChannelChat() {
     'text/plain': ['.txt']
   };
 
-  // 檔案驗證函數
+
   const validateFile = (file: File): { valid: boolean; error?: string } => {
-    // 檢查檔案大小
+
     if (file.size > MAX_FILE_SIZE) {
       return {
         valid: false,
@@ -282,7 +354,7 @@ export function ChannelChat() {
       };
     }
 
-    // 檢查檔案類型
+
     const isValidType = Object.keys(ALLOWED_FILE_TYPES).some(type => {
       if (type.endsWith('/*')) {
         return file.type.startsWith(type.replace('/*', '/'));
@@ -307,7 +379,7 @@ export function ChannelChat() {
     return { valid: true };
   };
 
-  // 檔案處理函數
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validFiles: File[] = [];
@@ -330,7 +402,7 @@ export function ChannelChat() {
       setAttachedFiles(prev => [...prev, ...validFiles]);
     }
 
-    // 清空 input value 以允許重複選擇同一檔案
+
     if (e.target) {
       e.target.value = '';
     }
@@ -416,25 +488,15 @@ export function ChannelChat() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  // 快捷選單操作
+
   const quickMenuActions = [
     {
-      id: 'new-order',
-      icon: ShoppingCart,
-      label: '新增訂單',
-      color: 'text-purple-600',
-      action: () => {
-        setShowNewOrderDialog(true);
-        setShowQuickMenu(false);
-      }
-    },
-    {
       id: 'share-order',
-      icon: ShoppingCart,
-      label: '分享訂單',
+      icon: Receipt,
+      label: '分享待收款',
       color: 'text-indigo-600',
       action: () => {
-        setShowShareTourDialog(true);  // 暫時共用對話框，之後改為分享訂單
+        setShowShareOrdersDialog(true);
         setShowQuickMenu(false);
       }
     },
@@ -469,6 +531,16 @@ export function ChannelChat() {
       }
     },
     {
+      id: 'share-advance',
+      icon: Wallet,
+      label: '分享代墊清單',
+      color: 'text-purple-600',
+      action: () => {
+        setShowShareAdvanceDialog(true);
+        setShowQuickMenu(false);
+      }
+    },
+    {
       id: 'new-task',
       icon: CheckSquare,
       label: '新增任務',
@@ -490,7 +562,7 @@ export function ChannelChat() {
     }
   ];
 
-  // 點擊外部關閉選單
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (quickMenuRef.current && !quickMenuRef.current.contains(event.target as Node)) {
@@ -507,7 +579,7 @@ export function ChannelChat() {
     };
   }, [showQuickMenu]);
 
-  if (loading) {
+  if (loading && channels.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
@@ -517,135 +589,56 @@ export function ChannelChat() {
 
   return (
     <div className="h-full flex rounded-lg border border-border overflow-hidden bg-white">
-      {/* 頻道側邊欄 */}
-      <div className="w-64 bg-morandi-container/5 border-r border-morandi-gold/20 flex flex-col shrink-0">
-        {/* 工作空間標題 */}
-        <div className="px-4 py-3 border-b border-morandi-gold/20 bg-gradient-to-r from-morandi-gold/5 to-transparent">
-          <h2 className="font-semibold text-morandi-primary truncate">
-            {currentWorkspace?.icon} {currentWorkspace?.name || '工作空間'}
-          </h2>
-        </div>
+      {/* 頻道側邊欄 - 使用新的 ChannelSidebar 組件 */}
+      <ChannelSidebar
+        selectedChannelId={selectedChannel?.id || null}
+        onSelectChannel={(channel) => {
+          if (selectedChannel?.id !== channel.id) {
+            // 設定切換狀態，產生淡出效果
+            setIsSwitching(true);
 
-        {/* 頻道區塊 */}
-        <div className="flex-1 overflow-y-auto">
-          {/* 頻道標題 */}
-          <div className="px-3 py-2 flex items-center justify-between sticky top-0 bg-morandi-container/5 z-10">
-            <div className="flex items-center gap-2">
-              <Hash size={16} className="text-morandi-secondary" />
-              <span className="text-xs font-semibold text-morandi-secondary uppercase tracking-wider">頻道</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-5 h-5 hover:bg-morandi-gold/10"
-              onClick={() => setShowChannelForm(true)}
-            >
-              <Plus size={12} className="text-morandi-secondary" />
-            </Button>
-          </div>
+            // 150ms 後切換頻道
+            setTimeout(() => {
+              selectChannel(channel);  // ✨ 改用 store 的 selectChannel
 
-          {/* 頻道列表 */}
-          <div className="px-2 pb-2 space-y-0.5">
-            {channels.map(channel => (
-              <button
-                key={channel.id}
-                onClick={() => setSelectedChannel(channel)}
-                className={cn(
-                  "w-full flex items-center gap-2 px-2 py-1.5 text-left rounded text-sm transition-all group",
-                  selectedChannel?.id === channel.id
-                    ? "bg-morandi-gold/15 text-morandi-primary font-medium"
-                    : "text-morandi-secondary hover:bg-morandi-container/20 hover:text-morandi-primary"
-                )}
-              >
-                <Hash size={14} className={cn(
-                  "shrink-0",
-                  selectedChannel?.id === channel.id ? "text-morandi-gold" : "text-morandi-secondary group-hover:text-morandi-gold"
-                )} />
-                <span className="truncate">{channel.name}</span>
-                {/* 未讀訊息數（預留） */}
-                {/* <span className="ml-auto text-xs bg-morandi-gold text-white rounded-full px-1.5 py-0.5">3</span> */}
-              </button>
-            ))}
-          </div>
-        </div>
+              // 再 150ms 後移除切換狀態，產生淡入效果
+              setTimeout(() => setIsSwitching(false), 150);
+            }, 150);
+          }
+        }}
+      />
 
-        {/* 新增頻道表單 */}
-        {showChannelForm && (
-          <div className="p-4 border-t border-border">
-            <form onSubmit={handleCreateChannel} className="space-y-2">
-              <Input
-                value={newChannelName}
-                onChange={(e) => setNewChannelName(e.target.value)}
-                placeholder="頻道名稱"
-                className="text-sm"
-              />
-              <div className="flex gap-2">
-                <Button type="submit" size="sm" className="flex-1">
-                  建立
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setShowChannelForm(false);
-                    setNewChannelName('');
-                  }}
-                >
-                  取消
-                </Button>
-              </div>
-            </form>
-          </div>
-        )}
-      </div>
-
-      {/* 主要聊天區域 */}
+      {/* 主要聊天區域 - 使用 ChannelTabs 包裹 */}
       <div className="flex-1 flex flex-col min-w-0">
         {selectedChannel ? (
-          <>
-            {/* 頻道標題列 */}
-            <div className="p-4 border-b border-border bg-white shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Hash size={20} className="text-morandi-gold" />
-                  <div>
-                    <h3 className="font-medium text-morandi-primary">
-                      {selectedChannel.name}
-                    </h3>
-                    {selectedChannel.description && (
-                      <p className="text-sm text-morandi-secondary">
-                        {selectedChannel.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8"
-                    onClick={() => setShowMemberSidebar(!showMemberSidebar)}
-                  >
-                    <Users size={16} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8"
-                    onClick={() => setShowSettingsDialog(true)}
-                  >
-                    <Settings size={16} />
-                  </Button>
-                </div>
-              </div>
+        <ChannelTabs
+          channel={selectedChannel}
+          headerActions={
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8"
+                onClick={() => setShowMemberSidebar(!showMemberSidebar)}
+              >
+                <Users size={16} />
+              </Button>
             </div>
+          }
+        >
 
             {/* 訊息與成員區域 */}
             <div className="flex-1 flex min-h-0">
               {/* 訊息區域 */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-              {messages.length === 0 ? (
+              <div className={cn(
+                "flex-1 overflow-y-auto p-4 space-y-4 min-h-0 transition-opacity duration-150",
+                isSwitching ? "opacity-0" : "opacity-100"
+              )}>
+              {isLoadingMessages ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin w-6 h-6 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
+                </div>
+              ) : currentMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <Hash size={48} className="text-morandi-secondary/50 mb-4" />
                   <h3 className="text-lg font-medium text-morandi-primary mb-2">
@@ -656,11 +649,11 @@ export function ChannelChat() {
                   </p>
                 </div>
               ) : (
-                messages.map(message => (
+                currentMessages.map(message => (
                   <div key={message.id} className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
                     {/* 用戶頭像 */}
                     <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
-                      {(message.author?.chineseName || message.author?.chinese_name)?.charAt(0) || '?'}
+                      {message.author?.display_name?.charAt(0) || '?'}
                     </div>
 
                     {/* 訊息內容 */}
@@ -668,7 +661,7 @@ export function ChannelChat() {
                       {/* 訊息標題 */}
                       <div className="flex items-baseline gap-2 mb-0.5">
                         <span className="font-semibold text-morandi-primary text-[15px]">
-                          {message.author?.chineseName || message.author?.chinese_name || '未知用戶'}
+                          {message.author?.display_name || '未知用戶'}
                         </span>
                         <span className="text-[11px] text-morandi-secondary/80 font-normal">
                           {formatMessageTime(message.created_at)}
@@ -740,23 +733,83 @@ export function ChannelChat() {
                         </div>
                       )}
 
-                      {/* 反應按鈕 - hover 訊息時顯示 */}
-                      <div className="flex gap-0.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {['👍', '❤️', '😄', '😮', '🎉'].map(emoji => (
+                      {/* 反應按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
+                      <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-0.5">
+                          {['👍', '❤️', '😄', '😮', '🎉'].map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => handleReaction(message.id, emoji)}
+                              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/40 transition-all hover:scale-110"
+                              title={`加上 ${emoji} 反應`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                        {/* 刪除按鈕 - 只有作者可以刪除 */}
+                        {user?.id === message.author_id && (
                           <button
-                            key={emoji}
-                            onClick={() => handleReaction(message.id, emoji)}
-                            className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/40 transition-all hover:scale-110"
-                            title={`加上 ${emoji} 反應`}
+                            onClick={async () => {
+                              if (confirm('確定要刪除這則訊息嗎？')) {
+                                const { deleteMessage } = useWorkspaceStore.getState();
+                                await deleteMessage(message.id);
+
+                                // 同時更新 local state 中的訊息列表
+                                if (selectedChannel?.id) {
+                                  setChannelMessages(prev => ({
+                                    ...prev,
+                                    [selectedChannel.id]: prev[selectedChannel.id]?.filter(m => m.id !== message.id) || []
+                                  }));
+                                }
+                              }
+                            }}
+                            className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-red/10 rounded border border-morandi-container hover:border-morandi-red/40 transition-all hover:scale-110"
+                            title="刪除訊息"
                           >
-                            {emoji}
+                            <Trash2 size={12} className="text-morandi-red" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </div>
                 ))
               )}
+
+              {/* 代墊清單卡片 */}
+              {advanceLists.map(advanceList => (
+                <AdvanceListCard
+                  key={advanceList.id}
+                  advanceList={advanceList}
+                  userName={advanceList.author?.display_name}
+                  currentUserId={user?.id || ''}
+                  userRole="admin" // TODO: 從實際權限系統取得
+                  onCreatePayment={(itemId, item) => {
+                    setSelectedAdvanceItem(item);
+                    setSelectedAdvanceListId(advanceList.id);
+                    setShowCreatePaymentDialog(true);
+                  }}
+                  onDelete={(listId) => {
+                    deleteAdvanceList(listId);
+                  }}
+                />
+              ))}
+
+              {/* 訂單列表卡片 */}
+              {sharedOrderLists.map(orderList => (
+                <OrderListCard
+                  key={orderList.id}
+                  orderList={orderList}
+                  userName={orderList.author?.display_name}
+                  currentUserId={user?.id || ''}
+                  userRole="admin" // TODO: 從實際權限系統取得
+                  onCreateReceipt={(orderId, order) => {
+                    setSelectedOrder(order);
+                    setShowCreateReceiptDialog(true);
+                  }}
+                />
+              ))}
+
               <div ref={messagesEndRef} />
               </div>
 
@@ -933,7 +986,7 @@ export function ChannelChat() {
                 </div>
               )}
             </div>
-          </>
+        </ChannelTabs>
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -944,7 +997,76 @@ export function ChannelChat() {
         )}
       </div>
 
-      {/* 頻道設定對話框 */}
+      {/* 分享代墊對話框 */}
+      {showShareAdvanceDialog && selectedChannel && user && (
+        <ShareAdvanceDialog
+          channelId={selectedChannel.id}
+          currentUserId={user.id}
+          onClose={() => setShowShareAdvanceDialog(false)}
+          onSuccess={() => {
+            console.log('代墊已分享');
+            setShowShareAdvanceDialog(false);
+          }}
+        />
+      )}
+
+      {/* 分享訂單對話框 */}
+      {showShareOrdersDialog && selectedChannel && (
+        <ShareOrdersDialog
+          channelId={selectedChannel.id}
+          onClose={() => setShowShareOrdersDialog(false)}
+          onSuccess={() => {
+            console.log('訂單已分享');
+            setShowShareOrdersDialog(false);
+            // 重新載入訂單列表
+            if (selectedChannel?.id) {
+              loadSharedOrderLists(selectedChannel.id);
+            }
+          }}
+        />
+      )}
+
+      {/* 建立收款單對話框 */}
+      {showCreateReceiptDialog && selectedOrder && (
+        <CreateReceiptDialog
+          order={selectedOrder}
+          onClose={() => {
+            setShowCreateReceiptDialog(false);
+            setSelectedOrder(null);
+          }}
+          onSuccess={(receiptId) => {
+            console.log('收款單已建立:', receiptId);
+            // TODO: 更新訂單的收款狀態
+            setShowCreateReceiptDialog(false);
+            setSelectedOrder(null);
+          }}
+        />
+      )}
+
+      {/* 建立請款單對話框（從代墊項目） */}
+      {showCreatePaymentDialog && selectedAdvanceItem && selectedAdvanceListId && (
+        <CreatePaymentRequestDialog
+          items={selectedAdvanceItem}
+          listId={selectedAdvanceListId}
+          onClose={() => {
+            setShowCreatePaymentDialog(false);
+            setSelectedAdvanceItem(null);
+            setSelectedAdvanceListId('');
+          }}
+          onSuccess={() => {
+            console.log('請款單已建立');
+            setShowCreatePaymentDialog(false);
+            setSelectedAdvanceItem(null);
+            setSelectedAdvanceListId('');
+            // 重新載入代墊列表
+            if (selectedChannel?.id) {
+              loadAdvanceLists(selectedChannel.id);
+            }
+          }}
+        />
+      )}
+
+      {/* 頻道設定對話框 - 暫時保留以後實作 */}
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
         <DialogContent>
           <DialogHeader>
@@ -989,7 +1111,7 @@ export function ChannelChat() {
                       console.log('開始刪除頻道:', selectedChannel.id);
                       await deleteChannel(selectedChannel.id);
                       console.log('頻道刪除成功');
-                      setSelectedChannel(null);
+                      selectChannel(null);  // ✨ 改用 store 的 selectChannel
                       setShowSettingsDialog(false);
                       alert('頻道已刪除');
                     } catch (error) {
@@ -1102,44 +1224,6 @@ export function ChannelChat() {
               setShowShareTourDialog(false);
             }}>
               分享到頻道
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 新增訂單對話框 */}
-      <Dialog open={showNewOrderDialog} onOpenChange={setShowNewOrderDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>新增訂單</DialogTitle>
-            <DialogDescription>
-              建立新訂單並分享到頻道
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">訂單名稱</label>
-              <Input placeholder="輸入訂單名稱..." />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">客戶名稱</label>
-              <Input placeholder="輸入客戶名稱..." />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">金額</label>
-              <Input type="number" placeholder="輸入金額..." />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewOrderDialog(false)}>
-              取消
-            </Button>
-            <Button onClick={() => {
-              // TODO: 實作新增訂單
-              console.log('新增訂單');
-              setShowNewOrderDialog(false);
-            }}>
-              建立並分享
             </Button>
           </DialogFooter>
         </DialogContent>

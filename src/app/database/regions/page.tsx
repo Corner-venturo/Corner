@@ -1,198 +1,136 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { MapPin, Edit, Trash2, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
-import { cn } from '@/lib/utils';
-import { regionOptionsMap, type RegionName } from '@/data/region-options';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { ContentContainer } from '@/components/layout/content-container';
+import { useState, useMemo, useEffect } from 'react';
+import { MapPin, Edit, Trash2, Power, ChevronRight, ChevronDown } from 'lucide-react';
 
-interface RegionData {
-  id: string;
-  name: string;
-  transportCount: number;
-  activityCount: number;
-  lastUpdated: string;
-  isActive: boolean;
-}
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { ResponsiveHeader } from '@/components/layout/responsive-header';
+
+import { cn } from '@/lib/utils';
+import { DESTINATIONS } from '@/constants/destinations';
+import { useRegionStore } from '@/stores';
+import type { Region } from '@/types';
 
 export default function RegionsPage() {
-  const router = useRouter();
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingRegion, setEditingRegion] = useState<RegionData | null>(null);
-  const [newRegion, setNewRegion] = useState({
-    name: '',
-    isActive: true
-  });
+  const [expandedCountries, setExpandedCountries] = useState<Set<string>>(new Set());
+  const { items: regions, create, update, delete: deleteRegion } = useRegionStore();
 
-  // 從資料庫選項生成地區列表
-  const regions: RegionData[] = Object.entries(regionOptionsMap).map(([name, options]) => ({
-    id: name,
-    name: name,
-    transportCount: options.transport.length,
-    activityCount: options.activities.length,
-    lastUpdated: '2024-01-15',
-    isActive: true
-  }));
+  // 初始化：如果沒有資料，從 DESTINATIONS 匯入
+  useEffect(() => {
+    const initializeRegions = async () => {
+      // 檢查是否已經初始化過（使用 localStorage 標記）
+      const initialized = localStorage.getItem('regions_initialized');
+      if (initialized === 'true') {
+        console.log('📍 地區資料已初始化，跳過');
+        return;
+      }
 
-  // 表格配置
-  const tableColumns: TableColumn[] = useMemo(() => [
-    {
-      key: 'name',
-      label: '地區名稱',
-      sortable: true,
-      filterable: true,
-      render: (value) => (
-        <div className="flex items-center">
-          <MapPin size={16} className="mr-2 text-morandi-gold" />
-          <span className="font-medium text-morandi-primary">{value}</span>
-        </div>
-      )
-    },
-    {
-      key: 'transportCount',
-      label: '交通選項',
-      sortable: true,
-      filterable: true,
-      filterType: 'number',
-      render: (value) => (
-        <span className="text-morandi-secondary">{value} 項</span>
-      )
-    },
-    {
-      key: 'activityCount',
-      label: '活動門票',
-      sortable: true,
-      filterable: true,
-      filterType: 'number',
-      render: (value) => (
-        <span className="text-morandi-secondary">{value} 項</span>
-      )
-    },
-    {
-      key: 'lastUpdated',
-      label: '最後更新',
-      sortable: true,
-      filterable: true,
-      filterType: 'date',
-      render: (value) => (
-        <span className="text-morandi-secondary">{value}</span>
-      )
-    },
-    {
-      key: 'isActive',
-      label: '狀態',
-      sortable: true,
-      filterable: true,
-      filterType: 'select',
-      filterOptions: [
-        { value: 'true', label: '啟用' },
-        { value: 'false', label: '停用' }
-      ],
-      render: (value) => (
-        <span className={cn(
-          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-          value
-            ? 'bg-morandi-green text-white'
-            : 'bg-morandi-container text-morandi-secondary'
-        )}>
-          {value ? '啟用' : '停用'}
-        </span>
-      )
-    },
-    {
-      key: 'actions',
-      label: '操作',
-      sortable: false,
-      filterable: false,
-      render: (_, row) => (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => handleEditRegion(row)}
-            className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-            title="編輯地區"
-          >
-            <Edit size={14} className="text-morandi-gold" />
-          </button>
-          <button
-            onClick={() => handleDeleteRegion(row.id)}
-            className="p-1 hover:bg-morandi-red/10 rounded transition-colors"
-            title="刪除地區"
-          >
-            <Trash2 size={14} className="text-morandi-red" />
-          </button>
-        </div>
-      )
-    }
-  ], []);
+      // 再次檢查 store 中是否已有資料（防止重複初始化）
+      if (regions.length > 0) {
+        console.log('📍 地區資料已存在，標記為已初始化');
+        localStorage.setItem('regions_initialized', 'true');
+        return;
+      }
 
-  // 排序和篩選函數
-  const sortFunction = (data: RegionData[], column: string, direction: 'asc' | 'desc') => {
-    return [...data].sort((a, b) => {
-      let aValue: string | number | boolean = a[column as keyof RegionData];
-      let bValue: string | number | boolean = b[column as keyof RegionData];
+      console.log('📍 初始化地區資料...');
 
-      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
-      return 0;
+      try {
+        for (const [countryCode, destination] of Object.entries(DESTINATIONS)) {
+          // 添加國家
+          await create({
+            type: 'country',
+            name: destination.name,
+            code: countryCode,
+            status: 'active'
+          } as any);
+
+          // 添加城市
+          for (const city of destination.cities) {
+            await create({
+              type: 'city',
+              name: city.name,
+              code: city.code,
+              status: 'active',
+              country_code: countryCode
+            } as any);
+          }
+        }
+
+        // 標記為已初始化
+        localStorage.setItem('regions_initialized', 'true');
+        console.log('✅ 地區資料初始化完成');
+      } catch (error) {
+        console.error('❌ 地區資料初始化失敗:', error);
+        // 不標記為已初始化，下次可以重試
+      }
+    };
+
+    // 延遲執行，確保 store 已載入
+    const timer = setTimeout(initializeRegions, 100);
+    return () => clearTimeout(timer);
+  }, []); // 只執行一次
+
+  // 切換國家展開/收起
+  const toggleCountry = (countryCode: string) => {
+    setExpandedCountries(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(countryCode)) {
+        newSet.delete(countryCode);
+      } else {
+        newSet.add(countryCode);
+      }
+      return newSet;
     });
   };
 
-  const filterFunction = (data: RegionData[], filters: Record<string, string>) => {
-    return data.filter(region => {
-      return (
-        (!filters.name || region.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.transportCount || region.transportCount.toString().includes(filters.transportCount)) &&
-        (!filters.activityCount || region.activityCount.toString().includes(filters.activityCount)) &&
-        (!filters.lastUpdated || region.lastUpdated.includes(filters.lastUpdated)) &&
-        (!filters.isActive || region.isActive.toString() === filters.isActive)
-      );
+  // 停用/啟用
+  const toggleStatus = async (id: string) => {
+    const region = regions.find(r => r.id === id);
+    if (!region) return;
+
+    await update(id, {
+      status: region.status === 'active' ? 'inactive' : 'active'
     });
   };
 
-  const { data: filteredAndSortedRegions, handleSort, handleFilter } = useEnhancedTable(
-    regions.filter(r => !searchTerm || r.name.toLowerCase().includes(searchTerm.toLowerCase())),
-    sortFunction,
-    filterFunction
-  );
-
-  const handleAddRegion = () => {
-    if (!newRegion.name.trim()) return;
-
-    // TODO: 新增地區到資料庫
-    setNewRegion({ name: '', isActive: true });
-    setIsAddDialogOpen(false);
-  };
-
-  const handleEditRegion = (region: RegionData) => {
-    setEditingRegion(region);
-    setNewRegion({
-      name: region.name,
-      isActive: region.isActive
-    });
-    setIsAddDialogOpen(true);
-  };
-
-  const handleDeleteRegion = (regionId: string) => {
-    if (confirm('確定要刪除此地區嗎？這將同時刪除相關的交通和活動選項。')) {
-      // TODO: 刪除地區從資料庫
+  // 刪除
+  const handleDelete = async (id: string) => {
+    if (confirm('確定要刪除嗎？')) {
+      await deleteRegion(id);
     }
   };
 
-  const closeDialog = () => {
-    setIsAddDialogOpen(false);
-    setEditingRegion(null);
-    setNewRegion({ name: '', isActive: true });
+  // 過濾和組織資料
+  const { countries, cities } = useMemo(() => {
+    const countryList = regions.filter(r => r.type === 'country');
+    const cityList = regions.filter(r => r.type === 'city');
+
+    return {
+      countries: countryList.filter(country =>
+        !searchTerm ||
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        country.code.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+      cities: cityList
+    };
+  }, [regions, searchTerm]);
+
+  // 獲取國家的城市列表
+  const getCities = (countryCode: string) => {
+    return cities.filter(city =>
+      city.country_code === countryCode &&
+      (!searchTerm ||
+        city.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        city.code.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
   };
 
   return (
-    <div className="space-y-6 ">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="地區管理"
         icon={MapPin}
@@ -204,79 +142,153 @@ export default function RegionsPage() {
         showSearch={true}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋地區名稱..."
-        onAdd={() => setIsAddDialogOpen(true)}
-        addLabel="新增地區"
-        actions={
-          <div className="text-sm text-morandi-secondary">
-            {filteredAndSortedRegions.length} 個地區
-          </div>
-        }
+        searchPlaceholder="搜尋國家或城市..."
       />
 
-      <ContentContainer>
-        <EnhancedTable
-          columns={tableColumns}
-          data={filteredAndSortedRegions}
-          onSort={handleSort}
-          onFilter={handleFilter}
-          cellSelection={false}
-        />
-
-        {filteredAndSortedRegions.length === 0 && (
-          <div className="text-center py-12 text-morandi-secondary">
-            <MapPin size={48} className="mx-auto mb-4 opacity-50" />
-            <p>{regions.length === 0 ? '尚未建立任何地區' : '無符合條件的地區'}</p>
-          </div>
-        )}
-      </ContentContainer>
-
-      {/* 新增/編輯地區對話框 */}
-      <Dialog open={isAddDialogOpen} onOpenChange={closeDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingRegion ? '編輯地區' : '新增地區'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">地區名稱</label>
-              <Input
-                value={newRegion.name}
-                onChange={(e) => setNewRegion(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="輸入地區名稱，例如：清邁、曼谷"
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={newRegion.isActive}
-                onChange={(e) => setNewRegion(prev => ({ ...prev, isActive: e.target.checked }))}
-                className="rounded border-border"
-              />
-              <label htmlFor="isActive" className="text-sm text-morandi-primary">
-                啟用此地區
-              </label>
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={closeDialog}>
-                取消
-              </Button>
-              <Button
-                onClick={handleAddRegion}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                {editingRegion ? '更新' : '新增'}
-              </Button>
+      <div className="flex-1 overflow-auto">
+        <div className="border border-border rounded-lg overflow-hidden bg-card">
+          {/* 表格標題 */}
+          <div className="bg-morandi-container/30 border-b border-border">
+            <div className="flex items-center px-4 py-3">
+              <div className="flex-1 text-sm font-medium text-morandi-secondary">國家/城市</div>
+              <div className="w-32 text-sm font-medium text-morandi-secondary">代碼</div>
+              <div className="w-24 text-sm font-medium text-morandi-secondary">狀態</div>
+              <div className="w-32 text-sm font-medium text-morandi-secondary text-right">操作</div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {/* 表格內容 */}
+          <div>
+            {countries.length === 0 ? (
+              <div className="text-center py-12 text-morandi-secondary">
+                <MapPin size={48} className="mx-auto mb-4 opacity-50" />
+                <p>無符合條件的地區</p>
+              </div>
+            ) : (
+              countries.map((country) => {
+                const isExpanded = expandedCountries.has(country.code);
+                const countryCities = getCities(country.code);
+
+                return (
+                  <div key={country.id}>
+                    {/* 國家行 */}
+                    <div className="border-b border-border hover:bg-morandi-container/20 transition-colors">
+                      <div className="flex items-center px-4 py-3">
+                        <div className="flex-1 flex items-center">
+                          {/* 展開/收起按鈕 */}
+                          <button
+                            onClick={() => toggleCountry(country.code)}
+                            className="mr-2 p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+                          >
+                            {isExpanded ? (
+                              <ChevronDown size={16} className="text-morandi-gold" />
+                            ) : (
+                              <ChevronRight size={16} className="text-morandi-secondary" />
+                            )}
+                          </button>
+
+                          <MapPin size={16} className="mr-2 text-morandi-gold" />
+                          <span className="font-semibold text-morandi-primary">{country.name}</span>
+                          <span className="ml-2 text-xs text-morandi-muted">
+                            ({countryCities.length} 個城市)
+                          </span>
+                        </div>
+
+                        <div className="w-32 text-morandi-secondary font-mono">{country.code}</div>
+
+                        <div className="w-24">
+                          <span className={cn(
+                            'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
+                            country.status === 'active'
+                              ? 'bg-morandi-green text-white'
+                              : 'bg-morandi-container text-morandi-secondary'
+                          )}>
+                            {country.status === 'active' ? '啟用' : '停用'}
+                          </span>
+                        </div>
+
+                        <div className="w-32 flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => toggleStatus(country.id)}
+                            className="p-1 rounded transition-colors hover:bg-morandi-container/30"
+                            title={country.status === 'active' ? '停用' : '啟用'}
+                          >
+                            <Power size={14} className={
+                              country.status === 'active' ? 'text-morandi-green' : 'text-morandi-secondary'
+                            } />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(country.id)}
+                            className="p-1 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+                            title="刪除"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 城市列表（展開時顯示） */}
+                    {isExpanded && countryCities.length > 0 && (
+                      <div className="bg-morandi-container/5">
+                        {countryCities.map((city) => (
+                          <div
+                            key={city.id}
+                            className="border-b border-border/50 hover:bg-morandi-container/20 transition-colors"
+                          >
+                            <div className="flex items-center px-4 py-2.5 pl-14">
+                              <div className="flex-1 flex items-center">
+                                <div className="w-1 h-1 rounded-full bg-morandi-gold mr-3"></div>
+                                <span className="text-morandi-primary">{city.name}</span>
+                              </div>
+
+                              <div className="w-32 text-morandi-secondary font-mono text-sm">{city.code}</div>
+
+                              <div className="w-24">
+                                <span className={cn(
+                                  'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                                  city.status === 'active'
+                                    ? 'bg-morandi-green/80 text-white'
+                                    : 'bg-morandi-container text-morandi-secondary'
+                                )}>
+                                  {city.status === 'active' ? '啟用' : '停用'}
+                                </span>
+                              </div>
+
+                              <div className="w-32 flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleStatus(city.id)}
+                                  className="h-7 w-7 p-0"
+                                  title={city.status === 'active' ? '停用' : '啟用'}
+                                >
+                                  <Power size={12} className={
+                                    city.status === 'active' ? 'text-morandi-green' : 'text-morandi-secondary'
+                                  } />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDelete(city.id)}
+                                  className="h-7 w-7 p-0 hover:text-morandi-red"
+                                  title="刪除"
+                                >
+                                  <Trash2 size={12} />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

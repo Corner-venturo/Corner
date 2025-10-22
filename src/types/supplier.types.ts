@@ -32,7 +32,10 @@ export interface PriceListItem extends BaseEntity {
 }
 
 export interface Supplier extends BaseEntity {
+  supplier_code?: string; // 供應商編號
   name: string;
+  country?: string; // 國家
+  location?: string; // 地點
   type: 'hotel' | 'restaurant' | 'transport' | 'ticket' | 'guide' | 'other';
   contact: SupplierContact;
   bank_info?: SupplierBankInfo;

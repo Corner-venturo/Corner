@@ -6,16 +6,16 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodoStore } from '@/stores';
 import { useUserStore } from '@/stores/user-store';
-import { CheckCircle, Clock, Calendar, ChevronDown, X, Star, Receipt, FileText, Users, DollarSign, UserPlus, AlertCircle, Trash2, Edit2, Grid3x3, List, Search, Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import { useAuthStore } from '@/stores/auth-store';
+import { CheckCircle, Clock, Calendar, ChevronDown, X, Star, Receipt, FileText, Users, DollarSign, UserPlus, AlertCircle, Trash2, Edit2, Grid3x3, List, Search, Cloud, CloudOff, RefreshCw, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import { EnhancedTable } from '@/components/ui/enhanced-table';
 import { TodoExpandedView } from '@/components/todos/todo-expanded-view';
-import { TodoCardGroups } from '@/components/todos/todo-card-groups';
 import { StarRating } from '@/components/ui/star-rating';
 import { Todo } from '@/stores/types';
-import { useOfflineSync } from '@/lib/offline/sync-manager';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,30 +28,23 @@ const statusFilters = [
 ];
 
 export default function TodosPage() {
-  const { todos, addTodo, updateTodo, deleteTodo, clearAllTodos, loadTodos } = useTodoStore();
+  const todoStore = useTodoStore();
+  const todos = todoStore.items;
+  const { create: addTodo, update: updateTodo, delete: deleteTodo, fetchAll } = todoStore;
+  const { user } = useAuthStore(); // 取得當前登入用戶
   const searchParams = useSearchParams();
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedTodo, setExpandedTodo] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'card' | 'list'>('list');
-  const [groupBy, setGroupBy] = useState<'date' | 'priority' | 'status'>('date');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { isOnline, hasPendingChanges, pendingCount, syncStatus } = useOfflineSync();
+  const [isLoading, setIsLoading] = useState(false); // 使用快取資料，不需要載入
+  const [isSubmitting, setIsSubmitting] = useState(false); // 防止重複提交
+  const [isComposing, setIsComposing] = useState(false); // 中文輸入法狀態
 
-  // 初次載入時只載入待辦事項
+  // 載入待辦事項資料
   useEffect(() => {
-    const syncData = async () => {
-      try {
-        await loadTodos();
-      } catch (error) {
-        console.error('載入資料失敗:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    syncData();
-  }, [loadTodos]);
+    fetchAll();
+  }, [fetchAll]);
 
   // 處理從其他頁面跳轉來的情況
   useEffect(() => {
@@ -63,7 +56,22 @@ export default function TodosPage() {
 
   // 篩選待辦 - 使用 useMemo 優化
   const filteredTodos = useMemo(() => {
+    if (!todos || !Array.isArray(todos)) return [];
+    const currentUserId = user?.id;
+
     return todos.filter(todo => {
+      // ✅ 可見性篩選 - 只顯示當前用戶相關的待辦
+      if (currentUserId) {
+        const isCreator = todo.creator === currentUserId;
+        const isAssignee = todo.assignee === currentUserId;
+        const inVisibility = todo.visibility?.includes(currentUserId);
+
+        // 必須是建立者、被指派者或在可見列表中
+        if (!isCreator && !isAssignee && !inVisibility) {
+          return false;
+        }
+      }
+
       // 狀態篩選
       if (statusFilter !== 'all' && todo.status !== statusFilter) return false;
 
@@ -72,7 +80,7 @@ export default function TodosPage() {
 
       return true;
     });
-  }, [todos, statusFilter, searchTerm]);
+  }, [todos, statusFilter, searchTerm, user?.id]);
 
   // 狀態標籤 - 使用 useCallback 優化
   const getStatusLabel = useCallback((status: Todo['status']) => {
@@ -116,38 +124,42 @@ export default function TodosPage() {
       label: '任務標題',
       sortable: true,
       render: (value: string, todo: Todo) => (
-        <div className="flex items-center gap-3">
-          <StarRating value={todo.priority} readonly size="sm" />
-          <div>
-            <div className="text-sm font-medium text-morandi-primary">{value}</div>
-            {todo.relatedItems && todo.relatedItems.length > 0 && (
-              <div className="flex gap-1 mt-1">
-                {todo.relatedItems.map((item, index) => (
-                  <button
-                    key={index}
-                    onClick={(e) => {
-                      e.stopPropagation(); // 避免觸發行點擊
-                      // 根據類型跳轉到相應頁面
-                      const basePath = {
-                        'group': '/tours',
-                        'quote': '/quotes',
-                        'order': '/orders',
-                        'invoice': '/finance/treasury/disbursement',
-                        'receipt': '/finance/payments'
-                      }[item.type];
-                      if (basePath) {
-                        window.location.href = `${basePath}?highlight=${item.id}`;
-                      }
-                    }}
-                    className="text-xs bg-morandi-gold/20 text-morandi-primary px-2 py-0.5 rounded hover:bg-morandi-gold/30 transition-colors"
-                  >
-                    {item.title}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        <div>
+          <div className="text-sm font-medium text-morandi-primary">{value}</div>
+          {todo.related_items && todo.related_items.length > 0 && (
+            <div className="flex gap-1 mt-1">
+              {todo.related_items.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const basePath = {
+                      'group': '/tours',
+                      'quote': '/quotes',
+                      'order': '/orders',
+                      'invoice': '/finance/treasury/disbursement',
+                      'receipt': '/finance/payments'
+                    }[item.type];
+                    if (basePath) {
+                      window.location.href = `${basePath}?highlight=${item.id}`;
+                    }
+                  }}
+                  className="text-xs bg-morandi-gold/20 text-morandi-primary px-2 py-0.5 rounded hover:bg-morandi-gold/30 transition-colors"
+                >
+                  {item.title}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+      )
+    },
+    {
+      key: 'priority',
+      label: '優先級',
+      sortable: true,
+      render: (value: number, todo: Todo) => (
+        <StarRating value={todo.priority} readonly size="sm" />
       )
     },
     {
@@ -159,30 +171,6 @@ export default function TodosPage() {
           {getStatusLabel(value)}
         </span>
       )
-    },
-    {
-      key: 'progress',
-      label: '進度',
-      render: (value: any, todo: Todo) => {
-        const subTasks = todo.subTasks || [];
-        const completed = subTasks.filter(task => task.done).length;
-        const total = subTasks.length;
-        const percentage = total > 0 ? (completed / total) * 100 : 0;
-
-        return (
-          <div className="flex items-center gap-2">
-            <div className="w-16 bg-morandi-container/30 rounded-full h-2">
-              <div
-                className="bg-morandi-gold h-2 rounded-full transition-all duration-300"
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
-            <span className="text-sm text-morandi-secondary">
-              {completed}/{total}
-            </span>
-          </div>
-        );
-      }
     },
     {
       key: 'deadline',
@@ -219,33 +207,49 @@ export default function TodosPage() {
         setExpandedTodo(null);
       }
     } catch (err) {
-      console.error('刪除待辦事項失敗:', err);
+      logger.error('刪除待辦事項失敗:', err);
       alert('刪除失敗，請稍後再試');
     }
   }, [deleteTodo, expandedTodo]);
 
-  const handleAddTodo = useCallback((formData: any) => {
-    const newTodoData = {
-      title: formData.title,
-      priority: formData.priority,
-      deadline: formData.deadline,
-      status: 'pending' as const,
-      completed: false,
-      creator: '1', // 暂時使用固定值
-      assignee: formData.assignee || null,
-      visibility: ['1'],
-      relatedItems: [],
-      subTasks: [],
-      notes: [],
-      enabledQuickActions: formData.enabledQuickActions || ['receipt', 'quote']
-    };
+  const handleAddTodo = useCallback(async (formData: any) => {
+    if (!user?.id) {
+      alert('請先登入');
+      return;
+    }
 
-    addTodo(newTodoData);
-    setIsAddDialogOpen(false);
-  }, [addTodo]);
+    try {
+      // 計算 visibility - 包含建立者和被指派者
+      const visibilityList = [user.id];
+      if (formData.assignee && formData.assignee !== user.id) {
+        visibilityList.push(formData.assignee);
+      }
+
+      const newTodoData = {
+        title: formData.title,
+        priority: formData.priority,
+        deadline: formData.deadline,
+        status: 'pending' as const,
+        completed: false,
+        creator: user.id, // ✅ 使用當前登入用戶
+        assignee: formData.assignee || null,
+        visibility: visibilityList, // ✅ 包含建立者和被指派者
+        related_items: [],
+        sub_tasks: [],
+        notes: [],
+        enabled_quick_actions: formData.enabled_quick_actions || ['receipt', 'quote']
+      };
+
+      await addTodo(newTodoData as any);
+      setIsAddDialogOpen(false);
+    } catch (error) {
+      logger.error('新增待辦事項失敗:', error);
+      alert('新增失敗，請稍後再試');
+    }
+  }, [addTodo, user?.id]);
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="待辦事項"
         showSearch={true}
@@ -254,56 +258,85 @@ export default function TodosPage() {
         searchPlaceholder="搜尋任務..."
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增任務"
-      >
-        {/* 狀態篩選和清除按鈕 */}
-        <div className="flex gap-2 items-center">
-
-          <div className="flex gap-2">
-            {statusFilters.map((filter) => (
-              <button
-                key={filter.value}
-                onClick={() => setStatusFilter(filter.value)}
-                className={cn(
-                  'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
-                  statusFilter === filter.value
-                    ? 'bg-morandi-gold text-white'
-                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
-                )}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-          
-          {todos.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (confirm(`確定要清除所有 ${todos.length} 個待辦事項嗎？\n\n此操作無法復原。`)) {
-                  clearAllTodos();
+        actions={
+          <Input
+            placeholder="快速新增... (Enter)"
+            className="w-64"
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
+            onKeyDown={async (e) => {
+              // 如果正在使用輸入法（如注音、拼音），不要觸發新增
+              if (e.key === 'Enter' && e.currentTarget.value.trim() && !isSubmitting && !isComposing) {
+                e.preventDefault();
+                if (!user?.id) {
+                  alert('請先登入');
+                  return;
                 }
-              }}
-              className="ml-4 text-morandi-red hover:text-morandi-red border-morandi-red/30 hover:border-morandi-red"
+                const title = e.currentTarget.value.trim();
+                const inputElement = e.currentTarget;
+                inputElement.value = '';
+                setIsSubmitting(true);
+
+                const newTodoData = {
+                  title,
+                  priority: 3 as 1 | 2 | 3 | 4 | 5,
+                  deadline: '',
+                  status: 'pending' as const,
+                  completed: false,
+                  creator: user.id,
+                  assignee: null,
+                  visibility: [user.id],
+                  related_items: [],
+                  sub_tasks: [],
+                  notes: [],
+                  enabled_quick_actions: ['receipt', 'quote'] as ('receipt' | 'quote')[]
+                };
+
+                try {
+                  await addTodo(newTodoData as any);
+                  logger.log('✅ 待辦事項新增成功');
+                } catch (error) {
+                  logger.error('快速新增失敗:', error);
+                  if (inputElement) {
+                    inputElement.value = title;
+                  }
+                  alert('新增失敗，請稍後再試');
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }
+            }}
+          />
+        }
+      >
+        {/* 狀態篩選 */}
+        <div className="flex gap-2">
+          {statusFilters.map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() => setStatusFilter(filter.value)}
+              className={cn(
+                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
+                statusFilter === filter.value
+                  ? 'bg-morandi-gold text-white'
+                  : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
+              )}
             >
-              <Trash2 size={14} className="mr-1" />
-              清除全部
-            </Button>
-          )}
+              {filter.label}
+            </button>
+          ))}
         </div>
       </ResponsiveHeader>
 
       {/* 待辦事項列表 */}
-      <div>
+      <div className="flex-1 overflow-auto">
         <EnhancedTable
-            columns={columns}
-            data={filteredTodos}
-            onRowClick={handleRowClick}
-            actions={(todo: Todo) => (
+          columns={columns}
+          data={filteredTodos}
+          onRowClick={handleRowClick}
+          actions={(todo: Todo) => (
             <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   const newStatus = todo.status === 'completed' ? 'pending' : 'completed';
@@ -313,58 +346,38 @@ export default function TodosPage() {
                   });
                 }}
                 className={cn(
-                  "h-8 w-8 p-0",
+                  "p-1 rounded transition-colors",
                   todo.status === 'completed'
                     ? "text-green-600 hover:text-green-700 hover:bg-green-50"
                     : "text-morandi-secondary hover:text-green-600 hover:bg-green-50"
                 )}
                 title={todo.status === 'completed' ? '取消完成' : '標記完成'}
               >
-                <CheckCircle size={16} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+                <CheckCircle size={14} />
+              </button>
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setExpandedTodo(todo.id);
                 }}
-                className="h-8 w-8 p-0"
+                className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
                 title="編輯"
               >
-                <Edit2 size={16} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+                <Edit2 size={14} />
+              </button>
+              <button
                 onClick={(e) => handleDeleteTodo(todo, e)}
-                className="h-8 w-8 p-0 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
+                className="p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
                 title="刪除"
               >
-                <Trash2 size={16} />
-              </Button>
+                <Trash2 size={14} />
+              </button>
             </div>
           )}
           searchableFields={['title']}
           searchTerm={searchTerm}
           showFilters={false}
           initialPageSize={15}
-          emptyState={
-            <div className="text-center py-8 text-morandi-secondary">
-              <Clock size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium text-morandi-primary mb-2">
-                {statusFilter === 'all' ? '還沒有任何待辦事項' : `沒有「${statusFilters.find(f => f.value === statusFilter)?.label}」的任務`}
-              </p>
-              <p className="text-sm text-morandi-secondary mb-6">
-                點擊右上角「新增任務」開始建立待辦事項
-              </p>
-              <div className="text-sm text-morandi-secondary space-y-1">
-                <p>• 待辦事項將顯示標題、類型、優先級、狀態和建立時間</p>
-                <p>• 可以按狀態篩選（待辦、進行中、完成）和搜尋任務</p>
-                <p>• 點擊任務可查看詳細資訊和編輯內容</p>
-              </div>
-            </div>
-          }
         />
       </div>
 
@@ -393,14 +406,14 @@ export default function TodosPage() {
 
 // 新增待辦事項表單組件
 function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: any) => void; onCancel: () => void }) {
-  const { users, loadUsersFromDatabase } = useUserStore();
+  const { items: users, fetchAll: loadUsersFromDatabase } = useUserStore();
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     priority: 3 as 1 | 2 | 3 | 4 | 5,
     deadline: '',
     assignee: '',
-    enabledQuickActions: ['receipt', 'quote'] as ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
+    enabled_quick_actions: ['receipt', 'quote'] as ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
   });
 
   // 當點擊或聚焦指派選單時，才載入員工資料
@@ -410,7 +423,7 @@ function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: any) => void; on
       try {
         await loadUsersFromDatabase();
       } catch (error) {
-        console.error('載入員工資料失敗:', error);
+        logger.error('載入員工資料失敗:', error);
       } finally {
         setIsLoadingUsers(false);
       }
@@ -466,7 +479,7 @@ function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: any) => void; on
           </option>
           {users && users.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.chineseName} ({user.employeeNumber})
+              {user.display_name} ({user.employee_number})
             </option>
           ))}
         </select>

@@ -12,6 +12,7 @@
  */
 
 import { ValidationError, NotFoundError } from '@/core/errors/app-errors';
+import { logger } from '@/lib/utils/logger';
 
 export interface ErrorLogEntry {
   timestamp: string;
@@ -44,7 +45,7 @@ class ErrorHandler {
 
     // 如果是開發環境，直接拋出以便調試
     if (process.env.NODE_ENV === 'development') {
-      console.error(`[${context}]`, error);
+      logger.error(`[${context}]`, error);
     }
   }
 
@@ -74,11 +75,11 @@ class ErrorHandler {
    */
   private extractMessage(error: unknown): string {
     if (error instanceof ValidationError) {
-      return `驗證錯誤: ${error.field} - ${error.message}`;
+      return `驗證錯誤: ${(error as any).field} - ${error.message}`;
     }
 
     if (error instanceof NotFoundError) {
-      return `找不到資源: ${error.resource} (ID: ${error.id})`;
+      return `找不到資源: ${(error as any).resource} (ID: ${(error as any).id})`;
     }
 
     if (error instanceof Error) {
@@ -95,13 +96,9 @@ class ErrorHandler {
     // TODO: 整合 Toast 通知系統
     const message = this.getUserFriendlyMessage(error);
 
-    if (typeof window !== 'undefined') {
-      // 暫時使用 console
-      console.warn(`[用戶通知] ${message}`);
-
-      // 未來可以這樣：
-      // toast.error(message);
-    }
+    // 未來可以這樣：
+    // toast.error(message);
+    logger.warn(`[用戶通知] ${message}`);
   }
 
   /**

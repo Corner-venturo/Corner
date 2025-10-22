@@ -5,7 +5,8 @@ import { useMemo } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Card } from '@/components/ui/card';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
-import { useTourStore } from '@/stores/tour-store';
+import { useTourStore, useOrderStore } from '@/stores';
+// TODO: usePaymentStore deprecated - 收款/付款記錄功能未實作
 import {
   CreditCard,
   FileText,
@@ -19,7 +20,9 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function FinancePage() {
-  const { payments, orders, tours } = useTourStore();
+  const { items: tours } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const payments: any[] = []; // TODO: 實作收款/付款記錄功能
 
   // 計算財務統計
   const totalReceivable = payments
@@ -100,7 +103,7 @@ export default function FinancePage() {
       }
     },
     {
-      key: 'createdAt',
+      key: 'created_at',
       label: '日期',
       sortable: true,
       render: (value, payment) => (
@@ -142,11 +145,13 @@ export default function FinancePage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader title="財務管理中心" />
 
-      {/* 財務總覽 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="flex-1 overflow-auto">
+        <div className="space-y-6">
+          {/* 財務總覽 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4 border border-border">
           <div className="flex items-center justify-between">
             <div>
@@ -228,123 +233,8 @@ export default function FinancePage() {
         <EnhancedTable
           columns={transactionColumns}
           data={recentPayments}
-          emptyState={
-            <div className="space-y-6">
-              {/* 空狀態提示 */}
-              <div className="text-center py-8 text-morandi-secondary">
-                <DollarSign size={48} className="mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium text-morandi-primary mb-2">尚無財務交易記錄</p>
-                <p className="text-sm text-morandi-secondary">開始建立收款或請款記錄來管理財務</p>
-              </div>
-
-              {/* 示例交易表格 */}
-              <div className="border-t border-border pt-6">
-                <h3 className="text-lg font-medium text-morandi-primary mb-4">預覽：財務交易表格樣式</h3>
-                <div className="morandi-card overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      {/* 表格標題 */}
-                      <thead className="bg-morandi-container/30 border-b border-border">
-                        <tr>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">類型</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">說明</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">金額</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">狀態</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">日期</th>
-                        </tr>
-                      </thead>
-
-                      {/* 示例交易 */}
-                      <tbody>
-                        {[
-                          {
-                            type: '收款',
-                            description: '東京賞櫻團 - 王小明訂金',
-                            amount: 45000,
-                            status: '已確認',
-                            createdAt: new Date().toLocaleDateString(),
-                            isIncome: true
-                          },
-                          {
-                            type: '請款',
-                            description: '沖繩團住宿費用',
-                            amount: 28000,
-                            status: '待確認',
-                            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                            isIncome: false
-                          },
-                          {
-                            type: '收款',
-                            description: '京都古蹟團 - 陳大華尾款',
-                            amount: 52000,
-                            status: '已完成',
-                            createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                            isIncome: true
-                          },
-                          {
-                            type: '出納',
-                            description: '公司營運費用',
-                            amount: 15000,
-                            status: '已確認',
-                            createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                            isIncome: false
-                          }
-                        ].map((payment, index) => (
-                          <tr key={index} className="border-b border-border opacity-60 hover:bg-morandi-container/20">
-                            <td className="py-4 px-4">
-                              <div className="flex items-center space-x-2">
-                                {payment.type === '收款' ? (
-                                  <TrendingUp size={16} className="text-morandi-green" />
-                                ) : payment.type === '請款' ? (
-                                  <TrendingDown size={16} className="text-morandi-red" />
-                                ) : (
-                                  <DollarSign size={16} className="text-morandi-gold" />
-                                )}
-                                <span className="text-sm">{payment.type}</span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-4">
-                              <span className="text-sm text-morandi-primary">{payment.description}</span>
-                            </td>
-                            <td className="py-4 px-4">
-                              <span className={cn(
-                                'text-sm font-medium',
-                                payment.isIncome ? 'text-morandi-green' : 'text-morandi-red'
-                              )}>
-                                {payment.isIncome ? '+' : '-'} NT$ {payment.amount.toLocaleString()}
-                              </span>
-                            </td>
-                            <td className="py-4 px-4">
-                              <span className={cn(
-                                'text-sm',
-                                payment.status === '已確認' ? 'text-morandi-green' :
-                                payment.status === '待確認' ? 'text-morandi-gold' :
-                                'text-morandi-primary'
-                              )}>
-                                {payment.status}
-                              </span>
-                            </td>
-                            <td className="py-4 px-4">
-                              <span className="text-sm text-morandi-secondary">
-                                {payment.created_at}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="mt-6 p-4 bg-morandi-container/10 rounded-lg text-center">
-                  <p className="text-sm text-morandi-secondary">
-                    💡 以上為財務交易表格樣式預覽，實際資料建立後將顯示真實內容
-                  </p>
-                </div>
-              </div>
-            </div>
-          }
         />
+        </div>
       </div>
     </div>
   );

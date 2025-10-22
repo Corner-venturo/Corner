@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Database, MapPin, Car, MapIcon, Calculator, Plus, Building2 } from 'lucide-react';
+import { MapPin, Car, MapIcon, Calculator, Building2 } from 'lucide-react';
+
+import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
 
 const databaseModules = [
   {
@@ -59,14 +59,14 @@ export default function DatabasePage() {
   const router = useRouter();
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="資料庫管理"
         onAdd={() => {/* TODO: 批次匯入邏輯 */}}
         addLabel="批次匯入"
       />
 
-      <div className="pb-6">
+      <div className="flex-1 overflow-auto pb-6">
         {/* 概覽卡片 */}
         <div className="mb-8 bg-gradient-to-r from-morandi-gold/10 to-morandi-primary/10 rounded-lg border border-morandi-gold/20 p-6">
           <div className="flex items-center justify-between">

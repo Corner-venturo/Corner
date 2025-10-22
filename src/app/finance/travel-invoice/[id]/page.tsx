@@ -77,7 +77,7 @@ export default function InvoiceDetailPage() {
           <div>
             <h1 className="text-3xl font-bold">{currentInvoice.transactionNo}</h1>
             <p className="text-muted-foreground mt-1">
-              {currentInvoice.invoiceNumber || '尚未取得發票號碼'}
+              {currentInvoice.invoice_number || '尚未取得發票號碼'}
             </p>
           </div>
         </div>
@@ -104,14 +104,14 @@ export default function InvoiceDetailPage() {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">開立日期</p>
-            <p className="font-medium">{currentInvoice.invoiceDate}</p>
+            <p className="font-medium">{currentInvoice.invoice_date}</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">課稅別</p>
             <p className="font-medium">
-              {currentInvoice.taxType === 'dutiable'
+              {currentInvoice.tax_type === 'dutiable'
                 ? '應稅'
-                : currentInvoice.taxType === 'zero'
+                : currentInvoice.tax_type === 'zero'
                   ? '零稅率'
                   : '免稅'}
             </p>
@@ -167,10 +167,10 @@ export default function InvoiceDetailPage() {
             <tbody>
               {currentInvoice.items.map((item, index) => (
                 <tr key={index} className="border-b">
-                  <td className="py-3">{item.itemName}</td>
+                  <td className="py-3">{item.item_name}</td>
                   <td className="text-center">{item.item_count}</td>
-                  <td className="text-center">{item.itemUnit}</td>
-                  <td className="text-right">NT$ {item.itemPrice.toLocaleString()}</td>
+                  <td className="text-center">{item.item_unit}</td>
+                  <td className="text-right">NT$ {item.item_price.toLocaleString()}</td>
                   <td className="text-right font-medium">NT$ {item.itemAmt.toLocaleString()}</td>
                 </tr>
               ))}

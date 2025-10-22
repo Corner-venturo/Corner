@@ -8,7 +8,7 @@
 
 ## 📋 功能模組總覽
 
-VENTURO 系統共有 **18 個核心功能模組**：
+VENTURO 系統共有 **19 個核心功能模組**：
 
 | # | 功能模組 | 路徑 | 狀態 | 優先級 |
 |---|---------|------|------|--------|
@@ -17,19 +17,20 @@ VENTURO 系統共有 **18 個核心功能模組**：
 | 3 | 🗓️ 行事曆 (Calendar) | `/calendar` | ✅ 已實作 | P0 |
 | 4 | ⏰ 時間盒 (Timebox) | `/timebox` | ✅ 已實作 | P1 |
 | 5 | 🏨 旅遊團 (Tours) | `/tours` | ⚠️ 需修正 | P0 |
-| 6 | 📝 訂單 (Orders) | `/orders` | ⚠️ 需修正 | P0 |
-| 7 | 💰 報價單 (Quotes) | `/quotes` | ⚠️ 需修正 | P0 |
-| 8 | 👥 客戶管理 (Customers) | `/customers` | ⚠️ 需修正 | P1 |
-| 9 | 💳 財務管理 (Finance) | `/finance` | ⚠️ 需修正 | P0 |
-| 10 | 📊 會計系統 (Accounting) | `/accounting` | ⚠️ 需修正 | P0 |
-| 11 | 👔 人事管理 (HR) | `/hr` | ⚠️ 需修正 | P1 |
-| 12 | 🌍 簽證管理 (Visas) | `/visas` | ⚠️ 需修正 | P2 |
-| 13 | 🗂️ 基礎資料 (Database) | `/database` | ⚠️ 需修正 | P1 |
-| 14 | 📄 模板系統 (Templates) | `/templates` | ✅ 已實作 | P1 |
-| 15 | 👤 檔案管理 (Profile) | `/profile-manager` | ⚠️ 需修正 | P2 |
-| 16 | 📚 導覽 (Guide) | `/guide` | ✅ 已實作 | P2 |
-| 17 | ⚙️ 系統設定 (Settings) | `/settings` | ✅ 已實作 | P1 |
-| 18 | 🔐 登入系統 (Auth) | `/login` | ✅ 已實作 | P0 |
+| 6 | 📝 行程表 (Itinerary) | `/itinerary` | ✅ 已實作 | P0 |
+| 7 | 📋 訂單 (Orders) | `/orders` | ⚠️ 需修正 | P0 |
+| 8 | 💰 報價單 (Quotes) | `/quotes` | ⚠️ 需修正 | P0 |
+| 9 | 👥 客戶管理 (Customers) | `/customers` | ⚠️ 需修正 | P1 |
+| 10 | 💳 財務管理 (Finance) | `/finance` | ⚠️ 需修正 | P0 |
+| 11 | 📊 會計系統 (Accounting) | `/accounting` | ⚠️ 需修正 | P0 |
+| 12 | 👔 人事管理 (HR) | `/hr` | ⚠️ 需修正 | P1 |
+| 13 | 🌍 簽證管理 (Visas) | `/visas` | ⚠️ 需修正 | P2 |
+| 14 | 🗂️ 基礎資料 (Database) | `/database` | ⚠️ 需修正 | P1 |
+| 15 | 📄 模板系統 (Templates) | `/templates` | ✅ 已實作 | P1 |
+| 16 | 👤 檔案管理 (Profile) | `/profile-manager` | ⚠️ 需修正 | P2 |
+| 17 | 📚 導覽 (Guide) | `/guide` | ✅ 已實作 | P2 |
+| 18 | ⚙️ 系統設定 (Settings) | `/settings` | ✅ 已實作 | P1 |
+| 19 | 🔐 登入系統 (Auth) | `/login` | ✅ 已實作 | P0 |
 
 **優先級說明**：
 - P0：核心功能，必須優先修復
@@ -799,7 +800,372 @@ GROUP BY t.id;
 
 ---
 
-## 📝 訂單 (Orders) 功能規格
+## 📝 行程表 (Itinerary) 功能規格
+
+### 1. 基本資訊
+
+| 項目 | 內容 |
+|------|------|
+| **功能名稱** | 行程表管理 (Itinerary) |
+| **路徑** | `/itinerary` |
+| **狀態** | ✅ 已完成實作 |
+| **更新日期** | 2025-01-07 |
+
+### 2. 功能說明
+
+**用途描述**：
+- 旅遊行程的視覺化展示系統
+- 支援電腦版和手機版即時預覽
+- 可產生外部分享連結
+- 與旅遊團、報價單互相關聯
+- 自動帶入天數、航班、飯店資訊
+
+**主要使用者**：
+- 業務人員（建立與編輯行程）
+- 客戶（瀏覽外部分享頁面）
+- 管理層（審核行程內容）
+
+**業務流程**：
+1. 從報價單轉換或直接建立行程
+2. 輸入封面資訊（標題、圖片、地點、日期）
+3. 設定航班資訊（去回程）
+4. 添加行程特色和精選景點
+5. 建立逐日行程（景點、餐食、住宿）
+6. 即時預覽電腦版/手機版效果
+7. 發佈並產生分享連結
+8. 客戶透過外部連結瀏覽
+
+### 3. 資料模型
+
+#### 3.1 行程表 (Itinerary)
+
+**核心說明**：行程表實際上是 **Tour 資料的擴充版本**，在 Tour Store 中储存，但包含了大量展示用欄位。
+
+| 欄位名 | 型別 | 必填 | 說明 | ⚠️ 問題 |
+|--------|------|------|------|--------|
+| `id` | string (UUID) | ✅ | 行程唯一識別碼 | |
+| `tourCode` | string | ✅ | 行程編號（25JFO21CIG） | |
+| `title` | string | ✅ | 主標題（漫遊福岡） | |
+| `subtitle` | string | ❓ | 副標題（半自由行） | |
+| `tagline` | string | ❓ | 標籤文字（Venturo 2025） | |
+| `description` | string | ✅ | 行程描述 | |
+| `country` | string | ✅ | 國家 | |
+| `city` | string | ✅ | 城市 | |
+| `departureDate` | string (YYYY/MM/DD) | ✅ | 出發日期 | |
+| `coverImage` | string (URL) | ✅ | 封面圖片 | |
+| `status` | '草稿' \| '已發佈' | ✅ | 行程狀態 | ⚠️ **中文值** |
+| `outboundFlight` | FlightInfo | ✅ | 去程航班 | |
+| `returnFlight` | FlightInfo | ✅ | 回程航班 | |
+| `features` | Feature[] | ✅ | 行程特色列表 | |
+| `focusCards` | FocusCard[] | ✅ | 精選景點卡片 | |
+| `leader` | LeaderInfo | ✅ | 領隊資訊 | |
+| `meetingInfo` | MeetingInfo | ✅ | 集合資訊 | |
+| `itinerarySubtitle` | string | ❓ | 行程副標題 | |
+| `dailyItinerary` | DailyItinerary[] | ✅ | 逐日行程列表 | |
+| `created_at` | string (ISO 8601) | ✅ | 建立時間 | |
+| `updated_at` | string (ISO 8601) | ✅ | 更新時間 | |
+
+#### 3.2 航班資訊 (FlightInfo)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `airline` | string | ✅ | 航空公司（中華航空） |
+| `flightNumber` | string | ✅ | 航班號碼（CI110） |
+| `departureAirport` | string | ✅ | 出發機場（TPE） |
+| `departureTime` | string | ✅ | 出發時間（06:50） |
+| `departureDate` | string | ✅ | 出發日期（10/21） |
+| `arrivalAirport` | string | ✅ | 抵達機場（FUK） |
+| `arrivalTime` | string | ✅ | 抵達時間（09:55） |
+| `duration` | string | ✅ | 飛行時間（自動計算） |
+
+#### 3.3 行程特色 (Feature)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `icon` | string | ✅ | 圖示名稱（IconBuilding） |
+| `title` | string | ✅ | 特色標題 |
+| `description` | string | ✅ | 特色描述 |
+
+**可用圖示**：
+- `IconBuilding`: 🏨 建築/飯店
+- `IconToolsKitchen2`: 🍽️ 餐食
+- `IconSparkles`: ✨ 特色
+- `IconCalendar`: 📅 行程
+- `IconPlane`: ✈️ 航班
+- `IconMapPin`: 📍 景點
+
+#### 3.4 精選景點 (FocusCard)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `title` | string | ✅ | 景點名稱 |
+| `src` | string (URL) | ✅ | 景點圖片 |
+
+#### 3.5 領隊資訊 (LeaderInfo)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `name` | string | ✅ | 領隊姓名 |
+| `domesticPhone` | string | ✅ | 國內電話 |
+| `overseasPhone` | string | ✅ | 國外電話 |
+
+#### 3.6 集合資訊 (MeetingInfo)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `time` | string | ✅ | 集合時間 |
+| `location` | string | ✅ | 集合地點 |
+
+#### 3.7 逐日行程 (DailyItinerary)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `dayLabel` | string | ✅ | 日期標籤（Day 1） |
+| `date` | string | ✅ | 日期（10/21 (二)） |
+| `title` | string | ✅ | 當日主題 |
+| `highlight` | string | ❓ | 特別安排 |
+| `description` | string | ❓ | 當日描述 |
+| `activities` | Activity[] | ❓ | 景點活動列表 |
+| `recommendations` | string[] | ❓ | 推薦行程列表 |
+| `meals` | Meals | ✅ | 餐食安排 |
+| `accommodation` | string | ❓ | 住宿飯店 |
+
+#### 3.8 景點活動 (Activity)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `icon` | string | ✅ | emoji 圖示（🌋） |
+| `title` | string | ✅ | 活動名稱 |
+| `description` | string | ❓ | 活動說明 |
+
+#### 3.9 餐食 (Meals)
+
+| 欄位名 | 型別 | 必填 | 說明 |
+|--------|------|------|------|
+| `breakfast` | string | ✅ | 早餐安排 |
+| `lunch` | string | ✅ | 午餐安排 |
+| `dinner` | string | ✅ | 晚餐安排 |
+
+#### 3.10 與其他模組的關聯
+
+```
+Quote (1) ----< (1) Itinerary (從報價單轉換)
+Tour (1) ----< (N) Itinerary (同個旅遊團多個版本)
+Itinerary (1) ----< (N) FlightInfo
+Itinerary (1) ----< (N) Feature
+Itinerary (1) ----< (N) FocusCard
+Itinerary (1) ----< (N) DailyItinerary
+DailyItinerary (1) ----< (N) Activity
+```
+
+### 4. UI 組件
+
+| 組件名稱 | 檔案路徑 | 說明 |
+|----------|---------|------|
+| ItineraryPage | `src/app/itinerary/page.tsx` | 行程表主頁 |
+| NewItineraryPage | `src/app/itinerary/new/page.tsx` | 新增行程頁（左右分屏） |
+| EditItineraryPage | `src/app/itinerary/[slug]/page.tsx` | 編輯行程頁 |
+| TourForm | `src/components/editor/TourForm.tsx` | 行程表單編輯器 |
+| TourPreview | `src/components/editor/TourPreview.tsx` | 行程即時預覽 |
+| PublishButton | `src/components/editor/PublishButton.tsx` | 發佈按鈕 |
+
+### 5. 資料層架構
+
+**目前實作（Phase 1）**：
+```typescript
+// Store 層（重用 Tour Store）
+src/stores/create-store.ts
+export const useTourStore = createStore<Tour>('tours', 'TR');
+
+// 無獨立的 Hook 層，直接使用 useTourStore
+
+// Service 層
+src/features/tours/services/tour.service.ts
+- validate(data): 驗證行程資料
+- generateTourCode(): 生成行程編號
+```
+
+**未來 Phase 3 架構**：
+```
+UI (ItineraryPage)
+  ↓
+Hook (useItineraries)
+  ↓
+Service (ItineraryService)
+  ↓
+API (/api/itineraries)
+  ↓
+Supabase (tours 表 + itinerary_details 表)
+```
+
+### 6. API 端點（Phase 3 規劃）
+
+| 端點 | 方法 | 說明 |
+|------|------|------|
+| `/api/itineraries` | GET | 取得行程表列表 |
+| `/api/itineraries` | POST | 建立新行程 |
+| `/api/itineraries/:id` | GET | 取得行程詳情 |
+| `/api/itineraries/:id` | PATCH | 更新行程 |
+| `/api/itineraries/:id` | DELETE | 刪除行程 |
+| `/api/itineraries/:id/publish` | POST | 發佈行程 |
+| `/api/itineraries/:id/duplicate` | POST | 複製行程 |
+| `/api/itineraries/from-quote/:quoteId` | POST | 從報價單建立行程 |
+
+### 7. 權限控制
+
+| 操作 | 允許角色 | 說明 |
+|------|---------|------|
+| 查看行程 | 所有人 | - |
+| 建立行程 | 業務、管理員 | - |
+| 編輯行程 | 業務、管理員 | - |
+| 刪除行程 | 管理員 | - |
+| 發佈行程 | 業務、管理員 | - |
+| 查看分享連結 | 所有人（包含外部） | 公開分享 |
+
+### 8. 已知問題
+
+#### 8.1 欄位命名問題
+
+✅ **大部分欄位已使用 camelCase**
+
+⚠️ **status 使用中文**
+```typescript
+// 現狀
+status: '草稿' | '已發佈'
+
+// 建議
+status: 'draft' | 'published'
+```
+
+#### 8.2 資料重複問題
+
+⚠️ **行程表和 Tour 資料混在一起**
+- Tour Store 包含了旅遊團的財務欄位（price, total_revenue）
+- 也包含了行程展示用欄位（dailyItinerary, features）
+- **建議**：分離為兩個表：
+  - `tours`：旅遊團業務資料（人數、價格、財務）
+  - `itineraries`：行程展示資料（封面、逐日行程）
+
+#### 8.3 航班時間計算
+
+✅ **duration 已自動計算**
+- 根據 departureTime 和 arrivalTime
+- 考慮時差（timezoneOffset）
+
+#### 8.4 圖片資源管理
+
+⚠️ **城市圖片硬編碼在程式中**
+```typescript
+// src/components/editor/TourForm.tsx
+const cityImages: Record<string, string> = {
+  "東京": "https://images.unsplash.com/...",
+  "京都": "https://images.unsplash.com/...",
+  // ...
+};
+```
+- **建議**：移到資料庫的 `city_images` 表
+
+#### 8.5 分享連結問題
+
+⚠️ **ngrok 網址硬編碼**
+```typescript
+// src/app/itinerary/page.tsx
+const baseUrl = 'https://frisky-masonic-mellissa.ngrok-free.dev';
+const shareUrl = `${baseUrl}/view/${itinerary.id}`;
+```
+- **建議**：移到環境變數 `NEXT_PUBLIC_BASE_URL`
+
+### 9. 修復建議
+
+**優先修復（P0）**：
+1. **統一 status 命名為英文**：
+   ```typescript
+   status: 'draft' | 'published'
+   ```
+
+2. **分離 Tour 和 Itinerary 資料**：
+   - Tour: 業務資料（code, name, departure_date, price, max_participants）
+   - Itinerary: 展示資料（title, subtitle, coverImage, dailyItinerary）
+
+**次要修復（P1）**：
+3. 城市圖片移到資料庫
+4. 分享連結使用環境變數
+5. 新增 `author` 欄位（目前從 useAuthStore 取得）
+
+**未來優化（P2）**：
+6. 支援行程範本
+7. 多語言版本
+8. PDF 匯出功能
+9. 行程比較功能
+10. SEO 優化（外部分享頁）
+
+### 10. 資料表建議（Phase 3）
+
+```sql
+-- 行程表（與 Tour 分離）
+CREATE TABLE itineraries (
+  id UUID PRIMARY KEY,
+  tour_id UUID REFERENCES tours(id),  -- 關聯旅遊團
+  tour_code VARCHAR(20) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  subtitle VARCHAR(255),
+  tagline VARCHAR(255),
+  description TEXT,
+  country VARCHAR(100) NOT NULL,
+  city VARCHAR(100) NOT NULL,
+  departure_date DATE NOT NULL,
+  cover_image TEXT,
+  status VARCHAR(20) NOT NULL CHECK (status IN ('draft', 'published')),
+  author_id UUID REFERENCES users(id),
+  
+  -- 航班資訊（JSONB）
+  outbound_flight JSONB NOT NULL,
+  return_flight JSONB NOT NULL,
+  
+  -- 特色、景點、領隊、集合（JSONB）
+  features JSONB,
+  focus_cards JSONB,
+  leader_info JSONB,
+  meeting_info JSONB,
+  
+  -- 逐日行程（JSONB）
+  itinerary_subtitle VARCHAR(255),
+  daily_itinerary JSONB NOT NULL,
+  
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- 城市圖片對照表
+CREATE TABLE city_images (
+  id UUID PRIMARY KEY,
+  country VARCHAR(100) NOT NULL,
+  city VARCHAR(100) NOT NULL,
+  image_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(country, city)
+);
+
+-- 分享連結記錄
+CREATE TABLE itinerary_shares (
+  id UUID PRIMARY KEY,
+  itinerary_id UUID REFERENCES itineraries(id),
+  share_token VARCHAR(50) UNIQUE NOT NULL,
+  view_count INTEGER DEFAULT 0,
+  last_viewed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- 索引
+CREATE INDEX idx_itineraries_tour_id ON itineraries(tour_id);
+CREATE INDEX idx_itineraries_status ON itineraries(status);
+CREATE INDEX idx_itineraries_country_city ON itineraries(country, city);
+CREATE INDEX idx_itinerary_shares_token ON itinerary_shares(share_token);
+```
+
+---
+
+## 📋 訂單 (Orders) 功能規格
 
 ### 1. 基本資訊
 
@@ -3041,6 +3407,388 @@ CREATE INDEX idx_budgets_user_id ON budgets(user_id);
 
 ---
 
+---
+
+## 🔗 模組關聯圖
+
+### 1. 核心業務關聯
+
+```
+╔═══════════════════════════╗
+║     業務流程核心路徑      ║
+╚═══════════════════════════╝
+
+   1. 客戶詢價
+      ↓
+   ┌─────────────┐
+   │    Quote    │  報價單
+   │   (報價單)  │
+   └─────┬───────┘
+        │
+        ├───────────────┐
+        │                │
+        ↓                ↓
+   ┌─────────────┐  ┌───────────────┐
+   │     Tour     │  │   Itinerary  │
+   │   (旅遊團)   │  │   (行程表)   │
+   └─────┬───────┘  └───────────────┘
+        │                 (展示用)
+        │
+   2. 客戶確認，開始成團
+        │
+        ↓
+   ┌─────────────┐
+   │    Order    │  訂單
+   │    (訂單)   │
+   └─────┬───────┘
+        │
+        ↓
+   ┌─────────────┐
+   │   Member   │  團員
+   │   (團員)   │
+   └─────────────┘
+        │
+   3. 財務流程
+        │
+        ├────────────────────────┐
+        │                         │
+        ↓                         ↓
+   ┌────────────────┐    ┌──────────────────┐
+   │ ReceiptOrder  │    │ PaymentRequest │
+   │  (收款單)    │    │   (請款單)    │
+   └────────────────┘    └───────┬─────────┘
+                                 │
+                                 ↓
+                        ┌───────────────────┐
+                        │ DisbursementOrder │
+                        │   (出納單)      │
+                        └───────────────────┘
+```
+
+### 2. 模組之間的詳細關聯
+
+#### 2.1 報價 → 開團 關聯
+
+```
+Quote (報價單)
+ │
+ ├──> Tour (旅遊團)          [1:1 轉換]
+ │    - 帶入日期、人數、地點
+ │    - 帶入成本結構 (quote_cost_structure)
+ │
+ └──> Itinerary (行程表)   [1:N 多版本]
+      - 帶入天數 (accommodation_days)
+      - 帶入地點 (country, city)
+      - 帶入飯店 (從 categories 的住宿項)
+```
+
+#### 2.2 旅遊團 → 訂單 關聯
+
+```
+Tour (旅遊團)
+ │
+ ├──> Order (訂單)           [1:N]
+ │    │ - 自動帶入 tour_name, code
+ │    │ - 自動帶入 departure_date
+ │    │
+ │    └──> Member (團員)       [1:N]
+ │         - 自動計算 age (根據 birthday 和 tour.departure_date)
+ │
+ ├──> TourAddOn (加購)       [1:N]
+ │    - Member 可選擇 add_ons[]
+ │
+ ├──> TourRefund (退費)      [1:N]
+ │    - 關聯 order_id, member_name
+ │
+ └──> Payment (收款/請款)   [1:N]
+      - 關聯 tour_id, order_id
+```
+
+#### 2.3 訂單 → 財務 關聯
+
+```
+Order (訂單)
+ │
+ ├──> ReceiptOrder (收款單)   [1:N]
+ │    │ - 單訂單多次收款
+ │    │ - 或批量分配（一筆款分多訂單）
+ │    │
+ │    └──> ReceiptPaymentItem [1:N]
+ │         - 現金/匙款/刷卡/支票
+ │
+ └──> PaymentRequest (請款單) [1:N]
+      - 每週四出帳
+      - 批次請款（例如保險分多訂單）
+```
+
+#### 2.4 請款流程
+
+```
+PaymentRequest (請款單)
+ │
+ ├──> PaymentRequestItem [1:N]
+ │    - category: 住宿/交通/餐食/門票/導遊/其他
+ │    - supplier_id 關聯供應商
+ │
+ └──> DisbursementOrder (出納單) [N:1]
+      - 每週彙總多筆請款單
+      - 週四統一支付
+```
+
+#### 2.5 待辦事項關聯
+
+```
+Todo (待辦事項)
+ │
+ ├──> related_items[]        [多種關聯]
+ │    ├── type: 'group'  → Tour
+ │    ├── type: 'quote'  → Quote
+ │    ├── type: 'order'  → Order
+ │    ├── type: 'invoice' → PaymentRequest
+ │    └── type: 'receipt' → ReceiptOrder
+ │
+ └──> enabled_quick_actions[]  [快速操作]
+      ├── 'receipt'  → 快速收款
+      ├── 'invoice'  → 快速請款
+      ├── 'group'    → 快速分組
+      ├── 'quote'    → 快速報價
+      └── 'assign'   → 快速指派
+```
+
+#### 2.6 簽證管理關聯
+
+```
+Order (訂單)
+ │
+ └──> Member (團員)
+      │
+      └──> Visa (簽證)
+           - 自動帶入 passport_number
+           - 自動帶入 order_id, tour_id
+```
+
+### 3. 輔助系統關聯
+
+#### 3.1 工作區系統
+
+```
+Workspace (工作區)
+ ├──> Channel (頻道)          [1:N]
+ │    └──> Message (訊息)       [1:N]
+ │
+ ├──> CanvasNote (Canvas 筆記) [1:N]
+ │
+ └──> Todo (任務列表)        [展示]
+```
+
+#### 3.2 會計系統
+
+```
+Accounting (個人記帳)
+ ├──> Account (帳戶)          [1:N]
+ │    └──> Transaction (交易)  [1:N]
+ │
+ ├──> Category (分類)         [1:N]
+ │    └──> Budget (預算)       [1:N]
+ │
+ └──> AccountingStats (統計)  [計算值]
+```
+
+#### 3.3 人事系統
+
+```
+Employee (員工) = User (使用者)
+ ├──> personal_info          [個人資訊]
+ ├──> job_info               [工作資訊]
+ ├──> salary_info            [薪資資訊]
+ ├──> attendance             [出勤記錄]
+ └──> contracts              [合約記錄]
+```
+
+### 4. 資料流向與同步
+
+```
+╔═══════════════════╗
+║   Phase 1 (當前)   ║
+╚═══════════════════╝
+
+UI Component
+     ↓
+Zustand Store (IndexedDB)
+     ↓
+Local Storage (離線優先)
+
+────────────────────
+
+╔═══════════════════╗
+║   Phase 3 (規劃)   ║
+╚═══════════════════╝
+
+UI Component
+     ↓
+Hook (useXXX)
+     ↓
+Service (XXXService)
+     ↓
+API Route (/api/xxx)
+     ↓
+Supabase PostgreSQL
+     ↓
+IndexedDB (離線快取)
+```
+
+### 5. 模組依賴關係
+
+```
+╔═══════════════════════╗
+║  必須優先實作 (P0)  ║
+╚═══════════════════════╝
+
+Auth (登入) ← 所有模組依賴
+  │
+  ├──> User/Employee
+  │
+  └──> Permissions
+
+Quote → Tour → Order → Member
+               │
+               ├──> Payment
+               │
+               └──> Finance
+
+Workspace + Todos (獨立但關聯其他模組)
+
+────────────────────────
+
+╔═══════════════════════╗
+║  次要優先 (P1)      ║
+╚═══════════════════════╝
+
+Customer ← Order, Quote
+
+Database (供應商/飯店/餐廳) ← PaymentRequest, Quote
+
+HR ← Employee
+
+Calendar + Timebox (獨立)
+
+Accounting (個人記帳，獨立)
+
+────────────────────────
+
+╔═══════════════════════╗
+║  輔助功能 (P2)      ║
+╚═══════════════════════╝
+
+Visa ← Member
+
+Profile Manager
+
+Guide (幫助文件)
+
+Templates (模板管理)
+```
+
+### 6. 重要設計原則
+
+#### 6.1 離線優先 (Offline-First)
+
+- 所有資料優先儲存於 IndexedDB
+- Zustand Store 作為中間層管理狀態
+- 自動同步機制（Phase 3）
+
+#### 6.2 資料欄位凍存 (Snapshot)
+
+為了離線優先和數據一致性，當前設計采用**欄位凍存**：
+
+```
+Order
+  - tour_name ← Tour.name 的快照
+  - code ← Tour.code 的快照
+
+PaymentRequest
+  - tour_name ← Tour.name 的快照
+  - supplier_name ← Supplier.name 的快照
+
+Tour
+  - quote_cost_structure ← Quote.categories 的快照
+```
+
+**Phase 3 建議**：移除凍存，改用 JOIN 查詢或 VIEW
+
+#### 6.3 狀態管理
+
+**目前問題**：中英文狀態混用
+
+```typescript
+// ⚠️ 現狀 (不一致)
+Tour.status: '提案' | '進行中' | '待結案' | '結案'
+Order.status: ''進行中' | '已完成' | '已取消'
+Payment.status: '待確認' | '已確認' | '已完成'
+Quote.status: '提案' | '最終版本'
+Itinerary.status: '草稿' | '已發佈'
+
+// ✅ 建議 (統一英文)
+Tour.status: 'draft' | 'active' | 'pending_close' | 'closed'
+Order.status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+Payment.status: 'pending' | 'confirmed' | 'completed'
+Quote.status: 'draft' | 'proposed' | 'approved' | 'converted'
+Itinerary.status: 'draft' | 'published'
+```
+
+#### 6.4 關聯資料自動帶入
+
+當建立子資料時，自動帶入父資料：
+
+```typescript
+// Quote → Tour
+createTourFromQuote(quoteId) {
+  const quote = getQuote(quoteId);
+  return {
+    name: quote.name,
+    location: quote.country + ' ' + quote.city,
+    max_participants: quote.group_size,
+    quote_id: quote.id,
+    quote_cost_structure: quote.categories  // 凍存
+  };
+}
+
+// Quote → Itinerary
+createItineraryFromQuote(quoteId) {
+  const quote = getQuote(quoteId);
+  return {
+    country: quote.country,
+    city: quote.city,
+    dailyItinerary: generateDaysFromAccommodation(quote.accommodation_days),
+    accommodation: extractHotelsFromQuote(quote.categories)
+  };
+}
+
+// Tour → Order
+createOrder(tourId) {
+  const tour = getTour(tourId);
+  return {
+    tour_id: tourId,
+    code: tour.code,              // 凍存
+    tour_name: tour.name,         // 凍存
+    total_amount: tour.price * memberCount
+  };
+}
+
+// Member 自動計算
+createMember(data, orderId) {
+  const order = getOrder(orderId);
+  const tour = getTour(order.tour_id);
+  return {
+    ...data,
+    age: calculateAge(data.birthday, tour.departure_date),
+    gender: inferGenderFromId(data.id_number)
+  };
+}
+```
+
+---
+
 **最後更新**：2025-01-07
 **維護者**：Claude AI
-**文件版本**：1.0.0
+**文件版本**：1.1.0

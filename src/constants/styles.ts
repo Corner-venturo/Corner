@@ -13,6 +13,6 @@ export const STATUS_COLORS = {
   [ORDER_STATUS.PAID]: 'bg-morandi-green text-white',
 
   [TODO_STATUS.PENDING]: 'bg-morandi-container text-morandi-secondary',
-  [TODO_STATUS.IN_PROGRESS]: 'bg-morandi-gold text-white',
+  // [TODO_STATUS.IN_PROGRESS]: 'bg-morandi-gold text-white', // Duplicate removed
   [TODO_STATUS.COMPLETED]: 'bg-morandi-green text-white'
 } as const;

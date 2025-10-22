@@ -1,15 +1,17 @@
 // src/hooks/useCrudOperations.ts
+import { generateUUID } from '@/lib/utils/uuid';
+
 export function useCrudOperations<T extends { id: string }>(
   items: T[],
   setItems: (items: T[]) => void
 ) {
-  const add = (item: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const add = (item: Omit<T, 'id' | 'created_at' | 'updated_at'>) => {
     const newItem = {
       ...item,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    } as T;
+      id: generateUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    } as unknown as T;
 
     setItems([...items, newItem]);
     return newItem;
@@ -18,7 +20,7 @@ export function useCrudOperations<T extends { id: string }>(
   const update = (id: string, updates: Partial<T>) => {
     setItems(items.map(item =>
       item.id === id
-        ? { ...item, ...updates, updatedAt: new Date().toISOString() }
+        ? { ...item, ...updates, updated_at: new Date().toISOString() }
         : item
     ));
   };

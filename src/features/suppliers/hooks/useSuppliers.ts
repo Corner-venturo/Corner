@@ -1,4 +1,4 @@
-import { useSupplierStore } from '@/stores/supplier-store';
+import { useSupplierStore } from '@/stores';
 import { supplierService } from '../services/supplier.service';
 import { Supplier } from '@/stores/types';
 
@@ -11,42 +11,42 @@ export const useSuppliers = () => {
 
   return {
     // ========== 資料 ==========
-    suppliers: store.suppliers,
+    suppliers: store.items,
 
     // ========== CRUD 操作 ==========
     /**
      * 創建新供應商
      */
-    createSupplier: async (data: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return await store.addSupplier(data);
+    createSupplier: async (data: Omit<Supplier, 'id' | 'created_at' | 'updated_at'>) => {
+      return await store.create(data);
     },
 
     /**
      * 更新供應商資訊
      */
     updateSupplier: async (id: string, data: Partial<Supplier>) => {
-      return await store.updateSupplier(id, data);
+      return await store.update(id, data);
     },
 
     /**
      * 刪除供應商
      */
     deleteSupplier: async (id: string) => {
-      return await store.deleteSupplier(id);
+      return await store.delete(id);
     },
 
     /**
      * 載入供應商列表
      */
     loadSuppliers: async () => {
-      return await store.loadSuppliers();
+      return store.items;
     },
 
     // ========== 業務方法 ==========
     /**
      * 根據類別獲取供應商
      */
-    getSuppliersByCategory: (category: Supplier['category']) => {
+    getSuppliersByCategory: (category: Supplier['type']) => {
       return supplierService.getSuppliersByCategory(category);
     },
 

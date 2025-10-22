@@ -3,8 +3,8 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useTourStore } from '@/stores/tour-store';
-import { ChevronDown, BarChart3, CreditCard, Users, FileCheck, Plus, User, ShoppingCart, DollarSign, Banknote, Trash2 } from 'lucide-react';
+import { useTourStore, useOrderStore } from '@/stores';
+import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, ShoppingCart, DollarSign, Banknote, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table';
 import { Order } from '@/stores/types';
@@ -13,35 +13,38 @@ interface ExpandableOrderTableProps {
   orders: Order[];
   showTourInfo?: boolean;
   tourDepartureDate?: string; // 用於成員管理的出發日期
+  className?: string;
 }
 
 const orderTabs = [
   { id: 'overview', label: '總覽', icon: BarChart3 },
   { id: 'payment', label: '付款記錄', icon: CreditCard },
   { id: 'members', label: '成員管理', icon: Users },
-  { id: 'documents', label: '文件管理', icon: FileCheck },
 ];
 
-export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ orders, showTourInfo = false, tourDepartureDate }: ExpandableOrderTableProps) {
+export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ orders, showTourInfo = false, tourDepartureDate, className }: ExpandableOrderTableProps) {
   const router = useRouter();
-  const { tours, deleteOrder } = useTourStore();
+  const tourStore = useTourStore();
+  const tours = tourStore.items;
+  const orderStore = useOrderStore();
+  const deleteOrder = orderStore.delete;
   const [expandedOrders, setExpandedOrders] = useState<string[]>([]);
   const [activeTabs, setActiveTabs] = useState<Record<string, string>>({});
   const memberTableRefs = useRef<Record<string, MemberTableRef | null>>({});
 
   const toggleOrderExpand = (order_id: string) => {
     setExpandedOrders(prev =>
-      prev.includes(orderId)
-        ? prev.filter(id => id !== orderId)
-        : [...prev, orderId]
+      prev.includes(order_id)
+        ? prev.filter(id => id !== order_id)
+        : [...prev, order_id]
     );
-    if (!activeTabs[orderId]) {
-      setActiveTabs(prev => ({ ...prev, [orderId]: 'overview' }));
+    if (!activeTabs[order_id]) {
+      setActiveTabs(prev => ({ ...prev, [order_id]: 'overview' }));
     }
   };
 
   const setActiveTab = (order_id: string, tabId: string) => {
-    setActiveTabs(prev => ({ ...prev, [orderId]: tabId }));
+    setActiveTabs(prev => ({ ...prev, [order_id]: tabId }));
   };
 
   const getPaymentBadge = (status: string) => {
@@ -75,35 +78,35 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
   };
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden bg-card relative">
-      <div className="overflow-x-auto">
-        <table className="w-full">
+    <div className={cn("border border-border rounded-lg overflow-hidden bg-card shadow-sm flex flex-col", className)}>
+      <div className="overflow-x-auto flex-1">
+        <table className="w-full h-full">
           <thead className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20">
             <tr className="relative">
-              <th className="text-left py-4 px-4 relative">
+              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-sm font-medium text-morandi-secondary">訂單編號</span>
+                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">訂單編號</span>
               </th>
               {showTourInfo && (
-                <th className="text-left py-4 px-4 relative">
+                <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                  <span className="text-sm font-medium text-morandi-secondary">旅遊團</span>
+                  <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">旅遊團</span>
                 </th>
               )}
-              <th className="text-left py-4 px-4 relative">
+              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-sm font-medium text-morandi-secondary">聯絡人</span>
+                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">聯絡人</span>
               </th>
-              <th className="text-left py-4 px-4 relative">
+              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-sm font-medium text-morandi-secondary">業務</span>
+                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">業務</span>
               </th>
-              <th className="text-left py-4 px-4 relative">
+              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-sm font-medium text-morandi-secondary">狀態</span>
+                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">狀態</span>
               </th>
-              <th className="text-left py-4 px-4 relative">
-                <span className="text-sm font-medium text-morandi-secondary">操作</span>
+              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
+                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">操作</span>
               </th>
             </tr>
           </thead>
@@ -111,25 +114,15 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
             {orders.length === 0 ? (
               <>
                 <tr>
-                  <td className="py-4 px-4 text-center text-morandi-secondary/50">-</td>
-                  {showTourInfo && <td className="py-4 px-4 text-center text-morandi-secondary/50">-</td>}
-                  <td className="py-4 px-4 text-center text-morandi-secondary/50">-</td>
-                  <td className="py-4 px-4 text-center text-morandi-secondary/50">-</td>
-                  <td className="py-4 px-4 text-center text-morandi-secondary/50">-</td>
-                  <td className="py-4 px-4 text-center text-morandi-secondary/50">-</td>
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4 text-center text-morandi-secondary/50">-</td>
+                  {showTourInfo && <td className="py-1.5 sm:py-2 px-3 sm:px-4 text-center text-morandi-secondary/50">-</td>}
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4 text-center text-morandi-secondary/50">-</td>
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4 text-center text-morandi-secondary/50">-</td>
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4 text-center text-morandi-secondary/50">-</td>
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4 text-center text-morandi-secondary/50">-</td>
                 </tr>
                 <tr>
                   <td colSpan={showTourInfo ? 6 : 5} className="py-8">
-                    <div className="text-center text-morandi-secondary">
-                      <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
-                      <p className="text-lg font-medium text-morandi-primary mb-2">還沒有任何訂單</p>
-                      <p className="text-sm text-morandi-secondary mb-6">點擊右上角「新增訂單」開始建立</p>
-                      <div className="text-sm text-morandi-secondary space-y-1">
-                        <p>• 訂單表格將顯示訂單編號、聯絡人、業務、付款狀態等資訊</p>
-                        <p>• 點擊展開可查看總覽、付款記錄、成員管理、文件管理等詳細功能</p>
-                        <p>• 支援快速收款($)和快速請款(💳)操作</p>
-                      </div>
-                    </div>
                   </td>
                 </tr>
               </>
@@ -147,37 +140,39 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                     !expandedOrders.includes(order.id) && "hover:bg-morandi-container/30"
                   )}
                 >
-                  <td className="py-4 px-4">
-                    <div className="text-sm font-medium text-morandi-primary">{order.order_number}</div>
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4">
+                    <div className="text-[10px] sm:text-xs font-medium text-morandi-primary">{order.order_number}</div>
                   </td>
 
                   {showTourInfo && (
-                    <td className="py-4 px-4">
-                      <div className="text-sm font-medium text-morandi-primary">{order.tour_name}</div>
+                    <td className="py-1.5 sm:py-2 px-3 sm:px-4">
+                      <div className="text-[10px] sm:text-xs font-medium text-morandi-primary">{order.tour_name}</div>
                     </td>
                   )}
 
-                  <td className="py-4 px-4">
-                    <div className="flex items-center text-sm">
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4">
+                    <div className="flex items-center text-[10px] sm:text-xs">
                       <User size={14} className="mr-1 text-morandi-secondary" />
                       <span className="font-medium text-morandi-primary">{order.contact_person}</span>
                     </div>
                   </td>
 
-                  <td className="py-4 px-4">
-                    <div className="text-sm text-morandi-primary">{order.sales_person}</div>
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4">
+                    <div className="text-[10px] sm:text-xs text-morandi-primary">{order.sales_person}</div>
                   </td>
 
-                  <td className="py-4 px-4">
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4">
                     <span className={cn(
-                      'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                      getPaymentBadge(order.payment_status)
+                      'text-[10px] sm:text-xs font-medium',
+                      order.payment_status === '已收款' ? 'text-morandi-green' :
+                      order.payment_status === '部分收款' ? 'text-morandi-gold' :
+                      'text-morandi-red'
                     )}>
                       {order.payment_status}
                     </span>
                   </td>
 
-                  <td className="py-4 px-4">
+                  <td className="py-1.5 sm:py-2 px-3 sm:px-4">
                     <div className="flex items-center space-x-1">
                       {/* 快速收款按鈕 */}
                       <Button
@@ -185,7 +180,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/finance/payments?orderId=${order.id}&orderNumber=${order.order_number}&contactPerson=${order.contact_person}&amount=${order.remaining_amount}`);
+                          router.push(`/finance/payments?order_id=${order.id}&order_number=${order.order_number}&contact_person=${order.contact_person}&amount=${order.remaining_amount}`);
                         }}
                         className="h-7 w-7 p-0 text-morandi-green hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
                         title="快速收款"
@@ -246,7 +241,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                             <div className="flex min-w-max w-full justify-between">
                               <div className="flex">
                                 {orderTabs.map((tab) => {
-                                  const isActive = activeTabs[order.id] === tab.id;
+                                  const is_active = activeTabs[order.id] === tab.id;
                                   return (
                                     <button
                                       key={tab.id}
@@ -254,7 +249,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                                       className={cn(
                                         'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative whitespace-nowrap flex-shrink-0',
                                         'hover:bg-morandi-container/50',
-                                        isActive
+                                        is_active
                                           ? 'text-morandi-primary bg-white border-b-2 border-morandi-gold shadow-sm'
                                           : 'text-morandi-secondary hover:text-morandi-primary'
                                       )}
@@ -311,10 +306,10 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                           {/* 分頁內容 */}
                           {activeTabs[order.id] === 'members' ? (
                             <ExcelMemberTable
-                              ref={(ref) => (memberTableRefs.current[order.id] = ref)}
-                              orderId={order.id}
-                              departureDate={tourDepartureDate || tours.find(t => t.id === order.tour_id)?.departure_date || ''}
-                              memberCount={order.member_count}
+                              ref={(ref) => { if (ref) memberTableRefs.current[order.id] = ref; }}
+                              order_id={order.id}
+                              departure_date={tourDepartureDate || tours.find((t: any) => t.id === order.tour_id)?.departure_date || ''}
+                              member_count={order.member_count}
                             />
                           ) : (
                             <div className="px-6 py-4">
@@ -326,10 +321,6 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">訂單編號:</span>
                                         <span className="text-morandi-primary">{order.order_number}</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-morandi-secondary">建立時間:</span>
-                                        <span className="text-morandi-primary">{new Date(order.created_at).toLocaleDateString()}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-morandi-secondary">聯絡人:</span>
@@ -382,17 +373,6 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                                     <div className="text-center text-morandi-secondary">
                                       <CreditCard size={24} className="mx-auto mb-2 opacity-50" />
                                       <p>付款記錄功能開發中...</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {activeTabs[order.id] === 'documents' && (
-                                <div className="space-y-4">
-                                  <div className="border border-border rounded-lg p-4">
-                                    <div className="text-center text-morandi-secondary">
-                                      <FileCheck size={24} className="mx-auto mb-2 opacity-50" />
-                                      <p>文件管理功能開發中...</p>
                                     </div>
                                   </div>
                                 </div>

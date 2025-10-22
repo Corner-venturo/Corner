@@ -13,7 +13,7 @@ interface TemplatePDFPreviewProps {
 export function TemplatePDFPreview({
   data,
   columnWidths = [80, 100, 150, 120, 100, 100, 100, 100, 100, 100, 100, 100],
-  field_mappings,
+  fieldMappings,
   repeatableSections = [],
   highlightedSection
 }: TemplatePDFPreviewProps) {
@@ -129,7 +129,7 @@ export function TemplatePDFPreview({
           const content = (
             <div key={rowIndex} className="relative">
               {/* 內容列 - 根據區塊類型美化 */}
-              <div className={`flex items-center ${currentStyle?.container || ''}`}>
+              <div className={`flex items-center ${(currentStyle as any)?.container || ''}`}>
                 {row.map((cell: any, colIndex: number) => {
                   // 跳過空白儲存格（不渲染）
                   if (!cell || cell === '') return null;
@@ -140,7 +140,7 @@ export function TemplatePDFPreview({
                   return (
                     <div
                       key={colIndex}
-                      className={`px-3 py-2 transition-all ${currentStyle?.text || ''}
+                      className={`px-3 py-2 transition-all ${(currentStyle as any)?.text || ''}
                         ${isLabel ? 'text-morandi-secondary font-medium' : ''}
                         ${isPrice ? 'text-morandi-gold font-semibold' : ''}
                         ${isDynamic ? 'bg-morandi-gold/10 text-morandi-gold font-medium rounded-md px-3 border border-morandi-gold/30' : ''}

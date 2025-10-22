@@ -1,4 +1,4 @@
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodoStore } from '@/stores';
 import { todoService } from '../services/todo.service';
 import { Todo } from '@/stores/types';
 
@@ -7,36 +7,36 @@ export const useTodos = () => {
 
   return {
     // ========== 資料 ==========
-    todos: store.todos,
+    todos: store.items,
 
     // ========== CRUD 操作 ==========
-    createTodo: async (data: Omit<Todo, 'id' | 'createdAt' | 'updatedAt' | 'creator' | 'visibility'>) => {
-      return await store.addTodo(data);
+    createTodo: async (data: Omit<Todo, 'id' | 'created_at' | 'updated_at' | 'creator' | 'visibility'>) => {
+      return await store.create(data as Omit<Todo, 'id' | 'created_at' | 'updated_at'>);
     },
 
     updateTodo: async (id: string, data: Partial<Todo>) => {
-      return await store.updateTodo(id, data);
+      return await store.update(id, data);
     },
 
     deleteTodo: async (id: string) => {
-      return await store.deleteTodo(id);
+      return await store.delete(id);
     },
 
     toggleTodo: async (id: string) => {
       return await todoService.toggleTodo(id);
     },
 
-    loadTodos: async (userId?: string) => {
-      return await store.loadTodos(userId);
+    loadTodos: async (user_id?: string) => {
+      return await store.fetchAll();
     },
 
     clearAllTodos: () => {
-      store.clearAllTodos();
+      store.clear();
     },
 
     // ========== 業務方法 ==========
-    getTodosByUser: (userId: string) => {
-      return todoService.getTodosByUser(userId);
+    getTodosByUser: (user_id: string) => {
+      return todoService.getTodosByUser(user_id);
     },
 
     getTodosByStatus: (completed: boolean) => {

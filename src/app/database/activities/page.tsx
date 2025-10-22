@@ -1,23 +1,20 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo, useCallback } from 'react';
 import { MapIcon, Edit, Trash2, Ticket } from 'lucide-react';
+
+import { ContentContainer } from '@/components/layout/content-container';
+import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { ContentContainer } from '@/components/layout/content-container';
-import { cn } from '@/lib/utils';
-import { getRegionOptions, regionOptionsMap, type RegionName, type ActivityOption } from '@/data/region-options';
+import { Input } from '@/components/ui/input';
+import { getRegionOptions, type RegionName, type ActivityOption } from '@/data/region-options';
 
 export default function ActivitiesPage() {
-  const router = useRouter();
-  const [selectedRegion, setSelectedRegion] = useState<RegionName>('清邁');
+  const [selectedRegion] = useState<RegionName>('清邁');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<ActivityOption | null>(null);
+  const [_editingActivity, setEditingActivity] = useState<ActivityOption | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [newActivity, setNewActivity] = useState({
     name: '',
@@ -118,8 +115,8 @@ export default function ActivitiesPage() {
   // 排序和篩選函數
   const sortFunction = (data: ActivityOption[], column: string, direction: 'asc' | 'desc') => {
     return [...data].sort((a, b) => {
-      let aValue: string | number = a[column as keyof ActivityOption];
-      let bValue: string | number = b[column as keyof ActivityOption];
+      const aValue: string | number = a[column as keyof ActivityOption] ?? '';
+      const bValue: string | number = b[column as keyof ActivityOption] ?? '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
@@ -127,7 +124,7 @@ export default function ActivitiesPage() {
     });
   };
 
-  const filterFunction = (data: ActivityOption[], filters: Record<string, string>) => {
+  const filterFunction = useCallback((data: ActivityOption[], filters: Record<string, string>) => {
     return data.filter(activity => {
       // 搜尋功能：檢查名稱或類別是否包含搜尋詞
       const matchesSearch = !searchTerm ||
@@ -143,7 +140,7 @@ export default function ActivitiesPage() {
         (!filters.groupDiscount || (activity.groupDiscount || 0).toString().includes(filters.groupDiscount))
       );
     });
-  };
+  }, [searchTerm]);
 
   const { data: filteredAndSortedActivities, handleSort, handleFilter } = useEnhancedTable(
     activityOptions,
@@ -154,7 +151,7 @@ export default function ActivitiesPage() {
   // 重新計算過濾結果（當搜尋詞改變時）
   const finalFilteredActivities = useMemo(() => {
     return filterFunction(filteredAndSortedActivities, {});
-  }, [filteredAndSortedActivities, searchTerm]);
+  }, [filteredAndSortedActivities, filterFunction]);
 
   const handleAddActivity = () => {
     if (!newActivity.name.trim()) return;
@@ -174,7 +171,7 @@ export default function ActivitiesPage() {
     setIsAddDialogOpen(true);
   };
 
-  const handleDeleteActivity = (activityId: string) => {
+  const handleDeleteActivity = (_activityId: string) => {
     if (confirm('確定要刪除此活動選項嗎？')) {
       // TODO: 刪除活動選項從資料庫
     }
@@ -195,8 +192,9 @@ export default function ActivitiesPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="活動門票管理"
-        icon={Ticket}
+        {...{
+        title: '活動門票管理',
+        icon: Ticket} as any}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
@@ -221,7 +219,7 @@ export default function ActivitiesPage() {
           data={finalFilteredActivities}
           onSort={handleSort}
           onFilter={handleFilter}
-          cellSelection={false}
+          selection={undefined}
         />
 
         {finalFilteredActivities.length === 0 && (

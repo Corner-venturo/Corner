@@ -21,7 +21,7 @@ export default function TransportPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [newTransport, setNewTransport] = useState({
     name: '',
-    pricePerPerson: 0,
+    price_per_person: 0,
     pricePerGroup: 0,
     capacity: 0,
     is_group_cost: false
@@ -76,7 +76,7 @@ export default function TransportPage() {
       )
     },
     {
-      key: 'pricePerPerson',
+      key: 'price_per_person',
       label: '個人價格',
       sortable: true,
       filterable: true,
@@ -140,8 +140,8 @@ export default function TransportPage() {
   // 排序和篩選函數
   const sortFunction = (data: TransportOption[], column: string, direction: 'asc' | 'desc') => {
     return [...data].sort((a, b) => {
-      let aValue: string | number | boolean = a[column as keyof TransportOption];
-      let bValue: string | number | boolean = b[column as keyof TransportOption];
+      let aValue: string | number | boolean = a[column as keyof TransportOption] ?? '';
+      let bValue: string | number | boolean = b[column as keyof TransportOption] ?? '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
@@ -157,8 +157,8 @@ export default function TransportPage() {
       return (
         matchesSearch &&
         (!filters.name || transport.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.is_group_cost || transport.is_group_cost.toString() === filters.is_group_cost) &&
-        (!filters.pricePerPerson || (transport.pricePerPerson || 0).toString().includes(filters.pricePerPerson)) &&
+        (!filters.is_group_cost || (transport.is_group_cost ?? false).toString() === filters.is_group_cost) &&
+        (!filters.price_per_person || (transport.price_per_person || 0).toString().includes(filters.price_per_person)) &&
         (!filters.pricePerGroup || (transport.pricePerGroup || 0).toString().includes(filters.pricePerGroup)) &&
         (!filters.capacity || (transport.capacity || 0).toString().includes(filters.capacity))
       );
@@ -187,7 +187,7 @@ export default function TransportPage() {
     setEditingTransport(transport);
     setNewTransport({
       name: transport.name,
-      pricePerPerson: transport.pricePerPerson || 0,
+      price_per_person: transport.price_per_person || 0,
       pricePerGroup: transport.pricePerGroup || 0,
       capacity: transport.capacity || 0,
       is_group_cost: transport.is_group_cost || false
@@ -204,7 +204,7 @@ export default function TransportPage() {
   const resetForm = () => {
     setNewTransport({
       name: '',
-      pricePerPerson: 0,
+      price_per_person: 0,
       pricePerGroup: 0,
       capacity: 0,
       is_group_cost: false
@@ -216,8 +216,9 @@ export default function TransportPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="交通選項管理"
-        icon={Car}
+        {...{
+        title: "交通選項管理",
+        icon: Car} as any}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
@@ -242,7 +243,7 @@ export default function TransportPage() {
           data={finalFilteredTransport}
           onSort={handleSort}
           onFilter={handleFilter}
-          cellSelection={false}
+          selection={undefined}
         />
 
         {finalFilteredTransport.length === 0 && (
@@ -293,8 +294,8 @@ export default function TransportPage() {
                 <label className="text-sm font-medium text-morandi-primary">個人價格</label>
                 <Input
                   type="number"
-                  value={newTransport.pricePerPerson || ''}
-                  onChange={(e) => setNewTransport(prev => ({ ...prev, pricePerPerson: Number(e.target.value) || 0 }))}
+                  value={newTransport.price_per_person || ''}
+                  onChange={(e) => setNewTransport(prev => ({ ...prev, price_per_person: Number(e.target.value) || 0 }))}
                   placeholder="0"
                   className="mt-1"
                 />

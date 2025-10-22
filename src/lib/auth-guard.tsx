@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLocalAuthStore } from '@/lib/auth/local-auth-manager';
-import { useOfflineStore } from '@/lib/offline/sync-manager';
 import { useAuthStore } from '@/stores/auth-store';
 // ⚠️ Supabase 已停用 - 純本地模式
 // import { supabase } from '@/lib/supabase/client';
 import { hasPermissionForRoute } from '@/lib/permissions';
+import { logger } from '@/lib/utils/logger';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -19,7 +19,21 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   const pathname = usePathname();
   const { currentProfile, setCurrentProfile, profiles } = useLocalAuthStore();
   const { user } = useAuthStore();
-  const { isOnline } = useOfflineStore();
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  // 監聽網路狀態變化
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -28,7 +42,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
         return;
       }
 
-      console.log('🔍 AuthGuard 檢查:', {
+      logger.debug('AuthGuard 檢查', {
         hasCurrentProfile: !!currentProfile,
         hasUser: !!user,
         pathname
@@ -36,7 +50,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
 
       // 1. 優先檢查 auth-store 的 user（持久化的）
       if (user && user.id) {
-        console.log('✅ 從 auth-store 找到用戶:', user.chineseName);
+        logger.info(`從 auth-store 找到用戶: ${user.display_name}`);
         // 如果 currentProfile 沒有，同步一下
         if (!currentProfile) {
           const profile = profiles.find(p => p.id === user.id);
@@ -50,7 +64,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
       // 2. 檢查本地是否有登入的角色
       if (!currentProfile) {
         // 📦 純本地模式 - 沒有登入就導向登入頁
-        console.log('⚠️ 沒有 currentProfile，應該跳轉登入');
+        logger.warn('沒有 currentProfile，應該跳轉登入');
         // 暫時停用自動跳轉，避免無限循環
         // router.push('/login');
         return;
@@ -61,7 +75,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
         const hasPermission = currentProfile.permissions.includes(requiredPermission);
 
         if (!hasPermission) {
-          console.warn(`🚫 用戶 ${currentProfile.chineseName} 無權限訪問 ${pathname}`);
+          logger.warn(`用戶 ${currentProfile.display_name} 無權限訪問 ${pathname}`);
           router.push('/unauthorized');
           return;
         }
@@ -70,7 +84,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
       // 2.1 檢查路由權限
       const hasRoutePermission = hasPermissionForRoute(currentProfile.permissions, pathname);
       if (!hasRoutePermission && pathname !== '/') {
-        console.warn(`🚫 用戶 ${currentProfile.chineseName} 無權限訪問路由 ${pathname}`);
+        logger.warn(`用戶 ${currentProfile.display_name} 無權限訪問路由 ${pathname}`);
         // 暫時停用路由權限檢查
         // router.push('/');
         return;
@@ -87,7 +101,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
 
   // 📦 純本地模式 - 無需刷新 session
   const refreshSupabaseSession = async (profile: any) => {
-    console.log('📦 本地模式：無需刷新 session');
+    logger.debug('本地模式：無需刷新 session');
   };
 
   // 登入頁面不顯示載入畫面，直接渲染

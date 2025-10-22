@@ -50,7 +50,7 @@ export default function BoxManager() {
         name: formData.name,
         type: formData.type,
         color: formData.color,
-        userId: user?.employeeNumber || 'guest',
+        user_id: user?.employee_number || 'guest',
       })
     }
 

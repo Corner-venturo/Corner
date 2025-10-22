@@ -63,7 +63,7 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
         top: `${topOffset}px`,
         height: `${height}px`,
         backgroundColor: box.color,
-        borderLeftColor: scheduledBox.completed ? '#10B981' : box.color,
+        borderLeftColor: scheduledBox.completed ? 'var(--morandi-green)' : box.color,
       }}
       onClick={() => setShowDialog(true)}
     >
@@ -76,7 +76,7 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
 
           {/* 時間資訊 */}
           <div className="text-xs opacity-90">
-            {scheduledBox.startTime} • {formatDuration(scheduledBox.duration)}
+            {scheduledBox.start_time} • {formatDuration(scheduledBox.duration)}
           </div>
 
           {/* 完成狀態 */}

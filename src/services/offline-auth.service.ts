@@ -4,7 +4,9 @@ import {
   LocalProfile,
   PasswordEncryption
 } from '@/lib/auth/local-auth-manager';
-import { useOfflineStore } from '@/lib/offline/sync-manager';
+import { localDB } from '@/lib/db';
+import { TABLES } from '@/lib/db/schemas';
+import bcrypt from 'bcryptjs';
 
 // ============= 離線認證服務 =============
 export class OfflineAuthService {
@@ -17,66 +19,46 @@ export class OfflineAuthService {
     password: string
   ): Promise<{ success: boolean; profile?: LocalProfile; message?: string }> {
     try {
+      // 🚀 TODO: [上線修改] 改成 Supabase 優先，IndexedDB 備援
+      // 參考：docs/PRODUCTION_TODO.md
       console.log('🔐 純本地登入驗證...');
       console.log('輸入的帳號:', email);
 
-      // ⚠️ 純本地模式 - 不使用 Supabase
-      // 建立測試帳號資料
-      const testUsers: Record<string, { password: string; data: any }> = {
-        'admin': {
-          password: 'admin123',
-          data: {
-            id: 'admin-001',
-            employee_number: 'admin',
-            chinese_name: '管理員',
-            english_name: 'Admin',
-            permissions: ['super_admin', 'admin'],
-            status: 'active' as const
-          }
-        },
-        'william01': {
-          password: '123456',
-          data: {
-            id: 'william-001',
-            employee_number: 'william01',
-            chinese_name: '威廉',
-            english_name: 'William',
-            permissions: ['admin'],
-            status: 'active' as const
-          }
-        },
-        'test': {
-          password: 'test',
-          data: {
-            id: 'test-001',
-            employee_number: 'test',
-            chinese_name: '測試員工',
-            english_name: 'Test',
-            permissions: [],
-            status: 'active' as const
-          }
-        }
-      };
+      // 🚀 TODO: [上線修改] 這裡要改成：
+      // 1. 先嘗試從 Supabase 讀取
+      // 2. 成功則同步到 IndexedDB
+      // 3. 失敗則使用 IndexedDB 離線登入
+      // 從 IndexedDB 讀取真實使用者
+      await localDB.init(); // 確保資料庫已初始化
+      const users = await localDB.getAll<any>(TABLES.EMPLOYEES as any);
+      const employee = users.find(u => u.employee_number === email || u.employee_number === email);
 
-      // 1. 檢查測試帳號
-      const user = testUsers[email.toLowerCase()];
-
-      if (!user) {
+      if (!employee) {
         return {
           success: false,
           message: '用戶名稱或密碼錯誤'
         };
       }
 
-      // 2. 驗證密碼
-      if (password !== user.password) {
+      // 驗證密碼 - 支援多種欄位名稱
+      const password_hash = employee.password_hash || employee.password_hash;
+      if (!password_hash) {
+        console.error('員工沒有密碼設定:', employee);
+        return {
+          success: false,
+          message: '帳號尚未設定密碼'
+        };
+      }
+
+      const isValidPassword = await bcrypt.compare(password, password_hash);
+      if (!isValidPassword) {
         return {
           success: false,
           message: '用戶名稱或密碼錯誤'
         };
       }
 
-      const employee = user.data;
+      console.log('✓ 密碼驗證成功:', employee.name || employee.display_name);
 
       // 3. 建立本地 Profile
       console.log('開始加密密碼...');
@@ -89,23 +71,28 @@ export class OfflineAuthService {
         throw encErr;
       }
 
+      // 支援多種屬性名稱格式
       const profile: LocalProfile = {
         id: employee.id,
-        email: employee.employee_number + '@venturo.local',
-        employeeNumber: employee.employee_number,
-        chineseName: employee.chinese_name,
-        englishName: employee.english_name,
+        email: employee.email || employee.employee_number + '@venturo.local',
+        employee_number: employee.employee_number || employee.employee_number,
+        display_name: employee.name || employee.display_name || employee.display_name,
+        english_name: employee.english_name || employee.english_name || employee.name,
         role: this.determineRole(employee.permissions),
         permissions: employee.permissions || [],
         cachedPassword: encryptedPassword,
-        personalInfo: employee.personal_info,
-        jobInfo: employee.job_info,
-        salaryInfo: employee.salary_info,
+        personal_info: employee.personal_info || employee.personal_info,
+        job_info: employee.job_info || employee.job_info || {
+          department: employee.department,
+          position: employee.position,
+          salary: employee.salary
+        },
+        salary_info: employee.salary_info || employee.salary_info,
         contracts: employee.contracts,
         attendance: employee.attendance,
         lastLoginAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        status: employee.status
+        created_at: employee.created_at || employee.created_at || new Date().toISOString(),
+        status: (employee.is_active || employee.is_active) ? 'active' : 'inactive'
       };
 
       // 4. 儲存到本地
@@ -189,7 +176,7 @@ export class OfflineAuthService {
       console.log('✅ 離線登入成功');
 
       // 背景嘗試刷新 Supabase session
-      if (useOfflineStore.getState().isOnline && profile.cachedPassword) {
+      if (typeof navigator !== 'undefined' && navigator.onLine && profile.cachedPassword) {
         this.refreshSupabaseSession(profile).catch(console.error);
       }
 
@@ -242,10 +229,10 @@ export class OfflineAuthService {
       }
 
       useLocalAuthStore.getState().setCurrentProfile(profile);
-      console.log('✅ 已切換到:', profile.chineseName);
+      console.log('✅ 已切換到:', profile.display_name);
 
       // 背景刷新 session
-      if (useOfflineStore.getState().isOnline && profile.cachedPassword) {
+      if (typeof navigator !== 'undefined' && navigator.onLine && profile.cachedPassword) {
         this.refreshSupabaseSession(profile).catch(console.error);
       }
 
@@ -275,8 +262,7 @@ export class OfflineAuthService {
   /**
    * 判斷用戶角色
    */
-  private static determineRole(permissions: string[]): 'SUPER_ADMIN' | 'ADMIN' | 'EMPLOYEE' {
-    if (permissions?.includes('super_admin')) return 'SUPER_ADMIN';
+  private static determineRole(permissions: string[]): 'ADMIN' | 'EMPLOYEE' {
     if (permissions?.includes('admin')) return 'ADMIN';
     return 'EMPLOYEE';
   }
@@ -286,7 +272,7 @@ export class OfflineAuthService {
    */
   static async syncProfile(profileId: string): Promise<boolean> {
     try {
-      const isOnline = useOfflineStore.getState().isOnline;
+      const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : false;
 
       if (!isOnline) {
         console.log('離線狀態，無法同步');
@@ -299,33 +285,10 @@ export class OfflineAuthService {
         return false;
       }
 
-      // 從遠端獲取最新資料
-      const { data: employee, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', profile.id)
-        .is('deleted_at', null)
-        .single();
-
-      if (error || !employee) {
-        console.error('無法同步 Profile:', error);
-        return false;
-      }
-
-      // 更新本地 Profile
-      useLocalAuthStore.getState().updateProfile(profileId, {
-        permissions: employee.permissions,
-        personalInfo: employee.personal_info,
-        jobInfo: employee.job_info,
-        salaryInfo: employee.salary_info,
-        contracts: employee.contracts,
-        attendance: employee.attendance,
-        status: employee.status,
-        lastSyncAt: new Date().toISOString()
-      });
-
-      console.log('✅ Profile 已同步');
-      return true;
+      // 🚀 TODO: [上線修改] 這裡需要實作 Supabase 同步
+      // 目前暫時返回 false
+      console.log('⚠️ Supabase 同步尚未實作');
+      return false;
 
     } catch (error) {
       console.error('同步失敗:', error);

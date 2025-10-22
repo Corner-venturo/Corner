@@ -5,10 +5,10 @@
 import { create } from 'zustand'
 
 export interface TravelInvoiceItem {
-  itemName: string
+  item_name: string
   item_count: number
-  itemUnit: string
-  itemPrice: number
+  item_unit: string
+  item_price: number
   itemAmt: number
   itemTaxType?: string
   itemWord?: string
@@ -31,10 +31,10 @@ export interface TravelInvoice {
   id: string
   transactionNo: string
   merchantId: string
-  invoiceNumber?: string
-  invoiceDate: string
+  invoice_number?: string
+  invoice_date: string
   total_amount: number
-  taxType: 'dutiable' | 'zero' | 'free'
+  tax_type: 'dutiable' | 'zero' | 'free'
   buyerInfo: BuyerInfo
   items: TravelInvoiceItem[]
   status: 'pending' | 'issued' | 'voided' | 'allowance' | 'failed'
@@ -49,8 +49,8 @@ export interface TravelInvoice {
   allowanceDate?: string
   allowanceAmount?: number
   allowanceItems?: TravelInvoiceItem[]
-  orderId?: string
-  tourId?: string
+  order_id?: string
+  tour_id?: string
   created_by: string
   created_at: string
   updated_at: string
@@ -65,20 +65,20 @@ interface TravelInvoiceState {
   // Actions
   fetchInvoices: (filters?: {
     status?: string
-    startDate?: string
-    endDate?: string
+    start_date?: string
+    end_date?: string
     page?: number
     limit?: number
   }) => Promise<void>
   fetchInvoiceById: (id: string) => Promise<void>
   issueInvoice: (data: {
-    invoiceDate: string
+    invoice_date: string
     total_amount: number
-    taxType?: string
+    tax_type?: string
     buyerInfo: BuyerInfo
     items: TravelInvoiceItem[]
-    orderId?: string
-    tourId?: string
+    order_id?: string
+    tour_id?: string
     created_by: string
   }) => Promise<TravelInvoice>
   voidInvoice: (invoiceId: string, voidReason: string, operatedBy: string) => Promise<void>
@@ -103,8 +103,8 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
     try {
       const params = new URLSearchParams()
       if (filters.status) params.append('status', filters.status)
-      if (filters.start_date) params.append('startDate', filters.start_date)
-      if (filters.end_date) params.append('endDate', filters.end_date)
+      if (filters.start_date) params.append('start_date', filters.start_date)
+      if (filters.end_date) params.append('end_date', filters.end_date)
       if (filters.page) params.append('page', filters.page.toString())
       if (filters.limit) params.append('limit', filters.limit.toString())
 

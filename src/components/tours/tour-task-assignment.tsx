@@ -31,12 +31,12 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     assignee: '',
     deadline: '',
     priority: 3 as 1 | 2 | 3 | 4 | 5,
-    subTasks: [''] as string[]
+    sub_tasks: [''] as string[]
   });
 
   // 獲取與此旅遊團相關的任務
   const tourTasks = todos.filter(todo =>
-    todo.relatedItems.some(item => item.type === 'group' && item.id === tour.id)
+    todo.related_items.some(item => item.type === 'group' && item.id === tour.id)
   );
 
   useEffect(() => {
@@ -59,43 +59,43 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
         assignee: '',
         deadline,
         priority: template.defaultPriority,
-        subTasks: [...template.subTasks, ''] // 加一個空欄位供自訂
+        sub_tasks: [...template.sub_tasks, ''] // 加一個空欄位供自訂
       });
     }
   };
 
   const handleSubTaskChange = (index: number, value: string) => {
-    const newSubTasks = [...taskForm.subTasks];
+    const newSubTasks = [...taskForm.sub_tasks];
     newSubTasks[index] = value;
-    setTaskForm(prev => ({ ...prev, subTasks: newSubTasks }));
+    setTaskForm(prev => ({ ...prev, sub_tasks: newSubTasks }));
   };
 
   const addSubTask = () => {
     setTaskForm(prev => ({
       ...prev,
-      subTasks: [...prev.subTasks, '']
+      sub_tasks: [...prev.sub_tasks, '']
     }));
   };
 
   const removeSubTask = (index: number) => {
-    if (taskForm.subTasks.length > 1) {
-      const newSubTasks = taskForm.subTasks.filter((_, i) => i !== index);
-      setTaskForm(prev => ({ ...prev, subTasks: newSubTasks }));
+    if (taskForm.sub_tasks.length > 1) {
+      const newSubTasks = taskForm.sub_tasks.filter((_, i) => i !== index);
+      setTaskForm(prev => ({ ...prev, sub_tasks: newSubTasks }));
     }
   };
 
   const handleCreateTask = () => {
     if (!taskForm.title.trim() || !taskForm.assignee) return;
 
-    const subTasks = taskForm.subTasks
-      .filter(task => task.trim())
-      .map((task, index) => ({
+    const sub_tasks = taskForm.sub_tasks
+      .filter((task: string) => task.trim())
+      .map((task: string, index: number) => ({
         id: `${Date.now()}-${index}`,
         title: task.trim(),
         done: false
       }));
 
-    const newTodo = {
+    const newTodo: any = {
       title: taskForm.title,
       priority: taskForm.priority,
       deadline: taskForm.deadline,
@@ -103,21 +103,20 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       creator: '1', // 當前用戶
       assignee: taskForm.assignee,
       visibility: ['1', taskForm.assignee],
-      relatedItems: [
+      related_items: [
         {
           type: 'group' as const,
           id: tour.id,
           title: tour.name
         }
       ],
-      subTasks,
+      sub_tasks,
       notes: [
         {
           timestamp: new Date().toISOString(),
           content: `從旅遊團「${tour.name}」指派的任務`
         }
-      ],
-      enabledQuickActions: ['receipt', 'invoice'] as ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
+      ]
     };
 
     addTodo(newTodo);
@@ -128,7 +127,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       assignee: '',
       deadline: calculateDeadlineFromDeparture(tour.departure_date, -7),
       priority: 3,
-      subTasks: ['']
+      sub_tasks: ['']
     });
     setSelectedTemplate('');
   };
@@ -153,13 +152,13 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     return colorMap[status];
   };
 
-  const getEmployeeName = (employeeId: string) => {
-    return employees.find(emp => emp.id === employeeId)?.name || '未指派';
+  const getEmployeeName = (employee_id: string) => {
+    return employees.find(emp => emp.id === employee_id)?.name || '未指派';
   };
 
   const getProgressInfo = (todo: Todo) => {
-    const completed = todo.subTasks.filter(task => task.done).length;
-    const total = todo.subTasks.length;
+    const completed = todo.sub_tasks.filter(task => task.done).length;
+    const total = todo.sub_tasks.length;
     return { completed, total, percentage: total > 0 ? (completed / total) * 100 : 0 };
   };
 
@@ -330,7 +329,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
               </Button>
             </div>
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {taskForm.subTasks.map((subTask, index) => (
+              {taskForm.sub_tasks.map((subTask, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
                     value={subTask}
@@ -338,7 +337,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
                     placeholder={`子任務 ${index + 1}`}
                     className="text-sm"
                   />
-                  {taskForm.subTasks.length > 1 && (
+                  {taskForm.sub_tasks.length > 1 && (
                     <Button
                       size="sm"
                       variant="outline"

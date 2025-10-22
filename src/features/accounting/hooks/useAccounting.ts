@@ -14,7 +14,7 @@ export const useAccounting = () => {
     stats: store.stats,
 
     // ========== Account 操作 ==========
-    createAccount: async (data: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>) => {
+    createAccount: async (data: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => {
       return await store.addAccount(data);
     },
 
@@ -35,11 +35,11 @@ export const useAccounting = () => {
     },
 
     getAccountBalance: (account_id: string) => {
-      return accountingService.getAccountBalance(accountId);
+      return accountingService.getAccountBalance(account_id);
     },
 
     // ========== Category 操作 ==========
-    createCategory: async (data: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
+    createCategory: async (data: Omit<Category, 'id' | 'created_at' | 'updated_at'>) => {
       return await store.addCategory(data);
     },
 
@@ -59,12 +59,12 @@ export const useAccounting = () => {
       return categoryService.getCategoriesByType(type);
     },
 
-    getCategoryTotal: (category_id: string, startDate?: string, endDate?: string) => {
-      return accountingService.getCategoryTotal(categoryId, startDate, endDate);
+    getCategoryTotal: (category_id: string, start_date?: string, end_date?: string) => {
+      return accountingService.getCategoryTotal(category_id, start_date, end_date);
     },
 
     // ========== Transaction 操作 ==========
-    createTransaction: (data: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
+    createTransaction: (data: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => {
       return accountingService.addTransaction(data);
     },
 
@@ -77,11 +77,11 @@ export const useAccounting = () => {
     },
 
     getTransactionsByAccount: (account_id: string) => {
-      return accountingService.getTransactionsByAccount(accountId);
+      return accountingService.getTransactionsByAccount(account_id);
     },
 
-    getTransactionsByDateRange: (startDate: string, endDate: string) => {
-      return accountingService.getTransactionsByDateRange(startDate, endDate);
+    getTransactionsByDateRange: (start_date: string, end_date: string) => {
+      return accountingService.getTransactionsByDateRange(start_date, end_date);
     },
 
     // ========== 統計方法 ==========

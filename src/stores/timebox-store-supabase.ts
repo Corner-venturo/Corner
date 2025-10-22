@@ -1,15 +1,17 @@
 import { create } from 'zustand'
+
 import { VenturoAPI } from '@/lib/supabase/api'
+import { logger } from '@/lib/utils/logger'
 
 // 基礎類型定義
 export interface BaseBox {
   id: string
-  userId: string
+  user_id: string
   name: string
   color: string
   type: 'workout' | 'reminder' | 'basic'
-  createdAt: Date
-  updatedAt: Date
+  created_at: Date
+  updated_at: Date
   // 重訓專用欄位
   equipment?: string
   weight?: number
@@ -35,9 +37,9 @@ export interface ScheduledBox {
   id: string
   boxId: string
   weekId: string
-  userId: string
+  user_id: string
   dayOfWeek: number
-  startTime: string
+  start_time: string
   duration: number
   completed: boolean
   completedAt?: Date
@@ -48,7 +50,7 @@ export interface ScheduledBox {
 // 週記錄
 export interface WeekRecord {
   id: string
-  userId: string
+  user_id: string
   weekStart: Date
   weekEnd: Date
   name?: string
@@ -98,7 +100,7 @@ export const morandiColors = [
 interface TimeboxState {
   // 當前使用者 ID
   currentUserId: string | null
-  setCurrentUserId: (userId: string) => void
+  setCurrentUserId: (user_id: string) => void
 
   // 狀態
   boxes: BaseBox[]
@@ -110,7 +112,7 @@ interface TimeboxState {
 
   // 箱子管理
   loadBoxes: () => Promise<void>
-  createBox: (box: Omit<BaseBox, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<void>
+  createBox: (box: Omit<BaseBox, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>
   updateBox: (id: string, updates: Partial<BaseBox>) => Promise<void>
   deleteBox: (id: string) => Promise<void>
 
@@ -122,7 +124,7 @@ interface TimeboxState {
 
   // 排程管理
   loadScheduledBoxes: (weekId: string) => Promise<void>
-  addScheduledBox: (box: Omit<ScheduledBox, 'id' | 'userId'>) => Promise<void>
+  addScheduledBox: (box: Omit<ScheduledBox, 'id' | 'user_id'>) => Promise<void>
   updateScheduledBox: (id: string, updates: Partial<ScheduledBox>) => Promise<void>
   removeScheduledBox: (id: string) => Promise<void>
   toggleBoxCompletion: (id: string) => Promise<void>
@@ -157,8 +159,8 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   loading: false,
   error: null,
 
-  setCurrentUserId: (userId) => {
-    set({ currentUserId: userId })
+  setCurrentUserId: (user_id) => {
+    set({ currentUserId: user_id })
   },
 
   // 載入箱子
@@ -169,12 +171,12 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     set({ loading: true, error: null })
     try {
       const boxes = await VenturoAPI.read<BaseBox>('timebox_boxes', {
-        filters: { userId: currentUserId },
-        orderBy: { column: 'createdAt', ascending: false }
+        filters: { user_id: currentUserId },
+        orderBy: { column: 'created_at', ascending: false }
       })
       set({ boxes, loading: false })
     } catch (error) {
-      console.error('載入箱子失敗:', error)
+      logger.error('載入箱子失敗:', error)
       set({ error: '載入箱子失敗', loading: false })
     }
   },
@@ -187,11 +189,11 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     try {
       const newBox = await VenturoAPI.create<BaseBox>('timebox_boxes', {
         ...boxData,
-        userId: currentUserId
+        user_id: currentUserId
       })
       set((state) => ({ boxes: [newBox, ...state.boxes] }))
     } catch (error) {
-      console.error('建立箱子失敗:', error)
+      logger.error('建立箱子失敗:', error)
       set({ error: '建立箱子失敗' })
     }
   },
@@ -204,7 +206,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         boxes: state.boxes.map((box) => (box.id === id ? updatedBox : box))
       }))
     } catch (error) {
-      console.error('更新箱子失敗:', error)
+      logger.error('更新箱子失敗:', error)
       set({ error: '更新箱子失敗' })
     }
   },
@@ -218,7 +220,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         scheduledBoxes: state.scheduledBoxes.filter((sb) => sb.boxId !== id)
       }))
     } catch (error) {
-      console.error('刪除箱子失敗:', error)
+      logger.error('刪除箱子失敗:', error)
       set({ error: '刪除箱子失敗' })
     }
   },
@@ -236,7 +238,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
       // 查詢當前週
       const weeks = await VenturoAPI.read<WeekRecord>('timebox_weeks', {
         filters: {
-          userId: currentUserId,
+          user_id: currentUserId,
           weekStart: weekStart.toISOString().split('T')[0],
           archived: false
         }
@@ -251,7 +253,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         await get().initializeCurrentWeek(weekStart)
       }
     } catch (error) {
-      console.error('載入當前週失敗:', error)
+      logger.error('載入當前週失敗:', error)
       set({ error: '載入當前週失敗', loading: false })
     }
   },
@@ -263,12 +265,12 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
 
     try {
       const records = await VenturoAPI.read<WeekRecord>('timebox_weeks', {
-        filters: { userId: currentUserId, archived: true },
+        filters: { user_id: currentUserId, archived: true },
         orderBy: { column: 'weekStart', ascending: false }
       })
       set({ weekRecords: records })
     } catch (error) {
-      console.error('載入週記錄失敗:', error)
+      logger.error('載入週記錄失敗:', error)
       set({ error: '載入週記錄失敗' })
     }
   },
@@ -281,7 +283,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     try {
       const weekEnd = getWeekEnd(weekStart)
       const newWeek = await VenturoAPI.create<WeekRecord>('timebox_weeks', {
-        userId: currentUserId,
+        user_id: currentUserId,
         weekStart: weekStart.toISOString().split('T')[0],
         weekEnd: weekEnd.toISOString().split('T')[0],
         archived: false,
@@ -292,7 +294,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
 
       set({ currentWeek: newWeek, scheduledBoxes: [] })
     } catch (error) {
-      console.error('初始化當前週失敗:', error)
+      logger.error('初始化當前週失敗:', error)
       set({ error: '初始化當前週失敗' })
     }
   },
@@ -320,7 +322,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
       await get().loadWeekRecords()
       await get().loadCurrentWeek()
     } catch (error) {
-      console.error('封存週記錄失敗:', error)
+      logger.error('封存週記錄失敗:', error)
       set({ error: '封存週記錄失敗' })
     }
   },
@@ -334,7 +336,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
       })
       set({ scheduledBoxes: schedules })
     } catch (error) {
-      console.error('載入排程失敗:', error)
+      logger.error('載入排程失敗:', error)
       set({ error: '載入排程失敗' })
     }
   },
@@ -347,13 +349,13 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     try {
       const newSchedule = await VenturoAPI.create<ScheduledBox>('timebox_schedules', {
         ...boxData,
-        userId: currentUserId
+        user_id: currentUserId
       })
       set((state) => ({
         scheduledBoxes: [...state.scheduledBoxes, newSchedule]
       }))
     } catch (error) {
-      console.error('新增排程失敗:', error)
+      logger.error('新增排程失敗:', error)
       set({ error: '新增排程失敗' })
     }
   },
@@ -366,7 +368,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         scheduledBoxes: state.scheduledBoxes.map((box) => (box.id === id ? updated : box))
       }))
     } catch (error) {
-      console.error('更新排程失敗:', error)
+      logger.error('更新排程失敗:', error)
       set({ error: '更新排程失敗' })
     }
   },
@@ -379,7 +381,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         scheduledBoxes: state.scheduledBoxes.filter((box) => box.id !== id)
       }))
     } catch (error) {
-      console.error('刪除排程失敗:', error)
+      logger.error('刪除排程失敗:', error)
       set({ error: '刪除排程失敗' })
     }
   },
@@ -408,7 +410,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
 
     const updated = { ...currentData }
     updated.setsCompleted[setIndex] = !updated.setsCompleted[setIndex]
-    updated.completedSetsTime[setIndex] = updated.setsCompleted[setIndex] ? new Date() : null
+    updated.completedSetsTime[setIndex] = updated.setsCompleted[setIndex] ? new Date() : null as any
 
     await get().updateScheduledBox(boxId, { workoutData: updated })
   },

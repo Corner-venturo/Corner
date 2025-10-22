@@ -28,7 +28,7 @@ export default function TravelInvoicePage() {
   const filteredInvoices = (invoices || []).filter(invoice => {
     const matchesSearch =
       invoice.transactionNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.buyerInfo.buyerName?.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesStatus = statusFilter ? invoice.status === statusFilter : true
@@ -127,7 +127,7 @@ export default function TravelInvoicePage() {
                   <div>
                     <CardTitle className="text-lg">{invoice.transactionNo}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {invoice.invoiceNumber || '尚未取得發票號碼'}
+                      {invoice.invoice_number || '尚未取得發票號碼'}
                     </p>
                   </div>
                   <div className="text-right space-y-2">{getStatusBadge(invoice.status)}</div>
@@ -137,7 +137,7 @@ export default function TravelInvoicePage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">開立日期</p>
-                    <p className="font-medium">{invoice.invoiceDate}</p>
+                    <p className="font-medium">{invoice.invoice_date}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">買受人</p>

@@ -1,6 +1,7 @@
 /**
  * Stores 統一匯出
  * 使用工廠函數建立所有 Store
+ * 支援 Supabase 雲端同步 + IndexedDB 本地快取
  */
 
 import { createStore } from './create-store';
@@ -11,21 +12,22 @@ import type {
   Order,
   Member,
   Customer,
-  Payment,
-  PaymentRequest,
-  DisbursementOrder,
   ReceiptOrder,
-  Quote,
-  QuoteItem,
   Employee,
+  Region,
 } from '@/types';
 
-// 從本地 types 匯入其他型別
+// 從本地 types 匯入（包含 PaymentRequest, DisbursementOrder 等）
 import type {
-  CalendarEvent,
+  PaymentRequest,
+  DisbursementOrder,
   Todo,
   Visa,
   Supplier,
+  Payment,
+  Quote,
+  QuoteItem,
+  Itinerary,
 } from './types';
 
 // ============================================
@@ -39,6 +41,12 @@ import type {
 export const useTourStore = createStore<Tour>('tours', 'T');
 
 /**
+ * 行程表 Store
+ * 編號格式：I{year}{4位數} (如: I20240001)
+ */
+export const useItineraryStore = createStore<Itinerary>('itineraries', 'I');
+
+/**
  * 訂單 Store
  * 編號格式：O{year}{4位數} (如: O20240001)
  */
@@ -49,12 +57,6 @@ export const useOrderStore = createStore<Order>('orders', 'O');
  * 編號格式：C{year}{4位數} (如: C20240001)
  */
 export const useCustomerStore = createStore<Customer>('customers', 'C');
-
-/**
- * 付款記錄 Store
- * 編號格式：P{year}{4位數} (如: P20240001)
- */
-export const usePaymentStore = createStore<Payment>('payments', 'P');
 
 /**
  * 報價單 Store
@@ -109,7 +111,7 @@ export const useQuoteItemStore = createStore<QuoteItem>('quote_items');
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons');
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as any);
 
 // ============================================
 // 系統管理 Stores（無編號）
@@ -117,7 +119,7 @@ export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_
 
 /**
  * 員工 Store
- * 使用員工編號（employeeNumber），不是 code
+ * 使用員工編號（employee_number），不是 code
  */
 export const useEmployeeStore = createStore<Employee>('employees');
 
@@ -134,8 +136,11 @@ export const useVisaStore = createStore<Visa>('visas', 'V');
 // 供應商 Store
 export const useSupplierStore = createStore<Supplier>('suppliers', 'S');
 
-// 行事曆 Store
-export const useCalendarEventStore = createStore<CalendarEvent>('calendar_events');
+// 地區 Store
+export const useRegionStore = createStore<Region>('regions');
+
+// 行事曆 Store (TODO: CalendarEvent 類型需定義)
+// export const useCalendarEventStore = createStore<CalendarEvent>('calendar_events');
 
 // TODO: WorkspaceItem, Template, TimeboxSession 型別需要定義後再啟用
 // export const useTemplateStore = createStore<Template>('templates');
@@ -165,6 +170,7 @@ export { useUserStore } from './user-store';
 export { useAccountingStore } from './accounting-store';
 
 // TODO: 移到 hooks/use-calendar.ts
+// calendar-store 需要額外的 settings 功能，暫時保留
 export { useCalendarStore } from './calendar-store';
 
 // TODO: 移到 hooks/use-timebox.ts
@@ -177,11 +183,34 @@ export { useTimeboxStore } from './timebox-store';
 export { useWorkspaceStore } from './workspace-store';
 
 // ============================================
+// 暫時保留的舊 Stores（待重構）
+// ============================================
+
+/**
+ * @deprecated payment-store 將逐步遷移到新架構
+ *
+ * 此 Store 包含：
+ * - PaymentRequest (請款單) - 應改用 usePaymentRequestStore
+ * - DisbursementOrder (出納單) - 應改用 useDisbursementOrderStore
+ * - 複雜的業務邏輯 - 應移到 payment.service.ts
+ *
+ * TODO:
+ * - [ ] 遷移 PaymentRequest 相關頁面
+ * - [ ] 遷移 DisbursementOrder 相關頁面
+ * - [ ] 業務邏輯移到 service
+ * - [ ] 刪除 payment-store.deprecated.ts
+ */
+// usePaymentStore 已遷移到新架構（payment-store.deprecated.ts）
+// 新的 Store：usePaymentRequestStore, useDisbursementOrderStore
+// export { usePaymentStore } from './payment-store'; // DEPRECATED
+
+// ============================================
 // 型別匯出（方便使用）
 // ============================================
 
 export type {
   Tour,
+  Itinerary,
   Order,
   Member,
   Customer,
@@ -195,4 +224,5 @@ export type {
   Todo,
   Visa,
   Supplier,
+  Region,
 };

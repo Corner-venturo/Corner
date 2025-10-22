@@ -24,12 +24,12 @@ import {
   BarChart3,
   Calendar,
   TrendingDown,
-  FileCheck
+  FileCheck,
+  Edit,
+  Flag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { useAutoSync } from '@/lib/offline/auto-sync-provider';
-import { Wifi, WifiOff } from 'lucide-react';
 
 interface MenuItem {
   href: string;
@@ -58,22 +58,16 @@ const menuItems: MenuItem[] = [
     requiredPermission: 'workspace',
   },
   {
-    href: '/accounting',
-    label: '記帳管理',
-    icon: Wallet,
-    requiredPermission: 'accounting',
-  },
-  {
-    href: '/timebox',
-    label: '箱型時間',
-    icon: Clock,
-    requiredPermission: 'timebox',
-  },
-  {
     href: '/todos',
     label: '待辦事項',
     icon: CheckSquare,
     requiredPermission: 'todos',
+  },
+  {
+    href: '/itinerary',
+    label: '行程管理',
+    icon: Flag,
+    requiredPermission: 'business',
   },
   {
     href: '/tours',
@@ -94,22 +88,21 @@ const menuItems: MenuItem[] = [
     requiredPermission: 'quotes',
   },
   {
-    href: '/visas',
-    label: '簽證管理',
-    icon: FileCheck,
-    requiredPermission: 'visas',
-  },
-  {
     href: '/finance',
     label: '財務系統',
     icon: CreditCard,
-    requiredPermission: 'finance',
     children: [
       { href: '/finance/payments', label: '收款管理', icon: CreditCard, requiredPermission: 'payments' },
       { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
       { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
     ]
+  },
+  {
+    href: '/visas',
+    label: '簽證管理',
+    icon: FileCheck,
+    requiredPermission: 'visas',
   },
   {
     href: '/database',
@@ -131,10 +124,21 @@ const menuItems: MenuItem[] = [
     icon: UserCog,
     requiredPermission: 'hr',
   },
+];
+
+// 底部個人工具選單
+const personalToolItems: MenuItem[] = [
   {
-    href: '/guide',
-    label: '系統說明',
-    icon: Settings,
+    href: '/accounting',
+    label: '記帳管理',
+    icon: Wallet,
+    requiredPermission: 'accounting',
+  },
+  {
+    href: '/timebox',
+    label: '箱型時間',
+    icon: Clock,
+    requiredPermission: 'timebox',
   },
 ];
 
@@ -145,11 +149,9 @@ export function Sidebar() {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const sidebarRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [showSyncTooltip, setShowSyncTooltip] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { syncStatus, isOnline } = useAutoSync();
-  const pendingCount = syncStatus?.pendingCount || 0;
-  const hasPendingChanges = pendingCount > 0;
+  const [isDropdownHovered, setIsDropdownHovered] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
   // 確保組件已掛載
   useEffect(() => {
@@ -174,7 +176,7 @@ export function Sidebar() {
       const rect = element.getBoundingClientRect();
       setDropdownPosition({
         top: rect.top,
-        left: sidebarCollapsed ? 64 : 180
+        left: rect.right + 10  // 直接使用元素的右邊界 + 10px 間距
       });
       setHoveredItem(item.href);
     }
@@ -182,21 +184,30 @@ export function Sidebar() {
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
-      setHoveredItem(null);
-    }, 150);
+      if (!isDropdownHovered) {
+        setHoveredItem(null);
+      }
+    }, 100); // 縮短延遲時間
   };
 
   const handleDropdownMouseEnter = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+    setIsDropdownHovered(true);
   };
 
   const handleDropdownMouseLeave = () => {
+    setIsDropdownHovered(false);
     setHoveredItem(null);
+    // 同時收起側邊欄（如果是摺疊模式）
+    if (sidebarCollapsed) {
+      setIsSidebarHovered(false);
+    }
   };
 
-  const isActive = (href: string) => {
+  const is_active = (href: string) => {
+    if (!mounted) return false; // 避免 hydration error
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
   };
@@ -215,37 +226,91 @@ export function Sidebar() {
       }
 
       const userPermissions = user.permissions || [];
-      const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('system.admin');
+      const isSuperAdmin = userPermissions.includes('admin');  // admin 就是管理員
 
       return items
-        .filter(item => {
-          if (!item.requiredPermission) return true;
-          if (isSuperAdmin) return true;
-          return userPermissions.includes(item.requiredPermission);
-        })
         .map(item => {
+          // 如果有子選單，先過濾子選單
           if (item.children) {
-            return {
-              ...item,
-              children: filterMenuByPermissions(item.children)
-            };
+            const visibleChildren = filterMenuByPermissions(item.children);
+
+            // 如果有任何子項目可見，就顯示父項目
+            if (visibleChildren.length > 0 || isSuperAdmin) {
+              return {
+                ...item,
+                children: visibleChildren
+              };
+            }
+            // 如果沒有可見的子項目，隱藏整個父項目
+            return null;
           }
-          return item;
-        });
+
+          // 沒有子選單的項目，檢查權限
+          if (!item.requiredPermission) return item;
+          if (isSuperAdmin) return item;
+          return userPermissions.includes(item.requiredPermission) ? item : null;
+        })
+        .filter((item): item is MenuItem => item !== null);
     };
 
     return filterMenuByPermissions(menuItems);
+  }, [user]);
+
+  const visiblePersonalToolItems = useMemo(() => {
+    const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
+      if (!user) {
+        return items.filter(item => !item.requiredPermission);
+      }
+
+      const userPermissions = user.permissions || [];
+      const isSuperAdmin = userPermissions.includes('admin');
+
+      return items
+        .map(item => {
+          if (!item.requiredPermission) return item;
+          if (isSuperAdmin) return item;
+          return userPermissions.includes(item.requiredPermission) ? item : null;
+        })
+        .filter((item): item is MenuItem => item !== null);
+    };
+
+    return filterMenuByPermissions(personalToolItems);
   }, [user]);
 
   return (
     <>
       <div
         ref={sidebarRef}
+        onMouseEnter={(e) => {
+          // 只有當滑鼠真的在側邊欄範圍內才觸發（x < 80）
+          if (e.clientX < 80) {
+            setIsSidebarHovered(true);
+          }
+        }}
+        onMouseMove={(e) => {
+          // 動態判斷容忍範圍：展開時允許到 190px，收起時只允許到 80px
+          const toleranceWidth = (isSidebarHovered || hoveredItem) ? 190 : 80;
+
+          // 持續檢查滑鼠位置
+          if (e.clientX >= toleranceWidth && isSidebarHovered && !isDropdownHovered && !hoveredItem) {
+            setIsSidebarHovered(false);
+          } else if (e.clientX < 80 && !isSidebarHovered) {
+            setIsSidebarHovered(true);
+          }
+        }}
+        onMouseLeave={() => {
+          // 只有當沒有下拉選單時才收起
+          if (!hoveredItem && !isDropdownHovered) {
+            setIsSidebarHovered(false);
+          }
+        }}
         className={cn(
-          'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-50 group',
+          'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-40 group transition-[width] duration-300',
           sidebarCollapsed
-            ? 'w-16 hover:w-[180px] transition-[width] duration-300'
-            : 'w-[180px]'
+            ? (isSidebarHovered || isDropdownHovered)
+              ? 'w-[190px]'
+              : 'w-16'
+            : 'w-[190px]'
         )}
       >
         {/* Logo區域 */}
@@ -255,19 +320,12 @@ export function Sidebar() {
               <span className="text-white/95 font-semibold text-lg">V</span>
             </div>
             <div className={cn(
-              "ml-12 text-xl font-bold text-morandi-primary transition-opacity duration-300",
-              sidebarCollapsed ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+              "ml-[58px] text-xl font-bold text-morandi-primary transition-opacity duration-300",
+              sidebarCollapsed ? ((isSidebarHovered || isDropdownHovered) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none") : "opacity-100 pointer-events-auto"
             )}>
               CORNER
             </div>
-            {!sidebarCollapsed && (
-              <button
-                onClick={toggleSidebar}
-                className="absolute right-3 p-2 hover:bg-morandi-container rounded-lg transition-colors"
-              >
-                <ChevronLeft size={20} />
-              </button>
-            )}
+            {/* 移除收合按鈕，使用純 hover 控制 */}
           </div>
           <div style={{ marginLeft: '12px', marginRight: '12px', borderTop: '1px solid var(--border)', height: '1px' }}></div>
         </div>
@@ -282,15 +340,15 @@ export function Sidebar() {
                   <div
                     className={cn(
                       'w-full relative h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors cursor-pointer',
-                      isActive(item.href) && 'bg-morandi-container text-morandi-primary'
+                      is_active(item.href) && 'bg-morandi-container text-morandi-primary'
                     )}
                     onMouseEnter={(e) => handleMouseEnter(item, e.currentTarget)}
                     onMouseLeave={handleMouseLeave}
                   >
                     <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
                     <span className={cn(
-                      "ml-12 block text-left leading-10 transition-opacity duration-300",
-                      sidebarCollapsed ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+                      "ml-[58px] block text-left leading-10 transition-opacity duration-300",
+                      sidebarCollapsed ? ((isSidebarHovered || isDropdownHovered) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none") : "opacity-100 pointer-events-auto"
                     )}>
                       {item.label}
                     </span>
@@ -308,13 +366,13 @@ export function Sidebar() {
                     prefetch={false}
                     className={cn(
                       'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                      isActive(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
+                      is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
                     )}
                   >
                     <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
                     <span className={cn(
-                      "ml-12 block text-left leading-10 transition-opacity duration-300",
-                      sidebarCollapsed ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+                      "ml-[58px] block text-left leading-10 transition-opacity duration-300",
+                      sidebarCollapsed ? ((isSidebarHovered || isDropdownHovered) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none") : "opacity-100 pointer-events-auto"
                     )}>
                       {item.label}
                     </span>
@@ -328,89 +386,68 @@ export function Sidebar() {
         {/* 底部功能區 */}
         <div className="py-4">
           <div className="mb-4" style={{ marginLeft: '12px', marginRight: '12px', borderTop: '1px solid var(--border)', height: '1px' }}></div>
+
           {!sidebarCollapsed && user && (
             <div className="mb-4 mx-4 p-3 bg-morandi-container rounded-lg">
               <div className="text-sm font-medium text-morandi-primary">
-                {user.chineseName}
+                {user.display_name}
               </div>
               <div className="text-xs text-morandi-secondary">
-                {user.employeeNumber}
+                {user.employee_number}
               </div>
             </div>
           )}
 
           <ul className="space-y-1">
+            {/* 個人工具選單 */}
+            {visiblePersonalToolItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  prefetch={false}
+                  className={cn(
+                    'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
+                    is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
+                  )}
+                >
+                  <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  <span className={cn(
+                    "ml-[58px] block text-left leading-10 transition-opacity duration-300",
+                    sidebarCollapsed ? ((isSidebarHovered || isDropdownHovered) ? "opacity-100" : "opacity-0") : "opacity-100"
+                  )}>
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            ))}
+
+            {/* 分隔線（如果有個人工具項目的話） */}
+            {visiblePersonalToolItems.length > 0 && (
+              <li className="my-2">
+                <div style={{ marginLeft: '12px', marginRight: '12px', borderTop: '1px solid var(--border)', height: '1px' }}></div>
+              </li>
+            )}
+
+            {/* 設定 */}
             <li>
               <Link
                 href="/settings"
                 prefetch={false}
                 className={cn(
                   'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                  pathname === '/settings' && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
+                  mounted && pathname === '/settings' && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
                 )}
               >
                 <Settings size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
                 <span className={cn(
-                  "ml-12 block text-left leading-10 transition-opacity duration-300",
-                  sidebarCollapsed ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+                  "ml-[58px] block text-left leading-10 transition-opacity duration-300",
+                  sidebarCollapsed ? ((isSidebarHovered || isDropdownHovered) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none") : "opacity-100 pointer-events-auto"
                 )}>
                   設定
                 </span>
               </Link>
             </li>
 
-            {/* 網路狀態指示器 - 只在客戶端渲染 */}
-            {mounted && (
-              <li>
-                <div
-                  className="w-full relative block h-10 text-sm hover:bg-morandi-container transition-colors group/sync"
-                  onMouseEnter={() => setShowSyncTooltip(true)}
-                  onMouseLeave={() => setShowSyncTooltip(false)}
-                >
-                {isOnline ? (
-                  <Wifi size={20} className={cn(
-                    "absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-colors",
-                    hasPendingChanges ? "text-orange-500" : "text-green-500"
-                  )} />
-                ) : (
-                  <WifiOff size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500" />
-                )}
-                <span className={cn(
-                  "ml-12 block text-left leading-10 transition-opacity duration-300",
-                  sidebarCollapsed ? "opacity-0 group-hover:opacity-100" : "opacity-100",
-                  isOnline ? (hasPendingChanges ? "text-orange-500" : "text-green-500") : "text-red-500"
-                )}>
-                  {isOnline ? (hasPendingChanges ? `${pendingCount} 待同步` : '已連線') : '離線'}
-                </span>
-                </div>
-
-                {/* Hover 顯示詳細資訊 - 移到 li 外面 */}
-                {showSyncTooltip && (
-                  <div className="fixed left-[196px] bg-card border border-border rounded-lg shadow-lg p-3 min-w-48 z-[70]" style={{ top: `${dropdownPosition.top}px` }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      {isOnline ? (
-                        <Wifi size={16} className="text-green-500" />
-                      ) : (
-                        <WifiOff size={16} className="text-red-500" />
-                      )}
-                      <span className="text-sm font-medium">
-                        {isOnline ? '網路已連線' : '離線模式'}
-                      </span>
-                    </div>
-                    {hasPendingChanges && (
-                      <div className="text-xs text-morandi-secondary">
-                        {pendingCount} 個變更待同步
-                      </div>
-                    )}
-                    {!isOnline && (
-                      <div className="text-xs text-morandi-secondary mt-1">
-                        您的變更將在恢復連線後同步
-                      </div>
-                    )}
-                  </div>
-                )}
-              </li>
-            )}
           </ul>
         </div>
       </div>
@@ -421,7 +458,7 @@ export function Sidebar() {
           className="fixed bg-card border border-border rounded-lg shadow-lg py-2 min-w-48 z-[60]"
           style={{
             top: dropdownPosition.top,
-            left: dropdownPosition.left + 8,
+            left: dropdownPosition.left,
           }}
           onMouseEnter={handleDropdownMouseEnter}
           onMouseLeave={handleDropdownMouseLeave}
@@ -433,7 +470,7 @@ export function Sidebar() {
               prefetch={false}
               className={cn(
                 'flex items-center px-4 py-2 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                isActive(child.href) && 'bg-morandi-container text-morandi-primary'
+                is_active(child.href) && 'bg-morandi-container text-morandi-primary'
               )}
             >
               <child.icon size={16} className="mr-3" />

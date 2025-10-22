@@ -8,8 +8,6 @@ import {
   User,
   DollarSign,
   Shield,
-  Calendar,
-  FileText,
   X,
   Edit,
   Save
@@ -19,28 +17,25 @@ import {
 import { BasicInfoTab } from './tabs/basic-info-tab';
 import { SalaryTab } from './tabs/salary-tab';
 import { PermissionsTab } from './tabs/permissions-tab';
-import { AttendanceTab } from './tabs/attendance-tab';
-import { ContractsTab } from './tabs/contracts-tab';
 import { SYSTEM_PERMISSIONS } from '@/stores/types';
 
 interface EmployeeExpandedViewProps {
-  employeeId: string;
+  employee_id: string;
   onClose: () => void;
 }
 
-type EmployeeTab = 'basic' | 'salary' | 'permissions' | 'attendance' | 'contracts';
+type EmployeeTab = 'basic' | 'salary' | 'permissions';
 
-export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedViewProps) {
-  const { getUser } = useUserStore();
+export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedViewProps) {
   const [activeTab, setActiveTab] = useState<EmployeeTab>('basic');
   const [isEditing, setIsEditing] = useState(false);
   const basicInfoTabRef = useRef<{ handleSave: () => void }>(null);
   const salaryTabRef = useRef<{ handleSave: () => void }>(null);
-  const permissionsTabRef = useRef<{ handleSave: () => void }>(null);
-  const attendanceTabRef = useRef<{ handleSave: () => void }>(null);
-  const contractsTabRef = useRef<{ handleSave: () => void }>(null);
 
-  const employee = getUser(employeeId);
+  // ✨ 使用 Zustand selector 來自動訂閱員工資料更新
+  const employee = useUserStore(state =>
+    state.items.find(u => u.id === employee_id)
+  );
 
   if (!employee) {
     return null;
@@ -50,46 +45,33 @@ export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedVi
     { key: 'basic' as const, label: '基本資料', icon: User },
     { key: 'salary' as const, label: '薪資', icon: DollarSign },
     { key: 'permissions' as const, label: '權限', icon: Shield },
-    { key: 'attendance' as const, label: '出勤', icon: Calendar },
-    { key: 'contracts' as const, label: '合約', icon: FileText },
   ];
 
   const renderTabStats = () => {
     switch (activeTab) {
       case 'basic':
-        return (
-          <div className="text-morandi-muted">
-            入職日期：{new Date(employee.jobInfo.hireDate).toLocaleDateString()}
-          </div>
-        );
+        return null;
       case 'salary':
-        const totalAllowances = employee.salaryInfo.allowances.reduce((sum, allowance) => sum + allowance.amount, 0);
+        const allowances = employee.salary_info?.allowances || [];
+        const totalAllowances = allowances.reduce((sum, allowance) => sum + allowance.amount, 0);
+        const baseSalary = employee.salary_info?.base_salary || 0;
         return (
           <div className="flex items-center gap-4 text-morandi-muted">
-            <span>底薪：NT$ {employee.salaryInfo.baseSalary.toLocaleString()}</span>
+            <span>底薪：NT$ {baseSalary.toLocaleString()}</span>
             <span>津貼：NT$ {totalAllowances.toLocaleString()}</span>
             <span className="text-morandi-primary font-medium">
-              總薪資：NT$ {(employee.salaryInfo.baseSalary + totalAllowances).toLocaleString()}
+              總薪資：NT$ {(baseSalary + totalAllowances).toLocaleString()}
             </span>
           </div>
         );
       case 'permissions':
+        // 如果有 admin 權限，視為全選
+        const hasAdmin = employee.permissions.includes('admin');
+        const permissionCount = hasAdmin ? SYSTEM_PERMISSIONS.length : employee.permissions.length;
+
         return (
           <div className="text-morandi-muted">
-            已授權 {employee.permissions.length} / {SYSTEM_PERMISSIONS.length} 項功能
-          </div>
-        );
-      case 'attendance':
-        return (
-          <div className="flex items-center gap-4 text-morandi-muted">
-            <span>請假記錄：{employee.attendance.leaveRecords.length} 筆</span>
-            <span>加班記錄：{employee.attendance.overtimeRecords.length} 筆</span>
-          </div>
-        );
-      case 'contracts':
-        return (
-          <div className="text-morandi-muted">
-            合約記錄：{employee.contracts.length} 筆
+            已授權 {permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能
           </div>
         );
       default:
@@ -100,25 +82,19 @@ export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedVi
   const handleSave = async () => {
     try {
       // 根據不同頁面調用對應的儲存函數
-      if (activeTab === 'permissions' && permissionsTabRef.current) {
-        await permissionsTabRef.current.handleSave();
-      } else if (activeTab === 'basic' && basicInfoTabRef.current) {
+      if (activeTab === 'basic' && basicInfoTabRef.current) {
         await basicInfoTabRef.current.handleSave();
       } else if (activeTab === 'salary' && salaryTabRef.current) {
         await salaryTabRef.current.handleSave();
-      } else if (activeTab === 'attendance' && attendanceTabRef.current) {
-        await attendanceTabRef.current.handleSave();
-      } else if (activeTab === 'contracts' && contractsTabRef.current) {
-        await contractsTabRef.current.handleSave();
       }
 
       // 重新載入員工資料以確保顯示最新內容
-      const { loadUsersFromDatabase } = useUserStore.getState();
-      await loadUsersFromDatabase();
+      const { fetchAll } = useUserStore.getState();
+      await fetchAll();
 
       setIsEditing(false);
     } catch (error) {
-      console.error('儲存失敗:', error);
+      console.error('❌ 儲存失敗:', error);
       alert('儲存失敗，請稍後再試');
     }
   };
@@ -130,11 +106,7 @@ export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedVi
       case 'salary':
         return <SalaryTab ref={salaryTabRef} employee={employee} isEditing={isEditing} setIsEditing={setIsEditing} />;
       case 'permissions':
-        return <PermissionsTab ref={permissionsTabRef} employee={employee} isEditing={isEditing} setIsEditing={setIsEditing} />;
-      case 'attendance':
-        return <AttendanceTab ref={attendanceTabRef} employee={employee} isEditing={isEditing} setIsEditing={setIsEditing} />;
-      case 'contracts':
-        return <ContractsTab ref={contractsTabRef} employee={employee} isEditing={isEditing} setIsEditing={setIsEditing} />;
+        return <PermissionsTab employee={employee} />;
       default:
         return null;
     }
@@ -150,7 +122,7 @@ export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedVi
               {employee.avatar ? (
                 <img
                   src={employee.avatar}
-                  alt={employee.chineseName}
+                  alt={employee.display_name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
               ) : (
@@ -159,10 +131,10 @@ export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedVi
             </div>
             <div>
               <h2 className="text-xl font-bold text-morandi-primary">
-                {employee.chineseName} ({employee.englishName})
+                {employee.display_name || (employee as any).chinese_name || '未命名員工'}
               </h2>
               <p className="text-morandi-secondary">
-                {employee.employeeNumber} | {employee.jobInfo.department} | {employee.jobInfo.position}
+                {employee.employee_number}
               </p>
             </div>
           </div>
@@ -199,26 +171,28 @@ export function EmployeeExpandedView({ employeeId, onClose }: EmployeeExpandedVi
             {renderTabStats()}
           </div>
 
-          {/* 編輯按鈕區域 */}
-          <div className="py-3">
-            {isEditing ? (
-              <div className="flex gap-2">
-                <Button size="sm" onClick={handleSave}>
-                  <Save size={14} className="mr-1" />
-                  儲存
+          {/* 編輯按鈕區域（權限分頁不顯示） */}
+          {activeTab !== 'permissions' && (
+            <div className="py-3">
+              {isEditing ? (
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSave}>
+                    <Save size={14} className="mr-1" />
+                    儲存
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
+                    <X size={14} className="mr-1" />
+                    取消
+                  </Button>
+                </div>
+              ) : (
+                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+                  <Edit size={14} className="mr-1" />
+                  編輯
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
-                  <X size={14} className="mr-1" />
-                  取消
-                </Button>
-              </div>
-            ) : (
-              <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
-                <Edit size={14} className="mr-1" />
-                編輯
-              </Button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 分頁內容 */}

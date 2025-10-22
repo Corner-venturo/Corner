@@ -21,7 +21,7 @@ export class LocalAuthService {
     try {
       // 1. 從 IndexedDB 查詢員工
       const employees = await localDB.filter('employees', [
-        { field: 'employeeNumber', operator: 'eq', value: username }
+        { field: 'employee_number', operator: 'eq', value: username }
       ]);
 
       if (employees.length === 0) {
@@ -56,9 +56,9 @@ export class LocalAuthService {
       // 4. 驗證密碼
       let isValidPassword = false;
       
-      if (employee.passwordHash) {
+      if (employee.password_hash) {
         try {
-          isValidPassword = await bcrypt.compare(password, employee.passwordHash);
+          isValidPassword = await bcrypt.compare(password, employee.password_hash);
         } catch (error) {
           console.error('密碼驗證失敗:', error);
           // 開發環境 fallback
@@ -73,8 +73,8 @@ export class LocalAuthService {
           // 自動設定密碼
           const hashedPassword = await bcrypt.hash(password, 10);
           await localDB.update('employees', employee.id, {
-            passwordHash: hashedPassword
-          });
+            password_hash: hashedPassword
+          } as any);
           isValidPassword = true;
           console.log('✅ 已為預設帳號設定密碼');
         }
@@ -103,21 +103,21 @@ export class LocalAuthService {
         lastLoginAt: new Date().toISOString(),
         loginAttempts: 0,
         lockedUntil: null
-      });
+      } as any);
 
       // 6. 建立使用者物件
-      const user: User = {
+      const user: any = {
         id: employee.id,
-        employeeNumber: employee.employee_number,
+        employee_number: employee.employee_number,
         name: employee.name,
         email: employee.email,
         permissions: employee.permissions || [],
         department: employee.department,
         position: employee.position,
         avatar: employee.avatar,
-        isActive: employee.is_active !== false,
-        createdAt: employee.created_at,
-        updatedAt: employee.updated_at
+        is_active: employee.is_active !== false,
+        created_at: employee.created_at,
+        updated_at: employee.updated_at || employee.updatedAt
       };
 
       return { 
@@ -138,13 +138,13 @@ export class LocalAuthService {
    * 變更密碼
    */
   static async changePassword(
-    userId: string,
+    user_id: string,
     oldPassword: string,
     newPassword: string
   ): Promise<{ success: boolean; message?: string }> {
     try {
       // 1. 取得使用者資料
-      const employee: any = await localDB.read('employees', userId);
+      const employee: any = await localDB.read('employees', user_id);
       
       if (!employee) {
         return { 
@@ -154,8 +154,8 @@ export class LocalAuthService {
       }
 
       // 2. 驗證舊密碼
-      if (employee.passwordHash) {
-        const isValid = await bcrypt.compare(oldPassword, employee.passwordHash);
+      if (employee.password_hash) {
+        const isValid = await bcrypt.compare(oldPassword, employee.password_hash);
         if (!isValid) {
           return { 
             success: false, 
@@ -168,10 +168,10 @@ export class LocalAuthService {
       const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
       // 4. 更新密碼
-      await localDB.update('employees', userId, {
-        passwordHash: newPasswordHash,
-        updatedAt: new Date().toISOString()
-      });
+      await localDB.update('employees', user_id, {
+        password_hash: newPasswordHash,
+        updated_at: new Date().toISOString()
+      } as any);
 
       return { success: true };
 
@@ -188,20 +188,20 @@ export class LocalAuthService {
    * 重設密碼（管理員功能）
    */
   static async resetPassword(
-    userId: string,
+    user_id: string,
     newPassword: string
   ): Promise<{ success: boolean; message?: string }> {
     try {
       // 加密新密碼
-      const passwordHash = await bcrypt.hash(newPassword, 10);
+      const password_hash = await bcrypt.hash(newPassword, 10);
 
       // 更新密碼並清除鎖定
-      await localDB.update('employees', userId, {
-        passwordHash,
+      await localDB.update('employees', user_id, {
+        password_hash,
         loginAttempts: 0,
         lockedUntil: null,
-        updatedAt: new Date().toISOString()
-      });
+        updated_at: new Date().toISOString()
+      } as any);
 
       return { success: true };
 
@@ -218,7 +218,7 @@ export class LocalAuthService {
    * 建立新使用者
    */
   static async createUser(userData: {
-    employeeNumber: string;
+    employee_number: string;
     name: string;
     email: string;
     password: string;
@@ -229,7 +229,7 @@ export class LocalAuthService {
     try {
       // 檢查員工編號是否已存在
       const existing = await localDB.filter('employees', [
-        { field: 'employeeNumber', operator: 'eq', value: userData.employee_number }
+        { field: 'employee_number', operator: 'eq', value: userData.employee_number }
       ]);
 
       if (existing.length > 0) {
@@ -240,40 +240,40 @@ export class LocalAuthService {
       }
 
       // 加密密碼
-      const passwordHash = await bcrypt.hash(userData.password, 10);
+      const password_hash = await bcrypt.hash(userData.password, 10);
 
       // 建立員工資料
       const newEmployee = {
         id: `emp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        employeeNumber: userData.employee_number,
+        employee_number: userData.employee_number,
         name: userData.name,
         email: userData.email,
-        passwordHash,
+        password_hash,
         permissions: userData.permissions || [],
         department: userData.department || '',
         position: userData.position || '',
         salary: 0,
-        isActive: true,
+        is_active: true,
         loginAttempts: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       // 儲存到 IndexedDB
       const created = await localDB.create('employees', newEmployee);
 
       // 建立使用者物件
-      const user: User = {
+      const user: any = {
         id: created.id,
-        employeeNumber: created.employee_number,
+        employee_number: created.employee_number,
         name: created.name,
         email: created.email,
         permissions: created.permissions,
         department: created.department,
         position: created.position,
-        isActive: true,
-        createdAt: created.created_at,
-        updatedAt: created.updated_at
+        is_active: true,
+        created_at: created.created_at,
+        updated_at: created.updated_at
       };
 
       return { 

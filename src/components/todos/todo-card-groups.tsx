@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Todo } from '@/stores/types';
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodoStore } from '@/stores';
 import { Calendar, Clock, AlertTriangle, CheckCircle2, Star, Trash2, Edit2, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,9 @@ interface TodoCardGroupsProps {
 }
 
 export function TodoCardGroups({ todos, groupBy, onTodoClick, onEdit }: TodoCardGroupsProps) {
-  const { updateTodo, deleteTodo } = useTodoStore();
+  const todoStore = useTodoStore();
+  const updateTodo = todoStore.update;
+  const deleteTodo = todoStore.delete;
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   // 按日期分組：今天、本週、稍後
@@ -261,10 +263,10 @@ export function TodoCardGroups({ todos, groupBy, onTodoClick, onEdit }: TodoCard
                         {todo.title}
                       </h4>
 
-                      {/* 描述 */}
-                      {todo.description && (
+                      {/* 備註（使用第一條 note） */}
+                      {todo.notes && todo.notes.length > 0 && (
                         <p className="text-sm text-morandi-secondary line-clamp-2 mb-3">
-                          {todo.description}
+                          {todo.notes[0].content}
                         </p>
                       )}
 
@@ -277,22 +279,23 @@ export function TodoCardGroups({ todos, groupBy, onTodoClick, onEdit }: TodoCard
                       )}
 
                       {/* 關聯項目標籤 */}
-                      {todo.relatedItems && todo.relatedItems.length > 0 && (
+                      {todo.related_items && todo.related_items.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
-                          {todo.relatedItems.slice(0, 2).map((item, idx) => (
+                          {todo.related_items.slice(0, 2).map((item, idx) => (
                             <span
                               key={idx}
                               className="px-2 py-0.5 bg-morandi-container rounded text-xs text-morandi-secondary"
                             >
-                              {item.type === 'tour' && '🎫'}
+                              {item.type === 'group' && '🎫'}
                               {item.type === 'order' && '📋'}
-                              {item.type === 'payment' && '💰'}
-                              {item.type === 'visa' && '🛂'}
+                              {item.type === 'quote' && '💰'}
+                              {item.type === 'invoice' && '🧾'}
+                              {item.type === 'receipt' && '🧾'}
                             </span>
                           ))}
-                          {todo.relatedItems.length > 2 && (
+                          {todo.related_items.length > 2 && (
                             <span className="px-2 py-0.5 bg-morandi-container rounded text-xs text-morandi-secondary">
-                              +{todo.relatedItems.length - 2}
+                              +{todo.related_items.length - 2}
                             </span>
                           )}
                         </div>

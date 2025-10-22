@@ -3,7 +3,7 @@
 export interface TransportOption {
   id: string;
   name: string;
-  pricePerPerson?: number;
+  price_per_person?: number;
   pricePerGroup?: number;
   capacity?: number;
   is_group_cost?: boolean;
@@ -26,13 +26,13 @@ export interface RegionOptions {
 // 清邁選項
 export const chiangMaiOptions: RegionOptions = {
   transport: [
-    { id: 'cm-airport-transfer', name: '機場接送', pricePerPerson: 150, pricePerGroup: 800, is_group_cost: true },
-    { id: 'cm-city-halfday', name: '古城包車半日', pricePerPerson: 200, pricePerGroup: 1200, is_group_cost: true },
-    { id: 'cm-city-fullday', name: '古城包車一日', pricePerPerson: 350, pricePerGroup: 2100, is_group_cost: true },
-    { id: 'cm-night-market', name: '夜市包車', pricePerPerson: 100, pricePerGroup: 600, is_group_cost: true },
-    { id: 'cm-doi-suthep', name: '素帖山包車', pricePerPerson: 250, pricePerGroup: 1500, is_group_cost: true },
-    { id: 'cm-taxi', name: '計程車', pricePerPerson: 50, is_group_cost: false },
-    { id: 'cm-tuk-tuk', name: '嘟嘟車', pricePerPerson: 80, is_group_cost: false },
+    { id: 'cm-airport-transfer', name: '機場接送', price_per_person: 150, pricePerGroup: 800, is_group_cost: true },
+    { id: 'cm-city-halfday', name: '古城包車半日', price_per_person: 200, pricePerGroup: 1200, is_group_cost: true },
+    { id: 'cm-city-fullday', name: '古城包車一日', price_per_person: 350, pricePerGroup: 2100, is_group_cost: true },
+    { id: 'cm-night-market', name: '夜市包車', price_per_person: 100, pricePerGroup: 600, is_group_cost: true },
+    { id: 'cm-doi-suthep', name: '素帖山包車', price_per_person: 250, pricePerGroup: 1500, is_group_cost: true },
+    { id: 'cm-taxi', name: '計程車', price_per_person: 50, is_group_cost: false },
+    { id: 'cm-tuk-tuk', name: '嘟嘟車', price_per_person: 80, is_group_cost: false },
   ],
   activities: [
     { id: 'cm-elephant-sanctuary', name: '大象保護區', category: '生態體驗', adultPrice: 1500, childPrice: 1000 },
@@ -48,12 +48,12 @@ export const chiangMaiOptions: RegionOptions = {
 // 曼谷選項
 export const bangkokOptions: RegionOptions = {
   transport: [
-    { id: 'bkk-airport-transfer', name: '機場接送', pricePerPerson: 200, pricePerGroup: 1000, is_group_cost: true },
-    { id: 'bkk-city-tour', name: '市區觀光包車', pricePerPerson: 300, pricePerGroup: 1800, is_group_cost: true },
-    { id: 'bkk-floating-market', name: '水上市場包車', pricePerPerson: 400, pricePerGroup: 2400, is_group_cost: true },
-    { id: 'bkk-bts-day-pass', name: 'BTS一日券', pricePerPerson: 140, is_group_cost: false },
-    { id: 'bkk-mrt-day-pass', name: 'MRT一日券', pricePerPerson: 120, is_group_cost: false },
-    { id: 'bkk-taxi', name: '計程車', pricePerPerson: 100, is_group_cost: false },
+    { id: 'bkk-airport-transfer', name: '機場接送', price_per_person: 200, pricePerGroup: 1000, is_group_cost: true },
+    { id: 'bkk-city-tour', name: '市區觀光包車', price_per_person: 300, pricePerGroup: 1800, is_group_cost: true },
+    { id: 'bkk-floating-market', name: '水上市場包車', price_per_person: 400, pricePerGroup: 2400, is_group_cost: true },
+    { id: 'bkk-bts-day-pass', name: 'BTS一日券', price_per_person: 140, is_group_cost: false },
+    { id: 'bkk-mrt-day-pass', name: 'MRT一日券', price_per_person: 120, is_group_cost: false },
+    { id: 'bkk-taxi', name: '計程車', price_per_person: 100, is_group_cost: false },
   ],
   activities: [
     { id: 'bkk-grand-palace', name: '大皇宮', category: '歷史古蹟', adultPrice: 500, childPrice: 250 },
@@ -68,12 +68,12 @@ export const bangkokOptions: RegionOptions = {
 // 東京選項
 export const tokyoOptions: RegionOptions = {
   transport: [
-    { id: 'tyo-airport-narita', name: '成田機場接送', pricePerPerson: 600, pricePerGroup: 3600, is_group_cost: true },
-    { id: 'tyo-airport-haneda', name: '羽田機場接送', pricePerPerson: 500, pricePerGroup: 3000, is_group_cost: true },
-    { id: 'tyo-jr-pass-7day', name: 'JR Pass 7日券', pricePerPerson: 8500, is_group_cost: false },
-    { id: 'tyo-tokyo-metro-24h', name: '東京地鐵24小時券', pricePerPerson: 240, is_group_cost: false },
-    { id: 'tyo-private-car', name: '包車一日', pricePerPerson: 1200, pricePerGroup: 7200, is_group_cost: true },
-    { id: 'tyo-taxi', name: '計程車', pricePerPerson: 200, is_group_cost: false },
+    { id: 'tyo-airport-narita', name: '成田機場接送', price_per_person: 600, pricePerGroup: 3600, is_group_cost: true },
+    { id: 'tyo-airport-haneda', name: '羽田機場接送', price_per_person: 500, pricePerGroup: 3000, is_group_cost: true },
+    { id: 'tyo-jr-pass-7day', name: 'JR Pass 7日券', price_per_person: 8500, is_group_cost: false },
+    { id: 'tyo-tokyo-metro-24h', name: '東京地鐵24小時券', price_per_person: 240, is_group_cost: false },
+    { id: 'tyo-private-car', name: '包車一日', price_per_person: 1200, pricePerGroup: 7200, is_group_cost: true },
+    { id: 'tyo-taxi', name: '計程車', price_per_person: 200, is_group_cost: false },
   ],
   activities: [
     { id: 'tyo-tokyo-skytree', name: '東京晴空塔', category: '觀光景點', adultPrice: 2100, childPrice: 950 },

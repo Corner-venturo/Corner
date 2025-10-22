@@ -38,30 +38,33 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
 
   // 從請款單解析房間配額，生成房間選項
   const generateRoomOptions = (): RoomOption[] => {
-    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id);
+    const tourPaymentRequests = paymentRequests.filter((request: any) => request.tour_id === tour.id);
     const roomOptions: RoomOption[] = [];
 
-    tourPaymentRequests.forEach(request => {
-      request.items.forEach(item => {
+    tourPaymentRequests.forEach((request: any) => {
+      request.items.forEach((item: any) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g);
           if (roomMatches) {
-            roomMatches.forEach(match => {
-              const [, roomType, quantity] = match.match(/(\S+房)\s*[x×]\s*(\d+)/) || [];
-              if (roomType && quantity) {
-                const capacity = getRoomCapacity(roomType);
-                const roomCount = parseInt(quantity);
+            roomMatches.forEach((match: any) => {
+              const matchResult = match.match(/(\S+房)\s*[x×]\s*(\d+)/);
+              if (matchResult) {
+                const [, room_type, quantity] = matchResult;
+                if (room_type && quantity) {
+                  const capacity = getRoomCapacity(room_type);
+                  const roomCount = parseInt(quantity);
 
-                // 生成具體房間選項（如：雙人房-1、雙人房-2...）
-                for (let i = 1; i <= roomCount; i++) {
-                  roomOptions.push({
-                    value: `${roomType}-${i}`,
-                    label: `${roomType}-${i}`,
-                    roomType,
-                    capacity,
-                    currentCount: 0
-                  });
+                  // 生成具體房間選項（如：雙人房-1、雙人房-2...）
+                  for (let i = 1; i <= roomCount; i++) {
+                    roomOptions.push({
+                      value: `${room_type}-${i}`,
+                      label: `${room_type}-${i}`,
+                      room_type,
+                      capacity,
+                      currentCount: 0
+                    });
+                  }
                 }
               }
             });
@@ -87,14 +90,14 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     const rooms = generateRoomOptions();
     setRoomOptions(rooms);
     // 保留 members 中原有的 assignedRoom 數據
-    setMembersWithRooms(tourMembers.map(member => ({ ...member })));
+    setMembersWithRooms(tourMembers.map(member => ({ ...member } as MemberWithRoom)));
   }, [tour.id, paymentRequests, tourMembers]);
 
   // 分配房間
-  const assignMemberToRoom = (memberId: string, roomValue: string) => {
+  const assignMemberToRoom = (member_id: string, roomValue: string) => {
     setMembersWithRooms(prev =>
       prev.map(member =>
-        member.id === memberId
+        member.id === member_id
           ? { ...member, assignedRoom: roomValue || undefined }
           : member
       )

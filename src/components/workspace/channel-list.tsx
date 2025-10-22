@@ -13,14 +13,14 @@ interface ChannelListProps {
 }
 
 export function ChannelList({ channels, activeChannelId, onSelectChannel }: ChannelListProps) {
-  // 分類頻道
-  const fixedChannels = channels.filter(c => c.type === 'fixed');
-  const tourChannels = channels.filter(c => c.type === 'tour');
-  const customChannels = channels.filter(c => c.type === 'custom');
-  
+  // 分類頻道 - 使用實際的 type 值
+  const publicChannels = channels.filter(c => c.type === 'public');
+  const privateChannels = channels.filter(c => c.type === 'private');
+  const directChannels = channels.filter(c => c.type === 'direct');
+
   const renderChannel = (channel: Channel) => {
     const is_active = channel.id === activeChannelId;
-    const isArchived = channel.isArchived;
+    const isArchived = (channel as any).isArchived; // TODO: Add isArchived to Channel interface
 
     return (
       <button
@@ -33,7 +33,7 @@ export function ChannelList({ channels, activeChannelId, onSelectChannel }: Chan
           isArchived && 'opacity-60'
         )}
       >
-        {channel.type === 'custom' ? (
+        {channel.type === 'private' ? (
           <Lock size={14} className="flex-shrink-0" />
         ) : (
           <Hash size={14} className="flex-shrink-0" />
@@ -46,36 +46,36 @@ export function ChannelList({ channels, activeChannelId, onSelectChannel }: Chan
   
   return (
     <div className="py-2 space-y-4">
-      {/* 固定頻道 */}
-      {fixedChannels.length > 0 && (
+      {/* 公開頻道 */}
+      {publicChannels.length > 0 && (
         <div className="px-3">
-          <div className="text-xs font-semibold text-morandi-secondary mb-2">固定頻道</div>
+          <div className="text-xs font-semibold text-morandi-secondary mb-2">公開頻道</div>
           <div className="space-y-0.5">
-            {fixedChannels.map(channel => (
+            {publicChannels.map(channel => (
               <div key={channel.id}>{renderChannel(channel)}</div>
             ))}
           </div>
         </div>
       )}
 
-      {/* 旅遊團頻道 */}
-      {tourChannels.length > 0 && (
-        <div className="px-3">
-          <div className="text-xs font-semibold text-morandi-secondary mb-2">旅遊團</div>
-          <div className="space-y-0.5">
-            {tourChannels.map(channel => (
-              <div key={channel.id}>{renderChannel(channel)}</div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 自訂頻道 */}
-      {customChannels.length > 0 && (
+      {/* 私人頻道 */}
+      {privateChannels.length > 0 && (
         <div className="px-3">
           <div className="text-xs font-semibold text-morandi-secondary mb-2">私人頻道</div>
           <div className="space-y-0.5">
-            {customChannels.map(channel => (
+            {privateChannels.map(channel => (
+              <div key={channel.id}>{renderChannel(channel)}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 直接訊息 */}
+      {directChannels.length > 0 && (
+        <div className="px-3">
+          <div className="text-xs font-semibold text-morandi-secondary mb-2">直接訊息</div>
+          <div className="space-y-0.5">
+            {directChannels.map(channel => (
               <div key={channel.id}>{renderChannel(channel)}</div>
             ))}
           </div>

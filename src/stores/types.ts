@@ -2,17 +2,26 @@
 // 核心型別定義
 // ============================
 
+// 收款狀態
+export type ReceiptStatus = 'received' | 'confirmed' | 'rejected';
+
+// 付款方式
+export type PaymentMethod = 'cash' | 'transfer' | 'card' | 'check';
+
+// 簽證狀態
+export type VisaStatus = 'pending' | 'submitted' | 'issued' | 'collected' | 'rejected';
+
 // 正確的 User 型別（與 Employee 一致）
 export interface User {
   id: string;
   employee_number: string;
   english_name: string;
-  chinese_name: string;
+  display_name: string;
+  chinese_name: string; // 中文姓名（本名）
   personal_info: {
     national_id: string;
     birthday: string;
-    gender: 'male' | 'female';
-    phone: string;
+    phone: string | string[]; // 支援單一電話或多個電話
     email: string;
     address: string;
     emergency_contact: {
@@ -22,28 +31,26 @@ export interface User {
     };
   };
   job_info: {
-    department: string;
-    position: string;
     supervisor?: string;
-    hireDate: string;
-    probationEndDate?: string;
-    employmentType: 'fulltime' | 'parttime' | 'contract';
+    hire_date: string;
+    probation_end_date?: string;
   };
   salary_info: {
-    baseSalary: number;
+    base_salary: number;
     allowances: {
       type: string;
       amount: number;
     }[];
-    salaryHistory: {
-      effectiveDate: string;
-      baseSalary: number;
+    salary_history: {
+      effective_date: string;
+      base_salary: number;
       reason: string;
     }[];
   };
   permissions: string[];
+  roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant')[]; // 附加身份標籤（不影響權限），支援多重身份
   attendance: {
-    leaveRecords: {
+    leave_records: {
       id: string;
       type: 'annual' | 'sick' | 'personal' | 'maternity' | 'other';
       start_date: string;
@@ -51,14 +58,14 @@ export interface User {
       days: number;
       reason?: string;
       status: 'pending' | 'approved' | 'rejected';
-      approvedBy?: string;
+      approved_by?: string;
     }[];
-    overtimeRecords: {
+    overtime_records: {
       id: string;
       date: string;
       hours: number;
       reason: string;
-      approvedBy?: string;
+      approved_by?: string;
     }[];
   };
   contracts: {
@@ -66,13 +73,21 @@ export interface User {
     type: 'employment' | 'probation' | 'renewal';
     start_date: string;
     end_date?: string;
-    filePath?: string;
+    file_path?: string;
     notes?: string;
   }[];
   status: 'active' | 'probation' | 'leave' | 'terminated';
   avatar?: string;
-  created_at?: string;
-  updated_at?: string;
+
+  // 認證相關
+  password_hash?: string; // 加密後的密碼
+  last_password_change?: string; // 最後修改密碼時間
+  must_change_password?: boolean; // 是否需要修改密碼（首次登入）
+  failed_login_attempts?: number; // 登入失敗次數
+  last_failed_login?: string; // 最後失敗登入時間
+
+  created_at: string;
+  updated_at: string;
 }
 
 // Employee 型別現在是 User 的別名
@@ -92,18 +107,18 @@ export interface Todo {
   visibility: string[]; // 可見人員ID列表 = [creator, assignee]
 
   // 關聯資料
-  relatedItems: {
+  related_items: {
     type: 'group' | 'quote' | 'order' | 'invoice' | 'receipt';
     id: string;
     title: string;
   }[];
 
   // 子任務
-  subTasks: {
+  sub_tasks: {
     id: string;
     title: string;
     done: boolean;
-    completedAt?: string;
+    completed_at?: string;
   }[];
 
   // 簡單備註（非留言板）
@@ -113,13 +128,25 @@ export interface Todo {
   }[];
 
   // 快速功能設定
-  enabledQuickActions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[];
+  enabled_quick_actions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[];
 
   // 通知標記
-  needsCreatorNotification?: boolean; // 被指派人有更新，需要通知建立者
+  needs_creator_notification?: boolean; // 被指派人有更新，需要通知建立者
 
   created_at: string;
   updated_at: string;
+}
+
+// 航班資訊
+export interface FlightInfo {
+  airline: string;  // 航空公司
+  flightNumber: string;  // 班次
+  departureAirport: string;  // 出發機場代碼（如：TPE）
+  departureTime: string;  // 出發時間（如：06:50）
+  departureDate?: string;  // 出發日期（如：10/21）
+  arrivalAirport: string;  // 抵達機場代碼（如：FUK）
+  arrivalTime: string;  // 抵達時間（如：09:55）
+  duration?: string;  // 飛行時間（如：2小時5分）
 }
 
 export interface Tour {
@@ -128,16 +155,31 @@ export interface Tour {
   name: string;
   departure_date: string;
   return_date: string;
-  status: '提案' | '進行中' | '待結案' | '結案' | '特殊團';
+  status: 'draft' | 'active' | 'pending_close' | 'closed' | 'cancelled' | 'special';
+  // draft: 提案
+  // active: 進行中
+  // pending_close: 待結案
+  // closed: 結案
+  // cancelled: 已取消
+  // special: 特殊團
   location: string;
   price: number;
   max_participants: number; // 最大參與人數
-  contract_status: '未簽署' | '已簽署';
+  contract_status: 'pending' | 'partial' | 'signed';
+  // pending: 未簽署
+  // partial: 部分簽署
+  // signed: 已簽署
   total_revenue: number;
   total_cost: number;
   profit: number;
   quote_id?: string; // 關聯的報價單ID
   quote_cost_structure?: QuoteCategory[]; // 報價成本結構快照
+  archived?: boolean; // 是否已封存
+
+  // 航班資訊（選填）
+  outboundFlight?: FlightInfo;  // 去程航班
+  returnFlight?: FlightInfo;  // 回程航班
+
   created_at: string;
   updated_at: string;
 }
@@ -190,6 +232,106 @@ export interface TourRefund {
   updated_at: string;
 }
 
+// 行程表相關型別
+export interface FlightInfo {
+  airline: string;
+  flightNumber: string;
+  departureAirport: string;
+  departureTime: string;
+  departureDate: string;
+  arrivalAirport: string;
+  arrivalTime: string;
+  duration: string;
+}
+
+export interface ItineraryFeature {
+  icon: string; // icon 名稱 (如: "IconBuilding")
+  title: string;
+  description: string;
+}
+
+export interface FocusCard {
+  title: string;
+  src: string; // 圖片 URL
+}
+
+export interface LeaderInfo {
+  name: string;
+  domesticPhone: string;
+  overseasPhone: string;
+}
+
+export interface MeetingInfo {
+  time: string; // ISO 8601 格式
+  location: string;
+}
+
+export interface DailyActivity {
+  icon: string; // emoji 或 icon
+  title: string;
+  description: string;
+}
+
+export interface DailyMeals {
+  breakfast: string;
+  lunch: string;
+  dinner: string;
+}
+
+export interface DailyItineraryDay {
+  dayLabel: string; // 如: "Day 1"
+  date: string; // 如: "10/21 (二)"
+  title: string;
+  highlight?: string;
+  description?: string;
+  activities: DailyActivity[];
+  recommendations: string[];
+  meals: DailyMeals;
+  accommodation: string;
+}
+
+export interface Itinerary {
+  id: string;
+  tour_id?: string; // 關聯的團 ID（選填，因為可能只是草稿）
+
+  // 封面資訊
+  tagline: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  departureDate: string;
+  tourCode: string;
+  coverImage: string;
+  country: string;
+  city: string;
+  status: '草稿' | '已發布';
+
+  // 航班資訊
+  outboundFlight?: FlightInfo;
+  returnFlight?: FlightInfo;
+
+  // 行程特色
+  features: ItineraryFeature[];
+
+  // 精選景點
+  focusCards: FocusCard[];
+
+  // 領隊資訊
+  leader?: LeaderInfo;
+
+  // 集合資訊
+  meetingInfo?: MeetingInfo;
+
+  // 行程副標題
+  itinerarySubtitle?: string;
+
+  // 逐日行程
+  dailyItinerary: DailyItineraryDay[];
+
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Order {
   id: string;
   order_number: string;
@@ -200,7 +342,16 @@ export interface Order {
   sales_person: string;
   assistant: string;
   member_count: number; // 訂單人數
-  payment_status: '未收款' | '部分收款' | '已收款';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  // pending: 待確認
+  // confirmed: 已確認
+  // completed: 已完成
+  // cancelled: 已取消
+  payment_status: 'unpaid' | 'partial' | 'paid' | 'refunded';
+  // unpaid: 未收款
+  // partial: 部分收款
+  // paid: 已收款
+  // refunded: 已退款
   total_amount: number;
   paid_amount: number;
   remaining_amount: number;
@@ -208,27 +359,24 @@ export interface Order {
   updated_at: string;
 }
 
-export interface Customer {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  orders: string[]; // order IDs
-  tours: string[]; // tour IDs
-  total_spent: number;
-  created_at: string;
-  updated_at: string;
-}
+// Customer 類型已移至 @/types/customer.types.ts
+// 使用完整的 Customer 定義，不再使用簡化版
+export type { Customer } from '@/types/customer.types';
 
 export interface Payment {
   id: string;
-  type: '收款' | '請款' | '出納';
+  type: 'receipt' | 'request' | 'disbursement';
+  // receipt: 收款
+  // request: 請款
+  // disbursement: 出納
   order_id?: string;
   tour_id?: string;
   amount: number;
   description: string;
-  status: '待確認' | '已確認' | '已完成';
+  status: 'pending' | 'confirmed' | 'completed';
+  // pending: 待確認
+  // confirmed: 已確認
+  // completed: 已完成
   created_at: string;
   updated_at: string;
 }
@@ -237,7 +385,13 @@ export interface Quote {
   id: string;
   quote_number?: string; // 報價單號碼 (QUOTE-2025-0001)
   name: string; // 團體名稱
-  status: '提案' | '最終版本';
+  status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected';
+  // draft: 草稿
+  // proposed: 提案
+  // revised: 修改中
+  // approved: 已核准
+  // converted: 已轉單
+  // rejected: 已拒絕
   tour_id?: string; // 關聯的旅遊團ID
 
   // 客戶資訊
@@ -247,12 +401,30 @@ export interface Quote {
   contact_email?: string; // Email
 
   // 需求資訊
-  group_size: number; // 團體人數
+  group_size: number; // 團體人數（向下相容：總人數）
   accommodation_days: number; // 住宿天數
   requirements?: string; // 需求說明
   budget_range?: string; // 預算範圍
   valid_until?: string; // 報價有效期
   payment_terms?: string; // 付款條件
+
+  // 多身份人數統計
+  participant_counts?: {
+    adult: number; // 成人（雙人房）
+    child_with_bed: number; // 小朋友（佔床）
+    child_no_bed: number; // 不佔床
+    single_room: number; // 單人房
+    infant: number; // 嬰兒
+  };
+
+  // 多身份售價
+  selling_prices?: {
+    adult: number;
+    child_with_bed: number;
+    child_no_bed: number;
+    single_room: number;
+    infant: number;
+  };
 
   categories: QuoteCategory[]; // 費用分類
   total_cost: number; // 總成本
@@ -267,6 +439,22 @@ export interface QuoteVersion {
   version: number;
   categories: QuoteCategory[];
   total_cost: number;
+  group_size: number; // 團體人數
+  accommodation_days: number; // 住宿天數
+  participant_counts: {
+    adult: number;
+    child_with_bed: number;
+    child_no_bed: number;
+    single_room: number;
+    infant: number;
+  }; // 多身份人數統計
+  selling_prices: {
+    adult: number;
+    child_with_bed: number;
+    child_no_bed: number;
+    single_room: number;
+    infant: number;
+  }; // 多身份售價
   note?: string; // 修改說明
   created_at: string;
 }
@@ -288,6 +476,13 @@ export interface QuoteItem {
   day?: number; // 住宿專用：第幾天
   room_type?: string; // 住宿專用：房型名稱
   is_group_cost?: boolean; // 交通和領隊導遊專用：團體分攤
+  // 多身份計價：機票專用
+  pricing_type?: 'uniform' | 'by_identity'; // uniform: 統一價格, by_identity: 依身份計價
+  adult_price?: number; // 成人價
+  child_price?: number; // 小朋友價
+  infant_price?: number; // 嬰兒價
+  created_at: string;
+  updated_at: string;
 }
 
 // === 供應商管理系統 ===
@@ -296,7 +491,7 @@ export interface Supplier {
   name: string;
   type: 'hotel' | 'restaurant' | 'transport' | 'ticket' | 'guide' | 'other';
   contact: SupplierContact;
-  bankInfo?: SupplierBankInfo;
+  bank_info?: SupplierBankInfo;
   price_list: PriceListItem[];
   status: 'active' | 'inactive';
   note?: string;
@@ -327,8 +522,8 @@ export interface PriceListItem {
   unit_price: number;
   unit: string; // 單位：晚、台、人、次等
   seasonality?: 'peak' | 'regular' | 'off';
-  validFrom?: string;
-  validTo?: string;
+  valid_from?: string;
+  valid_to?: string;
   note?: string;
   created_at: string;
 }
@@ -338,9 +533,19 @@ export interface PriceListItem {
 export interface PaymentRequest {
   id: string;
   request_number: string; // REQ-2024001
-  tour_id: string; // 團號
-  code: string; // CNX241225
-  tour_name: string; // 團體名稱快照
+
+  // 分配模式
+  allocation_mode: 'single' | 'multiple'; // 單一團體 or 批量分配
+
+  // 單一團體模式（向下相容）
+  tour_id?: string; // 團號（allocation_mode = 'single' 時使用）
+  code?: string; // CNX241225
+  tour_name?: string; // 團體名稱快照
+
+  // 批量分配模式（一筆帳分多團）
+  tour_allocations?: TourAllocation[]; // 團體分配列表（allocation_mode = 'multiple' 時使用）
+
+  // 共用欄位
   quote_id?: string; // 關聯的報價單ID
   order_id?: string; // 訂單ID（選填）
   order_number?: string; // 訂單號碼
@@ -372,6 +577,14 @@ export interface PaymentRequestItem {
   updated_at: string;
 }
 
+// 團體分配項目（用於批量分配）
+export interface TourAllocation {
+  tour_id: string; // 團號ID
+  code: string; // 團體代碼
+  tour_name: string; // 團體名稱
+  allocated_amount: number; // 分配金額
+}
+
 // === 出納單管理系統 ===
 export interface DisbursementOrder {
   id: string;
@@ -382,9 +595,9 @@ export interface DisbursementOrder {
   status: 'pending' | 'confirmed' | 'paid'; // 待確認、已確認、已付款
   note?: string; // 出納備註
   created_by: string; // 建立者ID
-  confirmedBy?: string; // 確認者ID
-  confirmedAt?: string; // 確認時間
-  paidAt?: string; // 付款時間
+  confirmed_by?: string; // 確認者ID
+  confirmed_at?: string; // 確認時間
+  paid_at?: string; // 付款時間
   created_at: string;
   updated_at: string;
 }
@@ -393,37 +606,58 @@ export interface DisbursementOrder {
 export interface ReceiptOrder {
   id: string;
   receipt_number: string; // REC-2024001
-  order_id: string; // 關聯的訂單ID
-  order_number: string; // 訂單號碼快照
-  tour_id: string; // 團號
-  code: string; // 團體代碼
-  tour_name: string; // 團體名稱快照
-  contact_person: string; // 聯絡人快照
+
+  // 分配模式
+  allocation_mode: 'single' | 'multiple'; // 單一訂單 or 批量分配
+
+  // 單一訂單模式（向下相容）
+  order_id?: string; // 關聯的訂單ID（allocation_mode = 'single' 時使用）
+  order_number?: string; // 訂單號碼快照
+  tour_id?: string; // 團號
+  code?: string; // 團體代碼
+  tour_name?: string; // 團體名稱快照
+  contact_person?: string; // 聯絡人快照
+
+  // 批量分配模式（一筆款分多訂單）
+  order_allocations?: OrderAllocation[]; // 訂單分配列表（allocation_mode = 'multiple' 時使用）
+
+  // 共用欄位
   receipt_date: string; // 收款日期
   payment_items: ReceiptPaymentItem[]; // 收款項目
   total_amount: number; // 總收款金額
-  status: '已收款' | '已確認' | '退回'; // 收款狀態
+  status: ReceiptStatus; // 收款狀態
   note?: string; // 收款備註
   created_by: string; // 建立者ID
-  confirmedBy?: string; // 確認者ID
-  confirmedAt?: string; // 確認時間
+  confirmed_by?: string; // 確認者ID
+  confirmed_at?: string; // 確認時間
   created_at: string;
   updated_at: string;
+}
+
+// 訂單分配項目（用於批量分配）
+export interface OrderAllocation {
+  order_id: string; // 訂單ID
+  order_number: string; // 訂單號碼
+  tour_id: string; // 團號
+  code: string; // 團體代碼
+  tour_name: string; // 團體名稱
+  contact_person: string; // 聯絡人
+  allocated_amount: number; // 分配金額
 }
 
 export interface ReceiptPaymentItem {
   id: string;
   receipt_id: string; // 所屬收款單ID
-  payment_method: '現金' | '匯款' | '刷卡' | '支票'; // 收款方式
+  payment_method: PaymentMethod; // 收款方式
   amount: number; // 金額
-  accountInfo?: string; // 帳戶資訊 (匯款用)
-  cardLastFour?: string; // 卡號後四碼 (刷卡用)
-  authCode?: string; // 授權碼 (刷卡用)
-  checkNumber?: string; // 支票號碼
-  checkBank?: string; // 支票銀行
-  checkDueDate?: string; // 支票到期日
+  account_info?: string; // 帳戶資訊 (匯款用)
+  card_last_four?: string; // 卡號後四碼 (刷卡用)
+  auth_code?: string; // 授權碼 (刷卡用)
+  check_number?: string; // 支票號碼
+  check_bank?: string; // 支票銀行
+  check_due_date?: string; // 支票到期日
   transaction_date: string; // 交易日期
-  handlerName?: string; // 經手人 (現金用)
+  handler_name?: string; // 經手人 (現金用)
   fees?: number; // 手續費
   note?: string; // 備註
   created_at: string;
@@ -444,12 +678,12 @@ export interface Visa {
   country: string; // 國家
 
   // 狀態
-  status: '待送件' | '已送件' | '已下件' | '已取件' | '退件';
+  status: VisaStatus;
 
   // 日期
-  submissionDate?: string; // 送件時間
-  receivedDate?: string; // 下件時間
-  pickupDate?: string; // 取件時間
+  submission_date?: string; // 送件時間
+  received_date?: string; // 下件時間
+  pickup_date?: string; // 取件時間
 
   // 關聯資訊
   order_id: string; // 關聯的訂單ID
@@ -463,7 +697,7 @@ export interface Visa {
 
   // 其他
   note?: string; // 備註
-  createdBy?: string; // 建立者ID
+  created_by?: string; // 建立者ID
   created_at: string;
   updated_at: string;
 }

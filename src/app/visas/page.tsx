@@ -7,18 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { Combobox, ComboboxOption } from '@/components/ui/combobox';
-import { useVisaStore } from '@/stores/visa-store';
-import { useTourStore } from '@/stores/tour-store';
-import { useOrderStore } from '@/stores/order-store';
+import { useVisaStore, useTourStore, useOrderStore } from '@/stores';
 import { useAuthStore } from '@/stores/auth-store';
-import { FileCheck, Clock, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
+import { FileCheck, Clock, CheckCircle, XCircle, AlertCircle, FileText, Edit2, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Visa } from '@/stores/types';
+import { logger } from '@/lib/utils/logger';
+import { tourService } from '@/features/tours/services/tour.service';
 
 export default function VisasPage() {
-  const { visas, addVisa, updateVisa, deleteVisa, batchUpdateStatus } = useVisaStore();
-  const { tours, addTour } = useTourStore();
-  const { addOrder } = useOrderStore();
+  const { items: visas, create: addVisa, update: updateVisa, delete: deleteVisa } = useVisaStore();
+  const { items: tours, create: addTour, fetchAll: fetchTours } = useTourStore();
+  const { items: orders, create: addOrder } = useOrderStore();
   const { user } = useAuthStore();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -50,50 +50,70 @@ export default function VisasPage() {
   }, []);
 
   // 新增簽證表單 - 聯絡人資訊
-  const [contactInfo, setContactInfo] = useState({
+  const [contact_info, setContactInfo] = useState({
     tour_id: '',
     order_id: '', // 新增訂單ID欄位
-    applicantName: '',
+    applicant_name: '',
     contact_person: '',
     contact_phone: '',
   });
 
   // 團號選項（轉換為 Combobox 格式）
-  const tourOptions: ComboboxOption[] = useMemo(() =>
-    tours.map(tour => ({
+  const tourOptions: ComboboxOption[] = useMemo(() => {
+    console.log('📋 當前 tours 數量:', tours.length);
+    console.log('📋 Tours:', tours);
+    return tours.map(tour => ({
       value: tour.id,
       label: `${tour.code} - ${tour.name}`,
-    }))
-  , [tours]);
+    }));
+  }, [tours]);
 
   // 訂單選項（根據選擇的團號過濾）
   const orderOptions: ComboboxOption[] = React.useMemo(() => {
-    if (!contactInfo.tour_id) return [];
-    const { orders } = useOrderStore.getState();
+    if (!contact_info.tour_id) return [];
+    const { items: orders } = useOrderStore.getState();
     return orders
-      .filter(order => order.tour_id === contactInfo.tour_id)
-      .map(order => ({
+      .filter((order: any) => order.tour_id === contact_info.tour_id)
+      .map((order: any) => ({
         value: order.id,
         label: `${order.order_number} - ${order.contact_person}`,
       }));
-  }, [contactInfo.tour_id]);
+  }, [contact_info.tour_id]);
 
-  // 當 tours 載入後，自動設定預設團號
+  // 當頁面載入時，自動取得或建立當年度簽證專用團
   useEffect(() => {
-    const defaultVisaTour = tours.find(t => t.code === 'SPC251231001');
-    if (defaultVisaTour && !contactInfo.tour_id) {
-      setContactInfo(prev => ({ ...prev, tour_id: defaultVisaTour.id }));
-    }
-  }, [tours]);
+    const initVisaTour = async () => {
+      try {
+        console.log('🔍 開始建立/取得簽證專用團...');
+        const visaTour = await tourService.getOrCreateVisaTour();
+        console.log('✅ 簽證專用團:', visaTour);
+
+        // 重新載入 tours 以確保新建立的簽證專用團出現在列表中
+        console.log('🔄 重新載入 tours...');
+        await fetchTours();
+        console.log('✅ Tours 重新載入完成');
+
+        if (visaTour && !contact_info.tour_id) {
+          console.log('✅ 設定預設團號:', visaTour.id);
+          setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
+        }
+      } catch (error) {
+        console.error('❌ 建立簽證專用團失敗:', error);
+        logger.error('Failed to get or create visa tour', error);
+      }
+    };
+
+    initVisaTour();
+  }, []);
 
   // 批次辦理人列表
   interface VisaApplicant {
     id: string;
     name: string;
     country: string;
-    isUrgent: boolean;
-    submissionDate: string;
-    receivedDate: string;
+    is_urgent: boolean;
+    submission_date: string;
+    received_date: string;
     cost: number;
   }
 
@@ -102,23 +122,23 @@ export default function VisasPage() {
       id: '1',
       name: '',
       country: '護照 成人',
-      isUrgent: false,
-      submissionDate: '',
-      receivedDate: '',
+      is_urgent: false,
+      submission_date: '',
+      received_date: '',
       cost: 0,
     }
   ]);
 
-  // 第一個辦理人自動帶入申請人姓名
+  // 第一個辦理人自動帶入申請人姓名（即時同步）
   useEffect(() => {
-    if (contactInfo.applicantName && applicants.length > 0 && !applicants[0].name) {
+    if (applicants.length > 0) {
       setApplicants(prev => {
         const updated = [...prev];
-        updated[0].name = contactInfo.applicantName;
+        updated[0].name = contact_info.applicant_name;
         return updated;
       });
     }
-  }, [contactInfo.applicantName]);
+  }, [contact_info.applicant_name]);
 
   // 新增辦理人
   const addApplicant = useCallback(() => {
@@ -126,9 +146,9 @@ export default function VisasPage() {
       id: Date.now().toString(),
       name: '',
       country: '護照 成人',
-      isUrgent: false,
-      submissionDate: '',
-      receivedDate: '',
+      is_urgent: false,
+      submission_date: '',
+      received_date: '',
       cost: 0,
     }]);
   }, []);
@@ -148,10 +168,21 @@ export default function VisasPage() {
       const updated = { ...a, [field]: value };
 
       // 如果是送件時間或簽證類型改變，自動計算下件時間
-      if (field === 'submissionDate' || field === 'country' || field === 'isUrgent') {
-        if (updated.submissionDate) {
-          const visaTypeWithUrgent = updated.isUrgent ? `${updated.country} 急件` : updated.country;
-          updated.receivedDate = calculateReceivedDate(updated.submissionDate, visaTypeWithUrgent);
+      if (field === 'submission_date' || field === 'country' || field === 'is_urgent') {
+        if (updated.submission_date) {
+          const visaTypeWithUrgent = updated.is_urgent ? `${updated.country} 急件` : updated.country;
+          updated.received_date = calculateReceivedDate(updated.submission_date, visaTypeWithUrgent);
+        }
+      }
+
+      // 如果勾選/取消急件，自動調整成本 ±900
+      if (field === 'is_urgent') {
+        if (value === true) {
+          // 勾選急件：+900
+          updated.cost = a.cost + 900;
+        } else {
+          // 取消急件：-900
+          updated.cost = Math.max(0, a.cost - 900);
         }
       }
 
@@ -176,12 +207,12 @@ export default function VisasPage() {
 
   // 處理批次新增簽證
   const handleAddVisa = async () => {
-    if (!contactInfo.applicantName || !user) return;
+    if (!contact_info.applicant_name || !user) return;
 
     let selectedTour;
 
     // 如果沒選團號，自動建立或使用預設的「簽證代辦團」
-    if (!contactInfo.tour_id) {
+    if (!contact_info.tour_id) {
       const currentYear = new Date().getFullYear();
       const defaultTourCode = `VISA-${currentYear}`;
 
@@ -191,22 +222,22 @@ export default function VisasPage() {
         selectedTour = existingDefaultTour;
       } else {
         const endOfYear = `${currentYear}-12-31`;
-        selectedTour = addTour({
+        selectedTour = await addTour({
           name: `${currentYear}年度簽證代辦`,
-          departureDate: endOfYear,
-          returnDate: endOfYear,
+          departure_date: endOfYear,
+          return_date: endOfYear,
           status: '特殊團' as const,
           location: 'VISA',
           price: 0,
-          maxParticipants: 9999,
-          contractStatus: '未簽署' as const,
-          totalRevenue: 0,
+          max_participants: 9999,
+          contract_status: '未簽署' as const,
+          total_revenue: 0,
           total_cost: 0,
           profit: 0,
-        });
+        } as any);
       }
     } else {
-      selectedTour = tours.find(t => t.id === contactInfo.tour_id);
+      selectedTour = tours.find(t => t.id === contact_info.tour_id);
       if (!selectedTour) return;
     }
 
@@ -214,32 +245,35 @@ export default function VisasPage() {
     const totalFee = applicants.reduce((sum, a) => sum + calculateFee(a.country), 0);
     let targetOrder;
 
-    if (contactInfo.order_id) {
+    if (contact_info.order_id) {
       // 如果有選擇訂單，使用現有訂單
-      const { orders } = useOrderStore.getState();
-      targetOrder = orders.find(o => o.id === contactInfo.order_id);
+      targetOrder = orders.find(o => o.id === contact_info.order_id);
       if (!targetOrder) return;
     } else {
       // 如果沒有選擇訂單，自動建立新訂單
-      const orderNumber = `${selectedTour.code}-${String(Date.now()).slice(-6)}`;
+      // 計算該團的訂單流水號（3位數）
+      const tourOrders = orders.filter(o => o.tour_id === selectedTour.id);
+      const nextNumber = (tourOrders.length + 1).toString().padStart(3, '0');
+      const order_number = `${selectedTour.code}-${nextNumber}`;
+
       targetOrder = await addOrder({
-        orderNumber,
+        order_number,
         tour_id: selectedTour.id,
-        code: selectedTour.code,
+        code: order_number, // 訂單編號同時作為 code（唯一識別）
         tour_name: selectedTour.name,
-        contact_person: contactInfo.contact_person || contactInfo.applicantName,
-        salesPerson: user.chineseName || '系統',
-        assistant: user.chineseName || '系統',
-        memberCount: applicants.filter(a => a.name).length,
+        contact_person: contact_info.contact_person || contact_info.applicant_name,
+        sales_person: user.display_name || '系統',
+        assistant: user.display_name || '系統',
+        member_count: applicants.filter(a => a.name).length,
         total_amount: totalFee,
-        paidAmount: 0,
-        remainingAmount: totalFee,
-        paymentStatus: '未收款' as const,
+        paid_amount: 0,
+        remaining_amount: totalFee,
+        payment_status: '未收款' as const,
       });
     }
 
     if (!targetOrder) {
-      console.error('訂單建立失敗');
+      logger.error('訂單建立失敗');
       return;
     }
 
@@ -248,19 +282,19 @@ export default function VisasPage() {
       if (!applicant.name) return;
 
       const fee = calculateFee(applicant.country);
-      const totalCost = applicant.isUrgent ? applicant.cost + 900 : applicant.cost;
+      const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost;
 
       // 建立簽證記錄
       addVisa({
-        applicantName: applicant.name,
-        contact_person: contactInfo.contact_person,
-        contact_phone: contactInfo.contact_phone,
-        visaType: applicant.country, // 簽證類型
+        applicant_name: applicant.name,
+        contact_person: contact_info.contact_person,
+        contact_phone: contact_info.contact_phone,
+        visa_type: applicant.country, // 簽證類型
         country: applicant.country,   // 國家（保留相容性）
-        submissionDate: applicant.submissionDate,
-        receivedDate: applicant.receivedDate,
+        submission_date: applicant.submission_date,
+        received_date: applicant.received_date,
         fee,
-        cost: totalCost,
+        cost: total_cost,
         status: '待送件',
         order_id: targetOrder.id,
         order_number: targetOrder.order_number,
@@ -272,11 +306,13 @@ export default function VisasPage() {
     });
 
     // 重置表單（保持預設團號）
-    const defaultVisaTour = tours.find(t => t.code === 'SPC251231001');
+    const currentYear = new Date().getFullYear();
+    const visaCode = `VISA${currentYear}001`;
+    const defaultVisaTour = tours.find(t => t.code === visaCode);
     setContactInfo({
       tour_id: defaultVisaTour?.id || '',
       order_id: '',
-      applicantName: '',
+      applicant_name: '',
       contact_person: '',
       contact_phone: '',
     });
@@ -284,9 +320,9 @@ export default function VisasPage() {
       id: '1',
       name: '',
       country: '護照 成人',
-      isUrgent: false,
-      submissionDate: '',
-      receivedDate: '',
+      is_urgent: false,
+      submission_date: '',
+      received_date: '',
       cost: 0,
     }]);
 
@@ -294,10 +330,15 @@ export default function VisasPage() {
   };
 
   // 批次送件
-  const handleBatchSubmit = () => {
+  const handleBatchSubmit = async () => {
     if (selectedRows.length === 0) return;
     const today = new Date().toISOString().split('T')[0];
-    batchUpdateStatus(selectedRows, '已送件', today);
+
+    // 使用標準 API 批次更新
+    for (const id of selectedRows) {
+      await updateVisa(id, { status: '已送件', submission_date: today });
+    }
+
     setSelectedRows([]);
   };
 
@@ -316,89 +357,90 @@ export default function VisasPage() {
   // Table 欄位定義
   const columns: TableColumn[] = [
     {
-      key: 'applicantName',
+      key: 'applicant_name',
       label: '申請人',
       sortable: true,
-      render: (value) => value,
+      render: (value) => <span className="text-sm text-morandi-primary">{value}</span>,
     },
     {
-      key: 'contactPerson',
+      key: 'contact_person',
       label: '聯絡人',
-      render: (value) => value,
+      render: (value) => <span className="text-sm text-morandi-primary">{value}</span>,
     },
     {
-      key: 'contactPhone',
+      key: 'contact_phone',
       label: '聯絡電話',
-      render: (value) => value,
+      render: (value) => <span className="text-sm text-morandi-primary">{value}</span>,
     },
     {
       key: 'country',
       label: '簽證',
-      render: (value) => value,
+      render: (value) => <span className="text-sm text-morandi-primary">{value}</span>,
     },
     {
       key: 'status',
       label: '狀態',
       render: (value, visa) => (
         <span className={cn(
-          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-          getStatusBadge(visa.status)
+          'text-sm font-medium',
+          visa.status === '已送件' ? 'text-morandi-gold' :
+          visa.status === '已下件' ? 'text-morandi-green' :
+          'text-morandi-secondary'
         )}>
           {visa.status}
         </span>
       ),
     },
     {
-      key: 'submissionDate',
+      key: 'submission_date',
       label: '送件時間',
-      render: (value) => value ? new Date(value).toLocaleDateString() : '-',
+      render: (value) => <span className="text-sm text-morandi-secondary">{value ? new Date(value).toLocaleDateString() : '-'}</span>,
     },
     {
-      key: 'receivedDate',
+      key: 'received_date',
       label: '下件時間',
-      render: (value) => value ? new Date(value).toLocaleDateString() : '-',
+      render: (value) => <span className="text-sm text-morandi-secondary">{value ? new Date(value).toLocaleDateString() : '-'}</span>,
     },
     {
       key: 'fee',
       label: '代辦費',
-      render: (value) => `NT$ ${value.toLocaleString()}`,
+      render: (value) => <span className="text-sm text-morandi-primary">NT$ {value.toLocaleString()}</span>,
     },
   ];
 
   const renderActions = (visa: Visa) => (
     <div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="sm"
+      <button
         onClick={(e) => {
           e.stopPropagation();
           // 編輯功能
         }}
-        className="h-8 w-8 p-0"
+        className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+        title="編輯"
       >
-        編輯
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+        <Edit2 size={14} />
+      </button>
+      <button
         onClick={(e) => {
           e.stopPropagation();
           if (confirm('確定要刪除此簽證記錄嗎？')) {
             deleteVisa(visa.id);
           }
         }}
-        className="h-8 w-8 p-0 text-morandi-red"
+        className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+        title="刪除"
       >
-        刪除
-      </Button>
+        <Trash2 size={14} />
+      </button>
     </div>
   );
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="簽證管理"
-        icon={FileText}
+        {...{
+        title: "簽證管理",
+        icon: FileText} as any}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '簽證管理', href: '/visas' }
@@ -417,8 +459,9 @@ export default function VisasPage() {
         onTabChange={setActiveTab}
       />
 
-      {/* 批次操作按鈕 */}
-      {selectedRows.length > 0 && (
+      <div className="flex-1 overflow-auto">
+        {/* 批次操作按鈕 */}
+        {selectedRows.length > 0 && (
         <div className="bg-morandi-container p-4 rounded-lg flex items-center justify-between">
           <span className="text-sm text-morandi-primary">
             已選擇 {selectedRows.length} 筆簽證
@@ -440,9 +483,9 @@ export default function VisasPage() {
         </div>
       )}
 
-      {/* 簽證列表 */}
-      <div className="pb-6">
+        {/* 簽證列表 */}
         <EnhancedTable
+          className="min-h-full"
           columns={columns}
           data={filteredVisas}
           loading={false}
@@ -452,17 +495,6 @@ export default function VisasPage() {
           }}
           actions={renderActions}
           bordered={true}
-          emptyState={
-            <div className="text-center py-8 text-morandi-secondary">
-              <FileText size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium text-morandi-primary mb-2">
-                {activeTab === 'all' ? '還沒有任何簽證記錄' : `沒有「${activeTab}」狀態的簽證`}
-              </p>
-              <p className="text-sm text-morandi-secondary mb-6">
-                點擊右上角「新增簽證」開始建立
-              </p>
-            </div>
-          }
         />
       </div>
 
@@ -480,7 +512,7 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
                   <Combobox
-                    value={contactInfo.tour_id}
+                    value={contact_info.tour_id}
                     onChange={(value) => {
                       setContactInfo(prev => ({ ...prev, tour_id: value, order_id: '' }));
                     }}
@@ -496,12 +528,12 @@ export default function VisasPage() {
                     選擇訂單 <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
                   </label>
                   <Combobox
-                    value={contactInfo.order_id}
+                    value={contact_info.order_id}
                     onChange={(value) => setContactInfo(prev => ({ ...prev, order_id: value }))}
                     options={orderOptions}
-                    placeholder={contactInfo.tour_id ? "請選擇訂單或留空自動建立" : "請先選擇團號"}
+                    placeholder={contact_info.tour_id ? "請選擇訂單或留空自動建立" : "請先選擇團號"}
                     className="mt-1"
-                    disabled={!contactInfo.tour_id}
+                    disabled={!contact_info.tour_id}
                     showSearchIcon
                     showClearButton
                   />
@@ -512,7 +544,7 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
                   <Input
-                    value={contactInfo.contact_person}
+                    value={contact_info.contact_person}
                     onChange={(e) => setContactInfo(prev => ({ ...prev, contact_person: e.target.value }))}
                     className="mt-1"
                     placeholder="請輸入聯絡人"
@@ -521,8 +553,8 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">申請人</label>
                   <Input
-                    value={contactInfo.applicantName}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, applicantName: e.target.value }))}
+                    value={contact_info.applicant_name}
+                    onChange={(e) => setContactInfo(prev => ({ ...prev, applicant_name: e.target.value }))}
                     className="mt-1"
                     placeholder="請輸入申請人姓名"
                   />
@@ -530,7 +562,7 @@ export default function VisasPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
                   <Input
-                    value={contactInfo.contact_phone}
+                    value={contact_info.contact_phone}
                     onChange={(e) => setContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
                     className="mt-1"
                     placeholder="請輸入聯絡電話"
@@ -569,14 +601,14 @@ export default function VisasPage() {
 
                   <Input
                     type="date"
-                    value={applicant.submissionDate}
-                    onChange={(e) => updateApplicant(applicant.id, 'submissionDate', e.target.value)}
+                    value={applicant.submission_date}
+                    onChange={(e) => updateApplicant(applicant.id, 'submission_date', e.target.value)}
                     className="flex-1"
                   />
 
                   <Input
                     type="date"
-                    value={applicant.receivedDate}
+                    value={applicant.received_date}
                     readOnly
                     className="flex-1 bg-muted"
                   />
@@ -599,8 +631,8 @@ export default function VisasPage() {
                   <div className="flex items-center gap-1">
                     <input
                       type="checkbox"
-                      checked={applicant.isUrgent}
-                      onChange={(e) => updateApplicant(applicant.id, 'isUrgent', e.target.checked)}
+                      checked={applicant.is_urgent}
+                      onChange={(e) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
                       className="w-4 h-4"
                     />
                     <span className="text-sm whitespace-nowrap">急件</span>
@@ -631,7 +663,7 @@ export default function VisasPage() {
             </Button>
             <Button
               onClick={handleAddVisa}
-              disabled={!contactInfo.applicantName || applicants.every(a => !a.name)}
+              disabled={!contact_info.applicant_name || applicants.every(a => !a.name)}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               批次新增簽證

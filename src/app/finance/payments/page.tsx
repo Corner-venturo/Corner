@@ -7,8 +7,10 @@ import { Input } from '@/components/ui/input';
 import { EnhancedTable } from '@/components/ui/enhanced-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore } from '@/stores';
+// TODO: usePaymentStore deprecated - 收款記錄功能未實作
 import { CreditCard, Calendar, Plus, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // 收款方式選項
 const paymentMethods = [
@@ -41,7 +43,8 @@ interface PaymentItem {
 }
 
 export default function PaymentsPage() {
-  const { payments, orders } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const payments: any[] = []; // TODO: 實作收款記錄功能
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 只取收款記錄
@@ -73,7 +76,7 @@ export default function PaymentsPage() {
   }, [orders, selectedOrderId]);
 
   // 計算總收款金額
-  const totalAmount = useMemo(() => {
+  const total_amount = useMemo(() => {
     return paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0);
   }, [paymentItems]);
 
@@ -119,7 +122,7 @@ export default function PaymentsPage() {
 
   // 處理儲存
   const handleSave = () => {
-    if (!selectedOrderId || paymentItems.length === 0 || totalAmount <= 0) {
+    if (!selectedOrderId || paymentItems.length === 0 || total_amount <= 0) {
       alert('請填寫完整資訊');
       return;
     }
@@ -129,7 +132,7 @@ export default function PaymentsPage() {
       order_id: selectedOrderId,
       receiptDate,
       paymentItems,
-      totalAmount,
+      total_amount,
       note
     });
 
@@ -141,7 +144,7 @@ export default function PaymentsPage() {
   // 定義表格欄位
   const columns = [
     {
-      key: 'createdAt',
+      key: 'created_at',
       label: '日期',
       sortable: true,
       render: (value: string) => (
@@ -156,7 +159,7 @@ export default function PaymentsPage() {
       label: '金額',
       sortable: true,
       render: (value: number) => (
-        <div className="font-medium text-morandi-green">
+        <div className="text-sm font-medium text-morandi-green">
           NT$ {value.toLocaleString()}
         </div>
       )
@@ -172,7 +175,7 @@ export default function PaymentsPage() {
       )
     },
     {
-      key: 'orderId',
+      key: 'order_id',
       label: '訂單編號',
       sortable: true,
       render: (value: string) => (
@@ -186,9 +189,10 @@ export default function PaymentsPage() {
       label: '狀態',
       sortable: true,
       render: (value: string) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          value === '已確認' ? 'bg-morandi-green text-white' : 'bg-morandi-gold text-white'
-        }`}>
+        <span className={cn(
+          'text-sm font-medium',
+          value === '已確認' ? 'text-morandi-green' : 'text-morandi-gold'
+        )}>
           {value}
         </span>
       )
@@ -196,7 +200,7 @@ export default function PaymentsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="收款管理"
         actions={
@@ -210,21 +214,16 @@ export default function PaymentsPage() {
         }
       />
 
-      {/* 使用 EnhancedTable - 直接作為卡片，不需要外層 ContentContainer */}
-      <EnhancedTable
-        data={paymentRecords}
-        columns={columns}
-        emptyState={
-          <div className="text-center text-morandi-secondary">
-            <CreditCard size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium text-morandi-primary mb-2">暫無收款記錄</p>
-            <p className="text-sm">點擊上方「新增收款」按鈕建立第一筆收款記錄</p>
-          </div>
-        }
-        defaultSort={{ key: 'createdAt', direction: 'desc' }}
-        searchable
-        searchPlaceholder="搜尋說明或訂單編號..."
-      />
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+          className="min-h-full"
+          data={paymentRecords}
+          columns={columns}
+          defaultSort={{ key: 'created_at', direction: 'desc' }}
+          searchable
+          searchPlaceholder="搜尋說明或訂單編號..."
+        />
+      </div>
 
       {/* 新增收款對話框 */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -464,7 +463,7 @@ export default function PaymentsPage() {
                 <div>
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">總收款金額</label>
                   <Input
-                    value={`NT$ ${totalAmount.toLocaleString()}`}
+                    value={`NT$ ${total_amount.toLocaleString()}`}
                     disabled
                     className="bg-morandi-container/30 text-lg font-medium"
                   />
@@ -474,7 +473,7 @@ export default function PaymentsPage() {
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">收款後狀態</label>
                   <Input
                     value={selectedOrder ?
-                      (totalAmount >= (selectedOrder.remaining_amount || 0) ? '已收款' : '部分收款')
+                      (total_amount >= (selectedOrder.remaining_amount || 0) ? '已收款' : '部分收款')
                       : '請選擇訂單'}
                     disabled
                     className="bg-morandi-container/30"
@@ -506,7 +505,7 @@ export default function PaymentsPage() {
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={!selectedOrderId || totalAmount <= 0}
+                disabled={!selectedOrderId || total_amount <= 0}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 儲存收款單

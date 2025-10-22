@@ -5,8 +5,6 @@
  *
  * 在應用啟動時自動檢查並初始化 IndexedDB
  * 確保 William 管理員帳號存在
- *
- * Phase 1 緊急修復
  */
 
 import { useEffect, useState } from 'react';

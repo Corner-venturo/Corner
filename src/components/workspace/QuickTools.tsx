@@ -148,7 +148,7 @@ export function QuickTools() {
       return;
     }
 
-    const rate = exchangeRates[fromCurrency as keyof typeof exchangeRates]?.[toCurrency as keyof typeof exchangeRates.USD];
+    const rate = (exchangeRates as any)[fromCurrency]?.[toCurrency];
     if (rate) {
       setConvertedAmount(amountNum * rate);
     }

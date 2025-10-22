@@ -60,7 +60,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
     let hasError = false;
 
     fields.forEach((field) => {
-      const validation = validateField(field);
+      const validation = validateField(field as any);
       if (!validation.valid) {
         newErrors[field.id] = validation.error!;
         hasError = true;

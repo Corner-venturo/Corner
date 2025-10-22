@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useImperativeHandle, forwardRef, useMemo, useCallback } from 'react';
-import { useTourStore } from '@/stores/tour-store';
+import { useMemberStore } from '@/stores';
 import { Member } from '@/stores/types';
 import {
   getGenderFromIdNumber,
@@ -11,28 +11,29 @@ import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/reac
 
 interface MemberTableProps {
   order_id: string;
-  departureDate: string;
-  memberCount: number;
+  departure_date: string;
+  member_count: number;
 }
 
 export interface MemberTableRef {
   addRow: () => void;
 }
 
-interface EditingMember extends Omit<Member, 'id' | 'createdAt' | 'updatedAt'> {
+interface EditingMember extends Omit<Member, 'id' | 'created_at' | 'updated_at'> {
   id?: string;
   isNew?: boolean;
 }
 
 
 export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
-  ({ orderId, departureDate, memberCount }, ref) => {
-  const { members, addMember, updateMember, deleteMember } = useTourStore();
+  ({ order_id, departure_date, member_count }, ref) => {
+  const memberStore = useMemberStore();
+  const members = memberStore.items;
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([]);
 
   const orderMembers = useMemo(() =>
-    members.filter(member => member.order_id === orderId),
-    [members, orderId]
+    members.filter(member => member.order_id === order_id),
+    [members, order_id]
   );
 
   // 配置 DataSheet 欄位
@@ -50,60 +51,61 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
   ];
 
   useEffect(() => {
-    const existingMembers = orderMembers.map(member => ({ ...member }));
+    const existingMembers = orderMembers.map((member: any) => ({ ...member }));
 
-    // 確保至少有memberCount行
-    while (existingMembers.length < memberCount) {
+    // 確保至少有member_count行
+    while (existingMembers.length < member_count) {
       existingMembers.push({
-        orderId,
+        order_id,
         name: '',
-        nameEn: '',
+        name_en: '',
         birthday: '',
-        passportNumber: '',
-        passportExpiry: '',
-        idNumber: '',
+        passport_number: '',
+        passport_expiry: '',
+        id_number: '',
         gender: '',
         age: 0,
-        reservationCode: '',
-        addOns: [],
+        reservation_code: '',
+        add_ons: [],
         refunds: [],
         isNew: true
       });
     }
 
     setTableMembers(existingMembers);
-  }, [orderMembers, memberCount, orderId]);
+  }, [orderMembers, member_count, order_id]);
 
 
   // 自動儲存成員
-  const autoSaveMember = (member: EditingMember, index: number) => {
+  const autoSaveMember = async (member: EditingMember, index: number) => {
     if (member.isNew && member.name.trim()) {
       const { isNew, ...memberData } = member;
-      const newId = addMember(memberData);
+      const created = await memberStore.create(memberData as any);
+      const newId = created?.id;
 
       const updatedMembers = [...tableMembers];
-      updatedMembers[index] = { ...member, id: newId, isNew: false };
+      updatedMembers[index] = { ...member, id: newId as string, isNew: false };
       setTableMembers(updatedMembers);
     } else if (member.id && !member.isNew) {
       const { isNew, ...memberData } = member;
-      updateMember(member.id, memberData);
+      await memberStore.update(member.id, memberData);
     }
   };
 
   // 處理資料更新 (用於 ReactDataSheet)
   const handleDataUpdate = useCallback((newData: EditingMember[]) => {
     // 處理自動計算欄位
-    const processedData = newData.map(member => {
+    const processedData = newData.map((member: any) => {
       const processed = { ...member };
 
       // 從身分證號自動計算性別和年齡
       if (processed.id_number) {
         processed.gender = getGenderFromIdNumber(processed.id_number);
-        processed.age = calculateAge(processed.id_number, departureDate);
+        processed.age = calculateAge(processed.id_number, departure_date) as number;
       }
       // 從生日計算年齡
       else if (processed.birthday) {
-        processed.age = calculateAge(processed.birthday, departureDate, true);
+        processed.age = calculateAge(processed.birthday as string, departure_date) as number;
       }
 
       return processed;
@@ -112,26 +114,26 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     setTableMembers(processedData);
 
     // 自動儲存到 store
-    processedData.forEach((member, index) => {
+    processedData.forEach((member: any, index: number) => {
       autoSaveMember(member, index);
     });
-  }, [departureDate, tableMembers, addMember, updateMember]);
+  }, [departure_date, tableMembers, memberStore]);
 
   // 新增行
   const addRow = () => {
     console.log('addRow called, current tableMembers:', tableMembers.length);
     const newMember: EditingMember = {
-      orderId,
+      order_id,
       name: '',
-      nameEn: '',
+      name_en: '',
       birthday: '',
-      passportNumber: '',
-      passportExpiry: '',
-      idNumber: '',
+      passport_number: '',
+      passport_expiry: '',
+      id_number: '',
       gender: '',
       age: 0,
-      reservationCode: '',
-      addOns: [],
+      reservation_code: '',
+      add_ons: [],
       refunds: [],
       isNew: true
     };

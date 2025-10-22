@@ -5,13 +5,13 @@ import { useRouter, useParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { useOrderStore, useTourStore } from '@/stores';
-import { ArrowLeft, BarChart3, Calendar, User, CreditCard } from 'lucide-react';
+import { ArrowLeft, BarChart3, User, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function OrderOverviewPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.order_id as string;
+  const orderId = params.orderId as string;
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore();
 
@@ -76,10 +76,6 @@ export default function OrderOverviewPage() {
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">團體代號</span>
                 <span className="text-morandi-primary font-medium">{order.code}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/30">
-                <span className="text-morandi-secondary">建立時間</span>
-                <span className="text-morandi-primary">{new Date(order.created_at).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">最後更新</span>
@@ -165,7 +161,7 @@ export default function OrderOverviewPage() {
         </div>
 
         {/* 快速導航 */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           <Button
             onClick={() => router.push(`/orders/${orderId}/payment`)}
             variant="outline"
@@ -181,14 +177,6 @@ export default function OrderOverviewPage() {
           >
             <User size={24} className="text-morandi-gold" />
             <span>成員管理</span>
-          </Button>
-          <Button
-            onClick={() => router.push(`/orders/${orderId}/documents`)}
-            variant="outline"
-            className="p-6 h-auto flex-col space-y-2"
-          >
-            <Calendar size={24} className="text-morandi-gold" />
-            <span>文件管理</span>
           </Button>
         </div>
       </div>

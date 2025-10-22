@@ -17,18 +17,18 @@ export interface Todo extends BaseEntity {
   visibility: string[]; // 可見人員ID列表 = [creator, assignee]
 
   // 關聯資料
-  relatedItems: {
+  related_items: {
     type: 'group' | 'quote' | 'order' | 'invoice' | 'receipt';
     id: string;
     title: string;
   }[];
 
   // 子任務
-  subTasks: {
+  sub_tasks: {
     id: string;
     title: string;
     done: boolean;
-    completedAt?: string;
+    completed_at?: string;
   }[];
 
   // 簡單備註（非留言板）
@@ -38,10 +38,10 @@ export interface Todo extends BaseEntity {
   }[];
 
   // 快速功能設定
-  enabledQuickActions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[];
+  enabled_quick_actions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[];
 
   // 通知標記
-  needsCreatorNotification?: boolean; // 被指派人有更新，需要通知建立者
+  needs_creator_notification?: boolean; // 被指派人有更新，需要通知建立者
 }
 
 export type CreateTodoData = Omit<Todo, keyof BaseEntity>;

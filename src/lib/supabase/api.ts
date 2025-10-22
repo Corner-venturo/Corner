@@ -90,8 +90,8 @@ export class VenturoAPI {
       const snakeData = data.map(toSnakeCase);
 
       const { data: result, error } = await supabase
-        .from(table)
-        .insert(snakeData)
+        .from(table as any)
+        .insert(snakeData as any)
         .select();
 
       if (error) {
@@ -197,8 +197,8 @@ export class VenturoAPI {
         updated_at: new Date().toISOString()
       };
 
-      const { data: result, error } = await supabase
-        .from(table)
+      const queryBuilder: any = supabase.from(table as any);
+      const { data: result, error } = await queryBuilder
         .update(updateData)
         .eq('id', id)
         .select()
@@ -233,7 +233,8 @@ export class VenturoAPI {
         updated_at: new Date().toISOString()
       };
 
-      let query = supabase.from(table).update(updateData);
+      let query: any = supabase.from(table as any);
+      query = query.update(updateData);
 
       // 過濾條件也轉換
       Object.entries(filters).forEach(([key, value]) => {
@@ -335,10 +336,10 @@ export class VenturoAPI {
    */
   static async query<T = any>(sql: string, params?: any[]): Promise<T[]> {
     try {
-      const { data, error } = await supabase.rpc('execute_sql', {
+      const { data, error } = await supabase.rpc('execute_sql' as any, {
         query: sql,
         params: params || []
-      });
+      } as any);
 
       if (error) {
         console.error(`SQL Query error:`, error);

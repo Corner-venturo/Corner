@@ -1,7 +1,7 @@
 export interface TaskTemplate {
   id: string;
   title: string;
-  subTasks: string[];
+  sub_tasks: string[];
   defaultDeadlineDays: number; // 相對出發日期的天數（負數表示之前）
   defaultPriority: 1 | 2 | 3 | 4 | 5;
   category: 'preparation' | 'documents' | 'booking' | 'finance' | 'operation';
@@ -11,7 +11,7 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'pre-tour': {
     id: 'pre-tour',
     title: '行前準備工作',
-    subTasks: [
+    sub_tasks: [
       '確認最終名單',
       '準備行程資料',
       '確認導遊領隊',
@@ -26,7 +26,7 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'documents': {
     id: 'documents',
     title: '文件準備作業',
-    subTasks: [
+    sub_tasks: [
       '收集護照資料',
       '準備簽證文件',
       '保險投保',
@@ -41,7 +41,7 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'booking': {
     id: 'booking',
     title: '訂房訂車作業',
-    subTasks: [
+    sub_tasks: [
       '飯店訂房確認',
       '遊覽車預訂',
       '餐廳訂位',
@@ -56,7 +56,7 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'collection': {
     id: 'collection',
     title: '收款作業',
-    subTasks: [
+    sub_tasks: [
       '發送訂金通知',
       '確認訂金收款',
       '發送尾款通知',
@@ -71,7 +71,7 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'cost-control': {
     id: 'cost-control',
     title: '成本控制',
-    subTasks: [
+    sub_tasks: [
       '供應商詢價',
       '比價分析',
       '簽訂供應商合約',
@@ -86,7 +86,7 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'quality-check': {
     id: 'quality-check',
     title: '品質檢查',
-    subTasks: [
+    sub_tasks: [
       '行程表確認',
       '住宿標準檢查',
       '餐食安排確認',
@@ -104,8 +104,8 @@ export function getTemplatesByCategory(category?: string): TaskTemplate[] {
   return category ? templates.filter(t => t.category === category) : templates;
 }
 
-export function calculateDeadlineFromDeparture(departureDate: string, daysBefore: number): string {
-  const departure = new Date(departureDate);
+export function calculateDeadlineFromDeparture(departure_date: string, daysBefore: number): string {
+  const departure = new Date(departure_date);
   const deadline = new Date(departure);
   deadline.setDate(deadline.getDate() + daysBefore); // daysBefore 是負數
   return deadline.toISOString().split('T')[0];

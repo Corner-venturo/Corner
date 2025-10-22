@@ -2,13 +2,11 @@
  * 資料庫初始化系統
  *
  * 確保 IndexedDB 在應用啟動時有必要的資料
- * 處理從 v4.0 LocalProfile 遷移到 v5.0 IndexedDB
- *
- * Phase 1 緊急修復的一部分
+ * 處理從舊版 LocalProfile 遷移到新版 IndexedDB
  */
 
 import { localDB } from '@/lib/db';
-import { User } from '@/types';
+import { Employee as User } from '@/stores/types';
 
 export class DatabaseInitializer {
   /**
@@ -98,11 +96,11 @@ export class DatabaseInitializer {
           const user: User = {
             id: profile.id || crypto.randomUUID(),
             employee_number: profile.employee_number,
-            chineseName: profile.chineseName || '',
+            display_name: profile.display_name || '',
             english_name: profile.english_name || '',
             permissions: profile.permissions || [],
-            personalInfo: {
-              nationalId: '',
+            personal_info: {
+              national_id: '',
               birthday: '',
               gender: 'male',
               phone: '',
@@ -110,20 +108,20 @@ export class DatabaseInitializer {
               address: '',
               emergency_contact: { name: '', relationship: '', phone: '' }
             },
-            jobInfo: {
+            job_info: {
               department: profile.department || '未分類',
               position: profile.position || '員工',
               hire_date: new Date().toISOString(),
-              employmentType: 'fulltime'
+              employment_type: 'fulltime'
             },
-            salaryInfo: {
-              baseSalary: 0,
+            salary_info: {
+              base_salary: 0,
               allowances: [],
-              salaryHistory: []
+              salary_history: []
             },
             attendance: {
-              leaveRecords: [],
-              overtimeRecords: []
+              leave_records: [],
+              overtime_records: []
             },
             contracts: [],
             status: 'active',
@@ -133,7 +131,7 @@ export class DatabaseInitializer {
 
           await localDB.create<User>('employees', user);
           migratedCount++;
-          console.log(`  ✅ 遷移: ${user.employee_number} - ${user.chineseName}`);
+          console.log(`  ✅ 遷移: ${user.employee_number} - ${user.display_name}`);
 
         } catch (error) {
           console.warn(`  ⚠️ 遷移失敗: ${profile.employee_number}`, error);
@@ -165,7 +163,7 @@ export class DatabaseInitializer {
       const adminUser: User = {
         id: crypto.randomUUID(),
         employee_number: 'william01',
-        chineseName: 'William Chien',
+        display_name: 'William Chien',
         english_name: 'William Chien',
         permissions: [
           'super_admin',
@@ -179,8 +177,8 @@ export class DatabaseInitializer {
           'reports',
           'settings'
         ],
-        personalInfo: {
-          nationalId: '',
+        personal_info: {
+          national_id: '',
           birthday: '',
           gender: 'male',
           phone: '',
@@ -188,20 +186,20 @@ export class DatabaseInitializer {
           address: '',
           emergency_contact: { name: '', relationship: '', phone: '' }
         },
-        jobInfo: {
+        job_info: {
           department: '管理部',
           position: '系統管理員',
           hire_date: new Date().toISOString(),
-          employmentType: 'fulltime'
+          employment_type: 'fulltime'
         },
-        salaryInfo: {
-          baseSalary: 0,
+        salary_info: {
+          base_salary: 0,
           allowances: [],
-          salaryHistory: []
+          salary_history: []
         },
         attendance: {
-          leaveRecords: [],
-          overtimeRecords: []
+          leave_records: [],
+          overtime_records: []
         },
         contracts: [],
         status: 'active',

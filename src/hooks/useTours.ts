@@ -41,9 +41,9 @@ export function useTours() {
   /**
    * 驗證旅遊團日期
    */
-  const validateTourDates = (startDate: string, endDate: string): void => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+  const validateTourDates = (start_date: string, end_date: string): void => {
+    const start = new Date(start_date);
+    const end = new Date(end_date);
     const now = new Date();
 
     // 檢查日期格式
@@ -77,25 +77,13 @@ export function useTours() {
       throw new Error('團名不能為空');
     }
 
-    if (data.destination && data.destination.trim().length === 0) {
+    if (data.location && data.location.trim().length === 0) {
       throw new Error('目的地不能為空');
     }
 
     // 檢查人數
-    if (data.min_people !== undefined && data.min_people < 1) {
-      throw new Error('最低成團人數必須大於 0');
-    }
-
-    if (data.max_people !== undefined && data.max_people < 1) {
+    if (data.max_participants !== undefined && data.max_participants < 1) {
       throw new Error('最高人數必須大於 0');
-    }
-
-    if (
-      data.min_people !== undefined &&
-      data.max_people !== undefined &&
-      data.min_people > data.max_people
-    ) {
-      throw new Error('最低成團人數不能大於最高人數');
     }
 
     // 檢查價格
@@ -104,8 +92,8 @@ export function useTours() {
     }
 
     // 檢查日期
-    if (data.start_date && data.end_date) {
-      validateTourDates(data.start_date, data.end_date);
+    if (data.departure_date && data.return_date) {
+      validateTourDates(data.departure_date, data.return_date);
     }
   };
 
@@ -116,9 +104,9 @@ export function useTours() {
   /**
    * 計算旅遊天數
    */
-  const calculateDays = (startDate: string, endDate: string): number => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+  const calculateDays = (start_date: string, end_date: string): number => {
+    const start = new Date(start_date);
+    const end = new Date(end_date);
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   };
 
@@ -133,24 +121,24 @@ export function useTours() {
    * 檢查是否可以編輯
    */
   const canEditTour = (tour: Tour): boolean => {
-    // 只有草稿和進行中的團可以編輯
-    return tour.status === 'draft' || tour.status === 'active';
+    // 只有提案和進行中的團可以編輯
+    return tour.status === '提案' || tour.status === '進行中';
   };
 
   /**
    * 檢查是否可以刪除
    */
   const canDeleteTour = (tour: Tour): boolean => {
-    // 只有草稿狀態可以刪除
-    return tour.status === 'draft';
+    // 只有提案狀態可以刪除
+    return tour.status === '提案';
   };
 
   /**
    * 檢查是否可以取消
    */
   const canCancelTour = (tour: Tour): boolean => {
-    // 草稿和進行中的團可以取消
-    return tour.status === 'draft' || tour.status === 'active';
+    // 提案和進行中的團可以取消
+    return tour.status === '提案' || tour.status === '進行中';
   };
 
   /**
@@ -158,10 +146,11 @@ export function useTours() {
    */
   const getNextStatus = (currentStatus: TourStatus): TourStatus | null => {
     const statusFlow: Record<TourStatus, TourStatus | null> = {
-      draft: 'active',
-      active: 'completed',
-      completed: null,
-      cancelled: null,
+      '提案': '進行中',
+      '進行中': '待結案',
+      '待結案': '結案',
+      '結案': null,
+      '特殊團': null,
     };
     return statusFlow[currentStatus];
   };
@@ -170,25 +159,25 @@ export function useTours() {
    * 檢查是否已滿團
    */
   const isFullyBooked = (tour: Tour): boolean => {
-    if (!tour.max_people || !tour.current_people) return false;
-    return tour.current_people >= tour.max_people;
+    if (!tour.max_participants || !tour.current_participants) return false;
+    return tour.current_participants >= tour.max_participants;
   };
 
   /**
-   * 檢查是否成團
+   * 檢查是否成團（注意：Tour 類型沒有 min_people 欄位）
    */
   const hasMetMinimum = (tour: Tour): boolean => {
-    if (!tour.min_people || !tour.current_people) return false;
-    return tour.current_people >= tour.min_people;
+    // TODO: 如果需要最低成團人數，請在 Tour 類型中添加 min_participants 欄位
+    return false;
   };
 
   /**
    * 計算剩餘名額
    */
   const getRemainingSeats = (tour: Tour): number | null => {
-    if (!tour.max_people) return null;
-    const current = tour.current_people || 0;
-    return Math.max(0, tour.max_people - current);
+    if (!tour.max_participants) return null;
+    const current = tour.current_participants || 0;
+    return Math.max(0, tour.max_participants - current);
   };
 
   // ============================================
@@ -217,18 +206,14 @@ export function useTours() {
     // 2. 資料驗證
     validateTourData(data);
 
-    // 3. 計算天數和夜數
-    const days = calculateDays(data.start_date, data.end_date);
-    const nights = calculateNights(days);
+    // 3. 計算天數和夜數（如果需要）
+    // const days = calculateDays(data.departure_date, data.return_date);
+    // const nights = calculateNights(days);
 
     // 4. 組合完整資料
-    const tourData: Omit<CreateTourData, 'id' | 'code'> = {
+    const tourData: Omit<CreateTourData, 'code'> = {
       ...data,
-      days,
-      nights,
-      current_people: data.current_people || 0,
-      status: data.status || 'draft',
-      is_active: data.is_active ?? true,
+      status: data.status || '提案',
     };
 
     // 5. 呼叫 Store
@@ -258,15 +243,8 @@ export function useTours() {
     // 4. 資料驗證
     validateTourData(data);
 
-    // 5. 如果更新了日期，重新計算天數
-    let updatedData = { ...data };
-    if (data.start_date || data.end_date) {
-      const startDate = data.start_date || existingTour.start_date;
-      const endDate = data.end_date || existingTour.end_date;
-      const days = calculateDays(startDate, endDate);
-      const nights = calculateNights(days);
-      updatedData = { ...updatedData, days, nights };
-    }
+    // 5. 直接使用資料（不需要計算天數）
+    const updatedData = { ...data };
 
     // 6. 呼叫 Store
     return await store.update(id, updatedData);
@@ -309,7 +287,8 @@ export function useTours() {
       throw new Error(`${tour.status} 狀態的旅遊團無法取消`);
     }
 
-    return await store.update(id, { status: 'cancelled' });
+    // 注意：Tour 狀態沒有 'cancelled'，改為 '結案'
+    return await store.update(id, { status: '結案' });
   };
 
   /**
@@ -321,11 +300,11 @@ export function useTours() {
       throw new Error('旅遊團不存在');
     }
 
-    if (tour.status !== 'active') {
+    if (tour.status !== '進行中') {
       throw new Error('只有進行中的旅遊團可以完成');
     }
 
-    return await store.update(id, { status: 'completed' });
+    return await store.update(id, { status: '待結案' });
   };
 
   // ============================================
@@ -336,26 +315,26 @@ export function useTours() {
    * 取得進行中的旅遊團
    */
   const getActiveTours = useMemo(() => {
-    return store.items.filter((tour) => tour.status === 'active' && tour.is_active);
+    return store.items.filter((tour) => tour.status === '進行中');
   }, [store.items]);
 
   /**
    * 取得草稿旅遊團
    */
   const getDraftTours = useMemo(() => {
-    return store.items.filter((tour) => tour.status === 'draft' && tour.is_active);
+    return store.items.filter((tour) => tour.status === '提案');
   }, [store.items]);
 
   /**
    * 根據日期範圍查詢
    */
-  const getToursByDateRange = (startDate: string, endDate: string): Tour[] => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+  const getToursByDateRange = (start_date: string, end_date: string): Tour[] => {
+    const start = new Date(start_date);
+    const end = new Date(end_date);
 
     return store.items.filter((tour) => {
-      const tourStart = new Date(tour.start_date);
-      const tourEnd = new Date(tour.end_date);
+      const tourStart = new Date(tour.departure_date);
+      const tourEnd = new Date(tour.return_date);
       return tourStart <= end && tourEnd >= start;
     });
   };
@@ -369,7 +348,7 @@ export function useTours() {
       (tour) =>
         tour.code.toLowerCase().includes(lowerKeyword) ||
         tour.name.toLowerCase().includes(lowerKeyword) ||
-        tour.destination.toLowerCase().includes(lowerKeyword)
+        tour.location.toLowerCase().includes(lowerKeyword)
     );
   };
 

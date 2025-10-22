@@ -3,87 +3,172 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Employee, SYSTEM_PERMISSIONS } from '@/stores/types';
-import { useUserStore } from '@/stores/user-store';
+import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { Shield, Check, X, Save, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PermissionsTabProps {
   employee: Employee;
-  isEditing?: boolean;
-  setIsEditing?: (editing: boolean) => void;
 }
 
 export const PermissionsTab = forwardRef<{ handleSave: () => void }, PermissionsTabProps>(
-  ({ employee, isEditing = false, setIsEditing }, ref) => {
-    const { updateUserPermissions } = useUserStore();
+  ({ employee }, ref) => {
     const { user, login } = useAuthStore();
+    const { update: updateUser } = useUserStore();
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>(employee.permissions);
+    const [selectedRoles, setSelectedRoles] = useState<string[]>((employee as any).roles || []);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSavedMessage, setShowSavedMessage] = useState(false);
 
     useEffect(() => {
       setSelectedPermissions(employee.permissions);
-    }, [employee.permissions]);
+      setSelectedRoles((employee as any).roles || []);
+    }, [employee.permissions, (employee as any).roles]);
 
-    const handlePermissionToggle = (permissionId: string) => {
-      if (!isEditing) return;
+    const handlePermissionToggle = async (permissionId: string) => {
+      let newPermissions: string[];
 
-      // 如果勾選超級管理員，自動全選所有權限
-      if (permissionId === 'super_admin') {
-        const isSuperAdminSelected = selectedPermissions.includes('super_admin');
-        if (!isSuperAdminSelected) {
-          setSelectedPermissions(SYSTEM_PERMISSIONS.map(p => p.id));
+      // 如果勾選系統管理員，自動全選所有權限
+      if (permissionId === 'admin') {
+        const isAdminSelected = selectedPermissions.includes('admin');
+        if (!isAdminSelected) {
+          newPermissions = SYSTEM_PERMISSIONS.map(p => p.id);
         } else {
-          setSelectedPermissions([]);
+          newPermissions = [];
         }
-        return;
-      }
-
-      setSelectedPermissions(prev => {
-        const newPermissions = prev.includes(permissionId)
-          ? prev.filter(id => id !== permissionId)
-          : [...prev, permissionId];
-
-        // 如果取消勾選任何權限，自動取消超級管理員
-        if (prev.includes('super_admin') && !newPermissions.includes(permissionId)) {
-          return newPermissions.filter(id => id !== 'super_admin');
-        }
-
-        return newPermissions;
-      });
-    };
-
-    const handleSave = async () => {
-      await updateUserPermissions(employee.id, selectedPermissions);
-      console.log('✅ 權限已儲存:', selectedPermissions);
-
-      // 如果修改的是當前登入用戶，更新 auth-store 的 user 資料
-      if (user && user.id === employee.id) {
-        console.log('🔄 更新當前用戶權限...');
-        console.log('當前用戶 ID:', user.id, '修改的員工 ID:', employee.id);
-        login({
-          ...user,
-          permissions: selectedPermissions
-        });
-        console.log('✅ 當前用戶權限已更新');
       } else {
-        console.log('⚠️ 修改的不是當前用戶，不更新 auth-store');
-        if (user) {
-          console.log('當前用戶 ID:', user.id, '修改的員工 ID:', employee.id);
+        // 切換其他權限
+        newPermissions = selectedPermissions.includes(permissionId)
+          ? selectedPermissions.filter(id => id !== permissionId)
+          : [...selectedPermissions, permissionId];
+
+        // 如果取消勾選任何權限，自動取消系統管理員
+        if (selectedPermissions.includes('admin') && !newPermissions.includes(permissionId)) {
+          newPermissions = newPermissions.filter(id => id !== 'admin');
         }
       }
 
-      setIsEditing?.(false);
+      setSelectedPermissions(newPermissions);
+
+      // 自動儲存
+      await autoSave(newPermissions);
     };
 
-    // 暴露 handleSave 給父組件
+    const handleRoleToggle = async (role: string) => {
+      const newRoles = selectedRoles.includes(role)
+        ? selectedRoles.filter(r => r !== role)
+        : [...selectedRoles, role];
+
+      setSelectedRoles(newRoles);
+      await saveRoles(newRoles);
+    };
+
+    const saveRoles = async (roles: string[]) => {
+      setIsSaving(true);
+      try {
+        await updateUser(employee.id, { roles: roles as any });
+
+        // 同步更新 IndexedDB
+        try {
+          const { localDB } = await import('@/lib/db');
+          const { TABLES } = await import('@/lib/db/schemas');
+
+          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id) as any;
+          if (existingEmployee) {
+            await localDB.put(TABLES.EMPLOYEES, {
+              ...existingEmployee,
+              roles: roles,
+              updated_at: new Date().toISOString()
+            });
+          }
+        } catch (error) {
+          console.error('⚠️ IndexedDB 更新失敗（不影響主要功能）:', error);
+        }
+
+        // 如果修改的是當前登入用戶，更新 auth-store 和 LocalProfile
+        if (user && user.id === employee.id) {
+          // 更新 auth-store
+          login({
+            ...user,
+            roles: roles as any
+          });
+
+          // 🎴 同步更新 LocalProfile（角色卡）
+          try {
+            const { useLocalAuthStore } = await import('@/lib/auth/local-auth-manager');
+            const localAuthStore = useLocalAuthStore.getState();
+            const currentProfile = localAuthStore.currentProfile;
+
+            if (currentProfile && currentProfile.id === employee.id) {
+              localAuthStore.updateProfile(employee.id, {
+                roles: roles as any
+              });
+              console.log('✅ LocalProfile 角色已更新:', roles);
+            }
+          } catch (error) {
+            console.error('⚠️ LocalProfile 更新失敗（不影響主要功能）:', error);
+          }
+        }
+
+        // 顯示儲存成功訊息
+        setShowSavedMessage(true);
+        setTimeout(() => setShowSavedMessage(false), 2000);
+      } catch (error) {
+        console.error('❌ 儲存失敗:', error);
+        alert('儲存失敗，請稍後再試');
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    const autoSave = async (permissions: string[]) => {
+      setIsSaving(true);
+      try {
+        await userStoreHelpers.updateUserPermissions(employee.id, permissions);
+
+        // 同步更新 IndexedDB
+        try {
+          const { localDB } = await import('@/lib/db');
+          const { TABLES } = await import('@/lib/db/schemas');
+
+          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id) as any;
+          if (existingEmployee) {
+            await localDB.put(TABLES.EMPLOYEES, {
+              ...existingEmployee,
+              permissions: permissions,
+              updated_at: new Date().toISOString()
+            });
+          }
+        } catch (error) {
+          console.error('⚠️ IndexedDB 更新失敗（不影響主要功能）:', error);
+        }
+
+        // 如果修改的是當前登入用戶，更新 auth-store
+        if (user && user.id === employee.id) {
+          login({
+            ...user,
+            permissions: permissions
+          });
+        }
+
+        // 顯示儲存成功訊息
+        setShowSavedMessage(true);
+        setTimeout(() => setShowSavedMessage(false), 2000);
+      } catch (error) {
+        console.error('❌ 儲存失敗:', error);
+        alert('儲存失敗，請稍後再試');
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    // 暴露空的 handleSave（保持相容性）
     useImperativeHandle(ref, () => ({
-      handleSave
+      handleSave: async () => {
+        // 權限已自動儲存，這裡不需要做任何事
+      }
     }));
-
-    const handleCancel = () => {
-      setSelectedPermissions(employee.permissions);
-      setIsEditing?.(false);
-    };
 
   // 按類別分組權限
   const permissionsByCategory = SYSTEM_PERMISSIONS.reduce((acc, permission) => {
@@ -96,57 +181,148 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
 
   const categories = Object.keys(permissionsByCategory);
 
+  const roleLabels = {
+    admin: '管理員',
+    employee: '員工',
+    user: '普通使用者',
+    tour_leader: '領隊',
+    sales: '業務',
+    accountant: '會計',
+    assistant: '助理'
+  };
+
   return (
     <div className="space-y-6">
+      {/* 自動儲存提示 */}
+      {showSavedMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2 text-green-700">
+          <Check size={16} />
+          <span className="text-sm font-medium">✓ 已自動儲存</span>
+        </div>
+      )}
+
+      {/* 儲存中提示 */}
+      {isSaving && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2 text-blue-700">
+          <div className="animate-spin w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full"></div>
+          <span className="text-sm font-medium">儲存中...</span>
+        </div>
+      )}
+
+      {/* 角色選擇 */}
+      <div className="bg-morandi-container/10 rounded-lg p-4">
+        <h4 className="font-medium text-morandi-primary mb-3">附加身份標籤（可複選）</h4>
+        <p className="text-xs text-morandi-muted mb-3">此標籤僅用於篩選，不影響實際權限功能。可勾選多個身份</p>
+        <div className="flex flex-wrap gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="user"
+              checked={selectedRoles.includes('user')}
+              onChange={() => handleRoleToggle('user')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">普通使用者</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="employee"
+              checked={selectedRoles.includes('employee')}
+              onChange={() => handleRoleToggle('employee')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">員工</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="admin"
+              checked={selectedRoles.includes('admin')}
+              onChange={() => handleRoleToggle('admin')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">管理員</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="tour_leader"
+              checked={selectedRoles.includes('tour_leader')}
+              onChange={() => handleRoleToggle('tour_leader')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">領隊</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="sales"
+              checked={selectedRoles.includes('sales')}
+              onChange={() => handleRoleToggle('sales')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">業務</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="accountant"
+              checked={selectedRoles.includes('accountant')}
+              onChange={() => handleRoleToggle('accountant')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">會計</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              value="assistant"
+              checked={selectedRoles.includes('assistant')}
+              onChange={() => handleRoleToggle('assistant')}
+              className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
+            />
+            <span className="text-sm text-morandi-primary">助理</span>
+          </label>
+        </div>
+      </div>
 
       {/* 權限分類列表 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
         {categories.map((category) => (
           <div key={category} className="bg-morandi-container/10 rounded-lg p-4">
             <h4 className="font-medium text-morandi-primary mb-4 pb-2 border-b border-border/50">
               {category}
             </h4>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {permissionsByCategory[category].map((permission) => {
-                const isSelected = selectedPermissions.includes(permission.id);
+                // 如果有 admin 權限，視為全選
+                const hasAdmin = selectedPermissions.includes('admin');
+                const isSelected = hasAdmin || selectedPermissions.includes(permission.id);
 
                 return (
                   <div
                     key={permission.id}
                     onClick={() => handlePermissionToggle(permission.id)}
                     className={cn(
-                      'flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer',
-                      isEditing ? 'hover:bg-morandi-container/20' : 'cursor-default',
+                      'flex items-center gap-2 p-2.5 rounded-lg border transition-all cursor-pointer hover:bg-morandi-container/20',
                       isSelected
                         ? 'border-morandi-gold bg-morandi-gold/10'
                         : 'border-border bg-white'
                     )}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        'w-5 h-5 rounded border-2 flex items-center justify-center transition-colors',
-                        isSelected
-                          ? 'border-morandi-gold bg-morandi-gold text-white'
-                          : 'border-morandi-muted'
-                      )}>
-                        {isSelected && <Check size={12} />}
-                      </div>
-                      <div>
-                        <p className="font-medium text-morandi-primary">
-                          {permission.label}
-                        </p>
-                        <p className="text-xs text-morandi-muted">
-                          {permission.id}
-                        </p>
-                      </div>
+                    <div className={cn(
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0',
+                      isSelected
+                        ? 'border-morandi-gold bg-morandi-gold text-white'
+                        : 'border-morandi-muted'
+                    )}>
+                      {isSelected && <Check size={10} />}
                     </div>
-
-                    {isSelected && (
-                      <div className="text-morandi-gold">
-                        <Check size={16} />
-                      </div>
-                    )}
+                    <p className="text-sm font-medium text-morandi-primary truncate">
+                      {permission.label}
+                    </p>
                   </div>
                 );
               })}
@@ -155,79 +331,6 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
         ))}
       </div>
 
-      {/* 權限摘要 */}
-      <div className="bg-morandi-container/10 rounded-lg p-4">
-        <h4 className="font-medium text-morandi-primary mb-3">權限摘要</h4>
-
-        {selectedPermissions.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {selectedPermissions.map((permissionId) => {
-              const permission = SYSTEM_PERMISSIONS.find(p => p.id === permissionId);
-              if (!permission) return null;
-
-              return (
-                <span
-                  key={permissionId}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-morandi-gold/20 text-morandi-primary rounded text-sm"
-                >
-                  <Check size={12} />
-                  {permission.label}
-                </span>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="text-morandi-muted text-sm">尚未授權任何功能</p>
-        )}
-      </div>
-
-      {/* 快速設定 */}
-      {isEditing && (
-        <div className="bg-morandi-container/10 rounded-lg p-4">
-          <h4 className="font-medium text-morandi-primary mb-3">快速設定</h4>
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              size="sm"
-              className="bg-morandi-gold hover:bg-morandi-gold/90 text-white"
-              onClick={() => setSelectedPermissions(SYSTEM_PERMISSIONS.map(p => p.id))}
-            >
-              超級管理員（全選）
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedPermissions([])}
-            >
-              全部清除
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedPermissions(
-                SYSTEM_PERMISSIONS.filter(p => p.category === '業務').map(p => p.id)
-              )}
-            >
-              僅業務功能
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedPermissions(
-                SYSTEM_PERMISSIONS.filter(p => p.category === '財務').map(p => p.id)
-              )}
-            >
-              僅財務功能
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedPermissions(['todos'])}
-            >
-              僅基本功能
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 });

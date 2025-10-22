@@ -62,3 +62,17 @@ Thumbs.db
 *.tmp
 *.temp
 .cache
+
+# Development temporary files
+check_data_status.sql
+check-employees.js
+check-errors.sh
+ISSUE_DIAGNOSIS.md
+MIGRATION_GUIDE.md
+supabase-migration-*.sql
+fix-types-to-snake.js
+
+# Environment files
+.env
+.env.local
+.env*.local

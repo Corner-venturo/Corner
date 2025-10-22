@@ -28,8 +28,11 @@ import { Input } from '@/components/ui/input'
 import { useTourStore, useOrderStore, useMemberStore, useCalendarStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { Tour } from '@/stores/types'
+import { CalendarEvent } from '@/types/calendar.types'
+import { logger } from '@/lib/utils/logger'
 
-interface CalendarEvent {
+// FullCalendar 元件所需的顯示格式（與資料庫 CalendarEvent 不同）
+interface FullCalendarEvent {
   id: string
   title: string
   start: string
@@ -52,7 +55,7 @@ interface PersonalEvent {
   id: string
   title: string
   date: string
-  endDate?: string
+  end_date?: string
   time?: string
   type: 'meeting' | 'deadline' | 'task'
   description?: string
@@ -82,7 +85,7 @@ export default function CalendarPage() {
   const [moreEventsDialog, setMoreEventsDialog] = useState<{
     open: boolean
     date: string
-    events: CalendarEvent[]
+    events: FullCalendarEvent[]
   }>({
     open: false,
     date: '',
@@ -110,15 +113,15 @@ export default function CalendarPage() {
   const [newEvent, setNewEvent] = useState({
     title: '',
     visibility: 'personal' as 'personal' | 'company',
-    eventType: 'meeting' as 'meeting' | 'deadline' | 'task' | 'other',
+    event_type: 'meeting' as 'meeting' | 'deadline' | 'task' | 'other',
     description: '',
-    endDate: '',
-    startTime: '',
-    endTime: '',
+    end_date: '',
+    start_time: '',
+    end_time: '',
   })
 
   // 計算事件區間長度（用於排序）
-  const getEventDuration = useCallback((event: CalendarEvent): number => {
+  const getEventDuration = useCallback((event: FullCalendarEvent): number => {
     if (!event.end) return 0
     const start = new Date(event.start)
     const end = new Date(event.end)
@@ -127,7 +130,7 @@ export default function CalendarPage() {
 
   // 事件排序：短程在前，長程在後
   const compareEvents = useCallback(
-    (a: CalendarEvent, b: CalendarEvent): number => {
+    (a: FullCalendarEvent, b: FullCalendarEvent): number => {
       const durationA = getEventDuration(a)
       const durationB = getEventDuration(b)
 
@@ -161,46 +164,48 @@ export default function CalendarPage() {
     return colors[type as keyof typeof colors] || { bg: '#B8B3AE', border: '#A7A29D' }
   }, [])
 
-  // 轉換旅遊團為日曆事件
-  const tourEvents: CalendarEvent[] = useMemo(() => {
-    return (tours || []).map(tour => {
-      const color = getEventColor('tour', tour.status)
-      const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
-      const actualMembers = (members || []).filter(member =>
-        tourOrders.some(order => order.id === member.order_id)
-      ).length
+  // 轉換旅遊團為日曆事件（過濾掉特殊團）
+  const tourEvents: FullCalendarEvent[] = useMemo(() => {
+    return (tours || [])
+      .filter(tour => tour.status !== '特殊團') // 過濾掉簽證專用團等特殊團
+      .map(tour => {
+        const color = getEventColor('tour', tour.status)
+        const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
+        const actualMembers = (members || []).filter(member =>
+          tourOrders.some(order => order.id === member.order_id)
+        ).length
 
-      // 修正 FullCalendar 的多日事件顯示問題
-      // 如果有 returnDate，則需要加一天才能正確顯示跨日事件
-      let endDate = tour.return_date
-      if (endDate && endDate !== tour.departure_date) {
-        const returnDate = new Date(endDate)
-        returnDate.setDate(returnDate.getDate() + 1)
-        endDate = returnDate.toISOString().split('T')[0]
-      }
+        // 修正 FullCalendar 的多日事件顯示問題
+        // 如果有 return_date，則需要加一天才能正確顯示跨日事件
+        let end_date = tour.return_date
+        if (end_date && end_date !== tour.departure_date) {
+          const returnDateObj = new Date(end_date)
+          returnDateObj.setDate(returnDateObj.getDate() + 1)
+          end_date = returnDateObj.toISOString().split('T')[0]
+        }
 
-      return {
-        id: `tour-${tour.id}`,
-        title: `🛫 ${tour.name}`,
-        start: tour.departure_date,
-        end: endDate,
-        backgroundColor: color.bg,
-        borderColor: color.border,
-        extendedProps: {
-          type: 'tour' as const,
-          tour_id: tour.id,
-          code: tour.code,
-          location: tour.location,
-          participants: actualMembers,
-          max_participants: tour.max_participants,
-          status: tour.status,
-        },
-      }
-    })
+        return {
+          id: `tour-${tour.id}`,
+          title: `🛫 ${tour.name}`,
+          start: tour.departure_date,
+          end: end_date,
+          backgroundColor: color.bg,
+          borderColor: color.border,
+          extendedProps: {
+            type: 'tour' as const,
+            tour_id: tour.id,
+            code: tour.code,
+            location: tour.location,
+            participants: actualMembers,
+            max_participants: tour.max_participants,
+            status: tour.status,
+          },
+        }
+      })
   }, [tours, orders, members, getEventColor])
 
   // 轉換個人事項為日曆事件
-  const personalCalendarEvents: CalendarEvent[] = useMemo(() => {
+  const personalCalendarEvents: FullCalendarEvent[] = useMemo(() => {
     return (calendarEvents || [])
       .filter(event => event.visibility === 'personal')
       .map(event => {
@@ -208,12 +213,8 @@ export default function CalendarPage() {
         return {
           id: event.id,
           title: `📅 ${event.title}`,
-          start: event.startTime
-            ? `${event.startDate}T${event.startTime}`
-            : event.startDate,
-          end: event.endDate
-            ? (event.endTime ? `${event.endDate}T${event.endTime}` : event.endDate)
-            : undefined,
+          start: event.start,
+          end: event.end,
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {
@@ -225,7 +226,7 @@ export default function CalendarPage() {
   }, [calendarEvents, getEventColor])
 
   // 轉換公司事項為日曆事件
-  const companyCalendarEvents: CalendarEvent[] = useMemo(() => {
+  const companyCalendarEvents: FullCalendarEvent[] = useMemo(() => {
     return (calendarEvents || [])
       .filter(event => event.visibility === 'company')
       .map(event => {
@@ -233,12 +234,8 @@ export default function CalendarPage() {
         return {
           id: event.id,
           title: `🏢 ${event.title}`,
-          start: event.startTime
-            ? `${event.startDate}T${event.startTime}`
-            : event.startDate,
-          end: event.endDate
-            ? (event.endTime ? `${event.endDate}T${event.endTime}` : event.endDate)
-            : undefined,
+          start: event.start,
+          end: event.end,
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {
@@ -250,7 +247,7 @@ export default function CalendarPage() {
   }, [calendarEvents, getEventColor])
 
   // 轉換會員生日為日曆事件
-  const birthdayEvents: CalendarEvent[] = useMemo(() => {
+  const birthdayEvents: FullCalendarEvent[] = useMemo(() => {
     const currentYear = new Date().getFullYear()
 
     return (members || [])
@@ -268,13 +265,13 @@ export default function CalendarPage() {
           borderColor: getEventColor('birthday').border,
           extendedProps: {
             type: 'birthday' as const,
-            memberId: member.id,
-            memberName: member.name,
+            member_id: member.id,
+            member_name: member.name,
             order_id: member.order_id,
           },
         }
       })
-      .filter(Boolean) as CalendarEvent[]
+      .filter(Boolean) as FullCalendarEvent[]
   }, [members, getEventColor])
 
   // 合併所有事件
@@ -309,32 +306,44 @@ export default function CalendarPage() {
     if (!newEvent.title || !user) return
 
     try {
+      // 組合日期和時間
+      const startDateTime = newEvent.start_time
+        ? `${addEventDialog.selectedDate}T${newEvent.start_time}:00`
+        : `${addEventDialog.selectedDate}T00:00:00`;
+
+      const endDate = newEvent.end_date || addEventDialog.selectedDate;
+      const endDateTime = newEvent.end_time
+        ? `${endDate}T${newEvent.end_time}:00`
+        : `${endDate}T23:59:59`;
+
+      // 映射 event_type: deadline → reminder
+      const mappedType = newEvent.event_type === 'deadline' ? 'reminder' : newEvent.event_type;
+
       await addEvent({
         title: newEvent.title,
         description: newEvent.description,
-        startDate: addEventDialog.selectedDate,
-        endDate: newEvent.endDate || undefined,
-        startTime: newEvent.startTime || undefined,
-        endTime: newEvent.endTime || undefined,
+        start: startDateTime,
+        end: endDateTime,
+        all_day: !newEvent.start_time && !newEvent.end_time,
+        type: mappedType as 'tour' | 'meeting' | 'task' | 'reminder' | 'other',
         visibility: newEvent.visibility,
-        eventType: newEvent.eventType,
-        userId: user.id,
+        owner_id: user.id,
       })
 
       // 重置表單
       setNewEvent({
         title: '',
         visibility: 'personal',
-        eventType: 'meeting',
+        event_type: 'meeting',
         description: '',
-        endDate: '',
-        startTime: '',
-        endTime: '',
+        end_date: '',
+        start_time: '',
+        end_time: '',
       })
 
       setAddEventDialog({ open: false, selectedDate: '' })
     } catch (error) {
-      console.error('新增事件失敗:', error)
+      logger.error('新增事件失敗:', error)
     }
   }
 
@@ -381,13 +390,13 @@ export default function CalendarPage() {
     const eventType = info.event.extendedProps.type
 
     if (eventType === 'tour') {
-      const tourId = info.event.extendedProps.tour_id
-      router.push(`/tours/${tourId}`)
+      const tour_id = info.event.extendedProps.tourId
+      router.push(`/tours/${tour_id}`)
     } else if (eventType === 'birthday') {
       // 跳轉到會員資料頁面
-      const memberId = info.event.extendedProps.memberId
+      const member_id = info.event.extendedProps.memberId
       // 這裡可以跳轉到訂單詳情頁面的會員區塊
-      router.push(`/orders?member=${memberId}`)
+      router.push(`/orders?member=${member_id}`)
     } else if (eventType === 'personal' || eventType === 'company') {
       // 找到對應的事項
       const eventId = info.event.id
@@ -397,10 +406,10 @@ export default function CalendarPage() {
         const personalEventFormat: PersonalEvent = {
           id: event.id,
           title: event.title,
-          date: event.startDate,
-          endDate: event.endDate,
-          time: event.startTime,
-          type: event.eventType as 'meeting' | 'deadline' | 'task',
+          date: event.start,
+          end_date: event.end,
+          time: event.start,
+          type: event.type as 'meeting' | 'deadline' | 'task',
           description: event.description,
         }
         setEventDetailDialog({
@@ -418,7 +427,7 @@ export default function CalendarPage() {
       await deleteEvent(eventId)
       setEventDetailDialog({ open: false, event: null })
     } catch (error) {
-      console.error('刪除事件失敗:', error)
+      logger.error('刪除事件失敗:', error)
     }
   }
 
@@ -427,7 +436,7 @@ export default function CalendarPage() {
     info.jsEvent.preventDefault()
     const clickedDate = info.dateStr
 
-    const dayEvents = (filteredEvents || []).filter((event: CalendarEvent) => {
+    const dayEvents = (filteredEvents || []).filter((event: FullCalendarEvent) => {
       if (!event?.start) return false
       const eventStart = event.start.split('T')[0]
       const eventEnd = event?.end ? event.end.split('T')[0] : eventStart
@@ -442,7 +451,7 @@ export default function CalendarPage() {
       events: sortedEvents,
     })
 
-    return false
+    return 'popover' as const
   }
 
   const handleCloseDialog = () => {
@@ -453,7 +462,7 @@ export default function CalendarPage() {
     })
   }
 
-  const handleDialogEventClick = (event: CalendarEvent) => {
+  const handleDialogEventClick = (event: FullCalendarEvent) => {
     if (event.extendedProps.type === 'tour') {
       router.push(`/tours/${event.extendedProps.tour_id}`)
     }
@@ -461,10 +470,9 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       <ResponsiveHeader
         title="行事曆"
-        icon={CalendarIcon}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '行事曆', href: '/calendar' },
@@ -510,7 +518,8 @@ export default function CalendarPage() {
         }
       />
 
-      <Card className="p-6 border-morandi-container">
+      <div className="space-y-6">
+        <Card className="p-6 border-morandi-container">
         {/* 日曆主體 */}
         <div className="calendar-container">
           <FullCalendar
@@ -528,26 +537,14 @@ export default function CalendarPage() {
             moreLinkText="更多"
             weekends={true}
             firstDay={1}
-            eventDisplay={(arg: any) => {
-              const eventType = arg.event.extendedProps.type
-              const isMultiDay =
-                arg.event.start &&
-                arg.event.end &&
-                arg.event.start.toDateString() !== arg.event.end.toDateString()
-
-              // 跨日事件用 block，單日事件用 list-item
-              if (eventType === 'tour' && isMultiDay) {
-                return 'block'
-              }
-              return 'list-item'
-            }}
+            eventDisplay="auto"
             eventDidMount={info => {
               // 為事件添加 data 屬性以便 CSS 選擇器使用
               const eventType = info.event.extendedProps.type
               info.el.setAttribute('data-event-type', eventType)
             }}
             displayEventTime={false}
-            eventOrder={compareEvents}
+            eventOrder="start,-duration,title"
             buttonText={{
               today: '今天',
               month: '月',
@@ -608,11 +605,11 @@ export default function CalendarPage() {
             setNewEvent({
               title: '',
               visibility: 'personal',
-              eventType: 'meeting',
+              event_type: 'meeting',
               description: '',
-              endDate: '',
-              startTime: '',
-              endTime: '',
+              end_date: '',
+              start_time: '',
+              end_time: '',
             })
             setAddEventDialog({ open: false, selectedDate: '' })
           }
@@ -645,8 +642,8 @@ export default function CalendarPage() {
                 <label className="text-sm font-medium text-morandi-primary">結束日期（選填）</label>
                 <Input
                   type="date"
-                  value={newEvent.endDate}
-                  onChange={e => setNewEvent(prev => ({ ...prev, endDate: e.target.value }))}
+                  value={newEvent.end_date}
+                  onChange={e => setNewEvent(prev => ({ ...prev, end_date: e.target.value }))}
                   min={addEventDialog.selectedDate}
                   className="mt-1"
                   placeholder="跨天活動請選擇"
@@ -680,8 +677,8 @@ export default function CalendarPage() {
               <div>
                 <label className="text-sm font-medium text-morandi-primary">開始時間（選填）</label>
                 <select
-                  value={newEvent.startTime}
-                  onChange={e => setNewEvent(prev => ({ ...prev, startTime: e.target.value }))}
+                  value={newEvent.start_time}
+                  onChange={e => setNewEvent(prev => ({ ...prev, start_time: e.target.value }))}
                   className="mt-1 w-full p-2 border border-border rounded-md bg-white"
                 >
                   <option value="">不指定時間</option>
@@ -695,12 +692,12 @@ export default function CalendarPage() {
             </div>
 
             {/* 如果有結束日期，顯示結束時間 */}
-            {newEvent.endDate && (
+            {newEvent.end_date && (
               <div>
                 <label className="text-sm font-medium text-morandi-primary">結束時間（選填）</label>
                 <select
-                  value={newEvent.endTime}
-                  onChange={e => setNewEvent(prev => ({ ...prev, endTime: e.target.value }))}
+                  value={newEvent.end_time}
+                  onChange={e => setNewEvent(prev => ({ ...prev, end_time: e.target.value }))}
                   className="mt-1 w-full p-2 border border-border rounded-md bg-white"
                 >
                   <option value="">不指定時間</option>
@@ -792,11 +789,11 @@ export default function CalendarPage() {
                   </span>
                 </div>
 
-                {eventDetailDialog.event.endDate && (
+                {eventDetailDialog.event.end_date && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-morandi-secondary ml-6">至</span>
                     <span className="text-morandi-primary">
-                      {new Date(eventDetailDialog.event.endDate).toLocaleDateString('zh-TW', {
+                      {new Date(eventDetailDialog.event.end_date).toLocaleDateString('zh-TW', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -924,6 +921,7 @@ export default function CalendarPage() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
 
       <style jsx global>{`
         /* FullCalendar Morandi 樣式覆蓋 */
@@ -1079,6 +1077,6 @@ export default function CalendarPage() {
           text-align: center !important;
         }
       `}</style>
-    </div>
+    </>
   )
 }

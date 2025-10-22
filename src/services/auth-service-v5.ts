@@ -1,5 +1,5 @@
 /**
- * 認證服務 v5 - Phase 1.5 API + SQLite 版本
+ * 認證服務 v5 - Supabase 整合版本
  */
 
 import { supabase } from '@/lib/supabase/client';
@@ -14,13 +14,13 @@ export interface LoginResult {
 
 export class AuthServiceV5 {
   /**
-   * 登入驗證（Phase 1.5: API + SQLite）
+   * 登入驗證（Supabase）
    */
   static async login(username: string, password: string): Promise<LoginResult> {
     try {
-      console.log('🔐 Phase 1.5 登入驗證：', username);
+      console.log('🔐 登入驗證：', username);
 
-      // Phase 1.5: 固定預設密碼
+      // 固定預設密碼
       const DEFAULT_PASSWORD = 'Venturo2025!';
 
       if (password !== DEFAULT_PASSWORD) {
@@ -54,7 +54,7 @@ export class AuthServiceV5 {
       }
 
       // 檢查狀態
-      if (!user.is_active || user.status === 'terminated') {
+      if (!(user as any).is_active || user.status === 'terminated') {
         return {
           success: false,
           message: '帳號已停用'
@@ -81,19 +81,19 @@ export class AuthServiceV5 {
   /**
    * 更新最後登入時間
    */
-  static async updateLastLogin(userId: string): Promise<void> {
+  static async updateLastLogin(user_id: string): Promise<void> {
     try {
       const now = new Date().toISOString();
 
-      await supabase
+      await (supabase as any)
         .from('employees')
         .update({
           last_login: now,
           updated_at: now
         })
-        .eq('id', userId);
+        .eq('id', user_id);
 
-      console.log('✅ 更新登入時間:', userId);
+      console.log('✅ 更新登入時間:', user_id);
     } catch (error) {
       console.error('❌ 更新登入時間失敗:', error);
       // 不拋出錯誤，允許登入繼續

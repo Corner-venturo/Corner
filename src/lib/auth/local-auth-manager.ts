@@ -1,38 +1,40 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '@/lib/utils/logger';
 
 // ============= 1. 類型定義 =============
 export interface LocalProfile {
   id: string;
   email: string;
-  employeeNumber: string;
-  chineseName: string;
-  englishName: string;
+  employee_number: string;
+  display_name: string;
+  english_name: string;
   role: 'SUPER_ADMIN' | 'ADMIN' | 'EMPLOYEE';
   permissions: string[];
+  roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant')[]; // 附加身份標籤（支援多重角色）
 
   // 離線認證相關
   cachedPassword?: string; // 加密的密碼快取（用於背景同步）
   pinHash?: string; // PIN 碼的雜湊值
 
   // 個人資訊
-  personalInfo?: any;
-  jobInfo?: any;
-  salaryInfo?: any;
+  personal_info?: any;
+  job_info?: any;
+  salary_info?: any;
   contracts?: any[];
   attendance?: any;
 
   // 元資料
   lastLoginAt: string;
   lastSyncAt?: string;
-  createdAt: string;
+  created_at: string;
   status: 'active' | 'inactive' | 'suspended';
 }
 
 export interface ProfileCard {
   id: string;
-  chineseName: string;
-  englishName: string;
+  display_name: string;
+  english_name: string;
   role: string;
   avatarUrl?: string;
   lastLoginAt: string;
@@ -116,8 +118,8 @@ export const useLocalAuthStore = create<LocalAuthState>()(
       getProfileCards: () => {
         return get().profiles.map(profile => ({
           id: profile.id,
-          chineseName: profile.chineseName,
-          englishName: profile.englishName,
+          display_name: profile.display_name,
+          english_name: profile.english_name,
           role: profile.role,
           lastLoginAt: profile.lastLoginAt
         }));
@@ -161,7 +163,7 @@ export const useLocalAuthStore = create<LocalAuthState>()(
           const bcrypt = (await import('bcryptjs')).default;
           return await bcrypt.compare(pin, profile.pinHash);
         } catch (error) {
-          console.error('PIN 驗證失敗:', error);
+          logger.error('PIN 驗證失敗', error);
           return false;
         }
       },
@@ -206,7 +208,7 @@ export class PasswordEncryption {
 
       return btoa(String.fromCharCode(...encrypted));
     } catch (error) {
-      console.error('加密失敗:', error);
+      logger.error('加密失敗', error);
       return btoa(password); // 降級方案
     }
   }
@@ -229,7 +231,7 @@ export class PasswordEncryption {
       const decoder = new TextDecoder();
       return decoder.decode(decrypted);
     } catch (error) {
-      console.error('解密失敗:', error);
+      logger.error('解密失敗', error);
       return atob(encryptedPassword); // 降級方案
     }
   }

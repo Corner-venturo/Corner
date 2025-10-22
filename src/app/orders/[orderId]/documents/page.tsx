@@ -13,10 +13,10 @@ import { cn } from '@/lib/utils';
 export default function DocumentsDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.order_id as string;
+  const order_id = params.order_id as string;
   const { items: orders } = useOrderStore();
 
-  const order = orders.find(o => o.id === orderId);
+  const order = orders.find(o => o.id === order_id);
 
   if (!order) {
     return (
@@ -219,7 +219,6 @@ export default function DocumentsDetailPage() {
           data={filteredAndSortedDocuments}
           onSort={handleSort}
           onFilter={handleFilter}
-          cellSelection={false}
         />
 
         {filteredAndSortedDocuments.length === 0 && (

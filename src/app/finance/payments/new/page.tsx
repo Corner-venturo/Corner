@@ -73,7 +73,7 @@ export default function NewReceiptPage() {
   }, [orders, selectedOrderId]);
 
   // 計算總收款金額
-  const totalAmount = useMemo(() => {
+  const total_amount = useMemo(() => {
     return paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0);
   }, [paymentItems]);
 
@@ -104,7 +104,7 @@ export default function NewReceiptPage() {
 
   // 處理儲存
   const handleSave = () => {
-    if (!selectedOrderId || paymentItems.length === 0 || totalAmount <= 0) {
+    if (!selectedOrderId || paymentItems.length === 0 || total_amount <= 0) {
       alert('請填寫完整資訊');
       return;
     }
@@ -362,7 +362,7 @@ export default function NewReceiptPage() {
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">總收款金額</label>
               <Input
-                value={`NT$ ${totalAmount.toLocaleString()}`}
+                value={`NT$ ${total_amount.toLocaleString()}`}
                 disabled
                 className="bg-morandi-container/30 text-lg font-medium"
               />
@@ -372,7 +372,7 @@ export default function NewReceiptPage() {
               <label className="text-sm font-medium text-morandi-primary mb-2 block">收款後狀態</label>
               <Input
                 value={selectedOrder ?
-                  (totalAmount >= (selectedOrder.remaining_amount || 0) ? '已收款' : '部分收款')
+                  (total_amount >= (selectedOrder.remaining_amount || 0) ? '已收款' : '部分收款')
                   : '請選擇訂單'}
                 disabled
                 className="bg-morandi-container/30"
@@ -401,7 +401,7 @@ export default function NewReceiptPage() {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!selectedOrderId || totalAmount <= 0}
+            disabled={!selectedOrderId || total_amount <= 0}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             儲存收款單

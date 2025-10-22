@@ -25,7 +25,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
 
   // 刪除排程
   const handleDelete = () => {
-    const confirmMessage = `確定要移除此排程嗎？\n\n箱子：${box?.name}\n時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.startTime)}`;
+    const confirmMessage = `確定要移除此排程嗎？\n\n箱子：${box?.name}\n時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}`;
 
     if (!confirm(confirmMessage)) {
       return;
@@ -37,9 +37,9 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
 
   if (!box) return null
 
-  const formatDateTime = (dayOfWeek: number, startTime: string) => {
+  const formatDateTime = (dayOfWeek: number, start_time: string) => {
     const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
-    return `${days[dayOfWeek]} ${startTime}`
+    return `${days[dayOfWeek]} ${start_time}`
   }
 
   const formatDuration = (minutes: number) => {
@@ -56,7 +56,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {box.name} - {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.startTime)}
+            {box.name} - {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}
           </DialogTitle>
         </DialogHeader>
 

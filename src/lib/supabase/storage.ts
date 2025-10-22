@@ -34,7 +34,7 @@ export async function uploadFile(
     const fileName = `${timestamp}_${randomStr}.${fileExt}`;
 
     // 組合完整路徑
-    const filePath = folder ? `${folder}/${fileName}` : fileName;
+    const file_path = folder ? `${folder}/${fileName}` : fileName;
 
     // 模擬進度更新 (Supabase JS 客戶端不直接支援進度追蹤)
     if (onProgress) {
@@ -46,7 +46,7 @@ export async function uploadFile(
     // 3600 = 1小時, 86400 = 1天, 2592000 = 30天, 7776000 = 90天
     const { data, error } = await supabase.storage
       .from(bucket)
-      .upload(filePath, file, {
+      .upload(file_path, file, {
         cacheControl: '7776000', // 90 天快取
         upsert: false
       });
@@ -63,11 +63,11 @@ export async function uploadFile(
     // 獲取公開 URL
     const { data: urlData } = supabase.storage
       .from(bucket)
-      .getPublicUrl(filePath);
+      .getPublicUrl(file_path);
 
     return {
       url: urlData.publicUrl,
-      path: filePath,
+      path: file_path,
       fileName: file.name
     };
   } catch (error) {

@@ -32,8 +32,8 @@ interface EditingMember {
   gender: string;
   age: number;
   isNew?: boolean;
-  orderNumber?: string;
-  contactPerson?: string;
+  order_number?: string;
+  contact_person?: string;
   assignedRoom?: string;
   isChildNoBed?: boolean;
   reservationCode?: string;
@@ -87,43 +87,43 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
   }, {} as Record<string, number>);
 
   // 分配房間
-  const assignMemberToRoom = (memberId: string, roomValue: string) => {
+  const assignMemberToRoom = (member_id: string, roomValue: string) => {
     if (roomValue === 'no-bed') {
       // 選擇「不佔床」，更新狀態但不分配房間
       setTableMembers(prev =>
         prev.map(member =>
-          member.id === memberId
+          member.id === member_id
             ? { ...member, isChildNoBed: true, assignedRoom: undefined }
             : member
         )
       );
-      updateMember(memberId, { isChildNoBed: true, assignedRoom: undefined });
+      updateMember(member_id, { is_child_no_bed: true, assigned_room: undefined });
     } else if (roomValue.startsWith('no-bed-')) {
       // 不佔床但選擇特定房間
       const actualRoom = roomValue.replace('no-bed-', '');
       setTableMembers(prev =>
         prev.map(member =>
-          member.id === memberId
+          member.id === member_id
             ? { ...member, isChildNoBed: true, assignedRoom: actualRoom }
             : member
         )
       );
-      updateMember(memberId, { isChildNoBed: true, assignedRoom: actualRoom });
+      updateMember(member_id, { is_child_no_bed: true, assigned_room: actualRoom });
     } else {
       // 一般分房，檢查容量
-      if (roomValue && isRoomFull(roomValue, memberId)) {
+      if (roomValue && isRoomFull(roomValue, member_id)) {
         alert('該房間已滿，無法分配！');
         return;
       }
 
       setTableMembers(prev =>
         prev.map(member =>
-          member.id === memberId
+          member.id === member_id
             ? { ...member, assignedRoom: roomValue || undefined, isChildNoBed: false }
             : member
         )
       );
-      updateMember(memberId, { assignedRoom: roomValue || undefined, isChildNoBed: false });
+      updateMember(member_id, { assigned_room: roomValue || undefined, is_child_no_bed: false });
     }
   };
 
@@ -190,12 +190,16 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
       const relatedOrder = tourOrdersFiltered.find(order => order.id === member.order_id);
       return {
         ...member,
+        nameEn: member.name_en,
+        passportNumber: member.passport_number,
+        passportExpiry: member.passport_expiry,
+        idNumber: member.id_number,
         order_number: relatedOrder?.order_number || '',
         contact_person: relatedOrder?.contact_person || '',
         // 保留現有的分房數據，不要覆蓋
-        assignedRoom: member.assignedRoom,
-        isChildNoBed: member.isChildNoBed
-      };
+        assignedRoom: member.assigned_room,
+        isChildNoBed: member.is_child_no_bed
+      } as EditingMember;
     });
 
     setTableMembers(allTourMembers);
@@ -203,27 +207,27 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
 
   // 單獨處理房間選項
   useEffect(() => {
-    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id);
+    const tourPaymentRequests = paymentRequests.filter((request: any) => request.tour_id === tour.id);
     const roomOptions: RoomOption[] = [];
 
-    tourPaymentRequests.forEach(request => {
-      request.items.forEach(item => {
+    tourPaymentRequests.forEach((request: any) => {
+      request.items.forEach((item: any) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g);
           if (roomMatches) {
-            roomMatches.forEach(match => {
-              const [, roomType, quantity] = match.match(/(\S+房)\s*[x×]\s*(\d+)/) || [];
-              if (roomType && quantity) {
-                const capacity = getRoomCapacity(roomType);
+            roomMatches.forEach((match: any) => {
+              const [, room_type, quantity] = match.match(/(\S+房)\s*[x×]\s*(\d+)/) || [];
+              if (room_type && quantity) {
+                const capacity = getRoomCapacity(room_type);
                 const roomCount = parseInt(quantity);
 
                 // 生成具體房間選項（如：雙人房-1、雙人房-2...）
                 for (let i = 1; i <= roomCount; i++) {
                   roomOptions.push({
-                    value: `${roomType}-${i}`,
-                    label: `${roomType}-${i}`,
-                    roomType,
+                    value: `${room_type}-${i}`,
+                    label: `${room_type}-${i}`,
+                    room_type,
                     capacity,
                     currentCount: 0
                   });
@@ -240,7 +244,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
 
   const totalMembers = tableMembers.length;
   const completedMembers = tableMembers.filter(member =>
-    member.name && member.id_number
+    member.name && member.idNumber
   ).length;
 
 
@@ -321,7 +325,8 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
       // 更新到 store
       updatedMembers.forEach(member => {
         if (member.id) {
-          updateMember(member.id, { customFields: member.customFields });
+          // customFields 不是 Member 型別的欄位，移除此更新
+          // updateMember(member.id, { customFields: member.customFields });
         }
       });
 
@@ -375,8 +380,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
               ? `不佔床${member.assignedRoom ? ` - ${member.assignedRoom}` : ''}`
               : (member.assignedRoom || '未分配')
           }))}
-          tourAddOns={tourAddOns.filter(a => a.tour_id === tour.id)}
-          tourPrice={tour.price}
+          tour_add_ons={tourAddOns.filter((a: any) => a.tour_id === tour.id)}
           onDataUpdate={handleDataUpdate}
           onColumnHide={handleColumnHide}
           onColumnDelete={handleColumnDelete}
@@ -386,7 +390,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
           onRoomAssign={assignMemberToRoom}
           getRoomUsage={getRoomUsage}
           isRoomFull={isRoomFull}
-          tourId={tour.id}
+          tour_id={tour.id}
           className="min-h-[400px]"
         />
       </div>

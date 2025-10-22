@@ -23,8 +23,8 @@ export default function CreateInvoicePage() {
   const [error, setError] = useState<string | null>(null)
 
   // 基本資訊
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0])
-  const [taxType, setTaxType] = useState<'dutiable' | 'zero' | 'free'>('dutiable')
+  const [invoice_date, setInvoiceDate] = useState(new Date().toISOString().split('T')[0])
+  const [tax_type, setTaxType] = useState<'dutiable' | 'zero' | 'free'>('dutiable')
 
   // 買受人資訊
   const [buyerInfo, setBuyerInfo] = useState<BuyerInfo>({
@@ -43,10 +43,10 @@ export default function CreateInvoicePage() {
   // 商品明細
   const [items, setItems] = useState<TravelInvoiceItem[]>([
     {
-      itemName: '',
+      item_name: '',
       item_count: 1,
-      itemUnit: '式',
-      itemPrice: 0,
+      item_unit: '式',
+      item_price: 0,
       itemAmt: 0,
       itemWord: '',
     },
@@ -56,10 +56,10 @@ export default function CreateInvoicePage() {
     setItems([
       ...items,
       {
-        itemName: '',
+        item_name: '',
         item_count: 1,
-        itemUnit: '式',
-        itemPrice: 0,
+        item_unit: '式',
+        item_price: 0,
         itemAmt: 0,
         itemWord: '',
       },
@@ -77,16 +77,16 @@ export default function CreateInvoicePage() {
     newItems[index] = { ...newItems[index], [field]: value }
 
     // 自動計算金額
-    if (field === 'itemPrice' || field === 'itemCount') {
-      const price = field === 'itemPrice' ? value : newItems[index].itemPrice
-      const count = field === 'itemCount' ? value : newItems[index].item_count
+    if (field === 'item_price' || field === 'item_count') {
+      const price = field === 'item_price' ? value : newItems[index].item_price
+      const count = field === 'item_count' ? value : newItems[index].item_count
       newItems[index].itemAmt = price * count
     }
 
     setItems(newItems)
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.itemAmt, 0)
+  const total_amount = items.reduce((sum, item) => sum + item.itemAmt, 0)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -98,16 +98,16 @@ export default function CreateInvoicePage() {
       return
     }
 
-    if (items.some(item => !item.itemName || item.itemPrice <= 0)) {
+    if (items.some(item => !item.item_name || item.item_price <= 0)) {
       setError('請完整填寫商品資訊')
       return
     }
 
     try {
       await issueInvoice({
-        invoiceDate,
-        totalAmount,
-        taxType,
+        invoice_date,
+        total_amount,
+        tax_type,
         buyerInfo,
         items,
         created_by: 'current_user', // TODO: 從登入狀態取得
@@ -152,20 +152,20 @@ export default function CreateInvoicePage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="invoiceDate">開立日期</Label>
+                <Label htmlFor="invoice_date">開立日期</Label>
                 <Input
-                  id="invoiceDate"
+                  id="invoice_date"
                   type="date"
-                  value={invoiceDate}
+                  value={invoice_date}
                   onChange={e => setInvoiceDate(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="taxType">課稅別</Label>
+                <Label htmlFor="tax_type">課稅別</Label>
                 <select
-                  id="taxType"
-                  value={taxType}
+                  id="tax_type"
+                  value={tax_type}
                   onChange={e => setTaxType(e.target.value as any)}
                   className="w-full px-3 py-2 border rounded-md"
                 >
@@ -254,8 +254,8 @@ export default function CreateInvoicePage() {
                   <div className="col-span-2">
                     <Label>商品名稱 *</Label>
                     <Input
-                      value={item.itemName}
-                      onChange={e => updateItem(index, 'itemName', e.target.value)}
+                      value={item.item_name}
+                      onChange={e => updateItem(index, 'item_name', e.target.value)}
                       required
                     />
                   </div>
@@ -265,14 +265,14 @@ export default function CreateInvoicePage() {
                       type="number"
                       min="1"
                       value={item.item_count}
-                      onChange={e => updateItem(index, 'itemCount', parseInt(e.target.value))}
+                      onChange={e => updateItem(index, 'item_count', parseInt(e.target.value))}
                     />
                   </div>
                   <div>
                     <Label>單位</Label>
                     <Input
-                      value={item.itemUnit}
-                      onChange={e => updateItem(index, 'itemUnit', e.target.value)}
+                      value={item.item_unit}
+                      onChange={e => updateItem(index, 'item_unit', e.target.value)}
                     />
                   </div>
                   <div>
@@ -280,8 +280,8 @@ export default function CreateInvoicePage() {
                     <Input
                       type="number"
                       min="0"
-                      value={item.itemPrice}
-                      onChange={e => updateItem(index, 'itemPrice', parseFloat(e.target.value))}
+                      value={item.item_price}
+                      onChange={e => updateItem(index, 'item_price', parseFloat(e.target.value))}
                     />
                   </div>
                   <div>
@@ -302,7 +302,7 @@ export default function CreateInvoicePage() {
             <div className="flex justify-end items-center pt-4 border-t">
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">總金額</p>
-                <p className="text-2xl font-bold">NT$ {totalAmount.toLocaleString()}</p>
+                <p className="text-2xl font-bold">NT$ {total_amount.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>

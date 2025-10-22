@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useTourStore } from '@/stores';
+import { useTourStore, useOrderStore } from '@/stores';
+import type { Tour, Order } from '@/stores/types';
 
 import { cn } from '@/lib/utils';
 
@@ -20,17 +21,18 @@ interface ReceiptData {
   tour_id: string;
   order_id: string;
   amount: number;
-  payment_method: string;
+  paymentMethod: string;
   payment_date: string;
   note?: string;
 }
 
 export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
-  const { tours, orders } = useTourStore();
+  const { items: tours } = useTourStore();
+  const { items: orders } = useOrderStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTourId, setSelectedTourId] = useState('');
   const [formData, setFormData] = useState<Partial<ReceiptData>>({
-    payment_method: 'transfer',
+    paymentMethod: 'transfer',
     payment_date: new Date().toISOString().split('T')[0]
   });
 
@@ -39,7 +41,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
     if (!searchTerm.trim()) return tours || [];
 
     const term = searchTerm.toLowerCase();
-    return (tours || []).filter(tour => {
+    return (tours || []).filter((tour: Tour) => {
       const code = tour.code?.toLowerCase() || '';
       const name = tour.name?.toLowerCase() || '';
       const location = tour.location?.toLowerCase() || '';
@@ -55,14 +57,14 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
     if (!selectedTourId) return [];
 
     return orders
-      .filter(order => order.tour_id === selectedTourId)
-      .map(order => ({
+      .filter((order: Order) => order.tour_id === selectedTourId)
+      .map((order: Order) => ({
         id: order.id,
         label: `${order.order_number || 'N/A'} - ${order.contact_person} - ${order.sales_person || '未指派'}`
       }));
   }, [selectedTourId, orders]);
 
-  const selectedTour = (tours || []).find(t => t.id === selectedTourId);
+  const selectedTour = (tours || []).find((t: Tour) => t.id === selectedTourId);
 
   const handleSubmit = () => {
     if (!formData.order_id || !formData.amount) {
@@ -74,7 +76,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
       tour_id: selectedTourId,
       order_id: formData.order_id!,
       amount: formData.amount!,
-      payment_method: formData.payment_method!,
+      paymentMethod: formData.paymentMethod!,
       payment_date: formData.payment_date!,
       note: formData.note
     });
@@ -83,7 +85,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
     setSearchTerm('');
     setSelectedTourId('');
     setFormData({
-      payment_method: 'transfer',
+      paymentMethod: 'transfer',
       payment_date: new Date().toISOString().split('T')[0]
     });
   };
@@ -111,7 +113,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
         {searchTerm && (
           <div className="border border-morandi-container/30 rounded-lg max-h-48 overflow-y-auto">
             {filteredTours.length > 0 ? (
-              filteredTours.map((tour) => (
+              filteredTours.map((tour: Tour) => (
                 <button
                     key={tour.id}
                     onClick={() => {
@@ -130,7 +132,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
                           {tour.code || 'N/A'} - {tour.name}
                         </div>
                         <div className="text-xs text-morandi-secondary mt-1">
-                          {tour.location} • {tour.start_date}
+                          {tour.location} • {tour.departure_date}
                         </div>
                       </div>
                       {selectedTourId === tour.id && (
@@ -156,7 +158,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
                     {selectedTour.code || 'N/A'} - {selectedTour.name}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-1">
-                    {selectedTour.location} • {selectedTour.start_date}
+                    {selectedTour.location} • {selectedTour.departure_date}
                   </div>
                 </div>
                 <button
@@ -188,7 +190,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
             </SelectTrigger>
             <SelectContent>
               {tourOrders.length > 0 ? (
-                tourOrders.map((order) => (
+                tourOrders.map((order: { id: string; label: string }) => (
                   <SelectItem key={order.id} value={order.id}>
                     {order.label}
                   </SelectItem>
@@ -222,8 +224,8 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
             付款方式 <span className="text-morandi-red">*</span>
           </label>
           <Select
-            value={formData.payment_method}
-            onValueChange={(value) => setFormData(prev => ({ ...prev, payment_method: value }))}
+            value={formData.paymentMethod}
+            onValueChange={(value) => setFormData(prev => ({ ...prev, paymentMethod: value }))}
           >
             <SelectTrigger className="border-morandi-container/30">
               <SelectValue />

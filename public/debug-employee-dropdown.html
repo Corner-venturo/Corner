@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Debug 員工下拉選單</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #C19A6B; margin-bottom: 10px; }
+    button {
+      background: #C19A6B;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 20px;
+    }
+    button:hover { background: #A88555; }
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #333;
+      font-size: 18px;
+    }
+    pre {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .success { color: #28a745; }
+    .error { color: #dc3545; }
+    .warning { color: #ffc107; }
+    .info { color: #17a2b8; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #dee2e6;
+      font-size: 13px;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+    }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .badge-success { background: #d4edda; color: #155724; }
+    .badge-danger { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🐛 Debug 員工下拉選單</h1>
+    <p style="color: #666; margin-bottom: 30px;">一步步檢查為什麼下拉選單沒有員工選項</p>
+
+    <button onclick="runDiagnosis()">🔍 開始診斷</button>
+    <button onclick="fixCommonIssues()">🔧 嘗試自動修正</button>
+
+    <div id="step1" class="section" style="display:none;">
+      <h2>步驟 1️⃣：檢查 IndexedDB 中的員工資料</h2>
+      <div id="step1-content"></div>
+    </div>
+
+    <div id="step2" class="section" style="display:none;">
+      <h2>步驟 2️⃣：檢查員工資料格式</h2>
+      <div id="step2-content"></div>
+    </div>
+
+    <div id="step3" class="section" style="display:none;">
+      <h2>步驟 3️⃣：模擬前端篩選邏輯</h2>
+      <div id="step3-content"></div>
+    </div>
+
+    <div id="step4" class="section" style="display:none;">
+      <h2>步驟 4️⃣：生成下拉選單選項</h2>
+      <div id="step4-content"></div>
+    </div>
+
+    <div id="conclusion" class="section" style="display:none;">
+      <h2>📊 診斷結果</h2>
+      <div id="conclusion-content"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
+
+    let diagnosisResult = {
+      totalEmployees: 0,
+      validEmployees: 0,
+      issues: [],
+      employeeData: [],
+    };
+
+    window.runDiagnosis = async () => {
+      // 顯示所有步驟
+      ['step1', 'step2', 'step3', 'step4', 'conclusion'].forEach(id => {
+        document.getElementById(id).style.display = 'block';
+      });
+
+      try {
+        const db = await openDB('VenturoOfflineDB', 1);
+
+        // === 步驟 1：讀取員工資料 ===
+        const allEmployees = await db.getAll('employees');
+        diagnosisResult.totalEmployees = allEmployees.length;
+        diagnosisResult.employeeData = allEmployees;
+
+        const step1Content = document.getElementById('step1-content');
+        step1Content.innerHTML = `
+          <p><strong>找到 ${allEmployees.length} 筆員工資料</strong></p>
+          ${allEmployees.length === 0 ? '<p class="error">❌ 沒有員工資料！這就是問題所在。</p>' : ''}
+        `;
+
+        if (allEmployees.length === 0) {
+          diagnosisResult.issues.push('沒有員工資料');
+          showConclusion();
+          return;
+        }
+
+        // === 步驟 2：檢查資料格式 ===
+        const step2Content = document.getElementById('step2-content');
+        let formatIssues = [];
+
+        const formatTable = '<table><thead><tr><th>欄位</th><th>必要性</th><th>缺失數量</th></tr></thead><tbody>' +
+          ['display_name', 'english_name', 'status', '_deleted'].map(field => {
+            const missing = allEmployees.filter(emp => !emp[field] && field !== '_deleted').length;
+            const isCritical = field === 'display_name' || field === 'english_name';
+
+            if (missing > 0 && isCritical) {
+              formatIssues.push(`${missing} 位員工缺少 ${field}`);
+            }
+
+            return `<tr>
+              <td><code>${field}</code></td>
+              <td>${isCritical ? '必要' : '選填'}</td>
+              <td>${missing > 0 ? `<span class="error">${missing}</span>` : '<span class="success">0</span>'}</td>
+            </tr>`;
+          }).join('') +
+          '</tbody></table>';
+
+        step2Content.innerHTML = formatTable;
+        if (formatIssues.length > 0) {
+          step2Content.innerHTML += '<p class="warning">⚠️ ' + formatIssues.join(', ') + '</p>';
+          diagnosisResult.issues.push(...formatIssues);
+        }
+
+        // === 步驟 3：模擬前端篩選 ===
+        const step3Content = document.getElementById('step3-content');
+
+        // 這是前端實際的篩選邏輯
+        const filteredEmployees = allEmployees.filter(emp =>
+          !emp._deleted && emp.status !== 'inactive'
+        );
+
+        diagnosisResult.validEmployees = filteredEmployees.length;
+
+        let filterResultHTML = `<p><strong>篩選結果：${filteredEmployees.length} / ${allEmployees.length} 位員工通過篩選</strong></p>`;
+
+        if (filteredEmployees.length === 0) {
+          filterResultHTML += '<p class="error">❌ 所有員工都被篩選掉了！</p>';
+          filterResultHTML += '<p>可能原因：</p><ul>';
+
+          const deletedCount = allEmployees.filter(emp => emp._deleted).length;
+          const inactiveCount = allEmployees.filter(emp => emp.status === 'inactive').length;
+
+          if (deletedCount > 0) {
+            filterResultHTML += `<li class="error">${deletedCount} 位員工被標記為已刪除 (_deleted = true)</li>`;
+            diagnosisResult.issues.push(`${deletedCount} 位員工被標記為已刪除`);
+          }
+          if (inactiveCount > 0) {
+            filterResultHTML += `<li class="error">${inactiveCount} 位員工狀態是 inactive</li>`;
+            diagnosisResult.issues.push(`${inactiveCount} 位員工狀態是 inactive`);
+          }
+
+          filterResultHTML += '</ul>';
+        } else {
+          filterResultHTML += '<table><thead><tr><th>姓名</th><th>英文名</th><th>狀態</th><th>_deleted</th></tr></thead><tbody>';
+          filteredEmployees.forEach(emp => {
+            filterResultHTML += `<tr>
+              <td>${emp.display_name || emp.name || '(無)'}</td>
+              <td>${emp.english_name || '(無)'}</td>
+              <td><span class="badge badge-success">${emp.status || 'active'}</span></td>
+              <td><span class="badge badge-success">${emp._deleted ? 'true' : 'false'}</span></td>
+            </tr>`;
+          });
+          filterResultHTML += '</tbody></table>';
+        }
+
+        step3Content.innerHTML = filterResultHTML;
+
+        // === 步驟 4：生成選項 ===
+        const step4Content = document.getElementById('step4-content');
+
+        if (filteredEmployees.length === 0) {
+          step4Content.innerHTML = '<p class="error">❌ 無法生成選項（沒有有效員工）</p>';
+        } else {
+          const employeeOptions = filteredEmployees.map(emp => ({
+            value: emp.display_name,
+            label: `${emp.display_name} (${emp.english_name})`,
+            data: emp
+          }));
+
+          let optionsHTML = '<p class="success">✅ 成功生成 ' + employeeOptions.length + ' 個選項：</p>';
+          optionsHTML += '<pre>' + JSON.stringify(employeeOptions, null, 2) + '</pre>';
+
+          step4Content.innerHTML = optionsHTML;
+        }
+
+        // === 顯示結論 ===
+        showConclusion();
+
+      } catch (error) {
+        alert('診斷失敗：' + error.message);
+      }
+    };
+
+    function showConclusion() {
+      const conclusionContent = document.getElementById('conclusion-content');
+
+      let html = '';
+
+      if (diagnosisResult.issues.length === 0 && diagnosisResult.validEmployees > 0) {
+        html += '<p class="success" style="font-size: 18px; font-weight: bold;">✅ 資料看起來正常！</p>';
+        html += '<p>下拉選單應該要有 ' + diagnosisResult.validEmployees + ' 個選項。</p>';
+        html += '<hr style="margin: 20px 0;">';
+        html += '<p><strong>如果下拉選單還是空的，可能原因：</strong></p>';
+        html += '<ol>';
+        html += '<li>🔄 前端沒有載入員工資料 → <strong>重新整理頁面</strong></li>';
+        html += '<li>🐛 Combobox 組件有問題 → 檢查瀏覽器 Console</li>';
+        html += '<li>⏱️ 資料還在載入中 → 等幾秒後再試</li>';
+        html += '</ol>';
+      } else {
+        html += '<p class="error" style="font-size: 18px; font-weight: bold;">❌ 找到問題了！</p>';
+        html += '<p><strong>問題列表：</strong></p><ul>';
+        diagnosisResult.issues.forEach(issue => {
+          html += '<li class="error">' + issue + '</li>';
+        });
+        html += '</ul>';
+        html += '<hr style="margin: 20px 0;">';
+        html += '<p><strong>建議修正方式：</strong></p>';
+        html += '<button onclick="fixCommonIssues()" style="margin: 0;">🔧 自動修正問題</button>';
+      }
+
+      conclusionContent.innerHTML = html;
+    }
+
+    window.fixCommonIssues = async () => {
+      if (!confirm('確定要自動修正員工資料問題嗎？\n\n將會：\n1. 移除 _deleted 標記\n2. 設定 status 為 active\n3. 補充缺少的欄位')) {
+        return;
+      }
+
+      try {
+        const db = await openDB('VenturoOfflineDB', 1);
+        const allEmployees = await db.getAll('employees');
+        let fixedCount = 0;
+
+        for (const emp of allEmployees) {
+          let needsUpdate = false;
+          const updates = { ...emp };
+
+          // 移除 _deleted
+          if (emp._deleted) {
+            delete updates._deleted;
+            needsUpdate = true;
+          }
+
+          // 設定 status 為 active
+          if (emp.status === 'inactive' || !emp.status) {
+            updates.status = 'active';
+            needsUpdate = true;
+          }
+
+          // 補充 display_name
+          if (!emp.display_name && emp.name) {
+            updates.display_name = emp.name;
+            needsUpdate = true;
+          }
+
+          // 補充 english_name
+          if (!emp.english_name) {
+            updates.english_name = emp.employee_number || emp.name || 'Employee';
+            needsUpdate = true;
+          }
+
+          if (needsUpdate) {
+            await db.put('employees', updates);
+            fixedCount++;
+          }
+        }
+
+        alert(`✅ 修正完成！\n\n已更新 ${fixedCount} 位員工的資料\n\n請重新整理旅遊團頁面`);
+
+        // 重新診斷
+        runDiagnosis();
+
+      } catch (error) {
+        alert('修正失敗：' + error.message);
+      }
+    };
+  </script>
+</body>
+</html>

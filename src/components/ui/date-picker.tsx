@@ -65,17 +65,17 @@ export function DatePicker({ value, onChange, placeholder = '選擇日期', clas
     const lastDay = new Date(year, month + 1, 0);
 
     // 計算第一週需要顯示的上個月日期
-    const startDate = new Date(firstDay);
-    startDate.setDate(firstDay.getDate() - firstDay.getDay());
+    const start_date = new Date(firstDay);
+    start_date.setDate(firstDay.getDate() - firstDay.getDay());
 
     // 計算最後一週需要顯示的下個月日期
-    const endDate = new Date(lastDay);
-    endDate.setDate(lastDay.getDate() + (6 - lastDay.getDay()));
+    const end_date = new Date(lastDay);
+    end_date.setDate(lastDay.getDate() + (6 - lastDay.getDay()));
 
     const days = [];
-    const currentDate = new Date(startDate);
+    const currentDate = new Date(start_date);
 
-    while (currentDate <= endDate) {
+    while (currentDate <= end_date) {
       days.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }

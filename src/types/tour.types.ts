@@ -14,22 +14,19 @@ import { BaseEntity } from './base.types';
 export interface Tour extends BaseEntity {
   code: string;              // 團號（統一使用 code）
   name: string;              // 團名
-  destination: string;       // 目的地
-  start_date: string;        // 出發日期 (ISO 8601)
-  end_date: string;          // 結束日期 (ISO 8601)
-  days: number;              // 天數
-  nights: number;            // 夜數
-  status: TourStatus;        // 狀態
-  category?: TourCategory;   // 分類
-  min_people?: number;       // 最低成團人數
-  max_people?: number;       // 最高人數
-  current_people?: number;   // 當前報名人數
-  price?: number;            // 基本價格
-  description?: string;      // 說明
-  notes?: string;            // 備註
-  is_active: boolean;        // 是否啟用
-  leader_id?: string;        // 領隊 ID
-  leader_name?: string;      // 領隊名稱
+  location: string;          // 目的地（相容舊欄位：destination）
+  departure_date: string;    // 出發日期 (ISO 8601)（相容舊欄位：start_date）
+  return_date: string;       // 返回日期 (ISO 8601)（相容舊欄位：end_date）
+  status: TourStatus; // 狀態（英文）
+  price: number;             // 基本價格
+  max_participants: number;  // 最大參與人數（相容舊欄位：max_people）
+  current_participants?: number; // 當前參與人數
+  contract_status: ContractStatus; // 合約狀態
+  total_revenue: number;     // 總收入
+  total_cost: number;        // 總成本
+  profit: number;            // 利潤
+  quote_id?: string;         // 關聯的報價單ID
+  quote_cost_structure?: any[]; // 報價成本結構快照
 }
 
 // ============================================
@@ -37,13 +34,22 @@ export interface Tour extends BaseEntity {
 // ============================================
 
 /**
- * TourStatus - 旅遊團狀態
+ * TourStatus - 旅遊團狀態（英文）
  */
 export type TourStatus =
-  | 'draft'      // 草稿
-  | 'active'     // 進行中
-  | 'completed'  // 已完成
-  | 'cancelled'; // 已取消
+  | 'draft'          // 提案階段
+  | 'active'         // 進行中
+  | 'pending_close'  // 待結案
+  | 'closed'         // 已結案
+  | 'cancelled'      // 已取消
+  | 'special';       // 特殊團
+
+/**
+ * ContractStatus - 合約狀態（英文）
+ */
+export type ContractStatus =
+  | 'unsigned'  // 未簽署
+  | 'signed';   // 已簽署
 
 /**
  * TourCategory - 旅遊團分類
@@ -64,23 +70,20 @@ export type TourCategory =
  * CreateTourData - 建立旅遊團所需資料
  */
 export interface CreateTourData {
-  code: string;
+  code?: string;             // 可選，由 createStore 自動生成
   name: string;
-  destination: string;
-  start_date: string;
-  end_date: string;
-  days: number;
-  nights: number;
+  location: string;
+  departure_date: string;
+  return_date: string;
   status: TourStatus;
-  category?: TourCategory;
-  min_people?: number;
-  max_people?: number;
-  price?: number;
-  description?: string;
-  notes?: string;
-  is_active: boolean;
-  leader_id?: string;
-  leader_name?: string;
+  price: number;
+  max_participants: number;
+  contract_status: ContractStatus;
+  total_revenue: number;
+  total_cost: number;
+  profit: number;
+  quote_id?: string;
+  quote_cost_structure?: any[];
 }
 
 /**
@@ -89,22 +92,18 @@ export interface CreateTourData {
 export interface UpdateTourData {
   code?: string;
   name?: string;
-  destination?: string;
-  start_date?: string;
-  end_date?: string;
-  days?: number;
-  nights?: number;
+  location?: string;
+  departure_date?: string;
+  return_date?: string;
   status?: TourStatus;
-  category?: TourCategory;
-  min_people?: number;
-  max_people?: number;
-  current_people?: number;
   price?: number;
-  description?: string;
-  notes?: string;
-  is_active?: boolean;
-  leader_id?: string;
-  leader_name?: string;
+  max_participants?: number;
+  contract_status?: ContractStatus;
+  total_revenue?: number;
+  total_cost?: number;
+  profit?: number;
+  quote_id?: string;
+  quote_cost_structure?: any[];
 }
 
 // ============================================
@@ -131,14 +130,12 @@ export interface TourListItem {
   id: string;
   code: string;
   name: string;
-  destination: string;
-  start_date: string;
-  end_date: string;
+  location: string;
+  departure_date: string;
+  return_date: string;
   status: TourStatus;
-  current_people?: number;
-  max_people?: number;
-  price?: number;
-  leader_name?: string;
+  max_participants: number;
+  price: number;
 }
 
 // ============================================

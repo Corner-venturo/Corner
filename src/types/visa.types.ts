@@ -33,7 +33,8 @@ export interface Visa extends BaseEntity {
   cost: number; // 成本
 
   // 其他
-  notes?: string;
+  note?: string; // 備註
+  created_by?: string; // 建立者ID
 }
 
 export type CreateVisaData = Omit<Visa, keyof BaseEntity>;

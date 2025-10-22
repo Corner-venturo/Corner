@@ -3,6 +3,7 @@
  */
 
 import { TABLE_SCHEMAS } from './schemas';
+import { addSyncIndexes, isSyncableTable } from './sync-schema-helper';
 
 /**
  * 資料庫升級處理器
@@ -17,27 +18,31 @@ export function handleUpgrade(
 ): void {
   console.log(`[DB Migration] 升級資料庫: v${oldVersion} -> v${newVersion}`);
 
-  // 版本 0 -> 1: 初始化資料庫
-  if (oldVersion < 1) {
-    migrateToV1(db);
-  }
+  try {
+    // v0 -> v1: 建立所有資料表（包含 regions 和 workspace）
+    if (oldVersion === 0) {
+      console.log('[DB Migration] 初始化 v1 資料庫（包含所有資料表）');
+      createAllTables(db);
+    }
 
-  // 未來版本可在此加入
-  // if (oldVersion < 2) {
-  //   migrateToV2(db);
-  // }
+    console.log('[DB Migration] 升級完成！');
+  } catch (error) {
+    console.error('[DB Migration] 升級失敗:', error);
+    throw error;
+  }
 }
 
 /**
- * 遷移到版本 1: 建立所有資料表
+ * 建立所有資料表（v1）
+ * 包含：tours, orders, workspace 等所有表格
  */
-function migrateToV1(db: IDBDatabase): void {
-  console.log('[DB Migration] 執行 v1 遷移：建立所有資料表');
+function createAllTables(db: IDBDatabase): void {
+  console.log('[DB Migration] 建立所有資料表（v1 完整版）...');
 
   TABLE_SCHEMAS.forEach((schema) => {
-    // 如果資料表已存在，跳過
+    // 如果資料表已存在，跳過（理論上不應該發生）
     if (db.objectStoreNames.contains(schema.name)) {
-      console.log(`[DB Migration] 資料表 ${schema.name} 已存在，跳過`);
+      console.warn(`[DB Migration] 資料表 ${schema.name} 已存在，跳過`);
       return;
     }
 
@@ -54,28 +59,11 @@ function migrateToV1(db: IDBDatabase): void {
       });
     });
 
-    console.log(`[DB Migration] 建立資料表: ${schema.name}`);
+    console.log(`[DB Migration] ✓ 建立資料表: ${schema.name} (${schema.indexes.length} 個索引)`);
   });
 
-  console.log('[DB Migration] v1 遷移完成');
+  console.log(`[DB Migration] ✓ 完成！共建立 ${TABLE_SCHEMAS.length} 個資料表`);
 }
-
-/**
- * 遷移到版本 2 的範例（未來使用）
- */
-// function migrateToV2(db: IDBDatabase): void {
-//   console.log('[DB Migration] 執行 v2 遷移');
-//
-//   // 範例：新增索引
-//   const transaction = db.transaction(['tours'], 'versionchange');
-//   const objectStore = transaction.objectStore('tours');
-//
-//   if (!objectStore.indexNames.contains('newIndex')) {
-//     objectStore.createIndex('newIndex', 'newField', { unique: false });
-//   }
-//
-//   console.log('[DB Migration] v2 遷移完成');
-// }
 
 /**
  * 清除所有資料表（危險操作，僅供開發測試）

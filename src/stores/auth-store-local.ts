@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 import { LocalAuthService } from '@/services/local-auth-service';
 import { generateToken, type AuthPayload } from '@/lib/auth';
+import { logger } from '@/lib/utils/logger';
 
 import { User } from './types';
 
@@ -80,7 +81,7 @@ function setLocalToken(user: User): void {
   }
 }
 
-export const useAuthStore = create<AuthState>(
+export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
@@ -120,7 +121,7 @@ export const useAuthStore = create<AuthState>(
           return { success: false, message: result.message || '登入失敗' };
 
         } catch (error) {
-          console.error('登入錯誤:', error);
+          logger.error('登入錯誤:', error);
           return { success: false, message: '系統錯誤，請稍後再試' };
         }
       },

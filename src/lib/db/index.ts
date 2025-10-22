@@ -5,6 +5,7 @@
 
 import { handleUpgrade, clearAllTables, exportData, importData } from './migrations';
 import { DB_NAME, DB_VERSION, TableName } from './schemas';
+import { checkAndHandleVersion } from './version-manager';
 
 /**
  * 查詢選項
@@ -34,49 +35,149 @@ export class LocalDatabase {
   private initPromise: Promise<IDBDatabase> | null = null;
 
   /**
+   * Put 資料（更新或新增）
+   * 如果 ID 存在則更新，不存在則新增
+   */
+  async put<T extends { id: string }>(
+    tableName: TableName,
+    data: T
+  ): Promise<T> {
+    try {
+      const db = await this.ensureInit();
+
+      // 檢查 tableName 是否有效
+      if (!db.objectStoreNames.contains(tableName)) {
+        console.error(`[LocalDB] 資料表不存在: ${tableName}`);
+        console.log('可用的資料表:', Array.from(db.objectStoreNames));
+        throw new Error(`資料表不存在: ${tableName}`);
+      }
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(tableName, 'readwrite');
+        const objectStore = transaction.objectStore(tableName);
+
+        // 加入時間戳
+        const now = new Date().toISOString();
+        const recordWithTimestamp = {
+          ...data,
+          created_at: (data as any).created_at || now,
+          updated_at: now,
+        } as T;
+
+        const request = objectStore.put(recordWithTimestamp);
+
+        request.onsuccess = () => {
+          resolve(recordWithTimestamp);
+        };
+
+        request.onerror = () => {
+          const error = new Error(
+            `Put 資料失敗 (${tableName}): ${request.error?.message}`
+          );
+          console.error('[LocalDB]', error);
+          reject(error);
+        };
+      });
+    } catch (error) {
+      console.error('[LocalDB] put 方法錯誤:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 初始化資料庫
    */
   async init(): Promise<IDBDatabase> {
+    console.log('[LocalDB] init() 開始執行');
+
+    // 🔒 檢查是否在瀏覽器環境
+    if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+      const error = new Error('IndexedDB 不可用（非瀏覽器環境）');
+      console.warn('[LocalDB]', error.message);
+      throw error;
+    }
+
     // 如果已經初始化，直接返回
     if (this.db) {
+      console.log('[LocalDB] 資料庫已初始化，直接返回');
       return this.db;
     }
 
     // 如果正在初始化，等待完成
     if (this.initPromise) {
+      console.log('[LocalDB] 正在初始化中，等待完成');
       return this.initPromise;
     }
 
+    // ✨ 檢查版本並處理升級（如有需要）
+    try {
+      const needsSync = await checkAndHandleVersion();
+      if (needsSync) {
+        console.log('[LocalDB] ⚠️ 版本已升級，稍後需要從 Supabase 重新同步資料');
+        // 注意：實際同步會由 stores 的 fetchAll() 觸發
+      }
+    } catch (error) {
+      console.error('[LocalDB] 版本檢查失敗:', error);
+      // 不阻擋初始化，繼續執行
+    }
+
     // 開始初始化
+    console.log(`[LocalDB] 開始初始化資料庫: ${DB_NAME} v${DB_VERSION}`);
     this.initPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-      request.onerror = () => {
-        const error = new Error(
-          `無法開啟資料庫: ${request.error?.message || '未知錯誤'}`
-        );
-        console.error('[LocalDB]', error);
-        reject(error);
-      };
-
-      request.onsuccess = () => {
-        this.db = request.result;
-        console.log('[LocalDB] 資料庫初始化成功');
-        resolve(this.db);
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        const oldVersion = event.oldVersion;
-        const newVersion = event.newVersion;
-
+      // 🔥 關鍵修正：延遲執行確保環境就緒
+      setTimeout(() => {
         try {
-          handleUpgrade(db, oldVersion, newVersion);
+          console.log('[LocalDB] 呼叫 indexedDB.open()');
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+          console.log('[LocalDB] indexedDB.open() 返回:', request);
+
+        request.onerror = (event) => {
+          const error = new Error(
+            `無法開啟資料庫: ${request.error?.message || '未知錯誤'}`
+          );
+          console.error('[LocalDB] request.onerror 觸發:', error, event);
+          this.initPromise = null; // 清除失敗的 Promise
+          reject(error);
+        };
+
+        request.onsuccess = (event) => {
+          console.log('[LocalDB] request.onsuccess 觸發', event);
+          this.db = request.result;
+          console.log('[LocalDB] 資料庫初始化成功, version:', this.db.version);
+          console.log('[LocalDB] 資料表:', Array.from(this.db.objectStoreNames));
+          resolve(this.db);
+        };
+
+        request.onupgradeneeded = (event) => {
+          console.log('[LocalDB] request.onupgradeneeded 觸發', event);
+          const db = (event.target as IDBOpenDBRequest).result;
+          const oldVersion = event.oldVersion;
+          const newVersion = event.newVersion;
+          console.log(`[LocalDB] 升級資料庫: v${oldVersion} -> v${newVersion}`);
+
+          try {
+            handleUpgrade(db, oldVersion, newVersion);
+            console.log('[LocalDB] handleUpgrade 完成');
+          } catch (error) {
+            console.error('[LocalDB] 升級失敗:', error);
+            this.initPromise = null; // 清除失敗的 Promise
+            // 注意: 在 onupgradeneeded 中 reject 可能無效
+            // 因為還會觸發 onsuccess 或 onerror
+            throw error;
+          }
+        };
+
+        request.onblocked = (event) => {
+          console.warn('[LocalDB] request.onblocked 觸發 - 資料庫被其他連線阻擋', event);
+        };
+
+          console.log('[LocalDB] 已設定所有回調函數');
         } catch (error) {
-          console.error('[LocalDB] 升級失敗:', error);
+          console.error('[LocalDB] Promise 內部錯誤:', error);
+          this.initPromise = null;
           reject(error);
         }
-      };
+      }, 100); // 延遲 100ms 確保環境就緒
     });
 
     return this.initPromise;
@@ -122,9 +223,9 @@ export class LocalDatabase {
       const now = new Date().toISOString();
       const recordWithTimestamp = {
         ...data,
-        created_at: data.created_at || now,
+        created_at: (data as any).created_at || now,
         updated_at: now,
-      };
+      } as T;
 
       const request = objectStore.add(recordWithTimestamp);
 
@@ -212,6 +313,7 @@ export class LocalDatabase {
     });
   }
 
+
   /**
    * 刪除單筆資料
    */
@@ -291,9 +393,9 @@ export class LocalDatabase {
       dataArray.forEach((data) => {
         const recordWithTimestamp = {
           ...data,
-          created_at: data.created_at || now,
+          created_at: (data as any).created_at || now,
           updated_at: now,
-        };
+        } as T;
         objectStore.add(recordWithTimestamp);
         results.push(recordWithTimestamp);
       });
@@ -410,7 +512,7 @@ export class LocalDatabase {
       const transaction = db.transaction(tableName, 'readonly');
       const objectStore = transaction.objectStore(tableName);
       const index = objectStore.index(indexName);
-      const request = index.getAll(value);
+      const request = index.getAll(value as IDBValidKey);
 
       request.onsuccess = () => {
         resolve(request.result);
@@ -445,13 +547,13 @@ export class LocalDatabase {
           case 'ne':
             return fieldValue !== condition.value;
           case 'gt':
-            return fieldValue > condition.value;
+            return (fieldValue as any) > (condition.value as any);
           case 'gte':
-            return fieldValue >= condition.value;
+            return (fieldValue as any) >= (condition.value as any);
           case 'lt':
-            return fieldValue < condition.value;
+            return (fieldValue as any) < (condition.value as any);
           case 'lte':
-            return fieldValue <= condition.value;
+            return (fieldValue as any) <= (condition.value as any);
           case 'contains':
             return String(fieldValue)
               .toLowerCase()
@@ -561,7 +663,19 @@ export class LocalDatabase {
       console.log('[LocalDB] 資料庫連線已關閉');
     }
   }
+
+  /**
+   * 重置資料庫實例（強制清除所有狀態）
+   */
+  reset(): void {
+    console.log('[LocalDB] 重置資料庫實例');
+    if (this.db) {
+      this.db.close();
+    }
+    this.db = null;
+    this.initPromise = null;
+  }
 }
 
-// 匯出單例實例
+// 匯出單例實例和類別
 export const localDB = new LocalDatabase();

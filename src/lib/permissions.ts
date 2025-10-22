@@ -18,8 +18,8 @@ export interface PermissionConfig {
 export const FEATURE_PERMISSIONS: PermissionConfig[] = [
   // 系統管理
   {
-    id: 'super_admin',
-    label: '超級管理員',
+    id: 'admin',
+    label: '系統管理員',
     category: '系統',
     routes: ['*'], // 所有路由
     description: '擁有系統所有權限'
@@ -84,6 +84,13 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/customers'],
     description: '客戶資料管理'
   },
+  {
+    id: 'visas',
+    label: '簽證管理',
+    category: '業務',
+    routes: ['/visas'],
+    description: '簽證申請和管理'
+  },
 
   // 財務功能
   {
@@ -115,11 +122,11 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     description: '出納和現金流管理'
   },
   {
-    id: 'finance',
-    label: '財務系統',
+    id: 'reports',
+    label: '報表管理',
     category: '財務',
-    routes: ['/finance', '/finance/reports'],
-    description: '財務系統和報表'
+    routes: ['/finance/reports'],
+    description: '財務報表查看'
   },
 
   // 管理功能
@@ -160,8 +167,8 @@ export function getRequiredPermissions(pathname: string): string[] {
   const requiredPermissions: string[] = [];
 
   for (const permission of FEATURE_PERMISSIONS) {
-    // 超級管理員有所有權限
-    if (permission.id === 'super_admin') continue;
+    // 系統管理員有所有權限
+    if (permission.id === 'admin') continue;
 
     // 檢查路由是否匹配
     const hasAccess = permission.routes.some(route => {
@@ -181,8 +188,8 @@ export function getRequiredPermissions(pathname: string): string[] {
  * 檢查用戶是否有權限訪問指定路由
  */
 export function hasPermissionForRoute(userPermissions: string[], pathname: string): boolean {
-  // 超級管理員有所有權限
-  if (userPermissions.includes('super_admin')) {
+  // 系統管理員有所有權限
+  if (userPermissions.includes('admin')) {
     return true;
   }
 

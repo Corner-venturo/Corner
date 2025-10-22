@@ -41,9 +41,16 @@ const predefinedColors = [
 
 export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
   const { addAccount } = useAccountingStore();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    type: 'cash' | 'bank' | 'credit' | 'investment' | 'other';
+    balance: string;
+    credit_limit: string;
+    color: string;
+    description: string;
+  }>({
     name: '',
-    type: 'cash' as const,
+    type: 'cash',
     balance: '',
     credit_limit: '', // 信用額度
     color: '#10B981',

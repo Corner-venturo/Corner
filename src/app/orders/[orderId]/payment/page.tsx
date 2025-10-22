@@ -6,19 +6,25 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
 import { Button } from '@/components/ui/button';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
-import { useOrderStore, usePaymentStore } from '@/stores';
+import { useOrderStore } from '@/stores';
+// TODO: usePaymentStore deprecated
 import { ArrowLeft, CreditCard, Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PaymentDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.order_id as string;
-  const { items: orders } = useOrderStore()
-  const { items: payments } = usePaymentStore();
+  const orderId = params.orderId as string;
+  const orderStore = useOrderStore();
+  const paymentStore = { payment_requests: [] }; // TODO: usePaymentStore deprecated
 
-  const order = orders.find(o => o.id === orderId);
-  const orderPayments = payments.filter(p => p.order_id === orderId);
+  // 等待 store 載入
+  const orders = (orderStore as any).orders || [];
+  const paymentRequests = (paymentStore as any).payment_requests || [];
+
+  const order = orders.find((o: any) => o.id === orderId);
+  // 找出此訂單相關的請款單
+  const orderPayments = paymentRequests.filter((p: any) => p.order_id === orderId);
 
   if (!order) {
     return (
@@ -43,17 +49,25 @@ export default function PaymentDetailPage() {
     return badges[status] || 'bg-morandi-container text-morandi-secondary';
   };
 
-  const getPaymentTypeIcon = (type: string) => {
-    if (type === '收款') return <TrendingUp size={16} className="text-morandi-green" />;
-    if (type === '請款') return <TrendingDown size={16} className="text-morandi-red" />;
-    return <CreditCard size={16} className="text-morandi-gold" />;
+  const getPaymentTypeIcon = () => {
+    // PaymentRequest 都是請款類型
+    return <TrendingDown size={16} className="text-morandi-red" />;
   };
 
   // 表格配置
   const tableColumns: TableColumn[] = useMemo(() => [
     {
-      key: 'createdAt',
-      label: '日期',
+      key: 'request_number',
+      label: '請款單號',
+      sortable: true,
+      filterable: true,
+      render: (value) => (
+        <span className="text-morandi-primary font-medium">{value}</span>
+      )
+    },
+    {
+      key: 'request_date',
+      label: '請款日期',
       sortable: true,
       filterable: true,
       filterType: 'date',
@@ -64,44 +78,24 @@ export default function PaymentDetailPage() {
       )
     },
     {
-      key: 'type',
-      label: '類型',
-      sortable: true,
-      filterable: true,
-      filterType: 'select',
-      filterOptions: [
-        { value: '收款', label: '收款' },
-        { value: '請款', label: '請款' }
-      ],
-      render: (value) => (
-        <div className="flex items-center space-x-2">
-          {getPaymentTypeIcon(value)}
-          <span className="text-morandi-primary">{value}</span>
-        </div>
-      )
-    },
-    {
-      key: 'amount',
-      label: '金額',
-      sortable: true,
-      filterable: true,
-      filterType: 'number',
-      render: (value, row) => (
-        <span className={cn(
-          "font-medium",
-          row.type === '收款' ? 'text-morandi-green' : 'text-morandi-red'
-        )}>
-          {row.type === '收款' ? '+' : '-'} NT$ {value.toLocaleString()}
-        </span>
-      )
-    },
-    {
-      key: 'description',
-      label: '說明',
+      key: 'tour_name',
+      label: '團體名稱',
       sortable: true,
       filterable: true,
       render: (value) => (
         <span className="text-morandi-primary">{value}</span>
+      )
+    },
+    {
+      key: 'total_amount',
+      label: '請款金額',
+      sortable: true,
+      filterable: true,
+      filterType: 'number',
+      render: (value) => (
+        <span className="font-medium text-morandi-red">
+          NT$ {value.toLocaleString()}
+        </span>
       )
     },
     {
@@ -111,18 +105,29 @@ export default function PaymentDetailPage() {
       filterable: true,
       filterType: 'select',
       filterOptions: [
-        { value: '已確認', label: '已確認' },
-        { value: '待確認', label: '待確認' },
-        { value: '已完成', label: '已完成' }
+        { value: 'pending', label: '待處理' },
+        { value: 'processing', label: '處理中' },
+        { value: 'confirmed', label: '已確認' },
+        { value: 'paid', label: '已付款' }
       ],
-      render: (value) => (
-        <span className={cn(
-          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-          getPaymentStatusBadge(value)
-        )}>
-          {value}
-        </span>
-      )
+      render: (value) => {
+        const statusMap = {
+          'pending': '待處理',
+          'processing': '處理中',
+          'confirmed': '已確認',
+          'paid': '已付款'
+        };
+        return (
+          <span className={cn(
+            'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
+            value === 'paid' ? 'bg-morandi-green text-white' :
+            value === 'confirmed' ? 'bg-morandi-container text-morandi-primary' :
+            'bg-morandi-gold text-white'
+          )}>
+            {statusMap[value as keyof typeof statusMap] || value}
+          </span>
+        );
+      }
     }
   ], []);
 
@@ -132,7 +137,7 @@ export default function PaymentDetailPage() {
       let aValue: string | number | Date = a[column as keyof typeof a];
       let bValue: string | number | Date = b[column as keyof typeof b];
 
-      if (column === 'createdAt') {
+      if (column === 'request_date') {
         aValue = new Date(aValue);
         bValue = new Date(bValue);
       }
@@ -146,10 +151,10 @@ export default function PaymentDetailPage() {
   const filterFunction = (data: any[], filters: Record<string, string>) => {
     return data.filter(payment => {
       return (
-        (!filters.created_at || new Date(payment.created_at).toLocaleDateString().includes(filters.created_at)) &&
-        (!filters.type || payment.type === filters.type) &&
-        (!filters.amount || payment.amount.toString().includes(filters.amount)) &&
-        (!filters.description || payment.description.toLowerCase().includes(filters.description.toLowerCase())) &&
+        (!filters.request_number || payment.request_number.includes(filters.request_number)) &&
+        (!filters.request_date || new Date(payment.request_date).toLocaleDateString().includes(filters.request_date)) &&
+        (!filters.tour_name || payment.tour_name.toLowerCase().includes(filters.tour_name.toLowerCase())) &&
+        (!filters.total_amount || payment.total_amount.toString().includes(filters.total_amount)) &&
         (!filters.status || payment.status === filters.status)
       );
     });
@@ -164,9 +169,9 @@ export default function PaymentDetailPage() {
   return (
     <div className="space-y-6 ">
       <ResponsiveHeader
-        title={`付款記錄 - ${order.order_number}`}
-        onAdd={() => {/* TODO: 新增付款記錄 */}}
-        addLabel="新增記錄"
+        title={`請款記錄 - ${order.order_number}`}
+        onAdd={() => router.push('/finance/requests')}
+        addLabel="前往請款管理"
       >
         <div className="flex items-center space-x-4">
           <div className="text-sm text-morandi-secondary">
@@ -189,14 +194,14 @@ export default function PaymentDetailPage() {
           data={filteredAndSortedPayments}
           onSort={handleSort}
           onFilter={handleFilter}
-          cellSelection={false}
+          selection={undefined}
         />
 
         {filteredAndSortedPayments.length === 0 && (
           <div className="text-center py-12 text-morandi-secondary">
             <CreditCard size={48} className="mx-auto mb-4 opacity-50" />
-            <p>尚無付款記錄</p>
-            <p className="text-sm mt-1">點擊上方「新增記錄」按鈕開始記錄付款</p>
+            <p>此訂單尚無請款記錄</p>
+            <p className="text-sm mt-1">請前往財務管理建立請款單</p>
           </div>
         )}
       </ContentContainer>

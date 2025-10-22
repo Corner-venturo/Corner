@@ -62,9 +62,9 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
 
   if (!box) return null
 
-  const formatDateTime = (dayOfWeek: number, startTime: string) => {
+  const formatDateTime = (dayOfWeek: number, start_time: string) => {
     const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
-    return `${days[dayOfWeek]} ${startTime}`
+    return `${days[dayOfWeek]} ${start_time}`
   }
 
   const getLastUpdated = () => {
@@ -82,7 +82,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {box.name} - {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.startTime)}
+            {box.name} - {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}
           </DialogTitle>
         </DialogHeader>
 

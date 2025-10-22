@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Order, Tour } from '@/stores/types';
-import { useTourStore } from '@/stores/tour-store';
+import { useOrderStore } from '@/stores';
 import { Users, DollarSign, Calendar, User, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ interface OrderKanbanProps {
   onOrderClick?: (order: Order) => void;
 }
 
-type PaymentStatus = '待確認' | '已確認' | '已付款' | '已完成';
+type PaymentStatus = '未收款' | '部分收款' | '已收款';
 
 const columns: Array<{
   id: PaymentStatus;
@@ -21,14 +21,14 @@ const columns: Array<{
   color: string;
   icon: React.ElementType;
 }> = [
-  { id: '待確認', label: '待確認', color: 'bg-morandi-gold/10 border-morandi-gold', icon: Clock },
-  { id: '已確認', label: '已確認', color: 'bg-morandi-blue/10 border-morandi-blue', icon: CheckCircle2 },
-  { id: '已付款', label: '已付款', color: 'bg-morandi-green/10 border-morandi-green', icon: DollarSign },
-  { id: '已完成', label: '已完成', color: 'bg-morandi-container border-morandi-secondary', icon: CheckCircle2 },
+  { id: '未收款', label: '未收款', color: 'bg-morandi-gold/10 border-morandi-gold', icon: Clock },
+  { id: '部分收款', label: '部分收款', color: 'bg-morandi-blue/10 border-morandi-blue', icon: CheckCircle2 },
+  { id: '已收款', label: '已收款', color: 'bg-morandi-green/10 border-morandi-green', icon: DollarSign },
 ];
 
 export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
-  const { updateOrder } = useTourStore();
+  const orderStore = useOrderStore();
+  const updateOrder = orderStore.update;
   const [draggedOrder, setDraggedOrder] = useState<Order | null>(null);
 
   const getOrdersByStatus = (status: PaymentStatus) => {
@@ -45,7 +45,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
 
   const handleDrop = (status: PaymentStatus) => {
     if (draggedOrder) {
-      updateOrder(draggedOrder.id, { paymentStatus: status });
+      updateOrder(draggedOrder.id, { payment_status: status as any });
       setDraggedOrder(null);
     }
   };
@@ -100,7 +100,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                 const tour = getTourInfo(order);
                 const progress = getPaymentProgress(order);
                 const daysUntil = getDaysUntilDeparture(tour);
-                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.payment_status !== '已付款';
+                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.payment_status !== '已收款';
 
                 return (
                   <div

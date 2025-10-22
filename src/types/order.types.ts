@@ -12,27 +12,21 @@ import { BaseEntity } from './base.types';
  * Order - 訂單資料
  */
 export interface Order extends BaseEntity {
-  code: string;              // 訂單編號
+  order_number: string;      // 訂單編號（相容舊欄位：code）
+  code: string;              // 團號代碼
   tour_id: string;           // 旅遊團 ID
-  tour_code?: string;        // 旅遊團編號（冗餘欄位,方便查詢）
-  tour_name?: string;        // 旅遊團名稱（冗餘欄位）
-  customer_id: string;       // 客戶 ID
-  customer_name?: string;    // 客戶姓名（冗餘欄位）
+  tour_name: string;         // 旅遊團名稱
+  customer_id?: string;      // 客戶 ID（可選）
   contact_person: string;    // 聯絡人
-  contact_phone: string;     // 聯絡電話
-  contact_email?: string;    // 聯絡 Email
-  status: OrderStatus;       // 訂單狀態
+  sales_person: string;      // 業務人員
+  assistant: string;         // 助理
+  member_count: number;      // 團員人數
   payment_status: PaymentStatus; // 付款狀態
+  status?: OrderStatus;      // 訂單狀態
   total_amount: number;      // 總金額
   paid_amount: number;       // 已付金額
   remaining_amount: number;  // 待付金額
-  number_of_people: number;  // 人數
-  adult_count: number;       // 成人數
-  child_count: number;       // 兒童數
-  infant_count: number;      // 嬰兒數
   notes?: string;            // 備註
-  special_requests?: string; // 特殊需求
-  is_active: boolean;        // 是否啟用
 }
 
 // ============================================
@@ -44,25 +38,27 @@ export interface Order extends BaseEntity {
  */
 export interface Member extends BaseEntity {
   order_id: string;          // 訂單 ID
-  tour_id: string;           // 旅遊團 ID
+  tour_id: string;           // 旅遊團 ID（重要！）
   name: string;              // 姓名
-  english_name?: string;     // 英文姓名
-  gender: Gender;            // 性別
-  date_of_birth: string;     // 出生日期 (ISO 8601)
-  age?: number;              // 年齡（可計算）
-  age_category: AgeCategory; // 年齡分類
-  id_number?: string;        // 身分證字號
-  passport_number?: string;  // 護照號碼
-  passport_expiry?: string;  // 護照到期日 (ISO 8601)
+  name_en: string;           // 英文姓名/拼音
+  birthday: string;          // 生日 YYYY-MM-DD
+  passport_number: string;   // 護照號碼
+  passport_expiry: string;   // 護照到期日 YYYY-MM-DD
+  id_number: string;         // 身分證字號
+  gender: 'M' | 'F' | '';    // 性別
+  age?: number;              // 年齡（可計算，前端使用）
   phone?: string;            // 電話
   email?: string;            // Email
   emergency_contact?: string; // 緊急聯絡人
   emergency_phone?: string;  // 緊急聯絡電話
   dietary_restrictions?: string; // 飲食限制
-  medical_conditions?: string;   // 醫療狀況
-  room_type?: RoomType;      // 房型
-  room_mate_id?: string;     // 室友 ID
-  seat_preference?: string;  // 座位偏好
+  medical_conditions?: string; // 醫療狀況
+  room_preference?: string;  // 房間偏好
+  assigned_room?: string;    // 分配的房間
+  is_child_no_bed?: boolean; // 小孩不佔床
+  reservation_code?: string; // 訂位代號
+  add_ons?: string[];        // 加購項目IDs
+  refunds?: string[];        // 退費項目IDs
   notes?: string;            // 備註
 }
 

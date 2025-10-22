@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { useSupplierStore } from '@/stores/supplier-store';
+import { useSupplierStore } from '@/stores';
 import {
   Building2,
   Hotel,
@@ -15,17 +15,13 @@ import {
   Car,
   Ticket,
   UserCheck,
-  Package,
-  Mail,
-  Phone,
-  MapPin,
-  DollarSign,
-  Users,
-  Filter,
-  Search
+  Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Supplier } from '@/stores/types';
+import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table';
+import { supplierService } from '@/features/suppliers/services/supplier.service';
+import { useRegionStore } from '@/stores';
 
 const supplierTypeIcons = {
   hotel: Hotel,
@@ -55,14 +51,31 @@ const supplierTypeColors = {
 };
 
 export default function SuppliersPage() {
-  const { suppliers, addSupplier, searchSuppliers } = useSupplierStore();
+  const { items: suppliers, create: addSupplier, filter } = useSupplierStore();
+  const { items: regions, fetchAll: fetchRegions } = useRegionStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  // 懶載入：打開新增對話框時才載入 regions
+  const handleOpenAddDialog = useCallback(() => {
+    if (regions.length === 0) {
+      fetchRegions();
+    }
+    setIsAddDialogOpen(true);
+  }, [regions.length, fetchRegions]);
+
+  // 從 regions 取得國家列表
+  const activeCountries = useMemo(() => {
+    return regions
+      .filter(r => r.type === 'country' && r.status === 'active' && !r._deleted)
+      .map(r => ({ code: r.code, name: r.name }));
+  }, [regions]);
 
   const [newSupplier, setNewSupplier] = useState({
+    supplier_code: '',
     name: '',
+    country: '',
+    location: '',
     type: 'hotel' as Supplier['type'],
     contact: {
       contact_person: '',
@@ -75,13 +88,26 @@ export default function SuppliersPage() {
     note: ''
   });
 
-  const handleAddSupplier = useCallback(() => {
+  const handleAddSupplier = useCallback(async () => {
     if (!newSupplier.name.trim() || !newSupplier.contact.contact_person.trim()) return;
+    if (!newSupplier.country) {
+      alert('請選擇國家');
+      return;
+    }
 
-    addSupplier(newSupplier);
+    // 自動生成供應商編號
+    const supplierCode = await supplierService.generateSupplierCode(newSupplier.country);
+
+    addSupplier({
+      ...newSupplier,
+      supplier_code: supplierCode
+    } as any);
 
     setNewSupplier({
+      supplier_code: '',
       name: '',
+      country: '',
+      location: '',
       type: 'hotel',
       contact: {
         contact_person: '',
@@ -98,29 +124,59 @@ export default function SuppliersPage() {
 
   // 過濾供應商 - 使用 useMemo 優化
   const filteredSuppliers = useMemo(() => {
+    if (!suppliers || !Array.isArray(suppliers)) return [];
     return suppliers.filter(supplier => {
       const matchesSearch = searchQuery === '' ||
-        searchSuppliers(searchQuery).some(s => s.id === supplier.id);
-      const matchesType = typeFilter === 'all' || supplier.type === typeFilter;
-      const matchesStatus = statusFilter === 'all' || supplier.status === statusFilter;
+        supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (supplier.supplier_code && supplier.supplier_code.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (supplier.country && supplier.country.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (supplier.location && supplier.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        supplier.contact.contact_person.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchesSearch && matchesType && matchesStatus;
+      return matchesSearch;
     });
-  }, [suppliers, searchQuery, typeFilter, statusFilter, searchSuppliers]);
+  }, [suppliers, searchQuery]);
 
-  // 統計資料 - 使用 useMemo 優化
-  const statistics = useMemo(() => ({
-    totalSuppliers: suppliers.length,
-    activeSuppliers: suppliers.filter(s => s.status === 'active').length,
-    totalPriceItems: suppliers.reduce((sum, s) => sum + s.priceList.length, 0),
-    typeDistribution: suppliers.reduce((acc, s) => {
-      acc[s.type] = (acc[s.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  }), [suppliers]);
+  // 定義表格欄位
+  const columns: TableColumn[] = [
+    {
+      key: 'name',
+      label: '供應商名稱',
+      sortable: true,
+      render: (value) => <span className="font-medium text-morandi-primary">{value}</span>,
+    },
+    {
+      key: 'supplier_code',
+      label: '供應商編號',
+      sortable: true,
+      render: (value) => <span className="text-morandi-primary">{value || '-'}</span>,
+    },
+    {
+      key: 'country',
+      label: '國家',
+      sortable: true,
+      render: (value) => <span className="text-morandi-primary">{value || '-'}</span>,
+    },
+    {
+      key: 'location',
+      label: '地點',
+      sortable: true,
+      render: (value) => <span className="text-morandi-primary">{value || '-'}</span>,
+    },
+    {
+      key: 'type',
+      label: '服務項目',
+      sortable: true,
+      render: (value) => (
+        <Badge variant="secondary" className="text-xs">
+          {supplierTypeLabels[value as Supplier['type']]}
+        </Badge>
+      ),
+    },
+  ];
 
   return (
-    <>
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="供應商管理"
         icon={Building2}
@@ -133,246 +189,18 @@ export default function SuppliersPage() {
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="搜尋供應商名稱、聯絡人或服務項目..."
-        onAdd={() => setIsAddDialogOpen(true)}
+        onAdd={handleOpenAddDialog}
         addLabel="新增供應商"
-        actions={
-          <div className="flex items-center gap-3">
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="服務類別" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部類別</SelectItem>
-                {Object.entries(supplierTypeLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-28">
-                <SelectValue placeholder="狀態" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部狀態</SelectItem>
-                <SelectItem value="active">活躍</SelectItem>
-                <SelectItem value="inactive">停用</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <div className="text-sm text-morandi-secondary">
-              {filteredSuppliers.length} 個供應商
-            </div>
-          </div>
-        }
       />
 
-      {/* 統計卡片 */}
-      <div className="morandi-card p-6">
-        <h3 className="text-lg font-semibold text-morandi-primary mb-4">供應商統計</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 bg-morandi-container/20 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-morandi-secondary mb-1">總供應商數</p>
-                <p className="text-2xl font-bold text-morandi-primary">{statistics.totalSuppliers}</p>
-              </div>
-              <Building2 size={24} className="text-morandi-gold" />
-            </div>
-          </div>
-
-          <div className="p-4 bg-morandi-container/20 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-morandi-secondary mb-1">活躍供應商</p>
-                <p className="text-2xl font-bold text-morandi-green">{statistics.activeSuppliers}</p>
-              </div>
-              <Users size={24} className="text-morandi-green" />
-            </div>
-          </div>
-
-          <div className="p-4 bg-morandi-container/20 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-morandi-secondary mb-1">價格項目</p>
-                <p className="text-2xl font-bold text-morandi-primary">{statistics.totalPriceItems}</p>
-              </div>
-              <DollarSign size={24} className="text-morandi-primary" />
-            </div>
-          </div>
-
-          <div className="p-4 bg-morandi-container/20 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-morandi-secondary mb-1">服務類別</p>
-                <p className="text-2xl font-bold text-morandi-gold">{Object.keys(statistics.typeDistribution).length}</p>
-              </div>
-              <Package size={24} className="text-morandi-gold" />
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 供應商列表 */}
-      <div className="morandi-card p-6">
-        {/* 快速篩選標籤 */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={typeFilter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTypeFilter('all')}
-            className="h-8"
-          >
-            全部
-          </Button>
-          {Object.entries(supplierTypeLabels).map(([value, label]) => {
-            const Icon = supplierTypeIcons[value as keyof typeof supplierTypeIcons];
-            const count = statistics.typeDistribution[value] || 0;
-            return (
-              <Button
-                key={value}
-                variant={typeFilter === value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setTypeFilter(value)}
-                className="h-8"
-              >
-                <Icon size={14} className="mr-1" />
-                {label} ({count})
-              </Button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 供應商列表 */}
-      <div className="morandi-card p-6">
-        <div className="space-y-4">
-          {filteredSuppliers.map((supplier) => {
-            const Icon = supplierTypeIcons[supplier.type];
-            const typeColor = supplierTypeColors[supplier.type];
-            const typeLabel = supplierTypeLabels[supplier.type];
-
-            return (
-              <div
-                key={supplier.id}
-                className="bg-morandi-container/10 border border-morandi-border rounded-lg p-6 hover:bg-morandi-container/20 transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start gap-4">
-                    <div className={cn(
-                      'w-12 h-12 rounded-lg flex items-center justify-center',
-                      typeColor
-                    )}>
-                      <Icon size={24} className="text-white" />
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold text-morandi-primary mb-1">
-                        {supplier.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {typeLabel}
-                        </Badge>
-                        <Badge
-                          variant={supplier.status === 'active' ? 'default' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {supplier.status === 'active' ? '活躍' : '停用'}
-                        </Badge>
-                      </div>
-                      {supplier.note && (
-                        <p className="text-sm text-morandi-secondary">{supplier.note}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      編輯
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      價格清單
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* 聯絡資訊 */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-morandi-primary">聯絡資訊</h4>
-                    <div className="space-y-1 text-sm text-morandi-secondary">
-                      <div className="flex items-center gap-2">
-                        <UserCheck size={12} />
-                        {supplier.contact.contact_person}
-                      </div>
-                      {supplier.contact.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone size={12} />
-                          {supplier.contact.phone}
-                        </div>
-                      )}
-                      {supplier.contact.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail size={12} />
-                          {supplier.contact.email}
-                        </div>
-                      )}
-                      {supplier.contact.address && (
-                        <div className="flex items-center gap-2">
-                          <MapPin size={12} />
-                          {supplier.contact.address}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* 服務項目統計 */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-morandi-primary">服務項目</h4>
-                    <div className="text-sm text-morandi-secondary">
-                      <div>總項目: {supplier.priceList.length} 個</div>
-                      {supplier.priceList.length > 0 && (
-                        <div>
-                          價格範圍: NT$ {Math.min(...supplier.priceList.map(p => p.unit_price)).toLocaleString()} -
-                          NT$ {Math.max(...supplier.priceList.map(p => p.unit_price)).toLocaleString()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* 帳戶資訊 */}
-                  {supplier.bankInfo && (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-morandi-primary">帳戶資訊</h4>
-                      <div className="space-y-1 text-sm text-morandi-secondary">
-                        <div>{supplier.bankInfo.bank_name}</div>
-                        <div>帳號: {supplier.bankInfo.account_number}</div>
-                        <div>戶名: {supplier.bankInfo.account_name}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-
-          {filteredSuppliers.length === 0 && (
-            <div className="text-center py-12 text-morandi-secondary">
-              <Building2 size={48} className="mx-auto mb-4 opacity-50" />
-              <p>找不到符合條件的供應商</p>
-              {searchQuery && (
-                <Button
-                  variant="link"
-                  onClick={() => setSearchQuery('')}
-                  className="mt-2"
-                >
-                  清除搜尋條件
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+          className="min-h-full"
+          columns={columns}
+          data={filteredSuppliers}
+          loading={false}
+        />
       </div>
 
       {/* 新增供應商對話框 */}
@@ -384,7 +212,10 @@ export default function SuppliersPage() {
           <div className="space-y-6">
             {/* 基本資訊 */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-morandi-primary">基本資訊</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-morandi-primary">基本資訊</h3>
+                <p className="text-xs text-morandi-secondary">供應商編號將自動生成</p>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -393,6 +224,35 @@ export default function SuppliersPage() {
                     value={newSupplier.name}
                     onChange={(e) => setNewSupplier(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="輸入供應商名稱"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">國家 *</label>
+                  <Select
+                    value={newSupplier.country}
+                    onValueChange={(value) => setNewSupplier(prev => ({ ...prev, country: value }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="選擇國家" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeCountries.map((dest) => (
+                        <SelectItem key={dest.code} value={dest.name}>
+                          {dest.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">地點</label>
+                  <Input
+                    value={newSupplier.location}
+                    onChange={(e) => setNewSupplier(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder="輸入地點"
                     className="mt-1"
                   />
                 </div>
@@ -517,6 +377,6 @@ export default function SuppliersPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

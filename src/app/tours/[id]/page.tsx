@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
-import { useTourStore } from '@/stores/tour-store';
+import { useTourStore } from '@/stores';
 import { TourOverview } from '@/components/tours/tour-overview';
 import { TourOrders } from '@/components/tours/tour-orders';
 import { TourMembers } from '@/components/tours/tour-members';
@@ -30,13 +30,13 @@ const tabs = [
 export default function TourDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { tours } = useTourStore();
+  const { items: tours } = useTourStore();
   const [activeTab, setActiveTab] = useState('overview');
   const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false);
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false);
   const [triggerRefundAdd, setTriggerRefundAdd] = useState(false);
 
-  const tour = tours.find(t => t.id === params.id);
+  const tour = tours.find((t: any) => t.id === params.id);
 
   if (!tour) {
     return (
@@ -50,11 +50,13 @@ export default function TourDetailPage() {
     );
   }
 
-  // 統一的編輯按鈕配置 - 固定位置不跳動
-  const getEditButtonConfig = () => {
-    // 根據分頁決定按鈕文字 - 保持相同寬度避免畫面跳動
+  // 統一的按鈕配置
+  const getButtonConfig = () => {
+    // 根據分頁決定按鈕文字和功能
     const getButtonLabel = () => {
       switch (activeTab) {
+        case 'overview':
+          return '編輯';
         case 'operations':
           return '新增欄位';
         case 'addons':
@@ -65,15 +67,26 @@ export default function TourDetailPage() {
           return '新增成本';
         case 'refunds':
           return '新增退費';
+        case 'orders':
+          return '新增訂單';
+        case 'members':
+          return '新增團員';
         default:
-          return '新增項目';
+          return null; // 不顯示按鈕
       }
     };
 
+    const buttonLabel = getButtonLabel();
+    if (!buttonLabel) return null;
+
     return {
       onAdd: () => {
-        // 根據不同分頁執行不同的編輯邏輯
+        // 根據不同分頁執行不同的邏輯
         switch (activeTab) {
+          case 'overview':
+            // TODO: 編輯旅遊團基本資料
+            console.log('編輯旅遊團:', tour.id);
+            break;
           case 'operations':
             // TODO: 新增團務欄位
             break;
@@ -84,17 +97,20 @@ export default function TourDetailPage() {
             setTriggerPaymentAdd(true);
             break;
           case 'costs':
-            // TODO: 編輯成本支出
+            // TODO: 新增成本支出
             break;
           case 'refunds':
             setTriggerRefundAdd(true);
             break;
-          default:
-            // 其他分頁暫時不做任何動作
+          case 'orders':
+            // TODO: 新增訂單
+            break;
+          case 'members':
+            // TODO: 新增團員
             break;
         }
       },
-      addLabel: getButtonLabel()
+      addLabel: buttonLabel
     };
   };
 
@@ -123,10 +139,10 @@ export default function TourDetailPage() {
     }
   };
 
-  const buttonConfig = getEditButtonConfig();
+  const buttonConfig = getButtonConfig();
 
   return (
-    <div className="space-y-6">
+    <>
       <ResponsiveHeader
         title={`${tour.name} (${tour.code})`}
         tabs={tabs}
@@ -140,6 +156,6 @@ export default function TourDetailPage() {
       <ContentContainer>
         {renderTabContent()}
       </ContentContainer>
-    </div>
+    </>
   );
 }

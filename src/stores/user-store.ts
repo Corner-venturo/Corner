@@ -1,318 +1,302 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+/**
+ * 員工管理 Store
+ * 離線優先架構：Supabase（雲端）+ IndexedDB（快取）
+ */
+
 import { User } from './types';
+import { createStore } from './create-store';
+import { TABLES } from '@/lib/db/schemas';
+import { generateUUID } from '@/lib/utils/uuid';
 
-interface UserStore {
-  users: User[];
-  isLoading: boolean;
+// 建立員工 Store
+export const useUserStore = createStore<User>(
+  TABLES.EMPLOYEES as any,
+  undefined, // 員工使用 employee_number 而非 code，所以不需要 codePrefix
+  true // enableSupabase
+);
 
-  // 資料載入（純本地模式）
-  loadUsersFromDatabase: () => void;
-
-  // 基本操作
-  addUser: (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateUser: (id: string, updates: Partial<User>) => void;
-  deleteUser: (id: string) => void;
-  getUser: (id: string) => User | undefined;
-  getUserByNumber: (employeeNumber: string) => User | undefined;
-
-  // 員工編號生成
-  generateUserNumber: (englishName: string) => string;
-
-  // 權限管理
-  updateUserPermissions: (id: string, permissions: string[]) => void;
-
-  // 薪資管理
-  updateBaseSalary: (id: string, newSalary: number, reason: string) => void;
-  addAllowance: (id: string, type: string, amount: number) => void;
-  removeAllowance: (id: string, type: string) => void;
-
-  // 出勤管理
-  addLeaveRecord: (id: string, leaveRecord: Omit<User['attendance']['leaveRecords'][0], 'id'>) => void;
-  approveLeave: (userId: string, leaveId: string, approvedBy: string) => void;
-  rejectLeave: (userId: string, leaveId: string) => void;
-  addOvertimeRecord: (id: string, overtimeRecord: Omit<User['attendance']['overtimeRecords'][0], 'id'>) => void;
-
-  // 合約管理
-  addContract: (id: string, contract: Omit<User['contracts'][0], 'id'>) => void;
-  updateContract: (userId: string, contractId: string, updates: Partial<User['contracts'][0]>) => void;
-
-  // 搜尋與篩選
-  searchUsers: (searchTerm: string) => User[];
-  getUsersByStatus: (status: User['status']) => User[];
-  getUsersByDepartment: (department: string) => User[];
-}
-
-export const useUserStore = create<UserStore>()(
-  persist(
-    (set, get) => ({
-      users: [],
-      isLoading: false,
-
-      // 資料載入（純本地模式 - 從 localStorage 讀取）
-      loadUsersFromDatabase: () => {
-        console.log('📦 本地模式：從 localStorage 載入員工資料');
-        const state = get();
-        console.log('✅ 載入完成:', state.users.length, '筆員工資料');
-      },
-
-  // 基本操作
-  addUser: (userData) => {
-    const newUser: User = {
-      ...userData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    set((state) => ({
-      users: [...state.users, newUser]
-    }));
+// 擴充自訂方法（如果需要）
+export const userStoreHelpers = {
+  /**
+   * 根據員工編號查詢
+   */
+  getUserByNumber: (employee_number: string): User | undefined => {
+    const state = useUserStore.getState();
+    return state.items.find(user => user.employee_number === employee_number);
   },
 
-  updateUser: (id, updates) => {
-    set((state) => ({
-      users: state.users.map(user =>
-        user.id === id
-          ? { ...user, ...updates, updatedAt: new Date().toISOString() }
-          : user
-      )
-    }));
-    console.log('📦 本地模式：更新員工', id);
-  },
+  /**
+   * 員工編號生成
+   */
+  generateUserNumber: (english_name: string): string => {
+    const state = useUserStore.getState();
+    const users = state.items;
+    const baseName = english_name.toLowerCase();
 
-  deleteUser: (id) => {
-    set((state) => ({
-      users: state.users.filter(user => user.id !== id)
-    }));
-    console.log('📦 本地模式：刪除員工', id);
-  },
+    // 所有現有的員工編號（包括同名和不同名的）
+    const allEmployeeNumbers = users.map(user => user.employee_number);
 
-  getUser: (id) => {
-    return get().users.find(user => user.id === id);
-  },
-
-  getUserByNumber: (employeeNumber) => {
-    return get().users.find(user => user.employeeNumber === employeeNumber);
-  },
-
-  // 員工編號生成
-  generateUserNumber: (englishName) => {
-    const users = get().users;
-
-    // 所有現有的員工編號
-    const allEmployeeNumbers = users.map(user => user.employeeNumber);
-
-    // 取得最大的數字編號
-    const numericNumbers = allEmployeeNumbers
+    // 取得所有數字編號（不限名字）
+    const allNumericNumbers = allEmployeeNumbers
       .map(num => {
         const match = num.match(/\d+$/);
         return match ? parseInt(match[0], 10) : 0;
       })
       .filter(num => num > 0);
 
-    // 找到下一個可用的編號
-    const maxNumber = numericNumbers.length > 0 ? Math.max(...numericNumbers) : 0;
-    const nextNumber = maxNumber + 1;
+    // 找到全局最大編號
+    const maxNumber = allNumericNumbers.length > 0 ? Math.max(...allNumericNumbers) : 0;
+    let nextNumber = maxNumber + 1;
 
-    // 格式化為兩位數 (william01, william02...)
-    const formattedNumber = nextNumber.toString().padStart(2, '0');
+    // 確保這個編號不會與現有的任何員工編號衝突
+    let candidate = `${baseName}${nextNumber.toString().padStart(2, '0')}`;
+    while (allEmployeeNumbers.includes(candidate)) {
+      nextNumber++;
+      candidate = `${baseName}${nextNumber.toString().padStart(2, '0')}`;
+    }
 
-    return `${englishName.toLowerCase()}${formattedNumber}`;
+    console.log('🔢 產生員工編號:', candidate, '(檢查了', allEmployeeNumbers.length, '個現有編號)');
+    return candidate;
   },
 
-  // 權限管理
-  updateUserPermissions: (id, permissions) => {
-    get().updateUser(id, { permissions });
-    console.log('📦 本地模式：更新權限', id, permissions);
+  /**
+   * 搜尋員工
+   */
+  searchUsers: (searchTerm: string): User[] => {
+    const state = useUserStore.getState();
+    const users = state.items;
+    const term = searchTerm.toLowerCase();
+
+    return users.filter(user =>
+      user.employee_number.toLowerCase().includes(term) ||
+      user.english_name.toLowerCase().includes(term) ||
+      user.display_name.includes(term)
+    );
   },
 
-  // 薪資管理
-  updateBaseSalary: (id, newSalary, reason) => {
-    const user = get().getUser(id);
+  /**
+   * 按狀態篩選
+   */
+  getUsersByStatus: (status: User['status']): User[] => {
+    const state = useUserStore.getState();
+    return state.items.filter(user => user.status === status);
+  },
+
+  /**
+   * 按部門篩選
+   */
+  getUsersByDepartment: (department: string): User[] => {
+    const state = useUserStore.getState();
+    return state.items.filter(user => user.job_info.department === department);
+  },
+
+  /**
+   * 更新權限
+   */
+  updateUserPermissions: async (id: string, permissions: string[]): Promise<void> => {
+    await useUserStore.getState().update(id, { permissions } as any);
+    console.log('✅ 權限更新完成:', id, permissions);
+  },
+
+  /**
+   * 更新基本薪資
+   */
+  updateBaseSalary: async (id: string, newSalary: number, reason: string): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
     const newHistory = [
-      ...user.salaryInfo.salaryHistory,
+      ...user.salary_info.salary_history,
       {
-        effectiveDate: new Date().toISOString().split('T')[0],
-        baseSalary: newSalary,
+        effective_date: new Date().toISOString().split('T')[0],
+        base_salary: newSalary,
         reason
       }
     ];
 
-    get().updateUser(id, {
-      salaryInfo: {
-        ...user.salaryInfo,
-        baseSalary: newSalary,
-        salaryHistory: newHistory
+    await useUserStore.getState().update(id, {
+      salary_info: {
+        ...user.salary_info,
+        base_salary: newSalary,
+        salary_history: newHistory
       }
-    });
+    } as any);
   },
 
-  addAllowance: (id, type, amount) => {
-    const user = get().getUser(id);
+  /**
+   * 新增津貼
+   */
+  addAllowance: async (id: string, type: string, amount: number): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
     const newAllowances = [
-      ...user.salaryInfo.allowances.filter(a => a.type !== type),
+      ...user.salary_info.allowances.filter((a: any) => a.type !== type),
       { type, amount }
     ];
 
-    get().updateUser(id, {
-      salaryInfo: {
-        ...user.salaryInfo,
+    await useUserStore.getState().update(id, {
+      salary_info: {
+        ...user.salary_info,
         allowances: newAllowances
       }
-    });
+    } as any);
   },
 
-  removeAllowance: (id, type) => {
-    const user = get().getUser(id);
+  /**
+   * 移除津貼
+   */
+  removeAllowance: async (id: string, type: string): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
-    const newAllowances = user.salaryInfo.allowances.filter(a => a.type !== type);
+    const newAllowances = user.salary_info.allowances.filter((a: any) => a.type !== type);
 
-    get().updateUser(id, {
-      salaryInfo: {
-        ...user.salaryInfo,
+    await useUserStore.getState().update(id, {
+      salary_info: {
+        ...user.salary_info,
         allowances: newAllowances
       }
-    });
+    } as any);
   },
 
-  // 出勤管理
-  addLeaveRecord: (id, leaveRecord) => {
-    const user = get().getUser(id);
+  /**
+   * 新增請假記錄
+   */
+  addLeaveRecord: async (id: string, leaveRecord: Omit<User['attendance']['leave_records'][0], 'id'>): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
     const newRecord = {
       ...leaveRecord,
-      id: Date.now().toString()
+      id: generateUUID()
     };
 
-    const newLeaveRecords = [...user.attendance.leaveRecords, newRecord];
+    const newLeaveRecords = [...user.attendance.leave_records, newRecord];
 
-    get().updateUser(id, {
+    await useUserStore.getState().update(id, {
       attendance: {
         ...user.attendance,
-        leaveRecords: newLeaveRecords
+        leave_records: newLeaveRecords
       }
-    });
+    } as any);
   },
 
-  approveLeave: (userId, leaveId, approvedBy) => {
-    const user = get().getUser(userId);
+  /**
+   * 核准請假
+   */
+  approveLeave: async (user_id: string, leaveId: string, approved_by: string): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === user_id);
     if (!user) return;
 
-    const updatedRecords = user.attendance.leaveRecords.map(record =>
+    const updatedRecords = user.attendance.leave_records.map((record: any) =>
       record.id === leaveId
-        ? { ...record, status: 'approved' as const, approvedBy }
+        ? { ...record, status: 'approved' as const, approved_by }
         : record
     );
 
-    get().updateUser(userId, {
+    await useUserStore.getState().update(user_id, {
       attendance: {
         ...user.attendance,
-        leaveRecords: updatedRecords
+        leave_records: updatedRecords
       }
-    });
+    } as any);
   },
 
-  rejectLeave: (userId, leaveId) => {
-    const user = get().getUser(userId);
+  /**
+   * 拒絕請假
+   */
+  rejectLeave: async (user_id: string, leaveId: string): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === user_id);
     if (!user) return;
 
-    const updatedRecords = user.attendance.leaveRecords.map(record =>
+    const updatedRecords = user.attendance.leave_records.map((record: any) =>
       record.id === leaveId
         ? { ...record, status: 'rejected' as const }
         : record
     );
 
-    get().updateUser(userId, {
+    await useUserStore.getState().update(user_id, {
       attendance: {
         ...user.attendance,
-        leaveRecords: updatedRecords
+        leave_records: updatedRecords
       }
-    });
+    } as any);
   },
 
-  addOvertimeRecord: (id, overtimeRecord) => {
-    const user = get().getUser(id);
+  /**
+   * 新增加班記錄
+   */
+  addOvertimeRecord: async (id: string, overtimeRecord: Omit<User['attendance']['overtime_records'][0], 'id'>): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
     const newRecord = {
       ...overtimeRecord,
-      id: Date.now().toString()
+      id: generateUUID()
     };
 
-    const newOvertimeRecords = [...user.attendance.overtimeRecords, newRecord];
+    const newOvertimeRecords = [...user.attendance.overtime_records, newRecord];
 
-    get().updateUser(id, {
+    await useUserStore.getState().update(id, {
       attendance: {
         ...user.attendance,
-        overtimeRecords: newOvertimeRecords
+        overtime_records: newOvertimeRecords
       }
-    });
+    } as any);
   },
 
-  // 合約管理
-  addContract: (id, contract) => {
-    const user = get().getUser(id);
+  /**
+   * 新增合約
+   */
+  addContract: async (id: string, contract: Omit<User['contracts'][0], 'id'>): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
     const newContract = {
       ...contract,
-      id: Date.now().toString()
+      id: generateUUID()
     };
 
     const newContracts = [...user.contracts, newContract];
 
-    get().updateUser(id, {
+    await useUserStore.getState().update(id, {
       contracts: newContracts
-    });
+    } as any);
   },
 
-  updateContract: (userId, contractId, updates) => {
-    const user = get().getUser(userId);
+  /**
+   * 更新合約
+   */
+  updateContract: async (user_id: string, contractId: string, updates: Partial<User['contracts'][0]>): Promise<void> => {
+    const user = useUserStore.getState().items.find((u: User) => u.id === user_id);
     if (!user) return;
 
-    const updatedContracts = user.contracts.map(contract =>
+    const updatedContracts = user.contracts.map((contract: any) =>
       contract.id === contractId
         ? { ...contract, ...updates }
         : contract
     );
 
-    get().updateUser(userId, {
+    await useUserStore.getState().update(user_id, {
       contracts: updatedContracts
-    });
+    } as any);
   },
+};
 
-  // 搜尋與篩選
-  searchUsers: (searchTerm) => {
-    const users = get().users;
-    const term = searchTerm.toLowerCase();
+// 相容性 alias（保留舊的 API）
+export const useUserStoreCompat = () => {
+  const store = useUserStore();
 
-    return users.filter(user =>
-      user.employeeNumber.toLowerCase().includes(term) ||
-      user.englishName.toLowerCase().includes(term) ||
-      user.chineseName.includes(term) ||
-      user.jobInfo.department.toLowerCase().includes(term) ||
-      user.jobInfo.position.toLowerCase().includes(term)
-    );
-  },
-
-  getUsersByStatus: (status) => {
-    return get().users.filter(user => user.status === status);
-  },
-
-  getUsersByDepartment: (department) => {
-    return get().users.filter(user => user.jobInfo.department === department);
-  }
-    }),
-    {
-      name: 'user-storage',
-      version: 1
-    }
-  )
-);
+  return {
+    ...store,
+    users: store.items, // 相容性：items → users
+    isLoading: store.loading, // 相容性：loading → isLoading
+    loadUsersFromDatabase: store.fetchAll, // 相容性：fetchAll → loadUsersFromDatabase
+    addUser: store.create, // 相容性：create → addUser
+    updateUser: store.update, // 相容性：update → updateUser
+    deleteUser: store.delete, // 相容性：delete → deleteUser
+    getUser: (id: string) => store.items.find((u: User) => u.id === id), // 相容性：替代 findById
+    ...userStoreHelpers, // 包含所有自訂方法
+  };
+};

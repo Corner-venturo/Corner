@@ -79,8 +79,8 @@ export function calculateFormula(formula: string, context: FormulaContext): numb
     }
 
     // 替換中文欄位名稱為實際值
-    for (const [chineseName, fieldKey] of Object.entries(FIELD_MAP)) {
-      const regex = new RegExp(chineseName, 'g');
+    for (const [display_name, fieldKey] of Object.entries(FIELD_MAP)) {
+      const regex = new RegExp(display_name, 'g');
       const value = context[fieldKey];
 
       if (value !== undefined) {
@@ -127,10 +127,10 @@ function evaluateExpression(expression: string): number | string {
 }
 
 // 獲取團員的計算上下文
-export function getMemberContext(member: any, tourAddOns: any[] = [], tourPrice: number = 0): FormulaContext {
+export function getMemberContext(member: any, tour_add_ons: any[] = [], tourPrice: number = 0): FormulaContext {
   // 計算加購總金額
   const addOnTotal = (member.addOns || []).reduce((sum: number, addOnId: string) => {
-    const addOn = tourAddOns.find(a => a.id === addOnId);
+    const addOn = tour_add_ons.find(a => a.id === addOnId);
     return sum + (addOn?.price || 0);
   }, 0);
 
@@ -144,7 +144,7 @@ export function getMemberContext(member: any, tourAddOns: any[] = [], tourPrice:
     age: member.age || 0,
     gender: member.gender || '',
     idNumber: member.idNumber || '',
-    passportNumber: member.passportNumber || '',
+    passport_number: member.passport_number || '',
     passportExpiry: member.passportExpiry || '',
     reservationCode: member.reservationCode || '',
     assignedRoom: member.assignedRoom || '',

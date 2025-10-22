@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useSupplierStore } from '@/stores';
-import { useTourStore } from '@/stores';
+import { useSupplierStore, useTourStore, useOrderStore } from '@/stores';
+import type { Tour, Order } from '@/stores/types';
 
 import { cn } from '@/lib/utils';
+import { generateUUID } from '@/lib/utils/uuid';
 
 interface QuickDisbursementProps {
   onSubmit?: (data: DisbursementData) => void;
@@ -21,7 +22,7 @@ interface DisbursementItem {
   id: string;
   category: '住宿' | '交通' | '餐食' | '門票' | '導遊' | '其他';
   supplier_id: string;
-  supplier_name: string;
+  supplierName: string;
   description: string;
   unit_price: number;
   quantity: number;
@@ -29,7 +30,7 @@ interface DisbursementItem {
 
 interface DisbursementData {
   tour_id: string;
-  orderId?: string;
+  order_id?: string;
   request_date: string;
   items: DisbursementItem[];
   total_amount: number;
@@ -47,8 +48,9 @@ const categoryOptions = [
 ];
 
 export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
-  const { tours, orders } = useTourStore();
-  const { suppliers } = useSupplierStore();
+  const { items: tours } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const { items: suppliers } = useSupplierStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTourId, setSelectedTourId] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
@@ -79,7 +81,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     if (!searchTerm.trim()) return tours;
 
     const term = searchTerm.toLowerCase();
-    return tours.filter(tour => {
+    return tours.filter((tour: Tour) => {
       const code = tour.code?.toLowerCase() || '';
       const name = tour.name?.toLowerCase() || '';
       const location = tour.location?.toLowerCase() || '';
@@ -95,14 +97,14 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     if (!selectedTourId) return [];
 
     return orders
-      .filter(order => order.tour_id === selectedTourId)
-      .map(order => ({
+      .filter((order: Order) => order.tour_id === selectedTourId)
+      .map((order: Order) => ({
         id: order.id,
         label: `${order.order_number || 'N/A'} - ${order.contact_person} - ${order.sales_person || '未指派'}`
       }));
   }, [selectedTourId, orders]);
 
-  const selectedTour = tours.find(t => t.id === selectedTourId);
+  const selectedTour = tours.find((t: Tour) => t.id === selectedTourId);
 
   // 生成接下來8週的週四日期
   const upcomingThursdays = useMemo(() => {
@@ -138,11 +140,11 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     const selectedSupplier = suppliers.find(s => s.id === newItem.supplier_id);
     if (!selectedSupplier) return;
 
-    const itemId = Date.now().toString();
+    const itemId = generateUUID();
     setItems(prev => [...prev, {
       id: itemId,
       ...newItem,
-      supplier_name: selectedSupplier.name
+      supplierName: selectedSupplier.name
     }]);
 
     // 重置表單
@@ -161,7 +163,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
   };
 
   // 計算總金額
-  const totalAmount = useMemo(() =>
+  const total_amount = useMemo(() =>
     items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0)
   , [items]);
 
@@ -175,7 +177,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       onSubmit({
         tour_id: selectedTourId,
         order_id: selectedOrderId,
-        request_date,
+        request_date: requestDate,
         items,
         total_amount,
         note,
@@ -234,7 +236,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                           {tour.code || 'N/A'} - {tour.name}
                         </div>
                         <div className="text-xs text-morandi-secondary mt-1">
-                          {tour.location} • {tour.start_date}
+                          {tour.location} • {tour.departure_date}
                         </div>
                       </div>
                       {selectedTourId === tour.id && (
@@ -259,7 +261,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                     {selectedTour.code || 'N/A'} - {selectedTour.name}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-1">
-                    {selectedTour.location} • {selectedTour.start_date}
+                    {selectedTour.location} • {selectedTour.departure_date}
                   </div>
                 </div>
                 <button
@@ -474,7 +476,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                       <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-0.5 rounded">
                         {categoryOptions.find(c => c.value === item.category)?.label}
                       </span>
-                      <span className="text-sm font-medium text-morandi-primary">{item.supplier_name}</span>
+                      <span className="text-sm font-medium text-morandi-primary">{item.supplierName}</span>
                     </div>
                     <div className="text-xs text-morandi-secondary">{item.description}</div>
                     <div className="text-xs text-morandi-secondary mt-1">
@@ -496,7 +498,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
             <div className="mt-3 pt-3 border-t border-morandi-container/30 flex justify-between items-center">
               <span className="text-sm font-semibold text-morandi-primary">總金額:</span>
-              <span className="text-lg font-bold text-morandi-gold">NT$ {totalAmount.toLocaleString()}</span>
+              <span className="text-lg font-bold text-morandi-gold">NT$ {total_amount.toLocaleString()}</span>
             </div>
           </div>
         )}
@@ -522,7 +524,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <FileText size={16} className="mr-2" />
-          建立請款單 ({items.length} 項，NT$ {totalAmount.toLocaleString()})
+          建立請款單 ({items.length} 項，NT$ {total_amount.toLocaleString()})
         </Button>
       </div>
     </div>

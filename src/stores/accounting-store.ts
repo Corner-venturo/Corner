@@ -1,7 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Account, TransactionCategory, Transaction, Budget, AccountingStats } from '@/types';
-import { createPersistentCrudMethods, generateId } from '@/lib/persistent-store';
+import { generateUUID } from '@/lib/utils/uuid';
+
+/**
+ * 會計系統 Store (純 localStorage 版本)
+ *
+ * 說明：會計系統使用 localStorage 持久化，原因：
+ * 1. 資料量小 (帳戶、交易記錄)
+ * 2. 需要即時計算統計 (不適合 IndexedDB)
+ * 3. 暫不同步到 Supabase（待未來擴充）
+ */
 
 interface AccountingStore {
   // 資料狀態
@@ -13,28 +22,39 @@ interface AccountingStore {
   // 統計資料
   stats: AccountingStats;
 
-  // 帳戶管理（統一方法）
-  addAccount: (account: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => Promise<Account>;
-  updateAccount: (id: string, account: Partial<Account>) => Promise<Account | undefined>;
-  deleteAccount: (id: string) => Promise<boolean>;
-  loadAccounts: () => Promise<Account[] | null>;
+  // 帳戶管理
+  addAccount: (account: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => Account;
+  updateAccount: (id: string, account: Partial<Account>) => Account | undefined;
+  deleteAccount: (id: string) => boolean;
+  loadAccounts: () => Account[];
 
-  // 分類管理（統一方法）
-  addCategory: (category: Omit<TransactionCategory, 'id' | 'created_at' | 'updated_at'>) => Promise<TransactionCategory>;
-  updateCategory: (id: string, category: Partial<TransactionCategory>) => Promise<TransactionCategory | undefined>;
-  deleteCategory: (id: string) => Promise<boolean>;
-  loadCategories: () => Promise<TransactionCategory[] | null>;
+  // 分類管理
+  addCategory: (category: Omit<TransactionCategory, 'id' | 'created_at' | 'updated_at'>) => TransactionCategory;
+  updateCategory: (id: string, category: Partial<TransactionCategory>) => TransactionCategory | undefined;
+  deleteCategory: (id: string) => boolean;
+  loadCategories: () => TransactionCategory[];
 
-  // 交易記錄（保留自定義，因為有餘額計算）
+  // 交易記錄
   addTransaction: (transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => string;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
 
+  // 預算管理
+  addBudget: (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at'>) => Budget;
+  updateBudget: (id: string, budget: Partial<Budget>) => Budget | undefined;
+  deleteBudget: (id: string) => boolean;
+
   // 統計計算
   calculateStats: () => void;
   getAccountBalance: (account_id: string) => number;
-  getCategoryTotal: (category_id: string, startDate?: string, endDate?: string) => number;
+  getCategoryTotal: (category_id: string, start_date?: string, end_date?: string) => number;
+
+  // 輔助方法
+  updateAccountBalances: (transaction: Transaction) => void;
+  reverseAccountBalances: (transaction: Transaction) => void;
 }
+
+const generateId = () => generateUUID();
 
 export const useAccountingStore = create<AccountingStore>()(
   persist(
@@ -55,187 +75,208 @@ export const useAccountingStore = create<AccountingStore>()(
         category_breakdown: []
       },
 
-      // 帳戶管理（使用統一方法，加上計算邏輯）
-      ...createPersistentCrudMethods<Account>('accounts', 'accounts', set, get),
-      ...createPersistentCrudMethods<Category>('categories', 'categories', set, get),
-
+      // ===== 帳戶管理 =====
       addAccount: (accountData) => {
-        try {
-          const methods = createPersistentCrudMethods<Account>('accounts', 'accounts', set, get);
-          const account = methods.addAccount(accountData);
-          get().calculateStats();
-          return account;
-        } catch (error) {
-          console.error('❌ 新增帳戶失敗:', error);
-          throw error;
-        }
+        const id = generateId();
+        const now = new Date().toISOString();
+        const account: Account = {
+          ...accountData,
+          id,
+          created_at: now,
+          updated_at: now,
+        };
+        set((state) => ({ accounts: [...state.accounts, account] }));
+        get().calculateStats();
+        return account;
       },
 
       updateAccount: (id, accountData) => {
-        try {
-          const methods = createPersistentCrudMethods<Account>('accounts', 'accounts', set, get);
-          const account = methods.updateAccount(id, accountData);
-          get().calculateStats();
-          return account;
-        } catch (error) {
-          console.error('❌ 更新帳戶失敗:', error);
-          return undefined;
-        }
+        let updated: Account | undefined;
+        set((state) => {
+          const account = state.accounts.find(a => a.id === id);
+          if (!account) return state;
+
+          updated = { ...account, ...accountData, updated_at: new Date().toISOString() };
+          return {
+            accounts: state.accounts.map(a => a.id === id ? updated! : a)
+          };
+        });
+        get().calculateStats();
+        return updated;
       },
 
       deleteAccount: (id) => {
-        try {
-          // 先刪除相關交易
-          set((state) => ({
-            transactions: state.transactions.filter(transaction =>
-              transaction.account_id !== id && transaction.to_account_id !== id
-            ),
-          }));
+        // 先刪除相關交易
+        set((state) => ({
+          transactions: state.transactions.filter(transaction =>
+            transaction.account_id !== id && transaction.to_account_id !== id
+          ),
+        }));
 
-          const methods = createPersistentCrudMethods<Account>('accounts', 'accounts', set, get);
-          const success = methods.deleteAccount(id);
-          get().calculateStats();
-          return success;
-        } catch (error) {
-          console.error('❌ 刪除帳戶失敗:', error);
-          return false;
-        }
+        set((state) => ({
+          accounts: state.accounts.filter(a => a.id !== id)
+        }));
+        get().calculateStats();
+        return true;
       },
 
-      loadAccounts: async () => {
-        const methods = createPersistentCrudMethods<Account>('accounts', 'accounts', set, get);
-        return methods.loadAccounts();
+      loadAccounts: () => {
+        return get().accounts;
       },
 
-      // 分類管理（使用統一方法）
+      // ===== 分類管理 =====
       addCategory: (categoryData) => {
-        try {
-          const methods = createPersistentCrudMethods<Category>('categories', 'categories', set, get);
-          return methods.addCategory(categoryData);
-        } catch (error) {
-          console.error('❌ 新增分類失敗:', error);
-          throw error;
-        }
+        const id = generateId();
+        const now = new Date().toISOString();
+        const category: TransactionCategory = {
+          ...categoryData,
+          id,
+          created_at: now,
+          updated_at: now,
+        };
+        set((state) => ({ categories: [...state.categories, category] }));
+        return category;
       },
 
       updateCategory: (id, categoryData) => {
-        try {
-          const methods = createPersistentCrudMethods<Category>('categories', 'categories', set, get);
-          return methods.updateCategory(id, categoryData);
-        } catch (error) {
-          console.error('❌ 更新分類失敗:', error);
-          return undefined;
-        }
+        let updated: TransactionCategory | undefined;
+        set((state) => {
+          const category = state.categories.find(c => c.id === id);
+          if (!category) return state;
+
+          updated = { ...category, ...categoryData, updated_at: new Date().toISOString() };
+          return {
+            categories: state.categories.map(c => c.id === id ? updated! : c)
+          };
+        });
+        return updated;
       },
 
       deleteCategory: (id) => {
-        try {
-          // 先刪除該分類的交易
-          set((state) => ({
-            transactions: state.transactions.filter(transaction => transaction.category_id !== id),
-          }));
+        // 先刪除該分類的交易
+        set((state) => ({
+          transactions: state.transactions.filter(transaction => transaction.category_id !== id),
+        }));
 
-          const methods = createPersistentCrudMethods<Category>('categories', 'categories', set, get);
-          return methods.deleteCategory(id);
-        } catch (error) {
-          console.error('❌ 刪除分類失敗:', error);
-          return false;
-        }
+        set((state) => ({
+          categories: state.categories.filter(c => c.id !== id)
+        }));
+        return true;
       },
 
-      loadCategories: async () => {
-        const methods = createPersistentCrudMethods<Category>('categories', 'categories', set, get);
-        return methods.loadCategories();
+      loadCategories: () => {
+        return get().categories;
       },
 
-      // 交易記錄（保留自定義邏輯，因為需要更新帳戶餘額）
+      // ===== 交易記錄 =====
       addTransaction: (transactionData) => {
-        try {
-          const id = generateId();
-          const now = new Date().toISOString();
+        const id = generateId();
+        const now = new Date().toISOString();
 
-          const transaction: Transaction = {
-            ...transactionData,
-            id,
-            createdAt: now,
-            updatedAt: now,
-          };
+        const transaction: Transaction = {
+          ...transactionData,
+          id,
+          created_at: now,
+          updated_at: now,
+        };
 
-          set((state) => ({ transactions: [...state.transactions, transaction] }));
-          get().updateAccountBalances(transaction);
-          get().calculateStats();
-          return id;
-        } catch (error) {
-          console.error('❌ 新增交易失敗:', error);
-          return '';
-        }
+        set((state) => ({ transactions: [...state.transactions, transaction] }));
+        get().updateAccountBalances(transaction);
+        get().calculateStats();
+        return id;
       },
 
       updateTransaction: (id, transactionData) => {
-        try {
-          const now = new Date().toISOString();
-          const oldTransaction = get().transactions.find(t => t.id === id);
+        const now = new Date().toISOString();
+        const oldTransaction = get().transactions.find(t => t.id === id);
 
-          set((state) => ({
-            transactions: state.transactions.map(transaction =>
-              transaction.id === id ? { ...transaction, ...transactionData, updatedAt: now } : transaction
-            ),
-          }));
+        set((state) => ({
+          transactions: state.transactions.map(transaction =>
+            transaction.id === id ? { ...transaction, ...transactionData, updated_at: now } : transaction
+          ),
+        }));
 
-          if (oldTransaction) {
-            get().reverseAccountBalances(oldTransaction);
-          }
-          const newTransaction = get().transactions.find(t => t.id === id);
-          if (newTransaction) {
-            get().updateAccountBalances(newTransaction);
-          }
-          get().calculateStats();
-        } catch (error) {
-          console.error('❌ 更新交易失敗:', error);
+        if (oldTransaction) {
+          get().reverseAccountBalances(oldTransaction);
         }
+        const newTransaction = get().transactions.find(t => t.id === id);
+        if (newTransaction) {
+          get().updateAccountBalances(newTransaction);
+        }
+        get().calculateStats();
       },
 
       deleteTransaction: (id) => {
-        try {
-          const transaction = get().transactions.find(t => t.id === id);
-          if (transaction) {
-            get().reverseAccountBalances(transaction);
-          }
-
-          set((state) => ({
-            transactions: state.transactions.filter(transaction => transaction.id !== id),
-          }));
-          get().calculateStats();
-        } catch (error) {
-          console.error('❌ 刪除交易失敗:', error);
+        const transaction = get().transactions.find(t => t.id === id);
+        if (transaction) {
+          get().reverseAccountBalances(transaction);
         }
+
+        set((state) => ({
+          transactions: state.transactions.filter(transaction => transaction.id !== id),
+        }));
+        get().calculateStats();
       },
 
-      // 輔助方法：更新帳戶餘額
+      // ===== 預算管理 =====
+      addBudget: (budgetData) => {
+        const id = generateId();
+        const now = new Date().toISOString();
+        const budget: Budget = {
+          ...budgetData,
+          id,
+          created_at: now,
+          updated_at: now,
+        };
+        set((state) => ({ budgets: [...state.budgets, budget] }));
+        return budget;
+      },
+
+      updateBudget: (id, budgetData) => {
+        let updated: Budget | undefined;
+        set((state) => {
+          const budget = state.budgets.find(b => b.id === id);
+          if (!budget) return state;
+
+          updated = { ...budget, ...budgetData, updated_at: new Date().toISOString() };
+          return {
+            budgets: state.budgets.map(b => b.id === id ? updated! : b)
+          };
+        });
+        return updated;
+      },
+
+      deleteBudget: (id) => {
+        set((state) => ({
+          budgets: state.budgets.filter(b => b.id !== id)
+        }));
+        return true;
+      },
+
+      // ===== 輔助方法 =====
       updateAccountBalances: (transaction: Transaction) => {
         set((state) => ({
           accounts: state.accounts.map(account => {
             if (account.id === transaction.account_id) {
               const balanceChange = transaction.type === 'income' ? transaction.amount : -transaction.amount;
               const newBalance = account.balance + balanceChange;
-              const availableCredit = account.type === 'credit' && account.creditLimit
-                ? account.creditLimit + newBalance
-                : account.availableCredit;
-              return { ...account, balance: newBalance, availableCredit };
+              const availableCredit = account.type === 'credit' && account.credit_limit
+                ? (account.credit_limit ?? 0) + newBalance
+                : account.available_credit;
+              return { ...account, balance: newBalance, available_credit: availableCredit };
             }
             if (transaction.to_account_id && account.id === transaction.to_account_id) {
               const newBalance = account.balance + transaction.amount;
-              const availableCredit = account.type === 'credit' && account.creditLimit
-                ? account.creditLimit + newBalance
-                : account.availableCredit;
-              return { ...account, balance: newBalance, availableCredit };
+              const availableCredit = account.type === 'credit' && account.credit_limit
+                ? (account.credit_limit ?? 0) + newBalance
+                : account.available_credit;
+              return { ...account, balance: newBalance, available_credit: availableCredit };
             }
             return account;
           })
         }));
       },
 
-      // 輔助方法：反向更新帳戶餘額（用於刪除或修改交易）
       reverseAccountBalances: (transaction: Transaction) => {
         set((state) => ({
           accounts: state.accounts.map(account => {
@@ -251,9 +292,9 @@ export const useAccountingStore = create<AccountingStore>()(
         }));
       },
 
-      // 統計計算
+      // ===== 統計計算 =====
       calculateStats: () => {
-        const { accounts, transactions } = get();
+        const { accounts, transactions, categories } = get();
         const now = new Date();
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
@@ -294,7 +335,6 @@ export const useAccountingStore = create<AccountingStore>()(
           })
           .reduce((sum, t) => sum + t.amount, 0);
 
-        const { categories } = get();
         const categoryTotals = new Map<string, number>();
 
         transactions
@@ -308,7 +348,7 @@ export const useAccountingStore = create<AccountingStore>()(
           .map(([categoryId, amount]) => {
             const category = categories.find(c => c.id === categoryId);
             return {
-              categoryId,
+              category_id: categoryId,
               category_name: category?.name || '未知分類',
               amount,
               percentage: totalExpense > 0 ? (amount / totalExpense) * 100 : 0
@@ -318,30 +358,30 @@ export const useAccountingStore = create<AccountingStore>()(
 
         set({
           stats: {
-            totalAssets,
-            totalIncome,
-            totalExpense,
-            monthlyIncome,
-            monthlyExpense,
-            netWorth,
-            categoryBreakdown
+            total_assets: totalAssets,
+            total_income: totalIncome,
+            total_expense: totalExpense,
+            monthly_income: monthlyIncome,
+            monthly_expense: monthlyExpense,
+            net_worth: netWorth,
+            category_breakdown: categoryBreakdown
           }
         });
       },
 
       // 工具方法
-      getAccountBalance: (account_id: string) => {
+      getAccountBalance: (accountId: string) => {
         const account = get().accounts.find(a => a.id === accountId);
         return account?.balance || 0;
       },
 
-      getCategoryTotal: (category_id: string, startDate?: string, endDate?: string) => {
+      getCategoryTotal: (categoryId: string, start_date?: string, end_date?: string) => {
         const { transactions } = get();
         return transactions
           .filter(t => {
             if (t.category_id !== categoryId) return false;
-            if (startDate && t.date < startDate) return false;
-            if (endDate && t.date > endDate) return false;
+            if (start_date && t.date < start_date) return false;
+            if (end_date && t.date > end_date) return false;
             return true;
           })
           .reduce((sum, t) => sum + t.amount, 0);
@@ -349,12 +389,14 @@ export const useAccountingStore = create<AccountingStore>()(
     }),
     {
       name: 'venturo-accounting-store',
-      version: 1,
+      version: 2, // 版本升級
     }
   )
 );
 
 // 初始化統計資料
-setTimeout(() => {
-  useAccountingStore.getState().calculateStats();
-}, 0);
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    useAccountingStore.getState().calculateStats();
+  }, 0);
+}

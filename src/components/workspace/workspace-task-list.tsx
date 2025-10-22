@@ -30,7 +30,7 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
   
   // 獲取該旅遊團的任務
   const tourTasks = (todos || []).filter(todo =>
-    todo.relatedItems?.some(item => item.type === 'tour' && item.id === tourId)
+    todo.related_items?.some((item: any) => (item.type === 'quote' || item.type === 'order') && item.id === tour_id)
   ).sort((a, b) => {
     // 未完成的排在前面
     if (a.completed !== b.completed) {
@@ -40,14 +40,14 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
     return (b.priority || 0) - (a.priority || 0);
   });
   
-  const getEmployeeName = (employeeId?: string) => {
-    if (!employeeId) return '未指派';
-    return employees.find(emp => emp.id === employeeId)?.name || '未知';
+  const getEmployeeName = (employee_id?: string) => {
+    if (!employee_id) return '未指派';
+    return employees.find(emp => emp.id === employee_id)?.name || '未知';
   };
   
   const getProgressInfo = (todo: any) => {
-    const completed = (todo.subTasks || []).filter((task: any) => task.done).length;
-    const total = (todo.subTasks || []).length;
+    const completed = (todo.sub_tasks || []).filter((task: any) => task.done).length;
+    const total = (todo.sub_tasks || []).length;
     return { completed, total, percentage: total > 0 ? (completed / total) * 100 : 0 };
   };
   
@@ -78,21 +78,21 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
     updateTodo(taskId, {
       completed: !task.completed,
       status: !task.completed ? 'completed' : 'pending',
-      completedAt: !task.completed ? new Date().toISOString() : undefined,
-    });
+      completed_at: !task.completed ? new Date().toISOString() : undefined,
+    } as any);
   };
   
   const handleToggleSubTask = (taskId: string, subTaskId: string) => {
     const task = todos.find(t => t.id === taskId);
     if (!task) return;
     
-    const updatedSubTasks = (task.subTasks || []).map(st =>
+    const updatedSubTasks = (task.sub_tasks || []).map(st =>
       st.id === subTaskId
-        ? { ...st, done: !st.done, completedAt: !st.done ? new Date().toISOString() : undefined }
+        ? { ...st, done: !st.done, completed_at: !st.done ? new Date().toISOString() : undefined }
         : st
     );
     
-    updateTodo(taskId, { subTasks: updatedSubTasks });
+    updateTodo(taskId, { sub_tasks: updatedSubTasks });
   };
   
   const handleAddReply = (taskId: string) => {
@@ -131,7 +131,7 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
         tourTasks.map((task, index) => {
           const progress = getProgressInfo(task);
           const isExpanded = expandedTaskId === task.id;
-          const hasSubTasks = (task.subTasks || []).length > 0;
+          const hasSubTasks = (task.sub_tasks || []).length > 0;
           const hasNotes = (task.notes || []).length > 0;
           
           return (
@@ -213,7 +213,7 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
                     <div className="mb-4">
                       <div className="text-sm font-medium text-morandi-primary mb-2">子任務：</div>
                       <div className="space-y-1">
-                        {(task.subTasks || []).map(subTask => (
+                        {(task.sub_tasks || []).map(subTask => (
                           <div key={subTask.id} className="flex items-center gap-2 py-1">
                             <input
                               type="checkbox"
@@ -245,14 +245,14 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
                         <div key={i} className="flex gap-2">
                           {/* 頭像 */}
                           <div className="w-6 h-6 rounded-full bg-morandi-gold/20 flex items-center justify-center text-xs font-medium text-morandi-primary flex-shrink-0">
-                            {getEmployeeName(note.user_id)[0]}
+                            {getEmployeeName((note as any).user_id)[0]}
                           </div>
-                          
+
                           {/* 訊息內容 */}
                           <div className="flex-1 bg-white rounded p-2 text-sm border border-border">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium text-morandi-primary">
-                                {getEmployeeName(note.user_id)}
+                                {getEmployeeName((note as any).user_id)}
                               </span>
                               <span className="text-xs text-morandi-secondary">
                                 {formatTimestamp(note.timestamp)}

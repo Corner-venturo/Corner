@@ -25,7 +25,7 @@ export interface DataSheetColumn {
 export interface DataSheetProps {
   columns: DataSheetColumn[];
   data: any[];
-  tourAddOns?: any[];
+  tour_add_ons?: any[];
   tourPrice?: number;
   onCellsChanged?: (changes: any[]) => void;
   onDataUpdate?: (newData: any[]) => void;
@@ -35,18 +35,19 @@ export interface DataSheetProps {
   className?: string;
   orderFilter?: string;
   roomOptions?: Array<{ value: string; label: string; capacity: number; room_type: string }>;
-  onRoomAssign?: (memberId: string, roomValue: string) => void;
+  onRoomAssign?: (member_id: string, roomValue: string) => void;
   getRoomUsage?: (roomValue: string) => { bedCount: number; noBedCount: number; totalCount: number; capacity: number };
   isRoomFull?: (roomValue: string, excludeMemberId?: string) => boolean;
   enableColumnResize?: boolean;
   enableRowDrag?: boolean;
-  tourId?: string;
+  tour_id?: string;
+  tourId?: string; // 相容舊名稱
 }
 
 export function ReactDataSheetWrapper({
   columns,
   data,
-  tourAddOns = [],
+  tour_add_ons = [],
   tourPrice = 0,
   onCellsChanged,
   onDataUpdate,
@@ -61,8 +62,11 @@ export function ReactDataSheetWrapper({
   isRoomFull,
   enableColumnResize = true,
   enableRowDrag = true,
+  tour_id,
   tourId
 }: DataSheetProps) {
+  // 統一使用 tour_id (優先使用 tour_id，其次 tourId)
+  const finalTourId = tour_id || tourId;
   const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
   const [selectedRange, setSelectedRange] = useState<{start: {i: number, j: number}, end: {i: number, j: number}} | null>(null);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
@@ -75,8 +79,8 @@ export function ReactDataSheetWrapper({
 
   // 從 localStorage 載入欄位寬度
   useEffect(() => {
-    if (tourId) {
-      const savedWidths = localStorage.getItem(`columnWidths_${tourId}`);
+    if (finalTourId) {
+      const savedWidths = localStorage.getItem(`columnWidths_${finalTourId}`);
       if (savedWidths) {
         try {
           setColumnWidths(JSON.parse(savedWidths));
@@ -85,16 +89,16 @@ export function ReactDataSheetWrapper({
         }
       }
     }
-  }, [tourId]);
+  }, [finalTourId]);
 
   // 儲存欄位寬度到 localStorage
   const saveColumnWidth = useCallback((columnKey: string, width: number) => {
     const newWidths = { ...columnWidths, [columnKey]: width };
     setColumnWidths(newWidths);
-    if (tourId) {
-      localStorage.setItem(`columnWidths_${tourId}`, JSON.stringify(newWidths));
+    if (finalTourId) {
+      localStorage.setItem(`columnWidths_${finalTourId}`, JSON.stringify(newWidths));
     }
-  }, [columnWidths, tourId]);
+  }, [columnWidths, finalTourId]);
 
   // 處理欄位寬度調整
   const handleColumnResize = useCallback((e: React.MouseEvent, columnKey: string) => {
@@ -187,7 +191,7 @@ export function ReactDataSheetWrapper({
         // 如果是公式欄位，計算結果
         let displayValue = value;
         if (typeof value === 'string' && value.startsWith('=')) {
-          const context = getMemberContext(row, tourAddOns, tourPrice);
+          const context = getMemberContext(row, tour_add_ons, tourPrice);
           displayValue = calculateFormula(value, context);
         }
 
@@ -212,7 +216,7 @@ export function ReactDataSheetWrapper({
     });
 
     return [headerRow, ...dataRows];
-  }, [visibleColumns, data, tourAddOns, tourPrice]);
+  }, [visibleColumns, data, tour_add_ons, tourPrice]);
 
   // 處理單元格變更
   const handleCellsChanged = useCallback((changes: any[]) => {
@@ -251,7 +255,7 @@ export function ReactDataSheetWrapper({
       // 核心欄位不允許刪除
       const isCoreField = ['index', 'name', 'idNumber'].includes(column.key);
       // 自定義欄位可以刪除
-      const isCustomField = !['index', 'name', 'nameEn', 'birthday', 'age', 'gender', 'idNumber', 'passportNumber', 'passportExpiry', 'reservationCode', 'assignedRoom'].includes(column.key);
+      const isCustomField = !['index', 'name', 'nameEn', 'birthday', 'age', 'gender', 'idNumber', 'passport_number', 'passportExpiry', 'reservationCode', 'assignedRoom'].includes(column.key);
       // 大部分欄位都可以隱藏（除了核心欄位）
       const canHide = !isCoreField;
 
@@ -605,29 +609,30 @@ export function ReactDataSheetWrapper({
         }}
         tabIndex={0}
       >
+        {/* @ts-ignore - ReactDataSheet 型別定義不完整 */}
         <ReactDataSheet
           data={sheetData}
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
-          dataRenderer={(cell) => cell.value}
-          onContextMenu={(e, cell, i, j) => e.preventDefault()}
+          dataRenderer={(cell: any) => cell.value}
+          onContextMenu={(e: any, cell: any, i: any, j: any) => e.preventDefault()}
           // 增強多儲存格選擇
           onSelect={handleSelect}
           // 處理複製貼上
-          parsePaste={(str) => {
-            return str.split(/\r\n|\n|\r/).map(row => row.split('\t'));
+          parsePaste={(str: any) => {
+            return str.split(/\r\n|\n|\r/).map((row: any) => row.split('\t'));
           }}
           // 啟用 Excel 式功能
           tabBehaviour={'default'}
           // 自定義鍵盤導航
-          onKeyDown={(e) => {
+          onKeyDown={(e: any) => {
             // 阻止方向鍵滾動頁面
             if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
               e.preventDefault();
               e.stopPropagation();
             }
           }}
-          rowRenderer={(props) => {
+          rowRenderer={(props: any) => {
             const rowIndex = props['data-row'];
             const isDraggable = enableRowDrag && rowIndex > 0; // 不允許拖曳標題行
             const isDragging = draggedRow === rowIndex - 1;
@@ -651,7 +656,7 @@ export function ReactDataSheetWrapper({
               />
             );
           }}
-          cellRenderer={(props) => {
+          cellRenderer={(props: any) => {
             // 過濾掉非 DOM 屬性
             const {
               editing,

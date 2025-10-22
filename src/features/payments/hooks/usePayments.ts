@@ -1,84 +1,143 @@
-import { usePaymentStore } from '@/stores/payment-store';
-import { paymentService } from '../services/payment.service';
-import { PaymentRequest, PaymentRequestItem } from '@/stores/types';
+import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores';
+import { paymentRequestService } from '../services/payment-request.service';
+import { disbursementOrderService } from '../services/disbursement-order.service';
+import { PaymentRequest, PaymentRequestItem, DisbursementOrder } from '@/stores/types';
+import { BaseEntity } from '@/types';
 
+/**
+ * Payments Hook - 統一財務操作接口
+ *
+ * 使用新的 Service 層架構
+ */
 export const usePayments = () => {
-  const store = usePaymentStore();
+  const paymentRequestStore = usePaymentRequestStore();
+  const disbursementOrderStore = useDisbursementOrderStore();
 
   return {
     // ========== 資料 ==========
-    paymentRequests: store.paymentRequests,
-    selectedPaymentRequest: store.selectedPaymentRequest,
-    disbursementOrders: store.disbursementOrders,
-    selectedDisbursementOrder: store.selectedDisbursementOrder,
+    payment_requests: paymentRequestStore.items,
+    disbursement_orders: disbursementOrderStore.items,
 
-    // ========== PaymentRequest 操作 ==========
-    createPaymentRequest: async (data: Omit<PaymentRequest, 'id' | 'requestNumber' | 'createdAt' | 'updatedAt'>) => {
-      return await store.addPaymentRequest(data);
+    // ========== PaymentRequest CRUD 操作 ==========
+    createPaymentRequest: async (
+      data: Omit<PaymentRequest, keyof BaseEntity | 'request_number'>
+    ) => {
+      return await paymentRequestService.create(data as any);
     },
 
     updatePaymentRequest: async (id: string, data: Partial<PaymentRequest>) => {
-      return await store.updatePaymentRequest(id, data);
+      return await paymentRequestService.update(id, data);
     },
 
     deletePaymentRequest: async (id: string) => {
-      return await store.deletePaymentRequest(id);
+      return await paymentRequestService.delete(id);
     },
 
-    setSelectedPaymentRequest: (request: PaymentRequest | null) => {
-      store.setSelectedPaymentRequest(request);
-    },
-
-    createFromQuote: async (tour_id: string, quote_id: string, request_date: string) => {
-      return await paymentService.createFromQuote(tourId, quoteId, requestDate);
+    loadPaymentRequests: async () => {
+      return await paymentRequestStore.fetchAll();
     },
 
     // ========== PaymentRequestItem 操作 ==========
-    addPaymentItem: (requestId: string, item: Omit<PaymentRequestItem, 'id' | 'requestId' | 'itemNumber' | 'createdAt' | 'updatedAt'>) => {
-      return store.addPaymentItem(requestId, item);
+    addPaymentItem: async (
+      requestId: string,
+      item: Omit<PaymentRequestItem, 'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'>
+    ) => {
+      return await paymentRequestService.addItem(requestId, item);
     },
 
-    updatePaymentItem: (requestId: string, itemId: string, item: Partial<PaymentRequestItem>) => {
-      store.updatePaymentItem(requestId, itemId, item);
+    updatePaymentItem: async (
+      requestId: string,
+      itemId: string,
+      data: Partial<PaymentRequestItem>
+    ) => {
+      return await paymentRequestService.updateItem(requestId, itemId, data);
     },
 
-    deletePaymentItem: (requestId: string, itemId: string) => {
-      store.deletePaymentItem(requestId, itemId);
+    deletePaymentItem: async (requestId: string, itemId: string) => {
+      return await paymentRequestService.deleteItem(requestId, itemId);
     },
 
-    // ========== DisbursementOrder 操作 ==========
-    createDisbursementOrder: (payment_request_ids: string[], note?: string) => {
-      return paymentService.createDisbursementOrder(paymentRequestIds, note);
+    // ========== PaymentRequest 業務邏輯 ==========
+    createFromQuote: async (
+      tourId: string,
+      quoteId: string,
+      requestDate: string,
+      tourName: string,
+      code: string
+    ) => {
+      return await paymentRequestService.createFromQuote(
+        tourId,
+        quoteId,
+        requestDate,
+        tourName,
+        code
+      );
     },
 
-    updateDisbursementOrder: (id: string, updates: any) => {
-      store.updateDisbursementOrder(id, updates);
+    calculateTotalAmount: async (requestId: string) => {
+      return await paymentRequestService.calculateTotalAmount(requestId);
     },
 
-    confirmDisbursementOrder: (id: string, confirmed_by: string) => {
-      paymentService.confirmDisbursementOrder(id, confirmedBy);
+    getItemsByCategory: (requestId: string, category: PaymentRequestItem['category']) => {
+      return paymentRequestService.getItemsByCategory(requestId, category);
     },
 
-    addToCurrentDisbursementOrder: (payment_request_ids: string[]) => {
-      paymentService.addToCurrentDisbursementOrder(paymentRequestIds);
+    getPendingRequests: () => {
+      return paymentRequestService.getPendingRequests();
     },
 
-    removeFromDisbursementOrder: (disbursementId: string, paymentRequestId: string) => {
-      paymentService.removeFromDisbursementOrder(disbursementId, paymentRequestId);
+    getProcessingRequests: () => {
+      return paymentRequestService.getProcessingRequests();
+    },
+
+    // ========== DisbursementOrder CRUD 操作 ==========
+    createDisbursementOrder: async (paymentRequestIds: string[], note?: string) => {
+      return await disbursementOrderService.createWithRequests(paymentRequestIds, note);
+    },
+
+    updateDisbursementOrder: async (id: string, data: Partial<DisbursementOrder>) => {
+      return await disbursementOrderService.update(id, data);
+    },
+
+    deleteDisbursementOrder: async (id: string) => {
+      return await disbursementOrderService.delete(id);
+    },
+
+    loadDisbursementOrders: async () => {
+      return await disbursementOrderStore.fetchAll();
+    },
+
+    // ========== DisbursementOrder 業務邏輯 ==========
+    confirmDisbursementOrder: async (id: string, confirmedBy: string) => {
+      return await disbursementOrderService.confirmOrder(id, confirmedBy);
+    },
+
+    addToCurrentDisbursementOrder: async (paymentRequestIds: string[]) => {
+      return await disbursementOrderService.addToCurrentWeekOrder(paymentRequestIds);
+    },
+
+    removeFromDisbursementOrder: async (orderId: string, requestId: string) => {
+      return await disbursementOrderService.removePaymentRequest(orderId, requestId);
+    },
+
+    addPaymentRequestsToOrder: async (orderId: string, requestIds: string[]) => {
+      return await disbursementOrderService.addPaymentRequests(orderId, requestIds);
     },
 
     getCurrentWeekDisbursementOrder: () => {
-      return paymentService.getCurrentWeekDisbursementOrder();
+      return disbursementOrderService.getCurrentWeekOrder();
     },
 
-    // ========== 工具方法 ==========
-    generateRequestNumber: () => paymentService.generateRequestNumber(),
-    generateDisbursementNumber: () => paymentService.generateDisbursementNumber(),
-    calculateTotalAmount: (request: PaymentRequest) => paymentService.calculateTotalAmount(request),
-    getItemsByCategory: (requestId: string, category: PaymentRequestItem['category']) =>
-      paymentService.getItemsByCategory(requestId, category),
-    getNextThursday: () => paymentService.getNextThursday(),
-    getPendingRequests: () => paymentService.getPendingRequests(),
-    getProcessingRequests: () => paymentService.getProcessingRequests(),
+    getNextThursday: () => {
+      return disbursementOrderService.getNextThursday();
+    },
+
+    getPendingOrders: () => {
+      return disbursementOrderService.getPendingOrders();
+    },
+
+    getConfirmedOrders: () => {
+      return disbursementOrderService.getConfirmedOrders();
+    },
   };
 };

@@ -1,17 +1,19 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { Users, User, Mail, Phone, MapPin, Calendar, DollarSign, Edit } from 'lucide-react';
+
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
-import { useTourStore } from '@/stores/tour-store';
-import { Users, User, Mail, Phone, MapPin, Calendar, DollarSign, Edit } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { useTourStore, useOrderStore, useCustomerStore } from '@/stores';
 
 export default function CustomersPage() {
-  const { customers, orders, tours, addCustomer } = useTourStore();
+  const { items: customers, create: addCustomer } = useCustomerStore();
+  const { items: orders } = useOrderStore();
+  const { items: tours } = useTourStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [newCustomer, setNewCustomer] = useState({
@@ -30,13 +32,14 @@ export default function CustomersPage() {
     );
   }, [customers, searchTerm]);
 
-  const handleAddCustomer = () => {
+  const handleAddCustomer = async () => {
     if (!newCustomer.name.trim()) return;
 
-    addCustomer({
+    await addCustomer({
       ...newCustomer,
-      orders: [],
-      tours: [],
+      code: '', // 由 Store 自動生成
+      is_vip: false,
+      is_active: true,
       total_spent: 0
     });
 
@@ -49,16 +52,17 @@ export default function CustomersPage() {
     setIsAddDialogOpen(false);
   };
 
-  const getCustomerOrders = (customerId: string) => {
-    const customer = customers.find(c => c.id === customerId);
-    if (!customer) return [];
-    return orders.filter(order => customer.orders.includes(order.id));
+  const getCustomerOrders = (customer_id: string) => {
+    // ✅ 透過 Order.customer_id 反查（目前 Order 類型還沒有 customer_id，暫時返回空陣列）
+    // TODO: 等 Order 類型加入 customer_id 後，改為: orders.filter(order => order.customer_id === customer_id)
+    return [];
   };
 
-  const getCustomerTours = (customerId: string) => {
-    const customer = customers.find(c => c.id === customerId);
-    if (!customer) return [];
-    return tours.filter(tour => customer.tours.includes(tour.id));
+  const getCustomerTours = (customer_id: string) => {
+    // ✅ 透過反查訂單的 tour_id
+    const customerOrders = getCustomerOrders(customer_id);
+    const tourIds = new Set(customerOrders.map((o: any) => o.tour_id));
+    return tours.filter(tour => tourIds.has(tour.id));
   };
 
   // 模擬更豐富的顧客資料
@@ -66,7 +70,7 @@ export default function CustomersPage() {
     const customerOrders = getCustomerOrders(customer.id);
     const customerTours = getCustomerTours(customer.id);
     const lastOrderDate = customerOrders.length > 0
-      ? new Date(Math.max(...customerOrders.map(o => new Date(o.created_at).getTime())))
+      ? new Date(Math.max(...customerOrders.map((o: any) => new Date(o.created_at).getTime())))
       : null;
 
     return {
@@ -75,7 +79,7 @@ export default function CustomersPage() {
       tourCount: customerTours.length,
       lastOrderDate: lastOrderDate?.toLocaleDateString(),
       avgOrderValue: customerOrders.length > 0
-        ? customerOrders.reduce((sum, o) => sum + o.total_amount, 0) / customerOrders.length
+        ? customerOrders.reduce((sum: number, o: any) => sum + o.total_amount, 0) / customerOrders.length
         : 0
     };
   });
@@ -88,7 +92,7 @@ export default function CustomersPage() {
       sortable: true,
       render: (value, customer) => (
         <div>
-          <div className="font-medium text-morandi-primary">{customer.name}</div>
+          <div className="text-sm font-medium text-morandi-primary">{customer.name}</div>
           <div className="text-xs text-morandi-secondary">ID: {customer.id}</div>
         </div>
       ),
@@ -175,84 +179,32 @@ export default function CustomersPage() {
   ], []);
 
   const totalCustomers = customers.length;
-  const activeCustomers = customers.filter(c => c.orders.length > 0).length;
-  const totalSpent = customers.reduce((sum, c) => sum + c.total_spent, 0);
+  const activeCustomers = customers.filter(c => (c.total_orders ?? 0) > 0).length;
+  const totalSpent = customers.reduce((sum, c) => sum + (c.total_spent ?? 0), 0);
   const avgSpentPerCustomer = totalCustomers > 0 ? totalSpent / totalCustomers : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="顧客管理"
-        icon={Users}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '顧客管理', href: '/customers' }
-        ]}
         showSearch={true}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋顧客姓名、電話、Email..."
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增顧客"
-        actions={
-          <div className="text-sm text-morandi-secondary">
-            {filteredCustomers.length} 位顧客
-          </div>
-        }
-      />
-
-      {/* 統計卡片 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-card border border-border p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-morandi-secondary mb-1">總顧客數</p>
-              <p className="text-2xl font-bold text-morandi-primary">{totalCustomers}</p>
-            </div>
-            <Users size={24} className="text-morandi-gold" />
-          </div>
+      >
+        <div className="text-sm text-morandi-secondary">
+          {filteredCustomers.length} 位顧客
         </div>
+      </ResponsiveHeader>
 
-        <div className="bg-card border border-border p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-morandi-secondary mb-1">活躍顧客</p>
-              <p className="text-2xl font-bold text-morandi-green">{activeCustomers}</p>
-            </div>
-            <User size={24} className="text-morandi-green" />
-          </div>
-        </div>
-
-        <div className="bg-card border border-border p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-morandi-secondary mb-1">總消費額</p>
-              <p className="text-2xl font-bold text-morandi-primary">
-                NT$ {totalSpent.toLocaleString()}
-              </p>
-            </div>
-            <DollarSign size={24} className="text-morandi-primary" />
-          </div>
-        </div>
-
-        <div className="bg-card border border-border p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-morandi-secondary mb-1">平均消費</p>
-              <p className="text-2xl font-bold text-morandi-gold">
-                NT$ {avgSpentPerCustomer.toLocaleString()}
-              </p>
-            </div>
-            <DollarSign size={24} className="text-morandi-gold" />
-          </div>
-        </div>
-      </div>
-
-      {/* 顧客列表 */}
-      <EnhancedTable
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+        className="min-h-full"
         columns={tableColumns}
         data={enrichedCustomers}
-        actions={(customer) => (
+        actions={() => (
           <Button
             variant="outline"
             size="sm"
@@ -262,19 +214,8 @@ export default function CustomersPage() {
             <Edit size={14} className="text-morandi-gold" />
           </Button>
         )}
-        emptyState={
-          <div className="text-center py-8 text-morandi-secondary">
-            <Users size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium text-morandi-primary mb-2">還沒有任何顾客</p>
-            <p className="text-sm text-morandi-secondary mb-6">點擊右上角「新增顧客」開始建立</p>
-            <div className="text-sm text-morandi-secondary space-y-1">
-              <p>• 顧客管理將包含姓名、聯絡方式、地址等基本資訊</p>
-              <p>• 自動統計訂單數量、旅遊團參與數、總消費額和平均消費</p>
-              <p>• 顯示最後消費時間和活躍度，方便進行客戶關係管理</p>
-            </div>
-          </div>
-        }
       />
+      </div>
 
       {/* 新增顧客對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

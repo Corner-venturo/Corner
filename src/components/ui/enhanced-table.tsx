@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 
 export interface TableColumn {
   key: string;
-  label: string;
+  label: string | React.ReactNode;
   sortable?: boolean;
   filterable?: boolean;
   filterType?: 'text' | 'number' | 'date' | 'select';
@@ -61,6 +61,9 @@ export interface EnhancedTableProps {
   initialPageSize?: number;
   searchTerm?: string;
   emptyState?: React.ReactNode;
+  defaultSort?: { key: string; direction: 'asc' | 'desc' };
+  searchable?: boolean;
+  searchPlaceholder?: string;
 
   // DataTable 功能
   selection?: SelectionConfig;
@@ -260,15 +263,15 @@ export function EnhancedTable({
   }
 
   return (
-    <div className={cn("border border-border rounded-lg overflow-hidden bg-card shadow-sm", className)}>
-      <div className="overflow-x-auto">
+    <div className={cn("border border-border rounded-lg overflow-hidden bg-card shadow-sm flex flex-col h-full", className)}>
+      <div className="overflow-auto flex-1">
         <table className="w-full">
-          <thead className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20">
+          <thead className="sticky top-0 z-10 bg-white border-b-2 border-morandi-gold/20">
             {/* 主標題行 */}
-            <tr className="relative">
+            <tr className="relative bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40">
               {/* Selection checkbox column */}
               {selection && (
-                <th className="w-12 py-2.5 px-4">
+                <th className="w-12 py-1.5 sm:py-2 px-3 sm:px-4">
                   <Checkbox
                     checked={allVisibleSelected}
                     indeterminate={someVisibleSelected && !allVisibleSelected}
@@ -279,23 +282,23 @@ export function EnhancedTable({
 
               {columns.map((column, index) => (
                 <th key={column.key} className={cn(
-                  "text-left py-2.5 relative",
-                  index === columns.length - 1 ? "pl-4 pr-1" : "px-4"
+                  "text-left py-1.5 sm:py-2 relative",
+                  index === columns.length - 1 ? "pl-4 pr-1" : "px-3 sm:px-4"
                 )}>
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
                     {column.sortable ? (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-auto p-0 hover:bg-transparent text-sm font-medium text-morandi-secondary hover:text-morandi-primary transition-colors"
+                        className="h-auto p-0 hover:bg-transparent text-[10px] sm:text-xs font-medium text-morandi-secondary hover:text-morandi-primary transition-colors [&_svg]:!size-[14px]"
                         onClick={() => handleSort(column.key)}
                       >
                         {column.label}
                         {getSortIcon(column.key)}
                       </Button>
                     ) : (
-                      <span className="text-sm font-medium text-morandi-secondary">{column.label}</span>
+                      <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">{column.label}</span>
                     )}
                     {index === columns.length - 1 && columns.some(col => col.filterable) && (
                       <Button
@@ -316,8 +319,8 @@ export function EnhancedTable({
 
               {/* Actions column */}
               {actions && (
-                <th className="text-left py-2.5 px-4">
-                  <span className="text-sm font-medium text-morandi-secondary">操作</span>
+                <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4">
+                  <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">操作</span>
                 </th>
               )}
             </tr>
@@ -378,12 +381,7 @@ export function EnhancedTable({
                   (expandable ? 1 : 0) +
                   (actions ? 1 : 0)
                 } className="py-8 px-6">
-                  {emptyState || (
-                    <div className="text-center text-morandi-secondary">
-                      <p className="text-lg font-medium text-morandi-primary mb-2">沒有資料</p>
-                      <p className="text-sm">目前沒有任何資料可顯示</p>
-                    </div>
-                  )}
+                  {emptyState}
                 </td>
               </tr>
             ) : (
@@ -414,7 +412,7 @@ export function EnhancedTable({
                     >
                       {/* Selection checkbox */}
                       {selection && (
-                        <td className="py-4 px-4">
+                        <td className="py-1.5 sm:py-2 px-3 sm:px-4">
                           <Checkbox
                             checked={isSelected}
                             disabled={isDisabled}
@@ -429,8 +427,8 @@ export function EnhancedTable({
                         <td
                           key={column.key}
                           className={cn(
-                            "py-4",
-                            colIndex === columns.length - 1 ? "pl-4 pr-1" : "px-4",
+                            "py-1.5 sm:py-2",
+                            colIndex === columns.length - 1 ? "pl-4 pr-1" : "px-3 sm:px-4",
                             column.align === 'center' && "text-center",
                             column.align === 'right' && "text-right",
                             column.className
@@ -438,7 +436,7 @@ export function EnhancedTable({
                           style={{ width: column.width }}
                         >
                           {column.render ? column.render(row[column.key], row) : (
-                            <div className="text-sm text-morandi-primary">
+                            <div className="text-[10px] sm:text-xs text-morandi-primary">
                               {row[column.key]}
                             </div>
                           )}
@@ -447,7 +445,7 @@ export function EnhancedTable({
 
                       {/* Actions column */}
                       {actions && (
-                        <td className="py-4 px-4">
+                        <td className="py-1.5 sm:py-2 px-3 sm:px-4">
                           <div onClick={(e) => e.stopPropagation()}>
                             {actions(row)}
                           </div>
@@ -478,69 +476,91 @@ export function EnhancedTable({
         </table>
       </div>
 
-      {/* 分頁控制 */}
-      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              上一頁
-            </Button>
+      {/* 分頁控制 - 永遠顯示 */}
+      {processedData.length > 0 && (
+        <div className="p-2 sm:p-3 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 border-t border-border bg-morandi-container/5">
+          {/* 左側：資料統計 */}
+          <div className="text-[10px] sm:text-xs text-morandi-secondary">
+            顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> 到 <span className="font-medium text-morandi-primary">{Math.min(startIndex + pageSize, processedData.length)}</span> 筆，
+            共 <span className="font-medium text-morandi-primary">{processedData.length}</span> 筆資料
+          </div>
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className="w-8 h-8 p-0"
-                  >
-                    {pageNum}
-                  </Button>
-                );
-              })}
+          {/* 右側：分頁控制 */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* 每頁顯示筆數 */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-[10px] sm:text-xs text-morandi-secondary">每頁</span>
+              <Select value={pageSize.toString()} onValueChange={(value) => setPageSize(Number(value))}>
+                <SelectTrigger className="w-14 sm:w-16 h-7 sm:h-8 text-[10px] sm:text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="15">15</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-[10px] sm:text-xs text-morandi-secondary">筆</span>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              下一頁
-            </Button>
+            {/* 分頁按鈕 - 只在有多頁時顯示 */}
+            {totalPages > 1 && (
+              <>
+                <div className="w-px h-5 sm:h-6 bg-border mx-0.5 sm:mx-1"></div>
 
-            <Select value={pageSize.toString()} onValueChange={(value) => setPageSize(Number(value))}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs"
+                >
+                  上一頁
+                </Button>
+
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className="w-7 h-7 sm:w-8 sm:h-8 p-0 text-[10px] sm:text-xs"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs"
+                >
+                  下一頁
+                </Button>
+              </>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

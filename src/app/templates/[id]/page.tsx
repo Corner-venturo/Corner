@@ -42,7 +42,7 @@ export default function TemplateEditorPage({ params }: PageProps) {
     setIsSaving(true)
     try {
       await updateTemplate(id, {
-        excel_structure: excelData,
+        excel_structure: excelData || undefined,
       })
       alert('儲存成功！')
     } catch (error) {
@@ -100,7 +100,7 @@ export default function TemplateEditorPage({ params }: PageProps) {
             data={excelData}
             onChange={setExcelData}
             onColumnWidthChange={setColumnWidths}
-            fieldMappings={template.field_mappings}
+            field_mappings={template.field_mappings}
           />
         </div>
 

@@ -15,7 +15,7 @@ interface TourAddOnsProps {
 }
 
 export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onTriggerAddComplete }: TourAddOnsProps) {
-  const { items: tourAddOns, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
+  const { items: tour_add_ons, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newAddOn, setNewAddOn] = useState({
     name: '',
@@ -32,7 +32,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
   }, [triggerAdd, onTriggerAddComplete]);
 
   // 獲取此旅遊團的加購項目
-  const addOns = tourAddOns.filter(addOn => addOn.tour_id === tour.id);
+  const addOns = tour_add_ons.filter((addOn: any) => addOn.tour_id === tour.id);
 
   const handleAddNew = () => {
     if (!newAddOn.name.trim()) return;
@@ -54,7 +54,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
   };
 
   const toggleActive = (id: string) => {
-    const addOn = addOns.find(item => item.id === id);
+    const addOn = addOns.find((item: any) => item.id === id);
     if (addOn) {
       updateTourAddOn(id, { is_active: !addOn.is_active });
     }
@@ -141,7 +141,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                 )}
 
                 {/* 現有項目列表 */}
-                {addOns.map((addOn) => (
+                {addOns.map((addOn: any) => (
                   <tr key={addOn.id} className="border-b border-border">
                     <td className="py-3 px-4 font-medium text-morandi-primary">
                       {addOn.name}

@@ -53,7 +53,7 @@ export class LRUCache<T = any> {
   set(key: string, value: T): void {
     // 如果已達上限，刪除最久未使用的項目（第一個）
     if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
-      const firstKey = this.cache.keys().next().value;
+      const firstKey = this.cache.keys().next().value as string;
       this.cache.delete(firstKey);
     }
 
@@ -117,9 +117,9 @@ export const cacheKeys = {
   tour: (id: string) => `tour:${id}`,
   tourList: (filter?: string) => `tours:list:${filter || 'all'}`,
   order: (id: string) => `order:${id}`,
-  orderList: (tourId?: string) => `orders:list:${tourId || 'all'}`,
+  orderList: (tour_id?: string) => `orders:list:${tour_id || 'all'}`,
   customer: (id: string) => `customer:${id}`,
   customerList: () => `customers:list`,
   payment: (id: string) => `payment:${id}`,
-  paymentList: (orderId?: string) => `payments:list:${orderId || 'all'}`,
+  paymentList: (order_id?: string) => `payments:list:${order_id || 'all'}`,
 };

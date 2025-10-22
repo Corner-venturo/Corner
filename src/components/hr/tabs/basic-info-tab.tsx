@@ -4,8 +4,8 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Employee } from '@/stores/types';
-import { useUserStore } from '@/stores/user-store';
-import { User, Phone, Mail, MapPin, Calendar, Edit, Save, X, Lock, Eye, EyeOff } from 'lucide-react';
+import { useUserStore, userStoreHelpers } from '@/stores/user-store';
+import { User, Phone, Mail, MapPin, Calendar, Edit, Save, X, Lock, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 
 interface BasicInfoTabProps {
   employee: Employee;
@@ -15,7 +15,7 @@ interface BasicInfoTabProps {
 
 export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabProps>(
   ({ employee, isEditing, setIsEditing }, ref) => {
-  const { updateUser } = useUserStore();
+  const { update: updateUser } = useUserStore();
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [passwordData, setPasswordData] = useState({
     newPassword: '',
@@ -25,45 +25,59 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
   const [passwordUpdateLoading, setPasswordUpdateLoading] = useState(false);
 
   console.log('🔍 BasicInfoTab employee:', employee);
-  console.log('🔍 personalInfo:', employee.personalInfo);
-  console.log('🔍 emergencyContact:', employee.personalInfo?.emergencyContact);
+  console.log('🔍 personal_info:', employee.personal_info);
+  console.log('🔍 emergency_contact:', employee.personal_info?.emergency_contact);
 
   const [formData, setFormData] = useState({
-    chineseName: employee.chineseName || '',
-    englishName: employee.englishName || '',
-    personalInfo: {
-      nationalId: employee.personalInfo?.nationalId || '',
-      birthday: employee.personalInfo?.birthday || '',
-      gender: employee.personalInfo?.gender || 'male',
-      phone: employee.personalInfo?.phone || '',
-      email: employee.personalInfo?.email || '',
-      address: employee.personalInfo?.address || '',
-      emergencyContact: {
-        name: employee.personalInfo?.emergencyContact?.name || '',
-        relationship: employee.personalInfo?.emergencyContact?.relationship || '',
-        phone: employee.personalInfo?.emergencyContact?.phone || ''
+    display_name: employee.display_name || '',
+    chinese_name: (employee as any).chinese_name || '',
+    english_name: employee.english_name || '',
+    personal_info: {
+      national_id: employee.personal_info?.national_id || '',
+      birthday: employee.personal_info?.birthday || '',
+      phone: Array.isArray(employee.personal_info?.phone)
+        ? employee.personal_info.phone
+        : employee.personal_info?.phone
+          ? [employee.personal_info.phone]
+          : [''],
+      email: employee.personal_info?.email || '',
+      address: employee.personal_info?.address || '',
+      emergency_contact: {
+        name: employee.personal_info?.emergency_contact?.name || '',
+        relationship: employee.personal_info?.emergency_contact?.relationship || '',
+        phone: employee.personal_info?.emergency_contact?.phone || ''
       }
     },
-    jobInfo: {
-      department: employee.jobInfo?.department || '',
-      position: employee.jobInfo?.position || '',
-      supervisor: employee.jobInfo?.supervisor || '',
-      hireDate: employee.jobInfo?.hireDate || '',
-      probationEndDate: employee.jobInfo?.probationEndDate || '',
-      employmentType: employee.jobInfo?.employmentType || 'fulltime'
+    job_info: {
+      supervisor: employee.job_info?.supervisor || '',
+      hire_date: employee.job_info?.hire_date || '',
+      probation_end_date: employee.job_info?.probation_end_date || ''
     }
   });
 
   const handleSave = async () => {
+    console.log('🔵 [BasicInfoTab] handleSave 開始執行');
+    console.log('🔵 [BasicInfoTab] formData:', formData);
+    console.log('🔵 [BasicInfoTab] employee.id:', employee.id);
+
     // 如果英文名字改變了，同時更新員工編號
-    const updates = { ...formData };
-    if (formData.englishName !== employee.englishName) {
-      const { generateUserNumber } = useUserStore.getState();
-      updates.employeeNumber = generateUserNumber(formData.englishName);
+    const updates: any = { ...formData };
+
+    if (formData.english_name !== employee.english_name) {
+      console.log('🔵 [BasicInfoTab] 英文名字有變更，重新生成員工編號');
+      (updates as any).employee_number = userStoreHelpers.generateUserNumber(formData.english_name);
     }
 
-    await updateUser(employee.id, updates);
-    setIsEditing(false);
+    console.log('🔵 [BasicInfoTab] 準備更新，updates:', updates);
+
+    try {
+      await updateUser(employee.id, updates);
+      console.log('✅ [BasicInfoTab] 更新成功');
+      setIsEditing(false);
+    } catch (error) {
+      console.error('❌ [BasicInfoTab] 更新失敗:', error);
+      alert('儲存失敗：' + (error as Error).message);
+    }
   };
 
   // 將 handleSave 暴露給父組件
@@ -73,28 +87,29 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
 
   const handleCancel = () => {
     setFormData({
-      chineseName: employee.chineseName || '',
-      englishName: employee.englishName || '',
-      personalInfo: {
-        nationalId: employee.personalInfo?.nationalId || '',
-        birthday: employee.personalInfo?.birthday || '',
-        gender: employee.personalInfo?.gender || 'male',
-        phone: employee.personalInfo?.phone || '',
-        email: employee.personalInfo?.email || '',
-        address: employee.personalInfo?.address || '',
-        emergencyContact: {
-          name: employee.personalInfo?.emergencyContact?.name || '',
-          relationship: employee.personalInfo?.emergencyContact?.relationship || '',
-          phone: employee.personalInfo?.emergencyContact?.phone || ''
+      display_name: employee.display_name || '',
+      chinese_name: (employee as any).chinese_name || '',
+      english_name: employee.english_name || '',
+      personal_info: {
+        national_id: employee.personal_info?.national_id || '',
+        birthday: employee.personal_info?.birthday || '',
+        phone: Array.isArray(employee.personal_info?.phone)
+          ? employee.personal_info.phone
+          : employee.personal_info?.phone
+            ? [employee.personal_info.phone]
+            : [''],
+        email: employee.personal_info?.email || '',
+        address: employee.personal_info?.address || '',
+        emergency_contact: {
+          name: employee.personal_info?.emergency_contact?.name || '',
+          relationship: employee.personal_info?.emergency_contact?.relationship || '',
+          phone: employee.personal_info?.emergency_contact?.phone || ''
         }
       },
-      jobInfo: {
-        department: employee.jobInfo?.department || '',
-        position: employee.jobInfo?.position || '',
-        supervisor: employee.jobInfo?.supervisor || '',
-        hireDate: employee.jobInfo?.hireDate || '',
-        probationEndDate: employee.jobInfo?.probationEndDate || '',
-        employmentType: employee.jobInfo?.employmentType || 'fulltime'
+      job_info: {
+        supervisor: employee.job_info?.supervisor || '',
+        hire_date: employee.job_info?.hire_date || '',
+        probation_end_date: employee.job_info?.probation_end_date || ''
       }
     });
     setIsEditing(false);
@@ -121,10 +136,12 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       // 導入 Supabase client
       const { supabase } = await import('@/lib/supabase/client');
 
-      const { error } = await supabase
-        .from('users')
+      const result: any = await (supabase as any)
+        .from('employees')
         .update({ password_hash: hashedPassword })
-        .eq('employee_number', employee.employeeNumber);
+        .eq('employee_number', employee.employee_number);
+
+      const { error } = result;
 
       if (error) {
         console.error('密碼更新失敗:', error);
@@ -132,7 +149,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
         return;
       }
 
-      alert(`成功更新 ${employee.chineseName} 的密碼！`);
+      alert(`成功更新 ${employee.display_name} 的密碼！`);
       setPasswordData({ newPassword: '', confirmPassword: '' });
       setShowPasswordSection(false);
     } catch (error) {
@@ -156,80 +173,71 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">
+                    顯示名稱
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      value={formData.display_name}
+                      onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
+                    />
+                  ) : (
+                    <p className="text-morandi-primary py-2">{employee.display_name}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-morandi-primary mb-1">
                     中文姓名
                   </label>
                   {isEditing ? (
                     <Input
-                      value={formData.chineseName}
-                      onChange={(e) => setFormData({ ...formData, chineseName: e.target.value })}
+                      value={formData.chinese_name}
+                      onChange={(e) => setFormData({ ...formData, chinese_name: e.target.value })}
                     />
                   ) : (
-                    <p className="text-morandi-primary py-2">{employee.chineseName}</p>
+                    <p className="text-morandi-primary py-2">{(employee as any).chinese_name || '-'}</p>
                   )}
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">
                     英文姓名
                   </label>
                   {isEditing ? (
                     <Input
-                      value={formData.englishName}
-                      onChange={(e) => setFormData({ ...formData, englishName: e.target.value })}
+                      value={formData.english_name}
+                      onChange={(e) => setFormData({ ...formData, english_name: e.target.value })}
                     />
                   ) : (
-                    <p className="text-morandi-primary py-2">{employee.englishName}</p>
+                    <p className="text-morandi-primary py-2">{employee.english_name}</p>
                   )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-morandi-primary mb-1">
+                    員工編號
+                  </label>
+                  <p className="text-morandi-primary py-2 bg-morandi-container/20 px-3 rounded">
+                    {employee.employee_number}
+                  </p>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  員工編號
+                  身分證號
                 </label>
-                <p className="text-morandi-primary py-2 bg-morandi-container/20 px-3 rounded">
-                  {employee.employeeNumber}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">
-                    身分證號
-                  </label>
-                  {isEditing ? (
-                    <Input
-                      value={formData.personalInfo.nationalId}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        personalInfo: { ...formData.personalInfo, nationalId: e.target.value }
-                      })}
-                    />
-                  ) : (
-                    <p className="text-morandi-primary py-2">{employee.personalInfo.nationalId}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">
-                    性別
-                  </label>
-                  {isEditing ? (
-                    <select
-                      value={formData.personalInfo.gender}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        personalInfo: { ...formData.personalInfo, gender: e.target.value as 'male' | 'female' }
-                      })}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary"
-                    >
-                      <option value="male">男</option>
-                      <option value="female">女</option>
-                    </select>
-                  ) : (
-                    <p className="text-morandi-primary py-2">
-                      {employee.personalInfo.gender === 'male' ? '男' : '女'}
-                    </p>
-                  )}
-                </div>
+                {isEditing ? (
+                  <Input
+                    value={formData.personal_info.national_id}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      personal_info: { ...formData.personal_info, national_id: e.target.value }
+                    })}
+                  />
+                ) : (
+                  <p className="text-morandi-primary py-2">{employee.personal_info.national_id}</p>
+                )}
               </div>
 
               <div>
@@ -240,15 +248,15 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                 {isEditing ? (
                   <Input
                     type="date"
-                    value={formData.personalInfo.birthday}
+                    value={formData.personal_info.birthday}
                     onChange={(e) => setFormData({
                       ...formData,
-                      personalInfo: { ...formData.personalInfo, birthday: e.target.value }
+                      personal_info: { ...formData.personal_info, birthday: e.target.value }
                     })}
                   />
                 ) : (
                   <p className="text-morandi-primary py-2">
-                    {new Date(employee.personalInfo.birthday).toLocaleDateString()}
+                    {new Date(employee.personal_info.birthday).toLocaleDateString()}
                   </p>
                 )}
               </div>
@@ -261,20 +269,89 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1 flex items-center gap-1">
-                  <Phone size={14} />
-                  電話
+                <label className="block text-sm font-medium text-morandi-primary mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Phone size={14} />
+                    聯絡電話
+                  </span>
+                  {isEditing && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const phones = Array.isArray(formData.personal_info.phone)
+                          ? formData.personal_info.phone
+                          : [formData.personal_info.phone];
+                        setFormData({
+                          ...formData,
+                          personal_info: {
+                            ...formData.personal_info,
+                            phone: [...phones, '']
+                          }
+                        });
+                      }}
+                      className="h-6 text-xs"
+                    >
+                      <Plus size={12} className="mr-1" />
+                      新增電話
+                    </Button>
+                  )}
                 </label>
                 {isEditing ? (
-                  <Input
-                    value={formData.personalInfo.phone}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      personalInfo: { ...formData.personalInfo, phone: e.target.value }
-                    })}
-                  />
+                  <div className="space-y-2">
+                    {(Array.isArray(formData.personal_info.phone)
+                      ? formData.personal_info.phone
+                      : [formData.personal_info.phone]
+                    ).map((phone, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          value={phone}
+                          onChange={(e) => {
+                            const phones = Array.isArray(formData.personal_info.phone)
+                              ? [...formData.personal_info.phone]
+                              : [formData.personal_info.phone];
+                            phones[index] = e.target.value;
+                            setFormData({
+                              ...formData,
+                              personal_info: { ...formData.personal_info, phone: phones }
+                            });
+                          }}
+                          placeholder={`電話 ${index + 1}`}
+                        />
+                        {(Array.isArray(formData.personal_info.phone)
+                          ? formData.personal_info.phone.length
+                          : 1) > 1 && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              const phones = Array.isArray(formData.personal_info.phone)
+                                ? formData.personal_info.phone.filter((_, i) => i !== index)
+                                : [];
+                              setFormData({
+                                ...formData,
+                                personal_info: { ...formData.personal_info, phone: phones }
+                              });
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <p className="text-morandi-primary py-2">{employee.personalInfo.phone}</p>
+                  <div className="space-y-1">
+                    {(Array.isArray(employee.personal_info.phone)
+                      ? employee.personal_info.phone
+                      : [employee.personal_info.phone]
+                    ).map((phone, index) => (
+                      <p key={index} className="text-morandi-primary py-2">
+                        {phone || '-'}
+                      </p>
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -286,14 +363,14 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                 {isEditing ? (
                   <Input
                     type="email"
-                    value={formData.personalInfo.email}
+                    value={formData.personal_info.email}
                     onChange={(e) => setFormData({
                       ...formData,
-                      personalInfo: { ...formData.personalInfo, email: e.target.value }
+                      personal_info: { ...formData.personal_info, email: e.target.value }
                     })}
                   />
                 ) : (
-                  <p className="text-morandi-primary py-2">{employee.personalInfo.email}</p>
+                  <p className="text-morandi-primary py-2">{employee.personal_info.email}</p>
                 )}
               </div>
 
@@ -304,14 +381,14 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                 </label>
                 {isEditing ? (
                   <Input
-                    value={formData.personalInfo.address}
+                    value={formData.personal_info.address}
                     onChange={(e) => setFormData({
                       ...formData,
-                      personalInfo: { ...formData.personalInfo, address: e.target.value }
+                      personal_info: { ...formData.personal_info, address: e.target.value }
                     })}
                   />
                 ) : (
-                  <p className="text-morandi-primary py-2">{employee.personalInfo.address}</p>
+                  <p className="text-morandi-primary py-2">{employee.personal_info.address}</p>
                 )}
               </div>
             </div>
@@ -327,79 +404,20 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  部門
-                </label>
-                {isEditing ? (
-                  <Input
-                    value={formData.jobInfo.department}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      jobInfo: { ...formData.jobInfo, department: e.target.value }
-                    })}
-                  />
-                ) : (
-                  <p className="text-morandi-primary py-2">{employee.jobInfo.department}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  職位
-                </label>
-                {isEditing ? (
-                  <Input
-                    value={formData.jobInfo.position}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      jobInfo: { ...formData.jobInfo, position: e.target.value }
-                    })}
-                  />
-                ) : (
-                  <p className="text-morandi-primary py-2">{employee.jobInfo.position}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1">
                   入職日期
                 </label>
                 {isEditing ? (
                   <Input
                     type="date"
-                    value={formData.jobInfo.hireDate}
+                    value={formData.job_info.hire_date}
                     onChange={(e) => setFormData({
                       ...formData,
-                      jobInfo: { ...formData.jobInfo, hireDate: e.target.value }
+                      job_info: { ...formData.job_info, hire_date: e.target.value }
                     })}
                   />
                 ) : (
                   <p className="text-morandi-primary py-2">
-                    {new Date(employee.jobInfo.hireDate).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  雇用類型
-                </label>
-                {isEditing ? (
-                  <select
-                    value={formData.jobInfo.employmentType}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      jobInfo: { ...formData.jobInfo, employmentType: e.target.value as Employee['jobInfo']['employmentType'] }
-                    })}
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary"
-                  >
-                    <option value="fulltime">全職</option>
-                    <option value="parttime">兼職</option>
-                    <option value="contract">約聘</option>
-                  </select>
-                ) : (
-                  <p className="text-morandi-primary py-2">
-                    {employee.jobInfo.employmentType === 'fulltime' ? '全職' :
-                     employee.jobInfo.employmentType === 'parttime' ? '兼職' : '約聘'}
+                    {new Date(employee.job_info.hire_date).toLocaleDateString()}
                   </p>
                 )}
               </div>
@@ -417,20 +435,20 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                 </label>
                 {isEditing ? (
                   <Input
-                    value={formData.personalInfo.emergencyContact.name}
+                    value={formData.personal_info.emergency_contact.name}
                     onChange={(e) => setFormData({
                       ...formData,
-                      personalInfo: {
-                        ...formData.personalInfo,
-                        emergencyContact: {
-                          ...formData.personalInfo.emergencyContact,
+                      personal_info: {
+                        ...formData.personal_info,
+                        emergency_contact: {
+                          ...formData.personal_info.emergency_contact,
                           name: e.target.value
                         }
                       }
                     })}
                   />
                 ) : (
-                  <p className="text-morandi-primary py-2">{employee.personalInfo.emergencyContact.name}</p>
+                  <p className="text-morandi-primary py-2">{employee.personal_info?.emergency_contact?.name || '-'}</p>
                 )}
               </div>
 
@@ -440,20 +458,20 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                 </label>
                 {isEditing ? (
                   <Input
-                    value={formData.personalInfo.emergencyContact.relationship}
+                    value={formData.personal_info.emergency_contact.relationship}
                     onChange={(e) => setFormData({
                       ...formData,
-                      personalInfo: {
-                        ...formData.personalInfo,
-                        emergencyContact: {
-                          ...formData.personalInfo.emergencyContact,
+                      personal_info: {
+                        ...formData.personal_info,
+                        emergency_contact: {
+                          ...formData.personal_info.emergency_contact,
                           relationship: e.target.value
                         }
                       }
                     })}
                   />
                 ) : (
-                  <p className="text-morandi-primary py-2">{employee.personalInfo.emergencyContact.relationship}</p>
+                  <p className="text-morandi-primary py-2">{employee.personal_info?.emergency_contact?.relationship || '-'}</p>
                 )}
               </div>
 
@@ -463,20 +481,20 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                 </label>
                 {isEditing ? (
                   <Input
-                    value={formData.personalInfo.emergencyContact.phone}
+                    value={formData.personal_info.emergency_contact.phone}
                     onChange={(e) => setFormData({
                       ...formData,
-                      personalInfo: {
-                        ...formData.personalInfo,
-                        emergencyContact: {
-                          ...formData.personalInfo.emergencyContact,
+                      personal_info: {
+                        ...formData.personal_info,
+                        emergency_contact: {
+                          ...formData.personal_info.emergency_contact,
                           phone: e.target.value
                         }
                       }
                     })}
                   />
                 ) : (
-                  <p className="text-morandi-primary py-2">{employee.personalInfo.emergencyContact.phone}</p>
+                  <p className="text-morandi-primary py-2">{employee.personal_info?.emergency_contact?.phone || '-'}</p>
                 )}
               </div>
             </div>
@@ -501,7 +519,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
 
             {!showPasswordSection && (
               <p className="text-sm text-morandi-muted">
-                點擊「修改密碼」為 {employee.chineseName} 設定新密碼
+                點擊「修改密碼」為 {employee.display_name} 設定新密碼
               </p>
             )}
 

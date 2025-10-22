@@ -12,6 +12,8 @@ export interface CalendarEvent extends BaseEntity {
   all_day: boolean;
   type: 'tour' | 'meeting' | 'task' | 'reminder' | 'other';
   color?: string;
+  // 可見性
+  visibility: 'personal' | 'company';
   // 關聯資料
   related_tour_id?: string;
   related_order_id?: string;

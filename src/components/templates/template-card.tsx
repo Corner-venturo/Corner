@@ -126,7 +126,7 @@ export function TemplateCard({ template, onEdit }: TemplateCardProps) {
         {/* 統計資訊 */}
         <div className="flex items-center justify-between text-xs text-morandi-muted mb-4">
           <span>已使用 {template.usage_count || 0} 次</span>
-          <span>{formatDate(template.metadata.updated_at)}</span>
+          <span>{formatDate((template.metadata as any).updated_at)}</span>
         </div>
 
         {/* 快速動作 */}

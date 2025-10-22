@@ -1,16 +1,17 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service';
-import { Account, Transaction, Category } from '@/stores/accounting-types';
+import { Account, Transaction } from '@/types/accounting.types';
+import { Category } from '@/stores/accounting-types';
 import { useAccountingStore } from '@/stores/accounting-store';
 import { ValidationError } from '@/core/errors/app-errors';
 
 class AccountingService extends BaseService<Account> {
   protected resourceName = 'accounts';
 
-  protected getStore(): StoreOperations<Account> {
+  protected getStore = (): StoreOperations<Account> => {
     const store = useAccountingStore.getState();
     return {
-      getAll: () => store.accounts,
-      getById: (id: string) => store.accounts.find(a => a.id === id),
+      getAll: () => store.accounts as any,
+      getById: (id: string) => store.accounts.find(a => a.id === id) as any,
       add: async (account: Account) => {
         await store.addAccount(account as any);
         return account;
@@ -38,12 +39,12 @@ class AccountingService extends BaseService<Account> {
 
   getAccountBalance(account_id: string): number {
     const store = useAccountingStore.getState();
-    return store.getAccountBalance(accountId);
+    return store.getAccountBalance(account_id);
   }
 
-  getCategoryTotal(category_id: string, startDate?: string, endDate?: string): number {
+  getCategoryTotal(category_id: string, start_date?: string, end_date?: string): number {
     const store = useAccountingStore.getState();
-    return store.getCategoryTotal(categoryId, startDate, endDate);
+    return store.getCategoryTotal(category_id, start_date, end_date);
   }
 
   calculateStats(): void {
@@ -77,7 +78,7 @@ class AccountingService extends BaseService<Account> {
   }
 
   // Transaction 相關
-  addTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>): string {
+  addTransaction(transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>): string {
     const store = useAccountingStore.getState();
     return store.addTransaction(transaction);
   }
@@ -95,14 +96,14 @@ class AccountingService extends BaseService<Account> {
   getTransactionsByAccount(account_id: string): Transaction[] {
     const store = useAccountingStore.getState();
     return store.transactions.filter(t =>
-      t.account_id === accountId || t.to_account_id === accountId
+      t.account_id === account_id || t.to_account_id === account_id
     );
   }
 
-  getTransactionsByDateRange(startDate: string, endDate: string): Transaction[] {
+  getTransactionsByDateRange(start_date: string, end_date: string): Transaction[] {
     const store = useAccountingStore.getState();
     return store.transactions.filter(t =>
-      t.date >= startDate && t.date <= endDate
+      t.date >= start_date && t.date <= end_date
     );
   }
 }
@@ -110,7 +111,7 @@ class AccountingService extends BaseService<Account> {
 class CategoryService extends BaseService<Category> {
   protected resourceName = 'categories';
 
-  protected getStore(): StoreOperations<Category> {
+  protected getStore = (): StoreOperations<Category> => {
     const store = useAccountingStore.getState();
     return {
       getAll: () => store.categories,

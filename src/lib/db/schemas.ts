@@ -18,23 +18,34 @@ export interface IndexSchema {
 
 /**
  * 資料庫版本
- * 更新記錄：
- * v4: 初始版本
- * v5: 修正 calendar_events 索引欄位 (2025-10-07)
- * v6: 新增 todos 的 type, parentId, projectId 索引 (2025-10-07)
- * v7: 全面統一使用 snake_case 命名 (2025-10-08)
+ * v1: 完整的 Offline-First 架構，包含所有資料表（含 regions 和 workspace）
  */
-export const DB_VERSION = 7;
+export const DB_VERSION = 1;
 
 /**
  * 資料庫名稱
+ * 離線優先架構專用資料庫
  */
-export const DB_NAME = 'VenturoLocalDB';
+export const DB_NAME = 'VenturoOfflineDB';
 
 /**
  * 所有資料表的 Schema 定義
  */
 export const TABLE_SCHEMAS: TableSchema[] = [
+  // 同步佇列表
+  {
+    name: 'syncQueue',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'table_name', keyPath: 'table_name', unique: false },
+      { name: 'operation', keyPath: 'operation', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'retry_count', keyPath: 'retry_count', unique: false },
+    ],
+  },
+
   // 員工表
   {
     name: 'employees',
@@ -46,6 +57,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -61,6 +74,25 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 行程表
+  {
+    name: 'itineraries',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'code', keyPath: 'code', unique: true },
+      { name: 'tour_id', keyPath: 'tour_id', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -78,6 +110,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -95,6 +129,24 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 團體加購項目表
+  {
+    name: 'tour_addons',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'tour_id', keyPath: 'tour_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -111,6 +163,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -128,6 +182,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -146,6 +202,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -163,6 +221,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -180,6 +240,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -196,6 +258,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -211,6 +275,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -231,6 +297,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -248,6 +316,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -263,6 +333,25 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 地區表
+  {
+    name: 'regions',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'code', keyPath: 'code', unique: true },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -279,6 +368,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'end_date', keyPath: 'end_date', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -351,6 +442,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -365,6 +458,8 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
 
@@ -379,6 +474,110 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // ============================================
+  // Workspace 相關表格（v2 新增）
+  // ============================================
+
+  // 工作空間
+  {
+    name: 'workspaces',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_by', keyPath: 'created_by', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+    ],
+  },
+
+  // 頻道
+  {
+    name: 'channels',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'type', keyPath: 'type', unique: false },
+      { name: 'group_id', keyPath: 'group_id', unique: false },
+      { name: 'tour_id', keyPath: 'tour_id', unique: false },
+      { name: 'is_favorite', keyPath: 'is_favorite', unique: false },
+      { name: 'created_by', keyPath: 'created_by', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+    ],
+  },
+
+  // 頻道群組
+  {
+    name: 'channel_groups',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'order', keyPath: 'order', unique: false },
+      { name: 'is_collapsed', keyPath: 'is_collapsed', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+    ],
+  },
+
+  // 訊息
+  {
+    name: 'messages',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'channel_id', keyPath: 'channel_id', unique: false },
+      { name: 'author_id', keyPath: 'author_id', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'edited_at', keyPath: 'edited_at', unique: false },
+    ],
+  },
+
+  // 公告
+  {
+    name: 'bulletins',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'type', keyPath: 'type', unique: false },
+      { name: 'priority', keyPath: 'priority', unique: false },
+      { name: 'is_pinned', keyPath: 'is_pinned', unique: false },
+      { name: 'author_id', keyPath: 'author_id', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+    ],
+  },
+
+  // 代墊清單
+  {
+    name: 'advance_lists',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'channel_id', keyPath: 'channel_id', unique: false },
+      { name: 'created_by', keyPath: 'created_by', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+    ],
+  },
+
+  // 分享訂單清單
+  {
+    name: 'shared_order_lists',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'channel_id', keyPath: 'channel_id', unique: false },
+      { name: 'created_by', keyPath: 'created_by', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
     ],
   },
 ];
@@ -392,10 +591,13 @@ export const TABLE_NAMES = TABLE_SCHEMAS.map((schema) => schema.name);
  * 資料表名稱常數（用於型別安全）
  */
 export const TABLES = {
+  SYNC_QUEUE: 'syncQueue',
   EMPLOYEES: 'employees',
   TOURS: 'tours',
+  ITINERARIES: 'itineraries',
   ORDERS: 'orders',
   MEMBERS: 'members',
+  TOUR_ADDONS: 'tour_addons',
   CUSTOMERS: 'customers',
   PAYMENTS: 'payments',
   PAYMENT_REQUESTS: 'payment_requests',
@@ -406,6 +608,7 @@ export const TABLES = {
   TODOS: 'todos',
   VISAS: 'visas',
   SUPPLIERS: 'suppliers',
+  REGIONS: 'regions',
   CALENDAR_EVENTS: 'calendar_events',
   ACCOUNTS: 'accounts',
   CATEGORIES: 'categories',
@@ -414,6 +617,14 @@ export const TABLES = {
   WORKSPACE_ITEMS: 'workspace_items',
   TIMEBOX_SESSIONS: 'timebox_sessions',
   TEMPLATES: 'templates',
+  // Workspace 相關（v2 新增）
+  WORKSPACES: 'workspaces',
+  CHANNELS: 'channels',
+  CHANNEL_GROUPS: 'channel_groups',
+  MESSAGES: 'messages',
+  BULLETINS: 'bulletins',
+  ADVANCE_LISTS: 'advance_lists',
+  SHARED_ORDER_LISTS: 'shared_order_lists',
 } as const;
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES];

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Venturo Schema 核對工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #C19A6B;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      background: #C19A6B;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #A88555;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #C19A6B;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+    .table-grid {
+      display: grid;
+      gap: 20px;
+    }
+    .table-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .table-header {
+      background: #f8f9fa;
+      padding: 15px;
+      border-bottom: 2px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+    }
+    .badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .badge-warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .badge-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .field-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px;
+      padding: 15px;
+    }
+    .field-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .field-status {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-ok { background: #28a745; }
+    .status-missing { background: #dc3545; }
+    .status-extra { background: #ffc107; }
+    .field-name {
+      flex: 1;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+    .legend {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .filter-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+    .filter-section label {
+      margin-right: 15px;
+      font-size: 14px;
+    }
+    .filter-section input[type="checkbox"] {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Venturo Schema 核對工具</h1>
+    <p class="subtitle">比對前端需要的欄位 vs Supabase 實際欄位</p>
+
+    <div class="controls">
+      <button onclick="loadData()">🔄 重新檢查</button>
+      <button onclick="exportReport()">📥 匯出報告</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">總表格數</div>
+        <div class="stat-value" id="total-tables">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">缺少的表格</div>
+        <div class="stat-value" id="missing-tables" style="color: #dc3545;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">缺少的欄位</div>
+        <div class="stat-value" id="missing-fields" style="color: #ffc107;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">完全匹配</div>
+        <div class="stat-value" id="perfect-match" style="color: #28a745;">0</div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <label><input type="checkbox" id="filter-ok" checked> 顯示正常表格</label>
+      <label><input type="checkbox" id="filter-warning" checked> 顯示有差異表格</label>
+      <label><input type="checkbox" id="filter-error" checked> 顯示缺少表格</label>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="field-status status-ok"></div>
+        <span>Supabase 有此欄位</span>
+      </div>
+      <div class="legend-item">
+        <div class="field-status status-missing"></div>
+        <span>Supabase 缺少此欄位</span>
+      </div>
+      <div class="legend-item">
+        <div class="field-status status-extra"></div>
+        <span>Supabase 多出的欄位</span>
+      </div>
+    </div>
+
+    <div id="results" class="table-grid"></div>
+  </div>
+
+  <script type="module">
+    // 前端實際使用的型別定義
+    const FRONTEND_SCHEMA = {
+      employees: {
+        fields: ['id', 'employee_number', 'english_name', 'display_name', 'email', 'password_hash', 'personal_info', 'job_info', 'salary_info', 'permissions', 'attendance', 'contracts', 'status', 'avatar', 'is_active', 'last_login_at', 'created_at', 'updated_at'],
+        module: '人資系統'
+      },
+      tours: {
+        fields: ['id', 'code', 'name', 'departure_date', 'return_date', 'status', 'location', 'price', 'max_participants', 'current_participants', 'contract_status', 'total_revenue', 'total_cost', 'profit', 'quote_id', 'quote_cost_structure', 'description', 'archived', 'is_active', 'created_at', 'updated_at'],
+        module: '旅遊團管理'
+      },
+      orders: {
+        fields: ['id', 'code', 'order_number', 'tour_id', 'tour_name', 'customer_id', 'contact_person', 'sales_person', 'assistant', 'member_count', 'payment_status', 'status', 'total_amount', 'paid_amount', 'remaining_amount', 'notes', 'is_active', 'created_at', 'updated_at'],
+        module: '訂單管理'
+      },
+      members: {
+        fields: ['id', 'order_id', 'tour_id', 'name', 'name_en', 'gender', 'birthday', 'id_number', 'passport_number', 'passport_expiry', 'phone', 'email', 'emergency_contact', 'emergency_phone', 'dietary_restrictions', 'medical_conditions', 'room_preference', 'assigned_room', 'reservation_code', 'is_child_no_bed', 'add_ons', 'refunds', 'notes', 'is_active', 'created_at', 'updated_at'],
+        module: '團員管理'
+      },
+      customers: {
+        fields: ['id', 'code', 'name', 'phone', 'email', 'address', 'notes', 'is_vip', 'is_active', 'created_at', 'updated_at'],
+        module: '客戶管理'
+      },
+      quotes: {
+        fields: ['id', 'code', 'customer_id', 'customer_name', 'name', 'destination', 'start_date', 'end_date', 'days', 'nights', 'number_of_people', 'group_size', 'accommodation_days', 'status', 'total_amount', 'version', 'valid_until', 'notes', 'created_by', 'created_by_name', 'converted_to_tour', 'tour_id', 'categories', 'versions', 'is_active', 'created_at', 'updated_at'],
+        module: '報價單'
+      },
+      suppliers: {
+        fields: ['id', 'code', 'name', 'type', 'contact_person', 'phone', 'email', 'address', 'bank_account', 'tax_id', 'notes', 'is_active', 'created_at', 'updated_at'],
+        module: '供應商管理'
+      },
+      todos: {
+        fields: ['id', 'title', 'priority', 'deadline', 'status', 'creator', 'assignee', 'visibility', 'related_items', 'sub_tasks', 'notes', 'enabled_quick_actions', 'needs_creator_notification', 'type', 'parent_id', 'project_id', 'is_active', 'created_at', 'updated_at'],
+        module: '待辦事項'
+      },
+      tour_addons: {
+        fields: ['id', 'tour_id', 'name', 'price', 'description', 'is_active', 'created_at', 'updated_at'],
+        module: '團體加購',
+        missing: true
+      },
+      tour_refunds: {
+        fields: ['id', 'tour_id', 'order_id', 'order_number', 'member_name', 'reason', 'amount', 'status', 'applied_date', 'processed_date', 'notes', 'created_at', 'updated_at'],
+        module: '團體退費',
+        missing: true
+      },
+    };
+
+    // Supabase 實際 schema（從 types.ts）
+    const SUPABASE_SCHEMA = {
+      employees: ['id', 'employee_number', 'english_name', 'display_name', 'email', 'password_hash', 'personal_info', 'job_info', 'salary_info', 'permissions', 'attendance', 'contracts', 'status', 'avatar', 'is_active', 'last_login_at', 'created_at', 'updated_at'],
+      tours: ['id', 'code', 'name', 'departure_date', 'return_date', 'status', 'location', 'price', 'max_participants', 'current_participants', 'contract_status', 'total_revenue', 'total_cost', 'profit', 'quote_id', 'quote_cost_structure', 'description', 'is_active', 'created_at', 'updated_at'],
+      orders: ['id', 'code', 'order_number', 'tour_id', 'tour_name', 'customer_id', 'contact_person', 'sales_person', 'assistant', 'member_count', 'payment_status', 'status', 'total_amount', 'paid_amount', 'remaining_amount', 'notes', 'is_active', 'created_at', 'updated_at'],
+      members: ['id', 'order_id', 'name', 'name_en', 'gender', 'birthday', 'id_number', 'passport_number', 'passport_expiry', 'phone', 'email', 'emergency_contact', 'emergency_phone', 'dietary_restrictions', 'medical_conditions', 'room_preference', 'assigned_room', 'reservation_code', 'is_child_no_bed', 'add_ons', 'refunds', 'notes', 'is_active', 'created_at', 'updated_at'],
+      customers: ['id', 'code', 'name', 'phone', 'email', 'address', 'notes', 'is_vip', 'is_active', 'created_at', 'updated_at'],
+      quotes: ['id', 'code', 'customer_id', 'customer_name', 'name', 'destination', 'start_date', 'end_date', 'days', 'nights', 'number_of_people', 'group_size', 'accommodation_days', 'status', 'total_amount', 'version', 'valid_until', 'notes', 'created_by', 'created_by_name', 'converted_to_tour', 'tour_id', 'categories', 'versions', 'is_active', 'created_at', 'updated_at'],
+      suppliers: ['id', 'code', 'name', 'type', 'contact_person', 'phone', 'email', 'address', 'bank_account', 'tax_id', 'notes', 'is_active', 'created_at', 'updated_at'],
+      todos: ['id', 'title', 'priority', 'deadline', 'status', 'creator', 'assignee', 'visibility', 'related_items', 'sub_tasks', 'notes', 'enabled_quick_actions', 'needs_creator_notification', 'type', 'parent_id', 'project_id', 'is_active', 'created_at', 'updated_at'],
+    };
+
+    function loadData() {
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+
+      let totalTables = 0;
+      let missingTables = 0;
+      let missingFieldsCount = 0;
+      let perfectMatch = 0;
+
+      Object.entries(FRONTEND_SCHEMA).forEach(([tableName, tableInfo]) => {
+        totalTables++;
+        const frontendFields = tableInfo.fields;
+        const supabaseFields = SUPABASE_SCHEMA[tableName] || [];
+        const isMissingTable = tableInfo.missing || supabaseFields.length === 0;
+
+        if (isMissingTable) {
+          missingTables++;
+        }
+
+        // 計算差異
+        const missingInSupabase = frontendFields.filter(f => !supabaseFields.includes(f));
+        const extraInSupabase = supabaseFields.filter(f => !frontendFields.includes(f));
+
+        if (missingInSupabase.length === 0 && extraInSupabase.length === 0 && !isMissingTable) {
+          perfectMatch++;
+        }
+
+        missingFieldsCount += missingInSupabase.length;
+
+        // 決定狀態
+        let status = 'ok';
+        let statusText = '完全匹配';
+        if (isMissingTable) {
+          status = 'error';
+          statusText = '❌ 表格不存在';
+        } else if (missingInSupabase.length > 0 || extraInSupabase.length > 0) {
+          status = 'warning';
+          statusText = `⚠️ ${missingInSupabase.length} 個欄位缺失`;
+        }
+
+        // 建立卡片
+        const card = document.createElement('div');
+        card.className = 'table-card';
+        card.dataset.status = status;
+
+        let fieldsHTML = '';
+
+        if (isMissingTable) {
+          fieldsHTML = `
+            <div style="padding: 15px; color: #721c24; background: #f8d7da;">
+              ❌ <strong>此表格在 Supabase 中不存在</strong><br>
+              <small>需要的欄位：${frontendFields.join(', ')}</small>
+            </div>
+          `;
+        } else {
+          fieldsHTML = frontendFields.map(field => {
+            const inSupabase = supabaseFields.includes(field);
+            return `
+              <div class="field-item">
+                <div class="field-status ${inSupabase ? 'status-ok' : 'status-missing'}"></div>
+                <span class="field-name">${field}</span>
+              </div>
+            `;
+          }).join('');
+
+          if (extraInSupabase.length > 0) {
+            fieldsHTML += '<div style="grid-column: 1/-1; padding: 10px; background: #fff3cd; margin-top: 10px; border-radius: 4px; font-size: 13px;">';
+            fieldsHTML += '<strong>⚠️ Supabase 多出的欄位：</strong> ' + extraInSupabase.join(', ');
+            fieldsHTML += '</div>';
+          }
+        }
+
+        card.innerHTML = `
+          <div class="table-header">
+            <div>
+              <div class="table-name">${tableName}</div>
+              <div style="font-size: 12px; color: #666; margin-top: 4px;">${tableInfo.module}</div>
+            </div>
+            <span class="badge badge-${status}">${statusText}</span>
+          </div>
+          <div class="field-list">
+            ${fieldsHTML}
+          </div>
+        `;
+
+        results.appendChild(card);
+      });
+
+      // 更新統計
+      document.getElementById('total-tables').textContent = totalTables;
+      document.getElementById('missing-tables').textContent = missingTables;
+      document.getElementById('missing-fields').textContent = missingFieldsCount;
+      document.getElementById('perfect-match').textContent = perfectMatch;
+
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const showOk = document.getElementById('filter-ok').checked;
+      const showWarning = document.getElementById('filter-warning').checked;
+      const showError = document.getElementById('filter-error').checked;
+
+      document.querySelectorAll('.table-card').forEach(card => {
+        const status = card.dataset.status;
+        const shouldShow =
+          (status === 'ok' && showOk) ||
+          (status === 'warning' && showWarning) ||
+          (status === 'error' && showError);
+
+        card.style.display = shouldShow ? 'block' : 'none';
+      });
+    }
+
+    function exportReport() {
+      let report = '# Venturo Schema 檢查報告\n\n';
+      report += `檢查日期: ${new Date().toLocaleString('zh-TW')}\n\n`;
+
+      report += '## 統計\n\n';
+      report += `- 總表格數: ${document.getElementById('total-tables').textContent}\n`;
+      report += `- 缺少的表格: ${document.getElementById('missing-tables').textContent}\n`;
+      report += `- 缺少的欄位: ${document.getElementById('missing-fields').textContent}\n`;
+      report += `- 完全匹配: ${document.getElementById('perfect-match').textContent}\n\n`;
+
+      report += '## 詳細列表\n\n';
+
+      Object.entries(FRONTEND_SCHEMA).forEach(([tableName, tableInfo]) => {
+        const frontendFields = tableInfo.fields;
+        const supabaseFields = SUPABASE_SCHEMA[tableName] || [];
+        const missing = frontendFields.filter(f => !supabaseFields.includes(f));
+
+        report += `### ${tableName} (${tableInfo.module})\n\n`;
+
+        if (tableInfo.missing || supabaseFields.length === 0) {
+          report += '❌ **表格不存在於 Supabase**\n\n';
+        } else if (missing.length > 0) {
+          report += `⚠️ **缺少 ${missing.length} 個欄位**:\n`;
+          missing.forEach(f => {
+            report += `- ${f}\n`;
+          });
+          report += '\n';
+        } else {
+          report += '✅ 完全匹配\n\n';
+        }
+      });
+
+      const blob = new Blob([report], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'schema-report.md';
+      a.click();
+    }
+
+    // 事件監聽
+    document.getElementById('filter-ok').addEventListener('change', applyFilters);
+    document.getElementById('filter-warning').addEventListener('change', applyFilters);
+    document.getElementById('filter-error').addEventListener('change', applyFilters);
+
+    // 初始載入
+    loadData();
+  </script>
+</body>
+</html>

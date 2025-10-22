@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { Employee } from '@/stores/types';
 import { FileText } from 'lucide-react';
 
@@ -10,7 +10,15 @@ interface ContractsTabProps {
   setIsEditing?: (editing: boolean) => void;
 }
 
-export function ContractsTab({ employee, isEditing, setIsEditing }: ContractsTabProps) {
+export const ContractsTab = forwardRef<{ handleSave: () => void }, ContractsTabProps>(
+  ({ employee, isEditing, setIsEditing }, ref) => {
+  useImperativeHandle(ref, () => ({
+    handleSave: async () => {
+      // 合約資訊目前為唯讀，未來若需編輯功能可在此實作
+      console.log('ContractsTab handleSave called');
+    }
+  }));
+
   const getContractTypeLabel = (type: Employee['contracts'][0]['type']) => {
     const typeMap = {
       employment: '正式雇用',
@@ -39,8 +47,8 @@ export function ContractsTab({ employee, isEditing, setIsEditing }: ContractsTab
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-morandi-secondary">
-                      {new Date(contract.startDate).toLocaleDateString()}
-                      {contract.endDate && ` - ${new Date(contract.endDate).toLocaleDateString()}`}
+                      {new Date(contract.start_date).toLocaleDateString()}
+                      {contract.end_date && ` - ${new Date(contract.end_date).toLocaleDateString()}`}
                     </p>
                   </div>
                 </div>
@@ -51,10 +59,10 @@ export function ContractsTab({ employee, isEditing, setIsEditing }: ContractsTab
                   </div>
                 )}
 
-                {contract.filePath && (
+                {contract.file_path && (
                   <div className="text-sm">
                     <a
-                      href={contract.filePath}
+                      href={contract.file_path}
                       className="text-morandi-primary hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -72,4 +80,4 @@ export function ContractsTab({ employee, isEditing, setIsEditing }: ContractsTab
       </div>
     </div>
   );
-}
+});

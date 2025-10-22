@@ -25,9 +25,9 @@ export interface PaperSettings {
 // 儲存格格式
 export interface CellFormat {
   // 背景和邊框
-  background_color: string;  // HEX 顏色
+  backgroundColor: string;  // HEX 顏色
   border_style: 'none' | 'thin' | 'medium' | 'thick' | 'double';
-  border_color: string;      // HEX 顏色
+  borderColor: string;      // HEX 顏色
 
   // 文字格式
   text_align: 'left' | 'center' | 'right';
@@ -71,7 +71,7 @@ export interface Cell {
 // 模板欄位定義
 export interface TemplateField {
   id: string;
-  field_key: string;           // Excel 中的變數名稱，例如：tour_name
+  field_key: string;           // Excel 中的變數名稱，例如：tourName
   display_name: string;        // 顯示名稱，例如：旅遊團名稱
   field_type: FieldType;
   is_required: boolean;

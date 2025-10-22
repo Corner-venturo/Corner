@@ -8,6 +8,11 @@
 // ============================================
 
 /**
+ * SyncStatus - 同步狀態
+ */
+export type SyncStatus = 'pending' | 'synced' | 'conflict';
+
+/**
  * BaseEntity - 所有實體的基礎介面
  * 包含共用的 ID 和時間戳記欄位
  */
@@ -17,6 +22,16 @@ export interface BaseEntity {
   updated_at: string;  // ISO 8601 格式
   created_by?: string;
   updated_by?: string;
+}
+
+/**
+ * SyncableEntity - 可同步實體的基礎介面
+ * 繼承 BaseEntity 並加入同步相關欄位
+ */
+export interface SyncableEntity extends BaseEntity {
+  sync_status: SyncStatus;  // 同步狀態
+  temp_code?: string | null;  // 離線時的臨時編號
+  synced_at?: string | null;  // 最後同步時間 (ISO 8601)
 }
 
 // ============================================

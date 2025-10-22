@@ -3,26 +3,23 @@
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
 import { Card } from '@/components/ui/card';
-import { useTourStore } from '@/stores/tour-store';
+import { useTourStore, useOrderStore } from '@/stores';
+// TODO: usePaymentStore deprecated - 財務報表功能未完整實作
 import { BarChart3, TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucide-react';
 
 export default function ReportsPage() {
-  const { payments, orders, tours } = useTourStore();
+  const { items: tours } = useTourStore();
+  const { items: orders } = useOrderStore();
+  const payments: any[] = []; // TODO: 實作完整財務報表
 
-  const totalRevenue = payments.filter(p => p.type === '收款').reduce((sum, p) => sum + p.amount, 0);
+  const total_revenue = payments.filter(p => p.type === '收款').reduce((sum, p) => sum + p.amount, 0);
   const totalCosts = payments.filter(p => p.type === '請款').reduce((sum, p) => sum + p.amount, 0);
-  const netProfit = totalRevenue - totalCosts;
+  const netProfit = total_revenue - totalCosts;
 
   return (
     <div className="space-y-6 ">
       <ResponsiveHeader
         title="財務報表"
-        icon={BarChart3}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '財務系統', href: '/finance' },
-          { label: '財務報表', href: '/finance/reports' }
-        ]}
       />
 
       {/* 財務概覽 */}
@@ -34,7 +31,7 @@ export default function ReportsPage() {
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">總收入</p>
                 <p className="text-2xl font-bold text-morandi-green">
-                  NT$ {totalRevenue.toLocaleString()}
+                  NT$ {total_revenue.toLocaleString()}
                 </p>
               </div>
               <TrendingUp size={24} className="text-morandi-green" />

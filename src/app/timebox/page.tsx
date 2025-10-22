@@ -44,7 +44,7 @@ export default function TimeboxPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="時間箱管理"
         icon={Clock}
@@ -147,8 +147,9 @@ export default function TimeboxPage() {
         </div>
       </ResponsiveHeader>
 
-      {/* 統計面板 */}
-      <StatisticsPanel />
+      <div className="flex-1 overflow-auto">
+        {/* 統計面板 */}
+        <StatisticsPanel />
 
       {/* 主要內容區域 */}
       <div className="flex gap-6">
@@ -189,6 +190,7 @@ export default function TimeboxPage() {
           </DialogContent>
         </Dialog>
       )}
+      </div>
     </div>
   )
 }

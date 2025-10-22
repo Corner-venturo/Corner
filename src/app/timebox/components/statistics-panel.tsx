@@ -17,7 +17,13 @@ function StatisticsPanel() {
     return `${mins}分鐘`
   }
 
-  const hasWorkoutStats = stats.totalWorkoutSessions > 0 && stats.totalWorkoutVolume && stats.totalWorkoutVolume > 0
+  const completionRate = stats?.completionRate ?? 0
+  const totalWorkoutTime = stats?.totalWorkoutTime ?? 0
+  const completedByType = stats?.completedByType ?? { workout: 0, reminder: 0, basic: 0 }
+  const totalWorkoutVolume = stats?.totalWorkoutVolume ?? 0
+  const totalWorkoutSessions = stats?.totalWorkoutSessions ?? 0
+
+  const hasWorkoutStats = totalWorkoutSessions > 0 && totalWorkoutVolume > 0
 
   return (
     <div className="bg-card border-b border-border px-6 py-4">
@@ -28,12 +34,12 @@ function StatisticsPanel() {
             <div>
               <p className="text-xs sm:text-sm font-medium text-morandi-secondary">本週完成率</p>
               <p className="text-lg sm:text-2xl font-bold text-morandi-primary">
-                {Math.round(stats.completionRate * 100)}%
+                {Math.round(completionRate * 100)}%
               </p>
             </div>
             <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-morandi-container flex items-center justify-center">
               <div className="text-morandi-gold font-semibold text-xs sm:text-base">
-                {Math.round(stats.completionRate * 100)}
+                {Math.round(completionRate * 100)}
               </div>
             </div>
           </div>
@@ -45,13 +51,13 @@ function StatisticsPanel() {
             <div>
               <p className="text-xs sm:text-sm font-medium text-morandi-secondary">運動時間</p>
               <p className="text-lg sm:text-2xl font-bold text-morandi-primary">
-                <span className="hidden sm:inline">{formatTime(stats.totalWorkoutTime)}</span>
-                <span className="sm:hidden">{Math.floor(stats.totalWorkoutTime / 60)}h</span>
+                <span className="hidden sm:inline">{formatTime(totalWorkoutTime)}</span>
+                <span className="sm:hidden">{Math.floor(totalWorkoutTime / 60)}h</span>
               </p>
             </div>
             <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-morandi-container flex items-center justify-center">
               <div className="text-morandi-green font-semibold text-xs sm:text-sm">
-                {Math.floor(stats.totalWorkoutTime / 60)}h
+                {Math.floor(totalWorkoutTime / 60)}h
               </div>
             </div>
           </div>
@@ -64,15 +70,15 @@ function StatisticsPanel() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-morandi-secondary">運動</span>
-                <span className="font-medium text-morandi-primary">{stats.completedByType.workout} 次</span>
+                <span className="font-medium text-morandi-primary">{completedByType.workout} 次</span>
               </div>
               <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-morandi-secondary">保養</span>
-                <span className="font-medium text-morandi-primary">{stats.completedByType.reminder} 次</span>
+                <span className="font-medium text-morandi-primary">{completedByType.reminder} 次</span>
               </div>
               <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-morandi-secondary">其他</span>
-                <span className="font-medium text-morandi-primary">{stats.completedByType.basic} 次</span>
+                <span className="font-medium text-morandi-primary">{completedByType.basic} 次</span>
               </div>
             </div>
           </div>
@@ -86,16 +92,16 @@ function StatisticsPanel() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-morandi-secondary">本週訓練量</span>
-                  <span className="font-medium text-morandi-primary">{stats.totalWorkoutVolume?.toLocaleString()} kg</span>
+                  <span className="font-medium text-morandi-primary">{totalWorkoutVolume.toLocaleString()} kg</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-morandi-secondary">訓練次數</span>
-                  <span className="font-medium text-morandi-primary">{stats.totalWorkoutSessions} 次</span>
+                  <span className="font-medium text-morandi-primary">{totalWorkoutSessions} 次</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-morandi-secondary">平均每次</span>
                   <span className="font-medium text-morandi-primary">
-                    {Math.round((stats.totalWorkoutVolume || 0) / stats.totalWorkoutSessions).toLocaleString()} kg
+                    {Math.round(totalWorkoutVolume / (totalWorkoutSessions || 1)).toLocaleString()} kg
                   </span>
                 </div>
               </div>

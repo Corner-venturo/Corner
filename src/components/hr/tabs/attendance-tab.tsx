@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { Employee } from '@/stores/types';
 import { Calendar, Clock } from 'lucide-react';
 
@@ -10,8 +10,16 @@ interface AttendanceTabProps {
   setIsEditing?: (editing: boolean) => void;
 }
 
-export function AttendanceTab({ employee, isEditing, setIsEditing }: AttendanceTabProps) {
-  const getLeaveTypeLabel = (type: Employee['attendance']['leaveRecords'][0]['type']) => {
+export const AttendanceTab = forwardRef<{ handleSave: () => void }, AttendanceTabProps>(
+  ({ employee, isEditing, setIsEditing }, ref) => {
+  useImperativeHandle(ref, () => ({
+    handleSave: async () => {
+      // 出勤資訊目前為唯讀，未來若需編輯功能可在此實作
+      console.log('AttendanceTab handleSave called');
+    }
+  }));
+
+  const getLeaveTypeLabel = (type: Employee['attendance']['leave_records'][0]['type']) => {
     const typeMap = {
       annual: '年假',
       sick: '病假',
@@ -22,7 +30,7 @@ export function AttendanceTab({ employee, isEditing, setIsEditing }: AttendanceT
     return typeMap[type];
   };
 
-  const getStatusColor = (status: Employee['attendance']['leaveRecords'][0]['status']) => {
+  const getStatusColor = (status: Employee['attendance']['leave_records'][0]['status']) => {
     const colorMap = {
       pending: 'text-yellow-600',
       approved: 'text-green-600',
@@ -37,9 +45,9 @@ export function AttendanceTab({ employee, isEditing, setIsEditing }: AttendanceT
       <div className="bg-morandi-container/10 rounded-lg p-4">
         <h4 className="font-medium text-morandi-primary mb-3">請假紀錄</h4>
 
-        {employee.attendance.leaveRecords.length > 0 ? (
+        {employee.attendance.leave_records.length > 0 ? (
           <div className="space-y-3">
-            {employee.attendance.leaveRecords.map((record) => (
+            {employee.attendance.leave_records.map((record) => (
               <div key={record.id} className="bg-white rounded border p-3">
                 <div className="flex justify-between items-start mb-2">
                   <div>
@@ -56,7 +64,7 @@ export function AttendanceTab({ employee, isEditing, setIsEditing }: AttendanceT
                   </span>
                 </div>
                 <div className="text-sm text-morandi-secondary">
-                  {new Date(record.startDate).toLocaleDateString()} - {new Date(record.endDate).toLocaleDateString()}
+                  {new Date(record.start_date).toLocaleDateString()} - {new Date(record.end_date).toLocaleDateString()}
                 </div>
                 {record.reason && (
                   <div className="text-sm text-morandi-muted mt-1">
@@ -75,9 +83,9 @@ export function AttendanceTab({ employee, isEditing, setIsEditing }: AttendanceT
       <div className="bg-morandi-container/10 rounded-lg p-4">
         <h4 className="font-medium text-morandi-primary mb-3">加班紀錄</h4>
 
-        {employee.attendance.overtimeRecords.length > 0 ? (
+        {employee.attendance.overtime_records.length > 0 ? (
           <div className="space-y-3">
-            {employee.attendance.overtimeRecords.map((record) => (
+            {employee.attendance.overtime_records.map((record) => (
               <div key={record.id} className="bg-white rounded border p-3">
                 <div className="flex justify-between items-start mb-2">
                   <div className="font-medium text-morandi-primary">
@@ -99,4 +107,4 @@ export function AttendanceTab({ employee, isEditing, setIsEditing }: AttendanceT
       </div>
     </div>
   );
-}
+});

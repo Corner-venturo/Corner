@@ -15,7 +15,7 @@ interface TourRefundsProps {
 }
 
 export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, onTriggerAddComplete }: TourRefundsProps) {
-  // 使用 tourAddOns 相同的 store 結構，但用於退費項目管理
+  // 使用 tour_add_ons 相同的 store 結構，但用於退費項目管理
   const { items: tourAddOns, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newRefund, setNewRefund] = useState({

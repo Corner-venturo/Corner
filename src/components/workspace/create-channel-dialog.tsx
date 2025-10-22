@@ -23,9 +23,10 @@ export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogP
     
     createChannel({
       name: channelName.trim(),
-      type: 'custom',
-      isArchived: false,
-      members: [currentUserId], // 創建者自動加入
+      type: 'public', // 'custom' 不是有效類型，改為 'public'
+      // isArchived: false, // Channel 類型不包含此屬性
+      // members: [currentUserId], // Channel 類型不包含此屬性
+      workspace_id: '', // TODO: 從 workspace store 獲取當前 workspace_id
       created_by: currentUserId,
     });
     

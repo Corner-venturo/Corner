@@ -74,20 +74,20 @@ export function RepeatableSectionDialog({
       name: name.trim(),
       type: 'repeatable',
       range: {
-        startRow: startRowNum,
-        endRow: endRowNum,
+        start_row: startRowNum,
+        end_row: endRowNum,
         columns: 'A:Z',
       },
-      repeatConfig: {
+      repeat_config: {
         min: minInstances ? parseInt(minInstances) : 1,
         max: maxInstances ? parseInt(maxInstances) : 999,
-        defaultCount: 1,
-        autoNumber: true,
-        numberFormat: '[N]',
+        default_count: 1,
+        auto_number: true,
+        number_format: '[N]',
       },
-      pageBreak: {
+      page_break: {
         enabled: false,
-        afterCount: 1,
+        after_count: 1,
       },
     };
 

@@ -3,12 +3,14 @@ import { tourService } from '../services/tour.service';
 import { Tour } from '@/stores/types';
 import { PageRequest, PageResponse, UseEntityResult } from '@/core/types/common';
 import { BaseEntity } from '@/core/types/common';
+import { useTourStore } from '@/stores';
 
 export function useTours(params?: PageRequest): UseEntityResult<Tour> {
   const [data, setData] = useState<Tour[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const tourStore = useTourStore();
 
   // 使用 useMemo 來穩定 params 物件的參考
   const stableParams = useMemo(() => params, [
@@ -16,7 +18,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     params?.pageSize,
     params?.search,
     params?.sortBy,
-    params?.sortOrder
+    (params as any)?.sort_order
   ]);
 
   const loadTours = useCallback(async () => {
@@ -43,14 +45,23 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     try {
       setError(null);
       const newTour = await tourService.create(tourData);
-      await loadTours(); // 重新載入列表以確保數據同步
+
+      // ✅ 樂觀更新 - 立即加入 UI，不等待重新載入
+      setData(prevData => [newTour, ...prevData]);
+      setTotalCount(prev => prev + 1);
+
+      // 🔧 Store 已經在 tourService.create() 中更新了，這裡不需要重複更新
+      console.log('✅ 已建立新旅遊團:', newTour.code);
+
       return newTour;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '建立旅遊團失敗';
       setError(errorMessage);
+      // 失敗時重新載入以確保數據一致性
+      await loadTours();
       throw err; // 讓調用者可以處理錯誤
     }
-  }, [loadTours]);
+  }, [loadTours, tourStore]);
 
   const updateTour = useCallback(async (id: string, tourData: Partial<Tour>) => {
     try {
@@ -113,7 +124,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     actions: {
       create: createTour,
       update: updateTour,
-      delete: deleteTour,
+      delete: (async (id: string) => { await deleteTour(id); return true; }) as (id: string) => Promise<boolean>,
       refresh,
     },
   };
@@ -127,7 +138,7 @@ export function useTourDetails(tour_id: string) {
   const [error, setError] = useState<string | null>(null);
 
   const loadTourDetails = useCallback(async () => {
-    if (!tourId) {
+    if (!tour_id) {
       setLoading(false);
       return;
     }
@@ -137,8 +148,8 @@ export function useTourDetails(tour_id: string) {
       setError(null);
 
       const [tourData, financialData] = await Promise.all([
-        tourService.getById(tourId),
-        tourService.calculateFinancialSummary(tourId),
+        tourService.getById(tour_id),
+        tourService.calculateFinancialSummary(tour_id),
       ]);
 
       setTour(tourData);
@@ -150,18 +161,18 @@ export function useTourDetails(tour_id: string) {
     } finally {
       setLoading(false);
     }
-  }, [tourId]);
+  }, [tour_id]);
 
   useEffect(() => {
     loadTourDetails();
   }, [loadTourDetails]);
 
   const updateTourStatus = useCallback(async (newStatus: Tour['status'], reason?: string) => {
-    if (!tourId) return null;
+    if (!tour_id) return null;
 
     try {
       setError(null);
-      const updated = await tourService.updateTourStatus(tourId, newStatus, reason);
+      const updated = await tourService.updateTourStatus(tour_id, newStatus, reason);
       setTour(updated);
       return updated;
     } catch (err) {
@@ -169,7 +180,7 @@ export function useTourDetails(tour_id: string) {
       setError(errorMessage);
       throw err;
     }
-  }, [tourId]);
+  }, [tour_id]);
 
   const generateTourCode = useCallback(async (location: string, date: Date, isSpecial?: boolean) => {
     try {

@@ -16,17 +16,17 @@ interface CanvasViewProps {
 }
 
 export function CanvasView({ channel }: CanvasViewProps) {
-  const { canvasDocuments, createCanvas } = useWorkspaceStore();
+  const { personalCanvases, createPersonalCanvas } = useWorkspaceStore();
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
-  
+
   // 獲取該頻道的 Canvas 文件
-  const channelDocs = canvasDocuments
-    .filter(doc => doc.channelId === channel.id)
-    .sort((a, b) => a.order - b.order);
+  const channelDocs = personalCanvases
+    .filter((doc: any) => doc.channelId === channel.id)
+    .sort((a: any, b: any) => a.order - b.order);
   
   // 如果沒有選擇文件，自動選擇第一個
-  const activeDoc = activeDocId 
-    ? channelDocs.find(doc => doc.id === activeDocId)
+  const activeDoc = activeDocId
+    ? channelDocs.find((doc: any) => doc.id === activeDocId)
     : channelDocs[0];
   
   const getDocIcon = (type: string) => {
@@ -42,21 +42,22 @@ export function CanvasView({ channel }: CanvasViewProps) {
     }
   };
   
-  const handleCreateDoc = (type: 'document' | 'tasks' | 'files') => {
+  const handleCreateDoc = (type: 'document' | 'tools' | 'custom') => {
     const typeNames = {
       document: '新文件',
-      tasks: '待辦清單',
-      files: '檔案庫',
+      tools: '待辦清單',
+      custom: '檔案庫',
     };
-    
-    createCanvas({
-      channelId: channel.id,
+
+    createPersonalCanvas({
+      employee_id: '1', // TODO: 從 auth store 獲取
+      workspace_id: channel.workspace_id,
+      canvas_number: channelDocs.length + 1,
       title: typeNames[type],
-      content: '',
       type,
-      order: channelDocs.length + 1,
-      created_by: '1', // TODO: 從 auth store 獲取
-    });
+      content: {},
+      layout: {},
+    } as any);
   };
   
   return (
@@ -77,10 +78,10 @@ export function CanvasView({ channel }: CanvasViewProps) {
         </div>
         
         <div className="flex-1 overflow-y-auto py-2">
-          {channelDocs.map((doc) => {
+          {channelDocs.map((doc: any) => {
             const Icon = getDocIcon(doc.type);
             const is_active = activeDoc?.id === doc.id;
-            
+
             return (
               <button
                 key={doc.id}
@@ -116,17 +117,17 @@ export function CanvasView({ channel }: CanvasViewProps) {
                 {activeDoc.title}
               </h3>
               <div className="text-sm text-morandi-secondary">
-                {activeDoc.type === 'tasks' && '管理團隊待辦事項'}
+                {activeDoc.type === 'tools' && '管理團隊待辦事項'}
                 {activeDoc.type === 'document' && '共同編輯文件'}
-                {activeDoc.type === 'files' && '共享檔案庫'}
+                {activeDoc.type === 'custom' && '共享檔案庫'}
               </div>
             </div>
             
             {/* 根據類型渲染不同內容 */}
-            {activeDoc.type === 'tasks' && channel.tour_id && (
-              <WorkspaceTaskList 
+            {activeDoc.type === 'tools' && (
+              <WorkspaceTaskList
                 channelId={channel.id}
-                tourId={channel.tour_id}
+                tour_id={(channel as any).tour_id}
               />
             )}
             
@@ -138,7 +139,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
               </div>
             )}
             
-            {activeDoc.type === 'files' && (
+            {activeDoc.type === 'custom' && (
               <div className="border border-border rounded-lg p-4 bg-white">
                 <p className="text-sm text-morandi-secondary">
                   檔案庫功能開發中...

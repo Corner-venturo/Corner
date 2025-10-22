@@ -80,7 +80,7 @@ export function TourDocuments({ tour, orderFilter }: TourDocumentsProps) {
     }
   ];
 
-  // 根據 orderFilter 過濾文件（實際使用時會從 store 根據 orderId 過濾）
+  // 根據 orderFilter 過濾文件（實際使用時會從 store 根據 order_id 過濾）
   const mockDocuments = orderFilter
     ? allMockDocuments.filter(doc => {
         // 模擬：當有 orderFilter 時，只顯示部分文件

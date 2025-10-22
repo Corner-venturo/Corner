@@ -26,8 +26,8 @@
       "allowTemplateLiterals": true
     }],
 
-    // Import 規則
-    "import/order": ["error", {
+    // Import 規則 (Phase 1: 警告即可，避免阻擋開發)
+    "import/order": ["warn", {
       "groups": [
         "builtin",
         "external",

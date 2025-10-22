@@ -126,7 +126,7 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                   <button
                     key={option}
                     type="button"
-                    onClick={() => setDuration(option)}
+                    onClick={() => setDuration(option as 30 | 60)}
                     className={`p-2 text-sm rounded border transition-colors ${
                       duration === option
                         ? 'border-blue-500 bg-blue-50 text-blue-700'

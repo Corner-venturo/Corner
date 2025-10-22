@@ -17,7 +17,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
   const { createBox } = useTimeboxStore()
   const [formData, setFormData] = useState({
     name: '',
-    type: 'basic' as 'workout' | 'reminder' | 'basic',
+    type: 'workout' as 'workout' | 'reminder',
     color: morandiColors[0].value,
   })
 
@@ -28,12 +28,12 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
       name: formData.name,
       type: formData.type,
       color: formData.color,
-      userId: 'current-user', // TODO: 實際用戶ID
+      user_id: 'current-user', // TODO: 實際用戶ID
     })
 
     setFormData({
       name: '',
-      type: 'basic',
+      type: 'workout',
       color: morandiColors[0].value,
     })
     onClose()
@@ -42,7 +42,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
   const handleClose = () => {
     setFormData({
       name: '',
-      type: 'basic',
+      type: 'workout',
       color: morandiColors[0].value,
     })
     onClose()
@@ -74,7 +74,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
             </label>
             <Select
               value={formData.type}
-              onValueChange={(value: 'workout' | 'reminder' | 'basic') =>
+              onValueChange={(value: 'workout' | 'reminder') =>
                 setFormData({ ...formData, type: value })
               }
             >
@@ -82,7 +82,6 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="basic">普通箱子</SelectItem>
                 <SelectItem value="workout">重訓箱子</SelectItem>
                 <SelectItem value="reminder">文字提示箱子</SelectItem>
               </SelectContent>

@@ -123,18 +123,20 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
           name: formData.name,
           type: formData.type,
           description: formData.description,
-          paperSettings: {
+          paper_settings: {
             size: 'A4',
             orientation: 'portrait',
             margins: { top: 2.0, bottom: 2.0, left: 2.0, right: 2.0 },
-            showGrid: true,
-            showRuler: true,
+            show_grid: true,
+            show_ruler: true,
           },
           cells: {},
-          dynamicBlocks: [],
+          dynamic_blocks: [],
           field_mappings: fields,
           excel_structure: excelData || { data: [['']], settings: {} },
-        });
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        } as any);
       }
 
       onOpenChange(false);
