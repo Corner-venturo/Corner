@@ -120,26 +120,26 @@ interface StoreConfig {
  * const useOrderStore = createStore({ tableName: 'orders', fastInsert: false });
  */
 export function createStore<T extends BaseEntity>(
-  tableName: TableName | StoreConfig,
-  codePrefix?: string,
-  enableSupabase: boolean = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
+  tableNameOrConfig: TableName | StoreConfig,
+  codePrefixParam?: string,
+  enableSupabaseParam: boolean = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 ) {
   // 支援兩種調用方式：1. 舊版參數 2. 配置物件
   let config: StoreConfig;
-  if (typeof tableName === 'string') {
+  if (typeof tableNameOrConfig === 'string') {
     // 舊版調用方式（向後相容）
     config = {
-      tableName,
-      codePrefix,
-      enableSupabase,
+      tableName: tableNameOrConfig,
+      codePrefix: codePrefixParam,
+      enableSupabase: enableSupabaseParam,
       fastInsert: true, // 預設啟用 FastIn
     };
   } else {
     // 新版配置物件
     config = {
-      ...tableName,
-      enableSupabase: tableName.enableSupabase ?? (process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'),
-      fastInsert: tableName.fastInsert ?? true, // 預設啟用 FastIn
+      ...tableNameOrConfig,
+      enableSupabase: tableNameOrConfig.enableSupabase ?? (process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'),
+      fastInsert: tableNameOrConfig.fastInsert ?? true, // 預設啟用 FastIn
     };
   }
 
