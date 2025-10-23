@@ -101,7 +101,7 @@ export default function QuoteDetailPage() {
 
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null;
-  const isSpecialTour = relatedTour?.status === '特殊團';
+  const isSpecialTour = relatedTour?.status === 'special';
   const isReadOnly = isSpecialTour; // 特殊團報價單設為唯讀
 
   // 懶載入 regions（只在報價單頁面才載入）
@@ -948,7 +948,7 @@ export default function QuoteDetailPage() {
 
     // 更新狀態為最終版本
     updateQuote(quote.id, {
-      status: '最終版本',
+      status: 'approved',
       categories: updatedCategories as any, // CostCategory[] 與 QuoteCategory[] 結構相同
       total_cost,
       group_size: groupSize,
@@ -970,7 +970,7 @@ export default function QuoteDetailPage() {
     handleSaveVersion('轉為旅遊團前的版本');
 
     // 更新報價單狀態為最終版本
-    updateQuote(quote.id, { status: '最終版本' });
+    updateQuote(quote.id, { status: 'approved' });
 
     // 創建旅遊團（使用報價單選擇的城市）
     const departure_date = new Date();
@@ -1158,11 +1158,11 @@ export default function QuoteDetailPage() {
             <span className="text-sm text-morandi-secondary">狀態:</span>
             <span className={cn(
               'inline-flex items-center px-2 py-1 rounded text-sm font-medium',
-              quote && quote.status === '提案'
+              quote && quote.status === 'proposed'
                 ? 'bg-morandi-gold text-white'
                 : 'bg-morandi-green text-white'
             )}>
-              {quote?.status || '提案'}
+              {quote?.status === 'proposed' ? '提案' : quote?.status === 'approved' ? '已核准' : quote?.status || '提案'}
             </span>
           </div>
 
@@ -1244,7 +1244,7 @@ export default function QuoteDetailPage() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {quote && quote.status === '提案' && (
+          {quote && quote.status === 'proposed' && (
             <Button
               onClick={handleFinalize}
               disabled={isReadOnly}
@@ -1258,7 +1258,7 @@ export default function QuoteDetailPage() {
             </Button>
           )}
 
-          {quote && quote.status === '最終版本' && (
+          {quote && quote.status === 'approved' && (
             relatedTour ? (
               // 已有關聯旅遊團：前往該旅遊團
               <Button

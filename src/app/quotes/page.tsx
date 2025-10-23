@@ -13,24 +13,25 @@ import { useTourStore } from '@/stores';
 import { Calculator, FileText, Users, Trash2, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
+import { QUOTE_STATUS_LABELS } from '@/constants/quote-status';
 
-const statusFilters = ['全部', '提案', '最終版本'];
+const statusFilters = ['all', 'proposed', 'approved'];
 
 export default function QuotesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items: tours } = useTourStore();
   const { quotes, addQuote, deleteQuote, duplicateQuote, loadQuotes } = useQuotes();
-  const [statusFilter, setStatusFilter] = useState<string>('全部');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [newQuote, setNewQuote] = useState<{
     name: string;
-    status: '提案' | '最終版本';
+    status: 'proposed' | 'approved';
     group_size: number;
   }>({
     name: '',
-    status: '提案',
+    status: 'proposed',
     group_size: 1,
   });
 
@@ -112,7 +113,7 @@ export default function QuotesPage() {
           'text-sm font-medium',
           getStatusColor(quote.status)
         )}>
-          {quote.status}
+          {QUOTE_STATUS_LABELS[quote.status] || quote.status}
         </span>
       ),
     },
@@ -150,7 +151,7 @@ export default function QuotesPage() {
   ], []);
 
   const filteredQuotes = quotes.filter(quote => {
-    const matchesStatus = statusFilter === '全部' || quote.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || quote.status === statusFilter;
 
     // 搜尋 - 搜尋所有文字欄位
     const searchLower = searchTerm.toLowerCase();
@@ -235,8 +236,8 @@ export default function QuotesPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      '提案': 'text-morandi-gold',
-      '最終版本': 'text-green-600'
+      'proposed': 'text-morandi-gold',
+      'approved': 'text-green-600'
     };
     return colors[status] || 'text-morandi-secondary';
   };
@@ -251,9 +252,9 @@ export default function QuotesPage() {
           { label: '報價單管理', href: '/quotes' }
         ]}
         tabs={[
-          { value: '全部', label: '全部', icon: Calculator },
-          { value: '提案', label: '提案', icon: FileText },
-          { value: '最終版本', label: '最終版本', icon: FileText }
+          { value: 'all', label: '全部', icon: Calculator },
+          { value: 'proposed', label: '提案', icon: FileText },
+          { value: 'approved', label: '已核准', icon: FileText }
         ]}
         activeTab={statusFilter}
         onTabChange={setStatusFilter}
@@ -348,14 +349,14 @@ export default function QuotesPage() {
               <label className="text-sm font-medium text-morandi-primary">狀態</label>
               <Select
                 value={newQuote.status}
-                onValueChange={(value) => setNewQuote(prev => ({ ...prev, status: value as '提案' | '最終版本' }))}
+                onValueChange={(value) => setNewQuote(prev => ({ ...prev, status: value as 'proposed' | 'approved' }))}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="提案">提案</SelectItem>
-                  <SelectItem value="最終版本">最終版本</SelectItem>
+                  <SelectItem value="proposed">提案</SelectItem>
+                  <SelectItem value="approved">已核准</SelectItem>
                 </SelectContent>
               </Select>
             </div>

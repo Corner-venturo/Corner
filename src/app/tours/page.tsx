@@ -252,7 +252,7 @@ export default function ToursPage() {
         return_date: tour.return_date,
         price: tour.price,
         status: tour.status,
-        isSpecial: tour.status === '特殊團',
+        isSpecial: tour.status === 'special',
         max_participants: tour.max_participants || 20,
         description: tour.description || '',
       });
