@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useLocalAuthStore } from '@/lib/auth/local-auth-manager';
 import { Sidebar } from './sidebar';
+import { SyncStatusIndicator } from '@/components/sync/sync-status-indicator';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -116,6 +117,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           {children}
         </div>
       </main>
+
+      {/* FastIn 同步狀態指示器 */}
+      {isClient && shouldShowSidebar && <SyncStatusIndicator />}
     </div>
   );
 }

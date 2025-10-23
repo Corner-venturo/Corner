@@ -101,8 +101,8 @@ export class BackgroundSyncService {
           // @ts-ignore
           await localDB.put(tableName, {
             ...supabaseData,
-            sync_status: 'synced',
-            synced_at: new Date().toISOString()
+            _needs_sync: false,
+            _synced_at: new Date().toISOString()
           });
 
           logger.log(`✅ [${tableName}] TBC 編號已轉換: ${typedItem.code} → ${(supabaseData as any).code}`);
@@ -125,8 +125,10 @@ export class BackgroundSyncService {
       const allLocalItems = await localDB.getAll(tableName);
       const pendingUpserts = allLocalItems.filter((item: unknown) => {
         const typedItem = item as any;
-        // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-        return typedItem.sync_status === 'pending' && !(typedItem.code && typedItem.code.endsWith('TBC'));
+        // 過濾：待同步 且 不是 TBC 編號 且 未軟刪除
+        return typedItem._needs_sync === true &&
+               !(typedItem.code && typedItem.code.endsWith('TBC')) &&
+               !typedItem._deleted;
       });
 
       if (pendingUpserts.length === 0) return;
@@ -137,7 +139,7 @@ export class BackgroundSyncService {
         try {
           const typedItem = item as any;
           // 移除同步標記欄位
-          const { sync_status, synced_at, temp_code, ...syncData } = typedItem;
+          const { _needs_sync, _synced_at, _deleted, temp_code, ...syncData } = typedItem;
 
           // 檢查是否已存在（update）或新建（insert）
           const { data: existing } = await supabase
@@ -166,8 +168,8 @@ export class BackgroundSyncService {
           // @ts-ignore
           await localDB.put(tableName, {
             ...(item as any),
-            sync_status: 'synced',
-            synced_at: new Date().toISOString()
+            _needs_sync: false,
+            _synced_at: new Date().toISOString()
           });
         } catch (error) {
           logger.error(`❌ [${tableName}] 同步失敗:`, (item as any).id, error);
@@ -230,7 +232,7 @@ export class BackgroundSyncService {
       const allLocalItems = await localDB.getAll(tableName);
       const hasLocalPending = allLocalItems.some((item: unknown) => {
         const typedItem = item as any;
-        return typedItem.sync_status === 'pending' || (typedItem.code && typedItem.code.endsWith('TBC'));
+        return typedItem._needs_sync === true || (typedItem.code && typedItem.code.endsWith('TBC'));
       });
 
       // 檢查是否有刪除隊列
@@ -255,7 +257,7 @@ export class BackgroundSyncService {
       const allLocalItems = await localDB.getAll(tableName);
       const localPendingCount = allLocalItems.filter((item: unknown) => {
         const typedItem = item as any;
-        return typedItem.sync_status === 'pending' || (typedItem.code && typedItem.code.endsWith('TBC'));
+        return typedItem._needs_sync === true || (typedItem.code && typedItem.code.endsWith('TBC'));
       }).length;
 
       // 計算刪除隊列數量

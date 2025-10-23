@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-// TODO: 重新實作同步狀態指示器，使用 background-sync-service
-// import { useOfflineSync, useOfflineStore, syncManager } from '@/lib/offline/sync-manager';
 import { backgroundSyncService } from '@/lib/sync/background-sync-service';
+import { localDB } from '@/lib/db';
+import { TABLES } from '@/lib/db/schemas';
 import {
   Wifi, WifiOff, Cloud, CloudOff,
   RefreshCw, AlertCircle, Clock,
@@ -13,10 +13,34 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 
-// ===== 主要同步狀態指示器 =====
+/**
+ * 檢查所有表格的待同步數量
+ */
+async function checkPendingCount(): Promise<number> {
+  let totalCount = 0;
+
+  for (const tableName of Object.values(TABLES)) {
+    try {
+      const count = await backgroundSyncService.getPendingCount(tableName);
+      totalCount += count;
+    } catch (error) {
+      console.warn(`無法取得 ${tableName} 的待同步數量:`, error);
+    }
+  }
+
+  return totalCount;
+}
+
+/**
+ * 檢查網路連線狀態
+ */
+function checkOnline(): boolean {
+  return typeof navigator !== 'undefined' ? navigator.onLine : true;
+}
+
+// ===== 主要同步狀態指示器（FastIn 架構版本）=====
 export function SyncStatusIndicator() {
-  // TODO: 使用 navigator.onLine 和 background-sync-service 替代
-  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [isOnline, setIsOnline] = useState(checkOnline());
   const [hasPendingChanges, setHasPendingChanges] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
@@ -41,13 +65,33 @@ export function SyncStatusIndicator() {
     setIsMounted(true);
   }, []);
 
+  // 定期檢查待同步數量（每 15 秒）
+  useEffect(() => {
+    const checkSync = async () => {
+      const count = await checkPendingCount();
+      setPendingCount(count);
+      setHasPendingChanges(count > 0);
+    };
+
+    // 立即執行一次
+    checkSync();
+
+    // 每 15 秒檢查一次
+    const interval = setInterval(checkSync, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 監聽網路狀態變化，顯示通知
   useEffect(() => {
     const handleOnline = () => {
+      setIsOnline(true);
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
     };
 
     const handleOffline = () => {
+      setIsOnline(false);
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
     };
@@ -235,25 +279,40 @@ export function SyncStatusIndicator() {
   );
 }
 
+/**
+ * 顯示待同步項目列表
+ */
 function PendingChangesList() {
-  const pendingChanges = useOfflineStore(state => state.pendingChanges);
+  const [pendingByTable, setPendingByTable] = useState<Record<string, number>>({});
 
-  if (pendingChanges.length === 0) return null;
+  useEffect(() => {
+    const loadPendingCounts = async () => {
+      const counts: Record<string, number> = {};
 
-  const groupedChanges = pendingChanges.reduce((acc, change) => {
-    if (!acc[change.table]) {
-      acc[change.table] = [];
-    }
-    acc[change.table].push(change);
-    return acc;
-  }, {} as Record<string, typeof pendingChanges>);
+      for (const tableName of Object.values(TABLES)) {
+        try {
+          const count = await backgroundSyncService.getPendingCount(tableName);
+          if (count > 0) {
+            counts[tableName] = count;
+          }
+        } catch (error) {
+          console.warn(`無法取得 ${tableName} 的待同步數量:`, error);
+        }
+      }
+
+      setPendingByTable(counts);
+    };
+
+    loadPendingCounts();
+  }, []);
+
+  if (Object.keys(pendingByTable).length === 0) return null;
 
   return (
     <div className="mt-2 space-y-1">
-      {Object.entries(groupedChanges).map(([table, changes]) => (
+      {Object.entries(pendingByTable).map(([table, count]) => (
         <div key={table} className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="capitalize">{table}</span>:
-          {' '}{changes.map(c => c.type).join(', ')} ({changes.length})
+          <span className="capitalize">{table}</span>: {count} 筆待同步
         </div>
       ))}
     </div>

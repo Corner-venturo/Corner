@@ -93,18 +93,60 @@ function generateCode(config: CodeConfig, existingItems: BaseEntity[]): string {
 }
 
 /**
+ * Store 配置選項
+ */
+interface StoreConfig {
+  /** 資料表名稱 */
+  tableName: TableName;
+  /** 編號前綴（可選，如 'T', 'O', 'C'） */
+  codePrefix?: string;
+  /** 是否啟用 Supabase 同步（預設讀取環境變數） */
+  enableSupabase?: boolean;
+  /** FastIn 模式：本地先寫入 IndexedDB → 背景同步 Supabase（預設 true） */
+  fastInsert?: boolean;
+}
+
+/**
  * 建立 Store 工廠函數
  *
- * @param tableName - 資料表名稱
- * @param codePrefix - 編號前綴（可選，如 'T', 'O', 'C'）
- * @param enableSupabase - 是否啟用 Supabase 同步（預設讀取 NEXT_PUBLIC_ENABLE_SUPABASE 環境變數）
- * @returns Zustand Store Hook
+ * @example
+ * // 基本使用
+ * const useTourStore = createStore({ tableName: 'tours', codePrefix: 'T' });
+ *
+ * // FastIn 模式（預設）
+ * const useQuoteStore = createStore({ tableName: 'quotes', fastInsert: true });
+ *
+ * // Supabase 優先模式
+ * const useOrderStore = createStore({ tableName: 'orders', fastInsert: false });
  */
 export function createStore<T extends BaseEntity>(
-  tableName: TableName,
+  tableName: TableName | StoreConfig,
   codePrefix?: string,
   enableSupabase: boolean = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 ) {
+  // 支援兩種調用方式：1. 舊版參數 2. 配置物件
+  let config: StoreConfig;
+  if (typeof tableName === 'string') {
+    // 舊版調用方式（向後相容）
+    config = {
+      tableName,
+      codePrefix,
+      enableSupabase,
+      fastInsert: true, // 預設啟用 FastIn
+    };
+  } else {
+    // 新版配置物件
+    config = {
+      ...tableName,
+      enableSupabase: tableName.enableSupabase ?? (process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'),
+      fastInsert: tableName.fastInsert ?? true, // 預設啟用 FastIn
+    };
+  }
+
+  const { tableName: table, codePrefix: prefix, enableSupabase: supabaseEnabled, fastInsert } = config;
+  const tableName = table;
+  const codePrefix = prefix;
+  const enableSupabase = supabaseEnabled;
   const store = create<StoreState<T>>()(
     persist(
       (set, get) => ({
@@ -223,11 +265,11 @@ export function createStore<T extends BaseEntity>(
 
                   // 找出本地有但 Supabase 沒有的資料（待上傳或新增的）
                   const localOnlyItems = currentItems.filter((localItem: any) => {
-                    // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-                    // if (localItem._deleted) return false;
+                    // 過濾軟刪除項目
+                    if (localItem._deleted) return false;
 
-                    // 保留有 sync_status: 'pending' 標記的本地資料（新增或修改）
-                    if (localItem.sync_status === 'pending') return true;
+                    // 保留有 _needs_sync: true 標記的本地資料（新增或修改）
+                    if (localItem._needs_sync === true) return true;
                     // 保留 Supabase 中不存在的資料
                     return !items.find((serverItem: any) => serverItem.id === localItem.id);
                   });
@@ -338,118 +380,58 @@ export function createStore<T extends BaseEntity>(
           }
         },
 
-        // 建立資料（Supabase → IndexedDB → Store，離線時降級）
+        // 建立資料（FastIn 模式：IndexedDB 優先 → 背景同步 Supabase）
         create: async (data) => {
-          // 🔧 建立獨立的 AbortController，不與 fetchAll 共用
-          const createController = new AbortController();
-
           try {
             set({ loading: true, error: null });
 
             // 生成 ID
             const id = generateUUID();
 
-            // 如果有 codePrefix，自動生成編號（但不覆蓋已存在的 code）
+            // 如果有 codePrefix，暫時使用 TBC 編號（背景同步時會取得正式編號）
             let recordData = { ...data, id } as T;
             if (codePrefix && 'code' in data) {
               const existingCode = (data as any).code;
               if (!existingCode) {
-                // 預設使用 TBC 編號（離線模式）
-                let code: string = `${codePrefix}TBC`;
-
-                // 🌐 檢查是否能連線 Supabase
-                let isOnline = false;
-                if (enableSupabase && typeof window !== 'undefined') {
-                  try {
-                    const { supabase } = await import('@/lib/supabase/client');
-                    const { data: dbItems } = await supabase.from(tableName).select('*').limit(1);
-                    isOnline = true; // 連線成功
-
-                    // 從 Supabase 查詢所有資料以生成正式編號
-                    const { data: allDbItems } = await supabase.from(tableName).select('*');
-                    const allItems = (allDbItems || []) as T[];
-                    code = generateCode({ prefix: codePrefix }, allItems);
-                  } catch {
-                    isOnline = false; // 連線失敗
-                    // 📴 離線模式：使用 TBC 編號（已在上方初始化）
-                    logger.log(`📴 [${tableName}] 離線模式：使用 TBC 編號 ${code}`);
-                  }
-                }
-
+                // FastIn 模式：一律先用 TBC 編號
+                const code: string = `${codePrefix}TBC`;
                 recordData = { ...recordData, code } as T;
+                logger.log(`⚡ [${tableName}] FastIn: 使用 TBC 編號 ${code}`);
               }
             }
 
-            // 🔧 檢查是否為可同步表，決定是否加入同步欄位
+            // 檢查是否為可同步表
             const needsSyncFields = isSyncableTable(tableName);
 
-            if (enableSupabase && typeof window !== 'undefined') {
-              // 先嘗試存到 Supabase
-              try {
-                logger.log(`☁️ [${tableName}] 同步到 Supabase...`);
-                const { supabase } = await import('@/lib/supabase/client');
+            // FastIn Step 1: 立即寫入 IndexedDB
+            recordData = needsSyncFields
+              ? withSyncFields(recordData, false) as T  // _needs_sync: true
+              : recordData;
 
-                const { data: created, error: supabaseError } = await (supabase as any)
-                  .from(tableName)
-                  .insert([recordData])
-                  .select();
+            await localDB.put(tableName, recordData);
+            logger.log(`💾 [${tableName}] FastIn: 已寫入本地 IndexedDB`);
 
-                if (supabaseError) throw supabaseError;
-
-                logger.log(`✅ [${tableName}] Supabase 新增成功`);
-
-                // 🔧 取得第一筆資料（因為 insert 回傳的是陣列）
-                const createdRecord = (created && created.length > 0) ? created[0] : recordData;
-
-                // 🔧 標記為已同步
-                recordData = needsSyncFields
-                  ? markAsSynced(createdRecord) as T
-                  : createdRecord as T;
-
-                // 🔧 立即更新 Store（不等 IndexedDB）
-                set((state) => ({
-                  items: [...state.items, recordData],
-                  loading: false,
-                }));
-
-                // 同步到 IndexedDB（背景執行）
-                localDB.put(tableName, recordData).catch(err => {
-                  logger.warn(`⚠️ [${tableName}] IndexedDB 快取失敗:`, err);
-                });
-
-                logger.log(`✅ [${tableName}] 新增完成`);
-                return recordData;
-
-              } catch (supabaseError) {
-                // 🔧 離線降級：Supabase 失敗時靜默使用 IndexedDB，標記為待同步
-                logger.warn(`⚠️ [${tableName}] 離線模式：使用 IndexedDB`);
-
-                // 標記為待同步
-                recordData = needsSyncFields
-                  ? withSyncFields(recordData, false) as T
-                  : recordData;
-
-                await localDB.put(tableName, recordData);
-                logger.log(`💾 [${tableName}] 已存入 IndexedDB:`, '1 筆（離線模式）');
-              }
-
-            } else {
-              // 只存到 IndexedDB
-              // 🔧 標記為待同步
-              recordData = needsSyncFields
-                ? withSyncFields(recordData, false) as T
-                : recordData;
-
-              await localDB.put(tableName, recordData);
-            }
-
-            // 更新 Store
+            // FastIn Step 2: 立即更新 UI
             set((state) => ({
               items: [...state.items, recordData],
               loading: false,
             }));
 
-            logger.log(`✅ [${tableName}] 新增完成`);
+            logger.log(`⚡ [${tableName}] FastIn: UI 已更新（本地資料）`);
+
+            // FastIn Step 3: 背景同步到 Supabase（不阻塞 UI）
+            if (enableSupabase && typeof window !== 'undefined' && needsSyncFields) {
+              setTimeout(async () => {
+                try {
+                  logger.log(`☁️ [${tableName}] FastIn: 開始背景同步...`);
+                  await backgroundSyncService.syncTable(tableName);
+                  logger.log(`✅ [${tableName}] FastIn: 背景同步完成`);
+                } catch (syncError) {
+                  logger.warn(`⚠️ [${tableName}] FastIn: 背景同步失敗（不影響本地資料）`, syncError);
+                }
+              }, 0);
+            }
+
             return recordData;
 
           } catch (error) {
@@ -459,67 +441,29 @@ export function createStore<T extends BaseEntity>(
           }
         },
 
-        // 更新資料（Supabase → Store → IndexedDB，離線時降級）
+        // 更新資料（FastIn 模式：IndexedDB 優先 → 背景同步 Supabase）
         update: async (id: string, data: Partial<T>) => {
           try {
             set({ loading: true, error: null });
 
-            // 🔧 檢查是否為可同步表
+            // 檢查是否為可同步表
             const needsSyncFields = isSyncableTable(tableName);
+
+            // FastIn Step 1: 準備更新資料（標記為待同步）
             let syncData = data;
-
-            if (enableSupabase && typeof window !== 'undefined') {
-              // 先嘗試更新 Supabase
-              try {
-                logger.log(`☁️ [${tableName}] 同步到 Supabase...`);
-                const { supabase } = await import('@/lib/supabase/client');
-
-                const result: any = await (supabase as any)
-                  .from(tableName)
-                  .update(data)
-                  .eq('id', id);
-
-                const { error: supabaseError } = result;
-
-                if (supabaseError) throw supabaseError;
-
-                logger.log(`✅ [${tableName}] Supabase 更新成功`);
-
-                // 🔧 標記為已同步
-                if (needsSyncFields) {
-                  syncData = markAsSynced(data) as Partial<T>;
-                }
-
-              } catch (supabaseError) {
-                // 🔧 離線降級：Supabase 失敗時靜默使用 IndexedDB，標記為待同步
-                // 標記為待同步
-                if (needsSyncFields) {
-                  syncData = {
-                    ...data,
-                    sync_status: 'pending' as any,
-                    synced_at: null as any,
-                  };
-                }
-
-                await localDB.update(tableName, id, syncData);
-                logger.log(`💾 [${tableName}] 已更新 IndexedDB: 1 筆（離線模式）`);
-              }
-
-            } else {
-              // 更新 IndexedDB
-              // 🔧 標記為待同步
-              if (needsSyncFields) {
-                syncData = {
-                  ...data,
-                  sync_status: 'pending' as any,
-                  synced_at: null as any,
-                };
-              }
-
-              await localDB.update(tableName, id, syncData);
+            if (needsSyncFields) {
+              syncData = {
+                ...data,
+                _needs_sync: true as any,
+                _synced_at: null as any,
+              };
             }
 
-            // 更新 Store 並取得更新後的項目
+            // FastIn Step 2: 立即更新 IndexedDB
+            await localDB.update(tableName, id, syncData);
+            logger.log(`💾 [${tableName}] FastIn: 已更新本地 IndexedDB`);
+
+            // FastIn Step 3: 立即更新 UI
             let updatedItem: T | undefined;
             set((state) => {
               const newItems = (state.items || []).map(item => {
@@ -536,14 +480,21 @@ export function createStore<T extends BaseEntity>(
               throw new Error('找不到要更新的項目');
             }
 
-            // 同步到 IndexedDB（背景執行）
-            if (enableSupabase) {
-              localDB.put(tableName, updatedItem).catch(err => {
-                logger.warn(`⚠️ [${tableName}] IndexedDB 快取失敗:`, err);
-              });
+            logger.log(`⚡ [${tableName}] FastIn: UI 已更新（本地資料）`);
+
+            // FastIn Step 4: 背景同步到 Supabase（不阻塞 UI）
+            if (enableSupabase && typeof window !== 'undefined' && needsSyncFields) {
+              setTimeout(async () => {
+                try {
+                  logger.log(`☁️ [${tableName}] FastIn: 開始背景同步...`);
+                  await backgroundSyncService.syncTable(tableName);
+                  logger.log(`✅ [${tableName}] FastIn: 背景同步完成`);
+                } catch (syncError) {
+                  logger.warn(`⚠️ [${tableName}] FastIn: 背景同步失敗（不影響本地資料）`, syncError);
+                }
+              }, 0);
             }
 
-            logger.log(`✅ [${tableName}] 更新完成`);
             return updatedItem;
 
           } catch (error) {
@@ -553,101 +504,56 @@ export function createStore<T extends BaseEntity>(
           }
         },
 
-        // 刪除資料（Supabase → Store → IndexedDB，離線時降級）
+        // 刪除資料（FastIn 模式：立即刪除 → 背景同步 Supabase）
         delete: async (id: string) => {
           try {
             set({ loading: true, error: null });
 
-            if (enableSupabase && typeof window !== 'undefined') {
-              // 先嘗試從 Supabase 刪除
+            // FastIn Step 1: 加入刪除隊列（用於背景同步）
+            const items = await localDB.getAll(tableName) as T[];
+            const item = items.find((i: any) => i.id === id);
+
+            if (item) {
+              // 加入刪除隊列
               try {
-                logger.log(`☁️ [${tableName}] 從 Supabase 刪除...`);
-                const { supabase } = await import('@/lib/supabase/client');
-
-                const { error: supabaseError } = await supabase
-                  .from(tableName)
-                  .delete()
-                  .eq('id', id);
-
-                if (supabaseError) throw supabaseError;
-
-                logger.log(`✅ [${tableName}] Supabase 刪除成功`);
-
-                // 🔧 立即更新 Store（不等 IndexedDB）
-                set((state) => ({
-                  items: (state.items || []).filter(item => item.id !== id),
-                  loading: false,
-                }));
-
-                // 從 IndexedDB 刪除（背景執行）
-                localDB.delete(tableName, id).catch(err => {
-                  logger.warn(`⚠️ [${tableName}] IndexedDB 清除失敗:`, err);
+                await localDB.put('syncQueue', {
+                  id: generateUUID(),
+                  table_name: tableName,
+                  record_id: id,
+                  operation: 'delete',
+                  data: item,
+                  created_at: new Date().toISOString(),
                 });
-
-                logger.log(`✅ [${tableName}] 刪除完成`);
-                return;
-
-              } catch (supabaseError) {
-                // 🔧 離線降級：靜默標記為已刪除，等待同步
-                logger.error(`❌ [${tableName}] Supabase 刪除失敗:`, supabaseError);
-
-                // 取得原始資料
-                const items = await localDB.getAll(tableName) as T[];
-                const item = items.find((i: any) => i.id === id);
-
-                if (item) {
-                  // TODO: 軟刪除機制需要重新設計
-                  // 目前暫時直接從 IndexedDB 刪除，並標記為待同步刪除
-                  // 未來應該：1. 在 Supabase 加入 deleted_at 欄位 2. 使用 soft delete
-
-                  // 標記為待同步刪除（暫時方案：加入刪除隊列）
-                  const deletedItem = {
-                    ...item,
-                    sync_status: 'pending' as any,
-                    synced_at: null as any,
-                  } as any;
-
-                  // 加入刪除隊列（使用 syncQueue 表記錄）
-                  try {
-                    await localDB.put('syncQueue', {
-                      id: generateUUID(),
-                      table_name: tableName,
-                      record_id: id,
-                      operation: 'delete',
-                      data: deletedItem,
-                      created_at: new Date().toISOString(),
-                    });
-                    logger.log(`💾 [${tableName}] 已加入刪除隊列: 1 筆（離線模式）`);
-                  } catch (queueError) {
-                    logger.warn(`⚠️ [${tableName}] 無法加入刪除隊列:`, queueError);
-                  }
-
-                  // 從 IndexedDB 刪除
-                  await localDB.delete(tableName, id);
-                }
-
-                // 🔧 立即更新 Store UI（從畫面上移除）
-                set((state) => ({
-                  items: (state.items || []).filter(item => item.id !== id),
-                  loading: false,
-                }));
-
-                logger.log(`✅ [${tableName}] 刪除完成（離線模式）`);
-                return;
+                logger.log(`📝 [${tableName}] FastIn: 已加入刪除隊列`);
+              } catch (queueError) {
+                logger.warn(`⚠️ [${tableName}] FastIn: 無法加入刪除隊列:`, queueError);
               }
-
-            } else {
-              // 從 IndexedDB 刪除
-              await localDB.delete(tableName, id);
             }
 
-            // 更新 Store
+            // FastIn Step 2: 立即從 IndexedDB 刪除
+            await localDB.delete(tableName, id);
+            logger.log(`💾 [${tableName}] FastIn: 已從本地刪除`);
+
+            // FastIn Step 3: 立即更新 UI
             set((state) => ({
               items: (state.items || []).filter(item => item.id !== id),
               loading: false,
             }));
 
-            logger.log(`✅ [${tableName}] 刪除完成`);
+            logger.log(`⚡ [${tableName}] FastIn: UI 已更新（本地刪除）`);
+
+            // FastIn Step 4: 背景同步到 Supabase（不阻塞 UI）
+            if (enableSupabase && typeof window !== 'undefined') {
+              setTimeout(async () => {
+                try {
+                  logger.log(`☁️ [${tableName}] FastIn: 開始背景同步刪除...`);
+                  await backgroundSyncService.syncTable(tableName);
+                  logger.log(`✅ [${tableName}] FastIn: 背景同步刪除完成`);
+                } catch (syncError) {
+                  logger.warn(`⚠️ [${tableName}] FastIn: 背景同步刪除失敗（不影響本地）`, syncError);
+                }
+              }, 0);
+            }
 
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : '刪除失敗';

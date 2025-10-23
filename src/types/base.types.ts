@@ -8,11 +8,6 @@
 // ============================================
 
 /**
- * SyncStatus - 同步狀態
- */
-export type SyncStatus = 'pending' | 'synced' | 'conflict';
-
-/**
  * BaseEntity - 所有實體的基礎介面
  * 包含共用的 ID 和時間戳記欄位
  */
@@ -27,12 +22,23 @@ export interface BaseEntity {
 /**
  * SyncableEntity - 可同步實體的基礎介面
  * 繼承 BaseEntity 並加入同步相關欄位
+ *
+ * FastIn 架構欄位說明：
+ * - _needs_sync: 是否需要同步到 Supabase（true = 待同步）
+ * - _synced_at: 最後同步時間（null = 尚未同步）
+ * - _deleted: 軟刪除標記（用於延遲刪除同步）
  */
 export interface SyncableEntity extends BaseEntity {
-  sync_status: SyncStatus;  // 同步狀態
-  temp_code?: string | null;  // 離線時的臨時編號
-  synced_at?: string | null;  // 最後同步時間 (ISO 8601)
+  _needs_sync: boolean;        // 是否待同步
+  _synced_at: string | null;   // 最後同步時間 (ISO 8601)
+  _deleted?: boolean;          // 軟刪除標記
 }
+
+/**
+ * @deprecated 舊版同步狀態型別，已改用 _needs_sync 布林值
+ * 保留此型別以維持向後相容
+ */
+export type SyncStatus = 'pending' | 'synced' | 'conflict';
 
 // ============================================
 // 分頁相關型別
