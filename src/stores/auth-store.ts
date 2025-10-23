@@ -252,63 +252,9 @@ export const useAuthStore = create<AuthState>(
 
       if (queryError || !employees) {
         logger.error('❌ Supabase 查詢失敗:', queryError?.message);
-        logger.warn('⚠️ 嘗試降級到 IndexedDB 本地驗證...');
-
-        // 🔄 降級到 IndexedDB 驗證（如果有本地資料）
-        try {
-          const { localDB } = await import('@/lib/db');
-          const { TABLES } = await import('@/lib/db/schemas');
-
-          // 從 IndexedDB 查詢員工
-          const allEmployees = await localDB.getAll<any>(TABLES.EMPLOYEES);
-          const localEmployee = allEmployees.find((emp: any) => emp.employee_number === username);
-
-          if (!localEmployee || !localEmployee.password_hash) {
-            logger.error('❌ IndexedDB 也沒有此用戶或密碼');
-            recordLoginAttempt(username, false);
-            return { success: false, message: '帳號或密碼錯誤' };
-          }
-
-          // 驗證密碼
-          const bcrypt = (await import('bcryptjs')).default;
-          const isValidPassword = await bcrypt.compare(password, localEmployee.password_hash);
-
-          if (!isValidPassword) {
-            logger.error('❌ 本地密碼驗證失敗');
-            recordLoginAttempt(username, false);
-            return { success: false, message: '帳號或密碼錯誤' };
-          }
-
-          // ✅ 本地驗證成功！
-          logger.log('✅ 使用本地資料登入成功');
-          recordLoginAttempt(username, true);
-
-          const user: User = {
-            id: localEmployee.id,
-            employee_number: localEmployee.employee_number,
-            english_name: localEmployee.english_name,
-            display_name: localEmployee.display_name,
-            chinese_name: localEmployee.chinese_name || localEmployee.display_name,
-            personal_info: localEmployee.personal_info || {},
-            job_info: localEmployee.job_info || {},
-            salary_info: localEmployee.salary_info || {},
-            permissions: localEmployee.permissions || [],
-            roles: localEmployee.roles || [],
-            attendance: localEmployee.attendance || { leave_records: [], overtime_records: [] },
-            contracts: localEmployee.contracts || [],
-            status: localEmployee.status,
-            created_at: localEmployee.created_at || new Date().toISOString(),
-            updated_at: localEmployee.updated_at || new Date().toISOString()
-          };
-
-          set({ user, isAuthenticated: true, isOfflineMode: true });
-          return { success: true };
-
-        } catch (fallbackError) {
-          logger.error('❌ 降級到本地驗證也失敗:', fallbackError);
-          recordLoginAttempt(username, false);
-          return { success: false, message: '帳號或密碼錯誤' };
-        }
+        logger.error('   完整錯誤:', queryError);
+        recordLoginAttempt(username, false);
+        return { success: false, message: '帳號或密碼錯誤' };
       }
 
       const employeeData = employees as any;
