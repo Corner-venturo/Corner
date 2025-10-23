@@ -113,7 +113,7 @@ export default function QuotesPage() {
           'text-sm font-medium',
           getStatusColor(quote.status)
         )}>
-          {QUOTE_STATUS_LABELS[quote.status] || quote.status}
+          {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] || quote.status}
         </span>
       ),
     },
