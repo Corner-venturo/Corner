@@ -1,8 +1,14 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { Database } from './types'
 
+// 🔍 診斷：檢查環境變數
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
+
+console.log('🔍 Supabase 環境變數診斷：');
+console.log('  NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl);
+console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? `${supabaseAnonKey.slice(0, 20)}...` : 'undefined');
+console.log('  來源:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'from env' : 'using placeholder');
 
 // 簡單的單例模式，避免複雜的 Proxy
 // 🔧 新增：fetch timeout 防止請求卡住
