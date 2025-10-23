@@ -73,7 +73,7 @@ export default function CalendarPage() {
   const { settings } = useCalendarStore()
 
   // CalendarEventStore（管理事件資料）
-  const { items: calendarEvents, create: addEvent, remove: deleteEvent } = useCalendarEventStore()
+  const { items: calendarEvents, create: addEvent, delete: deleteEvent } = useCalendarEventStore()
 
   const [moreEventsDialog, setMoreEventsDialog] = useState<{
     open: boolean
