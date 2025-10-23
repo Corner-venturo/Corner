@@ -991,9 +991,9 @@ export default function QuoteDetailPage() {
       departure_date: departure_date.toISOString().split('T')[0],
       return_date: return_date.toISOString().split('T')[0],
       price: Math.round(total_cost / groupSize), // 每人單價
-      status: '提案',
+      status: 'draft',
       code: tourCode,
-      contract_status: '未簽署',
+      contract_status: 'pending',
       total_revenue: 0,
       total_cost: total_cost,
       profit: 0,

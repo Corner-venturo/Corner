@@ -154,7 +154,7 @@ export default function ToursPage() {
     departure_date: '',
     return_date: '',
     price: 0,
-    status: '提案',
+    status: 'draft',
     isSpecial: false,
     max_participants: 20,
     description: '',
@@ -320,7 +320,7 @@ export default function ToursPage() {
       departure_date: '',
       return_date: '',
       price: 0,
-      status: '提案',
+      status: 'draft',
       isSpecial: false,
       max_participants: 20,
       description: '',
@@ -1145,8 +1145,8 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
   const { items: orders } = useOrderStore();
   const { items: members } = useMemberStore();
 
-  // 找到該旅遊團的報價單（通常取最新的或最終版本）
-  const tourQuote = quotes.find((quote: any) => quote.tour_id === tour.id && quote.status === '最終版本') ||
+  // 找到該旅遊團的報價單（通常取最新的或已核准版本）
+  const tourQuote = quotes.find((quote: any) => quote.tour_id === tour.id && quote.status === 'approved') ||
                    quotes.find((quote: any) => quote.tour_id === tour.id);
 
   // 計算該旅遊團的訂單資訊

@@ -57,7 +57,7 @@ export default function QuotesPage() {
           console.log('📋 自動開啟新增對話框，團名:', tour.name);
           setNewQuote({
             name: tour.name,
-            status: '提案',
+            status: 'proposed',
             group_size: tour.max_participants || 1,
           });
           setIsAddDialogOpen(true);
@@ -195,7 +195,7 @@ export default function QuotesPage() {
       // 重置表單並關閉對話框
       setNewQuote({
         name: '',
-        status: '提案',
+        status: 'proposed',
         group_size: 1,
       });
       setIsAddDialogOpen(false);
