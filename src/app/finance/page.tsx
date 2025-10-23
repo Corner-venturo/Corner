@@ -234,9 +234,9 @@ export default function FinancePage() {
           columns={transactionColumns}
           data={recentPayments}
         />
+      </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }
