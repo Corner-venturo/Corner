@@ -464,6 +464,14 @@ export class LocalDatabase {
     const db = await this.ensureInit();
 
     return new Promise((resolve, reject) => {
+      // 檢查資料表是否存在
+      if (!db.objectStoreNames.contains(tableName)) {
+        console.error(`[LocalDB] getAll - 資料表不存在: ${tableName}`);
+        console.log('[LocalDB] 可用的資料表:', Array.from(db.objectStoreNames));
+        reject(new Error(`資料表不存在: ${tableName}`));
+        return;
+      }
+
       const transaction = db.transaction(tableName, 'readonly');
       const objectStore = transaction.objectStore(tableName);
       const request = objectStore.getAll();

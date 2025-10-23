@@ -153,11 +153,21 @@ export const useAuthStore = create<AuthState>(
 
           const employee = await localDB.read(TABLES.EMPLOYEES, existingProfile.id) as any;
 
-          if (!employee || !employee.password_hash) {
-            logger.error('❌ IndexedDB 資料不完整，需要重新從網路登入');
-            // 刪除損壞的角色卡
+          if (!employee) {
+            logger.error('❌ IndexedDB 找不到員工資料');
             localAuthStore.removeProfile(existingProfile.id);
             return { success: false, message: '本地資料已損壞，請連線網路後重新登入' };
+          }
+
+          // 🔍 檢查資料格式（統一使用 snake_case）
+          if (!employee.password_hash || !employee.employee_number || !employee.display_name) {
+            logger.error('❌ IndexedDB 資料格式錯誤（應為 snake_case）');
+            logger.error('   請開啟 http://localhost:3000/check-db.html 清空資料庫');
+            localAuthStore.removeProfile(existingProfile.id);
+            return {
+              success: false,
+              message: '本地資料格式錯誤，請連線網路後重新登入\n（或訪問 /check-db.html 清空資料庫）'
+            };
           }
 
           // 檢查員工狀態
@@ -190,7 +200,7 @@ export const useAuthStore = create<AuthState>(
             job_info: employee.job_info || {},
             salary_info: employee.salary_info || {},
             permissions: employee.permissions || [],
-            roles: employee.roles || [], // 附加身份標籤
+            roles: employee.roles || [],
             attendance: employee.attendance || { leave_records: [], overtime_records: [] },
             contracts: employee.contracts || [],
             status: employee.status,
