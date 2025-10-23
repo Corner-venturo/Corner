@@ -143,10 +143,7 @@ export function createStore<T extends BaseEntity>(
     };
   }
 
-  const { tableName: table, codePrefix: prefix, enableSupabase: supabaseEnabled, fastInsert } = config;
-  const tableName = table;
-  const codePrefix = prefix;
-  const enableSupabase = supabaseEnabled;
+  const { tableName, codePrefix, enableSupabase, fastInsert } = config;
   const store = create<StoreState<T>>()(
     persist(
       (set, get) => ({
