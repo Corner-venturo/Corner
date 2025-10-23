@@ -18,7 +18,7 @@ import {
   Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Supplier } from '@/stores/types';
+import { Supplier } from '@/types/supplier.types';
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table';
 import { supplierService } from '@/features/suppliers/services/supplier.service';
 import { useRegionStore } from '@/stores';

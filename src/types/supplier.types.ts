@@ -2,7 +2,7 @@
  * 供應商管理類型定義
  */
 
-import type { BaseEntity } from './base.types';
+import type { BaseEntity, SyncableEntity } from './base.types';
 
 export interface SupplierContact {
   contact_person: string;
@@ -31,7 +31,7 @@ export interface PriceListItem extends BaseEntity {
   note?: string;
 }
 
-export interface Supplier extends BaseEntity {
+export interface Supplier extends SyncableEntity {
   supplier_code?: string; // 供應商編號
   name: string;
   country?: string; // 國家
