@@ -51,7 +51,7 @@ class QuoteService extends BaseService<Quote> {
     const duplicated = await store.create({
       ...rest,
       name: `${original.name} (副本)`,
-      status: '提案'
+      status: 'proposed'
     } as any);
 
     return duplicated;

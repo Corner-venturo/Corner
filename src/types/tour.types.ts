@@ -25,6 +25,7 @@ export interface Tour extends BaseEntity {
   total_revenue: number;     // 總收入
   total_cost: number;        // 總成本
   profit: number;            // 利潤
+  description?: string;      // 團體說明/描述
   quote_id?: string;         // 關聯的報價單ID
   quote_cost_structure?: any[]; // 報價成本結構快照
 }
@@ -48,8 +49,9 @@ export type TourStatus =
  * ContractStatus - 合約狀態（英文）
  */
 export type ContractStatus =
-  | 'unsigned'  // 未簽署
-  | 'signed';   // 已簽署
+  | 'pending'  // 未簽署
+  | 'partial'  // 部分簽署
+  | 'signed';  // 已簽署
 
 /**
  * TourCategory - 旅遊團分類

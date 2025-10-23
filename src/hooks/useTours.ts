@@ -122,7 +122,7 @@ export function useTours() {
    */
   const canEditTour = (tour: Tour): boolean => {
     // 只有提案和進行中的團可以編輯
-    return tour.status === '提案' || tour.status === '進行中';
+    return tour.status === 'draft' || tour.status === 'active';
   };
 
   /**
@@ -130,7 +130,7 @@ export function useTours() {
    */
   const canDeleteTour = (tour: Tour): boolean => {
     // 只有提案狀態可以刪除
-    return tour.status === '提案';
+    return tour.status === 'draft';
   };
 
   /**
@@ -138,7 +138,7 @@ export function useTours() {
    */
   const canCancelTour = (tour: Tour): boolean => {
     // 提案和進行中的團可以取消
-    return tour.status === '提案' || tour.status === '進行中';
+    return tour.status === 'draft' || tour.status === 'active';
   };
 
   /**
@@ -213,7 +213,7 @@ export function useTours() {
     // 4. 組合完整資料
     const tourData: Omit<CreateTourData, 'code'> = {
       ...data,
-      status: data.status || '提案',
+      status: data.status || 'draft',
     };
 
     // 5. 呼叫 Store
@@ -300,11 +300,11 @@ export function useTours() {
       throw new Error('旅遊團不存在');
     }
 
-    if (tour.status !== '進行中') {
+    if (tour.status !== 'active') {
       throw new Error('只有進行中的旅遊團可以完成');
     }
 
-    return await store.update(id, { status: '待結案' });
+    return await store.update(id, { status: 'pending_close' });
   };
 
   // ============================================
@@ -315,14 +315,14 @@ export function useTours() {
    * 取得進行中的旅遊團
    */
   const getActiveTours = useMemo(() => {
-    return store.items.filter((tour) => tour.status === '進行中');
+    return store.items.filter((tour) => tour.status === 'active');
   }, [store.items]);
 
   /**
    * 取得草稿旅遊團
    */
   const getDraftTours = useMemo(() => {
-    return store.items.filter((tour) => tour.status === '提案');
+    return store.items.filter((tour) => tour.status === 'draft');
   }, [store.items]);
 
   /**

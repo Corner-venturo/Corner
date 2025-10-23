@@ -78,8 +78,8 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
     {
       title: '合約狀態',
       value: tour.contract_status,
-      icon: tour.contract_status === '已簽署' ? CheckCircle : AlertCircle,
-      color: tour.contract_status === '已簽署' ? 'text-morandi-green' : 'text-morandi-red'
+      icon: tour.contract_status === 'signed' ? CheckCircle : AlertCircle,
+      color: tour.contract_status === 'signed' ? 'text-morandi-green' : 'text-morandi-red'
     },
     {
       title: '總收入',

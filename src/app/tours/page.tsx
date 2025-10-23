@@ -412,7 +412,7 @@ export default function ToursPage() {
         price: newTour.price,
         max_participants: newTour.max_participants,
         code,
-        contract_status: '未簽署' as const,
+        contract_status: 'pending' as const,
         total_revenue: 0,
         total_cost: 0,
         profit: 0,

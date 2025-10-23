@@ -264,11 +264,11 @@ class TourService extends BaseService<Tour> {
       name: `${targetYear}年度簽證專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: '特殊團',
+      status: 'special',
       location: '簽證專用',
       price: 0,
       max_participants: 9999,
-      contract_status: '未簽署',
+      contract_status: 'pending',
       total_revenue: 0,
       total_cost: 0,
       profit: 0,
@@ -287,7 +287,7 @@ class TourService extends BaseService<Tour> {
     const allTours = await this.list();
     return {
       ...allTours,
-      data: allTours.data.filter(tour => tour.status !== '特殊團')
+      data: allTours.data.filter(tour => tour.status !== 'special')
     };
   }
 }
