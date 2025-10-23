@@ -149,40 +149,9 @@ export interface FlightInfo {
   duration?: string;  // 飛行時間（如：2小時5分）
 }
 
-export interface Tour {
-  id: string;
-  code: string;
-  name: string;
-  departure_date: string;
-  return_date: string;
-  status: 'draft' | 'active' | 'pending_close' | 'closed' | 'cancelled' | 'special';
-  // draft: 提案
-  // active: 進行中
-  // pending_close: 待結案
-  // closed: 結案
-  // cancelled: 已取消
-  // special: 特殊團
-  location: string;
-  price: number;
-  max_participants: number; // 最大參與人數
-  contract_status: 'pending' | 'partial' | 'signed';
-  // pending: 未簽署
-  // partial: 部分簽署
-  // signed: 已簽署
-  total_revenue: number;
-  total_cost: number;
-  profit: number;
-  quote_id?: string; // 關聯的報價單ID
-  quote_cost_structure?: QuoteCategory[]; // 報價成本結構快照
-  archived?: boolean; // 是否已封存
-
-  // 航班資訊（選填）
-  outboundFlight?: FlightInfo;  // 去程航班
-  returnFlight?: FlightInfo;  // 回程航班
-
-  created_at: string;
-  updated_at: string;
-}
+// Tour 類型已移至 @/types/tour.types.ts
+// 使用完整的 Tour 定義
+export type { Tour } from '@/types/tour.types';
 
 export interface Member {
   id: string;
@@ -332,32 +301,9 @@ export interface Itinerary {
   updated_at: string;
 }
 
-export interface Order {
-  id: string;
-  order_number: string;
-  tour_id: string;
-  code: string;
-  tour_name: string;
-  contact_person: string;
-  sales_person: string;
-  assistant: string;
-  member_count: number; // 訂單人數
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  // pending: 待確認
-  // confirmed: 已確認
-  // completed: 已完成
-  // cancelled: 已取消
-  payment_status: 'unpaid' | 'partial' | 'paid' | 'refunded';
-  // unpaid: 未收款
-  // partial: 部分收款
-  // paid: 已收款
-  // refunded: 已退款
-  total_amount: number;
-  paid_amount: number;
-  remaining_amount: number;
-  created_at: string;
-  updated_at: string;
-}
+// Order 類型已移至 @/types/order.types.ts
+// 使用完整的 Order 定義
+export type { Order } from '@/types/order.types';
 
 // Customer 類型已移至 @/types/customer.types.ts
 // 使用完整的 Customer 定義，不再使用簡化版

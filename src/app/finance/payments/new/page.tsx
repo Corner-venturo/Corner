@@ -63,7 +63,7 @@ export default function NewReceiptPage() {
   // 過濾可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
     return orders.filter(order =>
-      order.payment_status === '未收款' || order.payment_status === '部分收款'
+      order.payment_status === 'unpaid' || order.payment_status === 'partial'
     );
   }, [orders]);
 

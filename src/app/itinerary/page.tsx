@@ -85,11 +85,11 @@ export default function ItineraryPage() {
       render: (value, itinerary: Itinerary) => (
         <span className={cn(
           'text-sm font-medium',
-          itinerary.status === '已發布'
+          itinerary.status === 'published'
             ? 'text-green-600'
             : 'text-gray-600'
         )}>
-          {itinerary.status}
+          {itinerary.status === 'published' ? '已發布' : '草稿'}
         </span>
       ),
     },

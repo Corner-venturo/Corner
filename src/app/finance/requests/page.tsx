@@ -189,8 +189,8 @@ export default function RequestsPage() {
           bValue = b.request_number;
           break;
         case 'tour_name':
-          aValue = a.tour_name;
-          bValue = b.tour_name;
+          aValue = a.tour_name || '';
+          bValue = b.tour_name || '';
           break;
         case 'order_number':
           aValue = a.order_number || '';
@@ -222,7 +222,7 @@ export default function RequestsPage() {
     return data.filter(request => {
       return (
         (!filters.request_number || request.request_number.toLowerCase().includes(filters.request_number.toLowerCase())) &&
-        (!filters.tour_name || request.tour_name.toLowerCase().includes(filters.tour_name.toLowerCase())) &&
+        (!filters.tour_name || (request.tour_name || '').toLowerCase().includes(filters.tour_name.toLowerCase())) &&
         (!filters.order_number || (request.order_number || '').toLowerCase().includes(filters.order_number.toLowerCase())) &&
         (!filters.request_date || (request.request_date || '').includes(filters.request_date)) &&
         (!filters.total_amount || request.total_amount.toString().includes(filters.total_amount)) &&

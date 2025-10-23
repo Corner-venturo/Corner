@@ -13,19 +13,17 @@ import { SimpleOrderTable } from '@/components/orders/simple-order-table';
 import { AddOrderForm } from '@/components/orders/add-order-form';
 import { cn } from '@/lib/utils';
 
-const statusFilters = ['全部', '未收款', '部分收款', '已收款'];
-
 export default function OrdersPage() {
   const router = useRouter();
   const { items: orders, create: addOrder } = useOrderStore();
   const { items: tours } = useTourStore();
-  const [statusFilter, setStatusFilter] = useState('全部');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [tourFilter, setTourFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const filteredOrders = orders.filter(order => {
-    const matchesStatus = statusFilter === '全部' || order.payment_status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || order.payment_status === statusFilter;
     const matchesTour = !tourFilter || order.tour_id === tourFilter;
 
     const searchLower = searchQuery.toLowerCase();
@@ -54,7 +52,7 @@ export default function OrdersPage() {
       const daysUntilDeparture = Math.ceil((departure_date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       // 1. 即將出發但未收齊款項
-      if (daysUntilDeparture <= 7 && daysUntilDeparture >= 0 && order.payment_status !== '已收款') {
+      if (daysUntilDeparture <= 7 && daysUntilDeparture >= 0 && order.payment_status !== 'paid') {
         result.push({
           type: 'payment',
           priority: 'high',
@@ -64,7 +62,7 @@ export default function OrdersPage() {
       }
 
       // 2. 未收款超過30天
-      if (order.payment_status === '未收款') {
+      if (order.payment_status === 'unpaid') {
         const orderDate = new Date(order.created_at || today);
         const daysOverdue = Math.ceil((today.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
         if (daysOverdue > 30) {
@@ -78,7 +76,7 @@ export default function OrdersPage() {
       }
 
       // 3. 部分收款提醒
-      if (order.payment_status === '部分收款' && daysUntilDeparture <= 14 && daysUntilDeparture >= 0) {
+      if (order.payment_status === 'partial' && daysUntilDeparture <= 14 && daysUntilDeparture >= 0) {
         result.push({
           type: 'partial',
           priority: 'medium',
@@ -143,10 +141,10 @@ export default function OrdersPage() {
         onSearchChange={setSearchQuery}
         searchPlaceholder="搜尋訂單..."
         tabs={[
-          { value: '全部', label: '全部', icon: ShoppingCart },
-          { value: '未收款', label: '未收款', icon: AlertCircle },
-          { value: '部分收款', label: '部分收款', icon: Clock },
-          { value: '已收款', label: '已收款', icon: CheckCircle }
+          { value: 'all', label: '全部', icon: ShoppingCart },
+          { value: 'unpaid', label: '未收款', icon: AlertCircle },
+          { value: 'partial', label: '部分收款', icon: Clock },
+          { value: 'paid', label: '已收款', icon: CheckCircle }
         ]}
         activeTab={statusFilter}
         onTabChange={setStatusFilter}

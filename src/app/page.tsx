@@ -774,7 +774,7 @@ function StatsWidget() {
   };
 
   // 過濾掉特殊團
-  const normalTours = tours.filter(t => !t.is_special);
+  const normalTours = tours.filter(t => t.status !== 'special');
 
   // 計算本週時間範圍
   const today = new Date();
@@ -842,7 +842,7 @@ function StatsWidget() {
 
   // 待辦事項數量（簡化版：未收齊款且即將出發的訂單，排除特殊團）
   const todosCount = orders.filter(order => {
-    if (order.payment_status === '已收款') return false;
+    if (order.payment_status === 'paid') return false;
     const tour = normalTours.find(t => t.id === order.tour_id);
     if (!tour) return false;
     const departureDate = new Date(tour.departure_date);

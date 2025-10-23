@@ -23,12 +23,14 @@ import type {
   DisbursementOrder,
   Todo,
   Visa,
-  Supplier,
   Payment,
   Quote,
   QuoteItem,
   Itinerary,
 } from './types';
+
+// Supplier 從標準 types 匯入（完整定義含 supplier_code, country, location）
+import type { Supplier } from '@/types/supplier.types';
 
 // ============================================
 // 業務實體 Stores（有編號前綴）
