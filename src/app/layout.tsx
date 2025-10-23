@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import { NetworkMonitorInitializer } from "@/components/network-monitor-initializer";
 import { ErrorLogger } from '@/components/ErrorLogger';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AppInitializer } from '@/components/AppInitializer';
 // import { DevAutoLogin } from '@/components/dev-auto-login'; // 停用自動登入
 
 export const dynamic = 'force-dynamic';
@@ -39,16 +40,18 @@ export default function RootLayout({
       >
         <ErrorLogger />
         <NetworkMonitorInitializer />
-        <ErrorBoundary>
-          <ThemeProvider>
-            <MainLayout>
-              <AuthProvider>
-                {/* <DevAutoLogin /> 停用自動登入 */}
-                {children}
-              </AuthProvider>
-            </MainLayout>
-          </ThemeProvider>
-        </ErrorBoundary>
+        <AppInitializer>
+          <ErrorBoundary>
+            <ThemeProvider>
+              <MainLayout>
+                <AuthProvider>
+                  {/* <DevAutoLogin /> 停用自動登入 */}
+                  {children}
+                </AuthProvider>
+              </MainLayout>
+            </ThemeProvider>
+          </ErrorBoundary>
+        </AppInitializer>
       </body>
     </html>
   );
