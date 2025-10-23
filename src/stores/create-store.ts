@@ -174,8 +174,8 @@ export function createStore<T extends BaseEntity>(
             if (enableSupabase && typeof window !== 'undefined') {
               // 1. 先從 IndexedDB 讀取
               let cachedItems = await localDB.getAll(tableName) as T[];
-              // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-              // cachedItems = cachedItems.filter((item: any) => !item._deleted);
+              // 過濾軟刪除的項目
+              cachedItems = cachedItems.filter((item: any) => !item._deleted);
 
               // 2. 檢查是否需要首次初始化下載
               const initFlag = `${tableName}_initialized`;
@@ -195,8 +195,8 @@ export function createStore<T extends BaseEntity>(
 
                   if (!supabaseError && data) {
                     let items = (data || []) as T[];
-                    // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-                    // items = items.filter((item: any) => !item._deleted);
+                    // 過濾軟刪除的項目
+                    items = items.filter((item: any) => !item._deleted);
 
                     // 批次存入 IndexedDB
                     for (const item of items) {

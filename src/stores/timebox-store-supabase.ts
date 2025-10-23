@@ -1,3 +1,23 @@
+/**
+ * ⚠️ EXPERIMENTAL - NOT IN USE ⚠️
+ *
+ * 這是實驗性的 Supabase 版時間箱 Store，目前未被使用。
+ *
+ * 現況：
+ * - 所有頁面使用 timebox-store.ts（本地 persist 版本）
+ * - 此檔案採用 VenturoAPI + currentUserId 非同步流程
+ * - 欄位結構與 timebox-store.ts 不同（user_id vs 無用戶欄位）
+ * - 沒有任何地方載入此模組
+ *
+ * 使用中的版本：src/stores/timebox-store.ts
+ *
+ * 決策待定：
+ * 1. 如要啟用 Supabase 版，需同步更新所有 UI 為非同步流程
+ * 2. 如不啟用，建議重新命名或搬移到 experimental/ 目錄
+ *
+ * 此檔案保留作為未來整合 Supabase 的參考實作。
+ */
+
 import { create } from 'zustand'
 
 import { VenturoAPI } from '@/lib/supabase/api'

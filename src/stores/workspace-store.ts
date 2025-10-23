@@ -56,26 +56,6 @@ export interface ChannelGroup {
   created_at?: string;
 }
 
-interface AdvanceList {
-  id: string;
-  channel_id: string;
-  author_id: string;
-  items: Array<{
-    id: string;
-    name: string;
-    amount: number;
-    payer_id?: string;
-    payer_name?: string;
-    note?: string;
-  }>;
-  created_at: string;
-  author?: {
-    id: string;
-    display_name: string;
-    avatar?: string;
-  };
-}
-
 interface Message {
   id: string;
   channel_id: string;

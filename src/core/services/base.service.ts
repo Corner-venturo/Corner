@@ -1,12 +1,16 @@
 import { BaseEntity, PageRequest, PageResponse } from '@/core/types/common';
 import { NotFoundError, ValidationError } from '@/core/errors/app-errors';
 
+/**
+ * Store 操作介面（FastIn 架構 - 非同步版本）
+ * 所有 CRUD 操作都回傳 Promise，配合 createStore 的非同步實作
+ */
 export interface StoreOperations<T> {
   getAll: () => T[];
   getById: (id: string) => T | undefined;
-  add: (entity: T) => void;
-  update: (id: string, data: Partial<T>) => void;
-  delete: (id: string) => void;
+  add: (entity: T) => Promise<T | undefined>;
+  update: (id: string, data: Partial<T>) => Promise<void>;
+  delete: (id: string) => Promise<void>;
 }
 
 export abstract class BaseService<T extends BaseEntity> {
@@ -45,14 +49,14 @@ export abstract class BaseService<T extends BaseEntity> {
         updated_at: this.now(),
       } as T;
 
-      // 開發階段：直接更新 store
+      // FastIn 架構：await store 操作確保寫入完成
       const store = this.getStore();
-      store.add(entity);
+      const result = await store.add(entity);
 
       // 未來：調用 API
       // const response = await api.post(`/${this.resourceName}`, data);
 
-      return entity;
+      return result || entity;
     } catch (error) {
       throw error instanceof Error ? error : new Error(`Failed to create ${this.resourceName}`);
     }
@@ -135,7 +139,8 @@ export abstract class BaseService<T extends BaseEntity> {
         updated_at: this.now(),
       } as T;
 
-      store.update(id, updated);
+      // FastIn 架構：await store 操作確保寫入完成
+      await store.update(id, updated);
       return updated;
     } catch (error) {
       throw error instanceof Error ? error : new Error(`Failed to update ${this.resourceName}`);
@@ -152,7 +157,8 @@ export abstract class BaseService<T extends BaseEntity> {
         throw new NotFoundError(this.resourceName, id);
       }
 
-      store.delete(id);
+      // FastIn 架構：await store 操作確保寫入完成
+      await store.delete(id);
       return true;
     } catch (error) {
       throw error instanceof Error ? error : new Error(`Failed to delete ${this.resourceName}`);

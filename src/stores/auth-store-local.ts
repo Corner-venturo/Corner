@@ -1,3 +1,21 @@
+/**
+ * ⚠️ LEGACY CODE - DO NOT USE ⚠️
+ *
+ * 這是舊版的本地認證 Store，已被 src/stores/auth-store.ts 取代。
+ *
+ * 問題：
+ * - 只使用 sessionStorage，沒有整合線上驗證
+ * - 缺少角色卡（Role Card）功能
+ * - 沒有離線登入機制
+ * - 不支援安全 cookie
+ * - 與新版 useAuthStore 名稱衝突
+ *
+ * 新版位置：src/stores/auth-store.ts
+ * 使用方式：import { useAuthStore } from '@/stores/auth-store';
+ *
+ * 此檔案僅保留作為歷史參考，請勿引用！
+ */
+
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 

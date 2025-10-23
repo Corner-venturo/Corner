@@ -1,9 +1,10 @@
 /**
- * 同步狀態服務
+ * 同步狀態服務（FastIn 架構版本）
  * 提供針對單一表的同步狀態檢查
  */
 
 import { localDB } from '@/lib/db';
+import { TABLES } from '@/lib/db/schemas';
 import { useState, useCallback } from 'react';
 
 /**
@@ -15,8 +16,7 @@ export async function checkPendingCount(tableName: string): Promise<number> {
   try {
     const items = await localDB.getAll(tableName);
     const pending = items.filter((item: any) =>
-      item.sync_status === 'pending' ||
-      item._needs_sync ||
+      item._needs_sync === true ||
       (item.code && item.code.endsWith('TBC'))
     );
     return pending.length;
@@ -45,8 +45,8 @@ export function useSyncStatus() {
     setOnline(isOnline());
 
     try {
-      // 檢查所有表的待同步數量
-      const tables = ['tours', 'orders', 'members'];
+      // 檢查所有表的待同步數量（動態讀取 TABLES）
+      const tables = Object.values(TABLES);
       let total = 0;
       for (const table of tables) {
         const count = await checkPendingCount(table);

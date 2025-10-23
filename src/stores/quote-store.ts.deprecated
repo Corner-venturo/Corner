@@ -1,3 +1,20 @@
+/**
+ * ⚠️ LEGACY CODE - DO NOT USE ⚠️
+ *
+ * 這是舊版的報價單 Store，已被 src/stores/index.ts 中的 createStore 工廠取代。
+ *
+ * 問題：
+ * - 使用已廢棄的 createDataStoreMethods
+ * - 不支援 FastIn 架構
+ * - 沒有 _needs_sync 同步欄位
+ * - 與新版 useQuoteStore 名稱衝突
+ *
+ * 新版位置：src/stores/index.ts
+ * 使用方式：import { useQuoteStore } from '@/stores';
+ *
+ * 此檔案僅保留作為歷史參考，請勿引用！
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Quote } from './types';
