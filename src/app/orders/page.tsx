@@ -119,7 +119,7 @@ export default function OrdersPage() {
       member_count: orderData.member_count,
       total_amount: orderData.total_amount,
       paid_amount: 0,
-      payment_status: '未收款',
+      payment_status: 'unpaid',
       remaining_amount: orderData.total_amount
     } as any);
 

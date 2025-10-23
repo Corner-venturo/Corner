@@ -14,8 +14,8 @@ export interface Visa extends BaseEntity {
   visa_type: string; // 簽證類型（護照 成人、台胞證等）
   country: string; // 國家
 
-  // 狀態
-  status: '待送件' | '已送件' | '已下件' | '已取件' | '退件';
+  // 狀態（英文值，UI 顯示使用 VISA_STATUS_MAP 映射）
+  status: 'pending' | 'submitted' | 'issued' | 'collected' | 'rejected';
 
   // 日期
   submission_date?: string; // 送件時間

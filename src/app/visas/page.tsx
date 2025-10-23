@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { Visa } from '@/stores/types';
 import { logger } from '@/lib/utils/logger';
 import { tourService } from '@/features/tours/services/tour.service';
+import { VISA_STATUS_MAP, getVisaStatusLabel } from '@/constants/status-maps';
 
 export default function VisasPage() {
   const { items: visas, create: addVisa, update: updateVisa, delete: deleteVisa } = useVisaStore();
@@ -295,7 +296,7 @@ export default function VisasPage() {
         received_date: applicant.received_date,
         fee,
         cost: total_cost,
-        status: '待送件',
+        status: 'pending',
         order_id: targetOrder.id,
         order_number: targetOrder.order_number,
         tour_id: selectedTour.id,
@@ -336,7 +337,7 @@ export default function VisasPage() {
 
     // 使用標準 API 批次更新
     for (const id of selectedRows) {
-      await updateVisa(id, { status: '已送件', submission_date: today });
+      await updateVisa(id, { status: 'submitted', submission_date: today });
     }
 
     setSelectedRows([]);
@@ -345,11 +346,11 @@ export default function VisasPage() {
   // 狀態徽章樣式
   const getStatusBadge = (status: Visa['status']) => {
     const badges: Record<Visa['status'], string> = {
-      '待送件': 'bg-morandi-gold/20 text-morandi-gold',
-      '已送件': 'bg-morandi-blue/20 text-morandi-blue',
-      '已下件': 'bg-morandi-green/20 text-morandi-green',
-      '已取件': 'bg-morandi-container text-morandi-secondary',
-      '退件': 'bg-morandi-red/20 text-morandi-red',
+      'pending': 'bg-morandi-gold/20 text-morandi-gold',
+      'submitted': 'bg-morandi-blue/20 text-morandi-blue',
+      'issued': 'bg-morandi-green/20 text-morandi-green',
+      'collected': 'bg-morandi-container text-morandi-secondary',
+      'rejected': 'bg-morandi-red/20 text-morandi-red',
     };
     return badges[status] || 'bg-morandi-container text-morandi-secondary';
   };
@@ -383,11 +384,11 @@ export default function VisasPage() {
       render: (value, visa) => (
         <span className={cn(
           'text-sm font-medium',
-          visa.status === '已送件' ? 'text-morandi-gold' :
-          visa.status === '已下件' ? 'text-morandi-green' :
+          visa.status === 'submitted' ? 'text-morandi-gold' :
+          visa.status === 'issued' ? 'text-morandi-green' :
           'text-morandi-secondary'
         )}>
-          {visa.status}
+          {getVisaStatusLabel(visa.status)}
         </span>
       ),
     },
@@ -449,13 +450,12 @@ export default function VisasPage() {
         addLabel="新增簽證"
         tabs={[
           { value: 'all', label: '全部', icon: FileText },
-          { value: '待送件', label: '待送件', icon: Clock },
-          { value: '已送件', label: '已送件', icon: AlertCircle },
-          { value: '已下件', label: '已下件', icon: CheckCircle },
-          { value: '已取件', label: '已取件', icon: FileCheck },
-          { value: '退件', label: '退件', icon: XCircle },
-        ]}
-        activeTab={activeTab}
+          { value: 'pending', label: '待送件', icon: Clock },
+          { value: 'submitted', label: '已送件', icon: AlertCircle },
+          { value: 'issued', label: '已下件', icon: CheckCircle },
+          { value: 'collected', label: '已取件', icon: FileCheck },
+          { value: 'rejected', label: '退件', icon: XCircle },
+        ]}        activeTab={activeTab}
         onTabChange={setActiveTab}
       />
 

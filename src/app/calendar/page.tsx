@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { useTourStore, useOrderStore, useMemberStore, useCalendarStore } from '@/stores'
+import { useTourStore, useOrderStore, useMemberStore, useCalendarStore, useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { Tour } from '@/stores/types'
 import { CalendarEvent } from '@/types/calendar.types'
@@ -68,19 +68,12 @@ export default function CalendarPage() {
   const { items: orders } = useOrderStore()
   const { items: members } = useMemberStore()
 
-  // CalendarStore
+  // CalendarStore（只管理 UI 狀態）
   const { user } = useAuthStore()
-  const {
-    events: calendarEvents,
-    settings,
-    addEvent,
-    loadEvents
-  } = useCalendarStore()
+  const { settings } = useCalendarStore()
 
-  // 載入事件
-  useEffect(() => {
-    loadEvents()
-  }, [loadEvents])
+  // CalendarEventStore（管理事件資料）
+  const { items: calendarEvents, create: addEvent, remove: deleteEvent } = useCalendarEventStore()
 
   const [moreEventsDialog, setMoreEventsDialog] = useState<{
     open: boolean
@@ -423,7 +416,6 @@ export default function CalendarPage() {
   // 刪除事項
   const handleDeleteEvent = async (eventId: string) => {
     try {
-      const { deleteEvent } = useCalendarStore.getState()
       await deleteEvent(eventId)
       setEventDetailDialog({ open: false, event: null })
     } catch (error) {

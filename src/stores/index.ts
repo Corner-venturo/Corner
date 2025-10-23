@@ -139,8 +139,8 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S');
 // 地區 Store
 export const useRegionStore = createStore<Region>('regions');
 
-// 行事曆 Store (TODO: CalendarEvent 類型需定義)
-// export const useCalendarEventStore = createStore<CalendarEvent>('calendar_events');
+// 行事曆事件 Store
+export const useCalendarEventStore = createStore<import('@/types/calendar.types').CalendarEvent>('calendar_events');
 
 // TODO: WorkspaceItem, Template, TimeboxSession 型別需要定義後再啟用
 // export const useTemplateStore = createStore<Template>('templates');

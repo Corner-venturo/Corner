@@ -224,7 +224,7 @@ export interface TourRefund {
   member_name: string;
   reason: string;
   amount: number;
-  status: '申請中' | '已核准' | '已退款' | '已拒絕';
+  status: 'pending' | 'approved' | 'refunded' | 'rejected';
   applied_date: string;
   processed_date?: string;
   notes?: string;
@@ -304,7 +304,7 @@ export interface Itinerary {
   coverImage: string;
   country: string;
   city: string;
-  status: '草稿' | '已發布';
+  status: 'draft' | 'published';
 
   // 航班資訊
   outboundFlight?: FlightInfo;

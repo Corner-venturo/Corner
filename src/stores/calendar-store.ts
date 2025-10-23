@@ -1,11 +1,11 @@
 /**
- * 行事曆 Store
- * 簡單版本 - 使用 createStore
+ * 行事曆 UI 狀態 Store
+ * 只管理 UI 狀態（view, selectedDate, settings）
+ * 事件資料請使用 useCalendarEventStore
  */
 
 import { create } from 'zustand';
-import { CalendarEvent, CreateCalendarEventData } from '@/types/calendar.types';
-import { generateUUID } from '@/lib/utils/uuid';
+import { persist } from 'zustand/middleware';
 
 interface CalendarSettings {
   showPersonal: boolean;
@@ -15,76 +15,44 @@ interface CalendarSettings {
 }
 
 interface CalendarStore {
-  events: CalendarEvent[];
   selectedDate: Date | null;
   view: 'month' | 'week' | 'day';
   settings: CalendarSettings;
 
   // Actions
-  addEvent: (event: CreateCalendarEventData) => void;
-  updateEvent: (id: string, event: Partial<CalendarEvent>) => void;
-  deleteEvent: (id: string) => void;
   setSelectedDate: (date: Date | null) => void;
   setView: (view: 'month' | 'week' | 'day') => void;
   updateSettings: (settings: Partial<CalendarSettings>) => void;
-  loadEvents: () => Promise<void>;
 }
 
-export const useCalendarStore = create<CalendarStore>((set) => ({
-  events: [],
-  selectedDate: new Date(),
-  view: 'month',
-  settings: {
-    showPersonal: true,
-    showCompany: true,
-    showTours: true,
-    showBirthdays: true,
-  },
+export const useCalendarStore = create<CalendarStore>()(
+  persist(
+    (set) => ({
+      selectedDate: new Date(),
+      view: 'month',
+      settings: {
+        showPersonal: true,
+        showCompany: true,
+        showTours: true,
+        showBirthdays: true,
+      },
 
-  addEvent: (eventData) => {
-    const now = new Date().toISOString();
-    const event: CalendarEvent = {
-      id: generateUUID(),
-      ...eventData,
-      created_at: now,
-      updated_at: now,
-    };
-    set((state) => ({
-      events: [...state.events, event],
-    }));
-  },
+      setSelectedDate: (date) => {
+        set({ selectedDate: date });
+      },
 
-  updateEvent: (id, updates) => {
-    set((state) => ({
-      events: state.events.map((event) =>
-        event.id === id ? { ...event, ...updates } : event
-      ),
-    }));
-  },
+      setView: (view) => {
+        set({ view });
+      },
 
-  deleteEvent: (id) => {
-    set((state) => ({
-      events: state.events.filter((event) => event.id !== id),
-    }));
-  },
-
-  setSelectedDate: (date) => {
-    set({ selectedDate: date });
-  },
-
-  setView: (view) => {
-    set({ view });
-  },
-
-  updateSettings: (newSettings) => {
-    set((state) => ({
-      settings: { ...state.settings, ...newSettings },
-    }));
-  },
-
-  loadEvents: async () => {
-    // TODO: 從 localDB 載入行事曆事件
-    // const events = await localDB.getAll('calendar_events');
-    // set({ events });
-  },
-}));
+      updateSettings: (newSettings) => {
+        set((state) => ({
+          settings: { ...state.settings, ...newSettings },
+        }));
+      },
+    }),
+    {
+      name: 'calendar-ui-storage',
+    }
+  )
+);
