@@ -83,14 +83,6 @@ export const userStoreHelpers = {
   },
 
   /**
-   * 按部門篩選
-   */
-  getUsersByDepartment: (department: string): User[] => {
-    const state = useUserStore.getState();
-    return state.items.filter(user => user.job_info.department === department);
-  },
-
-  /**
    * 更新權限
    */
   updateUserPermissions: async (id: string, permissions: string[]): Promise<void> => {

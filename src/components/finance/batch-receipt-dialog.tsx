@@ -18,10 +18,10 @@ interface BatchReceiptDialogProps {
 
 // 收款方式選項
 const paymentMethods = [
-  { value: '現金', label: '現金' },
-  { value: '匯款', label: '匯款' },
-  { value: '刷卡', label: '刷卡' },
-  { value: '支票', label: '支票' }
+  { value: 'cash', label: '現金' },
+  { value: 'transfer', label: '匯款' },
+  { value: 'card', label: '刷卡' },
+  { value: 'check', label: '支票' }
 ];
 
 export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogProps) {
@@ -37,7 +37,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   // 收款項目
   const [paymentItems, setPaymentItems] = useState<Partial<ReceiptPaymentItem>[]>([
     {
-      payment_method: '現金',
+      payment_method: 'cash',
       amount: 0,
       transaction_date: new Date().toISOString().split('T')[0]
     }
@@ -46,7 +46,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   // 可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
     return orders.filter(order =>
-      order.payment_status === '未收款' || order.payment_status === '部分收款'
+      order.payment_status === 'unpaid' || order.payment_status === 'partial'
     );
   }, [orders]);
 
@@ -75,7 +75,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       order_id: firstAvailableOrder.id,
       order_number: firstAvailableOrder.code,
       tour_id: firstAvailableOrder.tour_id,
-      code: firstAvailableOrder.tour_code || '',
+      code: firstAvailableOrder.code || '',
       tour_name: firstAvailableOrder.tour_name || '',
       contact_person: firstAvailableOrder.contact_person,
       allocated_amount: 0
@@ -103,7 +103,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       order_id: order.id,
       order_number: order.code,
       tour_id: order.tour_id,
-      code: order.tour_code || '',
+      code: order.code || '',
       tour_name: order.tour_name || '',
       contact_person: order.contact_person
     });
@@ -112,7 +112,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   // 新增收款項目
   const addPaymentItem = () => {
     setPaymentItems(prev => [...prev, {
-      payment_method: '現金',
+      payment_method: 'cash',
       amount: 0,
       transaction_date: new Date().toISOString().split('T')[0]
     }]);
@@ -151,7 +151,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     setNote('');
     setOrderAllocations([]);
     setPaymentItems([{
-      payment_method: '現金',
+      payment_method: 'cash',
       amount: 0,
       transaction_date: new Date().toISOString().split('T')[0]
     }]);

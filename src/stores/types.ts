@@ -202,17 +202,6 @@ export interface TourRefund {
 }
 
 // 行程表相關型別
-export interface FlightInfo {
-  airline: string;
-  flightNumber: string;
-  departureAirport: string;
-  departureTime: string;
-  departureDate: string;
-  arrivalAirport: string;
-  arrivalTime: string;
-  duration: string;
-}
-
 export interface ItineraryFeature {
   icon: string; // icon 名稱 (如: "IconBuilding")
   title: string;
@@ -432,47 +421,9 @@ export interface QuoteItem {
 }
 
 // === 供應商管理系統 ===
-export interface Supplier {
-  id: string;
-  name: string;
-  type: 'hotel' | 'restaurant' | 'transport' | 'ticket' | 'guide' | 'other';
-  contact: SupplierContact;
-  bank_info?: SupplierBankInfo;
-  price_list: PriceListItem[];
-  status: 'active' | 'inactive';
-  note?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SupplierContact {
-  contact_person: string;
-  phone: string;
-  email?: string;
-  address?: string;
-  website?: string;
-}
-
-export interface SupplierBankInfo {
-  bank_name: string;
-  account_number: string;
-  account_name: string;
-  branch?: string;
-}
-
-export interface PriceListItem {
-  id: string;
-  supplier_id: string; // 對齊資料庫：加入供應商ID
-  item_name: string;
-  category: string;
-  unit_price: number;
-  unit: string; // 單位：晚、台、人、次等
-  seasonality?: 'peak' | 'regular' | 'off';
-  valid_from?: string;
-  valid_to?: string;
-  note?: string;
-  created_at: string;
-}
+// Supplier 類型已移至 @/types/supplier.types.ts
+// 使用完整的 Supplier 定義
+export type { Supplier, SupplierContact, SupplierBankInfo, PriceListItem } from '@/types/supplier.types';
 
 
 // === 請款單管理系統 ===
@@ -538,7 +489,7 @@ export interface DisbursementOrder {
   disbursement_date: string; // 出帳日期 (預設本週四)
   payment_request_ids: string[]; // 關聯的請款單ID陣列
   total_amount: number; // 總金額 (自動加總)
-  status: 'pending' | 'confirmed' | 'paid'; // 待確認、已確認、已付款
+  status: 'pending' | 'confirmed' | 'paid' | 'cancelled'; // 待確認、已確認、已付款、已取消
   note?: string; // 出納備註
   created_by: string; // 建立者ID
   confirmed_by?: string; // 確認者ID

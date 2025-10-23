@@ -100,7 +100,7 @@ export class BackgroundSyncService {
           await localDB.delete(tableName, typedItem.id);
           // @ts-ignore
           await localDB.put(tableName, {
-            ...supabaseData,
+            ...(supabaseData as any),
             _needs_sync: false,
             _synced_at: new Date().toISOString()
           });

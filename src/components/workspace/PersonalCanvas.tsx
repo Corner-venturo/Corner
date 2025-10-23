@@ -108,13 +108,13 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
       doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.content.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesTag = !selectedTag || doc.tags.includes(selectedTag);
+    const matchesTag = !selectedTag || (doc.tags?.includes(selectedTag) ?? false);
 
     return matchesSearch && matchesTag;
   });
 
   // Get all unique tags
-  const allTags = [...new Set(richDocuments.flatMap((doc: RichDocument) => doc.tags))];
+  const allTags = [...new Set(richDocuments.flatMap((doc: RichDocument) => doc.tags || []).filter(Boolean))];
 
   const handleCreateDocument = () => {
     setSelectedDocument(null);
@@ -234,7 +234,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
                 onClick={() => handleToggleFavorite(selectedDocument)}
               />
               <span className="text-sm text-morandi-secondary">
-                {format(new Date(selectedDocument.created_at), 'yyyy/MM/dd HH:mm')}
+                {selectedDocument.created_at ? format(new Date(selectedDocument.created_at), 'yyyy/MM/dd HH:mm') : '未知時間'}
               </span>
             </div>
           </div>
@@ -335,7 +335,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
                   </p>
                   <div className="flex items-center justify-between text-xs text-morandi-secondary">
                     <span>
-                      {format(new Date(canvas.updated_at), 'MM/dd')}
+                      {canvas.updated_at ? format(new Date(canvas.updated_at), 'MM/dd') : '未知日期'}
                     </span>
                     <Button
                       variant="ghost"
@@ -516,10 +516,10 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
                       viewMode === 'list' && "mt-1"
                     )}>
                       <span>
-                        {format(new Date(document.updated_at), 'MM/dd')}
+                        {document.updated_at ? format(new Date(document.updated_at), 'MM/dd') : '未知'}
                       </span>
                       <div className="flex items-center gap-2">
-                        {document.tags.length > 0 && (
+                        {document.tags && document.tags.length > 0 && (
                           <div className="flex gap-1">
                             {document.tags.slice(0, 2).map((tag: string) => (
                               <span

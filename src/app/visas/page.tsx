@@ -269,7 +269,7 @@ export default function VisasPage() {
         total_amount: totalFee,
         paid_amount: 0,
         remaining_amount: totalFee,
-        payment_status: '未收款' as const,
+        payment_status: 'unpaid' as const,
       });
     }
 

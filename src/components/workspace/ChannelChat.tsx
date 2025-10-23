@@ -35,7 +35,7 @@ import {
   Wallet,
   AlertTriangle
 } from 'lucide-react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useWorkspaceStore, type Message } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -57,21 +57,6 @@ const downloadFile = (path: string, bucket: string, fileName: string) => {
   console.log('📦 本地模式：檔案下載功能暫時停用', { path, bucket, fileName });
   alert('檔案下載功能目前僅支援線上模式');
 };
-
-interface Message {
-  id: string;
-  channel_id: string;
-  author_id: string;
-  content: string;
-  reactions: Record<string, string[]>;
-  created_at: string;
-  edited_at?: string;
-  author?: {
-    id: string;
-    display_name: string;
-    avatar?: string;
-  };
-}
 
 export function ChannelChat() {
   // ❌ 移除本地 state，改用 store 管理
@@ -260,8 +245,9 @@ export function ChannelChat() {
           id: user.id,
           display_name: currentProfile?.display_name || user.display_name || '未知用戶',
           avatar: undefined
-        }
-      }, attachedFiles.length > 0 ? attachedFiles : undefined);
+        },
+        attachments: attachedFiles.length > 0 ? attachedFiles : undefined
+      });
 
       setMessageText('');
       setAttachedFiles([]);

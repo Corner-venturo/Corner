@@ -48,22 +48,36 @@ const DropdownMenuTrigger = React.forwardRef<
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     isOpen?: boolean
     onOpenChange?: (open: boolean) => void
+    asChild?: boolean
   }
->(({ className, children, isOpen, onOpenChange, ...props }, ref) => (
-  <button
-    ref={ref}
-    className={cn(
-      "flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors",
-      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-      "disabled:pointer-events-none disabled:opacity-50",
-      className
-    )}
-    onClick={() => onOpenChange?.(!isOpen)}
-    {...props}
-  >
-    {children}
-  </button>
-))
+>(({ className, children, isOpen, onOpenChange, asChild, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    const child = children as React.ReactElement<any>
+    return React.cloneElement(child, {
+      onClick: (e: React.MouseEvent) => {
+        onOpenChange?.(!isOpen)
+        child.props.onClick?.(e)
+      },
+      ...props
+    })
+  }
+
+  return (
+    <button
+      ref={ref}
+      className={cn(
+        "flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        "disabled:pointer-events-none disabled:opacity-50",
+        className
+      )}
+      onClick={() => onOpenChange?.(!isOpen)}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+})
 DropdownMenuTrigger.displayName = "DropdownMenuTrigger"
 
 const DropdownMenuContent = React.forwardRef<
@@ -71,8 +85,9 @@ const DropdownMenuContent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & {
     isOpen?: boolean
     onOpenChange?: (open: boolean) => void
+    align?: 'start' | 'center' | 'end'
   }
->(({ className, children, isOpen, onOpenChange, ...props }, ref) => {
+>(({ className, children, isOpen, onOpenChange, align = 'start', ...props }, ref) => {
   const contentRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
@@ -97,8 +112,11 @@ const DropdownMenuContent = React.forwardRef<
     <div
       ref={contentRef}
       className={cn(
-        "absolute top-full left-0 z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md",
+        "absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md",
         "animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2",
+        align === 'start' && 'left-0',
+        align === 'center' && 'left-1/2 -translate-x-1/2',
+        align === 'end' && 'right-0',
         className
       )}
       {...props}

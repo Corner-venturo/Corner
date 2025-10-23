@@ -78,9 +78,7 @@ export function useOrders() {
       sales_person: '', // CreateOrderData 沒有這個欄位
       assistant: '', // CreateOrderData 沒有這個欄位
       member_count: data.number_of_people,
-      payment_status: data.payment_status === 'unpaid' ? '未收款' :
-                      data.payment_status === 'partial' ? '部分收款' :
-                      data.payment_status === 'paid' ? '已收款' : '未收款',
+      payment_status: data.payment_status || 'unpaid',
       total_amount: data.total_amount,
       paid_amount: data.paid_amount,
       remaining_amount: data.total_amount - (data.paid_amount || 0),
@@ -105,9 +103,7 @@ export function useOrders() {
 
     // 轉換 payment_status
     if (data.payment_status) {
-      updateData.payment_status = data.payment_status === 'unpaid' ? '未收款' :
-                                   data.payment_status === 'partial' ? '部分收款' :
-                                   data.payment_status === 'paid' ? '已收款' : '未收款';
+      updateData.payment_status = data.payment_status || 'unpaid';
     }
 
     // 重新計算付款狀態
@@ -165,7 +161,7 @@ export function useOrders() {
 
   const getUnpaidOrders = useMemo(() => {
     return orderStore.items.filter(o =>
-      o.payment_status === '未收款' || o.payment_status === '部分收款'
+      o.payment_status === 'unpaid' || o.payment_status === 'partial'
     );
   }, [orderStore.items]);
 

@@ -423,8 +423,10 @@ export default function ToursPage() {
       const createdTour = await actions.create(tourData);
 
       // 如果有填寫聯絡人，同時新增訂單
-      if (newOrder.contact_person.trim()) {
+      if (newOrder.contact_person?.trim()) {
         const order_number = `${code}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`; // 生成訂單編號（使用隨機數而非時間戳記）
+        const memberCount = newOrder.member_count || 1;
+        const totalAmount = newOrder.total_amount || (newTour.price * memberCount);
         const orderData = {
           order_number,
           tour_id: createdTour.id,
@@ -433,11 +435,11 @@ export default function ToursPage() {
           contact_person: newOrder.contact_person,
           sales_person: newOrder.sales_person || '',
           assistant: newOrder.assistant || '',
-          member_count: newOrder.member_count,
-          payment_status: '未收款' as const,
-          total_amount: newOrder.total_amount || (newTour.price * newOrder.member_count),
+          member_count: memberCount,
+          payment_status: 'unpaid' as const,
+          total_amount: totalAmount,
           paid_amount: 0,
-          remaining_amount: newOrder.total_amount || (newTour.price * newOrder.member_count),
+          remaining_amount: totalAmount,
         };
 
         addOrder(orderData);

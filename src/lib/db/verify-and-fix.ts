@@ -52,6 +52,7 @@ export async function verifyAndFix() {
       employee_number: 'william01',
       display_name: 'William Chien',
       english_name: 'William Chien',
+      chinese_name: '簡威廉',
       permissions: [
         'super_admin',
         'admin',
@@ -67,17 +68,13 @@ export async function verifyAndFix() {
       personal_info: {
         national_id: '',
         birthday: '',
-        gender: 'male',
         phone: '',
         email: 'william@venturo.com',
         address: '',
         emergency_contact: { name: '', relationship: '', phone: '' }
       },
       job_info: {
-        department: '管理部',
-        position: '系統管理員',
-        hire_date: new Date().toISOString(),
-        employment_type: 'fulltime'
+        hire_date: new Date().toISOString()
       },
       salary_info: {
         base_salary: 0,

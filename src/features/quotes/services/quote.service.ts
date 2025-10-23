@@ -67,6 +67,22 @@ class QuoteService extends BaseService<Quote> {
       version: (current.version || 1) + 1,
       categories: current.categories,
       total_cost: current.total_cost,
+      group_size: current.group_size,
+      accommodation_days: current.accommodation_days,
+      participant_counts: current.participant_counts || {
+        adult: 0,
+        child_with_bed: 0,
+        child_no_bed: 0,
+        single_room: 0,
+        infant: 0
+      },
+      selling_prices: current.selling_prices || {
+        adult: 0,
+        child_with_bed: 0,
+        child_no_bed: 0,
+        single_room: 0,
+        infant: 0
+      },
       created_at: new Date().toISOString()
     };
 

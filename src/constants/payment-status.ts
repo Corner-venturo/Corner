@@ -6,7 +6,7 @@
 import { PaymentRequest, DisbursementOrder, ReceiptOrder } from '@/stores/types';
 
 // 請款單狀態對照
-export const PAYMENT_REQUEST_STATUS_LABELS: Record<PaymentRequest['status'], string> = {
+export const PAYMENT_REQUEST_STATUS_LABELS: Record<NonNullable<PaymentRequest['status']>, string> = {
   pending: '請款中',
   processing: '處理中',
   confirmed: '已確認',
@@ -14,7 +14,7 @@ export const PAYMENT_REQUEST_STATUS_LABELS: Record<PaymentRequest['status'], str
 };
 
 // 請款單狀態顏色
-export const PAYMENT_REQUEST_STATUS_COLORS: Record<PaymentRequest['status'], string> = {
+export const PAYMENT_REQUEST_STATUS_COLORS: Record<NonNullable<PaymentRequest['status']>, string> = {
   pending: 'bg-morandi-gold text-white',
   processing: 'bg-blue-500 text-white',
   confirmed: 'bg-morandi-green text-white',
@@ -22,7 +22,7 @@ export const PAYMENT_REQUEST_STATUS_COLORS: Record<PaymentRequest['status'], str
 };
 
 // 出納單狀態對照
-export const DISBURSEMENT_ORDER_STATUS_LABELS: Record<DisbursementOrder['status'], string> = {
+export const DISBURSEMENT_ORDER_STATUS_LABELS: Record<NonNullable<DisbursementOrder['status']>, string> = {
   pending: '待支付',
   confirmed: '已確認',
   paid: '已支付',
@@ -30,7 +30,7 @@ export const DISBURSEMENT_ORDER_STATUS_LABELS: Record<DisbursementOrder['status'
 };
 
 // 出納單狀態顏色
-export const DISBURSEMENT_ORDER_STATUS_COLORS: Record<DisbursementOrder['status'], string> = {
+export const DISBURSEMENT_ORDER_STATUS_COLORS: Record<NonNullable<DisbursementOrder['status']>, string> = {
   pending: 'bg-morandi-gold text-white',
   confirmed: 'bg-blue-500 text-white',
   paid: 'bg-morandi-green text-white',
@@ -38,17 +38,17 @@ export const DISBURSEMENT_ORDER_STATUS_COLORS: Record<DisbursementOrder['status'
 };
 
 // 收款單狀態對照
-export const RECEIPT_ORDER_STATUS_LABELS: Record<ReceiptOrder['status'], string> = {
-  '已收款': '已收款',
-  '已確認': '已確認',
-  '退回': '退回'
+export const RECEIPT_ORDER_STATUS_LABELS: Record<NonNullable<ReceiptOrder['status']>, string> = {
+  received: '已收款',
+  confirmed: '已確認',
+  rejected: '退回'
 };
 
 // 收款單狀態顏色
-export const RECEIPT_ORDER_STATUS_COLORS: Record<ReceiptOrder['status'], string> = {
-  '已收款': 'bg-morandi-green text-white',
-  '已確認': 'bg-morandi-primary text-white',
-  '退回': 'bg-morandi-red text-white'
+export const RECEIPT_ORDER_STATUS_COLORS: Record<NonNullable<ReceiptOrder['status']>, string> = {
+  received: 'bg-morandi-green text-white',
+  confirmed: 'bg-morandi-primary text-white',
+  rejected: 'bg-morandi-red text-white'
 };
 
 // 請款項目類別對照

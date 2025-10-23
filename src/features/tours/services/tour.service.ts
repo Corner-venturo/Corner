@@ -153,8 +153,8 @@ class TourService extends BaseService<Tour> {
         return { canCancel: false, reason: '找不到該旅遊團' };
       }
 
-      // Tour 狀態是中文：'提案' | '進行中' | '待結案' | '結案' | '特殊團'
-      if (tour.status === '結案') {
+      // Tour 狀態檢查
+      if (tour.status === 'closed') {
         return { canCancel: false, reason: '該旅遊團已經結案，無法取消' };
       }
 
@@ -216,14 +216,14 @@ class TourService extends BaseService<Tour> {
           // 如果找到已刪除的簽證團，復原它
           if ((data as any)._deleted) {
             console.log(`🔄 [Visa Tour] 找到已刪除的簽證團，正在復原...`);
-            const { data: updated, error: updateError } = await supabase
+            const { data: updated, error: updateError } = await (supabase as any)
               .from('tours')
               .update({
                 _deleted: false,
                 _synced_at: null,
                 updated_at: this.now()
               })
-              .eq('id', data.id)
+              .eq('id', (data as any).id)
               .select()
               .single();
 

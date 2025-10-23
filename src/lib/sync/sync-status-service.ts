@@ -3,7 +3,7 @@
  * 提供針對單一表的同步狀態檢查
  */
 
-import { localDB } from '@/lib/db';
+import { localDB, type TableName } from '@/lib/db';
 import { TABLES } from '@/lib/db/schemas';
 import { useState, useCallback } from 'react';
 
@@ -12,7 +12,7 @@ import { useState, useCallback } from 'react';
  * @param tableName - 表名稱
  * @returns 待同步項目數量
  */
-export async function checkPendingCount(tableName: string): Promise<number> {
+export async function checkPendingCount(tableName: TableName): Promise<number> {
   try {
     const items = await localDB.getAll(tableName);
     const pending = items.filter((item: any) =>

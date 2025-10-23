@@ -100,7 +100,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
   };
 
   const selectedAccountType = accountTypes.find(t => t.id === formData.type);
-  const handleKeyDown = useEnterSubmit(handleSubmit);
+  const { handleKeyDown, compositionProps } = useEnterSubmit(handleSubmit);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -155,6 +155,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               onKeyDown={handleKeyDown}
+              {...compositionProps}
               placeholder={`輸入${selectedAccountType?.label}名稱`}
               className="mt-1"
             />
@@ -172,6 +173,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                 value={formData.balance}
                 onChange={(e) => setFormData(prev => ({ ...prev, balance: e.target.value }))}
                 onKeyDown={handleKeyDown}
+                {...compositionProps}
                 placeholder="0"
                 className="pl-12"
                 step="1"
@@ -195,6 +197,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                   value={formData.credit_limit}
                   onChange={(e) => setFormData(prev => ({ ...prev, credit_limit: e.target.value }))}
                   onKeyDown={handleKeyDown}
+                  {...compositionProps}
                   placeholder="50000"
                   className="pl-12"
                   min="0"
@@ -234,6 +237,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               onKeyDown={handleKeyDown}
+              {...compositionProps}
               placeholder="輸入帳戶備註（選填）"
               className="mt-1"
             />

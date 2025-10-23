@@ -146,11 +146,12 @@ export function useTours() {
    */
   const getNextStatus = (currentStatus: TourStatus): TourStatus | null => {
     const statusFlow: Record<TourStatus, TourStatus | null> = {
-      '提案': '進行中',
-      '進行中': '待結案',
-      '待結案': '結案',
-      '結案': null,
-      '特殊團': null,
+      draft: 'active',
+      active: 'pending_close',
+      pending_close: 'closed',
+      closed: null,
+      cancelled: null,
+      special: null,
     };
     return statusFlow[currentStatus];
   };
@@ -287,8 +288,7 @@ export function useTours() {
       throw new Error(`${tour.status} 狀態的旅遊團無法取消`);
     }
 
-    // 注意：Tour 狀態沒有 'cancelled'，改為 '結案'
-    return await store.update(id, { status: '結案' });
+    return await store.update(id, { status: 'cancelled' });
   };
 
   /**

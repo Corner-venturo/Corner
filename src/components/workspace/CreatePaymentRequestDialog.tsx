@@ -150,7 +150,7 @@ export function CreatePaymentRequestDialog({
               <option value="">請選擇旅遊團</option>
               {tours.map(tour => (
                 <option key={tour.id} value={tour.id}>
-                  {tour.tour_name} ({tour.code})
+                  {tour.name} ({tour.code})
                 </option>
               ))}
             </select>

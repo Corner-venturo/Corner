@@ -6,7 +6,7 @@
 import { Tour } from '@/stores/types';
 
 // 團體狀態對照
-export const TOUR_STATUS_LABELS: Record<Tour['status'], string> = {
+export const TOUR_STATUS_LABELS: Record<NonNullable<Tour['status']>, string> = {
   draft: '提案',
   active: '進行中',
   pending_close: '待結案',
@@ -16,7 +16,7 @@ export const TOUR_STATUS_LABELS: Record<Tour['status'], string> = {
 };
 
 // 團體狀態顏色
-export const TOUR_STATUS_COLORS: Record<Tour['status'], string> = {
+export const TOUR_STATUS_COLORS: Record<NonNullable<Tour['status']>, string> = {
   draft: 'bg-morandi-secondary text-white',
   active: 'bg-morandi-green text-white',
   pending_close: 'bg-morandi-gold text-white',

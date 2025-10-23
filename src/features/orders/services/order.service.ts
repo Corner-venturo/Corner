@@ -41,7 +41,7 @@ class OrderService extends BaseService<Order> {
     return store.items.filter(o => o.tour_id === tour_id);
   }
 
-  getOrdersByStatus(status: '未收款' | '部分收款' | '已收款'): Order[] {
+  getOrdersByStatus(status: 'unpaid' | 'partial' | 'paid'): Order[] {
     const store = useOrderStore.getState();
     return store.items.filter(o => o.payment_status === status);
   }
@@ -54,16 +54,16 @@ class OrderService extends BaseService<Order> {
   calculateTotalRevenue(): number {
     const store = useOrderStore.getState();
     return store.items
-      .filter(o => o.payment_status === '已收款')
+      .filter(o => o.payment_status === 'paid')
       .reduce((sum, o) => sum + (o.total_amount || 0), 0);
   }
 
   getPendingOrders(): Order[] {
-    return this.getOrdersByStatus('未收款');
+    return this.getOrdersByStatus('unpaid');
   }
 
   getConfirmedOrders(): Order[] {
-    return this.getOrdersByStatus('已收款');
+    return this.getOrdersByStatus('paid');
   }
 }
 

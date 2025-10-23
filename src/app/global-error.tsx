@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { AlertTriangle } from 'lucide-react'
 
 export default function GlobalError({
   error,
@@ -16,8 +15,11 @@ export default function GlobalError({
   }, [error])
 
   return (
-    <html>
-      <body>
+    <html lang="zh-TW">
+      <head>
+        <title>系統錯誤</title>
+      </head>
+      <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif' }}>
         <div
           style={{
             minHeight: '100vh',
@@ -37,8 +39,8 @@ export default function GlobalError({
             }}
           >
             {/* 錯誤圖示 */}
-            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
-              <AlertTriangle size={48} color="#ef4444" />
+            <div style={{ marginBottom: '1.5rem', fontSize: '4rem' }}>
+              ⚠️
             </div>
 
             {/* 標題 */}

@@ -6,7 +6,7 @@
 import { Quote } from '@/stores/types';
 
 // 報價單狀態對照
-export const QUOTE_STATUS_LABELS: Record<Quote['status'], string> = {
+export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> = {
   draft: '草稿',
   proposed: '提案',
   revised: '修改中',
@@ -16,7 +16,7 @@ export const QUOTE_STATUS_LABELS: Record<Quote['status'], string> = {
 };
 
 // 報價單狀態顏色
-export const QUOTE_STATUS_COLORS: Record<Quote['status'], string> = {
+export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> = {
   draft: 'bg-morandi-secondary text-white',
   proposed: 'bg-morandi-gold text-white',
   revised: 'bg-blue-500 text-white',

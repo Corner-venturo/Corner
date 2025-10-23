@@ -26,6 +26,8 @@ export interface Tour extends BaseEntity {
   total_cost: number;        // 總成本
   profit: number;            // 利潤
   description?: string;      // 團體說明/描述
+  archived?: boolean;        // 是否已封存
+  features?: any[];          // 行程特色（用於展示頁面）
   quote_id?: string;         // 關聯的報價單ID
   quote_cost_structure?: any[]; // 報價成本結構快照
 }

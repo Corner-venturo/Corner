@@ -25,11 +25,11 @@ export async function initDefaultUser(): Promise<void> {
         employee_number: 'william01',
         english_name: 'William',
         display_name: 'William Chien',
+        chinese_name: '簡威廉',
         status: 'active',
-        
+
         personal_info: {
           national_id: 'A123456789',
-          gender: 'male',
           birthday: '1990-01-01',
           phone: '0912-345-678',
           email: 'william@venturo.com',
@@ -40,12 +40,9 @@ export async function initDefaultUser(): Promise<void> {
             phone: '0912-345-678'
           }
         },
-        
+
         job_info: {
-          department: '管理部',
-          position: '系統管理員',
-          hire_date: '2024-01-01',
-          employment_type: 'fulltime' as const
+          hire_date: '2024-01-01'
         },
         
         salary_info: {

@@ -26,12 +26,12 @@ export async function initializeEmployeePasswords() {
       employee_number: 'admin',
       english_name: 'Administrator',
       display_name: '系統管理員',
+      chinese_name: '系統管理員',
       password_hash: defaultAdminPassword,
       must_change_password: true,
       personal_info: {
         national_id: 'A123456789',
         birthday: '1990-01-01',
-        gender: 'male' as const,
         phone: '0912-345-678',
         email: 'admin@venturo.com',
         address: '台北市信義區',
@@ -42,10 +42,7 @@ export async function initializeEmployeePasswords() {
         }
       },
       job_info: {
-        department: '管理部',
-        position: '系統管理員',
         hire_date: new Date().toISOString().split('T')[0],
-        employment_type: 'fulltime' as const
       },
       salary_info: {
         base_salary: 0,
@@ -142,8 +139,6 @@ export async function createTestEmployees() {
       english_name: 'John',
       display_name: '約翰',
       password: 'john123',
-      department: '業務部',
-      position: '業務經理',
       permissions: ['orders', 'quotes', 'customers']
     },
     {
@@ -151,8 +146,6 @@ export async function createTestEmployees() {
       english_name: 'Mary',
       display_name: '瑪麗',
       password: 'mary123',
-      department: '財務部',
-      position: '會計',
       permissions: ['finance', 'payments']
     },
     {
@@ -160,8 +153,6 @@ export async function createTestEmployees() {
       english_name: 'Peter',
       display_name: '彼得',
       password: 'peter123',
-      department: '人資部',
-      position: 'HR專員',
       permissions: ['hr']
     }
   ];
@@ -184,12 +175,12 @@ export async function createTestEmployees() {
       employee_number: emp.employee_number,
       english_name: emp.english_name,
       display_name: emp.display_name,
+      chinese_name: emp.display_name,
       password_hash,
       must_change_password: false, // 測試帳號不強制改密碼
       personal_info: {
         national_id: `TEST${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
         birthday: '1990-01-01',
-        gender: 'male' as const,
         phone: `09${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
         email: `${emp.employee_number}@venturo.com`,
         address: '台北市',
@@ -200,10 +191,7 @@ export async function createTestEmployees() {
         }
       },
       job_info: {
-        department: emp.department,
-        position: emp.position,
         hire_date: new Date().toISOString().split('T')[0],
-        employment_type: 'fulltime' as const
       },
       salary_info: {
         base_salary: 50000,

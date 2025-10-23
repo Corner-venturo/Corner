@@ -6,7 +6,7 @@
 import { Order } from '@/stores/types';
 
 // 訂單狀態對照
-export const ORDER_STATUS_LABELS: Record<Order['status'], string> = {
+export const ORDER_STATUS_LABELS: Record<NonNullable<Order['status']>, string> = {
   pending: '待確認',
   confirmed: '已確認',
   completed: '已完成',
@@ -14,7 +14,7 @@ export const ORDER_STATUS_LABELS: Record<Order['status'], string> = {
 };
 
 // 訂單狀態顏色
-export const ORDER_STATUS_COLORS: Record<Order['status'], string> = {
+export const ORDER_STATUS_COLORS: Record<NonNullable<Order['status']>, string> = {
   pending: 'bg-morandi-gold text-white',
   confirmed: 'bg-morandi-green text-white',
   completed: 'bg-morandi-primary text-white',
@@ -30,7 +30,7 @@ export const PAYMENT_STATUS_LABELS: Record<Order['payment_status'], string> = {
 };
 
 // 付款狀態顏色
-export const PAYMENT_STATUS_COLORS: Record<Order['payment_status'], string> = {
+export const PAYMENT_STATUS_COLORS: Record<NonNullable<Order['payment_status']>, string> = {
   unpaid: 'bg-morandi-red text-white',
   partial: 'bg-morandi-gold text-white',
   paid: 'bg-morandi-green text-white',

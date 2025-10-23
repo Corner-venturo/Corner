@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { checkPendingCount, isOnline } from '@/lib/sync/sync-status-service';
 import { Cloud, CloudOff, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { TableName } from '@/lib/db';
 
 interface SyncStatusBadgeProps {
-  tableName: string;
+  tableName: TableName;
   label?: string; // 例如：「旅遊團」「訂單」
 }
 

@@ -7,6 +7,9 @@ import { handleUpgrade, clearAllTables, exportData, importData } from './migrati
 import { DB_NAME, DB_VERSION, TableName } from './schemas';
 import { checkAndHandleVersion } from './version-manager';
 
+// Re-export TableName for external use
+export type { TableName };
+
 /**
  * 查詢選項
  */

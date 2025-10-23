@@ -40,9 +40,9 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
     {
       title: '付款狀態',
       value: order.payment_status,
-      icon: order.payment_status === '已收款' ? CheckCircle : AlertCircle,
-      color: order.payment_status === '已收款' ? 'text-morandi-green' :
-             order.payment_status === '部分收款' ? 'text-morandi-gold' : 'text-morandi-red'
+      icon: order.payment_status === 'paid' ? CheckCircle : AlertCircle,
+      color: order.payment_status === 'paid' ? 'text-morandi-green' :
+             order.payment_status === 'partial' ? 'text-morandi-gold' : 'text-morandi-red'
     },
     {
       title: '已付金額',

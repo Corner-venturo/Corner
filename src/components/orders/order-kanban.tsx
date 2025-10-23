@@ -13,7 +13,7 @@ interface OrderKanbanProps {
   onOrderClick?: (order: Order) => void;
 }
 
-type PaymentStatus = '未收款' | '部分收款' | '已收款';
+type PaymentStatus = 'unpaid' | 'partial' | 'paid';
 
 const columns: Array<{
   id: PaymentStatus;
@@ -21,9 +21,9 @@ const columns: Array<{
   color: string;
   icon: React.ElementType;
 }> = [
-  { id: '未收款', label: '未收款', color: 'bg-morandi-gold/10 border-morandi-gold', icon: Clock },
-  { id: '部分收款', label: '部分收款', color: 'bg-morandi-blue/10 border-morandi-blue', icon: CheckCircle2 },
-  { id: '已收款', label: '已收款', color: 'bg-morandi-green/10 border-morandi-green', icon: DollarSign },
+  { id: 'unpaid', label: '未收款', color: 'bg-morandi-gold/10 border-morandi-gold', icon: Clock },
+  { id: 'partial', label: '部分收款', color: 'bg-morandi-blue/10 border-morandi-blue', icon: CheckCircle2 },
+  { id: 'paid', label: '已收款', color: 'bg-morandi-green/10 border-morandi-green', icon: DollarSign },
 ];
 
 export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
@@ -100,7 +100,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                 const tour = getTourInfo(order);
                 const progress = getPaymentProgress(order);
                 const daysUntil = getDaysUntilDeparture(tour);
-                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.payment_status !== '已收款';
+                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.payment_status !== 'paid';
 
                 return (
                   <div

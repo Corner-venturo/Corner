@@ -56,7 +56,7 @@ export interface ChannelGroup {
   created_at?: string;
 }
 
-interface Message {
+export interface Message {
   id: string;
   channel_id: string;
   author_id: string;
@@ -65,11 +65,36 @@ interface Message {
   attachments?: any[];
   created_at: string;
   edited_at?: string;
+  is_pinned?: boolean;  // ✨ 新增：是否置頂
   author?: {
     id: string;
     display_name: string;
     avatar?: string;
   };
+}
+
+export interface PersonalCanvas {
+  id: string;
+  channelId: string;
+  name: string;
+  title?: string;  // ✨ 新增：文件標題
+  type: string;
+  order: number;
+  canvas_number?: number;  // ✨ 新增：工作區編號
+  created_at?: string;
+  updated_at?: string;  // ✨ 新增：更新時間
+}
+
+export interface RichDocument {
+  id: string;
+  canvas_id: string;
+  title: string;
+  content: string;
+  format_data?: any;  // ✨ 新增：格式資料
+  tags?: string[];
+  is_favorite?: boolean;  // ✨ 新增：是否收藏
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AdvanceItem {
@@ -135,6 +160,14 @@ interface WorkspaceState {
   error: string | null;
   searchQuery: string;
   channelFilter: 'all' | 'starred' | 'unread' | 'muted';
+  personalCanvases: PersonalCanvas[];  // ✨ 新增：個人 Canvas 文件
+  richDocuments: RichDocument[];  // ✨ 新增：富文本文件
+  createPersonalCanvas: (canvas: any) => Promise<PersonalCanvas>;  // ✨ 新增：建立個人 Canvas
+  loadRichDocuments: (canvasId?: string) => Promise<void>;  // ✨ 新增
+  createRichDocument: (document: Partial<RichDocument>) => Promise<void>;  // ✨ 新增
+  updateRichDocument: (id: string, updates: Partial<RichDocument>) => Promise<void>;  // ✨ 新增
+  deleteRichDocument: (id: string) => Promise<void>;  // ✨ 新增
+  loadPersonalCanvases: (userId?: string, workspaceId?: string) => Promise<void>;  // ✨ 新增
 
   loadWorkspaces: () => Promise<void>;
   setCurrentWorkspace: (workspace: Workspace) => void;
@@ -159,9 +192,15 @@ interface WorkspaceState {
   selectChannel: (channel: Channel | null) => Promise<void>;  // ✨ 新增：切換頻道
   loadMessages: (channelId: string) => Promise<void>;
   sendMessage: (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => Promise<void>;
+  addMessage: (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => Promise<void>;  // ✨ 新增
+  updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;  // ✨ 新增
+  togglePinMessage: (messageId: string) => void;  // ✨ 新增
+  addReaction: (messageId: string, emoji: string, userId: string) => void;  // ✨ 新增
   updateMessageReactions: (messageId: string, reactions: Record<string, string[]>) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   softDeleteMessage: (messageId: string) => Promise<void>;
+  activeCanvasTab: string;  // ✨ 新增
+  setActiveCanvasTab: (tab: string) => void;  // ✨ 新增
 
   shareAdvanceList: (channelId: string, items: Omit<AdvanceItem, 'id' | 'status'>[], currentUserId: string) => Promise<void>;
   processAdvanceItem: (listId: string, itemId: string, paymentRequestId: string, processedBy: string) => Promise<void>;
@@ -193,6 +232,58 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       error: null,
       searchQuery: '',
       channelFilter: 'all',
+      personalCanvases: [],  // ✨ 新增初始值
+      richDocuments: [],  // ✨ 新增初始值
+      activeCanvasTab: 'canvas',  // ✨ 新增初始值
+      createPersonalCanvas: async (canvas: any) => {
+        // ✨ 新增：暫時實作（待完整實作）
+        const newCanvas: PersonalCanvas = { ...canvas, id: Date.now().toString() };
+        set((state) => ({
+          personalCanvases: [...state.personalCanvases, newCanvas]
+        }));
+        return newCanvas;
+      },
+      loadRichDocuments: async (canvasId?: string) => {
+        // ✨ 新增：暫時實作（待完整實作）
+        console.log('loadRichDocuments stub', canvasId);
+      },
+      createRichDocument: async (document: Partial<RichDocument>) => {
+        // ✨ 新增：暫時實作（待完整實作）
+        const newDoc: RichDocument = {
+          id: Date.now().toString(),
+          canvas_id: document.canvas_id || '',
+          title: document.title || 'Untitled',
+          content: document.content || '',
+          tags: document.tags || [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        set((state) => ({
+          richDocuments: [...state.richDocuments, newDoc]
+        }));
+      },
+      updateRichDocument: async (id: string, updates: Partial<RichDocument>) => {
+        // ✨ 新增：暫時實作（待完整實作）
+        set((state) => ({
+          richDocuments: state.richDocuments.map(doc =>
+            doc.id === id ? { ...doc, ...updates, updated_at: new Date().toISOString() } : doc
+          )
+        }));
+      },
+      deleteRichDocument: async (id: string) => {
+        // ✨ 新增：暫時實作（待完整實作）
+        set((state) => ({
+          richDocuments: state.richDocuments.filter(doc => doc.id !== id)
+        }));
+      },
+      loadPersonalCanvases: async (userId?: string, workspaceId?: string) => {
+        // ✨ 新增：暫時實作（待完整實作）
+        console.log('loadPersonalCanvases stub', userId, workspaceId);
+      },
+      setActiveCanvasTab: (tab: string) => {
+        // ✨ 新增：設定活動 Canvas 標籤
+        set({ activeCanvasTab: tab });
+      },
 
       loadWorkspaces: async () => {
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
@@ -202,7 +293,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 載入
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
               .from('workspaces')
               .select('*')
               .eq('is_active', true)
@@ -331,7 +422,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             setTimeout(async () => {
               try {
                 console.log('☁️ [channels] 背景同步 Supabase...');
-                const { data, error } = await supabase
+                const { data, error } = await (supabase as any)
                   .from('channels')
                   .select('*')
                   .eq('workspace_id', currentWorkspaceId)
@@ -375,7 +466,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：寫入 Supabase
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('channels')
               .insert({
                 id: newChannel.id,
@@ -424,7 +515,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             setTimeout(async () => {
               try {
                 console.log('☁️ [messages] 背景同步 Supabase...');
-                const { data, error } = await supabase
+                const { data, error } = await (supabase as any)
                   .from('messages')
                   .select(`
                     *,
@@ -473,7 +564,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：寫入 Supabase
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('messages')
               .insert({
                 id: newMessage.id,
@@ -502,6 +593,48 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }));
       },
 
+      addMessage: async (message) => {
+        // ✨ 新增：別名方法，指向 sendMessage
+        return get().sendMessage(message);
+      },
+
+      updateMessage: async (messageId, updates) => {
+        // ✨ 新增：更新訊息
+        set(state => ({
+          messages: state.messages.map(m =>
+            m.id === messageId ? { ...m, ...updates } : m
+          )
+        }));
+      },
+
+      togglePinMessage: (messageId) => {
+        // ✨ 新增：切換訊息置頂
+        set(state => ({
+          messages: state.messages.map(m =>
+            m.id === messageId ? { ...m, is_pinned: !m.is_pinned } : m
+          )
+        }));
+      },
+
+      addReaction: (messageId, emoji, userId) => {
+        // ✨ 新增：新增反應
+        set(state => ({
+          messages: state.messages.map(m => {
+            if (m.id === messageId) {
+              const reactions = { ...m.reactions };
+              if (!reactions[emoji]) {
+                reactions[emoji] = [];
+              }
+              if (!reactions[emoji].includes(userId)) {
+                reactions[emoji] = [...reactions[emoji], userId];
+              }
+              return { ...m, reactions };
+            }
+            return m;
+          })
+        }));
+      },
+
       updateMessageReactions: async (messageId, reactions) => {
         set(state => ({
           messages: state.messages.map(m =>
@@ -517,7 +650,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 刪除
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('messages')
               .delete()
               .eq('id', messageId);
@@ -544,7 +677,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：更新 Supabase
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('messages')
               .update({ content: '此訊息已被刪除' })
               .eq('id', messageId);
@@ -572,7 +705,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：更新 Supabase
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('channels')
               .update(updates)
               .eq('id', id);
@@ -601,7 +734,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 刪除
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('channels')
               .delete()
               .eq('id', id);
@@ -696,7 +829,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：寫入 Supabase
             // 1. 建立代墊清單
-            const { error: listError } = await supabase
+            const { error: listError } = await (supabase as any)
               .from('advance_lists')
               .insert({
                 id: listId,
@@ -708,7 +841,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             if (listError) throw listError;
 
             // 2. 建立代墊項目
-            const { error: itemsError } = await supabase
+            const { error: itemsError } = await (supabase as any)
               .from('advance_items')
               .insert(
                 advanceItems.map(item => ({
@@ -786,7 +919,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 載入
             // 1. 載入代墊清單
-            const { data: lists, error: listsError } = await supabase
+            const { data: lists, error: listsError } = await (supabase as any)
               .from('advance_lists')
               .select('*')
               .eq('channel_id', channelId)
@@ -797,7 +930,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             // 2. 載入每個清單的項目
             const advanceLists: AdvanceList[] = [];
             for (const list of lists || []) {
-              const { data: items, error: itemsError } = await supabase
+              const { data: items, error: itemsError } = await (supabase as any)
                 .from('advance_items')
                 .select('*')
                 .eq('advance_list_id', list.id)
@@ -834,7 +967,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 刪除（會自動刪除關聯的 items，因為有 ON DELETE CASCADE）
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .from('advance_lists')
               .delete()
               .eq('id', listId);

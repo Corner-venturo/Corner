@@ -83,7 +83,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
     { id: 'transfer', label: '轉帳', icon: ArrowRightLeft, color: 'text-morandi-blue', bgColor: 'bg-morandi-blue/10' },
   ];
 
-  const handleKeyDown = useEnterSubmit(handleSubmit);
+  const { handleKeyDown, compositionProps } = useEnterSubmit(handleSubmit);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -188,6 +188,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                 value={formData.amount}
                 onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
                 onKeyDown={handleKeyDown}
+                {...compositionProps}
                 placeholder="0"
                 className="pl-12 text-lg font-semibold"
                 min="0"
@@ -214,6 +215,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               onKeyDown={handleKeyDown}
+              {...compositionProps}
               placeholder="輸入備註（選填）"
               className="mt-1"
             />

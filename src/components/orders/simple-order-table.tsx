@@ -123,8 +123,8 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                   <td className="py-1.5 sm:py-2 px-3 sm:px-4">
                     <span className={cn(
                       'text-[10px] sm:text-xs font-medium',
-                      order.payment_status === '已收款' ? 'text-morandi-green' :
-                      order.payment_status === '部分收款' ? 'text-morandi-gold' :
+                      order.payment_status === 'paid' ? 'text-morandi-green' :
+                      order.payment_status === 'partial' ? 'text-morandi-gold' :
                       'text-morandi-red'
                     )}>
                       {order.payment_status}

@@ -114,7 +114,7 @@ export function FinanceAlertDialog({ open, onOpenChange, onShare }: FinanceAlert
     }).sort((a, b) => {
       // 優先顯示高風險訂單
       if (a.riskLevel !== b.riskLevel) {
-        const riskOrder = { high: 0, medium: 1, low: 2 };
+        const riskOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
         return riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
       }
       // 同等風險按缺口金額排序

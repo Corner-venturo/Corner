@@ -88,23 +88,14 @@ export type {
 // 財務型別（使用 Store 統一型別）
 // ============================================
 // 注意：PaymentRequest, PaymentRequestItem, DisbursementOrder 現在從 @/stores/types 導出
-// 這裡保留其他財務相關型別的導出（舊的 finance.types 已 deprecated）
+// 這裡保留其他財務相關型別的導出
 export type {
-  Payment,
+  PaymentRequest,
+  DisbursementOrder,
   ReceiptOrder,
   ReceiptPaymentItem,
   PaymentMethod,
-  RequestStatus,
-  DisbursementStatus,
-  ReceiptStatus,
-  RecipientType,
-  ExpenseCategory,
-  CreatePaymentData,
-  CreatePaymentRequestData,
-  CreateDisbursementOrderData,
-  CreateReceiptOrderData,
-  FinanceStats,
-} from './finance.types.deprecated';
+} from '@/stores/types';
 
 // ============================================
 // 報價單型別

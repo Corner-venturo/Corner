@@ -49,9 +49,9 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
 
   const getPaymentBadge = (status: string) => {
     const badges: Record<string, string> = {
-      '已收款': 'bg-morandi-green text-white',
-      '部分收款': 'bg-morandi-gold text-white',
-      '未收款': 'bg-morandi-red text-white'
+      'paid': 'bg-morandi-green text-white',
+      'partial': 'bg-morandi-gold text-white',
+      'unpaid': 'bg-morandi-red text-white'
     };
     return badges[status] || 'bg-morandi-container text-morandi-secondary';
   };
@@ -164,8 +164,8 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                   <td className="py-1.5 sm:py-2 px-3 sm:px-4">
                     <span className={cn(
                       'text-[10px] sm:text-xs font-medium',
-                      order.payment_status === '已收款' ? 'text-morandi-green' :
-                      order.payment_status === '部分收款' ? 'text-morandi-gold' :
+                      order.payment_status === 'paid' ? 'text-morandi-green' :
+                      order.payment_status === 'partial' ? 'text-morandi-gold' :
                       'text-morandi-red'
                     )}>
                       {order.payment_status}

@@ -98,21 +98,18 @@ export class DatabaseInitializer {
             employee_number: profile.employee_number,
             display_name: profile.display_name || '',
             english_name: profile.english_name || '',
+            chinese_name: profile.display_name || '',
             permissions: profile.permissions || [],
             personal_info: {
               national_id: '',
               birthday: '',
-              gender: 'male',
               phone: '',
               email: profile.email || '',
               address: '',
               emergency_contact: { name: '', relationship: '', phone: '' }
             },
             job_info: {
-              department: profile.department || '未分類',
-              position: profile.position || '員工',
-              hire_date: new Date().toISOString(),
-              employment_type: 'fulltime'
+              hire_date: new Date().toISOString()
             },
             salary_info: {
               base_salary: 0,
@@ -165,6 +162,7 @@ export class DatabaseInitializer {
         employee_number: 'william01',
         display_name: 'William Chien',
         english_name: 'William Chien',
+        chinese_name: '簡威廉',
         permissions: [
           'super_admin',
           'admin',
@@ -180,17 +178,13 @@ export class DatabaseInitializer {
         personal_info: {
           national_id: '',
           birthday: '',
-          gender: 'male',
           phone: '',
           email: 'william@venturo.com',
           address: '',
           emergency_contact: { name: '', relationship: '', phone: '' }
         },
         job_info: {
-          department: '管理部',
-          position: '系統管理員',
-          hire_date: new Date().toISOString(),
-          employment_type: 'fulltime'
+          hire_date: new Date().toISOString()
         },
         salary_info: {
           base_salary: 0,

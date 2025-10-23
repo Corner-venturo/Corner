@@ -75,7 +75,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           total_amount: newOrder.total_amount,
           paid_amount: 0,
           remaining_amount: newOrder.total_amount,
-          payment_status: '未收款' as const
+          payment_status: 'unpaid' as const
         };
 
         await orderStore.create(orderData);

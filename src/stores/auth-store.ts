@@ -256,6 +256,7 @@ export const useAuthStore = create<AuthState>(
         employee_number: employeeData.employee_number,
         display_name: employeeData.display_name,
         english_name: employeeData.english_name,
+        chinese_name: employeeData.chinese_name,
         password_hash: employeeData.password_hash,
         must_change_password: employeeData.must_change_password,
         last_password_change: employeeData.last_password_change,
