@@ -139,14 +139,15 @@ export default function CalendarPage() {
   // 根據類型取得顏色 - 使用莫蘭迪配色
   const getEventColor = useCallback((type: string, status?: Tour['status']) => {
     if (type === 'tour' && status) {
-      const colors = {
-        提案: { bg: '#9BB5D6', border: '#8AA4C5' },
-        進行中: { bg: '#A8C4A2', border: '#97B391' },
-        待結案: { bg: '#D4B896', border: '#C3A785' },
-        結案: { bg: '#B8B3AE', border: '#A7A29D' },
-        特殊團: { bg: '#D4A5A5', border: '#C39494' },
+      const colors: Record<Tour['status'], { bg: string; border: string }> = {
+        draft: { bg: '#9BB5D6', border: '#8AA4C5' },       // 提案
+        active: { bg: '#A8C4A2', border: '#97B391' },      // 進行中
+        pending_close: { bg: '#D4B896', border: '#C3A785' }, // 待結案
+        closed: { bg: '#B8B3AE', border: '#A7A29D' },      // 結案
+        cancelled: { bg: '#B8B3AE', border: '#A7A29D' },   // 已取消
+        special: { bg: '#D4A5A5', border: '#C39494' },     // 特殊團
       }
-      return colors[status] || colors['提案']
+      return colors[status] || colors.draft
     }
 
     const colors = {
