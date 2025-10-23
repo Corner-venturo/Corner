@@ -26,7 +26,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
 })
 
-// 測試連接
+// 測試 Supabase 連接
 export async function testSupabaseConnection() {
   try {
     const { data, error } = await supabase.from('employees').select('count').limit(1);
