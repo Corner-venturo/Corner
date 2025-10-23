@@ -2,12 +2,12 @@
  * 地區管理類型定義
  */
 
-import type { BaseEntity } from './base.types';
+import type { BaseEntity, SyncableEntity } from './base.types';
 
 /**
  * 地區/國家
  */
-export interface Region extends BaseEntity {
+export interface Region extends SyncableEntity {
   type: 'country' | 'city';       // 類型：國家或城市
   name: string;                   // 地區名稱（例如：日本、東京）
   code: string;                   // 地區代碼（例如：JPN、TYO）
