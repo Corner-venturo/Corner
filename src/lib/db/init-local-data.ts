@@ -37,13 +37,20 @@ export async function initLocalDatabase(): Promise<void> {
     const employeeCount = await localDB.count('employees');
 
     if (employeeCount === 0) {
-      console.log('📝 建立預設管理員...');
+      console.log('📝 IndexedDB 無資料，嘗試從 Supabase 同步...');
 
-      // 只建立預設管理員（william01）
-      await createDefaultAdmin();
+      // 🔄 優先從 Supabase 同步資料（如果有網路）
+      const syncedFromSupabase = await syncFromSupabase();
 
-      console.log('✅ 預設管理員建立完成');
-      console.log('💡 其他資料請透過系統介面新增');
+      if (!syncedFromSupabase) {
+        // Supabase 也沒資料或無網路 → 建立預設管理員
+        console.log('📝 Supabase 無資料，建立預設管理員...');
+        await createDefaultAdmin();
+        console.log('✅ 預設管理員建立完成');
+        console.log('💡 其他資料請透過系統介面新增');
+      } else {
+        console.log('✅ 已從 Supabase 同步資料到本地');
+      }
     } else {
       console.log('✅ 資料庫已有資料，跳過初始化');
 
@@ -53,6 +60,53 @@ export async function initLocalDatabase(): Promise<void> {
   } catch (error) {
     console.error('❌ 初始化資料庫失敗:', error);
     throw error;
+  }
+}
+
+/**
+ * 從 Supabase 同步資料到本地
+ * @returns true 表示成功同步，false 表示無資料或失敗
+ */
+async function syncFromSupabase(): Promise<boolean> {
+  try {
+    // 檢查是否有網路
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      console.log('⚠️ 無網路連線，無法從 Supabase 同步');
+      return false;
+    }
+
+    console.log('🌐 嘗試從 Supabase 下載資料...');
+    const { supabase } = await import('@/lib/supabase/client');
+
+    // 下載 employees 資料
+    const { data: employees, error } = await (supabase as any)
+      .from('employees')
+      .select('*')
+      .eq('status', 'active');
+
+    if (error) {
+      console.error('❌ Supabase 查詢失敗:', error);
+      return false;
+    }
+
+    if (!employees || employees.length === 0) {
+      console.log('⚠️ Supabase 沒有員工資料');
+      return false;
+    }
+
+    console.log(`📥 從 Supabase 下載了 ${employees.length} 位員工`);
+
+    // 寫入到 IndexedDB
+    for (const employee of employees) {
+      await localDB.create('employees', employee);
+    }
+
+    console.log('✅ 員工資料已同步到本地');
+    return true;
+
+  } catch (error) {
+    console.error('❌ 從 Supabase 同步失敗:', error);
+    return false;
   }
 }
 
