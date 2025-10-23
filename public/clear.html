@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>清空 IndexedDB</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin: 10px 0;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+    .success { background: #d4edda; color: #155724; display: block; }
+    .error { background: #f8d7da; color: #721c24; display: block; }
+    .info { background: #d1ecf1; color: #0c5460; display: block; }
+    .step {
+      background: #f8f9fa;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔧 清空本地資料</h1>
+
+    <div class="step">
+      <strong>為什麼需要清空？</strong>
+      <p>本地快取的資料格式已更新，需要清空後重新從雲端下載。</p>
+    </div>
+
+    <button onclick="clearData()">清空並重新載入</button>
+    <button onclick="checkStatus()" style="background: #6c757d;">檢查狀態</button>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+
+    async function clearData() {
+      status.className = 'info';
+      status.style.display = 'block';
+      status.textContent = '⏳ 清空中...';
+
+      try {
+        const deleteReq = indexedDB.deleteDatabase('VenturoOfflineDB');
+
+        deleteReq.onsuccess = () => {
+          status.className = 'success';
+          status.innerHTML = '✅ 清空成功！<br>⏳ 2 秒後自動跳轉到登入頁...';
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        };
+
+        deleteReq.onerror = () => {
+          status.className = 'error';
+          status.innerHTML = '❌ 清空失敗: ' + deleteReq.error + '<br><br>請關閉所有分頁後重試';
+        };
+
+        deleteReq.onblocked = () => {
+          status.className = 'error';
+          status.innerHTML = '⚠️ 資料庫被其他分頁鎖住！<br><br>請關閉所有此網站的分頁，只保留這一個，然後重試。';
+        };
+
+      } catch (error) {
+        status.className = 'error';
+        status.style.display = 'block';
+        status.textContent = '❌ 錯誤: ' + error.message;
+      }
+    }
+
+    async function checkStatus() {
+      status.className = 'info';
+      status.style.display = 'block';
+      status.textContent = '⏳ 檢查中...';
+
+      try {
+        const dbs = await indexedDB.databases();
+        const hasVenturo = dbs.some(db => db.name === 'VenturoOfflineDB');
+
+        if (hasVenturo) {
+          // 檢查資料格式
+          const request = indexedDB.open('VenturoOfflineDB', 1);
+          request.onsuccess = (e) => {
+            const db = e.target.result;
+            const tx = db.transaction('employees', 'readonly');
+            const store = tx.objectStore('employees');
+            const getAllReq = store.getAll();
+
+            getAllReq.onsuccess = () => {
+              const employees = getAllReq.result;
+              if (employees.length === 0) {
+                status.className = 'info';
+                status.innerHTML = '📭 資料庫存在但為空<br>可以直接跳轉到登入頁';
+              } else {
+                const firstEmp = employees[0];
+                const isSnakeCase = 'employee_number' in firstEmp;
+                const isCamelCase = 'employeeNumber' in firstEmp;
+
+                if (isSnakeCase) {
+                  status.className = 'success';
+                  status.innerHTML = '✅ 資料格式正確（snake_case）<br>👥 員工數量: ' + employees.length + '<br><br>可以直接去登入了！';
+                } else if (isCamelCase) {
+                  status.className = 'error';
+                  status.innerHTML = '❌ 資料格式錯誤（舊的 camelCase）<br><br>請點擊「清空並重新載入」按鈕';
+                } else {
+                  status.className = 'error';
+                  status.innerHTML = '⚠️ 無法識別資料格式<br><br>建議清空重新下載';
+                }
+              }
+              db.close();
+            };
+          };
+        } else {
+          status.className = 'success';
+          status.innerHTML = '✅ VenturoOfflineDB 不存在<br><br>可以跳轉到登入頁，系統會自動下載資料';
+        }
+      } catch (e) {
+        status.className = 'error';
+        status.style.display = 'block';
+        status.textContent = '❌ 檢查失敗: ' + e.message;
+      }
+    }
+
+    // 自動檢查
+    window.onload = () => checkStatus();
+  </script>
+</body>
+</html>
