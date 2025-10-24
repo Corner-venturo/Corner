@@ -17,7 +17,7 @@ export const useTours = () => {
 
     // ========== Tour CRUD 操作 ==========
     createTour: async (data: Omit<Tour, 'id' | 'created_at' | 'updated_at'>) => {
-      return await tourStore.create(data as any);
+      return await tourStore.create(data as unknown);
     },
 
     updateTour: async (id: string, data: Partial<Tour>) => {

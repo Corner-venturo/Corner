@@ -114,8 +114,8 @@ export default function CreateInvoicePage() {
       })
 
       router.push('/finance/travel-invoice')
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : '發生未知錯誤')
     }
   }
 
@@ -166,7 +166,7 @@ export default function CreateInvoicePage() {
                 <select
                   id="tax_type"
                   value={tax_type}
-                  onChange={e => setTaxType(e.target.value as any)}
+                  onChange={e => setTaxType(e.target.value as unknown)}
                   className="w-full px-3 py-2 border rounded-md"
                 >
                   <option value="dutiable">應稅</option>

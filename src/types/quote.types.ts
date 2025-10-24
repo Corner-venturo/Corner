@@ -36,7 +36,7 @@ export interface Quote extends BaseEntity {
   tour_id?: string;          // 轉換後的旅遊團 ID
 
   // 擴展欄位（用於詳細頁）
-  categories?: any[];        // 報價分類（前端使用的複雜結構）
+  categories?: unknown[];        // 報價分類（前端使用的複雜結構）
   versions?: QuoteVersion[]; // 歷史版本
 }
 

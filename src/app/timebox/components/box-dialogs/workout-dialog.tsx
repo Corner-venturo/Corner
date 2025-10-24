@@ -195,7 +195,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                   variant="outline"
                   size="sm"
                   onClick={() => setShowAddExercise(true)}
-                  className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+                  className="text-morandi-gold border-morandi-gold/20 hover:bg-morandi-gold/10"
                 >
                   <Plus className="h-4 w-4 mr-1" />
                   新增動作
@@ -205,7 +205,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
 
             {/* 新增/編輯表單 */}
             {showAddExercise && (
-              <div className="bg-morandi-container/10 rounded-lg p-4 mb-4 border-2 border-morandi-gold/30">
+              <div className="bg-morandi-container/10 rounded-lg p-4 mb-4 border-2 border-morandi-gold/20">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-medium text-morandi-gold">
                     {editingExerciseId ? '編輯動作' : '新增動作'}
@@ -313,7 +313,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                   return (
                     <div
                       key={exercise.id}
-                      className="bg-white rounded-lg border border-border p-4 hover:border-morandi-gold/50 transition-colors"
+                      className="bg-white rounded-lg border border-border p-4 hover:border-morandi-gold/20/20 transition-colors"
                     >
                       {/* 動作標題 */}
                       <div className="flex items-start justify-between mb-3">
@@ -370,7 +370,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                                 active:scale-95
                                 ${completed
                                   ? 'bg-morandi-green border-morandi-green text-white shadow-lg scale-105 animate-pulse'
-                                  : 'border-morandi-container hover:border-morandi-gold hover:bg-morandi-gold/5 bg-white hover:scale-105'
+                                  : 'border-morandi-container hover:border-morandi-gold/20 hover:bg-morandi-gold/5 bg-white hover:scale-105'
                                 }
                               `}
                               title={exercise.completedSetsTime[setIndex]

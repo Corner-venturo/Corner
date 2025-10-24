@@ -169,7 +169,7 @@ export interface Member {
   reservation_code?: string; // 訂位代號
   add_ons?: string[]; // 加購項目IDs
   refunds?: string[]; // 退費項目IDs
-  custom_fields?: Record<string, any>; // 自定義欄位數據 {fieldId: value}
+  custom_fields?: Record<string, unknown>; // 自定義欄位數據 {fieldId: value}
   created_at: string;
   updated_at: string;
 }

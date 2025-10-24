@@ -104,7 +104,7 @@ export function TourDocuments({ tour, orderFilter }: TourDocumentsProps) {
   };
 
   const getStatusIcon = (status: string) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, unknown> = {
       '已簽署': CheckCircle,
       '已確認': CheckCircle,
       '待確認': Clock,

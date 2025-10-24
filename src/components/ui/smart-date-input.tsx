@@ -54,7 +54,7 @@ export function SmartDateInput({
   };
 
   const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value.replace(/\D/g, ''); // 只允許數字
+    const val = e.target.value.replace(/\D/g, ''); // 只允許數字
 
     // 直接更新，不補0
     onChange(val ? `${val}${month ? '-' + month : ''}${day ? '-' + day : ''}` : '');
@@ -192,7 +192,7 @@ export function SmartDateInput({
               caption: "flex justify-center pt-1 relative items-center",
               caption_label: "text-sm font-medium",
               nav: "space-x-1 flex items-center",
-              nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+              nav_button: "h-10 w-10 bg-transparent p-0 opacity-50 hover:opacity-100",
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
               table: "w-full border-collapse space-y-1",

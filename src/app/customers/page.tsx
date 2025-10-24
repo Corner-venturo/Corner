@@ -61,7 +61,7 @@ export default function CustomersPage() {
   const getCustomerTours = (customer_id: string) => {
     // ✅ 透過反查訂單的 tour_id
     const customerOrders = getCustomerOrders(customer_id);
-    const tourIds = new Set(customerOrders.map((o: any) => o.tour_id));
+    const tourIds = new Set(customerOrders.map((o) => o.tour_id));
     return tours.filter(tour => tourIds.has(tour.id));
   };
 
@@ -70,7 +70,7 @@ export default function CustomersPage() {
     const customerOrders = getCustomerOrders(customer.id);
     const customerTours = getCustomerTours(customer.id);
     const lastOrderDate = customerOrders.length > 0
-      ? new Date(Math.max(...customerOrders.map((o: any) => new Date(o.created_at).getTime())))
+      ? new Date(Math.max(...customerOrders.map((o) => new Date(o.created_at).getTime())))
       : null;
 
     return {

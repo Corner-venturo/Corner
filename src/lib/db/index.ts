@@ -63,7 +63,7 @@ export class LocalDatabase {
         const now = new Date().toISOString();
         const recordWithTimestamp = {
           ...data,
-          created_at: (data as any).created_at || now,
+          created_at: (data as unknown).created_at || now,
           updated_at: now,
         } as T;
 
@@ -226,7 +226,7 @@ export class LocalDatabase {
       const now = new Date().toISOString();
       const recordWithTimestamp = {
         ...data,
-        created_at: (data as any).created_at || now,
+        created_at: (data as unknown).created_at || now,
         updated_at: now,
       } as T;
 
@@ -396,7 +396,7 @@ export class LocalDatabase {
       dataArray.forEach((data) => {
         const recordWithTimestamp = {
           ...data,
-          created_at: (data as any).created_at || now,
+          created_at: (data as unknown).created_at || now,
           updated_at: now,
         } as T;
         objectStore.add(recordWithTimestamp);
@@ -558,13 +558,13 @@ export class LocalDatabase {
           case 'ne':
             return fieldValue !== condition.value;
           case 'gt':
-            return (fieldValue as any) > (condition.value as any);
+            return (fieldValue as unknown) > (condition.value as unknown);
           case 'gte':
-            return (fieldValue as any) >= (condition.value as any);
+            return (fieldValue as unknown) >= (condition.value as unknown);
           case 'lt':
-            return (fieldValue as any) < (condition.value as any);
+            return (fieldValue as unknown) < (condition.value as unknown);
           case 'lte':
-            return (fieldValue as any) <= (condition.value as any);
+            return (fieldValue as unknown) <= (condition.value as unknown);
           case 'contains':
             return String(fieldValue)
               .toLowerCase()

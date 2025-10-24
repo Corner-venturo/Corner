@@ -288,7 +288,7 @@ export default function CalendarPage() {
   }, [allEvents, settings])
 
   // 處理日期點擊 - 直接開啟新增個人事項
-  const handleDateClick = (info: any) => {
+  const handleDateClick = (info) => {
     setAddEventDialog({
       open: true,
       selectedDate: info.dateStr,
@@ -425,7 +425,7 @@ export default function CalendarPage() {
   }
 
   // 處理 "更多" 連結點擊
-  const handleMoreLinkClick = (info: any) => {
+  const handleMoreLinkClick = (info) => {
     info.jsEvent.preventDefault()
     const clickedDate = info.dateStr
 

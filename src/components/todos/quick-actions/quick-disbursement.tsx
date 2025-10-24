@@ -254,7 +254,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           )}
 
           {selectedTour && !searchTerm && (
-            <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-3">
+            <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-medium text-morandi-primary">
@@ -338,7 +338,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                 type="date"
                 value={requestDate}
                 onChange={(e) => setRequestDate(e.target.value)}
-                className="bg-morandi-gold/10 border-morandi-gold/50"
+                className="bg-morandi-gold/10 border-morandi-gold/20"
               />
               <p className="text-xs text-morandi-gold mt-1">⚠️ 特殊出帳：可選擇任何日期</p>
             </div>
@@ -374,7 +374,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                 <label className="text-xs font-medium text-morandi-secondary mb-1 block">類別</label>
                 <Select
                   value={newItem.category}
-                  onValueChange={(value: any) => setNewItem(prev => ({ ...prev, category: value }))}
+                  onValueChange={(value) => setNewItem(prev => ({ ...prev, category: value }))}
                 >
                   <SelectTrigger className="border-morandi-container/30">
                     <SelectValue />

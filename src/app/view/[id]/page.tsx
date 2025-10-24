@@ -40,7 +40,7 @@ export default function ViewItineraryPage() {
           // Convert icon strings to components
           const processedData = {
             ...tour,
-            features: tour.features?.map((f: any) => ({
+            features: tour.features?.map((f) => ({
               ...f,
               iconComponent: iconMap[f.icon] || IconSparkles,
             })) || [],

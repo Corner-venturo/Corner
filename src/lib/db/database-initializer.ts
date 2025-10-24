@@ -221,6 +221,6 @@ export class DatabaseInitializer {
 
 // 瀏覽器環境中提供全域訪問
 if (typeof window !== 'undefined') {
-  (window as any).DatabaseInitializer = DatabaseInitializer;
+  (window as unknown).DatabaseInitializer = DatabaseInitializer;
   console.log('💡 DatabaseInitializer 已載入');
 }

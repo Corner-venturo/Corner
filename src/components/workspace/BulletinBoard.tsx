@@ -81,7 +81,7 @@ export function BulletinBoard() {
     setNewBulletin({
       title: bulletin.title,
       content: bulletin.content,
-      type: bulletin.type as any,
+      type: bulletin.type as unknown,
       is_pinned: bulletin.is_pinned
     });
     setEditingBulletin(bulletin);
@@ -279,7 +279,7 @@ export function BulletinBoard() {
                 <label className="text-sm font-medium text-morandi-primary">類型</label>
                 <select
                   value={newBulletin.type}
-                  onChange={(e) => setNewBulletin({...newBulletin, type: e.target.value as any})}
+                  onChange={(e) => setNewBulletin({...newBulletin, type: e.target.value as unknown})}
                   className="mt-1 px-3 py-2 border border-border rounded-md text-sm"
                 >
                   <option value="announcement">一般公告</option>

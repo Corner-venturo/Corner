@@ -74,8 +74,8 @@ export default function VisasPage() {
     if (!contact_info.tour_id) return [];
     const { items: orders } = useOrderStore.getState();
     return orders
-      .filter((order: any) => order.tour_id === contact_info.tour_id)
-      .map((order: any) => ({
+      .filter((order) => order.tour_id === contact_info.tour_id)
+      .map((order) => ({
         value: order.id,
         label: `${order.order_number} - ${order.contact_person}`,
       }));
@@ -105,7 +105,7 @@ export default function VisasPage() {
     };
 
     initVisaTour();
-  }, []);
+  }, [contact_info.tour_id, fetchTours]);
 
   // 批次辦理人列表
   interface VisaApplicant {
@@ -139,7 +139,7 @@ export default function VisasPage() {
         return updated;
       });
     }
-  }, [contact_info.applicant_name]);
+  }, [contact_info.applicant_name, applicants.length]);
 
   // 新增辦理人
   const addApplicant = useCallback(() => {
@@ -235,7 +235,7 @@ export default function VisasPage() {
           total_revenue: 0,
           total_cost: 0,
           profit: 0,
-        } as any);
+        } as unknown);
       }
     } else {
       selectedTour = tours.find(t => t.id === contact_info.tour_id);
@@ -441,7 +441,7 @@ export default function VisasPage() {
       <ResponsiveHeader
         {...{
         title: "簽證管理",
-        icon: FileText} as any}
+        icon: FileText} as unknown}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '簽證管理', href: '/visas' }

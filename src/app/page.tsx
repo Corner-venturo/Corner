@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
@@ -190,8 +190,8 @@ function CalculatorWidget() {
   const displayResult = calculateResult();
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full border border-[#E6DDD4] shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/50 transition-all duration-200">
-      <div className="bg-morandi-container px-4 py-3 border-b border-[#E6DDD4] flex-shrink-0">
+    <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
+      <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calculator className="h-4 w-4 text-morandi-gold" />
@@ -202,7 +202,7 @@ function CalculatorWidget() {
               type="checkbox"
               checked={sequentialMode}
               onChange={(e) => setSequentialMode(e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-morandi-gold/30 text-morandi-gold focus:ring-morandi-gold/20 cursor-pointer"
+              className="w-3.5 h-3.5 rounded border-morandi-gold/20 text-morandi-gold focus:ring-morandi-gold/20 cursor-pointer"
             />
             <span className="text-xs text-morandi-secondary group-hover:text-morandi-primary transition-colors">順序計算</span>
           </label>
@@ -212,7 +212,7 @@ function CalculatorWidget() {
         <div className="space-y-3 flex-1 flex flex-col min-h-0">
         {/* iPhone 風格顯示區 */}
         <div
-          className="bg-white rounded-xl p-4 min-h-[80px] flex flex-col justify-end border border-[#E6DDD4] cursor-text shadow-sm"
+          className="bg-white rounded-xl p-4 min-h-[80px] flex flex-col justify-end border border-morandi-gold/20 cursor-text shadow-sm"
           onClick={() => inputRef.current?.focus()}
         >
           {/* 算式輸入（小字灰色） */}
@@ -242,7 +242,7 @@ function CalculatorWidget() {
               variant="outline"
               size="sm"
               onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-[#E6DDD4] hover:border-morandi-gold transition-all rounded-xl"
+              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
             >
               {btn}
             </Button>
@@ -253,7 +253,7 @@ function CalculatorWidget() {
               variant="outline"
               size="sm"
               onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-[#E6DDD4] hover:border-morandi-gold transition-all rounded-xl"
+              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
             >
               {btn}
             </Button>
@@ -264,7 +264,7 @@ function CalculatorWidget() {
               variant="outline"
               size="sm"
               onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-[#E6DDD4] hover:border-morandi-gold transition-all rounded-xl"
+              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
             >
               {btn}
             </Button>
@@ -275,7 +275,7 @@ function CalculatorWidget() {
               variant="outline"
               size="sm"
               onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-[#E6DDD4] hover:border-morandi-gold transition-all rounded-xl"
+              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
             >
               {btn}
             </Button>
@@ -284,7 +284,7 @@ function CalculatorWidget() {
             variant="outline"
             size="sm"
             onClick={() => handleButtonClick('+')}
-            className="h-9 text-sm font-medium bg-white/80 border-[#E6DDD4]/50 hover:bg-white hover:border-morandi-gold hover:scale-105 transition-all rounded-xl"
+            className="h-9 text-sm font-medium bg-white/80 border-morandi-gold/20 hover:bg-white hover:border-morandi-gold/20 hover:scale-105 transition-all rounded-xl"
           >
             +
           </Button>
@@ -299,7 +299,7 @@ function CalculatorWidget() {
             variant="outline"
             size="sm"
             onClick={() => handleButtonClick('C')}
-            className="h-9 text-sm font-medium col-span-2 bg-white/80 border-[#E6DDD4]/50 hover:bg-red-50 hover:text-red-600 hover:border-red-300 hover:scale-105 transition-all rounded-xl"
+            className="h-9 text-sm font-medium col-span-2 bg-white/80 border-morandi-gold/20 hover:bg-red-50 hover:text-red-600 hover:border-red-300 hover:scale-105 transition-all rounded-xl"
           >
             清除
           </Button>
@@ -313,14 +313,14 @@ function CalculatorWidget() {
 // 匯率轉換組件（雙向轉換）
 function CurrencyWidget() {
   // 預設匯率（1 外幣 = ? 台幣）
-  const DEFAULT_RATES = {
+  const DEFAULT_RATES = useMemo(() => ({
     USD: { rate: 31.5, symbol: '$', name: '美金' },
     JPY: { rate: 0.21, symbol: '¥', name: '日幣' },
     KRW: { rate: 0.024, symbol: '₩', name: '韓元' },
     CNY: { rate: 4.35, symbol: '¥', name: '人民幣' },
     VND: { rate: 0.00127, symbol: '₫', name: '越南盾' },
     IDR: { rate: 0.002, symbol: 'Rp', name: '印尼盾' },
-  };
+  }), []);
 
   const [twdAmount, setTwdAmount] = useState('10000');
   const [foreignAmount, setForeignAmount] = useState('');
@@ -334,22 +334,22 @@ function CurrencyWidget() {
     if (!useCustomRate) {
       setCustomRate(DEFAULT_RATES[selectedCurrency].rate.toString());
     }
-  }, [selectedCurrency, useCustomRate]);
+  }, [selectedCurrency, useCustomRate, DEFAULT_RATES]);
 
   // 計算外幣金額（台幣 → 外幣）
-  const calculateForeign = (twd: string): string => {
+  const calculateForeign = useCallback((twd: string): string => {
     const amount = parseFloat(twd) || 0;
     const rate = parseFloat(customRate) || 0;
     if (rate === 0) return '0';
     return (amount / rate).toFixed(2);
-  };
+  }, [customRate]);
 
   // 計算台幣金額（外幣 → 台幣）
-  const calculateTWD = (foreign: string): string => {
+  const calculateTWD = useCallback((foreign: string): string => {
     const amount = parseFloat(foreign) || 0;
     const rate = parseFloat(customRate) || 0;
     return (amount * rate).toFixed(2);
-  };
+  }, [customRate]);
 
   // 當台幣金額變更
   const handleTwdChange = (value: string) => {
@@ -372,12 +372,13 @@ function CurrencyWidget() {
     } else {
       setTwdAmount(calculateTWD(foreignAmount));
     }
-  }, [customRate]);
+  }, [customRate, direction, twdAmount, foreignAmount, calculateForeign, calculateTWD]);
 
   // 初始化外幣金額
   useEffect(() => {
     setForeignAmount(calculateForeign(twdAmount));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只在組件掛載時執行一次
 
   const currencyInfo = DEFAULT_RATES[selectedCurrency];
 
@@ -387,8 +388,8 @@ function CurrencyWidget() {
   };
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full border border-[#E6DDD4] shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/50 transition-all duration-200">
-      <div className="bg-morandi-container px-4 py-3 border-b border-[#E6DDD4] flex-shrink-0">
+    <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
+      <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
         <div className="flex items-center gap-2">
           <DollarSign className="h-4 w-4 text-morandi-gold" />
           <h3 className="font-semibold text-sm text-morandi-primary">匯率換算</h3>
@@ -404,7 +405,7 @@ function CurrencyWidget() {
               setSelectedCurrency(e.target.value as keyof typeof DEFAULT_RATES);
               setUseCustomRate(false);
             }}
-            className="w-full px-3 py-2 text-sm border border-[#E6DDD4] rounded-xl bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
+            className="w-full px-3 py-2 text-sm border border-morandi-gold/20 rounded-xl bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
           >
             {Object.entries(DEFAULT_RATES).map(([code, info]) => (
               <option key={code} value={code}>
@@ -425,7 +426,7 @@ function CurrencyWidget() {
                 type="number"
                 value={twdAmount}
                 onChange={(e) => handleTwdChange(e.target.value)}
-                className="w-full px-3 py-2 pl-[42px] border border-[#E6DDD4] rounded-xl font-mono text-sm bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
+                className="w-full px-3 py-2 pl-[42px] border border-morandi-gold/20 rounded-xl font-mono text-sm bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
                 placeholder="10000"
               />
             </div>
@@ -465,7 +466,7 @@ function CurrencyWidget() {
                 type="number"
                 value={foreignAmount}
                 onChange={(e) => handleForeignChange(e.target.value)}
-                className="w-full px-3 py-2 pl-[42px] border border-[#E6DDD4] rounded-xl font-mono text-sm bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
+                className="w-full px-3 py-2 pl-[42px] border border-morandi-gold/20 rounded-xl font-mono text-sm bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
                 placeholder="0.00"
               />
             </div>
@@ -496,7 +497,7 @@ function CurrencyWidget() {
               setCustomRate(e.target.value);
               setUseCustomRate(true);
             }}
-            className="w-full px-4 py-2.5 border border-[#E6DDD4] rounded-xl font-mono text-sm bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
+            className="w-full px-4 py-2.5 border border-morandi-gold/20 rounded-xl font-mono text-sm bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none"
             placeholder="輸入匯率"
           />
           <p className="text-xs text-morandi-muted mt-2 flex items-center gap-1.5">
@@ -541,15 +542,15 @@ function TimerWidget() {
   };
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full border border-[#E6DDD4] shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/50 transition-all duration-200">
-      <div className="bg-morandi-container px-4 py-3 border-b border-[#E6DDD4] flex-shrink-0">
+    <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
+      <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-morandi-gold" />
           <h3 className="font-semibold text-sm text-morandi-primary">計時器</h3>
         </div>
       </div>
       <div className="p-6 flex-1 flex flex-col justify-center min-h-0">
-        <div className="bg-white rounded-2xl p-8 border border-[#E6DDD4] shadow-sm mb-6">
+        <div className="bg-white rounded-2xl p-8 border border-morandi-gold/20 shadow-sm mb-6">
           <div className="text-center">
             <div className="text-5xl font-mono font-bold text-morandi-primary tracking-wider">
               {formatTime(seconds)}
@@ -564,7 +565,7 @@ function TimerWidget() {
             size="lg"
             className={`flex-1 rounded-xl transition-all duration-200 ${
               isRunning
-                ? 'bg-white border border-[#E6DDD4] text-morandi-primary hover:border-morandi-gold'
+                ? 'bg-white border border-morandi-gold/20 text-morandi-primary hover:border-morandi-gold'
                 : 'bg-gradient-to-r from-[#B5986A] to-[#D4C4A8] text-white border-0 shadow-lg active:scale-95'
             }`}
             onClick={() => setIsRunning(!isRunning)}
@@ -578,7 +579,7 @@ function TimerWidget() {
               setSeconds(0);
               setIsRunning(false);
             }}
-            className="bg-white border-[#E6DDD4] hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all rounded-xl"
+            className="bg-white border-morandi-gold/20 hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all rounded-xl"
           >
             重設
           </Button>
@@ -656,8 +657,8 @@ function NotesWidget() {
   const activeTab = tabs.find(tab => tab.id === activeTabId) || tabs[0];
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full border border-[#E6DDD4] shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/50 transition-all duration-200">
-      <div className="bg-morandi-container px-4 py-3 border-b border-[#E6DDD4] flex-shrink-0">
+    <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
+      <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Clipboard className="h-4 w-4 text-morandi-gold" />
@@ -685,7 +686,7 @@ function NotesWidget() {
                       if (e.key === 'Enter') renameTab(tab.id, editingName);
                       if (e.key === 'Escape') setIsEditingTab(null);
                     }}
-                    className="w-16 px-1 bg-white border border-morandi-gold rounded outline-none"
+                    className="w-16 px-1 bg-white border border-morandi-gold/20 rounded outline-none"
                     autoFocus
                   />
                 ) : (
@@ -738,7 +739,7 @@ function NotesWidget() {
         <textarea
           value={activeTab.content}
           onChange={(e) => updateContent(activeTab.id, e.target.value)}
-          className="w-full h-full p-4 border border-[#E6DDD4] rounded-xl resize-none bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none font-mono text-sm leading-relaxed"
+          className="w-full h-full p-4 border border-morandi-gold/20 rounded-xl resize-none bg-white hover:border-morandi-gold focus:border-morandi-gold focus:ring-2 focus:ring-morandi-gold/10 transition-all outline-none font-mono text-sm leading-relaxed"
           placeholder="在這裡寫下你的筆記..."
         />
         <p className="text-xs text-morandi-muted mt-2">自動儲存 • 雙擊分頁名稱可重新命名</p>
@@ -905,8 +906,8 @@ function StatsWidget() {
   const stats = allStats.filter(stat => activeStats.includes(stat.id));
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full border border-[#E6DDD4] shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/50 transition-all duration-200">
-      <div className="bg-morandi-container px-4 py-3 border-b border-[#E6DDD4] flex-shrink-0">
+    <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
+      <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-morandi-gold" />
@@ -923,7 +924,7 @@ function StatsWidget() {
 
         {/* 設定面板 */}
         {isConfigOpen && (
-          <div className="mt-3 pt-3 border-t border-[#E6DDD4]/50">
+          <div className="mt-3 pt-3 border-t border-morandi-gold/20">
             <div className="text-xs text-morandi-secondary mb-2">選擇要顯示的統計項目</div>
             <div className="grid grid-cols-2 gap-2">
               {allStats.map((stat) => (
@@ -935,7 +936,7 @@ function StatsWidget() {
                     type="checkbox"
                     checked={activeStats.includes(stat.id)}
                     onChange={() => toggleStat(stat.id)}
-                    className="w-3 h-3 rounded border-morandi-gold/30 text-morandi-gold focus:ring-morandi-gold/20"
+                    className="w-3 h-3 rounded border-morandi-gold/20 text-morandi-gold focus:ring-morandi-gold/20"
                   />
                   <span className="text-morandi-primary">{stat.label}</span>
                 </label>
@@ -960,7 +961,7 @@ function StatsWidget() {
               return (
                 <div
                   key={stat.id}
-                  className="bg-white rounded-xl p-4 border border-[#E6DDD4] hover:border-morandi-gold/50 transition-all"
+                  className="bg-white rounded-xl p-4 border border-morandi-gold/20 hover:border-morandi-gold/20 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -1022,7 +1023,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold/20 mx-auto"></div>
           <p className="mt-4 text-morandi-muted">載入中...</p>
         </div>
       </div>
@@ -1037,12 +1038,12 @@ export default function Home() {
         actions={
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 bg-white border-[#E6DDD4] hover:border-morandi-gold transition-all rounded-xl">
+              <Button variant="outline" size="sm" className="gap-2 bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl">
                 <Settings className="h-4 w-4" />
                 小工具設定
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md border-[#E6DDD4] shadow-lg rounded-2xl">
+            <DialogContent className="sm:max-w-md border-morandi-gold/20 shadow-lg rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="text-xl text-morandi-primary">選擇要顯示的小工具</DialogTitle>
                 <p className="text-sm text-morandi-muted mt-1">勾選你想在首頁顯示的小工具</p>
@@ -1053,7 +1054,7 @@ export default function Home() {
                   return (
                     <div
                       key={widget.id}
-                      className="flex items-center space-x-3 p-4 rounded-xl border border-[#E6DDD4] bg-white hover:border-morandi-gold cursor-pointer transition-all shadow-sm"
+                      className="flex items-center space-x-3 p-4 rounded-xl border border-morandi-gold/20 bg-white hover:border-morandi-gold cursor-pointer transition-all shadow-sm"
                       onClick={() => toggleWidget(widget.id)}
                     >
                       <Checkbox
@@ -1077,7 +1078,7 @@ export default function Home() {
 
       <div className="flex-1 overflow-auto min-h-0">
         {activeWidgets.length === 0 ? (
-          <Card className="p-12 text-center border-[#E6DDD4] shadow-sm rounded-2xl bg-white">
+          <Card className="p-12 text-center border-morandi-gold/20 shadow-sm rounded-2xl bg-white">
             <div className="max-w-md mx-auto">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <Settings className="h-8 w-8 text-morandi-gold" />

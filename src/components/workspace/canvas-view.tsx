@@ -21,12 +21,12 @@ export function CanvasView({ channel }: CanvasViewProps) {
 
   // 獲取該頻道的 Canvas 文件
   const channelDocs = personalCanvases
-    .filter((doc: any) => doc.channelId === channel.id)
+    .filter((doc) => doc.channelId === channel.id)
     .sort((a: any, b: any) => a.order - b.order);
   
   // 如果沒有選擇文件，自動選擇第一個
   const activeDoc = activeDocId
-    ? channelDocs.find((doc: any) => doc.id === activeDocId)
+    ? channelDocs.find((doc) => doc.id === activeDocId)
     : channelDocs[0];
   
   const getDocIcon = (type: string) => {
@@ -57,7 +57,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
       type,
       content: {},
       layout: {},
-    } as any);
+    } as unknown);
   };
   
   return (
@@ -78,7 +78,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
         </div>
         
         <div className="flex-1 overflow-y-auto py-2">
-          {channelDocs.map((doc: any) => {
+          {channelDocs.map((doc) => {
             const Icon = getDocIcon(doc.type);
             const is_active = activeDoc?.id === doc.id;
 
@@ -127,7 +127,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
             {activeDoc.type === 'tools' && (
               <WorkspaceTaskList
                 channelId={channel.id}
-                tour_id={(channel as any).tour_id}
+                tour_id={(channel as unknown).tour_id}
               />
             )}
             

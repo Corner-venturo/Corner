@@ -127,7 +127,7 @@ function evaluateExpression(expression: string): number | string {
 }
 
 // 獲取團員的計算上下文
-export function getMemberContext(member: any, tour_add_ons: any[] = [], tourPrice: number = 0): FormulaContext {
+export function getMemberContext(member: any, tour_add_ons: unknown[] = [], tourPrice: number = 0): FormulaContext {
   // 計算加購總金額
   const addOnTotal = (member.addOns || []).reduce((sum: number, addOnId: string) => {
     const addOn = tour_add_ons.find(a => a.id === addOnId);
@@ -157,7 +157,7 @@ export function getMemberContext(member: any, tour_add_ons: any[] = [], tourPric
       const numValue = Number(value);
       acc[fieldId] = isNaN(numValue) ? value : numValue;
       return acc;
-    }, {} as Record<string, any>),
+    }, {} as Record<string, unknown>),
   };
 }
 

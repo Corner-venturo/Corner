@@ -92,7 +92,7 @@ export default function SettingsPage() {
         return;
       }
 
-      const isPasswordValid = await verifyPassword(passwordData.currentPassword, (userData as any).password_hash);
+      const isPasswordValid = await verifyPassword(passwordData.currentPassword, (userData as unknown).password_hash);
       if (!isPasswordValid) {
         alert('目前密碼錯誤！');
         setPasswordUpdateLoading(false);
@@ -102,7 +102,7 @@ export default function SettingsPage() {
       // 2. 更新新密碼
       const hashedPassword = await hashPassword(passwordData.newPassword);
 
-      const result: any = await (supabase as any)
+      const result: any = await (supabase as unknown)
         .from('employees')
         .update({ password_hash: hashedPassword })
         .eq('employee_number', user.employee_number);
@@ -133,7 +133,7 @@ export default function SettingsPage() {
         const { localDB } = await import('@/lib/db');
         const { TABLES } = await import('@/lib/db/schemas');
 
-        const employee = await localDB.read(TABLES.EMPLOYEES, user.id) as any;
+        const employee = await localDB.read(TABLES.EMPLOYEES, user.id) as unknown;
         if (employee) {
           await localDB.put(TABLES.EMPLOYEES, {
             ...employee,
@@ -241,8 +241,8 @@ export default function SettingsPage() {
                     'relative group text-left transition-all duration-300',
                     'border-2 rounded-xl overflow-hidden',
                     is_active
-                      ? 'border-morandi-gold shadow-lg scale-[1.02]'
-                      : 'border-border hover:border-morandi-gold/50 hover:shadow-md'
+                      ? 'border-morandi-gold/20 shadow-lg scale-[1.02]'
+                      : 'border-border hover:border-morandi-gold/20 hover:shadow-md'
                   )}
                 >
                   {/* 選中標記 */}

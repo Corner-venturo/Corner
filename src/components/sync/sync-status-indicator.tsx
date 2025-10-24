@@ -374,7 +374,7 @@ export function ConflictResolutionDialog({
   conflicts,
   onResolve
 }: {
-  conflicts: any[];
+  conflicts: unknown[];
   onResolve: (conflictId: string, resolution: 'local' | 'remote') => void;
 }) {
   if (conflicts.length === 0) return null;

@@ -104,7 +104,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
             <Button
               variant="outline"
               onClick={handleClose}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
               取消
             </Button>

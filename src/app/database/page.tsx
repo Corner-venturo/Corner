@@ -101,7 +101,7 @@ export default function DatabasePage() {
               <div
                 key={module.id}
                 onClick={() => router.push(module.href)}
-                className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-all duration-200 cursor-pointer hover:border-morandi-gold/50"
+                className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-all duration-200 cursor-pointer hover:border-morandi-gold/20"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={cn(

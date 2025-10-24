@@ -20,7 +20,7 @@ export interface ErrorLogEntry {
   context: string;
   message: string;
   stack?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 class ErrorHandler {
@@ -30,7 +30,7 @@ class ErrorHandler {
   /**
    * 處理錯誤並記錄
    */
-  handle(error: unknown, context: string, metadata?: Record<string, any>): void {
+  handle(error: unknown, context: string, metadata?: Record<string, unknown>): void {
     const entry: ErrorLogEntry = {
       timestamp: new Date().toISOString(),
       level: 'error',
@@ -75,11 +75,11 @@ class ErrorHandler {
    */
   private extractMessage(error: unknown): string {
     if (error instanceof ValidationError) {
-      return `驗證錯誤: ${(error as any).field} - ${error.message}`;
+      return `驗證錯誤: ${(error as unknown).field} - ${error.message}`;
     }
 
     if (error instanceof NotFoundError) {
-      return `找不到資源: ${(error as any).resource} (ID: ${(error as any).id})`;
+      return `找不到資源: ${(error as unknown).resource} (ID: ${(error as unknown).id})`;
     }
 
     if (error instanceof Error) {
@@ -163,7 +163,7 @@ export const errorHandler = new ErrorHandler();
 export function handleError(
   error: unknown,
   context: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   errorHandler.handle(error, context, metadata);
 }
@@ -174,7 +174,7 @@ export function handleError(
 export async function withErrorHandling<T>(
   fn: () => Promise<T>,
   context: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<T | null> {
   try {
     return await fn();

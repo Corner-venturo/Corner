@@ -123,7 +123,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold/20 mx-auto mb-4"></div>
         <p className="text-morandi-secondary">載入中...</p>
       </div>
     </div>

@@ -37,7 +37,7 @@ export function DevAutoLogin() {
       };
 
       // 登入
-      login(devUser as any);
+      login(devUser);
       
       // 導向旅遊團頁面
       router.push('/tours');

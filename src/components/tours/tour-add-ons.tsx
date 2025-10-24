@@ -54,7 +54,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
   };
 
   const toggleActive = (id: string) => {
-    const addOn = addOns.find((item: any) => item.id === id);
+    const addOn = addOns.find((item) => item.id === id);
     if (addOn) {
       updateTourAddOn(id, { is_active: !addOn.is_active });
     }
@@ -76,11 +76,11 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
             <table className="w-full">
               <thead className="bg-morandi-container/30">
                 <tr>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">項目名稱</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">價格</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">說明</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">狀態</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">操作</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">項目名稱</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">價格</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">說明</th>
+                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">狀態</th>
+                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">操作</th>
                 </tr>
               </thead>
               <tbody>

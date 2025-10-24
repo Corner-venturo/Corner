@@ -175,7 +175,7 @@ export function createStore<T extends BaseEntity>(
               // 1. 先從 IndexedDB 讀取
               let cachedItems = await localDB.getAll(tableName) as T[];
               // 過濾軟刪除的項目
-              cachedItems = cachedItems.filter((item: any) => !item._deleted);
+              cachedItems = cachedItems.filter((item) => !('_deleted' in item && item._deleted));
 
               // 2. 檢查是否需要首次初始化下載
               const initFlag = `${tableName}_initialized`;
@@ -196,7 +196,7 @@ export function createStore<T extends BaseEntity>(
                   if (!supabaseError && data) {
                     let items = (data || []) as T[];
                     // 過濾軟刪除的項目
-                    items = items.filter((item: any) => !item._deleted);
+                    items = items.filter((item) => !('_deleted' in item && item._deleted));
 
                     // 批次存入 IndexedDB
                     for (const item of items) {
@@ -251,9 +251,9 @@ export function createStore<T extends BaseEntity>(
                     return;
                   }
 
-                  let items = (data || []) as T[];
+                  const items = (data || []) as T[];
                   // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-                  // items = items.filter((item: any) => !item._deleted);
+                  // items = items.filter((item) => !item._deleted);
 
                   logger.log(`✅ [${tableName}] Supabase 同步成功:`, items.length, '筆');
 
@@ -261,14 +261,14 @@ export function createStore<T extends BaseEntity>(
                   const currentItems = get().items;
 
                   // 找出本地有但 Supabase 沒有的資料（待上傳或新增的）
-                  const localOnlyItems = currentItems.filter((localItem: any) => {
+                  const localOnlyItems = currentItems.filter((localItem) => {
                     // 過濾軟刪除項目
-                    if (localItem._deleted) return false;
+                    if ('_deleted' in localItem && localItem._deleted) return false;
 
                     // 保留有 _needs_sync: true 標記的本地資料（新增或修改）
-                    if (localItem._needs_sync === true) return true;
+                    if ('_needs_sync' in localItem && localItem._needs_sync === true) return true;
                     // 保留 Supabase 中不存在的資料
-                    return !items.find((serverItem: any) => serverItem.id === localItem.id);
+                    return !items.find((serverItem) => serverItem.id === localItem.id);
                   });
 
                   // 合併：Supabase 資料 + 本地專屬資料
@@ -301,10 +301,10 @@ export function createStore<T extends BaseEntity>(
             } else {
               // 從 IndexedDB 讀取（離線模式或未啟用 Supabase）
               logger.log(`💾 [${tableName}] 從 IndexedDB 載入資料...`);
-              let items = await localDB.getAll(tableName) as T[];
+              const items = await localDB.getAll(tableName) as T[];
 
               // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-              // items = items.filter((item: any) => !item._deleted);
+              // items = items.filter((item) => !item._deleted);
 
               set({ items, loading: false });
               logger.log(`✅ [${tableName}] IndexedDB 讀取成功:`, items.length, '筆');
@@ -312,7 +312,7 @@ export function createStore<T extends BaseEntity>(
 
           } catch (error) {
             // 🔧 忽略 AbortError（正常的請求取消）
-            if (error && typeof error === 'object' && 'code' in error && (error as any).code === '20') {
+            if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === '20') {
               set({ loading: false });
               return;
             }
@@ -325,9 +325,9 @@ export function createStore<T extends BaseEntity>(
 
             // 🔧 任何其他錯誤：靜默切換到本地模式
             try {
-              let items = await localDB.getAll(tableName) as T[];
+              const items = await localDB.getAll(tableName) as T[];
               // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
-              // items = items.filter((item: any) => !item._deleted);
+              // items = items.filter((item) => !item._deleted);
               set({ items, loading: false, error: null });
               logger.log(`💾 [${tableName}] IndexedDB 讀取成功:`, items.length, '筆');
             } catch (localError) {
@@ -366,7 +366,7 @@ export function createStore<T extends BaseEntity>(
 
             // 從 IndexedDB 讀取（無論是 Supabase 關閉或失敗）
             const items = await localDB.getAll(tableName) as T[];
-            const item = items.find((i: any) => i.id === id) || null;
+            const item = items.find((i) => i.id === id) || null;
             set({ loading: false });
             return item;
           } catch (error) {
@@ -388,7 +388,7 @@ export function createStore<T extends BaseEntity>(
             // 如果有 codePrefix，暫時使用 TBC 編號（背景同步時會取得正式編號）
             let recordData = { ...data, id } as T;
             if (codePrefix && 'code' in data) {
-              const existingCode = (data as any).code;
+              const existingCode = (data as Record<string, unknown>).code;
               if (!existingCode) {
                 // FastIn 模式：一律先用 TBC 編號
                 const code: string = `${codePrefix}TBC`;
@@ -447,13 +447,13 @@ export function createStore<T extends BaseEntity>(
             const needsSyncFields = isSyncableTable(tableName);
 
             // FastIn Step 1: 準備更新資料（標記為待同步）
-            let syncData = data;
+            let syncData: Partial<T> = data;
             if (needsSyncFields) {
               syncData = {
                 ...data,
-                _needs_sync: true as any,
-                _synced_at: null as any,
-              };
+                _needs_sync: true,
+                _synced_at: null,
+              } as Partial<T>;
             }
 
             // FastIn Step 2: 立即更新 IndexedDB
@@ -508,7 +508,7 @@ export function createStore<T extends BaseEntity>(
 
             // FastIn Step 1: 加入刪除隊列（用於背景同步）
             const items = await localDB.getAll(tableName) as T[];
-            const item = items.find((i: any) => i.id === id);
+            const item = items.find((i) => i.id === id);
 
             if (item) {
               // 加入刪除隊列

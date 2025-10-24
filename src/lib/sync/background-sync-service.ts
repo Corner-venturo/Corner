@@ -74,7 +74,7 @@ export class BackgroundSyncService {
     try {
       const allLocalItems = await localDB.getAll(tableName);
       const tbcItems = allLocalItems.filter((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
         return typedItem.code && typedItem.code.endsWith('TBC');
       });
@@ -85,7 +85,7 @@ export class BackgroundSyncService {
 
       for (const item of tbcItems) {
         try {
-          const typedItem = item as any;
+          const typedItem = item as unknown;
           const itemData = { ...typedItem };
           delete itemData.code; // 移除 TBC code
 
@@ -100,14 +100,14 @@ export class BackgroundSyncService {
           await localDB.delete(tableName, typedItem.id);
           // @ts-ignore
           await localDB.put(tableName, {
-            ...(supabaseData as any),
+            ...(supabaseData as unknown),
             _needs_sync: false,
             _synced_at: new Date().toISOString()
           });
 
-          logger.log(`✅ [${tableName}] TBC 編號已轉換: ${typedItem.code} → ${(supabaseData as any).code}`);
+          logger.log(`✅ [${tableName}] TBC 編號已轉換: ${typedItem.code} → ${(supabaseData as unknown).code}`);
         } catch (error) {
-          logger.error(`❌ [${tableName}] TBC 編號轉換失敗:`, (item as any).code, error);
+          logger.error(`❌ [${tableName}] TBC 編號轉換失敗:`, (item as unknown).code, error);
         }
       }
     } catch (error) {
@@ -124,7 +124,7 @@ export class BackgroundSyncService {
     try {
       const allLocalItems = await localDB.getAll(tableName);
       const pendingUpserts = allLocalItems.filter((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         // 過濾：待同步 且 不是 TBC 編號 且 未軟刪除
         return typedItem._needs_sync === true &&
                !(typedItem.code && typedItem.code.endsWith('TBC')) &&
@@ -137,7 +137,7 @@ export class BackgroundSyncService {
 
       for (const item of pendingUpserts) {
         try {
-          const typedItem = item as any;
+          const typedItem = item as unknown;
           // 移除同步標記欄位
           const { _needs_sync, _synced_at, _deleted, temp_code, ...syncData } = typedItem;
 
@@ -167,12 +167,12 @@ export class BackgroundSyncService {
           // 更新 IndexedDB（標記為已同步）
           // @ts-ignore
           await localDB.put(tableName, {
-            ...(item as any),
+            ...(item as unknown),
             _needs_sync: false,
             _synced_at: new Date().toISOString()
           });
         } catch (error) {
-          logger.error(`❌ [${tableName}] 同步失敗:`, (item as any).id, error);
+          logger.error(`❌ [${tableName}] 同步失敗:`, (item as unknown).id, error);
         }
       }
     } catch (error) {
@@ -190,7 +190,7 @@ export class BackgroundSyncService {
       // 從 syncQueue 表中取得該表的刪除操作
       const allQueueItems = await localDB.getAll('syncQueue');
       const pendingDeletes = allQueueItems.filter((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         return typedItem.table_name === tableName && typedItem.operation === 'delete';
       });
 
@@ -200,7 +200,7 @@ export class BackgroundSyncService {
 
       for (const queueItem of pendingDeletes) {
         try {
-          const typedItem = queueItem as any;
+          const typedItem = queueItem as unknown;
           // 從 Supabase 刪除
           const { error } = await supabase
             .from(tableName)
@@ -216,7 +216,7 @@ export class BackgroundSyncService {
             logger.log(`✅ [${tableName}] 刪除成功: ${typedItem.record_id}`);
           }
         } catch (error) {
-          logger.error(`❌ [${tableName}] 刪除失敗:`, (queueItem as any).record_id, error);
+          logger.error(`❌ [${tableName}] 刪除失敗:`, (queueItem as unknown).record_id, error);
         }
       }
     } catch (error) {
@@ -231,14 +231,14 @@ export class BackgroundSyncService {
     try {
       const allLocalItems = await localDB.getAll(tableName);
       const hasLocalPending = allLocalItems.some((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         return typedItem._needs_sync === true || (typedItem.code && typedItem.code.endsWith('TBC'));
       });
 
       // 檢查是否有刪除隊列
       const allQueueItems = await localDB.getAll('syncQueue');
       const hasDeletePending = allQueueItems.some((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         return typedItem.table_name === tableName && typedItem.operation === 'delete';
       });
 
@@ -256,14 +256,14 @@ export class BackgroundSyncService {
     try {
       const allLocalItems = await localDB.getAll(tableName);
       const localPendingCount = allLocalItems.filter((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         return typedItem._needs_sync === true || (typedItem.code && typedItem.code.endsWith('TBC'));
       }).length;
 
       // 計算刪除隊列數量
       const allQueueItems = await localDB.getAll('syncQueue');
       const deletePendingCount = allQueueItems.filter((item: unknown) => {
-        const typedItem = item as any;
+        const typedItem = item as unknown;
         return typedItem.table_name === tableName && typedItem.operation === 'delete';
       }).length;
 

@@ -44,7 +44,7 @@ interface PaymentItem {
 
 export default function PaymentsPage() {
   const { items: orders } = useOrderStore();
-  const payments: any[] = []; // TODO: 實作收款記錄功能
+  const payments: unknown[] = []; // TODO: 實作收款記錄功能
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 只取收款記錄

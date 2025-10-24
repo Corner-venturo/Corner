@@ -174,7 +174,7 @@ export default function QuoteDetailPage() {
     child_no_bed: number;   // 不佔床
     single_room: number;    // 單人房
     infant: number;         // 嬰兒
-  }>((quote as any)?.participant_counts || {
+  }>((quote as unknown)?.participant_counts || {
     adult: 1,
     child_with_bed: 0,
     child_no_bed: 0,
@@ -204,7 +204,7 @@ export default function QuoteDetailPage() {
     child_no_bed: number;
     single_room: number;
     infant: number;
-  }>((quote as any)?.selling_prices || {
+  }>((quote as unknown)?.selling_prices || {
     adult: 0,
     child_with_bed: 0,
     child_no_bed: 0,
@@ -233,7 +233,7 @@ export default function QuoteDetailPage() {
         setSelectedCity(cities[0].code);
       }
     }
-  }, [selectedCountry, relatedTour]);
+  }, [selectedCountry, relatedTour, getCitiesByCountryCode]);
 
   // 當人數改變時，重新計算所有團體分攤項目
   useEffect(() => {
@@ -330,7 +330,7 @@ export default function QuoteDetailPage() {
       }
       return cat;
     }));
-  }, []);
+  }, [handleAddAccommodationRoomType]);
 
   // 新增導遊項目
   const handleAddGuideRow = (category_id: string) => {
@@ -895,7 +895,7 @@ export default function QuoteDetailPage() {
 
       // 更新報價單：增加版本號，將當前狀態加入版本歷史
       updateQuote(quote.id, {
-        categories: updatedCategories as any,
+        categories: updatedCategories as unknown,
         total_cost,
         group_size: groupSize,
         name: quoteName,
@@ -903,8 +903,8 @@ export default function QuoteDetailPage() {
         participant_counts: participantCounts,
         selling_prices: sellingPrices,
         version: currentVersion + 1, // 版本號 +1
-        versions: [...existingVersions, newVersionRecord] as any // 加入新版本到歷史
-      } as any);
+        versions: [...existingVersions, newVersionRecord] as unknown // 加入新版本到歷史
+      } as unknown);
 
       // 顯示成功提示
       setSaveSuccess(true);
@@ -949,14 +949,14 @@ export default function QuoteDetailPage() {
     // 更新狀態為最終版本
     updateQuote(quote.id, {
       status: 'approved',
-      categories: updatedCategories as any, // CostCategory[] 與 QuoteCategory[] 結構相同
+      categories: updatedCategories as unknown, // CostCategory[] 與 QuoteCategory[] 結構相同
       total_cost,
       group_size: groupSize,
       name: quoteName,
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices
-    } as any);
+    } as unknown);
 
     // 自動跳轉到旅遊團新增頁面，並帶上報價單ID
     router.push(`/tours?fromQuote=${quote.id}`);
@@ -997,7 +997,7 @@ export default function QuoteDetailPage() {
       total_revenue: 0,
       total_cost: total_cost,
       profit: 0,
-    } as any);
+    } as unknown);
 
     // 更新報價單的 tour_id
     if (newTour?.id) {
@@ -1045,7 +1045,7 @@ export default function QuoteDetailPage() {
               </span>
             ) : (
               <span>
-                {(quote as any)?.code || '-'}
+                {(quote as unknown)?.code || '-'}
               </span>
             )}
           </div>
@@ -1298,13 +1298,13 @@ export default function QuoteDetailPage() {
                 <table className="w-full min-w-[800px] border-collapse">
                 <thead className="bg-morandi-container/50">
                   <tr className="border-b-2 border-border">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary w-12 table-divider">分類</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary w-70 table-divider">項目</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary w-8 table-divider">數量</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary w-28 table-divider">單價</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary w-28 table-divider whitespace-nowrap">小計</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary w-32 table-divider">備註</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary w-24">操作</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary w-12 table-divider">分類</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-70 table-divider">項目</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-8 table-divider">數量</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-28 table-divider">單價</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-28 table-divider whitespace-nowrap">小計</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-32 table-divider">備註</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-24">操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1647,7 +1647,7 @@ export default function QuoteDetailPage() {
                   })}
 
                   {/* 總計行 - 顯示各身份成本 */}
-                  <tr className="bg-morandi-gold/10 border-t-2 border-morandi-gold">
+                  <tr className="bg-morandi-gold/10 border-t-2 border-morandi-gold/20">
                     <td colSpan={2} className="py-3 px-4 font-bold text-morandi-primary">身份成本</td>
                     <td colSpan={5} className="py-3 px-4">
                       <div className="flex flex-wrap gap-4 text-sm">
@@ -1712,7 +1712,7 @@ export default function QuoteDetailPage() {
                   {/* 成人 */}
                   {participantCounts.adult > 0 && (
                     <>
-                      <tr className="border-b-2 border-morandi-gold bg-morandi-container/20">
+                      <tr className="border-b-2 border-morandi-gold/20 bg-morandi-container/20">
                         <td colSpan={2} className="py-2 px-4 font-medium text-morandi-primary">
                           成人 ({participantCounts.adult}人)
                         </td>
@@ -1747,7 +1747,7 @@ export default function QuoteDetailPage() {
                   {/* 小朋友（佔床） */}
                   {participantCounts.child_with_bed > 0 && (
                     <>
-                      <tr className="border-b-2 border-morandi-gold bg-morandi-container/20">
+                      <tr className="border-b-2 border-morandi-gold/20 bg-morandi-container/20">
                         <td colSpan={2} className="py-2 px-4 font-medium text-morandi-primary">
                           小朋友（佔床） ({participantCounts.child_with_bed}人)
                         </td>
@@ -1782,7 +1782,7 @@ export default function QuoteDetailPage() {
                   {/* 不佔床 */}
                   {participantCounts.child_no_bed > 0 && (
                     <>
-                      <tr className="border-b-2 border-morandi-gold bg-morandi-container/20">
+                      <tr className="border-b-2 border-morandi-gold/20 bg-morandi-container/20">
                         <td colSpan={2} className="py-2 px-4 font-medium text-morandi-primary">
                           不佔床 ({participantCounts.child_no_bed}人)
                         </td>
@@ -1817,7 +1817,7 @@ export default function QuoteDetailPage() {
                   {/* 單人房 */}
                   {participantCounts.single_room > 0 && (
                     <>
-                      <tr className="border-b-2 border-morandi-gold bg-morandi-container/20">
+                      <tr className="border-b-2 border-morandi-gold/20 bg-morandi-container/20">
                         <td colSpan={2} className="py-2 px-4 font-medium text-morandi-primary">
                           單人房 ({participantCounts.single_room}人)
                         </td>
@@ -1852,7 +1852,7 @@ export default function QuoteDetailPage() {
                   {/* 嬰兒 */}
                   {participantCounts.infant > 0 && (
                     <>
-                      <tr className="border-b-2 border-morandi-gold bg-morandi-container/20">
+                      <tr className="border-b-2 border-morandi-gold/20 bg-morandi-container/20">
                         <td colSpan={2} className="py-2 px-4 font-medium text-morandi-primary">
                           嬰兒 ({participantCounts.infant}人)
                         </td>

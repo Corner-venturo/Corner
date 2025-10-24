@@ -131,7 +131,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
     setEditMode('view');
   };
 
-  const handleSaveDocument = async (title: string, content: string, formatData: Record<string, any>) => {
+  const handleSaveDocument = async (title: string, content: string, formatData: Record<string, unknown>) => {
     if (!activeCanvasId) return;
 
     try {

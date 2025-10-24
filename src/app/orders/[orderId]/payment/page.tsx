@@ -19,26 +19,12 @@ export default function PaymentDetailPage() {
   const paymentStore = { payment_requests: [] }; // TODO: usePaymentStore deprecated
 
   // 等待 store 載入
-  const orders = (orderStore as any).orders || [];
-  const paymentRequests = (paymentStore as any).payment_requests || [];
+  const orders = (orderStore as unknown).orders || [];
+  const paymentRequests = (paymentStore as unknown).payment_requests || [];
 
-  const order = orders.find((o: any) => o.id === orderId);
+  const order = orders.find((o) => o.id === orderId);
   // 找出此訂單相關的請款單
   const orderPayments = paymentRequests.filter((p: any) => p.order_id === orderId);
-
-  if (!order) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-morandi-secondary mb-4">找不到該訂單</p>
-          <Button onClick={() => router.push('/orders')} variant="outline">
-            <ArrowLeft size={16} className="mr-1" />
-            返回訂單列表
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const getPaymentStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
@@ -132,7 +118,7 @@ export default function PaymentDetailPage() {
   ], []);
 
   // 排序和篩選函數
-  const sortFunction = (data: any[], column: string, direction: 'asc' | 'desc') => {
+  const sortFunction = (data: unknown[], column: string, direction: 'asc' | 'desc') => {
     return [...data].sort((a, b) => {
       let aValue: string | number | Date = a[column as keyof typeof a];
       let bValue: string | number | Date = b[column as keyof typeof b];
@@ -148,7 +134,7 @@ export default function PaymentDetailPage() {
     });
   };
 
-  const filterFunction = (data: any[], filters: Record<string, string>) => {
+  const filterFunction = (data: unknown[], filters: Record<string, string>) => {
     return data.filter(payment => {
       return (
         (!filters.request_number || payment.request_number.includes(filters.request_number)) &&
@@ -165,6 +151,20 @@ export default function PaymentDetailPage() {
     sortFunction,
     filterFunction
   );
+
+  if (!order) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-morandi-secondary mb-4">找不到該訂單</p>
+          <Button onClick={() => router.push('/orders')} variant="outline">
+            <ArrowLeft size={16} className="mr-1" />
+            返回訂單列表
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 ">

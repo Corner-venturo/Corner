@@ -174,7 +174,7 @@ function calculateFlightDuration(
   return `${hours}小時${minutes}分`;
 }
 
-export function TourForm({ data, onChange }: { data: any; onChange: (data: any) => void }) {
+export function TourForm({ data, onChange }: { data: any; onChange: (data) => void }) {
   const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || "");
   const [selectedCountryCode, setSelectedCountryCode] = React.useState<string>("");
   const { user } = useAuthStore();
@@ -221,7 +221,7 @@ export function TourForm({ data, onChange }: { data: any; onChange: (data: any) 
         setSelectedCountryCode(code);
       }
     }
-  }, [data.country, countryNameToCode]);
+  }, [data.country, countryNameToCode, selectedCountry]);
 
   const updateField = (field: string, value: any) => {
     onChange({ ...data, [field]: value });

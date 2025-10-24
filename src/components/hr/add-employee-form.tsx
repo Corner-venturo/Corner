@@ -108,7 +108,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
       };
 
       // 儲存到本地（純本地模式）
-      addUser(dbEmployeeData as any);
+      addUser(dbEmployeeData as unknown);
 
       console.log('📦 本地模式：員工已新增', employee_number);
 

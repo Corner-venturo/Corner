@@ -75,7 +75,7 @@ export function ThursdayDatePicker({
             className={cn(
               'w-full justify-start text-left font-normal',
               !date && 'text-muted-foreground',
-              allowAnyDay && 'bg-morandi-gold/10 border-morandi-gold/50',
+              allowAnyDay && 'bg-morandi-gold/10 border-morandi-gold/20',
               className
             )}
           >

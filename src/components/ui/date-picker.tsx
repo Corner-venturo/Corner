@@ -131,7 +131,7 @@ export function DatePicker({ value, onChange, placeholder = '選擇日期', clas
           'ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium',
           'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2',
           'focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          'hover:border-morandi-gold/50 focus:border-morandi-gold transition-colors',
+          'hover:border-morandi-gold/20 focus:border-morandi-gold/20 transition-colors',
           className
         )}
       >

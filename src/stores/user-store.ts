@@ -10,7 +10,7 @@ import { generateUUID } from '@/lib/utils/uuid';
 
 // 建立員工 Store
 export const useUserStore = createStore<User>(
-  TABLES.EMPLOYEES as any,
+  TABLES.EMPLOYEES,
   undefined, // 員工使用 employee_number 而非 code，所以不需要 codePrefix
   true // enableSupabase
 );
@@ -86,7 +86,7 @@ export const userStoreHelpers = {
    * 更新權限
    */
   updateUserPermissions: async (id: string, permissions: string[]): Promise<void> => {
-    await useUserStore.getState().update(id, { permissions } as any);
+    await useUserStore.getState().update(id, { permissions } as Partial<User>);
     console.log('✅ 權限更新完成:', id, permissions);
   },
 
@@ -112,7 +112,7 @@ export const userStoreHelpers = {
         base_salary: newSalary,
         salary_history: newHistory
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -123,7 +123,7 @@ export const userStoreHelpers = {
     if (!user) return;
 
     const newAllowances = [
-      ...user.salary_info.allowances.filter((a: any) => a.type !== type),
+      ...user.salary_info.allowances.filter((a) => a.type !== type),
       { type, amount }
     ];
 
@@ -132,7 +132,7 @@ export const userStoreHelpers = {
         ...user.salary_info,
         allowances: newAllowances
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -142,14 +142,14 @@ export const userStoreHelpers = {
     const user = useUserStore.getState().items.find((u: User) => u.id === id);
     if (!user) return;
 
-    const newAllowances = user.salary_info.allowances.filter((a: any) => a.type !== type);
+    const newAllowances = user.salary_info.allowances.filter((a) => a.type !== type);
 
     await useUserStore.getState().update(id, {
       salary_info: {
         ...user.salary_info,
         allowances: newAllowances
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -171,7 +171,7 @@ export const userStoreHelpers = {
         ...user.attendance,
         leave_records: newLeaveRecords
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -181,7 +181,7 @@ export const userStoreHelpers = {
     const user = useUserStore.getState().items.find((u: User) => u.id === user_id);
     if (!user) return;
 
-    const updatedRecords = user.attendance.leave_records.map((record: any) =>
+    const updatedRecords = user.attendance.leave_records.map((record) =>
       record.id === leaveId
         ? { ...record, status: 'approved' as const, approved_by }
         : record
@@ -192,7 +192,7 @@ export const userStoreHelpers = {
         ...user.attendance,
         leave_records: updatedRecords
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -202,7 +202,7 @@ export const userStoreHelpers = {
     const user = useUserStore.getState().items.find((u: User) => u.id === user_id);
     if (!user) return;
 
-    const updatedRecords = user.attendance.leave_records.map((record: any) =>
+    const updatedRecords = user.attendance.leave_records.map((record) =>
       record.id === leaveId
         ? { ...record, status: 'rejected' as const }
         : record
@@ -213,7 +213,7 @@ export const userStoreHelpers = {
         ...user.attendance,
         leave_records: updatedRecords
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -235,7 +235,7 @@ export const userStoreHelpers = {
         ...user.attendance,
         overtime_records: newOvertimeRecords
       }
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -254,7 +254,7 @@ export const userStoreHelpers = {
 
     await useUserStore.getState().update(id, {
       contracts: newContracts
-    } as any);
+    } as Partial<User>);
   },
 
   /**
@@ -264,7 +264,7 @@ export const userStoreHelpers = {
     const user = useUserStore.getState().items.find((u: User) => u.id === user_id);
     if (!user) return;
 
-    const updatedContracts = user.contracts.map((contract: any) =>
+    const updatedContracts = user.contracts.map((contract) =>
       contract.id === contractId
         ? { ...contract, ...updates }
         : contract
@@ -272,7 +272,7 @@ export const userStoreHelpers = {
 
     await useUserStore.getState().update(user_id, {
       contracts: updatedContracts
-    } as any);
+    } as Partial<User>);
   },
 };
 

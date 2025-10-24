@@ -74,7 +74,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         order_number: relatedOrder?.order_number || '',
         contact_person: relatedOrder?.contact_person || '',
         assignedRoom: member.assigned_room
-      } as any;
+      } as unknown;
     });
 
     setTableMembers(allTourMembers);
@@ -123,7 +123,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         member.gender = '';
       }
     } else {
-      (member as any)[field] = value;
+      (member as unknown)[field] = value;
     }
 
     updatedMembers[rowIndex] = member;
@@ -146,12 +146,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         assigned_room: assignedRoom
       };
       // 移除舊欄位
-      delete (convertedData as any).nameEn;
-      delete (convertedData as any).passportNumber;
-      delete (convertedData as any).passportExpiry;
-      delete (convertedData as any).idNumber;
+      delete (convertedData as unknown).nameEn;
+      delete (convertedData as unknown).passportNumber;
+      delete (convertedData as unknown).passportExpiry;
+      delete (convertedData as unknown).idNumber;
 
-      const newMember = await addMember(convertedData as any);
+      const newMember = await addMember(convertedData as unknown);
 
       const updatedMembers = [...tableMembers];
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false };
@@ -167,12 +167,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         assigned_room: assignedRoom
       };
       // 移除舊欄位
-      delete (convertedData as any).nameEn;
-      delete (convertedData as any).passportNumber;
-      delete (convertedData as any).passportExpiry;
-      delete (convertedData as any).idNumber;
+      delete (convertedData as unknown).nameEn;
+      delete (convertedData as unknown).passportNumber;
+      delete (convertedData as unknown).passportExpiry;
+      delete (convertedData as unknown).idNumber;
 
-      await updateMember(member.id, convertedData as any);
+      await updateMember(member.id, convertedData as unknown);
     }
   };
 
@@ -334,20 +334,20 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
           <table className="w-full text-sm border-collapse min-w-[1200px] bg-white rounded-lg overflow-hidden shadow-sm">
             <thead className="bg-morandi-container/10 sticky top-0 border-b-2 border-morandi-gold/20">
               <tr>
-                <th className="w-[30px] py-2 px-1 text-xs font-medium text-morandi-secondary border border-gray-300"></th>
-                <th className="w-[40px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">序號</th>
-                <th className="min-w-[80px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">姓名</th>
-                <th className="min-w-[100px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">英文姓名</th>
-                <th className="min-w-[100px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">生日</th>
-                <th className="min-w-[60px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">年齡</th>
-                <th className="min-w-[50px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">性別</th>
-                <th className="min-w-[120px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">身分證字號</th>
-                <th className="min-w-[100px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">護照號碼</th>
-                <th className="min-w-[100px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">護照效期</th>
-                <th className="min-w-[100px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">所屬訂單</th>
-                <th className="min-w-[80px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">聯絡人</th>
-                <th className="min-w-[100px] py-2 px-2 text-xs font-medium text-morandi-secondary border border-gray-300">分房</th>
-                <th className="w-[40px] py-2 px-1 text-xs font-medium text-morandi-secondary border border-gray-300">操作</th>
+                <th className="w-[30px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20"></th>
+                <th className="w-[40px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">序號</th>
+                <th className="min-w-[80px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">姓名</th>
+                <th className="min-w-[100px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">英文姓名</th>
+                <th className="min-w-[100px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">生日</th>
+                <th className="min-w-[60px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">年齡</th>
+                <th className="min-w-[50px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">性別</th>
+                <th className="min-w-[120px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">身分證字號</th>
+                <th className="min-w-[100px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">護照號碼</th>
+                <th className="min-w-[100px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">護照效期</th>
+                <th className="min-w-[100px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">所屬訂單</th>
+                <th className="min-w-[80px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">聯絡人</th>
+                <th className="min-w-[100px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">分房</th>
+                <th className="w-[40px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">操作</th>
               </tr>
             </thead>
             <tbody>

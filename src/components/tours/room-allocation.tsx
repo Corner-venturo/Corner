@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tour, Member } from '@/stores/types';
 import { useOrderStore, useMemberStore, usePaymentRequestStore } from '@/stores';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,13 +36,22 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     tourOrders.some(order => order.id === member.order_id)
   );
 
+  // 根據房型名稱推算容量
+  const getRoomCapacity = useCallback((room_type: string): number => {
+    if (room_type.includes('單人')) return 1;
+    if (room_type.includes('雙人')) return 2;
+    if (room_type.includes('三人')) return 3;
+    if (room_type.includes('四人')) return 4;
+    return 2; // 預設雙人房
+  }, []);
+
   // 從請款單解析房間配額，生成房間選項
-  const generateRoomOptions = (): RoomOption[] => {
-    const tourPaymentRequests = paymentRequests.filter((request: any) => request.tour_id === tour.id);
+  const generateRoomOptions = useCallback((): RoomOption[] => {
+    const tourPaymentRequests = paymentRequests.filter((request) => request.tour_id === tour.id);
     const roomOptions: RoomOption[] = [];
 
-    tourPaymentRequests.forEach((request: any) => {
-      request.items.forEach((item: any) => {
+    tourPaymentRequests.forEach((request) => {
+      request.items.forEach((item) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g);
@@ -74,16 +83,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     });
 
     return roomOptions;
-  };
-
-  // 根據房型名稱推算容量
-  const getRoomCapacity = (room_type: string): number => {
-    if (room_type.includes('單人')) return 1;
-    if (room_type.includes('雙人')) return 2;
-    if (room_type.includes('三人')) return 3;
-    if (room_type.includes('四人')) return 4;
-    return 2; // 預設雙人房
-  };
+  }, [paymentRequests, tour.id, getRoomCapacity]);
 
   // 初始化資料
   useEffect(() => {
@@ -91,7 +91,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     setRoomOptions(rooms);
     // 保留 members 中原有的 assignedRoom 數據
     setMembersWithRooms(tourMembers.map(member => ({ ...member } as MemberWithRoom)));
-  }, [tour.id, paymentRequests, tourMembers]);
+  }, [tour.id, paymentRequests, tourMembers, generateRoomOptions]);
 
   // 分配房間
   const assignMemberToRoom = (member_id: string, roomValue: string) => {
@@ -166,12 +166,12 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
           <table className="w-full text-sm border-collapse">
             <thead className="bg-morandi-container/30">
               <tr>
-                <th className="w-[40px] py-3 px-4 text-left text-xs font-medium text-morandi-secondary border border-gray-300">序號</th>
-                <th className="min-w-[80px] py-3 px-4 text-left text-xs font-medium text-morandi-secondary border border-gray-300">姓名</th>
-                <th className="min-w-[80px] py-3 px-4 text-left text-xs font-medium text-morandi-secondary border border-gray-300">性別</th>
-                <th className="min-w-[60px] py-3 px-4 text-left text-xs font-medium text-morandi-secondary border border-gray-300">年齡</th>
-                <th className="min-w-[120px] py-3 px-4 text-left text-xs font-medium text-morandi-secondary border border-gray-300">分房</th>
-                <th className="min-w-[80px] py-3 px-4 text-left text-xs font-medium text-morandi-secondary border border-gray-300">狀態</th>
+                <th className="w-[40px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">序號</th>
+                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">姓名</th>
+                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">性別</th>
+                <th className="min-w-[60px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">年齡</th>
+                <th className="min-w-[120px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">分房</th>
+                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">狀態</th>
               </tr>
             </thead>
             <tbody>

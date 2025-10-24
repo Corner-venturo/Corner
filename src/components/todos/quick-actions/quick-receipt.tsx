@@ -151,7 +151,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
 
           {/* 已選團體顯示 */}
           {selectedTour && !searchTerm && (
-            <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-3">
+            <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-medium text-morandi-primary">

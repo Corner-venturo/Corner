@@ -4,7 +4,7 @@ import { supabase } from './client';
  * 將 camelCase 轉換為 snake_case
  * 並清理空字串（轉換為 null）
  */
-function toSnakeCase(obj: any): any {
+function toSnakeCase(obj): any {
   if (obj === null || obj === undefined) return obj;
   if (Array.isArray(obj)) return obj.map(toSnakeCase);
   if (typeof obj !== 'object') return obj;
@@ -22,7 +22,7 @@ function toSnakeCase(obj: any): any {
 /**
  * 將 snake_case 轉換為 camelCase
  */
-function toCamelCase(obj: any): any {
+function toCamelCase(obj): any {
   if (obj === null || obj === undefined) return obj;
   if (Array.isArray(obj)) return obj.map(toCamelCase);
   if (typeof obj !== 'object') return obj;
@@ -37,7 +37,7 @@ function toCamelCase(obj: any): any {
 
 export interface QueryOptions {
   select?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   orderBy?: { column: string; ascending?: boolean };
   limit?: number;
   offset?: number;
@@ -84,14 +84,14 @@ export class VenturoAPI {
   /**
    * 批量創建記錄
    */
-  static async createMany<T = any>(table: string, data: any[]): Promise<T[]> {
+  static async createMany<T = any>(table: string, data: unknown[]): Promise<T[]> {
     try {
       // 將 camelCase 轉換為 snake_case
       const snakeData = data.map(toSnakeCase);
 
       const { data: result, error } = await supabase
-        .from(table as any)
-        .insert(snakeData as any)
+        .from(table as unknown)
+        .insert(snakeData as unknown)
         .select();
 
       if (error) {
@@ -197,7 +197,7 @@ export class VenturoAPI {
         updated_at: new Date().toISOString()
       };
 
-      const queryBuilder: any = supabase.from(table as any);
+      const queryBuilder: any = supabase.from(table as unknown);
       const { data: result, error } = await queryBuilder
         .update(updateData)
         .eq('id', id)
@@ -222,7 +222,7 @@ export class VenturoAPI {
    */
   static async updateWhere<T = any>(
     table: string,
-    filters: Record<string, any>,
+    filters: Record<string, unknown>,
     data: any
   ): Promise<T[]> {
     try {
@@ -233,7 +233,7 @@ export class VenturoAPI {
         updated_at: new Date().toISOString()
       };
 
-      let query: any = supabase.from(table as any);
+      let query: any = supabase.from(table as unknown);
       query = query.update(updateData);
 
       // 過濾條件也轉換
@@ -282,7 +282,7 @@ export class VenturoAPI {
   /**
    * 條件刪除記錄
    */
-  static async deleteWhere(table: string, filters: Record<string, any>): Promise<boolean> {
+  static async deleteWhere(table: string, filters: Record<string, unknown>): Promise<boolean> {
     try {
       let query = supabase.from(table).delete();
 
@@ -307,7 +307,7 @@ export class VenturoAPI {
   /**
    * 計數查詢
    */
-  static async count(table: string, filters?: Record<string, any>): Promise<number> {
+  static async count(table: string, filters?: Record<string, unknown>): Promise<number> {
     try {
       let query = supabase.from(table).select('*', { count: 'exact', head: true });
 
@@ -334,12 +334,12 @@ export class VenturoAPI {
   /**
    * 執行原生 SQL 查詢
    */
-  static async query<T = any>(sql: string, params?: any[]): Promise<T[]> {
+  static async query<T = any>(sql: string, params?: unknown[]): Promise<T[]> {
     try {
-      const { data, error } = await supabase.rpc('execute_sql' as any, {
+      const { data, error } = await supabase.rpc('execute_sql' as unknown, {
         query: sql,
         params: params || []
-      } as any);
+      } as unknown);
 
       if (error) {
         console.error(`SQL Query error:`, error);

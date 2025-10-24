@@ -141,7 +141,7 @@ export default function AccountingPage() {
       primary: 'text-[#6B5B73]',
       secondary: 'text-[#6B5B73]/60',
       accent: 'bg-gradient-to-r from-[#B5986A] to-[#D4C4A8]',
-      border: 'border-[#E6DDD4]'
+      border: 'border-morandi-gold/20'
     },
     moneypro: {
       bg: 'bg-gradient-to-b from-slate-700 to-slate-800',
@@ -212,7 +212,7 @@ export default function AccountingPage() {
             {/* 金額輸入 */}
             <div className="sm:col-span-1">
               <div className={cn('rounded-xl border-2 p-4 h-20 transition-colors',
-                theme === 'morandi' ? 'bg-white border-[#E6DDD4] focus-within:border-[#B5986A]' : 'bg-slate-700 border-slate-500 focus-within:border-blue-400'
+                theme === 'morandi' ? 'bg-white border-morandi-gold/20 focus-within:border-morandi-gold/20' : 'bg-slate-700 border-slate-500 focus-within:border-blue-400'
               )}>
                 <div className={cn('text-xs mb-1', currentTheme.secondary)}>金額</div>
                 <input
@@ -237,7 +237,7 @@ export default function AccountingPage() {
                   ref={categorySelectRef}
                   className={cn('h-20 border-2 rounded-xl text-center',
                     theme === 'morandi'
-                      ? 'bg-white border-[#E6DDD4] text-[#6B5B73] focus:border-[#B5986A]'
+                      ? 'bg-white border-morandi-gold/20 text-[#6B5B73] focus:border-morandi-gold/20'
                       : 'bg-slate-700 border-slate-500 text-white focus:border-blue-400'
                   )}
                 >
@@ -287,7 +287,7 @@ export default function AccountingPage() {
                     'flex items-center justify-center px-3 py-3 sm:px-4 rounded-full transition-all duration-200 active:scale-95 text-sm sm:text-base',
                     quickCategory === category.id
                       ? (theme === 'morandi' ? 'bg-[#B5986A] text-white shadow-lg' : 'bg-blue-600 text-white shadow-lg')
-                      : (theme === 'morandi' ? 'bg-white/80 text-[#6B5B73] hover:bg-white border border-[#E6DDD4]' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border border-slate-500')
+                      : (theme === 'morandi' ? 'bg-white/80 text-[#6B5B73] hover:bg-white border border-morandi-gold/20' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border border-slate-500')
                   )}
                 >
                   <span className="font-medium">{category.name}</span>
@@ -319,7 +319,7 @@ export default function AccountingPage() {
                 const _category = quickCategories.find(c => c.id === transaction.category_id);
                 return (
                   <div key={transaction.id} className={cn('flex items-center justify-between p-3 sm:p-4 rounded-xl border',
-                    theme === 'morandi' ? 'bg-white/60 border-[#E6DDD4]/50' : 'bg-slate-700 border-slate-600'
+                    theme === 'morandi' ? 'bg-white/60 border-morandi-gold/20' : 'bg-slate-700 border-slate-600'
                   )}>
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
                       <div className="min-w-0 flex-1">
@@ -399,7 +399,7 @@ export default function AccountingPage() {
       {/* APP風格底部導航 */}
       <div className={cn('fixed bottom-0 left-0 right-0 backdrop-blur-lg border-t px-2 sm:px-4 py-2 sm:py-3 safe-area-bottom',
         theme === 'morandi'
-          ? 'bg-gradient-to-r from-white/95 to-[#F8F5F0]/95 border-[#E6DDD4]/50'
+          ? 'bg-gradient-to-r from-white/95 to-[#F8F5F0]/95 border-morandi-gold/20'
           : 'bg-slate-800/95 border-slate-600'
       )}>
         <div className="flex items-center justify-around max-w-lg mx-auto">

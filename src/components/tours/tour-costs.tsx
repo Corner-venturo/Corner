@@ -17,8 +17,8 @@ interface TourCostsProps {
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
   const { items: orders } = useOrderStore();
-  const payments: any[] = []; // TODO: usePaymentStore deprecated
-  const addPayment = async (data: any) => { console.warn("addPayment not implemented"); };
+  const payments: unknown[] = []; // TODO: usePaymentStore deprecated
+  const addPayment = async (data) => { console.warn("addPayment not implemented"); };
 // TODO: usePaymentStore deprecated -   const { items: payments, create: addPayment } = usePaymentStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCost, setNewCost] = useState({
@@ -69,7 +69,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   );
 
   const getCategoryIcon = (category: string) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, unknown> = {
       'transport': Truck,
       'accommodation': Hotel,
       'food': Utensils,
@@ -151,7 +151,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           {['transport', 'accommodation', 'food', 'attraction', 'other'].map((category) => {
             const categoryTotal = costPayments
-              .filter(cost => (cost as any).category === category)
+              .filter(cost => (cost as unknown).category === category)
               .reduce((sum, cost) => sum + cost.amount, 0);
             const Icon = getCategoryIcon(category);
             const displayName = getCategoryDisplayName(category);
@@ -199,8 +199,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
           {/* 成本項目 */}
           <div className="space-y-2">
             {costPayments.map((cost) => {
-              const Icon = getCategoryIcon((cost as any).category || '');
-              const displayCategory = getCategoryDisplayName((cost as any).category || '');
+              const Icon = getCategoryIcon((cost as unknown).category || '');
+              const displayCategory = getCategoryDisplayName((cost as unknown).category || '');
               const relatedOrder = tourOrders.find(order => order.id === cost.order_id);
 
               return (
@@ -233,7 +233,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
                   <div className="col-span-2">
                     <div className="text-sm text-morandi-primary">
-                      {(cost as any).vendor || relatedOrder?.order_number || '-'}
+                      {(cost as unknown).vendor || relatedOrder?.order_number || '-'}
                     </div>
                   </div>
 

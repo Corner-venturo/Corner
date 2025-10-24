@@ -45,7 +45,7 @@ export default function RegionsPage() {
             name: destination.name,
             code: countryCode,
             status: 'active'
-          } as any);
+          } as unknown);
 
           // 添加城市
           for (const city of destination.cities) {
@@ -55,7 +55,7 @@ export default function RegionsPage() {
               code: city.code,
               status: 'active',
               country_code: countryCode
-            } as any);
+            } as unknown);
           }
         }
 
@@ -71,7 +71,8 @@ export default function RegionsPage() {
     // 延遲執行，確保 store 已載入
     const timer = setTimeout(initializeRegions, 100);
     return () => clearTimeout(timer);
-  }, []); // 只執行一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只執行一次 - 刻意忽略 create 和 regions.length，避免無限循環
 
   // 切換國家展開/收起
   const toggleCountry = (countryCode: string) => {
@@ -260,7 +261,7 @@ export default function RegionsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => toggleStatus(city.id)}
-                                  className="h-7 w-7 p-0"
+                                  className="h-10 w-10 p-0"
                                   title={city.status === 'active' ? '停用' : '啟用'}
                                 >
                                   <Power size={12} className={
@@ -271,7 +272,7 @@ export default function RegionsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleDelete(city.id)}
-                                  className="h-7 w-7 p-0 hover:text-morandi-red"
+                                  className="h-10 w-10 p-0 hover:text-morandi-red"
                                   title="刪除"
                                 >
                                   <Trash2 size={12} />

@@ -14,35 +14,35 @@ const getConsole = () => {
 };
 
 export const logger = {
-  log: (...args: any[]) => {
+  log: (...args: unknown[]) => {
     if (isDevelopment && isBrowser) {
       const c = getConsole();
       c?.log(...args);
     }
   },
 
-  error: (...args: any[]) => {
+  error: (...args: unknown[]) => {
     if (isDevelopment && isBrowser) {
       const c = getConsole();
       c?.error(...args);
     }
   },
 
-  warn: (...args: any[]) => {
+  warn: (...args: unknown[]) => {
     if (isDevelopment && isBrowser) {
       const c = getConsole();
       c?.warn(...args);
     }
   },
 
-  info: (...args: any[]) => {
+  info: (...args: unknown[]) => {
     if (isDevelopment && isBrowser) {
       const c = getConsole();
       c?.info(...args);
     }
   },
 
-  debug: (...args: any[]) => {
+  debug: (...args: unknown[]) => {
     if (isDevelopment && isBrowser) {
       const c = getConsole();
       c?.debug(...args);

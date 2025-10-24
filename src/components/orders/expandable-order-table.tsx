@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTourStore, useOrderStore } from '@/stores';
-import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, ShoppingCart, DollarSign, Banknote, Trash2 } from 'lucide-react';
+import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Banknote, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table';
 import { Order } from '@/stores/types';
@@ -83,30 +83,30 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
         <table className="w-full h-full">
           <thead className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20">
             <tr className="relative">
-              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
+              <th className="text-left py-2.5 px-4 text-xs relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">訂單編號</span>
+                <span className="font-medium text-morandi-secondary">訂單編號</span>
               </th>
               {showTourInfo && (
-                <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
+                <th className="text-left py-2.5 px-4 text-xs relative">
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                  <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">旅遊團</span>
+                  <span className="font-medium text-morandi-secondary">旅遊團</span>
                 </th>
               )}
-              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
+              <th className="text-left py-2.5 px-4 text-xs relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">聯絡人</span>
+                <span className="font-medium text-morandi-secondary">聯絡人</span>
               </th>
-              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
+              <th className="text-left py-2.5 px-4 text-xs relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">業務</span>
+                <span className="font-medium text-morandi-secondary">業務</span>
               </th>
-              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
+              <th className="text-left py-2.5 px-4 text-xs relative">
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">狀態</span>
+                <span className="font-medium text-morandi-secondary">狀態</span>
               </th>
-              <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4 relative">
-                <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">操作</span>
+              <th className="text-left py-2.5 px-4 text-xs relative">
+                <span className="font-medium text-morandi-secondary">操作</span>
               </th>
             </tr>
           </thead>
@@ -182,7 +182,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                           e.stopPropagation();
                           router.push(`/finance/payments?order_id=${order.id}&order_number=${order.order_number}&contact_person=${order.contact_person}&amount=${order.remaining_amount}`);
                         }}
-                        className="h-7 w-7 p-0 text-morandi-green hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
+                        className="h-10 w-10 p-0 text-morandi-green hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
                         title="快速收款"
                       >
                         $
@@ -196,7 +196,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                           e.stopPropagation();
                           router.push(`/finance/requests`);
                         }}
-                        className="h-7 w-7 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10"
+                        className="h-10 w-10 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10"
                         title="快速請款"
                       >
                         <CreditCard size={14} />
@@ -207,7 +207,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                         size="sm"
                         variant="ghost"
                         onClick={(e) => handleDeleteOrder(order, e)}
-                        className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
+                        className="h-10 w-10 p-0 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
                         title="刪除訂單"
                       >
                         <Trash2 size={14} />
@@ -308,7 +308,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                             <ExcelMemberTable
                               ref={(ref) => { if (ref) memberTableRefs.current[order.id] = ref; }}
                               order_id={order.id}
-                              departure_date={tourDepartureDate || tours.find((t: any) => t.id === order.tour_id)?.departure_date || ''}
+                              departure_date={tourDepartureDate || tours.find((t) => t.id === order.tour_id)?.departure_date || ''}
                               member_count={order.member_count}
                             />
                           ) : (

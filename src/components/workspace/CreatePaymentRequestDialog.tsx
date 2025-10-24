@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, Calendar } from 'lucide-react';
 import { useTourStore, usePaymentRequestStore } from '@/stores';
 import { useWorkspaceStore, AdvanceItem } from '@/stores/workspace-store';
@@ -22,7 +22,7 @@ export function CreatePaymentRequestDialog({
   const { create: createPaymentRequest } = usePaymentRequestStore();
   const { processAdvanceItem } = useWorkspaceStore();
 
-  const itemsArray = Array.isArray(items) ? items : [items];
+  const itemsArray = useMemo(() => Array.isArray(items) ? items : [items], [items]);
   const isBatch = Array.isArray(items);
 
   const [selectedTourId, setSelectedTourId] = useState('');
@@ -79,7 +79,7 @@ export function CreatePaymentRequestDialog({
         status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      } as any);
+      } as unknown);
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {

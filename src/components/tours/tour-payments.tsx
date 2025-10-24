@@ -20,8 +20,8 @@ interface TourPaymentsProps {
 
 export const TourPayments = React.memo(function TourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete }: TourPaymentsProps) {
   const { items: orders } = useOrderStore();
-  const payments: any[] = []; // TODO: usePaymentStore deprecated
-  const addPayment = async (data: any) => { console.warn("addPayment not implemented"); };
+  const payments: unknown[] = []; // TODO: usePaymentStore deprecated
+  const addPayment = async (data) => { console.warn("addPayment not implemented"); };
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // 監聽外部觸發新增
@@ -165,13 +165,13 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
           <table className="w-full">
             <thead className="bg-morandi-container/30">
               <tr>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">日期</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">類型</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">金額</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">說明</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">付款方式</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">訂單</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">狀態</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">日期</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">類型</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">金額</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">說明</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">付款方式</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">訂單</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">狀態</th>
               </tr>
             </thead>
             <tbody>
@@ -204,9 +204,9 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                       <td className="py-3 px-4">
                         <span className={cn(
                           'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                          getMethodBadge((payment as any).method)
+                          getMethodBadge((payment as unknown).method)
                         )}>
-                          {getMethodDisplayName((payment as any).method)}
+                          {getMethodDisplayName((payment as unknown).method)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-morandi-primary">
@@ -299,7 +299,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
               <select
                 value={newPayment.status}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as any }))}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as unknown }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="已確認">已確認</option>

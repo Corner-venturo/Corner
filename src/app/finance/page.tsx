@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 export default function FinancePage() {
   const { items: tours } = useTourStore();
   const { items: orders } = useOrderStore();
-  const payments: any[] = []; // TODO: 實作收款/付款記錄功能
+  const payments: unknown[] = []; // TODO: 實作收款/付款記錄功能
 
   // 計算財務統計
   const totalReceivable = payments

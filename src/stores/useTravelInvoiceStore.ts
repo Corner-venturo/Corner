@@ -135,8 +135,9 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
 
       const result = await response.json()
       set({ invoices: result.data, isLoading: false })
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '查詢發票失敗'
+      set({ error: errorMessage, isLoading: false })
       throw error
     }
   },
@@ -153,8 +154,9 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
       } else {
         throw new Error('找不到發票')
       }
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '查詢發票失敗'
+      set({ error: errorMessage, isLoading: false })
       throw error
     }
   },
@@ -178,8 +180,9 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
       set({ isLoading: false })
 
       return result.data
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '開立發票失敗'
+      set({ error: errorMessage, isLoading: false })
       throw error
     }
   },
@@ -206,8 +209,9 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
       // 重新載入發票列表
       await get().fetchInvoices()
       set({ isLoading: false })
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '作廢發票失敗'
+      set({ error: errorMessage, isLoading: false })
       throw error
     }
   },
@@ -234,8 +238,9 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
       // 重新載入發票列表
       await get().fetchInvoices()
       set({ isLoading: false })
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '開立折讓失敗'
+      set({ error: errorMessage, isLoading: false })
       throw error
     }
   },

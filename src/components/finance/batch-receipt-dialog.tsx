@@ -184,7 +184,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         status: '已收款',
         note,
         created_by: '1' // TODO: 從 auth store 取得當前用戶
-      } as any);
+      } as unknown);
 
       alert('✅ 批量收款單建立成功');
       onOpenChange(false);
@@ -231,7 +231,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                 <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
                   <Select
                     value={item.payment_method}
-                    onValueChange={(value) => updatePaymentItem(index, { payment_method: value as any })}
+                    onValueChange={(value) => updatePaymentItem(index, { payment_method: value as unknown })}
                   >
                     <SelectTrigger className="w-32">
                       <SelectValue />
@@ -356,7 +356,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
             </div>
 
             {unallocatedAmount !== 0 && (
-              <div className="flex items-center gap-2 p-3 border border-morandi-gold/30 rounded-lg bg-morandi-gold/5 text-sm">
+              <div className="flex items-center gap-2 p-3 border border-morandi-gold/20 rounded-lg bg-morandi-gold/5 text-sm">
                 <AlertCircle className="h-4 w-4 text-morandi-gold" />
                 <span className="text-morandi-gold">
                   {unallocatedAmount > 0 ? '還有金額未分配' : '分配金額超過收款金額'}，請調整分配金額

@@ -15,7 +15,7 @@ import { useState, useCallback } from 'react';
 export async function checkPendingCount(tableName: TableName): Promise<number> {
   try {
     const items = await localDB.getAll(tableName);
-    const pending = items.filter((item: any) =>
+    const pending = items.filter((item) =>
       item._needs_sync === true ||
       (item.code && item.code.endsWith('TBC'))
     );

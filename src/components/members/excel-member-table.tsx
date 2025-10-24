@@ -51,7 +51,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
   ];
 
   useEffect(() => {
-    const existingMembers = orderMembers.map((member: any) => ({ ...member }));
+    const existingMembers = orderMembers.map((member) => ({ ...member }));
 
     // 確保至少有member_count行
     while (existingMembers.length < member_count) {
@@ -77,10 +77,10 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
 
   // 自動儲存成員
-  const autoSaveMember = async (member: EditingMember, index: number) => {
+  const autoSaveMember = useCallback(async (member: EditingMember, index: number) => {
     if (member.isNew && member.name.trim()) {
       const { isNew, ...memberData } = member;
-      const created = await memberStore.create(memberData as any);
+      const created = await memberStore.create(memberData as unknown);
       const newId = created?.id;
 
       const updatedMembers = [...tableMembers];
@@ -90,12 +90,12 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       const { isNew, ...memberData } = member;
       await memberStore.update(member.id, memberData);
     }
-  };
+  }, [memberStore, tableMembers]);
 
   // 處理資料更新 (用於 ReactDataSheet)
   const handleDataUpdate = useCallback((newData: EditingMember[]) => {
     // 處理自動計算欄位
-    const processedData = newData.map((member: any) => {
+    const processedData = newData.map((member) => {
       const processed = { ...member };
 
       // 從身分證號自動計算性別和年齡
@@ -117,7 +117,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     processedData.forEach((member: any, index: number) => {
       autoSaveMember(member, index);
     });
-  }, [departure_date, tableMembers, memberStore]);
+  }, [departure_date, autoSaveMember]);
 
   // 新增行
   const addRow = () => {

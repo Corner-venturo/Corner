@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 import { HotTable } from '@handsontable/react';
 import { registerLanguageDictionary, zhTW } from 'handsontable/i18n';
@@ -16,7 +16,7 @@ registerLanguageDictionary(zhTW);
 
 interface TemplateExcelEditorProps {
   data: any;
-  onChange: (data: any) => void;
+  onChange: (data) => void;
   onColumnWidthChange?: (widths: number[]) => void;
   field_mappings?: TemplateField[];
   repeatable_sections?: RepeatableSection[];
@@ -39,11 +39,11 @@ export function TemplateExcelEditor({
     : Array.from({ length: 60 }, () => Array.from({ length: 20 }, () => ''));
 
   // 檢查某一列是否在可重複區塊內
-  const isRowInRepeatableSection = (row: number) => {
+  const isRowInRepeatableSection = useCallback((row: number) => {
     return repeatable_sections.find(
       section => row >= section.range.start_row && row <= section.range.end_row
     );
-  };
+  }, [repeatable_sections]);
 
   // 儲存格樣式自定義 + A4 邊框繪製
   useEffect(() => {
@@ -125,7 +125,7 @@ export function TemplateExcelEditor({
     return () => {
       window.removeEventListener('resize', drawA4Background);
     };
-  }, [repeatable_sections, highlightedSection]);
+  }, [repeatable_sections, highlightedSection, isRowInRepeatableSection]);
 
   return (
     <div className="h-full flex flex-col bg-background">

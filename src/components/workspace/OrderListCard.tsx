@@ -47,7 +47,7 @@ export function OrderListCard({
   const totalGap = orderList.orders.reduce((sum, order) => sum + order.gap, 0);
   const canProcess = userRole === 'admin' || userRole === 'finance';
 
-  const getOrderStatus = (order: any) => {
+  const getOrderStatus = (order) => {
     const isFullyUnpaid = order.total_amount > 0 && order.paid_amount === 0;
     const isLowRate = order.collection_rate < 30;
 
@@ -129,13 +129,13 @@ export function OrderListCard({
               <table className="w-full">
                 <thead className="bg-morandi-container/5 border-b border-morandi-gold/20">
                   <tr>
-                    <th className="text-left py-2 px-3 text-xs font-semibold text-morandi-secondary">訂單號</th>
-                    <th className="text-left py-2 px-3 text-xs font-semibold text-morandi-secondary">客戶</th>
-                    <th className="text-right py-2 px-3 text-xs font-semibold text-morandi-secondary">總額</th>
-                    <th className="text-right py-2 px-3 text-xs font-semibold text-morandi-secondary">已收</th>
-                    <th className="text-right py-2 px-3 text-xs font-semibold text-morandi-secondary">缺口</th>
-                    <th className="text-center py-2 px-3 text-xs font-semibold text-morandi-secondary">狀態</th>
-                    <th className="text-center py-2 px-3 text-xs font-semibold text-morandi-secondary">操作</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">訂單號</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">客戶</th>
+                    <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">總額</th>
+                    <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">已收</th>
+                    <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">缺口</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">狀態</th>
+                    <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">操作</th>
                   </tr>
                 </thead>
                 <tbody>

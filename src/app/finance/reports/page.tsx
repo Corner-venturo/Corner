@@ -10,7 +10,7 @@ import { BarChart3, TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucid
 export default function ReportsPage() {
   const { items: tours } = useTourStore();
   const { items: orders } = useOrderStore();
-  const payments: any[] = []; // TODO: 實作完整財務報表
+  const payments: unknown[] = []; // TODO: 實作完整財務報表
 
   const total_revenue = payments.filter(p => p.type === '收款').reduce((sum, p) => sum + p.amount, 0);
   const totalCosts = payments.filter(p => p.type === '請款').reduce((sum, p) => sum + p.amount, 0);

@@ -196,8 +196,8 @@ export function ChannelView({ channel }: ChannelViewProps) {
                             className={cn(
                               'px-2 py-0.5 rounded-full text-xs flex items-center gap-1 transition-colors',
                               users.includes(currentUserId)
-                                ? 'bg-morandi-gold/20 border border-morandi-gold/40'
-                                : 'bg-morandi-container/20 border border-border hover:border-morandi-gold/40'
+                                ? 'bg-morandi-gold/20 border border-morandi-gold/20'
+                                : 'bg-morandi-container/20 border border-border hover:border-morandi-gold/20'
                             )}
                           >
                             <span>{emoji}</span>

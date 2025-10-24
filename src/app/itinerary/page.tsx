@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
@@ -18,13 +18,13 @@ export default function ItineraryPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // 複製行程
-  const handleDuplicate = async (id: string) => {
+  const handleDuplicate = useCallback(async (id: string) => {
     // TODO: 實作複製邏輯
     console.log('複製行程:', id);
-  };
+  }, []);
 
   // 刪除行程
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     if (confirm('確定要刪除這個行程嗎？')) {
       try {
         await deleteItinerary(id);
@@ -35,7 +35,7 @@ export default function ItineraryPage() {
         alert('❌ 刪除失敗，請稍後再試');
       }
     }
-  };
+  }, [deleteItinerary]);
 
   // 表格配置
   const tableColumns: TableColumn[] = useMemo(() => [
@@ -151,7 +151,7 @@ export default function ItineraryPage() {
         </div>
       ),
     },
-  ], [router, handleDelete, handleDuplicate]);
+  ], [handleDelete, handleDuplicate]);
 
   // 過濾資料
   const filteredItineraries = useMemo(() => {

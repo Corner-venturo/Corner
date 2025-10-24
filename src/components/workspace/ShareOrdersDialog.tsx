@@ -156,13 +156,13 @@ export function ShareOrdersDialog({
             <table className="w-full">
               <thead className="sticky top-0 bg-morandi-container/5 border-b border-morandi-gold/20">
                 <tr>
-                  <th className="w-10 py-2 px-2"></th>
-                  <th className="text-left py-2 px-2 text-sm font-semibold text-morandi-secondary">訂單號</th>
-                  <th className="text-left py-2 px-2 text-sm font-semibold text-morandi-secondary">客戶</th>
-                  <th className="text-right py-2 px-2 text-sm font-semibold text-morandi-secondary">總額</th>
-                  <th className="text-right py-2 px-2 text-sm font-semibold text-morandi-secondary">已收</th>
-                  <th className="text-right py-2 px-2 text-sm font-semibold text-morandi-secondary">缺口</th>
-                  <th className="text-center py-2 px-2 text-sm font-semibold text-morandi-secondary">狀態</th>
+                  <th className="w-10 py-2.5 px-4 text-xs"></th>
+                  <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">訂單號</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">客戶</th>
+                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">總額</th>
+                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">已收</th>
+                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">缺口</th>
+                  <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">狀態</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,7 +184,7 @@ export function ShareOrdersDialog({
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => toggleOrderSelection(order.id)}
-                          className="w-4 h-4 rounded border-morandi-gold/30 text-morandi-gold focus:ring-morandi-gold/20"
+                          className="w-4 h-4 rounded border-morandi-gold/20 text-morandi-gold focus:ring-morandi-gold/20"
                           onClick={(e) => e.stopPropagation()}
                         />
                       </td>

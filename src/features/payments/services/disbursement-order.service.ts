@@ -12,7 +12,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(o => o.id === id),
       add: async (order: DisbursementOrder) => {
-        const result = await store.create(order as any);
+        const result = await store.create(order as unknown);
         return result || order;
       },
       update: async (id: string, data: Partial<DisbursementOrder>) => {
@@ -100,7 +100,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       created_by: '1', // TODO: 使用實際用戶ID
     };
 
-    const order = await this.create(orderData as any);
+    const order = await this.create(orderData as unknown);
 
     // 更新請款單狀態為 processing
     for (const requestId of paymentRequestIds) {

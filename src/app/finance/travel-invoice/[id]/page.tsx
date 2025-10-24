@@ -39,8 +39,8 @@ export default function InvoiceDetailPage() {
       await voidInvoice(currentInvoice.id, voidReason, 'current_user') // TODO: 從登入狀態取得
       setShowVoidDialog(false)
       setVoidReason('')
-    } catch (error: any) {
-      alert(error.message)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '發生未知錯誤')
     }
   }
 
@@ -157,11 +157,11 @@ export default function InvoiceDetailPage() {
           <table className="w-full">
             <thead className="border-b">
               <tr>
-                <th className="text-left py-2">商品名稱</th>
-                <th className="text-center py-2">數量</th>
-                <th className="text-center py-2">單位</th>
-                <th className="text-right py-2">單價</th>
-                <th className="text-right py-2">金額</th>
+                <th className="text-left py-2.5 px-4 text-xs">商品名稱</th>
+                <th className="text-center py-2.5 px-4 text-xs">數量</th>
+                <th className="text-center py-2.5 px-4 text-xs">單位</th>
+                <th className="text-right py-2.5 px-4 text-xs">單價</th>
+                <th className="text-right py-2.5 px-4 text-xs">金額</th>
               </tr>
             </thead>
             <tbody>

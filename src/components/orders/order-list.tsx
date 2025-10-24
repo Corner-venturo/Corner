@@ -36,13 +36,13 @@ export const OrderList = React.memo(function OrderList({ orders, showTourInfo = 
     <table className="w-full">
       <thead className="bg-morandi-container/30">
         <tr className="relative">
-          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">訂單編號</th>
-          {showTourInfo && <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">旅遊團</th>}
-          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">聯絡人</th>
-          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">業務/助理</th>
-          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">金額/收款</th>
-          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">狀態</th>
-          <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">操作</th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">訂單編號</th>
+          {showTourInfo && <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">旅遊團</th>}
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">聯絡人</th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">業務/助理</th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">金額/收款</th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">狀態</th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">操作</th>
           <td className="absolute bottom-0 left-4 right-4 h-[1px] bg-border"></td>
         </tr>
       </thead>

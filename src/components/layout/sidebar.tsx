@@ -26,10 +26,12 @@ import {
   TrendingDown,
   FileCheck,
   Edit,
-  Flag
+  Flag,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
+import { SyncStatusIndicator } from './sync-status-indicator';
 
 interface MenuItem {
   href: string;
@@ -139,6 +141,12 @@ const personalToolItems: MenuItem[] = [
     label: '箱型時間',
     icon: Clock,
     requiredPermission: 'timebox',
+  },
+  {
+    href: '/manifestation',
+    label: '顯化魔法',
+    icon: Sparkles,
+    requiredPermission: 'hr',
   },
 ];
 
@@ -366,7 +374,7 @@ export function Sidebar() {
                     prefetch={false}
                     className={cn(
                       'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                      is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
+                      is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold/20'
                     )}
                   >
                     <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -407,7 +415,7 @@ export function Sidebar() {
                   prefetch={false}
                   className={cn(
                     'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                    is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
+                    is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold/20'
                   )}
                 >
                   <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -435,7 +443,7 @@ export function Sidebar() {
                 prefetch={false}
                 className={cn(
                   'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                  mounted && pathname === '/settings' && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold'
+                  mounted && pathname === '/settings' && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold/20'
                 )}
               >
                 <Settings size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -446,6 +454,11 @@ export function Sidebar() {
                   設定
                 </span>
               </Link>
+            </li>
+
+            {/* 同步狀態指示器 */}
+            <li>
+              <SyncStatusIndicator isDropdownHovered={isSidebarHovered || isDropdownHovered} />
             </li>
 
           </ul>

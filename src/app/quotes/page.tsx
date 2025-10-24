@@ -41,7 +41,7 @@ export default function QuotesPage() {
       loadQuotes();
     }, 100);
     return () => clearTimeout(timer);
-  }, []); // ✅ 只在組件掛載時執行一次
+  }, [loadQuotes]); // 只在組件掛載時執行一次（添加 loadQuotes 依賴）
 
   // 檢查 URL 參數，自動開啟新增對話框
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function QuotesPage() {
         // 否則顯示報價單自己的編號
         return (
           <span className="text-sm text-morandi-secondary font-mono">
-            {(quote as any).code || '-'}
+            {(quote as unknown).code || '-'}
           </span>
         );
       },
@@ -148,7 +148,7 @@ export default function QuotesPage() {
         </span>
       ),
     },
-  ], []);
+  ], [tours]);
 
   const filteredQuotes = quotes.filter(quote => {
     const matchesStatus = statusFilter === 'all' || quote.status === statusFilter;
@@ -214,7 +214,7 @@ export default function QuotesPage() {
     }
   };
 
-  const handleQuoteClick = (quote: any) => {
+  const handleQuoteClick = (quote) => {
     router.push(`/quotes/${quote.id}`);
   };
 
@@ -222,9 +222,9 @@ export default function QuotesPage() {
     e.stopPropagation();
     try {
       const duplicated = await duplicateQuote(quote_id);
-      if (duplicated && (duplicated as any).id) {
+      if (duplicated && (duplicated as unknown).id) {
         // 跳轉到新報價單
-        router.push(`/quotes/${(duplicated as any).id}`);
+        router.push(`/quotes/${(duplicated as unknown).id}`);
       } else {
         alert('複製報價單失敗，請重試');
       }

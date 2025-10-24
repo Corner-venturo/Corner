@@ -98,7 +98,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                     className={cn(
                       "border rounded-xl p-6 transition-all duration-200 hover:shadow-lg",
                       account.is_active
-                        ? "border-border bg-white hover:border-morandi-gold/50"
+                        ? "border-border bg-white hover:border-morandi-gold/20"
                         : "border-morandi-container bg-morandi-container/30 opacity-75"
                     )}
                   >

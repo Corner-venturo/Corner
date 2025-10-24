@@ -21,7 +21,7 @@ export interface LocalProfile {
   personal_info?: any;
   job_info?: any;
   salary_info?: any;
-  contracts?: any[];
+  contracts?: unknown[];
   attendance?: any;
 
   // 元資料

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
  * 通用的 Combobox 選項類型
  * @template T - 可選的額外資料類型
  */
-export interface ComboboxOption<T = any> {
+export interface ComboboxOption<T = unknown> {
   /** 選項的唯一識別值 */
   value: string;
   /** 顯示的標籤文字 */
@@ -25,7 +25,7 @@ export interface ComboboxOption<T = any> {
  * Combobox 組件的屬性
  * @template T - 選項額外資料的類型
  */
-export interface ComboboxProps<T = any> {
+export interface ComboboxProps<T = unknown> {
   /** 當前選中的值 */
   value: string;
   /** 值改變時的回調函數 */
@@ -80,7 +80,7 @@ export interface ComboboxProps<T = any> {
  * />
  * ```
  */
-export function Combobox<T = any>({
+export function Combobox<T = unknown>({
   value,
   onChange,
   onSelect,
@@ -382,12 +382,12 @@ export function LegacyCombobox({
           <span className="text-morandi-primary">{option.label}</span>
           {option.data && (
             <span className="text-xs text-morandi-secondary">
-              {(option.data as any).pricePerGroup ? (
-                (option.data as any).isGroupCost
-                  ? `團體 NT$${(option.data as any).pricePerGroup}`
-                  : `個人 NT$${(option.data as any).price_per_person}`
-              ) : (option.data as any).price_per_person ? (
-                `NT$${(option.data as any).price_per_person}`
+              {option.data && typeof option.data === 'object' && 'pricePerGroup' in option.data && option.data.pricePerGroup ? (
+                'isGroupCost' in option.data && option.data.isGroupCost
+                  ? `團體 NT$${option.data.pricePerGroup}`
+                  : 'price_per_person' in option.data ? `個人 NT$${option.data.price_per_person}` : ''
+              ) : option.data && typeof option.data === 'object' && 'price_per_person' in option.data && option.data.price_per_person ? (
+                `NT$${option.data.price_per_person}`
               ) : ''}
             </span>
           )}

@@ -17,14 +17,14 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
     const { user, login } = useAuthStore();
     const { update: updateUser } = useUserStore();
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>(employee.permissions);
-    const [selectedRoles, setSelectedRoles] = useState<string[]>((employee as any).roles || []);
+    const [selectedRoles, setSelectedRoles] = useState<string[]>((employee as unknown).roles || []);
     const [isSaving, setIsSaving] = useState(false);
     const [showSavedMessage, setShowSavedMessage] = useState(false);
 
     useEffect(() => {
       setSelectedPermissions(employee.permissions);
-      setSelectedRoles((employee as any).roles || []);
-    }, [employee.permissions, (employee as any).roles]);
+      setSelectedRoles((employee as unknown).roles || []);
+    }, [employee.permissions, employee]);
 
     const handlePermissionToggle = async (permissionId: string) => {
       let newPermissions: string[];
@@ -67,14 +67,14 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
     const saveRoles = async (roles: string[]) => {
       setIsSaving(true);
       try {
-        await updateUser(employee.id, { roles: roles as any });
+        await updateUser(employee.id, { roles: roles as unknown });
 
         // 同步更新 IndexedDB
         try {
           const { localDB } = await import('@/lib/db');
           const { TABLES } = await import('@/lib/db/schemas');
 
-          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id) as any;
+          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id) as unknown;
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
@@ -91,7 +91,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           // 更新 auth-store
           login({
             ...user,
-            roles: roles as any
+            roles: roles as unknown
           });
 
           // 🎴 同步更新 LocalProfile（角色卡）
@@ -102,7 +102,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
 
             if (currentProfile && currentProfile.id === employee.id) {
               localAuthStore.updateProfile(employee.id, {
-                roles: roles as any
+                roles: roles as unknown
               });
               console.log('✅ LocalProfile 角色已更新:', roles);
             }
@@ -132,7 +132,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           const { localDB } = await import('@/lib/db');
           const { TABLES } = await import('@/lib/db/schemas');
 
-          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id) as any;
+          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id) as unknown;
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,

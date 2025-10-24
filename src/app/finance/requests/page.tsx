@@ -232,7 +232,7 @@ export default function RequestsPage() {
   }, []);
 
   const { data: filteredAndSortedRequests, handleSort, handleFilter } = useEnhancedTable(
-    payment_requests as any, // 使用新的 Store 型別
+    payment_requests as unknown, // 使用新的 Store 型別
     sortFunction,
     filterFunction
   );
@@ -335,7 +335,7 @@ export default function RequestsPage() {
       note: newRequest.note,
       budget_warning: false
       // created_by 會在 service 層自動填入
-    } as any);
+    } as unknown);
 
     // 依序添加所有項目（使用 for...of 確保順序執行）
     for (let i = 0; i < requestItems.length; i++) {
@@ -397,7 +397,7 @@ export default function RequestsPage() {
         status: 'pending',
         note: batchRequest.note,
         budget_warning: false
-      } as any);
+      } as unknown);
 
       // 添加所有項目
       for (let i = 0; i < requestItems.length; i++) {
@@ -583,7 +583,7 @@ export default function RequestsPage() {
                     className={cn(
                       "mt-1",
                       newRequest.request_date && new Date(newRequest.request_date + 'T00:00:00').getDay() !== 4
-                        ? "bg-morandi-gold/10 border-morandi-gold/50"
+                        ? "bg-morandi-gold/10 border-morandi-gold/20"
                         : "bg-background"
                     )}
                   />
@@ -913,7 +913,7 @@ export default function RequestsPage() {
                     className={cn(
                       "mt-1",
                       batchRequest.request_date && new Date(batchRequest.request_date + 'T00:00:00').getDay() !== 4
-                        ? "bg-morandi-gold/10 border-morandi-gold/50"
+                        ? "bg-morandi-gold/10 border-morandi-gold/20"
                         : "bg-background"
                     )}
                   />

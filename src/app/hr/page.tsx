@@ -32,7 +32,7 @@ export default function HRPage() {
     if (users.length === 0) {
       fetchAll();
     }
-  }, []);
+  }, [users.length, fetchAll]);
 
   const filteredEmployees = useMemo(() => {
     if (statusFilter === 'all') {
@@ -83,7 +83,7 @@ export default function HRPage() {
       e.stopPropagation();
     }
 
-    const confirmMessage = `⚠️ 確定要將員工「${employee.display_name || (employee as any).chinese_name || '未命名員工'}」辦理離職嗎？\n\n離職後將無法登入系統，但歷史記錄會保留。`;
+    const confirmMessage = `⚠️ 確定要將員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」辦理離職嗎？\n\n離職後將無法登入系統，但歷史記錄會保留。`;
 
     if (!confirm(confirmMessage)) {
       return;
@@ -105,7 +105,7 @@ export default function HRPage() {
       e.stopPropagation();
     }
 
-    const confirmMessage = `⚠️⚠️⚠️ 確定要刪除員工「${employee.display_name || (employee as any).chinese_name || '未命名員工'}」嗎？\n\n此操作會：\n- 永久刪除員工所有資料\n- 移除所有歷史記錄\n- 無法復原\n\n建議使用「辦理離職」功能來保留歷史記錄。\n\n真的要刪除嗎？`;
+    const confirmMessage = `⚠️⚠️⚠️ 確定要刪除員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」嗎？\n\n此操作會：\n- 永久刪除員工所有資料\n- 移除所有歷史記錄\n- 無法復原\n\n建議使用「辦理離職」功能來保留歷史記錄。\n\n真的要刪除嗎？`;
 
     if (!confirm(confirmMessage)) {
       return;
@@ -116,7 +116,7 @@ export default function HRPage() {
       if (expandedEmployee === employee.id) {
         setExpandedEmployee(null);
       }
-      alert(`✅ 員工「${employee.display_name || (employee as any).chinese_name || '未命名員工'}」已成功刪除`);
+      alert(`✅ 員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」已成功刪除`);
     } catch (err) {
       console.error('刪除員工失敗:', err);
       const errorMessage = err instanceof Error ? err.message : '未知錯誤';
@@ -182,7 +182,7 @@ export default function HRPage() {
                       variant="ghost"
                       size="sm"
                       onClick={(e) => handleTerminateEmployee(employee, e)}
-                      className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-100"
+                      className="h-10 w-10 p-0 text-orange-600 hover:bg-orange-100"
                       title="辦理離職"
                     >
                       <UserX size={14} />
@@ -192,7 +192,7 @@ export default function HRPage() {
                     variant="ghost"
                     size="sm"
                     onClick={(e) => handleDeleteEmployee(employee, e)}
-                    className="h-7 w-7 p-0 text-morandi-red hover:bg-morandi-red/10"
+                    className="h-10 w-10 p-0 text-morandi-red hover:bg-morandi-red/10"
                     title="刪除（不建議）"
                   >
                     <Trash2 size={14} />
@@ -213,7 +213,7 @@ export default function HRPage() {
                     )}
                   </div>
                   <h3 className="font-semibold text-morandi-primary text-center">
-                    {employee.display_name || (employee as any).chinese_name || '未命名員工'}
+                    {employee.display_name || (employee as unknown).chinese_name || '未命名員工'}
                   </h3>
                   <p className="text-sm text-morandi-muted">
                     {employee.employee_number}

@@ -16,7 +16,7 @@ import type { SyncableEntity } from '@/types';
  * @param isSynced - 是否已同步（true: 已同步, false: 待同步）
  * @returns 加入同步欄位的資料
  */
-export function withSyncFields<T extends Record<string, any>>(
+export function withSyncFields<T extends Record<string, unknown>>(
   data: T,
   isSynced: boolean = false
 ): T & Partial<SyncableEntity> {
@@ -33,7 +33,7 @@ export function withSyncFields<T extends Record<string, any>>(
  * @param data - 原始資料
  * @returns 更新同步狀態的資料
  */
-export function markAsSynced<T extends Record<string, any>>(
+export function markAsSynced<T extends Record<string, unknown>>(
   data: T
 ): T & Partial<SyncableEntity> {
   return {
@@ -48,7 +48,7 @@ export function markAsSynced<T extends Record<string, any>>(
  * @param data - 原始資料
  * @returns 更新同步狀態的資料
  */
-export function markAsPending<T extends Record<string, any>>(
+export function markAsPending<T extends Record<string, unknown>>(
   data: T
 ): T & Partial<SyncableEntity> {
   return {
@@ -63,7 +63,7 @@ export function markAsPending<T extends Record<string, any>>(
  * @param data - 原始資料
  * @returns 更新刪除狀態的資料
  */
-export function markAsDeleted<T extends Record<string, any>>(
+export function markAsDeleted<T extends Record<string, unknown>>(
   data: T
 ): T & Partial<SyncableEntity> {
   return {

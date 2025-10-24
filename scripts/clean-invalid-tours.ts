@@ -18,7 +18,7 @@ async function cleanInvalidTours() {
     console.log(`📊 總共找到 ${allTours.length} 筆旅遊團資料`);
 
     // 找出無效的旅遊團（departure_date 空白或無效）
-    const invalidTours = allTours.filter((tour: any) => {
+    const invalidTours = allTours.filter((tour) => {
       if (!tour.departure_date) return true; // 空白
       const date = new Date(tour.departure_date);
       return isNaN(date.getTime()); // 無效日期
@@ -30,7 +30,7 @@ async function cleanInvalidTours() {
     }
 
     console.log(`❌ 找到 ${invalidTours.length} 筆無效的旅遊團資料：`);
-    invalidTours.forEach((tour: any) => {
+    invalidTours.forEach((tour) => {
       console.log(`  - ID: ${tour.id}, 名稱: ${tour.name || '(無名稱)'}, 出發日期: ${tour.departure_date || '(空白)'}`);
     });
 

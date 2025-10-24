@@ -202,8 +202,8 @@ export function FinanceAlertDialog({ open, onOpenChange, onShare }: FinanceAlert
                 className={cn(
                   "flex items-start gap-3 p-3 rounded-lg border transition-colors cursor-pointer",
                   selectedFilters.includes(option.id)
-                    ? "border-morandi-gold bg-morandi-gold/5"
-                    : "border-morandi-gold/20 hover:border-morandi-gold/40"
+                    ? "border-morandi-gold/20 bg-morandi-gold/5"
+                    : "border-morandi-gold/20 hover:border-morandi-gold/20"
                 )}
                 onClick={() => handleFilterToggle(option.id)}
               >
@@ -253,7 +253,7 @@ export function FinanceAlertDialog({ open, onOpenChange, onShare }: FinanceAlert
                       "flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer",
                       selectedTours.includes(tour.id)
                         ? "border-morandi-blue bg-morandi-blue/5"
-                        : "border-morandi-gold/20 hover:border-morandi-gold/40"
+                        : "border-morandi-gold/20 hover:border-morandi-gold/20"
                     )}
                     onClick={() => handleTourToggle(tour.id)}
                   >

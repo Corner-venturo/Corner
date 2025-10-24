@@ -112,13 +112,13 @@ export function TodoCardGroups({ todos, groupBy, onTodoClick, onEdit }: TodoCard
   const getGroupColor = (groupName: string) => {
     const colors: Record<string, string> = {
       '今天': 'border-morandi-red',
-      '本週': 'border-morandi-gold',
+      '本週': 'border-morandi-gold/20',
       '稍後': 'border-morandi-secondary',
       '緊急': 'border-morandi-red',
-      '重要': 'border-morandi-gold',
+      '重要': 'border-morandi-gold/20',
       '一般': 'border-morandi-secondary',
       '待辦': 'border-morandi-blue',
-      '進行中': 'border-morandi-gold',
+      '進行中': 'border-morandi-gold/20',
       '已完成': 'border-morandi-green'
     };
     return colors[groupName] || 'border-border';
@@ -314,7 +314,7 @@ export function TodoCardGroups({ todos, groupBy, onTodoClick, onEdit }: TodoCard
                               e.stopPropagation();
                               onEdit?.(todo);
                             }}
-                            className="h-7 w-7 p-0"
+                            className="h-10 w-10 p-0"
                           >
                             <Edit2 size={12} />
                           </Button>
@@ -327,7 +327,7 @@ export function TodoCardGroups({ todos, groupBy, onTodoClick, onEdit }: TodoCard
                                 deleteTodo(todo.id);
                               }
                             }}
-                            className="h-7 w-7 p-0 text-morandi-red"
+                            className="h-10 w-10 p-0 text-morandi-red"
                           >
                             <Trash2 size={12} />
                           </Button>

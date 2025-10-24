@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useSyncStatus } from '@/lib/sync/sync-status-service';
-import { Cloud, CloudOff, AlertCircle } from 'lucide-react';
+import { Cloud, CloudOff, AlertCircle, Wifi, WifiOff, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
+import { formatDistanceToNow } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 
 interface SyncStatusIndicatorProps {
   isDropdownHovered?: boolean;
@@ -14,6 +16,7 @@ export function SyncStatusIndicator({ isDropdownHovered = false }: SyncStatusInd
   const { pendingCount, isOnline, lastSyncTime, updateStatus } = useSyncStatus();
   const { sidebarCollapsed } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -73,10 +76,26 @@ export function SyncStatusIndicator({ isDropdownHovered = false }: SyncStatusInd
   const config = getStatusConfig();
   const Icon = config.icon;
 
+  const formatLastSyncTime = () => {
+    if (!lastSyncTime) return '尚未同步';
+    try {
+      return formatDistanceToNow(new Date(lastSyncTime), {
+        addSuffix: true,
+        locale: zhTW
+      });
+    } catch {
+      return '尚未同步';
+    }
+  };
+
   return (
-    <div className={cn(
-      'w-full relative h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors cursor-pointer'
-    )}>
+    <div
+      className={cn(
+        'w-full relative h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors cursor-pointer'
+      )}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
       <Icon size={20} className={cn(
         config.color,
         "absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -91,6 +110,56 @@ export function SyncStatusIndicator({ isDropdownHovered = false }: SyncStatusInd
       )}>
         {config.text}
       </span>
+
+      {/* Hover 詳細資訊彈出框 */}
+      {showTooltip && (
+        <div className="fixed left-[200px] bg-card border border-border rounded-lg shadow-lg py-3 px-4 min-w-64 z-[60]"
+          style={{
+            top: 'auto',
+            bottom: '16px'
+          }}
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-morandi-secondary">網路連線</span>
+              <div className="flex items-center gap-2">
+                {isOnline ? (
+                  <>
+                    <Wifi className="w-4 h-4 text-morandi-green" />
+                    <span className="text-morandi-green">已連線</span>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff className="w-4 h-4 text-morandi-red" />
+                    <span className="text-morandi-red">離線</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-morandi-secondary">最後同步</span>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-morandi-secondary" />
+                <span className="text-morandi-primary">
+                  {formatLastSyncTime()}
+                </span>
+              </div>
+            </div>
+
+            {pendingCount > 0 && (
+              <div className="bg-morandi-container rounded p-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <AlertCircle className="w-4 h-4 text-morandi-gold" />
+                  <span className="text-morandi-primary">
+                    {pendingCount} 筆變更待同步
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

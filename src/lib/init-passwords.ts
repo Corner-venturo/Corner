@@ -58,7 +58,7 @@ export async function initializeEmployeePasswords() {
       status: 'active' as const
     };
 
-    await userStore.create(adminUser as any);
+    await userStore.create(adminUser as unknown);
     console.log('✅ 已建立預設管理員帳號');
     console.log('   帳號：admin');
     console.log('   密碼：admin123');
@@ -68,7 +68,7 @@ export async function initializeEmployeePasswords() {
     if (typeof window !== 'undefined' && 'indexedDB' in window) {
       try {
         await localDB.init(); // 確保資料庫已初始化
-        await localDB.put(TABLES.EMPLOYEES as any, {
+        await localDB.put(TABLES.EMPLOYEES as unknown, {
           ...adminUser,
           id: generateUUID(),
           created_at: new Date().toISOString()
@@ -103,7 +103,7 @@ export async function initializeEmployeePasswords() {
       // 同步到 IndexedDB（僅在瀏覽器環境）
       if (typeof window !== 'undefined' && 'indexedDB' in window) {
         try {
-          await localDB.put(TABLES.EMPLOYEES as any, {
+          await localDB.put(TABLES.EMPLOYEES as unknown, {
             ...user,
             password_hash: hashedPassword,
             must_change_password: true,
@@ -213,7 +213,7 @@ export async function createTestEmployees() {
     if (typeof window !== 'undefined' && 'indexedDB' in window) {
       try {
         await localDB.init(); // 確保資料庫已初始化
-        await localDB.put(TABLES.EMPLOYEES as any, {
+        await localDB.put(TABLES.EMPLOYEES as unknown, {
           ...newEmployee,
           id: generateUUID(),
           created_at: new Date().toISOString()

@@ -9,26 +9,39 @@ import { X, EyeOff } from 'lucide-react';
 // 引入 react-datasheet 的 CSS (我們會自訂樣式)
 import 'react-datasheet/lib/react-datasheet.css';
 
+interface CellData {
+  value: unknown;
+  displayValue?: unknown;
+  readOnly?: boolean;
+  key?: string;
+  rowData?: Record<string, unknown>;
+  colKey?: string;
+  width?: number;
+  columnKey?: string;
+  rowIndex?: number;
+  className?: string;
+}
+
 export interface DataSheetColumn {
   key: string;
   label: string;
   width?: number;
   readOnly?: boolean;
-  dataRenderer?: (value: any, row: any, col: any) => string;
-  valueRenderer?: (cell: any, row: number, col: number) => React.ReactNode;
-  dataEditor?: React.ComponentType<any>;
+  dataRenderer?: (value: unknown, row: Record<string, unknown>, col: string) => string;
+  valueRenderer?: (cell: CellData, row: number, col: number) => React.ReactNode;
+  dataEditor?: React.ComponentType<unknown>;
   type?: 'text' | 'select' | 'readonly';
   options?: Array<{ value: string; label: string; disabled?: boolean }>;
-  onCellClick?: (rowData: any, field: string) => void;
+  onCellClick?: (rowData: Record<string, unknown>, field: string) => void;
 }
 
 export interface DataSheetProps {
   columns: DataSheetColumn[];
-  data: any[];
-  tour_add_ons?: any[];
+  data: Record<string, unknown>[];
+  tour_add_ons?: Record<string, unknown>[];
   tourPrice?: number;
-  onCellsChanged?: (changes: any[]) => void;
-  onDataUpdate?: (newData: any[]) => void;
+  onCellsChanged?: (changes: Array<{ cell: CellData; row: number; col: number; value: unknown }>) => void;
+  onDataUpdate?: (newData: Record<string, unknown>[]) => void;
   onColumnDelete?: (columnKey: string) => void;
   onColumnHide?: (columnKey: string) => void;
   hiddenColumns?: string[];
@@ -216,10 +229,10 @@ export function ReactDataSheetWrapper({
     });
 
     return [headerRow, ...dataRows];
-  }, [visibleColumns, data, tour_add_ons, tourPrice]);
+  }, [visibleColumns, data, tour_add_ons, tourPrice, columnWidths, draggedRow, orderFilter]);
 
   // 處理單元格變更
-  const handleCellsChanged = useCallback((changes: any[]) => {
+  const handleCellsChanged = useCallback((changes: Array<{ cell: CellData; row: number; col: number; value: unknown }>) => {
     if (!onDataUpdate) return;
 
     const newData = [...data];
@@ -246,7 +259,7 @@ export function ReactDataSheetWrapper({
   }, [data, visibleColumns, onDataUpdate, onCellsChanged]);
 
   // 自訂值渲染器
-  const valueRenderer = useCallback((cell: any, row: number, col: number) => {
+  const valueRenderer = useCallback((cell: CellData, row: number, col: number) => {
     // 如果是標題行，顯示帶有 hover 控制的標題
     if (row === 0) {
       const column = visibleColumns[col];
@@ -377,7 +390,7 @@ export function ReactDataSheetWrapper({
 
     // 一般顯示
     return <span className="text-morandi-primary text-xs">{cell.value}</span>;
-  }, [visibleColumns, hoveredColumn, onColumnHide, onColumnDelete]);
+  }, [visibleColumns, hoveredColumn, onColumnHide, onColumnDelete, enableColumnResize, getRoomUsage, handleColumnResize, isRoomFull, onRoomAssign, orderFilter, roomOptions]);
 
   // 增強鍵盤導航
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -614,25 +627,25 @@ export function ReactDataSheetWrapper({
           data={sheetData}
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
-          dataRenderer={(cell: any) => cell.value}
+          dataRenderer={(cell) => cell.value}
           onContextMenu={(e: any, cell: any, i: any, j: any) => e.preventDefault()}
           // 增強多儲存格選擇
           onSelect={handleSelect}
           // 處理複製貼上
           parsePaste={(str: any) => {
-            return str.split(/\r\n|\n|\r/).map((row: any) => row.split('\t'));
+            return str.split(/\r\n|\n|\r/).map((row) => row.split('\t'));
           }}
           // 啟用 Excel 式功能
           tabBehaviour={'default'}
           // 自定義鍵盤導航
-          onKeyDown={(e: any) => {
+          onKeyDown={(e) => {
             // 阻止方向鍵滾動頁面
             if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
               e.preventDefault();
               e.stopPropagation();
             }
           }}
-          rowRenderer={(props: any) => {
+          rowRenderer={(props) => {
             const rowIndex = props['data-row'];
             const isDraggable = enableRowDrag && rowIndex > 0; // 不允許拖曳標題行
             const isDragging = draggedRow === rowIndex - 1;
@@ -656,7 +669,7 @@ export function ReactDataSheetWrapper({
               />
             );
           }}
-          cellRenderer={(props: any) => {
+          cellRenderer={(props) => {
             // 過濾掉非 DOM 屬性
             const {
               editing,

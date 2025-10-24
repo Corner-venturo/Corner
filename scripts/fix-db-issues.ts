@@ -13,7 +13,7 @@ const CURRENT_VERSION = 2;
 interface DBFixResult {
   success: boolean;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 class DatabaseFixer {
@@ -240,7 +240,7 @@ class DatabaseFixer {
 
       getAllRequest.onsuccess = async () => {
         const records = getAllRequest.result;
-        const seen = new Map<any, any>();
+        const seen = new Map<string, Record<string, unknown>>();
         const duplicates: string[] = [];
 
         // 找出重複資料
@@ -334,7 +334,7 @@ class DatabaseFixer {
 // 在瀏覽器環境中執行
 if (typeof window !== 'undefined') {
   // 添加到 window 對象以便在 console 中調用
-  (window as any).fixDatabase = DatabaseFixer.fix;
+  (window as typeof window & { fixDatabase: typeof DatabaseFixer.fix }).fixDatabase = DatabaseFixer.fix;
   console.log('💡 在 Console 中執行 fixDatabase() 來修復資料庫問題');
 } else {
   console.log('⚠️ 此腳本需要在瀏覽器環境中執行');

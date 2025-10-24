@@ -30,8 +30,8 @@ export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateD
   const { addDocument } = useTemplateStore();
 
   const [step, setStep] = useState<Step>('select-data');
-  const [selectedData, setSelectedData] = useState<Record<string, any>>({});
-  const [manualData, setManualData] = useState<Record<string, any>>({});
+  const [selectedData, setSelectedData] = useState<Record<string, unknown>>({});
+  const [manualData, setManualData] = useState<Record<string, unknown>>({});
 
   // 需要從資料來源選擇的欄位
   const autoFields = useMemo(

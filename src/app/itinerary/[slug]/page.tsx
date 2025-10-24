@@ -64,7 +64,7 @@ export default function EditItineraryPage() {
   // Convert icon strings to components for preview
   const processedData = itineraryData ? {
     ...itineraryData,
-    features: itineraryData.features?.map((f: any) => ({
+    features: itineraryData.features?.map((f) => ({
       ...f,
       iconComponent: iconMap[f.icon] || IconSparkles,
     })) || [],

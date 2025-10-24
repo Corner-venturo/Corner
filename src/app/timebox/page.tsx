@@ -66,7 +66,7 @@ export default function TimeboxPage() {
                 prev.setDate(prev.getDate() - 7)
                 setSelectedWeek(prev)
               }}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
               ←
             </Button>
@@ -90,7 +90,7 @@ export default function TimeboxPage() {
                 next.setDate(next.getDate() + 7)
                 setSelectedWeek(next)
               }}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
               →
             </Button>
@@ -103,8 +103,8 @@ export default function TimeboxPage() {
               size="sm"
               onClick={() => setTimeInterval(30)}
               className={timeInterval === 30
-                ? "bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold"
-                : "text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+                ? "bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold/20"
+                : "text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
               }
             >
               30分鐘
@@ -114,8 +114,8 @@ export default function TimeboxPage() {
               size="sm"
               onClick={() => setTimeInterval(60)}
               className={timeInterval === 60
-                ? "bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold"
-                : "text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+                ? "bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold/20"
+                : "text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
               }
             >
               1小時
@@ -128,7 +128,7 @@ export default function TimeboxPage() {
               variant="outline"
               size="sm"
               onClick={() => setShowBoxManager(true)}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
               <Plus className="h-4 w-4 mr-2" />
               管理箱子
@@ -138,7 +138,7 @@ export default function TimeboxPage() {
               variant="outline"
               size="sm"
               onClick={() => setShowReviewDialog(true)}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold"
+              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
               <Calendar className="h-4 w-4 mr-2" />
               覆盤本週

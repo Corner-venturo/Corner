@@ -213,7 +213,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                         'px-3 py-1.5 text-xs rounded-lg transition-all font-medium',
                         todo.status === 'in_progress'
                           ? 'bg-morandi-gold text-white shadow-sm'
-                          : 'bg-white/60 border border-morandi-container/30 text-morandi-secondary hover:bg-white hover:border-morandi-gold/50'
+                          : 'bg-white/60 border border-morandi-container/30 text-morandi-secondary hover:bg-white hover:border-morandi-gold/20'
                       )}
                     >
                       進行中
@@ -266,7 +266,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                             window.location.href = `${basePath}?highlight=${item.id}`;
                           }
                         }}
-                        className="bg-white/60 border border-morandi-gold/30 text-morandi-primary text-xs px-2 py-1 rounded-lg hover:bg-morandi-gold/10 hover:border-morandi-gold/50 transition-all font-medium"
+                        className="bg-white/60 border border-morandi-gold/20 text-morandi-primary text-xs px-2 py-1 rounded-lg hover:bg-morandi-gold/10 hover:border-morandi-gold/20 transition-all font-medium"
                       >
                         {item.title}
                       </button>
@@ -283,14 +283,14 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   <CheckCircle size={14} className="text-morandi-gold" />
                   子任務清單
                 </h4>
-                <span className="text-xs text-morandi-primary bg-morandi-gold/10 border border-morandi-gold/30 px-2 py-1 rounded-lg font-medium">
+                <span className="text-xs text-morandi-primary bg-morandi-gold/10 border border-morandi-gold/20 px-2 py-1 rounded-lg font-medium">
                   {completedSubTasks}/{(todo.sub_tasks || []).length}
                 </span>
               </div>
 
               <div className="space-y-1.5 mb-3">
                 {(todo.sub_tasks || []).map((task) => (
-                  <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-morandi-container/10 hover:bg-morandi-container/20 transition-colors border border-transparent hover:border-morandi-gold/30 group relative">
+                  <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-morandi-container/10 hover:bg-morandi-container/20 transition-colors border border-transparent hover:border-morandi-gold/20 group relative">
                     {editingSubTaskId === task.id ? (
                       // 編輯模式
                       <>
@@ -416,7 +416,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                         <Textarea
                           value={editingNoteContent}
                           onChange={(e) => setEditingNoteContent(e.target.value)}
-                          className="text-xs mt-2 resize-none border-morandi-gold/50 focus-visible:ring-morandi-gold"
+                          className="text-xs mt-2 resize-none border-morandi-gold/20 focus-visible:ring-morandi-gold"
                           rows={3}
                           autoFocus
                         />
@@ -545,7 +545,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   newDeadline.setDate(newDeadline.getDate() + 7);
                   onUpdate({ deadline: newDeadline.toISOString().split('T')[0] });
                 }}
-                className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/50 shadow-sm transition-all"
+                className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/20 shadow-sm transition-all"
               >
                 <Calendar size={16} className="mr-1" />
                 延期一週

@@ -131,7 +131,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
             </div>
             <div>
               <h2 className="text-xl font-bold text-morandi-primary">
-                {employee.display_name || (employee as any).chinese_name || '未命名員工'}
+                {employee.display_name || (employee as unknown).chinese_name || '未命名員工'}
               </h2>
               <p className="text-morandi-secondary">
                 {employee.employee_number}

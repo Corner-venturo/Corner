@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 interface RichTextEditorProps {
   initialTitle?: string;
   initialContent?: string;
-  onSave?: (title: string, content: string, formatData: Record<string, any>) => void;
+  onSave?: (title: string, content: string, formatData: Record<string, unknown>) => void;
   onCancel?: () => void;
   className?: string;
 }

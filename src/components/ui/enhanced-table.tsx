@@ -32,21 +32,21 @@ export interface TableColumn {
 export interface SelectionConfig {
   selected: string[];
   onChange: (selected: string[]) => void;
-  disabled?: (row: any) => boolean;
+  disabled?: (row) => boolean;
   getRowId?: (row: any, index: number) => string;
 }
 
 export interface ExpandableConfig {
   expanded: string[];
   onExpand: (id: string) => void;
-  renderExpanded: (row: any) => React.ReactNode;
+  renderExpanded: (row) => React.ReactNode;
   expandIcon?: (expanded: boolean) => React.ReactNode;
   getRowId?: (row: any, index: number) => string;
 }
 
 export interface EnhancedTableProps {
   columns: TableColumn[];
-  data: any[];
+  data: unknown[];
   loading?: boolean;
   error?: string | null;
 
@@ -68,8 +68,8 @@ export interface EnhancedTableProps {
   // DataTable 功能
   selection?: SelectionConfig;
   expandable?: ExpandableConfig;
-  actions?: (row: any) => React.ReactNode;
-  rowClassName?: (row: any) => string;
+  actions?: (row) => React.ReactNode;
+  rowClassName?: (row) => string;
   bordered?: boolean;
   striped?: boolean;
   hoverable?: boolean;
@@ -271,7 +271,7 @@ export function EnhancedTable({
             <tr className="relative bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40">
               {/* Selection checkbox column */}
               {selection && (
-                <th className="w-12 py-1.5 sm:py-2 px-3 sm:px-4">
+                <th className="w-12 py-2.5 px-4 text-xs">
                   <Checkbox
                     checked={allVisibleSelected}
                     indeterminate={someVisibleSelected && !allVisibleSelected}
@@ -282,8 +282,8 @@ export function EnhancedTable({
 
               {columns.map((column, index) => (
                 <th key={column.key} className={cn(
-                  "text-left py-1.5 sm:py-2 relative",
-                  index === columns.length - 1 ? "pl-4 pr-1" : "px-3 sm:px-4"
+                  "text-left py-2.5 px-4 text-xs relative",
+                  index === columns.length - 1 && "pl-4 pr-1"
                 )}>
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
                   <div className="flex items-center gap-1.5 sm:gap-2">
@@ -291,14 +291,14 @@ export function EnhancedTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-auto p-0 hover:bg-transparent text-[10px] sm:text-xs font-medium text-morandi-secondary hover:text-morandi-primary transition-colors [&_svg]:!size-[14px]"
+                        className="h-auto p-0 hover:bg-transparent font-medium text-morandi-secondary hover:text-morandi-primary transition-colors [&_svg]:!size-[14px]"
                         onClick={() => handleSort(column.key)}
                       >
                         {column.label}
                         {getSortIcon(column.key)}
                       </Button>
                     ) : (
-                      <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">{column.label}</span>
+                      <span className="font-medium text-morandi-secondary">{column.label}</span>
                     )}
                     {index === columns.length - 1 && columns.some(col => col.filterable) && (
                       <Button
@@ -319,8 +319,8 @@ export function EnhancedTable({
 
               {/* Actions column */}
               {actions && (
-                <th className="text-left py-1.5 sm:py-2 px-3 sm:px-4">
-                  <span className="text-[10px] sm:text-xs font-medium text-morandi-secondary">操作</span>
+                <th className="text-left py-2.5 px-4 text-xs">
+                  <span className="font-medium text-morandi-secondary">操作</span>
                 </th>
               )}
             </tr>

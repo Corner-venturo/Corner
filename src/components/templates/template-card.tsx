@@ -70,7 +70,7 @@ export function TemplateCard({ template, onEdit }: TemplateCardProps) {
 
   return (
     <>
-      <div className="bg-card rounded-xl p-6 border border-morandi-container/20 hover:border-morandi-gold/40 transition-all group">
+      <div className="bg-card rounded-xl p-6 border border-morandi-container/20 hover:border-morandi-gold/20 transition-all group">
         {/* 模板類型標籤 */}
         <div className="flex items-start justify-between mb-4">
           <TemplateTypeBadge type={template.type} />
@@ -126,7 +126,7 @@ export function TemplateCard({ template, onEdit }: TemplateCardProps) {
         {/* 統計資訊 */}
         <div className="flex items-center justify-between text-xs text-morandi-muted mb-4">
           <span>已使用 {template.usage_count || 0} 次</span>
-          <span>{formatDate((template.metadata as any).updated_at)}</span>
+          <span>{formatDate((template.metadata as unknown).updated_at)}</span>
         </div>
 
         {/* 快速動作 */}

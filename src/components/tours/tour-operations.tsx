@@ -39,7 +39,7 @@ interface EditingMember {
   reservationCode?: string;
   addOns?: string[];
   refunds?: string[];
-  customFields?: Record<string, any>;
+  customFields?: Record<string, unknown>;
 }
 
 interface RoomOption {
@@ -207,11 +207,11 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
 
   // 單獨處理房間選項
   useEffect(() => {
-    const tourPaymentRequests = paymentRequests.filter((request: any) => request.tour_id === tour.id);
+    const tourPaymentRequests = paymentRequests.filter((request) => request.tour_id === tour.id);
     const roomOptions: RoomOption[] = [];
 
-    tourPaymentRequests.forEach((request: any) => {
-      request.items.forEach((item: any) => {
+    tourPaymentRequests.forEach((request) => {
+      request.items.forEach((item) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g);
@@ -247,43 +247,8 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
     member.name && member.idNumber
   ).length;
 
-
-  if (tourOrders.length === 0) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center py-12">
-          <p className="text-morandi-secondary">此旅遊團尚無訂單</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 配置 DataSheet 欄位
-  const dataSheetColumns: DataSheetColumn[] = [
-    { key: 'index', label: '序號', width: 40, readOnly: true },
-    { key: 'name', label: '姓名', width: 80 },
-    { key: 'nameEn', label: '英文姓名', width: 100 },
-    { key: 'birthday', label: '生日', width: 100 },
-    { key: 'age', label: '年齡', width: 60, readOnly: true },
-    { key: 'gender', label: '性別', width: 50, readOnly: true },
-    { key: 'idNumber', label: '身分證字號', width: 120 },
-    { key: 'passportNumber', label: '護照號碼', width: 100 },
-    { key: 'passportExpiry', label: '護照效期', width: 100 },
-    { key: 'reservationCode', label: '訂位代號', width: 100 },
-    { key: 'assignedRoom', label: '分房', width: 120 },
-
-    // 動態欄位
-    ...(extraFields?.addOns ? [{ key: 'addOns', label: '加購項目', width: 100, readOnly: true }] : []),
-    ...(extraFields?.refunds ? [{ key: 'refunds', label: '退費項目', width: 100 }] : []),
-    ...(extraFields?.customFields?.map(field => ({
-      key: field.id,
-      label: field.name,
-      width: 100
-    })) || [])
-  ];
-
   // 處理資料更新
-  const handleDataUpdate = useCallback((newData: any[]) => {
+  const handleDataUpdate = useCallback((newData: unknown[]) => {
     setTableMembers(newData);
 
     // 更新到 store
@@ -333,7 +298,41 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
       // 從隱藏列表中移除（如果存在）
       setHiddenColumns(prev => prev.filter(key => key !== columnKey));
     }
-  }, [tableMembers, updateMember]);
+  }, [tableMembers]);
+
+  if (tourOrders.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <p className="text-morandi-secondary">此旅遊團尚無訂單</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 配置 DataSheet 欄位
+  const dataSheetColumns: DataSheetColumn[] = [
+    { key: 'index', label: '序號', width: 40, readOnly: true },
+    { key: 'name', label: '姓名', width: 80 },
+    { key: 'nameEn', label: '英文姓名', width: 100 },
+    { key: 'birthday', label: '生日', width: 100 },
+    { key: 'age', label: '年齡', width: 60, readOnly: true },
+    { key: 'gender', label: '性別', width: 50, readOnly: true },
+    { key: 'idNumber', label: '身分證字號', width: 120 },
+    { key: 'passportNumber', label: '護照號碼', width: 100 },
+    { key: 'passportExpiry', label: '護照效期', width: 100 },
+    { key: 'reservationCode', label: '訂位代號', width: 100 },
+    { key: 'assignedRoom', label: '分房', width: 120 },
+
+    // 動態欄位
+    ...(extraFields?.addOns ? [{ key: 'addOns', label: '加購項目', width: 100, readOnly: true }] : []),
+    ...(extraFields?.refunds ? [{ key: 'refunds', label: '退費項目', width: 100 }] : []),
+    ...(extraFields?.customFields?.map(field => ({
+      key: field.id,
+      label: field.name,
+      width: 100
+    })) || [])
+  ];
 
   return (
     <div>
@@ -380,7 +379,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
               ? `不佔床${member.assignedRoom ? ` - ${member.assignedRoom}` : ''}`
               : (member.assignedRoom || '未分配')
           }))}
-          tour_add_ons={tourAddOns.filter((a: any) => a.tour_id === tour.id)}
+          tour_add_ons={tourAddOns.filter((a) => a.tour_id === tour.id)}
           onDataUpdate={handleDataUpdate}
           onColumnHide={handleColumnHide}
           onColumnDelete={handleColumnDelete}

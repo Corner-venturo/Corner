@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -135,7 +135,7 @@ export function ChannelChat() {
       loadChannels(currentWorkspace.id);
     }
 
-  }, [currentWorkspace?.id]);
+  }, [currentWorkspace?.id, loadChannels]);
 
   useEffect(() => {
     if (channels.length > 0 && !selectedChannel) {
@@ -187,7 +187,7 @@ export function ChannelChat() {
       }
     }
 
-  }, [selectedChannel?.id]);
+  }, [selectedChannel?.id, channelMessages, loadMessages, loadAdvanceLists, loadSharedOrderLists, messages]);
 
 
   useEffect(() => {
@@ -200,9 +200,11 @@ export function ChannelChat() {
   }, [messages, selectedChannel?.id]);
 
 
-  const currentMessages = selectedChannel?.id 
-    ? (channelMessages[selectedChannel.id] || messages) 
-    : [];
+  const currentMessages = useMemo(() =>
+    selectedChannel?.id
+      ? (channelMessages[selectedChannel.id] || messages)
+      : []
+  , [selectedChannel?.id, channelMessages, messages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -726,7 +728,7 @@ export function ChannelChat() {
                             <button
                               key={emoji}
                               onClick={() => handleReaction(message.id, emoji)}
-                              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/40 transition-all hover:scale-110"
+                              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/20 transition-all hover:scale-110"
                               title={`加上 ${emoji} 反應`}
                             >
                               {emoji}

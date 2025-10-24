@@ -40,7 +40,7 @@ export default function OrdersPage() {
 
   // 計算待辦事項
   const todos = React.useMemo(() => {
-    const result: any[] = [];
+    const result: unknown[] = [];
     const today = new Date();
     const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -119,7 +119,7 @@ export default function OrdersPage() {
       paid_amount: 0,
       payment_status: 'unpaid',
       remaining_amount: orderData.total_amount
-    } as any);
+    } as unknown);
 
     setIsAddDialogOpen(false);
   };
@@ -131,7 +131,7 @@ export default function OrdersPage() {
       <ResponsiveHeader
         {...{
         title: "訂單管理",
-        icon: ShoppingCart} as any}
+        icon: ShoppingCart} as unknown}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '訂單管理', href: '/orders' }

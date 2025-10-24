@@ -18,20 +18,6 @@ export default function DocumentsDetailPage() {
 
   const order = orders.find(o => o.id === order_id);
 
-  if (!order) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-morandi-secondary mb-4">找不到該訂單</p>
-          <Button onClick={() => router.push('/orders')} variant="outline">
-            <ArrowLeft size={16} className="mr-1" />
-            返回訂單列表
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   // 模擬文件數據
   const documents = [
     {
@@ -157,7 +143,7 @@ export default function DocumentsDetailPage() {
   ], []);
 
   // 排序和篩選函數
-  const sortFunction = (data: any[], column: string, direction: 'asc' | 'desc') => {
+  const sortFunction = (data: unknown[], column: string, direction: 'asc' | 'desc') => {
     return [...data].sort((a, b) => {
       let aValue: string | number | Date = a[column as keyof typeof a];
       let bValue: string | number | Date = b[column as keyof typeof b];
@@ -173,7 +159,7 @@ export default function DocumentsDetailPage() {
     });
   };
 
-  const filterFunction = (data: any[], filters: Record<string, string>) => {
+  const filterFunction = (data: unknown[], filters: Record<string, string>) => {
     return data.filter(doc => {
       return (
         (!filters.name || doc.name.toLowerCase().includes(filters.name.toLowerCase())) &&
@@ -190,6 +176,20 @@ export default function DocumentsDetailPage() {
     sortFunction,
     filterFunction
   );
+
+  if (!order) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-morandi-secondary mb-4">找不到該訂單</p>
+          <Button onClick={() => router.push('/orders')} variant="outline">
+            <ArrowLeft size={16} className="mr-1" />
+            返回訂單列表
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 ">

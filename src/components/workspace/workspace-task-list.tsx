@@ -30,7 +30,7 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
   
   // 獲取該旅遊團的任務
   const tourTasks = (todos || []).filter(todo =>
-    todo.related_items?.some((item: any) => (item.type === 'quote' || item.type === 'order') && item.id === tour_id)
+    todo.related_items?.some((item) => (item.type === 'quote' || item.type === 'order') && item.id === tour_id)
   ).sort((a, b) => {
     // 未完成的排在前面
     if (a.completed !== b.completed) {
@@ -79,7 +79,7 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
       completed: !task.completed,
       status: !task.completed ? 'completed' : 'pending',
       completed_at: !task.completed ? new Date().toISOString() : undefined,
-    } as any);
+    } as unknown);
   };
   
   const handleToggleSubTask = (taskId: string, subTaskId: string) => {
@@ -245,14 +245,14 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
                         <div key={i} className="flex gap-2">
                           {/* 頭像 */}
                           <div className="w-6 h-6 rounded-full bg-morandi-gold/20 flex items-center justify-center text-xs font-medium text-morandi-primary flex-shrink-0">
-                            {getEmployeeName((note as any).user_id)[0]}
+                            {getEmployeeName((note as unknown).user_id)[0]}
                           </div>
 
                           {/* 訊息內容 */}
                           <div className="flex-1 bg-white rounded p-2 text-sm border border-border">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium text-morandi-primary">
-                                {getEmployeeName((note as any).user_id)}
+                                {getEmployeeName((note as unknown).user_id)}
                               </span>
                               <span className="text-xs text-morandi-secondary">
                                 {formatTimestamp(note.timestamp)}

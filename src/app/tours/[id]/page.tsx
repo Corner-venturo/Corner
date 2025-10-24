@@ -36,7 +36,7 @@ export default function TourDetailPage() {
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false);
   const [triggerRefundAdd, setTriggerRefundAdd] = useState(false);
 
-  const tour = tours.find((t: any) => t.id === params.id);
+  const tour = tours.find((t) => t.id === params.id);
 
   if (!tour) {
     return (

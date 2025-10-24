@@ -27,9 +27,9 @@ export interface Tour extends BaseEntity {
   profit: number;            // 利潤
   description?: string;      // 團體說明/描述
   archived?: boolean;        // 是否已封存
-  features?: any[];          // 行程特色（用於展示頁面）
+  features?: unknown[];          // 行程特色（用於展示頁面）
   quote_id?: string;         // 關聯的報價單ID
-  quote_cost_structure?: any[]; // 報價成本結構快照
+  quote_cost_structure?: unknown[]; // 報價成本結構快照
 }
 
 // ============================================
@@ -87,7 +87,7 @@ export interface CreateTourData {
   total_cost: number;
   profit: number;
   quote_id?: string;
-  quote_cost_structure?: any[];
+  quote_cost_structure?: unknown[];
 }
 
 /**
@@ -107,7 +107,7 @@ export interface UpdateTourData {
   total_cost?: number;
   profit?: number;
   quote_id?: string;
-  quote_cost_structure?: any[];
+  quote_cost_structure?: unknown[];
 }
 
 // ============================================

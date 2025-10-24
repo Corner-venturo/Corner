@@ -148,7 +148,7 @@ export function QuickTools() {
       return;
     }
 
-    const rate = (exchangeRates as any)[fromCurrency]?.[toCurrency];
+    const rate = (exchangeRates as unknown)[fromCurrency]?.[toCurrency];
     if (rate) {
       setConvertedAmount(amountNum * rate);
     }

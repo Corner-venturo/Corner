@@ -13,13 +13,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
   const tourStore = useTourStore();
 
   // 使用 useMemo 來穩定 params 物件的參考
-  const stableParams = useMemo(() => params, [
-    params?.page,
-    params?.pageSize,
-    params?.search,
-    params?.sortBy,
-    (params as any)?.sort_order
-  ]);
+  const stableParams = useMemo(() => params, [params]);
 
   const loadTours = useCallback(async () => {
     try {
@@ -61,7 +55,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       await loadTours();
       throw err; // 讓調用者可以處理錯誤
     }
-  }, [loadTours, tourStore]);
+  }, [loadTours]);
 
   const updateTour = useCallback(async (id: string, tourData: Partial<Tour>) => {
     try {

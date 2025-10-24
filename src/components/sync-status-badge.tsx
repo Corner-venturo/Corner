@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { checkPendingCount, isOnline } from '@/lib/sync/sync-status-service';
 import { Cloud, CloudOff, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,11 +20,11 @@ export function SyncStatusBadge({ tableName, label }: SyncStatusBadgeProps) {
   const [online, setOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  const updateStatus = async () => {
+  const updateStatus = useCallback(async () => {
     const count = await checkPendingCount(tableName);
     setPendingCount(count);
     setOnline(isOnline());
-  };
+  }, [tableName]);
 
   useEffect(() => {
     setMounted(true);
@@ -41,7 +41,7 @@ export function SyncStatusBadge({ tableName, label }: SyncStatusBadgeProps) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [tableName]);
+  }, [tableName, updateStatus]);
 
   // SSR 期間不渲染
   if (!mounted) {

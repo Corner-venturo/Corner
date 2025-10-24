@@ -30,7 +30,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
 
   const [formData, setFormData] = useState({
     display_name: employee.display_name || '',
-    chinese_name: (employee as any).chinese_name || '',
+    chinese_name: (employee as unknown).chinese_name || '',
     english_name: employee.english_name || '',
     personal_info: {
       national_id: employee.personal_info?.national_id || '',
@@ -65,7 +65,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
 
     if (formData.english_name !== employee.english_name) {
       console.log('🔵 [BasicInfoTab] 英文名字有變更，重新生成員工編號');
-      (updates as any).employee_number = userStoreHelpers.generateUserNumber(formData.english_name);
+      (updates as unknown).employee_number = userStoreHelpers.generateUserNumber(formData.english_name);
     }
 
     console.log('🔵 [BasicInfoTab] 準備更新，updates:', updates);
@@ -88,7 +88,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
   const handleCancel = () => {
     setFormData({
       display_name: employee.display_name || '',
-      chinese_name: (employee as any).chinese_name || '',
+      chinese_name: (employee as unknown).chinese_name || '',
       english_name: employee.english_name || '',
       personal_info: {
         national_id: employee.personal_info?.national_id || '',
@@ -136,7 +136,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       // 導入 Supabase client
       const { supabase } = await import('@/lib/supabase/client');
 
-      const result: any = await (supabase as any)
+      const result: any = await (supabase as unknown)
         .from('employees')
         .update({ password_hash: hashedPassword })
         .eq('employee_number', employee.employee_number);
@@ -194,7 +194,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                       onChange={(e) => setFormData({ ...formData, chinese_name: e.target.value })}
                     />
                   ) : (
-                    <p className="text-morandi-primary py-2">{(employee as any).chinese_name || '-'}</p>
+                    <p className="text-morandi-primary py-2">{(employee as unknown).chinese_name || '-'}</p>
                   )}
                 </div>
               </div>

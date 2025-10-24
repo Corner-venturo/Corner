@@ -20,7 +20,7 @@ export function ChannelList({ channels, activeChannelId, onSelectChannel }: Chan
 
   const renderChannel = (channel: Channel) => {
     const is_active = channel.id === activeChannelId;
-    const isArchived = (channel as any).isArchived; // TODO: Add isArchived to Channel interface
+    const isArchived = (channel as unknown).isArchived; // TODO: Add isArchived to Channel interface
 
     return (
       <button

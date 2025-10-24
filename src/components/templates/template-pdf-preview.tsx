@@ -40,7 +40,7 @@ export function TemplatePDFPreview({
   }
 
   // 偵測區塊類型標記
-  const detectBlockType = (row: any[]) => {
+  const detectBlockType = (row: unknown[]) => {
     const firstCell = String(row[0] || '').trim();
 
     if (firstCell.startsWith('#標題')) return 'title';
@@ -81,7 +81,7 @@ export function TemplatePDFPreview({
 
     return (
       <div className="space-y-4">
-        {data.map((row: any[], rowIndex: number) => {
+        {data.map((row: unknown[], rowIndex: number) => {
           // 檢查這一列是否全部為空
           const isEmpty = row.every(cell => !cell || cell === '');
           if (isEmpty) return null;
@@ -129,7 +129,7 @@ export function TemplatePDFPreview({
           const content = (
             <div key={rowIndex} className="relative">
               {/* 內容列 - 根據區塊類型美化 */}
-              <div className={`flex items-center ${(currentStyle as any)?.container || ''}`}>
+              <div className={`flex items-center ${(currentStyle as unknown)?.container || ''}`}>
                 {row.map((cell: any, colIndex: number) => {
                   // 跳過空白儲存格（不渲染）
                   if (!cell || cell === '') return null;
@@ -140,10 +140,10 @@ export function TemplatePDFPreview({
                   return (
                     <div
                       key={colIndex}
-                      className={`px-3 py-2 transition-all ${(currentStyle as any)?.text || ''}
+                      className={`px-3 py-2 transition-all ${(currentStyle as unknown)?.text || ''}
                         ${isLabel ? 'text-morandi-secondary font-medium' : ''}
                         ${isPrice ? 'text-morandi-gold font-semibold' : ''}
-                        ${isDynamic ? 'bg-morandi-gold/10 text-morandi-gold font-medium rounded-md px-3 border border-morandi-gold/30' : ''}
+                        ${isDynamic ? 'bg-morandi-gold/10 text-morandi-gold font-medium rounded-md px-3 border border-morandi-gold/20' : ''}
                         ${currentBlockType === 'title' ? 'w-full' : ''}
                       `}
                       style={{

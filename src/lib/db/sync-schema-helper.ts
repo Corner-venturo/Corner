@@ -56,7 +56,7 @@ export const SYNCABLE_TABLES = [
  * 檢查表是否需要同步索引
  */
 export function isSyncableTable(tableName: string): boolean {
-  return SYNCABLE_TABLES.includes(tableName as any);
+  return SYNCABLE_TABLES.includes(tableName as unknown);
 }
 
 /**

@@ -11,7 +11,7 @@ export function ExportButton({ data }: { data: any }) {
     a.click();
   };
 
-  const generateFullHTML = (data: any) => {
+  const generateFullHTML = (data) => {
     return `
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -48,7 +48,7 @@ export function ExportButton({ data }: { data: any }) {
       <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-4xl font-bold text-center mb-12">精選景點</h2>
         <div class="grid md:grid-cols-3 gap-6">
-          ${data.attractions.map((a: any) => `
+          ${data.attractions.map((a) => `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
               <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-400"></div>
               <div class="p-6">

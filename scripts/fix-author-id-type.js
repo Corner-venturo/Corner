@@ -10,6 +10,7 @@ if (!supabaseUrl || !supabaseKey) {
   process.exit(1);
 }
 
+// eslint-disable-next-line no-unused-vars
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function fixAuthorIdType() {

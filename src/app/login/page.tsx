@@ -134,7 +134,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => handleProfileCardClick(card.id)}
-                    className="w-full p-3 rounded-lg border border-gray-200 hover:border-morandi-gold hover:bg-morandi-light/20 transition-all flex items-center gap-3 text-left"
+                    className="w-full p-3 rounded-lg border border-gray-200 hover:border-morandi-gold/20 hover:bg-morandi-light/20 transition-all flex items-center gap-3 text-left"
                   >
                     <div className="w-10 h-10 rounded-full bg-morandi-gold/10 flex items-center justify-center group-hover:bg-morandi-gold/20">
                       <User size={20} className="text-morandi-gold" />

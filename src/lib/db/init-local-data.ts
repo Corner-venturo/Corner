@@ -43,19 +43,14 @@ export async function initLocalDatabase(): Promise<void> {
       const syncedFromSupabase = await syncFromSupabase();
 
       if (!syncedFromSupabase) {
-        // Supabase 也沒資料或無網路 → 建立預設管理員
-        console.log('📝 Supabase 無資料，建立預設管理員...');
-        await createDefaultAdmin();
-        console.log('✅ 預設管理員建立完成');
-        console.log('💡 其他資料請透過系統介面新增');
+        // Supabase 也沒資料或無網路 → 不自動建立管理員
+        console.log('⚠️ Supabase 無資料');
+        console.log('💡 請透過系統介面建立管理員帳號');
       } else {
         console.log('✅ 已從 Supabase 同步資料到本地');
       }
     } else {
       console.log('✅ 資料庫已有資料，跳過初始化');
-
-      // 檢查預設管理員是否有密碼
-      await checkDefaultAdminPassword();
     }
   } catch (error) {
     console.error('❌ 初始化資料庫失敗:', error);
@@ -79,7 +74,7 @@ async function syncFromSupabase(): Promise<boolean> {
     const { supabase } = await import('@/lib/supabase/client');
 
     // 下載 employees 資料
-    const { data: employees, error } = await (supabase as any)
+    const { data: employees, error } = await (supabase as unknown)
       .from('employees')
       .select('*')
       .eq('status', 'active');
@@ -111,105 +106,20 @@ async function syncFromSupabase(): Promise<boolean> {
 }
 
 /**
- * 建立預設管理員
+ * 建立預設管理員（已停用）
+ * 此函數已不再使用，請透過系統介面建立管理員
  */
-async function createDefaultAdmin(): Promise<void> {
-  const hashedPassword = await bcrypt.hash('Venturo2025!', 10);
-
-  const adminData = {
-    id: generateUUID(),
-    employee_number: 'william01',
-    english_name: 'William',
-    display_name: '威廉',
-    password_hash: hashedPassword,
-    permissions: ['admin'], // 只要 admin 權限，移除 super_admin
-    personal_info: {
-      national_id: '',
-      birthday: '1990-01-01',
-      gender: 'male',
-      phone: '',
-      email: 'william@venturo.local',
-      address: '',
-      emergency_contact: {
-        name: '',
-        relationship: '',
-        phone: ''
-      }
-    },
-    job_info: {
-      department: 'Management',
-      position: 'Administrator',
-      supervisor: '',
-      hire_date: new Date().toISOString().split('T')[0],
-      probation_end_date: '',
-      employment_type: 'fulltime'
-    },
-    salary_info: {
-      base_salary: 0,
-      allowances: [],
-      salary_history: [{
-        effective_date: new Date().toISOString().split('T')[0],
-        base_salary: 0,
-        reason: '初始設定'
-      }]
-    },
-    attendance: {
-      leave_records: [],
-      overtime_records: []
-    },
-    contracts: [],
-    status: 'active',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-
-  // 同步到 Supabase + IndexedDB
-  try {
-    console.log('☁️ 同步管理員資料到 Supabase...');
-    const { supabase } = await import('@/lib/supabase/client');
-
-    const result: any = await (supabase as any)
-      .from('employees')
-      .insert([adminData]);
-
-    const { error } = result;
-
-    if (error) {
-      console.error('❌ Supabase 同步失敗:', error);
-      console.log('💾 改為只儲存到 IndexedDB');
-      await localDB.create('employees', adminData);
-    } else {
-      console.log('✅ Supabase 同步成功');
-      // 同步到 IndexedDB
-      await localDB.create('employees', adminData);
-      console.log('✅ IndexedDB 快取成功');
-    }
-  } catch (error) {
-    console.error('⚠️ 同步失敗，僅儲存到 IndexedDB:', error);
-    await localDB.create('employees', adminData);
-  }
-
-  console.log('✅ 管理員已建立 (william01 / Venturo2025!)');
-}
+// async function createDefaultAdmin(): Promise<void> {
+//   ... 已移除
+// }
 
 /**
- * 檢查預設管理員密碼
+ * 檢查預設管理員密碼（已停用）
+ * 此函數已不再使用
  */
-async function checkDefaultAdminPassword(): Promise<void> {
-  const admins = await localDB.filter('employees', [
-    { field: 'employee_number', operator: 'eq', value: 'william01' }
-  ]);
-  
-  if (admins.length > 0 && !(admins[0] as any).password_hash) {
-    // 如果沒有密碼，設定預設密碼
-    const hashedPassword = await bcrypt.hash('Venturo2025!', 10);
-    await localDB.update('employees', (admins[0] as any).id, {
-      password_hash: hashedPassword,
-      updated_at: new Date().toISOString()
-    } as any);
-    console.log('✅ 已為預設管理員設定密碼');
-  }
-}
+// async function checkDefaultAdminPassword(): Promise<void> {
+//   ... 已移除
+// }
 
 
 // ========================================
@@ -232,7 +142,7 @@ export async function clearAllData(): Promise<void> {
   
   for (const table of tables) {
     try {
-      await localDB.clear(table as any);
+      await localDB.clear(table as unknown);
       console.log(`✅ 已清空 ${table} 表`);
     } catch (error) {
       console.error(`❌ 清空 ${table} 表失敗:`, error);

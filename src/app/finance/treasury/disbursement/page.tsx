@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
@@ -58,7 +58,7 @@ export default function DisbursementPage() {
     getNextThursday = () => new Date().toLocaleDateString('zh-TW'),
     createDisbursementOrder = () => {},
     generateDisbursementNumber = () => 'DISB-000001'
-  } = {} as any;
+  } = {} as unknown;
 
   const [activeTab, setActiveTab] = useState<'pending' | 'current' | 'all'>('pending');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
@@ -87,10 +87,10 @@ export default function DisbursementPage() {
   };
 
   // 獲取數據 - 加上防禦性檢查，避免 deprecated store 導致崩潰
-  const pendingRequests = getPendingPaymentRequests ? getPendingPaymentRequests() : [];
-  const processingRequests = getProcessingPaymentRequests ? getProcessingPaymentRequests() : [];
-  const currentOrder = getCurrentWeekDisbursementOrder ? getCurrentWeekDisbursementOrder() : null;
-  const nextThursday = getNextThursday ? getNextThursday() : new Date();
+  const pendingRequests = useMemo(() => getPendingPaymentRequests ? getPendingPaymentRequests() : [], [getPendingPaymentRequests]);
+  const processingRequests = useMemo(() => getProcessingPaymentRequests ? getProcessingPaymentRequests() : [], [getProcessingPaymentRequests]);
+  const currentOrder = useMemo(() => getCurrentWeekDisbursementOrder ? getCurrentWeekDisbursementOrder() : null, [getCurrentWeekDisbursementOrder]);
+  const nextThursday = useMemo(() => getNextThursday ? getNextThursday() : new Date(), [getNextThursday]);
 
   // 新增出納單時的請款單勾選
   const handleSelectRequestForNew = (requestId: string) => {
@@ -145,10 +145,10 @@ export default function DisbursementPage() {
   };
 
   // 從出納單移除
-  const handleRemoveFromDisbursement = (paymentRequestId: string) => {
+  const handleRemoveFromDisbursement = useCallback((paymentRequestId: string) => {
     if (!currentOrder) return;
     removeFromDisbursementOrder(currentOrder.id, paymentRequestId);
-  };
+  }, [currentOrder, removeFromDisbursementOrder]);
 
   // 確認出納單
   const handleConfirmDisbursement = () => {
@@ -220,7 +220,7 @@ export default function DisbursementPage() {
         </Badge>
       )
     }
-  ], [selectedRequests, pendingRequests]);
+  ], [selectedRequests]);
 
   // 本週出帳表格配置
   const currentOrderColumns: TableColumn[] = useMemo(() => [
@@ -279,7 +279,7 @@ export default function DisbursementPage() {
         </button>
       )
     }
-  ], [currentOrder]);
+  ], [currentOrder, handleRemoveFromDisbursement]);
 
   // 歷史記錄表格配置
   const historyColumns: TableColumn[] = useMemo(() => [
@@ -354,7 +354,7 @@ export default function DisbursementPage() {
           { value: 'all', label: '出納單列表', icon: Wallet }
         ]}
         activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as any)}
+        onTabChange={(tab) => setActiveTab(tab as unknown)}
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增出納單"
         showSearch={true}

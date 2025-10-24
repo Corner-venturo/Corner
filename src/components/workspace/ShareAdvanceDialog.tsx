@@ -45,8 +45,8 @@ export function ShareAdvanceDialog({
   // 篩選活躍員工
   const activeEmployees = useMemo(() => {
     return employees.filter(emp => {
-      const notDeleted = !(emp as any)._deleted;
-      const isActive = (emp as any).status === 'active';
+      const notDeleted = !(emp as unknown)._deleted;
+      const isActive = (emp as unknown).status === 'active';
       return notDeleted && isActive;
     });
   }, [employees]);
@@ -116,11 +116,11 @@ export function ShareAdvanceDialog({
           <table className="w-full">
             <thead className="sticky top-0 bg-morandi-container/5 border-b border-morandi-gold/20">
               <tr>
-                <th className="text-left py-2 px-2 text-sm font-semibold text-morandi-secondary w-[30%]">品項</th>
-                <th className="text-left py-2 px-2 text-sm font-semibold text-morandi-secondary w-[25%]">說明</th>
-                <th className="text-left py-2 px-2 text-sm font-semibold text-morandi-secondary w-[20%]">金額</th>
-                <th className="text-left py-2 px-2 text-sm font-semibold text-morandi-secondary w-[20%]">代墊人</th>
-                <th className="w-[5%]"></th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[30%]">品項</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[25%]">說明</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">金額</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">代墊人</th>
+                <th className="w-[5%] py-2.5 px-4 text-xs"></th>
               </tr>
             </thead>
             <tbody>

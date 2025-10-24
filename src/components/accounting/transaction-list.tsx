@@ -98,7 +98,7 @@ export const TransactionList = React.memo(function TransactionList() {
           {/* 類型篩選 */}
           <select
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value as any)}
+            onChange={(e) => setFilterType(e.target.value as unknown)}
             className="px-3 py-2 border border-border rounded-md bg-background text-sm"
           >
             <option value="all">全部類型</option>
@@ -110,7 +110,7 @@ export const TransactionList = React.memo(function TransactionList() {
           {/* 日期篩選 */}
           <select
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as any)}
+            onChange={(e) => setDateRange(e.target.value as unknown)}
             className="px-3 py-2 border border-border rounded-md bg-background text-sm"
           >
             <option value="all">全部時間</option>

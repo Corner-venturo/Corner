@@ -12,7 +12,7 @@ class OrderService extends BaseService<Order> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(o => o.id === id),
       add: async (order: Order) => {
-        const result = await store.create(order as any);
+        const result = await store.create(order as unknown);
         return result || order;
       },
       update: async (id: string, data: Partial<Order>) => {
@@ -48,7 +48,7 @@ class OrderService extends BaseService<Order> {
 
   getOrdersByCustomer(customer_id: string): Order[] {
     const store = useOrderStore.getState();
-    return store.items.filter((o: any) => o.customer_id === customer_id);
+    return store.items.filter((o) => o.customer_id === customer_id);
   }
 
   calculateTotalRevenue(): number {

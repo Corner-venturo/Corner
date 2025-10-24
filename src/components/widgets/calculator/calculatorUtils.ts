@@ -27,7 +27,7 @@ export const evaluateExpression = (expr: string, fallback: number = 0): number =
   try {
     // 將運算符號轉換為 JS 可執行的格式
     const jsExpr = expr.replace(/×/g, '*').replace(/÷/g, '/');
-    // eslint-disable-next-line no-eval
+     
     return eval(jsExpr);
   } catch {
     return fallback;

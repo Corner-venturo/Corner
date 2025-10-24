@@ -151,7 +151,7 @@ export const useAuthStore = create<AuthState>(
           const { localDB } = await import('@/lib/db');
           const { TABLES } = await import('@/lib/db/schemas');
 
-          const employee = await localDB.read(TABLES.EMPLOYEES, existingProfile.id) as any;
+          const employee = await localDB.read(TABLES.EMPLOYEES, existingProfile.id);
 
           if (!employee) {
             logger.error('❌ IndexedDB 找不到員工資料');
@@ -257,7 +257,7 @@ export const useAuthStore = create<AuthState>(
         return { success: false, message: '帳號或密碼錯誤' };
       }
 
-      const employeeData = employees as any;
+      const employeeData = employees;
       logger.log('✅ 找到員工資料:', employeeData.display_name);
 
       // 將 snake_case 轉換為 camelCase（前端統一格式）

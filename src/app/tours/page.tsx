@@ -530,9 +530,9 @@ export default function ToursPage() {
       key: 'participants',
       label: '人數',
       render: (value, tour) => {
-        const tourOrders = orders.filter((order: any) => order.tour_id === tour.id);
-        const actualMembers = members.filter((member: any) =>
-          tourOrders.some((order: any) => order.id === member.order_id)
+        const tourOrders = orders.filter((order) => order.tour_id === tour.id);
+        const actualMembers = members.filter((member) =>
+          tourOrders.some((order) => order.id === member.order_id)
         ).length;
         return <span className="text-sm text-morandi-primary">{actualMembers}</span>;
       },
@@ -676,7 +676,7 @@ export default function ToursPage() {
                 className={cn(
                   'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors',
                   is_active
-                    ? 'text-morandi-primary bg-white border-b-2 border-morandi-gold'
+                    ? 'text-morandi-primary bg-white border-b-2 border-morandi-gold/20'
                     : 'text-morandi-secondary hover:text-morandi-primary'
                 )}
               >
@@ -760,7 +760,7 @@ export default function ToursPage() {
         )}
         {activeTabs[tour.id] === 'orders' && (
           <ExpandableOrderTable
-            orders={orders.filter((order: any) => order.tour_id === tour.id)}
+            orders={orders.filter((order) => order.tour_id === tour.id)}
             showTourInfo={false}
             tourDepartureDate={tour.departure_date}
           />
@@ -798,7 +798,7 @@ export default function ToursPage() {
               tour,
               triggerAdd: triggerCostAdd[tour.id] || false,
               onTriggerAddComplete: () => setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))
-            } as any}
+            } as unknown}
           />
         )}
         {activeTabs[tour.id] === 'documents' && (
@@ -850,7 +850,7 @@ export default function ToursPage() {
             setActiveStatusTab(tab);
             setCurrentPage(1); // 切換標籤時重置頁碼
           }
-        } as any}
+        } as unknown}
       />
 
       {/* 旅遊團列表 */}
@@ -1148,16 +1148,16 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
   const { items: members } = useMemberStore();
 
   // 找到該旅遊團的報價單（通常取最新的或已核准版本）
-  const tourQuote = quotes.find((quote: any) => quote.tour_id === tour.id && quote.status === 'approved') ||
-                   quotes.find((quote: any) => quote.tour_id === tour.id);
+  const tourQuote = quotes.find((quote) => quote.tour_id === tour.id && quote.status === 'approved') ||
+                   quotes.find((quote) => quote.tour_id === tour.id);
 
   // 計算該旅遊團的訂單資訊
-  const tourOrders = orders.filter((order: any) => order.tour_id === tour.id);
+  const tourOrders = orders.filter((order) => order.tour_id === tour.id);
   const totalPaidAmount = tourOrders.reduce((sum: any, order: any) => sum + order.paid_amount, 0);
 
   // 計算當前參與人數（從團員統計）
-  const tourMembers = members.filter((member: any) =>
-    tourOrders.some((order: any) => order.id === member.order_id)
+  const tourMembers = members.filter((member) =>
+    tourOrders.some((order) => order.id === member.order_id)
   );
   const currentParticipants = tourMembers.length;
 
@@ -1174,15 +1174,15 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
   const paymentRequests = paymentStore.payment_requests; // TODO: 從 paymentStore 取得
 
   // 獲取該旅遊團的請款單
-  const tourPaymentRequests = paymentRequests.filter((req: any) => req.tour_id === tour.id);
+  const tourPaymentRequests = paymentRequests.filter((req) => req.tour_id === tour.id);
 
   // 報價單中的類別預算
   const quoteBudget = tourQuote?.categories || [];
 
   // 計算各類別的實際支出 (從請款單統計)
-  const actualExpenses = quoteBudget.map((category: any) => {
+  const actualExpenses = quoteBudget.map((category) => {
     const categoryTotal = tourPaymentRequests.reduce((sum: any, request: any) => {
-      const categoryItems = request.items?.filter((item: any) => item.category === category.name) || [];
+      const categoryItems = request.items?.filter((item) => item.category === category.name) || [];
       return sum + categoryItems.reduce((itemSum: any, item: any) => itemSum + (item.unit_price * item.quantity), 0);
     }, 0);
 
@@ -1345,12 +1345,12 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
           <table className="w-full">
             <thead className="bg-morandi-container/20 border-b border-border">
               <tr>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-morandi-primary">類別</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-morandi-primary">單人預算</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-morandi-primary">預算總額</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-morandi-primary">實際支出</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-morandi-primary">差額</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-morandi-primary">差額率</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-primary">類別</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">單人預算</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">預算總額</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">實際支出</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">差額</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">差額率</th>
               </tr>
             </thead>
             <tbody>
@@ -1460,8 +1460,8 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
 // 團務操作新增按鈕組件
 function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFields }: {
   tour: Tour;
-  tourExtraFields: Record<string, any>;
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  tourExtraFields: Record<string, unknown>;
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
 }) {
   const tourStore = useTourStore();
   const orderStore = useOrderStore();
@@ -1469,15 +1469,15 @@ function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFields }: 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 獲取屬於這個旅遊團的所有訂單
-  const tourOrders = orderStore.items.filter((order: any) => order.tour_id === tour.id);
+  const tourOrders = orderStore.items.filter((order) => order.tour_id === tour.id);
 
   // 獲取團員數據
-  const allTourMembers = memberStore.items.filter((member: any) =>
-    tourOrders.some((order: any) => order.id === member.order_id)
+  const allTourMembers = memberStore.items.filter((member) =>
+    tourOrders.some((order) => order.id === member.order_id)
   );
 
   // 計算已分房人數
-  const assignedMembers = allTourMembers.filter((member: any) => member.assignedRoom).length;
+  const assignedMembers = allTourMembers.filter((member) => member.assignedRoom).length;
 
   return (
     <>
@@ -1513,8 +1513,8 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
   isOpen: boolean;
   onClose: () => void;
   tour: Tour;
-  tourExtraFields: Record<string, any>;
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  tourExtraFields: Record<string, unknown>;
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
 }) {
   const handleOptionSelect = useCallback((option: string) => {
     const tour_id = tour.id;

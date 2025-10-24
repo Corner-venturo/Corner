@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Car, Edit, Trash2, Users, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -138,18 +138,18 @@ export default function TransportPage() {
   ], []);
 
   // 排序和篩選函數
-  const sortFunction = (data: TransportOption[], column: string, direction: 'asc' | 'desc') => {
+  const sortFunction = useCallback((data: TransportOption[], column: string, direction: 'asc' | 'desc') => {
     return [...data].sort((a, b) => {
-      let aValue: string | number | boolean = a[column as keyof TransportOption] ?? '';
-      let bValue: string | number | boolean = b[column as keyof TransportOption] ?? '';
+      const aValue: string | number | boolean = a[column as keyof TransportOption] ?? '';
+      const bValue: string | number | boolean = b[column as keyof TransportOption] ?? '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-  };
+  }, []);
 
-  const filterFunction = (data: TransportOption[], filters: Record<string, string>) => {
+  const filterFunction = useCallback((data: TransportOption[], filters: Record<string, string>) => {
     return data.filter(transport => {
       // 搜尋功能：檢查名稱是否包含搜尋詞
       const matchesSearch = !searchTerm || transport.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -163,7 +163,7 @@ export default function TransportPage() {
         (!filters.capacity || (transport.capacity || 0).toString().includes(filters.capacity))
       );
     });
-  };
+  }, [searchTerm]);
 
   const { data: filteredAndSortedTransport, handleSort, handleFilter } = useEnhancedTable(
     transportOptions,
@@ -174,7 +174,7 @@ export default function TransportPage() {
   // 重新計算過濾結果（當搜尋詞改變時）
   const finalFilteredTransport = useMemo(() => {
     return filterFunction(filteredAndSortedTransport, {});
-  }, [filteredAndSortedTransport, searchTerm]);
+  }, [filteredAndSortedTransport, filterFunction]);
 
   const handleAddTransport = () => {
     if (!newTransport.name.trim()) return;
@@ -218,7 +218,7 @@ export default function TransportPage() {
       <ResponsiveHeader
         {...{
         title: "交通選項管理",
-        icon: Car} as any}
+        icon: Car} as unknown}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },

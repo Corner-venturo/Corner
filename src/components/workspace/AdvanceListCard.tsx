@@ -112,7 +112,7 @@ export function AdvanceListCard({
                   type="checkbox"
                   checked={selectedItems.has(item.id)}
                   onChange={() => toggleSelection(item.id)}
-                  className="w-4 h-4 rounded border-morandi-gold/30 text-morandi-gold focus:ring-morandi-gold/20"
+                  className="w-4 h-4 rounded border-morandi-gold/20 text-morandi-gold focus:ring-morandi-gold/20"
                 />
               )}
 

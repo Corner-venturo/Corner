@@ -67,7 +67,7 @@ export function aesDecrypt(encryptedData: string, key: string, iv: string): stri
  * @returns SHA256 雜湊值 (大寫)
  */
 export function generateCheckCode(
-  params: Record<string, any>,
+  params: Record<string, unknown>,
   hashKey: string,
   hashIv: string
 ): string {
@@ -93,7 +93,7 @@ export function generateCheckCode(
  * @param postData 要傳送的原始資料
  * @returns 加密後的 POST 資料物件 { MerchantID, PostData }
  */
-export function createEncryptedPostData(postData: Record<string, any>) {
+export function createEncryptedPostData(postData: Record<string, unknown>) {
   const config = getNewebpayConfig()
 
   // 將資料轉為 JSON 字串
@@ -138,7 +138,7 @@ export function generateTransactionNo(): string {
  * @returns 是否驗證通過
  */
 export function verifyCheckCode(
-  responseData: Record<string, any>,
+  responseData: Record<string, unknown>,
   receivedCheckCode: string
 ): boolean {
   const config = getNewebpayConfig()

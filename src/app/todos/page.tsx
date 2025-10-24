@@ -240,7 +240,7 @@ export default function TodosPage() {
         enabled_quick_actions: formData.enabled_quick_actions || ['receipt', 'quote']
       };
 
-      await addTodo(newTodoData as any);
+      await addTodo(newTodoData as unknown);
       setIsAddDialogOpen(false);
     } catch (error) {
       logger.error('新增待辦事項失敗:', error);
@@ -293,7 +293,7 @@ export default function TodosPage() {
                 };
 
                 try {
-                  await addTodo(newTodoData as any);
+                  await addTodo(newTodoData as unknown);
                   logger.log('✅ 待辦事項新增成功');
                 } catch (error) {
                   logger.error('快速新增失敗:', error);
@@ -405,7 +405,7 @@ export default function TodosPage() {
 }
 
 // 新增待辦事項表單組件
-function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: any) => void; onCancel: () => void }) {
+function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data) => void; onCancel: () => void }) {
   const { items: users, fetchAll: loadUsersFromDatabase } = useUserStore();
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [formData, setFormData] = useState({
