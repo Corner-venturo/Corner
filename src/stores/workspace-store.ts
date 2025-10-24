@@ -63,10 +63,17 @@ export interface ChannelGroup {
 
 export interface MessageAttachment {
   id: string;
-  name: string;
-  url: string;
-  size: number;
-  type: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  path: string;
+  publicUrl: string;
+  /** 以下欄位保留給舊版資料使用 */
+  name?: string;
+  url?: string;
+  size?: number;
+  type?: string;
+  fileType?: string;
 }
 
 export interface Message {
@@ -85,6 +92,73 @@ export interface Message {
     avatar?: string;
   };
 }
+
+type RawMessage = Omit<Message, 'attachments'> & { attachments?: unknown };
+
+const ensureMessageAttachments = (attachments: unknown): MessageAttachment[] => {
+  if (!Array.isArray(attachments)) {
+    return [];
+  }
+
+  return attachments.map((item) => {
+    const attachment = item as Partial<MessageAttachment> & Record<string, unknown>;
+
+    const path = typeof attachment.path === 'string'
+      ? attachment.path
+      : typeof attachment.url === 'string'
+        ? String(attachment.url)
+        : '';
+
+    const fileName = typeof attachment.fileName === 'string'
+      ? attachment.fileName
+      : typeof attachment.name === 'string'
+        ? attachment.name
+        : '未命名檔案';
+
+    const mimeType = typeof attachment.mimeType === 'string'
+      ? attachment.mimeType
+      : typeof attachment.fileType === 'string'
+        ? attachment.fileType
+        : typeof attachment.type === 'string'
+          ? attachment.type
+          : 'application/octet-stream';
+
+    const fileSize = typeof attachment.fileSize === 'number'
+      ? attachment.fileSize
+      : typeof attachment.size === 'number'
+        ? attachment.size
+        : 0;
+
+    const publicUrl = typeof attachment.publicUrl === 'string'
+      ? attachment.publicUrl
+      : typeof attachment.url === 'string'
+        ? String(attachment.url)
+        : '';
+
+    const id = typeof attachment.id === 'string' && attachment.id.length > 0
+      ? attachment.id
+      : path || `${fileName}-${fileSize}-${mimeType}` || uuidv4();
+
+    return {
+      id,
+      fileName,
+      fileSize,
+      mimeType,
+      path,
+      publicUrl,
+      name: attachment.name,
+      url: attachment.url,
+      size: attachment.size,
+      type: attachment.type,
+      fileType: attachment.fileType,
+    };
+  });
+};
+
+const normalizeMessage = (message: RawMessage): Message => ({
+  ...message,
+  attachments: ensureMessageAttachments(message.attachments),
+});
 
 export interface PersonalCanvas {
   id: string;
@@ -532,8 +606,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           // ✨ 1. 立即從 IndexedDB 快取讀取（快！）
           console.log('💾 [messages] 從 IndexedDB 快速載入...');
-          const cachedMessages = (await localDB.getAll('messages') as Message[])
-            .filter(m => m.channel_id === channelId);
+          const cachedMessages = (await localDB.getAll('messages') as RawMessage[])
+            .filter(m => m.channel_id === channelId)
+            .map(normalizeMessage);
 
           // 立即更新 UI（不等 Supabase）
           set({ messages: cachedMessages });
@@ -558,7 +633,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                   return;
                 }
 
-                const freshMessages = data || [];
+                const freshMessages = (data || []).map(normalizeMessage);
                 console.log(`✅ [messages] Supabase 同步成功: ${freshMessages.length} 筆`);
 
                 // 批次存入 IndexedDB
@@ -582,12 +657,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         // supabase client already imported at top
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
+        const attachments = ensureMessageAttachments(message.attachments);
+
         const newMessage: Message = {
           ...message,
           id: uuidv4(),
           reactions: {},
           created_at: new Date().toISOString(),
-          author: message.author
+          author: message.author,
+          attachments: attachments.length > 0 ? attachments : [],
         };
 
         try {
