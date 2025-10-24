@@ -3,6 +3,11 @@ import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { localDB } from '@/lib/db';
+import type {
+  ChannelMessageType,
+  ChannelPoll,
+  ChannelPollStats,
+} from '@/types/workspace.types';
 
 
 
@@ -62,6 +67,10 @@ export interface MessageAttachment {
   url: string;
   size: number;
   type: string;
+  fileType?: string;
+  fileName?: string;
+  fileSize?: number;
+  path?: string;
 }
 
 export interface Message {
@@ -79,6 +88,8 @@ export interface Message {
     display_name: string;
     avatar?: string;
   };
+  type: ChannelMessageType;
+  poll?: ChannelPoll;
 }
 
 export interface PersonalCanvas {
@@ -160,6 +171,41 @@ export interface SharedOrderList {
   };
 }
 
+const calculatePollStats = (poll: Pick<ChannelPoll, 'options'>): ChannelPollStats => {
+  const totalVotes = poll.options.reduce((sum, option) => sum + option.votes.length, 0);
+  const voters = new Set<string>();
+
+  poll.options.forEach(option => {
+    option.votes.forEach(voterId => {
+      voters.add(voterId);
+    });
+  });
+
+  return {
+    totalVotes,
+    voterCount: voters.size,
+  };
+};
+
+const normalizePoll = (poll: ChannelPoll): ChannelPoll => {
+  const options = poll.options.map(option => ({
+    ...option,
+    votes: Array.from(new Set(option.votes)),
+  }));
+
+  return {
+    ...poll,
+    options,
+    stats: calculatePollStats({ ...poll, options }),
+  };
+};
+
+const normalizeMessage = (message: Message): Message => ({
+  ...message,
+  type: message.type ?? 'text',
+  poll: message.poll ? normalizePoll(message.poll) : undefined,
+});
+
 interface WorkspaceState {
   workspaces: Workspace[];
   currentWorkspace: Workspace | null;
@@ -211,6 +257,8 @@ interface WorkspaceState {
   updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;  // ✨ 新增
   togglePinMessage: (messageId: string) => void;  // ✨ 新增
   addReaction: (messageId: string, emoji: string, userId: string) => void;  // ✨ 新增
+  votePollOption: (messageId: string, optionId: string, userId: string) => Promise<void>;
+  revokePollVote: (messageId: string, optionId: string, userId: string) => Promise<void>;
   updateMessageReactions: (messageId: string, reactions: Record<string, string[]>) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   softDeleteMessage: (messageId: string) => Promise<void>;
@@ -523,8 +571,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           // ✨ 1. 立即從 IndexedDB 快取讀取（快！）
           console.log('💾 [messages] 從 IndexedDB 快速載入...');
-          const cachedMessages = (await localDB.getAll('messages') as Message[])
-            .filter(m => m.channel_id === channelId);
+          const cachedMessages = ((await localDB.getAll('messages') as Message[])
+            .filter(m => m.channel_id === channelId))
+            .map(normalizeMessage);
 
           // 立即更新 UI（不等 Supabase）
           set({ messages: cachedMessages });
@@ -549,7 +598,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                   return;
                 }
 
-                const freshMessages = data || [];
+                const freshMessages = (data || []).map(normalizeMessage);
                 console.log(`✅ [messages] Supabase 同步成功: ${freshMessages.length} 筆`);
 
                 // 批次存入 IndexedDB
@@ -573,13 +622,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         // supabase client already imported at top
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
-        const newMessage: Message = {
+        const newMessage: Message = normalizeMessage({
           ...message,
           id: uuidv4(),
           reactions: {},
           created_at: new Date().toISOString(),
-          author: message.author
-        };
+          author: message.author,
+          type: message.type ?? 'text',
+          poll: message.poll ? normalizePoll(message.poll) : undefined,
+        });
 
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
@@ -593,7 +644,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                 content: newMessage.content,
                 reactions: newMessage.reactions,
                 attachments: newMessage.attachments || [],
-                created_at: newMessage.created_at
+                created_at: newMessage.created_at,
+                type: newMessage.type,
+                poll: newMessage.poll || null,
               });
 
             if (error) throw error;
@@ -621,9 +674,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       updateMessage: async (messageId, updates) => {
         // ✨ 新增：更新訊息
         set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, ...updates } : m
-          )
+          messages: state.messages.map(m => {
+            if (m.id !== messageId) return m;
+            return normalizeMessage({ ...m, ...updates });
+          })
         }));
       },
 
@@ -653,6 +707,96 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             return m;
           })
         }));
+      },
+
+      votePollOption: async (messageId, optionId, userId) => {
+        const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
+        let updatedMessage: Message | null = null;
+
+        set(state => ({
+          messages: state.messages.map(message => {
+            if (message.id !== messageId || !message.poll) {
+              return message;
+            }
+
+            const allowMultiple = message.poll.settings.allowMultiple;
+            const options = message.poll.options.map(option => {
+              let votes = option.votes;
+
+              if (option.id === optionId) {
+                if (!votes.includes(userId)) {
+                  votes = [...votes, userId];
+                }
+              } else if (!allowMultiple) {
+                votes = votes.filter(id => id !== userId);
+              }
+
+              return {
+                ...option,
+                votes,
+              };
+            });
+
+            const poll = normalizePoll({ ...message.poll, options });
+            const nextMessage = { ...message, poll };
+            updatedMessage = nextMessage;
+            return nextMessage;
+          })
+        }));
+
+        if (updatedMessage) {
+          await localDB.put('messages', updatedMessage);
+
+          if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
+            try {
+              await (supabase as unknown)
+                .from('messages')
+                .update({ poll: updatedMessage.poll })
+                .eq('id', messageId);
+            } catch (error) {
+              console.warn('⚠️ [poll] 更新投票失敗:', error);
+            }
+          }
+        }
+      },
+
+      revokePollVote: async (messageId, optionId, userId) => {
+        const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
+        let updatedMessage: Message | null = null;
+
+        set(state => ({
+          messages: state.messages.map(message => {
+            if (message.id !== messageId || !message.poll) {
+              return message;
+            }
+
+            const options = message.poll.options.map(option =>
+              option.id === optionId
+                ? { ...option, votes: option.votes.filter(id => id !== userId) }
+                : option
+            );
+
+            const poll = normalizePoll({ ...message.poll, options });
+            const nextMessage = { ...message, poll };
+            updatedMessage = nextMessage;
+            return nextMessage;
+          })
+        }));
+
+        if (updatedMessage) {
+          await localDB.put('messages', updatedMessage);
+
+          if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
+            try {
+              await (supabase as unknown)
+                .from('messages')
+                .update({ poll: updatedMessage.poll })
+                .eq('id', messageId);
+            } catch (error) {
+              console.warn('⚠️ [poll] 收回投票同步失敗:', error);
+            }
+          }
+        }
       },
 
       updateMessageReactions: async (messageId, reactions) => {
