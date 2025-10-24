@@ -154,28 +154,30 @@ export default function InvoiceDetailPage() {
           <CardTitle>商品明細</CardTitle>
         </CardHeader>
         <CardContent>
-          <table className="w-full">
-            <thead className="border-b">
-              <tr>
-                <th className="text-left py-2.5 px-4 text-xs">商品名稱</th>
-                <th className="text-center py-2.5 px-4 text-xs">數量</th>
-                <th className="text-center py-2.5 px-4 text-xs">單位</th>
-                <th className="text-right py-2.5 px-4 text-xs">單價</th>
-                <th className="text-right py-2.5 px-4 text-xs">金額</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentInvoice.items.map((item, index) => (
-                <tr key={index} className="border-b">
-                  <td className="py-3">{item.item_name}</td>
-                  <td className="text-center">{item.item_count}</td>
-                  <td className="text-center">{item.item_unit}</td>
-                  <td className="text-right">NT$ {item.item_price.toLocaleString()}</td>
-                  <td className="text-right font-medium">NT$ {item.itemAmt.toLocaleString()}</td>
+          <div className="border border-border/60 rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-morandi-container/40 border-b border-border/60">
+                <tr>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">商品名稱</th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">數量</th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">單位</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">單價</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">金額</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentInvoice.items.map((item, index) => (
+                  <tr key={index} className="border-b border-border/40 last:border-b-0">
+                    <td className="py-3 px-4 text-sm text-morandi-primary">{item.item_name}</td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-center">{item.item_count}</td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-center">{item.item_unit}</td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-right">NT$ {item.item_price.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-right font-medium">NT$ {item.itemAmt.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
