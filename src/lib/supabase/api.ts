@@ -89,9 +89,10 @@ export class VenturoAPI {
       // 將 camelCase 轉換為 snake_case
       const snakeData = data.map(toSnakeCase);
 
-      const { data: result, error } = await supabase
-        .from(table as unknown)
-        .insert(snakeData as unknown)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: result, error } = await (supabase as any)
+        .from(table)
+        .insert(snakeData)
         .select();
 
       if (error) {
@@ -197,8 +198,9 @@ export class VenturoAPI {
         updated_at: new Date().toISOString()
       };
 
-      const queryBuilder: any = supabase.from(table as unknown);
-      const { data: result, error } = await queryBuilder
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: result, error } = await (supabase as any)
+        .from(table)
         .update(updateData)
         .eq('id', id)
         .select()
@@ -233,7 +235,8 @@ export class VenturoAPI {
         updated_at: new Date().toISOString()
       };
 
-      let query: any = supabase.from(table as unknown);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase as any).from(table);
       query = query.update(updateData);
 
       // 過濾條件也轉換
@@ -336,10 +339,11 @@ export class VenturoAPI {
    */
   static async query<T = any>(sql: string, params?: unknown[]): Promise<T[]> {
     try {
-      const { data, error } = await supabase.rpc('execute_sql' as unknown, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('execute_sql', {
         query: sql,
         params: params || []
-      } as unknown);
+      });
 
       if (error) {
         console.error(`SQL Query error:`, error);
