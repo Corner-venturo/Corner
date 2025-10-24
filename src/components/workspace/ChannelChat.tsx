@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { _Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -27,14 +29,19 @@ import {
   DollarSign,
   CheckSquare,
   Download,
-  Wallet
+  Wallet,
+  MessageSquarePlus,
+  BarChart3,
+  FolderOpen
 } from 'lucide-react';
-import { useWorkspaceStore, type Message } from '@/stores/workspace-store';
+import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
 import { useCleanupOrphanChannels } from '@/hooks/use-cleanup-orphan-channels';
+import { theme } from '@/constants/theme';
+import { shallow } from 'zustand/shallow';
 import { ChannelSidebar } from './ChannelSidebar';
 import { ChannelTabs } from './ChannelTabs';
 import { ShareAdvanceDialog } from './ShareAdvanceDialog';
@@ -59,9 +66,6 @@ export function ChannelChat() {
   const [showMemberSidebar, setShowMemberSidebar] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [channelMessages, setChannelMessages] = useState<Record<string, Message[]>>({});
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [isSwitching, setIsSwitching] = useState(false);
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showShareQuoteDialog, setShowShareQuoteDialog] = useState(false);
   const [showShareTourDialog, setShowShareTourDialog] = useState(false);
@@ -72,6 +76,14 @@ export function ChannelChat() {
   const [showShareOrdersDialog, setShowShareOrdersDialog] = useState(false);
   const [showCreateReceiptDialog, setShowCreateReceiptDialog] = useState(false);
   const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
+  const [showThreadComposer, setShowThreadComposer] = useState(false);
+  const [showPollComposer, setShowPollComposer] = useState(false);
+  const [showFileLibrary, setShowFileLibrary] = useState(false);
+  const [threadTitle, setThreadTitle] = useState('');
+  const [threadMessage, setThreadMessage] = useState('');
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
+  const [fileSearch, setFileSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null);
   const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('');
@@ -89,11 +101,10 @@ export function ChannelChat() {
 
   const {
     channels,
-    messages,
     currentWorkspace,
     loading,
-    selectedChannel,      // ✨ 從 store 取得
-    selectChannel,        // ✨ 從 store 取得
+    selectedChannel,
+    selectChannel,
     loadChannels,
     createChannel,
     updateChannel,
@@ -105,8 +116,36 @@ export function ChannelChat() {
     sharedOrderLists,
     loadAdvanceLists,
     loadSharedOrderLists,
-    deleteAdvanceList
-  } = useWorkspaceStore();
+    deleteAdvanceList,
+    currentMessages,
+    messagesLoading
+  } = useWorkspaceStore(
+    (state) => {
+      const channelId = state.selectedChannel?.id;
+      return {
+        channels: state.channels,
+        currentWorkspace: state.currentWorkspace,
+        loading: state.loading,
+        selectedChannel: state.selectedChannel,
+        selectChannel: state.selectChannel,
+        loadChannels: state.loadChannels,
+        createChannel: state.createChannel,
+        updateChannel: state.updateChannel,
+        deleteChannel: state.deleteChannel,
+        loadMessages: state.loadMessages,
+        sendMessage: state.sendMessage,
+        updateMessageReactions: state.updateMessageReactions,
+        advanceLists: state.advanceLists,
+        sharedOrderLists: state.sharedOrderLists,
+        loadAdvanceLists: state.loadAdvanceLists,
+        loadSharedOrderLists: state.loadSharedOrderLists,
+        deleteAdvanceList: state.deleteAdvanceList,
+        currentMessages: channelId ? state.channelMessages[channelId] ?? [] : [],
+        messagesLoading: channelId ? state.messagesLoading[channelId] ?? false : false
+      };
+    },
+    shallow
+  );
 
   const { user, currentProfile } = useAuthStore();
 
@@ -146,61 +185,22 @@ export function ChannelChat() {
 
 
   useEffect(() => {
-    if (selectedChannel?.id) {
-
-      if (!channelMessages[selectedChannel.id]) {
-        console.log('載入訊息列表...', selectedChannel.id);
-        setIsLoadingMessages(true);
-        Promise.all([
-          loadMessages(selectedChannel.id),
-          loadAdvanceLists(selectedChannel.id),
-          loadSharedOrderLists(selectedChannel.id)
-        ]).then(() => {
-          setIsLoadingMessages(false);
-
-          setChannelMessages(prev => ({
-            ...prev,
-            [selectedChannel.id]: messages
-          }));
-        });
-      } else {
-
-        Promise.all([
-          loadMessages(selectedChannel.id),
-          loadAdvanceLists(selectedChannel.id),
-          loadSharedOrderLists(selectedChannel.id)
-        ]).then(() => {
-
-          setChannelMessages(prev => ({
-            ...prev,
-            [selectedChannel.id]: messages
-          }));
-        });
-      }
+    if (!selectedChannel?.id) {
+      return;
     }
 
-  }, [selectedChannel?.id, channelMessages, loadMessages, loadAdvanceLists, loadSharedOrderLists, messages]);
-
-
-  useEffect(() => {
-    if (selectedChannel?.id && messages.length > 0) {
-      setChannelMessages(prev => ({
-        ...prev,
-        [selectedChannel.id]: messages
-      }));
-    }
-  }, [messages, selectedChannel?.id]);
-
-
-  const currentMessages = useMemo(() =>
-    selectedChannel?.id
-      ? (channelMessages[selectedChannel.id] || messages)
-      : []
-  , [selectedChannel?.id, channelMessages, messages]);
+    Promise.all([
+      loadMessages(selectedChannel.id),
+      loadAdvanceLists(selectedChannel.id),
+      loadSharedOrderLists(selectedChannel.id)
+    ]).catch((error) => {
+      console.error('載入頻道資料失敗:', error);
+    });
+  }, [selectedChannel?.id, loadMessages, loadAdvanceLists, loadSharedOrderLists]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [currentMessages]);
+  }, [currentMessages.length]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -277,7 +277,7 @@ export function ChannelChat() {
   const handleReaction = async (messageId: string, emoji: string) => {
     if (!user) return;
 
-    const message = messages.find(m => m.id === messageId);
+    const message = currentMessages.find(m => m.id === messageId);
     if (!message) return;
 
     const currentReactions = { ...message.reactions };
@@ -469,13 +469,40 @@ export function ChannelChat() {
   };
 
 
+  const resetInlinePanels = () => {
+    setShowThreadComposer(false);
+    setShowPollComposer(false);
+    setShowFileLibrary(false);
+  };
+
+  const openComposer = (type: 'thread' | 'poll' | 'files') => {
+    resetInlinePanels();
+
+    if (type === 'thread') {
+      setShowThreadComposer(true);
+    }
+
+    if (type === 'poll') {
+      setShowPollComposer(true);
+    }
+
+    if (type === 'files') {
+      setShowFileLibrary(true);
+    }
+
+    setShowQuickMenu(false);
+  };
+
+
   const quickMenuActions = [
     {
       id: 'share-order',
       icon: Receipt,
       label: '分享待收款',
-      color: 'text-indigo-600',
-      action: () => {
+      description: '快速貼上待收款進度',
+      iconColor: theme.colors.accent,
+      onSelect: () => {
+        resetInlinePanels();
         setShowShareOrdersDialog(true);
         setShowQuickMenu(false);
       }
@@ -484,8 +511,10 @@ export function ChannelChat() {
       id: 'share-quote',
       icon: Receipt,
       label: '分享報價單',
-      color: 'text-blue-600',
-      action: () => {
+      description: '同步報價單狀態',
+      iconColor: theme.colors.accent,
+      onSelect: () => {
+        resetInlinePanels();
         setShowShareQuoteDialog(true);
         setShowQuickMenu(false);
       }
@@ -494,8 +523,10 @@ export function ChannelChat() {
       id: 'new-payment',
       icon: DollarSign,
       label: '新增請款單',
-      color: 'text-orange-600',
-      action: () => {
+      description: '建立請款與財務同步',
+      iconColor: theme.colors.success,
+      onSelect: () => {
+        resetInlinePanels();
         setShowNewPaymentDialog(true);
         setShowQuickMenu(false);
       }
@@ -504,8 +535,10 @@ export function ChannelChat() {
       id: 'new-receipt',
       icon: DollarSign,
       label: '新增收款單',
-      color: 'text-emerald-600',
-      action: () => {
+      description: '建立收款紀錄',
+      iconColor: theme.colors.success,
+      onSelect: () => {
+        resetInlinePanels();
         setShowNewReceiptDialog(true);
         setShowQuickMenu(false);
       }
@@ -514,8 +547,10 @@ export function ChannelChat() {
       id: 'share-advance',
       icon: Wallet,
       label: '分享代墊清單',
-      color: 'text-purple-600',
-      action: () => {
+      description: '關注代墊進度',
+      iconColor: theme.colors.accent,
+      onSelect: () => {
+        resetInlinePanels();
         setShowShareAdvanceDialog(true);
         setShowQuickMenu(false);
       }
@@ -524,23 +559,96 @@ export function ChannelChat() {
       id: 'new-task',
       icon: CheckSquare,
       label: '新增任務',
-      color: 'text-morandi-gold',
-      action: () => {
+      description: '分派待辦事項',
+      iconColor: theme.colors.accent,
+      onSelect: () => {
+        resetInlinePanels();
         setShowNewTaskDialog(true);
         setShowQuickMenu(false);
       }
     },
     {
-      id: 'upload-file',
-      icon: Paperclip,
-      label: '上傳檔案',
-      color: 'text-morandi-secondary',
-      action: () => {
-        fileInputRef.current?.click();
-        setShowQuickMenu(false);
-      }
+      id: 'open-thread',
+      icon: MessageSquarePlus,
+      label: '建立討論串',
+      description: '針對訊息展開子討論',
+      iconColor: theme.colors.accent,
+      onSelect: () => openComposer('thread')
+    },
+    {
+      id: 'create-poll',
+      icon: BarChart3,
+      label: '建立投票',
+      description: '蒐集團隊意見',
+      iconColor: theme.colors.accent,
+      onSelect: () => openComposer('poll')
+    },
+    {
+      id: 'open-files',
+      icon: FolderOpen,
+      label: '頻道檔案',
+      description: '快速瀏覽共享檔案',
+      iconColor: theme.colors.accent,
+      onSelect: () => openComposer('files')
     }
   ];
+
+  const composerBackground = isDragging ? theme.colors.accentMuted : theme.colors.surfaceSubtle;
+
+  const handlePollOptionChange = (index: number, value: string) => {
+    setPollOptions((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  };
+
+  const addPollOption = () => {
+    setPollOptions((prev) => [...prev, '']);
+  };
+
+  const handleCreateThread = () => {
+    console.log('建立討論串', { threadTitle, threadMessage, channelId: selectedChannel?.id });
+    resetInlinePanels();
+    setThreadTitle('');
+    setThreadMessage('');
+  };
+
+  const handleCreatePoll = () => {
+    console.log('建立投票', { pollQuestion, pollOptions, channelId: selectedChannel?.id });
+    resetInlinePanels();
+    setPollQuestion('');
+    setPollOptions(['', '']);
+  };
+
+  const channelFiles = useMemo(() => {
+    return currentMessages.flatMap((message) =>
+      (message.attachments || []).map((attachment, index) => {
+        const file = attachment as unknown as Record<string, unknown>;
+        const name = (file.fileName as string) || (file.name as string) || '未命名檔案';
+        const size = (file.fileSize as number) || (file.size as number) || 0;
+        const type = (file.fileType as string) || (file.type as string) || '';
+        const pathOrUrl = (file.path as string) || (file.url as string) || '';
+        return {
+          id: `${message.id}-${(file.id as string) || index}`,
+          name,
+          size,
+          type,
+          owner: message.author?.display_name || '未知用戶',
+          createdAt: message.created_at,
+          path: pathOrUrl,
+        };
+      })
+    );
+  }, [currentMessages]);
+
+  const filteredChannelFiles = useMemo(() => {
+    const keyword = fileSearch.trim().toLowerCase();
+    if (!keyword) {
+      return channelFiles;
+    }
+    return channelFiles.filter((file) => file.name.toLowerCase().includes(keyword));
+  }, [channelFiles, fileSearch]);
 
 
   useEffect(() => {
@@ -561,29 +669,30 @@ export function ChannelChat() {
 
   if (loading && channels.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
+      <div className="flex h-full items-center justify-center">
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+          style={{ borderColor: theme.colors.accent, borderTopColor: 'transparent' }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="h-full flex rounded-lg border border-border overflow-hidden bg-white">
+    <Card
+      className="h-full flex overflow-hidden"
+      style={{
+        backgroundColor: theme.colors.surfaceElevated,
+        borderColor: theme.colors.border,
+        boxShadow: theme.shadows.card
+      }}
+    >
       {/* 頻道側邊欄 - 使用新的 ChannelSidebar 組件 */}
       <ChannelSidebar
         selectedChannelId={selectedChannel?.id || null}
         onSelectChannel={(channel) => {
           if (selectedChannel?.id !== channel.id) {
-            // 設定切換狀態，產生淡出效果
-            setIsSwitching(true);
-
-            // 150ms 後切換頻道
-            setTimeout(() => {
-              selectChannel(channel);  // ✨ 改用 store 的 selectChannel
-
-              // 再 150ms 後移除切換狀態，產生淡入效果
-              setTimeout(() => setIsSwitching(false), 150);
-            }, 150);
+            selectChannel(channel);
           }
         }}
       />
@@ -610,49 +719,66 @@ export function ChannelChat() {
             {/* 訊息與成員區域 */}
             <div className="flex-1 flex min-h-0">
               {/* 訊息區域 */}
-              <div className={cn(
-                "flex-1 overflow-y-auto p-4 space-y-4 min-h-0 transition-opacity duration-150",
-                isSwitching ? "opacity-0" : "opacity-100"
-              )}>
-              {isLoadingMessages ? (
+              <div
+                className="flex-1 overflow-y-auto space-y-4 min-h-0 transition-opacity duration-150"
+                style={{ backgroundColor: theme.colors.surface, padding: theme.spacing.lg }}
+              >
+              {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin w-6 h-6 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
+                  <div
+                    className="h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"
+                    style={{ borderColor: theme.colors.accent, borderTopColor: 'transparent' }}
+                  />
                 </div>
               ) : currentMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <Hash size={48} className="text-morandi-secondary/50 mb-4" />
-                  <h3 className="text-lg font-medium text-morandi-primary mb-2">
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <Hash size={48} className="mb-4" style={{ color: theme.colors.textMuted, opacity: 0.4 }} />
+                  <h3 className="mb-2 text-lg font-semibold" style={{ color: theme.colors.textPrimary }}>
                     歡迎來到 #{selectedChannel.name}
                   </h3>
-                  <p className="text-morandi-secondary">
+                  <p className="text-sm" style={{ color: theme.colors.textMuted }}>
                     這裡還沒有任何訊息。開始對話吧！
                   </p>
                 </div>
               ) : (
                 currentMessages.map(message => (
-                  <div key={message.id} className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
+                  <div
+                    key={message.id}
+                    className="group -mx-2 flex gap-3 px-3 py-2 transition-colors hover:bg-accent/5"
+                    style={{ borderRadius: theme.radius.lg }}
+                  >
                     {/* 用戶頭像 */}
-                    <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
+                    <div
+                      className="mt-0.5 flex h-9 w-9 items-center justify-center text-sm font-semibold"
+                      style={{
+                        borderRadius: theme.radius.md,
+                        background: `linear-gradient(135deg, ${theme.colors.accentMuted}, ${theme.colors.accentStrong})`,
+                        color: theme.colors.accent
+                      }}
+                    >
                       {message.author?.display_name?.charAt(0) || '?'}
                     </div>
 
                     {/* 訊息內容 */}
                     <div className="flex-1 min-w-0 relative pt-0.5">
                       {/* 訊息標題 */}
-                      <div className="flex items-baseline gap-2 mb-0.5">
-                        <span className="font-semibold text-morandi-primary text-[15px]">
+                      <div className="mb-1 flex items-baseline gap-2">
+                        <span className="text-[15px] font-semibold" style={{ color: theme.colors.textPrimary }}>
                           {message.author?.display_name || '未知用戶'}
                         </span>
-                        <span className="text-[11px] text-morandi-secondary/80 font-normal">
+                        <span className="text-[11px]" style={{ color: theme.colors.textMuted }}>
                           {formatMessageTime(message.created_at)}
                         </span>
                         {message.edited_at && (
-                          <span className="text-[11px] text-morandi-secondary/60">(已編輯)</span>
+                          <span className="text-[11px]" style={{ color: theme.colors.textMuted, opacity: 0.6 }}>(已編輯)</span>
                         )}
                       </div>
 
                       {/* 訊息文字 */}
-                      <div className="text-morandi-primary text-[15px] whitespace-pre-wrap leading-[1.46668] break-words">
+                      <div
+                        className="whitespace-pre-wrap break-words text-[15px]"
+                        style={{ color: theme.colors.textPrimary, lineHeight: 1.6 }}
+                      >
                         {message.content}
                       </div>
 
@@ -664,28 +790,37 @@ export function ChannelChat() {
                             return (
                               <div
                                 key={index}
-                                className="inline-flex items-center gap-2 px-3 py-2 bg-morandi-container/10 border border-morandi-container rounded-lg hover:bg-morandi-container/20 transition-colors group/attachment"
+                                className="group/attachment inline-flex items-center gap-2 px-3 py-2 transition-colors hover:bg-accent/5"
+                                style={{
+                                  borderRadius: theme.radius.md,
+                                  border: `1px solid ${theme.colors.border}`,
+                                  backgroundColor: theme.colors.surfaceSubtle
+                                }}
                               >
                                 {isImage ? (
-                                  <ImageIcon size={16} className="text-morandi-gold shrink-0" />
+                                  <ImageIcon size={16} style={{ color: theme.colors.accent }} className="shrink-0" />
                                 ) : (
-                                  <FileText size={16} className="text-morandi-secondary shrink-0" />
+                                  <FileText size={16} style={{ color: theme.colors.textMuted }} className="shrink-0" />
                                 )}
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm text-morandi-primary truncate max-w-[200px]">
+                                  <p className="max-w-[200px] truncate text-sm" style={{ color: theme.colors.textPrimary }}>
                                     {attachment.fileName}
                                   </p>
-                                  <p className="text-xs text-morandi-secondary">
+                                  <p className="text-xs" style={{ color: theme.colors.textMuted }}>
                                     {formatFileSize(attachment.fileSize)}
                                   </p>
                                 </div>
-                                <button
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="iconSm"
                                   onClick={() => downloadFile(attachment.path, 'workspace-files', attachment.fileName)}
-                                  className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
+                                  className="opacity-0 transition-opacity group-hover/attachment:opacity-100"
+                                  style={{ color: theme.colors.accent }}
                                   title="下載檔案"
                                 >
-                                  <Download size={14} className="text-morandi-gold" />
-                                </button>
+                                  <Download size={14} />
+                                </Button>
                               </div>
                             );
                           })}
@@ -694,61 +829,70 @@ export function ChannelChat() {
 
                       {/* 反應列 */}
                       {Object.keys(message.reactions).length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {Object.entries(message.reactions).map(([emoji, users]) => (
-                            <button
-                              key={emoji}
-                              onClick={() => handleReaction(message.id, emoji)}
-                              className={cn(
-                                "flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors",
-                                users.includes(user?.id || '')
-                                  ? "bg-morandi-gold/20 border-morandi-gold text-morandi-primary"
-                                  : "bg-morandi-container/20 border-border text-morandi-secondary hover:bg-morandi-container/30"
-                              )}
-                            >
-                              <span>{emoji}</span>
-                              <span>{users.length}</span>
-                            </button>
-                          ))}
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {Object.entries(message.reactions).map(([emoji, users]) => {
+                            const isReacted = users.includes(user?.id || '');
+                            return (
+                              <Button
+                                key={emoji}
+                                type="button"
+                                variant="ghost"
+                                size="xs"
+                                onClick={() => handleReaction(message.id, emoji)}
+                                className="h-7 rounded-full border px-3 text-xs font-medium transition-all"
+                                style={{
+                                  borderColor: isReacted ? theme.colors.accent : theme.colors.border,
+                                  backgroundColor: isReacted ? theme.colors.accentMuted : 'transparent',
+                                  color: isReacted ? theme.colors.accent : theme.colors.textMuted
+                                }}
+                              >
+                                <span>{emoji}</span>
+                                <span className="ml-1">{users.length}</span>
+                              </Button>
+                            );
+                          })}
                         </div>
                       )}
 
                       {/* 反應按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
-                      <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex gap-0.5">
+                      <div className="mt-1 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                        <div className="flex gap-1">
                           {['👍', '❤️', '😄', '😮', '🎉'].map(emoji => (
-                            <button
+                            <Button
                               key={emoji}
+                              type="button"
+                              variant="ghost"
+                              size="xs"
                               onClick={() => handleReaction(message.id, emoji)}
-                              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/20 transition-all hover:scale-110"
                               title={`加上 ${emoji} 反應`}
+                              className="h-7 w-7 rounded-full border px-0 text-xs transition-all hover:scale-105"
+                              style={{ borderColor: theme.colors.border, color: theme.colors.textMuted }}
                             >
                               {emoji}
-                            </button>
+                            </Button>
                           ))}
                         </div>
                         {/* 刪除按鈕 - 只有作者可以刪除 */}
                         {user?.id === message.author_id && (
-                          <button
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="iconSm"
                             onClick={async () => {
                               if (confirm('確定要刪除這則訊息嗎？')) {
                                 const { deleteMessage } = useWorkspaceStore.getState();
                                 await deleteMessage(message.id);
-
-                                // 同時更新 local state 中的訊息列表
-                                if (selectedChannel?.id) {
-                                  setChannelMessages(prev => ({
-                                    ...prev,
-                                    [selectedChannel.id]: prev[selectedChannel.id]?.filter(m => m.id !== message.id) || []
-                                  }));
-                                }
                               }
                             }}
-                            className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-red/10 rounded border border-morandi-container hover:border-morandi-red/40 transition-all hover:scale-110"
+                            className="rounded-full border transition-all hover:scale-105"
+                            style={{
+                              borderColor: theme.colors.border,
+                              color: theme.colors.destructive
+                            }}
                             title="刪除訊息"
                           >
-                            <Trash2 size={12} className="text-morandi-red" />
-                          </button>
+                            <Trash2 size={14} />
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -795,12 +939,16 @@ export function ChannelChat() {
 
               {/* 成員側邊欄 */}
               {showMemberSidebar && (
-                <div className="w-64 border-l border-border bg-morandi-container/5 flex flex-col shrink-0">
-                  <div className="p-4 border-b border-border">
-                    <h3 className="font-medium text-morandi-primary">成員列表</h3>
+                <div
+                  className="w-64 shrink-0 border-l flex flex-col"
+                  style={{ backgroundColor: theme.colors.surfaceSubtle, borderColor: theme.colors.border }}
+                >
+                  <div className="border-b px-4 py-3" style={{ borderColor: theme.colors.border }}
+                  >
+                    <h3 className="text-sm font-semibold" style={{ color: theme.colors.textPrimary }}>成員列表</h3>
                   </div>
-                  <div className="flex-1 overflow-y-auto p-2">
-                    <div className="text-center text-morandi-secondary text-sm py-4">
+                  <div className="flex-1 overflow-y-auto px-3 py-4">
+                    <div className="text-center text-sm" style={{ color: theme.colors.textMuted }}>
                       載入成員列表中...
                     </div>
                   </div>
@@ -810,10 +958,12 @@ export function ChannelChat() {
 
             {/* 輸入區域 */}
             <div
-              className={cn(
-                "p-4 border-t border-morandi-gold/20 bg-morandi-container/5 shrink-0 transition-colors",
-                isDragging && "bg-morandi-gold/10 border-morandi-gold"
-              )}
+              className="shrink-0 transition-colors"
+              style={{
+                padding: theme.spacing.lg,
+                borderTop: `1px solid ${theme.colors.border}`,
+                backgroundColor: composerBackground
+              }}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -826,41 +976,234 @@ export function ChannelChat() {
                     return (
                       <div
                         key={index}
-                        className="relative bg-white border border-morandi-container rounded-lg p-2 pr-8 flex items-center gap-2 max-w-xs"
+                        className="relative flex max-w-xs items-center gap-2 px-3 py-2"
+                        style={{
+                          borderRadius: theme.radius.md,
+                          border: `1px solid ${theme.colors.border}`,
+                          backgroundColor: theme.colors.surfaceElevated
+                        }}
                       >
                         {isImage ? (
-                          <ImageIcon size={16} className="text-morandi-gold shrink-0" />
+                          <ImageIcon size={16} style={{ color: theme.colors.accent }} className="shrink-0" />
                         ) : (
-                          <FileText size={16} className="text-morandi-secondary shrink-0" />
+                          <FileText size={16} style={{ color: theme.colors.textMuted }} className="shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-morandi-primary truncate">{file.name}</p>
-                          <p className="text-xs text-morandi-secondary">{formatFileSize(file.size)}</p>
+                          <p className="truncate text-sm" style={{ color: theme.colors.textPrimary }}>{file.name}</p>
+                          <p className="text-xs" style={{ color: theme.colors.textMuted }}>{formatFileSize(file.size)}</p>
                         </div>
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="iconSm"
                           onClick={() => handleRemoveFile(index)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-morandi-secondary hover:text-morandi-red transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2"
+                          style={{ color: theme.colors.textMuted }}
                         >
                           <X size={14} />
-                        </button>
+                        </Button>
                       </div>
                     );
                   })}
                 </div>
               )}
 
+              {(showThreadComposer || showPollComposer || showFileLibrary) && (
+                <div className="mb-4 space-y-3">
+                  {showThreadComposer && (
+                    <Card
+                      className="space-y-3"
+                      style={{
+                        borderColor: theme.colors.border,
+                        backgroundColor: theme.colors.surfaceElevated
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <MessageSquarePlus size={18} style={{ color: theme.colors.accent }} />
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: theme.colors.textPrimary }}>建立討論串</p>
+                            <p className="text-xs" style={{ color: theme.colors.textMuted }}>與頻道成員開啟專注討論</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => setShowThreadComposer(false)}>關閉</Button>
+                      </div>
+                      <div className="grid gap-2">
+                        <Input
+                          placeholder="討論主題"
+                          value={threadTitle}
+                          onChange={(e) => setThreadTitle(e.target.value)}
+                        />
+                        <Textarea
+                          placeholder="說明背景與需求..."
+                          value={threadMessage}
+                          onChange={(e) => setThreadMessage(e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setShowThreadComposer(false);
+                            setThreadTitle('');
+                            setThreadMessage('');
+                          }}
+                        >
+                          取消
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleCreateThread}
+                          disabled={!threadTitle.trim() && !threadMessage.trim()}
+                        >
+                          發布討論串
+                        </Button>
+                      </div>
+                    </Card>
+                  )}
+                  {showPollComposer && (
+                    <Card
+                      className="space-y-3"
+                      style={{
+                        borderColor: theme.colors.border,
+                        backgroundColor: theme.colors.surfaceElevated
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <BarChart3 size={18} style={{ color: theme.colors.accent }} />
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: theme.colors.textPrimary }}>建立投票</p>
+                            <p className="text-xs" style={{ color: theme.colors.textMuted }}>蒐集團隊意見</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => setShowPollComposer(false)}>關閉</Button>
+                      </div>
+                      <div className="grid gap-2">
+                        <Input
+                          placeholder="投票主題"
+                          value={pollQuestion}
+                          onChange={(e) => setPollQuestion(e.target.value)}
+                        />
+                        {pollOptions.map((option, optionIndex) => (
+                          <Input
+                            key={optionIndex}
+                            placeholder={`選項 ${optionIndex + 1}`}
+                            value={option}
+                            onChange={(e) => handlePollOptionChange(optionIndex, e.target.value)}
+                          />
+                        ))}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={addPollOption}
+                          className="justify-start text-xs"
+                        >
+                          新增選項
+                        </Button>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setShowPollComposer(false);
+                            setPollQuestion('');
+                            setPollOptions(['', '']);
+                          }}
+                        >
+                          取消
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleCreatePoll}
+                          disabled={!pollQuestion.trim() || pollOptions.every(option => !option.trim())}
+                        >
+                          建立投票
+                        </Button>
+                      </div>
+                    </Card>
+                  )}
+                  {showFileLibrary && (
+                    <Card
+                      className="space-y-3"
+                      style={{
+                        borderColor: theme.colors.border,
+                        backgroundColor: theme.colors.surfaceElevated
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <FolderOpen size={18} style={{ color: theme.colors.accent }} />
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: theme.colors.textPrimary }}>頻道檔案</p>
+                            <p className="text-xs" style={{ color: theme.colors.textMuted }}>快速瀏覽近期分享</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => setShowFileLibrary(false)}>關閉</Button>
+                      </div>
+                      <Input
+                        placeholder="搜尋檔案..."
+                        value={fileSearch}
+                        onChange={(e) => setFileSearch(e.target.value)}
+                      />
+                      <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
+                        {filteredChannelFiles.length === 0 ? (
+                          <p className="py-6 text-center text-sm" style={{ color: theme.colors.textMuted }}>暫無檔案</p>
+                        ) : (
+                          filteredChannelFiles.map((file) => (
+                            <div
+                              key={file.id}
+                              className="flex items-center justify-between rounded-md border px-3 py-2"
+                              style={{ borderColor: theme.colors.border }}
+                            >
+                              <div className="flex items-center gap-2">
+                                <FileText size={16} style={{ color: theme.colors.textMuted }} />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>{file.name}</span>
+                                  <span className="text-xs" style={{ color: theme.colors.textMuted }}>
+                                    {formatFileSize(file.size)} · {file.owner}
+                                  </span>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="iconSm"
+                                onClick={() => downloadFile(file.path, 'workspace-files', file.name)}
+                                style={{ color: theme.colors.accent }}
+                              >
+                                <Download size={14} />
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </Card>
+                  )}
+                </div>
+              )}
+
               {/* 上傳進度條 */}
               {uploadingFiles && uploadProgress > 0 && (
                 <div className="mb-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-morandi-secondary">上傳檔案中...</span>
-                    <span className="text-xs text-morandi-secondary">{uploadProgress}%</span>
+                  <div className="mb-1 flex items-center justify-between text-xs" style={{ color: theme.colors.textMuted }}>
+                    <span>上傳檔案中...</span>
+                    <span>{uploadProgress}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-morandi-container/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-1.5 w-full overflow-hidden rounded-full"
+                    style={{ backgroundColor: theme.colors.surfaceSubtle }}
+                  >
                     <div
-                      className="h-full bg-morandi-gold transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
+                      className="h-full transition-all duration-300"
+                      style={{
+                        width: `${uploadProgress}%`,
+                        backgroundColor: theme.colors.accent
+                      }}
                     />
                   </div>
                 </div>
@@ -873,7 +1216,8 @@ export function ChannelChat() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="w-9 h-9 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
+                    className="h-9 w-9 hover:bg-accent/10"
+                    style={{ color: showQuickMenu ? theme.colors.accent : theme.colors.textMuted }}
                     onClick={() => setShowQuickMenu(!showQuickMenu)}
                   >
                     <Plus size={18} />
@@ -881,37 +1225,54 @@ export function ChannelChat() {
 
                   {/* 快捷選單 */}
                   {showQuickMenu && (
-                    <div
+                    <Card
                       ref={quickMenuRef}
-                      className="absolute bottom-full left-0 mb-2 bg-white border border-morandi-gold/20 rounded-lg shadow-xl py-1.5 min-w-[220px] z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+                      className="absolute bottom-full left-0 mb-2 min-w-[260px] overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+                      style={{
+                        backgroundColor: theme.colors.surfaceElevated,
+                        borderColor: theme.colors.border,
+                        boxShadow: theme.shadows.overlay
+                      }}
                     >
-                      <div className="px-3 py-1.5 border-b border-morandi-container/30">
-                        <p className="text-xs font-semibold text-morandi-secondary uppercase tracking-wider">快捷操作</p>
+                      <div
+                        className="px-4 py-2 border-b"
+                        style={{ borderColor: theme.colors.border }}
+                      >
+                        <p className={cn(theme.typography.label, 'tracking-[0.12em] text-[11px]')}>快捷操作</p>
                       </div>
-                      {quickMenuActions.map((action, index) => {
-                        const Icon = action.icon;
-                        const isLast = index === quickMenuActions.length - 1;
-                        return (
-                          <div key={action.id}>
-                            {isLast && <div className="my-1 border-t border-morandi-container/30" />}
-                            <button
-                              type="button"
-                              onClick={action.action}
-                              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-morandi-gold/10 transition-all text-left group"
-                            >
-                              <div className={cn(
-                                "w-8 h-8 rounded-md flex items-center justify-center transition-all",
-                                "bg-gradient-to-br from-morandi-container/20 to-morandi-container/5",
-                                "group-hover:from-morandi-gold/10 group-hover:to-morandi-gold/5"
-                              )}>
-                                <Icon size={16} className={cn(action.color, "group-hover:scale-110 transition-transform")} />
-                              </div>
-                              <span className="text-sm text-morandi-primary font-medium">{action.label}</span>
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
+                      <div className="flex flex-col py-1">
+                        {quickMenuActions.map((action, index) => {
+                          const Icon = action.icon;
+                          const isLast = index === quickMenuActions.length - 1;
+                          return (
+                            <div key={action.id} className="flex flex-col">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={action.onSelect}
+                                className="w-full justify-start gap-3 rounded-none px-4 py-3 text-left hover:bg-accent/5"
+                                style={{ color: theme.colors.textPrimary }}
+                              >
+                                <span
+                                  className="flex h-8 w-8 items-center justify-center rounded-md"
+                                  style={{ backgroundColor: theme.colors.accentMuted }}
+                                >
+                                  <Icon size={16} style={{ color: action.iconColor }} />
+                                </span>
+                                <span className="flex flex-col items-start">
+                                  <span className="text-sm font-medium">{action.label}</span>
+                                  {action.description && (
+                                    <span className="text-xs text-muted-foreground">{action.description}</span>
+                                  )}
+                                </span>
+                              </Button>
+                              {!isLast && <Separator className="mx-4" style={{ borderColor: theme.colors.border }} />}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </Card>
                   )}
 
                   {/* 附件上傳按鈕 (隱藏的 input) */}
@@ -934,23 +1295,33 @@ export function ChannelChat() {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder={`在 #${selectedChannel.name} 中輸入訊息...`}
-                    className="pr-10 bg-white border-morandi-container"
+                    className="pr-10"
+                    style={{ borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }}
                   />
-                  <button
+                  <Button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-morandi-secondary hover:text-morandi-gold transition-colors pointer-events-auto z-10"
+                    variant="ghost"
+                    size="iconSm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
+                    style={{ color: theme.colors.textMuted }}
                   >
                     <Smile size={16} />
-                  </button>
+                  </Button>
                 </div>
 
                 <Button
                   type="submit"
                   disabled={(!messageText.trim() && attachedFiles.length === 0) || uploadingFiles}
-                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundColor: theme.colors.accent,
+                    color: '#fff'
+                  }}
                 >
                   {uploadingFiles ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div
+                      className="h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"
+                      style={{ borderColor: '#fff', borderTopColor: 'transparent' }}
+                    />
                   ) : (
                     <Send size={16} />
                   )}
@@ -958,10 +1329,18 @@ export function ChannelChat() {
               </form>
 
               {isDragging && (
-                <div className="absolute inset-0 flex items-center justify-center bg-morandi-gold/5 border-2 border-dashed border-morandi-gold rounded-lg pointer-events-none">
+                <div
+                  className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg border-2 border-dashed"
+                  style={{
+                    borderColor: theme.colors.accent,
+                    backgroundColor: theme.colors.accentMuted
+                  }}
+                >
                   <div className="text-center">
-                    <Paperclip size={32} className="mx-auto mb-2 text-morandi-gold" />
-                    <p className="text-morandi-gold font-medium">放開以上傳檔案</p>
+                    <Paperclip size={32} className="mx-auto mb-2" style={{ color: theme.colors.accent }} />
+                    <p className="font-medium" style={{ color: theme.colors.accent }}>
+                      放開以上傳檔案
+                    </p>
                   </div>
                 </div>
               )}
@@ -970,8 +1349,8 @@ export function ChannelChat() {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <Hash size={48} className="text-morandi-secondary/50 mx-auto mb-4" />
-              <p className="text-morandi-secondary">選擇一個頻道開始對話</p>
+              <Hash size={48} className="mx-auto mb-4" style={{ color: theme.colors.textMuted, opacity: 0.4 }} />
+              <p style={{ color: theme.colors.textMuted }}>選擇一個頻道開始對話</p>
             </div>
           </div>
         )}
@@ -1057,7 +1436,7 @@ export function ChannelChat() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">頻道名稱</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>頻道名稱</label>
               <Input
                 value={editChannelName}
                 onChange={(e) => setEditChannelName(e.target.value)}
@@ -1065,7 +1444,7 @@ export function ChannelChat() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">頻道描述</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>頻道描述</label>
               <Input
                 value={editChannelDescription}
                 onChange={(e) => setEditChannelDescription(e.target.value)}
@@ -1152,12 +1531,15 @@ export function ChannelChat() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">報價單編號</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>報價單編號</label>
               <Input placeholder="輸入報價單編號搜尋..." />
             </div>
-            <div className="border border-morandi-container rounded-lg p-3 space-y-2">
-              <p className="text-sm text-morandi-secondary">暫無報價單資料</p>
-              <p className="text-xs text-morandi-secondary">提示：完整功能將連接報價單系統</p>
+            <div
+              className="space-y-2 rounded-lg border p-3"
+              style={{ borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceSubtle }}
+            >
+              <p className="text-sm" style={{ color: theme.colors.textMuted }}>暫無報價單資料</p>
+              <p className="text-xs" style={{ color: theme.colors.textMuted }}>提示：完整功能將連接報價單系統</p>
             </div>
           </div>
           <DialogFooter>
@@ -1186,12 +1568,15 @@ export function ChannelChat() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">團號</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>團號</label>
               <Input placeholder="輸入團號搜尋..." />
             </div>
-            <div className="border border-morandi-container rounded-lg p-3 space-y-2">
-              <p className="text-sm text-morandi-secondary">暫無團況資料</p>
-              <p className="text-xs text-morandi-secondary">提示：完整功能將連接團況管理系統</p>
+            <div
+              className="space-y-2 rounded-lg border p-3"
+              style={{ borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceSubtle }}
+            >
+              <p className="text-sm" style={{ color: theme.colors.textMuted }}>暫無團況資料</p>
+              <p className="text-xs" style={{ color: theme.colors.textMuted }}>提示：完整功能將連接團況管理系統</p>
             </div>
           </div>
           <DialogFooter>
@@ -1220,15 +1605,15 @@ export function ChannelChat() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">請款項目</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>請款項目</label>
               <Input placeholder="輸入請款項目..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">請款金額</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>請款金額</label>
               <Input type="number" placeholder="輸入請款金額..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">請款原因</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>請款原因</label>
               <Input placeholder="輸入請款原因..." />
             </div>
           </div>
@@ -1258,15 +1643,15 @@ export function ChannelChat() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">收款項目</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>收款項目</label>
               <Input placeholder="輸入收款項目..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">收款金額</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>收款金額</label>
               <Input type="number" placeholder="輸入收款金額..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">付款人</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>付款人</label>
               <Input placeholder="輸入付款人..." />
             </div>
           </div>
@@ -1296,19 +1681,19 @@ export function ChannelChat() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">任務標題</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>任務標題</label>
               <Input placeholder="輸入任務標題..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">任務描述</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>任務描述</label>
               <Input placeholder="輸入任務描述..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">指派給</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>指派給</label>
               <Input placeholder="輸入成員名稱..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">截止日期</label>
+              <label className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>截止日期</label>
               <Input type="date" />
             </div>
           </div>
@@ -1326,6 +1711,6 @@ export function ChannelChat() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </Card>
   );
 }

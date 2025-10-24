@@ -169,6 +169,8 @@ interface WorkspaceState {
   selectedChannel: Channel | null;  // ✨ 新增：當前選擇的頻道
   currentChannel: Channel | null;   // ✨ 新增：當前頻道（與 selectedChannel 同步）
   messages: Message[];
+  channelMessages: Record<string, Message[]>;
+  messagesLoading: Record<string, boolean>;
   advanceLists: AdvanceList[];
   sharedOrderLists: SharedOrderList[];
   loading: boolean;
@@ -241,6 +243,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       selectedChannel: null,  // ✨ 新增
       currentChannel: null,   // ✨ 新增
       messages: [],
+      channelMessages: {},
+      messagesLoading: {},
       advanceLists: [],
       sharedOrderLists: [],
       loading: false,
@@ -520,6 +524,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       loadMessages: async (channelId) => {
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
+        set((state) => ({
+          messagesLoading: { ...state.messagesLoading, [channelId]: true }
+        }));
+
         try {
           // ✨ 1. 立即從 IndexedDB 快取讀取（快！）
           console.log('💾 [messages] 從 IndexedDB 快速載入...');
@@ -527,7 +535,21 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             .filter(m => m.channel_id === channelId);
 
           // 立即更新 UI（不等 Supabase）
-          set({ messages: cachedMessages });
+          set((state) => {
+            const nextChannelMessages = {
+              ...state.channelMessages,
+              [channelId]: cachedMessages
+            };
+            const shouldUpdateCurrent = state.selectedChannel?.id === channelId;
+            return {
+              channelMessages: nextChannelMessages,
+              messages: shouldUpdateCurrent ? cachedMessages : state.messages,
+              messagesLoading: {
+                ...state.messagesLoading,
+                [channelId]: false
+              }
+            };
+          });
           console.log(`✅ [messages] IndexedDB 快速載入完成: ${cachedMessages.length} 筆`);
 
           // ✨ 2. 背景從 Supabase 同步（不阻塞 UI）
@@ -558,7 +580,21 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                 }
 
                 // 靜默更新 UI
-                set({ messages: freshMessages });
+                set((state) => {
+                  const nextChannelMessages = {
+                    ...state.channelMessages,
+                    [channelId]: freshMessages
+                  };
+                  const shouldUpdateCurrent = state.selectedChannel?.id === channelId;
+                  return {
+                    channelMessages: nextChannelMessages,
+                    messages: shouldUpdateCurrent ? freshMessages : state.messages,
+                    messagesLoading: {
+                      ...state.messagesLoading,
+                      [channelId]: false
+                    }
+                  };
+                });
               } catch (syncError) {
                 console.warn('⚠️ [messages] 背景同步失敗:', syncError);
               }
@@ -566,6 +602,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           }
         } catch (error) {
           console.log('⚠️ 載入訊息失敗:', error);
+          set((state) => ({
+            messagesLoading: { ...state.messagesLoading, [channelId]: false }
+          }));
         }
       },
 
@@ -608,9 +647,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
         // ✨ 同時寫入 IndexedDB 和 state
         await localDB.put('messages', newMessage);
-        set(state => ({
-          messages: [...state.messages, newMessage]
-        }));
+        set(state => {
+          const existingMessages = state.channelMessages[newMessage.channel_id] || [];
+          const updatedChannelMessages = [...existingMessages, newMessage];
+          const shouldUpdateCurrent = state.selectedChannel?.id === newMessage.channel_id;
+
+          return {
+            messages: shouldUpdateCurrent ? updatedChannelMessages : state.messages,
+            channelMessages: {
+              ...state.channelMessages,
+              [newMessage.channel_id]: updatedChannelMessages
+            }
+          };
+        });
       },
 
       addMessage: async (message) => {
@@ -620,47 +669,126 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
       updateMessage: async (messageId, updates) => {
         // ✨ 新增：更新訊息
-        set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, ...updates } : m
-          )
-        }));
+        set(state => {
+          let targetChannelId: string | null = null;
+          const nextChannelMessages = { ...state.channelMessages };
+
+          for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
+            const index = channelMessages.findIndex(m => m.id === messageId);
+            if (index !== -1) {
+              targetChannelId = channelId;
+              const updatedMessages = [...channelMessages];
+              updatedMessages[index] = { ...channelMessages[index], ...updates };
+              nextChannelMessages[channelId] = updatedMessages;
+              break;
+            }
+          }
+
+          if (!targetChannelId) {
+            return {};
+          }
+
+          const shouldUpdateCurrent = state.selectedChannel?.id === targetChannelId;
+          return {
+            channelMessages: nextChannelMessages,
+            messages: shouldUpdateCurrent ? nextChannelMessages[targetChannelId] : state.messages
+          };
+        });
       },
 
       togglePinMessage: (messageId) => {
         // ✨ 新增：切換訊息置頂
-        set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, is_pinned: !m.is_pinned } : m
-          )
-        }));
+        set(state => {
+          let targetChannelId: string | null = null;
+          const nextChannelMessages = { ...state.channelMessages };
+
+          for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
+            const index = channelMessages.findIndex(m => m.id === messageId);
+            if (index !== -1) {
+              targetChannelId = channelId;
+              const updatedMessages = [...channelMessages];
+              const currentMessage = channelMessages[index];
+              updatedMessages[index] = { ...currentMessage, is_pinned: !currentMessage.is_pinned };
+              nextChannelMessages[channelId] = updatedMessages;
+              break;
+            }
+          }
+
+          if (!targetChannelId) {
+            return {};
+          }
+
+          const shouldUpdateCurrent = state.selectedChannel?.id === targetChannelId;
+          return {
+            channelMessages: nextChannelMessages,
+            messages: shouldUpdateCurrent ? nextChannelMessages[targetChannelId] : state.messages
+          };
+        });
       },
 
       addReaction: (messageId, emoji, userId) => {
         // ✨ 新增：新增反應
-        set(state => ({
-          messages: state.messages.map(m => {
-            if (m.id === messageId) {
-              const reactions = { ...m.reactions };
+        set(state => {
+          let targetChannelId: string | null = null;
+          const nextChannelMessages = { ...state.channelMessages };
+
+          for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
+            const index = channelMessages.findIndex(m => m.id === messageId);
+            if (index !== -1) {
+              targetChannelId = channelId;
+              const updatedMessages = [...channelMessages];
+              const currentMessage = channelMessages[index];
+              const reactions = { ...currentMessage.reactions };
               if (!reactions[emoji]) {
                 reactions[emoji] = [];
               }
               if (!reactions[emoji].includes(userId)) {
                 reactions[emoji] = [...reactions[emoji], userId];
               }
-              return { ...m, reactions };
+              updatedMessages[index] = { ...currentMessage, reactions };
+              nextChannelMessages[channelId] = updatedMessages;
+              break;
             }
-            return m;
-          })
-        }));
+          }
+
+          if (!targetChannelId) {
+            return {};
+          }
+
+          const shouldUpdateCurrent = state.selectedChannel?.id === targetChannelId;
+          return {
+            channelMessages: nextChannelMessages,
+            messages: shouldUpdateCurrent ? nextChannelMessages[targetChannelId] : state.messages
+          };
+        });
       },
 
       updateMessageReactions: async (messageId, reactions) => {
-        set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, reactions } : m
-          )
-        }));
+        set(state => {
+          let targetChannelId: string | null = null;
+          const nextChannelMessages = { ...state.channelMessages };
+
+          for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
+            const index = channelMessages.findIndex(m => m.id === messageId);
+            if (index !== -1) {
+              targetChannelId = channelId;
+              const updatedMessages = [...channelMessages];
+              updatedMessages[index] = { ...channelMessages[index], reactions };
+              nextChannelMessages[channelId] = updatedMessages;
+              break;
+            }
+          }
+
+          if (!targetChannelId) {
+            return {};
+          }
+
+          const shouldUpdateCurrent = state.selectedChannel?.id === targetChannelId;
+          return {
+            channelMessages: nextChannelMessages,
+            messages: shouldUpdateCurrent ? nextChannelMessages[targetChannelId] : state.messages
+          };
+        });
       },
 
       deleteMessage: async (messageId) => {
@@ -685,9 +813,32 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }
 
         // 從本地 state 移除
-        set((state) => ({
-          messages: state.messages.filter(m => m.id !== messageId)
-        }));
+        set((state) => {
+          let targetChannelId: string | null = null;
+          const nextChannelMessages = { ...state.channelMessages };
+
+          for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
+            if (channelMessages.some(m => m.id === messageId)) {
+              targetChannelId = channelId;
+              nextChannelMessages[channelId] = channelMessages.filter(m => m.id !== messageId);
+              break;
+            }
+          }
+
+          if (!targetChannelId) {
+            return {
+              messages: state.messages.filter(m => m.id !== messageId)
+            };
+          }
+
+          const shouldUpdateCurrent = state.selectedChannel?.id === targetChannelId;
+          return {
+            channelMessages: nextChannelMessages,
+            messages: shouldUpdateCurrent
+              ? nextChannelMessages[targetChannelId]
+              : state.messages.filter(m => m.id !== messageId)
+          };
+        });
       },
 
       softDeleteMessage: async (messageId) => {
@@ -709,13 +860,42 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }
 
         // 更新本地 state
-        set((state) => ({
-          messages: state.messages.map(m =>
-            m.id === messageId
-              ? { ...m, content: '此訊息已被刪除' }
-              : m
-          )
-        }));
+        set((state) => {
+          let targetChannelId: string | null = null;
+          const nextChannelMessages = { ...state.channelMessages };
+
+          for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
+            const index = channelMessages.findIndex(m => m.id === messageId);
+            if (index !== -1) {
+              targetChannelId = channelId;
+              const updatedMessages = [...channelMessages];
+              updatedMessages[index] = {
+                ...channelMessages[index],
+                content: '此訊息已被刪除'
+              };
+              nextChannelMessages[channelId] = updatedMessages;
+              break;
+            }
+          }
+
+          if (!targetChannelId) {
+            return {
+              messages: state.messages.map(m =>
+                m.id === messageId ? { ...m, content: '此訊息已被刪除' } : m
+              )
+            };
+          }
+
+          const shouldUpdateCurrent = state.selectedChannel?.id === targetChannelId;
+          return {
+            channelMessages: nextChannelMessages,
+            messages: shouldUpdateCurrent
+              ? nextChannelMessages[targetChannelId]
+              : state.messages.map(m =>
+                  m.id === messageId ? { ...m, content: '此訊息已被刪除' } : m
+                )
+          };
+        });
       },
 
       updateChannel: async (id, updates) => {
@@ -809,21 +989,32 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       selectChannel: async (channel) => {
         console.log('📢 切換頻道:', channel?.name || 'null');
 
-        // 1. 清空當前訊息和相關資料
+        if (!channel) {
+          set({
+            selectedChannel: null,
+            currentChannel: null,
+            messages: [],
+            advanceLists: [],
+            sharedOrderLists: []
+          });
+          return;
+        }
+
+        const cachedMessages = get().channelMessages[channel.id] || [];
+
+        // 1. 預先帶入快取資料，避免畫面閃爍
         set({
           selectedChannel: channel,
           currentChannel: channel,
-          messages: [],
+          messages: cachedMessages,
           advanceLists: [],
           sharedOrderLists: []
         });
 
         // 2. 載入新頻道的資料
-        if (channel) {
-          await get().loadMessages(channel.id);
-          await get().loadAdvanceLists(channel.id);
-          await get().loadSharedOrderLists(channel.id);
-        }
+        await get().loadMessages(channel.id);
+        await get().loadAdvanceLists(channel.id);
+        await get().loadSharedOrderLists(channel.id);
       },
 
       shareAdvanceList: async (channelId, items, currentUserId) => {
