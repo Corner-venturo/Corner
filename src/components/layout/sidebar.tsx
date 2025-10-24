@@ -142,7 +142,7 @@ const personalToolItems: MenuItem[] = [
     href: '/manifestation',
     label: '顯化魔法',
     icon: Sparkles,
-    requiredPermission: 'hr',
+    requiredPermission: 'manifestation',
   },
 ];
 

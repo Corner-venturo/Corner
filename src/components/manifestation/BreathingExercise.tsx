@@ -84,22 +84,34 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
           }}
         />
 
-        <motion.h2
-          key={phase}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-light text-white mb-4"
-        >
-          {phaseText[phase]}
-        </motion.h2>
+        {cycleCount < totalCycles ? (
+          <>
+            <motion.h2
+              key={phase}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-3xl font-light text-white mb-4"
+            >
+              {phaseText[phase]}
+            </motion.h2>
 
-        <p className="text-white/60 text-lg">
-          {cycleCount + 1} / {totalCycles}
-        </p>
+            <p className="text-white/60 text-lg">
+              {cycleCount + 1} / {totalCycles}
+            </p>
 
-        <p className="text-white/40 text-sm mt-8">
-          讓我們先深呼吸，準備好進入顯化的旅程
-        </p>
+            <p className="text-white/40 text-sm mt-8">
+              讓我們先深呼吸，準備好進入顯化的旅程
+            </p>
+          </>
+        ) : (
+          <motion.h2
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-3xl font-light text-white mb-4"
+          >
+            完成 ✨
+          </motion.h2>
+        )}
       </div>
     </div>
   );
