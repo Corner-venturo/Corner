@@ -5,6 +5,20 @@
 
 // 基礎型別
 export type { Database, Json } from '@/lib/supabase/types'
+export type {
+  BaseEntity,
+  SyncableEntity,
+  SyncStatus as LegacySyncStatus,
+  PageRequest,
+  PageResponse,
+  Filter,
+  FilterOperator,
+  Sort,
+  ApiResponse as ApiResponseBase,
+  ApiError,
+  LoadingState,
+  AsyncState,
+} from './base.types'
 
 // 資料模型
 export type {
