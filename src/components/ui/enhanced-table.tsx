@@ -265,12 +265,12 @@ export function EnhancedTable({
     <div className={cn("border border-border rounded-lg overflow-hidden bg-card shadow-sm flex flex-col h-full", className)}>
       <div className="overflow-auto flex-1">
         <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-white border-b-2 border-morandi-gold/20">
+          <thead className="sticky top-0 z-10 bg-morandi-container/40 border-b border-border/60 backdrop-blur-sm">
             {/* 主標題行 */}
-            <tr className="relative bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40">
+            <tr className="bg-morandi-container/60" data-enhanced-table-header-row>
               {/* Selection checkbox column */}
               {selection && (
-                <th className="w-12 py-2.5 px-4 text-xs">
+                <th className="w-12 py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40">
                   <Checkbox
                     checked={allVisibleSelected}
                     indeterminate={someVisibleSelected && !allVisibleSelected}
@@ -281,32 +281,31 @@ export function EnhancedTable({
 
               {columns.map((column, index) => (
                 <th key={column.key} className={cn(
-                  "text-left py-2.5 px-4 text-xs relative",
-                  index === columns.length - 1 && "pl-4 pr-1"
+                  "text-left py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 align-middle",
+                  index === columns.length - 1 && "border-r-0"
                 )}>
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-2">
                     {column.sortable ? (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-auto p-0 hover:bg-transparent font-medium text-morandi-secondary hover:text-morandi-primary transition-colors [&_svg]:!size-[14px]"
+                        className="h-auto p-0 hover:bg-transparent text-sm font-medium text-morandi-primary transition-colors [&_svg]:!size-[16px]"
                         onClick={() => handleSort(column.key)}
                       >
                         {column.label}
                         {getSortIcon(column.key)}
                       </Button>
                     ) : (
-                      <span className="font-medium text-morandi-secondary">{column.label}</span>
+                      <span className="text-sm font-medium text-morandi-primary">{column.label}</span>
                     )}
                     {index === columns.length - 1 && columns.some(col => col.filterable) && (
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
+                        size="iconSm"
+                        className="text-morandi-primary hover:text-morandi-primary"
                         onClick={() => setShowFilters(!showFilters)}
                       >
-                        <Filter size={12} className={cn(
+                        <Filter size={14} className={cn(
                           "transition-colors",
                           showFilters ? "text-morandi-primary" : "text-morandi-muted"
                         )} />
@@ -318,27 +317,27 @@ export function EnhancedTable({
 
               {/* Actions column */}
               {actions && (
-                <th className="text-left py-2.5 px-4 text-xs">
-                  <span className="font-medium text-morandi-secondary">操作</span>
+                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary">
+                  <span>操作</span>
                 </th>
               )}
             </tr>
 
             {/* 篩選行 */}
             {showFilters && (
-              <tr className="bg-background border-t border-border/50">
+              <tr className="bg-card border-t border-border/60">
                 {/* Selection checkbox column - empty */}
-                {selection && <td className="py-2 px-4"></td>}
+                {selection && <td className="py-3 px-4"></td>}
 
                 {columns.map((column) => (
-                  <td key={column.key} className="py-2 px-4">
+                  <td key={column.key} className="py-3 px-4">
                     {column.filterable ? (
                       column.filterType === 'select' ? (
                         <Select
                           value={filters[column.key] || '__all__'}
                           onValueChange={(value) => updateFilter(column.key, value)}
                         >
-                          <SelectTrigger className="h-8 text-xs">
+                          <SelectTrigger className="h-9 text-sm">
                             <SelectValue placeholder={`選擇${column.label}...`} />
                           </SelectTrigger>
                           <SelectContent>
@@ -356,7 +355,7 @@ export function EnhancedTable({
                           placeholder={`搜尋${column.label}...`}
                           value={filters[column.key] || ''}
                           onChange={(e) => updateFilter(column.key, e.target.value)}
-                          className="h-8 text-xs"
+                          className="h-9 text-sm"
                         />
                       )
                     ) : null}
@@ -364,10 +363,10 @@ export function EnhancedTable({
                 ))}
 
                 {/* Actions column - empty */}
-                {actions && <td className="py-2 px-4"></td>}
+                {actions && <td className="py-3 px-4"></td>}
 
                 {/* Expandable icon column - empty */}
-                {expandable && <td className="py-2 px-4"></td>}
+                {expandable && <td className="py-3 px-4"></td>}
               </tr>
             )}
           </thead>
@@ -379,7 +378,7 @@ export function EnhancedTable({
                   (selection ? 1 : 0) +
                   (expandable ? 1 : 0) +
                   (actions ? 1 : 0)
-                } className="py-8 px-6">
+                } className="py-12 px-6 text-center text-sm text-morandi-secondary">
                   {emptyState}
                 </td>
               </tr>
@@ -395,11 +394,11 @@ export function EnhancedTable({
                   <React.Fragment key={rowId}>
                     <tr
                       className={cn(
-                        "relative group border-b border-border/50 last:border-b-0",
+                        "relative group border-b border-border/40 last:border-b-0",
                         isSelected && "bg-morandi-gold/10",
                         (onRowClick || onRowDoubleClick) && !selection && !expandable && "cursor-pointer",
                         hoverable && "hover:bg-morandi-container/20 transition-all duration-150",
-                        striped && index % 2 === 0 && "bg-morandi-container/5",
+                        striped && index % 2 === 0 && "bg-morandi-container/10",
                         rowClassName?.(row)
                       )}
                       onClick={() => {
@@ -411,7 +410,7 @@ export function EnhancedTable({
                     >
                       {/* Selection checkbox */}
                       {selection && (
-                        <td className="py-1.5 sm:py-2 px-3 sm:px-4">
+                        <td className="py-3 px-4 align-middle">
                           <Checkbox
                             checked={isSelected}
                             disabled={isDisabled}
@@ -426,8 +425,8 @@ export function EnhancedTable({
                         <td
                           key={column.key}
                           className={cn(
-                            "py-1.5 sm:py-2",
-                            colIndex === columns.length - 1 ? "pl-4 pr-1" : "px-3 sm:px-4",
+                            "py-3 px-4 text-sm text-morandi-primary",
+                            colIndex === columns.length - 1 && "pr-4",
                             column.align === 'center' && "text-center",
                             column.align === 'right' && "text-right",
                             column.className
@@ -435,16 +434,14 @@ export function EnhancedTable({
                           style={{ width: column.width }}
                         >
                           {column.render ? column.render(row[column.key], row) : (
-                            <div className="text-[10px] sm:text-xs text-morandi-primary">
-                              {row[column.key]}
-                            </div>
+                            <span>{row[column.key]}</span>
                           )}
                         </td>
                       ))}
 
                       {/* Actions column */}
                       {actions && (
-                        <td className="py-1.5 sm:py-2 px-3 sm:px-4">
+                        <td className="py-3 px-4">
                           <div onClick={(e) => e.stopPropagation()}>
                             {actions(row)}
                           </div>
@@ -461,7 +458,7 @@ export function EnhancedTable({
                           (expandable ? 1 : 0) +
                           (actions ? 1 : 0)
                         } className="py-0 px-0">
-                          <div className="bg-morandi-container/20 p-4 border-t border-border/50">
+                          <div className="bg-morandi-container/20 p-4 border-t border-border/40">
                             {expandable.renderExpanded(row)}
                           </div>
                         </td>
@@ -477,20 +474,20 @@ export function EnhancedTable({
 
       {/* 分頁控制 - 永遠顯示 */}
       {processedData.length > 0 && (
-        <div className="p-2 sm:p-3 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 border-t border-border bg-morandi-container/5">
+        <div className="p-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border/40 bg-morandi-container/10">
           {/* 左側：資料統計 */}
-          <div className="text-[10px] sm:text-xs text-morandi-secondary">
+          <div className="text-sm text-morandi-secondary">
             顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> 到 <span className="font-medium text-morandi-primary">{Math.min(startIndex + pageSize, processedData.length)}</span> 筆，
             共 <span className="font-medium text-morandi-primary">{processedData.length}</span> 筆資料
           </div>
 
           {/* 右側：分頁控制 */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2">
             {/* 每頁顯示筆數 */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-[10px] sm:text-xs text-morandi-secondary">每頁</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-morandi-secondary">每頁</span>
               <Select value={pageSize.toString()} onValueChange={(value) => setPageSize(Number(value))}>
-                <SelectTrigger className="w-14 sm:w-16 h-7 sm:h-8 text-[10px] sm:text-xs">
+                <SelectTrigger className="w-20 h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -501,20 +498,20 @@ export function EnhancedTable({
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-[10px] sm:text-xs text-morandi-secondary">筆</span>
+              <span className="text-sm text-morandi-secondary">筆</span>
             </div>
 
             {/* 分頁按鈕 - 只在有多頁時顯示 */}
             {totalPages > 1 && (
               <>
-                <div className="w-px h-5 sm:h-6 bg-border mx-0.5 sm:mx-1"></div>
+                <div className="w-px h-6 bg-border/60 mx-1"></div>
 
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs"
+                  className="h-9 px-3 text-sm"
                 >
                   上一頁
                 </Button>
@@ -538,7 +535,10 @@ export function EnhancedTable({
                         variant={currentPage === pageNum ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCurrentPage(pageNum)}
-                        className="w-7 h-7 sm:w-8 sm:h-8 p-0 text-[10px] sm:text-xs"
+                        className={cn(
+                          "w-9 h-9 p-0 text-sm",
+                          currentPage === pageNum ? "" : "text-morandi-primary"
+                        )}
                       >
                         {pageNum}
                       </Button>
@@ -551,7 +551,7 @@ export function EnhancedTable({
                   size="sm"
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs"
+                  className="h-9 px-3 text-sm"
                 >
                   下一頁
                 </Button>

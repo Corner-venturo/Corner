@@ -1292,17 +1292,17 @@ export default function QuoteDetailPage() {
             <div className="border border-border bg-card rounded-lg overflow-hidden shadow-sm">
               <div ref={scrollRef} className="scrollable-content overflow-x-auto">
                 <table className="w-full min-w-[800px] border-collapse">
-                <thead className="bg-morandi-container/50">
-                  <tr className="border-b-2 border-border">
-                    <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary w-12 table-divider">分類</th>
-                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-70 table-divider">項目</th>
-                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-8 table-divider">數量</th>
-                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-28 table-divider">單價</th>
-                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-28 table-divider whitespace-nowrap">小計</th>
-                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-32 table-divider">備註</th>
-                    <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary w-24">操作</th>
-                  </tr>
-                </thead>
+                  <thead className="bg-morandi-container/40 border-b border-border/60">
+                    <tr>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary w-12 table-divider">分類</th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-70 table-divider">項目</th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-8 table-divider">數量</th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider">單價</th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider whitespace-nowrap">小計</th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-32 table-divider">備註</th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-24">操作</th>
+                    </tr>
+                  </thead>
                 <tbody>
                   {categories.map((category) => {
                     const Icon = categoryIcons[category.id];
@@ -1310,29 +1310,29 @@ export default function QuoteDetailPage() {
                     return (
                       <React.Fragment key={category.id}>
                         {/* 分類標題行 */}
-                        <tr className="bg-morandi-container/20 border-b border-border">
-                          <td colSpan={2} className="py-2 px-4 font-medium text-morandi-primary">
+                        <tr className="bg-morandi-container/20 border-b border-border/40">
+                          <td colSpan={2} className="py-3 px-4 text-sm font-medium text-morandi-primary">
                             <div className="flex items-center space-x-2">
                               <Icon size={16} className="text-morandi-gold" />
                               <span>{category.name}</span>
                             </div>
                           </td>
-                          <td className="py-2 px-4"></td>
-                          <td className="py-2 px-4"></td>
-                          <td className="py-2 px-4 font-medium text-morandi-primary text-center whitespace-nowrap">
+                          <td className="py-3 px-4"></td>
+                          <td className="py-3 px-4"></td>
+                          <td className="py-3 px-4 text-sm font-medium text-morandi-primary text-center whitespace-nowrap">
                             NT$ {category.id === 'accommodation' ? accommodationTotal.toLocaleString() :
                                  category.items.reduce((sum, item) => sum + (item.total || 0), 0).toLocaleString()}
                           </td>
-                          <td colSpan={2} className="py-2 px-4 text-right">
+                          <td colSpan={2} className="py-3 px-4 text-right">
                             {category.id === 'accommodation' ? (
                               <div className="flex gap-1 justify-end">
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={handleAddAccommodationDay}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-gold hover:bg-morandi-gold/10",
+                                    "text-morandi-gold hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1342,11 +1342,11 @@ export default function QuoteDetailPage() {
                                 {accommodationDays > 0 && (
                                   <Button
                                     variant="ghost"
-                                    size="sm"
+                                    size="xs"
                                     onClick={() => handleAddRow(category.id)}
                                     disabled={isReadOnly}
                                     className={cn(
-                                      "h-6 px-2 text-xs text-morandi-secondary hover:bg-morandi-gold/10",
+                                      "text-morandi-secondary hover:bg-morandi-gold/10",
                                       isReadOnly && "cursor-not-allowed opacity-60"
                                     )}
                                   >
@@ -1359,11 +1359,11 @@ export default function QuoteDetailPage() {
                               <div className="flex gap-1 justify-end">
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddRow(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-gold hover:bg-morandi-gold/10",
+                                    "text-morandi-gold hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1372,11 +1372,11 @@ export default function QuoteDetailPage() {
                                 </Button>
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddGuideRow(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-secondary hover:bg-morandi-gold/10",
+                                    "text-morandi-secondary hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1388,11 +1388,11 @@ export default function QuoteDetailPage() {
                               <div className="flex gap-1 justify-end">
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddAdultTicket(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-gold hover:bg-morandi-gold/10",
+                                    "text-morandi-gold hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1401,11 +1401,11 @@ export default function QuoteDetailPage() {
                                 </Button>
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddChildTicket(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-secondary hover:bg-morandi-gold/10",
+                                    "text-morandi-secondary hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1414,11 +1414,11 @@ export default function QuoteDetailPage() {
                                 </Button>
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddInfantTicket(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-secondary hover:bg-morandi-gold/10",
+                                    "text-morandi-secondary hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1427,11 +1427,11 @@ export default function QuoteDetailPage() {
                                 </Button>
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddRow(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-secondary hover:bg-morandi-gold/10",
+                                    "text-morandi-secondary hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1443,11 +1443,11 @@ export default function QuoteDetailPage() {
                               <div className="flex justify-end">
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="xs"
                                   onClick={() => handleAddRow(category.id)}
                                   disabled={isReadOnly}
                                   className={cn(
-                                    "h-6 px-2 text-xs text-morandi-gold hover:bg-morandi-gold/10",
+                                    "text-morandi-gold hover:bg-morandi-gold/10",
                                     isReadOnly && "cursor-not-allowed opacity-60"
                                   )}
                                 >
@@ -1486,12 +1486,12 @@ export default function QuoteDetailPage() {
                                     className="border-b border-border hover:bg-morandi-container/10 transition-colors"
                                   >
                                     {/* 分類欄：第一個房型顯示天數 */}
-                                    <td className="py-2 px-4 text-sm text-morandi-primary text-center table-divider">
+                                    <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
                                       {roomIndex === 0 ? `DAY${day}` : ''}
                                     </td>
 
                                     {/* 項目欄：房型名稱 */}
-                                    <td className="py-2 px-4 text-sm text-morandi-primary text-center table-divider">
+                                    <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
                                       <input
                                         type="text"
                                         value={item.name}
@@ -1502,7 +1502,7 @@ export default function QuoteDetailPage() {
                                     </td>
 
                                     {/* 人數欄 */}
-                                    <td className="py-2 px-4 text-sm text-morandi-secondary text-center table-divider">
+                                    <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
                                       <input
                                         type="number"
                                         value={item.quantity && item.quantity !== 1 ? item.quantity : ''}
@@ -1513,7 +1513,7 @@ export default function QuoteDetailPage() {
                                     </td>
 
                                     {/* 單價欄 */}
-                                    <td className="py-2 px-4 text-sm text-morandi-secondary text-center table-divider">
+                                    <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
                                       <input
                                         type="number"
                                         value={item.unit_price || ''}
@@ -1524,13 +1524,13 @@ export default function QuoteDetailPage() {
                                     </td>
 
                                     {/* 小計欄 */}
-                                    <td className="py-2 px-4 text-sm text-morandi-primary text-center font-medium table-divider whitespace-nowrap">
+                                    <td className="py-3 px-4 text-sm text-morandi-primary text-center font-medium table-divider whitespace-nowrap">
                                       {item.total.toLocaleString()}
                                     </td>
 
 
                                     {/* 備註 / 操作合併欄 */}
-                                    <td colSpan={2} className="py-2 px-4 text-sm text-morandi-secondary">
+                                    <td colSpan={2} className="py-3 px-4 text-sm text-morandi-secondary">
                                       <div className="flex items-center justify-between">
                                         <input
                                           type="text"
@@ -1559,7 +1559,7 @@ export default function QuoteDetailPage() {
                               key={item.id}
                               className="border-b border-border hover:bg-morandi-container/10 transition-colors"
                             >
-                              <td colSpan={2} className={`py-2 px-4 text-sm text-morandi-primary text-center ${(item.quantity && item.quantity !== 1) ? 'table-divider' : ''}`}>
+                              <td colSpan={2} className={`py-3 px-4 text-sm text-morandi-primary text-center ${(item.quantity && item.quantity !== 1) ? 'table-divider' : ''}`}>
                                 <input
                                   type="text"
                                   value={item.name}
@@ -1568,7 +1568,7 @@ export default function QuoteDetailPage() {
                                   placeholder="輸入項目名稱"
                                 />
                               </td>
-                              <td className="py-2 px-4 text-sm text-morandi-secondary text-center table-divider">
+                              <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
                                 <input
                                   type="number"
                                   value={item.quantity && item.quantity !== 1 ? item.quantity : ''}
@@ -1576,7 +1576,7 @@ export default function QuoteDetailPage() {
                                   className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                               </td>
-                              <td className="py-2 px-4 text-sm text-morandi-secondary text-center table-divider">
+                              <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
                                 {item.name === '成人機票' ? (
                                   <input
                                     type="number"
@@ -1610,13 +1610,13 @@ export default function QuoteDetailPage() {
                                   />
                                 )}
                               </td>
-                              <td className="py-2 px-4 text-sm text-morandi-primary text-center font-medium table-divider whitespace-nowrap">
+                              <td className="py-3 px-4 text-sm text-morandi-primary text-center font-medium table-divider whitespace-nowrap">
                                 {item.total.toLocaleString()}
                               </td>
 
 
                               {/* 備註 / 操作合併欄 */}
-                              <td colSpan={2} className="py-2 px-4 text-sm text-morandi-secondary">
+                              <td colSpan={2} className="py-3 px-4 text-sm text-morandi-secondary">
                                 <div className="flex items-center justify-between">
                                   <input
                                     type="text"

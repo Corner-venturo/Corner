@@ -277,33 +277,42 @@ export default function QuotesPage() {
         bordered={true}
         actions={(quote) => (
           <div className="flex items-center gap-1">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
               onClick={(e) => {
                 e.stopPropagation();
                 handleQuoteClick(quote);
               }}
-              className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+              className="text-morandi-gold hover:bg-morandi-gold/10"
               title="編輯報價單"
             >
-              <Calculator size={14} className="text-morandi-gold" />
-            </button>
-            <button
+              <Calculator size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
               onClick={(e) => handleDuplicateQuote(quote.id, e)}
-              className="p-1 hover:bg-morandi-blue/10 rounded transition-colors"
+              className="text-morandi-blue hover:bg-morandi-blue/10"
               title="複製報價單"
             >
-              <Copy size={14} className="text-morandi-blue" />
-            </button>
-            <button
+              <Copy size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
               onClick={(e) => {
                 e.stopPropagation();
                 deleteQuote(quote.id);
               }}
-              className="p-1 hover:bg-morandi-red/10 rounded transition-colors"
+              className="text-morandi-red hover:bg-morandi-red/10"
               title="刪除報價單"
             >
-              <Trash2 size={14} className="text-morandi-red" />
-            </button>
+              <Trash2 size={16} />
+            </Button>
           </div>
         )}
       />
