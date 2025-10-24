@@ -57,9 +57,6 @@ export function ChannelChat() {
   const [showMemberSidebar, setShowMemberSidebar] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [channelMessages, setChannelMessages] = useState<Record<string, Message[]>>({});
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [isSwitching, setIsSwitching] = useState(false);
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showShareQuoteDialog, setShowShareQuoteDialog] = useState(false);
   const [showShareTourDialog, setShowShareTourDialog] = useState(false);
@@ -87,11 +84,10 @@ export function ChannelChat() {
 
   const {
     channels,
-    messages,
     currentWorkspace,
     loading,
-    selectedChannel,      // ✨ 從 store 取得
-    selectChannel,        // ✨ 從 store 取得
+    selectedChannel,
+    selectChannel,
     loadChannels,
     createChannel,
     updateChannel,
@@ -103,8 +99,36 @@ export function ChannelChat() {
     sharedOrderLists,
     loadAdvanceLists,
     loadSharedOrderLists,
-    deleteAdvanceList
-  } = useWorkspaceStore();
+    deleteAdvanceList,
+    currentMessages,  // ✨ 從 channelMessages 取得當前頻道訊息
+    messagesLoading   // ✨ 從 messagesLoading 取得當前頻道載入狀態
+  } = useWorkspaceStore(
+    (state) => {
+      const channelId = state.selectedChannel?.id;
+      return {
+        channels: state.channels,
+        currentWorkspace: state.currentWorkspace,
+        loading: state.loading,
+        selectedChannel: state.selectedChannel,
+        selectChannel: state.selectChannel,
+        loadChannels: state.loadChannels,
+        createChannel: state.createChannel,
+        updateChannel: state.updateChannel,
+        deleteChannel: state.deleteChannel,
+        loadMessages: state.loadMessages,
+        sendMessage: state.sendMessage,
+        updateMessageReactions: state.updateMessageReactions,
+        advanceLists: state.advanceLists,
+        sharedOrderLists: state.sharedOrderLists,
+        loadAdvanceLists: state.loadAdvanceLists,
+        loadSharedOrderLists: state.loadSharedOrderLists,
+        deleteAdvanceList: state.deleteAdvanceList,
+        currentMessages: channelId ? state.channelMessages[channelId] ?? [] : [],
+        messagesLoading: channelId ? state.messagesLoading[channelId] ?? false : false
+      };
+    },
+    shallow
+  );
 
   const { user, currentProfile } = useAuthStore();
 
@@ -144,61 +168,22 @@ export function ChannelChat() {
 
 
   useEffect(() => {
-    if (selectedChannel?.id) {
-
-      if (!channelMessages[selectedChannel.id]) {
-        console.log('載入訊息列表...', selectedChannel.id);
-        setIsLoadingMessages(true);
-        Promise.all([
-          loadMessages(selectedChannel.id),
-          loadAdvanceLists(selectedChannel.id),
-          loadSharedOrderLists(selectedChannel.id)
-        ]).then(() => {
-          setIsLoadingMessages(false);
-
-          setChannelMessages(prev => ({
-            ...prev,
-            [selectedChannel.id]: messages
-          }));
-        });
-      } else {
-
-        Promise.all([
-          loadMessages(selectedChannel.id),
-          loadAdvanceLists(selectedChannel.id),
-          loadSharedOrderLists(selectedChannel.id)
-        ]).then(() => {
-
-          setChannelMessages(prev => ({
-            ...prev,
-            [selectedChannel.id]: messages
-          }));
-        });
-      }
+    if (!selectedChannel?.id) {
+      return;
     }
 
-  }, [selectedChannel?.id, channelMessages, loadMessages, loadAdvanceLists, loadSharedOrderLists, messages]);
-
-
-  useEffect(() => {
-    if (selectedChannel?.id && messages.length > 0) {
-      setChannelMessages(prev => ({
-        ...prev,
-        [selectedChannel.id]: messages
-      }));
-    }
-  }, [messages, selectedChannel?.id]);
-
-
-  const currentMessages = useMemo(() =>
-    selectedChannel?.id
-      ? (channelMessages[selectedChannel.id] || messages)
-      : []
-  , [selectedChannel?.id, channelMessages, messages]);
+    Promise.all([
+      loadMessages(selectedChannel.id),
+      loadAdvanceLists(selectedChannel.id),
+      loadSharedOrderLists(selectedChannel.id)
+    ]).catch((error) => {
+      console.error('載入頻道資料失敗:', error);
+    });
+  }, [selectedChannel?.id, loadMessages, loadAdvanceLists, loadSharedOrderLists]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [currentMessages]);
+  }, [currentMessages.length]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -681,11 +666,11 @@ export function ChannelChat() {
             {/* 訊息與成員區域 */}
             <div className="flex-1 flex min-h-0">
               {/* 訊息區域 */}
-              <div className={cn(
-                "flex-1 overflow-y-auto p-4 space-y-4 min-h-0 transition-opacity duration-150",
-                isSwitching ? "opacity-0" : "opacity-100"
-              )}>
-              {isLoadingMessages ? (
+              <div
+                className="flex-1 overflow-y-auto space-y-4 min-h-0 transition-opacity duration-150"
+                style={{ backgroundColor: theme.colors.surface, padding: theme.spacing.lg }}
+              >
+              {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin w-6 h-6 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
                 </div>
