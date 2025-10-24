@@ -45,6 +45,7 @@ import { ShareOrdersDialog } from './ShareOrdersDialog';
 import { OrderListCard } from './OrderListCard';
 import { CreateReceiptDialog } from './CreateReceiptDialog';
 import { CreatePaymentRequestDialog } from './CreatePaymentRequestDialog';
+import { ThreadPanel } from './ThreadPanel';
 
 
 const downloadFile = (path: string, bucket: string, fileName: string) => {
@@ -75,6 +76,7 @@ export function ChannelChat() {
   const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null);
   const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('');
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [_showChannelForm, setShowChannelForm] = useState(false);
@@ -277,7 +279,7 @@ export function ChannelChat() {
   const handleReaction = async (messageId: string, emoji: string) => {
     if (!user) return;
 
-    const message = messages.find(m => m.id === messageId);
+    const message = findMessageInTree(messages, messageId);
     if (!message) return;
 
     const currentReactions = { ...message.reactions };
@@ -309,6 +311,69 @@ export function ChannelChat() {
       return `昨天 ${format(date, 'HH:mm')}`;
     } else {
       return format(date, 'MM/dd HH:mm');
+    }
+  };
+
+  const findMessageInTree = (items: Message[], targetId: string): Message | undefined => {
+    for (const item of items) {
+      if (item.id === targetId) {
+        return item;
+      }
+      if (item.replies && item.replies.length > 0) {
+        const found = findMessageInTree(item.replies, targetId);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return undefined;
+  };
+
+  const activeThreadMessage = useMemo(() => {
+    if (!activeThreadId) return null;
+    return findMessageInTree(currentMessages, activeThreadId) || null;
+  }, [activeThreadId, currentMessages]);
+
+  useEffect(() => {
+    if (activeThreadId) {
+      const exists = findMessageInTree(currentMessages, activeThreadId);
+      if (!exists) {
+        setActiveThreadId(null);
+      }
+    }
+  }, [activeThreadId, currentMessages]);
+
+  useEffect(() => {
+    setActiveThreadId(null);
+  }, [selectedChannel?.id]);
+
+  const handleToggleThread = (message: Message) => {
+    setActiveThreadId(prev => prev === message.id ? null : message.id);
+  };
+
+  const handleOpenThreadPanel = (message: Message) => {
+    setActiveThreadId(message.id);
+  };
+
+  const handleSendThreadReply = async (content: string) => {
+    if (!content.trim()) return;
+    if (!selectedChannel || !user || !activeThreadMessage) return;
+
+    try {
+      await sendMessage({
+        channel_id: selectedChannel.id,
+        author_id: user.id,
+        content: content.trim(),
+        author: {
+          id: user.id,
+          display_name: currentProfile?.display_name || user.display_name || '未知用戶',
+          avatar: undefined
+        },
+        parentMessageId: activeThreadMessage.id
+      });
+    } catch (error) {
+      console.error('回覆 Thread 失敗:', error);
+      alert('回覆訊息失敗，請稍後再試');
     }
   };
 
@@ -629,7 +694,11 @@ export function ChannelChat() {
                   </p>
                 </div>
               ) : (
-                currentMessages.map(message => (
+                currentMessages.map(message => {
+                  const replyCount = message.replies?.length ?? 0;
+                  const isThreadOpen = activeThreadId === message.id;
+
+                  return (
                   <div key={message.id} className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
                     {/* 用戶頭像 */}
                     <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
@@ -713,6 +782,40 @@ export function ChannelChat() {
                         </div>
                       )}
 
+                      <div className="flex items-center gap-2 mt-2 text-xs text-morandi-secondary">
+                        <button
+                          onClick={() => handleToggleThread(message)}
+                          className={cn(
+                            'transition-colors hover:text-morandi-gold',
+                            isThreadOpen ? 'text-morandi-gold' : 'text-morandi-secondary'
+                          )}
+                        >
+                          {replyCount > 0
+                            ? `${isThreadOpen ? '收合' : '展開'} ${replyCount} 則回覆`
+                            : '回覆'}
+                        </button>
+                        <span className="text-morandi-secondary/40">•</span>
+                        <button
+                          onClick={() => handleOpenThreadPanel(message)}
+                          className={cn(
+                            'transition-colors hover:text-morandi-gold',
+                            isThreadOpen ? 'text-morandi-gold' : 'text-morandi-secondary'
+                          )}
+                        >
+                          {isThreadOpen ? '在側欄顯示中' : '在側欄開啟'}
+                        </button>
+                        {replyCount > 0 && (
+                          <span
+                            className={cn(
+                              'text-[11px]',
+                              isThreadOpen ? 'text-morandi-gold' : 'text-morandi-secondary/70'
+                            )}
+                          >
+                            {isThreadOpen ? '回覆已展開' : '回覆已摺疊'}
+                          </span>
+                        )}
+                      </div>
+
                       {/* 反應按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
                       <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="flex gap-0.5">
@@ -753,7 +856,8 @@ export function ChannelChat() {
                       </div>
                     </div>
                   </div>
-                ))
+                  );
+                })
               )}
 
               {/* 代墊清單卡片 */}
@@ -792,6 +896,20 @@ export function ChannelChat() {
 
               <div ref={messagesEndRef} />
               </div>
+
+              {activeThreadMessage && selectedChannel && (
+                <ThreadPanel
+                  rootMessage={activeThreadMessage}
+                  channelName={selectedChannel.name}
+                  onClose={() => setActiveThreadId(null)}
+                  onSendReply={handleSendThreadReply}
+                  onReact={handleReaction}
+                  formatMessageTime={formatMessageTime}
+                  formatFileSize={formatFileSize}
+                  downloadFile={downloadFile}
+                  currentUserId={user?.id}
+                />
+              )}
 
               {/* 成員側邊欄 */}
               {showMemberSidebar && (

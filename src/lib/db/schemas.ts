@@ -536,6 +536,7 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     indexes: [
       { name: 'channel_id', keyPath: 'channel_id', unique: false },
       { name: 'author_id', keyPath: 'author_id', unique: false },
+      { name: 'parent_message_id', keyPath: 'parent_message_id', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'edited_at', keyPath: 'edited_at', unique: false },
     ],

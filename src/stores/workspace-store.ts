@@ -74,12 +74,205 @@ export interface Message {
   created_at: string;
   edited_at?: string;
   is_pinned?: boolean;  // ✨ 新增：是否置頂
+  parentMessageId?: string | null;
+  replies?: Message[];
   author?: {
     id: string;
     display_name: string;
     avatar?: string;
   };
 }
+
+export type MessageInput = Omit<Message, 'id' | 'created_at' | 'reactions' | 'replies'>;
+
+type StoredMessageRecord = Omit<Message, 'replies' | 'parentMessageId'> & {
+  parent_message_id?: string | null;
+};
+
+const deserializeMessage = (record: StoredMessageRecord | Message): Message => {
+  const {
+    parent_message_id,
+    reactions,
+    ...rest
+  } = record as StoredMessageRecord & { reactions?: Record<string, string[]> };
+
+  return {
+    ...rest,
+    reactions: reactions || {},
+    parentMessageId:
+      typeof parent_message_id !== 'undefined'
+        ? parent_message_id
+        : (record as Message).parentMessageId ?? null,
+    replies: [],
+  };
+};
+
+const serializeMessage = (message: Message): StoredMessageRecord => {
+  const { replies, parentMessageId, ...rest } = message;
+  return {
+    ...rest,
+    parent_message_id: parentMessageId ?? null,
+  };
+};
+
+const sortMessageTree = (messages: Message[]): Message[] => {
+  const sorted = messages
+    .map((message) => ({
+      ...message,
+      replies: message.replies ? sortMessageTree(message.replies) : [],
+    }))
+    .sort((a, b) =>
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+
+  return sorted;
+};
+
+const buildMessageThreads = (flatMessages: Message[]): Message[] => {
+  const messageMap = new Map<string, Message>();
+
+  flatMessages.forEach((message) => {
+    messageMap.set(message.id, {
+      ...message,
+      replies: [],
+    });
+  });
+
+  const roots: Message[] = [];
+
+  messageMap.forEach((message) => {
+    if (message.parentMessageId) {
+      const parent = messageMap.get(message.parentMessageId);
+      if (parent) {
+        parent.replies = parent.replies ? [...parent.replies, message] : [message];
+      } else {
+        roots.push(message);
+      }
+    } else {
+      roots.push(message);
+    }
+  });
+
+  return sortMessageTree(roots);
+};
+
+const findMessageInTree = (messages: Message[], messageId: string): Message | undefined => {
+  for (const message of messages) {
+    if (message.id === messageId) {
+      return message;
+    }
+    if (message.replies && message.replies.length > 0) {
+      const found = findMessageInTree(message.replies, messageId);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+};
+
+const updateMessageTree = (
+  messages: Message[],
+  messageId: string,
+  updater: (message: Message) => Message,
+): Message[] => {
+  return messages.map((message) => {
+    if (message.id === messageId) {
+      const updated = updater({
+        ...message,
+        replies: message.replies ? [...message.replies] : [],
+      });
+      return {
+        ...updated,
+        replies: updated.replies ? [...updated.replies] : [],
+      };
+    }
+
+    if (message.replies && message.replies.length > 0) {
+      return {
+        ...message,
+        replies: updateMessageTree(message.replies, messageId, updater),
+      };
+    }
+
+    return message;
+  });
+};
+
+const addMessageToTree = (messages: Message[], newMessage: Message): Message[] => {
+  if (!newMessage.parentMessageId) {
+    return sortMessageTree([...messages, { ...newMessage, replies: [] }]);
+  }
+
+  const addToChildren = (
+    items: Message[],
+  ): { messages: Message[]; added: boolean } => {
+    let added = false;
+
+    const updated = items.map((item) => {
+      if (item.id === newMessage.parentMessageId) {
+        added = true;
+        const replies = item.replies ? [...item.replies, newMessage] : [newMessage];
+        return {
+          ...item,
+          replies: sortMessageTree(replies),
+        };
+      }
+
+      if (item.replies && item.replies.length > 0) {
+        const childResult = addToChildren(item.replies);
+        if (childResult.added) {
+          added = true;
+          return {
+            ...item,
+            replies: childResult.messages,
+          };
+        }
+      }
+
+      return item;
+    });
+
+    return { messages: updated, added };
+  };
+
+  const result = addToChildren(messages);
+
+  if (!result.added) {
+    return sortMessageTree([...messages, { ...newMessage, replies: [] }]);
+  }
+
+  return result.messages;
+};
+
+const removeMessageFromTree = (messages: Message[], messageId: string): Message[] => {
+  return messages
+    .map((message) => {
+      if (message.id === messageId) {
+        return null;
+      }
+
+      if (message.replies && message.replies.length > 0) {
+        return {
+          ...message,
+          replies: removeMessageFromTree(message.replies, messageId),
+        };
+      }
+
+      return message;
+    })
+    .filter(Boolean) as Message[];
+};
+
+const collectMessageIds = (message: Message): string[] => {
+  const ids = [message.id];
+  if (message.replies && message.replies.length > 0) {
+    message.replies.forEach((reply) => {
+      ids.push(...collectMessageIds(reply));
+    });
+  }
+  return ids;
+};
 
 export interface PersonalCanvas {
   id: string;
@@ -206,8 +399,8 @@ interface WorkspaceState {
 
   selectChannel: (channel: Channel | null) => Promise<void>;  // ✨ 新增：切換頻道
   loadMessages: (channelId: string) => Promise<void>;
-  sendMessage: (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => Promise<void>;
-  addMessage: (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => Promise<void>;  // ✨ 新增
+  sendMessage: (message: MessageInput) => Promise<void>;
+  addMessage: (message: MessageInput) => Promise<void>;  // ✨ 新增
   updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;  // ✨ 新增
   togglePinMessage: (messageId: string) => void;  // ✨ 新增
   addReaction: (messageId: string, emoji: string, userId: string) => void;  // ✨ 新增
@@ -521,16 +714,17 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
         try {
-          // ✨ 1. 立即從 IndexedDB 快取讀取（快！）
           console.log('💾 [messages] 從 IndexedDB 快速載入...');
-          const cachedMessages = (await localDB.getAll('messages') as Message[])
-            .filter(m => m.channel_id === channelId);
+          const cachedRecords = (await localDB.getAll('messages') as StoredMessageRecord[])
+            .filter((record) => record.channel_id === channelId);
 
-          // 立即更新 UI（不等 Supabase）
+          const cachedMessages = buildMessageThreads(
+            cachedRecords.map(deserializeMessage),
+          );
+
           set({ messages: cachedMessages });
-          console.log(`✅ [messages] IndexedDB 快速載入完成: ${cachedMessages.length} 筆`);
+          console.log(`✅ [messages] IndexedDB 快速載入完成: ${cachedRecords.length} 筆`);
 
-          // ✨ 2. 背景從 Supabase 同步（不阻塞 UI）
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             setTimeout(async () => {
               try {
@@ -549,16 +743,14 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                   return;
                 }
 
-                const freshMessages = data || [];
-                console.log(`✅ [messages] Supabase 同步成功: ${freshMessages.length} 筆`);
+                const freshRecords = (data || []).map(deserializeMessage);
+                console.log(`✅ [messages] Supabase 同步成功: ${freshRecords.length} 筆`);
 
-                // 批次存入 IndexedDB
-                for (const message of freshMessages) {
-                  await localDB.put('messages', message);
+                for (const message of freshRecords) {
+                  await localDB.put('messages', serializeMessage(message));
                 }
 
-                // 靜默更新 UI
-                set({ messages: freshMessages });
+                set({ messages: buildMessageThreads(freshRecords) });
               } catch (syncError) {
                 console.warn('⚠️ [messages] 背景同步失敗:', syncError);
               }
@@ -570,7 +762,6 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       },
 
       sendMessage: async (message) => {
-        // supabase client already imported at top
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
         const newMessage: Message = {
@@ -578,12 +769,13 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           id: uuidv4(),
           reactions: {},
           created_at: new Date().toISOString(),
-          author: message.author
+          parentMessageId: message.parentMessageId ?? null,
+          replies: [],
+          author: message.author,
         };
 
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-            // 🌐 有網路：寫入 Supabase
             const { error } = await (supabase as unknown)
               .from('messages')
               .insert({
@@ -593,7 +785,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                 content: newMessage.content,
                 reactions: newMessage.reactions,
                 attachments: newMessage.attachments || [],
-                created_at: newMessage.created_at
+                created_at: newMessage.created_at,
+                parent_message_id: newMessage.parentMessageId ?? null,
               });
 
             if (error) throw error;
@@ -606,61 +799,74 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           console.log('⚠️ 訊息同步失敗，僅儲存到本地:', error);
         }
 
-        // ✨ 同時寫入 IndexedDB 和 state
-        await localDB.put('messages', newMessage);
-        set(state => ({
-          messages: [...state.messages, newMessage]
+        await localDB.put('messages', serializeMessage(newMessage));
+        set((state) => ({
+          messages: addMessageToTree(state.messages, newMessage),
         }));
       },
 
       addMessage: async (message) => {
-        // ✨ 新增：別名方法，指向 sendMessage
         return get().sendMessage(message);
       },
 
       updateMessage: async (messageId, updates) => {
-        // ✨ 新增：更新訊息
-        set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, ...updates } : m
-          )
+        let updatedMessage: Message | null = null;
+        set((state) => ({
+          messages: updateMessageTree(state.messages, messageId, (message) => {
+            const next = { ...message, ...updates };
+            updatedMessage = next;
+            return next;
+          }),
         }));
+
+        if (updatedMessage) {
+          await localDB.put('messages', serializeMessage(updatedMessage));
+        }
       },
 
       togglePinMessage: (messageId) => {
-        // ✨ 新增：切換訊息置頂
-        set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, is_pinned: !m.is_pinned } : m
-          )
+        let updatedMessage: Message | null = null;
+        set((state) => ({
+          messages: updateMessageTree(state.messages, messageId, (message) => {
+            const next = { ...message, is_pinned: !message.is_pinned };
+            updatedMessage = next;
+            return next;
+          }),
         }));
+
+        if (updatedMessage) {
+          void localDB.put('messages', serializeMessage(updatedMessage));
+        }
       },
 
       addReaction: (messageId, emoji, userId) => {
-        // ✨ 新增：新增反應
-        set(state => ({
-          messages: state.messages.map(m => {
-            if (m.id === messageId) {
-              const reactions = { ...m.reactions };
-              if (!reactions[emoji]) {
-                reactions[emoji] = [];
-              }
-              if (!reactions[emoji].includes(userId)) {
-                reactions[emoji] = [...reactions[emoji], userId];
-              }
-              return { ...m, reactions };
+        set((state) => ({
+          messages: updateMessageTree(state.messages, messageId, (message) => {
+            const reactions = { ...message.reactions };
+            if (!reactions[emoji]) {
+              reactions[emoji] = [];
             }
-            return m;
-          })
+            if (!reactions[emoji].includes(userId)) {
+              reactions[emoji] = [...reactions[emoji], userId];
+            }
+            return { ...message, reactions };
+          }),
         }));
       },
 
       updateMessageReactions: async (messageId, reactions) => {
-        set(state => ({
-          messages: state.messages.map(m =>
-            m.id === messageId ? { ...m, reactions } : m
-          )
+        let updatedMessage: Message | null = null;
+        set((state) => ({
+          messages: updateMessageTree(state.messages, messageId, (message) => {
+            const next = { ...message, reactions };
+            updatedMessage = next;
+            return next;
+          }),
         }));
+
+        if (updatedMessage) {
+          await localDB.put('messages', serializeMessage(updatedMessage));
+        }
       },
 
       deleteMessage: async (messageId) => {
@@ -684,10 +890,16 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           console.log('⚠️ 訊息刪除失敗，僅從本地刪除:', error);
         }
 
-        // 從本地 state 移除
+        const existing = findMessageInTree(get().messages, messageId);
+        const idsToDelete = existing ? collectMessageIds(existing) : [messageId];
+
         set((state) => ({
-          messages: state.messages.filter(m => m.id !== messageId)
+          messages: removeMessageFromTree(state.messages, messageId),
         }));
+
+        for (const id of idsToDelete) {
+          await localDB.delete('messages', id);
+        }
       },
 
       softDeleteMessage: async (messageId) => {
@@ -708,14 +920,18 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           console.log('⚠️ 訊息更新失敗:', error);
         }
 
-        // 更新本地 state
+        let updatedMessage: Message | null = null;
         set((state) => ({
-          messages: state.messages.map(m =>
-            m.id === messageId
-              ? { ...m, content: '此訊息已被刪除' }
-              : m
-          )
+          messages: updateMessageTree(state.messages, messageId, (message) => {
+            const next = { ...message, content: '此訊息已被刪除' };
+            updatedMessage = next;
+            return next;
+          }),
         }));
+
+        if (updatedMessage) {
+          await localDB.put('messages', serializeMessage(updatedMessage));
+        }
       },
 
       updateChannel: async (id, updates) => {
