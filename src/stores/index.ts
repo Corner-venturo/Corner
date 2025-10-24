@@ -4,7 +4,7 @@
  * 支援 Supabase 雲端同步 + IndexedDB 本地快取
  */
 
-import { createStore } from './create-store';
+import { createStore } from './core/create-store-new';
 
 // 從 @/types 匯入（使用 types/ 目錄下的標準定義）
 import type {
