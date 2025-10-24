@@ -400,7 +400,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 載入
-            const { data, error } = await (supabase as unknown)
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data, error } = await (supabase as any)
               .from('workspaces')
               .select('*')
               .eq('is_active', true)
@@ -529,7 +530,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             setTimeout(async () => {
               try {
                 console.log('☁️ [channels] 背景同步 Supabase...');
-                const { data, error } = await (supabase as unknown)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data, error } = await (supabase as any)
                   .from('channels')
                   .select('*')
                   .eq('workspace_id', currentWorkspaceId)
@@ -573,7 +575,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：寫入 Supabase
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('channels')
               .insert({
                 id: newChannel.id,
@@ -642,7 +645,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             setTimeout(async () => {
               try {
                 console.log('☁️ [messages] 背景同步 Supabase...');
-                const { data, error } = await (supabase as unknown)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data, error } = await (supabase as any)
                   .from('messages')
                   .select(`
                     *,
@@ -711,7 +715,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：寫入 Supabase
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('messages')
               .insert({
                 id: newMessage.id,
@@ -886,7 +891,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 刪除
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('messages')
               .delete()
               .eq('id', messageId);
@@ -936,7 +942,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：更新 Supabase
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('messages')
               .update({ content: '此訊息已被刪除' })
               .eq('id', messageId);
@@ -1025,7 +1032,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：更新 Supabase
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('channels')
               .update(updates)
               .eq('id', id);
@@ -1054,7 +1062,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 刪除
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('channels')
               .delete()
               .eq('id', id);
@@ -1149,7 +1158,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：寫入 Supabase
             // 1. 建立代墊清單
-            const { error: listError } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: listError } = await (supabase as any)
               .from('advance_lists')
               .insert({
                 id: listId,
@@ -1161,7 +1171,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             if (listError) throw listError;
 
             // 2. 建立代墊項目
-            const { error: itemsError } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: itemsError } = await (supabase as any)
               .from('advance_items')
               .insert(
                 advanceItems.map(item => ({
@@ -1239,7 +1250,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 載入
             // 1. 載入代墊清單
-            const { data: lists, error: listsError } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: lists, error: listsError } = await (supabase as any)
               .from('advance_lists')
               .select('*')
               .eq('channel_id', channelId)
@@ -1250,7 +1262,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
             // 2. 載入每個清單的項目
             const advanceLists: AdvanceList[] = [];
             for (const list of lists || []) {
-              const { data: items, error: itemsError } = await (supabase as unknown)
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: items, error: itemsError } = await (supabase as any)
                 .from('advance_items')
                 .select('*')
                 .eq('advance_list_id', list.id)
@@ -1287,7 +1300,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // 🌐 有網路：從 Supabase 刪除（會自動刪除關聯的 items，因為有 ON DELETE CASCADE）
-            const { error } = await (supabase as unknown)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('advance_lists')
               .delete()
               .eq('id', listId);
@@ -1334,7 +1348,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
               receipt_status: 'not_received' as const
             };
           })
-          .filter(Boolean) as unknown[];
+          .filter((order): order is NonNullable<typeof order> => order !== null);
 
         const newList: SharedOrderList = {
           id: uuidv4(),
