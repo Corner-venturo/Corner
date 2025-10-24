@@ -4,6 +4,7 @@
  */
 
 import { Database } from '@/lib/supabase/types'
+import type { ChannelPoll } from './workspace.types'
 
 // ==================== 基礎型別 ====================
 
@@ -91,11 +92,12 @@ export interface Message {
   channel_id: ID
   author_id: ID
   content: string
-  type: 'text' | 'image' | 'file' | 'system'
+  type: 'text' | 'image' | 'file' | 'system' | 'poll'
   attachments?: Attachment[]
   created_at: ISODateTime
   updated_at?: ISODateTime
   deleted_at?: ISODateTime
+  poll?: ChannelPoll
 }
 
 export interface Attachment {

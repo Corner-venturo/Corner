@@ -11,6 +11,7 @@ import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { cn } from '@/lib/utils';
+import { PollMessage } from './PollMessage';
 
 interface ChannelViewProps {
   channel: Channel;
@@ -22,6 +23,8 @@ export function ChannelView({ channel }: ChannelViewProps) {
     addMessage,
     togglePinMessage,
     addReaction,
+    votePollOption,
+    revokePollVote,
     activeCanvasTab,
     setActiveCanvasTab
   } = useWorkspaceStore();
@@ -55,6 +58,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
       channel_id: channel.id,
       author_id: currentUserId,
       content: messageInput.trim(),
+      type: 'text',
       author: {
         id: currentUserId,
         display_name: currentUserName,
@@ -63,12 +67,30 @@ export function ChannelView({ channel }: ChannelViewProps) {
 
     setMessageInput('');
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleVotePollOption = (messageId: string, optionId: string) => {
+    if (!currentUserId) {
+      alert('請先登入才能投票');
+      return;
+    }
+
+    votePollOption(messageId, optionId, currentUserId);
+  };
+
+  const handleRevokePollVote = (messageId: string, optionId: string) => {
+    if (!currentUserId) {
+      alert('請先登入才能收回投票');
+      return;
+    }
+
+    revokePollVote(messageId, optionId, currentUserId);
   };
   
   const formatTime = (timestamp: string) => {
@@ -180,10 +202,19 @@ export function ChannelView({ channel }: ChannelViewProps) {
                         {formatTime(message.created_at)}
                       </span>
                     </div>
-                    <div className="text-sm text-morandi-primary whitespace-pre-wrap break-words">
-                      {message.content}
-                    </div>
-                    
+                    {message.type === 'poll' && message.poll ? (
+                      <PollMessage
+                        poll={message.poll}
+                        currentUserId={currentUserId}
+                        onVote={(optionId) => handleVotePollOption(message.id, optionId)}
+                        onRevoke={(optionId) => handleRevokePollVote(message.id, optionId)}
+                      />
+                    ) : (
+                      <div className="text-sm text-morandi-primary whitespace-pre-wrap break-words">
+                        {message.content}
+                      </div>
+                    )}
+
                     {/* 反應 */}
                     {Object.keys(message.reactions).length > 0 && (
                       <div className="flex items-center gap-1 mt-2">

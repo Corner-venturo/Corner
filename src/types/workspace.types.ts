@@ -21,3 +21,38 @@ export interface WorkspaceItem extends BaseEntity {
 
 export type CreateWorkspaceItemData = Omit<WorkspaceItem, keyof BaseEntity>;
 export type UpdateWorkspaceItemData = Partial<CreateWorkspaceItemData>;
+
+export type ChannelMessageType =
+  | 'text'
+  | 'poll'
+  | 'system'
+  | 'file';
+
+export interface ChannelPollOption {
+  id: string;
+  text: string;
+  votes: string[];
+}
+
+export interface ChannelPollSettings {
+  allowMultiple: boolean;
+  allowAddOptions: boolean;
+  anonymous: boolean;
+  deadline?: string;
+}
+
+export interface ChannelPollStats {
+  totalVotes: number;
+  voterCount: number;
+}
+
+export interface ChannelPoll {
+  id: string;
+  question: string;
+  description?: string;
+  options: ChannelPollOption[];
+  settings: ChannelPollSettings;
+  stats: ChannelPollStats;
+  created_by: string;
+  created_at: string;
+}

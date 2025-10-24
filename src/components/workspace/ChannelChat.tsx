@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { _Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,8 +27,10 @@ import {
   DollarSign,
   CheckSquare,
   Download,
-  Wallet
+  Wallet,
+  BarChart3,
 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import { useWorkspaceStore, type Message } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -45,6 +47,9 @@ import { ShareOrdersDialog } from './ShareOrdersDialog';
 import { OrderListCard } from './OrderListCard';
 import { CreateReceiptDialog } from './CreateReceiptDialog';
 import { CreatePaymentRequestDialog } from './CreatePaymentRequestDialog';
+import { CreatePollDialog, type CreatePollFormValues } from './CreatePollDialog';
+import { PollMessage } from './PollMessage';
+import type { ChannelPoll } from '@/types/workspace.types';
 
 
 const downloadFile = (path: string, bucket: string, fileName: string) => {
@@ -72,6 +77,8 @@ export function ChannelChat() {
   const [showShareOrdersDialog, setShowShareOrdersDialog] = useState(false);
   const [showCreateReceiptDialog, setShowCreateReceiptDialog] = useState(false);
   const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
+  const [showCreatePollDialog, setShowCreatePollDialog] = useState(false);
+  const [isCreatingPoll, setIsCreatingPoll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null);
   const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('');
@@ -100,6 +107,8 @@ export function ChannelChat() {
     deleteChannel,
     loadMessages,
     sendMessage,
+    votePollOption,
+    revokePollVote,
     updateMessageReactions,
     advanceLists,
     sharedOrderLists,
@@ -235,6 +244,7 @@ export function ChannelChat() {
         channel_id: selectedChannel.id,
         author_id: user.id,
         content: messageText.trim() || '（傳送了附件）',
+        type: 'text',
         author: {
           id: user.id,
           display_name: currentProfile?.display_name || user.display_name || '未知用戶',
@@ -311,6 +321,93 @@ export function ChannelChat() {
       return format(date, 'MM/dd HH:mm');
     }
   };
+
+  const handleVotePollOption = useCallback(async (messageId: string, optionId: string) => {
+    if (!user) {
+      alert('請先登入才能投票');
+      return;
+    }
+
+    try {
+      await votePollOption(messageId, optionId, user.id);
+    } catch (error) {
+      console.error('投票失敗:', error);
+      alert('投票失敗，請稍後再試');
+    }
+  }, [user, votePollOption]);
+
+  const handleRevokePollOption = useCallback(async (messageId: string, optionId: string) => {
+    if (!user) {
+      alert('請先登入才能收回投票');
+      return;
+    }
+
+    try {
+      await revokePollVote(messageId, optionId, user.id);
+    } catch (error) {
+      console.error('收回投票失敗:', error);
+      alert('收回投票失敗，請稍後再試');
+    }
+  }, [user, revokePollVote]);
+
+  const handleCreatePoll = useCallback(async (values: CreatePollFormValues) => {
+    if (!selectedChannel) {
+      alert('請先選擇頻道');
+      return;
+    }
+
+    if (!user) {
+      alert('請先登入才能建立投票');
+      return;
+    }
+
+    setIsCreatingPoll(true);
+
+    try {
+      const poll: ChannelPoll = {
+        id: uuidv4(),
+        question: values.question.trim(),
+        description: values.description?.trim() || undefined,
+        options: values.options.map(option => ({
+          id: uuidv4(),
+          text: option.trim(),
+          votes: [],
+        })),
+        settings: {
+          allowMultiple: values.allowMultiple,
+          allowAddOptions: values.allowAddOptions,
+          anonymous: values.anonymous,
+          deadline: values.deadline ? new Date(values.deadline).toISOString() : undefined,
+        },
+        stats: {
+          totalVotes: 0,
+          voterCount: 0,
+        },
+        created_by: user.id,
+        created_at: new Date().toISOString(),
+      };
+
+      await sendMessage({
+        channel_id: selectedChannel.id,
+        author_id: user.id,
+        content: poll.question,
+        type: 'poll',
+        poll,
+        author: {
+          id: user.id,
+          display_name: currentProfile?.display_name || user.display_name || '未知用戶',
+          avatar: undefined,
+        },
+      });
+
+      setShowCreatePollDialog(false);
+    } catch (error) {
+      console.error('建立投票失敗:', error);
+      alert('建立投票失敗，請稍後再試');
+    } finally {
+      setIsCreatingPoll(false);
+    }
+  }, [currentProfile?.display_name, sendMessage, selectedChannel, user]);
 
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -531,6 +628,16 @@ export function ChannelChat() {
       }
     },
     {
+      id: 'create-poll',
+      icon: BarChart3,
+      label: '建立投票',
+      color: 'text-sky-600',
+      action: () => {
+        setShowCreatePollDialog(true);
+        setShowQuickMenu(false);
+      }
+    },
+    {
       id: 'upload-file',
       icon: Paperclip,
       label: '上傳檔案',
@@ -629,131 +736,149 @@ export function ChannelChat() {
                   </p>
                 </div>
               ) : (
-                currentMessages.map(message => (
-                  <div key={message.id} className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
-                    {/* 用戶頭像 */}
-                    <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
-                      {message.author?.display_name?.charAt(0) || '?'}
-                    </div>
+                currentMessages.map(message => {
+                  const isPollMessage = message.type === 'poll' && Boolean(message.poll);
 
-                    {/* 訊息內容 */}
-                    <div className="flex-1 min-w-0 relative pt-0.5">
-                      {/* 訊息標題 */}
-                      <div className="flex items-baseline gap-2 mb-0.5">
-                        <span className="font-semibold text-morandi-primary text-[15px]">
-                          {message.author?.display_name || '未知用戶'}
-                        </span>
-                        <span className="text-[11px] text-morandi-secondary/80 font-normal">
-                          {formatMessageTime(message.created_at)}
-                        </span>
-                        {message.edited_at && (
-                          <span className="text-[11px] text-morandi-secondary/60">(已編輯)</span>
+                  return (
+                    <div key={message.id} className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
+                      {/* 用戶頭像 */}
+                      <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
+                        {message.author?.display_name?.charAt(0) || '?'}
+                      </div>
+
+                      {/* 訊息內容 */}
+                      <div className="flex-1 min-w-0 relative pt-0.5">
+                        {/* 訊息標題 */}
+                        <div className="flex items-baseline gap-2 mb-0.5">
+                          <span className="font-semibold text-morandi-primary text-[15px]">
+                            {message.author?.display_name || '未知用戶'}
+                          </span>
+                          <span className="text-[11px] text-morandi-secondary/80 font-normal">
+                            {formatMessageTime(message.created_at)}
+                          </span>
+                          {message.edited_at && (
+                            <span className="text-[11px] text-morandi-secondary/60">(已編輯)</span>
+                          )}
+                        </div>
+
+                        {isPollMessage && message.poll ? (
+                          <PollMessage
+                            poll={message.poll}
+                            messageId={message.id}
+                            currentUserId={user?.id || ''}
+                            onVote={optionId => handleVotePollOption(message.id, optionId)}
+                            onRevoke={optionId => handleRevokePollOption(message.id, optionId)}
+                          />
+                        ) : (
+                          <div className="text-morandi-primary text-[15px] whitespace-pre-wrap leading-[1.46668] break-words">
+                            {message.content}
+                          </div>
                         )}
-                      </div>
 
-                      {/* 訊息文字 */}
-                      <div className="text-morandi-primary text-[15px] whitespace-pre-wrap leading-[1.46668] break-words">
-                        {message.content}
-                      </div>
-
-                      {/* 附件列表 */}
-                      {message.attachments && message.attachments.length > 0 && (
-                        <div className="mt-2 space-y-2">
-                          {message.attachments.map((attachment, index) => {
-                            const isImage = attachment.fileType.startsWith('image/');
-                            return (
-                              <div
-                                key={index}
-                                className="inline-flex items-center gap-2 px-3 py-2 bg-morandi-container/10 border border-morandi-container rounded-lg hover:bg-morandi-container/20 transition-colors group/attachment"
-                              >
-                                {isImage ? (
-                                  <ImageIcon size={16} className="text-morandi-gold shrink-0" />
-                                ) : (
-                                  <FileText size={16} className="text-morandi-secondary shrink-0" />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm text-morandi-primary truncate max-w-[200px]">
-                                    {attachment.fileName}
-                                  </p>
-                                  <p className="text-xs text-morandi-secondary">
-                                    {formatFileSize(attachment.fileSize)}
-                                  </p>
-                                </div>
-                                <button
-                                  onClick={() => downloadFile(attachment.path, 'workspace-files', attachment.fileName)}
-                                  className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
-                                  title="下載檔案"
+                        {/* 附件列表 */}
+                        {message.attachments && message.attachments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {message.attachments.map((attachment, index) => {
+                              const fileType = attachment.fileType || attachment.type || '';
+                              const fileName = attachment.fileName || attachment.name;
+                              const fileSize = attachment.fileSize ?? attachment.size;
+                              const isImage = fileType.startsWith('image/');
+                              return (
+                                <div
+                                  key={index}
+                                  className="inline-flex items-center gap-2 px-3 py-2 bg-morandi-container/10 border border-morandi-container rounded-lg hover:bg-morandi-container/20 transition-colors group/attachment"
                                 >
-                                  <Download size={14} className="text-morandi-gold" />
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* 反應列 */}
-                      {Object.keys(message.reactions).length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {Object.entries(message.reactions).map(([emoji, users]) => (
-                            <button
-                              key={emoji}
-                              onClick={() => handleReaction(message.id, emoji)}
-                              className={cn(
-                                "flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors",
-                                users.includes(user?.id || '')
-                                  ? "bg-morandi-gold/20 border-morandi-gold text-morandi-primary"
-                                  : "bg-morandi-container/20 border-border text-morandi-secondary hover:bg-morandi-container/30"
-                              )}
-                            >
-                              <span>{emoji}</span>
-                              <span>{users.length}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* 反應按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
-                      <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex gap-0.5">
-                          {['👍', '❤️', '😄', '😮', '🎉'].map(emoji => (
-                            <button
-                              key={emoji}
-                              onClick={() => handleReaction(message.id, emoji)}
-                              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/20 transition-all hover:scale-110"
-                              title={`加上 ${emoji} 反應`}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                        {/* 刪除按鈕 - 只有作者可以刪除 */}
-                        {user?.id === message.author_id && (
-                          <button
-                            onClick={async () => {
-                              if (confirm('確定要刪除這則訊息嗎？')) {
-                                const { deleteMessage } = useWorkspaceStore.getState();
-                                await deleteMessage(message.id);
-
-                                // 同時更新 local state 中的訊息列表
-                                if (selectedChannel?.id) {
-                                  setChannelMessages(prev => ({
-                                    ...prev,
-                                    [selectedChannel.id]: prev[selectedChannel.id]?.filter(m => m.id !== message.id) || []
-                                  }));
-                                }
-                              }
-                            }}
-                            className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-red/10 rounded border border-morandi-container hover:border-morandi-red/40 transition-all hover:scale-110"
-                            title="刪除訊息"
-                          >
-                            <Trash2 size={12} className="text-morandi-red" />
-                          </button>
+                                  {isImage ? (
+                                    <ImageIcon size={16} className="text-morandi-gold shrink-0" />
+                                  ) : (
+                                    <FileText size={16} className="text-morandi-secondary shrink-0" />
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm text-morandi-primary truncate max-w-[200px]">
+                                      {fileName}
+                                    </p>
+                                    <p className="text-xs text-morandi-secondary">
+                                      {fileSize ? formatFileSize(fileSize) : '未知大小'}
+                                    </p>
+                                  </div>
+                                  {attachment.path && fileName && (
+                                    <button
+                                      onClick={() => downloadFile(attachment.path, 'workspace-files', fileName)}
+                                      className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
+                                      title="下載檔案"
+                                    >
+                                      <Download size={14} className="text-morandi-gold" />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
                         )}
+
+                        {/* 反應列 */}
+                        {Object.keys(message.reactions).length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {Object.entries(message.reactions).map(([emoji, users]) => (
+                              <button
+                                key={emoji}
+                                onClick={() => handleReaction(message.id, emoji)}
+                                className={cn(
+                                  "flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors",
+                                  users.includes(user?.id || '')
+                                    ? "bg-morandi-gold/20 border-morandi-gold text-morandi-primary"
+                                    : "bg-morandi-container/20 border-border text-morandi-secondary hover:bg-morandi-container/30"
+                                )}
+                              >
+                                <span>{emoji}</span>
+                                <span>{users.length}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* 反應按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
+                        <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex gap-0.5">
+                            {['👍', '❤️', '😄', '😮', '🎉'].map(emoji => (
+                              <button
+                                key={emoji}
+                                onClick={() => handleReaction(message.id, emoji)}
+                                className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-container/30 rounded border border-morandi-container hover:border-morandi-gold/20 transition-all hover:scale-110"
+                                title={`加上 ${emoji} 反應`}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                          {/* 刪除按鈕 - 只有作者可以刪除 */}
+                          {user?.id === message.author_id && (
+                            <button
+                              onClick={async () => {
+                                if (confirm('確定要刪除這則訊息嗎？')) {
+                                  const { deleteMessage } = useWorkspaceStore.getState();
+                                  await deleteMessage(message.id);
+
+                                  // 同時更新 local state 中的訊息列表
+                                  if (selectedChannel?.id) {
+                                    setChannelMessages(prev => ({
+                                      ...prev,
+                                      [selectedChannel.id]: prev[selectedChannel.id]?.filter(m => m.id !== message.id) || []
+                                    }));
+                                  }
+                                }
+                              }}
+                              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-red/10 rounded border border-morandi-container hover:border-morandi-red/40 transition-all hover:scale-110"
+                              title="刪除訊息"
+                            >
+                              <Trash2 size={12} className="text-morandi-red" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
 
               {/* 代墊清單卡片 */}
@@ -989,6 +1114,13 @@ export function ChannelChat() {
           }}
         />
       )}
+
+      <CreatePollDialog
+        open={showCreatePollDialog}
+        onOpenChange={setShowCreatePollDialog}
+        onSubmit={handleCreatePoll}
+        loading={isCreatingPoll}
+      />
 
       {/* 分享訂單對話框 */}
       {showShareOrdersDialog && selectedChannel && (
