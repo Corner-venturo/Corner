@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 
 import { Send, Paperclip, Smile, MoreVertical, Pin } from 'lucide-react';
 
 import { CanvasView } from './canvas-view';
 import { Button } from '@/components/ui/button';
-import type { Channel } from '@/stores/workspace-store';
+import type { Channel, Message } from '@/stores/workspace-store';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -33,11 +33,24 @@ export function ChannelView({ channel }: ChannelViewProps) {
 
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // 獲取該頻道的訊息
-  const channelMessages = messages
-    .filter(m => m.channel_id === channel.id)
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+  const flattenMessages = (items: Message[]): Message[] => {
+    const result: Message[] = [];
+    items.forEach((item) => {
+      result.push(item);
+      if (item.replies && item.replies.length > 0) {
+        result.push(...flattenMessages(item.replies));
+      }
+    });
+    return result;
+  };
+
+  const channelMessages = useMemo(() => {
+    const allMessages = flattenMessages(messages);
+    return allMessages
+      .filter(m => m.channel_id === channel.id)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }, [messages, channel.id]);
   
   // 釘選的訊息
   const pinnedMessages = channelMessages.filter(m => m.is_pinned);
