@@ -7,7 +7,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Palette, Monitor, Moon, Sun, Check, LogOut, User, Lock, Eye, EyeOff } from 'lucide-react';
+import { Palette, Sun, Moon, User, LogOut, Check, EyeOff, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 
@@ -102,7 +102,7 @@ export default function SettingsPage() {
       // 2. 更新新密碼
       const hashedPassword = await hashPassword(passwordData.newPassword);
 
-      const result: any = await (supabase as unknown)
+      const result: unknown = await (supabase as unknown)
         .from('employees')
         .update({ password_hash: hashedPassword })
         .eq('employee_number', user.employee_number);

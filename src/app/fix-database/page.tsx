@@ -5,10 +5,10 @@ import { Wrench, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-interface FixResult {
+interface _FixResult {
   success: boolean;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 interface Issue {

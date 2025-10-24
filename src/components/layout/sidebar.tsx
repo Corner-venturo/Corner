@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  ChevronLeft,
   ChevronRight,
   Home,
   MapPin,
@@ -19,13 +18,10 @@ import {
   Wallet,
   Clock,
   UserCog,
-  Receipt,
-  FileText,
   BarChart3,
   Calendar,
   TrendingDown,
   FileCheck,
-  Edit,
   Flag,
   Sparkles
 } from 'lucide-react';
@@ -152,7 +148,7 @@ const personalToolItems: MenuItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarCollapsed, toggleSidebar, user, logout } = useAuthStore();
+  const { sidebarCollapsed, user } = useAuthStore();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const sidebarRef = useRef<HTMLDivElement>(null);

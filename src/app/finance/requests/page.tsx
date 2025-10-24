@@ -711,7 +711,7 @@ export default function RequestsPage() {
               <div className="border border-border rounded-lg p-4">
                 <h3 className="text-sm font-medium text-morandi-primary mb-4">請款項目列表</h3>
                 <div className="space-y-2">
-                  {requestItems.map((item, index) => (
+                  {requestItems.map((item, _index) => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-morandi-container/10 rounded">
                       <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
                         <div>
@@ -1041,7 +1041,7 @@ export default function RequestsPage() {
               <div className="border border-border rounded-lg p-4">
                 <h3 className="text-sm font-medium text-morandi-primary mb-4">請款項目列表</h3>
                 <div className="space-y-2">
-                  {requestItems.map((item, index) => (
+                  {requestItems.map((item, _index) => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-morandi-container/10 rounded">
                       <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
                         <div>

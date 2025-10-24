@@ -3,7 +3,7 @@
  * 用於為現有員工資料加入預設密碼
  */
 
-import { useUserStore, userStoreHelpers } from '@/stores/user-store';
+import { useUserStore } from '@/stores/user-store';
 import { PasswordUtils } from '@/lib/password-utils';
 import { localDB } from '@/lib/db';
 import { generateUUID } from '@/lib/utils/uuid';

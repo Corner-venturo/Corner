@@ -7,8 +7,8 @@ import { useOrderStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { DollarSign, Calendar, TrendingUp, TrendingDown, CreditCard, Plus } from 'lucide-react';
+import { _TabsContent } from '@/components/ui/tabs';
+import { DollarSign, TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TourPaymentsProps {
@@ -21,7 +21,7 @@ interface TourPaymentsProps {
 export const TourPayments = React.memo(function TourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete }: TourPaymentsProps) {
   const { items: orders } = useOrderStore();
   const payments: unknown[] = []; // TODO: usePaymentStore deprecated
-  const addPayment = async (data) => { console.warn("addPayment not implemented"); };
+  const addPayment = async (_data) => { console.warn("addPayment not implemented"); };
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // 監聽外部觸發新增

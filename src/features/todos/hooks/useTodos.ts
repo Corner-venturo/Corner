@@ -26,7 +26,7 @@ export const useTodos = () => {
       return await todoService.toggleTodo(id);
     },
 
-    loadTodos: async (user_id?: string) => {
+    loadTodos: async (_user_id?: string) => {
       return await store.fetchAll();
     },
 
@@ -35,8 +35,8 @@ export const useTodos = () => {
     },
 
     // ========== 業務方法 ==========
-    getTodosByUser: (user_id: string) => {
-      return todoService.getTodosByUser(user_id);
+    getTodosByUser: (_user_id: string) => {
+      return todoService.getTodosByUser(_user_id);
     },
 
     getTodosByStatus: (completed: boolean) => {

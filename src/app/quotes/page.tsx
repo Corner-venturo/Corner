@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { QUOTE_STATUS_LABELS } from '@/constants/quote-status';
 
-const statusFilters = ['all', 'proposed', 'approved'];
+const _statusFilters = ['all', 'proposed', 'approved'];
 
 export default function QuotesPage() {
   const router = useRouter();

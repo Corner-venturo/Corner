@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState} from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -12,11 +12,11 @@ import { TemplateEditorDialog } from '@/components/templates/template-editor-dia
 import { Button } from '@/components/ui/button'
 import { useTemplateStore } from '@/stores/template-store'
 
-import { Template } from '@/types/template'
+// import { Template } from '@/types/template'
 
 export default function TemplatesPage() {
   const router = useRouter()
-  const { templates, addTemplate } = useTemplateStore()
+  const { templates, _addTemplate } = useTemplateStore()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
   // 只顯示未刪除的模板

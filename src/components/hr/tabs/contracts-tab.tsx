@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { Employee } from '@/stores/types';
-import { FileText } from 'lucide-react';
+import { _FileText } from 'lucide-react';
 
 interface ContractsTabProps {
   employee: Employee;
@@ -11,7 +11,7 @@ interface ContractsTabProps {
 }
 
 export const ContractsTab = forwardRef<{ handleSave: () => void }, ContractsTabProps>(
-  ({ employee, isEditing, setIsEditing }, ref) => {
+  ({ employee }, ref) => {
   useImperativeHandle(ref, () => ({
     handleSave: async () => {
       // 合約資訊目前為唯讀，未來若需編輯功能可在此實作

@@ -71,7 +71,7 @@ const FRONTEND_TYPES = {
 // Supabase 型別定義（從 types.ts 提取）
 type SupabaseTables = Database['public']['Tables'];
 
-function getSupabaseFields(tableName: keyof SupabaseTables): string[] {
+function _getSupabaseFields(_tableName: keyof SupabaseTables): string[] {
   // 這裡需要手動列出（因為 TypeScript 型別在 runtime 不可用）
   // 或者從 Supabase 實際查詢 schema
   return [];

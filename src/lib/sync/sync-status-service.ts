@@ -20,7 +20,7 @@ export async function checkPendingCount(tableName: TableName): Promise<number> {
       (item.code && item.code.endsWith('TBC'))
     );
     return pending.length;
-  } catch (error) {
+  } catch (_error) {
     return 0;
   }
 }
@@ -54,8 +54,8 @@ export function useSyncStatus() {
       }
       setPendingCount(total);
       setLastSyncTime(new Date());
-    } catch (error) {
-      console.error('更新同步狀態失敗:', error);
+    } catch (_error) {
+      console.error('更新同步狀態失敗:', _error);
     }
   }, []);
 

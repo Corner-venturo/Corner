@@ -9,7 +9,6 @@ import {
   ArrowDownRight,
   ArrowRightLeft,
   Calendar,
-  Filter,
   Search,
   Trash2
 } from 'lucide-react';
@@ -22,7 +21,7 @@ const transactionTypeIcons = {
 };
 
 export const TransactionList = React.memo(function TransactionList() {
-  const { transactions, categories, accounts, deleteTransaction } = useAccountingStore();
+  const { transactions, deleteTransaction } = useAccountingStore();
   const [searchText, setSearchText] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense' | 'transfer'>('all');
   const [dateRange, setDateRange] = useState<'all' | 'today' | 'week' | 'month'>('month');

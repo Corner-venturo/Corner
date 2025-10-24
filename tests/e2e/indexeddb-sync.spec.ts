@@ -54,7 +54,7 @@ async function getAllFromIndexedDB(page: Page, storeName: string): Promise<any[]
 /**
  * 輔助函數：清空 IndexedDB
  */
-async function clearIndexedDB(page: Page): Promise<void> {
+async function _clearIndexedDB(page: Page): Promise<void> {
   await page.evaluate(async () => {
     await new Promise<void>((resolve) => {
       const request = indexedDB.deleteDatabase('venturo-db');
@@ -72,7 +72,7 @@ async function waitForSync(page: Page, timeMs: number = 3000): Promise<void> {
 }
 
 test.describe('IndexedDB 同步測試', () => {
-  test.beforeEach(async ({ page, context }) => {
+  test.beforeEach(async ({ page }) => {
     // 訪問應用程式（必須先訪問頁面才能使用 IndexedDB）
     await page.goto('/');
 

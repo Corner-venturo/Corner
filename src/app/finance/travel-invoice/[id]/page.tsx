@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
-import { ArrowLeft, FileX, FileEdit } from 'lucide-react'
+import { ArrowLeft, FileX} from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -20,7 +20,7 @@ import { useTravelInvoiceStore } from '@/stores/useTravelInvoiceStore'
 
 export default function InvoiceDetailPage() {
   const params = useParams()
-  const router = useRouter()
+  const _router = useRouter()
   const { currentInvoice, fetchInvoiceById, voidInvoice, isLoading } = useTravelInvoiceStore()
 
   const [showVoidDialog, setShowVoidDialog] = useState(false)

@@ -11,12 +11,10 @@ import {
   IconMapPin,
   IconPhone,
   IconPlane,
-  IconBuilding,
-  IconToolsKitchen2,
   IconSparkles,
 } from "@tabler/icons-react";
 
-export default function TourPage({ data, isPreview = false, viewMode = 'desktop' }: { data: any; isPreview?: boolean; viewMode?: 'desktop' | 'mobile' }) {
+export default function TourPage({ data, isPreview = false, viewMode = 'desktop' }: { data: unknown; isPreview?: boolean; viewMode?: 'desktop' | 'mobile' }) {
   const [scrollOpacity, setScrollOpacity] = useState(0);
   const [attractionsProgress, setAttractionsProgress] = useState(0); // 0-1 之間的進度值
   const [showGallery, setShowGallery] = useState(false);

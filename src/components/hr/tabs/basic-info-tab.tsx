@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Employee } from '@/stores/types';
 import { useUserStore, userStoreHelpers } from '@/stores/user-store';
-import { User, Phone, Mail, MapPin, Calendar, Edit, Save, X, Lock, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Calendar, Lock, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 
 interface BasicInfoTabProps {
   employee: Employee;
@@ -85,7 +85,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
     handleSave
   }));
 
-  const handleCancel = () => {
+  const _handleCancel = () => {
     setFormData({
       display_name: employee.display_name || '',
       chinese_name: (employee as unknown).chinese_name || '',
@@ -136,7 +136,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       // 導入 Supabase client
       const { supabase } = await import('@/lib/supabase/client');
 
-      const result: any = await (supabase as unknown)
+      const result: unknown = await (supabase as unknown)
         .from('employees')
         .update({ password_hash: hashedPassword })
         .eq('employee_number', employee.employee_number);

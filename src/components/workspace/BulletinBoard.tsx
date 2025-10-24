@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import { _Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Pin, Calendar, AlertCircle, Plus, Edit, Trash2, Building2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -121,7 +121,7 @@ export function BulletinBoard() {
     return labels[type as keyof typeof labels] || type;
   };
 
-  const getBorderColor = (type: string, is_pinned: boolean) => {
+  const _getBorderColor = (type: string, is_pinned: boolean) => {
     if (is_pinned) return 'border-morandi-gold';
     switch (type) {
       case 'notice': return 'border-morandi-red/30';

@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { Employee } from '@/stores/types';
-import { Calendar, Clock } from 'lucide-react';
+import { _Clock } from 'lucide-react';
 
 interface AttendanceTabProps {
   employee: Employee;
@@ -11,7 +11,7 @@ interface AttendanceTabProps {
 }
 
 export const AttendanceTab = forwardRef<{ handleSave: () => void }, AttendanceTabProps>(
-  ({ employee, isEditing, setIsEditing }, ref) => {
+  ({ employee }, ref) => {
   useImperativeHandle(ref, () => ({
     handleSave: async () => {
       // 出勤資訊目前為唯讀，未來若需編輯功能可在此實作

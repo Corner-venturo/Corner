@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import { _Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,9 +13,7 @@ import {
   Search,
   Grid,
   List,
-  Eye,
-  Settings,
-  Tag
+  Eye
 } from 'lucide-react';
 import { RichTextEditor, RichTextViewer } from './RichTextEditor';
 import { useWorkspaceStore, PersonalCanvas as PersonalCanvasType, RichDocument } from '@/stores/workspace-store';
@@ -183,7 +181,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
     }
   };
 
-  const handleUpdateTags = async (documentId: string, tags: string[]) => {
+  const _handleUpdateTags = async (documentId: string, tags: string[]) => {
     try {
       await updateRichDocument(documentId, { tags });
     } catch (error) {

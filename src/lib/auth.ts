@@ -34,7 +34,7 @@ export function verifyToken(token: string): AuthPayload | null {
     // 嘗試 JWT 驗證
     const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
     return decoded;
-  } catch (jwtError) {
+  } catch (_jwtError) {
     try {
       // 如果 JWT 失敗，嘗試簡單解碼
       const decoded = JSON.parse(atob(token));

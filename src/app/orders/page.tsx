@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Combobox } from '@/components/ui/combobox';
+// import { Button } from '@/components/ui/button';
+// import { Input } from '@/components/ui/input';
+// import { Combobox } from '@/components/ui/combobox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useOrderStore, useTourStore } from '@/stores';
 import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react';
@@ -18,7 +18,7 @@ export default function OrdersPage() {
   const { items: orders, create: addOrder } = useOrderStore();
   const { items: tours } = useTourStore();
   const [statusFilter, setStatusFilter] = useState('all');
-  const [tourFilter, setTourFilter] = useState('');
+  const [tourFilter, _setTourFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
@@ -42,7 +42,7 @@ export default function OrdersPage() {
   const todos = React.useMemo(() => {
     const result: unknown[] = [];
     const today = new Date();
-    const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const _sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     orders.forEach(order => {
       const tour = tours.find(t => t.id === order.tour_id);

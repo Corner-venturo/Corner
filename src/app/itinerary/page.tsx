@@ -3,9 +3,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
-import { MapPin, Calendar, Trash2, Copy, Eye } from 'lucide-react';
+import { MapPin, Eye, Copy, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useItineraryStore, type Itinerary } from '@/stores';
 

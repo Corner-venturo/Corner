@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useTourStore, useOrderStore } from '@/stores';
+import { useOrderStore } from '@/stores';
 import { User, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Order } from '@/stores/types';

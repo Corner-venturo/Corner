@@ -72,7 +72,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
   });
 
   const [fields, setFields] = useState<TemplateField[]>([]);
-  const [excelData, setExcelData] = useState<any>(null);
+  const [excelData, setExcelData] = useState<unknown>(null);
 
   // 載入編輯的模板資料
   useEffect(() => {

@@ -44,7 +44,7 @@ export async function uploadFile(
     // 上傳檔案
     // cacheControl: 快取時間（秒）
     // 3600 = 1小時, 86400 = 1天, 2592000 = 30天, 7776000 = 90天
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(bucket)
       .upload(file_path, file, {
         cacheControl: '7776000', // 90 天快取

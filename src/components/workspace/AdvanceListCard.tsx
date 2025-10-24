@@ -7,7 +7,7 @@ import { AdvanceList } from '@/stores/workspace-store';
 interface AdvanceListCardProps {
   advanceList: AdvanceList;
   userName?: string;
-  onCreatePayment: (itemId: string, item: any) => void;
+  onCreatePayment: (itemId: string, item: unknown) => void;
   onDelete?: (listId: string) => void;
   currentUserId: string;
   userRole?: 'admin' | 'finance' | 'member';
@@ -18,7 +18,6 @@ export function AdvanceListCard({
   userName = '使用者',
   onCreatePayment,
   onDelete,
-  currentUserId,
   userRole = 'member'
 }: AdvanceListCardProps) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());

@@ -65,7 +65,7 @@ export function QuickTools() {
 
   // Checklist state
   const [checklists, setChecklists] = useState<Checklist[]>([]);
-  const [newChecklist, setNewChecklist] = useState({ title: '', items: [] as ChecklistItem[] });
+  const [_newChecklist, _setNewChecklist] = useState({ title: '', items: [] as ChecklistItem[] });
   const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null);
 
   // Load data from localStorage

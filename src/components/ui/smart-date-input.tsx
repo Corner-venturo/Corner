@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
-import { Input } from './input';
+import React, { useRef, useState } from 'react';
+import { _Input } from './input';
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
@@ -14,7 +14,7 @@ interface SmartDateInputProps {
   onChange: (value: string) => void;
   min?: string;
   className?: string;
-  placeholder?: string;
+  _placeholder?: string;
   required?: boolean;
   initialMonth?: string; // 初始顯示的月份（YYYY-MM-DD 格式）
 }
@@ -24,7 +24,7 @@ export function SmartDateInput({
   onChange,
   min,
   className,
-  placeholder = 'YYYY-MM-DD',
+  _placeholder = 'YYYY-MM-DD',
   required = false,
   initialMonth
 }: SmartDateInputProps) {
@@ -135,7 +135,7 @@ export function SmartDateInput({
           value={year}
           onChange={handleYearChange}
           onKeyDown={(e) => handleKeyDown(e, 'year')}
-          placeholder="YYYY"
+          _placeholder="YYYY"
           className="w-14 bg-transparent outline-none text-center"
           maxLength={4}
           required={required}
@@ -148,7 +148,7 @@ export function SmartDateInput({
           value={month}
           onChange={handleMonthChange}
           onKeyDown={(e) => handleKeyDown(e, 'month')}
-          placeholder="MM"
+          _placeholder="MM"
           className="w-10 bg-transparent outline-none text-center"
           maxLength={2}
           required={required}
@@ -161,7 +161,7 @@ export function SmartDateInput({
           value={day}
           onChange={handleDayChange}
           onKeyDown={(e) => handleKeyDown(e, 'day')}
-          placeholder="DD"
+          _placeholder="DD"
           className="w-10 bg-transparent outline-none text-center"
           maxLength={2}
           required={required}

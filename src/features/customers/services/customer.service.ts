@@ -68,12 +68,12 @@ class CustomerService extends BaseService<Customer> {
     );
   }
 
-  getCustomersByTour(tour_id: string): Customer[] {
-    const store = useCustomerStore.getState();
+  getCustomersByTour(_tour_id: string): Customer[] {
+    const _store = useCustomerStore.getState();
     // TODO: Order 類型需要加入 customer_id 欄位
-    // const tourOrders = useOrderStore.getState().items.filter(o => o.tour_id === tour_id);
+    // const tourOrders = useOrderStore.getState().items.filter(o => o.tour_id === _tour_id);
     // const customerIds = tourOrders.map(o => o.customer_id);
-    // return store.items.filter(c => customerIds.includes(c.id));
+    // return _store.items.filter(c => customerIds.includes(c.id));
     return []; // 暫時返回空陣列，等 Order 類型更新
   }
 

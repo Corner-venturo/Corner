@@ -41,7 +41,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       const authUser = useAuthStore.getState().user;
 
       // 暫時停用檢查,避免無限循環
-      // if (!authUser) {
+      // if (!_authUser) {
       //   router.push('/login');
       // }
     }, 50);

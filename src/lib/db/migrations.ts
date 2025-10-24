@@ -3,7 +3,7 @@
  */
 
 import { TABLE_SCHEMAS } from './schemas';
-import { addSyncIndexes, isSyncableTable } from './sync-schema-helper';
+import { _isSyncableTable } from './sync-schema-helper';
 
 /**
  * 資料庫升級處理器

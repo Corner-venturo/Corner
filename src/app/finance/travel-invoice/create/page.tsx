@@ -72,7 +72,7 @@ export default function CreateInvoicePage() {
     }
   }
 
-  const updateItem = (index: number, field: keyof TravelInvoiceItem, value: any) => {
+  const updateItem = (index: number, field: keyof TravelInvoiceItem, value: unknown) => {
     const newItems = [...items]
     newItems[index] = { ...newItems[index], [field]: value }
 

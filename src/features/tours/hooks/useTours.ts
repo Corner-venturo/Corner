@@ -1,6 +1,6 @@
 import { useTourStore } from '@/stores';
 import { tourService } from '../services/tour.service';
-import { Tour, Order, Customer, Member } from '@/stores/types';
+import { Tour } from '@/stores/types';
 
 /**
  * 簡化版 Tours Hook（與其他模組接口統一）

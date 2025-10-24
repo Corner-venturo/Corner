@@ -18,7 +18,7 @@ interface ThursdayDatePickerProps {
   allowAnyDay?: boolean // 特殊請款允許任何日期
 }
 
-const dayNames = ['日', '一', '二', '三', '四', '五', '六']
+const _dayNames = ['日', '一', '二', '三', '四', '五', '六']
 
 export function ThursdayDatePicker({
   value,

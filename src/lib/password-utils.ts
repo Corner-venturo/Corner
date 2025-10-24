@@ -70,7 +70,7 @@ export class PasswordUtils {
     else messages.push('需要包含數字');
 
     // 包含特殊字符
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) score += 1;
 
     // 評分
     let strength = '弱';

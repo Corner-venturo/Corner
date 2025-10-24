@@ -8,8 +8,8 @@ import { ChapterList } from '@/components/manifestation/ChapterList';
 import { ChapterContent } from '@/components/manifestation/ChapterContent';
 import { WishWall } from '@/components/manifestation/WishWall';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Book, Heart, LayoutGrid } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Sparkles, Book, Heart} from 'lucide-react';
+// import { cn } from '@/lib/utils';
 
 type ViewMode = 'journal' | 'manifestation' | 'wish-wall';
 

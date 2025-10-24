@@ -23,7 +23,7 @@ export default function DocumentsDetailPage() {
     {
       id: '1',
       name: '行程確認書.pdf',
-      type: 'PDF',
+      _type: 'PDF',
       size: '2.4 MB',
       uploadDate: '2024-11-15',
       category: '合約文件'
@@ -31,7 +31,7 @@ export default function DocumentsDetailPage() {
     {
       id: '2',
       name: '保險清單.xlsx',
-      type: 'Excel',
+      _type: 'Excel',
       size: '1.2 MB',
       uploadDate: '2024-11-14',
       category: '保險文件'
@@ -39,14 +39,14 @@ export default function DocumentsDetailPage() {
     {
       id: '3',
       name: '成員名單.docx',
-      type: 'Word',
+      _type: 'Word',
       size: '0.8 MB',
       uploadDate: '2024-11-13',
       category: '成員資料'
     }
   ];
 
-  const getFileIcon = (type: string) => {
+  const getFileIcon = (_type: string) => {
     return <FileText size={16} className="text-morandi-gold" />;
   };
 
@@ -59,7 +59,7 @@ export default function DocumentsDetailPage() {
       filterable: true,
       render: (value, row) => (
         <div className="flex items-center space-x-2">
-          {getFileIcon(row.type)}
+          {getFileIcon(row._type)}
           <span className="font-medium text-morandi-primary">{value}</span>
         </div>
       )
@@ -85,7 +85,7 @@ export default function DocumentsDetailPage() {
       )
     },
     {
-      key: 'type',
+      key: '_type',
       label: '類型',
       sortable: true,
       filterable: true,
@@ -117,7 +117,7 @@ export default function DocumentsDetailPage() {
       label: '操作',
       sortable: false,
       filterable: false,
-      render: (_, row) => (
+      render: (_, _row) => (
         <div className="flex items-center space-x-2">
           <button
             className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
@@ -164,7 +164,7 @@ export default function DocumentsDetailPage() {
       return (
         (!filters.name || doc.name.toLowerCase().includes(filters.name.toLowerCase())) &&
         (!filters.category || doc.category === filters.category) &&
-        (!filters.type || doc.type.toLowerCase().includes(filters.type.toLowerCase())) &&
+        (!filters._type || doc._type.toLowerCase().includes(filters._type.toLowerCase())) &&
         (!filters.size || doc.size.includes(filters.size)) &&
         (!filters.uploadDate || doc.uploadDate.includes(filters.uploadDate))
       );

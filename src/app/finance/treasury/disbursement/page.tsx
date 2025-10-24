@@ -8,9 +8,9 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
+// import { Input } from '@/components/ui/input';
+// import { Textarea } from '@/components/ui/textarea';
+import { EnhancedTable, TableColumn} from '@/components/ui/enhanced-table';
 // TODO: usePaymentStore deprecated - import { usePaymentStore } from '@/stores';
 import { DisbursementOrder, PaymentRequest } from '@/stores/types';
 import { FileText, Calendar, Wallet, CheckCircle, Clock, Banknote, X, Plus } from 'lucide-react';
@@ -88,7 +88,7 @@ export default function DisbursementPage() {
 
   // 獲取數據 - 加上防禦性檢查，避免 deprecated store 導致崩潰
   const pendingRequests = useMemo(() => getPendingPaymentRequests ? getPendingPaymentRequests() : [], [getPendingPaymentRequests]);
-  const processingRequests = useMemo(() => getProcessingPaymentRequests ? getProcessingPaymentRequests() : [], [getProcessingPaymentRequests]);
+  const _processingRequests = useMemo(() => getProcessingPaymentRequests ? getProcessingPaymentRequests() : [], [getProcessingPaymentRequests]);
   const currentOrder = useMemo(() => getCurrentWeekDisbursementOrder ? getCurrentWeekDisbursementOrder() : null, [getCurrentWeekDisbursementOrder]);
   const nextThursday = useMemo(() => getNextThursday ? getNextThursday() : new Date(), [getNextThursday]);
 
@@ -128,7 +128,7 @@ export default function DisbursementPage() {
   };
 
   // 全選/取消全選
-  const handleSelectAll = () => {
+  const _handleSelectAll = () => {
     if (selectedRequests.length === pendingRequests.length) {
       setSelectedRequests([]);
     } else {
@@ -162,7 +162,7 @@ export default function DisbursementPage() {
       key: 'select',
       label: '',
       width: '50px',
-      render: (_value: any, row: any) => (
+      render: (_value: unknown, row: any) => (
         <input
           type="checkbox"
           checked={selectedRequests.includes(row.id)}

@@ -405,7 +405,7 @@ export default function AccountingPage() {
         <div className="flex items-center justify-around max-w-lg mx-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const is_active = activeTab === tab.id;
+            const _is_active = activeTab === tab.id;
             return (
               <button
                 key={tab.id}

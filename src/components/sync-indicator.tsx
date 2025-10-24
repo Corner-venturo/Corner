@@ -8,21 +8,12 @@
  */
 
 // import { useAutoSync } from '@/lib/offline/auto-sync-provider'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { _Badge } from '@/components/ui/badge'
+import { _Button } from '@/components/ui/button'
 import {
-  Cloud,
-  CloudOff,
-  Loader2,
-  RefreshCw,
-  CheckCircle,
-  AlertCircle
+  _AlertCircle
 } from 'lucide-react'
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
 } from '@/components/ui/tooltip'
 
 export function SyncIndicator() {

@@ -28,7 +28,7 @@ interface TemplateStore {
 }
 
 // 預設紙張設定
-const DEFAULT_PAPER_SETTINGS: PaperSettings = {
+const _DEFAULT_PAPER_SETTINGS: PaperSettings = {
   size: 'A4',
   orientation: 'portrait',
   margins: {

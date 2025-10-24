@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -122,7 +122,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
   };
 
   const completedSubTasks = (todo.sub_tasks || []).filter(task => task.done).length;
-  const progressPercentage = (todo.sub_tasks || []).length > 0 ? (completedSubTasks / (todo.sub_tasks || []).length) * 100 : 0;
+  const _progressPercentage = (todo.sub_tasks || []).length > 0 ? (completedSubTasks / (todo.sub_tasks || []).length) * 100 : 0;
 
   return (
     <div
@@ -559,7 +559,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 }
 
 // 快速功能內容組件
-function QuickActionContent({ activeTab, todo }: { activeTab: QuickActionTab; todo: Todo }) {
+function QuickActionContent({ activeTab }: { activeTab: QuickActionTab; todo: Todo }) {
   const { items: employees, fetchAll } = useUserStore();
   const { user: currentUser } = useAuthStore();
 

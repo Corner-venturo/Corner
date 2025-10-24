@@ -11,11 +11,11 @@ import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/en
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
 import { cn } from '@/lib/utils';
-import { getRegionOptions, regionOptionsMap, type RegionName, type TransportOption } from '@/data/region-options';
+import { getRegionOptions, _regionOptionsMap, type RegionName, type TransportOption } from '@/data/region-options';
 
 export default function TransportPage() {
-  const router = useRouter();
-  const [selectedRegion, setSelectedRegion] = useState<RegionName>('清邁');
+  const _router = useRouter();
+  const [selectedRegion, _setSelectedRegion] = useState<RegionName>('清邁');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingTransport, setEditingTransport] = useState<TransportOption | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -195,7 +195,7 @@ export default function TransportPage() {
     setIsAddDialogOpen(true);
   };
 
-  const handleDeleteTransport = (transportId: string) => {
+  const handleDeleteTransport = (_transportId: string) => {
     if (confirm('確定要刪除此交通選項嗎？')) {
       // TODO: 刪除交通選項從資料庫
     }

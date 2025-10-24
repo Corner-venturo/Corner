@@ -5,7 +5,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import { HotTable } from '@handsontable/react';
 import { registerLanguageDictionary, zhTW } from 'handsontable/i18n';
 import { registerAllModules } from 'handsontable/registry';
-import Handsontable from 'handsontable';
+import _Handsontable from 'handsontable';
 
 import 'handsontable/dist/handsontable.full.css';
 import { TemplateField, RepeatableSection } from '@/types/template';
@@ -15,7 +15,7 @@ registerAllModules();
 registerLanguageDictionary(zhTW);
 
 interface TemplateExcelEditorProps {
-  data: any;
+  data: unknown;
   onChange: (data) => void;
   onColumnWidthChange?: (widths: number[]) => void;
   field_mappings?: TemplateField[];
@@ -27,11 +27,10 @@ export function TemplateExcelEditor({
   data,
   onChange,
   onColumnWidthChange,
-  field_mappings,
   repeatable_sections = [],
   highlightedSection
 }: TemplateExcelEditorProps) {
-  const hotRef = useRef<any>(null);
+  const hotRef = useRef<unknown>(null);
 
   // 初始化空白資料（60 列 × 20 欄，給予足夠的欄位讓使用者調整）
   const initialData = (data && Array.isArray(data) && data.length > 0)
@@ -51,7 +50,7 @@ export function TemplateExcelEditor({
     if (!hot) return;
 
     // 添加樣式，讓變數欄位有特殊顏色
-    hot.addHook('afterRenderer', (TD: any, row: any, col: any, prop: any, value: any) => {
+    hot.addHook('afterRenderer', (TD: any, row: any, col: any, prop: any, value: unknown) => {
       // 變數高亮
       if (typeof value === 'string' && value.match(/\{.+?\}/)) {
         TD.style.background = '#fff3cd';
@@ -139,7 +138,7 @@ export function TemplateExcelEditor({
         </div>
       </div>
 
-      {/* Handsontable 編輯器 - 全頁模式（灰色區域 = 工作區，紅框 = A4 列印範圍） */}
+      {/* _Handsontable 編輯器 - 全頁模式（灰色區域 = 工作區，紅框 = A4 列印範圍） */}
       <div className="flex-1 overflow-auto bg-gray-800 rounded-lg border border-morandi-container/20 p-8">
         <div className="flex items-start justify-center">
           <div className="inline-block">
@@ -178,7 +177,7 @@ export function TemplateExcelEditor({
               row: 0,
               col,
               className: 'htCenter htMiddle',
-              renderer: function(instance: any, td: any, row: any, col: any, prop: any, value: any, cellProperties: any) {
+              renderer: function(instance: any, td: any, row: any, col: any, prop: any, value: unknown, _cellProperties: any) {
                 td.style.fontWeight = 'bold';
                 td.style.textAlign = 'center';
                 td.style.backgroundColor = '#f8f9fa';
@@ -203,7 +202,7 @@ export function TemplateExcelEditor({
           }}
 
           // 欄寬調整處理
-          afterColumnResize={(newSize, column) => {
+          afterColumnResize={(__newSize, _column) => {
             const hot = hotRef.current?.hotInstance;
             if (hot && onColumnWidthChange) {
               // 獲取所有欄位的寬度
@@ -218,7 +217,7 @@ export function TemplateExcelEditor({
           }}
 
           // 列高調整處理
-          afterRowResize={(newSize, row) => {
+          afterRowResize={(__newSize, _row) => {
             const hot = hotRef.current?.hotInstance;
             if (hot) {
               hot.render();

@@ -8,7 +8,6 @@ import {
   CreditCard,
   PiggyBank,
   TrendingUp,
-  MoreHorizontal,
   Edit,
   Trash2,
   Eye,
@@ -34,7 +33,7 @@ const accountTypeLabels = {
 
 export const AccountsManagement = React.memo(function AccountsManagement() {
   const { accounts, updateAccount, deleteAccount } = useAccountingStore();
-  const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
+  const [_expandedAccount, _setExpandedAccount] = useState<string | null>(null);
 
   const handleToggleActive = (account_id: string, is_active: boolean) => {
     updateAccount(account_id, { is_active: !is_active });

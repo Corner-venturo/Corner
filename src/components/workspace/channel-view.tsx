@@ -20,8 +20,6 @@ export function ChannelView({ channel }: ChannelViewProps) {
   const {
     messages,
     addMessage,
-    updateMessage,
-    deleteMessage,
     togglePinMessage,
     addReaction,
     activeCanvasTab,

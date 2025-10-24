@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTourStore, useOrderStore, useMemberStore } from '@/stores';
+import { useTourStore, useOrderStore } from '@/stores';
 // TODO: usePaymentStore deprecated
 import { useTemplateStore } from '@/stores/template-store';
 import type { Tour, Order } from '@/stores/types';

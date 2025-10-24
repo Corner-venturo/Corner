@@ -13,7 +13,7 @@ interface TourDocumentsProps {
   orderFilter?: string; // 選填：只顯示特定訂單的文件
 }
 
-export function TourDocuments({ tour, orderFilter }: TourDocumentsProps) {
+export function TourDocuments({ orderFilter }: TourDocumentsProps) {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [newDocument, setNewDocument] = useState({
     name: '',

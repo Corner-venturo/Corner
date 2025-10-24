@@ -3,9 +3,9 @@
 import { useState, useMemo } from 'react';
 import { Hash, Lock, Star, Search, ChevronDown, ChevronRight, Plus, Settings, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { _Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Channel, ChannelGroup, useWorkspaceStore } from '@/stores/workspace-store';
+import { Channel, useWorkspaceStore } from '@/stores/workspace-store';
 import {
   DropdownMenu,
   DropdownMenuContent,

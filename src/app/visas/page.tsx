@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { Visa } from '@/stores/types';
 import { logger } from '@/lib/utils/logger';
 import { tourService } from '@/features/tours/services/tour.service';
-import { VISA_STATUS_MAP, getVisaStatusLabel } from '@/constants/status-maps';
+import { getVisaStatusLabel } from '@/constants/status-maps';
 
 export default function VisasPage() {
   const { items: visas, create: addVisa, update: updateVisa, delete: deleteVisa } = useVisaStore();
@@ -162,7 +162,7 @@ export default function VisasPage() {
   }, [applicants.length]);
 
   // 更新辦理人資料
-  const updateApplicant = useCallback((id: string, field: keyof VisaApplicant, value: any) => {
+  const updateApplicant = useCallback((id: string, field: keyof VisaApplicant, value: unknown) => {
     setApplicants(prev => prev.map(a => {
       if (a.id !== id) return a;
 
@@ -279,7 +279,7 @@ export default function VisasPage() {
     }
 
     // 批次建立簽證（為每個辦理人建立，共用同一個訂單）
-    applicants.forEach((applicant, index) => {
+    applicants.forEach((applicant, _index) => {
       if (!applicant.name) return;
 
       const fee = calculateFee(applicant.country);
@@ -344,7 +344,7 @@ export default function VisasPage() {
   };
 
   // 狀態徽章樣式
-  const getStatusBadge = (status: Visa['status']) => {
+  const _getStatusBadge = (status: Visa['status']) => {
     const badges: Record<Visa['status'], string> = {
       'pending': 'bg-morandi-gold/20 text-morandi-gold',
       'submitted': 'bg-morandi-blue/20 text-morandi-blue',

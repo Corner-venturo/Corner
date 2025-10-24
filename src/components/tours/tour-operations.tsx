@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tour } from '@/stores/types';
 import { useOrderStore, useMemberStore, useTourAddOnStore, usePaymentRequestStore } from '@/stores';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Users, Eye } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { calculateFormula, getMemberContext, getFieldCoordinate } from '@/lib/formula-calculator';
+import { _Button } from '@/components/ui/button';
+import { _Input } from '@/components/ui/input';
+import { Eye } from 'lucide-react';
+import { _cn } from '@/lib/utils';
+import { getFieldCoordinate } from '@/lib/formula-calculator';
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper';
 
 interface TourOperationsProps {
@@ -59,8 +59,8 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
   const [roomOptions, setRoomOptions] = useState<RoomOption[]>([]);
 
   // Excel 式公式編輯狀態
-  const [isFormulaModeActive, setIsFormulaModeActive] = useState(false);
-  const [formulaInputRef, setFormulaInputRef] = useState<HTMLInputElement | null>(null);
+  const [isFormulaModeActive, _setIsFormulaModeActive] = useState(false);
+  const [formulaInputRef, _setFormulaInputRef] = useState<HTMLInputElement | null>(null);
 
   // 欄位管理狀態
   const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
@@ -75,7 +75,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
   };
 
   // 動態獲取房間容量
-  const getRoomCapacityFromOptions = (roomValue: string): number => {
+  const _getRoomCapacityFromOptions = (roomValue: string): number => {
     const room = roomOptions.find(option => option.value === roomValue);
     return room ? room.capacity : 0;
   };
@@ -148,7 +148,7 @@ export const TourOperations = React.memo(function TourOperations({ tour, orderFi
   };
 
   // 處理欄位點擊以插入公式引用
-  const handleFieldClick = (fieldName: string) => {
+  const _handleFieldClick = (fieldName: string) => {
     if (isFormulaModeActive && formulaInputRef) {
       const customFields = extraFields?.customFields || [];
       const coordinate = getFieldCoordinate(fieldName, customFields);

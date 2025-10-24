@@ -86,7 +86,7 @@ const DropdownMenuContent = React.forwardRef<
     onOpenChange?: (open: boolean) => void
     align?: 'start' | 'center' | 'end'
   }
->(({ className, children, isOpen, onOpenChange, align = 'start', ...props }, ref) => {
+>(({ className, children, isOpen, onOpenChange, align = 'start', ...props }, _ref) => {
   const contentRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {

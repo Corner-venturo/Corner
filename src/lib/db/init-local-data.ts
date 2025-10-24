@@ -3,10 +3,10 @@
  * 建立所有必要的預設資料
  */
 
-import bcrypt from 'bcryptjs';
+import _bcrypt from 'bcryptjs';
 import { localDB } from '@/lib/db';
 import { DB_NAME } from '@/lib/db/schemas';
-import { generateUUID } from '@/lib/utils/uuid';
+import { _generateUUID } from '@/lib/utils/uuid';
 
 /**
  * 產生 UUID（已移除，改用系統統一的 UUID 生成器）
@@ -16,7 +16,7 @@ import { generateUUID } from '@/lib/utils/uuid';
 /**
  * 產生編號
  */
-function generateCode(prefix: string, index: number): string {
+function _generateCode(prefix: string, index: number): string {
   const year = new Date().getFullYear();
   const number = (index + 1).toString().padStart(4, '0');
   return `${prefix}${year}${number}`;

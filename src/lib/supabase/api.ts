@@ -9,7 +9,7 @@ function toSnakeCase(obj): any {
   if (Array.isArray(obj)) return obj.map(toSnakeCase);
   if (typeof obj !== 'object') return obj;
 
-  const result: any = {};
+  const result: unknown = {};
   for (const key in obj) {
     const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
     const value = obj[key];
@@ -27,7 +27,7 @@ function toCamelCase(obj): any {
   if (Array.isArray(obj)) return obj.map(toCamelCase);
   if (typeof obj !== 'object') return obj;
 
-  const result: any = {};
+  const result: unknown = {};
   for (const key in obj) {
     const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
     result[camelKey] = toCamelCase(obj[key]);
@@ -51,7 +51,7 @@ export class VenturoAPI {
   /**
    * 創建新記錄
    */
-  static async create<T = any>(table: string, data: any): Promise<T> {
+  static async create<T = any>(table: string, data: Record<string, unknown>): Promise<T> {
     try {
       // 將 camelCase 轉換為 snake_case
       const snakeData = toSnakeCase(data);
@@ -187,7 +187,7 @@ export class VenturoAPI {
   /**
    * 更新記錄
    */
-  static async update<T = any>(table: string, id: string, data: any): Promise<T> {
+  static async update<T = any>(table: string, id: string, data: Record<string, unknown>): Promise<T> {
     try {
       // 將 camelCase 轉換為 snake_case
       const snakeData = toSnakeCase(data);
@@ -356,7 +356,7 @@ export class VenturoAPI {
   /**
    * 事務處理
    */
-  static async transaction(operations: (() => Promise<any>)[]): Promise<any[]> {
+  static async transaction(operations: (() => Promise<unknown>)[]): Promise<any[]> {
     const results = [];
 
     for (const operation of operations) {

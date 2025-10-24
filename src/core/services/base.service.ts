@@ -1,5 +1,5 @@
 import { BaseEntity, PageRequest, PageResponse } from '@/core/types/common';
-import { NotFoundError, ValidationError } from '@/core/errors/app-errors';
+import { NotFoundError } from '@/core/errors/app-errors';
 
 /**
  * Store 操作介面（FastIn 架構 - 非同步版本）

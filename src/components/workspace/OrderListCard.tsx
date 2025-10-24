@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Receipt, ChevronDown, ChevronUp, DollarSign, Check } from 'lucide-react';
-import { Order } from '@/stores/types';
+import { _Order } from '@/stores/types';
 
 interface SharedOrderList {
   id: string;
@@ -39,7 +39,6 @@ export function OrderListCard({
   orderList,
   userName = '會計',
   onCreateReceipt,
-  currentUserId,
   userRole = 'member'
 }: OrderListCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -139,7 +138,7 @@ export function OrderListCard({
                   </tr>
                 </thead>
                 <tbody>
-                  {orderList.orders.map((order, index) => {
+                  {orderList.orders.map((order, _index) => {
                     const status = getOrderStatus(order);
                     const isProcessed = order.receipt_status === 'received';
 

@@ -2,7 +2,7 @@
 
 import TourPage from "@/components/TourPage";
 
-export function TourPreview({ data, viewMode = 'desktop' }: { data: any; viewMode?: 'desktop' | 'mobile' }) {
+export function TourPreview({ data, viewMode = 'desktop' }: { data: unknown; viewMode?: 'desktop' | 'mobile' }) {
   return (
     <div style={{
       width: viewMode === 'mobile' ? '390px' : '1200px',

@@ -10,8 +10,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
   Filter,
-  ChevronRight,
-  ChevronDown as ExpandDown,
+  ChevronDown as _ExpandDown,
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,7 +22,7 @@ export interface TableColumn {
   filterable?: boolean;
   filterType?: 'text' | 'number' | 'date' | 'select';
   filterOptions?: Array<{ value: string; label: string }>;
-  render?: (value: any, row: any) => React.ReactNode;
+  render?: (value: unknown, row: any) => React.ReactNode;
   width?: string;
   align?: 'left' | 'center' | 'right';
   className?: string;
@@ -70,7 +69,7 @@ export interface EnhancedTableProps {
   expandable?: ExpandableConfig;
   actions?: (row) => React.ReactNode;
   rowClassName?: (row) => string;
-  bordered?: boolean;
+  _bordered?: boolean;
   striped?: boolean;
   hoverable?: boolean;
 }
@@ -94,7 +93,7 @@ export function EnhancedTable({
   expandable,
   actions,
   rowClassName,
-  bordered = true,
+  _bordered = true,
   striped = false,
   hoverable = true
 }: EnhancedTableProps) {
@@ -228,7 +227,7 @@ export function EnhancedTable({
     }
   };
 
-  const toggleExpansion = (row: any, index: number) => {
+  const _toggleExpansion = (row: any, index: number) => {
     if (!expandable) return;
     const rowId = getRowId(row, index);
     expandable.onExpand(rowId);
@@ -403,7 +402,7 @@ export function EnhancedTable({
                         striped && index % 2 === 0 && "bg-morandi-container/5",
                         rowClassName?.(row)
                       )}
-                      onClick={(e) => {
+                      onClick={() => {
                         // Don't trigger row click if clicking on selection checkbox or expand button
                         if (selection || expandable) return;
                         onRowClick?.(row, actualRowIndex);

@@ -18,11 +18,11 @@ export interface LocalProfile {
   pinHash?: string; // PIN 碼的雜湊值
 
   // 個人資訊
-  personal_info?: any;
-  job_info?: any;
-  salary_info?: any;
+  personal_info?: unknown;
+  job_info?: unknown;
+  salary_info?: unknown;
   contracts?: unknown[];
-  attendance?: any;
+  attendance?: unknown;
 
   // 元資料
   lastLoginAt: string;

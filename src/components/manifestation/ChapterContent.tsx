@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, Save, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { _cn } from '@/lib/utils';
 
 interface ChapterContentProps {
   chapter: Chapter;
@@ -45,7 +45,7 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
   }, [currentEntry, chapter.id]);
 
   // 處理輸入變化
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

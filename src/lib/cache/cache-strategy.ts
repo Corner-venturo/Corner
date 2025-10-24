@@ -19,7 +19,7 @@ interface CacheOptions {
   /** 過期時間（毫秒），0 表示永不過期 */
   ttl?: number;
   /** 是否壓縮儲存（針對大型資料） */
-  compress?: boolean;
+  _compress?: boolean;
 }
 
 interface CacheEntry {
@@ -85,7 +85,7 @@ class CacheStrategy {
     value: CacheValue,
     options: CacheOptions = {}
   ): Promise<void> {
-    const { level = 'hot', ttl = 0, compress = false } = options;
+    const { level = 'hot', ttl = 0, _compress = false } = options;
 
     const entry: CacheEntry = {
       value,

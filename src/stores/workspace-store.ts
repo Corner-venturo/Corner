@@ -1049,7 +1049,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         }));
       },
 
-      updateOrderReceiptStatus: async (listId, orderId, receiptId) => {
+      updateOrderReceiptStatus: async (listId, orderId, _receiptId) => {
         set(state => ({
           sharedOrderLists: state.sharedOrderLists.map(list =>
             list.id === listId

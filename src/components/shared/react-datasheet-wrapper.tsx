@@ -81,7 +81,7 @@ export function ReactDataSheetWrapper({
   // 統一使用 tour_id (優先使用 tour_id，其次 tourId)
   const finalTourId = tour_id || tourId;
   const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
-  const [selectedRange, setSelectedRange] = useState<{start: {i: number, j: number}, end: {i: number, j: number}} | null>(null);
+  const [_selectedRange, setSelectedRange] = useState<{start: {_i: number, j: number}, end: {_i: number, j: number}} | null>(null);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [draggedRow, setDraggedRow] = useState<number | null>(null);
 
@@ -237,7 +237,7 @@ export function ReactDataSheetWrapper({
 
     const newData = [...data];
 
-    changes.forEach(({ cell, row, col, value }) => {
+    changes.forEach(({ row, col, value }) => {
       if (row === 0) return; // 跳過標題行
 
       const dataRowIndex = row - 1;
@@ -412,7 +412,7 @@ export function ReactDataSheetWrapper({
   }, []);
 
   // 處理選擇範圍變更
-  const handleSelect = useCallback((start: {i: number, j: number}, end?: {i: number, j: number}) => {
+  const handleSelect = useCallback((start: {_i: number, j: number}, end?: {_i: number, j: number}) => {
     if (!start) return;
 
     // 如果沒有 end，則設為與 start 相同（單個儲存格選擇）
@@ -420,7 +420,7 @@ export function ReactDataSheetWrapper({
 
     setSelectedRange({ start, end: endCell });
 
-    if (start.i !== endCell.i || start.j !== endCell.j) {
+    if (start._i !== endCell._i || start.j !== endCell._j) {
       console.log('Multi-cell selection:', start, 'to', endCell);
     }
   }, []);
@@ -452,7 +452,7 @@ export function ReactDataSheetWrapper({
           table-layout: auto;
         }
 
-        :global(.excel-datasheet-wrapper .data-grid .cell) {
+        :global(.excel-datasheet-wrapper .data-grid ._cell) {
           border: 1px solid #e5e7eb;
           padding: 8px;
           min-height: 32px;
@@ -628,7 +628,7 @@ export function ReactDataSheetWrapper({
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
           dataRenderer={(cell) => cell.value}
-          onContextMenu={(e: any, cell: any, i: any, j: any) => e.preventDefault()}
+          onContextMenu={(e: any, cell: any, _i: any, j: any) => e.preventDefault()}
           // 增強多儲存格選擇
           onSelect={handleSelect}
           // 處理複製貼上

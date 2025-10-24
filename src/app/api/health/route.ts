@@ -46,7 +46,7 @@ export async function GET() {
       const supabase = createClient(supabaseUrl, supabaseKey);
 
       // 簡單查詢測試連線
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('employees')
         .select('count', { count: 'exact', head: true });
 

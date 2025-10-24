@@ -7,7 +7,7 @@
  * - 為未來 Sentry 整合預留接口
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type _LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogMeta {
   [key: string]: unknown;

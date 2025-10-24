@@ -24,7 +24,7 @@ type WidgetType = 'calculator' | 'currency' | 'timer' | 'notes' | 'stats';
 interface WidgetConfig {
   id: WidgetType;
   name: string;
-  icon: any;
+  icon: unknown;
   component: React.ComponentType;
   span?: number; // 佔據的列數（1 或 2）
 }
@@ -525,7 +525,7 @@ function TimerWidget() {
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    let interval: any;
+    let interval: unknown;
     if (isRunning) {
       interval = setInterval(() => {
         setSeconds((s) => s + 1);

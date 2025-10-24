@@ -95,8 +95,8 @@ export function calculateFormula(formula: string, context: FormulaContext): numb
     const result = evaluateExpression(expression);
 
     return result;
-  } catch (error) {
-    console.error('Formula calculation error:', error);
+  } catch (_error) {
+    console.error('Formula calculation error:', _error);
     return '#ERROR';
   }
 }
@@ -121,7 +121,7 @@ function evaluateExpression(expression: string): number | string {
     }
 
     return result;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Expression evaluation failed');
   }
 }

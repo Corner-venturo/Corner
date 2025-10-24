@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Users, User, Mail, Phone, MapPin, Calendar, DollarSign, Edit } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, Edit } from 'lucide-react';
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
@@ -52,15 +52,15 @@ export default function CustomersPage() {
     setIsAddDialogOpen(false);
   };
 
-  const getCustomerOrders = (customer_id: string) => {
+  const getCustomerOrders = (_customer_id: string) => {
     // ✅ 透過 Order.customer_id 反查（目前 Order 類型還沒有 customer_id，暫時返回空陣列）
-    // TODO: 等 Order 類型加入 customer_id 後，改為: orders.filter(order => order.customer_id === customer_id)
+    // TODO: 等 Order 類型加入 customer_id 後，改為: orders.filter(order => order.customer_id === _customer_id)
     return [];
   };
 
-  const getCustomerTours = (customer_id: string) => {
+  const getCustomerTours = (_customer_id: string) => {
     // ✅ 透過反查訂單的 tour_id
-    const customerOrders = getCustomerOrders(customer_id);
+    const customerOrders = getCustomerOrders(_customer_id);
     const tourIds = new Set(customerOrders.map((o) => o.tour_id));
     return tours.filter(tour => tourIds.has(tour.id));
   };
@@ -179,9 +179,9 @@ export default function CustomersPage() {
   ], []);
 
   const totalCustomers = customers.length;
-  const activeCustomers = customers.filter(c => (c.total_orders ?? 0) > 0).length;
+  const _activeCustomers = customers.filter(c => (c.total_orders ?? 0) > 0).length;
   const totalSpent = customers.reduce((sum, c) => sum + (c.total_spent ?? 0), 0);
-  const avgSpentPerCustomer = totalCustomers > 0 ? totalSpent / totalCustomers : 0;
+  const _avgSpentPerCustomer = totalCustomers > 0 ? totalSpent / totalCustomers : 0;
 
   return (
     <div className="h-full flex flex-col">

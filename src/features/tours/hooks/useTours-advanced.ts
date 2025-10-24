@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { tourService } from '../services/tour.service';
 import { Tour } from '@/stores/types';
-import { PageRequest, PageResponse, UseEntityResult } from '@/core/types/common';
+import { PageRequest, UseEntityResult } from '@/core/types/common';
 import { BaseEntity } from '@/core/types/common';
 import { useTourStore } from '@/stores';
 
@@ -10,7 +10,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const tourStore = useTourStore();
+  const _tourStore = useTourStore();
 
   // 使用 useMemo 來穩定 params 物件的參考
   const stableParams = useMemo(() => params, [params]);
@@ -92,7 +92,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       setError(null);
 
       // 樂觀更新 - 立即從 UI 移除
-      const originalData = data;
+      const _originalData = data;
       setData(prevData => prevData.filter(tour => tour.id !== id));
       setTotalCount(prev => Math.max(0, prev - 1));
 
@@ -127,7 +127,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 // 專門用於單個旅遊團詳情的 hook
 export function useTourDetails(tour_id: string) {
   const [tour, setTour] = useState<Tour | null>(null);
-  const [financials, setFinancials] = useState<any>(null);
+  const [financials, setFinancials] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

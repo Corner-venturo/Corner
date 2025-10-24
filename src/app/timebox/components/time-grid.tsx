@@ -3,7 +3,7 @@
 import { useTimeboxStore } from '@/stores/timebox-store'
 
 import ScheduledBoxItem from './scheduled-box-item'
-import { logger } from '@/lib/utils/logger'
+// import { logger } from '@/lib/utils/logger'
 
 interface TimeGridProps {
   weekDays: Date[]
@@ -146,7 +146,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   }
 
   // 檢查時段是否被任何箱子佔用
-  const isTimeSlotOccupied = (dayOfWeek: number, timeSlot: string) => {
+  const _isTimeSlotOccupied = (dayOfWeek: number, timeSlot: string) => {
     const currentMinutes = timeToMinutes(timeSlot)
 
     return scheduledBoxes.some(box => {
@@ -201,7 +201,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     if (timeInterval === 30) return 0
 
     // 在 60 分鐘視圖下，需要計算箱子在整點格子內的偏移
-    const [hour, minute] = start_time.split(':').map(Number)
+    const [_hour, minute] = start_time.split(':').map(Number)
 
     // 如果是整點（:00），在格子頂部
     if (minute === 0) return 0

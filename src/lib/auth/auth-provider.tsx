@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        localStorage.setItem('auth-token', data.token);
+        localStorage.setItem('auth-token', data._token);
       } else {
         throw new Error('登入失敗');
       }

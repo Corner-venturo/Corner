@@ -12,7 +12,7 @@ import { cacheStrategy } from '@/lib/cache/cache-strategy';
 
 export function PerformanceMonitor() {
   const [stats, setStats] = useState<MemoryStats | null>(null);
-  const [cacheStats, setCacheStats] = useState<any>(null);
+  const [cacheStats, setCacheStats] = useState<unknown>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {

@@ -5,7 +5,7 @@
 import { useMemo } from 'react';
 
 import { useOrderStore, useMemberStore } from '@/stores';
-import { Order, Member, CreateOrderData, UpdateOrderData, OrderStatus, PaymentStatus } from '@/types';
+import { Order, Member, CreateOrderData, UpdateOrderData } from '@/types';
 
 export function useOrders() {
   const orderStore = useOrderStore();
@@ -15,7 +15,7 @@ export function useOrders() {
   // 資料驗證
   // ============================================
 
-  const validateOrderData = (data: Partial<Order>): void => {
+  const _validateOrderData = (data: Partial<Order>): void => {
     if (data.total_amount !== undefined && data.total_amount < 0) {
       throw new Error('總金額不能為負數');
     }
@@ -117,9 +117,9 @@ export function useOrders() {
   };
 
   const cancelOrder = async (id: string): Promise<Order> => {
-    const order = await orderStore.fetchById(id);
-    if (!order) throw new Error('訂單不存在');
-    if (!canCancelOrder(order)) throw new Error('此訂單無法取消');
+    const _order = await orderStore.fetchById(id);
+    if (!_order) throw new Error('訂單不存在');
+    if (!canCancelOrder(_order)) throw new Error('此訂單無法取消');
 
     // Order 介面沒有 status 欄位，無法設定為 cancelled
     // 改為設定 payment_status 或其他欄位來表示取消
@@ -139,8 +139,8 @@ export function useOrders() {
     const member = await memberStore.create(orderData);
 
     // 更新訂單人數
-    const order = await orderStore.fetchById(orderData.order_id);
-    if (order) {
+    const _order = await orderStore.fetchById(orderData.order_id);
+    if (_order) {
       const members = await getOrderMembers(orderData.order_id);
       await orderStore.update(orderData.order_id, {
         member_count: members.length,

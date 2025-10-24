@@ -33,7 +33,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
     onChange([...fields, newField]);
   };
 
-  const updateField = (index: number, key: keyof TemplateField, value: any) => {
+  const updateField = (index: number, key: keyof TemplateField, value: unknown) => {
     const newFields = [...fields];
     newFields[index] = { ...newFields[index], [key]: value };
 
@@ -55,7 +55,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
     onChange(newFields);
   };
 
-  const validateAllFields = () => {
+  const _validateAllFields = () => {
     const newErrors: Record<string, string> = {};
     let hasError = false;
 

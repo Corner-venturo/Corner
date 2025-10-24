@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 interface DateInputProps {
   value: string // ISO 8601 格式 (YYYY-MM-DD)
   onChange: (value: string) => void
-  placeholder?: string
+  _placeholder?: string
   disabled?: boolean
   className?: string
   min?: string
@@ -16,7 +16,7 @@ interface DateInputProps {
 export function DateInput({
   value,
   onChange,
-  placeholder = 'YYYY/MM/DD',
+  _placeholder = 'YYYY/MM/DD',
   disabled = false,
   className,
   min,
@@ -164,7 +164,7 @@ export function DateInput({
         value={year}
         onChange={handleYearChange}
         onKeyDown={handleYearKeyDown}
-        placeholder="YYYY"
+        _placeholder="YYYY"
         disabled={disabled}
         className="w-12 bg-transparent outline-none text-center"
         maxLength={4}
@@ -177,7 +177,7 @@ export function DateInput({
         value={month}
         onChange={handleMonthChange}
         onKeyDown={handleMonthKeyDown}
-        placeholder="MM"
+        _placeholder="MM"
         disabled={disabled}
         className="w-8 bg-transparent outline-none text-center"
         maxLength={2}
@@ -190,7 +190,7 @@ export function DateInput({
         value={day}
         onChange={handleDayChange}
         onKeyDown={handleDayKeyDown}
-        placeholder="DD"
+        _placeholder="DD"
         disabled={disabled}
         className="w-8 bg-transparent outline-none text-center"
         maxLength={2}

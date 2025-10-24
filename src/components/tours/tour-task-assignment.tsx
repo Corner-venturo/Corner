@@ -8,7 +8,7 @@ import { StarRating } from '@/components/ui/star-rating';
 import { EnhancedTable } from '@/components/ui/enhanced-table';
 import { Tour, Todo } from '@/stores/types';
 import { useTodoStore } from '@/stores';
-import { taskTemplates, getTemplatesByCategory, calculateDeadlineFromDeparture } from '@/lib/task-templates';
+import { taskTemplates, calculateDeadlineFromDeparture } from '@/lib/task-templates';
 import { cn } from '@/lib/utils';
 import { Plus, Eye, Calendar, User, CheckCircle, Clock } from 'lucide-react';
 
@@ -24,7 +24,7 @@ const employees = [
 ];
 
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
-  const { items: todos, create: addTodo, update: updateTodo } = useTodoStore();
+  const { items: todos, create: addTodo, update: _updateTodo } = useTodoStore();
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [taskForm, setTaskForm] = useState({
     title: '',
@@ -201,7 +201,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     {
       key: 'progress',
       label: '進度',
-      render: (value: any, todo: Todo) => {
+      render: (value: unknown, todo: Todo) => {
         const { completed, total, percentage } = getProgressInfo(todo);
         return (
           <div className="flex items-center gap-2">
@@ -232,7 +232,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     {
       key: 'actions',
       label: '操作',
-      render: (value: any, todo: Todo) => (
+      render: (value: unknown, todo: Todo) => (
         <Button
           size="sm"
           variant="outline"

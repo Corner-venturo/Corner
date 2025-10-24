@@ -185,7 +185,7 @@ export function useTours() {
   // 權限檢查（簡化版，實際應從 auth 取得）
   // ============================================
 
-  const hasPermission = (action: 'create' | 'update' | 'delete'): boolean => {
+  const hasPermission = (_action: 'create' | 'update' | 'delete'): boolean => {
     // TODO: 從 auth store 取得實際權限
     // 目前簡化為都允許
     return true;

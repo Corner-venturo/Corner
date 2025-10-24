@@ -3,19 +3,17 @@
 import { TemplateField, RepeatableSection } from '@/types/template';
 
 interface TemplatePDFPreviewProps {
-  data: any;
+  data: unknown;
   columnWidths?: number[];
   fieldMappings?: TemplateField[];
-  repeatableSections?: RepeatableSection[];
+  _repeatableSections?: RepeatableSection[];
   highlightedSection?: RepeatableSection | null;
 }
 
 export function TemplatePDFPreview({
   data,
   columnWidths = [80, 100, 150, 120, 100, 100, 100, 100, 100, 100, 100, 100],
-  fieldMappings,
-  repeatableSections = [],
-  highlightedSection
+  _repeatableSections = []
 }: TemplatePDFPreviewProps) {
   // 如果沒有資料，顯示空白 A4
   if (!data || !Array.isArray(data) || data.length === 0) {

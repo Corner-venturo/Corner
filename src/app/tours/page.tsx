@@ -10,14 +10,14 @@ import { SmartDateInput } from '@/components/ui/smart-date-input';
 import { useTours } from '@/features/tours/hooks/useTours-advanced';
 import { tourService } from '@/features/tours/services/tour.service';
 import { PageRequest } from '@/core/types/common';
-import { Calendar, FileText, MapPin, Calculator, BarChart3, ShoppingCart, Users, FileCheck, AlertCircle, Clipboard, Plus, Package, RefreshCw, FileX, Edit2, UserPlus, Search, Grid3x3, List, Trash2, Archive, ArchiveRestore } from 'lucide-react';
+import { Calendar, FileText, MapPin, Calculator, BarChart3, ShoppingCart, Users, FileCheck, AlertCircle, Clipboard, Plus, Package, RefreshCw, Edit2, UserPlus, Trash2, Archive, ArchiveRestore } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { ExpandableOrderTable } from '@/components/orders/expandable-order-table';
 import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form';
 import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionStore } from '@/stores';
 import { useQuotes } from '@/features/quotes/hooks/useQuotes';
-import { Combobox } from '@/components/ui/combobox';
+// import { Combobox } from '@/components/ui/combobox';
 // TODO: usePaymentStore deprecated - import { usePaymentStore } from '@/stores';
 import { Tour } from '@/stores/types';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
@@ -29,7 +29,7 @@ import { TourRefunds } from '@/components/tours/tour-refunds';
 import { TourPayments } from '@/components/tours/tour-payments';
 import { TourCosts } from '@/components/tours/tour-costs';
 import { TourTaskAssignment } from '@/components/tours/tour-task-assignment';
-import { TourCard } from '@/components/tours/tour-card';
+// import { TourCard } from '@/components/tours/tour-card';
 
 // 使用與詳細模式相同的標籤定義
 const tourTabs = [
@@ -64,7 +64,7 @@ interface NewTourData {
 export default function ToursPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tourStore = useTourStore();
+  const _tourStore = useTourStore();
   const orderStore = useOrderStore();
   const { items: orders } = orderStore;
   const addOrder = orderStore.create;
@@ -89,16 +89,16 @@ export default function ToursPage() {
   }, [regions.length, employees.length, regionStore, employeeStore, openDialog]);
 
   // 選中的旅遊團
-  const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
+  const [_selectedTour, setSelectedTour] = useState<Tour | null>(null);
 
   // 分頁和篩選狀態
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [_selectedRows, _setSelectedRows] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [activeStatusTab, setActiveStatusTab] = useState('all');
-  const [viewMode, setViewMode] = useState<'card' | 'list'>('list');
+  const [_viewMode, _setViewMode] = useState<'card' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; tour: Tour | null }>({ isOpen: false, tour: null });
   const pageSize = 10;
@@ -106,14 +106,13 @@ export default function ToursPage() {
   // 建立 PageRequest 參數
   const pageRequest: PageRequest = {
     page: currentPage,
-    pageSize,
     search: '',
     sortBy,
     sortOrder,
   };
 
   // 使用新的 hook
-  const { data: tours, totalCount, loading, error, actions } = useTours(pageRequest);
+  const { data: tours, loading, actions } = useTours(pageRequest);
 
   // UI 狀態
   const [activeTabs, setActiveTabs] = useState<Record<string, string>>({});
@@ -558,7 +557,7 @@ export default function ToursPage() {
     setCurrentPage(1);
   }, []);
 
-  const handlePaginationChange = useCallback((page: number, pageSize: number) => {
+  const _handlePaginationChange = useCallback((page: number, pageSize: number) => {
     setCurrentPage(page);
   }, []);
 
@@ -1183,7 +1182,7 @@ function TourOverviewTab({ tour }: { tour: Tour }) {
   const actualExpenses = quoteBudget.map((category) => {
     const categoryTotal = tourPaymentRequests.reduce((sum: any, request: any) => {
       const categoryItems = request.items?.filter((item) => item.category === category.name) || [];
-      return sum + categoryItems.reduce((itemSum: any, item: any) => itemSum + (item.unit_price * item.quantity), 0);
+      return sum + categoryItems.reduce((itemSum: any, item: unknown) => itemSum + (item.unit_price * item.quantity), 0);
     }, 0);
 
     return {
@@ -1463,7 +1462,7 @@ function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFields }: 
   tourExtraFields: Record<string, unknown>;
   setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
 }) {
-  const tourStore = useTourStore();
+  const _tourStore = useTourStore();
   const orderStore = useOrderStore();
   const memberStore = useMemberStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);

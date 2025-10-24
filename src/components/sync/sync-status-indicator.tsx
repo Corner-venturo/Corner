@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { backgroundSyncService } from '@/lib/sync/background-sync-service';
-import { localDB } from '@/lib/db';
+import { _localDB } from '@/lib/db';
 import { TABLES } from '@/lib/db/schemas';
 import {
   Wifi, WifiOff, Cloud, CloudOff,

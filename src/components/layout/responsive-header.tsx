@@ -6,12 +6,12 @@ import { cn } from '@/lib/utils';
 
 interface ResponsiveHeaderProps {
   title: string;
-  icon?: any;
+  icon?: unknown;
   breadcrumb?: { label: string; href: string }[];
   tabs?: {
     value: string;
     label: string;
-    icon?: any;
+    icon?: unknown;
   }[];
   activeTab?: string;
   onTabChange?: (value: string) => void;
@@ -29,7 +29,7 @@ interface ResponsiveHeaderProps {
 }
 
 export const ResponsiveHeader = memo(function ResponsiveHeader(props: ResponsiveHeaderProps) {
-  const { sidebarCollapsed } = useAuthStore();
+  const { _sidebarCollapsed } = useAuthStore();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (

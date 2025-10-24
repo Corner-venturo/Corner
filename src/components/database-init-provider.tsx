@@ -15,7 +15,7 @@ interface DatabaseInitProviderProps {
 }
 
 export function DatabaseInitProvider({ children }: DatabaseInitProviderProps) {
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [_isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     async function initializeDatabase() {
@@ -27,7 +27,7 @@ export function DatabaseInitProvider({ children }: DatabaseInitProviderProps) {
         if (process.env.NODE_ENV === 'development') {
           try {
             await import('@/lib/db/verify-and-fix');
-          } catch (e) {
+          } catch (_e) {
             // 忽略錯誤
           }
         }

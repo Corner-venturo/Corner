@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrderStore } from '@/stores';
-import { CreditCard, Plus, Trash2, ArrowLeft } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { CreditCard, Plus, Trash2} from 'lucide-react';
+// import { cn } from '@/lib/utils';
 
 // 收款方式選項
 const paymentMethods = [

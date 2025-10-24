@@ -2,7 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { _TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {

@@ -17,7 +17,7 @@ import { memoryCache } from '@/lib/cache/memory-cache';
 import { localDB } from '@/lib/db';
 import { TableName } from '@/lib/db/schemas';
 import { isSyncableTable } from '@/lib/db/sync-schema-helper';
-import { withSyncFields, markAsSynced } from '@/lib/db/sync-utils';
+import { withSyncFields } from '@/lib/db/sync-utils';
 import { generateUUID } from '@/lib/utils/uuid';
 import { logger } from '@/lib/utils/logger';
 import { backgroundSyncService } from '@/lib/sync/background-sync-service';
@@ -68,7 +68,7 @@ interface CodeConfig {
 /**
  * 生成編號
  */
-function generateCode(config: CodeConfig, existingItems: BaseEntity[]): string {
+function _generateCode(config: CodeConfig, existingItems: BaseEntity[]): string {
   const year = config.year || new Date().getFullYear();
   const yearStr = year.toString();
 
@@ -143,7 +143,7 @@ export function createStore<T extends BaseEntity>(
     };
   }
 
-  const { tableName, codePrefix, enableSupabase, fastInsert } = config;
+  const { tableName, codePrefix, enableSupabase } = config;
   const store = create<StoreState<T>>()(
     persist(
       (set, get) => ({

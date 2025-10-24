@@ -146,16 +146,16 @@ class TourService extends BaseService<Tour> {
   }
 
   // 檢查團體是否可以取消
-  async canCancelTour(tour_id: string): Promise<{ canCancel: boolean; reason?: string }> {
+  async canCancelTour(tour_id: string): Promise<{ canCancel: boolean; _reason?: string }> {
     try {
       const tour = await this.getById(tour_id);
       if (!tour) {
-        return { canCancel: false, reason: '找不到該旅遊團' };
+        return { canCancel: false, _reason: '找不到該旅遊團' };
       }
 
       // Tour 狀態檢查
       if (tour.status === 'closed') {
-        return { canCancel: false, reason: '該旅遊團已經結案，無法取消' };
+        return { canCancel: false, _reason: '該旅遊團已經結案，無法取消' };
       }
 
       const departure_date = new Date(tour.departure_date);
@@ -163,7 +163,7 @@ class TourService extends BaseService<Tour> {
       const daysDiff = Math.ceil((departure_date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
       if (daysDiff < 3) {
-        return { canCancel: false, reason: '出發前3天內無法取消' };
+        return { canCancel: false, _reason: '出發前3天內無法取消' };
       }
 
       return { canCancel: true };
@@ -173,7 +173,7 @@ class TourService extends BaseService<Tour> {
   }
 
   // 更新團體狀態
-  async updateTourStatus(tour_id: string, newStatus: Tour['status'], reason?: string): Promise<Tour> {
+  async updateTourStatus(tour_id: string, newStatus: Tour['status'], _reason?: string): Promise<Tour> {
     try {
       const tour = await this.getById(tour_id);
       if (!tour) {
@@ -230,7 +230,7 @@ class TourService extends BaseService<Tour> {
             if (!updateError && updated) {
               console.log(`✅ [Visa Tour] 簽證團已復原`);
               // 重新載入 tours
-              const store = this.getStore();
+              const _store = this.getStore();
               const tourStore = useTourStore.getState();
               await tourStore.fetchAll();
               return updated as Tour;

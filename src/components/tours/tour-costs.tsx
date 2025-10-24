@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tour } from '@/stores/types';
 import { useOrderStore } from '@/stores';
 // TODO: usePaymentStore deprecated
-import { Receipt, Calendar, FileText, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react';
+import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react';
 
 interface TourCostsProps {
   tour: Tour;
@@ -18,7 +18,7 @@ interface TourCostsProps {
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
   const { items: orders } = useOrderStore();
   const payments: unknown[] = []; // TODO: usePaymentStore deprecated
-  const addPayment = async (data) => { console.warn("addPayment not implemented"); };
+  const addPayment = async (_data) => { console.warn("addPayment not implemented"); };
 // TODO: usePaymentStore deprecated -   const { items: payments, create: addPayment } = usePaymentStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCost, setNewCost] = useState({
@@ -29,7 +29,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     vendor: ''
   });
 
-  const tourCosts = payments.filter(payment => {
+  const _tourCosts = payments.filter(payment => {
     if (payment.type !== '請款') return false;
 
     if (orderFilter) {

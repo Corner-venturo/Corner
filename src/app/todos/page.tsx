@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from '@/components/ui/dialog';
 import { useTodoStore } from '@/stores';
 import { useUserStore } from '@/stores/user-store';
 import { useAuthStore } from '@/stores/auth-store';
-import { CheckCircle, Clock, Calendar, ChevronDown, X, Star, Receipt, FileText, Users, DollarSign, UserPlus, AlertCircle, Trash2, Edit2, Grid3x3, List, Search, Cloud, CloudOff, RefreshCw, Plus } from 'lucide-react';
+import { CheckCircle, Clock, Calendar, ChevronDown, X, Star, Receipt, FileText, Users, DollarSign, UserPlus, AlertCircle, Trash2, Edit2} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { EnhancedTable } from '@/components/ui/enhanced-table';
@@ -37,7 +37,7 @@ export default function TodosPage() {
   const [expandedTodo, setExpandedTodo] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 使用快取資料，不需要載入
+  const [isLoading, _setIsLoading] = useState(false); // 使用快取資料，不需要載入
   const [isSubmitting, setIsSubmitting] = useState(false); // 防止重複提交
   const [isComposing, setIsComposing] = useState(false); // 中文輸入法狀態
 
@@ -407,7 +407,7 @@ export default function TodosPage() {
 // 新增待辦事項表單組件
 function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data) => void; onCancel: () => void }) {
   const { items: users, fetchAll: loadUsersFromDatabase } = useUserStore();
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [isLoadingUsers, _setIsLoadingUsers] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     priority: 3 as 1 | 2 | 3 | 4 | 5,
@@ -419,13 +419,13 @@ function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data) => void; onCance
   // 當點擊或聚焦指派選單時，才載入員工資料
   const handleAssigneeDropdownFocus = async () => {
     if (users.length === 0 && !isLoadingUsers) {
-      setIsLoadingUsers(true);
+      _setIsLoadingUsers(true);
       try {
         await loadUsersFromDatabase();
       } catch (error) {
         logger.error('載入員工資料失敗:', error);
       } finally {
-        setIsLoadingUsers(false);
+        _setIsLoadingUsers(false);
       }
     }
   };

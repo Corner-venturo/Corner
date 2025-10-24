@@ -1,7 +1,7 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
-import { DollarSign } from 'lucide-react';
+import { _Input } from '@/components/ui/input';
+import { _DollarSign } from 'lucide-react';
 // import { useCurrency } from './currency/useCurrency';
 // import { currencies } from './currency/currencyData';
 // import { getCurrencyInfo, getCurrentRate, convertAmount } from './currency/currencyUtils';

@@ -4,14 +4,12 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Tour } from '@/stores/types';
 import { useOrderStore, useMemberStore } from '@/stores';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { _Input } from '@/components/ui/input';
 import {
   getGenderFromIdNumber,
-  calculateAge,
-  validateIdNumber,
-  validatePassportNumber
+  calculateAge
 } from '@/lib/utils';
-import { Plus, Trash2, GripVertical, Users } from 'lucide-react';
+import { Trash2, GripVertical, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TourMembersProps {
@@ -177,9 +175,9 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
   };
 
   // 新增成員到指定訂單
-  const addMemberToOrder = (order_id: string) => {
-    const relatedOrder = tourOrders.find(order => order.id === order_id);
-    if (!relatedOrder) return;
+  const _addMemberToOrder = (order_id: string) => {
+    const _relatedOrder = tourOrders.find(order => order.id === order_id);
+    if (!_relatedOrder) return;
 
     const newMember: EditingMember = {
       order_id,
@@ -192,8 +190,8 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
       gender: '',
       age: 0,
       isNew: true,
-      order_number: relatedOrder.order_number,
-      contact_person: relatedOrder.contact_person
+      order_number: _relatedOrder.order_number,
+      contact_person: _relatedOrder.contact_person
     };
     setTableMembers([...tableMembers, newMember]);
   };
@@ -383,17 +381,17 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
                     </td>
 
                     {/* 可編輯欄位 */}
-                    <td className="border border-gray-300">{renderCell(member, index, 'name')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'nameEn')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'birthday')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'age')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'gender')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'idNumber')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'passportNumber')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'passportExpiry')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'order_number')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'contact_person')}</td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'assignedRoom')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'name')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'nameEn')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'birthday')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'age')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'gender')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'idNumber')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'passportNumber')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'passportExpiry')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'order_number')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'contact_person')}</td>
+                    <td className="border border-gray-300">{renderCell(member, 'assignedRoom')}</td>
 
                     {/* 刪除按鈕 */}
                     <td className="border border-gray-300 text-center py-1">

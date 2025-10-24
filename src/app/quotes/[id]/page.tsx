@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
+// import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -20,20 +20,16 @@ import {
   MapPin,
   MoreHorizontal,
   Users,
-  Trash2,
-  Edit,
   ArrowLeft,
   Save,
-  History,
+  CheckCircle,
   Plane,
-  Copy,
-  CheckCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuotes } from '@/features/quotes/hooks/useQuotes';
 import { useTourStore, useRegionStore } from '@/stores';
 import { generateTourCode } from '@/lib/utils';
-import { Combobox } from '@/components/ui/combobox';
+// import { Combobox } from '@/components/ui/combobox';
 import { getRegionOptions, type RegionName } from '@/data/region-options';
 import { logger } from '@/lib/utils/logger';
 
@@ -65,7 +61,7 @@ interface CostCategory {
 }
 
 // Import QuoteItem from store types for type casting
-import { QuoteItem } from '@/stores/types';
+// import { QuoteItem } from '@/stores/types';
 
 const costCategories: CostCategory[] = [
   { id: 'transport', name: '交通', items: [], total: 0 },
@@ -138,7 +134,7 @@ export default function QuoteDetailPage() {
   };
 
   // 國家和城市選擇 state
-  const [selectedCountry, setSelectedCountry] = useState<string>(() => {
+  const [selectedCountry, _setSelectedCountry] = useState<string>(() => {
     if (relatedTour) {
       return getCountryAndCityFromLocation(relatedTour.location).countryCode;
     }
@@ -192,7 +188,7 @@ export default function QuoteDetailPage() {
                             participantCounts.child_no_bed + participantCounts.single_room;
 
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '');
-  const [showVersionHistory, setShowVersionHistory] = useState<boolean>(false);
+  const [_showVersionHistory, _setShowVersionHistory] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
   const [versionName, setVersionName] = useState<string>('');
@@ -490,7 +486,7 @@ export default function QuoteDetailPage() {
   }, [accommodationDays]);
 
 
-  const handleUpdateItem = (category_id: string, itemId: string, field: keyof CostItem, value: any) => {
+  const handleUpdateItem = (category_id: string, itemId: string, field: keyof CostItem, value: unknown) => {
     setCategories(prev => {
       const newCategories = prev.map(cat => {
         if (cat.id === category_id) {
@@ -675,7 +671,7 @@ export default function QuoteDetailPage() {
   }, []);
 
   // 計算交通團體分攤信息
-  const transportGroupSummary = useMemo(() => {
+  const _transportGroupSummary = useMemo(() => {
     const transportCategory = categories.find(cat => cat.id === 'transport');
     if (!transportCategory || transportCategory.items.length === 0) return null;
 
@@ -693,13 +689,13 @@ export default function QuoteDetailPage() {
   }, [categories, groupSize]);
 
   // 計算領隊分攤金額
-  const guideCostPerPerson = useMemo(() => {
+  const _guideCostPerPerson = useMemo(() => {
     const totalGuideCost = calculateGuideWithCategories(categories);
     return groupSizeForGuide > 0 ? Math.ceil(totalGuideCost / groupSizeForGuide) : 0;
   }, [categories, groupSizeForGuide]);
 
   // 處理下拉選單項目選擇
-  const handleOptionSelect = (category_id: string, itemId: string, option: any) => {
+  const _handleOptionSelect = (category_id: string, itemId: string, option: any) => {
     // 更新項目名稱
     handleUpdateItem(category_id, itemId, 'name', option.name);
 
@@ -720,7 +716,7 @@ export default function QuoteDetailPage() {
   };
 
   // 取得當前地區的選項
-  const regionOptions = getRegionOptions(selectedRegion);
+  const _regionOptions = getRegionOptions(selectedRegion);
 
   // 計算住宿的房型位置平均費用
   const accommodationSummary = useMemo(() => {
@@ -1558,7 +1554,7 @@ export default function QuoteDetailPage() {
                           })()
                         ) : (
                           // 一般分類的渲染
-                          category.items.map((item, index) => (
+                          category.items.map((item, _index) => (
                             <tr
                               key={item.id}
                               className="border-b border-border hover:bg-morandi-container/10 transition-colors"

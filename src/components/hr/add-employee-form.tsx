@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Employee } from '@/stores/types';
+import { _Employee } from '@/stores/types';
 import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { hashPassword } from '@/lib/auth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -15,7 +15,7 @@ interface AddEmployeeFormProps {
 }
 
 export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
-  const { create: addUser, fetchAll } = useUserStore();
+  const { create: addUser } = useUserStore();
 
   // 成功創建對話框狀態
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);

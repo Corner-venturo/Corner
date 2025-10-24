@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrderStore } from '@/stores';
 // TODO: usePaymentStore deprecated - 收款記錄功能未實作
-import { CreditCard, Calendar, Plus, Trash2 } from 'lucide-react';
+import {  Calendar, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // 收款方式選項

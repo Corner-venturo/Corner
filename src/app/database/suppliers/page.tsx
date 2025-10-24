@@ -17,13 +17,13 @@ import {
   UserCheck,
   Package
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils';
 import { Supplier } from '@/types/supplier.types';
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table';
 import { supplierService } from '@/features/suppliers/services/supplier.service';
 import { useRegionStore } from '@/stores';
 
-const supplierTypeIcons = {
+const _supplierTypeIcons = {
   hotel: Hotel,
   restaurant: UtensilsCrossed,
   transport: Car,
@@ -41,7 +41,7 @@ const supplierTypeLabels = {
   other: '其他'
 };
 
-const supplierTypeColors = {
+const _supplierTypeColors = {
   hotel: 'bg-blue-500',
   restaurant: 'bg-green-500',
   transport: 'bg-orange-500',
@@ -51,7 +51,7 @@ const supplierTypeColors = {
 };
 
 export default function SuppliersPage() {
-  const { items: suppliers, create: addSupplier, filter } = useSupplierStore();
+  const { items: suppliers, create: addSupplier, _filter } = useSupplierStore();
   const { items: regions, fetchAll: fetchRegions } = useRegionStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,7 +67,7 @@ export default function SuppliersPage() {
   // 從 regions 取得國家列表
   const activeCountries = useMemo(() => {
     return regions
-      .filter(r => r.type === 'country' && r.status === 'active' && !r._deleted)
+      ._filter(r => r.type === 'country' && r.status === 'active' && !r._deleted)
       .map(r => ({ code: r.code, name: r.name }));
   }, [regions]);
 
@@ -125,7 +125,7 @@ export default function SuppliersPage() {
   // 過濾供應商 - 使用 useMemo 優化
   const filteredSuppliers = useMemo(() => {
     if (!suppliers || !Array.isArray(suppliers)) return [];
-    return suppliers.filter(supplier => {
+    return suppliers._filter(supplier => {
       const matchesSearch = searchQuery === '' ||
         supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (supplier.supplier_code && supplier.supplier_code.toLowerCase().includes(searchQuery.toLowerCase())) ||

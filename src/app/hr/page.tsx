@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+// import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { Employee } from '@/stores/types';
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view';
 import { AddEmployeeForm } from '@/components/hr/add-employee-form';
-import { User, Building, Phone, Mail, UserCheck, UserX, Clock, Briefcase, Trash2, MoreVertical } from 'lucide-react';
+import { User, UserCheck, UserX, Clock, Phone, Mail, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const statusFilters = [

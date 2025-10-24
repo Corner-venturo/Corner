@@ -35,7 +35,7 @@ export default function EditItineraryPage() {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [itineraryData, setItineraryData] = useState<any>(null);
+  const [itineraryData, setItineraryData] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
 
   // 載入行程資料

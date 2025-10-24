@@ -6,7 +6,7 @@ import { initializeEmployeePasswords, createTestEmployees } from '@/lib/init-pas
 import { useUserStore } from '@/stores/user-store';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { DB_NAME } from '@/lib/db/schemas';
-import { Shield, Users, Key, AlertTriangle, CheckCircle, Settings, Trash2, Hash } from 'lucide-react';
+import { Shield, Users, Key, AlertTriangle,  /* CheckCircle, */ Settings, Trash2, Hash } from 'lucide-react';
 
 export default function DevToolsPage() {
   const [isInitializing, setIsInitializing] = useState(false);
@@ -117,7 +117,7 @@ export default function DevToolsPage() {
                 try {
                   transaction.objectStore(storeName).clear();
                   logs.push(`✅ 清空 ${storeName}`);
-                } catch (err) {
+                } catch (error) {
                   logs.push(`⚠️ 清空 ${storeName} 失敗`);
                 }
               }

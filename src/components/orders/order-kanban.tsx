@@ -5,7 +5,7 @@ import { Order, Tour } from '@/stores/types';
 import { useOrderStore } from '@/stores';
 import { Users, DollarSign, Calendar, User, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { _Button } from '@/components/ui/button';
 
 interface OrderKanbanProps {
   orders: Order[];

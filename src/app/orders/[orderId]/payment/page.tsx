@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
 import { useOrderStore } from '@/stores';
 // TODO: usePaymentStore deprecated
-import { ArrowLeft, CreditCard, Plus, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, CreditCard, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PaymentDetailPage() {
@@ -26,7 +26,7 @@ export default function PaymentDetailPage() {
   // 找出此訂單相關的請款單
   const orderPayments = paymentRequests.filter((p: any) => p.order_id === orderId);
 
-  const getPaymentStatusBadge = (status: string) => {
+  const _getPaymentStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
       '已確認': 'bg-morandi-green text-white',
       '待確認': 'bg-morandi-gold text-white',
@@ -35,7 +35,7 @@ export default function PaymentDetailPage() {
     return badges[status] || 'bg-morandi-container text-morandi-secondary';
   };
 
-  const getPaymentTypeIcon = () => {
+  const _getPaymentTypeIcon = () => {
     // PaymentRequest 都是請款類型
     return <TrendingDown size={16} className="text-morandi-red" />;
   };

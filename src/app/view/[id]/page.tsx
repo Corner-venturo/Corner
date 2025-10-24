@@ -28,7 +28,7 @@ export default function ViewItineraryPage() {
   const id = params.id as string;
   const { fetchById } = useTourStore();
 
-  const [tourData, setTourData] = useState<any>(null);
+  const [tourData, setTourData] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
 
   // 載入行程資料

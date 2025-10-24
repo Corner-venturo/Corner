@@ -4,7 +4,7 @@ import { FileText, Image as ImageIcon, Table, AlignLeft, Calendar, Users, Dollar
 
 import { Button } from '@/components/ui/button';
 
-import { cn } from '@/lib/utils';
+import { _cn } from '@/lib/utils';
 
 interface Component {
   id: string;

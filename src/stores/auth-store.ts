@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from './types';
-import { useUserStore } from './user-store';
-import { generateToken, verifyPassword, type AuthPayload } from '@/lib/auth';
+import { _useUserStore } from './user-store';
+import { generateToken, type AuthPayload } from '@/lib/auth';
 import { useLocalAuthStore, LocalProfile } from '@/lib/auth/local-auth-manager';
 import { OfflineAuthService } from '@/services/offline-auth.service';
 import { logger } from '@/lib/utils/logger';

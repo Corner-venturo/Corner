@@ -5,7 +5,7 @@ import { Tour } from '@/stores/types';
 import { useTourAddOnStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ShoppingCart } from 'lucide-react';
+import { Trash2, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TourAddOnsProps {

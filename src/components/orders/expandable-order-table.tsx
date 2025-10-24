@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTourStore, useOrderStore } from '@/stores';
-import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Banknote, Trash2 } from 'lucide-react';
+import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table';
 import { Order } from '@/stores/types';

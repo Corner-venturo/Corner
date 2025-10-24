@@ -3,7 +3,7 @@
 import { AlertTriangle, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { _cn } from '@/lib/utils';
 import { useTourStore } from '@/stores';
 
 interface FinanceAlertCardProps {
@@ -31,7 +31,7 @@ export function FinanceAlertCard({ tourIds, authorName, createdAt }: FinanceAler
 
   const totalGap = selectedTours.reduce((sum, tour) => sum + tour.gap, 0);
 
-  const getRiskBadge = (level: string) => {
+  const _getRiskBadge = (level: string) => {
     switch (level) {
       case 'high':
         return '🔴';

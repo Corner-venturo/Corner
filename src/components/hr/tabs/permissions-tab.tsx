@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { _Button } from '@/components/ui/button';
 import { Employee, SYSTEM_PERMISSIONS } from '@/stores/types';
 import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { useAuthStore } from '@/stores/auth-store';
-import { Shield, Check, X, Save, Edit } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PermissionsTabProps {
@@ -181,7 +181,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
 
   const categories = Object.keys(permissionsByCategory);
 
-  const roleLabels = {
+  const _roleLabels = {
     admin: '管理員',
     employee: '員工',
     user: '普通使用者',

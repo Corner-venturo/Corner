@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { useOrderStore, useTourStore } from '@/stores';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft} from 'lucide-react';
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table';
 
 export default function MemberDetailPage() {

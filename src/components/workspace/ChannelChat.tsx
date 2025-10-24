@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Card } from '@/components/ui/card';
+import { _Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,9 +17,7 @@ import {
   Users,
   Send,
   Plus,
-  Settings,
   Smile,
-  MoreHorizontal,
   Trash2,
   Paperclip,
   X,
@@ -28,12 +26,8 @@ import {
   Receipt,
   DollarSign,
   CheckSquare,
-  Link2,
-  TrendingUp,
   Download,
-  ShoppingCart,
-  Wallet,
-  AlertTriangle
+  Wallet
 } from 'lucide-react';
 import { useWorkspaceStore, type Message } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
@@ -45,8 +39,8 @@ import { ChannelSidebar } from './ChannelSidebar';
 import { ChannelTabs } from './ChannelTabs';
 import { ShareAdvanceDialog } from './ShareAdvanceDialog';
 import { AdvanceListCard } from './AdvanceListCard';
-import { FinanceAlertDialog } from './FinanceAlertDialog';
-import { FinanceAlertCard } from './FinanceAlertCard';
+import { _FinanceAlertDialog } from './FinanceAlertDialog';
+import { FinanceAlert_Card } from './_FinanceAlertCard';
 import { ShareOrdersDialog } from './ShareOrdersDialog';
 import { OrderListCard } from './OrderListCard';
 import { CreateReceiptDialog } from './CreateReceiptDialog';
@@ -60,7 +54,7 @@ const downloadFile = (path: string, bucket: string, fileName: string) => {
 
 export function ChannelChat() {
   // ❌ 移除本地 state，改用 store 管理
-  // const [selectedChannel, setSelectedChannel] = useState<any>(null);
+  // const [selectedChannel, setSelectedChannel] = useState<unknown>(null);
   const [messageText, setMessageText] = useState('');
   const [showMemberSidebar, setShowMemberSidebar] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -78,12 +72,12 @@ export function ChannelChat() {
   const [showShareOrdersDialog, setShowShareOrdersDialog] = useState(false);
   const [showCreateReceiptDialog, setShowCreateReceiptDialog] = useState(false);
   const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
+  const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null);
   const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('');
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [showChannelForm, setShowChannelForm] = useState(false);
+  const [_showChannelForm, setShowChannelForm] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [editChannelName, setEditChannelName] = useState('');
@@ -111,9 +105,7 @@ export function ChannelChat() {
     sharedOrderLists,
     loadAdvanceLists,
     loadSharedOrderLists,
-    deleteAdvanceList,
-    processAdvanceItem,
-    updateOrderReceiptStatus
+    deleteAdvanceList
   } = useWorkspaceStore();
 
   const { user, currentProfile } = useAuthStore();
@@ -264,7 +256,7 @@ export function ChannelChat() {
     }
   };
 
-  const handleCreateChannel = async (e: React.FormEvent) => {
+  const _handleCreateChannel = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newChannelName.trim() || !currentWorkspace) return;
 

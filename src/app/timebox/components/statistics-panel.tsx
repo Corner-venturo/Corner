@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 import { useTimeboxStore } from '@/stores/timebox-store'
-import { Card } from '@/components/ui/card'
+// import { Card } from '@/components/ui/card'
 
 function StatisticsPanel() {
   const { getWeekStatistics } = useTimeboxStore()

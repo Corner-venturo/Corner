@@ -34,7 +34,6 @@ class ErrorHandler {
     const entry: ErrorLogEntry = {
       timestamp: new Date().toISOString(),
       level: 'error',
-      context,
       message: this.extractMessage(error),
       stack: error instanceof Error ? error.stack : undefined,
       metadata,
@@ -64,7 +63,7 @@ class ErrorHandler {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('venturo-error-logs', JSON.stringify(this.logs.slice(-100)));
-      } catch (e) {
+      } catch (_e) {
         // localStorage 可能已滿，忽略
       }
     }
@@ -165,7 +164,7 @@ export function handleError(
   context: string,
   metadata?: Record<string, unknown>
 ): void {
-  errorHandler.handle(error, context, metadata);
+  errorHandler.handle(error, metadata);
 }
 
 /**
@@ -179,7 +178,7 @@ export async function withErrorHandling<T>(
   try {
     return await fn();
   } catch (error) {
-    handleError(error, context, metadata);
+    handleError(error, metadata);
     return null;
   }
 }

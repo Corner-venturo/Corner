@@ -23,7 +23,7 @@ const employees = [
   { id: '4', name: '陳業務', role: '業務' },
 ];
 
-export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps) {
+export function WorkspaceTaskList({ tour_id }: WorkspaceTaskListProps) {
   const { items: todos, update: updateTodo } = useTodoStore();
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
@@ -128,11 +128,11 @@ export function WorkspaceTaskList({ channelId, tour_id }: WorkspaceTaskListProps
           <p className="text-xs mt-1">前往旅遊團管理 &gt; 指派任務建立任務</p>
         </div>
       ) : (
-        tourTasks.map((task, index) => {
+        tourTasks.map((task, _index) => {
           const progress = getProgressInfo(task);
           const isExpanded = expandedTaskId === task.id;
           const hasSubTasks = (task.sub_tasks || []).length > 0;
-          const hasNotes = (task.notes || []).length > 0;
+          const _hasNotes = (task.notes || []).length > 0;
           
           return (
             <div key={task.id}>

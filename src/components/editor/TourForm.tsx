@@ -174,7 +174,7 @@ function calculateFlightDuration(
   return `${hours}小時${minutes}分`;
 }
 
-export function TourForm({ data, onChange }: { data: any; onChange: (data) => void }) {
+export function TourForm({ data, onChange }: { data: unknown; onChange: (data) => void }) {
   const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || "");
   const [selectedCountryCode, setSelectedCountryCode] = React.useState<string>("");
   const { user } = useAuthStore();
@@ -223,7 +223,7 @@ export function TourForm({ data, onChange }: { data: any; onChange: (data) => vo
     }
   }, [data.country, countryNameToCode, selectedCountry]);
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: unknown) => {
     onChange({ ...data, [field]: value });
   };
 
@@ -236,7 +236,7 @@ export function TourForm({ data, onChange }: { data: any; onChange: (data) => vo
     });
   };
 
-  const updateNestedField = (parent: string, field: string, value: any) => {
+  const updateNestedField = (parent: string, field: string, value: unknown) => {
     onChange({
       ...data,
       [parent]: { ...data[parent], [field]: value }
@@ -317,7 +317,7 @@ export function TourForm({ data, onChange }: { data: any; onChange: (data) => vo
     });
   };
 
-  const updateDailyItinerary = (index: number, field: string, value: any) => {
+  const updateDailyItinerary = (index: number, field: string, value: unknown) => {
     const newItinerary = [...data.dailyItinerary];
     newItinerary[index] = { ...newItinerary[index], [field]: value };
     onChange({ ...data, dailyItinerary: newItinerary });

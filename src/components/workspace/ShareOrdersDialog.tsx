@@ -5,7 +5,7 @@ import { X, Search, Receipt } from 'lucide-react';
 import { useOrderStore } from '@/stores';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
-import { Order } from '@/stores/types';
+import { _Order } from '@/stores/types';
 
 interface ShareOrdersDialogProps {
   channelId: string;

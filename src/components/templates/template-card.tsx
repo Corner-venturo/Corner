@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { MoreVertical, FileText, FileSpreadsheet, FileBarChart, File } from 'lucide-react';
+import { MoreVertical, FileText, FileSpreadsheet, File } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {

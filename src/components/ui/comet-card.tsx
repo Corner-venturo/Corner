@@ -1,17 +1,17 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import React, { useState, useRef, useEffect } from "react";
+import { _motion } from "framer-motion";
+import React, { useState, useRef } from "react";
 
 interface CometCardProps {
   rotateDepth?: number;
-  translateDepth?: number;
+  _translateDepth?: number;
   className?: string;
   children: React.ReactNode;
 }
 
 export function CometCard({
   rotateDepth = 17.5,
-  translateDepth = 20,
+  _translateDepth = 20,
   className,
   children,
 }: CometCardProps) {

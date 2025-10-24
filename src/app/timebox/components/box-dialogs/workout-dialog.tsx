@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState} from 'react'
 
-import { Check, Clock, Dumbbell, Trash2, Plus, Edit2, X } from 'lucide-react'
+import { Check, Dumbbell, Plus, X, Edit2, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -169,7 +169,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
 
   const totalCompletedSets = getTotalCompletedSets()
   const totalSets = getTotalSets()
-  const allCompleted = totalSets > 0 && totalCompletedSets === totalSets
+  const _allCompleted = totalSets > 0 && totalCompletedSets === totalSets
   const isBoxCompleted = currentScheduledBox.completed
 
   return (

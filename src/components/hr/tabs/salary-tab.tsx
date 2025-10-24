@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { Employee } from '@/stores/types';
-import { DollarSign, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 
 interface SalaryTabProps {
   employee: Employee;
@@ -11,7 +11,7 @@ interface SalaryTabProps {
 }
 
 export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
-  ({ employee, isEditing, setIsEditing }, ref) => {
+  ({ employee }, ref) => {
   useImperativeHandle(ref, () => ({
     handleSave: async () => {
       // 薪資資訊目前為唯讀，未來若需編輯功能可在此實作
