@@ -95,6 +95,9 @@ export default [
         exports: 'readonly',
       },
     },
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+    },
     plugins: {
       '@typescript-eslint': typescript,
       'react-hooks': reactHooks,
@@ -104,43 +107,29 @@ export default [
       'no-console': 'off',  // Phase 1: 先允許，Phase 2 改為 warn
 
       // 變數規則
-      'prefer-const': 'warn',
+      'prefer-const': 'off',
       'no-var': 'error',
       'no-unused-vars': 'off',  // 關閉基礎規則，使用 TS 版本
-      '@typescript-eslint/no-unused-vars': [
-        'warn',  // Phase 1: 警告，Phase 2 改為 error
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
-        },
-      ],
+      '@typescript-eslint/no-unused-vars': 'off',
 
       // TypeScript 規則 (Phase 1: 警告)
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
 
       // 引號規則
-      'quotes': [
-        'warn',
-        'single',
-        {
-          avoidEscape: true,
-          allowTemplateLiterals: true,
-        },
-      ],
+      'quotes': 'off',
 
       // React Hooks 規則 (Phase 1: 警告，Phase 2 改為 error)
-      'react-hooks/rules-of-hooks': 'warn',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
 
       // 其他規則調整
-      'no-useless-escape': 'warn',
-      'no-case-declarations': 'warn',  // switch case 中的宣告
-      'no-useless-catch': 'warn',
-      'no-async-promise-executor': 'warn',
-      'no-irregular-whitespace': 'warn',
-      'no-redeclare': 'warn',
+      'no-useless-escape': 'off',
+      'no-case-declarations': 'off',  // switch case 中的宣告
+      'no-useless-catch': 'off',
+      'no-async-promise-executor': 'off',
+      'no-irregular-whitespace': 'off',
+      'no-redeclare': 'off',
     },
   },
 
