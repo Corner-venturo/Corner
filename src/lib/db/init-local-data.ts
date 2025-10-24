@@ -91,9 +91,9 @@ async function syncFromSupabase(): Promise<boolean> {
 
     console.log(`📥 從 Supabase 下載了 ${employees.length} 位員工`);
 
-    // 寫入到 IndexedDB
+    // 寫入到 IndexedDB（使用 put 允許更新現有資料）
     for (const employee of employees) {
-      await localDB.create('employees', employee);
+      await localDB.put('employees', employee);
     }
 
     console.log('✅ 員工資料已同步到本地');

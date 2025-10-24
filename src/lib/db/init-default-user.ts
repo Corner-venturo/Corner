@@ -74,7 +74,7 @@ export async function initDefaultUser(): Promise<void> {
         updated_at: new Date().toISOString()
       };
 
-      await localDB.create('employees', adminUser);
+      await localDB.put('employees', adminUser);
       console.log('✅ 成功建立管理員帳號 william01 (密碼: william123)');
     }
     
