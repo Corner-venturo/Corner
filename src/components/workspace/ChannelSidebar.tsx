@@ -1,17 +1,90 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Hash, Lock, Star, Search, ChevronDown, ChevronRight, Plus, Settings, Filter } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import {
+  Hash,
+  Lock,
+  Star,
+  Search,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  Settings,
+  Filter,
+  Users,
+  UserMinus,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { _Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Channel, useWorkspaceStore } from '@/stores/workspace-store';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import type { ChannelMember } from '@/services/workspace-members';
+
+const ROLE_LABELS: Record<string, string> = {
+  owner: '擁有者',
+  admin: '管理員',
+  manager: '管理者',
+  member: '成員',
+  guest: '訪客',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  active: '使用中',
+  invited: '已邀請',
+  pending: '待加入',
+  suspended: '已停用',
+  removed: '已移除',
+};
+
+const STATUS_BADGE_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  active: 'default',
+  invited: 'secondary',
+  pending: 'secondary',
+  suspended: 'outline',
+  removed: 'destructive',
+};
+
+const getMemberInitials = (name?: string | null, fallback?: string | null) => {
+  const source = name || fallback || '';
+  if (!source) return '成員';
+  const words = source.trim().split(/\s+/);
+  if (words.length === 1) {
+    return words[0].slice(0, 2).toUpperCase();
+  }
+  return (words[0][0] + words[1][0]).toUpperCase();
+};
+
+const formatRoleLabel = (role?: string | null) => {
+  if (!role) return '成員';
+  const normalized = role.toLowerCase();
+  return ROLE_LABELS[normalized] || role;
+};
+
+const formatStatusLabel = (status?: string | null) => {
+  if (!status) return '未知狀態';
+  const normalized = status.toLowerCase();
+  return STATUS_LABELS[normalized] || status;
+};
+
+const getStatusBadgeVariant = (status?: string | null) => {
+  if (!status) return 'outline';
+  const normalized = status.toLowerCase();
+  return STATUS_BADGE_VARIANTS[normalized] || 'outline';
+};
 
 interface ChannelSidebarProps {
   selectedChannelId: string | null;
@@ -30,7 +103,11 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     toggleChannelFavorite,
     createChannelGroup,
     toggleGroupCollapse,
+    channelMembers,
+    loadChannelMembers,
+    removeChannelMember,
   } = useWorkspaceStore();
+  const { user } = useAuthStore();
 
   const [showNewGroupDialog, setShowNewGroupDialog] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
@@ -38,6 +115,18 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     favorites: true,
     ungrouped: true
   });
+  const [memberToRemove, setMemberToRemove] = useState<ChannelMember | null>(null);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [isRemovingMember, setIsRemovingMember] = useState(false);
+
+  const canManageMembers = useMemo(() => {
+    if (!user) return false;
+    const permissions = user.permissions || [];
+    return permissions.includes('super_admin') ||
+      permissions.includes('admin') ||
+      permissions.includes('workspace:manage_members') ||
+      permissions.includes('workspace:manage');
+  }, [user]);
 
   // 篩選頻道
   const filteredChannels = useMemo(() => {
@@ -57,6 +146,36 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
     return filtered;
   }, [channels, searchQuery, channelFilter]);
+
+  useEffect(() => {
+    if (!selectedChannelId || !currentWorkspace) {
+      return;
+    }
+
+    void loadChannelMembers(currentWorkspace.id, selectedChannelId);
+  }, [selectedChannelId, currentWorkspace?.id, loadChannelMembers]);
+
+  const currentChannelMembers = useMemo(() => {
+    if (!selectedChannelId) return [];
+    return channelMembers[selectedChannelId] || [];
+  }, [channelMembers, selectedChannelId]);
+
+  const handleRemoveMember = async () => {
+    if (!memberToRemove || !selectedChannelId || !currentWorkspace) {
+      return;
+    }
+
+    setIsRemovingMember(true);
+    try {
+      await removeChannelMember(currentWorkspace.id, selectedChannelId, memberToRemove.id);
+      setIsRemoveDialogOpen(false);
+      setMemberToRemove(null);
+    } catch (error) {
+      console.error('Failed to remove member:', error);
+    } finally {
+      setIsRemovingMember(false);
+    }
+  };
 
   // 分類頻道
   const favoriteChannels = filteredChannels.filter(ch => ch.is_favorite);
@@ -233,6 +352,79 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
             )}
           </div>
         )}
+
+        <div className="mt-4 border-t border-morandi-gold/20">
+          <div className="flex items-center justify-between px-4 pt-3 pb-2">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-morandi-secondary">
+              <Users size={12} />
+              <span>頻道成員</span>
+              {selectedChannelId && (
+                <span className="text-[11px] text-morandi-secondary/70">{currentChannelMembers.length}</span>
+              )}
+            </div>
+          </div>
+          <div className="px-3 pb-4 space-y-1.5">
+            {selectedChannelId ? (
+              currentChannelMembers.length > 0 ? (
+                currentChannelMembers.map((member) => {
+                  const displayName = member.profile?.displayName || member.profile?.englishName || '未命名成員';
+                  const roleLabel = formatRoleLabel(member.role);
+                  const statusLabel = formatStatusLabel(member.status);
+                  const statusVariant = getStatusBadgeVariant(member.status);
+
+                  return (
+                    <div
+                      key={member.id}
+                      className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-morandi-container/20"
+                    >
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-morandi-container text-[12px] font-semibold text-morandi-primary">
+                        {getMemberInitials(member.profile?.displayName, member.profile?.englishName)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-morandi-primary">{displayName}</p>
+                        {member.profile?.englishName && member.profile.englishName !== displayName && (
+                          <p className="truncate text-[11px] text-morandi-secondary">
+                            {member.profile.englishName}
+                          </p>
+                        )}
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-morandi-secondary">
+                          <Badge variant="secondary" className="capitalize">
+                            {roleLabel}
+                          </Badge>
+                          <Badge variant={statusVariant} className="capitalize">
+                            {statusLabel}
+                          </Badge>
+                        </div>
+                      </div>
+                      {canManageMembers && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-morandi-red opacity-0 transition-opacity hover:text-morandi-red group-hover:opacity-100"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setMemberToRemove(member);
+                            setIsRemoveDialogOpen(true);
+                          }}
+                        >
+                          <UserMinus size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="rounded-md bg-morandi-container/20 px-3 py-4 text-xs text-morandi-secondary">
+                  尚未有成員加入此頻道
+                </p>
+              )
+            ) : (
+              <p className="rounded-md bg-morandi-container/20 px-3 py-4 text-xs text-morandi-secondary">
+                選擇頻道以查看成員
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* 新增群組對話框 */}
@@ -258,6 +450,44 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
           </div>
         </div>
       )}
+
+      <Dialog
+        open={isRemoveDialogOpen}
+        onOpenChange={(open) => {
+          setIsRemoveDialogOpen(open);
+          if (!open) {
+            setMemberToRemove(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>移除頻道成員</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-morandi-secondary">
+            確定要將「{memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || '此成員'}」移出頻道嗎？
+          </p>
+          <DialogFooter className="mt-4">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setIsRemoveDialogOpen(false);
+                setMemberToRemove(null);
+              }}
+              disabled={isRemovingMember}
+            >
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRemoveMember}
+              disabled={isRemovingMember}
+            >
+              {isRemovingMember ? '移除中...' : '移除'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

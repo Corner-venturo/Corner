@@ -3,6 +3,11 @@ import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { localDB } from '@/lib/db';
+import {
+  fetchChannelMembers,
+  removeChannelMember as removeChannelMemberService,
+  type ChannelMember,
+} from '@/services/workspace-members';
 
 
 
@@ -169,6 +174,7 @@ interface WorkspaceState {
   selectedChannel: Channel | null;  // ✨ 新增：當前選擇的頻道
   currentChannel: Channel | null;   // ✨ 新增：當前頻道（與 selectedChannel 同步）
   messages: Message[];
+  channelMembers: Record<string, ChannelMember[]>;
   advanceLists: AdvanceList[];
   sharedOrderLists: SharedOrderList[];
   loading: boolean;
@@ -214,6 +220,8 @@ interface WorkspaceState {
   updateMessageReactions: (messageId: string, reactions: Record<string, string[]>) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   softDeleteMessage: (messageId: string) => Promise<void>;
+  loadChannelMembers: (workspaceId: string, channelId: string) => Promise<void>;
+  removeChannelMember: (workspaceId: string, channelId: string, memberId: string) => Promise<void>;
   activeCanvasTab: string;  // ✨ 新增
   setActiveCanvasTab: (tab: string) => void;  // ✨ 新增
 
@@ -241,6 +249,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       selectedChannel: null,  // ✨ 新增
       currentChannel: null,   // ✨ 新增
       messages: [],
+      channelMembers: {},
       advanceLists: [],
       sharedOrderLists: [],
       loading: false,
@@ -716,6 +725,38 @@ export const useWorkspaceStore = create<WorkspaceState>()(
               : m
           )
         }));
+      },
+
+      loadChannelMembers: async (workspaceId, channelId) => {
+        try {
+          const members = await fetchChannelMembers(workspaceId, channelId);
+          set((state) => ({
+            channelMembers: {
+              ...state.channelMembers,
+              [channelId]: members,
+            },
+          }));
+        } catch (error) {
+          console.error('⚠️ 無法載入頻道成員:', error);
+          set({ error: error instanceof Error ? error.message : '無法載入頻道成員' });
+        }
+      },
+
+      removeChannelMember: async (workspaceId, channelId, memberId) => {
+        try {
+          await removeChannelMemberService(workspaceId, channelId, memberId);
+          set((state) => ({
+            channelMembers: {
+              ...state.channelMembers,
+              [channelId]: (state.channelMembers[channelId] || []).filter(
+                (member) => member.id !== memberId
+              ),
+            },
+          }));
+        } catch (error) {
+          console.error('⚠️ 無法移除頻道成員:', error);
+          set({ error: error instanceof Error ? error.message : '移除頻道成員失敗' });
+        }
       },
 
       updateChannel: async (id, updates) => {
