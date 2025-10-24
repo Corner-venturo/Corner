@@ -171,11 +171,28 @@ export function createStore<T extends BaseEntity>(
             const controller = new AbortController();
             set({ loading: true, error: null, _abortController: controller });
 
+            // ⏱️ 超時機制：如果 IndexedDB 初始化超過 3 秒，直接從 Supabase 讀取
+            const timeout = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('IndexedDB_TIMEOUT')), 3000)
+            );
+
             if (enableSupabase && typeof window !== 'undefined') {
-              // 1. 先從 IndexedDB 讀取
-              let cachedItems = await localDB.getAll(tableName) as T[];
-              // 過濾軟刪除的項目
-              cachedItems = cachedItems.filter((item) => !('_deleted' in item && item._deleted));
+              // 1. 先從 IndexedDB 讀取（帶超時）
+              let cachedItems: T[] = [];
+              try {
+                const indexedDBRead = localDB.getAll(tableName);
+                cachedItems = await Promise.race([indexedDBRead, timeout]) as T[];
+                // 過濾軟刪除的項目
+                cachedItems = cachedItems.filter((item) => !('_deleted' in item && item._deleted));
+                logger.log(`💾 [${tableName}] IndexedDB 讀取成功:`, cachedItems.length, '筆');
+              } catch (error) {
+                if (error instanceof Error && error.message === 'IndexedDB_TIMEOUT') {
+                  logger.warn(`⏱️ [${tableName}] IndexedDB 初始化超時，跳過快取`);
+                  cachedItems = [];
+                } else {
+                  throw error;
+                }
+              }
 
               // 2. 檢查是否需要首次初始化下載
               const initFlag = `${tableName}_initialized`;
@@ -198,12 +215,19 @@ export function createStore<T extends BaseEntity>(
                     // 過濾軟刪除的項目
                     items = items.filter((item) => !('_deleted' in item && item._deleted));
 
-                    // 批次存入 IndexedDB
-                    for (const item of items) {
-                      await localDB.put(tableName, item);
+                    // 批次存入 IndexedDB（靜默失敗，不阻擋 UI）
+                    try {
+                      for (const item of items) {
+                        await Promise.race([
+                          localDB.put(tableName, item),
+                          new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 1000))
+                        ]);
+                      }
+                    } catch (cacheError) {
+                      logger.warn(`⚠️ [${tableName}] IndexedDB 快取失敗（不影響功能）`);
                     }
 
-                    // 更新 UI
+                    // 更新 UI（不管 IndexedDB 是否成功）
                     set({ items, loading: false });
 
                     // 設置初始化標記

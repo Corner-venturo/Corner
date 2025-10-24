@@ -77,7 +77,7 @@ export default function ManifestationPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="absolute inset-0 flex flex-col">
       <ResponsiveHeader
         title="顯化魔法"
         icon={Sparkles}
@@ -93,10 +93,10 @@ export default function ManifestationPage() {
         onTabChange={(tab) => setViewMode(tab as ViewMode)}
       />
 
-      <div className="flex-1 overflow-auto flex">
+      <div className="flex-1 flex min-h-0">
         {/* 側邊欄 - 章節列表（僅在練習模式顯示） */}
         {viewMode === 'practice' && (
-          <aside className="w-80 border-r border-border bg-card shrink-0 overflow-y-auto">
+          <aside className="w-80 border-r border-border shrink-0 overflow-y-auto">
             <div className="p-6">
               <ChapterList
                 currentChapter={currentChapter}

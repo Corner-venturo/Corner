@@ -103,13 +103,13 @@ export default function ToursPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; tour: Tour | null }>({ isOpen: false, tour: null });
   const pageSize = 10;
 
-  // 建立 PageRequest 參數
-  const pageRequest: PageRequest = {
+  // 建立 PageRequest 參數（使用 useMemo 避免無限循環）
+  const pageRequest: PageRequest = React.useMemo(() => ({
     page: currentPage,
     search: '',
     sortBy,
     sortOrder,
-  };
+  }), [currentPage, sortBy, sortOrder]);
 
   // 使用新的 hook
   const { data: tours, loading, actions } = useTours(pageRequest);

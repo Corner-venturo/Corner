@@ -190,7 +190,7 @@ function CalculatorWidget() {
   const displayResult = calculateResult();
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
+    <Card className="overflow-hidden flex flex-col border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
       <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -208,8 +208,8 @@ function CalculatorWidget() {
           </label>
         </div>
       </div>
-      <div className="p-4 flex-1 flex flex-col overflow-hidden">
-        <div className="space-y-3 flex-1 flex flex-col min-h-0">
+      <div className="p-4 flex flex-col">
+        <div className="space-y-3 flex flex-col">
         {/* iPhone 風格顯示區 */}
         <div
           className="bg-white rounded-xl p-4 min-h-[80px] flex flex-col justify-end border border-morandi-gold/20 cursor-text shadow-sm"
@@ -1090,12 +1090,12 @@ export default function Home() {
             </div>
           </Card>
         ) : (
-          <div className="h-full grid md:grid-cols-2 xl:grid-cols-3 md:grid-rows-3 xl:grid-rows-2 gap-6 auto-rows-fr">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
             {AVAILABLE_WIDGETS.filter((w) => activeWidgets.includes(w.id)).map(
               (widget) => {
                 const Component = widget.component;
                 return (
-                  <div key={widget.id} className={`h-full ${widget.span === 2 ? 'md:col-span-2' : ''}`}>
+                  <div key={widget.id} className={widget.span === 2 ? 'md:col-span-2' : ''}>
                     <Component />
                   </div>
                 );

@@ -309,7 +309,7 @@ export function Sidebar() {
           }
         }}
         className={cn(
-          'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-40 group transition-[width] duration-300',
+          'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-40 group transition-[width] duration-300 flex flex-col',
           sidebarCollapsed
             ? (isSidebarHovered || isDropdownHovered)
               ? 'w-[190px]'
@@ -318,7 +318,7 @@ export function Sidebar() {
         )}
       >
         {/* Logo區域 */}
-        <div>
+        <div className="shrink-0">
           <div className="h-18 flex items-center relative mx-3">
             <div className="absolute left-5 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-gradient-to-br from-[#d4c5a9] via-[#c9b896] to-[#bfad87] flex items-center justify-center shadow-sm flex-shrink-0 opacity-90">
               <span className="text-white/95 font-semibold text-lg">V</span>
@@ -335,7 +335,7 @@ export function Sidebar() {
         </div>
 
         {/* 導航選單 */}
-        <nav className="flex-1 py-4">
+        <nav className="flex-1 py-4 overflow-y-auto min-h-0">
           <ul className="space-y-1">
             {visibleMenuItems.map((item) => (
               <li key={item.href}>
@@ -388,7 +388,7 @@ export function Sidebar() {
         </nav>
 
         {/* 底部功能區 */}
-        <div className="py-4">
+        <div className="py-4 shrink-0">
           <div className="mb-4" style={{ marginLeft: '12px', marginRight: '12px', borderTop: '1px solid var(--border)', height: '1px' }}></div>
 
           {!sidebarCollapsed && user && (

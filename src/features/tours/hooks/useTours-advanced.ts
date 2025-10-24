@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { tourService } from '../services/tour.service';
 import { Tour } from '@/stores/types';
 import { PageRequest, UseEntityResult } from '@/core/types/common';
@@ -10,23 +10,42 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const _tourStore = useTourStore();
+  const initializedRef = useRef(false);
 
   // 使用 useMemo 來穩定 params 物件的參考
   const stableParams = useMemo(() => params, [params]);
 
   const loadTours = useCallback(async () => {
     try {
+      console.log('[useTours] 開始載入旅遊團資料...');
       setLoading(true);
       setError(null);
+
+      // ✅ 步驟 1: 首次載入時才呼叫 fetchAll()
+      // 之後只從 store 讀取（store 會自動背景同步）
+      // 使用 ref 避免觸發 useCallback 重建
+      if (!initializedRef.current) {
+        console.log('[useTours] 首次載入，呼叫 fetchAll()...');
+        await useTourStore.getState().fetchAll();
+        initializedRef.current = true;
+        console.log('[useTours] fetchAll() 完成');
+      } else {
+        console.log('[useTours] 已初始化，直接從 store 讀取');
+      }
+
+      // ✅ 步驟 2: 從 Store 讀取並處理資料（過濾、排序、分頁）
+      console.log('[useTours] 呼叫 tourService.list()...');
       const result = await tourService.list(stableParams);
+      console.log('[useTours] 取得資料:', result.data.length, '筆');
       setData(result.data);
       setTotalCount(result.total);
+      console.log('[useTours] 資料載入完成 ✅');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '載入旅遊團資料失敗';
       setError(errorMessage);
-      console.error('Failed to load tours:', err);
+      console.error('[useTours] ❌ 載入失敗:', err);
     } finally {
+      console.log('[useTours] 設定 loading = false');
       setLoading(false);
     }
   }, [stableParams]);

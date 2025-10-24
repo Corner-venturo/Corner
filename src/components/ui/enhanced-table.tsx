@@ -163,11 +163,11 @@ export function EnhancedTable({
 
   const getSortIcon = (columnKey: string) => {
     if (sortColumn !== columnKey) {
-      return <ChevronsUpDown size={14} className="text-morandi-secondary opacity-50" />;
+      return <ChevronsUpDown size={12} className="text-morandi-secondary opacity-50" />;
     }
     return sortDirection === 'asc' ?
-      <ChevronUp size={14} className="text-morandi-gold transition-colors" /> :
-      <ChevronDown size={14} className="text-morandi-gold transition-colors" />;
+      <ChevronUp size={12} className="text-morandi-gold transition-colors" /> :
+      <ChevronDown size={12} className="text-morandi-gold transition-colors" />;
   };
 
   const updateFilter = (key: string, value: string) => {
@@ -265,12 +265,13 @@ export function EnhancedTable({
     <div className={cn("border border-border rounded-lg overflow-hidden bg-card shadow-sm flex flex-col h-full", className)}>
       <div className="overflow-auto flex-1">
         <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-morandi-container/40 border-b border-border/60 backdrop-blur-sm">
+          <thead className="sticky top-0 z-10 bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 backdrop-blur-sm">
             {/* 主標題行 */}
-            <tr className="bg-morandi-container/60" data-enhanced-table-header-row>
+            <tr className="relative" data-enhanced-table-header-row>
               {/* Selection checkbox column */}
               {selection && (
-                <th className="w-12 py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40">
+                <th className="w-12 py-2.5 px-4 text-xs relative">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
                   <Checkbox
                     checked={allVisibleSelected}
                     indeterminate={someVisibleSelected && !allVisibleSelected}
@@ -281,22 +282,25 @@ export function EnhancedTable({
 
               {columns.map((column, index) => (
                 <th key={column.key} className={cn(
-                  "text-left py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 align-middle",
+                  "text-left py-2.5 px-4 text-xs relative align-middle",
                   index === columns.length - 1 && "border-r-0"
                 )}>
+                  {index < columns.length - 1 && (
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
+                  )}
                   <div className="flex items-center gap-2">
                     {column.sortable ? (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-auto p-0 hover:bg-transparent text-sm font-medium text-morandi-primary transition-colors [&_svg]:!size-[16px]"
+                        className="h-auto p-0 hover:bg-transparent text-xs font-medium text-morandi-secondary transition-colors [&_svg]:!size-[12px]"
                         onClick={() => handleSort(column.key)}
                       >
                         {column.label}
                         {getSortIcon(column.key)}
                       </Button>
                     ) : (
-                      <span className="text-sm font-medium text-morandi-primary">{column.label}</span>
+                      <span className="text-xs font-medium text-morandi-secondary">{column.label}</span>
                     )}
                     {index === columns.length - 1 && columns.some(col => col.filterable) && (
                       <Button
@@ -305,7 +309,7 @@ export function EnhancedTable({
                         className="text-morandi-primary hover:text-morandi-primary"
                         onClick={() => setShowFilters(!showFilters)}
                       >
-                        <Filter size={14} className={cn(
+                        <Filter size={12} className={cn(
                           "transition-colors",
                           showFilters ? "text-morandi-primary" : "text-morandi-muted"
                         )} />
@@ -317,8 +321,8 @@ export function EnhancedTable({
 
               {/* Actions column */}
               {actions && (
-                <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary">
-                  <span>操作</span>
+                <th className="text-left py-2.5 px-4 text-xs relative">
+                  <span className="font-medium text-morandi-secondary">操作</span>
                 </th>
               )}
             </tr>
