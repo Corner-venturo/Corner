@@ -161,10 +161,12 @@ export function createStore<T extends BaseEntity>(
         // 取得所有資料（IndexedDB 優先顯示，背景同步 Supabase）
         fetchAll: async () => {
           try {
-            // 🔧 取消前一個請求
+            // ✅ 修復記憶體洩漏：正確清理舊的 AbortController
             const state = get();
             if (state._abortController) {
               state._abortController.abort();
+              // 💡 顯式清除參考，讓 GC 可以回收
+              set({ _abortController: undefined });
             }
 
             // 建立新的 AbortController
@@ -228,7 +230,8 @@ export function createStore<T extends BaseEntity>(
                     }
 
                     // 更新 UI（不管 IndexedDB 是否成功）
-                    set({ items, loading: false });
+                    // ✅ 清理 AbortController
+                    set({ items, loading: false, _abortController: undefined });
 
                     // 設置初始化標記
                     localStorage.setItem(initFlag, 'true');
@@ -357,7 +360,8 @@ export function createStore<T extends BaseEntity>(
             } catch (localError) {
               // 連 IndexedDB 都失敗，才顯示錯誤
               logger.error(`❌ [${tableName}] 無法載入資料:`, localError);
-              set({ error: '無法載入資料', loading: false });
+              // ✅ 清理 AbortController
+              set({ error: '無法載入資料', loading: false, _abortController: undefined });
             }
           }
         },
@@ -664,17 +668,28 @@ export function createStore<T extends BaseEntity>(
     )
   );
 
-  // 監聽網路同步完成事件，自動重新載入資料
+  // ✅ 修復記憶體洩漏：使用 Symbol 避免 HMR 重複註冊
   if (typeof window !== 'undefined') {
+    // 使用 Symbol 作為唯一識別，避免 HMR (Hot Module Reload) 時重複註冊
+    const SYNC_LISTENER_KEY = Symbol.for(`venturo:sync-listener:${tableName}`);
+
     const handleSyncCompleted = () => {
       logger.log(`📥 [${tableName}] 收到同步完成通知，重新載入資料...`);
       store.getState().fetchAll();
     };
 
-    window.addEventListener('venturo:sync-completed', handleSyncCompleted);
+    // 清理舊的監聽器（如果存在）
+    const oldListener = (window as any)[SYNC_LISTENER_KEY];
+    if (oldListener) {
+      window.removeEventListener('venturo:sync-completed', oldListener);
+      logger.log(`🧹 [${tableName}] 清理舊的同步監聽器`);
+    }
 
-    // 注意：在實際應用中，應該在適當的時機移除監聽器
-    // 但由於 Store 是全域單例，通常不需要清理
+    // 註冊新的監聽器
+    window.addEventListener('venturo:sync-completed', handleSyncCompleted);
+    (window as any)[SYNC_LISTENER_KEY] = handleSyncCompleted;
+
+    logger.log(`📡 [${tableName}] 已註冊同步監聽器`);
   }
 
   return store;

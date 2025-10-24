@@ -16,10 +16,14 @@ import type { Region } from '@/types';
 export default function RegionsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCountries, setExpandedCountries] = useState<Set<string>>(new Set());
-  const { items: regions, create, update, delete: deleteRegion } = useRegionStore();
+  const [isInitializing, setIsInitializing] = useState(false);
+  const { items: regions, loading, create, update, delete: deleteRegion, fetchAll } = useRegionStore();
 
-  // 初始化：如果沒有資料，從 DESTINATIONS 匯入
+  // ✅ 修復：移除 setTimeout，使用 Store 的 loading 狀態判斷準備完成
   useEffect(() => {
+    // 等待 Store 首次載入完成（loading: false）
+    if (loading || isInitializing) return;
+
     const initializeRegions = async () => {
       // 檢查是否已經初始化過（使用 localStorage 標記）
       const initialized = localStorage.getItem('regions_initialized');
@@ -36,26 +40,27 @@ export default function RegionsPage() {
       }
 
       console.log('📍 初始化地區資料...');
+      setIsInitializing(true);
 
       try {
         for (const [countryCode, destination] of Object.entries(DESTINATIONS)) {
-          // 添加國家
+          // ✅ 修復：使用 satisfies 而非 as unknown
           await create({
-            type: 'country',
+            type: 'country' as const,
             name: destination.name,
             code: countryCode,
-            status: 'active'
-          } as unknown);
+            status: 'active' as const
+          } satisfies Omit<Region, 'id' | 'created_at' | 'updated_at'>);
 
           // 添加城市
           for (const city of destination.cities) {
             await create({
-              type: 'city',
+              type: 'city' as const,
               name: city.name,
               code: city.code,
-              status: 'active',
+              status: 'active' as const,
               country_code: countryCode
-            } as unknown);
+            } satisfies Omit<Region, 'id' | 'created_at' | 'updated_at'>);
           }
         }
 
@@ -65,14 +70,13 @@ export default function RegionsPage() {
       } catch (error) {
         console.error('❌ 地區資料初始化失敗:', error);
         // 不標記為已初始化，下次可以重試
+      } finally {
+        setIsInitializing(false);
       }
     };
 
-    // 延遲執行，確保 store 已載入
-    const timer = setTimeout(initializeRegions, 100);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 只執行一次 - 刻意忽略 create 和 regions.length，避免無限循環
+    initializeRegions();
+  }, [loading, regions.length, create, isInitializing]);
 
   // 切換國家展開/收起
   const toggleCountry = (countryCode: string) => {
