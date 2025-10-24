@@ -40,7 +40,7 @@ export abstract class BaseService<T extends BaseEntity> {
   // CREATE
   async create(data: Omit<T, keyof BaseEntity>): Promise<T> {
     try {
-      this.validate(data as unknown);
+      this.validate(data as Partial<T>);
 
       const entity: T = {
         ...data,
@@ -78,11 +78,11 @@ export abstract class BaseService<T extends BaseEntity> {
       // 排序
       if (params?.sortBy) {
         allData.sort((a, b) => {
-          const aVal = (a as unknown)[params.sortBy!];
-          const bVal = (b as unknown)[params.sortBy!];
+          const aVal = (a as Record<string, unknown>)[params.sortBy!];
+          const bVal = (b as Record<string, unknown>)[params.sortBy!];
 
-          if (aVal < bVal) return (params as unknown).sort_order === 'desc' ? 1 : -1;
-          if (aVal > bVal) return (params as unknown).sort_order === 'desc' ? -1 : 1;
+          if (aVal < bVal) return params.sortOrder === 'desc' ? 1 : -1;
+          if (aVal > bVal) return params.sortOrder === 'desc' ? -1 : 1;
           return 0;
         });
       }
