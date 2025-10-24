@@ -29,7 +29,7 @@ import {
   Download,
   Wallet
 } from 'lucide-react';
-import { useWorkspaceStore, type Message } from '@/stores/workspace-store';
+import { useWorkspaceStore, type Message, type MessageAttachment } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -45,12 +45,10 @@ import { ShareOrdersDialog } from './ShareOrdersDialog';
 import { OrderListCard } from './OrderListCard';
 import { CreateReceiptDialog } from './CreateReceiptDialog';
 import { CreatePaymentRequestDialog } from './CreatePaymentRequestDialog';
+import { uploadFileToStorage, getPublicUrlFromStorage } from '@/services/storage';
+import { downloadFile } from '@/lib/files';
 
-
-const downloadFile = (path: string, bucket: string, fileName: string) => {
-  console.log('📦 本地模式：檔案下載功能暫時停用', { path, bucket, fileName });
-  alert('檔案下載功能目前僅支援線上模式');
-};
+const STORAGE_BUCKET = 'workspace-files';
 
 export function ChannelChat() {
   // ❌ 移除本地 state，改用 store 管理
@@ -227,9 +225,48 @@ export function ChannelChat() {
       return;
     }
 
-    try {
+    const hasAttachments = attachedFiles.length > 0;
+
+    if (hasAttachments) {
       setUploadingFiles(true);
       setUploadProgress(0);
+    }
+
+    try {
+      let uploadedAttachments: MessageAttachment[] | undefined;
+
+      if (hasAttachments) {
+        const totalBytes = attachedFiles.reduce((sum, file) => sum + file.size, 0);
+        let uploadedBytes = 0;
+
+        const results: MessageAttachment[] = [];
+
+        for (const file of attachedFiles) {
+          const uploadResult = await uploadFileToStorage(file, {
+            bucket: STORAGE_BUCKET,
+            folder: selectedChannel.id,
+            onProgress: (progress) => {
+              const totalLoaded = uploadedBytes + progress.loaded;
+              const percentage = totalBytes === 0
+                ? 100
+                : Math.round((totalLoaded / totalBytes) * 100);
+              setUploadProgress(percentage);
+            }
+          });
+
+          uploadedBytes += file.size;
+
+          results.push({
+            id: uploadResult.id,
+            fileName: uploadResult.fileName,
+            fileSize: uploadResult.fileSize,
+            mimeType: uploadResult.mimeType,
+            path: uploadResult.path,
+            publicUrl: uploadResult.publicUrl
+          });
+        }
+        uploadedAttachments = results;
+      }
 
       await sendMessage({
         channel_id: selectedChannel.id,
@@ -240,19 +277,28 @@ export function ChannelChat() {
           display_name: currentProfile?.display_name || user.display_name || '未知用戶',
           avatar: undefined
         },
-        attachments: attachedFiles.length > 0 ? attachedFiles : undefined
+        attachments: uploadedAttachments
       });
+
+      if (hasAttachments) {
+        setUploadProgress(100);
+      }
 
       setMessageText('');
       setAttachedFiles([]);
-      setUploadProgress(100);
-      console.log('訊息發送成功');
+      if (hasAttachments) {
+        console.log('附件上傳並訊息發送成功');
+      } else {
+        console.log('訊息發送成功');
+      }
     } catch (error) {
       console.error('發送訊息失敗:', error);
       alert('發送訊息失敗，請稍後再試');
     } finally {
-      setUploadingFiles(false);
-      setTimeout(() => setUploadProgress(0), 1000);
+      if (hasAttachments) {
+        setUploadingFiles(false);
+        setTimeout(() => setUploadProgress(0), 1000);
+      }
     }
   };
 
@@ -468,6 +514,31 @@ export function ChannelChat() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
+  const resolveAttachmentUrl = (attachment: MessageAttachment) => {
+    if (attachment.publicUrl) return attachment.publicUrl;
+    if (attachment.url) return attachment.url;
+    if (attachment.path) {
+      return getPublicUrlFromStorage(attachment.path, STORAGE_BUCKET);
+    }
+    return '';
+  };
+
+  const handleDownloadAttachment = async (attachment: MessageAttachment) => {
+    const fileName = attachment.fileName || attachment.name || '未命名檔案';
+    const targetUrl = resolveAttachmentUrl(attachment);
+
+    if (!targetUrl) {
+      alert('找不到檔案下載連結');
+      return;
+    }
+
+    try {
+      await downloadFile(targetUrl, fileName);
+    } catch (error) {
+      console.error('下載附件失敗:', error);
+    }
+  };
+
 
   const quickMenuActions = [
     {
@@ -660,7 +731,14 @@ export function ChannelChat() {
                       {message.attachments && message.attachments.length > 0 && (
                         <div className="mt-2 space-y-2">
                           {message.attachments.map((attachment, index) => {
-                            const isImage = attachment.fileType.startsWith('image/');
+                            const mimeType = attachment.mimeType || attachment.fileType || attachment.type || 'application/octet-stream';
+                            const fileName = attachment.fileName || attachment.name || '未命名檔案';
+                            const fileSize = typeof attachment.fileSize === 'number'
+                              ? attachment.fileSize
+                              : typeof attachment.size === 'number'
+                                ? attachment.size
+                                : 0;
+                            const isImage = mimeType.startsWith('image/');
                             return (
                               <div
                                 key={index}
@@ -673,14 +751,14 @@ export function ChannelChat() {
                                 )}
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm text-morandi-primary truncate max-w-[200px]">
-                                    {attachment.fileName}
+                                    {fileName}
                                   </p>
                                   <p className="text-xs text-morandi-secondary">
-                                    {formatFileSize(attachment.fileSize)}
+                                    {formatFileSize(fileSize)}
                                   </p>
                                 </div>
                                 <button
-                                  onClick={() => downloadFile(attachment.path, 'workspace-files', attachment.fileName)}
+                                  onClick={() => handleDownloadAttachment(attachment)}
                                   className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
                                   title="下載檔案"
                                 >
