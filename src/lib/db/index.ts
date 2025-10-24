@@ -1,5 +1,5 @@
 /**
- * IndexedDB 本地資料庫管理器
+ * IndexedDB 本地資料庫管理器（型別安全版本）
  * 提供完整的 CRUD 操作和查詢功能
  */
 
@@ -9,6 +9,46 @@ import { checkAndHandleVersion } from './version-manager';
 
 // Re-export TableName for external use
 export type { TableName };
+
+/**
+ * 帶時間戳的記錄型別
+ */
+interface WithTimestamps {
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * 型別守衛：檢查值是否可比較（數字或字串）
+ */
+function isComparable(value: unknown): value is number | string {
+  return typeof value === 'number' || typeof value === 'string';
+}
+
+/**
+ * 型別安全的比較函數
+ */
+function compareValues(
+  a: unknown,
+  b: unknown,
+  operator: 'gt' | 'gte' | 'lt' | 'lte'
+): boolean {
+  // 如果兩個值都可比較，進行比較
+  if (isComparable(a) && isComparable(b)) {
+    switch (operator) {
+      case 'gt':
+        return a > b;
+      case 'gte':
+        return a >= b;
+      case 'lt':
+        return a < b;
+      case 'lte':
+        return a <= b;
+    }
+  }
+  // 不可比較的值回傳 false
+  return false;
+}
 
 /**
  * 查詢選項
@@ -61,9 +101,10 @@ export class LocalDatabase {
 
         // 加入時間戳
         const now = new Date().toISOString();
+        const dataWithTimestamps = data as T & WithTimestamps;
         const recordWithTimestamp = {
           ...data,
-          created_at: (data as unknown).created_at || now,
+          created_at: dataWithTimestamps.created_at || now,
           updated_at: now,
         } as T;
 
@@ -224,9 +265,10 @@ export class LocalDatabase {
 
       // 加入時間戳
       const now = new Date().toISOString();
+      const dataWithTimestamps = data as T & WithTimestamps;
       const recordWithTimestamp = {
         ...data,
-        created_at: (data as unknown).created_at || now,
+        created_at: dataWithTimestamps.created_at || now,
         updated_at: now,
       } as T;
 
@@ -394,9 +436,10 @@ export class LocalDatabase {
       };
 
       dataArray.forEach((data) => {
+        const dataWithTimestamps = data as T & WithTimestamps;
         const recordWithTimestamp = {
           ...data,
-          created_at: (data as unknown).created_at || now,
+          created_at: dataWithTimestamps.created_at || now,
           updated_at: now,
         } as T;
         objectStore.add(recordWithTimestamp);
@@ -558,13 +601,13 @@ export class LocalDatabase {
           case 'ne':
             return fieldValue !== condition.value;
           case 'gt':
-            return (fieldValue as unknown) > (condition.value as unknown);
+            return compareValues(fieldValue, condition.value, 'gt');
           case 'gte':
-            return (fieldValue as unknown) >= (condition.value as unknown);
+            return compareValues(fieldValue, condition.value, 'gte');
           case 'lt':
-            return (fieldValue as unknown) < (condition.value as unknown);
+            return compareValues(fieldValue, condition.value, 'lt');
           case 'lte':
-            return (fieldValue as unknown) <= (condition.value as unknown);
+            return compareValues(fieldValue, condition.value, 'lte');
           case 'contains':
             return String(fieldValue)
               .toLowerCase()
