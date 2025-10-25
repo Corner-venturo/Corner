@@ -1,3 +1,4 @@
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 'use client';
 
 import React, { useState } from 'react';
@@ -108,7 +109,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
       };
 
       // 儲存到本地（純本地模式）
-      addUser(dbEmployeeData as unknown);
+      addUser(dbEmployeeData as any);
 
       console.log('📦 本地模式：員工已新增', employee_number);
 
@@ -129,7 +130,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
+    setTimeout(() => setCopiedField(null), UI_DELAYS.SUCCESS_MESSAGE);
   };
 
   // 關閉成功對話框

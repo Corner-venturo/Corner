@@ -15,7 +15,7 @@ import { _Calculator } from 'lucide-react';
  * - 雙擊 Backspace（在 0 狀態下）快速清除記錄
  */
 export function CalculatorWidget() {
-  // TODO: 實作計算機功能
+  // 待實作: 計算機功能
   // 需要實作 calculator 子模組才能啟用此功能
   return <div className="p-4 text-morandi-secondary">計算機功能開發中...</div>;
 }

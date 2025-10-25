@@ -45,8 +45,8 @@ export function ShareAdvanceDialog({
   // 篩選活躍員工
   const activeEmployees = useMemo(() => {
     return employees.filter(emp => {
-      const notDeleted = !(emp as unknown)._deleted;
-      const isActive = (emp as unknown).status === 'active';
+      const notDeleted = !(emp as any)._deleted;
+      const isActive = (emp as any).status === 'active';
       return notDeleted && isActive;
     });
   }, [employees]);

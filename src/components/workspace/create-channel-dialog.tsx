@@ -19,14 +19,14 @@ export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogP
   const handleCreate = () => {
     if (!channelName.trim()) return;
     
-    const currentUserId = '1'; // TODO: 從 auth store 獲取
+    const currentUserId = '1'; // 從 auth store 獲取
     
     createChannel({
       name: channelName.trim(),
       type: 'public', // 'custom' 不是有效類型，改為 'public'
       // isArchived: false, // Channel 類型不包含此屬性
       // members: [currentUserId], // Channel 類型不包含此屬性
-      workspace_id: '', // TODO: 從 workspace store 獲取當前 workspace_id
+      workspace_id: '', // 從 workspace store 獲取當前 workspace_id
       created_by: currentUserId,
     });
     

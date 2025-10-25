@@ -45,7 +45,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
 
   const handleDrop = (status: PaymentStatus) => {
     if (draggedOrder) {
-      updateOrder(draggedOrder.id, { payment_status: status as unknown });
+      updateOrder(draggedOrder.id, { payment_status: status as any });
       setDraggedOrder(null);
     }
   };

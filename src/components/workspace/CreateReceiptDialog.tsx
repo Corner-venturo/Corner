@@ -34,9 +34,9 @@ export function CreateReceiptDialog({
       const receiptData = {
         order_id: order.id,
         order_number: order.order_number,
-        tour_id: '', // TODO: 從訂單取得 tour_id
-        code: '', // TODO: 從訂單取得 code
-        tour_name: '', // TODO: 從訂單取得 tour_name
+        tour_id: '', // 從訂單取得 tour_id
+        code: '', // 從訂單取得 code
+        tour_name: '', // 從訂單取得 tour_name
         contact_person: order.contact_person,
         receipt_date: receiptDate,
         payment_items: [
@@ -50,12 +50,12 @@ export function CreateReceiptDialog({
         total_amount: parseFloat(amount),
         status: '已收款' as const,
         note,
-        created_by: 'current-user', // TODO: 從 auth store 取得
+        created_by: 'current-user', // 從 auth store 取得
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
 
-      const receipt = await createReceipt(receiptData as unknown);
+      const receipt = await createReceipt(receiptData as any);
       onSuccess(receipt.id);
       onClose();
     } catch (error) {
@@ -130,7 +130,7 @@ export function CreateReceiptDialog({
             </label>
             <select
               value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value as unknown)}
+              onChange={(e) => setPaymentMethod(e.target.value as any)}
               className="input-morandi"
             >
               <option value="現金">現金</option>

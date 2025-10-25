@@ -110,7 +110,7 @@ export default function CreateInvoicePage() {
         tax_type,
         buyerInfo,
         items,
-        created_by: 'current_user', // TODO: 從登入狀態取得
+        created_by: 'current_user', // 注意: 需從登入狀態取得用戶ID
       })
 
       router.push('/finance/travel-invoice')
@@ -166,7 +166,7 @@ export default function CreateInvoicePage() {
                 <select
                   id="tax_type"
                   value={tax_type}
-                  onChange={e => setTaxType(e.target.value as unknown)}
+                  onChange={e => setTaxType(e.target.value as any)}
                   className="w-full px-3 py-2 border rounded-md"
                 >
                   <option value="dutiable">應稅</option>

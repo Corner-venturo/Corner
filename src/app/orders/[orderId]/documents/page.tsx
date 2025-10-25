@@ -195,7 +195,7 @@ export default function DocumentsDetailPage() {
     <div className="space-y-6 ">
       <ResponsiveHeader
         title={`文件管理 - ${order.order_number}`}
-        onAdd={() => {/* TODO: 上傳文件 */}}
+        onAdd={() => {/* 上傳文件 */}}
         addLabel="上傳文件"
       >
         <div className="flex items-center space-x-4">

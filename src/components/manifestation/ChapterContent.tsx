@@ -1,3 +1,4 @@
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -81,7 +82,7 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
 
       if (success) {
         setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 2000);
+        setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE);
         if (markAsCompleted) {
           recordManifestationCompletion();
         }

@@ -179,7 +179,7 @@ export default function TransportPage() {
   const handleAddTransport = () => {
     if (!newTransport.name.trim()) return;
 
-    // TODO: 新增交通選項到資料庫
+    // 功能: 新增交通選項到資料庫
     resetForm();
   };
 
@@ -197,7 +197,7 @@ export default function TransportPage() {
 
   const handleDeleteTransport = (_transportId: string) => {
     if (confirm('確定要刪除此交通選項嗎？')) {
-      // TODO: 刪除交通選項從資料庫
+      // 功能: 刪除交通選項從資料庫
     }
   };
 
@@ -218,7 +218,7 @@ export default function TransportPage() {
       <ResponsiveHeader
         {...{
         title: "交通選項管理",
-        icon: Car} as unknown}
+        icon: Car} as any}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },

@@ -26,6 +26,7 @@ export interface Quote extends BaseEntity {
   accommodation_days?: number; // 住宿天數
   status: QuoteStatus;       // 報價狀態
   total_amount: number;      // 總金額
+  total_cost?: number;       // 總成本
   version: number;           // 版本號
   valid_until?: string;      // 有效期限 (ISO 8601)
   notes?: string;            // 備註
@@ -35,9 +36,11 @@ export interface Quote extends BaseEntity {
   converted_to_tour?: boolean; // 是否已轉成旅遊團
   tour_id?: string;          // 轉換後的旅遊團 ID
 
-  // 擴展欄位（用於詳細頁）
-  categories?: unknown[];        // 報價分類（前端使用的複雜結構）
-  versions?: QuoteVersion[]; // 歷史版本
+  // 擴展欄位（用於詳細頁）- 使用 any 暫時相容舊結構
+  categories?: any[];        // 報價分類（複雜的前端結構，使用 CostCategory[] 或 any[]）
+  versions?: any[];          // 歷史版本（使用 VersionRecord[] 或 QuoteVersion[]）
+  participant_counts?: any;  // 參與人數統計
+  selling_prices?: any;      // 銷售價格
 }
 
 /**

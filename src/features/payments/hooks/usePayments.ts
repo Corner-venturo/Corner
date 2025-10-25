@@ -22,7 +22,7 @@ export const usePayments = () => {
     createPaymentRequest: async (
       data: Omit<PaymentRequest, keyof BaseEntity | 'request_number'>
     ) => {
-      return await paymentRequestService.create(data as unknown);
+      return await paymentRequestService.create(data as any);
     },
 
     updatePaymentRequest: async (id: string, data: Partial<PaymentRequest>) => {

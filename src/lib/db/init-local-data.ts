@@ -74,7 +74,7 @@ async function syncFromSupabase(): Promise<boolean> {
     const { supabase } = await import('@/lib/supabase/client');
 
     // 下載 employees 資料
-    const { data: employees, error } = await (supabase as unknown)
+    const { data: employees, error } = await (supabase as any)
       .from('employees')
       .select('*')
       .eq('status', 'active');
@@ -142,7 +142,7 @@ export async function clearAllData(): Promise<void> {
   
   for (const table of tables) {
     try {
-      await localDB.clear(table as unknown);
+      await localDB.clear(table as any);
       console.log(`✅ 已清空 ${table} 表`);
     } catch (error) {
       console.error(`❌ 清空 ${table} 表失敗:`, error);

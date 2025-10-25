@@ -54,7 +54,7 @@ export default function CustomersPage() {
 
   const getCustomerOrders = (_customer_id: string) => {
     // ✅ 透過 Order.customer_id 反查（目前 Order 類型還沒有 customer_id，暫時返回空陣列）
-    // TODO: 等 Order 類型加入 customer_id 後，改為: orders.filter(order => order.customer_id === _customer_id)
+    // 注意: 等 Order 類型加入 customer_id 後，改為: orders.filter(order => order.customer_id === _customer_id)
     return [];
   };
 

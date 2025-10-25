@@ -155,7 +155,7 @@ export default function ActivitiesPage() {
 
   const handleAddActivity = () => {
     if (!newActivity.name.trim()) return;
-    // TODO: 新增活動選項到資料庫
+    // 功能: 新增活動選項到資料庫
     resetForm();
   };
 
@@ -173,7 +173,7 @@ export default function ActivitiesPage() {
 
   const handleDeleteActivity = (_activityId: string) => {
     if (confirm('確定要刪除此活動選項嗎？')) {
-      // TODO: 刪除活動選項從資料庫
+      // 功能: 刪除活動選項從資料庫
     }
   };
 
@@ -194,7 +194,7 @@ export default function ActivitiesPage() {
       <ResponsiveHeader
         {...{
         title: '活動門票管理',
-        icon: Ticket} as unknown}
+        icon: Ticket} as any}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },

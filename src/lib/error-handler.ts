@@ -74,11 +74,11 @@ class ErrorHandler {
    */
   private extractMessage(error: unknown): string {
     if (error instanceof ValidationError) {
-      return `驗證錯誤: ${(error as unknown).field} - ${error.message}`;
+      return `驗證錯誤: ${(error as any).field} - ${error.message}`;
     }
 
     if (error instanceof NotFoundError) {
-      return `找不到資源: ${(error as unknown).resource} (ID: ${(error as unknown).id})`;
+      return `找不到資源: ${(error as any).resource} (ID: ${(error as any).id})`;
     }
 
     if (error instanceof Error) {
@@ -92,7 +92,7 @@ class ErrorHandler {
    * 通知用戶（可擴展為 Toast 通知）
    */
   private notifyUser(error: unknown, context: string): void {
-    // TODO: 整合 Toast 通知系統
+    // 整合 Toast 通知系統
     const message = this.getUserFriendlyMessage(error);
 
     // 未來可以這樣：

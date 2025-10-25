@@ -12,6 +12,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { BaseEntity } from '@/types';
+import { SYNC_DELAYS } from '@/lib/constants/timeouts';
 
 import { memoryCache } from '@/lib/cache/memory-cache';
 import { localDB } from '@/lib/db';
@@ -173,9 +174,9 @@ export function createStore<T extends BaseEntity>(
             const controller = new AbortController();
             set({ loading: true, error: null, _abortController: controller });
 
-            // ⏱️ 超時機制：如果 IndexedDB 初始化超過 3 秒，直接從 Supabase 讀取
+            // ⏱️ 超時機制：如果 IndexedDB 初始化超時，直接從 Supabase 讀取
             const timeout = new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('IndexedDB_TIMEOUT')), 3000)
+              setTimeout(() => reject(new Error('IndexedDB_TIMEOUT')), SYNC_DELAYS.INDEXEDDB_INIT_TIMEOUT)
             );
 
             if (enableSupabase && typeof window !== 'undefined') {
@@ -222,7 +223,7 @@ export function createStore<T extends BaseEntity>(
                       for (const item of items) {
                         await Promise.race([
                           localDB.put(tableName, item),
-                          new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 1000))
+                          new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), SYNC_DELAYS.INDEXEDDB_OPERATION_TIMEOUT))
                         ]);
                       }
                     } catch (cacheError) {
@@ -279,7 +280,7 @@ export function createStore<T extends BaseEntity>(
                   }
 
                   const items = (data || []) as T[];
-                  // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
+                  // 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
                   // items = items.filter((item) => !item._deleted);
 
                   logger.log(`✅ [${tableName}] Supabase 同步成功:`, items.length, '筆');
@@ -315,7 +316,7 @@ export function createStore<T extends BaseEntity>(
                     }
                     const batch = items.slice(startIndex, startIndex + batchSize);
                     await Promise.all(batch.map(item => localDB.put(tableName, item)));
-                    setTimeout(() => syncBatch(startIndex + batchSize), 10);
+                    setTimeout(() => syncBatch(startIndex + batchSize), SYNC_DELAYS.BATCH_SYNC_DELAY);
                   };
                   syncBatch(0).catch(err => {
                     logger.warn(`⚠️ [${tableName}] IndexedDB 快取失敗:`, err);
@@ -330,7 +331,7 @@ export function createStore<T extends BaseEntity>(
               logger.log(`💾 [${tableName}] 從 IndexedDB 載入資料...`);
               const items = await localDB.getAll(tableName) as T[];
 
-              // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
+              // 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
               // items = items.filter((item) => !item._deleted);
 
               set({ items, loading: false });
@@ -353,7 +354,7 @@ export function createStore<T extends BaseEntity>(
             // 🔧 任何其他錯誤：靜默切換到本地模式
             try {
               const items = await localDB.getAll(tableName) as T[];
-              // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
+              // 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
               // items = items.filter((item) => !item._deleted);
               set({ items, loading: false, error: null });
               logger.log(`💾 [${tableName}] IndexedDB 讀取成功:`, items.length, '筆');

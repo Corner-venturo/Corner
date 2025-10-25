@@ -79,7 +79,7 @@ export function CreatePaymentRequestDialog({
         status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      } as unknown);
+      } as any);
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {
@@ -87,7 +87,7 @@ export function CreatePaymentRequestDialog({
           listId,
           item.id,
           paymentRequest.id,
-          'current-user' // TODO: 從 auth store 取得當前用戶 ID
+          'current-user' // 從 auth store 取得當前用戶 ID
         );
       }
 

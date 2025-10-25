@@ -12,7 +12,7 @@ class TodoService extends BaseService<Todo> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(t => t.id === id),
       add: async (todo: Todo) => {
-        await store.create(todo as unknown);
+        await store.create(todo as any);
         return todo;
       },
       update: async (id: string, data: Partial<Todo>) => {
@@ -43,7 +43,7 @@ class TodoService extends BaseService<Todo> {
     const store = useTodoStore.getState();
     const todo = store.items.find(t => t.id === id);
     if (todo) {
-      await store.update(id, { status: todo.status === 'completed' ? 'pending' : 'completed' } as unknown);
+      await store.update(id, { status: todo.status === 'completed' ? 'pending' : 'completed' } as any);
     }
   }
 

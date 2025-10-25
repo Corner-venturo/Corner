@@ -84,11 +84,11 @@ export default function TourDetailPage() {
         // 根據不同分頁執行不同的邏輯
         switch (activeTab) {
           case 'overview':
-            // TODO: 編輯旅遊團基本資料
+            // 功能: 編輯旅遊團基本資料
             console.log('編輯旅遊團:', tour.id);
             break;
           case 'operations':
-            // TODO: 新增團務欄位
+            // 功能: 新增團務欄位
             break;
           case 'addons':
             setTriggerAddOnAdd(true);
@@ -97,16 +97,16 @@ export default function TourDetailPage() {
             setTriggerPaymentAdd(true);
             break;
           case 'costs':
-            // TODO: 新增成本支出
+            // 功能: 新增成本支出
             break;
           case 'refunds':
             setTriggerRefundAdd(true);
             break;
           case 'orders':
-            // TODO: 新增訂單
+            // 功能: 新增訂單
             break;
           case 'members':
-            // TODO: 新增團員
+            // 功能: 新增團員
             break;
         }
       },

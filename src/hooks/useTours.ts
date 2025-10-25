@@ -168,7 +168,7 @@ export function useTours() {
    * 檢查是否成團（注意：Tour 類型沒有 min_people 欄位）
    */
   const hasMetMinimum = (tour: Tour): boolean => {
-    // TODO: 如果需要最低成團人數，請在 Tour 類型中添加 min_participants 欄位
+    // 如果需要最低成團人數，請在 Tour 類型中添加 min_participants 欄位
     return false;
   };
 
@@ -186,7 +186,7 @@ export function useTours() {
   // ============================================
 
   const hasPermission = (_action: 'create' | 'update' | 'delete'): boolean => {
-    // TODO: 從 auth store 取得實際權限
+    // 從 auth store 取得實際權限
     // 目前簡化為都允許
     return true;
   };

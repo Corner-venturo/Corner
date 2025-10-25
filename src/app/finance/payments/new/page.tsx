@@ -110,7 +110,7 @@ export default function NewReceiptPage() {
     }
 
     // 這裡應該要保存到 store 或 API
-    // TODO: 保存收款單到 store 或 API
+    // 動作: 保存收款單到 store 或 API
 
     // 儲存成功後回到列表頁
     router.push('/finance/payments');

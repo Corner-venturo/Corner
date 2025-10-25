@@ -43,7 +43,7 @@ export function FinanceAlertCard({ tourIds, authorName, createdAt }: FinanceAler
   };
 
   const handleSendReminder = (tour: typeof selectedTours[0]) => {
-    // TODO: 實作發送提醒功能
+    // 待實作: 發送提醒功能
     alert(`發送收款提醒：${tour.name}`);
   };
 

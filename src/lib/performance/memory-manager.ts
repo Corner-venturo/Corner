@@ -35,6 +35,7 @@ class MemoryManager {
   private cleanupTimer: NodeJS.Timeout | null = null;
   private pressureThreshold = 0.8; // 80% 記憶體使用率視為壓力
   private autoCleanupInterval = 5 * 60 * 1000; // 5 分鐘自動清理一次
+  private visibilityChangeHandler: (() => void) | null = null;
 
   private constructor() {
     // 啟動自動清理
@@ -42,11 +43,12 @@ class MemoryManager {
 
     // 監聽頁面隱藏事件（用戶切換分頁時清理）
     if (typeof window !== 'undefined') {
-      document.addEventListener('visibilitychange', () => {
+      this.visibilityChangeHandler = () => {
         if (document.hidden) {
           this.cleanup({ clearHot: true });
         }
-      });
+      };
+      document.addEventListener('visibilitychange', this.visibilityChangeHandler);
     }
   }
 
@@ -61,11 +63,11 @@ class MemoryManager {
    * 獲取記憶體統計資訊
    */
   getMemoryStats(): MemoryStats | null {
-    if (typeof window === 'undefined' || !(performance as unknown).memory) {
+    if (typeof window === 'undefined' || !(performance as any).memory) {
       return null;
     }
 
-    const memory = (performance as unknown).memory;
+    const memory = (performance as any).memory;
     const usedMemory = memory.usedJSHeapSize / 1024 / 1024; // 轉換為 MB
     const totalMemory = memory.jsHeapSizeLimit / 1024 / 1024;
     const usagePercent = (usedMemory / totalMemory) * 100;
@@ -107,9 +109,9 @@ class MemoryManager {
     }
 
     // 觸發垃圾回收（如果瀏覽器支援）
-    if (typeof window !== 'undefined' && (window as unknown).gc) {
+    if (typeof window !== 'undefined' && (window as any).gc) {
       try {
-        (window as unknown).gc();
+        (window as any).gc();
         console.log('  ✅ 觸發垃圾回收');
       } catch {
         // 忽略錯誤
@@ -140,6 +142,18 @@ class MemoryManager {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = null;
+    }
+  }
+
+  /**
+   * 清理所有資源（記憶體洩漏防護）
+   */
+  destroy(): void {
+    this.stopAutoCleanup();
+
+    if (this.visibilityChangeHandler && typeof window !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+      this.visibilityChangeHandler = null;
     }
   }
 

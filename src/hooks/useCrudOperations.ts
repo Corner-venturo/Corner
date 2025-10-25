@@ -11,7 +11,7 @@ export function useCrudOperations<T extends { id: string }>(
       id: generateUUID(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
-    } as unknown as T;
+    } as any as T;
 
     setItems([...items, newItem]);
     return newItem;

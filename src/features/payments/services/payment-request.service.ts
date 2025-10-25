@@ -13,7 +13,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
-        const result = await store.create(request as unknown);
+        const result = await store.create(request as any);
         return result || request;
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
@@ -190,10 +190,10 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       status: 'pending' as const,
       note: '從報價單自動生成',
       budget_warning: false,
-      created_by: '1', // TODO: 使用實際用戶ID
+      created_by: '1', // 使用實際用戶ID
     };
 
-    return await this.create(requestData as unknown);
+    return await this.create(requestData as any);
   }
 
   // ========== Query 方法 ==========

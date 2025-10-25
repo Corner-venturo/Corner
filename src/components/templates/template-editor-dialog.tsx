@@ -136,7 +136,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
           excel_structure: excelData || { data: [['']], settings: {} },
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        } as unknown);
+        } as any);
       }
 
       onOpenChange(false);

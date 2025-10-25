@@ -12,7 +12,7 @@ class SupplierService extends BaseService<Supplier> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find((s: Supplier) => s.id === id),
       add: async (supplier: Supplier) => {
-        await store.create(supplier as unknown);
+        await store.create(supplier as any);
         return supplier;
       },
       update: async (id: string, data: Partial<Supplier>) => {

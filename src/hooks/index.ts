@@ -7,7 +7,7 @@
 export { useTours } from './useTours';
 export { useOrders } from './useOrders';
 export { useCustomers } from './useCustomers';
-// TODO: usePayments deprecated (moved to features/payments/hooks/usePayments.ts)
+// usePayments deprecated (moved to features/payments/hooks/usePayments.ts)
 // export { usePayments } from './usePayments';
 
 // 現有通用 Hooks

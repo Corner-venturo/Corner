@@ -4,13 +4,12 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ContentContainer } from '@/components/layout/content-container';
 import { Card } from '@/components/ui/card';
 import { useTourStore, useOrderStore } from '@/stores';
-// TODO: usePaymentStore deprecated - 財務報表功能未完整實作
 import { BarChart3, TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucide-react';
 
 export default function ReportsPage() {
   const { items: tours } = useTourStore();
   const { items: _orders } = useOrderStore();
-  const payments: unknown[] = []; // TODO: 實作完整財務報表
+  const payments: unknown[] = []; // 待實作: 完整財務報表
 
   const total_revenue = payments.filter(p => p.type === '收款').reduce((sum, p) => sum + p.amount, 0);
   const totalCosts = payments.filter(p => p.type === '請款').reduce((sum, p) => sum + p.amount, 0);

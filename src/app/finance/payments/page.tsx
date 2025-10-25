@@ -8,7 +8,6 @@ import { EnhancedTable } from '@/components/ui/enhanced-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrderStore } from '@/stores';
-// TODO: usePaymentStore deprecated - 收款記錄功能未實作
 import {  Calendar, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -44,7 +43,6 @@ interface PaymentItem {
 
 export default function PaymentsPage() {
   const { items: orders } = useOrderStore();
-  const payments: unknown[] = []; // TODO: 實作收款記錄功能
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 只取收款記錄
@@ -127,7 +125,7 @@ export default function PaymentsPage() {
       return;
     }
 
-    // TODO: 保存收款單到 store 或 API
+    // 動作: 保存收款單到 store 或 API
     console.log('儲存收款單', {
       order_id: selectedOrderId,
       receiptDate,

@@ -50,14 +50,14 @@ export function CanvasView({ channel }: CanvasViewProps) {
     };
 
     createPersonalCanvas({
-      employee_id: '1', // TODO: 從 auth store 獲取
+      employee_id: '1', // 從 auth store 獲取
       workspace_id: channel.workspace_id,
       canvas_number: channelDocs.length + 1,
       title: typeNames[type],
       type,
       content: {},
       layout: {},
-    } as unknown);
+    } as any);
   };
   
   return (
@@ -127,7 +127,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
             {activeDoc.type === 'tools' && (
               <WorkspaceTaskList
                 channelId={channel.id}
-                tour_id={(channel as unknown).tour_id}
+                tour_id={(channel as any).tour_id}
               />
             )}
             

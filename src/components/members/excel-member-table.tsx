@@ -80,7 +80,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
   const autoSaveMember = useCallback(async (member: EditingMember, index: number) => {
     if (member.isNew && member.name.trim()) {
       const { isNew, ...memberData } = member;
-      const created = await memberStore.create(memberData as unknown);
+      const created = await memberStore.create(memberData as any);
       const newId = created?.id;
 
       const updatedMembers = [...tableMembers];

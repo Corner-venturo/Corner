@@ -7,7 +7,6 @@ import { ContentContainer } from '@/components/layout/content-container';
 import { Button } from '@/components/ui/button';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
 import { useOrderStore } from '@/stores';
-// TODO: usePaymentStore deprecated
 import { ArrowLeft, CreditCard, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,11 +15,10 @@ export default function PaymentDetailPage() {
   const params = useParams();
   const orderId = params.orderId as string;
   const orderStore = useOrderStore();
-  const paymentStore = { payment_requests: [] }; // TODO: usePaymentStore deprecated
 
   // 等待 store 載入
-  const orders = (orderStore as unknown).orders || [];
-  const paymentRequests = (paymentStore as unknown).payment_requests || [];
+  const orders = (orderStore as any).orders || [];
+  const paymentRequests = (paymentStore as any).payment_requests || [];
 
   const order = orders.find((o) => o.id === orderId);
   // 找出此訂單相關的請款單

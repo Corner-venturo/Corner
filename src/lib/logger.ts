@@ -49,7 +49,7 @@ class AppLogger {
 
     // 生產環境可整合 Sentry
     if (!this.isDev && typeof window !== 'undefined') {
-      // TODO: 整合 Sentry
+      // 整合 Sentry
       // Sentry.captureException(new Error(message), { extra: meta });
     }
   }

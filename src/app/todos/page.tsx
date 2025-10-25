@@ -240,7 +240,7 @@ export default function TodosPage() {
         enabled_quick_actions: formData.enabled_quick_actions || ['receipt', 'quote']
       };
 
-      await addTodo(newTodoData as unknown);
+      await addTodo(newTodoData as any);
       setIsAddDialogOpen(false);
     } catch (error) {
       logger.error('新增待辦事項失敗:', error);
@@ -293,7 +293,7 @@ export default function TodosPage() {
                 };
 
                 try {
-                  await addTodo(newTodoData as unknown);
+                  await addTodo(newTodoData as any);
                   logger.log('✅ 待辦事項新增成功');
                 } catch (error) {
                   logger.error('快速新增失敗:', error);

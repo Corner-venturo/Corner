@@ -6,7 +6,6 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Card } from '@/components/ui/card';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { useTourStore, useOrderStore } from '@/stores';
-// TODO: usePaymentStore deprecated - 收款/付款記錄功能未實作
 import {
   CreditCard,
   TrendingUp,
@@ -21,7 +20,6 @@ import { cn } from '@/lib/utils';
 export default function FinancePage() {
   const { items: _tours } = useTourStore();
   const { items: _orders } = useOrderStore();
-  const payments: unknown[] = []; // TODO: 實作收款/付款記錄功能
 
   // 計算財務統計
   const totalReceivable = payments

@@ -493,7 +493,7 @@ export default function VisasPage() {
           total_revenue: 0,
           total_cost: 0,
           profit: 0,
-        } as unknown);
+        } as any);
       }
     } else {
       selectedTour = tours.find(t => t.id === contact_info.tour_id);
@@ -703,7 +703,7 @@ export default function VisasPage() {
       <ResponsiveHeader
         {...{
         title: "簽證管理",
-        icon: FileText} as unknown}
+        icon: FileText} as any}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '簽證管理', href: '/visas' }

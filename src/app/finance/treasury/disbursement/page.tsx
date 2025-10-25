@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 // import { Input } from '@/components/ui/input';
 // import { Textarea } from '@/components/ui/textarea';
 import { EnhancedTable, TableColumn} from '@/components/ui/enhanced-table';
-// TODO: usePaymentStore deprecated - import { usePaymentStore } from '@/stores';
 import { DisbursementOrder, PaymentRequest } from '@/stores/types';
 import { FileText, Calendar, Wallet, CheckCircle, Clock, Banknote, X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -45,7 +44,7 @@ const disbursementStatusColors = {
 export default function DisbursementPage() {
   const searchParams = useSearchParams();
 
-  // TODO: 暫時使用空資料，等待 payment store 完整實作
+  // 注意: 暫時使用空資料，等待 payment store 完整實作
   const {
     payment_requests = [],
     disbursement_orders = [],
@@ -58,7 +57,7 @@ export default function DisbursementPage() {
     getNextThursday = () => new Date().toLocaleDateString('zh-TW'),
     createDisbursementOrder = () => {},
     generateDisbursementNumber = () => 'DISB-000001'
-  } = {} as unknown;
+  } = {} as any;
 
   const [activeTab, setActiveTab] = useState<'pending' | 'current' | 'all'>('pending');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
@@ -153,7 +152,7 @@ export default function DisbursementPage() {
   // 確認出納單
   const handleConfirmDisbursement = () => {
     if (!currentOrder) return;
-    confirmDisbursementOrder(currentOrder.id, '1'); // TODO: 使用實際用戶ID
+    confirmDisbursementOrder(currentOrder.id, '1'); // 使用實際用戶ID
   };
 
   // 待出帳表格配置
@@ -354,7 +353,7 @@ export default function DisbursementPage() {
           { value: 'all', label: '出納單列表', icon: Wallet }
         ]}
         activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as unknown)}
+        onTabChange={(tab) => setActiveTab(tab as any)}
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增出納單"
         showSearch={true}

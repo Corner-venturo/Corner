@@ -187,9 +187,9 @@ export async function clearAndRebuild() {
 
 // 自動掛載到 window（方便 Console 使用）
 if (typeof window !== 'undefined') {
-  (window as unknown).verifyAndFix = verifyAndFix;
-  (window as unknown).quickCheck = quickCheck;
-  (window as unknown).clearAndRebuild = clearAndRebuild;
+  (window as any).verifyAndFix = verifyAndFix;
+  (window as any).quickCheck = quickCheck;
+  (window as any).clearAndRebuild = clearAndRebuild;
 
   console.log('💡 驗證工具已載入');
   console.log('📝 可用指令：');

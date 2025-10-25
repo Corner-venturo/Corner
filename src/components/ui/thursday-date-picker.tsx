@@ -1,3 +1,4 @@
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 'use client'
 
 import * as React from 'react'
@@ -55,7 +56,7 @@ export function ThursdayDatePicker({
     // 如果不是特殊請款且不是週四，顯示警告
     if (!allowAnyDay && !isThursday) {
       setShowWarning(true)
-      setTimeout(() => setShowWarning(false), 3000) // 3秒後自動隱藏
+      setTimeout(() => setShowWarning(false), UI_DELAYS.MESSAGE_DISPLAY) // 3秒後自動隱藏
       return
     }
 

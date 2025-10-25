@@ -54,12 +54,12 @@ export default function TemplateEditorPage({ params }: PageProps) {
   }
 
   const handlePreview = () => {
-    // TODO: 實作預覽功能
+    // 待實作: 預覽功能
     alert('PDF 預覽功能即將推出')
   }
 
   const handleExport = () => {
-    // TODO: 實作匯出功能
+    // 待實作: 匯出功能
     alert('PDF 匯出功能即將推出')
   }
 

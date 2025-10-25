@@ -1,3 +1,4 @@
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 /**
  * IndexedDB 版本管理器
  * 自動偵測版本變化並處理升級
@@ -92,7 +93,7 @@ async function clearDatabase(): Promise<void> {
     request.onblocked = () => {
       console.warn('[Version Manager] ⚠️ 清空被阻擋（可能有其他分頁開啟）');
       // 等待一下再試
-      setTimeout(() => resolve(), 1000);
+      setTimeout(() => resolve(), UI_DELAYS.AUTO_SAVE);
     };
   });
 }

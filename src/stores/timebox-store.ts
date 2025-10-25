@@ -549,7 +549,7 @@ export const useTimeboxStore = create<TimeboxState>()(
         const weekEnd = getWeekEnd(weekStart)
         const newWeek: WeekRecord = {
           id: generateId(),
-          user_id: 'current-user', // TODO: 實際用戶ID
+          user_id: 'current-user', // 注意: 需要實際用戶ID
           weekStart: getWeekStart(weekStart),
           weekEnd,
           archived: false,

@@ -381,7 +381,7 @@ export const useAuthStore = create<AuthState>(
         currentProfile: profile
       });
 
-      // TODO: 初始化同步已改用 createStore 的 fetchAll 自動處理
+      // 初始化同步已改用 createStore 的 fetchAll 自動處理
       // 每個頁面載入時會自動從 Supabase 下載資料
       logger.log('✅ 登入成功，資料將在各頁面載入時自動同步');
 

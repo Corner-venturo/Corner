@@ -28,7 +28,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
       name: formData.name,
       type: formData.type,
       color: formData.color,
-      user_id: 'current-user', // TODO: 實際用戶ID
+      user_id: 'current-user', // 注意: 需要實際用戶ID
     })
 
     setFormData({

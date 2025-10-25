@@ -142,7 +142,7 @@ export class LazyStore<T extends { id: string }> {
 
     // 2. 從 IndexedDB 讀取
     try {
-      const localItem = await localDB.read(this.options.table as unknown, id);
+      const localItem = await localDB.read(this.options.table as any, id);
       if (localItem) {
         // 快取到熱快取
         if (this.options.enableCache) {
@@ -223,7 +223,7 @@ export class LazyStore<T extends { id: string }> {
     pageSize: number
   ): Promise<PaginatedData<T>> {
     try {
-      const allData = (await localDB.getAll(this.options.table as unknown)) as T[];
+      const allData = (await localDB.getAll(this.options.table as any)) as T[];
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       const pageData = allData.slice(start, end);
@@ -285,7 +285,7 @@ export class LazyStore<T extends { id: string }> {
 
       // 同步到 IndexedDB
       for (const item of supabaseData.data) {
-        await localDB.create(this.options.table as unknown, item);
+        await localDB.create(this.options.table as any, item);
       }
     } catch (error) {
       console.warn('背景同步失敗', error);

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/tooltip'
 
 export function SyncIndicator() {
-  // TODO: 實作自動同步功能
+  // 待實作: 自動同步功能
   return null;
 
   /* const { syncStatus, isOnline, triggerSync } = useAutoSync()

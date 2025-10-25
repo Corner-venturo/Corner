@@ -7,6 +7,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
 import { format, parse, isValid } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { SPECIAL_DELAYS } from '@/lib/constants/timeouts';
 import 'react-day-picker/style.css';
 
 interface SmartDateInputProps {
@@ -61,7 +62,7 @@ export function SmartDateInput({
 
     // 當輸入4位數時，自動跳到月份
     if (val.length === 4) {
-      setTimeout(() => monthRef.current?.focus(), 0);
+      setTimeout(() => monthRef.current?.focus(), SPECIAL_DELAYS.NEXT_TICK);
     }
   };
 
@@ -83,7 +84,7 @@ export function SmartDateInput({
 
     // 當輸入2位數時，自動跳到日期
     if (val.length === 2 && parseInt(val) > 0 && parseInt(val) <= 12) {
-      setTimeout(() => dayRef.current?.focus(), 0);
+      setTimeout(() => dayRef.current?.focus(), SPECIAL_DELAYS.NEXT_TICK);
     }
   };
 

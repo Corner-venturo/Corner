@@ -12,7 +12,7 @@ class CustomerService extends BaseService<Customer> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(c => c.id === id),
       add: async (customer: Customer) => {
-        await store.create(customer as unknown);
+        await store.create(customer as any);
         return customer;
       },
       update: async (id: string, data: Partial<Customer>) => {
@@ -70,7 +70,7 @@ class CustomerService extends BaseService<Customer> {
 
   getCustomersByTour(_tour_id: string): Customer[] {
     const _store = useCustomerStore.getState();
-    // TODO: Order 類型需要加入 customer_id 欄位
+    // Order 類型需要加入 customer_id 欄位
     // const tourOrders = useOrderStore.getState().items.filter(o => o.tour_id === _tour_id);
     // const customerIds = tourOrders.map(o => o.customer_id);
     // return _store.items.filter(c => customerIds.includes(c.id));

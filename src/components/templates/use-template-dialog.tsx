@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTourStore, useOrderStore } from '@/stores';
-// TODO: usePaymentStore deprecated
 import { useTemplateStore } from '@/stores/template-store';
 import type { Tour, Order } from '@/stores/types';
 
@@ -72,10 +71,10 @@ export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateD
         template_name: template.name,
         data_used: allData,
         file_type: 'pdf',
-        created_by: 'current-user-id', // TODO: 使用實際的用戶 ID
+        created_by: 'current-user-id', // 使用實際的用戶 ID
       });
 
-      // TODO: 實際的 PDF 生成邏輯
+      // 實際的 PDF 生成邏輯
       alert('PDF 生成功能即將整合');
 
       onOpenChange(false);

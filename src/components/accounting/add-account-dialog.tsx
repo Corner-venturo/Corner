@@ -122,7 +122,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                     key={type.id}
                     onClick={() => setFormData(prev => ({
                       ...prev,
-                      type: type.id as unknown,
+                      type: type.id as any,
                       color: type.color
                     }))}
                     className={cn(

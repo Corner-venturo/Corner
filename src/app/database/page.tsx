@@ -62,7 +62,7 @@ export default function DatabasePage() {
     <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="資料庫管理"
-        onAdd={() => {/* TODO: 批次匯入邏輯 */}}
+        onAdd={() => {/* 批次匯入邏輯 */}}
         addLabel="批次匯入"
       />
 

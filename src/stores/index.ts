@@ -113,7 +113,7 @@ export const useQuoteItemStore = createStore<QuoteItem>('quote_items');
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as unknown);
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as any);
 
 // ============================================
 // 系統管理 Stores（無編號）
@@ -144,7 +144,7 @@ export const useRegionStore = createStore<Region>('regions');
 // 行事曆事件 Store
 export const useCalendarEventStore = createStore<import('@/types/calendar.types').CalendarEvent>('calendar_events');
 
-// TODO: WorkspaceItem, Template, TimeboxSession 型別需要定義後再啟用
+// WorkspaceItem, Template, TimeboxSession 型別需要定義後再啟用
 // export const useTemplateStore = createStore<Template>('templates');
 // export const useTimeboxSessionStore = createStore<TimeboxSession>('timebox_sessions');
 // export const useWorkspaceItemStore = createStore<WorkspaceItem>('workspace_items');
@@ -165,23 +165,23 @@ export { useHomeSettingsStore } from './home-settings-store';
 // 暫時保留的複雜 Stores（待重構）
 // ============================================
 
-// TODO: 移到 hooks/use-employees.ts
+// 移到 hooks/use-employees.ts
 export { useUserStore } from './user-store';
 
-// TODO: 拆分為 4 個 createStore + hooks/use-accounting.ts
+// 拆分為 4 個 createStore + hooks/use-accounting.ts
 export { useAccountingStore } from './accounting-store';
 
-// TODO: 移到 hooks/use-calendar.ts
+// 移到 hooks/use-calendar.ts
 // calendar-store 需要額外的 settings 功能，暫時保留
 export { useCalendarStore } from './calendar-store';
 
-// TODO: 移到 hooks/use-timebox.ts
+// 移到 hooks/use-timebox.ts
 export { useTimeboxStore } from './timebox-store';
 
-// TODO: 已有 useTemplateStore，檢查是否重複
+// 已有 useTemplateStore，檢查是否重複
 // export { useTemplateStore } from './template-store';
 
-// TODO: 已有 useWorkspaceItemStore，檢查是否重複
+// 已有 useWorkspaceItemStore，檢查是否重複
 export { useWorkspaceStore } from './workspace-store';
 
 // ============================================

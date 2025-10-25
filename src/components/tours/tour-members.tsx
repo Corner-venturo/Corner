@@ -72,7 +72,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         order_number: relatedOrder?.order_number || '',
         contact_person: relatedOrder?.contact_person || '',
         assignedRoom: member.assigned_room
-      } as unknown;
+      } as EditingMember;
     });
 
     setTableMembers(allTourMembers);
@@ -121,7 +121,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         member.gender = '';
       }
     } else {
-      (member as unknown)[field] = value;
+      (member as any)[field] = value;
     }
 
     updatedMembers[rowIndex] = member;
@@ -144,12 +144,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         assigned_room: assignedRoom
       };
       // 移除舊欄位
-      delete (convertedData as unknown).nameEn;
-      delete (convertedData as unknown).passportNumber;
-      delete (convertedData as unknown).passportExpiry;
-      delete (convertedData as unknown).idNumber;
+      delete (convertedData as any).nameEn;
+      delete (convertedData as any).passportNumber;
+      delete (convertedData as any).passportExpiry;
+      delete (convertedData as any).idNumber;
 
-      const newMember = await addMember(convertedData as unknown);
+      const newMember = await addMember(convertedData as any);
 
       const updatedMembers = [...tableMembers];
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false };
@@ -165,12 +165,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         assigned_room: assignedRoom
       };
       // 移除舊欄位
-      delete (convertedData as unknown).nameEn;
-      delete (convertedData as unknown).passportNumber;
-      delete (convertedData as unknown).passportExpiry;
-      delete (convertedData as unknown).idNumber;
+      delete (convertedData as any).nameEn;
+      delete (convertedData as any).passportNumber;
+      delete (convertedData as any).passportExpiry;
+      delete (convertedData as any).idNumber;
 
-      await updateMember(member.id, convertedData as unknown);
+      await updateMember(member.id, convertedData as any);
     }
   };
 

@@ -1,3 +1,4 @@
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -87,13 +88,13 @@ export function SyncStatusIndicator() {
     const handleOnline = () => {
       setIsOnline(true);
       setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 3000);
+      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
     };
 
     const handleOffline = () => {
       setIsOnline(false);
       setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 3000);
+      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
     };
 
     window.addEventListener('online', handleOnline);
@@ -113,7 +114,7 @@ export function SyncStatusIndicator() {
       await backgroundSyncService.syncAllTables();
       setShowNotification(true);
       setLastSyncTime(new Date());
-      setTimeout(() => setShowNotification(false), 3000);
+      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
     } catch (error) {
       console.error('手動同步失敗:', error);
     } finally {

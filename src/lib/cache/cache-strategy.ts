@@ -240,7 +240,7 @@ class CacheStrategy {
 
     try {
       // 使用特殊的 cache 表
-      const value = await localDB.read('cache' as unknown, key);
+      const value = await localDB.read('cache' as any, key);
       return value || null;
     } catch {
       return null;
@@ -251,7 +251,7 @@ class CacheStrategy {
     if (typeof window === 'undefined') return;
 
     try {
-      await localDB.create('cache' as unknown, { id: key, data: value });
+      await localDB.create('cache' as any, { id: key, data: value });
     } catch (error) {
       logger.warn('IndexedDB 寫入失敗', error);
     }
@@ -261,7 +261,7 @@ class CacheStrategy {
     if (typeof window === 'undefined') return;
 
     try {
-      await localDB.delete('cache' as unknown, key);
+      await localDB.delete('cache' as any, key);
     } catch {
       // 忽略錯誤
     }

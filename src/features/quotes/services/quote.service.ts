@@ -13,7 +13,7 @@ class QuoteService extends BaseService<Quote> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(q => q.id === id),
       add: async (quote: Quote) => {
-        const result = await store.create(quote as unknown);
+        const result = await store.create(quote as any);
         return result || quote;
       },
       update: async (id: string, data: Partial<Quote>) => {
@@ -52,7 +52,7 @@ class QuoteService extends BaseService<Quote> {
       ...rest,
       name: `${original.name} (副本)`,
       status: 'proposed'
-    } as unknown);
+    } as any);
 
     return duplicated;
   }

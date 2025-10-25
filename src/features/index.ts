@@ -19,7 +19,7 @@ export { useSuppliers } from './suppliers/hooks/useSuppliers';
 export { useCustomers } from './customers/hooks/useCustomers';
 
 // ========== Services ==========
-// TODO: paymentService deprecated (moved to payment.service.deprecated.ts)
+// paymentService deprecated (moved to payment.service.deprecated.ts)
 // export { paymentService } from './payments/services/payment.service';
 export { quoteService } from './quotes/services/quote.service';
 export { orderService } from './orders/services/order.service';

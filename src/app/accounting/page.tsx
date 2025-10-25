@@ -1,3 +1,4 @@
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 'use client';
 
 import React, { useState, useRef, useMemo, useCallback } from 'react';
@@ -89,7 +90,7 @@ export default function AccountingPage() {
     // 清空表單並顯示成功動畫
     setQuickAmount('');
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
+    setTimeout(() => setShowToast(false), UI_DELAYS.SUCCESS_MESSAGE);
 
     // 重新聚焦到金額輸入
     setTimeout(() => {

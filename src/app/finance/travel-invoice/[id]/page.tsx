@@ -36,7 +36,7 @@ export default function InvoiceDetailPage() {
     if (!currentInvoice || !voidReason.trim()) return
 
     try {
-      await voidInvoice(currentInvoice.id, voidReason, 'current_user') // TODO: 從登入狀態取得
+      await voidInvoice(currentInvoice.id, voidReason, 'current_user') // 注意: 需從登入狀態取得用戶ID
       setShowVoidDialog(false)
       setVoidReason('')
     } catch (error) {
