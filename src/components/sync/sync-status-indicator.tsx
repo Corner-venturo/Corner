@@ -1,5 +1,6 @@
-import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 'use client';
+
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
 
 import React, { useEffect, useState } from 'react';
 import { backgroundSyncService } from '@/lib/sync/background-sync-service';

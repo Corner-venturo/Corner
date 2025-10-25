@@ -21,18 +21,21 @@ export default function FinancePage() {
   const { items: _tours } = useTourStore();
   const { items: _orders } = useOrderStore();
 
+  // TODO: 實作 payment store
+  const payments: unknown[] = [];
+
   // 計算財務統計
   const totalReceivable = payments
-    .filter(p => p.type === '收款')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .filter((p: unknown) => (p as unknown).type === '收款')
+    .reduce((sum, p: unknown) => sum + (p as unknown).amount, 0);
 
   const totalPayable = payments
-    .filter(p => p.type === '請款')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .filter((p: unknown) => (p as unknown).type === '請款')
+    .reduce((sum, p: unknown) => sum + (p as unknown).amount, 0);
 
   const pendingPayments = payments
-    .filter(p => p.status === '待確認')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .filter((p: unknown) => (p as unknown).status === '待確認')
+    .reduce((sum, p: unknown) => sum + (p as unknown).amount, 0);
 
   const netProfit = totalReceivable - totalPayable;
 

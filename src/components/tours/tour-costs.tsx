@@ -16,7 +16,7 @@ interface TourCostsProps {
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
   const { items: orders } = useOrderStore();
-  const addPayment = async (_data) => { console.warn("addPayment not implemented"); };
+  const addPayment = async (_data: any) => { console.warn("addPayment not implemented"); };
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCost, setNewCost] = useState({
     amount: 0,
@@ -25,6 +25,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     status: '待確認' as const,
     vendor: ''
   });
+
+  // TODO: 實作 payment store
+  const payments: any[] = [];
 
   const _tourCosts = payments.filter(payment => {
     if (payment.type !== '請款') return false;
@@ -59,14 +62,14 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   const tourOrders = orders.filter(order => order.tour_id === tour.id);
 
   // 獲取所有相關的成本支出記錄
-  const costPayments = payments.filter(payment =>
+  const costPayments = (payments as any[]).filter(payment =>
     payment.type === '請款' &&
     (payment.tour_id === tour.id ||
      tourOrders.some(order => order.id === payment.order_id))
   );
 
   const getCategoryIcon = (category: string) => {
-    const icons: Record<string, unknown> = {
+    const icons: Record<string, any> = {
       'transport': Truck,
       'accommodation': Hotel,
       'food': Utensils,
@@ -148,7 +151,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           {['transport', 'accommodation', 'food', 'attraction', 'other'].map((category) => {
             const categoryTotal = costPayments
-              .filter(cost => (cost as unknown).category === category)
+              .filter(cost => (cost as any).category === category)
               .reduce((sum, cost) => sum + cost.amount, 0);
             const Icon = getCategoryIcon(category);
             const displayName = getCategoryDisplayName(category);
@@ -196,8 +199,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
           {/* 成本項目 */}
           <div className="space-y-2">
             {costPayments.map((cost) => {
-              const Icon = getCategoryIcon((cost as unknown).category || '');
-              const displayCategory = getCategoryDisplayName((cost as unknown).category || '');
+              const Icon = getCategoryIcon((cost as any).category || '');
+              const displayCategory = getCategoryDisplayName((cost as any).category || '');
               const relatedOrder = tourOrders.find(order => order.id === cost.order_id);
 
               return (
@@ -230,7 +233,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
                   <div className="col-span-2">
                     <div className="text-sm text-morandi-primary">
-                      {(cost as unknown).vendor || relatedOrder?.order_number || '-'}
+                      {(cost as any).vendor || relatedOrder?.order_number || '-'}
                     </div>
                   </div>
 

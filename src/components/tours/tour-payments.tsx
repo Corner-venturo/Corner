@@ -6,7 +6,6 @@ import { useOrderStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { _TabsContent } from '@/components/ui/tabs';
 import { DollarSign, TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,7 +18,7 @@ interface TourPaymentsProps {
 
 export const TourPayments = React.memo(function TourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete }: TourPaymentsProps) {
   const { items: orders } = useOrderStore();
-  const addPayment = async (_data) => { console.warn("addPayment not implemented"); };
+  const addPayment = async (_data: any) => { console.warn("addPayment not implemented"); };
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // 監聽外部觸發新增
@@ -37,6 +36,9 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
     status: '已確認' as const
   });
 
+  // TODO: 實作 payment store
+  const payments: any[] = [];
+
   // 獲取屬於這個旅遊團的所有訂單（如果有 orderFilter，則只取該訂單）
   const tourOrders = orders.filter(order => {
     if (orderFilter) {
@@ -46,7 +48,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
   });
 
   // 獲取所有相關的收款記錄（根據 orderFilter 過濾）
-  const tourPayments = payments.filter(payment => {
+  const tourPayments = (payments as any[]).filter(payment => {
     if (payment.type !== '收款') return false;
 
     if (orderFilter) {
@@ -202,9 +204,9 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                       <td className="py-3 px-4">
                         <span className={cn(
                           'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                          getMethodBadge((payment as unknown).method)
+                          getMethodBadge((payment as any).method)
                         )}>
-                          {getMethodDisplayName((payment as unknown).method)}
+                          {getMethodDisplayName((payment as any).method)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-morandi-primary">
@@ -297,7 +299,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
               <select
                 value={newPayment.status}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as unknown }))}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as any }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="已確認">已確認</option>

@@ -1,5 +1,6 @@
+'use client';
+
 import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
-'use client'
 
 import * as React from 'react'
 import { format } from 'date-fns'

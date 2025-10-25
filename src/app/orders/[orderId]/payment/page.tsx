@@ -16,11 +16,14 @@ export default function PaymentDetailPage() {
   const orderId = params.orderId as string;
   const orderStore = useOrderStore();
 
-  // 等待 store 載入
-  const orders = (orderStore as unknown).orders || [];
-  const paymentRequests = (paymentStore as unknown).payment_requests || [];
+  // TODO: 實作 payment store
+  const paymentStore: any = null;
 
-  const order = orders.find((o) => o.id === orderId);
+  // 等待 store 載入
+  const orders = (orderStore as any).orders || [];
+  const paymentRequests = (paymentStore as any).payment_requests || [];
+
+  const order = orders.find((o: any) => o.id === orderId);
   // 找出此訂單相關的請款單
   const orderPayments = paymentRequests.filter((p: any) => p.order_id === orderId);
 
@@ -116,8 +119,8 @@ export default function PaymentDetailPage() {
   ], []);
 
   // 排序和篩選函數
-  const sortFunction = (data: unknown[], column: string, direction: 'asc' | 'desc') => {
-    return [...data].sort((a, b) => {
+  const sortFunction = (data: any[], column: string, direction: 'asc' | 'desc') => {
+    return [...data].sort((a: any, b: any) => {
       let aValue: string | number | Date = a[column as keyof typeof a];
       let bValue: string | number | Date = b[column as keyof typeof b];
 
@@ -132,8 +135,8 @@ export default function PaymentDetailPage() {
     });
   };
 
-  const filterFunction = (data: unknown[], filters: Record<string, string>) => {
-    return data.filter(payment => {
+  const filterFunction = (data: any[], filters: Record<string, string>) => {
+    return data.filter((payment: any) => {
       return (
         (!filters.request_number || payment.request_number.includes(filters.request_number)) &&
         (!filters.request_date || new Date(payment.request_date).toLocaleDateString().includes(filters.request_date)) &&

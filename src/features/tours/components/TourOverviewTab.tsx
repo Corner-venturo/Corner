@@ -3,7 +3,9 @@ import { Tour } from '@/stores/types';
 import { useQuotes } from '@/features/quotes/hooks/useQuotes';
 import { useOrderStore, useMemberStore } from '@/stores';
 import { cn } from '@/lib/utils';
-import { paymentStore } from '@/stores/payment.store';
+
+// TODO: 實作 payment store
+const paymentStore = { payment_requests: [] as any[] };
 
 interface TourOverviewTabProps {
   tour: Tour;

@@ -45,6 +45,9 @@ export default function PaymentsPage() {
   const { items: orders } = useOrderStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // TODO: 實作 payment store
+  const payments: any[] = [];
+
   // 只取收款記錄
   const paymentRecords = payments.filter(p => p.type === '收款');
 
