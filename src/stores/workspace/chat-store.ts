@@ -64,7 +64,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           try {
             console.log('☁️ [messages] 背景同步 Supabase...');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data, error } = await (supabase as any)
+            const { data, error } = await (supabase as unknown)
               .from('messages')
               .select(`
                 *,
@@ -120,7 +120,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        const { error } = await (supabase as unknown)
           .from('messages')
           .insert({
             id: newMessage.id,
@@ -244,7 +244,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        const { error } = await (supabase as unknown)
           .from('messages')
           .delete()
           .eq('id', messageId);
@@ -278,7 +278,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        const { error } = await (supabase as unknown)
           .from('messages')
           .update({ content: '此訊息已被刪除' })
           .eq('id', messageId);

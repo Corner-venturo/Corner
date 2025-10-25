@@ -113,7 +113,7 @@ export const useQuoteItemStore = createStore<QuoteItem>('quote_items');
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as any);
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as unknown);
 
 // ============================================
 // 系統管理 Stores（無編號）

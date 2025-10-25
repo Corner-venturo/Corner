@@ -37,7 +37,7 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
           <label className="text-sm font-medium text-morandi-secondary">類別</label>
           <Select
             value={newItem.category}
-            onValueChange={(value) => setNewItem(prev => ({ ...prev, category: value as any }))}
+            onValueChange={(value) => setNewItem(prev => ({ ...prev, category: value as unknown }))}
           >
             <SelectTrigger className="mt-2 bg-background">
               <SelectValue />

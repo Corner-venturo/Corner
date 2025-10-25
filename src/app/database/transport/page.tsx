@@ -218,7 +218,7 @@ export default function TransportPage() {
       <ResponsiveHeader
         {...{
         title: "交通選項管理",
-        icon: Car} as any}
+        icon: Car} as unknown}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },

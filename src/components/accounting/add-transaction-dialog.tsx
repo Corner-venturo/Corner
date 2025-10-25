@@ -103,7 +103,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                 return (
                   <button
                     key={type.id}
-                    onClick={() => setTransactionType(type.id as any)}
+                    onClick={() => setTransactionType(type.id as unknown)}
                     className={cn(
                       'p-3 rounded-lg border-2 transition-all flex flex-col items-center space-y-2',
                       isSelected

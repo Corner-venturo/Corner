@@ -72,7 +72,7 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data, error } = await (supabase as any)
+            const { data, error } = await (supabase as unknown)
               .from('workspaces')
               .select('*')
               .eq('is_active', true)
@@ -195,7 +195,7 @@ export const useChannelsStore = create<ChannelsState>()(
               try {
                 console.log('☁️ [channels] 背景同步 Supabase...');
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data, error } = await (supabase as any)
+                const { data, error } = await (supabase as unknown)
                   .from('channels')
                   .select('*')
                   .eq('workspace_id', currentWorkspaceId)
@@ -237,7 +237,7 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase as any)
+            const { error } = await (supabase as unknown)
               .from('channels')
               .insert({
                 id: newChannel.id,
@@ -273,7 +273,7 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase as any)
+            const { error } = await (supabase as unknown)
               .from('channels')
               .update(updates)
               .eq('id', id);
@@ -300,7 +300,7 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase as any)
+            const { error } = await (supabase as unknown)
               .from('channels')
               .delete()
               .eq('id', id);

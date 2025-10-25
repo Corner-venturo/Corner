@@ -92,7 +92,7 @@ export default function SettingsPage() {
         return;
       }
 
-      const isPasswordValid = await verifyPassword(passwordData.currentPassword, (userData as any).password_hash);
+      const isPasswordValid = await verifyPassword(passwordData.currentPassword, (userData as unknown).password_hash);
       if (!isPasswordValid) {
         alert('目前密碼錯誤！');
         setPasswordUpdateLoading(false);
@@ -102,7 +102,7 @@ export default function SettingsPage() {
       // 2. 更新新密碼
       const hashedPassword = await hashPassword(passwordData.newPassword);
 
-      const result: unknown = await (supabase as any)
+      const result: unknown = await (supabase as unknown)
         .from('employees')
         .update({ password_hash: hashedPassword })
         .eq('employee_number', user.employee_number);
@@ -133,7 +133,7 @@ export default function SettingsPage() {
         const { localDB } = await import('@/lib/db');
         const { TABLES } = await import('@/lib/db/schemas');
 
-        const employee = await localDB.read(TABLES.EMPLOYEES, user.id) as any;
+        const employee = await localDB.read(TABLES.EMPLOYEES, user.id) as unknown;
         if (employee) {
           await localDB.put(TABLES.EMPLOYEES, {
             ...employee,

@@ -22,7 +22,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
     const supabase = getSupabaseAdminClient();
 
     const { data, error } = await supabase
-      .from('channel_members' as any)
+      .from('channel_members' as unknown)
       .select(
         `
           id,
@@ -101,7 +101,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     const supabase = getSupabaseAdminClient();
 
     const { error } = await supabase
-      .from('channel_members' as any)
+      .from('channel_members' as unknown)
       .delete()
       .eq('workspace_id', workspaceId)
       .eq('channel_id', channelId)

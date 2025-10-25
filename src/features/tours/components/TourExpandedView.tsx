@@ -194,7 +194,7 @@ export function TourExpandedView({
               tour,
               triggerAdd: triggerCostAdd[tour.id] || false,
               onTriggerAddComplete: () => setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))
-            } as any}
+            } as unknown}
           />
         )}
         {activeTabs[tour.id] === 'documents' && (

@@ -482,7 +482,7 @@ export default function ToursPage() {
             setActiveStatusTab(tab);
             setCurrentPage(1);
           }
-        } as any}
+        } as unknown}
       />
 
       {/* Tour list */}

@@ -13,7 +13,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
-        const result = await store.create(request as any);
+        const result = await store.create(request as unknown);
         return result || request;
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
@@ -193,7 +193,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       created_by: '1', // 使用實際用戶ID
     };
 
-    return await this.create(requestData as any);
+    return await this.create(requestData as unknown);
   }
 
   // ========== Query 方法 ==========

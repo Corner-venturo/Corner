@@ -680,7 +680,7 @@ export function createStore<T extends BaseEntity>(
     };
 
     // 清理舊的監聽器（如果存在）
-    const oldListener = (window as any)[SYNC_LISTENER_KEY];
+    const oldListener = (window as unknown)[SYNC_LISTENER_KEY];
     if (oldListener) {
       window.removeEventListener('venturo:sync-completed', oldListener);
       logger.log(`🧹 [${tableName}] 清理舊的同步監聽器`);
@@ -688,7 +688,7 @@ export function createStore<T extends BaseEntity>(
 
     // 註冊新的監聽器
     window.addEventListener('venturo:sync-completed', handleSyncCompleted);
-    (window as any)[SYNC_LISTENER_KEY] = handleSyncCompleted;
+    (window as unknown)[SYNC_LISTENER_KEY] = handleSyncCompleted;
 
     logger.log(`📡 [${tableName}] 已註冊同步監聽器`);
   }

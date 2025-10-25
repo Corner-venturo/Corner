@@ -121,7 +121,7 @@ export const useQuoteActions = ({
         selling_prices: sellingPrices,
         version: currentVersion + 1, // 版本號 +1
         versions: [...existingVersions, newVersionRecord]
-      } as any);
+      } as unknown);
 
       // 顯示成功提示
       setSaveSuccess(true);
@@ -160,7 +160,7 @@ export const useQuoteActions = ({
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices
-    } as any);
+    } as unknown);
 
     // 自動跳轉到旅遊團新增頁面，並帶上報價單ID
     router.push(`/tours?fromQuote=${quote.id}`);
@@ -201,7 +201,7 @@ export const useQuoteActions = ({
       total_revenue: 0,
       total_cost: total_cost,
       profit: 0,
-    } as any);
+    } as unknown);
 
     // 更新報價單的 tour_id
     if (newTour?.id) {

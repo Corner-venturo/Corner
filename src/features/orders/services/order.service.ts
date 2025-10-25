@@ -12,7 +12,7 @@ class OrderService extends BaseService<Order> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(o => o.id === id),
       add: async (order: Order) => {
-        const result = await store.create(order as any);
+        const result = await store.create(order as unknown);
         return result || order;
       },
       update: async (id: string, data: Partial<Order>) => {

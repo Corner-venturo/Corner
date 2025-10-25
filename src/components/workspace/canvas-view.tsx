@@ -57,7 +57,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
       type,
       content: {},
       layout: {},
-    } as any);
+    } as unknown);
   };
   
   return (
@@ -127,7 +127,7 @@ export function CanvasView({ channel }: CanvasViewProps) {
             {activeDoc.type === 'tools' && (
               <WorkspaceTaskList
                 channelId={channel.id}
-                tour_id={(channel as any).tour_id}
+                tour_id={(channel as unknown).tour_id}
               />
             )}
             

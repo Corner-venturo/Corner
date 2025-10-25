@@ -11,7 +11,7 @@ export const useQuotes = () => {
 
     // ========== CRUD 操作 ==========
     addQuote: async (data: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>) => {
-      return await store.create(data as any);
+      return await store.create(data as unknown);
     },
 
     updateQuote: async (id: string, data: Partial<Quote>) => {

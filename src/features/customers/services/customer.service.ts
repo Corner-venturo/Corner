@@ -12,7 +12,7 @@ class CustomerService extends BaseService<Customer> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(c => c.id === id),
       add: async (customer: Customer) => {
-        await store.create(customer as any);
+        await store.create(customer as unknown);
         return customer;
       },
       update: async (id: string, data: Partial<Customer>) => {

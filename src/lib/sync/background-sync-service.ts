@@ -98,7 +98,7 @@ export class BackgroundSyncService {
 
           // 上傳到 Supabase（會自動生成正式編號）
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: supabaseData, error } = await (supabase.from(tableName) as any)
+          const { data: supabaseData, error } = await (supabase.from(tableName) as unknown)
             .insert([itemData])
             .select()
             .single();
@@ -169,7 +169,7 @@ export class BackgroundSyncService {
           if (existing) {
             // 更新
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.from(tableName) as any)
+            const { error } = await (supabase.from(tableName) as unknown)
               .update(syncData)
               .eq('id', item.id);
 
@@ -178,7 +178,7 @@ export class BackgroundSyncService {
           } else {
             // 新增
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.from(tableName) as any)
+            const { error } = await (supabase.from(tableName) as unknown)
               .insert([syncData]);
 
             if (error) throw error;

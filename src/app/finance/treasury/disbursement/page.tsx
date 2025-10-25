@@ -57,7 +57,7 @@ export default function DisbursementPage() {
     getNextThursday = () => new Date().toLocaleDateString('zh-TW'),
     createDisbursementOrder = () => {},
     generateDisbursementNumber = () => 'DISB-000001'
-  } = {} as any;
+  } = {} as unknown;
 
   const [activeTab, setActiveTab] = useState<'pending' | 'current' | 'all'>('pending');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
@@ -353,7 +353,7 @@ export default function DisbursementPage() {
           { value: 'all', label: '出納單列表', icon: Wallet }
         ]}
         activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as any)}
+        onTabChange={(tab) => setActiveTab(tab as unknown)}
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增出納單"
         showSearch={true}

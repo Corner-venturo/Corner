@@ -184,7 +184,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         status: '已收款',
         note,
         created_by: '1' // 從 auth store 取得當前用戶
-      } as any);
+      } as unknown);
 
       alert('✅ 批量收款單建立成功');
       onOpenChange(false);
@@ -231,7 +231,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                 <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
                   <Select
                     value={item.payment_method}
-                    onValueChange={(value) => updatePaymentItem(index, { payment_method: value as any })}
+                    onValueChange={(value) => updatePaymentItem(index, { payment_method: value as unknown })}
                   >
                     <SelectTrigger className="w-32">
                       <SelectValue />

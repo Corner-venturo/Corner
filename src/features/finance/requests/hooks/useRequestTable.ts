@@ -142,7 +142,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   }, []);
 
   const { data: filteredAndSortedRequests, handleSort, handleFilter } = useEnhancedTable(
-    payment_requests as any,
+    payment_requests as unknown,
     sortFunction,
     filterFunction
   );

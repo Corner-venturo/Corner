@@ -19,7 +19,7 @@ class TourService extends BaseService<Tour> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(t => t.id === id),
       add: async (tour: Tour) => {
-        const result = await store.create(tour as any);
+        const result = await store.create(tour as unknown);
         return result || tour;
       },
       update: async (id: string, data: Partial<Tour>) => {
@@ -129,7 +129,7 @@ class TourService extends BaseService<Tour> {
 
       // 這裡需要獲取相關訂單資料來計算
       // 目前先使用模擬邏輯
-      const total_revenue = tour.price * ((tour as any).current_participants || 0);
+      const total_revenue = tour.price * ((tour as unknown).current_participants || 0);
       const estimatedCost = total_revenue * 0.7; // 假設成本為收入的70%
       const profit = total_revenue - estimatedCost;
       const profitMargin = total_revenue > 0 ? (profit / total_revenue) * 100 : 0;
@@ -214,7 +214,7 @@ class TourService extends BaseService<Tour> {
 
         if (!error && data) {
           // 如果找到已刪除的簽證團，復原它
-          if ((data as any)._deleted) {
+          if ((data as unknown)._deleted) {
             console.log(`🔄 [Visa Tour] 找到已刪除的簽證團，正在復原...`);
             const { data: updated, error: updateError } = await supabase
               .from('tours')
@@ -223,7 +223,7 @@ class TourService extends BaseService<Tour> {
                 _synced_at: null,
                 updated_at: this.now()
               })
-              .eq('id', (data as any).id)
+              .eq('id', (data as unknown).id)
               .select()
               .single();
 
@@ -274,9 +274,9 @@ class TourService extends BaseService<Tour> {
       profit: 0,
       created_at: this.now(),
       updated_at: this.now()
-    } as any;
+    } as unknown;
 
-    return await this.create(visaTour as any);
+    return await this.create(visaTour as unknown);
   }
 
   /**

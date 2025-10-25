@@ -30,7 +30,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
 
   const [formData, setFormData] = useState({
     display_name: employee.display_name || '',
-    chinese_name: (employee as any).chinese_name || '',
+    chinese_name: (employee as unknown).chinese_name || '',
     english_name: employee.english_name || '',
     personal_info: {
       national_id: employee.personal_info?.national_id || '',
@@ -88,7 +88,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
   const _handleCancel = () => {
     setFormData({
       display_name: employee.display_name || '',
-      chinese_name: (employee as any).chinese_name || '',
+      chinese_name: (employee as unknown).chinese_name || '',
       english_name: employee.english_name || '',
       personal_info: {
         national_id: employee.personal_info?.national_id || '',
@@ -194,7 +194,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
                       onChange={(e) => setFormData({ ...formData, chinese_name: e.target.value })}
                     />
                   ) : (
-                    <p className="text-morandi-primary py-2">{(employee as any).chinese_name || '-'}</p>
+                    <p className="text-morandi-primary py-2">{(employee as unknown).chinese_name || '-'}</p>
                   )}
                 </div>
               </div>

@@ -101,7 +101,7 @@ export default function SuppliersPage() {
     addSupplier({
       ...newSupplier,
       supplier_code: supplierCode
-    } as any);
+    } as unknown);
 
     setNewSupplier({
       supplier_code: '',

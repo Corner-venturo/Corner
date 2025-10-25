@@ -74,11 +74,11 @@ class ErrorHandler {
    */
   private extractMessage(error: unknown): string {
     if (error instanceof ValidationError) {
-      return `驗證錯誤: ${(error as any).field} - ${error.message}`;
+      return `驗證錯誤: ${(error as unknown).field} - ${error.message}`;
     }
 
     if (error instanceof NotFoundError) {
-      return `找不到資源: ${(error as any).resource} (ID: ${(error as any).id})`;
+      return `找不到資源: ${(error as unknown).resource} (ID: ${(error as unknown).id})`;
     }
 
     if (error instanceof Error) {

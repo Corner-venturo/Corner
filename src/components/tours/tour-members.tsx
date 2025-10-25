@@ -121,7 +121,7 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         member.gender = '';
       }
     } else {
-      (member as any)[field] = value;
+      (member as unknown)[field] = value;
     }
 
     updatedMembers[rowIndex] = member;
@@ -144,12 +144,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         assigned_room: assignedRoom
       };
       // 移除舊欄位
-      delete (convertedData as any).nameEn;
-      delete (convertedData as any).passportNumber;
-      delete (convertedData as any).passportExpiry;
-      delete (convertedData as any).idNumber;
+      delete (convertedData as unknown).nameEn;
+      delete (convertedData as unknown).passportNumber;
+      delete (convertedData as unknown).passportExpiry;
+      delete (convertedData as unknown).idNumber;
 
-      const newMember = await addMember(convertedData as any);
+      const newMember = await addMember(convertedData as unknown);
 
       const updatedMembers = [...tableMembers];
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false };
@@ -165,12 +165,12 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         assigned_room: assignedRoom
       };
       // 移除舊欄位
-      delete (convertedData as any).nameEn;
-      delete (convertedData as any).passportNumber;
-      delete (convertedData as any).passportExpiry;
-      delete (convertedData as any).idNumber;
+      delete (convertedData as unknown).nameEn;
+      delete (convertedData as unknown).passportNumber;
+      delete (convertedData as unknown).passportExpiry;
+      delete (convertedData as unknown).idNumber;
 
-      await updateMember(member.id, convertedData as any);
+      await updateMember(member.id, convertedData as unknown);
     }
   };
 

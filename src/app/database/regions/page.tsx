@@ -44,7 +44,7 @@ export default function RegionsPage() {
 
       try {
         for (const [countryCode, destination] of Object.entries(DESTINATIONS)) {
-          // ✅ 修復：使用 satisfies 而非 as any
+          // ✅ 修復：使用 satisfies 而非 as unknown
           await create({
             type: 'country' as const,
             name: destination.name,

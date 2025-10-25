@@ -194,7 +194,7 @@ export default function ActivitiesPage() {
       <ResponsiveHeader
         {...{
         title: '活動門票管理',
-        icon: Ticket} as any}
+        icon: Ticket} as unknown}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },

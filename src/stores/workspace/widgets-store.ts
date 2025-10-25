@@ -51,7 +51,7 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: listError } = await (supabase as any)
+        const { error: listError } = await (supabase as unknown)
           .from('advance_lists')
           .insert({
             id: listId,
@@ -63,7 +63,7 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
         if (listError) throw listError;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: itemsError } = await (supabase as any)
+        const { error: itemsError } = await (supabase as unknown)
           .from('advance_items')
           .insert(
             advanceItems.map(item => ({
@@ -138,7 +138,7 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: lists, error: listsError } = await (supabase as any)
+        const { data: lists, error: listsError } = await (supabase as unknown)
           .from('advance_lists')
           .select('*')
           .eq('channel_id', channelId)
@@ -149,7 +149,7 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
         const advanceLists: AdvanceList[] = [];
         for (const list of lists || []) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: items, error: itemsError } = await (supabase as any)
+          const { data: items, error: itemsError } = await (supabase as unknown)
             .from('advance_items')
             .select('*')
             .eq('advance_list_id', list.id)
@@ -183,7 +183,7 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        const { error } = await (supabase as unknown)
           .from('advance_lists')
           .delete()
           .eq('id', listId);

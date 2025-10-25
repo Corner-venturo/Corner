@@ -127,7 +127,7 @@ export function TemplatePDFPreview({
           const content = (
             <div key={rowIndex} className="relative">
               {/* 內容列 - 根據區塊類型美化 */}
-              <div className={`flex items-center ${(currentStyle as any)?.container || ''}`}>
+              <div className={`flex items-center ${(currentStyle as unknown)?.container || ''}`}>
                 {row.map((cell: any, colIndex: number) => {
                   // 跳過空白儲存格（不渲染）
                   if (!cell || cell === '') return null;
@@ -138,7 +138,7 @@ export function TemplatePDFPreview({
                   return (
                     <div
                       key={colIndex}
-                      className={`px-3 py-2 transition-all ${(currentStyle as any)?.text || ''}
+                      className={`px-3 py-2 transition-all ${(currentStyle as unknown)?.text || ''}
                         ${isLabel ? 'text-morandi-secondary font-medium' : ''}
                         ${isPrice ? 'text-morandi-gold font-semibold' : ''}
                         ${isDynamic ? 'bg-morandi-gold/10 text-morandi-gold font-medium rounded-md px-3 border border-morandi-gold/20' : ''}

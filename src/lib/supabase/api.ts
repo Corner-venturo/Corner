@@ -90,7 +90,7 @@ export class VenturoAPI {
       const snakeData = data.map(toSnakeCase);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: result, error } = await (supabase as any)
+      const { data: result, error } = await (supabase as unknown)
         .from(table)
         .insert(snakeData)
         .select();
@@ -199,7 +199,7 @@ export class VenturoAPI {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: result, error } = await (supabase as any)
+      const { data: result, error } = await (supabase as unknown)
         .from(table)
         .update(updateData)
         .eq('id', id)
@@ -236,7 +236,7 @@ export class VenturoAPI {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase as any).from(table);
+      let query = (supabase as unknown).from(table);
       query = query.update(updateData);
 
       // 過濾條件也轉換
@@ -340,7 +340,7 @@ export class VenturoAPI {
   static async query<T = any>(sql: string, params?: unknown[]): Promise<T[]> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).rpc('execute_sql', {
+      const { data, error } = await (supabase as unknown).rpc('execute_sql', {
         query: sql,
         params: params || []
       });

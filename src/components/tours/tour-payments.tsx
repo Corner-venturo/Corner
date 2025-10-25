@@ -202,9 +202,9 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                       <td className="py-3 px-4">
                         <span className={cn(
                           'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                          getMethodBadge((payment as any).method)
+                          getMethodBadge((payment as unknown).method)
                         )}>
-                          {getMethodDisplayName((payment as any).method)}
+                          {getMethodDisplayName((payment as unknown).method)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-morandi-primary">
@@ -297,7 +297,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
               <select
                 value={newPayment.status}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as any }))}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as unknown }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="已確認">已確認</option>

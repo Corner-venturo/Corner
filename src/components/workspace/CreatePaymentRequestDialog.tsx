@@ -79,7 +79,7 @@ export function CreatePaymentRequestDialog({
         status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      } as any);
+      } as unknown);
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {
