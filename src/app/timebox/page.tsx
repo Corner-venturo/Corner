@@ -1,23 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import WeekView from './components/week-view'
-import BoxManager from './components/box-manager'
-import StatisticsPanel from './components/statistics-panel'
-import ReviewDialog from './components/review-dialog'
-import CreateBoxDialog from './components/create-box-dialog'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Plus, Calendar, Clock } from 'lucide-react'
+import { Calendar, Clock, Package2 } from 'lucide-react'
+
 import { useTimeboxStore } from '@/stores/timebox-store'
+
+import BoxManager from './components/box-manager'
+import ReviewDialog from './components/review-dialog'
+import StatisticsPanel from './components/statistics-panel'
+import WeekView from './components/week-view'
 
 export default function TimeboxPage() {
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [timeInterval, setTimeInterval] = useState<30 | 60>(60) // 分鐘
   const [showReviewDialog, setShowReviewDialog] = useState(false)
   const [showBoxManager, setShowBoxManager] = useState(false)
-  const [showCreateBoxDialog, setShowCreateBoxDialog] = useState(false)
 
   const { currentWeek, initializeCurrentWeek } = useTimeboxStore()
 
@@ -52,8 +53,29 @@ export default function TimeboxPage() {
           { label: '首頁', href: '/' },
           { label: '箱型時間', href: '/timebox' }
         ]}
-        onAdd={() => setShowCreateBoxDialog(true)}
-        addLabel="新增箱子"
+        actions={(
+          <div className="flex items-center gap-3">
+            <StatisticsPanel variant="inline" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowBoxManager(true)}
+              className="hidden sm:inline-flex items-center gap-2 border-border hover:border-morandi-gold/40 text-morandi-secondary hover:text-morandi-primary"
+            >
+              <Package2 className="h-4 w-4" />
+              管理箱子
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowReviewDialog(true)}
+              className="hidden sm:inline-flex items-center gap-2 border-border hover:border-morandi-gold/40 text-morandi-secondary hover:text-morandi-primary"
+            >
+              <Calendar className="h-4 w-4" />
+              覆盤本週
+            </Button>
+          </div>
+        )}
       >
         <div className="flex items-center gap-6">
           {/* 週選擇器 */}
@@ -122,15 +144,13 @@ export default function TimeboxPage() {
             </Button>
           </div>
 
-          {/* 功能按鈕群組 */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:hidden">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowBoxManager(true)}
               className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
-              <Plus className="h-4 w-4 mr-2" />
               管理箱子
             </Button>
 
@@ -140,7 +160,6 @@ export default function TimeboxPage() {
               onClick={() => setShowReviewDialog(true)}
               className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
             >
-              <Calendar className="h-4 w-4 mr-2" />
               覆盤本週
             </Button>
           </div>
@@ -148,9 +167,6 @@ export default function TimeboxPage() {
       </ResponsiveHeader>
 
       <div className="flex-1 overflow-auto">
-        {/* 統計面板 */}
-        <StatisticsPanel />
-
       {/* 主要內容區域 */}
       <div className="flex gap-6">
         <div className="flex-1">
@@ -169,12 +185,6 @@ export default function TimeboxPage() {
         onClose={() => setShowReviewDialog(false)}
         weekStart={getWeekStart(selectedWeek)}
         weekEnd={getWeekEnd(selectedWeek)}
-      />
-
-      {/* 新增箱子對話框 */}
-      <CreateBoxDialog
-        isOpen={showCreateBoxDialog}
-        onClose={() => setShowCreateBoxDialog(false)}
       />
 
       {/* 管理箱子對話框 */}

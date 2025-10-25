@@ -61,11 +61,11 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
         <div className="space-y-4">
           {/* 箱子選擇 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-morandi-secondary mb-2">
               選擇箱子
             </label>
             {boxes.length === 0 ? (
-              <div className="text-center text-gray-500 py-4">
+              <div className="text-center text-morandi-secondary py-4">
                 <div className="mb-3">還沒有建立任何箱子</div>
                 <Button
                   onClick={() => {
@@ -90,13 +90,13 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                       key={box.id}
                       type="button"
                       onClick={() => setSelectedBox(box.id)}
-                      className={`w-full p-3 rounded-lg border text-left transition-colors ${
+                      className={`w-full rounded-lg border text-left transition-colors px-3 py-2 ${
                         selectedBox === box.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-morandi-gold/60 bg-morandi-gold/10'
+                          : 'border-border hover:border-morandi-gold/40'
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center gap-3">
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center text-white"
                           style={{ backgroundColor: box.color }}
@@ -104,8 +104,8 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                           <Icon className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900">{box.name}</div>
-                          <div className="text-sm text-gray-500">{typeLabels[box.type]}</div>
+                          <div className="font-medium text-morandi-primary">{box.name}</div>
+                          <div className="text-sm text-morandi-secondary">{typeLabels[box.type]}</div>
                         </div>
                       </div>
                     </button>
@@ -118,7 +118,7 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
           {/* 持續時間選擇 */}
           {selectedBox && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-morandi-secondary mb-2">
                 持續時間
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -129,8 +129,8 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                     onClick={() => setDuration(option as 30 | 60)}
                     className={`p-2 text-sm rounded border transition-colors ${
                       duration === option
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-morandi-gold/60 bg-morandi-gold/10 text-morandi-primary'
+                        : 'border-border hover:border-morandi-gold/40'
                     }`}
                   >
                     {formatDuration(option)}
@@ -142,7 +142,7 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
 
           {/* 按鈕 */}
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="text-morandi-secondary border-border">
               取消
             </Button>
             <Button
