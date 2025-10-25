@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,12 +9,165 @@ import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { Combobox, ComboboxOption } from '@/components/ui/combobox';
 import { useVisaStore, useTourStore, useOrderStore } from '@/stores';
 import { useAuthStore } from '@/stores/auth-store';
-import { FileCheck, Clock, CheckCircle, XCircle, AlertCircle, FileText, Edit2, Trash2 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { FileCheck, Clock, CheckCircle, XCircle, AlertCircle, FileText, Edit2, Trash2, Info, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Visa } from '@/stores/types';
 import { logger } from '@/lib/utils/logger';
 import { tourService } from '@/features/tours/services/tour.service';
 import { getVisaStatusLabel } from '@/constants/status-maps';
+
+interface DeliveryOption {
+  method: string;
+  adult: number;
+  child: number;
+}
+
+interface RequirementSection {
+  title: string;
+  items: string[];
+}
+
+const PASSPORT_DELIVERY_OPTIONS: DeliveryOption[] = [
+  { method: '自取', adult: 1800, child: 1400 },
+  { method: '郵政寄回', adult: 1900, child: 1500 },
+  { method: '雙北快遞寄回', adult: 2000, child: 1600 },
+];
+
+const PASSPORT_REQUIREMENTS: RequirementSection[] = [
+  {
+    title: '年滿18歲者申請護照（首次申請）',
+    items: [
+      '簡式護照資料表【人別確認專用】（請先至住家附近的戶政事務所辦理）',
+      '相片2張（2吋大頭照，護照規格）',
+      '身分證正本',
+    ],
+  },
+  {
+    title: '年滿18歲者申請護照（換發）',
+    items: [
+      '舊護照正本（效期未逾期才須提供，若已經過期則免）',
+      '相片2張（2吋大頭照，護照規格）',
+      '身分證正本',
+    ],
+  },
+  {
+    title: '滿14歲至未滿18歲者申請護照（首次申請）',
+    items: [
+      '簡式護照資料表【人別確認專用】（請先至住家附近的戶政事務所辦理）',
+      '相片2張（2吋大頭照，護照規格）',
+      '身分證正本',
+      '法定代理人身分證（提供父／母其中一位身分證正本即可）',
+    ],
+  },
+  {
+    title: '滿14歲至未滿18歲者申請護照（換發）',
+    items: [
+      '相片2張（2吋大頭照，護照規格）',
+      '身分證正本',
+      '法定代理人身分證（提供父／母其中一位身分證正本即可）',
+    ],
+  },
+  {
+    title: '未滿14歲者申請護照（首次申請）',
+    items: [
+      '簡式護照資料表【人別確認專用】（請先至住家附近的戶政事務所辦理）',
+      '相片2張（2吋大頭照，護照規格）',
+      '戶口名簿正本或戶籍謄本正本（已領新式國民身分證者請改繳身分證）',
+      '法定代理人身分證（提供父／母其中一位身分證正本即可）',
+    ],
+  },
+  {
+    title: '未滿14歲者申請護照（換發）',
+    items: [
+      '相片2張（2吋大頭照，護照規格）',
+      '戶口名簿正本或戶籍謄本正本（已領新式國民身分證者請改繳身分證）',
+      '法定代理人身分證（提供父／母其中一位身分證正本即可）',
+    ],
+  },
+];
+
+const PASSPORT_NOTES: string[] = [
+  '＊申請人應繳交最近6個月內所攝彩色正面、脫帽、五官清晰、白色背景的護照專用照片。',
+  '＊因近期受理案件較多，正常護照代辦時程改為14個工作天（不含例假日）；急件為4個工作天（不含例假日），每件費用+900元。',
+  '＊若護照遺失但效期未逾期，請先至警局備案，並提供相關證明文件，代辦時程需多加1個工作天。',
+];
+
+const TAIWAN_COMPATRIOT_DELIVERY_OPTIONS: DeliveryOption[] = [
+  { method: '自取', adult: 1800, child: 1800 },
+  { method: '郵政寄回', adult: 1900, child: 1900 },
+  { method: '雙北快遞寄回', adult: 2000, child: 2000 },
+];
+
+const TAIWAN_COMPATRIOT_REQUIREMENTS: RequirementSection[] = [
+  {
+    title: '台胞證申辦所需資料',
+    items: [
+      '護照正本（效期需六個月以上護照正本）',
+      '相片1張（2吋大頭照，護照規格）',
+      '身分證影本【須為原比例清楚完整的影本，請勿翻拍】',
+      '戶籍謄本正本（如有改名或個人身份資料更改者、未滿14歲未領身份證者，需附上3個月內戶籍謄本正本，記事不可省略或部分省略，需有完整詳細說明）',
+    ],
+  },
+];
+
+const TAIWAN_COMPATRIOT_NOTES: string[] = [
+  '＊申請人應繳交最近6個月內所攝彩色正面、脫帽、五官清晰、白色背景的護照專用照片。',
+  '＊因近期受理案件較多，正常台胞證代辦時程改為9個工作天（不含例假日）；急件為6個工作天（不含例假日），每件費用+900元。',
+  '＊若台胞證遺失但效期未逾期，請先至警局備案，並提供相關證明文件，另需支付罰金1,100元。',
+];
+
+function formatCurrency(amount: number): string {
+  return `NT$${amount.toLocaleString()}`;
+}
+
+function buildVisaInfoText(): string {
+  const sections = [
+    {
+      title: '護照',
+      options: PASSPORT_DELIVERY_OPTIONS,
+      requirements: PASSPORT_REQUIREMENTS,
+      notes: PASSPORT_NOTES,
+    },
+    {
+      title: '台胞證',
+      options: TAIWAN_COMPATRIOT_DELIVERY_OPTIONS,
+      requirements: TAIWAN_COMPATRIOT_REQUIREMENTS,
+      notes: TAIWAN_COMPATRIOT_NOTES,
+    },
+  ];
+
+  const lines: string[] = [];
+
+  sections.forEach((section, sectionIndex) => {
+    lines.push(section.title);
+    lines.push('取貨方式／身份');
+    section.options.forEach(option => {
+      lines.push(`  ${option.method}：成人 ${formatCurrency(option.adult)}／兒童（未滿14歲） ${formatCurrency(option.child)}`);
+    });
+    lines.push('');
+
+    section.requirements.forEach(requirement => {
+      lines.push(`－${requirement.title}`);
+      requirement.items.forEach((item, itemIndex) => {
+        lines.push(`  ${itemIndex + 1}. ${item}`);
+      });
+      lines.push('');
+    });
+
+    section.notes.forEach(note => {
+      lines.push(note);
+    });
+
+    if (sectionIndex < sections.length - 1) {
+      lines.push('');
+    }
+  });
+
+  return lines.join('\n');
+}
+
+const VISA_INFO_TEXT = buildVisaInfoText();
 
 export default function VisasPage() {
   const { items: visas, create: addVisa, update: updateVisa, delete: deleteVisa } = useVisaStore();
@@ -23,8 +176,24 @@ export default function VisasPage() {
   const { user } = useAuthStore();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const copyStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const canManageVisas = useMemo(() => {
+    const permissions = user?.permissions || [];
+    return permissions.includes('admin') || permissions.includes('super_admin');
+  }, [user]);
+
+  useEffect(() => {
+    return () => {
+      if (copyStatusTimeoutRef.current) {
+        clearTimeout(copyStatusTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // 計算下件時間：護照 21天、護照急件 3天、台胞證 14天、台胞證急件 6天（所有天數含例假日）
   const calculateReceivedDate = useCallback((submissionDate: string, visaType: string): string => {
@@ -198,6 +367,95 @@ export default function VisasPage() {
       : visas.filter((v) => v.status === activeTab)
   , [visas, activeTab]);
 
+  useEffect(() => {
+    if (!canManageVisas && selectedRows.length > 0) {
+      setSelectedRows([]);
+    }
+  }, [canManageVisas, selectedRows.length]);
+
+  const handleCopyVisaInfo = useCallback(async () => {
+    try {
+      let copied = false;
+
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(VISA_INFO_TEXT);
+        copied = true;
+      } else if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea');
+        textarea.value = VISA_INFO_TEXT;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+
+      if (!copied) {
+        throw new Error('Clipboard not supported');
+      }
+
+      setCopyStatus('success');
+    } catch (error) {
+      setCopyStatus('error');
+    } finally {
+      if (copyStatusTimeoutRef.current) {
+        clearTimeout(copyStatusTimeoutRef.current);
+      }
+      copyStatusTimeoutRef.current = setTimeout(() => {
+        setCopyStatus('idle');
+      }, 2000);
+    }
+  }, []);
+
+  const renderVisaInfoContent = (
+    options: DeliveryOption[],
+    requirements: RequirementSection[],
+    notes: string[],
+  ) => (
+    <div className="space-y-6">
+      <div className="rounded-lg border border-border overflow-hidden">
+        <div className="grid grid-cols-[1.5fr_1fr_1fr] bg-morandi-container text-xs font-medium uppercase tracking-wide text-morandi-secondary">
+          <div className="px-4 py-3">取貨方式／身份</div>
+          <div className="px-4 py-3">成人</div>
+          <div className="px-4 py-3">兒童（未滿14歲）</div>
+        </div>
+        {options.map(option => (
+          <div
+            key={option.method}
+            className="grid grid-cols-[1.5fr_1fr_1fr] border-t border-border text-sm text-morandi-primary"
+          >
+            <div className="px-4 py-3 font-medium">{option.method}</div>
+            <div className="px-4 py-3">{formatCurrency(option.adult)}</div>
+            <div className="px-4 py-3">{formatCurrency(option.child)}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-5">
+        {requirements.map(section => (
+          <div key={section.title} className="space-y-3">
+            <h3 className="text-sm font-semibold text-morandi-primary">－{section.title}</h3>
+            <ol className="list-decimal space-y-2 pl-5 text-sm text-morandi-secondary">
+              {section.items.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-lg bg-morandi-container p-4">
+        <ul className="list-disc space-y-2 pl-5 text-sm text-morandi-secondary">
+          {notes.map((note, index) => (
+            <li key={index}>{note}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
   // 計算代辦費
   const calculateFee = useCallback((country: string): number => {
     if (country.includes('兒童')) return 1500;
@@ -208,7 +466,7 @@ export default function VisasPage() {
 
   // 處理批次新增簽證
   const handleAddVisa = async () => {
-    if (!contact_info.applicant_name || !user) return;
+    if (!canManageVisas || !contact_info.applicant_name || !user) return;
 
     let selectedTour;
 
@@ -332,7 +590,7 @@ export default function VisasPage() {
 
   // 批次送件
   const handleBatchSubmit = async () => {
-    if (selectedRows.length === 0) return;
+    if (!canManageVisas || selectedRows.length === 0) return;
     const today = new Date().toISOString().split('T')[0];
 
     // 使用標準 API 批次更新
@@ -409,32 +667,36 @@ export default function VisasPage() {
     },
   ];
 
-  const renderActions = (visa: Visa) => (
-    <div className="flex items-center gap-1">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          // 編輯功能
-        }}
-        className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-        title="編輯"
-      >
-        <Edit2 size={14} />
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          if (confirm('確定要刪除此簽證記錄嗎？')) {
-            deleteVisa(visa.id);
-          }
-        }}
-        className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-        title="刪除"
-      >
-        <Trash2 size={14} />
-      </button>
-    </div>
-  );
+  const renderActions = (visa: Visa) => {
+    if (!canManageVisas) return null;
+
+    return (
+      <div className="flex items-center gap-1">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            // 編輯功能
+          }}
+          className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+          title="編輯"
+        >
+          <Edit2 size={14} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (confirm('確定要刪除此簽證記錄嗎？')) {
+              deleteVisa(visa.id);
+            }
+          }}
+          className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+          title="刪除"
+        >
+          <Trash2 size={14} />
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -446,8 +708,26 @@ export default function VisasPage() {
           { label: '首頁', href: '/' },
           { label: '簽證管理', href: '/visas' }
         ]}
-        onAdd={() => setIsDialogOpen(true)}
-        addLabel="新增簽證"
+        actions={(
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsInfoDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Info size={16} />
+              查看簽證資訊
+            </Button>
+            {canManageVisas && (
+              <Button
+                onClick={() => setIsDialogOpen(true)}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                新增簽證
+              </Button>
+            )}
+          </div>
+        )}
         tabs={[
           { value: 'all', label: '全部', icon: FileText },
           { value: 'pending', label: '待送件', icon: Clock },
@@ -455,33 +735,34 @@ export default function VisasPage() {
           { value: 'issued', label: '已下件', icon: CheckCircle },
           { value: 'collected', label: '已取件', icon: FileCheck },
           { value: 'rejected', label: '退件', icon: XCircle },
-        ]}        activeTab={activeTab}
+        ]}
+        activeTab={activeTab}
         onTabChange={setActiveTab}
       />
 
       <div className="flex-1 overflow-auto">
         {/* 批次操作按鈕 */}
-        {selectedRows.length > 0 && (
-        <div className="bg-morandi-container p-4 rounded-lg flex items-center justify-between">
-          <span className="text-sm text-morandi-primary">
-            已選擇 {selectedRows.length} 筆簽證
-          </span>
-          <div className="flex gap-2">
-            <Button
-              onClick={handleBatchSubmit}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
-              批次送件
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setSelectedRows([])}
-            >
-              取消選擇
-            </Button>
+        {canManageVisas && selectedRows.length > 0 && (
+          <div className="bg-morandi-container p-4 rounded-lg flex items-center justify-between">
+            <span className="text-sm text-morandi-primary">
+              已選擇 {selectedRows.length} 筆簽證
+            </span>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleBatchSubmit}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                批次送件
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setSelectedRows([])}
+              >
+                取消選擇
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
         {/* 簽證列表 */}
         <EnhancedTable
@@ -489,14 +770,59 @@ export default function VisasPage() {
           columns={columns}
           data={filteredVisas}
           loading={false}
-          selection={{
+          selection={canManageVisas ? {
             selected: selectedRows,
             onChange: setSelectedRows,
-          }}
+          } : undefined}
           actions={renderActions}
           bordered={true}
         />
       </div>
+
+      {/* 簽證資訊對話框 */}
+      <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <DialogTitle>簽證資訊總覽</DialogTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCopyVisaInfo}
+                className="flex items-center gap-2"
+              >
+                <Copy size={16} />
+                複製全部資訊
+              </Button>
+            </div>
+          </DialogHeader>
+          {copyStatus !== 'idle' && (
+            <p
+              className={cn(
+                'text-xs',
+                copyStatus === 'success' ? 'text-emerald-600' : 'text-red-500'
+              )}
+            >
+              {copyStatus === 'success' ? '已複製簽證資訊' : '複製失敗，請手動複製。'}
+            </p>
+          )}
+          <Tabs defaultValue="passport" className="mt-4">
+            <TabsList className="grid h-12 grid-cols-2 rounded-lg bg-morandi-container text-sm text-morandi-secondary">
+              <TabsTrigger value="passport">護照</TabsTrigger>
+              <TabsTrigger value="taiwan">台胞證</TabsTrigger>
+            </TabsList>
+            <TabsContent value="passport" className="mt-4">
+              {renderVisaInfoContent(PASSPORT_DELIVERY_OPTIONS, PASSPORT_REQUIREMENTS, PASSPORT_NOTES)}
+            </TabsContent>
+            <TabsContent value="taiwan" className="mt-4">
+              {renderVisaInfoContent(
+                TAIWAN_COMPATRIOT_DELIVERY_OPTIONS,
+                TAIWAN_COMPATRIOT_REQUIREMENTS,
+                TAIWAN_COMPATRIOT_NOTES,
+              )}
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
 
       {/* 新增簽證對話框 */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
