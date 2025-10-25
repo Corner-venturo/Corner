@@ -56,52 +56,45 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
 
   return (
     <div
-      className={`absolute left-0 right-0 w-full rounded-t-md shadow-sm border-l-4 p-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
-        scheduledBox.completed ? 'opacity-75' : ''
+      className={`absolute inset-x-2 rounded-xl shadow-sm border border-border/40 px-3 py-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
+        scheduledBox.completed ? 'opacity-80' : ''
       }`}
       style={{
         top: `${topOffset}px`,
         height: `${height}px`,
         backgroundColor: box.color,
-        borderLeftColor: scheduledBox.completed ? 'var(--morandi-green)' : box.color,
+        borderLeft: `4px solid ${scheduledBox.completed ? 'var(--morandi-green)' : box.color}`,
       }}
       onClick={() => setShowDialog(true)}
     >
-      <div className="flex items-start justify-between h-full">
-        <div className="flex-1 min-w-0">
-          {/* 箱子名稱 */}
-          <div className="font-medium text-sm truncate mb-1">
-            {box.name}
-          </div>
-
-          {/* 時間資訊 */}
-          <div className="text-xs opacity-90">
-            {scheduledBox.start_time} • {formatDuration(scheduledBox.duration)}
-          </div>
-
-          {/* 完成狀態 */}
-          {scheduledBox.completed && scheduledBox.completedAt && (
-            <div className="text-xs opacity-90 mt-1">
-              ✓ {new Date(scheduledBox.completedAt).toLocaleTimeString('zh-TW', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
+      <div className="flex h-full flex-col justify-between gap-2">
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-sm truncate">
+              {box.name}
             </div>
-          )}
+            <div className="text-xs opacity-90">
+              {scheduledBox.start_time} • {formatDuration(scheduledBox.duration)}
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-1 text-white/90">
+            <Icon className="h-4 w-4" />
+            {scheduledBox.completed && (
+              <Check className="h-3 w-3 text-morandi-green" />
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col items-center space-y-1 ml-2">
-          {/* 類型圖示 */}
-          <Icon className="h-4 w-4" />
-
-          {/* 完成標記 */}
-          {scheduledBox.completed && (
-            <Check className="h-3 w-3 text-green-300" />
-          )}
-        </div>
+        {scheduledBox.completed && scheduledBox.completedAt && (
+          <div className="text-[11px] opacity-90">
+            ✓ {new Date(scheduledBox.completedAt).toLocaleTimeString('zh-TW', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        )}
       </div>
 
-      {/* 對話框 */}
       {showDialog && (
         <>
           {box.type === 'workout' && (

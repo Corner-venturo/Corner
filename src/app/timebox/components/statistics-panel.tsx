@@ -1,10 +1,14 @@
 'use client'
 
 import { memo } from 'react'
-import { useTimeboxStore } from '@/stores/timebox-store'
-// import { Card } from '@/components/ui/card'
 
-function StatisticsPanel() {
+import { useTimeboxStore } from '@/stores/timebox-store'
+
+interface StatisticsPanelProps {
+  variant?: 'panel' | 'inline'
+}
+
+function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
   const { getWeekStatistics } = useTimeboxStore()
   const stats = getWeekStatistics()
 
@@ -25,10 +29,45 @@ function StatisticsPanel() {
 
   const hasWorkoutStats = totalWorkoutSessions > 0 && totalWorkoutVolume > 0
 
+  if (variant === 'inline') {
+    return (
+      <div className="hidden lg:flex items-center gap-4">
+        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
+          <p className="text-xs font-medium text-morandi-secondary">本週完成率</p>
+          <p className="text-xl font-semibold text-morandi-primary">
+            {Math.round(completionRate * 100)}%
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
+          <p className="text-xs font-medium text-morandi-secondary">運動時間</p>
+          <p className="text-xl font-semibold text-morandi-primary">
+            {formatTime(totalWorkoutTime)}
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
+          <p className="text-xs font-medium text-morandi-secondary">完成項目</p>
+          <p className="text-sm font-semibold text-morandi-primary">
+            運動 {completedByType.workout} / 保養 {completedByType.reminder} / 其他 {completedByType.basic}
+          </p>
+        </div>
+
+        {hasWorkoutStats && (
+          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
+            <p className="text-xs font-medium text-morandi-secondary">訓練量</p>
+            <p className="text-sm font-semibold text-morandi-primary">
+              {totalWorkoutVolume.toLocaleString()} kg · {totalWorkoutSessions} 次
+            </p>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="bg-card border-b border-border px-6 py-4">
       <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${hasWorkoutStats ? '4' : '3'} gap-4`}>
-        {/* 完成率 */}
         <div className="morandi-card p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -45,7 +84,6 @@ function StatisticsPanel() {
           </div>
         </div>
 
-        {/* 運動時間 */}
         <div className="morandi-card p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -63,7 +101,6 @@ function StatisticsPanel() {
           </div>
         </div>
 
-        {/* 完成項目分布 */}
         <div className="morandi-card p-4">
           <div>
             <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">完成項目</p>
@@ -84,7 +121,6 @@ function StatisticsPanel() {
           </div>
         </div>
 
-        {/* 重訓統計 */}
         {hasWorkoutStats && (
           <div className="morandi-card p-4">
             <div>
