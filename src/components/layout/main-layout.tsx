@@ -6,6 +6,7 @@ import { useLocalAuthStore } from '@/lib/auth/local-auth-manager';
 import { Sidebar } from './sidebar';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
+import { ManifestationReminderWidget } from '@/components/manifestation/ManifestationReminderWidget';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -96,6 +97,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="min-h-screen bg-background">
         {/* 左下象限 - 側邊欄 */}
         <Sidebar />
+        {isClient && <ManifestationReminderWidget />}
         {/* 內容由頁面自己的 layout 處理 */}
         {children}
       </div>
@@ -106,6 +108,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* 左下象限 - 側邊欄 */}
       <Sidebar />
+      {isClient && <ManifestationReminderWidget />}
 
       {/* 右下象限 - 主內容區域 */}
       <main className={cn(

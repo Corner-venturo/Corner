@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, Save, Check } from 'lucide-react';
-import { _cn } from '@/lib/utils';
+import { recordManifestationCompletion } from '@/lib/manifestation/reminder';
 
 interface ChapterContentProps {
   chapter: Chapter;
@@ -82,6 +82,9 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
       if (success) {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
+        if (markAsCompleted) {
+          recordManifestationCompletion();
+        }
       }
     } finally {
       setIsSaving(false);
