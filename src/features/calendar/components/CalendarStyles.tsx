@@ -4,6 +4,28 @@ export function CalendarStyles() {
       /* FullCalendar Morandi 樣式覆蓋 */
       .calendar-container {
         font-family: inherit;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 240, 235, 0.85));
+        border-radius: 1.25rem;
+        box-shadow: 0 25px 50px -12px rgba(17, 24, 39, 0.15);
+        border: 1px solid rgba(196, 180, 150, 0.3);
+        backdrop-filter: blur(12px);
+      }
+
+      .calendar-container .fc {
+        flex: 1 1 auto;
+      }
+
+      .calendar-container .fc-view-harness {
+        flex: 1 1 auto;
+      }
+
+      .calendar-container .fc-scrollgrid,
+      .calendar-container .fc-scrollgrid-section,
+      .calendar-container .fc-scrollgrid-sync-inner {
+        background-color: transparent;
       }
 
       .fc .fc-toolbar-title {
@@ -49,10 +71,12 @@ export function CalendarStyles() {
 
       .fc .fc-daygrid-day {
         border-color: #e8e6e3;
+        transition: background-color 0.2s ease;
       }
 
       .fc .fc-daygrid-day-frame {
         min-height: 120px;
+        padding: 0.25rem;
       }
 
       .fc .fc-daygrid-day-number {
@@ -120,6 +144,26 @@ export function CalendarStyles() {
         color: #b39561 !important;
       }
 
+      .fc-event[data-event-type='tour'] {
+        background: linear-gradient(135deg, rgba(155, 181, 214, 0.9), rgba(115, 151, 194, 0.9));
+        color: #243b53;
+      }
+
+      .fc-event[data-event-type='personal'] {
+        background: linear-gradient(135deg, rgba(184, 169, 209, 0.9), rgba(162, 143, 194, 0.9));
+        color: #2f2a26;
+      }
+
+      .fc-event[data-event-type='company'] {
+        background: linear-gradient(135deg, rgba(224, 195, 160, 0.95), rgba(204, 168, 128, 0.95));
+        color: #2f2a26;
+      }
+
+      .fc-event[data-event-type='birthday'] {
+        background: linear-gradient(135deg, rgba(230, 184, 200, 0.95), rgba(214, 157, 177, 0.95));
+        color: #5a2533;
+      }
+
       .fc-popover {
         display: none !important;
       }
@@ -129,33 +173,38 @@ export function CalendarStyles() {
         background-color: transparent;
       }
 
-      /* 點點樣式事件 */
-      .fc .fc-daygrid-event.fc-event-start.fc-event-end {
-        margin: 1px 2px;
-        padding: 2px 6px;
-        border-radius: 12px;
-        font-size: 11px;
-        line-height: 1.2;
+      @media (max-width: 1280px) {
+        .fc .fc-daygrid-day-frame {
+          min-height: 100px;
+        }
+
+        .calendar-container {
+          border-radius: 1rem;
+        }
       }
 
-      /* 生日事件特殊樣式 - 圓形點點 */
-      .fc-event[data-event-type='birthday'] {
-        border-radius: 50% !important;
-        width: 24px !important;
-        height: 24px !important;
-        padding: 0 !important;
-        margin: 2px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        overflow: hidden !important;
-        border: none !important;
+      @media (max-width: 1024px) {
+        .fc .fc-daygrid-day-frame {
+          min-height: 90px;
+        }
+
+        .fc .fc-daygrid-day-number {
+          font-size: 0.8125rem;
+        }
       }
 
-      .fc-event[data-event-type='birthday'] .fc-event-title {
-        font-size: 14px !important;
-        line-height: 1 !important;
-        text-align: center !important;
+      @media (max-width: 768px) {
+        .fc .fc-daygrid-day-frame {
+          min-height: 80px;
+        }
+
+        .fc .fc-daygrid-day-number {
+          font-size: 0.75rem;
+        }
+
+        .fc .fc-daygrid-more-link {
+          font-size: 0.6875rem !important;
+        }
       }
     `}</style>
   )

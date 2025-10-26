@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useLocalAuthStore } from '@/lib/auth/local-auth-manager';
 import { Sidebar } from './sidebar';
-import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   STORAGE_KEY_LAST_VISITED,
@@ -88,6 +87,12 @@ export function MainLayout({ children }: MainLayoutProps) {
   // 使用自定義 layout 的頁面
   const hasCustomLayout = CUSTOM_LAYOUT_PAGES.some(page => pathname.startsWith(page));
 
+  const sidebarWidth = !isClient
+    ? SIDEBAR_WIDTH_COLLAPSED_PX
+    : sidebarCollapsed
+      ? SIDEBAR_WIDTH_COLLAPSED_PX
+      : SIDEBAR_WIDTH_EXPANDED_PX;
+
   // 登入頁不需要側邊欄
   if (!shouldShowSidebar) {
     return (
@@ -115,14 +120,14 @@ export function MainLayout({ children }: MainLayoutProps) {
       <Sidebar />
 
       {/* 右下象限 - 主內容區域 */}
-      <main className={cn(
-        'fixed bottom-0 right-0 transition-all',
-        !isClient ? 'left-16' : (sidebarCollapsed ? 'left-16' : 'left-[190px]')
-      )}
-      style={{
-        top: HEADER_HEIGHT_PX,
-        transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
-      }}>
+      <main
+        className="fixed bottom-0 right-0 transition-all"
+        style={{
+          top: HEADER_HEIGHT_PX,
+          left: sidebarWidth,
+          transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
+        }}
+      >
         <div className="p-6 h-full">
           {children}
         </div>

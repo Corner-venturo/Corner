@@ -23,7 +23,7 @@ export function CalendarGrid({
   onMoreLinkClick,
 }: CalendarGridProps) {
   return (
-    <div className="calendar-container h-full p-6">
+    <div className="calendar-container h-full overflow-hidden p-4 sm:p-6">
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, interactionPlugin]}
