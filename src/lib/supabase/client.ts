@@ -33,6 +33,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
 })
 
+// 獲取 Supabase client 實例的函數
+export function getSupabaseClient() {
+  return supabase;
+}
+
 // 測試 Supabase 連接
 export async function testSupabaseConnection() {
   try {

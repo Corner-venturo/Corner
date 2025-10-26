@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
   CalendarGrid,
-  CalendarLegend,
   CalendarStyles,
   AddEventDialog,
   EventDetailDialog,
@@ -102,19 +101,18 @@ export default function CalendarPage() {
         }
       />
 
-      <div className="space-y-6">
-        <Card className="p-6 border-morandi-container">
+      <div className="h-[calc(100vh-180px)]">
+        <Card className="h-full border-morandi-container flex flex-col">
           {/* 日曆主體 */}
-          <CalendarGrid
-            calendarRef={calendarRef}
-            events={filteredEvents}
-            onDateClick={handleDateClick}
-            onEventClick={handleEventClick}
-            onMoreLinkClick={(info) => handleMoreLinkClick(info, filteredEvents)}
-          />
-
-          {/* 圖例 */}
-          <CalendarLegend />
+          <div className="flex-1 overflow-hidden">
+            <CalendarGrid
+              calendarRef={calendarRef}
+              events={filteredEvents}
+              onDateClick={handleDateClick}
+              onEventClick={handleEventClick}
+              onMoreLinkClick={(info) => handleMoreLinkClick(info, filteredEvents)}
+            />
+          </div>
         </Card>
 
         {/* 新增行事曆事項對話框 */}

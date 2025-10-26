@@ -23,7 +23,7 @@ export function CalendarGrid({
   onMoreLinkClick,
 }: CalendarGridProps) {
   return (
-    <div className="calendar-container">
+    <div className="calendar-container h-full p-6">
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, interactionPlugin]}
@@ -33,7 +33,7 @@ export function CalendarGrid({
         dateClick={onDateClick}
         eventClick={onEventClick}
         locale="zh-tw"
-        height="auto"
+        height="100%"
         dayMaxEvents={3}
         moreLinkClick={onMoreLinkClick}
         moreLinkText="更多"

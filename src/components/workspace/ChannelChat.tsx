@@ -182,7 +182,7 @@ export function ChannelChat() {
   }
 
   return (
-    <div className="h-full flex rounded-lg border border-border overflow-hidden bg-white">
+    <div className="h-full flex overflow-hidden">
       <ChannelSidebar
         selectedChannelId={selectedChannel?.id || null}
         onSelectChannel={(channel) => {

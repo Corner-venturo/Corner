@@ -62,12 +62,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets();
 
-  // 設定拖拽感應器（長按 250ms 才觸發）
+  // 設定拖拽感應器（長按 500ms 才觸發，避免影響正常互動）
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 250,
-        tolerance: 5,
+        delay: 500,
+        tolerance: 8,
       },
     })
   );

@@ -51,6 +51,10 @@ export function CalendarStyles() {
         border-color: #e8e6e3;
       }
 
+      .fc .fc-daygrid-day-frame {
+        min-height: 120px;
+      }
+
       .fc .fc-daygrid-day-number {
         color: #3a3633;
         padding: 0.5rem;
