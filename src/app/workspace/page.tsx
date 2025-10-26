@@ -17,19 +17,17 @@ export default function WorkspacePage() {
   }, [tours]);
 
   return (
-    <div className="fixed top-[72px] bottom-0 left-[190px] right-0 p-6">
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title="工作空間"
-          breadcrumb={[
-            { label: '首頁', href: '/' },
-            { label: '工作空間', href: '/workspace' },
-          ]}
-        />
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="工作空間"
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '工作空間', href: '/workspace' },
+        ]}
+      />
 
-        <div className="flex-1 overflow-hidden mt-4">
-          <ChannelChat />
-        </div>
+      <div className="flex-1 overflow-hidden mt-4">
+        <ChannelChat />
       </div>
     </div>
   );
