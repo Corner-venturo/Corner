@@ -34,6 +34,7 @@ export const useWorkspaceStore = () => {
     bulletins: channelsStore.bulletins,
     channels: channelsStore.channels,
     channelGroups: channelsStore.channelGroups,
+    directMessages: channelsStore.directMessages,
     selectedChannel: channelsStore.selectedChannel,
     currentChannel: channelsStore.currentChannel,
     searchQuery: channelsStore.searchQuery,
@@ -54,6 +55,10 @@ export const useWorkspaceStore = () => {
     toggleGroupCollapse: channelsStore.toggleGroupCollapse,
     setSearchQuery: channelsStore.setSearchQuery,
     setChannelFilter: channelsStore.setChannelFilter,
+    loadDirectMessages: channelsStore.loadDirectMessages,
+    createOrGetDirectMessage: channelsStore.createOrGetDirectMessage,
+    toggleDirectMessageFavorite: channelsStore.toggleDirectMessageFavorite,
+    reorderChannelGroups: channelsStore.reorderChannelGroups,
 
     // Channel selection with coordinated state
     selectChannel: async (channel: typeof channelsStore.selectedChannel) => {

@@ -95,7 +95,7 @@ export function ChannelChat() {
 
   const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations();
   const { attachedFiles, setAttachedFiles, uploadingFiles, uploadProgress, uploadFiles, clearFiles } = useFileUpload();
-  const { messagesEndRef } = useScrollToBottom(currentMessages.length);
+  const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0);
 
   useAutoCreateTourChannels();
   useCleanupOrphanChannels();
@@ -215,51 +215,53 @@ export function ChannelChat() {
               </div>
             }
           >
-            <div className="flex-1 flex min-h-0">
-              <MessageList
-                messages={currentMessages}
-                advanceLists={advanceLists}
-                sharedOrderLists={sharedOrderLists}
+            <>
+              <div className="flex-1 flex min-h-0">
+                <MessageList
+                  messages={currentMessages || []}
+                  advanceLists={advanceLists}
+                  sharedOrderLists={sharedOrderLists}
+                  channelName={selectedChannel.name}
+                  currentUserId={user?.id}
+                  isLoading={messagesLoading}
+                  onReaction={onReactionClick}
+                  onDeleteMessage={onDeleteMessageClick}
+                  onCreatePayment={(itemId, item) => {
+                    setSelectedAdvanceItem(item);
+                    setSelectedAdvanceListId(advanceLists.find(al =>
+                      al.items?.some((i: any) => i.id === itemId)
+                    )?.id || '');
+                    setShowCreatePaymentDialog(true);
+                  }}
+                  onDeleteAdvanceList={deleteAdvanceList}
+                  onCreateReceipt={(orderId, order) => {
+                    setSelectedOrder(order);
+                    setShowCreateReceiptDialog(true);
+                  }}
+                  messagesEndRef={messagesEndRef}
+                  theme={theme}
+                />
+
+                <MemberSidebar isOpen={showMemberSidebar} />
+              </div>
+
+              <MessageInput
                 channelName={selectedChannel.name}
-                currentUserId={user?.id}
-                isLoading={messagesLoading}
-                onReaction={onReactionClick}
-                onDeleteMessage={onDeleteMessageClick}
-                onCreatePayment={(itemId, item) => {
-                  setSelectedAdvanceItem(item);
-                  setSelectedAdvanceListId(advanceLists.find(al => 
-                    al.items?.some((i: any) => i.id === itemId)
-                  )?.id || '');
-                  setShowCreatePaymentDialog(true);
-                }}
-                onDeleteAdvanceList={deleteAdvanceList}
-                onCreateReceipt={(orderId, order) => {
-                  setSelectedOrder(order);
-                  setShowCreateReceiptDialog(true);
-                }}
-                messagesEndRef={messagesEndRef}
-                theme={theme}
+                value={messageText}
+                onChange={setMessageText}
+                onSubmit={onSubmitMessage}
+                attachedFiles={attachedFiles}
+                onFilesChange={setAttachedFiles}
+                uploadingFiles={uploadingFiles}
+                uploadProgress={uploadProgress}
+                onShowShareOrders={() => setShowShareOrdersDialog(true)}
+                onShowShareQuote={() => setShowShareQuoteDialog(true)}
+                onShowNewPayment={() => setShowNewPaymentDialog(true)}
+                onShowNewReceipt={() => setShowNewReceiptDialog(true)}
+                onShowShareAdvance={() => setShowShareAdvanceDialog(true)}
+                onShowNewTask={() => setShowNewTaskDialog(true)}
               />
-
-              <MemberSidebar isOpen={showMemberSidebar} />
-            </div>
-
-            <MessageInput
-              channelName={selectedChannel.name}
-              value={messageText}
-              onChange={setMessageText}
-              onSubmit={onSubmitMessage}
-              attachedFiles={attachedFiles}
-              onFilesChange={setAttachedFiles}
-              uploadingFiles={uploadingFiles}
-              uploadProgress={uploadProgress}
-              onShowShareOrders={() => setShowShareOrdersDialog(true)}
-              onShowShareQuote={() => setShowShareQuoteDialog(true)}
-              onShowNewPayment={() => setShowNewPaymentDialog(true)}
-              onShowNewReceipt={() => setShowNewReceiptDialog(true)}
-              onShowShareAdvance={() => setShowShareAdvanceDialog(true)}
-              onShowNewTask={() => setShowNewTaskDialog(true)}
-            />
+            </>
           </ChannelTabs>
         ) : (
           <div className="flex-1 flex items-center justify-center">
