@@ -463,7 +463,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <>
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="行事曆"
         breadcrumb={[
@@ -511,84 +511,87 @@ export default function CalendarPage() {
         }
       />
 
-      <div className="space-y-6">
-        <Card className="p-6 border-morandi-container">
-        {/* 日曆主體 */}
-        <div className="calendar-container">
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            headerToolbar={false}
-            events={filteredEvents}
-            dateClick={handleDateClick}
-            eventClick={handleEventClick}
-            locale="zh-tw"
-            height="auto"
-            dayMaxEvents={3}
-            moreLinkClick={handleMoreLinkClick}
-            moreLinkText="更多"
-            weekends={true}
-            firstDay={1}
-            eventDisplay="auto"
-            eventDidMount={info => {
-              // 為事件添加 data 屬性以便 CSS 選擇器使用
-              const eventType = info.event.extendedProps.type
-              info.el.setAttribute('data-event-type', eventType)
-            }}
-            displayEventTime={false}
-            eventOrder="start,-duration,title"
-            buttonText={{
-              today: '今天',
-              month: '月',
-              week: '週',
-              day: '日',
-            }}
-          />
-        </div>
-
-        {/* 圖例 */}
-        <div className="mt-6 flex flex-wrap gap-4 p-4 bg-morandi-container/10 rounded-lg">
-          <div className="text-sm font-medium text-morandi-secondary">圖例：</div>
-
-          {/* 旅遊團狀態圖例 */}
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#9BB5D6' }} />
-            <span className="text-sm text-morandi-secondary">提案</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#A8C4A2' }} />
-            <span className="text-sm text-morandi-secondary">進行中</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#D4B896' }} />
-            <span className="text-sm text-morandi-secondary">待結案</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#B8B3AE' }} />
-            <span className="text-sm text-morandi-secondary">結案</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#D4A5A5' }} />
-            <span className="text-sm text-morandi-secondary">特殊團</span>
+      <div className="flex-1 overflow-hidden px-0 lg:px-6 pb-6">
+        <Card className="h-full flex flex-col border-morandi-container">
+          <div className="flex-1 min-h-0 p-4 sm:p-6">
+            {/* 日曆主體 */}
+            <div className="calendar-container h-full">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                headerToolbar={false}
+                events={filteredEvents}
+                dateClick={handleDateClick}
+                eventClick={handleEventClick}
+                locale="zh-tw"
+                height="100%"
+                contentHeight="auto"
+                dayMaxEvents={3}
+                moreLinkClick={handleMoreLinkClick}
+                moreLinkText="更多"
+                weekends={true}
+                firstDay={1}
+                eventDisplay="auto"
+                eventDidMount={info => {
+                  // 為事件添加 data 屬性以便 CSS 選擇器使用
+                  const eventType = info.event.extendedProps.type
+                  info.el.setAttribute('data-event-type', eventType)
+                }}
+                displayEventTime={false}
+                eventOrder="start,-duration,title"
+                buttonText={{
+                  today: '今天',
+                  month: '月',
+                  week: '週',
+                  day: '日',
+                }}
+              />
+            </div>
           </div>
 
-          {/* 個人事項圖例 */}
-          <div className="flex items-center gap-2 ml-4">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#B8A9D1' }} />
-            <span className="text-sm text-morandi-secondary">個人事項</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#E6B8C8' }} />
-            <span className="text-sm text-morandi-secondary">生日</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#E0C3A0' }} />
-            <span className="text-sm text-morandi-secondary">公司活動</span>
-          </div>
-        </div>
-      </Card>
+          {/* 圖例 */}
+          <div className="border-t border-border p-4 sm:p-6 bg-morandi-container/10 flex flex-wrap items-center gap-4">
+            <div className="text-sm font-medium text-morandi-secondary">圖例：</div>
 
+            {/* 旅遊團狀態圖例 */}
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#9BB5D6' }} />
+              <span className="text-sm text-morandi-secondary">提案</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#A8C4A2' }} />
+              <span className="text-sm text-morandi-secondary">進行中</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#D4B896' }} />
+              <span className="text-sm text-morandi-secondary">待結案</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#B8B3AE' }} />
+              <span className="text-sm text-morandi-secondary">結案</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#D4A5A5' }} />
+              <span className="text-sm text-morandi-secondary">特殊團</span>
+            </div>
+
+            {/* 個人事項圖例 */}
+            <div className="flex items-center gap-2 ml-0 sm:ml-4">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#B8A9D1' }} />
+              <span className="text-sm text-morandi-secondary">個人事項</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#E6B8C8' }} />
+              <span className="text-sm text-morandi-secondary">生日</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#E0C3A0' }} />
+              <span className="text-sm text-morandi-secondary">公司活動</span>
+            </div>
+          </div>
+        </Card>
+      
       {/* 新增行事曆事項對話框 */}
       <Dialog
         open={addEventDialog.open}
@@ -1070,6 +1073,6 @@ export default function CalendarPage() {
           text-align: center !important;
         }
       `}</style>
-    </>
+    </div>
   )
 }
