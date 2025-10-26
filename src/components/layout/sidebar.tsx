@@ -23,7 +23,9 @@ import {
   TrendingDown,
   FileCheck,
   Flag,
-  Sparkles
+  Sparkles,
+  FileSignature,
+  CircleDot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
@@ -103,6 +105,12 @@ const menuItems: MenuItem[] = [
     requiredPermission: 'visas',
   },
   {
+    href: '/contracts',
+    label: '合約管理',
+    icon: FileSignature,
+    requiredPermission: 'contracts',
+  },
+  {
     href: '/database',
     label: '資料管理',
     icon: Database,
@@ -143,6 +151,12 @@ const personalToolItems: MenuItem[] = [
     label: '顯化魔法',
     icon: Sparkles,
     requiredPermission: 'manifestation',
+  },
+  {
+    href: '/heroic-summon',
+    label: '英靈招喚',
+    icon: CircleDot,
+    requiredPermission: 'heroic-summon',
   },
 ];
 
@@ -320,8 +334,8 @@ export function Sidebar() {
         {/* Logo區域 */}
         <div className="shrink-0">
           <div className="h-18 flex items-center relative mx-3">
-            <div className="absolute left-5 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-gradient-to-br from-[#d4c5a9] via-[#c9b896] to-[#bfad87] flex items-center justify-center shadow-sm flex-shrink-0 opacity-90">
-              <span className="text-white/95 font-semibold text-lg">V</span>
+            <div className="absolute left-5 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-morandi-gold flex items-center justify-center shadow-sm flex-shrink-0 opacity-90">
+              <span className="text-white font-semibold text-lg">V</span>
             </div>
             <div className={cn(
               "ml-[58px] text-xl font-bold text-morandi-primary transition-opacity duration-300",

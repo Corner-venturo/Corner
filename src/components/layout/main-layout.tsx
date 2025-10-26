@@ -6,7 +6,15 @@ import { useLocalAuthStore } from '@/lib/auth/local-auth-manager';
 import { Sidebar } from './sidebar';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
-import { ManifestationReminderWidget } from '@/components/manifestation/ManifestationReminderWidget';
+import {
+  STORAGE_KEY_LAST_VISITED,
+  NO_SIDEBAR_PAGES,
+  CUSTOM_LAYOUT_PAGES,
+  HEADER_HEIGHT_PX,
+  SIDEBAR_WIDTH_EXPANDED_PX,
+  SIDEBAR_WIDTH_COLLAPSED_PX,
+  LAYOUT_TRANSITION_DURATION,
+} from '@/lib/constants';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -29,7 +37,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     if (pathname === '/login') return;
 
     // 儲存當前路徑到 localStorage
-    localStorage.setItem('last-visited-path', pathname);
+    localStorage.setItem(STORAGE_KEY_LAST_VISITED, pathname);
   }, [isClient, pathname]);
 
   // 簡化的認證檢查 - 暫時停用,使用 auth-store 的 user
@@ -60,8 +68,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     const loadInitialData = async () => {
       try {
         // 載入工作空間（全域需要）
-        const { useWorkspaceStore } = await import('@/stores/workspace-store');
-        const workspaceState = useWorkspaceStore.getState();
+        const { useChannelsStore } = await import('@/stores/workspace/channels-store');
+        const workspaceState = useChannelsStore.getState();
         if (!workspaceState.currentWorkspace) {
           await workspaceState.loadWorkspaces();
           console.log('✅ 工作空間初始化完成');
@@ -75,12 +83,10 @@ export function MainLayout({ children }: MainLayoutProps) {
   }, [isClient]);
 
   // 不需要側邊欄的頁面
-  const noSidebarPages = ['/login', '/unauthorized'];
-  const shouldShowSidebar = !noSidebarPages.includes(pathname);
+  const shouldShowSidebar = !NO_SIDEBAR_PAGES.includes(pathname as any);
 
-  // 使用自定義 layout 的頁面（如記帳管理）
-  const customLayoutPages = ['/accounting'];
-  const hasCustomLayout = customLayoutPages.some(page => pathname.startsWith(page));
+  // 使用自定義 layout 的頁面
+  const hasCustomLayout = CUSTOM_LAYOUT_PAGES.some(page => pathname.startsWith(page));
 
   // 登入頁不需要側邊欄
   if (!shouldShowSidebar) {
@@ -97,7 +103,6 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="min-h-screen bg-background">
         {/* 左下象限 - 側邊欄 */}
         <Sidebar />
-        {isClient && <ManifestationReminderWidget />}
         {/* 內容由頁面自己的 layout 處理 */}
         {children}
       </div>
@@ -108,13 +113,16 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* 左下象限 - 側邊欄 */}
       <Sidebar />
-      {isClient && <ManifestationReminderWidget />}
 
       {/* 右下象限 - 主內容區域 */}
       <main className={cn(
-        'fixed top-[72px] bottom-0 right-0 transition-all duration-300',
+        'fixed bottom-0 right-0 transition-all',
         !isClient ? 'left-16' : (sidebarCollapsed ? 'left-16' : 'left-[190px]')
-      )}>
+      )}
+      style={{
+        top: HEADER_HEIGHT_PX,
+        transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
+      }}>
         <div className="p-6 h-full">
           {children}
         </div>

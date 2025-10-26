@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calculator } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function CalculatorWidget() {
   const [inputValue, setInputValue] = useState('');
@@ -165,122 +165,133 @@ export function CalculatorWidget() {
   const displayResult = calculateResult();
 
   return (
-    <Card className="overflow-hidden flex flex-col border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
-      <div className="bg-morandi-container px-4 py-3 border-b border-morandi-gold/20 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Calculator className="h-4 w-4 text-morandi-gold" />
-            <h3 className="font-semibold text-sm text-morandi-primary">計算機</h3>
+    <div className="h-full">
+      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+        <div className="p-5 space-y-4 h-full flex flex-col">
+          {/* Header with Icon */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <div className={cn(
+                'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
+                'bg-gradient-to-br from-teal-200/60 to-cyan-100/60',
+                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+              )}>
+                <Calculator className="w-5 h-5 drop-shadow-sm" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">計算機</p>
+                <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
+                  快速運算，精準無誤
+                </p>
+              </div>
+            </div>
+            <label className="flex items-center gap-1.5 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={sequentialMode}
+                onChange={(e) => setSequentialMode(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-morandi-gold/30 text-morandi-gold focus:ring-morandi-gold/20 cursor-pointer"
+              />
+              <span className="text-xs text-morandi-secondary/90 group-hover:text-morandi-primary transition-colors font-medium">順序</span>
+            </label>
           </div>
-          <label className="flex items-center gap-1.5 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={sequentialMode}
-              onChange={(e) => setSequentialMode(e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-morandi-gold/20 text-morandi-gold focus:ring-morandi-gold/20 cursor-pointer"
-            />
-            <span className="text-xs text-morandi-secondary group-hover:text-morandi-primary transition-colors">順序計算</span>
-          </label>
-        </div>
-      </div>
-      <div className="p-4 flex flex-col">
-        <div className="space-y-3 flex flex-col">
-        {/* iPhone 風格顯示區 */}
-        <div
-          className="bg-white rounded-xl p-4 min-h-[80px] flex flex-col justify-end border border-morandi-gold/20 cursor-text shadow-sm"
-          onClick={() => inputRef.current?.focus()}
-        >
-          {/* 算式輸入（小字灰色） */}
-          <input
-            ref={inputRef}
-            type="text"
-            inputMode="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onPaste={handlePaste}
-            onKeyDown={handleKeyDown}
-            autoComplete="off"
-            className="w-full bg-transparent border-none outline-none text-right font-mono text-sm text-morandi-secondary mb-1 placeholder:text-morandi-muted/40"
-            placeholder="直接輸入或點擊按鈕"
-          />
-          {/* 即時結果（大字黑色） */}
-          <div className="text-right text-2xl font-bold text-morandi-primary font-mono tracking-tight">
-            {displayResult}
-          </div>
-        </div>
 
-        {/* 快速按鈕 */}
-        <div className="grid grid-cols-4 gap-1.5 flex-shrink-0">
-          {['7', '8', '9', '/'].map((btn) => (
-            <Button
-              key={btn}
-              variant="outline"
-              size="sm"
-              onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
-            >
-              {btn}
-            </Button>
-          ))}
-          {['4', '5', '6', '*'].map((btn) => (
-            <Button
-              key={btn}
-              variant="outline"
-              size="sm"
-              onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
-            >
-              {btn}
-            </Button>
-          ))}
-          {['1', '2', '3', '-'].map((btn) => (
-            <Button
-              key={btn}
-              variant="outline"
-              size="sm"
-              onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
-            >
-              {btn}
-            </Button>
-          ))}
-          {['0', '.', '(', ')'].map((btn) => (
-            <Button
-              key={btn}
-              variant="outline"
-              size="sm"
-              onClick={() => handleButtonClick(btn)}
-              className="h-9 text-sm font-medium bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
-            >
-              {btn}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleButtonClick('+')}
-            className="h-9 text-sm font-medium bg-white/80 border-morandi-gold/20 hover:bg-white hover:border-morandi-gold/20 hover:scale-105 transition-all rounded-xl"
+          {/* Display Area */}
+          <div
+            className="rounded-xl bg-white/70 p-4 shadow-md border border-white/40 cursor-text min-h-[100px] flex flex-col justify-end"
+            onClick={() => inputRef.current?.focus()}
           >
-            +
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => handleButtonClick('=')}
-            className="h-9 text-sm font-medium bg-gradient-to-r from-[#B5986A] to-[#D4C4A8] border-0 text-white shadow-lg transition-all duration-200 active:scale-95 rounded-xl"
-          >
-            =
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleButtonClick('C')}
-            className="h-9 text-sm font-medium col-span-2 bg-white/80 border-morandi-gold/20 hover:bg-red-50 hover:text-red-600 hover:border-red-300 hover:scale-105 transition-all rounded-xl"
-          >
-            清除
-          </Button>
-        </div>
+            {/* 算式輸入（小字灰色） */}
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="text"
+              value={inputValue}
+              onChange={handleInputChange}
+              onPaste={handlePaste}
+              onKeyDown={handleKeyDown}
+              autoComplete="off"
+              className="w-full bg-transparent border-none outline-none text-right font-mono text-sm text-morandi-secondary/80 mb-1 placeholder:text-morandi-muted/40 font-medium"
+              placeholder="輸入算式"
+            />
+            {/* 即時結果（大字黑色） */}
+            <div className="text-right text-3xl font-bold text-morandi-primary font-mono tracking-tight">
+              {displayResult}
+            </div>
+          </div>
+
+          {/* Quick Buttons */}
+          <div className="grid grid-cols-4 gap-2 flex-shrink-0">
+            {['7', '8', '9', '/'].map((btn) => (
+              <Button
+                key={btn}
+                variant="outline"
+                size="sm"
+                onClick={() => handleButtonClick(btn)}
+                className="h-10 text-base font-bold bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-morandi-gold/10 hover:border-morandi-gold/50 shadow-sm hover:shadow-md transition-all rounded-xl"
+              >
+                {btn}
+              </Button>
+            ))}
+            {['4', '5', '6', '*'].map((btn) => (
+              <Button
+                key={btn}
+                variant="outline"
+                size="sm"
+                onClick={() => handleButtonClick(btn)}
+                className="h-10 text-base font-bold bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-morandi-gold/10 hover:border-morandi-gold/50 shadow-sm hover:shadow-md transition-all rounded-xl"
+              >
+                {btn}
+              </Button>
+            ))}
+            {['1', '2', '3', '-'].map((btn) => (
+              <Button
+                key={btn}
+                variant="outline"
+                size="sm"
+                onClick={() => handleButtonClick(btn)}
+                className="h-10 text-base font-bold bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-morandi-gold/10 hover:border-morandi-gold/50 shadow-sm hover:shadow-md transition-all rounded-xl"
+              >
+                {btn}
+              </Button>
+            ))}
+            {['0', '.', '(', ')'].map((btn) => (
+              <Button
+                key={btn}
+                variant="outline"
+                size="sm"
+                onClick={() => handleButtonClick(btn)}
+                className="h-10 text-base font-bold bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-morandi-gold/10 hover:border-morandi-gold/50 shadow-sm hover:shadow-md transition-all rounded-xl"
+              >
+                {btn}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleButtonClick('+')}
+              className="h-10 text-base font-bold bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-morandi-gold/10 hover:border-morandi-gold/50 shadow-sm hover:shadow-md transition-all rounded-xl"
+            >
+              +
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => handleButtonClick('=')}
+              className="h-10 text-base font-bold bg-morandi-gold text-white hover:bg-morandi-gold/90 shadow-md hover:shadow-lg transition-all rounded-xl"
+            >
+              =
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleButtonClick('C')}
+              className="h-10 text-sm font-semibold col-span-2 bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-red-50 hover:text-red-600 hover:border-red-400 shadow-sm hover:shadow-md transition-all rounded-xl"
+            >
+              清除
+            </Button>
+          </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

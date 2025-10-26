@@ -1,3 +1,5 @@
+import { getSupabaseClient } from '@/lib/supabase/client';
+
 export const MANIFESTATION_LAST_DATE_KEY = 'manifestation_last_date';
 export const MANIFESTATION_STREAK_KEY = 'manifestation_streak';
 export const MANIFESTATION_HISTORY_KEY = 'manifestation_history';
@@ -42,6 +44,98 @@ export interface ManifestationReminderSnapshot {
   history: string[];
 }
 
+// 從 Supabase 載入數據
+export const loadManifestationFromSupabase = async (userId: string): Promise<ManifestationReminderSnapshot | null> => {
+  try {
+    const supabase = getSupabaseClient();
+
+    // 從 manifestation_records 載入所有記錄
+    const { data, error } = await supabase
+      .from('manifestation_records')
+      .select('record_date, content')
+      .eq('user_id', userId)
+      .order('record_date', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load manifestation records:', error);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      return { lastDate: null, streak: 0, history: [] };
+    }
+
+    // 計算 history 和 streak
+    const history = data.map((record) => record.record_date).sort();
+    const lastDate = data[0].record_date;
+
+    // 計算連續天數
+    let streak = 0;
+    const today = toDateKey(new Date());
+    let checkDate = lastDate;
+
+    // 如果最後一次不是今天或昨天，連續天數為 0
+    const diff = getDayDiff(today, checkDate);
+    if (diff > 1) {
+      streak = 0;
+    } else {
+      // 從最後一天往前計算連續天數
+      for (let i = 0; i < history.length; i++) {
+        if (history[i] === checkDate) {
+          streak++;
+          // 計算前一天
+          const prevDate = new Date(toDateOnly(checkDate));
+          prevDate.setDate(prevDate.getDate() - 1);
+          checkDate = toDateKey(prevDate);
+        } else {
+          break;
+        }
+      }
+    }
+
+    return {
+      lastDate,
+      streak,
+      history,
+    };
+  } catch (error) {
+    console.error('Error loading manifestation from Supabase:', error);
+    return null;
+  }
+};
+
+// 保存到 Supabase
+export const saveManifestationToSupabase = async (
+  userId: string,
+  recordDate: string,
+  content: string = ''
+): Promise<boolean> => {
+  try {
+    const supabase = getSupabaseClient();
+
+    const { error } = await supabase
+      .from('manifestation_records')
+      .upsert({
+        user_id: userId,
+        record_date: recordDate,
+        content,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'user_id,record_date'
+      });
+
+    if (error) {
+      console.error('Failed to save manifestation record:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error saving manifestation to Supabase:', error);
+    return false;
+  }
+};
+
 export const getManifestationReminderSnapshot = (): ManifestationReminderSnapshot => {
   if (typeof window === 'undefined') {
     return { lastDate: null, streak: 0, history: [] };
@@ -63,7 +157,11 @@ const pruneHistory = (history: string[]): string[] => {
   return sorted.slice(-90);
 };
 
-export const recordManifestationCompletion = (completedAt: Date = new Date()): ManifestationReminderSnapshot | void => {
+export const recordManifestationCompletion = async (
+  userId?: string,
+  completedAt: Date = new Date(),
+  content: string = ''
+): Promise<ManifestationReminderSnapshot | void> => {
   if (typeof window === 'undefined') return;
 
   const today = toDateKey(completedAt);
@@ -85,9 +183,15 @@ export const recordManifestationCompletion = (completedAt: Date = new Date()): M
 
   const updatedHistory = pruneHistory([...history, today]);
 
+  // 保存到 localStorage（作為備份）
   localStorage.setItem(MANIFESTATION_LAST_DATE_KEY, today);
   localStorage.setItem(MANIFESTATION_STREAK_KEY, String(nextStreak));
   localStorage.setItem(MANIFESTATION_HISTORY_KEY, JSON.stringify(updatedHistory));
+
+  // 如果有 userId，也保存到 Supabase
+  if (userId) {
+    await saveManifestationToSupabase(userId, today, content);
+  }
 
   const updatedSnapshot: ManifestationReminderSnapshot = {
     lastDate: today,
