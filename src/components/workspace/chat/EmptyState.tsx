@@ -8,7 +8,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ channelName }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center">
+    <div className="flex-1 flex flex-col items-center justify-center text-center">
       <Hash size={48} className="text-morandi-secondary/50 mb-4" />
       <h3 className="text-lg font-medium text-morandi-primary mb-2">
         歡迎來到 #{channelName}

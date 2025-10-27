@@ -16,147 +16,152 @@ export interface PermissionConfig {
  * 一處定義，處處生效
  */
 export const FEATURE_PERMISSIONS: PermissionConfig[] = [
-  // 系統管理
   {
     id: 'admin',
     label: '系統管理員',
-    category: '系統',
+    category: '全部',
     routes: ['*'], // 所有路由
     description: '擁有系統所有權限'
   },
-
-  // 基礎功能
   {
     id: 'calendar',
     label: '行事曆',
-    category: '通用',
+    category: '全部',
     routes: ['/calendar'],
     description: '查看和管理行事曆'
   },
   {
     id: 'workspace',
     label: '工作空間',
-    category: '通用',
+    category: '全部',
     routes: ['/workspace'],
     description: '個人工作空間'
   },
   {
     id: 'todos',
     label: '待辦事項',
-    category: '通用',
+    category: '全部',
     routes: ['/todos'],
     description: '管理個人待辦事項'
   },
   {
     id: 'timebox',
     label: '時間管理',
-    category: '通用',
+    category: '全部',
     routes: ['/timebox'],
     description: '時間箱管理功能'
   },
-
-  // 業務功能
   {
     id: 'quotes',
     label: '報價管理',
-    category: '業務',
+    category: '全部',
     routes: ['/quotes'],
     description: '建立和管理報價單'
   },
   {
     id: 'tours',
     label: '旅遊團管理',
-    category: '業務',
+    category: '全部',
     routes: ['/tours'],
     description: '旅遊團建立和管理'
   },
   {
     id: 'orders',
     label: '訂單管理',
-    category: '業務',
+    category: '全部',
     routes: ['/orders'],
     description: '訂單處理和管理'
   },
   {
     id: 'customers',
     label: '客戶管理',
-    category: '業務',
+    category: '全部',
     routes: ['/customers'],
     description: '客戶資料管理'
   },
   {
     id: 'visas',
     label: '簽證管理',
-    category: '業務',
+    category: '全部',
     routes: ['/visas'],
     description: '簽證申請和管理'
   },
-
-  // 財務功能
   {
     id: 'accounting',
     label: '記帳管理',
-    category: '財務',
+    category: '全部',
     routes: ['/accounting'],
     description: '日常記帳功能'
   },
   {
     id: 'payments',
     label: '收款管理',
-    category: '財務',
+    category: '全部',
     routes: ['/finance/payments'],
     description: '收款管理'
   },
   {
     id: 'requests',
     label: '請款管理',
-    category: '財務',
+    category: '全部',
     routes: ['/finance/requests'],
     description: '請款管理'
   },
   {
     id: 'disbursement',
     label: '出納管理',
-    category: '財務',
+    category: '全部',
     routes: ['/finance/treasury'],
     description: '出納和現金流管理'
   },
   {
-    id: 'reports',
-    label: '報表管理',
-    category: '財務',
+    id: 'finance_reports',
+    label: '財務報表',
+    category: '全部',
     routes: ['/finance/reports'],
     description: '財務報表查看'
   },
-
-  // 管理功能
   {
     id: 'hr',
     label: '人資管理',
-    category: '管理',
+    category: '全部',
     routes: ['/hr'],
     description: '員工和人事管理'
   },
   {
     id: 'database',
     label: '資料管理',
-    category: '管理',
+    category: '全部',
     routes: ['/database'],
     description: '系統資料庫管理'
   },
   {
     id: 'settings',
     label: '系統設定',
-    category: '管理',
+    category: '全部',
     routes: ['/settings'],
     description: '系統設定和配置'
   },
   {
     id: 'reports',
     label: '報表管理',
-    category: '管理',
+    category: '全部',
     routes: ['/reports'],
     description: '各類報表查看'
+  },
+  {
+    id: 'manifestation',
+    label: '顯化魔法',
+    category: '全部',
+    routes: ['/manifestation'],
+    description: '顯化魔法功能'
+  },
+  {
+    id: 'heroic_summon',
+    label: '英靈招喚',
+    category: '全部',
+    routes: ['/heroic-summon'],
+    description: '英靈招喚系統'
   },
 ];
 

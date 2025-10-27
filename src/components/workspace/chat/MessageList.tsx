@@ -49,17 +49,28 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
     },
     ref
   ) {
+    console.log('🎬 [MessageList] render:', {
+      isLoading,
+      messagesCount: messages.length,
+      advanceListsCount: advanceLists.length,
+      sharedOrderListsCount: sharedOrderLists.length
+    });
+
     if (isLoading) {
+      console.log('⏳ [MessageList] 顯示載入狀態');
       return (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin w-6 h-6 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
         </div>
       );
     }
 
     if (messages.length === 0 && advanceLists.length === 0 && sharedOrderLists.length === 0) {
+      console.log('📭 [MessageList] 顯示空狀態');
       return <EmptyState channelName={channelName} />;
     }
+
+    console.log('📝 [MessageList] 顯示訊息列表');
 
     return (
       <div

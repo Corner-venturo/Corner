@@ -6,6 +6,13 @@ import {
   type ChannelMember,
 } from '@/services/workspace-members';
 
+// UUID 驗證正則
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUUID(id: string): boolean {
+  return UUID_REGEX.test(id);
+}
+
 interface MembersState {
   channelMembers: Record<string, ChannelMember[]>;
   error: string | null;
@@ -21,6 +28,18 @@ export const useMembersStore = create<MembersState>((set) => ({
   error: null,
 
   loadChannelMembers: async (workspaceId, channelId) => {
+    // 跳過假資料（不是有效的 UUID）
+    if (!isValidUUID(workspaceId) || !isValidUUID(channelId)) {
+      console.log('⚠️ [成員載入] 跳過（使用假資料）');
+      set((state) => ({
+        channelMembers: {
+          ...state.channelMembers,
+          [channelId]: [],
+        },
+      }));
+      return;
+    }
+
     try {
       const members = await fetchChannelMembers(workspaceId, channelId);
       set((state) => ({
