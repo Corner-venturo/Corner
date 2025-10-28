@@ -10,6 +10,9 @@ interface DailyItinerarySectionProps {
   addActivity: (dayIndex: number) => void;
   updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void;
   removeActivity: (dayIndex: number, actIndex: number) => void;
+  addDayImage: (dayIndex: number) => void;
+  updateDayImage: (dayIndex: number, imageIndex: number, value: string) => void;
+  removeDayImage: (dayIndex: number, imageIndex: number) => void;
   addRecommendation: (dayIndex: number) => void;
   updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void;
   removeRecommendation: (dayIndex: number, recIndex: number) => void;
@@ -24,6 +27,9 @@ export function DailyItinerarySection({
   addActivity,
   updateActivity,
   removeActivity,
+  addDayImage,
+  updateDayImage,
+  removeDayImage,
   addRecommendation,
   updateRecommendation,
   removeRecommendation,
@@ -52,17 +58,17 @@ export function DailyItinerarySection({
       </div>
 
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
-        <div key={dayIndex} className="p-6 border-2 border-red-200 rounded-xl space-y-4 bg-red-50">
+        <div key={dayIndex} className="p-6 border border-red-100 rounded-2xl space-y-5 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 shadow-sm">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
-              <span className="bg-red-500 text-white px-3 py-1 rounded-full font-bold text-sm">
+              <span className="bg-red-500 text-white px-3 py-1.5 rounded-full font-semibold text-sm tracking-wide">
                 {day.dayLabel}
               </span>
-              <span className="text-gray-600 text-sm">{day.date}</span>
+              <span className="text-gray-500 text-sm">{day.date}</span>
             </div>
             <button
               onClick={() => removeDailyItinerary(dayIndex)}
-              className="text-red-600 hover:text-red-800 text-sm font-medium"
+              className="text-red-500 hover:text-red-700 text-sm font-medium"
             >
               刪除此天
             </button>
@@ -124,48 +130,101 @@ export function DailyItinerarySection({
             />
           </div>
 
+          {/* 每日圖片 */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium text-gray-700">每日圖片</label>
+                <p className="text-xs text-gray-500 mt-1">建議尺寸 1600 × 900 以上，可依序新增多張照片</p>
+              </div>
+              <button
+                onClick={() => addDayImage(dayIndex)}
+                className="px-2.5 py-1 bg-amber-500 text-white rounded text-xs shadow hover:bg-amber-600"
+              >
+                + 新增圖片
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(day.images || []).map((image: string, imageIndex: number) => (
+                <div key={imageIndex} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={image}
+                    onChange={(e) => updateDayImage(dayIndex, imageIndex, e.target.value)}
+                    className="flex-1 px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                  <button
+                    onClick={() => removeDayImage(dayIndex, imageIndex)}
+                    className="px-2 py-1 text-red-500 hover:text-red-700 text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {(!day.images || day.images.length === 0) && (
+                <p className="text-xs text-gray-400">
+                  暫無圖片，點擊「新增圖片」填入第一張每日精選照片網址。
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* 活動 */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-gray-700">景點活動</label>
               <button
                 onClick={() => addActivity(dayIndex)}
-                className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
+                className="px-2.5 py-1 bg-blue-500 text-white rounded text-xs shadow hover:bg-blue-600"
               >
                 + 新增活動
               </button>
             </div>
             {day.activities?.map((activity: Activity, actIndex: number) => (
-              <div key={actIndex} className="flex flex-wrap gap-2 bg-white p-2 rounded items-center">
-                <input
-                  type="text"
-                  value={activity.icon}
-                  onChange={(e) => updateActivity(dayIndex, actIndex, "icon", e.target.value)}
-                  className="px-2 py-1 border rounded text-sm"
+              <div key={actIndex} className="space-y-2 bg-white/90 p-3 rounded-lg border border-blue-100">
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="text"
+                    value={activity.icon}
+                    onChange={(e) => updateActivity(dayIndex, actIndex, "icon", e.target.value)}
+                    className="px-2 py-1 border rounded text-sm"
                   style={{ width: `${Math.max(3, activity.icon.length + 1)}ch` }}
                   placeholder="🌋"
                 />
-                <input
-                  type="text"
-                  value={activity.title}
-                  onChange={(e) => updateActivity(dayIndex, actIndex, "title", e.target.value)}
-                  className="px-2 py-1 border rounded text-sm"
-                  style={{ width: `${Math.max(8, activity.title.length + 2)}ch` }}
-                  placeholder="阿蘇火山"
-                />
-                <input
-                  type="text"
-                  value={activity.description}
-                  onChange={(e) => updateActivity(dayIndex, actIndex, "description", e.target.value)}
-                  className="flex-1 min-w-[150px] px-2 py-1 border rounded text-sm"
-                  placeholder="描述"
-                />
-                <button
-                  onClick={() => removeActivity(dayIndex, actIndex)}
-                  className="px-2 py-1 text-red-500 hover:text-red-700 text-xs"
-                >
-                  ✕
-                </button>
+                  <input
+                    type="text"
+                    value={activity.title}
+                    onChange={(e) => updateActivity(dayIndex, actIndex, "title", e.target.value)}
+                    className="px-2 py-1 border rounded text-sm"
+                    style={{ width: `${Math.max(8, activity.title.length + 2)}ch` }}
+                    placeholder="阿蘇火山"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2">
+                  <input
+                    type="text"
+                    value={activity.description}
+                    onChange={(e) => updateActivity(dayIndex, actIndex, "description", e.target.value)}
+                    className="px-3 py-2 border rounded text-sm"
+                    placeholder="描述"
+                  />
+                  <input
+                    type="text"
+                    value={activity.image || ""}
+                    onChange={(e) => updateActivity(dayIndex, actIndex, "image", e.target.value)}
+                    className="px-3 py-2 border rounded text-sm"
+                    placeholder="圖片網址（選填）"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => removeActivity(dayIndex, actIndex)}
+                    className="px-2 py-1 text-red-500 hover:text-red-700 text-xs"
+                  >
+                    ✕ 刪除活動
+                  </button>
+                </div>
               </div>
             ))}
           </div>

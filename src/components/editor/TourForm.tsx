@@ -88,6 +88,9 @@ export function TourForm({ data, onChange }: TourFormProps) {
         addActivity={handlers.addActivity}
         updateActivity={handlers.updateActivity}
         removeActivity={handlers.removeActivity}
+        addDayImage={handlers.addDayImage}
+        updateDayImage={handlers.updateDayImage}
+        removeDayImage={handlers.removeDayImage}
         addRecommendation={handlers.addRecommendation}
         updateRecommendation={handlers.updateRecommendation}
         removeRecommendation={handlers.removeRecommendation}

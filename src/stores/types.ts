@@ -228,6 +228,7 @@ export interface DailyActivity {
   icon: string; // emoji 或 icon
   title: string;
   description: string;
+  image?: string;
 }
 
 export interface DailyMeals {
@@ -246,6 +247,7 @@ export interface DailyItineraryDay {
   recommendations: string[];
   meals: DailyMeals;
   accommodation: string;
+  images?: string[];
 }
 
 export interface Itinerary {

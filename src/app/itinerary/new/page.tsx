@@ -144,6 +144,10 @@ export default function NewItineraryPage() {
         title: "台北 ✈ 福岡空港 → 由布院 · 金麟湖 → 阿蘇溫泉",
         highlight: "✨ 特別安排：由布院 · 金麟湖 ～ 日本 OL 人氣 NO.1 散策地",
         description: "集合於台灣桃園國際機場，由專人辦理出境手續，搭乘豪華客機，飛往日本九州玄關──福岡。",
+        images: [
+          "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
+          "https://images.unsplash.com/photo-1526481280695-3c46997ceda7?auto=format&fit=crop&w=1600&q=80",
+        ],
         activities: [],
         recommendations: [],
         meals: {
@@ -159,11 +163,36 @@ export default function NewItineraryPage() {
         title: "阿蘇火山 → 柳川遊船 → 旅人列車 → 太宰府天滿宮",
         highlight: "",
         description: "",
+        images: [
+          "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=1600&q=80",
+          "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
+          "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1600&q=80",
+        ],
         activities: [
-          { icon: "🌋", title: "阿蘇火山", description: "近距離觀賞活火山壯麗景觀" },
-          { icon: "🚣", title: "柳川遊船", description: "乘船遊覽水鄉風情" },
-          { icon: "🚃", title: "旅人列車", description: "體驗日式風情列車" },
-          { icon: "⛩️", title: "太宰府天滿宮", description: "參拜學問之神" },
+          {
+            icon: "🌋",
+            title: "阿蘇火山",
+            description: "近距離觀賞活火山壯麗景觀",
+            image: "https://images.unsplash.com/photo-1523419409543-0c1df022bddb?auto=format&fit=crop&w=1200&q=80",
+          },
+          {
+            icon: "🚣",
+            title: "柳川遊船",
+            description: "乘船遊覽水鄉風情",
+            image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+          },
+          {
+            icon: "🚃",
+            title: "旅人列車",
+            description: "體驗日式風情列車",
+            image: "https://images.unsplash.com/photo-1526481280695-3c46997ceda7?auto=format&fit=crop&w=1200&q=80",
+          },
+          {
+            icon: "⛩️",
+            title: "太宰府天滿宮",
+            description: "參拜學問之神",
+            image: "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1200&q=80",
+          },
         ],
         recommendations: [],
         meals: {
@@ -179,6 +208,10 @@ export default function NewItineraryPage() {
         title: "福岡全日自由活動",
         highlight: "",
         description: "",
+        images: [
+          "https://images.unsplash.com/photo-1526481280695-3c46997ceda7?auto=format&fit=crop&w=1600&q=80",
+          "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1600&q=80",
+        ],
         activities: [],
         recommendations: [
           "天神商圈購物",
@@ -200,6 +233,9 @@ export default function NewItineraryPage() {
         title: "福岡空港 ✈ 台北",
         highlight: "",
         description: "享受一個沒有 MORNING CALL 的早晨，悠閒的飯店用完早餐後，接著前往福岡空港，搭乘豪華客機返回台北，結束了愉快的九州之旅。",
+        images: [
+          "https://images.unsplash.com/photo-1502920514313-52581002a659?auto=format&fit=crop&w=1600&q=80",
+        ],
         activities: [],
         recommendations: [],
         meals: {
