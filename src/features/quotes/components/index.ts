@@ -7,3 +7,4 @@ export { SaveVersionDialog } from './SaveVersionDialog';
 export { QuotesPage } from './QuotesPage';
 export { QuotesList } from './QuotesList';
 export { QuoteDialog } from './QuoteDialog';
+export { PrintableQuotation } from './PrintableQuotation';
