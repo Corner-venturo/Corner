@@ -24,6 +24,7 @@ export interface Activity {
   icon: string;
   title: string;
   description: string;
+  image?: string;
 }
 
 export interface Meals {
@@ -42,6 +43,7 @@ export interface DailyItinerary {
   recommendations: string[];
   meals: Meals;
   accommodation: string;
+  images?: string[];
 }
 
 export interface LeaderInfo {

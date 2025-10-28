@@ -96,7 +96,8 @@ export function useTourFormHandlers(
         activities: [],
         recommendations: [],
         meals: { breakfast: "", lunch: "", dinner: "" },
-        accommodation: ""
+        accommodation: "",
+        images: []
       }]
     });
   };
@@ -145,7 +146,7 @@ export function useTourFormHandlers(
     const newItinerary = [...data.dailyItinerary];
     newItinerary[dayIndex].activities = [
       ...(newItinerary[dayIndex].activities || []),
-      { icon: "🌋", title: "", description: "" }
+      { icon: "🌋", title: "", description: "", image: "" }
     ];
     onChange({ ...data, dailyItinerary: newItinerary });
   };
@@ -191,6 +192,33 @@ export function useTourFormHandlers(
     onChange({ ...data, dailyItinerary: newItinerary });
   };
 
+  // 每日圖片管理
+  const addDayImage = (dayIndex: number) => {
+    const newItinerary = [...data.dailyItinerary];
+    newItinerary[dayIndex].images = [
+      ...(newItinerary[dayIndex].images || []),
+      ""
+    ];
+    onChange({ ...data, dailyItinerary: newItinerary });
+  };
+
+  const updateDayImage = (dayIndex: number, imageIndex: number, value: string) => {
+    const newItinerary = [...data.dailyItinerary];
+    if (!newItinerary[dayIndex].images) {
+      newItinerary[dayIndex].images = [];
+    }
+    newItinerary[dayIndex].images![imageIndex] = value;
+    onChange({ ...data, dailyItinerary: newItinerary });
+  };
+
+  const removeDayImage = (dayIndex: number, imageIndex: number) => {
+    const newItinerary = [...data.dailyItinerary];
+    newItinerary[dayIndex].images = (newItinerary[dayIndex].images || []).filter(
+      (_: string, i: number) => i !== imageIndex
+    );
+    onChange({ ...data, dailyItinerary: newItinerary });
+  };
+
   return {
     updateField,
     updateCity,
@@ -208,6 +236,9 @@ export function useTourFormHandlers(
     addActivity,
     updateActivity,
     removeActivity,
+    addDayImage,
+    updateDayImage,
+    removeDayImage,
     addRecommendation,
     updateRecommendation,
     removeRecommendation,

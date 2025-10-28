@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FocusCards } from "@/components/ui/focus-cards";
 import { FloatingDock } from "@/components/ui/floating-dock";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
   IconHome,
@@ -14,12 +15,93 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 
+function DailyImageCarousel({ images, title }: { images: string[]; title: string }) {
+  const [current, setCurrent] = useState(0);
+
+  if (!images || images.length === 0) {
+    return null;
+  }
+
+  const showControls = images.length > 1;
+
+  const goToSlide = (index: number) => {
+    if (!showControls) return;
+    const total = images.length;
+    const next = (index + total) % total;
+    setCurrent(next);
+  };
+
+  return (
+    <div className="relative mb-8 mt-6">
+      <div className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-2xl ring-1 ring-morandi-border/20">
+        <div className="relative aspect-[16/9] w-full">
+          {images.map((image, index) => (
+            <img
+              key={`${image}-${index}`}
+              src={image}
+              alt={`${title} 圖片 ${index + 1}`}
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
+                index === current ? "opacity-100" : "opacity-0"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {showControls && (
+        <>
+          <button
+            type="button"
+            onClick={() => goToSlide(current - 1)}
+            className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:-translate-y-1/2 hover:bg-white"
+            aria-label="上一張圖片"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={() => goToSlide(current + 1)}
+            className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:-translate-y-1/2 hover:bg-white"
+            aria-label="下一張圖片"
+          >
+            ›
+          </button>
+          <div className="mt-4 flex justify-center gap-2">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => goToSlide(index)}
+                className={cn(
+                  "h-2.5 w-2.5 rounded-full border border-morandi-primary/30 transition-all duration-300",
+                  current === index ? "w-6 bg-morandi-primary/90" : "bg-white/60"
+                )}
+                aria-label={`切換至第 ${index + 1} 張圖片`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function TourPage({ data, isPreview = false, viewMode = 'desktop' }: { data: unknown; isPreview?: boolean; viewMode?: 'desktop' | 'mobile' }) {
   const [scrollOpacity, setScrollOpacity] = useState(0);
   const [attractionsProgress, setAttractionsProgress] = useState(0); // 0-1 之間的進度值
   const [showGallery, setShowGallery] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const galleryRef = useRef<HTMLElement>(null);
+  const [activeDayIndex, setActiveDayIndex] = useState(0);
+  const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const dailyItinerary = Array.isArray((data as any)?.dailyItinerary)
+    ? (data as any).dailyItinerary
+    : [];
+
+  useEffect(() => {
+    dayRefs.current = dayRefs.current.slice(0, dailyItinerary.length);
+  }, [dailyItinerary.length]);
 
   // 監聽父容器的滾動事件
   useEffect(() => {
@@ -172,6 +254,41 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       document.body.style.overflow = '';
     };
   }, [viewMode]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = dayRefs.current.findIndex((section) => section === entry.target);
+            if (index !== -1) {
+              setActiveDayIndex(index);
+            }
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.35,
+        rootMargin: '-30% 0px -45% 0px',
+      }
+    );
+
+    dayRefs.current.forEach((section) => {
+      if (section) {
+        observer.observe(section);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [dailyItinerary.length]);
+
+  const handleDayNavigate = (index: number) => {
+    const target = dayRefs.current[index];
+    if (!target) return;
+    setActiveDayIndex(index);
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // 導航項目
   const navLinks = data.navLinks || [
@@ -585,88 +702,214 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           </motion.div>
 
           {/* Main Timeline */}
-          <div className="max-w-4xl mx-auto">
-            <TracingBeam>
-              <div className="space-y-8">
-                {data.dailyItinerary?.map((day: any, index: number) => (
-                    <div key={index} className="bg-white rounded-2xl shadow-lg p-8 border border-border">
-                      <div className="flex items-center gap-4 mb-6">
-                        <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full font-bold text-lg">
-                          {day.dayLabel}
+          <div className={viewMode === 'mobile' ? '' : 'lg:grid lg:grid-cols-[240px,1fr] lg:gap-10'}>
+            <aside className="hidden lg:block">
+              <div className="sticky top-28 space-y-6 rounded-3xl border border-morandi-border/60 bg-morandi-container/30 p-6 shadow-xl ring-1 ring-morandi-border/30 backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.4em] text-morandi-secondary">
+                  Daily Guide
+                </p>
+                <ul className="space-y-2">
+                  {dailyItinerary.map((day: any, index: number) => (
+                    <li key={`day-nav-${day.dayLabel || index}`}>
+                      <button
+                        type="button"
+                        onClick={() => handleDayNavigate(index)}
+                        className={cn(
+                          "w-full rounded-2xl px-4 py-3 text-left transition-all duration-300",
+                          activeDayIndex === index
+                            ? "bg-white text-morandi-primary shadow-lg"
+                            : "bg-transparent text-morandi-secondary hover:bg-white/60 hover:text-morandi-primary"
+                        )}
+                      >
+                        <span className="text-[11px] uppercase tracking-[0.35em] text-morandi-secondary/70">
+                          {day.dayLabel || `Day ${index + 1}`}
                         </span>
-                        <span className="text-morandi-secondary">{day.date}</span>
+                        <p className="mt-2 text-base font-semibold leading-snug">
+                          {day.title || `行程第 ${index + 1} 天`}
+                        </p>
+                        {day.date && (
+                          <span className="mt-1 block text-xs text-morandi-secondary/80">{day.date}</span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+
+            <div>
+              {viewMode === 'mobile' && dailyItinerary.length > 0 && (
+                <div className="-mx-4 mb-6 flex gap-3 overflow-x-auto px-4">
+                  {dailyItinerary.map((day: any, index: number) => (
+                    <button
+                      key={`mobile-day-${day.dayLabel || index}`}
+                      type="button"
+                      onClick={() => handleDayNavigate(index)}
+                      className={cn(
+                        "flex min-w-[160px] flex-col rounded-2xl border border-morandi-border/40 px-4 py-3 text-left transition",
+                        activeDayIndex === index
+                          ? "bg-morandi-primary text-white"
+                          : "bg-white/80 text-morandi-primary/80"
+                      )}
+                    >
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.4em]">
+                        {day.dayLabel || `Day ${index + 1}`}
+                      </span>
+                      <span className="mt-2 line-clamp-2 text-sm font-medium leading-snug">
+                        {day.title || `行程第 ${index + 1} 天`}
+                      </span>
+                      {day.date && (
+                        <span className="mt-1 text-xs text-white/80">
+                          {day.date}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <TracingBeam>
+                <div className="space-y-12">
+                  {dailyItinerary.map((day: any, index: number) => (
+                    <article
+                      key={`day-section-${index}`}
+                      id={`day-${index + 1}`}
+                      ref={(el) => {
+                        dayRefs.current[index] = el;
+                      }}
+                      className="relative overflow-hidden rounded-[36px] border border-morandi-border/60 bg-white/95 p-8 shadow-xl ring-1 ring-morandi-border/40 backdrop-blur-sm"
+                    >
+                      <div className="flex flex-wrap items-center gap-4 mb-6">
+                        <span className="rounded-full bg-morandi-primary/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.35em] text-morandi-primary">
+                          {day.dayLabel || `Day ${index + 1}`}
+                        </span>
+                        {day.date && (
+                          <span className="text-sm text-morandi-secondary">{day.date}</span>
+                        )}
                       </div>
-                      <h3 className="text-2xl font-bold text-morandi-primary mb-4">
-                        {day.title}
+
+                      <h3 className="text-2xl font-bold leading-snug text-morandi-primary md:text-3xl">
+                        {day.title || `行程第 ${index + 1} 天`}
                       </h3>
 
                       {day.highlight && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                          <p className="text-blue-800 font-medium">
+                        <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50/80 p-5 text-amber-900 shadow-inner">
+                          <p className="text-base font-semibold leading-relaxed">
                             {day.highlight}
                           </p>
                         </div>
                       )}
 
+                      <DailyImageCarousel
+                        images={day.images || []}
+                        title={day.title || day.dayLabel || `Day ${index + 1}`}
+                      />
+
                       {day.description && (
-                        <p className="text-morandi-secondary mb-6">
+                        <p className="mt-6 mb-8 text-base leading-7 text-morandi-secondary">
                           {day.description}
                         </p>
                       )}
 
                       {day.activities && day.activities.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                          {day.activities.map((activity: any, actIndex: number) => (
-                            <div key={actIndex} className="border border-border rounded-lg p-4">
-                              <h4 className="font-bold text-morandi-primary mb-2">{activity.icon} {activity.title}</h4>
-                              <p className="text-sm text-morandi-secondary">{activity.description}</p>
-                            </div>
-                          ))}
+                        <div className="mb-8 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-morandi-primary">亮點景點</h4>
+                            <span className="text-sm text-morandi-secondary/80">
+                              {String(day.activities.length).padStart(2, '0')} Spots
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            {day.activities.map((activity: any, actIndex: number) => (
+                              <div
+                                key={`activity-${index}-${actIndex}`}
+                                className="group relative overflow-hidden rounded-3xl border border-morandi-border/50 bg-gradient-to-br from-white via-morandi-container/20 to-white shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
+                              >
+                                {activity?.image ? (
+                                  <>
+                                    <div className="relative aspect-[4/3] overflow-hidden">
+                                      <img
+                                        src={activity.image}
+                                        alt={activity.title}
+                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                      />
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                                      <div className="absolute bottom-4 left-5 flex items-center gap-3 text-white drop-shadow-lg">
+                                        <span className="text-2xl">{activity.icon}</span>
+                                        <span className="text-lg font-semibold">{activity.title}</span>
+                                      </div>
+                                    </div>
+                                    <p className="px-5 pb-6 pt-4 text-sm leading-relaxed text-morandi-secondary/95">
+                                      {activity.description}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <div className="p-5 space-y-3">
+                                    <div className="flex items-center gap-3 text-morandi-primary">
+                                      <span className="text-2xl">{activity.icon}</span>
+                                      <h5 className="text-lg font-semibold">{activity.title}</h5>
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-morandi-secondary/95">
+                                      {activity.description}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
 
                       {day.recommendations && day.recommendations.length > 0 && (
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6 mb-6">
-                          <h4 className="font-bold text-green-900 mb-3">
+                        <div className="mb-8 rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-inner">
+                          <h4 className="mb-3 flex items-center gap-2 text-lg font-semibold text-emerald-900">
                             🎉 推薦行程
                           </h4>
-                          <ul className="space-y-2 text-green-800">
+                          <ul className="space-y-2 text-emerald-800">
                             {day.recommendations.map((rec: string, recIndex: number) => (
-                              <li key={recIndex} className="flex items-center gap-2">
-                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                {rec}
+                              <li key={recIndex} className="flex items-start gap-2 text-sm leading-relaxed">
+                                <span className="mt-1 h-2 w-2 rounded-full bg-emerald-500"></span>
+                                <span>{rec}</span>
                               </li>
                             ))}
                           </ul>
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-morandi-container/20 rounded-lg p-4">
-                          <p className="text-sm text-morandi-secondary mb-1">早餐</p>
-                          <p className="font-medium text-morandi-primary">{day.meals?.breakfast || "敬請自理"}</p>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div className="rounded-3xl border border-morandi-border/40 bg-morandi-container/20 p-5">
+                          <p className="text-sm text-morandi-secondary/80">早餐</p>
+                          <p className="mt-2 font-semibold text-morandi-primary">
+                            {day.meals?.breakfast || "敬請自理"}
+                          </p>
                         </div>
-                        <div className="bg-morandi-container/20 rounded-lg p-4">
-                          <p className="text-sm text-morandi-secondary mb-1">午餐</p>
-                          <p className="font-medium text-morandi-primary">{day.meals?.lunch || "敬請自理"}</p>
+                        <div className="rounded-3xl border border-morandi-border/40 bg-morandi-container/20 p-5">
+                          <p className="text-sm text-morandi-secondary/80">午餐</p>
+                          <p className="mt-2 font-semibold text-morandi-primary">
+                            {day.meals?.lunch || "敬請自理"}
+                          </p>
                         </div>
-                        <div className="bg-morandi-container/20 rounded-lg p-4">
-                          <p className="text-sm text-morandi-secondary mb-1">晚餐</p>
-                          <p className="font-medium text-morandi-primary">{day.meals?.dinner || "敬請自理"}</p>
+                        <div className="rounded-3xl border border-morandi-border/40 bg-morandi-container/20 p-5">
+                          <p className="text-sm text-morandi-secondary/80">晚餐</p>
+                          <p className="mt-2 font-semibold text-morandi-primary">
+                            {day.meals?.dinner || "敬請自理"}
+                          </p>
                         </div>
                       </div>
 
                       {day.accommodation && (
-                        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                          <p className="text-sm text-amber-800">
-                            🏨 住宿：{day.accommodation}
+                        <div className="mt-6 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 text-blue-900 shadow-inner">
+                          <p className="text-sm font-medium tracking-wide">🏨 住宿</p>
+                          <p className="mt-1 text-lg font-semibold">
+                            {day.accommodation}
                           </p>
                         </div>
                       )}
-                  </div>
-                ))}
-              </div>
-            </TracingBeam>
+                    </article>
+                  ))}
+                </div>
+              </TracingBeam>
+            </div>
           </div>
         </div>
       </section>
