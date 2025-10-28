@@ -26,8 +26,7 @@ async function checkPendingCount(): Promise<number> {
       const count = await backgroundSyncService.getPendingCount(tableName);
       totalCount += count;
     } catch (error) {
-      console.warn(`無法取得 ${tableName} 的待同步數量:`, error);
-    }
+          }
   }
 
   return totalCount;
@@ -117,8 +116,7 @@ export function SyncStatusIndicator() {
       setLastSyncTime(new Date());
       setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
     } catch (error) {
-      console.error('手動同步失敗:', error);
-    } finally {
+          } finally {
       setIsSyncing(false);
     }
   };
@@ -298,8 +296,7 @@ function PendingChangesList() {
             counts[tableName] = count;
           }
         } catch (error) {
-          console.warn(`無法取得 ${tableName} 的待同步數量:`, error);
-        }
+                  }
       }
 
       setPendingByTable(counts);

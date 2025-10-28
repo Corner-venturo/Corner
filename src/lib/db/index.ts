@@ -90,8 +90,6 @@ export class LocalDatabase {
 
       // 檢查 tableName 是否有效
       if (!db.objectStoreNames.contains(tableName)) {
-        console.error(`[LocalDB] 資料表不存在: ${tableName}`);
-        console.log('可用的資料表:', Array.from(db.objectStoreNames));
         throw new Error(`資料表不存在: ${tableName}`);
       }
 
@@ -476,8 +474,6 @@ export class LocalDatabase {
     return new Promise((resolve, reject) => {
       // 檢查資料表是否存在
       if (!db.objectStoreNames.contains(tableName)) {
-        console.error(`[LocalDB] getAll - 資料表不存在: ${tableName}`);
-        console.log('[LocalDB] 可用的資料表:', Array.from(db.objectStoreNames));
         reject(new Error(`資料表不存在: ${tableName}`));
         return;
       }
@@ -631,7 +627,6 @@ export class LocalDatabase {
       const request = objectStore.clear();
 
       request.onsuccess = () => {
-        console.log(`[LocalDB] 已清空資料表: ${tableName}`);
         resolve();
       };
 

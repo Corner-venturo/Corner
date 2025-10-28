@@ -85,8 +85,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
             });
           }
         } catch (error) {
-          console.error('⚠️ IndexedDB 更新失敗（不影響主要功能）:', error);
-        }
+                  }
 
         // 如果修改的是當前登入用戶，更新 auth-store 和 LocalProfile
         if (user && user.id === employee.id) {
@@ -108,16 +107,14 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
               });
             }
           } catch (error) {
-            console.error('⚠️ LocalProfile 更新失敗（不影響主要功能）:', error);
-          }
+                      }
         }
 
         // 顯示儲存成功訊息
         setShowSavedMessage(true);
         setTimeout(() => setShowSavedMessage(false), UI_DELAYS.SUCCESS_MESSAGE);
       } catch (error) {
-        console.error('❌ 儲存失敗:', error);
-        alert('儲存失敗，請稍後再試');
+                alert('儲存失敗，請稍後再試');
       } finally {
         setIsSaving(false);
       }
@@ -142,8 +139,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
             });
           }
         } catch (error) {
-          console.error('⚠️ IndexedDB 更新失敗（不影響主要功能）:', error);
-        }
+                  }
 
         // 如果修改的是當前登入用戶，更新 auth-store
         if (user && user.id === employee.id) {
@@ -157,8 +153,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
         setShowSavedMessage(true);
         setTimeout(() => setShowSavedMessage(false), UI_DELAYS.SUCCESS_MESSAGE);
       } catch (error) {
-        console.error('❌ 儲存失敗:', error);
-        alert('儲存失敗，請稍後再試');
+                alert('儲存失敗，請稍後再試');
       } finally {
         setIsSaving(false);
       }

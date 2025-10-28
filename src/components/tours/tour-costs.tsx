@@ -23,7 +23,7 @@ interface CostPayment extends Payment {
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
   const { items: orders } = useOrderStore();
-  const addPayment = async (_data: any) => { console.warn("addPayment not implemented"); };
+  const addPayment = async (_data: any) => { /* addPayment not implemented */ };
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCost, setNewCost] = useState({
     amount: 0,

@@ -24,8 +24,7 @@ export function handleUpgrade(
     }
 
   } catch (error) {
-    console.error('[DB Migration] 升級失敗:', error);
-    throw error;
+        throw error;
   }
 }
 
@@ -38,8 +37,7 @@ function createAllTables(db: IDBDatabase): void {
   TABLE_SCHEMAS.forEach((schema) => {
     // 如果資料表已存在，跳過（理論上不應該發生）
     if (db.objectStoreNames.contains(schema.name)) {
-      console.warn(`[DB Migration] 資料表 ${schema.name} 已存在，跳過`);
-      return;
+            return;
     }
 
     // 建立資料表
@@ -113,8 +111,7 @@ export async function importData(
 ): Promise<void> {
   for (const [tableName, records] of Object.entries(data)) {
     if (!db.objectStoreNames.contains(tableName)) {
-      console.warn(`[DB Migration] 資料表 ${tableName} 不存在，跳過匯入`);
-      continue;
+            continue;
     }
 
     const transaction = db.transaction(tableName, 'readwrite');

@@ -18,8 +18,7 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         await initLocalDatabase();
         
       } catch (error) {
-        console.error('❌ 應用初始化失敗:', error);
-      }
+              }
     };
 
     init();

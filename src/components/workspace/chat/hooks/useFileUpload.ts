@@ -50,8 +50,7 @@ export function useFileUpload() {
         setUploadProgress(100);
         return results;
       } catch (error) {
-        console.error('檔案上傳失敗:', error);
-        throw error;
+                throw error;
       } finally {
         setUploadingFiles(false);
         setTimeout(() => setUploadProgress(0), UI_DELAYS.AUTO_SAVE);

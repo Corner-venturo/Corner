@@ -113,8 +113,7 @@ export function ShareOrdersDialog({
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('分享訂單失敗:', error);
-      alert('分享訂單失敗，請稍後再試');
+            alert('分享訂單失敗，請稍後再試');
     }
   };
 

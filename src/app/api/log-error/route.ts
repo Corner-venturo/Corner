@@ -28,7 +28,6 @@ export async function POST(request: NextRequest) {
     
     // 在開發模式下，也在控制台輸出
     if (process.env.NODE_ENV === 'development') {
-      console.log('📝 Error logged:', errorData);
     }
     
     return NextResponse.json({ success: true });

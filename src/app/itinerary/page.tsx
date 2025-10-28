@@ -30,8 +30,7 @@ export default function ItineraryPage() {
         alert('✅ 刪除成功！');
         // Store 會自動更新，不需要重新載入
       } catch (error) {
-        console.error('刪除失敗:', error);
-        alert('❌ 刪除失敗，請稍後再試');
+                alert('❌ 刪除失敗，請稍後再試');
       }
     }
   }, [deleteItinerary]);
@@ -118,8 +117,7 @@ export default function ItineraryPage() {
               navigator.clipboard.writeText(shareUrl).then(() => {
                 alert('✅ 分享連結已複製！\n\n' + shareUrl);
               }).catch(err => {
-                console.error('複製失敗:', err);
-                alert('❌ 複製失敗，請手動複製：\n' + shareUrl);
+                                alert('❌ 複製失敗，請手動複製：\n' + shareUrl);
               });
             }}
             className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"

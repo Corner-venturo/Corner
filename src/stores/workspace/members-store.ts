@@ -41,14 +41,6 @@ export const useMembersStore = create<MembersState>((set) => ({
 
     try {
       const members = await fetchChannelMembers(workspaceId, channelId);
-      console.log(`✅ [成員載入] 收到 ${members.length} 位成員:`, members.map(m => ({
-        id: m.id,
-        role: m.role,
-        profile: m.profile ? {
-          displayName: m.profile.displayName,
-          englishName: m.profile.englishName
-        } : null
-      })));
       set((state) => ({
         channelMembers: {
           ...state.channelMembers,
@@ -56,7 +48,6 @@ export const useMembersStore = create<MembersState>((set) => ({
         },
       }));
     } catch (error) {
-      console.error('⚠️ 無法載入頻道成員:', error);
       set({ error: error instanceof Error ? error.message : '無法載入頻道成員' });
     }
   },
@@ -73,7 +64,6 @@ export const useMembersStore = create<MembersState>((set) => ({
         },
       }));
     } catch (error) {
-      console.error('⚠️ 無法移除頻道成員:', error);
       set({ error: error instanceof Error ? error.message : '移除頻道成員失敗' });
     }
   },

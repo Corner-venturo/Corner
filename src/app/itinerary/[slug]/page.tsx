@@ -146,8 +146,7 @@ export default function EditItineraryPage() {
         setNotFound(true);
         setLoading(false);
       } catch (error) {
-        console.error('載入或建立行程失敗:', error);
-        setNotFound(true);
+                setNotFound(true);
         setLoading(false);
       }
     };

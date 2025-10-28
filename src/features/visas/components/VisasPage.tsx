@@ -71,8 +71,7 @@ export default function VisasPage() {
           setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
         }
       } catch (error) {
-        console.error('建立簽證專用團失敗:', error);
-        logger.error('Failed to get or create visa tour', error);
+                logger.error('Failed to get or create visa tour', error);
       }
     };
 

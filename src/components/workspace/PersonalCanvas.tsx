@@ -95,8 +95,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
         setActiveCanvasId(createdCanvas.id);
       }
     } catch (error) {
-      console.error('建立工作區失敗:', error);
-      alert('建立工作區失敗，請稍後再試。');
+            alert('建立工作區失敗，請稍後再試。');
     }
   };
 
@@ -152,8 +151,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
       setEditMode('view');
       setSelectedDocument(null);
     } catch (error) {
-      console.error('儲存文件失敗:', error);
-      throw error;
+            throw error;
     }
   };
 
@@ -166,8 +164,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
           setEditMode('view');
         }
       } catch (error) {
-        console.error('刪除文件失敗:', error);
-      }
+              }
     }
   };
 
@@ -177,16 +174,14 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
         is_favorite: !document.is_favorite
       });
     } catch (error) {
-      console.error('更新收藏失敗:', error);
-    }
+          }
   };
 
   const _handleUpdateTags = async (documentId: string, tags: string[]) => {
     try {
       await updateRichDocument(documentId, { tags });
     } catch (error) {
-      console.error('更新標籤失敗:', error);
-    }
+          }
   };
 
   // Render document editing/viewing

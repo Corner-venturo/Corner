@@ -23,7 +23,7 @@ interface ReceiptPayment extends Payment {
 
 export const TourPayments = React.memo(function TourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete }: TourPaymentsProps) {
   const { items: orders } = useOrderStore();
-  const addPayment = async (_data: any) => { console.warn("addPayment not implemented"); };
+  const addPayment = async (_data: any) => { /* addPayment not implemented */ };
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // 監聽外部觸發新增

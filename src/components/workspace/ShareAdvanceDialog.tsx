@@ -95,8 +95,7 @@ export function ShareAdvanceDialog({
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('分享代墊清單失敗:', error);
-      alert('分享失敗，請稍後再試');
+            alert('分享失敗，請稍後再試');
     }
   };
 

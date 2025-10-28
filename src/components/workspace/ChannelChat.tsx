@@ -117,8 +117,7 @@ export function ChannelChat() {
       loadAdvanceLists(selectedChannel.id),
       loadSharedOrderLists(selectedChannel.id)
     ]).catch((error) => {
-      console.error('載入頻道資料失敗:', error);
-    });
+          });
   }, [selectedChannel?.id, loadMessages, loadAdvanceLists, loadSharedOrderLists]);
 
   const onSubmitMessage = async (e: React.FormEvent) => {
@@ -147,8 +146,7 @@ export function ChannelChat() {
       setMessageText('');
       clearFiles();
     } catch (error) {
-      console.error('發送訊息失敗:', error);
-      alert('發送訊息失敗，請稍後再試');
+            alert('發送訊息失敗，請稍後再試');
     }
   };
 
@@ -276,7 +274,6 @@ export function ChannelChat() {
           channelId={selectedChannel.id}
           onClose={() => setShowShareOrdersDialog(false)}
           onSuccess={() => {
-            console.log('訂單已分享');
             setShowShareOrdersDialog(false);
             // 重新載入訂單列表
             if (selectedChannel?.id) {
@@ -368,8 +365,7 @@ export function ChannelChat() {
                       setShowSettingsDialog(false);
                       alert('頻道已刪除');
                     } catch (error) {
-                      console.error('刪除頻道失敗:', error);
-                      alert('刪除頻道失敗，請稍後再試');
+                                            alert('刪除頻道失敗，請稍後再試');
                     }
                   }
                 }}
@@ -401,8 +397,7 @@ export function ChannelChat() {
                 setShowSettingsDialog(false);
                 alert('頻道設定已更新');
               } catch (error) {
-                console.error('更新頻道失敗:', error);
-                alert('更新頻道失敗，請稍後再試');
+                                alert('更新頻道失敗，請稍後再試');
               }
             }}>
               儲存變更

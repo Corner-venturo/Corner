@@ -233,8 +233,7 @@ export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
       }, 500);
 
     } catch (error) {
-      console.error('圖片處理失敗:', error);
-      alert('圖片處理失敗，請重試');
+            alert('圖片處理失敗，請重試');
       setUploadProgress(null);
     }
   }, [editor, compressImage]);

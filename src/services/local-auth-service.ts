@@ -60,12 +60,10 @@ export class LocalAuthService {
         try {
           isValidPassword = await bcrypt.compare(password, employee.password_hash);
         } catch (error) {
-          console.error('密碼驗證失敗:', error);
-          // 開發環境 fallback
+                    // 開發環境 fallback
           if (password === 'Venturo2025!' && username === 'william01') {
             isValidPassword = true;
-            console.warn('⚠️ 使用開發環境預設密碼');
-          }
+                      }
         }
       } else {
         // 沒有密碼雜湊，檢查是否為預設帳號
@@ -76,7 +74,6 @@ export class LocalAuthService {
             password_hash: hashedPassword
           } as unknown);
           isValidPassword = true;
-          console.log('✅ 已為預設帳號設定密碼');
         }
       }
 
@@ -126,8 +123,7 @@ export class LocalAuthService {
       };
 
     } catch (error) {
-      console.error('登入錯誤:', error);
-      return { 
+            return { 
         success: false, 
         message: '系統錯誤，請稍後再試' 
       };
@@ -176,8 +172,7 @@ export class LocalAuthService {
       return { success: true };
 
     } catch (error) {
-      console.error('變更密碼錯誤:', error);
-      return { 
+            return { 
         success: false, 
         message: '變更密碼失敗' 
       };
@@ -206,8 +201,7 @@ export class LocalAuthService {
       return { success: true };
 
     } catch (error) {
-      console.error('重設密碼錯誤:', error);
-      return { 
+            return { 
         success: false, 
         message: '重設密碼失敗' 
       };
@@ -282,8 +276,7 @@ export class LocalAuthService {
       };
 
     } catch (error) {
-      console.error('建立使用者錯誤:', error);
-      return { 
+            return { 
         success: false, 
         message: '建立使用者失敗' 
       };

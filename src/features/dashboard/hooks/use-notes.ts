@@ -37,8 +37,7 @@ export function useNotes() {
           .order('tab_order', { ascending: true });
 
         if (error) {
-          console.error('Failed to load notes:', error);
-          // 降級使用 localStorage
+          // Failed to load from Supabase - fallback to localStorage
           const saved = localStorage.getItem(STORAGE_KEY);
           if (saved) {
             setTabs(JSON.parse(saved));
@@ -54,8 +53,7 @@ export function useNotes() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(loadedTabs));
         }
       } catch (error) {
-        console.error('Error loading notes:', error);
-        // 降級使用 localStorage
+        // Error loading notes - fallback to localStorage
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           setTabs(JSON.parse(saved));
@@ -102,10 +100,10 @@ export function useNotes() {
           .insert(notesToInsert);
 
         if (error) {
-          console.error('Failed to save notes to Supabase:', error);
+          // Failed to save to Supabase but localStorage is synced
         }
       } catch (error) {
-        console.error('Error saving notes:', error);
+        // Error saving notes to Supabase
       }
     }
   }, [user?.id]);

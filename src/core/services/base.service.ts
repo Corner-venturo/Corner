@@ -174,8 +174,7 @@ export abstract class BaseService<T extends BaseEntity> {
         const created = await this.create(item);
         results.push(created);
       } catch (error) {
-        // 繼續處理其他項目，但記錄錯誤
-        console.error(`Failed to create item:`, error);
+        // Continue processing other items on error
       }
     }
 
@@ -190,7 +189,7 @@ export abstract class BaseService<T extends BaseEntity> {
         const updated = await this.update(id, data);
         results.push(updated);
       } catch (error) {
-        console.error(`Failed to update item ${id}:`, error);
+        // Continue processing other items on error
       }
     }
 
@@ -206,7 +205,6 @@ export abstract class BaseService<T extends BaseEntity> {
         await this.delete(id);
         success.push(id);
       } catch (error) {
-        console.error(`Failed to delete item ${id}:`, error);
         failed.push(id);
       }
     }

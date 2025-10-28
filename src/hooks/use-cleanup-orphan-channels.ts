@@ -43,11 +43,10 @@ export function useCleanupOrphanChannels() {
           // 3. 同一個旅遊團有多個頻道（保留第一個，刪除其他）
           if (!tour || tour.archived) {
             try {
-              const reason = !tour ? '旅遊團已刪除' : '旅遊團已封存';
               await deleteChannel(channel.id);
               deletedCount++;
             } catch (error) {
-              console.error(`❌ 刪除頻道失敗 (${channel.name}):`, error);
+              // Silently fail - channel may not exist
             }
           } else if (channelsForTour.length > 1 && channelsForTour[0] !== channel.id) {
             // 重複頻道，只保留第一個
@@ -55,7 +54,7 @@ export function useCleanupOrphanChannels() {
               await deleteChannel(channel.id);
               deletedCount++;
             } catch (error) {
-              console.error(`❌ 刪除頻道失敗 (${channel.name}):`, error);
+              // Silently fail on duplicate channel deletion
             }
           }
         }

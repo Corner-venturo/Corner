@@ -108,8 +108,7 @@ export function useDataFiltering<T extends Record<string, unknown>>(
           try {
             return filter(item);
           } catch (error) {
-            console.warn('Custom filter error:', error);
-            return true; // 過濾器錯誤時，不排除該項目
+                        return true; // 過濾器錯誤時，不排除該項目
           }
         });
 

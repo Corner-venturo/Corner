@@ -125,8 +125,7 @@ export default function ContractsPage() {
         description: `已刪除「${tour.name}」的合約`,
       });
     } catch (error) {
-      console.error('刪除合約時發生錯誤:', error);
-      toast({
+            toast({
         title: '刪除失敗',
         description: '刪除合約時發生錯誤，請稍後再試',
         variant: 'destructive',

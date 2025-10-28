@@ -46,8 +46,7 @@ export default function TemplateEditorPage({ params }: PageProps) {
       })
       alert('儲存成功！')
     } catch (error) {
-      console.error('儲存失敗:', error)
-      alert('儲存失敗，請稍後再試')
+            alert('儲存失敗，請稍後再試')
     } finally {
       setIsSaving(false)
     }

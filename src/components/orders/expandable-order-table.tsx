@@ -72,8 +72,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
         setExpandedOrders(prev => prev.filter(id => id !== order.id));
       }
     } catch (err) {
-      console.error('刪除訂單失敗:', err);
-      alert('刪除失敗，請稍後再試');
+            alert('刪除失敗，請稍後再試');
     }
   };
 
@@ -268,15 +267,10 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({ o
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
-                                      console.log('Button clicked for order:', order.id);
-                                      console.log('Ref available:', !!memberTableRefs.current[order.id]);
-                                      console.log('All refs:', Object.keys(memberTableRefs.current));
                                       const tableRef = memberTableRefs.current[order.id];
                                       if (tableRef) {
-                                        console.log('Calling addRow...');
                                         tableRef.addRow();
                                       } else {
-                                        console.log('No ref found for order:', order.id);
                                       }
                                     }}
                                     size="sm"

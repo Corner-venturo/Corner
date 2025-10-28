@@ -41,8 +41,7 @@ export class OfflineAuthService {
       // 驗證密碼 - 支援多種欄位名稱
       const password_hash = employee.password_hash || employee.password_hash;
       if (!password_hash) {
-        console.error('員工沒有密碼設定:', employee);
-        return {
+                return {
           success: false,
           message: '帳號尚未設定密碼'
         };
@@ -62,8 +61,7 @@ export class OfflineAuthService {
       try {
         encryptedPassword = await PasswordEncryption.encrypt(password);
       } catch (encErr) {
-        console.error('密碼加密失敗:', encErr);
-        throw encErr;
+                throw encErr;
       }
 
       // 支援多種屬性名稱格式
@@ -95,16 +93,14 @@ export class OfflineAuthService {
         useLocalAuthStore.getState().addProfile(profile);
         useLocalAuthStore.getState().setCurrentProfile(profile);
       } catch (storeErr) {
-        console.error('儲存 Profile 失敗:', storeErr);
-        throw storeErr;
+                throw storeErr;
       }
 
 
       return { success: true };
 
     } catch (error) {
-      console.error('初次登入失敗:', error);
-      return {
+            return {
         success: false,
         message: '登入失敗，請稍後再試'
       };
@@ -167,14 +163,15 @@ export class OfflineAuthService {
 
       // 背景嘗試刷新 Supabase session
       if (typeof navigator !== 'undefined' && navigator.onLine && profile.cachedPassword) {
-        this.refreshSupabaseSession(profile).catch(console.error);
+        this.refreshSupabaseSession(profile).catch(() => {
+          // Silent fail - Supabase refresh is optional
+        });
       }
 
       return { success: true };
 
     } catch (error) {
-      console.error('離線登入失敗:', error);
-      return {
+            return {
         success: false,
         message: '登入失敗，請稍後再試'
       };
@@ -200,8 +197,7 @@ export class OfflineAuthService {
       return true;
 
     } catch (error) {
-      console.error('設定 PIN 碼失敗:', error);
-      return false;
+            return false;
     }
   }
 
@@ -213,22 +209,22 @@ export class OfflineAuthService {
       const profile = useLocalAuthStore.getState().getProfileById(profileId);
 
       if (!profile) {
-        console.error('找不到 Profile:', profileId);
-        return false;
+                return false;
       }
 
       useLocalAuthStore.getState().setCurrentProfile(profile);
 
       // 背景刷新 session
       if (typeof navigator !== 'undefined' && navigator.onLine && profile.cachedPassword) {
-        this.refreshSupabaseSession(profile).catch(console.error);
+        this.refreshSupabaseSession(profile).catch(() => {
+          // Silent fail - Supabase refresh is optional
+        });
       }
 
       return true;
 
     } catch (error) {
-      console.error('切換角色失敗:', error);
-      return false;
+            return false;
     }
   }
 
@@ -275,8 +271,7 @@ export class OfflineAuthService {
       return false;
 
     } catch (error) {
-      console.error('同步失敗:', error);
-      return false;
+            return false;
     }
   }
 }

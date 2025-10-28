@@ -1,0 +1,24 @@
+# 建置輸出
+.next/
+out/
+dist/
+build/
+
+# 依賴
+node_modules/
+
+# 腳本檔案（Node.js scripts）
+scripts/
+tools/
+
+# 測試
+coverage/
+
+# 設定檔
+*.config.js
+*.config.ts
+
+# 其他
+.env*
+.husky/
+public/

@@ -76,7 +76,6 @@ export async function initDefaultUser(): Promise<void> {
     }
     
   } catch (error) {
-    console.error('❌ 初始化失敗:', error);
-    throw error;
+        throw error;
   }
 }

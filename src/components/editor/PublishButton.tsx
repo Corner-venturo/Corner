@@ -15,7 +15,6 @@ export function PublishButton({ data }: { data: any }) {
     setSaving(true);
 
     try {
-      console.log('🔍 準備存檔的原始資料:', data);
 
       // 清理資料：移除 React 組件（iconComponent）避免序列化錯誤
       const cleanedData = {
@@ -23,7 +22,6 @@ export function PublishButton({ data }: { data: any }) {
         features: data.features?.map(({ iconComponent, ...rest }: any) => rest),
       };
 
-      console.log('🧹 清理後的資料:', cleanedData);
 
       // 如果有 ID 就更新，沒有就新增
       if (data.id) {
@@ -38,8 +36,7 @@ export function PublishButton({ data }: { data: any }) {
         }
       }
     } catch (error) {
-      console.error('儲存失敗:', error);
-      alert('❌ 儲存失敗，請稍後再試');
+            alert('❌ 儲存失敗，請稍後再試');
     } finally {
       setSaving(false);
     }
@@ -62,8 +59,7 @@ export function PublishButton({ data }: { data: any }) {
     navigator.clipboard.writeText(shareUrl).then(() => {
       alert('✅ 分享連結已複製！\n\n' + shareUrl);
     }).catch(err => {
-      console.error('複製失敗:', err);
-      alert('❌ 複製失敗，請手動複製：\n' + shareUrl);
+            alert('❌ 複製失敗，請手動複製：\n' + shareUrl);
     });
   };
 

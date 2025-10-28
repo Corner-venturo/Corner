@@ -1,0 +1,118 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import type { ChannelMember } from '@/services/workspace-members';
+import type { Channel } from '@/stores/workspace-store';
+
+interface MemberManagementDialogProps {
+  memberToRemove: ChannelMember | null;
+  isRemoveDialogOpen: boolean;
+  isRemovingMember: boolean;
+  onClose: () => void;
+  onRemove: () => Promise<void>;
+}
+
+export function MemberManagementDialog({
+  memberToRemove,
+  isRemoveDialogOpen,
+  isRemovingMember,
+  onClose,
+  onRemove,
+}: MemberManagementDialogProps) {
+  return (
+    <Dialog
+      open={isRemoveDialogOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+        }
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>移除頻道成員</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-morandi-secondary">
+          確定要將「{memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || '此成員'}」移出頻道嗎？
+        </p>
+        <DialogFooter className="mt-4">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={isRemovingMember}
+          >
+            取消
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onRemove}
+            disabled={isRemovingMember}
+          >
+            {isRemovingMember ? '移除中...' : '移除'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface ChannelDeleteDialogProps {
+  channelToDelete: Channel | null;
+  isDeleteDialogOpen: boolean;
+  isDeletingChannel: boolean;
+  onClose: () => void;
+  onDelete: () => Promise<void>;
+}
+
+export function ChannelDeleteDialog({
+  channelToDelete,
+  isDeleteDialogOpen,
+  isDeletingChannel,
+  onClose,
+  onDelete,
+}: ChannelDeleteDialogProps) {
+  return (
+    <Dialog
+      open={isDeleteDialogOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+        }
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-morandi-primary">刪除頻道</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-morandi-secondary">
+          確定要刪除頻道「{channelToDelete?.name}」嗎？此操作無法復原。
+        </p>
+        <DialogFooter className="mt-4">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={isDeletingChannel}
+            className="text-morandi-secondary hover:text-morandi-primary"
+          >
+            取消
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onDelete}
+            disabled={isDeletingChannel}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            {isDeletingChannel ? '刪除中...' : '刪除'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

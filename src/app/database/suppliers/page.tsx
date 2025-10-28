@@ -223,8 +223,7 @@ export default function SuppliersPage() {
       const store = useSupplierStore.getState();
       await store.fetchAll();
     } catch (error) {
-      console.error('新增供應商失敗:', error);
-      alert('新增供應商失敗，請稍後再試');
+            alert('新增供應商失敗，請稍後再試');
     }
   }, [newSupplier]);
 

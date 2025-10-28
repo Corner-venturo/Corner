@@ -119,12 +119,10 @@ class SupplierService extends BaseService<Supplier> {
         .insert(supplierCities);
 
       if (error) {
-        console.error('儲存供應商城市關聯失敗:', error);
         throw error;
       }
 
     } catch (error) {
-      console.error('saveSupplierCities 失敗:', error);
       throw error;
     }
   }
@@ -151,12 +149,10 @@ class SupplierService extends BaseService<Supplier> {
         .insert(paymentAccounts);
 
       if (error) {
-        console.error('儲存付款帳戶失敗:', error);
         throw error;
       }
 
     } catch (error) {
-      console.error('savePaymentAccounts 失敗:', error);
       throw error;
     }
   }
@@ -210,7 +206,6 @@ class SupplierService extends BaseService<Supplier> {
         .single();
 
       if (supplierError) {
-        console.error('建立供應商失敗:', supplierError);
         throw supplierError;
       }
 
@@ -230,7 +225,6 @@ class SupplierService extends BaseService<Supplier> {
 
       return newSupplier;
     } catch (error) {
-      console.error('createSupplierWithCities 失敗:', error);
       throw error;
     }
   }

@@ -73,8 +73,7 @@ export function BulletinBoard() {
       setShowAddDialog(false);
       resetForm();
     } catch (error) {
-      console.error('操作失敗:', error);
-    }
+          }
   };
 
   const handleEdit = (bulletin: Bulletin) => {

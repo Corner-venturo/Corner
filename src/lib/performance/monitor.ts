@@ -38,8 +38,7 @@ class PerformanceMonitor {
       });
 
       // 警告慢速操作
-      if (duration > 100) {
-        console.warn(`⚠️ Slow operation: ${name} took ${duration.toFixed(2)}ms`, context);
+      if (duration > 100) {}ms`, context);
       }
 
       return result;
@@ -76,8 +75,7 @@ class PerformanceMonitor {
       context,
     });
 
-    if (duration > 16) { // > 1 frame
-      console.warn(`⚠️ Blocking operation: ${name} took ${duration.toFixed(2)}ms`);
+    if (duration > 16) { // > 1 frame}ms`);
     }
 
     return result;
@@ -204,8 +202,7 @@ export function usePerformanceTracking(hookName: string) {
     const start = performance.now();
     return () => {
       const duration = performance.now() - start;
-      if (duration > 50) {
-        console.warn(`⚠️ Hook ${hookName} took ${duration.toFixed(2)}ms`);
+      if (duration > 50) {}ms`);
       }
     };
   }, [hookName]);
@@ -230,7 +227,6 @@ export function reportWebVitals() {
   // Largest Contentful Paint (LCP)
   const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-      console.log('LCP:', entry);
       perfMonitor.record({
         name: 'LCP',
         value: entry.startTime,
@@ -249,5 +245,4 @@ export function reportWebVitals() {
 // 在開發環境自動啟用
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   (window as any).__perfMonitor = perfMonitor;
-  console.log('📊 Performance Monitor enabled. Use window.__perfMonitor to access stats.');
 }

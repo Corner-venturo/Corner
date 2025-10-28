@@ -121,8 +121,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
       });
       setShowSuccessDialog(true);
     } catch (error) {
-      console.error('創建員工失敗:', error);
-      alert('創建員工失敗，請稍後再試');
+            alert('創建員工失敗，請稍後再試');
     }
   };
 

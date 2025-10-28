@@ -95,8 +95,7 @@ export default function HRPage() {
         setExpandedEmployee(null);
       }
     } catch (err) {
-      console.error('辦理離職失敗:', err);
-      alert('操作失敗，請稍後再試');
+            alert('操作失敗，請稍後再試');
     }
   };
 
@@ -118,8 +117,7 @@ export default function HRPage() {
       }
       alert(`✅ 員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」已成功刪除`);
     } catch (err) {
-      console.error('刪除員工失敗:', err);
-      const errorMessage = err instanceof Error ? err.message : '未知錯誤';
+            const errorMessage = err instanceof Error ? err.message : '未知錯誤';
       alert(`❌ 刪除失敗：${errorMessage}`);
     }
   };

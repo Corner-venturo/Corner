@@ -96,8 +96,7 @@ export default function FixDatabasePage() {
       addLog('🎉 所有問題已修復！');
     } catch (error) {
       addLog(`❌ 修復失敗: ${error}`);
-      console.error('修復失敗:', error);
-    } finally {
+          } finally {
       setIsFixing(false);
     }
   };
@@ -203,8 +202,7 @@ export default function FixDatabasePage() {
               addLog(`  清理 ${table}: 移除 ${cleaned} 筆重複資料`);
             }
           } catch (error) {
-            console.error(`${table} 清理失敗:`, error);
-          }
+                      }
         }
 
         db.close();

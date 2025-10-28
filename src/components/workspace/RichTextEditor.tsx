@@ -121,8 +121,7 @@ export function RichTextEditor({
 
       await onSave?.(title, content, formatData);
     } catch (error) {
-      console.error('儲存文件失敗:', error);
-      alert('儲存失敗，請稍後再試');
+            alert('儲存失敗，請稍後再試');
     } finally {
       setIsSaving(false);
     }

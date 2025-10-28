@@ -15,7 +15,6 @@ export const AttendanceTab = forwardRef<{ handleSave: () => void }, AttendanceTa
   useImperativeHandle(ref, () => ({
     handleSave: async () => {
       // 出勤資訊目前為唯讀，未來若需編輯功能可在此實作
-      console.log('AttendanceTab handleSave called');
     }
   }));
 

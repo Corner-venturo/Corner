@@ -33,8 +33,7 @@ export function WishWall() {
 
       setWishes(data || []);
     } catch (error) {
-      console.error('獲取願望失敗:', error);
-    } finally {
+          } finally {
       setIsLoading(false);
     }
   };

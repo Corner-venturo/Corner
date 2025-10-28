@@ -71,8 +71,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
               .order('created_at', { ascending: true });
 
             if (error) {
-              console.warn('⚠️ [messages] Supabase 同步失敗，繼續使用快取資料');
-              return;
+                            return;
             }
 
             const freshMessages = (data || []).map(normalizeMessage);
@@ -88,8 +87,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
               }
             }));
           } catch (syncError) {
-            console.warn('⚠️ [messages] 背景同步失敗:', syncError);
-          }
+                      }
         }, 0);
       }
     } catch (error) {
@@ -252,8 +250,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       await localDB.delete('messages', messageId);
     } catch (error) {
-      console.error('⚠️ IndexedDB 刪除失敗:', error);
-    }
+          }
 
     // 🔥 從 Zustand 狀態刪除
     set((state) => {

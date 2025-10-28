@@ -53,8 +53,7 @@ export function useAutoAddVisaMembers() {
 
         // 驗證頻道 ID 是否為有效的 UUID
         if (!isValidUUID(channel.id)) {
-          console.warn(`⚠️ [簽證頻道] 跳過無效的頻道 ID: ${channel.id}`);
-          processedChannelsRef.current.add(channel.id);
+                    processedChannelsRef.current.add(channel.id);
           continue;
         }
 
@@ -82,8 +81,7 @@ export function useAutoAddVisaMembers() {
           // 標記該頻道已處理
           processedChannelsRef.current.add(channel.id);
         } catch (error) {
-          console.error(`❌ 加入簽證頻道成員失敗 (${channel.name}):`, error);
-          // 即使失敗也標記為已處理，避免重複嘗試
+          // Silently fail - visa members may already be added
           processedChannelsRef.current.add(channel.id);
         }
       }

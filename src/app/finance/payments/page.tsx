@@ -129,13 +129,7 @@ export default function PaymentsPage() {
     }
 
     // 動作: 保存收款單到 store 或 API
-    console.log('儲存收款單', {
-      order_id: selectedOrderId,
-      receiptDate,
-      paymentItems,
-      total_amount,
-      note
-    });
+    // TODO: Implement save receipt logic
 
     // 關閉對話框並重置表單
     setIsDialogOpen(false);

@@ -2,14 +2,11 @@ import { createClient } from '@supabase/supabase-js'
 import { Database } from './types'
 import { POLLING_INTERVALS } from '@/lib/constants/timeouts'
 
-// 🔍 診斷：檢查環境變數
+// Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-console.log('  NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl);
-console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? `${supabaseAnonKey.slice(0, 20)}...` : 'undefined');
-
-// 簡單的單例模式，避免複雜的 Proxy
+// Simple singleton pattern
 // 🔧 新增：fetch timeout 防止請求卡住
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -42,13 +39,11 @@ export async function testSupabaseConnection() {
     const { data, error } = await supabase.from('employees').select('count').limit(1);
 
     if (error) {
-      console.error('❌ Supabase 連接失敗:', error.message);
-      return { success: false, error: error.message };
+            return { success: false, error: error.message };
     }
 
     return { success: true, data };
   } catch (err) {
-    console.error('❌ Supabase 連接錯誤:', err);
-    return { success: false, error: String(err) };
+        return { success: false, error: String(err) };
   }
 }

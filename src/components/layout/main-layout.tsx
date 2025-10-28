@@ -74,8 +74,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           await workspaceState.loadWorkspaces();
         }
       } catch (error) {
-        console.error('❌ 初始資料載入失敗:', error);
-      }
+              }
     };
 
     loadInitialData();

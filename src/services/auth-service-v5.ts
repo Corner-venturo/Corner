@@ -36,8 +36,7 @@ export class AuthServiceV5 {
         .eq('employee_number', username);
 
       if (error) {
-        console.error('❌ 查詢錯誤:', error);
-        return {
+                return {
           success: false,
           message: '系統錯誤，請稍後再試'
         };
@@ -68,8 +67,7 @@ export class AuthServiceV5 {
       };
 
     } catch (error) {
-      console.error('❌ 登入錯誤:', error);
-      return {
+            return {
         success: false,
         message: '系統錯誤，請稍後再試'
       };
@@ -92,8 +90,7 @@ export class AuthServiceV5 {
         .eq('id', user_id);
 
     } catch (error) {
-      console.error('❌ 更新登入時間失敗:', error);
-      // 不拋出錯誤，允許登入繼續
+            // 不拋出錯誤，允許登入繼續
     }
   }
 

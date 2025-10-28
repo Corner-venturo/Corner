@@ -58,8 +58,7 @@ export function useTours() {
 
     // 開始日期不能是過去（草稿狀態除外）
     if (start < now) {
-      console.warn('開始日期早於今天，請確認');
-    }
+          }
 
     // 旅遊天數不能超過 365 天
     const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));

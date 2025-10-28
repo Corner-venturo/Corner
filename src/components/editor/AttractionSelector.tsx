@@ -98,8 +98,7 @@ export function AttractionSelector({
 
         setAttractions(formatted);
       } catch (error) {
-        console.error('載入景點失敗:', error);
-      } finally {
+              } finally {
         setLoading(false);
       }
     };

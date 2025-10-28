@@ -38,7 +38,6 @@ export const useCanvasStore = create<CanvasState>((set) => ({
   },
 
   loadPersonalCanvases: async (userId?: string, workspaceId?: string) => {
-    console.log('loadPersonalCanvases stub', userId, workspaceId);
   },
 
   setActiveCanvasTab: (tab) => {
@@ -46,7 +45,6 @@ export const useCanvasStore = create<CanvasState>((set) => ({
   },
 
   loadRichDocuments: async (canvasId?: string) => {
-    console.log('loadRichDocuments stub', canvasId);
   },
 
   createRichDocument: async (document) => {

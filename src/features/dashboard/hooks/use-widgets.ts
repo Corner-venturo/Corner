@@ -40,12 +40,9 @@ export function useWidgets() {
 
         if (error) {
           if (error.code === 'PGRST116') {
-            // 沒有找到記錄，使用默認值
-            console.log('No widget preferences found, using defaults');
-          } else {
-            console.error('Failed to load widget preferences:', error);
+            // No record found, use default values
           }
-          // 降級使用 localStorage
+          // Fallback to localStorage
           const saved = localStorage.getItem(STORAGE_KEY);
           if (saved) {
             setActiveWidgets(JSON.parse(saved));
@@ -56,8 +53,7 @@ export function useWidgets() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data.preference_value));
         }
       } catch (error) {
-        console.error('Error loading widget preferences:', error);
-        // 降級使用 localStorage
+        // Error loading widget preferences - fallback to localStorage
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           setActiveWidgets(JSON.parse(saved));
@@ -96,12 +92,10 @@ export function useWidgets() {
           });
 
         if (error) {
-          console.error('Failed to save widget preferences to Supabase:', error);
-          console.error('Error details:', JSON.stringify(error, null, 2));
-        } else {
+          // Failed to save to Supabase but localStorage is synced
         }
       } catch (error) {
-        console.error('Error saving widget preferences:', error);
+        // Error saving widget preferences
       }
     }
   };

@@ -190,8 +190,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       onOpenChange(false);
       resetForm();
     } catch (error) {
-      console.error('建立批量收款單失敗:', error);
-      alert('❌ 建立失敗，請稍後再試');
+            alert('❌ 建立失敗，請稍後再試');
     }
   };
 

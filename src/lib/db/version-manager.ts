@@ -77,13 +77,11 @@ async function clearDatabase(): Promise<void> {
     };
 
     request.onerror = () => {
-      console.error('[Version Manager] ❌ 清空失敗:', request.error);
-      reject(request.error);
+            reject(request.error);
     };
 
     request.onblocked = () => {
-      console.warn('[Version Manager] ⚠️ 清空被阻擋（可能有其他分頁開啟）');
-      // 等待一下再試
+            // 等待一下再試
       setTimeout(() => resolve(), UI_DELAYS.AUTO_SAVE);
     };
   });

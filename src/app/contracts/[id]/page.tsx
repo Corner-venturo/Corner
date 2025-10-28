@@ -47,8 +47,7 @@ export default function ContractDetailPage() {
       alert('合約更新成功!');
       setIsEditing(false);
     } catch (error) {
-      console.error('儲存合約失敗:', error);
-      alert('儲存合約失敗，請稍後再試');
+            alert('儲存合約失敗，請稍後再試');
     } finally {
       setSaving(false);
     }

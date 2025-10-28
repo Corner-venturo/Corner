@@ -18,8 +18,7 @@ export function generateToken(payload: AuthPayload): string {
       issuer: 'venturo-app'
     });
   } catch (error) {
-    console.warn('JWT generation failed, using simple token', error);
-    // 如果 JWT 失敗，使用簡單的編碼方案
+        // 如果 JWT 失敗，使用簡單的編碼方案
     return btoa(JSON.stringify({
       ...payload,
       exp: Date.now() + 8 * 60 * 60 * 1000, // 8小時
@@ -41,14 +40,12 @@ export function verifyToken(token: string): AuthPayload | null {
 
       // 檢查是否過期
       if (decoded.exp && Date.now() > decoded.exp) {
-        console.log('Token expired');
         return null;
       }
 
       return decoded as AuthPayload;
     } catch (fallbackError) {
-      console.error('Token verification failed:', fallbackError);
-      return null;
+            return null;
     }
   }
 }

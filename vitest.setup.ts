@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { expect, afterEach } from 'vitest';
+import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 // Cleanup after each test case (e.g., clearing jsdom)
@@ -14,7 +14,9 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-global.localStorage = localStorageMock as any;
+// eslint-disable-next-line no-undef
+(global as any).localStorage = localStorageMock;
 
 // Mock IndexedDB
-global.indexedDB = {} as any;
+// eslint-disable-next-line no-undef
+(global as any).indexedDB = {};

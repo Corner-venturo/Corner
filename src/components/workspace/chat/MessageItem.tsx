@@ -27,8 +27,7 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
     try {
       await downloadFile(targetUrl, fileName);
     } catch (error) {
-      console.error('下載附件失敗:', error);
-    }
+          }
   };
 
   return (

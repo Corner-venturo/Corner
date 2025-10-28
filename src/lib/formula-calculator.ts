@@ -96,8 +96,7 @@ export function calculateFormula(formula: string, context: FormulaContext): numb
 
     return result;
   } catch (_error) {
-    console.error('Formula calculation error:', _error);
-    return '#ERROR';
+        return '#ERROR';
   }
 }
 

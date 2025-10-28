@@ -29,12 +29,9 @@ export default function WorkspacePage() {
     }
   }, [currentWorkspace?.id, loadChannelGroups]);
 
-  // 🐛 Debug: 監聽旅遊團資料變化（使用快取資料，不重新載入）
+  // 監聽旅遊團資料變化（使用快取資料，不重新載入）
   useEffect(() => {
-    console.log('📍 WorkspacePage: 旅遊團資料變化', {
-      toursCount: tours.length,
-      tours: tours.map(t => ({ id: t.id, name: t.name, code: t.code }))
-    });
+    // Tour data loaded
   }, [tours]);
 
   return (

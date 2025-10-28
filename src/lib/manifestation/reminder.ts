@@ -33,8 +33,7 @@ const parseHistory = (raw: string | null): string[] => {
       return parsed.filter(item => typeof item === 'string');
     }
   } catch (error) {
-    console.warn('Failed to parse manifestation history', error);
-  }
+      }
   return [];
 };
 
@@ -57,8 +56,7 @@ export const loadManifestationFromSupabase = async (userId: string): Promise<Man
       .order('record_date', { ascending: false });
 
     if (error) {
-      console.error('Failed to load manifestation records:', error);
-      return null;
+            return null;
     }
 
     if (!data || data.length === 0) {
@@ -99,8 +97,7 @@ export const loadManifestationFromSupabase = async (userId: string): Promise<Man
       history,
     };
   } catch (error) {
-    console.error('Error loading manifestation from Supabase:', error);
-    return null;
+        return null;
   }
 };
 
@@ -125,14 +122,12 @@ export const saveManifestationToSupabase = async (
       });
 
     if (error) {
-      console.error('Failed to save manifestation record:', error);
-      return false;
+            return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error saving manifestation to Supabase:', error);
-    return false;
+        return false;
   }
 };
 

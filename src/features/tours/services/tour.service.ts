@@ -241,8 +241,7 @@ class TourService extends BaseService<Tour> {
         }
       }
     } catch (error) {
-      console.warn(`⚠️ [Visa Tour] Supabase 查詢失敗，繼續建立新的:`, error);
-    }
+          }
 
     // 檢查本地 Store 是否有（未刪除的）
     const allTours = await this.list();

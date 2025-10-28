@@ -4,6 +4,16 @@
     "prettier"
   ],
   "plugins": ["@typescript-eslint"],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "jest": true
+  },
+  "globals": {
+    "vi": "readonly",
+    "global": "readonly"
+  },
   "rules": {
     // Console 規則
     "no-console": ["warn", { "allow": ["warn", "error", "log", "info"] }],

@@ -92,8 +92,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
   const handleUploadDocument = () => {
     if (!newDocument.name) return;
 
-    // 這裡應該實作文件上傳邏輯
-    console.log('Uploading document:', newDocument);
+    // TODO: Implement document upload logic
 
     setNewDocument({
       name: '',

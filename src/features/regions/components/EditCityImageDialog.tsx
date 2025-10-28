@@ -127,8 +127,7 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
       alert('圖片上傳成功！');
       onClose();
     } catch (error) {
-      console.error('上傳失敗:', error);
-      alert('圖片上傳失敗，請稍後再試');
+            alert('圖片上傳失敗，請稍後再試');
     } finally {
       setUploading(false);
     }

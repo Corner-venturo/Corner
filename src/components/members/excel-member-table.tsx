@@ -121,7 +121,6 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
   // 新增行
   const addRow = () => {
-    console.log('addRow called, current tableMembers:', tableMembers.length);
     const newMember: EditingMember = {
       order_id,
       name: '',
@@ -138,7 +137,6 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       isNew: true
     };
     setTableMembers([...tableMembers, newMember]);
-    console.log('New member added, new length should be:', tableMembers.length + 1);
   };
 
   // 暴露addRow函數給父組件

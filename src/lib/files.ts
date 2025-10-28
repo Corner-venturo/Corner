@@ -42,8 +42,7 @@ export async function downloadFile(url: string, fileName: string, options: Downl
       attempt += 1;
 
       if (attempt > retries) {
-        console.error('下載檔案失敗:', error);
-        onError?.(error);
+                onError?.(error);
         alert('檔案下載失敗，請稍後再試。');
         throw error;
       }

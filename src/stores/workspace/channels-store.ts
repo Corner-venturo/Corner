@@ -107,8 +107,7 @@ export const useChannelsStore = create<ChannelsState>()(
             });
           }
         } catch (error) {
-          console.warn('載入工作空間失敗，使用本地預設值:', error);
-          const data: Workspace[] = [
+                    const data: Workspace[] = [
             {
               id: 'workspace-001',
               name: '總部辦公室',
@@ -197,8 +196,7 @@ export const useChannelsStore = create<ChannelsState>()(
                   .order('created_at', { ascending: true });
 
                 if (error) {
-                  console.warn('⚠️ [loadChannels] Supabase 同步失敗:', error);
-                  return;
+                                    return;
                 }
 
                 const freshChannels = data || [];
@@ -227,13 +225,11 @@ export const useChannelsStore = create<ChannelsState>()(
 
                 set({ channels: freshChannels });
               } catch (syncError) {
-                console.warn('⚠️ [loadChannels] 背景同步失敗:', syncError);
-              }
+                              }
             }, 0);
           }
         } catch (error) {
-          console.error('❌ [loadChannels] 載入頻道失敗:', error);
-          set({ loading: false });
+                    set({ loading: false });
         }
       },
 
@@ -279,16 +275,13 @@ export const useChannelsStore = create<ChannelsState>()(
                   });
 
                 if (memberError) {
-                  console.warn('自動加入創建者失敗:', memberError);
-                }
+                                  }
               } catch (memberError) {
-                console.warn('加入創建者時發生錯誤:', memberError);
-              }
+                              }
             }
           }
         } catch (error) {
-          console.warn('頻道同步失敗，僅儲存到本地:', error);
-        }
+                  }
 
         await localDB.put('channels', newChannel);
         set(state => ({
@@ -304,8 +297,7 @@ export const useChannelsStore = create<ChannelsState>()(
         // 先獲取當前頻道資料
         const currentChannel = get().channels.find(ch => ch.id === id);
         if (!currentChannel) {
-          console.error('找不到頻道:', id);
-          return;
+                    return;
         }
 
         // 建立更新後的頻道物件
@@ -320,12 +312,11 @@ export const useChannelsStore = create<ChannelsState>()(
               .select();
 
             if (error) {
-              console.error('Supabase 更新失敗:', error);
-              throw error;
+                            throw error;
             }
           }
         } catch (error) {
-          console.error('Supabase 更新失敗:', error instanceof Error ? error.message : String(error));
+          // Supabase update failed - local state will still be updated
         }
 
         // 更新本地狀態
@@ -339,8 +330,7 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           await localDB.put('channels', updatedChannel);
         } catch (error) {
-          console.error('IndexedDB 更新失敗:', error);
-        }
+                  }
       },
 
       deleteChannel: async (id) => {
@@ -356,8 +346,7 @@ export const useChannelsStore = create<ChannelsState>()(
             if (error) throw error;
           }
         } catch (error) {
-          console.warn('頻道刪除失敗，僅從本地刪除:', error);
-        }
+                  }
 
         set(state => ({
           channels: state.channels.filter(ch => ch.id !== id)
@@ -367,8 +356,7 @@ export const useChannelsStore = create<ChannelsState>()(
       toggleChannelFavorite: async (id) => {
         const channel = get().channels.find(ch => ch.id === id);
         if (!channel) {
-          console.error('找不到頻道:', id);
-          return;
+                    return;
         }
 
         const newFavoriteStatus = !channel.is_favorite;
@@ -387,8 +375,7 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           await localDB.put('channels', updatedChannel);
         } catch (error) {
-          console.error('IndexedDB 更新失敗:', error);
-        }
+                  }
 
         // 更新到 Supabase
         try {
@@ -400,12 +387,11 @@ export const useChannelsStore = create<ChannelsState>()(
               .select();
 
             if (error) {
-              console.error('Supabase 更新失敗:', error);
-              throw error;
+                            throw error;
             }
           }
         } catch (error) {
-          console.error('Supabase 更新失敗:', error instanceof Error ? error.message : String(error));
+          // Supabase update failed - local state will still be updated
         }
       },
 
@@ -422,8 +408,7 @@ export const useChannelsStore = create<ChannelsState>()(
         // 先獲取當前頻道
         const currentChannel = get().channels.find(ch => ch.id === channelId);
         if (!currentChannel) {
-          console.error('找不到頻道:', channelId);
-          return;
+                    return;
         }
 
         const updatedChannel = { ...currentChannel, order: newOrder };
@@ -438,8 +423,7 @@ export const useChannelsStore = create<ChannelsState>()(
               .select();
 
             if (error) {
-              console.error('Supabase 更新失敗:', error);
-              throw error;
+                            throw error;
             }
           }
 
@@ -453,8 +437,7 @@ export const useChannelsStore = create<ChannelsState>()(
           // 更新 IndexedDB
           await localDB.put('channels', updatedChannel);
         } catch (error) {
-          console.error('更新失敗:', error);
-        }
+                  }
       },
 
       reorderChannels: (channels) => {
@@ -487,8 +470,7 @@ export const useChannelsStore = create<ChannelsState>()(
                   .order('order', { ascending: true });
 
                 if (error) {
-                  console.warn('⚠️ [loadChannelGroups] Supabase 同步失敗:', error);
-                  return;
+                                    return;
                 }
 
                 const freshGroups = data || [];
@@ -515,13 +497,11 @@ export const useChannelsStore = create<ChannelsState>()(
 
                 set({ channelGroups: freshGroups });
               } catch (syncError) {
-                console.warn('⚠️ [loadChannelGroups] 背景同步失敗:', syncError);
-              }
+                              }
             }, 0);
           }
         } catch (error) {
-          console.error('❌ [loadChannelGroups] 載入群組失敗:', error);
-        }
+                  }
       },
 
       createChannelGroup: (group) => {

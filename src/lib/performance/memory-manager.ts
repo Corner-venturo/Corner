@@ -161,14 +161,11 @@ class MemoryManager {
     setInterval(() => {
       const stats = this.getMemoryStats();
       if (stats) {
-        const emoji = stats.isUnderPressure ? '⚠️' : '✅';
-        console.log(
-          `${emoji} 記憶體使用: ${stats.usedMemory} MB / ${stats.totalMemory} MB (${stats.usagePercent}%)`
+        const emoji = stats.isUnderPressure ? '⚠️' : '✅';`
         );
 
         if (stats.isUnderPressure) {
-          console.warn('⚠️ 記憶體壓力過高，建議清理');
-        }
+                  }
       }
     }, interval);
   }

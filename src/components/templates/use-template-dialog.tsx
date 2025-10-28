@@ -79,8 +79,7 @@ export function UseTemplateDialog({ template, open, onOpenChange }: UseTemplateD
 
       onOpenChange(false);
     } catch (error) {
-      console.error('生成文件失敗:', error);
-      alert('生成失敗，請稍後再試');
+            alert('生成失敗，請稍後再試');
     }
   };
 

@@ -66,8 +66,7 @@ export default function ViewItineraryPage() {
           setError('找不到此行程');
         }
       } catch (error) {
-        console.error('載入行程失敗:', error);
-        setError('載入行程時發生錯誤');
+                setError('載入行程時發生錯誤');
       } finally {
         setLoading(false);
       }

@@ -165,8 +165,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
       }
       onClose();
     } catch (error) {
-      console.error('儲存合約失敗:', error);
-      alert('儲存合約失敗，請稍後再試');
+            alert('儲存合約失敗，請稍後再試');
     } finally {
       setSaving(false);
     }
@@ -225,8 +224,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
         };
       };
     } catch (error) {
-      console.error('列印合約時發生錯誤:', error);
-      alert('列印合約時發生錯誤，請稍後再試');
+            alert('列印合約時發生錯誤，請稍後再試');
     } finally {
       setSaving(false);
     }

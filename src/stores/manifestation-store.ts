@@ -50,8 +50,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       set({ entries: data || [], isLoading: false });
     } catch (error) {
-      console.error('獲取記錄失敗:', error);
-      set({
+            set({
         error: error instanceof Error ? error.message : '獲取記錄失敗',
         isLoading: false
       });
@@ -84,8 +83,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       set({ currentEntry: data || null, isLoading: false });
     } catch (error) {
-      console.error('獲取章節記錄失敗:', error);
-      set({
+            set({
         error: error instanceof Error ? error.message : '獲取章節記錄失敗',
         isLoading: false
       });
@@ -130,8 +128,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       return data;
     } catch (error) {
-      console.error('創建記錄失敗:', error);
-      set({
+            set({
         error: error instanceof Error ? error.message : '創建記錄失敗',
         isLoading: false
       });
@@ -170,8 +167,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       return true;
     } catch (error) {
-      console.error('更新記錄失敗:', error);
-      set({
+            set({
         error: error instanceof Error ? error.message : '更新記錄失敗',
         isLoading: false
       });
@@ -203,8 +199,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       return true;
     } catch (error) {
-      console.error('刪除記錄失敗:', error);
-      set({
+            set({
         error: error instanceof Error ? error.message : '刪除記錄失敗',
         isLoading: false
       });
@@ -230,8 +225,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       set({ progress: data || null });
     } catch (error) {
-      console.error('獲取進度失敗:', error);
-    }
+          }
   },
 
   // 設置當前記錄

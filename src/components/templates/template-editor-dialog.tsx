@@ -141,8 +141,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
 
       onOpenChange(false);
     } catch (error) {
-      console.error('儲存模板失敗:', error);
-      alert('儲存失敗，請稍後再試');
+            alert('儲存失敗，請稍後再試');
     }
   };
 

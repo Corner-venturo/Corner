@@ -21,7 +21,6 @@ class AppLogger {
    */
   debug(message: string, meta?: LogMeta) {
     if (this.isDev) {
-      console.log(`🐛 [DEBUG] ${message}`, meta || '');
     }
   }
 
@@ -30,7 +29,6 @@ class AppLogger {
    */
   info(message: string, meta?: LogMeta) {
     if (this.isDev) {
-      console.log(`ℹ️ [INFO] ${message}`, meta || '');
     }
   }
 
@@ -38,16 +36,13 @@ class AppLogger {
    * 警告訊息
    */
   warn(message: string, meta?: LogMeta) {
-    console.warn(`⚠️ [WARN] ${message}`, meta || '');
-  }
+      }
 
   /**
    * 錯誤訊息
    */
   error(message: string, meta?: LogMeta) {
-    console.error(`❌ [ERROR] ${message}`, meta || '');
-
-    // 生產環境可整合 Sentry
+        // 生產環境可整合 Sentry
     if (!this.isDev && typeof window !== 'undefined') {
       // 整合 Sentry
       // Sentry.captureException(new Error(message), { extra: meta });

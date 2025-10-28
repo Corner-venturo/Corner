@@ -24,8 +24,7 @@ export class DatabaseInitializer {
       }
 
     } catch (error) {
-      console.error('❌ 資料庫初始化失敗:', error);
-      // 不拋出錯誤，讓應用繼續運行
+            // 不拋出錯誤，讓應用繼續運行
     }
   }
 
@@ -37,8 +36,7 @@ export class DatabaseInitializer {
       const users = await localDB.getAll<User>('employees');
       return Array.isArray(users) ? users.length : 0;
     } catch (error) {
-      console.warn('⚠️ 無法檢查 employees 表:', error);
-      return 0;
+            return 0;
     }
   }
 
@@ -122,15 +120,13 @@ export class DatabaseInitializer {
           migratedCount++;
 
         } catch (error) {
-          console.warn(`  ⚠️ 遷移失敗: ${profile.employee_number}`, error);
-        }
+                  }
       }
 
       return migratedCount;
 
     } catch (error) {
-      console.warn('⚠️ LocalProfile 遷移失敗:', error);
-      return 0;
+            return 0;
     }
   }
 
@@ -193,8 +189,7 @@ export class DatabaseInitializer {
 
       await localDB.create<User>('employees', adminUser);
     } catch (error) {
-      console.warn('⚠️ 建立預設管理員時發生錯誤:', error);
-      // 不拋出錯誤，可能已經存在
+            // 不拋出錯誤，可能已經存在
     }
   }
 

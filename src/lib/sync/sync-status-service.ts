@@ -55,8 +55,7 @@ export function useSyncStatus() {
       setPendingCount(total);
       setLastSyncTime(new Date());
     } catch (_error) {
-      console.error('更新同步狀態失敗:', _error);
-    }
+          }
   }, []);
 
   return {

@@ -86,8 +86,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
       });
 
     } catch (error) {
-      console.error('❌ 儲存寄件紀錄失敗:', error);
-      // 繼續列印，不因儲存失敗而中斷
+            // 繼續列印，不因儲存失敗而中斷
     }
 
     // 產生列印內容

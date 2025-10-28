@@ -50,8 +50,7 @@ export default function CreateContractPage() {
       alert('合約建立成功!');
       router.push(`/contracts/${tourId}`);
     } catch (error) {
-      console.error('儲存合約失敗:', error);
-      alert('儲存合約失敗，請稍後再試');
+            alert('儲存合約失敗，請稍後再試');
     } finally {
       setSaving(false);
     }

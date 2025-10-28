@@ -66,8 +66,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       await updateUser(employee.id, updates);
       setIsEditing(false);
     } catch (error) {
-      console.error('❌ [BasicInfoTab] 更新失敗:', error);
-      alert('儲存失敗：' + (error as Error).message);
+            alert('儲存失敗：' + (error as Error).message);
     }
   };
 
@@ -135,8 +134,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       const { error } = result;
 
       if (error) {
-        console.error('密碼更新失敗:', error);
-        alert('密碼更新失敗：' + error.message);
+                alert('密碼更新失敗：' + error.message);
         return;
       }
 
@@ -144,8 +142,7 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       setPasswordData({ newPassword: '', confirmPassword: '' });
       setShowPasswordSection(false);
     } catch (error) {
-      console.error('密碼更新過程中發生錯誤:', error);
-      alert('密碼更新失敗，請稍後再試');
+            alert('密碼更新失敗，請稍後再試');
     } finally {
       setPasswordUpdateLoading(false);
     }

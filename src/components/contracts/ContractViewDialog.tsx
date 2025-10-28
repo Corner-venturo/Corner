@@ -30,8 +30,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
     try {
       return JSON.parse(tour.contract_content);
     } catch (error) {
-      console.error('無法解析合約資料:', error);
-      return {};
+            return {};
     }
   }, [tour.contract_content]);
 
@@ -83,8 +82,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         };
       };
     } catch (error) {
-      console.error('列印合約時發生錯誤:', error);
-      alert('列印合約時發生錯誤，請稍後再試');
+            alert('列印合約時發生錯誤，請稍後再試');
     } finally {
       setPrinting(false);
     }

@@ -32,8 +32,7 @@ export function DatabaseInitProvider({ children }: DatabaseInitProviderProps) {
           }
         }
       } catch (error) {
-        console.error('❌ 資料庫初始化失敗:', error);
-        // 即使失敗也讓應用繼續運行
+                // 即使失敗也讓應用繼續運行
         setIsInitialized(true);
       }
     }

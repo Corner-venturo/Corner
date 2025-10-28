@@ -103,8 +103,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！');
       onSubmit?.();
     } catch (error) {
-      console.error('建立失敗:', error);
-      alert('建立失敗，請稍後再試');
+            alert('建立失敗，請稍後再試');
     } finally {
       setSubmitting(false);
     }

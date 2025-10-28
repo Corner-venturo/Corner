@@ -19,8 +19,7 @@ export async function verifyAndFix() {
     const users = await localDB.getAll<User>('employees');
 
     if (users.length > 0) {
-      users.forEach(u => {
-        console.log(`   - ${u.display_name} (${u.employee_number}) [${u.status}]`);
+      users.forEach(u => { [${u.status}]`);
       });
     }
 
@@ -28,7 +27,6 @@ export async function verifyAndFix() {
     const william = users.find(u => u.employee_number === 'william01');
 
     if (william) {
-      console.log(`   ID: ${william.id}`);
 
       return { status: 'ok', user: william };
     }
@@ -81,8 +79,6 @@ export async function verifyAndFix() {
 
     await localDB.create<User>('employees', newWilliam);
 
-    console.log(`   ID: ${newWilliam.id}`);
-
     // 4. 驗證建立結果
     const verify = await localDB.getAll<User>('employees');
 
@@ -90,8 +86,7 @@ export async function verifyAndFix() {
     return { status: 'fixed', user: newWilliam };
 
   } catch (error) {
-    console.error('\n❌ 驗證/修復失敗:', error);
-    return { status: 'error', error };
+        return { status: 'error', error };
   }
 }
 
@@ -120,8 +115,7 @@ export async function quickCheck() {
     return { users, william, hasAuth: !!authStore };
 
   } catch (error) {
-    console.error('❌ 檢查失敗:', error);
-    return { error };
+        return { error };
   }
 }
 
@@ -147,8 +141,7 @@ export async function clearAndRebuild() {
     return result;
 
   } catch (error) {
-    console.error('❌ 清除並重建失敗:', error);
-    return { status: 'error', error };
+        return { status: 'error', error };
   }
 }
 

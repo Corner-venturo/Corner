@@ -76,7 +76,6 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
     return NextResponse.json({ members });
   } catch (error) {
-    console.error('Unexpected error while loading channel members:', error);
     return NextResponse.json({ error: 'Failed to load channel members' }, { status: 500 });
   }
 }
@@ -122,7 +121,6 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     return NextResponse.json({ members: data || [], count: data?.length || 0 });
   } catch (error) {
-    console.error('Unexpected error while adding channel members:', error);
     return NextResponse.json({ error: 'Failed to add channel members' }, { status: 500 });
   }
 }
@@ -160,7 +158,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Unexpected error while removing channel member:', error);
     return NextResponse.json({ error: 'Failed to remove channel member' }, { status: 500 });
   }
 }

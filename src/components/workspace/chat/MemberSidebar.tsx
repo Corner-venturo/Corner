@@ -80,8 +80,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       setSearchQuery('');
       setShowAddMemberDialog(false);
     } catch (error) {
-      console.error('新增成員失敗:', error);
-      alert('新增成員失敗，請稍後再試');
+            alert('新增成員失敗，請稍後再試');
     } finally {
       setIsAdding(false);
     }

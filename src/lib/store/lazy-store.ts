@@ -151,8 +151,7 @@ export class LazyStore<T extends { id: string }> {
         return localItem as T;
       }
     } catch (error) {
-      console.warn(`從 IndexedDB 讀取 ${id} 失敗`, error);
-    }
+          }
 
     // 3. 從 Supabase 讀取
     try {
@@ -171,8 +170,7 @@ export class LazyStore<T extends { id: string }> {
 
       return data as T;
     } catch (error) {
-      console.error(`從 Supabase 讀取 ${id} 失敗`, error);
-      return null;
+            return null;
     }
   }
 
@@ -288,8 +286,7 @@ export class LazyStore<T extends { id: string }> {
         await localDB.create(this.options.table as unknown, item);
       }
     } catch (error) {
-      console.warn('背景同步失敗', error);
-    }
+          }
   }
 }
 

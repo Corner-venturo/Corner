@@ -63,21 +63,13 @@ export class VenturoAPI {
         .single();
 
       if (error) {
-        console.error(`❌ Create error in ${table}:`, {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          data: snakeData
-        });
-        throw new Error(`創建失敗: ${error.message}`);
+                throw new Error(`創建失敗: ${error.message}`);
       }
 
       // 將回傳的 snake_case 轉換為 camelCase
       return toCamelCase(result) as T;
     } catch (error) {
-      console.error(`API Create Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -96,15 +88,13 @@ export class VenturoAPI {
         .select();
 
       if (error) {
-        console.error(`CreateMany error in ${table}:`, error);
-        throw new Error(`批量創建失敗: ${error.message}`);
+                throw new Error(`批量創建失敗: ${error.message}`);
       }
 
       // 將回傳的 snake_case 轉換為 camelCase
       return toCamelCase(result) as T[];
     } catch (error) {
-      console.error(`API CreateMany Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -146,15 +136,13 @@ export class VenturoAPI {
       const { data, error } = await query;
 
       if (error) {
-        console.error(`Read error in ${table}:`, error);
-        throw new Error(`查詢失敗: ${error.message}`);
+                throw new Error(`查詢失敗: ${error.message}`);
       }
 
       // 將回傳的 snake_case 轉換為 camelCase
       return toCamelCase(data || []) as T[];
     } catch (error) {
-      console.error(`API Read Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -173,15 +161,13 @@ export class VenturoAPI {
         if (error.code === 'PGRST116') {
           return null; // 記錄不存在
         }
-        console.error(`ReadById error in ${table}:`, error);
-        throw new Error(`查詢失敗: ${error.message}`);
+                throw new Error(`查詢失敗: ${error.message}`);
       }
 
       // 將回傳的 snake_case 轉換為 camelCase
       return toCamelCase(data) as T;
     } catch (error) {
-      console.error(`API ReadById Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -207,15 +193,13 @@ export class VenturoAPI {
         .single();
 
       if (error) {
-        console.error(`Update error in ${table}:`, error);
-        throw new Error(`更新失敗: ${error.message}`);
+                throw new Error(`更新失敗: ${error.message}`);
       }
 
       // 將回傳的 snake_case 轉換為 camelCase
       return toCamelCase(result) as T;
     } catch (error) {
-      console.error(`API Update Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -248,15 +232,13 @@ export class VenturoAPI {
       const { data: result, error } = await query.select();
 
       if (error) {
-        console.error(`UpdateWhere error in ${table}:`, error);
-        throw new Error(`條件更新失敗: ${error.message}`);
+                throw new Error(`條件更新失敗: ${error.message}`);
       }
 
       // 將回傳的 snake_case 轉換為 camelCase
       return toCamelCase(result || []) as T[];
     } catch (error) {
-      console.error(`API UpdateWhere Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -271,14 +253,12 @@ export class VenturoAPI {
         .eq('id', id);
 
       if (error) {
-        console.error(`Delete error in ${table}:`, error);
-        throw new Error(`刪除失敗: ${error.message}`);
+                throw new Error(`刪除失敗: ${error.message}`);
       }
 
       return true;
     } catch (error) {
-      console.error(`API Delete Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -296,14 +276,12 @@ export class VenturoAPI {
       const { error } = await query;
 
       if (error) {
-        console.error(`DeleteWhere error in ${table}:`, error);
-        throw new Error(`條件刪除失敗: ${error.message}`);
+                throw new Error(`條件刪除失敗: ${error.message}`);
       }
 
       return true;
     } catch (error) {
-      console.error(`API DeleteWhere Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -323,14 +301,12 @@ export class VenturoAPI {
       const { count, error } = await query;
 
       if (error) {
-        console.error(`Count error in ${table}:`, error);
-        throw new Error(`計數失敗: ${error.message}`);
+                throw new Error(`計數失敗: ${error.message}`);
       }
 
       return count || 0;
     } catch (error) {
-      console.error(`API Count Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -346,14 +322,12 @@ export class VenturoAPI {
       });
 
       if (error) {
-        console.error(`SQL Query error:`, error);
-        throw new Error(`SQL 查詢失敗: ${error.message}`);
+                throw new Error(`SQL 查詢失敗: ${error.message}`);
       }
 
       return (data || []) as T[];
     } catch (error) {
-      console.error(`API Query Error:`, error);
-      throw error;
+            throw error;
     }
   }
 
@@ -369,8 +343,7 @@ export class VenturoAPI {
         results.push(result);
       } catch (error) {
         // 如果任何操作失敗，拋出錯誤（簡單的事務處理）
-        console.error('Transaction failed:', error);
-        throw new Error(`事務處理失敗: ${error instanceof Error ? error.message : '未知錯誤'}`);
+                throw new Error(`事務處理失敗: ${error instanceof Error ? error.message : '未知錯誤'}`);
       }
     }
 

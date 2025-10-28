@@ -26,8 +26,7 @@ export function SyncIndicator() {
     try {
       await triggerSync()
     } catch (error) {
-      console.error('同步失敗:', error)
-    }
+          }
   }
 
   // 計算同步狀態

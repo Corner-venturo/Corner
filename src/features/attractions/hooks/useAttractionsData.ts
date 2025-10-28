@@ -23,7 +23,8 @@ export function useAttractionsData() {
       if (error) throw error;
       setAttractions(data || []);
     } catch (error) {
-      console.error('載入景點失敗:', error);
+      // Error loading attractions - fallback to empty list
+      setAttractions([]);
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,6 @@ export function useAttractionsData() {
       await fetchAttractions();
       return { success: true };
     } catch (error) {
-      console.error('新增失敗:', error);
       return { success: false, error };
     }
   }, [fetchAttractions]);
@@ -67,7 +67,6 @@ export function useAttractionsData() {
       await fetchAttractions();
       return { success: true };
     } catch (error) {
-      console.error('更新失敗:', error);
       return { success: false, error };
     }
   }, [fetchAttractions]);
@@ -86,7 +85,6 @@ export function useAttractionsData() {
       await fetchAttractions();
       return { success: true };
     } catch (error) {
-      console.error('刪除失敗:', error);
       alert('刪除失敗');
       return { success: false, error };
     }
@@ -104,7 +102,6 @@ export function useAttractionsData() {
       await fetchAttractions();
       return { success: true };
     } catch (error) {
-      console.error('更新狀態失敗:', error);
       return { success: false, error };
     }
   }, [fetchAttractions]);

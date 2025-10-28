@@ -46,8 +46,7 @@ export async function initLocalDatabase(): Promise<void> {
     } else {
     }
   } catch (error) {
-    console.error('❌ 初始化資料庫失敗:', error);
-    throw error;
+        throw error;
   }
 }
 
@@ -71,8 +70,7 @@ async function syncFromSupabase(): Promise<boolean> {
       .eq('status', 'active');
 
     if (error) {
-      console.error('❌ Supabase 查詢失敗:', error);
-      return false;
+            return false;
     }
 
     if (!employees || employees.length === 0) {
@@ -88,8 +86,7 @@ async function syncFromSupabase(): Promise<boolean> {
     return true;
 
   } catch (error) {
-    console.error('❌ 從 Supabase 同步失敗:', error);
-    return false;
+        return false;
   }
 }
 
@@ -132,8 +129,7 @@ export async function clearAllData(): Promise<void> {
     try {
       await localDB.clear(table as unknown);
     } catch (error) {
-      console.error(`❌ 清空 ${table} 表失敗:`, error);
-    }
+          }
   }
 }
 
@@ -161,7 +157,6 @@ if (typeof window !== 'undefined') {
     initLocalDatabase().then(() => {
       localStorage.setItem(initKey, 'true');
     }).catch(error => {
-      console.error('自動初始化失敗:', error);
-    });
+          });
   }
 }

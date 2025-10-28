@@ -36,8 +36,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '載入旅遊團資料失敗';
       setError(errorMessage);
-      console.error('[useTours] ❌ 載入失敗:', err);
-    } finally {
+          } finally {
       setLoading(false);
     }
   }, [stableParams]);
@@ -161,8 +160,7 @@ export function useTourDetails(tour_id: string) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '載入旅遊團詳情失敗';
       setError(errorMessage);
-      console.error('Failed to load tour details:', err);
-    } finally {
+          } finally {
       setLoading(false);
     }
   }, [tour_id]);

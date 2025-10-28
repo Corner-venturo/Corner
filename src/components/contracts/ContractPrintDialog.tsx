@@ -137,8 +137,7 @@ export function ContractPrintDialog({ isOpen, onClose, tour }: ContractPrintDial
         };
       };
     } catch (error) {
-      console.error('列印合約時發生錯誤:', error);
-      alert('列印合約時發生錯誤，請稍後再試');
+            alert('列印合約時發生錯誤，請稍後再試');
     }
   };
 

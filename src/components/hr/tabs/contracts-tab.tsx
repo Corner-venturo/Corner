@@ -15,7 +15,6 @@ export const ContractsTab = forwardRef<{ handleSave: () => void }, ContractsTabP
   useImperativeHandle(ref, () => ({
     handleSave: async () => {
       // 合約資訊目前為唯讀，未來若需編輯功能可在此實作
-      console.log('ContractsTab handleSave called');
     }
   }));
 

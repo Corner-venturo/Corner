@@ -74,11 +74,11 @@ export function useAutoCreateTourChannels() {
                   );
                 }
               } catch (error) {
-                console.error(`加入創建者失敗 (${tour.code}):`, error);
+                // Silently fail - creator may already be added
               }
             }
           } catch (error) {
-            console.error(`建立頻道失敗 (${tour.code}):`, error);
+            // Silently fail - channel may already exist
           }
         }
       } finally {

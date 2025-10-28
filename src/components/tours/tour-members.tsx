@@ -199,8 +199,6 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
 
   // 拖拽處理 - 重新實現更可靠的拖拽功能
   const handleDragStart = (e: React.DragEvent, index: number) => {
-    console.log('=== DRAG START ===', index);
-    console.log('Member being dragged:', tableMembers[index]?.name);
     setDraggedRow(index);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', index.toString());
@@ -215,22 +213,14 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('=== DROP EVENT ===');
-    console.log('Drop at index:', dropIndex);
-    console.log('Dragged from index:', draggedRow);
-
     if (draggedRow === null) {
-      console.log('No dragged row, aborting');
       return;
     }
 
     if (draggedRow === dropIndex) {
-      console.log('Same position, aborting');
       setDraggedRow(null);
       return;
     }
-
-    console.log('Before reorder:', tableMembers.map((m, i) => `${i}: ${m.name}`));
 
     // 執行重排序
     const newMembers = [...tableMembers];
@@ -241,14 +231,11 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
     // 插入到新位置
     newMembers.splice(dropIndex, 0, draggedMember);
 
-    console.log('After reorder:', newMembers.map((m, i) => `${i}: ${m.name}`));
-
     setTableMembers(newMembers);
     setDraggedRow(null);
   };
 
   const handleDragEnd = () => {
-    console.log('=== DRAG END ===');
     setDraggedRow(null);
   };
 

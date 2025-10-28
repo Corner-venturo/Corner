@@ -58,8 +58,7 @@ export default function LoginPage() {
         setError(result.message || '帳號或密碼錯誤');
       }
     } catch (error) {
-      console.error('登入錯誤:', error);
-      setError('系統錯誤，請稍後再試');
+            setError('系統錯誤，請稍後再試');
     } finally {
       setIsLoading(false);
     }
@@ -85,8 +84,7 @@ export default function LoginPage() {
         setShowProfileCards(false);
       }
     } catch (error) {
-      console.error('快速登入錯誤:', error);
-      setError('快速登入失敗，請使用密碼登入');
+            setError('快速登入失敗，請使用密碼登入');
       setShowProfileCards(false);
     } finally {
       setIsLoading(false);

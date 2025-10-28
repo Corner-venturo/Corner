@@ -36,8 +36,7 @@ export const TransactionList = React.memo(function TransactionList() {
     try {
       deleteTransaction(transactionId);
     } catch (err) {
-      console.error('刪除交易失敗:', err);
-      alert('刪除失敗，請稍後再試');
+            alert('刪除失敗，請稍後再試');
     }
   };
 

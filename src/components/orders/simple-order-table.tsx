@@ -35,8 +35,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
     try {
       await deleteOrder(order.id);
     } catch (err) {
-      console.error('刪除訂單失敗:', err);
-      alert('刪除失敗，請稍後再試');
+            alert('刪除失敗，請稍後再試');
     }
   };
 

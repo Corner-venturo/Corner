@@ -94,8 +94,7 @@ export function CreatePaymentRequestDialog({
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('建立請款單失敗:', error);
-      alert('建立請款單失敗，請稍後再試');
+            alert('建立請款單失敗，請稍後再試');
     }
   };
 
