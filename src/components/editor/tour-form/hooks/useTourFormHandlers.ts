@@ -1,22 +1,45 @@
 import { TourFormData, Activity } from "../types";
 import { cityImages, timezoneOffset } from "../constants";
 import { calculateFlightDuration } from "../utils";
+import { useRegionStoreNew } from "@/stores";
 
 export function useTourFormHandlers(
   data: TourFormData,
   onChange: (data: TourFormData) => void,
   selectedCountry: string
 ) {
+  const { cities } = useRegionStoreNew();
+
   const updateField = (field: string, value: unknown) => {
     onChange({ ...data, [field]: value });
   };
 
-  // 更新城市時自動設定封面圖片
+  // 更新城市時自動設定封面圖片（從 Supabase 取得）
   const updateCity = (city: string) => {
+    // 從資料庫找城市資料
+    const cityData = cities.find(c => c.name === city);
+
+    // 優先使用 Supabase Storage 的圖片
+    let coverImage = data.coverImage; // 保留現有圖片
+
+    if (cityData) {
+      // 如果有主要圖片（primary_image = 1 用 background_image_url，= 2 用 background_image_url_2）
+      if (cityData.primary_image === 2 && cityData.background_image_url_2) {
+        coverImage = cityData.background_image_url_2;
+      } else if (cityData.background_image_url) {
+        coverImage = cityData.background_image_url;
+      }
+    }
+
+    // 如果資料庫沒有圖片，退回到 cityImages 常數
+    if (!coverImage && cityImages[city]) {
+      coverImage = cityImages[city];
+    }
+
     onChange({
       ...data,
       city,
-      coverImage: cityImages[city] || data.coverImage
+      coverImage
     });
   };
 

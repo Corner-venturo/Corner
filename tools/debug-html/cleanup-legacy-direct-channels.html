@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>清理舊版直接訊息頻道</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; margin-bottom: 20px; }
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #d4a574;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      margin: 10px 0;
+    }
+    button:hover { background: #c49563; }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 13px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 清理舊版直接訊息頻道</h1>
+
+    <div class="warning">
+      <strong>⚠️ 注意：</strong>
+      <p>此工具會清理以下項目：</p>
+      <ul>
+        <li>所有「夥伴」群組（ChannelGroup）</li>
+        <li>所有 type='direct' 的舊式頻道</li>
+        <li>IndexedDB 和 localStorage 中的對應資料</li>
+      </ul>
+      <p><strong>此操作無法復原！請先備份重要資料。</strong></p>
+    </div>
+
+    <button onclick="analyzeData()">📊 分析現有資料</button>
+    <button onclick="cleanupData()">🗑️ 執行清理</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function showResult(message, type = 'info') {
+      const div = document.getElementById('result');
+      div.className = type;
+      div.textContent = message;
+    }
+
+    async function analyzeData() {
+      showResult('🔍 分析中...', 'info');
+
+      try {
+        // 1. 檢查 localStorage
+        const stored = localStorage.getItem('channels-storage');
+        if (!stored) {
+          showResult('❌ 找不到 channels-storage 資料', 'error');
+          return;
+        }
+
+        const data = JSON.parse(stored);
+        const groups = data.state?.channelGroups || [];
+        const channels = data.state?.channels || [];
+
+        let report = '📊 分析報告\n\n';
+
+        // 分析「夥伴」群組
+        const partnerGroups = groups.filter(g => g.name === '夥伴');
+        report += `=== 頻道群組 ===\n`;
+        report += `總群組數: ${groups.length}\n`;
+        report += `「夥伴」群組數: ${partnerGroups.length}\n`;
+        if (partnerGroups.length > 0) {
+          report += `\n將刪除的「夥伴」群組:\n`;
+          partnerGroups.forEach(g => {
+            report += `  - ID: ${g.id}, 建立時間: ${g.created_at}\n`;
+          });
+        }
+
+        // 分析 direct 類型頻道
+        const directChannels = channels.filter(ch => ch.type === 'direct');
+        report += `\n=== 頻道 ===\n`;
+        report += `總頻道數: ${channels.length}\n`;
+        report += `Direct 類型頻道數: ${directChannels.length}\n`;
+        if (directChannels.length > 0) {
+          report += `\n將刪除的 Direct 頻道:\n`;
+          directChannels.forEach(ch => {
+            report += `  - ${ch.name} (ID: ${ch.id})\n`;
+          });
+        }
+
+        // 2. 檢查 IndexedDB
+        const db = await new Promise((resolve, reject) => {
+          const request = indexedDB.open('VenturoOfflineDB', 2);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+
+        // 檢查 channel_groups 表
+        if (db.objectStoreNames.contains('channel_groups')) {
+          const dbGroups = await new Promise((resolve, reject) => {
+            const tx = db.transaction('channel_groups', 'readonly');
+            const request = tx.objectStore('channel_groups').getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+          });
+          const dbPartnerGroups = dbGroups.filter(g => g.name === '夥伴');
+          report += `\n=== IndexedDB - channel_groups ===\n`;
+          report += `總數: ${dbGroups.length}\n`;
+          report += `「夥伴」群組數: ${dbPartnerGroups.length}\n`;
+        }
+
+        // 檢查 channels 表
+        if (db.objectStoreNames.contains('channels')) {
+          const dbChannels = await new Promise((resolve, reject) => {
+            const tx = db.transaction('channels', 'readonly');
+            const request = tx.objectStore('channels').getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+          });
+          const dbDirectChannels = dbChannels.filter(ch => ch.type === 'direct');
+          report += `\n=== IndexedDB - channels ===\n`;
+          report += `總數: ${dbChannels.length}\n`;
+          report += `Direct 類型數: ${dbDirectChannels.length}\n`;
+        }
+
+        db.close();
+
+        report += `\n\n=== 摘要 ===\n`;
+        report += `即將刪除:\n`;
+        report += `  - ${partnerGroups.length} 個「夥伴」群組\n`;
+        report += `  - ${directChannels.length} 個 Direct 類型頻道\n`;
+        report += `\n確認無誤後，點擊「執行清理」按鈕`;
+
+        showResult(report, 'info');
+
+      } catch (error) {
+        showResult(`❌ 錯誤: ${error.message}\n\n${error.stack}`, 'error');
+        console.error('分析失敗:', error);
+      }
+    }
+
+    async function cleanupData() {
+      if (!confirm('⚠️ 確定要清理所有舊版直接訊息資料嗎？\n\n此操作無法復原！')) {
+        return;
+      }
+
+      showResult('🗑️ 清理中...', 'info');
+
+      try {
+        let report = '🎉 清理報告\n\n';
+        let totalDeleted = 0;
+
+        // 1. 清理 localStorage
+        const stored = localStorage.getItem('channels-storage');
+        if (stored) {
+          const data = JSON.parse(stored);
+          const originalGroupCount = (data.state?.channelGroups || []).length;
+          const originalChannelCount = (data.state?.channels || []).length;
+
+          // 移除「夥伴」群組
+          data.state.channelGroups = (data.state?.channelGroups || [])
+            .filter(g => g.name !== '夥伴');
+
+          // 移除 direct 類型頻道
+          data.state.channels = (data.state?.channels || [])
+            .filter(ch => ch.type !== 'direct');
+
+          // 清除選中狀態（如果選中的是被刪除的項目）
+          if (data.state.selectedChannel && data.state.selectedChannel.type === 'direct') {
+            data.state.selectedChannel = null;
+            data.state.currentChannel = null;
+          }
+
+          localStorage.setItem('channels-storage', JSON.stringify(data));
+
+          const deletedGroups = originalGroupCount - data.state.channelGroups.length;
+          const deletedChannels = originalChannelCount - data.state.channels.length;
+
+          report += `localStorage 清理:\n`;
+          report += `  - 刪除 ${deletedGroups} 個群組\n`;
+          report += `  - 刪除 ${deletedChannels} 個頻道\n`;
+          totalDeleted += deletedGroups + deletedChannels;
+        }
+
+        // 2. 清理 IndexedDB
+        const db = await new Promise((resolve, reject) => {
+          const request = indexedDB.open('VenturoOfflineDB', 2);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+
+        // 清理 channel_groups 表
+        if (db.objectStoreNames.contains('channel_groups')) {
+          const groups = await new Promise((resolve, reject) => {
+            const tx = db.transaction('channel_groups', 'readonly');
+            const request = tx.objectStore('channel_groups').getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+          });
+
+          const groupsToDelete = groups.filter(g => g.name === '夥伴');
+          for (const group of groupsToDelete) {
+            const tx = db.transaction('channel_groups', 'readwrite');
+            await new Promise((resolve, reject) => {
+              const request = tx.objectStore('channel_groups').delete(group.id);
+              request.onsuccess = () => resolve();
+              request.onerror = () => reject(request.error);
+            });
+          }
+
+          report += `\nIndexedDB channel_groups:\n`;
+          report += `  - 刪除 ${groupsToDelete.length} 個「夥伴」群組\n`;
+        }
+
+        // 清理 channels 表
+        if (db.objectStoreNames.contains('channels')) {
+          const channels = await new Promise((resolve, reject) => {
+            const tx = db.transaction('channels', 'readonly');
+            const request = tx.objectStore('channels').getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+          });
+
+          const channelsToDelete = channels.filter(ch => ch.type === 'direct');
+          for (const channel of channelsToDelete) {
+            const tx = db.transaction('channels', 'readwrite');
+            await new Promise((resolve, reject) => {
+              const request = tx.objectStore('channels').delete(channel.id);
+              request.onsuccess = () => resolve();
+              request.onerror = () => reject(request.error);
+            });
+          }
+
+          report += `\nIndexedDB channels:\n`;
+          report += `  - 刪除 ${channelsToDelete.length} 個 Direct 頻道\n`;
+        }
+
+        db.close();
+
+        report += `\n\n✅ 清理完成！\n`;
+        report += `總共清理了 ${totalDeleted} 個項目\n\n`;
+        report += `請重新整理頁面 (F5) 以查看結果`;
+
+        showResult(report, 'success');
+
+      } catch (error) {
+        showResult(`❌ 錯誤: ${error.message}\n\n${error.stack}`, 'error');
+        console.error('清理失敗:', error);
+      }
+    }
+  </script>
+</body>
+</html>

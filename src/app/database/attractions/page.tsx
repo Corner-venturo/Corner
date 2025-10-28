@@ -271,8 +271,9 @@ export default function AttractionsPage() {
           {/* 表格標題行 */}
           <div className="sticky top-0 z-10 bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 backdrop-blur-sm">
             <div className="flex items-center px-4 py-3">
-              <div className="w-64 text-sm font-medium text-morandi-primary">景點名稱</div>
-              <div className="w-48 text-sm font-medium text-morandi-primary">地點</div>
+              <div className="w-20 text-sm font-medium text-morandi-primary">圖片</div>
+              <div className="w-56 text-sm font-medium text-morandi-primary">景點名稱</div>
+              <div className="w-40 text-sm font-medium text-morandi-primary">地點</div>
               <div className="w-24 text-sm font-medium text-morandi-primary text-center">類別</div>
               <div className="flex-1 text-sm font-medium text-morandi-primary">標籤</div>
               <div className="w-24 text-sm font-medium text-morandi-primary text-center">狀態</div>
@@ -316,8 +317,23 @@ export default function AttractionsPage() {
                     className="border-b border-border last:border-b-0 hover:bg-morandi-container/20 transition-colors"
                   >
                     <div className="flex items-center px-4 py-3">
+                      {/* 圖片縮圖 */}
+                      <div className="w-20">
+                        {attraction.images && attraction.images.length > 0 ? (
+                          <img
+                            src={attraction.images[0]}
+                            alt={attraction.name}
+                            className="w-16 h-12 object-cover rounded border border-border"
+                          />
+                        ) : (
+                          <div className="w-16 h-12 bg-morandi-container/30 rounded border border-border flex items-center justify-center">
+                            <MapPin size={16} className="text-morandi-muted opacity-40" />
+                          </div>
+                        )}
+                      </div>
+
                       {/* 景點名稱 */}
-                      <div className="w-64">
+                      <div className="w-56">
                         <div className="font-medium text-morandi-primary">{attraction.name}</div>
                         {attraction.name_en && (
                           <div className="text-xs text-morandi-muted">{attraction.name_en}</div>
@@ -325,7 +341,7 @@ export default function AttractionsPage() {
                       </div>
 
                       {/* 地點 */}
-                      <div className="w-48 text-sm text-morandi-secondary">
+                      <div className="w-40 text-sm text-morandi-secondary">
                         {country?.emoji} {city?.name || attraction.city_id}
                       </div>
 

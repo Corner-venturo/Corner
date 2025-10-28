@@ -82,13 +82,15 @@ export function MainLayout({ children }: MainLayoutProps) {
     loadInitialData();
   }, [isClient]);
 
-  // 不需要側邊欄的頁面
-  const shouldShowSidebar = !NO_SIDEBAR_PAGES.includes(pathname as any);
+  // 不需要側邊欄的頁面（支援完全匹配和前綴匹配）
+  const shouldShowSidebar = !NO_SIDEBAR_PAGES.some(page =>
+    pathname === page || pathname.startsWith(page + '/')
+  );
 
   // 使用自定義 layout 的頁面
   const hasCustomLayout = CUSTOM_LAYOUT_PAGES.some(page => pathname.startsWith(page));
 
-  // 登入頁不需要側邊欄
+  // 登入頁或分享頁不需要側邊欄
   if (!shouldShowSidebar) {
     return (
       <div className="min-h-screen bg-background">

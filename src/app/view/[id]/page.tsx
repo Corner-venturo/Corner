@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import TourPage from "@/components/TourPage";
-import { useTourStore } from "@/stores";
+import { useItineraryStore } from "@/stores";
 import {
   IconBuilding,
   IconToolsKitchen2,
@@ -26,21 +26,21 @@ const iconMap: any = {
 export default function ViewItineraryPage() {
   const params = useParams();
   const id = params.id as string;
-  const { fetchById } = useTourStore();
+  const { fetchById } = useItineraryStore();
 
   const [tourData, setTourData] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
 
   // 載入行程資料
   useEffect(() => {
-    const loadTour = async () => {
+    const loadItinerary = async () => {
       try {
-        const tour = await fetchById(id);
-        if (tour) {
+        const itinerary = await fetchById(id);
+        if (itinerary) {
           // Convert icon strings to components
           const processedData = {
-            ...tour,
-            features: tour.features?.map((f) => ({
+            ...itinerary,
+            features: itinerary.features?.map((f: any) => ({
               ...f,
               iconComponent: iconMap[f.icon] || IconSparkles,
             })) || [],
@@ -56,7 +56,7 @@ export default function ViewItineraryPage() {
       }
     };
 
-    loadTour();
+    loadItinerary();
   }, [id, fetchById]);
 
   // 載入中狀態

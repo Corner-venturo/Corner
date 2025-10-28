@@ -48,6 +48,7 @@ export interface City {
   timezone?: string;
   background_image_url?: string;
   background_image_url_2?: string;
+  primary_image?: number; // 1 or 2, indicates which image is primary
   display_order: number;
   is_active: boolean;
   created_at: string;

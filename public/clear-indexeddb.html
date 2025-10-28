@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>清理 IndexedDB</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #dc2626;
+    }
+    button.safe {
+      background: #3b82f6;
+    }
+    button.safe:hover {
+      background: #2563eb;
+    }
+    .success {
+      background: #dcfce7;
+      color: #166534;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      display: none;
+    }
+    .warning {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    pre {
+      background: #1f2937;
+      color: #e5e7eb;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 清理 IndexedDB 快取資料</h1>
+    
+    <div class="warning">
+      <strong>⚠️ 注意：</strong>此操作會清除所有本地快取，然後重新從 Supabase 載入乾淨的資料。
+    </div>
+
+    <button class="safe" onclick="clearMessages()">清理訊息快取</button>
+    <button onclick="clearAllIndexedDB()">清理所有 IndexedDB 資料</button>
+
+    <div id="result" class="success"></div>
+    <pre id="log"></pre>
+  </div>
+
+  <script>
+    function log(message) {
+      const logEl = document.getElementById('log');
+      logEl.textContent += message + '\n';
+      console.log(message);
+    }
+
+    function showSuccess(message) {
+      const resultEl = document.getElementById('result');
+      resultEl.textContent = message;
+      resultEl.style.display = 'block';
+    }
+
+    async function clearMessages() {
+      log('🧹 開始清理訊息快取...');
+      
+      try {
+        const dbName = 'venturo-db';
+        const request = indexedDB.open(dbName);
+        
+        request.onsuccess = function(event) {
+          const db = event.target.result;
+          const transaction = db.transaction(['messages'], 'readwrite');
+          const objectStore = transaction.objectStore('messages');
+          const clearRequest = objectStore.clear();
+          
+          clearRequest.onsuccess = function() {
+            log('✅ 訊息快取已清理完成！');
+            showSuccess('✅ 訊息快取已清理！請重新整理頁面以重新載入資料。');
+          };
+          
+          clearRequest.onerror = function() {
+            log('❌ 清理失敗: ' + clearRequest.error);
+          };
+        };
+        
+        request.onerror = function() {
+          log('❌ 無法開啟資料庫: ' + request.error);
+        };
+      } catch (error) {
+        log('❌ 發生錯誤: ' + error.message);
+      }
+    }
+
+    async function clearAllIndexedDB() {
+      if (!confirm('確定要清除所有本地資料嗎？這會刪除所有快取，包括訊息、頻道等資料。')) {
+        return;
+      }
+
+      log('🧹 開始清理所有 IndexedDB 資料...');
+      
+      try {
+        const dbName = 'venturo-db';
+        const deleteRequest = indexedDB.deleteDatabase(dbName);
+        
+        deleteRequest.onsuccess = function() {
+          log('✅ IndexedDB 已完全清除！');
+          showSuccess('✅ 所有資料已清除！請重新整理頁面以重新載入資料。');
+        };
+        
+        deleteRequest.onerror = function() {
+          log('❌ 清除失敗: ' + deleteRequest.error);
+        };
+        
+        deleteRequest.onblocked = function() {
+          log('⚠️ 資料庫被鎖定，請關閉所有使用此網站的分頁後再試。');
+        };
+      } catch (error) {
+        log('❌ 發生錯誤: ' + error.message);
+      }
+    }
+
+    log('📋 IndexedDB 清理工具已就緒');
+    log('💡 提示：清理後請重新整理主頁面以重新載入資料');
+  </script>
+</body>
+</html>

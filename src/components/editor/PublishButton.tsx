@@ -47,13 +47,44 @@ export function PublishButton({ data }: { data: any }) {
 
   const isEditMode = !!data.id;
 
+  // 產生分享連結
+  const generateShareLink = () => {
+    if (!data.id) {
+      alert('⚠️ 請先儲存行程表才能產生連結！');
+      return;
+    }
+
+    // 使用當前網站的網址（會自動適配 localhost / Vercel 等環境）
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const shareUrl = `${baseUrl}/view/${data.id}`;
+
+    // 複製到剪貼簿
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('✅ 分享連結已複製！\n\n' + shareUrl);
+    }).catch(err => {
+      console.error('複製失敗:', err);
+      alert('❌ 複製失敗，請手動複製：\n' + shareUrl);
+    });
+  };
+
   return (
-    <button
-      onClick={saveItinerary}
-      disabled={saving}
-      className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-    >
-      {saving ? "儲存中..." : isEditMode ? "💾 更新行程表" : "💾 存檔行程表"}
-    </button>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={saveItinerary}
+        disabled={saving}
+        className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+      >
+        {saving ? "儲存中..." : isEditMode ? "💾 更新行程表" : "💾 存檔行程表"}
+      </button>
+
+      {isEditMode && (
+        <button
+          onClick={generateShareLink}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+        >
+          🔗 產生連結
+        </button>
+      )}
+    </div>
   );
 }

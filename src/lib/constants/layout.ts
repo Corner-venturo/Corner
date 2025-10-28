@@ -20,6 +20,7 @@ export const LAYOUT_TRANSITION_DURATION = 300; // ms
 export const NO_SIDEBAR_PAGES = [
   '/login',
   '/unauthorized',
+  '/view', // 分享的行程預覽頁面（無需登入、無側邊欄）
 ];
 
 // Pages with custom layout

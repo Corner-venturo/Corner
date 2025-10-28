@@ -111,8 +111,8 @@ export default function ItineraryPage() {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              // 固定使用 ngrok 網址（給外部分享用）
-              const baseUrl = 'https://frisky-masonic-mellissa.ngrok-free.dev';
+              // 使用當前網站的網址（會自動適配 localhost / Vercel 等環境）
+              const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
               const shareUrl = `${baseUrl}/view/${itinerary.id}`;
 
               // 複製到剪貼簿
