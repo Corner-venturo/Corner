@@ -10,6 +10,7 @@ import { FlightInfoSection } from "./tour-form/sections/FlightInfoSection";
 import { FeaturesSection } from "./tour-form/sections/FeaturesSection";
 import { FocusCardsSection } from "./tour-form/sections/FocusCardsSection";
 import { LeaderMeetingSection } from "./tour-form/sections/LeaderMeetingSection";
+import { HotelSection } from "./tour-form/sections/HotelSection";
 import { DailyItinerarySection } from "./tour-form/sections/DailyItinerarySection";
 
 interface TourFormProps {
@@ -70,6 +71,12 @@ export function TourForm({ data, onChange }: TourFormProps) {
       <LeaderMeetingSection
         data={data}
         updateNestedField={handlers.updateNestedField}
+        updateField={handlers.updateField}
+      />
+
+      <HotelSection
+        data={data}
+        updateField={handlers.updateField}
       />
 
       <DailyItinerarySection

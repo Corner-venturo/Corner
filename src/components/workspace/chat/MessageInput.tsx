@@ -82,18 +82,28 @@ export function MessageInput({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
+    e.stopPropagation();
+    // 只在真的離開容器時才設為 false
+    if (e.currentTarget === e.target) {
+      setIsDragging(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
+
+    console.log('🎯 [拖曳] 檔案放下了！');
     const files = Array.from(e.dataTransfer.files);
+    console.log('📁 [拖曳] 檔案數量:', files.length, files.map(f => f.name));
+
     const validFiles: File[] = [];
     const errors: string[] = [];
 
@@ -111,7 +121,10 @@ export function MessageInput({
     }
 
     if (validFiles.length > 0) {
+      console.log('✅ [拖曳] 有效檔案:', validFiles.length);
       onFilesChange([...attachedFiles, ...validFiles]);
+    } else {
+      console.log('⚠️ [拖曳] 沒有有效檔案');
     }
   };
 
@@ -181,6 +194,29 @@ export function MessageInput({
     }
   });
 
+  // 🔥 阻止整個頁面的拖曳預設行為（防止圖片在新分頁打開）
+  useEffect(() => {
+    const preventDefaults = (e: DragEvent) => {
+      // 只在拖曳區域外阻止預設行為
+      const messageInputContainer = messageInputRef.current?.closest('.p-4');
+      const isInDropZone = messageInputContainer?.contains(e.target as Node);
+
+      if (e.dataTransfer?.types?.includes('Files') && !isInDropZone) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    // 只阻止 document body 上的事件，不影響拖曳區域
+    document.body.addEventListener('dragover', preventDefaults);
+    document.body.addEventListener('drop', preventDefaults);
+
+    return () => {
+      document.body.removeEventListener('dragover', preventDefaults);
+      document.body.removeEventListener('drop', preventDefaults);
+    };
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (quickMenuRef.current && !quickMenuRef.current.contains(event.target as Node)) {
@@ -200,7 +236,7 @@ export function MessageInput({
   return (
     <div
       className={cn(
-        "p-4 border-t border-morandi-gold/20 bg-morandi-container/5 shrink-0 transition-colors",
+        "p-4 border-t border-morandi-gold/20 bg-white shrink-0 transition-colors",
         isDragging && "bg-morandi-gold/10 border-morandi-gold"
       )}
       onDragOver={handleDragOver}

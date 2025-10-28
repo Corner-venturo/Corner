@@ -316,9 +316,24 @@ export interface Payment {
   updated_at: string;
 }
 
+export interface QuoteRegion {
+  id: string;
+  quote_id: string;
+  country: string;      // 國家 ID
+  country_name: string; // 國家名稱
+  region?: string;      // 地區 ID（可選）
+  region_name?: string; // 地區名稱（可選）
+  city: string;         // 城市 ID
+  city_name: string;    // 城市名稱
+  order: number;        // 順序
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Quote {
   id: string;
-  quote_number?: string; // 報價單號碼 (QUOTE-2025-0001)
+  code?: string; // 報價單編號 (Q20250001 或自訂編號如 JP-BASIC)
+  quote_number?: string; // 報價單號碼 (QUOTE-2025-0001) - 向下相容
   name: string; // 團體名稱
   status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected';
   // draft: 草稿
@@ -328,6 +343,9 @@ export interface Quote {
   // converted: 已轉單
   // rejected: 已拒絕
   tour_id?: string; // 關聯的旅遊團ID
+  converted_to_tour?: boolean; // 是否已轉成旅遊團
+  is_pinned?: boolean; // 是否置頂（範本報價單）
+  regions?: QuoteRegion[]; // 多地區支援（新）
 
   // 客戶資訊
   customer_name?: string; // 客戶名稱

@@ -47,6 +47,31 @@ export async function fetchChannelMembers(
   return data.members || [];
 }
 
+export async function addChannelMembers(
+  workspaceId: string,
+  channelId: string,
+  employeeIds: string[],
+  role: string = 'member'
+): Promise<ChannelMember[]> {
+  const response = await fetch(buildMembersEndpoint(workspaceId, channelId), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ employeeIds, role }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(
+      `Failed to add channel members (${response.status}): ${errorText || response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  return data.members || [];
+}
+
 export async function removeChannelMember(
   workspaceId: string,
   channelId: string,

@@ -77,7 +77,7 @@ class TourService extends BaseService<Tour> {
    * @param cityCode - 3碼城市代號 (如: TYO, BKK, OSA)
    * @param date - 出發日期
    * @param isSpecial - 是否為特殊團
-   * @returns 團號 (格式: TYO250101001 或 SPC250101001)
+   * @returns 團號 (格式: TYO25010101 或 SPC25010101)
    */
   async generateTourCode(cityCode: string, date: Date, isSpecial: boolean = false): Promise<string> {
     const year = date.getFullYear().toString().slice(-2);
@@ -85,35 +85,35 @@ class TourService extends BaseService<Tour> {
     const day = date.getDate().toString().padStart(2, '0');
     const dateStr = `${year}${month}${day}`;
 
-    // 獲取當日已有的團號來生成流水號
+    const prefix = isSpecial ? 'SPC' : cityCode.toUpperCase();
+
+    // 獲取當日同地點已有的團號來生成流水號
     const allTours = await this.list();
-    const todayTours = allTours.data.filter(t =>
-      t.code && t.code.includes(dateStr)
+    const samePrefixDateTours = allTours.data.filter(t =>
+      t.code && t.code.startsWith(`${prefix}${dateStr}`)
     );
 
     // 找出最大的流水號並 +1，避免重複
     let maxSequence = 0;
-    todayTours.forEach(tour => {
-      const match = tour.code.match(/(\d{3})$/);
+    samePrefixDateTours.forEach(tour => {
+      // 團號格式: TYO25010101 (3碼城市+6碼日期+2碼流水號 = 11碼)
+      // 或: SPC25010101 (3碼SPC+6碼日期+2碼流水號 = 11碼)
+      const match = tour.code.match(/(\d{2})$/);
       if (match) {
         const seq = parseInt(match[1], 10);
         if (seq > maxSequence) maxSequence = seq;
       }
     });
 
-    const sequence = (maxSequence + 1).toString().padStart(3, '0');
-    const code = isSpecial
-      ? `SPC${dateStr}${sequence}`
-      : `${cityCode.toUpperCase()}${dateStr}${sequence}`;
+    const sequence = (maxSequence + 1).toString().padStart(2, '0');
+    const code = `${prefix}${dateStr}${sequence}`;
 
     // 雙重檢查：確保生成的團號不存在
     const exists = await this.isTourCodeExists(code);
     if (exists) {
       // 如果仍然重複，使用時間戳確保唯一性
-      const timestamp = Date.now().toString().slice(-3);
-      return isSpecial
-        ? `SPC${dateStr}${timestamp}`
-        : `${cityCode.toUpperCase()}${dateStr}${timestamp}`;
+      const timestamp = Date.now().toString().slice(-2);
+      return `${prefix}${dateStr}${timestamp}`;
     }
 
     return code;

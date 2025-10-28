@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -33,11 +33,14 @@ import { cn } from '@/lib/utils';
 
 interface CanvasEditorProps {
   channelId: string;
+  canvasId?: string; // 可選的畫布 ID，用於支援多畫布
 }
 
-export function CanvasEditor({ channelId }: CanvasEditorProps) {
-  const storageKey = `canvas-${channelId}`;
+export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
+  const storageKey = canvasId || `canvas-${channelId}`;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -84,6 +87,23 @@ export function CanvasEditor({ channelId }: CanvasEditorProps) {
     }
   }, [editor, storageKey]);
 
+  // 阻止整個頁面的拖曳預設行為
+  useEffect(() => {
+    const preventDefaults = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    // 阻止整個視窗的拖曳預設行為
+    window.addEventListener('dragover', preventDefaults, false);
+    window.addEventListener('drop', preventDefaults, false);
+
+    return () => {
+      window.removeEventListener('dragover', preventDefaults, false);
+      window.removeEventListener('drop', preventDefaults, false);
+    };
+  }, []);
+
   const setLink = useCallback(() => {
     const url = window.prompt('輸入網址:');
     if (url) {
@@ -98,32 +118,179 @@ export function CanvasEditor({ channelId }: CanvasEditorProps) {
     }
   }, [editor]);
 
-  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const compressImage = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // 設定最大寬度/高度為 1920px
+          const MAX_WIDTH = 1920;
+          const MAX_HEIGHT = 1920;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('無法取得 canvas context'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 壓縮品質：如果檔案大於 1MB，使用較低品質
+          const quality = file.size > 1024 * 1024 ? 0.7 : 0.85;
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('圖片壓縮失敗'));
+                return;
+              }
+
+              const compressedReader = new FileReader();
+              compressedReader.onload = (e) => {
+                resolve(e.target?.result as string);
+              };
+              compressedReader.onerror = reject;
+              compressedReader.readAsDataURL(blob);
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const processImageFile = useCallback(async (file: File) => {
     // 檢查檔案類型
     if (!file.type.startsWith('image/')) {
       alert('請選擇圖片檔案');
       return;
     }
 
-    // 檢查檔案大小（5MB）
-    if (file.size > 5 * 1024 * 1024) {
-      alert('圖片大小不能超過 5MB');
+    // 檢查檔案大小（20MB 上限，超過的話直接拒絕）
+    if (file.size > 20 * 1024 * 1024) {
+      alert('圖片大小不能超過 20MB');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const src = e.target?.result as string;
+    setUploadProgress(10);
+
+    try {
+      // 如果檔案大於 500KB，自動壓縮
+      let src: string;
+      if (file.size > 500 * 1024) {
+        setUploadProgress(30);
+        console.log(`📦 原始大小: ${(file.size / 1024).toFixed(2)} KB，開始壓縮...`);
+        src = await compressImage(file);
+
+        // 計算壓縮後的大小
+        const compressedSize = (src.length * 3) / 4; // Base64 大小估算
+        console.log(`✅ 壓縮完成: ${(compressedSize / 1024).toFixed(2)} KB`);
+        setUploadProgress(80);
+      } else {
+        // 小檔案直接讀取
+        src = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        setUploadProgress(80);
+      }
+
+      setUploadProgress(90);
       editor?.chain().focus().setImage({ src }).run();
-    };
-    reader.readAsDataURL(file);
-    
+      setUploadProgress(100);
+
+      // 延遲隱藏進度條
+      setTimeout(() => {
+        setUploadProgress(null);
+      }, 500);
+
+    } catch (error) {
+      console.error('圖片處理失敗:', error);
+      alert('圖片處理失敗，請重試');
+      setUploadProgress(null);
+    }
+  }, [editor, compressImage]);
+
+  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    processImageFile(file);
+
     // 清空 input
     event.target.value = '';
-  }, [editor]);
+  }, [processImageFile]);
+
+  // 拖曳事件處理
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+
+    // 只處理圖片檔案
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (imageFiles.length === 0) {
+      alert('請拖曳圖片檔案');
+      return;
+    }
+
+    // 處理第一張圖片
+    processImageFile(imageFiles[0]);
+
+    // 如果有多張圖片，依序處理
+    if (imageFiles.length > 1) {
+      imageFiles.slice(1).forEach((file, index) => {
+        setTimeout(() => {
+          processImageFile(file);
+        }, (index + 1) * 500); // 每張圖片間隔 500ms
+      });
+    }
+  }, [processImageFile]);
 
   if (!editor) {
     return null;
@@ -324,8 +491,44 @@ export function CanvasEditor({ channelId }: CanvasEditorProps) {
       </div>
 
       {/* 編輯器內容 */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div
+        className="flex-1 overflow-y-auto bg-white relative"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <EditorContent editor={editor} className="h-full" />
+
+        {/* 拖曳覆蓋層 */}
+        {isDragging && (
+          <div className="absolute inset-0 bg-morandi-gold/10 border-2 border-dashed border-morandi-gold flex items-center justify-center z-50">
+            <div className="text-center">
+              <ImageIcon size={48} className="mx-auto mb-2 text-morandi-gold" />
+              <p className="text-lg font-medium text-morandi-primary">放開以上傳圖片</p>
+              <p className="text-sm text-morandi-secondary mt-1">支援拖曳多張圖片</p>
+            </div>
+          </div>
+        )}
+
+        {/* 上傳進度 */}
+        {uploadProgress !== null && (
+          <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 border border-border z-50">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin">
+                <ImageIcon size={20} className="text-morandi-gold" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-morandi-primary">上傳中...</p>
+                <div className="w-48 h-1.5 bg-morandi-container/20 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-morandi-gold transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* 樣式 */}

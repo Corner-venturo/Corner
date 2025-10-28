@@ -49,34 +49,28 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
     },
     ref
   ) {
-    console.log('🎬 [MessageList] render:', {
-      isLoading,
-      messagesCount: messages.length,
-      advanceListsCount: advanceLists.length,
-      sharedOrderListsCount: sharedOrderLists.length
-    });
-
     if (isLoading) {
-      console.log('⏳ [MessageList] 顯示載入狀態');
       return (
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center bg-white">
           <div className="animate-spin w-6 h-6 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
         </div>
       );
     }
 
-    if (messages.length === 0 && advanceLists.length === 0 && sharedOrderLists.length === 0) {
-      console.log('📭 [MessageList] 顯示空狀態');
-      return <EmptyState channelName={channelName} />;
-    }
+    const hasNoContent = messages.length === 0 && advanceLists.length === 0 && sharedOrderLists.length === 0;
 
-    console.log('📝 [MessageList] 顯示訊息列表');
+    if (hasNoContent) {
+      return (
+        <div className="flex-1 flex items-center justify-center bg-white">
+          <EmptyState channelName={channelName} />
+        </div>
+      );
+    }
 
     return (
       <div
         ref={ref}
-        className="flex-1 overflow-y-auto space-y-4 min-h-0 transition-opacity duration-150"
-        style={{ backgroundColor: theme.colors.surface, padding: theme.spacing.lg }}
+        className="flex-1 overflow-y-auto space-y-4 min-h-0 transition-opacity duration-150 bg-white p-6"
       >
         {messages.map(message => (
           <MessageItem

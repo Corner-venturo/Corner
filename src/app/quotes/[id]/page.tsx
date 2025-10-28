@@ -141,7 +141,7 @@ export default function QuoteDetailPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-full space-y-6">
       <QuoteHeader
         isSpecialTour={isSpecialTour}
         isReadOnly={isReadOnly}
@@ -162,8 +162,8 @@ export default function QuoteDetailPage() {
         router={router}
       />
 
-      <div className="px-6 pb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+      <div className="w-full px-6 pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
           {/* 左側內容區 - 70% */}
           <div className={cn(
             "lg:col-span-7",
@@ -179,7 +179,6 @@ export default function QuoteDetailPage() {
                       <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-8 table-divider">數量</th>
                       <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider">單價</th>
                       <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider whitespace-nowrap">小計</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-32 table-divider">備註</th>
                       <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-24">操作</th>
                     </tr>
                   </thead>

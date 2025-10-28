@@ -242,6 +242,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
     try {
+      // 🔥 從 Supabase 刪除
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as unknown)
@@ -258,6 +259,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       console.log('⚠️ 訊息刪除失敗，僅從本地刪除:', error);
     }
 
+    // 🔥 從 IndexedDB 刪除
+    try {
+      await localDB.delete('messages', messageId);
+      console.log('✅ 訊息已從 IndexedDB 刪除');
+    } catch (error) {
+      console.error('⚠️ IndexedDB 刪除失敗:', error);
+    }
+
+    // 🔥 從 Zustand 狀態刪除
     set((state) => {
       const nextChannelMessages = { ...state.channelMessages };
 

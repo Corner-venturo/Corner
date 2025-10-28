@@ -14,27 +14,33 @@ import { BaseEntity } from './base.types';
 export interface Quote extends BaseEntity {
   code: string;              // 報價單編號
   customer_id?: string;      // 客戶 ID
-  customer_name?: string;    // 客戶姓名（冗餘欄位）
+  customer_name: string;     // 客戶姓名（必填）
+  customer_email?: string;   // 客戶電郵
+  customer_phone?: string;   // 客戶電話
   name?: string;             // 報價單名稱
-  destination: string;       // 目的地
-  start_date: string;        // 出發日期 (ISO 8601)
-  end_date: string;          // 結束日期 (ISO 8601)
-  days: number;              // 天數
-  nights: number;            // 夜數
-  number_of_people: number;  // 人數
+  destination?: string;      // 目的地
+  start_date?: string;       // 出發日期 (ISO 8601)
+  end_date?: string;         // 結束日期 (ISO 8601)
+  days?: number;             // 天數
+  nights?: number;           // 夜數
+  number_of_people?: number; // 人數
   group_size?: number;       // 團體人數（與 number_of_people 同義，保留向後相容）
+  adult_count?: number;      // 成人數
+  child_count?: number;      // 兒童數
+  infant_count?: number;     // 嬰兒數
   accommodation_days?: number; // 住宿天數
-  status: QuoteStatus;       // 報價狀態
-  total_amount: number;      // 總金額
+  status?: string;           // 報價狀態
+  total_amount?: number;     // 總金額
   total_cost?: number;       // 總成本
-  version: number;           // 版本號
+  version?: number;          // 版本號
   valid_until?: string;      // 有效期限 (ISO 8601)
   notes?: string;            // 備註
-  is_active: boolean;        // 是否啟用
+  is_active?: boolean;       // 是否啟用
   created_by?: string;       // 建立人 ID
   created_by_name?: string;  // 建立人姓名（冗餘欄位）
   converted_to_tour?: boolean; // 是否已轉成旅遊團
   tour_id?: string;          // 轉換後的旅遊團 ID
+  is_pinned?: boolean;       // 是否置頂（範本報價單）
 
   // 擴展欄位（用於詳細頁）- 使用 any 暫時相容舊結構
   categories?: any[];        // 報價分類（複雜的前端結構，使用 CostCategory[] 或 any[]）

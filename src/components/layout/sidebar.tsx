@@ -120,7 +120,7 @@ const menuItems: MenuItem[] = [
       { href: '/database/regions', label: '地區管理', icon: MapPin, requiredPermission: 'database' },
       { href: '/database/transport', label: '交通選項', icon: ShoppingCart, requiredPermission: 'database' },
       { href: '/database/activities', label: '活動門票', icon: CheckSquare, requiredPermission: 'database' },
-      { href: '/database/pricing', label: '價格管理', icon: Calculator, requiredPermission: 'database' },
+      { href: '/database/attractions', label: '景點管理', icon: MapPin, requiredPermission: 'database' },
       { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },
     ]
   },

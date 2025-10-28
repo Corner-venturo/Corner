@@ -36,13 +36,13 @@ const databaseModules = [
     count: 18
   },
   {
-    id: 'pricing',
-    title: '價格管理',
-    description: '統一管理價格策略和折扣規則',
-    icon: Calculator,
-    href: '/database/pricing',
-    color: 'bg-orange-500',
-    count: 5
+    id: 'attractions',
+    title: '景點管理',
+    description: '管理各地區的旅遊景點資訊',
+    icon: MapIcon,
+    href: '/database/attractions',
+    color: 'bg-rose-500',
+    count: 0
   },
   {
     id: 'suppliers',

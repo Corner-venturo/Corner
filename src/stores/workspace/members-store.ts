@@ -41,7 +41,16 @@ export const useMembersStore = create<MembersState>((set) => ({
     }
 
     try {
+      console.log(`🔍 [成員載入] 載入頻道成員: ${channelId}`);
       const members = await fetchChannelMembers(workspaceId, channelId);
+      console.log(`✅ [成員載入] 收到 ${members.length} 位成員:`, members.map(m => ({
+        id: m.id,
+        role: m.role,
+        profile: m.profile ? {
+          displayName: m.profile.displayName,
+          englishName: m.profile.englishName
+        } : null
+      })));
       set((state) => ({
         channelMembers: {
           ...state.channelMembers,

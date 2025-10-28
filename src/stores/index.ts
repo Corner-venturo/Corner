@@ -138,8 +138,12 @@ export const useVisaStore = createStore<Visa>('visas', 'V');
 // 供應商 Store
 export const useSupplierStore = createStore<Supplier>('suppliers', 'S');
 
-// 地區 Store
+// 地區 Store（舊版，保留向後相容）
 export const useRegionStore = createStore<Region>('regions');
+
+// 地區 Store（新版，三層架構）
+export { useRegionStoreNew } from './region-store-new';
+export type { Country, Region as RegionNew, City, RegionStats } from './region-store-new';
 
 // 行事曆事件 Store
 export const useCalendarEventStore = createStore<import('@/types/calendar.types').CalendarEvent>('calendar_events');

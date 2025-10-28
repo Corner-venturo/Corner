@@ -50,9 +50,15 @@ export interface LeaderInfo {
   overseasPhone: string;
 }
 
-export interface MeetingInfo {
+export interface MeetingPoint {
   time: string;
   location: string;
+}
+
+export interface HotelInfo {
+  name: string;
+  description: string;
+  image?: string;
 }
 
 export interface TourFormData {
@@ -70,7 +76,10 @@ export interface TourFormData {
   features: Feature[];
   focusCards: FocusCard[];
   leader: LeaderInfo;
-  meetingInfo: MeetingInfo;
+  meetingPoints: MeetingPoint[];  // 改為陣列支援多個集合地點
+  hotels: HotelInfo[];  // 新增飯店資訊陣列
+  showLeaderMeeting?: boolean;  // 是否顯示領隊與集合資訊
+  showHotels?: boolean;  // 是否顯示飯店資訊
   itinerarySubtitle: string;
   dailyItinerary: DailyItinerary[];
 }
@@ -82,6 +91,7 @@ export interface IconOption {
 }
 
 export interface CityOption {
+  id: string;
   code: string;
   name: string;
 }

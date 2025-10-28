@@ -14,22 +14,39 @@ import { BaseEntity } from './base.types';
 export interface Tour extends BaseEntity {
   code: string;              // 團號（統一使用 code）
   name: string;              // 團名
-  location: string;          // 目的地（相容舊欄位：destination）
+  location?: string;         // 目的地（相容舊欄位：destination）
+  country_id?: string;       // 國家 ID
+  main_city_id?: string;     // 主要城市 ID
   departure_date: string;    // 出發日期 (ISO 8601)（相容舊欄位：start_date）
   return_date: string;       // 返回日期 (ISO 8601)（相容舊欄位：end_date）
-  status: TourStatus; // 狀態（英文）
-  price: number;             // 基本價格
-  max_participants: number;  // 最大參與人數（相容舊欄位：max_people）
+  status?: string;           // 狀態（英文）
+  price?: number;            // 基本價格
+  max_participants?: number; // 最大參與人數（相容舊欄位：max_people）
   current_participants?: number; // 當前參與人數
-  contract_status: ContractStatus; // 合約狀態
+  contract_status: string;   // 合約狀態
   total_revenue: number;     // 總收入
   total_cost: number;        // 總成本
   profit: number;            // 利潤
   description?: string;      // 團體說明/描述
   archived?: boolean;        // 是否已封存
-  features?: unknown[];          // 行程特色（用於展示頁面）
+  is_active?: boolean;       // 是否啟用
+  features?: unknown;        // 行程特色（用於展示頁面）
   quote_id?: string;         // 關聯的報價單ID
-  quote_cost_structure?: unknown[]; // 報價成本結構快照
+  quote_cost_structure?: unknown; // 報價成本結構快照
+
+  // 合約相關欄位
+  contract_template?: string;     // 合約範本
+  contract_content?: string;      // 合約內容
+  contract_notes?: string;        // 合約備註
+  contract_completed?: boolean;   // 合約是否完成
+  contract_created_at?: string;   // 合約建立時間
+  contract_archived_date?: string; // 合約封存日期
+  envelope_records?: string;      // 信封記錄
+
+  // 同步欄位
+  _deleted?: boolean;        // 軟刪除標記
+  _needs_sync?: boolean;     // 需要同步
+  _synced_at?: string;       // 最後同步時間
 }
 
 // ============================================

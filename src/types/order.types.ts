@@ -18,6 +18,7 @@ export interface Order extends BaseEntity {
   tour_name: string;         // 旅遊團名稱
   customer_id?: string;      // 客戶 ID（可選）
   contact_person: string;    // 聯絡人
+  contact_phone?: string;    // 聯絡電話（可選）
   sales_person: string;      // 業務人員
   assistant: string;         // 助理
   member_count: number;      // 團員人數

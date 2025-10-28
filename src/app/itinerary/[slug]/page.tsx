@@ -37,28 +37,119 @@ export default function EditItineraryPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [itineraryData, setItineraryData] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  // 載入行程資料
+  // 載入行程資料或從旅遊團建立
   useEffect(() => {
-    const loadItinerary = async () => {
+    const loadOrCreateItinerary = async () => {
       try {
+        // 1. 先嘗試載入行程
         const itinerary = await fetchById(slug);
         if (itinerary) {
           setItineraryData(itinerary);
-        } else {
-          alert('找不到此行程');
-          router.push('/itinerary');
+          setLoading(false);
+          return;
         }
+
+        // 2. 找不到行程，嘗試從旅遊團載入
+        const { useTourStore } = await import('@/stores');
+        const tour = useTourStore.getState().items.find(t => t.id === slug);
+
+        if (tour) {
+          // 從旅遊團建立行程資料
+          const { useRegionStoreNew } = await import('@/stores');
+          const { countries, cities } = useRegionStoreNew.getState();
+
+          // 找到國家和城市名稱
+          const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null;
+          const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null;
+
+          // 計算天數
+          const departureDate = new Date(tour.departure_date);
+          const returnDate = new Date(tour.return_date);
+          const days = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+          // 建立預設行程資料
+          const newItinerary = {
+            id: slug,
+            tour_id: slug,
+            tagline: "Corner Travel 2025",
+            title: tour.name,
+            subtitle: "精緻旅遊",
+            description: tour.description || "",
+            departureDate: departureDate.toLocaleDateString('zh-TW'),
+            tourCode: tour.code,
+            coverImage: city?.background_image_url || "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop",
+            country: country?.name || tour.location || "",
+            city: city?.name || tour.location || "",
+            status: "草稿",
+            outboundFlight: {
+              airline: "",
+              flightNumber: "",
+              departureAirport: "TPE",
+              departureTime: "",
+              departureDate: departureDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+              arrivalAirport: city?.airport_code || "",
+              arrivalTime: "",
+              duration: "",
+            },
+            returnFlight: {
+              airline: "",
+              flightNumber: "",
+              departureAirport: city?.airport_code || "",
+              departureTime: "",
+              departureDate: returnDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+              arrivalAirport: "TPE",
+              arrivalTime: "",
+              duration: "",
+            },
+            features: [],
+            focusCards: [],
+            leader: {
+              name: "",
+              domesticPhone: "",
+              overseasPhone: "",
+            },
+            meetingInfo: {
+              time: "",
+              location: "",
+            },
+            itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,
+            dailyItinerary: Array.from({ length: days }, (_, i) => ({
+              dayLabel: `Day ${i + 1}`,
+              date: new Date(departureDate.getTime() + i * 24 * 60 * 60 * 1000).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+              title: i === 0 ? `台北 ✈ ${city?.name || tour.location}` :
+                     i === days - 1 ? `${city?.name || tour.location} ✈ 台北` :
+                     `${city?.name || tour.location} 自由活動`,
+              highlight: "",
+              description: "",
+              activities: [],
+              recommendations: [],
+              meals: {
+                breakfast: i === 0 ? "溫暖的家" : "飯店內早餐",
+                lunch: "敬請自理",
+                dinner: i === days - 1 ? "溫暖的家" : "敬請自理",
+              },
+              accommodation: i === days - 1 ? "" : "待安排",
+            })),
+          };
+
+          setItineraryData(newItinerary);
+          setLoading(false);
+          return;
+        }
+
+        // 3. 都找不到，顯示錯誤
+        setNotFound(true);
+        setLoading(false);
       } catch (error) {
-        console.error('載入行程失敗:', error);
-        alert('載入行程失敗');
-        router.push('/itinerary');
-      } finally {
+        console.error('載入或建立行程失敗:', error);
+        setNotFound(true);
         setLoading(false);
       }
     };
 
-    loadItinerary();
+    loadOrCreateItinerary();
   }, [slug, fetchById, router]);
 
   // Convert icon strings to components for preview
@@ -99,11 +190,52 @@ export default function EditItineraryPage() {
   }, [viewMode]);
 
   // 載入中狀態
-  if (loading || !itineraryData) {
+  if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
           <p className="text-lg text-morandi-secondary">載入中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 找不到行程
+  if (notFound || !itineraryData) {
+    return (
+      <div className="h-full flex flex-col">
+        <ResponsiveHeader
+          title="行程不存在"
+          breadcrumb={[
+            { label: '首頁', href: '/' },
+            { label: '行程管理', href: '/itinerary' },
+            { label: '錯誤', href: '#' }
+          ]}
+          showBackButton={true}
+          onBack={() => router.push('/itinerary')}
+        />
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="text-center max-w-md">
+            <div className="text-6xl mb-4">📄</div>
+            <h2 className="text-2xl font-bold text-morandi-primary mb-2">找不到此行程</h2>
+            <p className="text-morandi-secondary mb-6">
+              行程可能已被刪除，或是您輸入的網址不正確。
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => router.push('/itinerary')}
+                className="px-6 py-2 border border-border rounded-lg hover:bg-morandi-container/20 transition-colors"
+              >
+                返回列表
+              </button>
+              <button
+                onClick={() => router.push('/itinerary/new')}
+                className="px-6 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors"
+              >
+                建立新行程
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

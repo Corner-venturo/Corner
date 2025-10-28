@@ -117,7 +117,7 @@ export function CoverInfoSection({
           >
             <option value="">請選擇城市</option>
             {availableCities.map(city => (
-              <option key={city.code} value={city.name}>{city.name}</option>
+              <option key={city.id} value={city.name}>{city.name}</option>
             ))}
           </select>
         </div>
@@ -144,14 +144,6 @@ export function CoverInfoSection({
             placeholder="25JFO21CIG"
           />
         </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">作者</label>
-        <div className="w-full px-3 py-2 border rounded-lg bg-gray-50 text-gray-600">
-          {user?.display_name || user?.english_name || '未登入'} ({user?.employee_number || '-'})
-        </div>
-        <p className="text-xs text-gray-500 mt-1">自動取得當前登入用戶資訊</p>
       </div>
     </div>
   );

@@ -3,10 +3,31 @@
 import { useEffect } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ChannelChat } from '@/components/workspace/ChannelChat';
-import { useTourStore } from '@/stores';
+import { useTourStore, useWorkspaceStore } from '@/stores';
+import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
+import { useAutoAddVisaMembers } from '@/hooks/use-auto-add-visa-members';
 
 export default function WorkspacePage() {
   const { items: tours } = useTourStore();
+  const { loadWorkspaces, loadChannelGroups, currentWorkspace } = useWorkspaceStore();
+
+  // 自動建立旅遊團頻道
+  useAutoCreateTourChannels();
+
+  // 自動將所有員工加入簽證頻道
+  useAutoAddVisaMembers();
+
+  // 載入工作空間
+  useEffect(() => {
+    loadWorkspaces();
+  }, [loadWorkspaces]);
+
+  // 載入頻道群組
+  useEffect(() => {
+    if (currentWorkspace) {
+      loadChannelGroups(currentWorkspace.id);
+    }
+  }, [currentWorkspace?.id, loadChannelGroups]);
 
   // 🐛 Debug: 監聽旅遊團資料變化（使用快取資料，不重新載入）
   useEffect(() => {
@@ -26,7 +47,7 @@ export default function WorkspacePage() {
         ]}
       />
 
-      <div className="flex-1 overflow-hidden mt-4">
+      <div className="flex-1 overflow-hidden">
         <ChannelChat />
       </div>
     </div>

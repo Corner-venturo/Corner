@@ -13,6 +13,8 @@ import {
   Filter,
   Users,
   UserMinus,
+  GripVertical,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -33,6 +35,24 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { ChannelMember } from '@/services/workspace-members';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  useDroppable,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const ROLE_LABELS: Record<string, string> = {
   owner: '擁有者',
@@ -91,6 +111,112 @@ interface ChannelSidebarProps {
   onSelectChannel: (channel: Channel) => void;
 }
 
+interface SortableChannelItemProps {
+  channel: Channel;
+  isActive: boolean;
+  onSelectChannel: (channel: Channel) => void;
+  toggleChannelFavorite: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
+
+function SortableChannelItem({ channel, isActive, onSelectChannel, toggleChannelFavorite, onDelete }: SortableChannelItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: channel.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  // 判斷是否為旅遊團頻道
+  const isTourChannel = !!channel.tour_id;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        'group flex items-center gap-2 px-2 py-1.5 text-sm rounded cursor-grab active:cursor-grabbing transition-colors',
+        isActive
+          ? 'bg-morandi-gold/15 text-morandi-primary font-medium'
+          : 'text-morandi-secondary hover:bg-morandi-container/20 hover:text-morandi-primary'
+      )}
+    >
+      <div className="flex items-center gap-2 flex-1 min-w-0" onClick={() => onSelectChannel(channel)}>
+        {channel.type === 'private' ? (
+          <Lock size={14} className="shrink-0" />
+        ) : (
+          <Hash size={14} className="shrink-0" />
+        )}
+        <span className="flex-1 truncate">{channel.name}</span>
+      </div>
+      <div className="flex items-center gap-1" onPointerDown={(e) => e.stopPropagation()}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('🌟 [SortableChannelItem] 星號按鈕被點擊:', channel.name);
+            toggleChannelFavorite(channel.id);
+          }}
+          className={cn(
+            'opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 transition-opacity',
+            channel.is_favorite && 'opacity-100 text-morandi-gold'
+          )}
+        >
+          <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
+        </button>
+        {!isTourChannel && onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(channel.id);
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-100 text-red-600 hover:text-red-700 transition-opacity"
+          >
+            <Trash2 size={12} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface DroppableGroupHeaderProps {
+  groupId: string;
+  groupName: string;
+  isCollapsed: boolean;
+  onToggle: () => void;
+}
+
+function DroppableGroupHeader({ groupId, groupName, isCollapsed, onToggle }: DroppableGroupHeaderProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: groupId,
+  });
+
+  return (
+    <button
+      ref={setNodeRef}
+      className={cn(
+        'flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider flex-1 hover:bg-morandi-container/20 rounded transition-colors',
+        isOver && 'bg-morandi-gold/20'
+      )}
+      onClick={onToggle}
+    >
+      {isCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+      <span>{groupName}</span>
+      {isOver && <span className="ml-auto text-morandi-gold">放開以移動</span>}
+    </button>
+  );
+}
+
 export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSidebarProps) {
   const {
     channels,
@@ -106,6 +232,11 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     channelMembers,
     loadChannelMembers,
     removeChannelMember,
+    updateChannelOrder,
+    reorderChannels,
+    updateChannel,
+    deleteChannel,
+    createChannel,
   } = useWorkspaceStore();
   const { user } = useAuthStore();
 
@@ -118,6 +249,24 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const [memberToRemove, setMemberToRemove] = useState<ChannelMember | null>(null);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isRemovingMember, setIsRemovingMember] = useState(false);
+  const [channelToDelete, setChannelToDelete] = useState<Channel | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingChannel, setIsDeletingChannel] = useState(false);
+  const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false);
+  const [newChannelName, setNewChannelName] = useState('');
+  const [newChannelDescription, setNewChannelDescription] = useState('');
+  const [newChannelType, setNewChannelType] = useState<'public' | 'private'>('public');
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 需要拖曳 8px 才會觸發拖曳，允許正常點擊
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const canManageMembers = useMemo(() => {
     if (!user) return false;
@@ -143,6 +292,13 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     if (channelFilter === 'starred') {
       filtered = filtered.filter(ch => ch.is_favorite);
     }
+
+    // 根據 order 排序
+    filtered = [...filtered].sort((a, b) => {
+      const orderA = a.order ?? 9999;
+      const orderB = b.order ?? 9999;
+      return orderA - orderB;
+    });
 
     return filtered;
   }, [channels, searchQuery, channelFilter]);
@@ -177,6 +333,127 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
   };
 
+  const handleDeleteChannel = async () => {
+    if (!channelToDelete) {
+      return;
+    }
+
+    setIsDeletingChannel(true);
+    try {
+      await deleteChannel(channelToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setChannelToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete channel:', error);
+    } finally {
+      setIsDeletingChannel(false);
+    }
+  };
+
+  const handleDeleteClick = (channelId: string) => {
+    const channel = channels.find(ch => ch.id === channelId);
+    if (channel) {
+      setChannelToDelete(channel);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    console.log('🎯 [handleDragEnd] 拖曳結束:', { activeId: active.id, overId: over?.id });
+
+    if (!over || active.id === over.id) {
+      console.log('⏭️ [handleDragEnd] 沒有目標或拖到自己，跳過');
+      return;
+    }
+
+    const draggedChannelId = active.id as string;
+    const draggedChannel = channels.find(ch => ch.id === draggedChannelId);
+
+    if (!draggedChannel) {
+      console.error('❌ [handleDragEnd] 找不到被拖曳的頻道:', draggedChannelId);
+      return;
+    }
+
+    console.log('🎯 [handleDragEnd] 被拖曳的頻道:', draggedChannel.name);
+
+    // 檢查是否拖到群組標題上（over.id 是群組 ID）
+    const targetGroup = channelGroups.find(g => g.id === over.id);
+
+    if (targetGroup) {
+      console.log('📁 [handleDragEnd] 拖到群組:', targetGroup.name);
+      // 拖到群組：更新該頻道的 group_id
+      await updateChannel(draggedChannelId, {
+        group_id: targetGroup.id,
+        is_favorite: false // 移到群組時取消最愛
+      });
+      return;
+    }
+
+    // 檢查是否拖到其他頻道上
+    const targetChannel = channels.find(ch => ch.id === over.id);
+
+    if (targetChannel) {
+      console.log('📄 [handleDragEnd] 拖到頻道:', targetChannel.name);
+
+      // 同群組內排序或跨群組拖曳到另一個頻道上
+      const bothHaveNoGroup = !draggedChannel.group_id && !targetChannel.group_id;
+      const sameGroup = draggedChannel.group_id === targetChannel.group_id;
+
+      if (!bothHaveNoGroup && !sameGroup) {
+        console.log('🔀 [handleDragEnd] 跨群組拖曳');
+        // 跨群組：只在兩個頻道都沒有群組時才允許移動
+        // 或者目標頻道的 group_id 確實存在於 channel_groups 中
+        if (!targetChannel.group_id) {
+          // 移到沒有群組的區域
+          await updateChannel(draggedChannelId, {
+            group_id: null,
+            is_favorite: false
+          });
+        } else {
+          // 檢查目標群組是否存在
+          const targetGroupExists = channelGroups.find(g => g.id === targetChannel.group_id);
+          if (targetGroupExists) {
+            await updateChannel(draggedChannelId, {
+              group_id: targetChannel.group_id,
+              is_favorite: false
+            });
+          } else {
+            console.warn('⚠️ [handleDragEnd] 目標群組不存在，取消移動');
+          }
+        }
+      } else {
+        console.log('🔄 [handleDragEnd] 同群組內排序');
+        // 同群組內：重新排序
+        const groupChannels = channels.filter(ch =>
+          (bothHaveNoGroup ? !ch.group_id : ch.group_id === draggedChannel.group_id) &&
+          ch.is_favorite === draggedChannel.is_favorite
+        );
+
+        console.log('🔄 [handleDragEnd] 群組內頻道數量:', groupChannels.length);
+
+        const oldIndex = groupChannels.findIndex(ch => ch.id === draggedChannelId);
+        const newIndex = groupChannels.findIndex(ch => ch.id === over.id);
+
+        console.log('🔄 [handleDragEnd] 移動:', { oldIndex, newIndex });
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const reorderedChannels = arrayMove(groupChannels, oldIndex, newIndex);
+
+          console.log('🔄 [handleDragEnd] 重新排序後的頻道:', reorderedChannels.map((ch, i) => ({ name: ch.name, order: i })));
+
+          // 更新順序
+          for (let i = 0; i < reorderedChannels.length; i++) {
+            console.log(`🔢 [handleDragEnd] 更新順序: ${reorderedChannels[i].name} -> ${i}`);
+            await updateChannelOrder(reorderedChannels[i].id, i);
+          }
+          console.log('✅ [handleDragEnd] 所有順序更新完成');
+        }
+      }
+    }
+  };
+
   // 分類頻道
   const favoriteChannels = filteredChannels.filter(ch => ch.is_favorite);
   const ungroupedChannels = filteredChannels.filter(ch => !ch.group_id && !ch.is_favorite);
@@ -185,38 +462,19 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     channels: filteredChannels.filter(ch => ch.group_id === group.id)
   }));
 
-  const renderChannel = (channel: Channel) => {
-    const isActive = channel.id === selectedChannelId;
-
+  const renderChannelList = (channelList: Channel[]) => {
     return (
-      <div
-        key={channel.id}
-        className={cn(
-          'group flex items-center gap-2 px-2 py-1.5 text-sm rounded cursor-pointer transition-colors',
-          isActive
-            ? 'bg-morandi-gold/15 text-morandi-primary font-medium'
-            : 'text-morandi-secondary hover:bg-morandi-container/20 hover:text-morandi-primary'
-        )}
-        onClick={() => onSelectChannel(channel)}
-      >
-        {channel.type === 'private' ? (
-          <Lock size={14} className="shrink-0" />
-        ) : (
-          <Hash size={14} className="shrink-0" />
-        )}
-        <span className="flex-1 truncate">{channel.name}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleChannelFavorite(channel.id);
-          }}
-          className={cn(
-            'opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 transition-opacity',
-            channel.is_favorite && 'opacity-100 text-morandi-gold'
-          )}
-        >
-          <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
-        </button>
+      <div className="space-y-0.5">
+        {channelList.map((channel) => (
+          <SortableChannelItem
+            key={channel.id}
+            channel={channel}
+            isActive={channel.id === selectedChannelId}
+            onSelectChannel={onSelectChannel}
+            toggleChannelFavorite={toggleChannelFavorite}
+            onDelete={handleDeleteClick}
+          />
+        ))}
       </div>
     );
   };
@@ -234,8 +492,32 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
   };
 
+  const handleCreateChannel = async () => {
+    if (!newChannelName.trim() || !currentWorkspace || !user) {
+      return;
+    }
+
+    try {
+      await createChannel({
+        workspace_id: currentWorkspace.id,
+        name: newChannelName.trim(),
+        description: newChannelDescription.trim() || undefined,
+        type: newChannelType,
+        created_by: user.id, // 🔥 修正：User 類型只有 id，沒有 employee_id
+      });
+
+      // 重置表單
+      setNewChannelName('');
+      setNewChannelDescription('');
+      setNewChannelType('public');
+      setShowCreateChannelDialog(false);
+    } catch (error) {
+      console.error('Failed to create channel:', error);
+    }
+  };
+
   return (
-    <div className="w-[280px] bg-morandi-container/5 border-r border-morandi-gold/20 flex flex-col shrink-0">
+    <div className="w-[280px] bg-white border-r border-morandi-gold/20 flex flex-col shrink-0">
       {/* 工作空間標題列 */}
       <div className="h-[52px] px-6 border-b border-morandi-gold/20 bg-gradient-to-r from-morandi-gold/5 to-transparent flex items-center">
         <div className="flex items-center justify-between w-full">
@@ -243,9 +525,10 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
             {currentWorkspace?.icon} {currentWorkspace?.name || '工作空間'}
           </h2>
           <div className="flex items-center gap-1">
-            <button className="btn-icon-morandi !w-7 !h-7">
+            {/* TODO: 實作搜尋功能 */}
+            {/* <button className="btn-icon-morandi !w-7 !h-7">
               <Search size={14} />
-            </button>
+            </button> */}
             <DropdownMenu>
               <DropdownMenuTrigger className="btn-icon-morandi !w-7 !h-7">
                 <Filter size={14} />
@@ -265,9 +548,21 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <button className="btn-icon-morandi !w-7 !h-7">
-              <Settings size={14} />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="btn-icon-morandi !w-7 !h-7">
+                <Settings size={14} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[140px]">
+                <DropdownMenuItem onClick={() => setShowCreateChannelDialog(true)} className="dropdown-item-morandi">
+                  <Plus size={14} className="mr-2" />
+                  建立頻道
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowNewGroupDialog(true)} className="dropdown-item-morandi">
+                  <Plus size={14} className="mr-2" />
+                  建立群組
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -284,148 +579,82 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
       </div>
 
       {/* 頻道區塊 */}
-      <div className="flex-1 overflow-y-auto">
-        {/* 我的最愛 */}
-        {favoriteChannels.length > 0 && (
-          <div className="px-2 py-2">
-            <button
-              className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider w-full hover:bg-morandi-container/20 rounded transition-colors"
-              onClick={() => setExpandedSections(prev => ({ ...prev, favorites: !prev.favorites }))}
-            >
-              {expandedSections.favorites ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-              <Star size={12} />
-              <span>我的最愛</span>
-            </button>
-            {expandedSections.favorites && (
-              <div className="mt-1 space-y-0.5">
-                {favoriteChannels.map(renderChannel)}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={filteredChannels.map(ch => ch.id)} strategy={verticalListSortingStrategy}>
+          <div className="flex-1 overflow-y-auto">
+            {/* 我的最愛 */}
+            {favoriteChannels.length > 0 && (
+              <div className="px-2 py-2">
+                <button
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider w-full hover:bg-morandi-container/20 rounded transition-colors"
+                  onClick={() => setExpandedSections(prev => ({ ...prev, favorites: !prev.favorites }))}
+                >
+                  {expandedSections.favorites ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                  <Star size={12} />
+                  <span>我的最愛</span>
+                </button>
+                {expandedSections.favorites && (
+                  <div className="mt-1">
+                    {renderChannelList(favoriteChannels)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 自訂群組 */}
+            {groupedChannels.map(({ group, channels: groupChannels }) => (
+              <div key={group.id} className="px-2 py-2">
+                <div className="flex items-center justify-between group/section">
+                  <DroppableGroupHeader
+                    groupId={group.id}
+                    groupName={group.name}
+                    isCollapsed={group.is_collapsed}
+                    onToggle={() => toggleGroupCollapse(group.id)}
+                  />
+                </div>
+                {!group.is_collapsed && groupChannels.length > 0 && (
+                  <div className="mt-1">
+                    {renderChannelList(groupChannels)}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* 未分組頻道 */}
+            {ungroupedChannels.length > 0 && (
+              <div className="px-2 py-2">
+                <div className="flex items-center justify-between group/section">
+                  <button
+                    className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider flex-1 hover:bg-morandi-container/20 rounded transition-colors"
+                    onClick={() => setExpandedSections(prev => ({ ...prev, ungrouped: !prev.ungrouped }))}
+                  >
+                    {expandedSections.ungrouped ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                    <Hash size={12} />
+                    <span>頻道</span>
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 opacity-0 group-hover/section:opacity-100 transition-opacity"
+                    onClick={() => setShowNewGroupDialog(true)}
+                  >
+                    <Plus size={12} />
+                  </Button>
+                </div>
+                {expandedSections.ungrouped && (
+                  <div className="mt-1">
+                    {renderChannelList(ungroupedChannels)}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-
-        {/* 自訂群組 */}
-        {groupedChannels.map(({ group, channels: groupChannels }) => (
-          <div key={group.id} className="px-2 py-2">
-            <div className="flex items-center justify-between group/section">
-              <button
-                className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider flex-1 hover:bg-morandi-container/20 rounded transition-colors"
-                onClick={() => toggleGroupCollapse(group.id)}
-              >
-                {group.is_collapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
-                <span>{group.name}</span>
-              </button>
-            </div>
-            {!group.is_collapsed && groupChannels.length > 0 && (
-              <div className="mt-1 space-y-0.5">
-                {groupChannels.map(renderChannel)}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* 未分組頻道 */}
-        {ungroupedChannels.length > 0 && (
-          <div className="px-2 py-2">
-            <div className="flex items-center justify-between group/section">
-              <button
-                className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider flex-1 hover:bg-morandi-container/20 rounded transition-colors"
-                onClick={() => setExpandedSections(prev => ({ ...prev, ungrouped: !prev.ungrouped }))}
-              >
-                {expandedSections.ungrouped ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-                <Hash size={12} />
-                <span>頻道</span>
-              </button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 opacity-0 group-hover/section:opacity-100 transition-opacity"
-                onClick={() => setShowNewGroupDialog(true)}
-              >
-                <Plus size={12} />
-              </Button>
-            </div>
-            {expandedSections.ungrouped && (
-              <div className="mt-1 space-y-0.5">
-                {ungroupedChannels.map(renderChannel)}
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="mt-4 border-t border-morandi-gold/20">
-          <div className="flex items-center justify-between px-4 pt-3 pb-2">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-morandi-secondary">
-              <Users size={12} />
-              <span>頻道成員</span>
-              {selectedChannelId && (
-                <span className="text-[11px] text-morandi-secondary/70">{currentChannelMembers.length}</span>
-              )}
-            </div>
-          </div>
-          <div className="px-3 pb-4 space-y-1.5">
-            {selectedChannelId ? (
-              currentChannelMembers.length > 0 ? (
-                currentChannelMembers.map((member) => {
-                  const displayName = member.profile?.displayName || member.profile?.englishName || '未命名成員';
-                  const roleLabel = formatRoleLabel(member.role);
-                  const statusLabel = formatStatusLabel(member.status);
-                  const statusVariant = getStatusBadgeVariant(member.status);
-
-                  return (
-                    <div
-                      key={member.id}
-                      className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-morandi-container/20"
-                    >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-morandi-container text-[12px] font-semibold text-morandi-primary">
-                        {getMemberInitials(member.profile?.displayName, member.profile?.englishName)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-morandi-primary">{displayName}</p>
-                        {member.profile?.englishName && member.profile.englishName !== displayName && (
-                          <p className="truncate text-[11px] text-morandi-secondary">
-                            {member.profile.englishName}
-                          </p>
-                        )}
-                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-morandi-secondary">
-                          <Badge variant="secondary" className="capitalize">
-                            {roleLabel}
-                          </Badge>
-                          <Badge variant={statusVariant} className="capitalize">
-                            {statusLabel}
-                          </Badge>
-                        </div>
-                      </div>
-                      {canManageMembers && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-morandi-red opacity-0 transition-opacity hover:text-morandi-red group-hover:opacity-100"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setMemberToRemove(member);
-                            setIsRemoveDialogOpen(true);
-                          }}
-                        >
-                          <UserMinus size={14} />
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="rounded-md bg-morandi-container/20 px-3 py-4 text-xs text-morandi-secondary">
-                  尚未有成員加入此頻道
-                </p>
-              )
-            ) : (
-              <p className="rounded-md bg-morandi-container/20 px-3 py-4 text-xs text-morandi-secondary">
-                選擇頻道以查看成員
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+        </SortableContext>
+      </DndContext>
 
       {/* 新增群組對話框 */}
       {showNewGroupDialog && (
@@ -446,6 +675,91 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
                 取消
               </button>
               <button className="btn-morandi-primary !py-1.5 !px-3 text-sm" onClick={handleCreateGroup}>建立</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 新增頻道對話框 */}
+      {showCreateChannelDialog && (
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="card-morandi-elevated w-96">
+            <h3 className="font-semibold mb-4 text-morandi-primary">建立頻道</h3>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-morandi-primary mb-1">頻道名稱</label>
+                <input
+                  type="text"
+                  placeholder="例如：專案討論"
+                  value={newChannelName}
+                  onChange={(e) => setNewChannelName(e.target.value)}
+                  autoFocus
+                  className="input-morandi"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-morandi-primary mb-1">頻道描述（選填）</label>
+                <textarea
+                  placeholder="說明這個頻道的用途"
+                  value={newChannelDescription}
+                  onChange={(e) => setNewChannelDescription(e.target.value)}
+                  className="input-morandi resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-morandi-primary mb-2">頻道類型</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setNewChannelType('public')}
+                    className={cn(
+                      'flex-1 py-2 px-3 rounded-lg border transition-colors text-sm',
+                      newChannelType === 'public'
+                        ? 'border-morandi-gold bg-morandi-gold/10 text-morandi-primary'
+                        : 'border-morandi-gold/20 text-morandi-secondary hover:border-morandi-gold/40'
+                    )}
+                  >
+                    <Hash size={16} className="inline mr-1" />
+                    公開
+                  </button>
+                  <button
+                    onClick={() => setNewChannelType('private')}
+                    className={cn(
+                      'flex-1 py-2 px-3 rounded-lg border transition-colors text-sm',
+                      newChannelType === 'private'
+                        ? 'border-morandi-gold bg-morandi-gold/10 text-morandi-primary'
+                        : 'border-morandi-gold/20 text-morandi-secondary hover:border-morandi-gold/40'
+                    )}
+                  >
+                    <Lock size={16} className="inline mr-1" />
+                    私密
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-4 justify-end">
+              <button
+                className="btn-morandi-secondary !py-1.5 !px-3 text-sm"
+                onClick={() => {
+                  setShowCreateChannelDialog(false);
+                  setNewChannelName('');
+                  setNewChannelDescription('');
+                  setNewChannelType('public');
+                }}
+              >
+                取消
+              </button>
+              <button
+                className="btn-morandi-primary !py-1.5 !px-3 text-sm"
+                onClick={handleCreateChannel}
+                disabled={!newChannelName.trim()}
+              >
+                建立
+              </button>
             </div>
           </div>
         </div>
@@ -484,6 +798,46 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
               disabled={isRemovingMember}
             >
               {isRemovingMember ? '移除中...' : '移除'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          setIsDeleteDialogOpen(open);
+          if (!open) {
+            setChannelToDelete(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-morandi-primary">刪除頻道</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-morandi-secondary">
+            確定要刪除頻道「{channelToDelete?.name}」嗎？此操作無法復原。
+          </p>
+          <DialogFooter className="mt-4">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setChannelToDelete(null);
+              }}
+              disabled={isDeletingChannel}
+              className="text-morandi-secondary hover:text-morandi-primary"
+            >
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteChannel}
+              disabled={isDeletingChannel}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeletingChannel ? '刪除中...' : '刪除'}
             </Button>
           </DialogFooter>
         </DialogContent>

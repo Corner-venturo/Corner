@@ -159,6 +159,37 @@ export class BackgroundSyncService {
           // 移除同步標記欄位
           const { _needs_sync, _synced_at, _deleted, ...syncData } = item;
 
+          // 🔥 特殊處理：為 quotes 表補充必填欄位的預設值
+          if (tableName === 'quotes') {
+            const quoteData = syncData as unknown;
+            // 如果缺少 customer_name，提供預設值
+            if (!(quoteData as { customer_name?: string }).customer_name) {
+              (quoteData as { customer_name: string }).customer_name = '待指定';
+            }
+            // 確保其他必填欄位也有值
+            if (!(quoteData as { destination?: string }).destination) {
+              (quoteData as { destination: string }).destination = '待指定';
+            }
+            if (!(quoteData as { start_date?: string }).start_date) {
+              (quoteData as { start_date: string }).start_date = new Date().toISOString().split('T')[0];
+            }
+            if (!(quoteData as { end_date?: string }).end_date) {
+              (quoteData as { end_date: string }).end_date = new Date().toISOString().split('T')[0];
+            }
+            if (!(quoteData as { days?: number }).days) {
+              (quoteData as { days: number }).days = 1;
+            }
+            if (!(quoteData as { nights?: number }).nights) {
+              (quoteData as { nights: number }).nights = 0;
+            }
+            if (!(quoteData as { number_of_people?: number }).number_of_people) {
+              (quoteData as { number_of_people: number }).number_of_people = 1;
+            }
+            if (!(quoteData as { total_amount?: number }).total_amount) {
+              (quoteData as { total_amount: number }).total_amount = 0;
+            }
+          }
+
           // 檢查是否已存在（update）或新建（insert）
           const { data: existing } = await supabase
             .from(tableName)
@@ -194,7 +225,29 @@ export class BackgroundSyncService {
 
           await localDB.put(tableName, syncedItem);
         } catch (error) {
-          logger.error(`❌ [${tableName}] 同步失敗:`, item.id, error);
+          logger.error(`❌ [${tableName}] 同步失敗:`, item.id);
+
+          // 詳細記錄錯誤資訊
+          if (error instanceof Error) {
+            logger.error('錯誤訊息:', error.message);
+            logger.error('錯誤堆疊:', error.stack);
+          } else if (typeof error === 'object' && error !== null) {
+            // Supabase 錯誤物件
+            logger.error('Supabase 錯誤:', JSON.stringify(error, null, 2));
+            // @ts-ignore - Supabase error 可能有 message, code, details
+            if (error.message) logger.error('訊息:', error.message);
+            // @ts-ignore
+            if (error.code) logger.error('錯誤代碼:', error.code);
+            // @ts-ignore
+            if (error.details) logger.error('詳細資訊:', error.details);
+            // @ts-ignore
+            if (error.hint) logger.error('提示:', error.hint);
+          } else {
+            logger.error('錯誤內容:', String(error));
+          }
+
+          // 記錄嘗試同步的資料
+          logger.error('嘗試同步的資料:', JSON.stringify(item, null, 2));
         }
       }
     } catch (error) {

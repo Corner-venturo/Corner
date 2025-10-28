@@ -39,6 +39,7 @@ export interface Channel {
   is_favorite?: boolean;
   group_id?: string;
   tour_id?: string;
+  order?: number;
 }
 
 export interface ChannelGroup {

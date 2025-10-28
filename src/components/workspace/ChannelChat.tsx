@@ -52,6 +52,7 @@ export function ChannelChat() {
   const [editChannelName, setEditChannelName] = useState('');
   const [editChannelDescription, setEditChannelDescription] = useState('');
 
+  const store = useWorkspaceStore();
   const {
     channels,
     currentWorkspace,
@@ -67,31 +68,17 @@ export function ChannelChat() {
     loadAdvanceLists,
     loadSharedOrderLists,
     deleteAdvanceList,
-    currentMessages,
+    channelMessages,
     messagesLoading
-  } = useWorkspaceStore(
-    (state) => {
-      const channelId = state.selectedChannel?.id;
-      return {
-        channels: state.channels,
-        currentWorkspace: state.currentWorkspace,
-        loading: state.loading,
-        selectedChannel: state.selectedChannel,
-        selectChannel: state.selectChannel,
-        loadChannels: state.loadChannels,
-        updateChannel: state.updateChannel,
-        deleteChannel: state.deleteChannel,
-        loadMessages: state.loadMessages,
-        advanceLists: state.advanceLists,
-        sharedOrderLists: state.sharedOrderLists,
-        loadAdvanceLists: state.loadAdvanceLists,
-        loadSharedOrderLists: state.loadSharedOrderLists,
-        deleteAdvanceList: state.deleteAdvanceList,
-        currentMessages: channelId ? state.channelMessages[channelId] ?? [] : [],
-        messagesLoading: channelId ? state.messagesLoading[channelId] ?? false : false
-      };
-    }
-  );
+  } = store;
+
+  // 🔥 修正：從 store 中正確取得當前頻道的訊息
+  const currentMessages = selectedChannel?.id && channelMessages?.[selectedChannel.id]
+    ? channelMessages[selectedChannel.id]
+    : [];
+  const isMessagesLoading = selectedChannel?.id
+    ? (messagesLoading?.[selectedChannel.id] ?? false)
+    : false;
 
   const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations();
   const { attachedFiles, setAttachedFiles, uploadingFiles, uploadProgress, uploadFiles, clearFiles } = useFileUpload();
@@ -182,7 +169,7 @@ export function ChannelChat() {
   }
 
   return (
-    <div className="h-full flex overflow-hidden">
+    <div className="h-full flex overflow-hidden border border-border rounded-lg bg-card shadow-sm">
       <ChannelSidebar
         selectedChannelId={selectedChannel?.id || null}
         onSelectChannel={(channel) => {
@@ -223,7 +210,7 @@ export function ChannelChat() {
                   sharedOrderLists={sharedOrderLists}
                   channelName={selectedChannel.name}
                   currentUserId={user?.id}
-                  isLoading={messagesLoading}
+                  isLoading={isMessagesLoading}
                   onReaction={onReactionClick}
                   onDeleteMessage={onDeleteMessageClick}
                   onCreatePayment={(itemId, item) => {

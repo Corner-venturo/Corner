@@ -101,9 +101,16 @@ export function useTourOperations(params: UseTourOperationsParams) {
       // Create mode: create new tour
       const code = await tourService.generateTourCode(cityCode, departure_date, newTour.isSpecial);
 
+      // Get city ID from availableCities (if not custom)
+      const selectedCity = newTour.countryCode !== '__custom__'
+        ? availableCities.find(c => c.code === newTour.cityCode)
+        : undefined;
+
       const tourData = {
         name: newTour.name,
         location: cityName,
+        country_id: selectedCity?.country_id || undefined,
+        main_city_id: selectedCity?.id || undefined,
         departure_date: newTour.departure_date,
         return_date: newTour.return_date,
         status: newTour.status,

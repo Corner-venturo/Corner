@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 
 type RouteParams = {
-  params: {
+  params: Promise<{
     workspaceId: string;
     channelId: string;
-  };
+  }>;
 };
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  const { workspaceId, channelId } = params;
+  const { workspaceId, channelId } = await params;
 
   if (!workspaceId || !channelId) {
     return NextResponse.json(
@@ -81,8 +81,54 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 }
 
+export async function POST(request: Request, { params }: RouteParams) {
+  const { workspaceId, channelId } = await params;
+
+  if (!workspaceId || !channelId) {
+    return NextResponse.json(
+      { error: 'workspaceId and channelId are required' },
+      { status: 400 }
+    );
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const { employeeIds, role = 'member' } = body;
+
+  if (!employeeIds || !Array.isArray(employeeIds) || employeeIds.length === 0) {
+    return NextResponse.json({ error: 'employeeIds array is required' }, { status: 400 });
+  }
+
+  try {
+    const supabase = getSupabaseAdminClient();
+
+    // 準備批次插入的資料
+    const membersToInsert = employeeIds.map(employeeId => ({
+      workspace_id: workspaceId,
+      channel_id: channelId,
+      employee_id: employeeId,
+      role,
+      status: 'active',
+    }));
+
+    const { data, error } = await supabase
+      .from('channel_members')
+      .insert(membersToInsert)
+      .select();
+
+    if (error) {
+      console.error('Failed to add channel members:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ members: data || [], count: data?.length || 0 });
+  } catch (error) {
+    console.error('Unexpected error while adding channel members:', error);
+    return NextResponse.json({ error: 'Failed to add channel members' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request, { params }: RouteParams) {
-  const { workspaceId, channelId } = params;
+  const { workspaceId, channelId } = await params;
 
   if (!workspaceId || !channelId) {
     return NextResponse.json(

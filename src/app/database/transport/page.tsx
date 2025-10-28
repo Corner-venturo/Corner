@@ -1,224 +1,87 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Car, Edit, Trash2, Users, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Car, Edit2, Trash2, Users, User, Power, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { ContentContainer } from '@/components/layout/content-container';
 import { cn } from '@/lib/utils';
-import { getRegionOptions, _regionOptionsMap, type RegionName, type TransportOption } from '@/data/region-options';
+import { useRegionStoreNew } from '@/stores';
+
+// ============================================
+// 型別定義
+// ============================================
+
+interface TransportOption {
+  id: string;
+  name: string;
+  name_en?: string;
+  price_per_person: number | null;
+  price_per_group: number | null;
+  capacity: number | null;
+  is_group_cost: boolean;
+  country_id: string;
+  region_id?: string;
+  city_id: string;
+  is_active: boolean;
+  display_order: number;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// ============================================
+// 主頁面組件
+// ============================================
 
 export default function TransportPage() {
-  const _router = useRouter();
-  const [selectedRegion, _setSelectedRegion] = useState<RegionName>('清邁');
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingTransport, setEditingTransport] = useState<TransportOption | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [newTransport, setNewTransport] = useState({
-    name: '',
-    price_per_person: 0,
-    pricePerGroup: 0,
-    capacity: 0,
-    is_group_cost: false
-  });
+  const [transportOptions, setTransportOptions] = useState<TransportOption[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const currentOptions = getRegionOptions(selectedRegion);
-  const transportOptions = currentOptions.transport;
+  // Dialogs
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingTransport, setEditingTransport] = useState<TransportOption | null>(null);
 
-  // 表格配置
-  const tableColumns: TableColumn[] = useMemo(() => [
-    {
-      key: 'name',
-      label: '交通方式',
-      sortable: true,
-      filterable: true,
-      render: (value) => (
-        <div className="flex items-center">
-          <Car size={16} className="mr-2 text-morandi-gold" />
-          <span className="font-medium text-morandi-primary">{value}</span>
-        </div>
-      )
-    },
-    {
-      key: 'is_group_cost',
-      label: '類型',
-      sortable: true,
-      filterable: true,
-      filterType: 'select',
-      filterOptions: [
-        { value: 'true', label: '團體分攤' },
-        { value: 'false', label: '個人費用' }
-      ],
-      render: (value) => (
-        <span className={cn(
-          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-          value
-            ? 'bg-morandi-gold text-white'
-            : 'bg-morandi-container text-morandi-secondary'
-        )}>
-          {value ? (
-            <>
-              <Users size={12} className="mr-1" />
-              團體分攤
-            </>
-          ) : (
-            <>
-              <User size={12} className="mr-1" />
-              個人費用
-            </>
-          )}
-        </span>
-      )
-    },
-    {
-      key: 'price_per_person',
-      label: '個人價格',
-      sortable: true,
-      filterable: true,
-      filterType: 'number',
-      render: (value) => (
-        <span className="text-morandi-secondary">
-          {value ? `NT$ ${value}` : '-'}
-        </span>
-      )
-    },
-    {
-      key: 'pricePerGroup',
-      label: '團體價格',
-      sortable: true,
-      filterable: true,
-      filterType: 'number',
-      render: (value) => (
-        <span className="text-morandi-secondary">
-          {value ? `NT$ ${value}` : '-'}
-        </span>
-      )
-    },
-    {
-      key: 'capacity',
-      label: '載客量',
-      sortable: true,
-      filterable: true,
-      filterType: 'number',
-      render: (value) => (
-        <span className="text-morandi-secondary">
-          {value ? `${value} 人` : '-'}
-        </span>
-      )
-    },
-    {
-      key: 'actions',
-      label: '操作',
-      sortable: false,
-      filterable: false,
-      render: (_, row) => (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => handleEditTransport(row)}
-            className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-            title="編輯交通選項"
-          >
-            <Edit size={14} className="text-morandi-gold" />
-          </button>
-          <button
-            onClick={() => handleDeleteTransport(row.id)}
-            className="p-1 hover:bg-morandi-red/10 rounded transition-colors"
-            title="刪除交通選項"
-          >
-            <Trash2 size={14} className="text-morandi-red" />
-          </button>
-        </div>
-      )
-    }
-  ], []);
+  const {
+    countries,
+    cities,
+    fetchAll,
+  } = useRegionStoreNew();
 
-  // 排序和篩選函數
-  const sortFunction = useCallback((data: TransportOption[], column: string, direction: 'asc' | 'desc') => {
-    return [...data].sort((a, b) => {
-      const aValue: string | number | boolean = a[column as keyof TransportOption] ?? '';
-      const bValue: string | number | boolean = b[column as keyof TransportOption] ?? '';
+  // 載入地區資料
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
-      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, []);
+  // TODO: 載入交通選項資料
+  // useEffect(() => {
+  //   fetchTransportOptions();
+  // }, []);
 
-  const filterFunction = useCallback((data: TransportOption[], filters: Record<string, string>) => {
-    return data.filter(transport => {
-      // 搜尋功能：檢查名稱是否包含搜尋詞
-      const matchesSearch = !searchTerm || transport.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-      return (
-        matchesSearch &&
-        (!filters.name || transport.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.is_group_cost || (transport.is_group_cost ?? false).toString() === filters.is_group_cost) &&
-        (!filters.price_per_person || (transport.price_per_person || 0).toString().includes(filters.price_per_person)) &&
-        (!filters.pricePerGroup || (transport.pricePerGroup || 0).toString().includes(filters.pricePerGroup)) &&
-        (!filters.capacity || (transport.capacity || 0).toString().includes(filters.capacity))
-      );
-    });
-  }, [searchTerm]);
-
-  const { data: filteredAndSortedTransport, handleSort, handleFilter } = useEnhancedTable(
-    transportOptions,
-    sortFunction,
-    filterFunction
+  // 篩選交通選項
+  const filteredTransportOptions = transportOptions.filter(transport =>
+    !searchTerm ||
+    transport.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transport.name_en?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 重新計算過濾結果（當搜尋詞改變時）
-  const finalFilteredTransport = useMemo(() => {
-    return filterFunction(filteredAndSortedTransport, {});
-  }, [filteredAndSortedTransport, filterFunction]);
-
-  const handleAddTransport = () => {
-    if (!newTransport.name.trim()) return;
-
-    // 功能: 新增交通選項到資料庫
-    resetForm();
+  const handleDelete = async (id: string) => {
+    if (!confirm('確定要刪除此交通選項嗎？')) return;
+    // TODO: 實作刪除功能
   };
 
-  const handleEditTransport = (transport: TransportOption) => {
-    setEditingTransport(transport);
-    setNewTransport({
-      name: transport.name,
-      price_per_person: transport.price_per_person || 0,
-      pricePerGroup: transport.pricePerGroup || 0,
-      capacity: transport.capacity || 0,
-      is_group_cost: transport.is_group_cost || false
-    });
-    setIsAddDialogOpen(true);
-  };
-
-  const handleDeleteTransport = (_transportId: string) => {
-    if (confirm('確定要刪除此交通選項嗎？')) {
-      // 功能: 刪除交通選項從資料庫
-    }
-  };
-
-  const resetForm = () => {
-    setNewTransport({
-      name: '',
-      price_per_person: 0,
-      pricePerGroup: 0,
-      capacity: 0,
-      is_group_cost: false
-    });
-    setIsAddDialogOpen(false);
-    setEditingTransport(null);
+  const toggleStatus = async (transport: TransportOption) => {
+    // TODO: 實作切換狀態功能
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
-        {...{
-        title: "交通選項管理",
-        icon: Car} as unknown}
+        title="交通選項管理"
+        icon={Car}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
@@ -228,115 +91,168 @@ export default function TransportPage() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋交通方式..."
-        onAdd={() => setIsAddDialogOpen(true)}
+        onAdd={() => setIsAddOpen(true)}
         addLabel="新增交通選項"
-        actions={
-          <span className="text-sm text-morandi-secondary">
-            共 {finalFilteredTransport.length} 筆交通選項
-          </span>
-        }
       />
 
-      <ContentContainer>
-        <EnhancedTable
-          columns={tableColumns}
-          data={finalFilteredTransport}
-          onSort={handleSort}
-          onFilter={handleFilter}
-          selection={undefined}
-        />
-
-        {finalFilteredTransport.length === 0 && (
-          <div className="text-center py-12 text-morandi-secondary">
-            <Car size={48} className="mx-auto mb-4 opacity-50" />
-            <p>{transportOptions.length === 0 ? '此地區尚未建立交通選項' : '無符合條件的交通選項'}</p>
+      <div className="flex-1 overflow-auto">
+        {/* 表格 */}
+        <div className="border border-border rounded-lg overflow-hidden bg-card shadow-sm min-h-full flex flex-col">
+          {/* 表格標題行 */}
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 backdrop-blur-sm">
+            <div className="flex items-center px-4 py-3">
+              <div className="w-48 text-sm font-medium text-morandi-primary">交通方式</div>
+              <div className="w-40 text-sm font-medium text-morandi-primary">地點</div>
+              <div className="w-32 text-sm font-medium text-morandi-primary text-center">類型</div>
+              <div className="w-32 text-sm font-medium text-morandi-primary text-right">個人價格</div>
+              <div className="w-32 text-sm font-medium text-morandi-primary text-right">團體價格</div>
+              <div className="w-24 text-sm font-medium text-morandi-primary text-center">載客量</div>
+              <div className="w-24 text-sm font-medium text-morandi-primary text-center">狀態</div>
+              <div className="w-32 text-sm font-medium text-morandi-primary text-center">操作</div>
+            </div>
           </div>
-        )}
-      </ContentContainer>
 
-      {/* 新增/編輯交通選項對話框 */}
-      <Dialog open={isAddDialogOpen} onOpenChange={resetForm}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
-              {editingTransport ? '編輯交通選項' : '新增交通選項'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">交通方式名稱</label>
-              <Input
-                value={newTransport.name}
-                onChange={(e) => setNewTransport(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="例如：機場接送、包車一日"
-                className="mt-1"
-              />
+          {/* 載入中 */}
+          {loading && (
+            <div className="text-center py-12 text-morandi-secondary">
+              <Car size={48} className="mx-auto mb-4 opacity-50 animate-pulse" />
+              <p>載入中...</p>
             </div>
+          )}
 
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">費用類型</label>
-              <Select
-                value={newTransport.is_group_cost.toString()}
-                onValueChange={(value) => setNewTransport(prev => ({ ...prev, is_group_cost: value === 'true' }))}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="false">個人費用</SelectItem>
-                  <SelectItem value="true">團體分攤</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">個人價格</label>
-                <Input
-                  type="number"
-                  value={newTransport.price_per_person || ''}
-                  onChange={(e) => setNewTransport(prev => ({ ...prev, price_per_person: Number(e.target.value) || 0 }))}
-                  placeholder="0"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">團體價格</label>
-                <Input
-                  type="number"
-                  value={newTransport.pricePerGroup || ''}
-                  onChange={(e) => setNewTransport(prev => ({ ...prev, pricePerGroup: Number(e.target.value) || 0 }))}
-                  placeholder="0"
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">載客量</label>
-              <Input
-                type="number"
-                value={newTransport.capacity || ''}
-                onChange={(e) => setNewTransport(prev => ({ ...prev, capacity: Number(e.target.value) || 0 }))}
-                placeholder="最大載客人數"
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={resetForm}>
-                取消
-              </Button>
+          {/* 無資料 */}
+          {!loading && filteredTransportOptions.length === 0 && (
+            <div className="text-center py-12 text-morandi-secondary">
+              <Car size={48} className="mx-auto mb-4 opacity-50" />
+              <p>無符合條件的交通選項</p>
               <Button
-                onClick={handleAddTransport}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                onClick={() => setIsAddOpen(true)}
+                className="mt-4 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                {editingTransport ? '更新' : '新增'}
+                <Plus size={16} className="mr-2" />
+                新增第一個交通選項
               </Button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          )}
+
+          {/* 交通選項列表 */}
+          {!loading && filteredTransportOptions.length > 0 && (
+            <div className="flex-1">
+              {filteredTransportOptions.map((transport) => {
+                const country = countries.find(c => c.id === transport.country_id);
+                const city = cities.find(c => c.id === transport.city_id);
+
+                return (
+                  <div
+                    key={transport.id}
+                    className="border-b border-border last:border-b-0 hover:bg-morandi-container/20 transition-colors"
+                  >
+                    <div className="flex items-center px-4 py-3">
+                      {/* 交通方式 */}
+                      <div className="w-48">
+                        <div className="font-medium text-morandi-primary">{transport.name}</div>
+                        {transport.name_en && (
+                          <div className="text-xs text-morandi-muted">{transport.name_en}</div>
+                        )}
+                      </div>
+
+                      {/* 地點 */}
+                      <div className="w-40 text-sm text-morandi-secondary">
+                        {country?.emoji} {city?.name || transport.city_id}
+                      </div>
+
+                      {/* 類型 */}
+                      <div className="w-32 text-center">
+                        <span className={cn(
+                          'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                          transport.is_group_cost
+                            ? 'bg-morandi-gold/20 text-morandi-gold'
+                            : 'bg-morandi-blue/10 text-morandi-blue'
+                        )}>
+                          {transport.is_group_cost ? (
+                            <>
+                              <Users size={12} className="mr-1" />
+                              團體分攤
+                            </>
+                          ) : (
+                            <>
+                              <User size={12} className="mr-1" />
+                              個人費用
+                            </>
+                          )}
+                        </span>
+                      </div>
+
+                      {/* 個人價格 */}
+                      <div className="w-32 text-right text-sm text-morandi-secondary">
+                        {transport.price_per_person ? `NT$ ${transport.price_per_person.toLocaleString()}` : '-'}
+                      </div>
+
+                      {/* 團體價格 */}
+                      <div className="w-32 text-right text-sm text-morandi-secondary">
+                        {transport.price_per_group ? `NT$ ${transport.price_per_group.toLocaleString()}` : '-'}
+                      </div>
+
+                      {/* 載客量 */}
+                      <div className="w-24 text-center text-sm text-morandi-secondary">
+                        {transport.capacity ? `${transport.capacity} 人` : '-'}
+                      </div>
+
+                      {/* 狀態 */}
+                      <div className="w-24 text-center">
+                        <span className={cn(
+                          'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                          transport.is_active
+                            ? 'bg-morandi-green/80 text-white'
+                            : 'bg-morandi-container text-morandi-secondary'
+                        )}>
+                          {transport.is_active ? '啟用' : '停用'}
+                        </span>
+                      </div>
+
+                      {/* 操作 */}
+                      <div className="w-32 flex items-center justify-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingTransport(transport);
+                            setIsEditOpen(true);
+                          }}
+                          className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
+                          title="編輯"
+                        >
+                          <Edit2 size={14} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleStatus(transport)}
+                          className="h-8 px-2"
+                          title={transport.is_active ? '停用' : '啟用'}
+                        >
+                          <Power size={14} className={
+                            transport.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
+                          } />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(transport.id)}
+                          className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+                          title="刪除"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

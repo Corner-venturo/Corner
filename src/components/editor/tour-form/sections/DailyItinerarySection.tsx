@@ -136,12 +136,13 @@ export function DailyItinerarySection({
               </button>
             </div>
             {day.activities?.map((activity: Activity, actIndex: number) => (
-              <div key={actIndex} className="grid grid-cols-3 gap-2 bg-white p-2 rounded">
+              <div key={actIndex} className="flex flex-wrap gap-2 bg-white p-2 rounded items-center">
                 <input
                   type="text"
                   value={activity.icon}
                   onChange={(e) => updateActivity(dayIndex, actIndex, "icon", e.target.value)}
                   className="px-2 py-1 border rounded text-sm"
+                  style={{ width: `${Math.max(3, activity.icon.length + 1)}ch` }}
                   placeholder="🌋"
                 />
                 <input
@@ -149,23 +150,22 @@ export function DailyItinerarySection({
                   value={activity.title}
                   onChange={(e) => updateActivity(dayIndex, actIndex, "title", e.target.value)}
                   className="px-2 py-1 border rounded text-sm"
+                  style={{ width: `${Math.max(8, activity.title.length + 2)}ch` }}
                   placeholder="阿蘇火山"
                 />
-                <div className="flex gap-1">
-                  <input
-                    type="text"
-                    value={activity.description}
-                    onChange={(e) => updateActivity(dayIndex, actIndex, "description", e.target.value)}
-                    className="flex-1 px-2 py-1 border rounded text-sm"
-                    placeholder="描述"
-                  />
-                  <button
-                    onClick={() => removeActivity(dayIndex, actIndex)}
-                    className="px-2 text-red-500 hover:text-red-700 text-xs"
-                  >
-                    ✕
-                  </button>
-                </div>
+                <input
+                  type="text"
+                  value={activity.description}
+                  onChange={(e) => updateActivity(dayIndex, actIndex, "description", e.target.value)}
+                  className="flex-1 min-w-[150px] px-2 py-1 border rounded text-sm"
+                  placeholder="描述"
+                />
+                <button
+                  onClick={() => removeActivity(dayIndex, actIndex)}
+                  className="px-2 py-1 text-red-500 hover:text-red-700 text-xs"
+                >
+                  ✕
+                </button>
               </div>
             ))}
           </div>

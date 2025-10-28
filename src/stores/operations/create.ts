@@ -31,15 +31,19 @@ export async function create<T extends BaseEntity>(
     // 生成 ID
     const id = generateUUID();
 
-    // 如果有 codePrefix，暫時使用 TBC 編號（背景同步時會取得正式編號）
+    // 如果有 codePrefix，生成編號
     let recordData = { ...data, id } as T;
-    if (codePrefix && 'code' in data) {
+    if (codePrefix) {
       const existingCode = (data as Record<string, unknown>).code;
-      if (!existingCode) {
-        // FastIn 模式：一律先用 TBC 編號
-        const code: string = `${codePrefix}TBC`;
+      // 如果沒有 code 或 code 為空字串，直接生成正式編號
+      if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
+        // 直接生成正式編號（例如：Q20250001）
+        const code = generateCode({ prefix: codePrefix }, existingItems);
         recordData = { ...recordData, code } as T;
-        logger.log(`⚡ [${tableName}] FastIn: 使用 TBC 編號 ${code}`);
+        logger.log(`✨ [${tableName}] 生成編號: ${code}`);
+      } else {
+        // 使用自訂編號（如置頂範本的 JP-BASIC）
+        logger.log(`✨ [${tableName}] 使用自訂編號: ${existingCode}`);
       }
     }
 

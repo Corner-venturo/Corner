@@ -59,11 +59,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         </td>
         <td className="py-3 px-4"></td>
         <td className="py-3 px-4"></td>
-        <td className="py-3 px-4 text-sm font-medium text-morandi-primary text-center whitespace-nowrap">
-          NT$ {category.id === 'accommodation' ? accommodationTotal.toLocaleString() :
-               category.items.reduce((sum, item) => sum + (item.total || 0), 0).toLocaleString()}
-        </td>
-        <td colSpan={2} className="py-3 px-4 text-right">
+        <td className="py-3 px-4"></td>
+        <td className="py-3 px-4 text-right">
           {category.id === 'accommodation' ? (
             <div className="flex gap-1 justify-end">
               <Button
@@ -243,6 +240,31 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             handleRemoveItem={handleRemoveItem}
           />
         ))
+      )}
+
+      {/* 小計行 - 只有當該分類有項目時才顯示 */}
+      {category.items.length > 0 && (
+        <tr className="bg-morandi-container/10 border-b border-border">
+          <td colSpan={4} className="py-2 px-4 text-right text-sm font-medium text-morandi-secondary">
+            小計
+          </td>
+          <td className="py-2 px-4 text-center text-sm font-bold text-morandi-primary">
+            {(() => {
+              if (category.id === 'accommodation') {
+                return accommodationTotal.toLocaleString();
+              } else if (category.id === 'transport') {
+                // 機票小計：只計算成人機票
+                const adultTicketTotal = category.items
+                  .filter(item => item.name === '成人機票')
+                  .reduce((sum, item) => sum + (item.total || 0), 0);
+                return adultTicketTotal.toLocaleString();
+              } else {
+                return category.items.reduce((sum, item) => sum + (item.total || 0), 0).toLocaleString();
+              }
+            })()}
+          </td>
+          <td className="py-2 px-4"></td>
+        </tr>
       )}
     </React.Fragment>
   );

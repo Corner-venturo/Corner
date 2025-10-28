@@ -15,10 +15,10 @@ interface TourFormProps {
   setNewTour: React.Dispatch<React.SetStateAction<NewTourData>>;
   newOrder: Partial<OrderFormData>;
   setNewOrder: React.Dispatch<React.SetStateAction<Partial<OrderFormData>>>;
-  activeCountries: Array<{ code: string; name: string }>;
-  availableCities: Array<{ code: string; name: string }>;
+  activeCountries: Array<{ id: string; code: string; name: string }>;
+  availableCities: Array<{ id: string; code: string; name: string }>;
   setAvailableCities: React.Dispatch<React.SetStateAction<any[]>>;
-  getCitiesByCountryCode: (countryCode: string) => Array<{ code: string; name: string }>;
+  getCitiesByCountryId: (countryId: string) => Array<{ id: string; code: string; name: string }>;
   submitting: boolean;
   formError: string | null;
   onSubmit: () => void;
@@ -35,7 +35,7 @@ export function TourForm({
   activeCountries,
   availableCities,
   setAvailableCities,
-  getCitiesByCountryCode,
+  getCitiesByCountryId,
   submitting,
   formError,
   onSubmit,
@@ -46,7 +46,17 @@ export function TourForm({
         onClose();
       }
     }}>
-      <DialogContent className="max-w-6xl w-[90vw] h-[80vh] overflow-hidden" aria-describedby={undefined}>
+      <DialogContent
+        className="max-w-6xl w-[90vw] h-[80vh] overflow-hidden"
+        aria-describedby={undefined}
+        onInteractOutside={(e) => {
+          // 防止點擊 Select 下拉選單時關閉 Dialog
+          const target = e.target as HTMLElement;
+          if (target.closest('[role="listbox"]') || target.closest('select')) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>
             {mode === 'edit' ? '編輯旅遊團' : '新增旅遊團 & 訂單'}
@@ -86,7 +96,8 @@ export function TourForm({
                       value={newTour.countryCode}
                       onChange={(e) => {
                         const countryCode = e.target.value;
-                        const cities = countryCode === '__custom__' ? [] : getCitiesByCountryCode(countryCode);
+                        const selectedCountry = activeCountries.find(c => c.code === countryCode);
+                        const cities = countryCode === '__custom__' ? [] : (selectedCountry ? getCitiesByCountryId(selectedCountry.id) : []);
                         setAvailableCities(cities);
                         setNewTour(prev => ({
                           ...prev,
@@ -96,8 +107,9 @@ export function TourForm({
                       }}
                       className="mt-1 w-full p-2 border border-border rounded-md bg-background"
                     >
+                      <option value="">請選擇國家...</option>
                       {activeCountries.map((country) => (
-                        <option key={country.code} value={country.code}>
+                        <option key={country.id} value={country.code}>
                           {country.name}
                         </option>
                       ))}
@@ -119,9 +131,11 @@ export function TourForm({
                         value={newTour.cityCode}
                         onChange={(e) => setNewTour(prev => ({ ...prev, cityCode: e.target.value }))}
                         className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                        disabled={!newTour.countryCode || newTour.countryCode === '__custom__'}
                       >
+                        <option value="">請選擇城市...</option>
                         {availableCities.map((city) => (
-                          <option key={city.code} value={city.code}>
+                          <option key={city.id} value={city.code}>
                             {city.name} ({city.code})
                           </option>
                         ))}

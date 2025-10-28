@@ -46,13 +46,22 @@ class QuoteService extends BaseService<Quote> {
     if (!original) return undefined;
 
     // 排除不應該傳入的欄位
-    const { id: _, created_at, updated_at, version, versions, ...rest } = original;
+    const { id: _, created_at, updated_at, version, versions, code, is_pinned, ...rest } = original;
 
+    // 🔥 複製時不保留 code（讓系統自動生成新編號）和 is_pinned（不自動置頂）
     const duplicated = await store.create({
       ...rest,
       name: `${original.name} (副本)`,
-      status: 'proposed'
+      status: 'proposed',
+      is_pinned: false, // 複製的報價單不自動置頂
     } as unknown);
+
+    // 確保返回完整的資料（包含 id）
+    if (duplicated) {
+      // 從 store 重新取得完整資料
+      const fullDuplicated = store.items.find(q => q.id === duplicated.id);
+      return fullDuplicated || duplicated;
+    }
 
     return duplicated;
   }

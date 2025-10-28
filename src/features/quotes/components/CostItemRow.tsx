@@ -14,8 +14,11 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
   handleUpdateItem,
   handleRemoveItem
 }) => {
+  // 判斷是否為小孩或嬰兒機票（顯示為灰色）
+  const isChildOrInfantTicket = item.name === '小孩機票' || item.name === '嬰兒機票';
+
   return (
-    <tr className="border-b border-border hover:bg-morandi-container/10 transition-colors">
+    <tr className={`border-b border-border hover:bg-morandi-container/10 transition-colors ${isChildOrInfantTicket ? 'opacity-60' : ''}`}>
       <td colSpan={2} className={`py-3 px-4 text-sm text-morandi-primary text-center ${(item.quantity && item.quantity !== 1) ? 'table-divider' : ''}`}>
         <input
           type="text"

@@ -108,11 +108,34 @@ export function useTourFormHandlers(
   };
 
   const removeDailyItinerary = (index: number) => {
+    // 輔助函數：計算日期（根據出發日期和天數）
+    const calculateDate = (baseDate: string, dayOffset: number): string => {
+      if (!baseDate) return "";
+      try {
+        // 解析出發日期（支援 YYYY/MM/DD 格式）
+        const [year, month, day] = baseDate.split('/').map(Number);
+        const date = new Date(year, month - 1, day);
+
+        // 加上天數偏移
+        date.setDate(date.getDate() + dayOffset);
+
+        // 格式化為 YYYY/MM/DD
+        const newYear = date.getFullYear();
+        const newMonth = String(date.getMonth() + 1).padStart(2, '0');
+        const newDay = String(date.getDate()).padStart(2, '0');
+
+        return `${newYear}/${newMonth}/${newDay}`;
+      } catch {
+        return "";
+      }
+    };
+
     const newItinerary = data.dailyItinerary
       .filter((_: unknown, i: number) => i !== index)
       .map((day: unknown, i: number) => ({
         ...day,
-        dayLabel: `Day ${i + 1}` // 自動更新 dayLabel
+        dayLabel: `Day ${i + 1}`, // 自動更新 dayLabel
+        date: calculateDate(data.departureDate, i) // 自動更新日期
       }));
     onChange({ ...data, dailyItinerary: newItinerary });
   };

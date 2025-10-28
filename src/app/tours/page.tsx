@@ -7,7 +7,7 @@ import { useTours } from '@/features/tours/hooks/useTours-advanced';
 import { PageRequest } from '@/core/types/common';
 import { Calendar, FileText, MapPin, Calculator, BarChart3, FileCheck, AlertCircle, Edit2, Trash2, Archive, ArchiveRestore } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionStore } from '@/stores';
+import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionStoreNew } from '@/stores';
 import { useQuotes } from '@/features/quotes/hooks/useQuotes';
 import { Tour } from '@/stores/types';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
@@ -27,8 +27,7 @@ export default function ToursPage() {
   const { items: members } = useMemberStore();
   const employeeStore = useEmployeeStore();
   const { items: employees } = employeeStore;
-  const regionStore = useRegionStore();
-  const { items: regions } = regionStore;
+  const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionStoreNew();
   const { quotes, updateQuote } = useQuotes();
   const { dialog, openDialog, closeDialog } = useDialog();
 
@@ -78,14 +77,14 @@ export default function ToursPage() {
 
   // Lazy load: only load regions and employees when opening create dialog
   const handleOpenCreateDialog = useCallback(async (tour: any = null, fromQuoteId?: string) => {
-    if (regions.length === 0) {
-      await regionStore.fetchAll();
+    if (countries.length === 0) {
+      await fetchRegions();
     }
     if (employees.length === 0) {
       await employeeStore.fetchAll();
     }
     openDialog('create', tour, fromQuoteId);
-  }, [regions.length, employees.length, regionStore, employeeStore, openDialog]);
+  }, [countries.length, employees.length, fetchRegions, employeeStore, openDialog]);
 
   // Build PageRequest parameters
   const pageRequest: PageRequest = useMemo(() => ({
@@ -98,36 +97,28 @@ export default function ToursPage() {
   // Use tours hook
   const { data: tours, loading, actions } = useTours(pageRequest);
 
-  // Get active countries from regions
-  const activeCountries = useMemo(() => {
-    return regions
-      .filter(r => r.type === 'country' && r.status === 'active' && !r._deleted)
-      .map(r => ({ code: r.code, name: r.name }));
-  }, [regions]);
-
-  // Get cities by country code
-  const getCitiesByCountryCode = useCallback((countryCode: string) => {
-    return regions
-      .filter(r => r.type === 'city' && r.country_code === countryCode && r.status === 'active' && !r._deleted)
-      .map(r => ({ code: r.code, name: r.name }));
-  }, [regions]);
-
-  // Initialize default country and city
-  useEffect(() => {
-    if (activeCountries.length > 0 && !newTour.countryCode) {
-      const defaultCountry = activeCountries[0];
-      const defaultCities = getCitiesByCountryCode(defaultCountry.code);
-      const defaultCity = defaultCities[0];
-
-      setNewTour(prev => ({
-        ...prev,
-        countryCode: defaultCountry.code,
-        cityCode: defaultCity?.code || '',
-      }));
-      setAvailableCities(defaultCities);
+  // Load regions on mount
+  React.useEffect(() => {
+    if (countries.length === 0) {
+      fetchRegions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [countries.length, fetchRegions]);
+
+  // Get active countries from new region store
+  const activeCountries = useMemo(() => {
+    return countries
+      .filter(c => c.is_active)
+      .map(c => ({ id: c.id, code: c.code || '', name: c.name }));
+  }, [countries]);
+
+  // Get cities by country ID
+  const getCitiesByCountryId = useCallback((countryId: string) => {
+    return getCitiesByCountry(countryId)
+      .filter(c => c.is_active)
+      .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name, country_id: c.country_id }));
+  }, [getCitiesByCountry]);
+
+  // 不自動選擇預設國家，讓用戶自己選擇
 
   // Filter tours by status and search query
   const filteredTours = (tours || []).filter(tour => {
@@ -153,12 +144,12 @@ export default function ToursPage() {
 
       // Try to find matching city from destinations
       for (const country of activeCountries) {
-        const cities = getCitiesByCountryCode(country.code);
-        const matchedCity = cities.find(city => city.name === tour.location);
+        const citiesInCountry = getCitiesByCountryId(country.id);
+        const matchedCity = citiesInCountry.find(city => city.name === tour.location);
         if (matchedCity) {
           countryCode = country.code;
           cityCode = matchedCity.code;
-          setAvailableCities(cities);
+          setAvailableCities(citiesInCountry);
           break;
         }
       }
@@ -183,7 +174,7 @@ export default function ToursPage() {
         description: tour.description || '',
       });
     }
-  }, [dialog.type, dialog.data, activeCountries, getCitiesByCountryCode, setNewTour, setAvailableCities]);
+  }, [dialog.type, dialog.data, activeCountries, getCitiesByCountryId, setNewTour, setAvailableCities]);
 
   // Handle navigation from quote
   useEffect(() => {
@@ -219,14 +210,10 @@ export default function ToursPage() {
   }, [searchParams, quotes, handleOpenCreateDialog, setNewTour, toggleRowExpand, setActiveTab]);
 
   const resetForm = useCallback(() => {
-    const defaultCountry = activeCountries[0];
-    const defaultCities = defaultCountry ? getCitiesByCountryCode(defaultCountry.code) : [];
-    const defaultCity = defaultCities[0];
-
     setNewTour({
       name: '',
-      countryCode: defaultCountry?.code || '',
-      cityCode: defaultCity?.code || '',
+      countryCode: '',
+      cityCode: '',
       departure_date: '',
       return_date: '',
       price: 0,
@@ -235,7 +222,7 @@ export default function ToursPage() {
       max_participants: 20,
       description: '',
     });
-    setAvailableCities(defaultCities);
+    setAvailableCities([]);
     setNewOrder({
       contact_person: '',
       sales_person: '',
@@ -244,7 +231,7 @@ export default function ToursPage() {
       total_amount: 0,
     });
     setFormError(null);
-  }, [activeCountries, getCitiesByCountryCode, setNewTour, setAvailableCities, setNewOrder, setFormError]);
+  }, [setNewTour, setAvailableCities, setNewOrder, setFormError]);
 
   // Use tour operations hook
   const operations = useTourOperations({
@@ -519,7 +506,7 @@ export default function ToursPage() {
         activeCountries={activeCountries}
         availableCities={availableCities}
         setAvailableCities={setAvailableCities}
-        getCitiesByCountryCode={getCitiesByCountryCode}
+        getCitiesByCountryId={getCitiesByCountryId}
         submitting={submitting}
         formError={formError}
         onSubmit={handleAddTour}
