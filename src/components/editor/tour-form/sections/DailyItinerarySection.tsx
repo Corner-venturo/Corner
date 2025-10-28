@@ -1,5 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { TourFormData, DailyItinerary, Activity } from "../types";
+import { AttractionSelector } from "../../AttractionSelector";
+
+interface Attraction {
+  id: string;
+  name: string;
+  name_en: string | null;
+  category: string | null;
+  description: string | null;
+  thumbnail: string | null;
+  city_name?: string;
+}
 
 interface DailyItinerarySectionProps {
   data: TourFormData;
@@ -34,6 +45,36 @@ export function DailyItinerarySection({
   updateRecommendation,
   removeRecommendation,
 }: DailyItinerarySectionProps) {
+  const [showAttractionSelector, setShowAttractionSelector] = useState(false);
+  const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1);
+
+  // 開啟景點選擇器
+  const handleOpenAttractionSelector = (dayIndex: number) => {
+    setCurrentDayIndex(dayIndex);
+    setShowAttractionSelector(true);
+  };
+
+  // 處理景點選擇
+  const handleSelectAttractions = (attractions: Attraction[]) => {
+    if (currentDayIndex === -1) return;
+
+    // 將選擇的景點轉換為活動
+    attractions.forEach((attraction) => {
+      addActivity(currentDayIndex);
+      const day = data.dailyItinerary[currentDayIndex];
+      const newActivityIndex = day.activities.length;
+
+      // 設定活動資料
+      updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍');
+      updateActivity(currentDayIndex, newActivityIndex, 'title', attraction.name);
+      updateActivity(currentDayIndex, newActivityIndex, 'description', attraction.description || '');
+      if (attraction.thumbnail) {
+        updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail);
+      }
+    });
+
+    setCurrentDayIndex(-1);
+  };
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-red-500 pb-2">
@@ -174,12 +215,20 @@ export function DailyItinerarySection({
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-gray-700">景點活動</label>
-              <button
-                onClick={() => addActivity(dayIndex)}
-                className="px-2.5 py-1 bg-blue-500 text-white rounded text-xs shadow hover:bg-blue-600"
-              >
-                + 新增活動
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenAttractionSelector(dayIndex)}
+                  className="px-2.5 py-1 bg-morandi-gold text-white rounded text-xs shadow hover:bg-morandi-gold-hover"
+                >
+                  📍 從景點庫選擇
+                </button>
+                <button
+                  onClick={() => addActivity(dayIndex)}
+                  className="px-2.5 py-1 bg-blue-500 text-white rounded text-xs shadow hover:bg-blue-600"
+                >
+                  + 手動新增
+                </button>
+              </div>
             </div>
             {day.activities?.map((activity: Activity, actIndex: number) => (
               <div key={actIndex} className="space-y-2 bg-white/90 p-3 rounded-lg border border-blue-100">
@@ -306,6 +355,17 @@ export function DailyItinerarySection({
           </div>
         </div>
       ))}
+
+      {/* 景點選擇器 */}
+      <AttractionSelector
+        isOpen={showAttractionSelector}
+        onClose={() => {
+          setShowAttractionSelector(false);
+          setCurrentDayIndex(-1);
+        }}
+        tourCountries={data.countries}
+        onSelect={handleSelectAttractions}
+      />
     </div>
   );
 }

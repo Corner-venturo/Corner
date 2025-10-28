@@ -63,6 +63,15 @@ export interface HotelInfo {
   image?: string;
 }
 
+export interface TourCountry {
+  country_id: string;
+  country_name: string;
+  country_code?: string;
+  main_city_id?: string;
+  main_city_name?: string;
+  is_primary: boolean;  // 是否為主要國家
+}
+
 export interface TourFormData {
   tagline: string;
   title: string;
@@ -70,6 +79,7 @@ export interface TourFormData {
   description: string;
   country: string;
   city: string;
+  countries?: TourCountry[];  // 新增：行程涵蓋的國家清單
   departureDate: string;
   tourCode: string;
   coverImage?: string;
