@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ResponsiveHeader } from "@/components/layout/responsive-header";
 import { TourForm } from "@/components/editor/TourForm";
@@ -14,6 +14,9 @@ import {
   IconCalendar,
   IconPlane,
   IconMapPin,
+  IconDeviceDesktop,
+  IconDeviceMobile,
+  IconClock,
 } from "@tabler/icons-react";
 
 // Icon mapping
@@ -161,6 +164,26 @@ export default function EditItineraryPage() {
     })) || [],
   } : null;
 
+  const typedItinerary = useMemo(() => itineraryData as any, [itineraryData]);
+  const totalDays = useMemo(
+    () => (Array.isArray(typedItinerary?.dailyItinerary) ? typedItinerary.dailyItinerary.length : 0),
+    [typedItinerary]
+  );
+  const featureCount = useMemo(
+    () => (Array.isArray(typedItinerary?.features) ? typedItinerary.features.length : 0),
+    [typedItinerary]
+  );
+  const travelRange = useMemo(() => {
+    if (!typedItinerary?.departureDate || !typedItinerary?.returnFlight?.departureDate) return null;
+    return `${typedItinerary.departureDate} - ${typedItinerary.returnFlight.departureDate}`;
+  }, [typedItinerary]);
+  const locationLabel = useMemo(
+    () => typedItinerary?.city || typedItinerary?.country || "",
+    [typedItinerary]
+  );
+  const statusLabel = typedItinerary?.status ?? "草稿";
+  const previewSubtitle = typedItinerary?.subtitle || typedItinerary?.tagline || "隨時查看最新行程預覽";
+
   // 計算縮放比例
   useEffect(() => {
     const calculateScale = () => {
@@ -192,9 +215,12 @@ export default function EditItineraryPage() {
   // 載入中狀態
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-morandi-secondary">載入中...</p>
+      <div className="relative flex h-full min-h-[480px] items-center justify-center overflow-hidden bg-gradient-to-br from-[#f4f9ff] via-[#fef9f3] to-[#e8f7ff]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_55%)]" />
+        <div className="relative z-10 rounded-3xl border border-white/60 bg-white/80 px-10 py-8 text-center shadow-2xl backdrop-blur-xl">
+          <p className="text-sm uppercase tracking-[0.4em] text-morandi-muted">Loading</p>
+          <p className="mt-3 text-lg font-semibold text-morandi-primary">行程資料載入中...</p>
+          <p className="mt-2 text-morandi-secondary">我們正在為您整理每一個旅遊細節，請稍候片刻。</p>
         </div>
       </div>
     );
@@ -203,7 +229,11 @@ export default function EditItineraryPage() {
   // 找不到行程
   if (notFound || !itineraryData) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="relative flex h-full flex-col overflow-hidden bg-gradient-to-br from-[#f4f9ff] via-[#fef9f3] to-[#e8f7ff]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-24 left-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,_rgba(56,189,248,0.25),_transparent_65%)] blur-3xl" />
+          <div className="absolute bottom-0 right-10 h-80 w-80 rounded-full bg-[radial-gradient(circle,_rgba(34,211,238,0.18),_transparent_70%)] blur-3xl" />
+        </div>
         <ResponsiveHeader
           title="行程不存在"
           breadcrumb={[
@@ -214,23 +244,25 @@ export default function EditItineraryPage() {
           showBackButton={true}
           onBack={() => router.push('/itinerary')}
         />
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="text-center max-w-md">
-            <div className="text-6xl mb-4">📄</div>
-            <h2 className="text-2xl font-bold text-morandi-primary mb-2">找不到此行程</h2>
-            <p className="text-morandi-secondary mb-6">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-12">
+          <div className="w-full max-w-xl rounded-3xl border border-white/60 bg-white/85 p-10 text-center shadow-2xl backdrop-blur-xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0f6eea]/10 text-[#0f6eea]">
+              <IconSparkles size={32} stroke={1.6} />
+            </div>
+            <h2 className="text-2xl font-semibold text-morandi-primary">找不到此行程</h2>
+            <p className="mt-3 text-morandi-secondary">
               行程可能已被刪除，或是您輸入的網址不正確。
             </p>
-            <div className="flex gap-3 justify-center">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => router.push('/itinerary')}
-                className="px-6 py-2 border border-border rounded-lg hover:bg-morandi-container/20 transition-colors"
+                className="btn-morandi-secondary"
               >
-                返回列表
+                返回行程列表
               </button>
               <button
                 onClick={() => router.push('/itinerary/new')}
-                className="px-6 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors"
+                className="btn-morandi-primary"
               >
                 建立新行程
               </button>
@@ -242,109 +274,197 @@ export default function EditItineraryPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* ========== 頁面頂部區域 ========== */}
-      <ResponsiveHeader
-        title="編輯行程"
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '行程管理', href: '/itinerary' },
-          { label: '編輯行程', href: '#' }
-        ]}
-        showBackButton={true}
-        onBack={() => router.push('/itinerary')}
-        actions={<PublishButton data={itineraryData} />}
-      />
+    <div className="relative min-h-full overflow-hidden bg-gradient-to-br from-[#f4f9ff] via-[#fef9f3] to-[#e8f7ff]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-32 -left-28 h-80 w-80 rounded-full bg-[radial-gradient(circle,_rgba(56,189,248,0.25),_transparent_65%)] blur-3xl" />
+        <div className="absolute top-1/4 right-[-120px] h-96 w-96 rounded-full bg-[radial-gradient(circle,_rgba(34,211,238,0.2),_transparent_70%)] blur-3xl" />
+        <div className="absolute bottom-[-140px] left-1/3 h-96 w-96 rounded-full bg-[radial-gradient(circle,_rgba(14,165,233,0.22),_transparent_70%)] blur-3xl" />
+      </div>
 
-      {/* ========== 主要內容區域 ========== */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full flex">
-          {/* 左側：輸入表單 */}
-          <div className="w-1/2 bg-white border-r border-border flex flex-col">
-            <div className="h-14 bg-morandi-gold text-white px-6 flex items-center border-b border-border">
-              <h2 className="text-lg font-semibold">編輯表單</h2>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <TourForm data={itineraryData} onChange={setItineraryData} />
-            </div>
-          </div>
+      <div className="relative z-10 flex min-h-full flex-col">
+        {/* ========== 頁面頂部區域 ========== */}
+        <ResponsiveHeader
+          title="編輯行程"
+          breadcrumb={[
+            { label: '首頁', href: '/' },
+            { label: '行程管理', href: '/itinerary' },
+            { label: '編輯行程', href: '#' }
+          ]}
+          showBackButton={true}
+          onBack={() => router.push('/itinerary')}
+          actions={<PublishButton data={itineraryData} />}
+        />
 
-          {/* 右側：即時預覽 */}
-          <div className="w-1/2 bg-gray-100 flex flex-col">
-            {/* 標題列 */}
-            <div className="h-14 bg-white border-b px-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <h2 className="text-lg font-semibold text-morandi-primary">即時預覽</h2>
-                <div className="flex gap-2 bg-morandi-container/30 rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode('desktop')}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      viewMode === 'desktop'
-                        ? 'bg-morandi-gold text-white'
-                        : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
-                    }`}
-                  >
-                    💻 電腦
-                  </button>
-                  <button
-                    onClick={() => setViewMode('mobile')}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      viewMode === 'mobile'
-                        ? 'bg-morandi-gold text-white'
-                        : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
-                    }`}
-                  >
-                    📱 手機
-                  </button>
+        {/* ========== 主要內容區域 ========== */}
+        <div className="flex-1 overflow-y-auto px-6 pb-10 pt-6">
+          <div className="mx-auto flex max-w-[1680px] flex-col gap-6">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl shadow-[#9ad6ff]/30 backdrop-blur-lg">
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.4em] text-morandi-muted">Itinerary overview</p>
+                    <h1 className="mt-3 text-2xl font-semibold text-morandi-primary">
+                      {typedItinerary?.title || '尚未命名的旅程'}
+                    </h1>
+                    <p className="mt-1 text-sm text-morandi-secondary">{previewSubtitle}</p>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-[#22c55e]/15 px-4 py-2 text-sm font-medium text-[#0f5132]">
+                    <span className="h-2 w-2 rounded-full bg-[#22c55e]" />
+                    {statusLabel}
+                  </div>
+                </div>
+                <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-morandi-secondary">
+                  {typedItinerary?.tourCode && (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-[#0f6eea]/10 px-3 py-1 font-medium text-[#0f3d5c]">
+                      <IconSparkles size={16} stroke={1.6} />
+                      {typedItinerary.tourCode}
+                    </span>
+                  )}
+                  {locationLabel && (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
+                      <IconMapPin size={16} stroke={1.6} />
+                      {locationLabel}
+                    </span>
+                  )}
+                  {travelRange && (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
+                      <IconCalendar size={16} stroke={1.6} />
+                      {travelRange}
+                    </span>
+                  )}
+                  {totalDays > 0 && (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
+                      <IconClock size={16} stroke={1.6} />
+                      {totalDays} 天行程 · {Math.max(totalDays - 1, 0)} 晚
+                    </span>
+                  )}
+                  {featureCount > 0 && (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
+                      <IconSparkles size={16} stroke={1.6} />
+                      精選亮點 {featureCount} 項
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-center gap-3">
+                <div className="rounded-2xl border border-white/60 bg-white/60 px-5 py-4 shadow-lg shadow-[#9ad6ff]/40 backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.4em] text-morandi-muted">Preview sync</p>
+                  <p className="mt-2 text-sm text-morandi-secondary">
+                    左側修改會即時反映於右側預覽，協助團隊快速確認呈現效果。
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-[#0f6eea]/10 bg-[#0f6eea]/10 px-5 py-4 text-[#0f3d5c] shadow-lg shadow-[#9ad6ff]/40">
+                  <p className="text-xs uppercase tracking-[0.4em]">Corner Travel Style</p>
+                  <p className="mt-2 text-sm">
+                    採用 Corner 旅遊的海洋天空配色，營造清新且專業的品牌體驗。
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* 預覽容器 */}
-            <div className="flex-1 overflow-hidden p-8" ref={containerRef}>
-              <div className="w-full h-full flex items-center justify-center">
-                {/* 縮放容器 */}
-                <div
-                  style={{
-                    transform: `scale(${scale})`,
-                    transformOrigin: 'center center'
-                  }}
-                >
-                  {viewMode === 'mobile' ? (
-                    // 手機框架和內容
-                    <div className="relative">
-                      <div className="bg-black rounded-[40px] p-2 shadow-2xl">
-                        <div className="bg-black rounded-[32px] p-2">
-                          <div
-                            className="bg-white rounded-[28px] overflow-hidden relative"
-                            style={{ width: '375px', height: '812px' }}
-                          >
-                            {/* iPhone 動態島 */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-50">
-                              <div className="bg-black rounded-full w-[120px] h-[30px] mt-2" />
-                            </div>
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              {/* 左側：輸入表單 */}
+              <div className="flex min-h-[720px] flex-col overflow-hidden rounded-[32px] border border-white/60 bg-white/90 shadow-2xl shadow-[#9ad6ff]/25 backdrop-blur-xl">
+                <div className="flex items-center justify-between border-b border-white/50 px-8 py-6">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.35em] text-morandi-muted">Itinerary designer</p>
+                    <h2 className="mt-2 text-xl font-semibold text-morandi-primary">行程編輯表單</h2>
+                  </div>
+                  <div className="hidden items-center gap-2 text-sm text-morandi-secondary xl:flex">
+                    <IconSparkles size={18} stroke={1.6} />
+                    即時儲存預覽
+                  </div>
+                </div>
+                <div className="scrollable-content flex-1 overflow-y-auto px-6 py-6">
+                  <TourForm data={itineraryData} onChange={setItineraryData} />
+                </div>
+              </div>
 
-                            <div className="w-full h-full overflow-y-auto">
-                              <TourPreview data={processedData} viewMode="mobile" />
+              {/* 右側：即時預覽 */}
+              <div className="relative flex min-h-[720px] flex-col overflow-hidden rounded-[32px] border border-white/40 bg-gradient-to-br from-white/85 via-[#f0f9ff]/80 to-[#dff3ff]/90 shadow-2xl shadow-[#9ad6ff]/25 backdrop-blur-xl">
+                <div className="flex items-center justify-between border-b border-white/50 px-8 py-6">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.35em] text-morandi-muted">Live preview</p>
+                    <h2 className="mt-2 text-xl font-semibold text-morandi-primary">即時預覽</h2>
+                    <p className="mt-1 text-sm text-morandi-secondary">切換裝置尺寸，檢視行程於不同介面的呈現。</p>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-full bg-white/70 p-1 shadow-inner shadow-white/60">
+                    <button
+                      onClick={() => setViewMode('desktop')}
+                      className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        viewMode === 'desktop'
+                          ? 'bg-[#0f6eea] text-white shadow-lg shadow-[#0f6eea]/30'
+                          : 'text-morandi-secondary hover:text-morandi-primary hover:bg-white/80'
+                      }`}
+                    >
+                      <IconDeviceDesktop size={18} stroke={1.6} />
+                      桌機
+                    </button>
+                    <button
+                      onClick={() => setViewMode('mobile')}
+                      className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        viewMode === 'mobile'
+                          ? 'bg-[#0f6eea] text-white shadow-lg shadow-[#0f6eea]/30'
+                          : 'text-morandi-secondary hover:text-morandi-primary hover:bg-white/80'
+                      }`}
+                    >
+                      <IconDeviceMobile size={18} stroke={1.6} />
+                      手機
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-hidden px-6 pb-8 pt-6" ref={containerRef}>
+                  <div className="flex h-full w-full items-center justify-center">
+                    {/* 縮放容器 */}
+                    <div
+                      style={{
+                        transform: `scale(${scale})`,
+                        transformOrigin: 'center center'
+                      }}
+                    >
+                      {viewMode === 'mobile' ? (
+                        // 手機框架和內容
+                        <div className="relative">
+                          <div className="rounded-[46px] bg-[#0f172a] p-4 shadow-[0_30px_80px_rgba(15,110,234,0.25)]">
+                            <div className="rounded-[36px] bg-[#0b1120] p-3">
+                              <div
+                                className="relative overflow-hidden rounded-[28px] bg-white"
+                                style={{ width: '375px', height: '812px' }}
+                              >
+                                {/* iPhone 動態島 */}
+                                <div className="pointer-events-none absolute left-1/2 top-0 z-50 -translate-x-1/2">
+                                  <div className="mt-2 h-[30px] w-[120px] rounded-full bg-[#0b1120]" />
+                                </div>
+
+                                <div className="h-full w-full overflow-y-auto">
+                                  <TourPreview data={processedData} viewMode="mobile" />
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        // 電腦版
+                        <div
+                          className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_40px_120px_rgba(15,110,234,0.18)]"
+                          style={{
+                            width: '1200px',
+                            height: '800px'
+                          }}
+                        >
+                          <div className="h-full w-full overflow-y-auto">
+                            <TourPreview data={processedData} viewMode="desktop" />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    // 電腦版
-                    <div
-                      className="bg-white shadow-2xl rounded-lg overflow-hidden"
-                      style={{
-                        width: '1200px',
-                        height: '800px'
-                      }}
-                    >
-                      <div className="w-full h-full overflow-y-auto">
-                        <TourPreview data={processedData} viewMode="desktop" />
-                      </div>
-                    </div>
-                  )}
+                  </div>
+                </div>
+
+                <div className="pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 transform rounded-full bg-white/80 px-5 py-2 text-xs font-medium text-morandi-secondary shadow-lg shadow-[#9ad6ff]/25 sm:flex">
+                  即時預覽將同步顯示最新內容，建議在發佈前於桌機與手機雙重檢視。
                 </div>
               </div>
             </div>
