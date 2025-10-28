@@ -100,9 +100,7 @@ export function MessageInput({
     e.stopPropagation();
     setIsDragging(false);
 
-    console.log('🎯 [拖曳] 檔案放下了！');
     const files = Array.from(e.dataTransfer.files);
-    console.log('📁 [拖曳] 檔案數量:', files.length, files.map(f => f.name));
 
     const validFiles: File[] = [];
     const errors: string[] = [];
@@ -121,10 +119,8 @@ export function MessageInput({
     }
 
     if (validFiles.length > 0) {
-      console.log('✅ [拖曳] 有效檔案:', validFiles.length);
       onFilesChange([...attachedFiles, ...validFiles]);
     } else {
-      console.log('⚠️ [拖曳] 沒有有效檔案');
     }
   };
 

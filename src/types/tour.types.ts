@@ -73,6 +73,14 @@ export type ContractStatus =
   | 'signed';  // 已簽署
 
 /**
+ * ContractTemplate - 合約範本類型
+ */
+export type ContractTemplate =
+  | 'domestic'                 // 國內旅遊定型化契約（1120908修訂版）
+  | 'international'            // 國外旅遊定型化契約（1120908修訂版）
+  | 'individual_international'; // 國外個別旅遊定型化契約（1120908修訂版）
+
+/**
  * TourCategory - 旅遊團分類
  */
 export type TourCategory =

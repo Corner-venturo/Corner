@@ -103,7 +103,6 @@ export function ContractPrintDialog({ isOpen, onClose, tour }: ContractPrintDial
       await updateTour(tour.id, {
         contract_content: contractContentJson,
       });
-      console.log('✅ 合約資料已儲存');
 
       // 讀取合約範本
       const response = await fetch('/contract-templates/individual-overseas.html');

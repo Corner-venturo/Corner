@@ -5,13 +5,20 @@ import { ContentContainer } from '@/components/layout/content-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tour } from '@/stores/types';
+import { Tour, Payment } from '@/stores/types';
 import { useOrderStore } from '@/stores';
 import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react';
 
 interface TourCostsProps {
   tour: Tour;
   orderFilter?: string; // 選填：只顯示特定訂單相關的成本
+}
+
+// 擴展 Payment 型別以包含成本專用欄位
+interface CostPayment extends Payment {
+  category?: string;
+  vendor?: string;
+  receipt?: string;
 }
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
@@ -27,10 +34,10 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   });
 
   // TODO: 實作 payment store
-  const payments: any[] = [];
+  const payments: CostPayment[] = [];
 
   const _tourCosts = payments.filter(payment => {
-    if (payment.type !== '請款') return false;
+    if (payment.type !== 'request') return false;
 
     if (orderFilter) {
       return payment.order_id === orderFilter;
@@ -43,7 +50,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     if (!newCost.amount || !newCost.description) return;
 
     addPayment({
-      type: '請款',
+      type: 'request',
       tour_id: tour.id,
       ...newCost
     });
@@ -62,8 +69,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   const tourOrders = orders.filter(order => order.tour_id === tour.id);
 
   // 獲取所有相關的成本支出記錄
-  const costPayments = (payments as any[]).filter(payment =>
-    payment.type === '請款' &&
+  const costPayments = payments.filter(payment =>
+    payment.type === 'request' &&
     (payment.tour_id === tour.id ||
      tourOrders.some(order => order.id === payment.order_id))
   );
@@ -109,8 +116,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   };
 
   const totalCosts = costPayments.reduce((sum, cost) => sum + cost.amount, 0);
-  const confirmedCosts = costPayments.filter(cost => cost.status === '已確認').reduce((sum, cost) => sum + cost.amount, 0);
-  const pendingCosts = costPayments.filter(cost => cost.status === '待確認').reduce((sum, cost) => sum + cost.amount, 0);
+  const confirmedCosts = costPayments.filter(cost => cost.status === 'confirmed').reduce((sum, cost) => sum + cost.amount, 0);
+  const pendingCosts = costPayments.filter(cost => cost.status === 'pending').reduce((sum, cost) => sum + cost.amount, 0);
 
   return (
     <div className="space-y-6">
@@ -151,7 +158,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           {['transport', 'accommodation', 'food', 'attraction', 'other'].map((category) => {
             const categoryTotal = costPayments
-              .filter(cost => (cost as any).category === category)
+              .filter(cost => cost.category === category)
               .reduce((sum, cost) => sum + cost.amount, 0);
             const Icon = getCategoryIcon(category);
             const displayName = getCategoryDisplayName(category);
@@ -199,8 +206,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
           {/* 成本項目 */}
           <div className="space-y-2">
             {costPayments.map((cost) => {
-              const Icon = getCategoryIcon((cost as any).category || '');
-              const displayCategory = getCategoryDisplayName((cost as any).category || '');
+              const Icon = getCategoryIcon(cost.category || '');
+              const displayCategory = getCategoryDisplayName(cost.category || '');
               const relatedOrder = tourOrders.find(order => order.id === cost.order_id);
 
               return (
@@ -233,7 +240,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
                   <div className="col-span-2">
                     <div className="text-sm text-morandi-primary">
-                      {(cost as any).vendor || relatedOrder?.order_number || '-'}
+                      {cost.vendor || relatedOrder?.order_number || '-'}
                     </div>
                   </div>
 

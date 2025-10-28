@@ -51,7 +51,6 @@ export default function LoginPage() {
 
       if (result.success) {
         // 登入成功
-        console.log('✅ 登入成功');
         const redirectPath = getRedirectPath();
         router.push(redirectPath);
       } else {
@@ -79,7 +78,6 @@ export default function LoginPage() {
       const success = switchProfile(profileId);
 
       if (success) {
-        console.log('✅ 角色卡快速登入成功');
         const redirectPath = getRedirectPath();
         router.push(redirectPath);
       } else {
@@ -107,7 +105,6 @@ export default function LoginPage() {
       // 重新載入角色卡列表
       const cards = localAuthStore.getProfileCards();
       setProfileCards(cards);
-      console.log('🗑️ 角色卡已刪除:', profile.display_name);
     }
   };
 

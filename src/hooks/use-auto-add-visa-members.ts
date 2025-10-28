@@ -27,7 +27,6 @@ export function useAutoAddVisaMembers() {
 
     // 跳過假資料（不是有效的 UUID）
     if (!isValidUUID(currentWorkspace.id)) {
-      console.log('⚠️ [簽證頻道] 跳過自動加入成員（使用假資料）');
       return;
     }
 
@@ -43,7 +42,6 @@ export function useAutoAddVisaMembers() {
       );
 
       if (visaChannels.length === 0) {
-        console.log('📋 未找到簽證頻道');
         return;
       }
 
@@ -78,9 +76,7 @@ export function useAutoAddVisaMembers() {
               newMemberIds,
               'member'
             );
-            console.log(`✅ 已將 ${newMemberIds.length} 位員工加入簽證頻道: ${channel.name}`);
           } else {
-            console.log(`✓ 簽證頻道 ${channel.name} 所有員工已加入`);
           }
 
           // 標記該頻道已處理

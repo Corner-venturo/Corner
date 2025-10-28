@@ -28,7 +28,7 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
     if (city) {
       setPreviewUrl1(city.background_image_url || null);
       setPreviewUrl2(city.background_image_url_2 || null);
-      setPrimaryImage((city as any).primary_image || 1);
+      setPrimaryImage(city.primary_image || 1);
     } else {
       setPreviewUrl1(null);
       setPreviewUrl2(null);
@@ -73,7 +73,7 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
   };
 
   const handleUpload = async () => {
-    if (!city || (!selectedFile1 && !selectedFile2 && (city as any).primary_image === primaryImage)) return;
+    if (!city || (!selectedFile1 && !selectedFile2 && city.primary_image === primaryImage)) return;
 
     setUploading(true);
     try {
@@ -136,7 +136,7 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
 
   if (!city) return null;
 
-  const hasChanges = selectedFile1 || selectedFile2 || (city as any).primary_image !== primaryImage;
+  const hasChanges = selectedFile1 || selectedFile2 || city.primary_image !== primaryImage;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

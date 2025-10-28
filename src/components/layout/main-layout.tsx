@@ -72,7 +72,6 @@ export function MainLayout({ children }: MainLayoutProps) {
         const workspaceState = useChannelsStore.getState();
         if (!workspaceState.currentWorkspace) {
           await workspaceState.loadWorkspaces();
-          console.log('✅ 工作空間初始化完成');
         }
       } catch (error) {
         console.error('❌ 初始資料載入失敗:', error);

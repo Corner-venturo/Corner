@@ -94,25 +94,21 @@ class MemoryManager {
       }
     }
 
-    console.log('🧹 開始清理記憶體...');
 
     // 清理熱快取（記憶體）
     if (clearHot) {
       await cacheStrategy.clear('hot');
-      console.log('  ✅ 清理熱快取');
     }
 
     // 清理溫快取（SessionStorage）
     if (clearWarm) {
       await cacheStrategy.clear('warm');
-      console.log('  ✅ 清理溫快取');
     }
 
     // 觸發垃圾回收（如果瀏覽器支援）
     if (typeof window !== 'undefined' && (window as unknown).gc) {
       try {
         (window as unknown).gc();
-        console.log('  ✅ 觸發垃圾回收');
       } catch {
         // 忽略錯誤
       }
@@ -120,7 +116,6 @@ class MemoryManager {
 
     const afterStats = this.getMemoryStats();
     if (afterStats) {
-      console.log(`  📊 清理後記憶體使用: ${afterStats.usedMemory} MB (${afterStats.usagePercent}%)`);
     }
   }
 

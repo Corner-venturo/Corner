@@ -16,16 +16,13 @@ export function handleUpgrade(
   oldVersion: number,
   newVersion: number | null
 ): void {
-  console.log(`[DB Migration] 升級資料庫: v${oldVersion} -> v${newVersion}`);
 
   try {
     // v0 -> v1: 建立所有資料表（包含 regions 和 workspace）
     if (oldVersion === 0) {
-      console.log('[DB Migration] 初始化 v1 資料庫（包含所有資料表）');
       createAllTables(db);
     }
 
-    console.log('[DB Migration] 升級完成！');
   } catch (error) {
     console.error('[DB Migration] 升級失敗:', error);
     throw error;
@@ -37,7 +34,6 @@ export function handleUpgrade(
  * 包含：tours, orders, workspace 等所有表格
  */
 function createAllTables(db: IDBDatabase): void {
-  console.log('[DB Migration] 建立所有資料表（v1 完整版）...');
 
   TABLE_SCHEMAS.forEach((schema) => {
     // 如果資料表已存在，跳過（理論上不應該發生）
@@ -59,10 +55,8 @@ function createAllTables(db: IDBDatabase): void {
       });
     });
 
-    console.log(`[DB Migration] ✓ 建立資料表: ${schema.name} (${schema.indexes.length} 個索引)`);
   });
 
-  console.log(`[DB Migration] ✓ 完成！共建立 ${TABLE_SCHEMAS.length} 個資料表`);
 }
 
 /**
@@ -77,7 +71,6 @@ export function clearAllTables(db: IDBDatabase): Promise<void> {
 
     transaction.onerror = () => reject(transaction.error);
     transaction.oncomplete = () => {
-      console.log('[DB Migration] 所有資料表已清空');
       resolve();
     };
 
@@ -136,6 +129,5 @@ export async function importData(
       transaction.onerror = () => reject(transaction.error);
     });
 
-    console.log(`[DB Migration] 匯入 ${records.length} 筆資料到 ${tableName}`);
   }
 }

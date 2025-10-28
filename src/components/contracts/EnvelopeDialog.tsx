@@ -85,7 +85,6 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         envelope_records: JSON.stringify(updatedRecords),
       });
 
-      console.log('✅ 寄件紀錄已儲存');
     } catch (error) {
       console.error('❌ 儲存寄件紀錄失敗:', error);
       // 繼續列印，不因儲存失敗而中斷

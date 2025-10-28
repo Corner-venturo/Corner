@@ -18,7 +18,6 @@ export class AuthServiceV5 {
    */
   static async login(username: string, password: string): Promise<LoginResult> {
     try {
-      console.log('🔐 登入驗證：', username);
 
       // 固定預設密碼
       const DEFAULT_PASSWORD = 'Venturo2025!';
@@ -61,7 +60,6 @@ export class AuthServiceV5 {
         };
       }
 
-      console.log('✅ 登入成功:', user.employee_number);
 
       return {
         success: true,
@@ -93,7 +91,6 @@ export class AuthServiceV5 {
         })
         .eq('id', user_id);
 
-      console.log('✅ 更新登入時間:', user_id);
     } catch (error) {
       console.error('❌ 更新登入時間失敗:', error);
       // 不拋出錯誤，允許登入繼續
@@ -108,7 +105,6 @@ export class AuthServiceV5 {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth-storage');
     }
-    console.log('✅ 已登出');
   }
 
   /**

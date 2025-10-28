@@ -18,6 +18,11 @@ export interface ContractData {
   travelerIdNumber: string;
   travelerPhone: string;
 
+  // 緊急聯絡人資訊
+  emergencyContactName: string;
+  emergencyContactRelation: string;
+  emergencyContactPhone: string;
+
   // 旅遊團資訊
   tourName: string;
   tourDestination: string;
@@ -34,10 +39,15 @@ export interface ContractData {
   // 費用資訊
   totalAmount: string;
   depositAmount: string;
+  paymentMethod: string;
+  finalPaymentMethod: string;
 
   // 保險金額
   deathInsurance: string;
   medicalInsurance: string;
+
+  // 旅遊團資訊
+  minParticipants: string;
 
   // 乙方資訊
   companyExtension: string;
@@ -113,9 +123,14 @@ export function prepareContractData(
     travelerIdNumber: member.id_number || '',
     travelerPhone: member.phone || '',
 
+    // 緊急聯絡人資訊
+    emergencyContactName: member.emergency_contact_name || '',
+    emergencyContactRelation: member.emergency_contact_relation || '',
+    emergencyContactPhone: member.emergency_contact_phone || '',
+
     // 旅遊團資訊
     tourName: tour.name,
-    tourDestination: tour.location,
+    tourDestination: tour.location || '',
     tourCode: tour.code,
 
     // 集合資訊
@@ -129,12 +144,17 @@ export function prepareContractData(
       : '',
 
     // 費用資訊
-    totalAmount: order.total_amount.toString(),
-    depositAmount: depositAmount?.toString() || '',
+    totalAmount: order.total_amount?.toString() || '',
+    depositAmount: depositAmount?.toString() || (order.total_amount ? (order.total_amount * 0.3).toFixed(0) : ''),
+    paymentMethod: '現金',
+    finalPaymentMethod: '現金',
 
     // 保險金額（固定）
     deathInsurance: '2,500,000',
     medicalInsurance: '100,000',
+
+    // 旅遊團資訊
+    minParticipants: tour.max_participants?.toString() || '16',
 
     // 乙方資訊
     companyExtension: '', // 需手動填寫

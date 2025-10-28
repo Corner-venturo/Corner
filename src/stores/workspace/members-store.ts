@@ -30,7 +30,6 @@ export const useMembersStore = create<MembersState>((set) => ({
   loadChannelMembers: async (workspaceId, channelId) => {
     // 跳過假資料（不是有效的 UUID）
     if (!isValidUUID(workspaceId) || !isValidUUID(channelId)) {
-      console.log('⚠️ [成員載入] 跳過（使用假資料）');
       set((state) => ({
         channelMembers: {
           ...state.channelMembers,
@@ -41,7 +40,6 @@ export const useMembersStore = create<MembersState>((set) => ({
     }
 
     try {
-      console.log(`🔍 [成員載入] 載入頻道成員: ${channelId}`);
       const members = await fetchChannelMembers(workspaceId, channelId);
       console.log(`✅ [成員載入] 收到 ${members.length} 位成員:`, members.map(m => ({
         id: m.id,

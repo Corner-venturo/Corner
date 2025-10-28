@@ -8,7 +8,6 @@ import { Employee as User } from '@/stores/types';
 
 export async function initDefaultUser(): Promise<void> {
   try {
-    console.log('🔍 檢查使用者資料...');
 
     // 確保資料庫已初始化
     await localDB.init();
@@ -17,7 +16,6 @@ export async function initDefaultUser(): Promise<void> {
     const count = await localDB.count('employees');
 
     if (count === 0) {
-      console.log('⚠️ 沒有使用者，建立預設管理員...');
 
       // 動態載入 bcrypt（避免服務端/客戶端問題）
       const bcrypt = (await import('bcryptjs')).default;
@@ -75,7 +73,6 @@ export async function initDefaultUser(): Promise<void> {
       };
 
       await localDB.put('employees', adminUser);
-      console.log('✅ 成功建立管理員帳號 william01 (密碼: william123)');
     }
     
   } catch (error) {

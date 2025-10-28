@@ -17,7 +17,6 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 
   const loadTours = useCallback(async () => {
     try {
-      console.log('[useTours] 開始載入旅遊團資料...');
       setLoading(true);
       setError(null);
 
@@ -25,27 +24,20 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       // 之後只從 store 讀取（store 會自動背景同步）
       // 使用 ref 避免觸發 useCallback 重建
       if (!initializedRef.current) {
-        console.log('[useTours] 首次載入，呼叫 fetchAll()...');
         await useTourStore.getState().fetchAll();
         initializedRef.current = true;
-        console.log('[useTours] fetchAll() 完成');
       } else {
-        console.log('[useTours] 已初始化，直接從 store 讀取');
       }
 
       // ✅ 步驟 2: 從 Store 讀取並處理資料（過濾、排序、分頁）
-      console.log('[useTours] 呼叫 tourService.list()...');
       const result = await tourService.list(stableParams);
-      console.log('[useTours] 取得資料:', result.data.length, '筆');
       setData(result.data);
       setTotalCount(result.total);
-      console.log('[useTours] 資料載入完成 ✅');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '載入旅遊團資料失敗';
       setError(errorMessage);
       console.error('[useTours] ❌ 載入失敗:', err);
     } finally {
-      console.log('[useTours] 設定 loading = false');
       setLoading(false);
     }
   }, [stableParams]);
@@ -64,7 +56,6 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       setTotalCount(prev => prev + 1);
 
       // 🔧 Store 已經在 tourService.create() 中更新了，這裡不需要重複更新
-      console.log('✅ 已建立新旅遊團:', newTour.code);
 
       return newTour;
     } catch (err) {

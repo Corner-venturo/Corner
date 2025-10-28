@@ -230,8 +230,6 @@ export default function VisasPage() {
 
   // 團號選項（轉換為 Combobox 格式）
   const tourOptions: ComboboxOption[] = useMemo(() => {
-    console.log('📋 當前 tours 數量:', tours.length);
-    console.log('📋 Tours:', tours);
     return tours.map(tour => ({
       value: tour.id,
       label: `${tour.code} - ${tour.name}`,
@@ -254,17 +252,12 @@ export default function VisasPage() {
   useEffect(() => {
     const initVisaTour = async () => {
       try {
-        console.log('🔍 開始建立/取得簽證專用團...');
         const visaTour = await tourService.getOrCreateVisaTour();
-        console.log('✅ 簽證專用團:', visaTour);
 
         // 重新載入 tours 以確保新建立的簽證專用團出現在列表中
-        console.log('🔄 重新載入 tours...');
         await fetchTours();
-        console.log('✅ Tours 重新載入完成');
 
         if (visaTour && !contact_info.tour_id) {
-          console.log('✅ 設定預設團號:', visaTour.id);
           setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
         }
       } catch (error) {

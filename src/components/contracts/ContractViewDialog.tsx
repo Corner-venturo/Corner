@@ -45,7 +45,12 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
       setPrinting(true);
 
       // 讀取合約範本
-      const templateFile = tour.contract_template === 'template_a' ? 'individual-overseas.html' : 'individual-overseas.html';
+      const templateMap = {
+        'domestic': 'domestic.html',
+        'international': 'international.html',
+        'individual_international': 'individual_international.html',
+      };
+      const templateFile = templateMap[tour.contract_template as keyof typeof templateMap] || 'international.html';
       const response = await fetch(`/contract-templates/${templateFile}`);
       if (!response.ok) {
         throw new Error('無法載入合約範本');
@@ -163,6 +168,27 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
             </div>
           </div>
 
+          {/* 緊急聯絡人資訊 */}
+          <div>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">緊急聯絡人</h3>
+            <div className="space-y-2 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-morandi-secondary">姓名：</span>
+                  <span className="text-morandi-primary">{contractData.emergencyContactName || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-morandi-secondary">關係：</span>
+                  <span className="text-morandi-primary">{contractData.emergencyContactRelation || '-'}</span>
+                </div>
+              </div>
+              <div>
+                <span className="text-morandi-secondary">電話：</span>
+                <span className="text-morandi-primary">{contractData.emergencyContactPhone || '-'}</span>
+              </div>
+            </div>
+          </div>
+
           {/* 集合時地 */}
           <div>
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">集合時地</h3>
@@ -184,14 +210,26 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
           {/* 費用 */}
           <div>
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅遊費用</h3>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-morandi-secondary">總金額（新台幣）：</span>
-                <span className="text-morandi-primary">{contractData.totalAmount || '-'}</span>
+            <div className="space-y-2 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-morandi-secondary">總金額（新台幣）：</span>
+                  <span className="text-morandi-primary">{contractData.totalAmount || '-'} 元</span>
+                </div>
+                <div>
+                  <span className="text-morandi-secondary">定金（新台幣）：</span>
+                  <span className="text-morandi-primary">{contractData.depositAmount || '-'} 元</span>
+                </div>
               </div>
-              <div>
-                <span className="text-morandi-secondary">定金（新台幣）：</span>
-                <span className="text-morandi-primary">{contractData.depositAmount || '-'}</span>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-morandi-secondary">訂金付款方式：</span>
+                  <span className="text-morandi-primary">{contractData.paymentMethod || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-morandi-secondary">尾款付款方式：</span>
+                  <span className="text-morandi-primary">{contractData.finalPaymentMethod || '-'}</span>
+                </div>
               </div>
             </div>
           </div>

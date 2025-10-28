@@ -4,7 +4,7 @@
  */
 
 import { User } from './types';
-import { createStore } from './create-store';
+import { createStore } from './core/create-store-new';
 import { TABLES } from '@/lib/db/schemas';
 import { generateUUID } from '@/lib/utils/uuid';
 
@@ -55,7 +55,6 @@ export const userStoreHelpers = {
       candidate = `${baseName}${nextNumber.toString().padStart(2, '0')}`;
     }
 
-    console.log('🔢 產生員工編號:', candidate, '(檢查了', allEmployeeNumbers.length, '個現有編號)');
     return candidate;
   },
 
@@ -87,7 +86,6 @@ export const userStoreHelpers = {
    */
   updateUserPermissions: async (id: string, permissions: string[]): Promise<void> => {
     await useUserStore.getState().update(id, { permissions } as Partial<User>);
-    console.log('✅ 權限更新完成:', id, permissions);
   },
 
   /**

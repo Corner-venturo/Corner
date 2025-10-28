@@ -188,7 +188,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="系統設定"
         breadcrumb={[
@@ -220,7 +220,8 @@ export default function SettingsPage() {
         }
       />
 
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-4xl mx-auto space-y-8 p-6">
         {/* 主題設定區塊 */}
         <Card className="p-6">
           <div className="flex items-center gap-3 mb-6">
@@ -478,6 +479,7 @@ export default function SettingsPage() {
             </div>
           </div>
         </Card>
+        </div>
       </div>
     </div>
   );

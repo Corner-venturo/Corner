@@ -16,7 +16,6 @@ export function DevAutoLogin() {
   useEffect(() => {
     // 開發模式 + 沒有登入 = 自動登入
     if (process.env.NODE_ENV === 'development' && !user) {
-      console.log('🔧 開發模式：自動登入管理員');
       
       // 設定開發用戶
       const devUser = {

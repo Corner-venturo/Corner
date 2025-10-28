@@ -6,10 +6,8 @@ import { POLLING_INTERVALS } from '@/lib/constants/timeouts'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-console.log('🔍 Supabase 環境變數診斷：');
 console.log('  NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl);
 console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? `${supabaseAnonKey.slice(0, 20)}...` : 'undefined');
-console.log('  來源:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'from env' : 'using placeholder');
 
 // 簡單的單例模式，避免複雜的 Proxy
 // 🔧 新增：fetch timeout 防止請求卡住
@@ -48,7 +46,6 @@ export async function testSupabaseConnection() {
       return { success: false, error: error.message };
     }
 
-    console.log('✅ Supabase 連接成功！');
     return { success: true, data };
   } catch (err) {
     console.error('❌ Supabase 連接錯誤:', err);

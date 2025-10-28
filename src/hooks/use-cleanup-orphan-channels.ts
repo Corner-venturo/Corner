@@ -30,7 +30,6 @@ export function useCleanupOrphanChannels() {
         }
       }
 
-      console.log(`📊 頻道檢查：${channels.length} 個頻道，${tourChannelMap.size} 個旅遊團有頻道`);
 
       for (const channel of channels) {
         // 檢查是否為旅遊團頻道
@@ -45,7 +44,6 @@ export function useCleanupOrphanChannels() {
           if (!tour || tour.archived) {
             try {
               const reason = !tour ? '旅遊團已刪除' : '旅遊團已封存';
-              console.log(`🗑️ 刪除頻道: ${channel.name} (${reason})`);
               await deleteChannel(channel.id);
               deletedCount++;
             } catch (error) {
@@ -54,7 +52,6 @@ export function useCleanupOrphanChannels() {
           } else if (channelsForTour.length > 1 && channelsForTour[0] !== channel.id) {
             // 重複頻道，只保留第一個
             try {
-              console.log(`🗑️ 刪除重複頻道: ${channel.name} (重複)`);
               await deleteChannel(channel.id);
               deletedCount++;
             } catch (error) {
@@ -65,9 +62,7 @@ export function useCleanupOrphanChannels() {
       }
 
       if (deletedCount > 0) {
-        console.log(`✅ 清理完成：刪除 ${deletedCount} 個頻道`);
       } else {
-        console.log(`✓ 頻道狀態正常`);
       }
     };
 

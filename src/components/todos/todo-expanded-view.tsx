@@ -574,7 +574,6 @@ function QuickActionContent({ activeTab }: { activeTab: QuickActionTab; todo: To
   // 只在共享分頁時載入員工資料
   useEffect(() => {
     if (activeTab === 'share' && employees.length === 0) {
-      console.log('📥 載入員工資料...');
       fetchAllRef.current();
     }
   }, [activeTab, employees.length]);

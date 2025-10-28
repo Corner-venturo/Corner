@@ -72,7 +72,6 @@ export default function QuotesPage() {
         // 沒有報價單，找到旅遊團資料並開啟對話框
         const tour = tours.find(t => t.id === tourId);
         if (tour) {
-          console.log('📋 自動開啟新增對話框，團名:', tour.name);
           setNewQuote({
             name: tour.name,
             status: 'proposed',
@@ -88,7 +87,6 @@ export default function QuotesPage() {
         }
       } else {
         // 已有報價單，直接跳轉到該報價單
-        console.log('🔄 該團已有報價單，跳轉到:', existingQuote.id);
         router.replace(`/quotes/${existingQuote.id}`);
       }
     }
@@ -273,8 +271,6 @@ export default function QuotesPage() {
         is_pinned: newQuote.is_pinned || false,
       });
 
-      console.log('✅ 新增報價單完成:', newQuoteObj);
-      console.log('報價單 ID:', newQuoteObj?.id);
 
       // 重置表單並關閉對話框
       setNewQuote({
@@ -292,7 +288,6 @@ export default function QuotesPage() {
 
       // 直接跳轉到詳細頁面開始編輯
       if (newQuoteObj?.id) {
-        console.log('🔄 準備跳轉到:', `/quotes/${newQuoteObj.id}`);
         // 使用 replace 避免返回時回到帶參數的列表頁
         router.replace(`/quotes/${newQuoteObj.id}`);
       } else {

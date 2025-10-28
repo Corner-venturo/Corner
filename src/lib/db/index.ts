@@ -132,8 +132,6 @@ export class LocalDatabase {
    * 初始化資料庫
    */
   async init(): Promise<IDBDatabase> {
-    console.log('[LocalDB] init() 開始執行');
-
     // 🔒 檢查是否在瀏覽器環境
     if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
       const error = new Error('IndexedDB 不可用（非瀏覽器環境）');
@@ -143,37 +141,28 @@ export class LocalDatabase {
 
     // 如果已經初始化，直接返回
     if (this.db) {
-      console.log('[LocalDB] 資料庫已初始化，直接返回');
       return this.db;
     }
 
     // 如果正在初始化，等待完成
     if (this.initPromise) {
-      console.log('[LocalDB] 正在初始化中，等待完成');
       return this.initPromise;
     }
 
     // ✨ 檢查版本並處理升級（如有需要）
     try {
-      const needsSync = await checkAndHandleVersion();
-      if (needsSync) {
-        console.log('[LocalDB] ⚠️ 版本已升級，稍後需要從 Supabase 重新同步資料');
-        // 注意：實際同步會由 stores 的 fetchAll() 觸發
-      }
+      await checkAndHandleVersion();
     } catch (error) {
       console.error('[LocalDB] 版本檢查失敗:', error);
       // 不阻擋初始化，繼續執行
     }
 
     // 開始初始化
-    console.log(`[LocalDB] 開始初始化資料庫: ${DB_NAME} v${DB_VERSION}`);
     this.initPromise = new Promise((resolve, reject) => {
       // 🔥 關鍵修正：延遲執行確保環境就緒
       setTimeout(() => {
         try {
-          console.log('[LocalDB] 呼叫 indexedDB.open()');
           const request = indexedDB.open(DB_NAME, DB_VERSION);
-          console.log('[LocalDB] indexedDB.open() 返回:', request);
 
         request.onerror = (event) => {
           const error = new Error(
@@ -184,24 +173,18 @@ export class LocalDatabase {
           reject(error);
         };
 
-        request.onsuccess = (event) => {
-          console.log('[LocalDB] request.onsuccess 觸發', event);
+        request.onsuccess = () => {
           this.db = request.result;
-          console.log('[LocalDB] 資料庫初始化成功, version:', this.db.version);
-          console.log('[LocalDB] 資料表:', Array.from(this.db.objectStoreNames));
           resolve(this.db);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('[LocalDB] request.onupgradeneeded 觸發', event);
           const db = (event.target as IDBOpenDBRequest).result;
           const oldVersion = event.oldVersion;
           const newVersion = event.newVersion;
-          console.log(`[LocalDB] 升級資料庫: v${oldVersion} -> v${newVersion}`);
 
           try {
             handleUpgrade(db, oldVersion, newVersion);
-            console.log('[LocalDB] handleUpgrade 完成');
           } catch (error) {
             console.error('[LocalDB] 升級失敗:', error);
             this.initPromise = null; // 清除失敗的 Promise
@@ -212,10 +195,9 @@ export class LocalDatabase {
         };
 
         request.onblocked = (event) => {
-          console.warn('[LocalDB] request.onblocked 觸發 - 資料庫被其他連線阻擋', event);
+          console.warn('資料庫被其他連線阻擋', event);
         };
 
-          console.log('[LocalDB] 已設定所有回調函數');
         } catch (error) {
           console.error('[LocalDB] Promise 內部錯誤:', error);
           this.initPromise = null;
@@ -231,18 +213,14 @@ export class LocalDatabase {
    * 確保資料庫已初始化
    */
   private async ensureInit(): Promise<IDBDatabase> {
-    console.log('[LocalDB] ensureInit called, db exists:', !!this.db);
     if (!this.db) {
-      console.log('[LocalDB] DB not initialized, calling init()');
       await this.init();
-      console.log('[LocalDB] init() completed');
     }
 
     if (!this.db) {
       throw new Error('資料庫初始化失敗');
     }
 
-    console.log('[LocalDB] ensureInit completed');
     return this.db;
   }
 
@@ -363,22 +341,15 @@ export class LocalDatabase {
    * 刪除單筆資料
    */
   async delete(tableName: TableName, id: string): Promise<void> {
-    console.log('[LocalDB] 開始刪除:', tableName, id);
-
     try {
-      console.log('[LocalDB] 調用 ensureInit, this.db 存在:', !!this.db);
       const db = await this.ensureInit();
-      console.log('[LocalDB] DB 初始化完成');
 
       return new Promise((resolve, reject) => {
-        console.log('[LocalDB] 建立 transaction');
         const transaction = db.transaction(tableName, 'readwrite');
         const objectStore = transaction.objectStore(tableName);
-        console.log('[LocalDB] 調用 delete');
         const request = objectStore.delete(id);
 
         request.onsuccess = () => {
-          console.log('[LocalDB] delete request 成功');
           resolve();
         };
 
@@ -390,16 +361,12 @@ export class LocalDatabase {
           reject(error);
         };
 
-        transaction.oncomplete = () => {
-          console.log('[LocalDB] transaction 完成');
-        };
-
         transaction.onerror = () => {
-          console.error('[LocalDB] transaction 錯誤:', transaction.error);
+          console.error('transaction 錯誤:', transaction.error);
         };
       });
     } catch (error) {
-      console.error('[LocalDB] delete 方法異常:', error);
+      console.error('delete 方法異常:', error);
       throw error;
     }
   }
@@ -714,7 +681,6 @@ export class LocalDatabase {
       this.db.close();
       this.db = null;
       this.initPromise = null;
-      console.log('[LocalDB] 資料庫連線已關閉');
     }
   }
 
@@ -722,7 +688,6 @@ export class LocalDatabase {
    * 重置資料庫實例（強制清除所有狀態）
    */
   reset(): void {
-    console.log('[LocalDB] 重置資料庫實例');
     if (this.db) {
       this.db.close();
     }

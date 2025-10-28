@@ -20,7 +20,6 @@ export default function ItineraryPage() {
   // 複製行程
   const handleDuplicate = useCallback(async (id: string) => {
     // 待實作: 複製邏輯
-    console.log('複製行程:', id);
   }, []);
 
   // 刪除行程

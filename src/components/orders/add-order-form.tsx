@@ -39,8 +39,6 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
 
   // Debug: 檢查員工資料
   React.useEffect(() => {
-    console.log('🔍 AddOrderForm - 員工數量:', employees.length);
-    console.log('🔍 AddOrderForm - 員工資料:', employees);
   }, [employees]);
 
   // 取得當前登入使用者的顯示名稱

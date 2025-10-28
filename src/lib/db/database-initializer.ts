@@ -14,16 +14,13 @@ export class DatabaseInitializer {
    */
   static async ensureInitialized(): Promise<void> {
     try {
-      console.log('🔍 檢查資料庫初始化狀態...');
 
       // 1. 檢查 users 表
       const userCount = await this.checkUsersTable();
 
       if (userCount === 0) {
-        console.log('📦 資料庫為空，開始初始化...');
         await this.initializeDatabase();
       } else {
-        console.log(`✅ 資料庫已有 ${userCount} 位使用者，無需初始化`);
       }
 
     } catch (error) {
@@ -57,12 +54,10 @@ export class DatabaseInitializer {
     const migratedCount = await this.migrateFromLocalProfile();
 
     if (migratedCount > 0) {
-      console.log(`✅ 從 LocalProfile 遷移了 ${migratedCount} 位使用者`);
       return;
     }
 
     // Step 2: 沒有 LocalProfile，建立預設管理員
-    console.log('➕ 建立預設管理員帳號...');
     await this.createDefaultAdmin();
   }
 
@@ -74,7 +69,6 @@ export class DatabaseInitializer {
       // 讀取 localStorage 中的 LocalProfile
       const authStoreRaw = localStorage.getItem('venturo-local-auth-store');
       if (!authStoreRaw) {
-        console.log('📝 沒有找到 LocalProfile 資料');
         return 0;
       }
 
@@ -82,11 +76,9 @@ export class DatabaseInitializer {
       const profiles = authStore?.state?.profiles || [];
 
       if (profiles.length === 0) {
-        console.log('📝 LocalProfile 為空');
         return 0;
       }
 
-      console.log(`🔄 發現 ${profiles.length} 個 LocalProfile，開始遷移...`);
 
       let migratedCount = 0;
 
@@ -128,7 +120,6 @@ export class DatabaseInitializer {
 
           await localDB.create<User>('employees', user);
           migratedCount++;
-          console.log(`  ✅ 遷移: ${user.employee_number} - ${user.display_name}`);
 
         } catch (error) {
           console.warn(`  ⚠️ 遷移失敗: ${profile.employee_number}`, error);
@@ -153,7 +144,6 @@ export class DatabaseInitializer {
       const hasWilliam = existing?.some(u => u.employee_number === 'william01');
 
       if (hasWilliam) {
-        console.log('✅ william01 已存在，跳過建立');
         return;
       }
 
@@ -202,8 +192,6 @@ export class DatabaseInitializer {
       };
 
       await localDB.create<User>('employees', adminUser);
-      console.log(`✅ 建立預設管理員: william01`);
-      console.log(`   密碼: Venturo2025!`);
     } catch (error) {
       console.warn('⚠️ 建立預設管理員時發生錯誤:', error);
       // 不拋出錯誤，可能已經存在
@@ -214,7 +202,6 @@ export class DatabaseInitializer {
    * 手動觸發初始化（用於測試或修復）
    */
   static async forceInitialize(): Promise<void> {
-    console.log('🔧 強制初始化資料庫...');
     await this.initializeDatabase();
   }
 }
@@ -222,5 +209,4 @@ export class DatabaseInitializer {
 // 瀏覽器環境中提供全域訪問
 if (typeof window !== 'undefined') {
   (window as unknown).DatabaseInitializer = DatabaseInitializer;
-  console.log('💡 DatabaseInitializer 已載入');
 }

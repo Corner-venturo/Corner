@@ -24,9 +24,6 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
   const [showPassword, setShowPassword] = useState(false);
   const [passwordUpdateLoading, setPasswordUpdateLoading] = useState(false);
 
-  console.log('🔍 BasicInfoTab employee:', employee);
-  console.log('🔍 personal_info:', employee.personal_info);
-  console.log('🔍 emergency_contact:', employee.personal_info?.emergency_contact);
 
   const [formData, setFormData] = useState({
     display_name: employee.display_name || '',
@@ -56,23 +53,17 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
   });
 
   const handleSave = async () => {
-    console.log('🔵 [BasicInfoTab] handleSave 開始執行');
-    console.log('🔵 [BasicInfoTab] formData:', formData);
-    console.log('🔵 [BasicInfoTab] employee.id:', employee.id);
 
     // 如果英文名字改變了，同時更新員工編號
     const updates: any = { ...formData };
 
     if (formData.english_name !== employee.english_name) {
-      console.log('🔵 [BasicInfoTab] 英文名字有變更，重新生成員工編號');
       updates.employee_number = userStoreHelpers.generateUserNumber(formData.english_name);
     }
 
-    console.log('🔵 [BasicInfoTab] 準備更新，updates:', updates);
 
     try {
       await updateUser(employee.id, updates);
-      console.log('✅ [BasicInfoTab] 更新成功');
       setIsEditing(false);
     } catch (error) {
       console.error('❌ [BasicInfoTab] 更新失敗:', error);

@@ -82,15 +82,12 @@ export const useChannelsStore = create<ChannelsState>()(
 
             if (error) throw error;
 
-            console.log('✅ 從 Supabase 載入工作空間:', data);
-
             set({
               workspaces: data || [],
               currentWorkspace: data?.[0] || null,
               loading: false
             });
           } else {
-            console.log('📴 離線模式：使用本地工作空間');
             const data: Workspace[] = [
               {
                 id: 'workspace-001',
@@ -110,7 +107,7 @@ export const useChannelsStore = create<ChannelsState>()(
             });
           }
         } catch (error) {
-          console.log('⚠️ 載入工作空間失敗，使用本地預設值:', error);
+          console.warn('載入工作空間失敗，使用本地預設值:', error);
           const data: Workspace[] = [
             {
               id: 'workspace-001',
@@ -185,24 +182,14 @@ export const useChannelsStore = create<ChannelsState>()(
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
         try {
-          console.log('💾 [loadChannels] 從 IndexedDB 快速載入...');
           const cachedChannels = (await localDB.getAll('channels') as Channel[])
             .filter(ch => ch.workspace_id === currentWorkspaceId);
 
-          console.log('💾 [loadChannels] IndexedDB 頻道資料:', cachedChannels.map(ch => ({
-            id: ch.id,
-            name: ch.name,
-            order: ch.order,
-            is_favorite: ch.is_favorite
-          })));
-
           set({ channels: cachedChannels, loading: false });
-          console.log(`✅ [loadChannels] IndexedDB 快速載入完成: ${cachedChannels.length} 筆`);
 
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             setTimeout(async () => {
               try {
-                console.log('☁️ [loadChannels] 背景同步 Supabase...');
                 const { data, error } = await supabase
                   .from('channels')
                   .select('*')
@@ -215,13 +202,6 @@ export const useChannelsStore = create<ChannelsState>()(
                 }
 
                 const freshChannels = data || [];
-                console.log('☁️ [loadChannels] Supabase 頻道資料:', freshChannels.map(ch => ({
-                  id: ch.id,
-                  name: ch.name,
-                  order: ch.order,
-                  is_favorite: ch.is_favorite
-                })));
-                console.log(`✅ [loadChannels] Supabase 同步成功: ${freshChannels.length} 筆`);
 
                 // 🔥 修正：清理舊資料，只保留 Supabase 的真實資料
                 // 1. 取得 IndexedDB 中所有該 workspace 的頻道
@@ -236,7 +216,6 @@ export const useChannelsStore = create<ChannelsState>()(
                 const freshChannelIds = new Set(freshChannels.map(ch => ch.id));
                 for (const cachedId of workspaceChannelIds) {
                   if (!freshChannelIds.has(cachedId)) {
-                    console.log(`🗑️ [loadChannels] 清理已刪除的頻道: ${cachedId}`);
                     await localDB.delete('channels', cachedId);
                   }
                 }
@@ -247,7 +226,6 @@ export const useChannelsStore = create<ChannelsState>()(
                 }
 
                 set({ channels: freshChannels });
-                console.log('✅ [loadChannels] IndexedDB 已與 Supabase 同步完成');
               } catch (syncError) {
                 console.warn('⚠️ [loadChannels] 背景同步失敗:', syncError);
               }
@@ -286,7 +264,6 @@ export const useChannelsStore = create<ChannelsState>()(
               });
 
             if (error) throw error;
-            console.log('✅ 頻道已同步到 Supabase');
 
             // 🔥 自動將創建者加入為頻道擁有者
             if (newChannel.created_by) {
@@ -302,19 +279,15 @@ export const useChannelsStore = create<ChannelsState>()(
                   });
 
                 if (memberError) {
-                  console.warn('⚠️ 自動加入創建者失敗:', memberError);
-                } else {
-                  console.log('✅ 創建者已自動加入頻道為擁有者');
+                  console.warn('自動加入創建者失敗:', memberError);
                 }
               } catch (memberError) {
-                console.warn('⚠️ 加入創建者時發生錯誤:', memberError);
+                console.warn('加入創建者時發生錯誤:', memberError);
               }
             }
-          } else {
-            console.log('📴 離線模式：頻道僅儲存到本地');
           }
         } catch (error) {
-          console.log('⚠️ 頻道同步失敗，僅儲存到本地:', error);
+          console.warn('頻道同步失敗，僅儲存到本地:', error);
         }
 
         await localDB.put('channels', newChannel);
@@ -326,26 +299,20 @@ export const useChannelsStore = create<ChannelsState>()(
       },
 
       updateChannel: async (id, updates) => {
-        console.log('🔄 [updateChannel] 開始更新頻道:', { id, updates });
-        console.log('🔍 [updateChannel] updates 詳細內容:', JSON.stringify(updates, null, 2));
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-        console.log('🌐 [updateChannel] 網路狀態:', isOnline ? '線上' : '離線');
 
         // 先獲取當前頻道資料
         const currentChannel = get().channels.find(ch => ch.id === id);
         if (!currentChannel) {
-          console.error('❌ [updateChannel] 找不到頻道:', id);
+          console.error('找不到頻道:', id);
           return;
         }
-
-        console.log('📝 [updateChannel] 當前頻道:', currentChannel.name, 'group_id:', currentChannel.group_id);
 
         // 建立更新後的頻道物件
         const updatedChannel = { ...currentChannel, ...updates };
 
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-            console.log('☁️ [updateChannel] 準備更新到 Supabase...');
             const { error, data } = await supabase
               .from('channels')
               .update(updates)
@@ -353,20 +320,12 @@ export const useChannelsStore = create<ChannelsState>()(
               .select();
 
             if (error) {
-              console.error('❌ [updateChannel] Supabase 更新失敗:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-              });
+              console.error('Supabase 更新失敗:', error);
               throw error;
             }
-            console.log('✅ [updateChannel] Supabase 更新成功:', data);
-          } else {
-            console.log('📴 [updateChannel] 離線模式：頻道僅更新到本地');
           }
         } catch (error) {
-          console.error('⚠️ [updateChannel] Supabase 更新失敗:', error instanceof Error ? error.message : String(error));
+          console.error('Supabase 更新失敗:', error instanceof Error ? error.message : String(error));
         }
 
         // 更新本地狀態
@@ -375,14 +334,12 @@ export const useChannelsStore = create<ChannelsState>()(
             ch.id === id ? updatedChannel : ch
           )
         }));
-        console.log('✅ [updateChannel] 本地狀態已更新');
 
         // 更新到 IndexedDB
         try {
           await localDB.put('channels', updatedChannel);
-          console.log('✅ [updateChannel] IndexedDB 已更新');
         } catch (error) {
-          console.error('❌ [updateChannel] IndexedDB 更新失敗:', error);
+          console.error('IndexedDB 更新失敗:', error);
         }
       },
 
@@ -397,12 +354,9 @@ export const useChannelsStore = create<ChannelsState>()(
               .eq('id', id);
 
             if (error) throw error;
-            console.log('✅ 頻道已從 Supabase 刪除');
-          } else {
-            console.log('📴 離線模式：頻道僅從本地刪除');
           }
         } catch (error) {
-          console.log('⚠️ 頻道刪除失敗，僅從本地刪除:', error);
+          console.warn('頻道刪除失敗，僅從本地刪除:', error);
         }
 
         set(state => ({
@@ -411,17 +365,14 @@ export const useChannelsStore = create<ChannelsState>()(
       },
 
       toggleChannelFavorite: async (id) => {
-        console.log('⭐ [toggleChannelFavorite] 開始切換星號:', id);
-
         const channel = get().channels.find(ch => ch.id === id);
         if (!channel) {
-          console.error('❌ [toggleChannelFavorite] 找不到頻道:', id);
+          console.error('找不到頻道:', id);
           return;
         }
 
         const newFavoriteStatus = !channel.is_favorite;
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-        console.log('⭐ [toggleChannelFavorite] 新狀態:', newFavoriteStatus, '網路:', isOnline ? '線上' : '離線');
 
         const updatedChannel = { ...channel, is_favorite: newFavoriteStatus };
 
@@ -431,20 +382,17 @@ export const useChannelsStore = create<ChannelsState>()(
             ch.id === id ? updatedChannel : ch
           )
         }));
-        console.log('✅ [toggleChannelFavorite] 本地狀態已更新');
 
         // 更新到 IndexedDB
         try {
           await localDB.put('channels', updatedChannel);
-          console.log('✅ [toggleChannelFavorite] IndexedDB 已更新');
         } catch (error) {
-          console.error('❌ [toggleChannelFavorite] IndexedDB 更新失敗:', error);
+          console.error('IndexedDB 更新失敗:', error);
         }
 
         // 更新到 Supabase
         try {
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-            console.log('☁️ [toggleChannelFavorite] 準備更新到 Supabase...');
             const { error, data } = await supabase
               .from('channels')
               .update({ is_favorite: newFavoriteStatus })
@@ -452,26 +400,16 @@ export const useChannelsStore = create<ChannelsState>()(
               .select();
 
             if (error) {
-              console.error('❌ [toggleChannelFavorite] Supabase 更新失敗:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-              });
+              console.error('Supabase 更新失敗:', error);
               throw error;
             }
-            console.log('✅ [toggleChannelFavorite] Supabase 已更新:', data);
-          } else {
-            console.log('📴 [toggleChannelFavorite] 離線模式：僅更新本地');
           }
         } catch (error) {
-          console.error('⚠️ [toggleChannelFavorite] Supabase 更新失敗:', error instanceof Error ? error.message : String(error));
+          console.error('Supabase 更新失敗:', error instanceof Error ? error.message : String(error));
         }
       },
 
       selectChannel: async (channel) => {
-        console.log('📢 切換頻道:', channel?.name || 'null');
-
         set({
           selectedChannel: channel,
           currentChannel: channel
@@ -479,15 +417,12 @@ export const useChannelsStore = create<ChannelsState>()(
       },
 
       updateChannelOrder: async (channelId, newOrder) => {
-        console.log('🔢 [updateChannelOrder] 開始更新順序:', { channelId, newOrder });
-
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-        console.log('🌐 [updateChannelOrder] 網路狀態:', isOnline ? '線上' : '離線');
 
         // 先獲取當前頻道
         const currentChannel = get().channels.find(ch => ch.id === channelId);
         if (!currentChannel) {
-          console.error('❌ [updateChannelOrder] 找不到頻道:', channelId);
+          console.error('找不到頻道:', channelId);
           return;
         }
 
@@ -496,7 +431,6 @@ export const useChannelsStore = create<ChannelsState>()(
         try {
           // 更新 Supabase
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-            console.log('☁️ [updateChannelOrder] 準備更新到 Supabase...');
             const { error, data } = await supabase
               .from('channels')
               .update({ order: newOrder })
@@ -504,17 +438,9 @@ export const useChannelsStore = create<ChannelsState>()(
               .select();
 
             if (error) {
-              console.error('❌ [updateChannelOrder] Supabase 更新失敗:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-              });
+              console.error('Supabase 更新失敗:', error);
               throw error;
             }
-            console.log('✅ [updateChannelOrder] Supabase 更新成功:', data);
-          } else {
-            console.log('📴 [updateChannelOrder] 離線模式：僅更新本地');
           }
 
           // 更新本地狀態
@@ -523,13 +449,11 @@ export const useChannelsStore = create<ChannelsState>()(
               ch.id === channelId ? updatedChannel : ch
             )
           }));
-          console.log('✅ [updateChannelOrder] 本地狀態已更新');
 
           // 更新 IndexedDB
           await localDB.put('channels', updatedChannel);
-          console.log('✅ [updateChannelOrder] IndexedDB 已更新');
         } catch (error) {
-          console.error('❌ [updateChannelOrder] 更新失敗:', error);
+          console.error('更新失敗:', error);
         }
       },
 
@@ -547,18 +471,15 @@ export const useChannelsStore = create<ChannelsState>()(
 
         try {
           // 1. 快速載入 IndexedDB 快取
-          console.log('💾 [loadChannelGroups] 從 IndexedDB 快速載入...');
           const cachedGroups = (await localDB.getAll('channel_groups') as ChannelGroup[])
             .filter(g => g.workspace_id === currentWorkspaceId);
 
           set({ channelGroups: cachedGroups });
-          console.log(`✅ [loadChannelGroups] IndexedDB 快速載入完成: ${cachedGroups.length} 筆`);
 
           // 2. 背景同步 Supabase
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             setTimeout(async () => {
               try {
-                console.log('☁️ [loadChannelGroups] 背景同步 Supabase...');
                 const { data, error } = await supabase
                   .from('channel_groups')
                   .select('*')
@@ -571,7 +492,6 @@ export const useChannelsStore = create<ChannelsState>()(
                 }
 
                 const freshGroups = data || [];
-                console.log(`✅ [loadChannelGroups] Supabase 同步成功: ${freshGroups.length} 筆`);
 
                 // 清理舊資料
                 const allCachedGroups = await localDB.getAll('channel_groups') as ChannelGroup[];
@@ -584,7 +504,6 @@ export const useChannelsStore = create<ChannelsState>()(
                 const freshGroupIds = new Set(freshGroups.map(g => g.id));
                 for (const cachedId of workspaceGroupIds) {
                   if (!freshGroupIds.has(cachedId)) {
-                    console.log(`🗑️ [loadChannelGroups] 清理已刪除的群組: ${cachedId}`);
                     await localDB.delete('channel_groups', cachedId);
                   }
                 }
@@ -595,7 +514,6 @@ export const useChannelsStore = create<ChannelsState>()(
                 }
 
                 set({ channelGroups: freshGroups });
-                console.log('✅ [loadChannelGroups] IndexedDB 已與 Supabase 同步完成');
               } catch (syncError) {
                 console.warn('⚠️ [loadChannelGroups] 背景同步失敗:', syncError);
               }

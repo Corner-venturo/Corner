@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>國外個別旅遊定型化契約</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+    body {
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      font-size: 12pt;
+      line-height: 1.6;
+      color: #333;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 20pt;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 10pt;
+      margin-bottom: 20px;
+    }
+    .review-period {
+      text-align: center;
+      font-size: 10pt;
+      margin-bottom: 30px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .info-group {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+    .info-row {
+      margin-bottom: 8px;
+    }
+    .label {
+      display: inline-block;
+      width: 120px;
+      font-weight: 500;
+    }
+    .underline {
+      display: inline-block;
+      min-width: 300px;
+      border-bottom: 1px solid #333;
+      padding: 0 5px;
+    }
+    .article {
+      margin: 20px 0;
+      page-break-inside: avoid;
+    }
+    .article-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .article-content {
+      text-indent: 2em;
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+    .signature-section {
+      margin-top: 50px;
+      page-break-inside: avoid;
+    }
+    .signature-row {
+      margin: 20px 0;
+    }
+    @media print {
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>國外個別旅遊定型化契約</h1>
+  <div class="subtitle">中華民國112年9月8日觀業字第1123002067函修正，並自112年9月15日生效</div>
+
+  <div class="review-period">
+    立契約書人（本契約審閱期間至少一日，<span class="underline">{{reviewYear}}</span>年<span class="underline">{{reviewMonth}}</span>月<span class="underline">{{reviewDay}}</span>日由甲方攜回審閱）
+  </div>
+
+  <div class="section">
+    <div class="section-title">旅客（以下稱甲方）</div>
+    <div class="info-group">
+      <div class="info-row">
+        <span class="label">姓　　名：</span><span class="underline">{{travelerName}}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">電　　話：</span><span class="underline">{{travelerPhone}}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">居　住　所：</span><span class="underline">{{travelerAddress}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">緊急聯絡人</div>
+    <div class="info-group">
+      <div class="info-row">
+        <span class="label">姓　　名：</span><span class="underline">{{emergencyContactName}}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">與旅客關係：</span><span class="underline">{{emergencyContactRelation}}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">電　　話：</span><span class="underline">{{emergencyContactPhone}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">旅行業（以下稱乙方）</div>
+    <div class="info-group">
+      <div class="info-row">
+        <span class="label">公司名　稱：</span><span class="underline">角落旅行社股份有限公司</span>
+      </div>
+      <div class="info-row">
+        <span class="label">註冊編　號：</span><span class="underline">843100</span>
+      </div>
+      <div class="info-row">
+        <span class="label">負責人姓名：</span><span class="underline">簡瑋廷</span>
+      </div>
+      <div class="info-row">
+        <span class="label">電　　話：</span><span class="underline">02-7751-6051#9</span>
+      </div>
+      <div class="info-row">
+        <span class="label">營　業　所：</span><span class="underline">10350 台北市大同區重慶北路一段67號8樓之2</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 30px 0; text-align: justify;">
+    甲乙雙方同意就本旅遊事項，依下列約定辦理：
+  </div>
+
+  <div class="article">
+    <div class="article-title">第三條、旅遊團名稱、旅遊行程及廣告責任</div>
+    <div class="info-group">
+      <div class="info-row">
+        <span class="label">本旅遊行程名稱為：</span><span class="underline">{{tourName}}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">旅遊地區：</span><span class="underline">{{tourDestination}}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">行程：</span>詳如附件
+      </div>
+    </div>
+    <div class="article-content">
+      本契約適用於個別旅遊或客製化行程，不含領隊服務。甲方需自行負責旅遊期間之各項事務。
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="article-title">第四條、集合及出發時地</div>
+    <div class="article-content">
+      甲方應於民國<span class="underline">{{gatherYear}}</span>年<span class="underline">{{gatherMonth}}</span>月<span class="underline">{{gatherDay}}</span>日<span class="underline">{{gatherHour}}</span>時<span class="underline">{{gatherMinute}}</span>分於<span class="underline">{{gatherLocation}}</span>準時集合出發。
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="article-title">第五條、旅遊費用及付款方式</div>
+    <div class="info-group">
+      <div class="info-row">
+        <span class="label">旅遊費用：</span><span class="underline">新臺幣 {{totalAmount}} 元</span>
+      </div>
+    </div>
+    <div class="article-content">
+      除雙方有特別約定者外，甲方應依下列約定繳付：
+    </div>
+    <div class="info-group">
+      <div class="info-row">
+        一、簽訂本契約時，甲方應以<span class="underline">{{paymentMethod}}</span>（現金、信用卡、轉帳、支票等方式）繳付新臺幣<span class="underline">{{depositAmount}}</span>元。
+      </div>
+      <div class="info-row">
+        二、其餘款項以<span class="underline">{{finalPaymentMethod}}</span>（現金、信用卡、轉帳、支票等方式）於出發前三日繳清。
+      </div>
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="article-title">第二十六條、旅行業應投保責任保險及履約保證保險</div>
+    <div class="article-content">
+      乙方應依主管機關之規定投保責任保險及履約保證保險。責任保險投保金額：
+    </div>
+    <div class="info-group">
+      <div class="info-row">
+        ☑ 依法令規定。
+      </div>
+      <div class="info-row">
+        （一）每一旅客意外死亡新臺幣<span class="underline">{{deathInsurance}}</span>元。
+      </div>
+      <div class="info-row">
+        （二）每一旅客因意外事故所致體傷之醫療費用新臺幣<span class="underline">{{medicalInsurance}}</span>元。
+      </div>
+      <div class="info-row">
+        （三）國外旅遊善後處理費用新臺幣伍萬元。
+      </div>
+      <div class="info-row">
+        （四）每一旅客證件遺失之損害賠償費用新臺幣貳仟元。
+      </div>
+    </div>
+  </div>
+
+  <div class="signature-section">
+    <div style="font-weight: bold; margin-bottom: 30px;">訂約人</div>
+
+    <div class="signature-row">
+      <div style="margin-bottom: 15px;">甲方：<span class="underline" style="min-width: 200px;">{{travelerName}}</span></div>
+      <div style="margin-left: 60px;">
+        <div>住（居）所地址：<span class="underline" style="min-width: 300px;">{{travelerAddress}}</span></div>
+        <div>身分證字號（統一編號）：<span class="underline" style="min-width: 200px;">{{travelerIdNumber}}</span></div>
+        <div>電話或傳真：<span class="underline" style="min-width: 200px;">{{travelerPhone}}</span></div>
+      </div>
+    </div>
+
+    <div class="signature-row" style="margin-top: 40px;">
+      <div style="margin-bottom: 15px;">乙方：角落旅行社股份有限公司</div>
+      <div style="margin-left: 60px;">
+        <div>註冊編　號：843100</div>
+        <div>負　責　人：簡瑋廷</div>
+        <div>住　　　址：10350 台北市大同區重慶北路一段67號8樓之2</div>
+        <div>電話或傳真：02-7751-6051#9</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

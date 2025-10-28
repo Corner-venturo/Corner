@@ -99,7 +99,6 @@ export function useWidgets() {
           console.error('Failed to save widget preferences to Supabase:', error);
           console.error('Error details:', JSON.stringify(error, null, 2));
         } else {
-          console.log('✅ Widget preferences saved successfully to Supabase');
         }
       } catch (error) {
         console.error('Error saving widget preferences:', error);

@@ -15,17 +15,15 @@ import { Tour, ContractTemplate } from '@/types/tour.types';
 import { prepareContractData, ContractData } from '@/lib/contract-utils';
 
 const CONTRACT_TEMPLATES = [
-  { value: 'template_a' as ContractTemplate, label: '國外個別旅遊定型化契約書' },
-  { value: 'template_b' as ContractTemplate, label: '範本 B' },
-  { value: 'template_c' as ContractTemplate, label: '範本 C' },
-  { value: 'template_d' as ContractTemplate, label: '範本 D' },
+  { value: 'domestic' as ContractTemplate, label: '國內旅遊定型化契約（1120908修訂版）' },
+  { value: 'international' as ContractTemplate, label: '國外旅遊定型化契約（1120908修訂版）' },
+  { value: 'individual_international' as ContractTemplate, label: '國外個別旅遊定型化契約（1120908修訂版）' },
 ];
 
 const CONTRACT_TEMPLATE_LABELS = {
-  template_a: '國外個別旅遊定型化契約書',
-  template_b: '範本 B',
-  template_c: '範本 C',
-  template_d: '範本 D',
+  domestic: '國內旅遊定型化契約（1120908修訂版）',
+  international: '國外旅遊定型化契約（1120908修訂版）',
+  individual_international: '國外個別旅遊定型化契約（1120908修訂版）',
 };
 
 interface ContractDialogProps {
@@ -192,7 +190,6 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
         contract_completed: contractCompleted,
         contract_archived_date: archivedDate || '',
       });
-      console.log('✅ 合約資料已儲存');
 
       // 讀取合約範本
       const templateFile = selectedTemplate === 'template_a' ? 'individual-overseas.html' : 'individual-overseas.html';
@@ -275,7 +272,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
           {mode === 'create' && (
             <div>
               <h3 className="text-sm font-semibold text-morandi-primary mb-3">選擇合約範本</h3>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 gap-4">
                 {CONTRACT_TEMPLATES.map((template) => (
                   <button
                     key={template.value}

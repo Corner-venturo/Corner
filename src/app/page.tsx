@@ -77,8 +77,8 @@ export default function Home() {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = activeWidgets.indexOf(active.id as any);
-      const newIndex = activeWidgets.indexOf(over.id as any);
+      const oldIndex = activeWidgets.indexOf(active.id as string);
+      const newIndex = activeWidgets.indexOf(over.id as string);
       reorderWidgets(oldIndex, newIndex);
     }
   };

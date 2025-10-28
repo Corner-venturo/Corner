@@ -46,14 +46,17 @@ export async function loadWithSync<T extends { id: string }>(
     // 套用過濾條件
     if (filter) {
       cached = cached.filter(
-        (item: any) => item[filter.field] === filter.value
+        (item) => {
+          const value = item[filter.field as keyof T];
+          return value === filter.value;
+        }
       );
     }
 
     // 2. 背景同步 (如果在線上且啟用 Supabase)
     if (isOnline && supabaseEnabled) {
       try {
-        let query = (supabase as any).from(tableName).select(select);
+        let query = supabase.from(tableName).select(select);
 
         // 套用過濾
         if (filter) {
@@ -120,7 +123,7 @@ export async function createWithSync<T extends { id: string }>(
 
     // 2. 同步到 Supabase (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from(tableName)
         .insert(data);
 
@@ -166,7 +169,7 @@ export async function updateWithSync<T extends { id: string }>(
 
     // 3. 同步到 Supabase (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from(tableName)
         .update(updates)
         .eq('id', id);
@@ -203,7 +206,7 @@ export async function deleteWithSync(
 
     // 2. 從 Supabase 刪除 (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from(tableName)
         .delete()
         .eq('id', id);
@@ -250,7 +253,7 @@ export async function batchUpdateWithSync<T extends { id: string }>(
       // Supabase 不支援真正的批次更新，但可以用 Promise.all
       await Promise.all(
         updates.map(({ id, data }) =>
-          (supabase as any).from(tableName).update(data).eq('id', id)
+          supabase.from(tableName).update(data).eq('id', id)
         )
       );
     }

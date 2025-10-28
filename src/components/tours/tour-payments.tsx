@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tour } from '@/stores/types';
+import { Tour, Payment } from '@/stores/types';
 import { useOrderStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,11 @@ interface TourPaymentsProps {
   orderFilter?: string; // 選填：只顯示特定訂單的收款記錄
   triggerAdd?: boolean;
   onTriggerAddComplete?: () => void;
+}
+
+// 擴展 Payment 型別以包含收款專用欄位
+interface ReceiptPayment extends Payment {
+  method?: string;
 }
 
 export const TourPayments = React.memo(function TourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete }: TourPaymentsProps) {
@@ -37,7 +42,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
   });
 
   // TODO: 實作 payment store
-  const payments: any[] = [];
+  const payments: ReceiptPayment[] = [];
 
   // 獲取屬於這個旅遊團的所有訂單（如果有 orderFilter，則只取該訂單）
   const tourOrders = orders.filter(order => {
@@ -48,8 +53,8 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
   });
 
   // 獲取所有相關的收款記錄（根據 orderFilter 過濾）
-  const tourPayments = (payments as any[]).filter(payment => {
-    if (payment.type !== '收款') return false;
+  const tourPayments = payments.filter(payment => {
+    if (payment.type !== 'receipt') return false;
 
     if (orderFilter) {
       return payment.order_id === orderFilter;
@@ -63,7 +68,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
     if (!newPayment.amount || !newPayment.description) return;
 
     addPayment({
-      type: '收款',
+      type: 'receipt',
       tour_id: tour.id,
       order_id: selectedOrderId || undefined,
       ...newPayment
@@ -80,8 +85,8 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
   };
 
   // 統計數據計算
-  const confirmedPayments = tourPayments.filter(p => p.status === '已確認');
-  const pendingPayments = tourPayments.filter(p => p.status === '待確認');
+  const confirmedPayments = tourPayments.filter(p => p.status === 'confirmed');
+  const pendingPayments = tourPayments.filter(p => p.status === 'pending');
   const totalConfirmed = confirmedPayments.reduce((sum, p) => sum + p.amount, 0);
   const totalPending = pendingPayments.reduce((sum, p) => sum + p.amount, 0);
   const totalPayments = totalConfirmed + totalPending;
@@ -119,9 +124,9 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
     return names[method] || method;
   };
 
-  const getPaymentTypeIcon = (type: string) => {
-    if (type === '收款') return <TrendingUp size={16} className="text-morandi-green" />;
-    if (type === '請款') return <TrendingDown size={16} className="text-morandi-red" />;
+  const getPaymentTypeIcon = (type: Payment['type']) => {
+    if (type === 'receipt') return <TrendingUp size={16} className="text-morandi-green" />;
+    if (type === 'request') return <TrendingDown size={16} className="text-morandi-red" />;
     return <CreditCard size={16} className="text-morandi-gold" />;
   };
 
@@ -187,15 +192,17 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                       <td className="py-3 px-4">
                         <div className="flex items-center space-x-2">
                           {getPaymentTypeIcon(payment.type)}
-                          <span className="text-morandi-primary">{payment.type}</span>
+                          <span className="text-morandi-primary">
+                            {payment.type === 'receipt' ? '收款' : payment.type === 'request' ? '請款' : '出納'}
+                          </span>
                         </div>
                       </td>
                       <td className="py-3 px-4">
                         <span className={cn(
                           "font-medium",
-                          payment.type === '收款' ? 'text-morandi-green' : 'text-morandi-red'
+                          payment.type === 'receipt' ? 'text-morandi-green' : 'text-morandi-red'
                         )}>
-                          {payment.type === '收款' ? '+' : '-'} NT$ {payment.amount.toLocaleString()}
+                          {payment.type === 'receipt' ? '+' : '-'} NT$ {payment.amount.toLocaleString()}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-morandi-primary">
@@ -204,9 +211,9 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
                       <td className="py-3 px-4">
                         <span className={cn(
                           'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                          getMethodBadge((payment as any).method)
+                          getMethodBadge(payment.method || '')
                         )}>
-                          {getMethodDisplayName((payment as any).method)}
+                          {getMethodDisplayName(payment.method || '')}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-morandi-primary">

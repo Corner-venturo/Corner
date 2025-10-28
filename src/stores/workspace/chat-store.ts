@@ -42,7 +42,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
 
     try {
-      console.log('💾 [messages] 從 IndexedDB 快速載入...');
       const cachedMessages = (await localDB.getAll('messages') as RawMessage[])
         .filter(m => m.channel_id === channelId)
         .map(normalizeMessage);
@@ -57,12 +56,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
           [channelId]: false
         }
       }));
-      console.log(`✅ [messages] IndexedDB 快速載入完成: ${cachedMessages.length} 筆`);
 
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         setTimeout(async () => {
           try {
-            console.log('☁️ [messages] 背景同步 Supabase...');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data, error } = await (supabase as unknown)
               .from('messages')
@@ -79,7 +76,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
             }
 
             const freshMessages = (data || []).map(normalizeMessage);
-            console.log(`✅ [messages] Supabase 同步成功: ${freshMessages.length} 筆`);
 
             for (const message of freshMessages) {
               await localDB.put('messages', message);
@@ -97,7 +93,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }, 0);
       }
     } catch (error) {
-      console.log('⚠️ 載入訊息失敗:', error);
       set((state) => ({
         messagesLoading: { ...state.messagesLoading, [channelId]: false }
       }));
@@ -133,12 +128,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
           });
 
         if (error) throw error;
-        console.log('✅ 訊息已同步到 Supabase');
       } else {
-        console.log('📴 離線模式：訊息僅儲存到本地');
       }
     } catch (error) {
-      console.log('⚠️ 訊息同步失敗，僅儲存到本地:', error);
     }
 
     await localDB.put('messages', newMessage);
@@ -251,18 +243,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
           .eq('id', messageId);
 
         if (error) throw error;
-        console.log('✅ 訊息已從 Supabase 刪除');
       } else {
-        console.log('📴 離線模式：訊息僅從本地刪除');
       }
     } catch (error) {
-      console.log('⚠️ 訊息刪除失敗，僅從本地刪除:', error);
     }
 
     // 🔥 從 IndexedDB 刪除
     try {
       await localDB.delete('messages', messageId);
-      console.log('✅ 訊息已從 IndexedDB 刪除');
     } catch (error) {
       console.error('⚠️ IndexedDB 刪除失敗:', error);
     }
@@ -296,7 +284,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         if (error) throw error;
       }
     } catch (error) {
-      console.log('⚠️ 訊息更新失敗:', error);
     }
 
     set((state) => {

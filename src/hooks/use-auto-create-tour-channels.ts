@@ -72,7 +72,6 @@ export function useAutoCreateTourChannels() {
                     [creatorEmployeeId],
                     'owner'
                   );
-                  console.log(`✅ 已將創建者加入頻道: ${tour.code}`);
                 }
               } catch (error) {
                 console.error(`加入創建者失敗 (${tour.code}):`, error);

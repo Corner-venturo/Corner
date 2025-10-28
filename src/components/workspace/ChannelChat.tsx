@@ -265,7 +265,6 @@ export function ChannelChat() {
           currentUserId={user.id}
           onClose={() => setShowShareAdvanceDialog(false)}
           onSuccess={() => {
-            console.log('代墊已分享');
             setShowShareAdvanceDialog(false);
           }}
         />
@@ -296,7 +295,6 @@ export function ChannelChat() {
             setSelectedOrder(null);
           }}
           onSuccess={(receiptId) => {
-            console.log('收款單已建立:', receiptId);
             // 更新訂單的收款狀態
             setShowCreateReceiptDialog(false);
             setSelectedOrder(null);
@@ -315,7 +313,6 @@ export function ChannelChat() {
             setSelectedAdvanceListId('');
           }}
           onSuccess={() => {
-            console.log('請款單已建立');
             setShowCreatePaymentDialog(false);
             setSelectedAdvanceItem(null);
             setSelectedAdvanceListId('');
@@ -358,20 +355,15 @@ export function ChannelChat() {
                 variant="destructive"
                 className="w-full"
                 onClick={async () => {
-                  console.log('刪除按鈕被點擊', { selectedChannel });
                   if (!selectedChannel) {
-                    console.log('沒有選擇頻道');
                     return;
                   }
 
                   const confirmed = confirm(`確定要刪除 #${selectedChannel.name} 頻道嗎？此操作無法復原。`);
-                  console.log('確認刪除:', confirmed);
 
                   if (confirmed) {
                     try {
-                      console.log('開始刪除頻道:', selectedChannel.id);
                       await deleteChannel(selectedChannel.id);
-                      console.log('頻道刪除成功');
                       selectChannel(null);  // ✨ 改用 store 的 selectChannel
                       setShowSettingsDialog(false);
                       alert('頻道已刪除');
@@ -392,9 +384,7 @@ export function ChannelChat() {
               取消
             </Button>
             <Button onClick={async () => {
-              console.log('儲存變更按鈕被點擊');
               if (!selectedChannel) {
-                console.log('沒有選擇頻道');
                 return;
               }
 
@@ -404,7 +394,6 @@ export function ChannelChat() {
               }
 
               try {
-                console.log('開始更新頻道:', selectedChannel.id, { name: editChannelName, description: editChannelDescription });
                 await updateChannel(selectedChannel.id, {
                   name: editChannelName.toLowerCase().replace(/\s+/g, '-'),
                   description: editChannelDescription.trim() || undefined
@@ -447,7 +436,6 @@ export function ChannelChat() {
             </Button>
             <Button onClick={() => {
               // 待實作: 分享報價單卡片
-              console.log('分享報價單卡片');
               setShowShareQuoteDialog(false);
             }}>
               分享到頻道
@@ -481,7 +469,6 @@ export function ChannelChat() {
             </Button>
             <Button onClick={() => {
               // 待實作: 分享團況卡片
-              console.log('分享團況卡片');
               setShowShareTourDialog(false);
             }}>
               分享到頻道
@@ -519,7 +506,6 @@ export function ChannelChat() {
             </Button>
             <Button onClick={() => {
               // 待實作: 新增請款單
-              console.log('新增請款單');
               setShowNewPaymentDialog(false);
             }}>
               建立並分享
@@ -557,7 +543,6 @@ export function ChannelChat() {
             </Button>
             <Button onClick={() => {
               // 待實作: 新增收款單
-              console.log('新增收款單');
               setShowNewReceiptDialog(false);
             }}>
               建立並分享
@@ -599,7 +584,6 @@ export function ChannelChat() {
             </Button>
             <Button onClick={() => {
               // 待實作: 新增任務
-              console.log('新增任務');
               setShowNewTaskDialog(false);
             }}>
               建立並分享

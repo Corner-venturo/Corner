@@ -19,7 +19,7 @@ class TourService extends BaseService<Tour> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(t => t.id === id),
       add: async (tour: Tour) => {
-        const result = await store.create(tour as unknown);
+        const result = await store.create(tour);
         return result || tour;
       },
       update: async (id: string, data: Partial<Tour>) => {
@@ -129,7 +129,7 @@ class TourService extends BaseService<Tour> {
 
       // 這裡需要獲取相關訂單資料來計算
       // 目前先使用模擬邏輯
-      const total_revenue = tour.price * ((tour as unknown).current_participants || 0);
+      const total_revenue = tour.price * (tour.current_participants || 0);
       const estimatedCost = total_revenue * 0.7; // 假設成本為收入的70%
       const profit = total_revenue - estimatedCost;
       const profitMargin = total_revenue > 0 ? (profit / total_revenue) * 100 : 0;
@@ -214,8 +214,8 @@ class TourService extends BaseService<Tour> {
 
         if (!error && data) {
           // 如果找到已刪除的簽證團，復原它
-          if ((data as unknown)._deleted) {
-            console.log(`🔄 [Visa Tour] 找到已刪除的簽證團，正在復原...`);
+          const typedData = data as Tour & { _deleted?: boolean };
+          if (typedData._deleted) {
             const { data: updated, error: updateError } = await supabase
               .from('tours')
               .update({
@@ -223,12 +223,11 @@ class TourService extends BaseService<Tour> {
                 _synced_at: null,
                 updated_at: this.now()
               })
-              .eq('id', (data as unknown).id)
+              .eq('id', typedData.id)
               .select()
               .single();
 
             if (!updateError && updated) {
-              console.log(`✅ [Visa Tour] 簽證團已復原`);
               // 重新載入 tours
               const _store = this.getStore();
               const tourStore = useTourStore.getState();
@@ -237,7 +236,6 @@ class TourService extends BaseService<Tour> {
             }
           } else {
             // 找到且未被刪除，直接返回
-            console.log(`✅ [Visa Tour] 找到現有簽證團`);
             return data as Tour;
           }
         }
@@ -254,7 +252,6 @@ class TourService extends BaseService<Tour> {
     }
 
     // 不存在則建立新的簽證專用團
-    console.log(`📝 [Visa Tour] 建立新的簽證專用團...`);
     const today = new Date();
     const yearStart = new Date(targetYear, 0, 1);
     const departureDate = today > yearStart ? today : yearStart;
@@ -274,9 +271,9 @@ class TourService extends BaseService<Tour> {
       profit: 0,
       created_at: this.now(),
       updated_at: this.now()
-    } as unknown;
+    };
 
-    return await this.create(visaTour as unknown);
+    return await this.create(visaTour as Tour);
   }
 
   /**

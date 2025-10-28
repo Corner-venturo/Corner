@@ -163,7 +163,6 @@ function SortableChannelItem({ channel, isActive, onSelectChannel, toggleChannel
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🌟 [SortableChannelItem] 星號按鈕被點擊:', channel.name);
             toggleChannelFavorite(channel.id);
           }}
           className={cn(
@@ -361,10 +360,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
-    console.log('🎯 [handleDragEnd] 拖曳結束:', { activeId: active.id, overId: over?.id });
 
     if (!over || active.id === over.id) {
-      console.log('⏭️ [handleDragEnd] 沒有目標或拖到自己，跳過');
       return;
     }
 
@@ -376,13 +373,11 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
       return;
     }
 
-    console.log('🎯 [handleDragEnd] 被拖曳的頻道:', draggedChannel.name);
 
     // 檢查是否拖到群組標題上（over.id 是群組 ID）
     const targetGroup = channelGroups.find(g => g.id === over.id);
 
     if (targetGroup) {
-      console.log('📁 [handleDragEnd] 拖到群組:', targetGroup.name);
       // 拖到群組：更新該頻道的 group_id
       await updateChannel(draggedChannelId, {
         group_id: targetGroup.id,
@@ -395,14 +390,12 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     const targetChannel = channels.find(ch => ch.id === over.id);
 
     if (targetChannel) {
-      console.log('📄 [handleDragEnd] 拖到頻道:', targetChannel.name);
 
       // 同群組內排序或跨群組拖曳到另一個頻道上
       const bothHaveNoGroup = !draggedChannel.group_id && !targetChannel.group_id;
       const sameGroup = draggedChannel.group_id === targetChannel.group_id;
 
       if (!bothHaveNoGroup && !sameGroup) {
-        console.log('🔀 [handleDragEnd] 跨群組拖曳');
         // 跨群組：只在兩個頻道都沒有群組時才允許移動
         // 或者目標頻道的 group_id 確實存在於 channel_groups 中
         if (!targetChannel.group_id) {
@@ -424,31 +417,25 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
           }
         }
       } else {
-        console.log('🔄 [handleDragEnd] 同群組內排序');
         // 同群組內：重新排序
         const groupChannels = channels.filter(ch =>
           (bothHaveNoGroup ? !ch.group_id : ch.group_id === draggedChannel.group_id) &&
           ch.is_favorite === draggedChannel.is_favorite
         );
 
-        console.log('🔄 [handleDragEnd] 群組內頻道數量:', groupChannels.length);
 
         const oldIndex = groupChannels.findIndex(ch => ch.id === draggedChannelId);
         const newIndex = groupChannels.findIndex(ch => ch.id === over.id);
 
-        console.log('🔄 [handleDragEnd] 移動:', { oldIndex, newIndex });
 
         if (oldIndex !== -1 && newIndex !== -1) {
           const reorderedChannels = arrayMove(groupChannels, oldIndex, newIndex);
 
-          console.log('🔄 [handleDragEnd] 重新排序後的頻道:', reorderedChannels.map((ch, i) => ({ name: ch.name, order: i })));
 
           // 更新順序
           for (let i = 0; i < reorderedChannels.length; i++) {
-            console.log(`🔢 [handleDragEnd] 更新順序: ${reorderedChannels[i].name} -> ${i}`);
             await updateChannelOrder(reorderedChannels[i].id, i);
           }
-          console.log('✅ [handleDragEnd] 所有順序更新完成');
         }
       }
     }

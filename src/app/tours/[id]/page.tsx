@@ -85,7 +85,6 @@ export default function TourDetailPage() {
         switch (activeTab) {
           case 'overview':
             // 功能: 編輯旅遊團基本資料
-            console.log('編輯旅遊團:', tour.id);
             break;
           case 'operations':
             // 功能: 新增團務欄位

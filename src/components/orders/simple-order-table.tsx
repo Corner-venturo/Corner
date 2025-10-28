@@ -94,7 +94,6 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                 <tr
                   key={order.id}
                   onClick={() => {
-                    console.log('訂單列點擊:', order.id);
                     router.push(`/orders/${order.id}`);
                   }}
                   className="relative transition-colors cursor-pointer hover:bg-morandi-container/30"

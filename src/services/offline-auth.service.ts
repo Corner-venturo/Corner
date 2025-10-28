@@ -21,8 +21,6 @@ export class OfflineAuthService {
     try {
       // 🚀 TODO: [上線修改] 改成 Supabase 優先，IndexedDB 備援
       // 參考：docs/PRODUCTION_TODO.md
-      console.log('🔐 純本地登入驗證...');
-      console.log('輸入的帳號:', email);
 
       // 🚀 TODO: [上線修改] 這裡要改成：
       // 1. 先嘗試從 Supabase 讀取
@@ -58,14 +56,11 @@ export class OfflineAuthService {
         };
       }
 
-      console.log('✓ 密碼驗證成功:', employee.name || employee.display_name);
 
       // 3. 建立本地 Profile
-      console.log('開始加密密碼...');
       let encryptedPassword;
       try {
         encryptedPassword = await PasswordEncryption.encrypt(password);
-        console.log('密碼加密成功');
       } catch (encErr) {
         console.error('密碼加密失敗:', encErr);
         throw encErr;
@@ -96,18 +91,14 @@ export class OfflineAuthService {
       };
 
       // 4. 儲存到本地
-      console.log('準備儲存 Profile:', profile);
       try {
         useLocalAuthStore.getState().addProfile(profile);
-        console.log('Profile 已加入');
         useLocalAuthStore.getState().setCurrentProfile(profile);
-        console.log('Profile 已設為當前');
       } catch (storeErr) {
         console.error('儲存 Profile 失敗:', storeErr);
         throw storeErr;
       }
 
-      console.log('✅ Profile 已建立並儲存到本地');
 
       return { success: true };
 
@@ -173,7 +164,6 @@ export class OfflineAuthService {
       // 設定為當前登入
       useLocalAuthStore.getState().setCurrentProfile(profile);
 
-      console.log('✅ 離線登入成功');
 
       // 背景嘗試刷新 Supabase session
       if (typeof navigator !== 'undefined' && navigator.onLine && profile.cachedPassword) {
@@ -207,7 +197,6 @@ export class OfflineAuthService {
       const pinHash = await PasswordEncryption.hashPin(pin);
       useLocalAuthStore.getState().setPinForProfile(profileId, pinHash);
 
-      console.log('✅ PIN 碼設定成功');
       return true;
 
     } catch (error) {
@@ -229,7 +218,6 @@ export class OfflineAuthService {
       }
 
       useLocalAuthStore.getState().setCurrentProfile(profile);
-      console.log('✅ 已切換到:', profile.display_name);
 
       // 背景刷新 session
       if (typeof navigator !== 'undefined' && navigator.onLine && profile.cachedPassword) {
@@ -249,14 +237,12 @@ export class OfflineAuthService {
    */
   static logout(): void {
     useLocalAuthStore.getState().setCurrentProfile(null);
-    console.log('✅ 已登出');
   }
 
   /**
    * 背景刷新（純本地模式 - 已停用）
    */
   private static async refreshSupabaseSession(profile: LocalProfile): Promise<void> {
-    console.log('📦 本地模式：無需刷新 session');
   }
 
   /**
@@ -275,7 +261,6 @@ export class OfflineAuthService {
       const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : false;
 
       if (!isOnline) {
-        console.log('離線狀態，無法同步');
         return false;
       }
 
@@ -287,7 +272,6 @@ export class OfflineAuthService {
 
       // 🚀 TODO: [上線修改] 這裡需要實作 Supabase 同步
       // 目前暫時返回 false
-      console.log('⚠️ Supabase 同步尚未實作');
       return false;
 
     } catch (error) {

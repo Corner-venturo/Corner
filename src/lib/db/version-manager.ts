@@ -17,23 +17,19 @@ export async function checkAndHandleVersion(): Promise<boolean> {
   const lastVersion = localStorage.getItem(VERSION_KEY);
   const currentVersion = DB_VERSION.toString();
 
-  console.log(`[Version Manager] 上次版本: ${lastVersion}, 當前版本: ${currentVersion}`);
 
   // 第一次使用（沒有記錄）
   if (!lastVersion) {
-    console.log('[Version Manager] 首次使用，記錄版本');
     localStorage.setItem(VERSION_KEY, currentVersion);
     return false; // 不需要重新同步
   }
 
   // 版本相同，正常使用
   if (lastVersion === currentVersion) {
-    console.log('[Version Manager] 版本相同，正常使用');
     return false;
   }
 
   // 版本不同，需要處理升級
-  console.log('[Version Manager] 🔄 偵測到版本變化，準備升級...');
 
   // 顯示升級提示（可選）
   const shouldUpgrade = await confirmUpgrade(parseInt(lastVersion), DB_VERSION);
@@ -45,10 +41,8 @@ export async function checkAndHandleVersion(): Promise<boolean> {
     // 更新版本記錄
     localStorage.setItem(VERSION_KEY, currentVersion);
 
-    console.log('[Version Manager] ✅ 升級完成，需要重新同步資料');
     return true; // 需要重新同步
   } else {
-    console.log('[Version Manager] 使用者取消升級');
     return false;
   }
 }
@@ -58,7 +52,6 @@ export async function checkAndHandleVersion(): Promise<boolean> {
  */
 async function confirmUpgrade(oldVersion: number, newVersion: number): Promise<boolean> {
   // 方案 1：自動升級（推薦）
-  console.log(`[Version Manager] 自動升級: v${oldVersion} → v${newVersion}`);
   return true;
 
   // 方案 2：詢問使用者（可選）
@@ -76,12 +69,10 @@ async function confirmUpgrade(oldVersion: number, newVersion: number): Promise<b
  */
 async function clearDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
-    console.log('[Version Manager] 🗑️ 清空 IndexedDB...');
 
     const request = indexedDB.deleteDatabase(DB_NAME);
 
     request.onsuccess = () => {
-      console.log('[Version Manager] ✅ IndexedDB 已清空');
       resolve();
     };
 
@@ -118,5 +109,4 @@ export function getLastVersion(): number | null {
  */
 export function resetVersion(): void {
   localStorage.removeItem(VERSION_KEY);
-  console.log('[Version Manager] 版本記錄已清除');
 }

@@ -123,7 +123,6 @@ class SupplierService extends BaseService<Supplier> {
         throw error;
       }
 
-      console.log(`✅ 已儲存 ${cityIds.length} 個城市關聯`);
     } catch (error) {
       console.error('saveSupplierCities 失敗:', error);
       throw error;
@@ -156,7 +155,6 @@ class SupplierService extends BaseService<Supplier> {
         throw error;
       }
 
-      console.log(`✅ 已儲存 ${accounts.length} 個付款帳戶`);
     } catch (error) {
       console.error('savePaymentAccounts 失敗:', error);
       throw error;
@@ -230,7 +228,6 @@ class SupplierService extends BaseService<Supplier> {
         await this.savePaymentAccounts(newSupplier.id, paymentAccounts);
       }
 
-      console.log('✅ 供應商建立成功:', newSupplier.id);
       return newSupplier;
     } catch (error) {
       console.error('createSupplierWithCities 失敗:', error);

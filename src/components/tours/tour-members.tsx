@@ -121,7 +121,8 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
         member.gender = '';
       }
     } else {
-      (member as unknown)[field] = value;
+      // 使用型別安全的方式更新屬性
+      member[field] = value as never;
     }
 
     updatedMembers[rowIndex] = member;
@@ -134,43 +135,33 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
   // 自動儲存成員
   const autoSaveMember = async (member: EditingMember, index: number) => {
     if (member.isNew && member.name.trim()) {
-      const { isNew, order_number, contact_person, assignedRoom, ...memberData } = member;
+      const { isNew, order_number, contact_person, assignedRoom, nameEn, passportNumber, passportExpiry, idNumber, ...restData } = member;
       const convertedData = {
-        ...memberData,
-        name_en: memberData.nameEn,
-        passport_number: memberData.passportNumber,
-        passport_expiry: memberData.passportExpiry,
-        id_number: memberData.idNumber,
+        ...restData,
+        name_en: nameEn,
+        passport_number: passportNumber,
+        passport_expiry: passportExpiry,
+        id_number: idNumber,
         assigned_room: assignedRoom
       };
-      // 移除舊欄位
-      delete (convertedData as unknown).nameEn;
-      delete (convertedData as unknown).passportNumber;
-      delete (convertedData as unknown).passportExpiry;
-      delete (convertedData as unknown).idNumber;
 
-      const newMember = await addMember(convertedData as unknown);
+      const newMember = await addMember(convertedData);
 
       const updatedMembers = [...tableMembers];
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false };
       setTableMembers(updatedMembers);
     } else if (member.id && !member.isNew) {
-      const { isNew, order_number, contact_person, assignedRoom, ...memberData } = member;
+      const { isNew, order_number, contact_person, assignedRoom, nameEn, passportNumber, passportExpiry, idNumber, ...restData } = member;
       const convertedData = {
-        ...memberData,
-        name_en: memberData.nameEn,
-        passport_number: memberData.passportNumber,
-        passport_expiry: memberData.passportExpiry,
-        id_number: memberData.idNumber,
+        ...restData,
+        name_en: nameEn,
+        passport_number: passportNumber,
+        passport_expiry: passportExpiry,
+        id_number: idNumber,
         assigned_room: assignedRoom
       };
-      // 移除舊欄位
-      delete (convertedData as unknown).nameEn;
-      delete (convertedData as unknown).passportNumber;
-      delete (convertedData as unknown).passportExpiry;
-      delete (convertedData as unknown).idNumber;
 
-      await updateMember(member.id, convertedData as unknown);
+      await updateMember(member.id, convertedData);
     }
   };
 
@@ -381,17 +372,17 @@ export const TourMembers = React.memo(function TourMembers({ tour, orderFilter }
                     </td>
 
                     {/* 可編輯欄位 */}
-                    <td className="border border-gray-300">{renderCell(member, 'name')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'nameEn')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'birthday')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'age')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'gender')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'idNumber')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'passportNumber')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'passportExpiry')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'order_number')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'contact_person')}</td>
-                    <td className="border border-gray-300">{renderCell(member, 'assignedRoom')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'name')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'nameEn')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'birthday')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'age')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'gender')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'idNumber')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'passportNumber')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'passportExpiry')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'order_number')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'contact_person')}</td>
+                    <td className="border border-gray-300">{renderCell(member, index, 'assignedRoom')}</td>
 
                     {/* 刪除按鈕 */}
                     <td className="border border-gray-300 text-center py-1">

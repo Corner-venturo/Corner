@@ -79,12 +79,9 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
           );
 
         if (itemsError) throw itemsError;
-        console.log('✅ 代墊清單已同步到 Supabase');
       } else {
-        console.log('📴 離線模式：代墊清單僅儲存到本地');
       }
     } catch (error) {
-      console.log('⚠️ 代墊清單同步失敗，僅儲存到本地:', error);
     }
 
     set(state => ({
@@ -170,7 +167,6 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
         set({ advanceLists: filtered, loading: false });
       }
     } catch (error) {
-      console.log('⚠️ 載入代墊清單失敗，使用本地資料:', error);
       const allLists = get().advanceLists;
       const filtered = allLists.filter(list => list.channel_id === channelId);
       set({ advanceLists: filtered, loading: false });
@@ -189,12 +185,9 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
           .eq('id', listId);
 
         if (error) throw error;
-        console.log('✅ 代墊清單已從 Supabase 刪除');
       } else {
-        console.log('📴 離線模式：代墊清單僅從本地刪除');
       }
     } catch (error) {
-      console.log('⚠️ 代墊清單刪除失敗，僅從本地刪除:', error);
     }
 
     set(state => ({

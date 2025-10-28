@@ -207,12 +207,10 @@ export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
       let src: string;
       if (file.size > 500 * 1024) {
         setUploadProgress(30);
-        console.log(`📦 原始大小: ${(file.size / 1024).toFixed(2)} KB，開始壓縮...`);
         src = await compressImage(file);
 
         // 計算壓縮後的大小
         const compressedSize = (src.length * 3) / 4; // Base64 大小估算
-        console.log(`✅ 壓縮完成: ${(compressedSize / 1024).toFixed(2)} KB`);
         setUploadProgress(80);
       } else {
         // 小檔案直接讀取
