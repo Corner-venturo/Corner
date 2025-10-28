@@ -3,6 +3,7 @@ import { TracingBeam } from "@/components/ui/tracing-beam";
 import { cn } from "@/lib/utils";
 import { DailyImageCarousel } from "./DailyImageCarousel";
 import { MutableRefObject } from "react";
+import { DayLabel, DateSubtitle, AttractionCard, DecorativeDivider } from "@/components/tour-preview";
 
 interface TourItinerarySectionProps {
   data: any;
@@ -116,11 +117,9 @@ export function TourItinerarySection({
                     className="relative overflow-hidden rounded-[36px] border border-morandi-border/60 bg-white/95 p-8 shadow-xl ring-1 ring-morandi-border/40 backdrop-blur-sm"
                   >
                     <div className="flex flex-wrap items-center gap-4 mb-6">
-                      <span className="rounded-full bg-morandi-primary/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.35em] text-morandi-primary">
-                        {day.dayLabel || `Day ${index + 1}`}
-                      </span>
+                      <DayLabel dayNumber={index + 1} variant="default" />
                       {day.date && (
-                        <span className="text-sm text-morandi-secondary">{day.date}</span>
+                        <DateSubtitle date={day.date} />
                       )}
                     </div>
 
@@ -149,48 +148,23 @@ export function TourItinerarySection({
 
                     {day.activities && day.activities.length > 0 && (
                       <div className="mb-8 space-y-4">
+                        <DecorativeDivider variant="simple" />
                         <div className="flex items-center justify-between">
                           <h4 className="text-lg font-semibold text-morandi-primary">亮點景點</h4>
                           <span className="text-sm text-morandi-secondary/80">
                             {String(day.activities.length).padStart(2, '0')} Spots
                           </span>
                         </div>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                           {day.activities.map((activity: any, actIndex: number) => (
-                            <div
+                            <AttractionCard
                               key={`activity-${index}-${actIndex}`}
-                              className="group relative overflow-hidden rounded-3xl border border-morandi-border/50 bg-gradient-to-br from-white via-morandi-container/20 to-white shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
-                            >
-                              {activity?.image ? (
-                                <>
-                                  <div className="relative aspect-[4/3] overflow-hidden">
-                                    <img
-                                      src={activity.image}
-                                      alt={activity.title}
-                                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-                                    <div className="absolute bottom-4 left-5 flex items-center gap-3 text-white drop-shadow-lg">
-                                      <span className="text-2xl">{activity.icon}</span>
-                                      <span className="text-lg font-semibold">{activity.title}</span>
-                                    </div>
-                                  </div>
-                                  <p className="px-5 pb-6 pt-4 text-sm leading-relaxed text-morandi-secondary/95">
-                                    {activity.description}
-                                  </p>
-                                </>
-                              ) : (
-                                <div className="p-5 space-y-3">
-                                  <div className="flex items-center gap-3 text-morandi-primary">
-                                    <span className="text-2xl">{activity.icon}</span>
-                                    <h5 className="text-lg font-semibold">{activity.title}</h5>
-                                  </div>
-                                  <p className="text-sm leading-relaxed text-morandi-secondary/95">
-                                    {activity.description}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
+                              title={`${activity.icon || '📍'} ${activity.title}`}
+                              description={activity.description || ''}
+                              image={activity.image}
+                              layout={activity.image ? 'vertical' : 'horizontal'}
+                              className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                            />
                           ))}
                         </div>
                       </div>
