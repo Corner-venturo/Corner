@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Save, CheckCircle, Plane, Printer } from 'lucide-react';
+import { ArrowLeft, Save, CheckCircle, Plane } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -28,7 +28,6 @@ interface QuoteHeaderProps {
   handleLoadVersion: (versionData: any) => void;
   handleFinalize: () => void;
   handleCreateTour: () => void;
-  handlePrintQuotation: () => void;
   router: any;
 }
 
@@ -59,7 +58,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleLoadVersion,
   handleFinalize,
   handleCreateTour,
-  handlePrintQuotation,
   router
 }) => {
   return (
@@ -218,15 +216,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               {quote?.status === 'proposed' ? '提案' : quote?.status === 'approved' ? '已核准' : quote?.status || '提案'}
             </span>
           </div>
-
-          <Button
-            onClick={handlePrintQuotation}
-            className="h-8 px-3 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
-            title="列印報價單"
-          >
-            <Printer size={14} className="mr-1.5" />
-            列印報價單
-          </Button>
 
           <Button
             onClick={() => setIsSaveDialogOpen(true)}

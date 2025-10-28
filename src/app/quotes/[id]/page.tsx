@@ -11,8 +11,7 @@ import {
   QuoteHeader,
   CategorySection,
   SellingPriceSection,
-  SaveVersionDialog,
-  PrintableQuotation
+  SaveVersionDialog
 } from '@/features/quotes/components';
 
 export default function QuoteDetailPage() {
@@ -113,16 +112,6 @@ export default function QuoteDetailPage() {
     }
   }, [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]);
 
-  // 列印報價單
-  const handlePrintQuotation = useCallback(() => {
-    const printElement = document.getElementById('printable-quotation');
-    if (printElement) {
-      printElement.style.display = 'block';
-      window.print();
-      printElement.style.display = 'none';
-    }
-  }, []);
-
   // Scroll handling
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -170,7 +159,6 @@ export default function QuoteDetailPage() {
         handleLoadVersion={handleLoadVersion}
         handleFinalize={handleFinalize}
         handleCreateTour={handleCreateTour}
-        handlePrintQuotation={handlePrintQuotation}
         router={router}
       />
 
@@ -286,16 +274,6 @@ export default function QuoteDetailPage() {
         versionName={versionName}
         setVersionName={setVersionName}
         onSave={handleSaveVersion}
-      />
-
-      {/* 可列印的報價單 */}
-      <PrintableQuotation
-        quote={quote}
-        quoteName={quoteName}
-        participantCounts={participantCounts}
-        sellingPrices={sellingPrices}
-        categories={updatedCategories}
-        totalCost={total_cost}
       />
     </div>
   );
