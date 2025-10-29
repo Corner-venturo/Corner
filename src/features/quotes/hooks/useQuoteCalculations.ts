@@ -40,6 +40,8 @@ export const useQuoteCalculations = ({
       let total_cost = 0;
       let roomTypeName = '';
       let validDays = 0;
+      let totalCapacity = 0;
+      let capacityCount = 0;
 
       days.forEach(day => {
         const dayItems = groupedByDay[day];
@@ -49,15 +51,24 @@ export const useQuoteCalculations = ({
           if (!roomTypeName && dayItems[roomIndex].name) {
             roomTypeName = dayItems[roomIndex].name;
           }
+          // 記錄人數
+          if (dayItems[roomIndex].quantity && dayItems[roomIndex].quantity > 0) {
+            totalCapacity += dayItems[roomIndex].quantity;
+            capacityCount++;
+          }
         }
       });
 
       if (validDays > 0) {
+        // 計算平均人數，如果沒有填寫則預設為2
+        const avgCapacity = capacityCount > 0 ? Math.round(totalCapacity / capacityCount) : 2;
+
         roomTypeSummaries.push({
           name: roomTypeName || `房型${roomIndex + 1}`,
           total_cost,
           averageCost: total_cost / validDays,
-          days: validDays
+          days: validDays,
+          capacity: avgCapacity
         });
       }
     }
@@ -91,54 +102,77 @@ export const useQuoteCalculations = ({
     };
 
     updatedCategories.forEach(category => {
-      category.items.forEach(item => {
-        if (category.id === 'transport') {
-          // 交通類別：依照項目名稱區分身份
-          if (item.name === '成人機票') {
-            // 成人機票：只加給成人和單人房
-            costs.adult += (item.adult_price || 0);
-            costs.single_room += (item.adult_price || 0);
-          } else if (item.name === '小孩機票') {
-            // 小孩機票：只加給小孩（佔床、不佔床）
-            costs.child_with_bed += (item.child_price || 0);
-            costs.child_no_bed += (item.child_price || 0);
-          } else if (item.name === '嬰兒機票') {
-            // 嬰兒機票：只加給嬰兒
-            costs.infant += (item.infant_price || 0);
-          } else {
-            // 其他交通費用（遊覽車等統一價）：成人、小孩佔床、單人房
+      if (category.id === 'accommodation') {
+        // 住宿特殊處理：只計算每天的第一個房型
+        const accommodationItems = category.items.filter(item => item.day !== undefined);
+        const groupedByDay: Record<number, CostItem[]> = {};
+
+        // 按天分組
+        accommodationItems.forEach(item => {
+          const day = item.day!;
+          if (!groupedByDay[day]) groupedByDay[day] = [];
+          groupedByDay[day].push(item);
+        });
+
+        // 只取每天的第一個房型
+        Object.keys(groupedByDay).forEach(dayStr => {
+          const dayItems = groupedByDay[Number(dayStr)];
+          if (dayItems.length > 0) {
+            const firstRoomType = dayItems[0]; // 只取第一個房型
+            const roomTotal = firstRoomType.total || 0; // 使用小計（已經除過人數）
+
+            // 成人和小孩 = 房型1小計（每人住宿費）
+            costs.adult += roomTotal;
+            costs.child_with_bed += roomTotal;
+
+            // 單人房 = 房型1單價（全額）
+            const roomPrice = firstRoomType.unit_price || 0;
+            costs.single_room += roomPrice;
+          }
+        });
+      } else {
+        // 其他類別照常計算
+        category.items.forEach(item => {
+          if (category.id === 'transport') {
+            // 交通類別：依照項目名稱區分身份
+            if (item.name === '成人機票') {
+              // 成人機票：只加給成人和單人房
+              costs.adult += (item.adult_price || 0);
+              costs.single_room += (item.adult_price || 0);
+            } else if (item.name === '小孩機票') {
+              // 小孩機票：只加給小孩（佔床、不佔床）
+              costs.child_with_bed += (item.child_price || 0);
+              costs.child_no_bed += (item.child_price || 0);
+            } else if (item.name === '嬰兒機票') {
+              // 嬰兒機票：只加給嬰兒
+              costs.infant += (item.infant_price || 0);
+            } else {
+              // 其他交通費用（遊覽車等統一價）：成人、小孩佔床、單人房
+              const itemCost = item.unit_price || 0;
+              costs.adult += itemCost;
+              costs.child_with_bed += itemCost;
+              costs.single_room += itemCost;
+              // 不佔床和嬰兒不含一般交通
+            }
+          } else if (category.id === 'meals' || category.id === 'activities' || category.id === 'others') {
+            // 餐飲、活動、其他：成人、小朋友佔床、單人房有，不佔床和嬰兒沒有
             const itemCost = item.unit_price || 0;
             costs.adult += itemCost;
             costs.child_with_bed += itemCost;
+            // 不佔床不含餐飲和活動
             costs.single_room += itemCost;
-            // 不佔床和嬰兒不含一般交通
+            // 嬰兒不含餐飲和活動
+          } else if (category.id === 'group-transport' || category.id === 'guide') {
+            // 團體分攤、領隊導遊：不含嬰兒的身份分攤
+            const itemCost = item.total || 0;
+            costs.adult += itemCost;
+            costs.child_with_bed += itemCost;
+            costs.child_no_bed += itemCost;
+            costs.single_room += itemCost;
+            // 嬰兒不分攤導遊費用
           }
-        } else if (category.id === 'accommodation') {
-          // 住宿：成人和小朋友佔床是÷2，單人房是全額
-          const roomPrice = item.unit_price || 0;
-          costs.adult += Math.ceil(roomPrice / 2);
-          costs.child_with_bed += Math.ceil(roomPrice / 2);
-          // 不佔床不含住宿
-          costs.single_room += roomPrice; // 單人房全額
-          // 嬰兒不含住宿
-        } else if (category.id === 'meals' || category.id === 'activities' || category.id === 'others') {
-          // 餐飲、活動、其他：成人、小朋友佔床、單人房有，不佔床和嬰兒沒有
-          const itemCost = item.unit_price || 0;
-          costs.adult += itemCost;
-          costs.child_with_bed += itemCost;
-          // 不佔床不含餐飲和活動
-          costs.single_room += itemCost;
-          // 嬰兒不含餐飲和活動
-        } else if (category.id === 'group-transport' || category.id === 'guide') {
-          // 團體分攤、領隊導遊：不含嬰兒的身份分攤
-          const itemCost = item.total || 0;
-          costs.adult += itemCost;
-          costs.child_with_bed += itemCost;
-          costs.child_no_bed += itemCost;
-          costs.single_room += itemCost;
-          // 嬰兒不分攤導遊費用
-        }
-      });
+        });
+      }
     });
 
     return costs;

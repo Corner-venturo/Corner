@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SmartDateInput } from '@/components/ui/smart-date-input';
+import { Combobox } from '@/components/ui/combobox';
 import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form';
 import { AlertCircle } from 'lucide-react';
 import { NewTourData } from '../types';
@@ -127,19 +128,20 @@ export function TourForm({
                         className="mt-1"
                       />
                     ) : (
-                      <select
+                      <Combobox
                         value={newTour.cityCode}
-                        onChange={(e) => setNewTour(prev => ({ ...prev, cityCode: e.target.value }))}
-                        className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                        onChange={(cityCode) => setNewTour(prev => ({ ...prev, cityCode }))}
+                        options={availableCities.map((city) => ({
+                          value: city.code,
+                          label: `${city.name} (${city.code})`
+                        }))}
+                        placeholder="輸入或選擇城市..."
+                        emptyMessage="找不到符合的城市"
+                        showSearchIcon={true}
+                        showClearButton={true}
                         disabled={!newTour.countryCode || newTour.countryCode === '__custom__'}
-                      >
-                        <option value="">請選擇城市...</option>
-                        {availableCities.map((city) => (
-                          <option key={city.id} value={city.code}>
-                            {city.name} ({city.code})
-                          </option>
-                        ))}
-                      </select>
+                        className="mt-1"
+                      />
                     )}
                   </div>
                 </div>

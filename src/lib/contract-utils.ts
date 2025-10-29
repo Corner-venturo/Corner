@@ -75,11 +75,16 @@ function calculateGatherTime(departureTime: string): { hour: string; minute: str
 
 /**
  * 從各種資料來源準備合約資料
+ * @param tour 旅遊團資料
+ * @param order 訂單資料（用於聯絡人資訊）
+ * @param member 團員資料（選填，用於身分證、緊急聯絡人等資訊）
+ * @param itinerary 行程資料（選填，用於航班資訊）
+ * @param depositAmount 訂金金額（選填）
  */
 export function prepareContractData(
   tour: Tour,
   order: Order,
-  member: Member,
+  member?: Member,
   itinerary?: Itinerary,
   depositAmount?: number
 ): Partial<ContractData> {
@@ -117,16 +122,16 @@ export function prepareContractData(
     reviewMonth: (today.getMonth() + 1).toString(),
     reviewDay: today.getDate().toString(),
 
-    // 旅客資訊
-    travelerName: member.name || '',
-    travelerAddress: member.address || '',
-    travelerIdNumber: member.id_number || '',
-    travelerPhone: member.phone || '',
+    // 旅客資訊（優先使用訂單聯絡人，若有團員資料則補充）
+    travelerName: order.contact_person || '',
+    travelerAddress: '', // 需手動填寫
+    travelerIdNumber: member?.id_number || '',
+    travelerPhone: order.contact_phone || member?.phone || '',
 
-    // 緊急聯絡人資訊
-    emergencyContactName: member.emergency_contact_name || '',
-    emergencyContactRelation: member.emergency_contact_relation || '',
-    emergencyContactPhone: member.emergency_contact_phone || '',
+    // 緊急聯絡人資訊（來自團員資料）
+    emergencyContactName: member?.emergency_contact || '',
+    emergencyContactRelation: '', // 需手動填寫
+    emergencyContactPhone: member?.emergency_phone || '',
 
     // 旅遊團資訊
     tourName: tour.name,

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FileSignature, Save, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,6 +44,10 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
     handlePrint,
     firstOrder,
     tourMembers,
+    tourOrders,
+    selectedOrderId,
+    setSelectedOrderId,
+    selectedOrder,
   } = useContractForm({ tour, mode, isOpen });
 
   const onSave = async () => {
@@ -52,6 +56,19 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
       onClose();
     }
   };
+
+  // 當對話框開啟時，重置捲動位置到頂部
+  useEffect(() => {
+    if (isOpen) {
+      // 等待 DOM 更新後重置捲動
+      setTimeout(() => {
+        const dialogContent = document.querySelector('[role="dialog"]');
+        if (dialogContent) {
+          dialogContent.scrollTop = 0;
+        }
+      }, 100);
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -88,6 +105,29 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               </div>
             </div>
           </div>
+
+          {/* 選擇訂單（如果有多個訂單） */}
+          {tourOrders.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-morandi-primary mb-3">選擇訂單（旅客資料來源）</h3>
+              <select
+                value={selectedOrderId}
+                onChange={(e) => setSelectedOrderId(e.target.value)}
+                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
+              >
+                {tourOrders.map((order) => (
+                  <option key={order.id} value={order.id}>
+                    {order.order_number} - {order.contact_person} ({order.contact_phone || '無電話'})
+                  </option>
+                ))}
+              </select>
+              {selectedOrder && (
+                <div className="mt-2 text-xs text-morandi-secondary bg-blue-50 border border-blue-200 rounded p-2">
+                  💡 合約的旅客資訊將自動帶入此訂單的聯絡人：{selectedOrder.contact_person}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* 選擇範本 (只在建立模式顯示) */}
           {mode === 'create' && (

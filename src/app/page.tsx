@@ -58,7 +58,7 @@ function SortableWidget({ id, widget }: { id: string; widget: typeof AVAILABLE_W
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, _hasHydrated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets();
 
@@ -84,12 +84,18 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // 等待 zustand persist hydration 完成
+    if (!_hasHydrated) {
+      return;
+    }
+
+    // Hydration 完成後，檢查登入狀態
     if (!isAuthenticated) {
       router.replace('/login');
     } else {
       setIsLoading(false);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, _hasHydrated, router]);
 
   if (isLoading) {
     return (

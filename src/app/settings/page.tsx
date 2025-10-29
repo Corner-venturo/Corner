@@ -223,7 +223,7 @@ export default function SettingsPage() {
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto space-y-8 p-6">
         {/* 主題設定區塊 */}
-        <Card className="p-6">
+        <Card className="rounded-xl shadow-lg border border-border p-8">
           <div className="flex items-center gap-3 mb-6">
             <Palette className="h-6 w-6 text-morandi-gold" />
             <h2 className="text-xl font-semibold">主題設定</h2>
@@ -240,10 +240,10 @@ export default function SettingsPage() {
                   onClick={() => setTheme(theme.id)}
                   className={cn(
                     'relative group text-left transition-all duration-300',
-                    'border-2 rounded-xl overflow-hidden',
+                    'border rounded-xl overflow-hidden shadow-lg',
                     is_active
-                      ? 'border-morandi-gold/20 shadow-lg scale-[1.02]'
-                      : 'border-border hover:border-morandi-gold/20 hover:shadow-md'
+                      ? 'border-morandi-gold scale-[1.02]'
+                      : 'border-border hover:border-morandi-gold/40'
                   )}
                 >
                   {/* 選中標記 */}
@@ -327,15 +327,15 @@ export default function SettingsPage() {
         </Card>
 
         {/* 帳號安全設定 */}
-        <Card className="p-6">
+        <Card className="rounded-xl shadow-lg border border-border p-8">
           <div className="flex items-center gap-3 mb-6">
             <Lock className="h-6 w-6 text-morandi-gold" />
             <h2 className="text-xl font-semibold">帳號安全</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* 修改密碼區塊 */}
-            <div className="p-4 border border-border rounded-lg">
+            <div className="p-6 border border-border rounded-lg bg-card">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="font-medium mb-1">修改密碼</h3>
@@ -462,18 +462,18 @@ export default function SettingsPage() {
         </Card>
 
         {/* 其他設定區塊 */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">其他設定</h2>
-          <div className="space-y-4">
-            <div className="p-4 border border-border rounded-lg">
+        <Card className="rounded-xl shadow-lg border border-border p-8">
+          <h2 className="text-xl font-semibold mb-6">其他設定</h2>
+          <div className="space-y-6">
+            <div className="p-6 border border-border rounded-lg bg-card">
               <h3 className="font-medium mb-2">語言設定</h3>
               <p className="text-sm text-morandi-secondary">繁體中文（預設）</p>
             </div>
-            <div className="p-4 border border-border rounded-lg">
+            <div className="p-6 border border-border rounded-lg bg-card">
               <h3 className="font-medium mb-2">通知設定</h3>
               <p className="text-sm text-morandi-secondary">系統通知：開啟</p>
             </div>
-            <div className="p-4 border border-border rounded-lg">
+            <div className="p-6 border border-border rounded-lg bg-card">
               <h3 className="font-medium mb-2">資料備份</h3>
               <p className="text-sm text-morandi-secondary">自動備份：每日凌晨 2:00</p>
             </div>

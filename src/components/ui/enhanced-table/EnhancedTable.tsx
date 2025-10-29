@@ -125,7 +125,7 @@ export function EnhancedTable({
   // Loading and error states
   if (loading) {
     return (
-      <div className={cn("border border-border rounded-lg overflow-hidden bg-card", className)}>
+      <div className={cn("border border-border rounded-xl overflow-hidden bg-card shadow-sm", className)}>
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-morandi-primary" />
           <span className="ml-2 text-morandi-secondary">載入中...</span>
@@ -136,7 +136,7 @@ export function EnhancedTable({
 
   if (error) {
     return (
-      <div className={cn("border border-border rounded-lg overflow-hidden bg-card", className)}>
+      <div className={cn("border border-border rounded-xl overflow-hidden bg-card shadow-sm", className)}>
         <div className="flex items-center justify-center py-8 text-red-500">
           <span>錯誤: {error}</span>
         </div>
@@ -145,7 +145,7 @@ export function EnhancedTable({
   }
 
   return (
-    <div className={cn("border border-border rounded-lg overflow-hidden bg-card shadow-sm flex flex-col h-full", className)}>
+    <div className={cn("border border-border rounded-xl overflow-hidden bg-card shadow-sm flex flex-col h-full", className)}>
       <div className="overflow-auto flex-1">
         <table className="w-full">
           <TableHeader

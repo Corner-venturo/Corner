@@ -115,63 +115,30 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         {/* 右區：功能區域 (原中+右合併) */}
         <div className="flex items-center space-x-2">
 
-          {/* 人數統計 - 5個身份 */}
-          <div className="flex items-center space-x-2 whitespace-nowrap text-xs">
-            <div className="flex items-center space-x-1">
-              <span className="text-morandi-secondary">成人:</span>
-              <input
-                type="number"
-                value={participantCounts.adult}
-                onChange={(e) => setParticipantCounts(prev => ({ ...prev, adult: Number(e.target.value) || 0 }))}
-                disabled={isReadOnly}
-                className={cn("w-12 px-1 py-1 text-xs text-center border border-border rounded", isReadOnly && "cursor-not-allowed opacity-60")}
-                min="0"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-morandi-secondary">小孩:</span>
-              <input
-                type="number"
-                value={participantCounts.child_with_bed}
-                onChange={(e) => setParticipantCounts(prev => ({ ...prev, child_with_bed: Number(e.target.value) || 0 }))}
-                disabled={isReadOnly}
-                className={cn("w-12 px-1 py-1 text-xs text-center border border-border rounded", isReadOnly && "cursor-not-allowed opacity-60")}
-                min="0"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-morandi-secondary">不佔床:</span>
-              <input
-                type="number"
-                value={participantCounts.child_no_bed}
-                onChange={(e) => setParticipantCounts(prev => ({ ...prev, child_no_bed: Number(e.target.value) || 0 }))}
-                disabled={isReadOnly}
-                className={cn("w-12 px-1 py-1 text-xs text-center border border-border rounded", isReadOnly && "cursor-not-allowed opacity-60")}
-                min="0"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-morandi-secondary">單人房:</span>
-              <input
-                type="number"
-                value={participantCounts.single_room}
-                onChange={(e) => setParticipantCounts(prev => ({ ...prev, single_room: Number(e.target.value) || 0 }))}
-                disabled={isReadOnly}
-                className={cn("w-12 px-1 py-1 text-xs text-center border border-border rounded", isReadOnly && "cursor-not-allowed opacity-60")}
-                min="0"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-morandi-secondary">嬰兒:</span>
-              <input
-                type="number"
-                value={participantCounts.infant}
-                onChange={(e) => setParticipantCounts(prev => ({ ...prev, infant: Number(e.target.value) || 0 }))}
-                disabled={isReadOnly}
-                className={cn("w-12 px-1 py-1 text-xs text-center border border-border rounded", isReadOnly && "cursor-not-allowed opacity-60")}
-                min="0"
-              />
-            </div>
+          {/* 總人數 */}
+          <div className="flex items-center space-x-1 whitespace-nowrap text-xs">
+            <span className="text-morandi-secondary">總人數:</span>
+            <input
+              type="number"
+              value={participantCounts.adult + participantCounts.child_with_bed + participantCounts.child_no_bed + participantCounts.single_room + participantCounts.infant}
+              onChange={(e) => {
+                const total = Number(e.target.value) || 0;
+                // 簡化：所有人數設定為成人
+                setParticipantCounts({
+                  adult: total,
+                  child_with_bed: 0,
+                  child_no_bed: 0,
+                  single_room: 0,
+                  infant: 0
+                });
+              }}
+              disabled={isReadOnly}
+              className={cn(
+                "w-16 px-2 py-1 text-xs text-center bg-morandi-container rounded border-0 focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                isReadOnly && "cursor-not-allowed opacity-60"
+              )}
+            />
+            <span className="text-morandi-secondary">人</span>
           </div>
 
           <div className="flex items-center space-x-1 whitespace-nowrap">

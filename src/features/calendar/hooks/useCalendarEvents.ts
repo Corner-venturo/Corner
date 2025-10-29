@@ -54,7 +54,7 @@ export function useCalendarEvents() {
 
         return {
           id: `tour-${tour.id}`,
-          title: `🛫 ${tour.name}`,
+          title: tour.name,
           start: tour.departure_date,
           end: end_date,
           backgroundColor: color.bg,
@@ -80,7 +80,7 @@ export function useCalendarEvents() {
         const color = getEventColor('personal')
         return {
           id: event.id,
-          title: `📅 ${event.title}`,
+          title: event.title,
           start: event.start,
           end: event.end,
           backgroundColor: color.bg,
@@ -101,7 +101,7 @@ export function useCalendarEvents() {
         const color = getEventColor('company')
         return {
           id: event.id,
-          title: `🏢 ${event.title}`,
+          title: event.title,
           start: event.start,
           end: event.end,
           backgroundColor: color.bg,
@@ -127,7 +127,7 @@ export function useCalendarEvents() {
 
         return {
           id: `birthday-${member.id}`,
-          title: `🎂 ${member.name}`,
+          title: `${member.name} 生日`,
           start: birthdayThisYear,
           backgroundColor: getEventColor('birthday').bg,
           borderColor: getEventColor('birthday').border,

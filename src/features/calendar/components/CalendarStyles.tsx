@@ -84,11 +84,15 @@ export function CalendarStyles() {
         cursor: pointer;
         border: none;
         font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
+        padding: 0.125rem 0.5rem;
         border-radius: 0.25rem;
         font-weight: 500;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
         transition: all 0.2s ease;
+        height: 18px;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
       }
 
       .fc-event:hover {
@@ -129,13 +133,17 @@ export function CalendarStyles() {
         background-color: transparent;
       }
 
-      /* 點點樣式事件 */
+      /* 單日事件樣式 */
       .fc .fc-daygrid-event.fc-event-start.fc-event-end {
-        margin: 1px 2px;
-        padding: 2px 6px;
-        border-radius: 12px;
-        font-size: 11px;
-        line-height: 1.2;
+        margin: 2px 2px;
+        height: 18px;
+      }
+
+      /* 跨日事件樣式 */
+      .fc .fc-daygrid-event:not(.fc-event-start):not(.fc-event-end),
+      .fc .fc-daygrid-event.fc-event-start:not(.fc-event-end),
+      .fc .fc-daygrid-event.fc-event-end:not(.fc-event-start) {
+        height: 18px;
       }
 
       /* 生日事件特殊樣式 - 圓形點點 */

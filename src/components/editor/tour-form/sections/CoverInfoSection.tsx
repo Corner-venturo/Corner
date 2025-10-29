@@ -1,5 +1,6 @@
 import React from "react";
 import { TourFormData, CityOption } from "../types";
+import { Combobox } from "@/components/ui/combobox";
 
 interface CoverInfoSectionProps {
   data: TourFormData;
@@ -84,10 +85,9 @@ export function CoverInfoSection({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">國家</label>
-          <select
+          <Combobox
             value={selectedCountry}
-            onChange={(e) => {
-              const newCountry = e.target.value;
+            onChange={(newCountry) => {
               setSelectedCountry(newCountry);
               // 更新國家代碼
               const code = countryNameToCode[newCountry];
@@ -99,27 +99,23 @@ export function CoverInfoSection({
                 city: "",
               });
             }}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-          >
-            <option value="">請選擇國家</option>
-            {allDestinations.map(dest => (
-              <option key={dest.code} value={dest.name}>{dest.name}</option>
-            ))}
-          </select>
+            options={allDestinations.map(dest => ({ value: dest.name, label: dest.name }))}
+            placeholder="搜尋或選擇國家..."
+            showSearchIcon
+            showClearButton
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">城市</label>
-          <select
+          <Combobox
             value={data.city || ""}
-            onChange={(e) => updateCity(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            onChange={(value) => updateCity(value)}
+            options={availableCities.map(city => ({ value: city.name, label: city.name }))}
+            placeholder="搜尋或選擇城市..."
+            showSearchIcon
+            showClearButton
             disabled={!selectedCountry}
-          >
-            <option value="">請選擇城市</option>
-            {availableCities.map(city => (
-              <option key={city.id} value={city.name}>{city.name}</option>
-            ))}
-          </select>
+          />
         </div>
       </div>
 

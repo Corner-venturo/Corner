@@ -65,6 +65,7 @@ export default function QuoteDetailPage() {
     sellingPrices
   });
   const {
+    accommodationSummary,
     accommodationTotal,
     updatedCategories,
     identityCosts,
@@ -101,6 +102,7 @@ export default function QuoteDetailPage() {
 
   // 載入特定版本
   const handleLoadVersion = useCallback((versionData: any) => {
+    console.log('🔄 載入版本資料:', versionData);
     setCategories(versionData.categories);
     setAccommodationDays(versionData.accommodation_days || 0);
     if (versionData.participant_counts) {
@@ -109,6 +111,7 @@ export default function QuoteDetailPage() {
     if (versionData.selling_prices) {
       setSellingPrices(versionData.selling_prices);
     }
+    console.log('✅ 版本載入完成');
   }, [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]);
 
   // 報價單預覽
@@ -176,14 +179,14 @@ export default function QuoteDetailPage() {
         router={router}
       />
 
-      <div className="w-full px-6 pb-6">
+      <div className="w-full pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
           {/* 左側：成本計算表格 - 70% */}
           <div className={cn(
             "lg:col-span-7",
             isReadOnly && "opacity-70 pointer-events-none select-none"
           )}>
-            <div className="border border-border bg-card rounded-lg shadow-sm">
+            <div className="border border-border bg-card rounded-xl shadow-sm">
               <div ref={scrollRef} className="overflow-x-auto">
                 <table className="w-full min-w-[800px] border-collapse">
                   <thead className="bg-morandi-container/40 border-b border-border/60">
@@ -229,6 +232,7 @@ export default function QuoteDetailPage() {
             identityProfits={identityProfits}
             isReadOnly={isReadOnly}
             handleGenerateQuotation={handleGenerateQuotation}
+            accommodationSummary={accommodationSummary}
           />
         </div>
       </div>
@@ -253,6 +257,7 @@ export default function QuoteDetailPage() {
         isOpen={showQuotationPreview}
         onClose={handleClosePreview}
         onPrint={handlePrint}
+        accommodationSummary={accommodationSummary}
       />
     </div>
   );

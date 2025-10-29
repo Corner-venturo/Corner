@@ -58,50 +58,60 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
       {/* 集合時地 */}
       <div>
         <h3 className="text-sm font-semibold text-morandi-primary mb-3">集合時地</h3>
-        <div className="grid grid-cols-5 gap-2 mb-2">
-          <input
-            type="text"
-            value={contractData.gatherYear || ''}
-            onChange={(e) => onFieldChange('gatherYear', e.target.value)}
-            placeholder="年"
-            className="p-2 border rounded text-sm text-center"
-          />
-          <input
-            type="text"
-            value={contractData.gatherMonth || ''}
-            onChange={(e) => onFieldChange('gatherMonth', e.target.value)}
-            placeholder="月"
-            className="p-2 border rounded text-sm text-center"
-          />
-          <input
-            type="text"
-            value={contractData.gatherDay || ''}
-            onChange={(e) => onFieldChange('gatherDay', e.target.value)}
-            placeholder="日"
-            className="p-2 border rounded text-sm text-center"
-          />
-          <input
-            type="text"
-            value={contractData.gatherHour || ''}
-            onChange={(e) => onFieldChange('gatherHour', e.target.value)}
-            placeholder="時"
-            className="p-2 border rounded text-sm text-center"
-          />
-          <input
-            type="text"
-            value={contractData.gatherMinute || ''}
-            onChange={(e) => onFieldChange('gatherMinute', e.target.value)}
-            placeholder="分"
-            className="p-2 border rounded text-sm text-center"
-          />
+        <div className="space-y-2">
+          <div>
+            <label className="text-xs text-morandi-secondary block mb-1">集合時間</label>
+            <input
+              type="datetime-local"
+              value={(() => {
+                // 將分開的年月日時分組合成 datetime-local 格式
+                const { gatherYear, gatherMonth, gatherDay, gatherHour, gatherMinute } = contractData;
+                if (gatherYear && gatherMonth && gatherDay && gatherHour && gatherMinute) {
+                  const year = gatherYear.padStart(4, '0');
+                  const month = gatherMonth.padStart(2, '0');
+                  const day = gatherDay.padStart(2, '0');
+                  const hour = gatherHour.padStart(2, '0');
+                  const minute = gatherMinute.padStart(2, '0');
+                  return `${year}-${month}-${day}T${hour}:${minute}`;
+                }
+                return '';
+              })()}
+              onChange={(e) => {
+                // 將 datetime-local 格式分解成5個欄位
+                const value = e.target.value; // 格式: "2024-01-15T08:30"
+                if (value) {
+                  const [datePart, timePart] = value.split('T');
+                  const [year, month, day] = datePart.split('-');
+                  const [hour, minute] = timePart.split(':');
+
+                  onFieldChange('gatherYear', year);
+                  onFieldChange('gatherMonth', month);
+                  onFieldChange('gatherDay', day);
+                  onFieldChange('gatherHour', hour);
+                  onFieldChange('gatherMinute', minute);
+                } else {
+                  // 清空所有欄位
+                  onFieldChange('gatherYear', '');
+                  onFieldChange('gatherMonth', '');
+                  onFieldChange('gatherDay', '');
+                  onFieldChange('gatherHour', '');
+                  onFieldChange('gatherMinute', '');
+                }
+              }}
+              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-morandi-secondary block mb-1">集合地點</label>
+            <input
+              type="text"
+              value={contractData.gatherLocation || ''}
+              onChange={(e) => onFieldChange('gatherLocation', e.target.value)}
+              placeholder="集合地點（例如：桃園國際機場第一航廈）"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
+            />
+          </div>
         </div>
-        <input
-          type="text"
-          value={contractData.gatherLocation || ''}
-          onChange={(e) => onFieldChange('gatherLocation', e.target.value)}
-          placeholder="集合地點（例如：桃園國際機場第一航廈）"
-          className="w-full p-2 border rounded text-sm"
-        />
       </div>
 
       {/* 費用 */}

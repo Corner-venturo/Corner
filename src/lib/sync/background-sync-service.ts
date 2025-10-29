@@ -159,6 +159,16 @@ export class BackgroundSyncService {
           // 移除同步標記欄位
           const { _needs_sync, _synced_at, _deleted, ...syncData } = item;
 
+          // 🔥 通用處理：將空字串的 timestamp/date 欄位轉為 null
+          // PostgreSQL 不接受空字串作為 timestamp 值
+          Object.keys(syncData).forEach(key => {
+            const value = (syncData as Record<string, unknown>)[key];
+            // 如果欄位名稱包含 _at、_date 或是 deadline，且值為空字串，轉為 null
+            if ((key.endsWith('_at') || key.endsWith('_date') || key === 'deadline') && value === '') {
+              (syncData as Record<string, unknown>)[key] = null;
+            }
+          });
+
           // 🔥 特殊處理：為 quotes 表補充必填欄位的預設值
           if (tableName === 'quotes') {
             const quoteData = syncData as unknown;

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Combobox } from '@/components/ui/combobox';
 
 // ============================================
 // 景點篩選器組件
@@ -38,72 +39,90 @@ export function AttractionsFilters({
   categories,
 }: AttractionsFiltersProps) {
   return (
-    <div className="mb-4 p-4 bg-card border border-border rounded-lg flex flex-wrap gap-3">
+    <div className="mb-4 p-4 bg-card border border-border rounded-lg flex flex-wrap gap-3 items-end">
       {/* 國家選擇 */}
-      <select
-        value={selectedCountry}
-        onChange={(e) => {
-          setSelectedCountry(e.target.value);
-          setSelectedRegion('');
-          setSelectedCity('');
-        }}
-        className="px-3 py-2 border border-border rounded-md bg-background text-sm"
-      >
-        <option value="">所有國家</option>
-        {countries.map(country => (
-          <option key={country.id} value={country.id}>
-            {country.emoji} {country.name}
-          </option>
-        ))}
-      </select>
+      <div className="min-w-[200px]">
+        <Combobox
+          value={selectedCountry}
+          onChange={(value) => {
+            setSelectedCountry(value);
+            setSelectedRegion('');
+            setSelectedCity('');
+          }}
+          options={[
+            { value: '', label: '所有國家' },
+            ...countries.map(country => ({
+              value: country.id,
+              label: `${country.emoji} ${country.name}`
+            }))
+          ]}
+          placeholder="選擇國家..."
+          emptyMessage="找不到符合的國家"
+          showSearchIcon={true}
+          showClearButton={true}
+        />
+      </div>
 
       {/* 地區選擇（如果有） */}
       {availableRegions.length > 0 && (
-        <select
-          value={selectedRegion}
-          onChange={(e) => {
-            setSelectedRegion(e.target.value);
-            setSelectedCity('');
-          }}
-          className="px-3 py-2 border border-border rounded-md bg-background text-sm"
-        >
-          <option value="">所有地區</option>
-          {availableRegions.map(region => (
-            <option key={region.id} value={region.id}>
-              {region.name}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-[180px]">
+          <Combobox
+            value={selectedRegion}
+            onChange={(value) => {
+              setSelectedRegion(value);
+              setSelectedCity('');
+            }}
+            options={[
+              { value: '', label: '所有地區' },
+              ...availableRegions.map(region => ({
+                value: region.id,
+                label: region.name
+              }))
+            ]}
+            placeholder="選擇地區..."
+            emptyMessage="找不到符合的地區"
+            showSearchIcon={true}
+            showClearButton={true}
+          />
+        </div>
       )}
 
       {/* 城市選擇 */}
       {availableCities.length > 0 && (
-        <select
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-          className="px-3 py-2 border border-border rounded-md bg-background text-sm"
-        >
-          <option value="">所有城市</option>
-          {availableCities.map(city => (
-            <option key={city.id} value={city.id}>
-              {city.name}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-[180px]">
+          <Combobox
+            value={selectedCity}
+            onChange={setSelectedCity}
+            options={[
+              { value: '', label: '所有城市' },
+              ...availableCities.map(city => ({
+                value: city.id,
+                label: city.name
+              }))
+            ]}
+            placeholder="選擇城市..."
+            emptyMessage="找不到符合的城市"
+            showSearchIcon={true}
+            showClearButton={true}
+          />
+        </div>
       )}
 
       {/* 類別選擇 */}
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-        className="px-3 py-2 border border-border rounded-md bg-background text-sm"
-      >
-        {categories.map(cat => (
-          <option key={cat} value={cat}>
-            {cat === 'all' ? '所有類別' : cat}
-          </option>
-        ))}
-      </select>
+      <div className="min-w-[150px]">
+        <Combobox
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+          options={categories.map(cat => ({
+            value: cat,
+            label: cat === 'all' ? '所有類別' : cat
+          }))}
+          placeholder="選擇類別..."
+          emptyMessage="找不到符合的類別"
+          showSearchIcon={false}
+          showClearButton={false}
+        />
+      </div>
 
       {/* 清除篩選 */}
       {hasActiveFilters && (

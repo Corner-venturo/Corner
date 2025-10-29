@@ -1,6 +1,7 @@
 import React from "react";
 import { TourFormData, TourCountry } from "../types";
 import { X } from "lucide-react";
+import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 
 interface CountriesSectionProps {
   data: TourFormData;
@@ -127,45 +128,37 @@ export function CountriesSection({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
-              <select
+              <Combobox
                 value={primaryCountry.country_id}
-                onChange={(e) => {
+                onChange={(value) => {
                   const index = countries.findIndex(c => c.is_primary);
                   if (index !== -1) {
-                    updateCountry(index, 'country_id', e.target.value);
+                    updateCountry(index, 'country_id', value);
                   }
                 }}
-                className="w-full px-3 py-2 border rounded-lg text-sm bg-white"
-              >
-                <option value="">請選擇國家...</option>
-                {allCountries.map((country) => (
-                  <option key={country.id} value={country.id}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
+                options={allCountries.map(c => ({ value: c.id, label: c.name }))}
+                placeholder="搜尋或選擇國家..."
+                showSearchIcon
+                showClearButton
+              />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">主要城市（選填）</label>
-              <select
+              <Combobox
                 value={primaryCountry.main_city_id || ''}
-                onChange={(e) => {
+                onChange={(value) => {
                   const index = countries.findIndex(c => c.is_primary);
                   if (index !== -1) {
-                    updateCountry(index, 'main_city_id', e.target.value);
+                    updateCountry(index, 'main_city_id', value);
                   }
                 }}
-                className="w-full px-3 py-2 border rounded-lg text-sm bg-white"
+                options={primaryCountry.country_id ? getCitiesByCountryId(primaryCountry.country_id).map(c => ({ value: c.id, label: c.name })) : []}
+                placeholder="搜尋或選擇城市..."
+                showSearchIcon
+                showClearButton
                 disabled={!primaryCountry.country_id}
-              >
-                <option value="">請選擇城市...</option>
-                {primaryCountry.country_id && getCitiesByCountryId(primaryCountry.country_id).map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
         </div>
@@ -190,35 +183,27 @@ export function CountriesSection({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
-                <select
+                <Combobox
                   value={country.country_id}
-                  onChange={(e) => updateCountry(actualIndex, 'country_id', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-sm bg-white"
-                >
-                  <option value="">請選擇國家...</option>
-                  {allCountries.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => updateCountry(actualIndex, 'country_id', value)}
+                  options={allCountries.map(c => ({ value: c.id, label: c.name }))}
+                  placeholder="搜尋或選擇國家..."
+                  showSearchIcon
+                  showClearButton
+                />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">主要城市（選填）</label>
-                <select
+                <Combobox
                   value={country.main_city_id || ''}
-                  onChange={(e) => updateCountry(actualIndex, 'main_city_id', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-sm bg-white"
+                  onChange={(value) => updateCountry(actualIndex, 'main_city_id', value)}
+                  options={country.country_id ? getCitiesByCountryId(country.country_id).map(c => ({ value: c.id, label: c.name })) : []}
+                  placeholder="搜尋或選擇城市..."
+                  showSearchIcon
+                  showClearButton
                   disabled={!country.country_id}
-                >
-                  <option value="">請選擇城市...</option>
-                  {country.country_id && getCitiesByCountryId(country.country_id).map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
           </div>

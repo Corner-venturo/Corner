@@ -7,17 +7,19 @@ export interface DeliveryOption {
 export interface RequirementSection {
   title: string;
   items: string[];
+  fee?: number; // 該類別的簽證代辦費用
 }
 
 export const PASSPORT_DELIVERY_OPTIONS: DeliveryOption[] = [
   { method: '自取', adult: 1800, child: 1400 },
-  { method: '郵政寄回', adult: 1900, child: 1500 },
-  { method: '雙北快遞寄回', adult: 2000, child: 1600 },
+  { method: '郵政寄回', adult: 2000, child: 1600 },
+  { method: '雙北快遞寄回', adult: 2100, child: 1700 },
 ];
 
 export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   {
     title: '年滿18歲者申請護照（首次申請）',
+    fee: 1800,
     items: [
       '簡式護照資料表【人別確認專用】（請先至住家附近的戶政事務所辦理）',
       '相片2張（2吋大頭照，護照規格）',
@@ -26,6 +28,7 @@ export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   },
   {
     title: '年滿18歲者申請護照（換發）',
+    fee: 1800,
     items: [
       '舊護照正本（效期未逾期才須提供，若已經過期則免）',
       '相片2張（2吋大頭照，護照規格）',
@@ -34,6 +37,7 @@ export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   },
   {
     title: '滿14歲至未滿18歲者申請護照（首次申請）',
+    fee: 1800,
     items: [
       '簡式護照資料表【人別確認專用】（請先至住家附近的戶政事務所辦理）',
       '相片2張（2吋大頭照，護照規格）',
@@ -43,6 +47,7 @@ export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   },
   {
     title: '滿14歲至未滿18歲者申請護照（換發）',
+    fee: 1800,
     items: [
       '相片2張（2吋大頭照，護照規格）',
       '身分證正本',
@@ -51,6 +56,7 @@ export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   },
   {
     title: '未滿14歲者申請護照（首次申請）',
+    fee: 1400,
     items: [
       '簡式護照資料表【人別確認專用】（請先至住家附近的戶政事務所辦理）',
       '相片2張（2吋大頭照，護照規格）',
@@ -60,6 +66,7 @@ export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   },
   {
     title: '未滿14歲者申請護照（換發）',
+    fee: 1400,
     items: [
       '相片2張（2吋大頭照，護照規格）',
       '戶口名簿正本或戶籍謄本正本（已領新式國民身分證者請改繳身分證）',
@@ -76,13 +83,14 @@ export const PASSPORT_NOTES: string[] = [
 
 export const TAIWAN_COMPATRIOT_DELIVERY_OPTIONS: DeliveryOption[] = [
   { method: '自取', adult: 1800, child: 1800 },
-  { method: '郵政寄回', adult: 1900, child: 1900 },
-  { method: '雙北快遞寄回', adult: 2000, child: 2000 },
+  { method: '郵政寄回', adult: 2000, child: 2000 },
+  { method: '雙北快遞寄回', adult: 2100, child: 2100 },
 ];
 
 export const TAIWAN_COMPATRIOT_REQUIREMENTS: RequirementSection[] = [
   {
     title: '台胞證申辦所需資料',
+    fee: 1800,
     items: [
       '護照正本（效期需六個月以上護照正本）',
       '相片1張（2吋大頭照，護照規格）',

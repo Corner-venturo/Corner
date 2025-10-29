@@ -17,6 +17,7 @@ interface AuthState {
   // 新增屬性
   currentProfile: LocalProfile | null;
   isOfflineMode: boolean;
+  _hasHydrated: boolean;
 
   // 方法
   login: (user: User) => void;
@@ -26,6 +27,7 @@ interface AuthState {
   setSidebarCollapsed: (collapsed: boolean) => void;
   checkPermission: (permission: string) => boolean;
   switchProfile: (profileId: string) => boolean;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 // 防暴力破解的失敗記錄
@@ -90,6 +92,7 @@ export const useAuthStore = create<AuthState>(
       loginAttempts: new Map(),
       currentProfile: null,
       isOfflineMode: false,
+      _hasHydrated: false,
 
       login: (user) => {
         // 同時更新 user 和 currentProfile
@@ -459,6 +462,7 @@ export const useAuthStore = create<AuthState>(
 
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
     }),
     {
       name: 'auth-storage',
@@ -469,7 +473,13 @@ export const useAuthStore = create<AuthState>(
         currentProfile: state.currentProfile,
         sidebarCollapsed: state.sidebarCollapsed,
         isOfflineMode: state.isOfflineMode
-      })
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Hydration 完成後設置標記
+        if (state) {
+          state._hasHydrated = true;
+        }
+      }
     }
   )
 );

@@ -14,12 +14,20 @@ interface PrintableQuotationProps {
     child_no_bed: number;
     single_room: number;
     infant: number;
+    room_types?: Record<string, { adult: number; child: number }>;
   };
   categories: any[];
   totalCost: number;
   isOpen: boolean;
   onClose: () => void;
   onPrint: () => void;
+  accommodationSummary?: Array<{
+    name: string;
+    total_cost: number;
+    averageCost: number;
+    days: number;
+    capacity: number;
+  }>;
 }
 
 export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
@@ -32,6 +40,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
   isOpen,
   onClose,
   onPrint,
+  accommodationSummary = [],
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -40,6 +49,14 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
   }, []);
 
   if (!isOpen || !isMounted) return null;
+
+  // 計算總人數
+  const totalParticipants =
+    participantCounts.adult +
+    participantCounts.child_with_bed +
+    participantCounts.child_no_bed +
+    participantCounts.single_room +
+    participantCounts.infant;
 
   // 計算總收入
   const totalRevenue =
@@ -145,7 +162,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             style={{ height: 'calc(297mm - 8mm)' }}
           >
             {/* 頭部區域 */}
-            <div className="mb-1.5">
+            <div className="mb-1">
               <div className="flex items-start justify-between mb-1.5">
                 {/* Logo 與品牌 */}
                 <div>
@@ -179,12 +196,16 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                 <h3 className="text-[#3D2914] text-lg font-semibold mb-0.5">
                   {quoteName || '精選旅遊行程'}
                 </h3>
-                <p className="text-[#8B7355] text-[10px]">報價單編號：{quote?.code || 'A001'}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[#8B7355] text-[10px]">報價單編號：{quote?.code || 'A001'}</p>
+                  <span className="text-[#8B7355] text-[10px]">•</span>
+                  <p className="text-[#8B7355] text-[10px]">總人數：{totalParticipants} 人</p>
+                </div>
               </div>
             </div>
 
             {/* 基本資訊區 */}
-            <div className="grid grid-cols-2 gap-2 mb-1.5">
+            <div className="grid grid-cols-2 gap-2 mb-1">
               {/* 客戶資訊 */}
               <div className="bg-[#FAF8F5] rounded-xl p-1.5">
                 <h4 className="text-[#3D2914] text-xs font-semibold mb-1 pb-1 border-b border-[#C9A961]/20">
@@ -214,89 +235,110 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                 <div className="space-y-1">
                   <div>
                     <p className="text-[#8B7355] text-[9px] mb-0.5">承辦人</p>
-                    <p className="text-[#3D2914] text-[10px] font-medium">王小明</p>
+                    <p className="text-[#3D2914] text-[10px] font-medium">{quote?.user?.display_name || '待填寫'}</p>
                   </div>
                   <div>
                     <p className="text-[#8B7355] text-[9px] mb-0.5">聯絡電話</p>
-                    <p className="text-[#3D2914] text-[10px] font-medium">0912-345-678</p>
+                    <p className="text-[#3D2914] text-[10px] font-medium">{quote?.user?.phone || '待填寫'}</p>
                   </div>
                   <div>
                     <p className="text-[#8B7355] text-[9px] mb-0.5">Email</p>
-                    <p className="text-[#3D2914] text-[10px] font-medium">service@venturo.com</p>
+                    <p className="text-[#3D2914] text-[10px] font-medium">{quote?.user?.email || 'service@venturo.com'}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 價格區 */}
-            <div className="mb-1.5">
+            <div className="mb-1">
               <div className="bg-gradient-to-br from-[#C9A961]/5 to-[#C9A961]/10 rounded-xl p-1.5 border border-[#C9A961]/20">
-                <h4 className="text-[#3D2914] text-xs font-semibold mb-1.5">
+                <h4 className="text-[#3D2914] text-xs font-semibold mb-1">
                   團費報價
                 </h4>
 
-                <div className="grid grid-cols-3 gap-1.5 mb-1.5">
-                  {participantCounts.adult > 0 && (
+                <div className="grid grid-cols-4 gap-1.5">
+                  {/* 基礎身份 - 只顯示有售價的 */}
+                  {sellingPrices.adult > 0 && (
                     <div className="bg-white rounded-lg p-1.5">
                       <p className="text-[#8B7355] text-[10px] mb-0.5">成人</p>
                       <div className="flex items-baseline gap-0.5">
                         <span className="text-[#3D2914] text-[9px]">NT$</span>
                         <span className="text-[#C9A961] text-lg font-bold">{sellingPrices.adult.toLocaleString()}</span>
                       </div>
-                      <p className="text-[#8B7355] text-[9px] mt-0.5">{participantCounts.adult} 人</p>
                     </div>
                   )}
 
-                  {participantCounts.child_with_bed > 0 && (
+                  {sellingPrices.child_with_bed > 0 && (
                     <div className="bg-white rounded-lg p-1.5">
                       <p className="text-[#8B7355] text-[10px] mb-0.5">小孩</p>
                       <div className="flex items-baseline gap-0.5">
                         <span className="text-[#3D2914] text-[9px]">NT$</span>
                         <span className="text-[#C9A961] text-lg font-bold">{sellingPrices.child_with_bed.toLocaleString()}</span>
                       </div>
-                      <p className="text-[#8B7355] text-[9px] mt-0.5">{participantCounts.child_with_bed} 人</p>
                     </div>
                   )}
 
-                  {participantCounts.child_no_bed > 0 && (
+                  {sellingPrices.child_no_bed > 0 && (
                     <div className="bg-white rounded-lg p-1.5">
                       <p className="text-[#8B7355] text-[10px] mb-0.5">不佔床</p>
                       <div className="flex items-baseline gap-0.5">
                         <span className="text-[#3D2914] text-[9px]">NT$</span>
                         <span className="text-[#C9A961] text-lg font-bold">{sellingPrices.child_no_bed.toLocaleString()}</span>
                       </div>
-                      <p className="text-[#8B7355] text-[9px] mt-0.5">{participantCounts.child_no_bed} 人</p>
                     </div>
                   )}
 
-                  {participantCounts.single_room > 0 && (
+                  {sellingPrices.single_room > 0 && (
                     <div className="bg-white rounded-lg p-1.5">
                       <p className="text-[#8B7355] text-[10px] mb-0.5">單人房</p>
                       <div className="flex items-baseline gap-0.5">
                         <span className="text-[#3D2914] text-[9px]">NT$</span>
                         <span className="text-[#C9A961] text-lg font-bold">{sellingPrices.single_room.toLocaleString()}</span>
                       </div>
-                      <p className="text-[#8B7355] text-[9px] mt-0.5">{participantCounts.single_room} 人</p>
                     </div>
                   )}
 
-                  {participantCounts.infant > 0 && (
+                  {sellingPrices.infant > 0 && (
                     <div className="bg-white rounded-lg p-1.5">
                       <p className="text-[#8B7355] text-[10px] mb-0.5">嬰兒</p>
                       <div className="flex items-baseline gap-0.5">
                         <span className="text-[#3D2914] text-[9px]">NT$</span>
                         <span className="text-[#C9A961] text-lg font-bold">{sellingPrices.infant.toLocaleString()}</span>
                       </div>
-                      <p className="text-[#8B7355] text-[9px] mt-0.5">{participantCounts.infant} 人</p>
                     </div>
                   )}
+
+                  {/* 動態房型 - 從第二個房型開始 */}
+                  {accommodationSummary.length > 1 && accommodationSummary.slice(1).map((room) => {
+                    const roomPrices = sellingPrices.room_types?.[room.name];
+                    if (!roomPrices) return null;
+
+                    return (
+                      <React.Fragment key={room.name}>
+                        {roomPrices.adult > 0 && (
+                          <div className="bg-white rounded-lg p-1.5">
+                            <p className="text-[#8B7355] text-[10px] mb-0.5">{room.name}-成人</p>
+                            <div className="flex items-baseline gap-0.5">
+                              <span className="text-[#3D2914] text-[9px]">NT$</span>
+                              <span className="text-[#C9A961] text-lg font-bold">{roomPrices.adult.toLocaleString()}</span>
+                            </div>
+                          </div>
+                        )}
+                        {roomPrices.child > 0 && (
+                          <div className="bg-white rounded-lg p-1.5">
+                            <p className="text-[#8B7355] text-[10px] mb-0.5">{room.name}-小孩</p>
+                            <div className="flex items-baseline gap-0.5">
+                              <span className="text-[#3D2914] text-[9px]">NT$</span>
+                              <span className="text-[#C9A961] text-lg font-bold">{roomPrices.child.toLocaleString()}</span>
+                            </div>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </div>
 
-                <div className="flex items-center justify-between pt-1.5 border-t border-[#C9A961]/20">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[#8B7355] text-[10px]">報價總額</span>
-                    <span className="text-[#C9A961] text-base font-bold">NT$ {totalRevenue.toLocaleString()}</span>
-                  </div>
+                <div className="pt-1.5 border-t border-[#C9A961]/20">
                   <div className="flex items-center gap-1">
                     <svg className="w-2.5 h-2.5 text-[#C9A961]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -308,7 +350,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             </div>
 
             {/* 費用說明 */}
-            <div className="grid grid-cols-2 gap-2 mb-1.5">
+            <div className="grid grid-cols-2 gap-2 mb-1">
               {/* 費用包含 */}
               <div>
                 <div className="flex items-center gap-1 mb-1">
@@ -406,7 +448,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                     <svg className="w-2 h-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    <span>0912-345-678</span>
+                    <span>02-7751-6051</span>
                   </div>
                   <div className="flex items-center justify-end gap-0.5 text-[#8B7355]">
                     <svg className="w-2 h-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

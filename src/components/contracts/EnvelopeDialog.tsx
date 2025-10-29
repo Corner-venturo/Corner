@@ -38,9 +38,16 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
     if (isOpen && user) {
       // 從 HR 帶入員工資料
       setSenderName(user.display_name || user.username || '');
-      // 從 user 物件取得電話,如果沒有就空白(可手動輸入)
+      // 從 user 物件取得電話，如果沒有就使用公司總機（可手動修改）
       const userPhone = (user as Record<string, unknown>).phone || (user as Record<string, unknown>).mobile || '';
-      setSenderPhone(userPhone);
+      setSenderPhone(userPhone || '02-7751-6051');
+    } else if (!isOpen) {
+      // 對話框關閉時重置欄位
+      setRecipient('');
+      setRecipientAddress('');
+      setRecipientPhone('');
+      setSenderName('');
+      setSenderPhone('');
     }
   }, [isOpen, user]);
 
@@ -148,11 +155,11 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
             .recipient-section {
               position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              align-items: center;
-              text-align: center;
+              top: 60%;
+              right: 40mm;
+              transform: translateY(-50%);
+              align-items: flex-start;
+              text-align: left;
             }
 
             .label {
@@ -311,17 +318,19 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                     type="text"
                     value={senderCompany}
                     readOnly
-                    className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-morandi-secondary"
+                    className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-morandi-secondary cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-secondary block mb-1">員工姓名</label>
+                  <label className="text-xs text-morandi-secondary block mb-1">
+                    員工姓名 <span className="text-morandi-gold">*</span>
+                  </label>
                   <input
                     type="text"
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
-                    placeholder="員工姓名"
-                    className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
+                    placeholder="請輸入員工姓名（可修改）"
+                    className="w-full p-2 border-2 border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold focus:border-morandi-gold text-sm bg-white"
                   />
                 </div>
               </div>
@@ -331,17 +340,19 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   type="text"
                   value={senderAddress}
                   readOnly
-                  className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-morandi-secondary"
+                  className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-morandi-secondary cursor-not-allowed"
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary block mb-1">聯絡電話</label>
+                <label className="text-xs text-morandi-secondary block mb-1">
+                  聯絡電話 <span className="text-morandi-gold">*</span>
+                </label>
                 <input
                   type="text"
                   value={senderPhone}
                   onChange={(e) => setSenderPhone(e.target.value)}
-                  placeholder="聯絡電話"
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
+                  placeholder="請輸入聯絡電話（可修改）"
+                  className="w-full p-2 border-2 border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold focus:border-morandi-gold text-sm bg-white"
                 />
               </div>
             </div>

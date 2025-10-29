@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ListPageLayout } from '@/components/layout/list-page-layout';
 import { FileSignature, Edit2, Trash2, Eye, Mail } from 'lucide-react';
 import { useTourStore, useOrderStore, useMemberStore } from '@/stores';
@@ -15,6 +15,8 @@ import { EnvelopeDialog } from '@/components/contracts/EnvelopeDialog';
 
 export default function ContractsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tourIdParam = searchParams?.get('tour_id');
   const { items: tours, update: updateTour } = useTourStore();
   const { items: orders } = useOrderStore();
   const { items: members } = useMemberStore();
@@ -33,10 +35,31 @@ export default function ContractsPage() {
     tour: null,
   });
 
-  // 篩選旅遊團 - 只顯示有合約的團
+  // 篩選旅遊團 - 只顯示有合約的團（或是從 URL 指定的團）
   const contractTours = useMemo(() => {
+    if (tourIdParam) {
+      // 如果有指定 tour_id，只顯示該團（無論有無合約）
+      return tours.filter(tour => tour.id === tourIdParam);
+    }
+    // 否則顯示所有有合約的團
     return tours.filter(tour => !!tour.contract_template);
-  }, [tours]);
+  }, [tours, tourIdParam]);
+
+  // 自動打開對話框（如果從旅遊團頁面跳轉過來）
+  useEffect(() => {
+    if (tourIdParam && tours.length > 0) {
+      const targetTour = tours.find(tour => tour.id === tourIdParam);
+      if (targetTour && !contractDialog.isOpen) {
+        // 如果該團已有合約，打開編輯對話框；否則打開新增對話框
+        const mode = targetTour.contract_template ? 'edit' : 'create';
+        setContractDialog({
+          isOpen: true,
+          tour: targetTour,
+          mode,
+        });
+      }
+    }
+  }, [tourIdParam, tours, contractDialog.isOpen]);
 
   const handleRowClick = useCallback((tour: Tour) => {
     setContractDialog({

@@ -195,7 +195,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
       </div>
 
       {/* Bottom section: Budget vs actual expenses table */}
-      <div className="border border-border rounded-lg p-6">
+      <div className="border border-border rounded-xl shadow-sm p-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold text-morandi-primary">預算 vs 實際支出明細</h3>
           <div className="text-sm text-morandi-secondary">

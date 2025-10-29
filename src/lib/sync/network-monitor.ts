@@ -92,9 +92,26 @@ export class NetworkMonitor {
    */
   private async hasPendingSync(): Promise<boolean> {
     try {
-      // 這裡可以檢查各表的待同步數量
-      // 暫時簡化：直接嘗試同步，讓 backgroundSyncService 自己檢查
-      return true;
+      // 檢查 IndexedDB 是否有 _needs_sync: true 的資料
+      const { localDB } = await import('@/lib/db');
+      const { TABLES } = await import('@/lib/db/schemas');
+
+      // 檢查所有表格
+      for (const tableName of Object.values(TABLES)) {
+        try {
+          const items = await localDB.getAll(tableName);
+          // 檢查是否有待同步的項目
+          const hasPending = items.some((item: any) => item._needs_sync === true);
+          if (hasPending) {
+            return true;
+          }
+        } catch {
+          // 表格不存在或讀取失敗，跳過
+          continue;
+        }
+      }
+
+      return false;
     } catch {
       return false;
     }

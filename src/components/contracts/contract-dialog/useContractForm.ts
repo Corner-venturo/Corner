@@ -21,12 +21,28 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
   const [archivedDate, setArchivedDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [contractData, setContractData] = useState<Partial<ContractData>>({});
+  const [selectedOrderId, setSelectedOrderId] = useState<string>('');
 
   // 取得這個團的資料
   const tourOrders = orders.filter(o => o.tour_id === tour.id);
   const firstOrder = tourOrders[0];
+  const selectedOrder = tourOrders.find(o => o.id === selectedOrderId) || firstOrder;
   const tourMembers = members.filter(m => m.tour_id === tour.id);
+  const selectedOrderMembers = selectedOrder ? members.filter(m => m.order_id === selectedOrder.id) : [];
   const itinerary = itineraries.find(i => i.tour_id === tour.id);
+
+  // 初始化選擇的訂單（預設第一個）
+  useEffect(() => {
+    if (isOpen && firstOrder) {
+      // 對話框開啟時，如果還沒選擇訂單，預設第一個
+      if (!selectedOrderId) {
+        setSelectedOrderId(firstOrder.id);
+      }
+    } else if (!isOpen) {
+      // 對話框關閉時，重置選擇的訂單
+      setSelectedOrderId('');
+    }
+  }, [isOpen, firstOrder]);
 
   useEffect(() => {
     if (isOpen) {
@@ -43,13 +59,15 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             setContractData(savedData);
           } catch {
             // 如果 contract_content 不是 JSON,就重新準備資料
-            if (firstOrder && tourMembers[0]) {
-              const autoData = prepareContractData(tour, firstOrder, tourMembers[0], itinerary);
+            if (selectedOrder) {
+              const firstMember = selectedOrderMembers[0];
+              const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary);
               setContractData(autoData);
             }
           }
-        } else if (firstOrder && tourMembers[0]) {
-          const autoData = prepareContractData(tour, firstOrder, tourMembers[0], itinerary);
+        } else if (selectedOrder) {
+          const firstMember = selectedOrderMembers[0];
+          const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary);
           setContractData(autoData);
         }
       } else {
@@ -59,12 +77,13 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         setContractCompleted(false);
         setArchivedDate('');
 
-        if (firstOrder && tourMembers[0]) {
-          // 有訂單和團員資料，自動帶入
-          const autoData = prepareContractData(tour, firstOrder, tourMembers[0], itinerary);
+        if (selectedOrder) {
+          // 有訂單資料，自動帶入
+          const firstMember = selectedOrderMembers[0];
+          const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary);
           setContractData(autoData);
         } else {
-          // 沒有訂單/團員資料，初始化空白欄位
+          // 沒有訂單資料，初始化空白欄位
           setContractData({
             reviewYear: new Date().getFullYear().toString(),
             reviewMonth: (new Date().getMonth() + 1).toString(),
@@ -166,7 +185,12 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       });
 
       // 讀取合約範本
-      const templateFile = selectedTemplate === 'template_a' ? 'individual-overseas.html' : 'individual-overseas.html';
+      const templateMap: Record<string, string> = {
+        'domestic': 'domestic.html',
+        'international': 'international.html',
+        'individual_international': 'individual_international_full.html',
+      };
+      const templateFile = templateMap[selectedTemplate as string] || 'international.html';
       const response = await fetch(`/contract-templates/${templateFile}`);
       if (!response.ok) {
         throw new Error('無法載入合約範本');
@@ -221,5 +245,9 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
     handlePrint,
     firstOrder,
     tourMembers,
+    tourOrders,
+    selectedOrderId,
+    setSelectedOrderId,
+    selectedOrder,
   };
 }

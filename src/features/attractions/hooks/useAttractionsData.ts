@@ -106,10 +106,11 @@ export function useAttractionsData() {
     }
   }, [fetchAttractions]);
 
-  // 初始載入
+  // 初始載入（只執行一次，避免無限迴圈）
   useEffect(() => {
     fetchAttractions();
-  }, [fetchAttractions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     attractions,

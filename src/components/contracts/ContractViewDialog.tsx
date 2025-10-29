@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { FileSignature, X, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +21,8 @@ interface ContractViewDialogProps {
 
 export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialogProps) {
   const [printing, setPrinting] = useState(false);
+  const [contractHtml, setContractHtml] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   // 解析儲存的合約資料
   const contractData = useMemo<Partial<ContractData>>(() => {
@@ -30,38 +32,61 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
     try {
       return JSON.parse(tour.contract_content);
     } catch (error) {
-            return {};
+      return {};
     }
   }, [tour.contract_content]);
 
+  // 載入並渲染完整合約
+  useEffect(() => {
+    if (!isOpen || !tour.contract_template || !tour.contract_content) {
+      return;
+    }
+
+    const loadContract = async () => {
+      try {
+        setLoading(true);
+
+        // 讀取合約範本
+        const templateMap = {
+          'domestic': 'domestic.html',
+          'international': 'international.html',
+          'individual_international': 'individual_international_full.html',
+        };
+        const templateFile = templateMap[tour.contract_template as keyof typeof templateMap] || 'international.html';
+        const response = await fetch(`/contract-templates/${templateFile}`);
+
+        if (!response.ok) {
+          throw new Error('無法載入合約範本');
+        }
+
+        let template = await response.text();
+
+        // 替換所有變數
+        Object.entries(contractData).forEach(([key, value]) => {
+          const regex = new RegExp(`{{${key}}}`, 'g');
+          template = template.replace(regex, value || '');
+        });
+
+        setContractHtml(template);
+      } catch (error) {
+        console.error('載入合約失敗:', error);
+        setContractHtml('<p class="text-red-500">載入合約範本失敗，請稍後再試</p>');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContract();
+  }, [isOpen, tour.contract_template, tour.contract_content, contractData]);
+
   const handlePrint = async () => {
-    if (!contractData || Object.keys(contractData).length === 0) {
+    if (!contractHtml) {
       alert('無合約資料可列印');
       return;
     }
 
     try {
       setPrinting(true);
-
-      // 讀取合約範本
-      const templateMap = {
-        'domestic': 'domestic.html',
-        'international': 'international.html',
-        'individual_international': 'individual_international.html',
-      };
-      const templateFile = templateMap[tour.contract_template as keyof typeof templateMap] || 'international.html';
-      const response = await fetch(`/contract-templates/${templateFile}`);
-      if (!response.ok) {
-        throw new Error('無法載入合約範本');
-      }
-
-      let template = await response.text();
-
-      // 替換所有變數
-      Object.entries(contractData).forEach(([key, value]) => {
-        const regex = new RegExp(`{{${key}}}`, 'g');
-        template = template.replace(regex, value || '');
-      });
 
       // 開啟新視窗並列印
       const printWindow = window.open('', '_blank');
@@ -70,7 +95,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         return;
       }
 
-      printWindow.document.write(template);
+      printWindow.document.write(contractHtml);
       printWindow.document.close();
 
       // 等待內容載入後列印
@@ -82,7 +107,8 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         };
       };
     } catch (error) {
-            alert('列印合約時發生錯誤，請稍後再試');
+      console.error('列印錯誤:', error);
+      alert('列印合約時發生錯誤，請稍後再試');
     } finally {
       setPrinting(false);
     }
@@ -105,7 +131,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSignature size={20} />
@@ -113,156 +139,16 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* 旅遊團資訊 */}
-          <div className="bg-morandi-container/20 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅遊團資訊</h3>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-morandi-secondary">團號：</span>
-                <span className="text-morandi-primary">{contractData.tourCode || '-'}</span>
-              </div>
-              <div>
-                <span className="text-morandi-secondary">團名：</span>
-                <span className="text-morandi-primary">{contractData.tourName || '-'}</span>
-              </div>
-              <div>
-                <span className="text-morandi-secondary">目的地：</span>
-                <span className="text-morandi-primary">{contractData.tourDestination || '-'}</span>
-              </div>
+        <div className="flex-1 overflow-auto py-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-morandi-secondary">載入合約中...</div>
             </div>
-          </div>
-
-          {/* 審閱日期 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">契約審閱日期</h3>
-            <div className="text-sm text-morandi-primary">
-              {contractData.reviewYear || '-'}年 {contractData.reviewMonth || '-'}月 {contractData.reviewDay || '-'}日
-            </div>
-          </div>
-
-          {/* 旅客資訊 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅客資訊（甲方）</h3>
-            <div className="space-y-2 text-sm">
-              <div>
-                <span className="text-morandi-secondary">姓名：</span>
-                <span className="text-morandi-primary">{contractData.travelerName || '-'}</span>
-              </div>
-              <div>
-                <span className="text-morandi-secondary">住址：</span>
-                <span className="text-morandi-primary">{contractData.travelerAddress || '-'}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-morandi-secondary">身分證字號：</span>
-                  <span className="text-morandi-primary">{contractData.travelerIdNumber || '-'}</span>
-                </div>
-                <div>
-                  <span className="text-morandi-secondary">電話：</span>
-                  <span className="text-morandi-primary">{contractData.travelerPhone || '-'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 緊急聯絡人資訊 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">緊急聯絡人</h3>
-            <div className="space-y-2 text-sm">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-morandi-secondary">姓名：</span>
-                  <span className="text-morandi-primary">{contractData.emergencyContactName || '-'}</span>
-                </div>
-                <div>
-                  <span className="text-morandi-secondary">關係：</span>
-                  <span className="text-morandi-primary">{contractData.emergencyContactRelation || '-'}</span>
-                </div>
-              </div>
-              <div>
-                <span className="text-morandi-secondary">電話：</span>
-                <span className="text-morandi-primary">{contractData.emergencyContactPhone || '-'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 集合時地 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">集合時地</h3>
-            <div className="space-y-2 text-sm">
-              <div>
-                <span className="text-morandi-secondary">集合時間：</span>
-                <span className="text-morandi-primary">
-                  {contractData.gatherYear || '-'}年 {contractData.gatherMonth || '-'}月 {contractData.gatherDay || '-'}日{' '}
-                  {contractData.gatherHour || '-'}時 {contractData.gatherMinute || '-'}分
-                </span>
-              </div>
-              <div>
-                <span className="text-morandi-secondary">集合地點：</span>
-                <span className="text-morandi-primary">{contractData.gatherLocation || '-'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 費用 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅遊費用</h3>
-            <div className="space-y-2 text-sm">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-morandi-secondary">總金額（新台幣）：</span>
-                  <span className="text-morandi-primary">{contractData.totalAmount || '-'} 元</span>
-                </div>
-                <div>
-                  <span className="text-morandi-secondary">定金（新台幣）：</span>
-                  <span className="text-morandi-primary">{contractData.depositAmount || '-'} 元</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-morandi-secondary">訂金付款方式：</span>
-                  <span className="text-morandi-primary">{contractData.paymentMethod || '-'}</span>
-                </div>
-                <div>
-                  <span className="text-morandi-secondary">尾款付款方式：</span>
-                  <span className="text-morandi-primary">{contractData.finalPaymentMethod || '-'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 保險資訊 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">保險資訊</h3>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-morandi-secondary">死亡保險金：</span>
-                <span className="text-morandi-primary">新台幣 {contractData.deathInsurance || '-'} 元</span>
-              </div>
-              <div>
-                <span className="text-morandi-secondary">醫療保險金：</span>
-                <span className="text-morandi-primary">新台幣 {contractData.medicalInsurance || '-'} 元</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 乙方資訊 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">乙方資訊</h3>
-            <div className="text-sm">
-              <span className="text-morandi-secondary">電話分機：</span>
-              <span className="text-morandi-primary">02-7751-6051 #{contractData.companyExtension || '-'}</span>
-            </div>
-          </div>
-
-          {/* 合約建立時間 */}
-          {tour.contract_created_at && (
-            <div className="pt-4 border-t border-morandi-container/30">
-              <div className="text-xs text-morandi-secondary">
-                合約建立時間：{new Date(tour.contract_created_at).toLocaleString('zh-TW')}
-              </div>
-            </div>
+          ) : (
+            <div
+              className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg"
+              dangerouslySetInnerHTML={{ __html: contractHtml }}
+            />
           )}
         </div>
 
@@ -273,7 +159,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
           </Button>
           <Button
             onClick={handlePrint}
-            disabled={printing}
+            disabled={printing || loading}
             className="bg-morandi-gold hover:bg-morandi-gold/90"
           >
             <Printer size={16} className="mr-2" />

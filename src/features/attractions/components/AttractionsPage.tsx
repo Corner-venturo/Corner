@@ -69,10 +69,11 @@ export default function AttractionsPage() {
     initialFormData,
   } = useAttractionsDialog();
 
-  // 載入地區資料
+  // 載入地區資料（只執行一次，避免無限迴圈）
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 取得當前篩選的地區資訊
   const availableRegions = selectedCountry ? getRegionsByCountry(selectedCountry) : [];

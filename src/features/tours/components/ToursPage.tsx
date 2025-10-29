@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { useTours } from '../hooks/useTours-advanced';
 import { PageRequest } from '@/core/types/common';
-import { Calendar, FileText, MapPin, Calculator, BarChart3, FileCheck, AlertCircle, Edit2, Trash2, Archive, ArchiveRestore } from 'lucide-react';
+import { Calendar, FileText, MapPin, Calculator, BarChart3, FileCheck, AlertCircle, Edit2, Trash2, Archive, ArchiveRestore, FileSignature, Flag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionStoreNew } from '@/stores';
 import { useQuotes } from '@/features/quotes/hooks/useQuotes';
@@ -309,10 +309,9 @@ export const ToursPage: React.FC = () => {
       label: '人數',
       render: (value, tour) => {
         const tourOrders = orders.filter((order) => order.tour_id === tour.id);
-        const actualMembers = members.filter((member) =>
-          tourOrders.some((order) => order.id === member.order_id)
-        ).length;
-        return <span className="text-sm text-morandi-primary">{actualMembers}</span>;
+        // 計算預計人數：訂單的 member_count 加總
+        const plannedCount = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0);
+        return <span className="text-sm text-morandi-primary">{plannedCount}</span>;
       },
     },
     {
@@ -369,7 +368,17 @@ export const ToursPage: React.FC = () => {
           className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
           title="編輯行程表"
         >
-          <FileText size={14} />
+          <Flag size={14} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/contracts?tour_id=${tour.id}`);
+          }}
+          className="p-1 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+          title="合約管理"
+        >
+          <FileSignature size={14} />
         </button>
         <button
           onClick={(e) => {

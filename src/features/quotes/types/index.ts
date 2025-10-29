@@ -34,12 +34,19 @@ export interface ParticipantCounts {
   infant: number;         // 嬰兒
 }
 
+export interface RoomTypePrice {
+  adult: number;
+  child: number;
+}
+
 export interface SellingPrices {
   adult: number;
   child_with_bed: number;
   child_no_bed: number;
   single_room: number;
   infant: number;
+  // 動態房型價格（key: 房型名稱）
+  room_types?: Record<string, RoomTypePrice>;
 }
 
 export interface IdentityCosts {
@@ -63,6 +70,7 @@ export interface AccommodationSummaryItem {
   total_cost: number;
   averageCost: number;
   days: number;
+  capacity: number; // 房型人數（從 quantity 取得）
 }
 
 export interface VersionRecord {

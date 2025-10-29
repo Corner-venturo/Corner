@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ResponsiveHeader } from "@/components/layout/responsive-header";
 import { TourForm } from "@/components/editor/TourForm";
 import { TourPreview } from "@/components/editor/TourPreview";
 import { PublishButton } from "@/components/editor/PublishButton";
+import { useTourStore, useRegionStoreNew } from "@/stores";
 import {
   IconBuilding,
   IconToolsKitchen2,
@@ -25,13 +26,8 @@ const iconMap: any = {
   IconMapPin,
 };
 
-export default function NewItineraryPage() {
-  const router = useRouter();
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [scale, setScale] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mobileContentRef = useRef<HTMLDivElement>(null);
-  const [tourData, setTourData] = useState({
+// 預設的空白行程資料
+const getDefaultTourData = () => ({
     // 封面資訊
     tagline: "Corner Travel 2025",
     title: "漫遊福岡",
@@ -246,18 +242,146 @@ export default function NewItineraryPage() {
         accommodation: "",
       },
     ],
-  });
+});
 
-  // Convert icon strings to components for preview
-  const processedData = {
-    ...tourData,
-    features: tourData.features.map((f) => ({
-      ...f,
-      iconComponent: iconMap[f.icon] || IconSparkles,
-    })),
-  };
+export default function NewItineraryPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tourId = searchParams.get('tour_id');
+  const { items: tours } = useTourStore();
+  const { countries, cities } = useRegionStoreNew();
 
-  // 計算縮放比例
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mobileContentRef = useRef<HTMLDivElement>(null);
+  const [tourData, setTourData] = useState(getDefaultTourData());
+  const [loading, setLoading] = useState(true);
+
+  // 從旅遊團載入資料（如果有 tour_id）
+  useEffect(() => {
+    const initializeTourData = () => {
+      if (!tourId) {
+        // 沒有 tour_id，使用空白資料
+        setTourData({
+          tagline: "Corner Travel 2025",
+          title: "",
+          subtitle: "",
+          description: "",
+          departureDate: "",
+          tourCode: "",
+          coverImage: "",
+          country: "",
+          city: "",
+          status: "草稿",
+          outboundFlight: {
+            airline: "",
+            flightNumber: "",
+            departureAirport: "TPE",
+            departureTime: "",
+            departureDate: "",
+            arrivalAirport: "",
+            arrivalTime: "",
+            duration: "",
+          },
+          returnFlight: {
+            airline: "",
+            flightNumber: "",
+            departureAirport: "",
+            departureTime: "",
+            departureDate: "",
+            arrivalAirport: "TPE",
+            arrivalTime: "",
+            duration: "",
+          },
+          features: [],
+          focusCards: [],
+          leader: {
+            name: "",
+            domesticPhone: "",
+            overseasPhone: "",
+          },
+          meetingInfo: {
+            time: "",
+            location: "",
+          },
+          itinerarySubtitle: "",
+          dailyItinerary: [],
+        });
+        setLoading(false);
+        return;
+      }
+
+      // 有 tour_id，從旅遊團載入資料
+      const tour = tours.find(t => t.id === tourId);
+      if (!tour) {
+        setLoading(false);
+        return;
+      }
+
+      // 找到國家和城市名稱
+      const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null;
+      const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null;
+
+      // 計算天數
+      const departureDate = new Date(tour.departure_date);
+      const returnDate = new Date(tour.return_date);
+      const days = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+      // 建立從旅遊團帶入的行程資料
+      setTourData({
+        tagline: "Corner Travel 2025",
+        title: tour.name,
+        subtitle: "精緻旅遊",
+        description: tour.description || "",
+        departureDate: departureDate.toLocaleDateString('zh-TW'),
+        tourCode: tour.code,
+        coverImage: city?.background_image_url || "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop",
+        country: country?.name || tour.location || "",
+        city: city?.name || tour.location || "",
+        status: "草稿",
+        outboundFlight: {
+          airline: "",
+          flightNumber: "",
+          departureAirport: "TPE",
+          departureTime: "",
+          departureDate: departureDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+          arrivalAirport: city?.airport_code || "",
+          arrivalTime: "",
+          duration: "",
+        },
+        returnFlight: {
+          airline: "",
+          flightNumber: "",
+          departureAirport: city?.airport_code || "",
+          departureTime: "",
+          departureDate: returnDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+          arrivalAirport: "TPE",
+          arrivalTime: "",
+          duration: "",
+        },
+        features: [],
+        focusCards: [],
+        leader: {
+          name: "",
+          domesticPhone: "",
+          overseasPhone: "",
+        },
+        meetingInfo: {
+          time: departureDate.toLocaleDateString('zh-TW') + " 04:50",
+          location: "桃園機場第二航廈",
+        },
+        itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,
+        dailyItinerary: [],
+      });
+
+      setLoading(false);
+    };
+
+    initializeTourData();
+  }, [tourId, tours, countries, cities]);
+
+  // 計算縮放比例（必須在 early return 之前）
   useEffect(() => {
     const calculateScale = () => {
       if (!containerRef.current) return;
@@ -297,6 +421,23 @@ export default function NewItineraryPage() {
       }, 100);
     }
   }, [viewMode]);
+
+  // Convert icon strings to components for preview
+  const processedData = {
+    ...tourData,
+    features: tourData.features.map((f: any) => ({
+      ...f,
+      iconComponent: iconMap[f.icon] || IconSparkles,
+    })),
+  };
+
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-morandi-secondary">載入中...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col">

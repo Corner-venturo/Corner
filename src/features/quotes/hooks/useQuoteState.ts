@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuotes } from './useQuotes';
-import { useTourStore, useRegionStore } from '@/stores';
+import { useTourStore, useRegionStore, useOrderStore } from '@/stores';
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types';
 
 export const useQuoteState = () => {
@@ -9,6 +9,7 @@ export const useQuoteState = () => {
   const router = useRouter();
   const { quotes, updateQuote } = useQuotes();
   const { items: tours, create: addTour } = useTourStore();
+  const { items: orders } = useOrderStore();
   const regionStore = useRegionStore();
   const { items: regions } = regionStore;
 
@@ -19,6 +20,13 @@ export const useQuoteState = () => {
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null;
   const isSpecialTour = relatedTour?.status === 'special';
   const isReadOnly = isSpecialTour; // 特殊團報價單設為唯讀
+
+  // 計算旅遊團的實際預計人數（從訂單的 member_count 加總）
+  const tourPlannedParticipants = useMemo(() => {
+    if (!relatedTour) return 0;
+    const tourOrders = orders.filter(order => order.tour_id === relatedTour.id);
+    return tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0);
+  }, [relatedTour, orders]);
 
   // 懶載入 regions（只在報價單頁面才載入）
   useEffect(() => {
@@ -93,14 +101,18 @@ export const useQuoteState = () => {
     infant: 0
   });
 
-  // 總人數（向下相容）
-  const groupSize = participantCounts.adult + participantCounts.child_with_bed +
-                    participantCounts.child_no_bed + participantCounts.single_room +
-                    participantCounts.infant;
+  // 總人數：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
+  const groupSize = tourPlannedParticipants ||
+                    relatedTour?.max_participants ||
+                    (participantCounts.adult + participantCounts.child_with_bed +
+                     participantCounts.child_no_bed + participantCounts.single_room +
+                     participantCounts.infant);
 
-  // 導遊費用分攤人數（不含嬰兒）
-  const groupSizeForGuide = participantCounts.adult + participantCounts.child_with_bed +
-                            participantCounts.child_no_bed + participantCounts.single_room;
+  // 導遊費用分攤人數（不含嬰兒）：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
+  const groupSizeForGuide = tourPlannedParticipants ||
+                            relatedTour?.max_participants ||
+                            (participantCounts.adult + participantCounts.child_with_bed +
+                             participantCounts.child_no_bed + participantCounts.single_room);
 
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '');
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);

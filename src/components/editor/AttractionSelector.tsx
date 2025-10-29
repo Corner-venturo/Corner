@@ -41,6 +41,12 @@ export function AttractionSelector({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
+  // 序列化 tourCountries 避免無限迴圈
+  const tourCountryIds = useMemo(
+    () => tourCountries.map(c => c.country_id).filter(Boolean),
+    [tourCountries]
+  );
+
   // 載入景點資料
   React.useEffect(() => {
     if (!isOpen) return;
@@ -70,12 +76,9 @@ export function AttractionSelector({
         // 如果有選擇國家，篩選該國家的景點
         if (selectedCountryId) {
           query = query.eq('country_id', selectedCountryId);
-        } else if (tourCountries.length > 0) {
+        } else if (tourCountryIds.length > 0) {
           // 如果沒選擇國家，但行程有設定國家，就篩選這些國家的景點
-          const countryIds = tourCountries.map(c => c.country_id).filter(Boolean);
-          if (countryIds.length > 0) {
-            query = query.in('country_id', countryIds);
-          }
+          query = query.in('country_id', tourCountryIds);
         }
 
         const { data, error } = await query;
@@ -98,13 +101,15 @@ export function AttractionSelector({
 
         setAttractions(formatted);
       } catch (error) {
-              } finally {
+        // 靜默失敗，使用空陣列
+      } finally {
         setLoading(false);
       }
     };
 
     loadAttractions();
-  }, [isOpen, selectedCountryId, tourCountries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, selectedCountryId, tourCountryIds.join(',')]);
 
   // 搜尋過濾
   const filteredAttractions = useMemo(() => {

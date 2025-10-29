@@ -14,7 +14,6 @@ import {
   TAIWAN_COMPATRIOT_REQUIREMENTS,
   TAIWAN_COMPATRIOT_NOTES,
   formatCurrency,
-  VISA_INFO_TEXT,
   type DeliveryOption,
   type RequirementSection,
 } from '../constants/visa-info';
@@ -27,6 +26,7 @@ interface VisasInfoDialogProps {
 export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const copyStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedSections, setSelectedSections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     return () => {
@@ -36,16 +36,36 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
     };
   }, []);
 
-  const handleCopyVisaInfo = useCallback(async () => {
+  // 切換勾選類別
+  const toggleSection = (sectionTitle: string) => {
+    setSelectedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionTitle)) {
+        newSet.delete(sectionTitle);
+      } else {
+        newSet.add(sectionTitle);
+      }
+      return newSet;
+    });
+  };
+
+  // 複製已選擇的類別
+  const handleCopySelected = useCallback(async () => {
+    if (selectedSections.size === 0) {
+      setCopyStatus('error');
+      return;
+    }
+
     try {
+      const selectedText = Array.from(selectedSections).join('\n\n');
       let copied = false;
 
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(VISA_INFO_TEXT);
+        await navigator.clipboard.writeText(selectedText);
         copied = true;
       } else if (typeof document !== 'undefined') {
         const textarea = document.createElement('textarea');
-        textarea.value = VISA_INFO_TEXT;
+        textarea.value = selectedText;
         textarea.setAttribute('readonly', '');
         textarea.style.position = 'absolute';
         textarea.style.left = '-9999px';
@@ -70,7 +90,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
         setCopyStatus('idle');
       }, 2000);
     }
-  }, []);
+  }, [selectedSections]);
 
   const renderVisaInfoContent = (
     options: DeliveryOption[],
@@ -97,16 +117,38 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
       </div>
 
       <div className="space-y-5">
-        {requirements.map(section => (
-          <div key={section.title} className="space-y-3">
-            <h3 className="text-sm font-semibold text-morandi-primary">－{section.title}</h3>
-            <ol className="list-decimal space-y-2 pl-5 text-sm text-morandi-secondary">
-              {section.items.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ol>
-          </div>
-        ))}
+        {requirements.map(section => {
+          const sectionText = `－${section.title}${section.fee ? ` ${formatCurrency(section.fee)}` : ''}\n${section.items.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}`;
+
+          return (
+            <label
+              key={section.title}
+              className="block space-y-3 hover:bg-morandi-container/10 p-3 rounded cursor-pointer transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedSections.has(sectionText)}
+                  onChange={() => toggleSection(sectionText)}
+                  className="rounded"
+                />
+                <h3 className="text-sm font-semibold text-morandi-primary flex-1">
+                  －{section.title}
+                  {section.fee && (
+                    <span className="ml-3 text-morandi-gold font-bold">
+                      {formatCurrency(section.fee)}
+                    </span>
+                  )}
+                </h3>
+              </div>
+              <ol className="list-decimal space-y-2 pl-12 text-sm text-morandi-secondary">
+                {section.items.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ol>
+            </label>
+          );
+        })}
       </div>
 
       <div className="rounded-lg bg-morandi-container p-4">
@@ -127,11 +169,12 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
-              onClick={handleCopyVisaInfo}
+              onClick={handleCopySelected}
+              disabled={selectedSections.size === 0}
               className="flex items-center gap-2"
             >
               <Copy size={16} />
-              複製全部資訊
+              複製已選擇項目 ({selectedSections.size})
             </Button>
           </div>
         </DialogHeader>
@@ -142,7 +185,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
               copyStatus === 'success' ? 'text-emerald-600' : 'text-red-500'
             )}
           >
-            {copyStatus === 'success' ? '已複製簽證資訊' : '複製失敗，請手動複製。'}
+            {copyStatus === 'success' ? `已複製 ${selectedSections.size} 個項目` : selectedSections.size === 0 ? '請先勾選要複製的項目' : '複製失敗，請重試'}
           </p>
         )}
         <Tabs defaultValue="passport" className="mt-4">
