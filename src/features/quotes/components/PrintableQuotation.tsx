@@ -355,51 +355,51 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
 
             {/* 重要備註 */}
             <div className="bg-[#FAF8F5] rounded-xl p-2 border-l-4 border-[#C9A961] mb-2">
-              <h4 className="text-[#3D2914] text-xs font-semibold mb-2">重要備註</h4>
-              <div className="space-y-1.5">
-                <div className="flex items-start gap-2">
-                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">01.</span>
+              <h4 className="text-[#3D2914] text-xs font-semibold mb-1">重要備註</h4>
+              <div className="space-y-1">
+                <div className="flex items-start gap-1.5">
+                  <span className="text-[#C9A961] text-[10px] font-semibold mt-0.5">01.</span>
                   <p className="text-[#3D2914] text-[10px]">本報價單有效期限為報價日起 30 天內</p>
                 </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">02.</span>
+                <div className="flex items-start gap-1.5">
+                  <span className="text-[#C9A961] text-[10px] font-semibold mt-0.5">02.</span>
                   <p className="text-[#3D2914] text-[10px]">行程內容可能因天候、交通等因素彈性調整</p>
                 </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">03.</span>
+                <div className="flex items-start gap-1.5">
+                  <span className="text-[#C9A961] text-[10px] font-semibold mt-0.5">03.</span>
                   <p className="text-[#3D2914] text-[10px]">最終費用以簽約時確認之人數及價格為準</p>
                 </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">04.</span>
+                <div className="flex items-start gap-1.5">
+                  <span className="text-[#C9A961] text-[10px] font-semibold mt-0.5">04.</span>
                   <p className="text-[#3D2914] text-[10px]">付款方式：訂金 30%，出發前 7 天付清尾款</p>
                 </div>
               </div>
             </div>
 
             {/* 頁尾 */}
-            <div className="pt-2 mt-auto border-t border-[#C9A961]/20">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#C9A961] to-[#B89851] flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="pt-1.5 mt-auto border-t border-[#C9A961]/20">
+              <div className="flex items-center justify-between text-[10px]">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#C9A961] to-[#B89851] flex items-center justify-center">
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[#3D2914] text-xs font-semibold">Venturo Travel</p>
-                    <p className="text-[#8B7355] text-[10px]">專業旅遊規劃服務</p>
+                    <p className="text-[#3D2914] text-[10px] font-semibold">Venturo Travel</p>
+                    <p className="text-[#8B7355] text-[9px]">專業旅遊規劃服務</p>
                   </div>
                 </div>
 
-                <div className="text-right text-[10px]">
+                <div className="text-right text-[9px]">
                   <div className="flex items-center justify-end gap-1 text-[#8B7355] mb-0.5">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                     <span>0912-345-678</span>
                   </div>
                   <div className="flex items-center justify-end gap-1 text-[#8B7355]">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <span>service@venturo.com</span>
@@ -410,7 +410,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           </div>
 
           {/* 底部裝飾條 */}
-          <div className="h-2 bg-gradient-to-r from-[#C9A961] via-[#D4B76E] to-[#C9A961]"></div>
+          <div className="h-1.5 bg-gradient-to-r from-[#C9A961] via-[#D4B76E] to-[#C9A961]"></div>
         </div>
       </div>
     </div>
