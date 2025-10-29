@@ -116,14 +116,14 @@ export function MainLayout({ children }: MainLayoutProps) {
 
       {/* 右下象限 - 主內容區域 */}
       <main className={cn(
-        'fixed bottom-0 right-0 transition-all',
+        'fixed bottom-0 right-0 transition-all overflow-auto',
         !isClient ? 'left-16' : (sidebarCollapsed ? 'left-16' : 'left-[190px]')
       )}
       style={{
         top: HEADER_HEIGHT_PX,
         transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
       }}>
-        <div className="p-6 h-full">
+        <div className="p-6">
           {children}
         </div>
       </main>

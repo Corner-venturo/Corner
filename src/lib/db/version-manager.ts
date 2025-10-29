@@ -30,21 +30,14 @@ export async function checkAndHandleVersion(): Promise<boolean> {
   }
 
   // 版本不同，需要處理升級
+  console.log(`🔄 [IndexedDB] 偵測到版本變化: v${lastVersion} -> v${currentVersion}`);
 
-  // 顯示升級提示（可選）
-  const shouldUpgrade = await confirmUpgrade(parseInt(lastVersion), DB_VERSION);
+  // ✅ 不清空資料庫，直接更新版本記錄
+  // IndexedDB 的 onupgradeneeded 會自動處理表格建立
+  localStorage.setItem(VERSION_KEY, currentVersion);
 
-  if (shouldUpgrade) {
-    // 清空 IndexedDB（因為有 Supabase 備份，安全）
-    await clearDatabase();
-
-    // 更新版本記錄
-    localStorage.setItem(VERSION_KEY, currentVersion);
-
-    return true; // 需要重新同步
-  } else {
-    return false;
-  }
+  console.log('✅ [IndexedDB] 版本更新完成（資料保留）');
+  return false; // 不需要重新同步，資料都還在
 }
 
 /**

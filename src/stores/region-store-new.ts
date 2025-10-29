@@ -8,6 +8,7 @@
 import { createStore } from './core/create-store-new';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
+import { seedRegions } from '@/lib/db/seed-regions';
 
 // ============================================
 // 型別定義
@@ -141,11 +142,31 @@ export const useRegionStoreNew = () => {
     // 載入所有資料
     // ============================================
     fetchAll: async () => {
+      // 先載入現有資料
       await Promise.all([
         countryStore.fetchAll(),
         regionStore.fetchAll(),
         cityStore.fetchAll(),
       ]);
+
+      // 如果 countries 是空的，自動初始化預設資料
+      if (countryStore.items.length === 0) {
+        logger.info('📦 [RegionStore] 偵測到空資料，開始初始化預設地區資料...');
+        try {
+          await seedRegions();
+
+          // 重新載入資料
+          await Promise.all([
+            countryStore.fetchAll(),
+            regionStore.fetchAll(),
+            cityStore.fetchAll(),
+          ]);
+
+          logger.info('✅ [RegionStore] 預設地區資料初始化完成');
+        } catch (error) {
+          logger.error('❌ [RegionStore] 初始化失敗:', error);
+        }
+      }
 
       logger.info('✅ 地區資料載入完成', {
         countries: countryStore.items.length,

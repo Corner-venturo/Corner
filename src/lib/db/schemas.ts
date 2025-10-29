@@ -19,8 +19,9 @@ export interface IndexSchema {
 /**
  * 資料庫版本
  * v1: 完整的 Offline-First 架構，包含所有資料表（含 regions 和 workspace）
+ * v2: 新增 countries 和 cities 表（不刪除任何資料）
  */
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 /**
  * 資料庫名稱
@@ -338,16 +339,59 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     ],
   },
 
-  // 地區表
+  // ============================================
+  // 地區管理系統（三層架構：Countries > Regions > Cities）
+  // ============================================
+
+  // 國家表
+  {
+    name: 'countries',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'name_en', keyPath: 'name_en', unique: false },
+      { name: 'code', keyPath: 'code', unique: true },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'display_order', keyPath: 'display_order', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 地區表（某些國家有，如日本的關東/關西）
   {
     name: 'regions',
     keyPath: 'id',
     autoIncrement: false,
     indexes: [
-      { name: 'code', keyPath: 'code', unique: true },
+      { name: 'country_id', keyPath: 'country_id', unique: false },
       { name: 'name', keyPath: 'name', unique: false },
-      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'name_en', keyPath: 'name_en', unique: false },
       { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'display_order', keyPath: 'display_order', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 城市表
+  {
+    name: 'cities',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'country_id', keyPath: 'country_id', unique: false },
+      { name: 'region_id', keyPath: 'region_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'name_en', keyPath: 'name_en', unique: false },
+      { name: 'airport_code', keyPath: 'airport_code', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'display_order', keyPath: 'display_order', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
       // Offline-First 同步欄位
@@ -608,7 +652,10 @@ export const TABLES = {
   TODOS: 'todos',
   VISAS: 'visas',
   SUPPLIERS: 'suppliers',
+  // 地區管理系統（三層架構）
+  COUNTRIES: 'countries',
   REGIONS: 'regions',
+  CITIES: 'cities',
   CALENDAR_EVENTS: 'calendar_events',
   ACCOUNTS: 'accounts',
   CATEGORIES: 'categories',

@@ -156,7 +156,7 @@ export default function QuoteDetailPage() {
   }, []);
 
   return (
-    <div className="w-full max-w-full space-y-6">
+    <div className="w-full max-w-full space-y-6 pb-6">
       <QuoteHeader
         isSpecialTour={isSpecialTour}
         isReadOnly={isReadOnly}
@@ -178,13 +178,13 @@ export default function QuoteDetailPage() {
 
       <div className="w-full px-6 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
-          {/* 左側內容區 - 70% */}
+          {/* 左側：成本計算表格 - 70% */}
           <div className={cn(
             "lg:col-span-7",
             isReadOnly && "opacity-70 pointer-events-none select-none"
           )}>
-            <div className="border border-border bg-card rounded-lg overflow-hidden shadow-sm">
-              <div ref={scrollRef} className="scrollable-content overflow-x-auto">
+            <div className="border border-border bg-card rounded-lg shadow-sm">
+              <div ref={scrollRef} className="overflow-x-auto">
                 <table className="w-full min-w-[800px] border-collapse">
                   <thead className="bg-morandi-container/40 border-b border-border/60">
                     <tr>
@@ -214,62 +214,13 @@ export default function QuoteDetailPage() {
                         handleRemoveItem={categoryOps.handleRemoveItem}
                       />
                     ))}
-
-                    {/* 總計行 - 顯示各身份成本 */}
-                    <tr className="bg-morandi-gold/10 border-t-2 border-morandi-gold/20">
-                      <td colSpan={2} className="py-3 px-4 font-bold text-morandi-primary">身份成本</td>
-                      <td colSpan={5} className="py-3 px-4">
-                        <div className="flex flex-wrap gap-4 text-sm">
-                          {participantCounts.adult > 0 && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-morandi-secondary">成人:</span>
-                              <span className="font-bold text-morandi-primary">
-                                NT$ {identityCosts.adult.toLocaleString()}
-                              </span>
-                            </div>
-                          )}
-                          {participantCounts.child_with_bed > 0 && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-morandi-secondary">小孩:</span>
-                              <span className="font-bold text-morandi-primary">
-                                NT$ {identityCosts.child_with_bed.toLocaleString()}
-                              </span>
-                            </div>
-                          )}
-                          {participantCounts.child_no_bed > 0 && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-morandi-secondary">不佔床:</span>
-                              <span className="font-bold text-morandi-primary">
-                                NT$ {identityCosts.child_no_bed.toLocaleString()}
-                              </span>
-                            </div>
-                          )}
-                          {participantCounts.single_room > 0 && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-morandi-secondary">單人房:</span>
-                              <span className="font-bold text-morandi-primary">
-                                NT$ {identityCosts.single_room.toLocaleString()}
-                              </span>
-                            </div>
-                          )}
-                          {participantCounts.infant > 0 && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-morandi-secondary">嬰兒:</span>
-                              <span className="font-bold text-morandi-primary">
-                                NT$ {identityCosts.infant.toLocaleString()}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
 
-          {/* 右側售價顯示區 - 30% */}
+          {/* 右側：報價設定 - 30% */}
           <SellingPriceSection
             participantCounts={participantCounts}
             identityCosts={identityCosts}

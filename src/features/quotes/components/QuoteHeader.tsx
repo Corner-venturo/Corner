@@ -187,16 +187,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           </div>
 
           <Button
-            onClick={handleGenerateQuotation}
-            className="h-8 px-3 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white cursor-pointer z-50"
-            title="產生報價單預覽"
-            type="button"
-          >
-            <FileText size={14} className="mr-1.5" />
-            產生報價單
-          </Button>
-
-          <Button
             onClick={() => setIsSaveDialogOpen(true)}
             disabled={isReadOnly}
             className={cn(
@@ -222,23 +212,25 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               <History size={14} className="mr-1.5" />
               版本 {quote?.version || 1}
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64">
+            <DropdownMenuContent className="w-64" align="end">
               <div className="px-2 py-1 text-sm font-medium text-morandi-primary border-b border-border">
                 版本歷史
               </div>
 
-              {/* 當前版本 */}
-              <DropdownMenuItem className="flex items-center justify-between py-2">
-                <div className="flex flex-col">
-                  <span className="font-medium">版本 {quote?.version || 1} (當前)</span>
-                  <span className="text-xs text-morandi-secondary">
-                    {quote?.updated_at ? formatDateTime(quote.updated_at) : ''}
-                  </span>
-                </div>
-                <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">
-                  當前
-                </div>
-              </DropdownMenuItem>
+              {/* 當前版本（僅在有未保存修改時顯示） */}
+              {!saveSuccess && (
+                <DropdownMenuItem className="flex items-center justify-between py-2">
+                  <div className="flex flex-col">
+                    <span className="font-medium">版本 {quote?.version || 1} (當前)</span>
+                    <span className="text-xs text-morandi-secondary">
+                      {quote?.updated_at ? formatDateTime(quote.updated_at) : ''}
+                    </span>
+                  </div>
+                  <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">
+                    當前
+                  </div>
+                </DropdownMenuItem>
+              )}
 
               {/* 歷史版本 */}
               {quote?.versions && quote.versions.length > 0 && (

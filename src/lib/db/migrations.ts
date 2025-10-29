@@ -23,6 +23,11 @@ export function handleUpgrade(
       createAllTables(db);
     }
 
+    // v1 -> v2: 地區系統重構（Countries > Regions > Cities）
+    if (oldVersion === 1 && (newVersion === null || newVersion >= 2)) {
+      upgradeToV2(db);
+    }
+
   } catch (error) {
         throw error;
   }
@@ -55,6 +60,51 @@ function createAllTables(db: IDBDatabase): void {
 
   });
 
+}
+
+/**
+ * 升級到 v2：新增地區系統表格
+ * 只新增缺少的表格，不刪除任何現有資料
+ */
+function upgradeToV2(db: IDBDatabase): void {
+  console.log('🔄 [IndexedDB] 開始升級到 v2（新增 countries 和 cities 表）');
+
+  // 找到三個表的 schema
+  const countriesSchema = TABLE_SCHEMAS.find(s => s.name === 'countries');
+  const citiesSchema = TABLE_SCHEMAS.find(s => s.name === 'cities');
+
+  // 1. 建立 countries 表（如果不存在）
+  if (countriesSchema && !db.objectStoreNames.contains('countries')) {
+    console.log('📦 建立 countries 表');
+    const countriesStore = db.createObjectStore(countriesSchema.name, {
+      keyPath: countriesSchema.keyPath,
+      autoIncrement: countriesSchema.autoIncrement,
+    });
+    countriesSchema.indexes.forEach((index) => {
+      countriesStore.createIndex(index.name, index.keyPath, { unique: index.unique });
+    });
+  } else {
+    console.log('✓ countries 表已存在，跳過');
+  }
+
+  // 2. 建立 cities 表（如果不存在）
+  if (citiesSchema && !db.objectStoreNames.contains('cities')) {
+    console.log('📦 建立 cities 表');
+    const citiesStore = db.createObjectStore(citiesSchema.name, {
+      keyPath: citiesSchema.keyPath,
+      autoIncrement: citiesSchema.autoIncrement,
+    });
+    citiesSchema.indexes.forEach((index) => {
+      citiesStore.createIndex(index.name, index.keyPath, { unique: index.unique });
+    });
+  } else {
+    console.log('✓ cities 表已存在，跳過');
+  }
+
+  // 3. regions 表保持不變（不刪除任何資料）
+  console.log('✓ regions 表保持不變');
+
+  console.log('✅ [IndexedDB] v2 升級完成（所有現有資料保留）');
 }
 
 /**
