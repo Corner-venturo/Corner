@@ -113,10 +113,15 @@ export class LocalDatabase {
         };
 
         request.onerror = () => {
+          const errorMsg = request.error?.message || request.error?.name || '未知錯誤';
           const error = new Error(
-            `Put 資料失敗 (${tableName}): ${request.error?.message}`
+            `Put 資料失敗 (${tableName}): ${errorMsg}`
           );
-          console.error('[LocalDB]', error);
+          console.error('[LocalDB] Put 失敗詳情:', {
+            tableName,
+            error: request.error,
+            data: data
+          });
           reject(error);
         };
       });
