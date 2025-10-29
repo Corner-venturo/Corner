@@ -1,6 +1,9 @@
 /**
  * 網路狀態監聽器
- * 當網路恢復時自動觸發背景同步
+ * 自動同步機制：
+ * 1. 首次載入時自動檢查並同步
+ * 2. 定期檢查（每 5 分鐘）
+ * 3. 網路恢復時自動同步
  */
 
 import { logger } from '@/lib/utils/logger';
@@ -9,53 +12,110 @@ import { backgroundSyncService } from './background-sync-service';
 export class NetworkMonitor {
   private isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
   private syncInProgress = false;
+  private periodicCheckInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
+      // 監聽網路狀態變化
       window.addEventListener('online', this.handleOnline);
       window.addEventListener('offline', this.handleOffline);
 
       logger.log(`🌐 NetworkMonitor 已啟動，當前狀態: ${this.isOnline ? '在線' : '離線'}`);
+
+      // 首次載入時延遲 3 秒後檢查並同步（避免與頁面初始化衝突）
+      setTimeout(() => {
+        this.checkAndSync('首次載入');
+      }, 3000);
+
+      // 啟動定期檢查（每 5 分鐘）
+      this.startPeriodicCheck();
     }
   }
 
   private handleOnline = async () => {
     this.isOnline = true;
     logger.log('🌐 網路已連線');
+    await this.checkAndSync('網路恢復');
+  };
+
+  /**
+   * 檢查並同步待處理資料
+   * @param trigger - 觸發來源（用於日誌記錄）
+   */
+  private async checkAndSync(trigger: string): Promise<void> {
+    // 離線時跳過
+    if (!this.isOnline) {
+      logger.log(`⏭️ [${trigger}] 目前離線，跳過同步`);
+      return;
+    }
 
     // 防止重複同步
     if (this.syncInProgress) {
-      logger.log('⏭️ 同步已在進行中，跳過');
+      logger.log(`⏭️ [${trigger}] 同步已在進行中，跳過`);
       return;
     }
 
     try {
       this.syncInProgress = true;
-      logger.log('🔄 開始背景同步所有待處理資料...');
+      logger.log(`🔄 [${trigger}] 開始檢查待同步資料...`);
 
-      // Step 1: 上傳待同步資料
+      // 檢查是否有待同步資料
+      const hasPending = await this.hasPendingSync();
+
+      if (!hasPending) {
+        logger.log(`✅ [${trigger}] 無待同步資料`);
+        return;
+      }
+
+      logger.log(`📤 [${trigger}] 發現待同步資料，開始上傳...`);
+
+      // 上傳待同步資料
       await backgroundSyncService.syncAllTables();
-      logger.log('✅ 待同步資料已上傳');
+      logger.log(`✅ [${trigger}] 待同步資料已上傳`);
 
-      // Step 2: 通知所有 Store 重新載入資料
+      // 通知所有 Store 重新載入資料
       logger.log('📥 觸發資料重新載入...');
       if (typeof window !== 'undefined') {
-        // 發出自訂事件，讓各 Store 重新載入
         window.dispatchEvent(new CustomEvent('venturo:sync-completed'));
       }
 
-      logger.log('✅ 背景同步完成');
+      logger.log(`✅ [${trigger}] 同步完成`);
     } catch (err) {
-      logger.warn('⚠️ 背景同步失敗:', err);
+      logger.warn(`⚠️ [${trigger}] 同步失敗:`, err);
     } finally {
       this.syncInProgress = false;
     }
-  };
+  }
+
+  /**
+   * 檢查是否有待同步資料
+   */
+  private async hasPendingSync(): Promise<boolean> {
+    try {
+      // 這裡可以檢查各表的待同步數量
+      // 暫時簡化：直接嘗試同步，讓 backgroundSyncService 自己檢查
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   private handleOffline = () => {
     this.isOnline = false;
     logger.log('📴 網路已斷線 - 切換到離線模式');
   };
+
+  /**
+   * 啟動定期檢查（每 5 分鐘）
+   */
+  private startPeriodicCheck(): void {
+    // 每 5 分鐘檢查一次
+    this.periodicCheckInterval = setInterval(() => {
+      this.checkAndSync('定期檢查');
+    }, 5 * 60 * 1000); // 5 分鐘
+
+    logger.log('⏰ 定期檢查已啟動（每 5 分鐘）');
+  }
 
   /**
    * 取得當前網路狀態
@@ -68,17 +128,7 @@ export class NetworkMonitor {
    * 手動觸發同步（例如使用者按重新整理按鈕）
    */
   public async triggerSync(): Promise<void> {
-    if (!this.isOnline) {
-      logger.warn('⚠️ 目前離線，無法同步');
-      return;
-    }
-
-    if (this.syncInProgress) {
-      logger.warn('⏭️ 同步已在進行中');
-      return;
-    }
-
-    await this.handleOnline();
+    await this.checkAndSync('手動觸發');
   }
 
   /**
@@ -88,6 +138,13 @@ export class NetworkMonitor {
     if (typeof window !== 'undefined') {
       window.removeEventListener('online', this.handleOnline);
       window.removeEventListener('offline', this.handleOffline);
+
+      // 清理定期檢查
+      if (this.periodicCheckInterval) {
+        clearInterval(this.periodicCheckInterval);
+        this.periodicCheckInterval = null;
+      }
+
       logger.log('🔌 NetworkMonitor 已停止');
     }
   }

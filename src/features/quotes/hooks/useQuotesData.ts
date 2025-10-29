@@ -16,14 +16,15 @@ export const useQuotesData = () => {
   const { items: tours } = useTourStore();
   const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionStoreNew();
 
-  // 載入報價單資料 - 延遲載入優化
+  // 載入報價單資料 - 只在首次載入時執行
   useEffect(() => {
     const timer = setTimeout(() => {
       loadQuotes();
       fetchRegions();
     }, 100);
     return () => clearTimeout(timer);
-  }, [loadQuotes, fetchRegions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只執行一次，避免無限循環
 
   const handleDuplicateQuote = async (quote_id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();

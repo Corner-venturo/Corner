@@ -141,7 +141,9 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S');
 // 地區 Store（舊版，保留向後相容）
 export const useRegionStore = createStore<Region>('regions');
 
-// 地區 Store（新版，三層架構）
+// 地區 Store（新版，三層架構 - 已重構使用 createStore）
+// 支援 Countries > Regions > Cities 三層架構
+// 內部使用 createStore 工廠，提供統一的離線優先架構
 export { useRegionStoreNew } from './region-store-new';
 export type { Country, Region as RegionNew, City, RegionStats } from './region-store-new';
 
