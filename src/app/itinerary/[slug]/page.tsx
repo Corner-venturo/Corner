@@ -163,7 +163,7 @@ export default function EditItineraryPage() {
     })) || [],
   } : null;
 
-  const typedItinerary = useMemo(() => itineraryData as any, [itineraryData]);
+  const typedItinerary = useMemo(() => itineraryData, [itineraryData]);
   const totalDays = useMemo(
     () => (Array.isArray(typedItinerary?.dailyItinerary) ? typedItinerary.dailyItinerary.length : 0),
     [typedItinerary]

@@ -35,4 +35,5 @@ export {
 } from './constants';
 
 // Default export for backwards compatibility
-export { ReactDatasheetWrapper as default };
+import { ReactDatasheetWrapper as RDW } from './ReactDatasheetWrapper';
+export default RDW;

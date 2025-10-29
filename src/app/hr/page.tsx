@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { Employee } from '@/stores/types';
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view';
-import { AddEmployeeForm } from '@/components/hr/add-employee-form';
+import { AddEmployeeForm } from '@/components/hr/add-employee';
 import { User, UserCheck, UserX, Clock, Phone, Mail, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

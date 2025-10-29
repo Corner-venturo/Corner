@@ -1,3 +1,4 @@
+export { ToursPage } from './ToursPage';
 export { TourOverviewTab } from './TourOverviewTab';
 export { TourOperationsAddButton } from './TourOperationsAddButton';
 export { TourForm } from './TourForm';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback, useMemo } from 'react';
 import { Tour } from '@/stores/types';
 import { NewTourData, TourExtraFields, DeleteConfirmState } from '../types';

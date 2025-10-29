@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { MapPin, Car, MapIcon, Calculator, Building2 } from 'lucide-react';
+import { MapPin, MapIcon, Calculator, Building2 } from 'lucide-react';
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
@@ -16,15 +16,6 @@ const databaseModules = [
     href: '/database/regions',
     color: 'bg-blue-500',
     count: 3
-  },
-  {
-    id: 'transport',
-    title: '交通選項',
-    description: '管理各地區的交通方式和價格',
-    icon: Car,
-    href: '/database/transport',
-    color: 'bg-green-500',
-    count: 21
   },
   {
     id: 'activities',
@@ -148,14 +139,6 @@ export default function DatabasePage() {
             >
               <div className="font-medium text-morandi-primary">新增地區</div>
               <div className="text-sm text-morandi-secondary mt-1">快速添加新的旅遊目的地</div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto p-4 text-left flex flex-col items-start"
-              onClick={() => router.push('/database/transport')}
-            >
-              <div className="font-medium text-morandi-primary">匯入交通選項</div>
-              <div className="text-sm text-morandi-secondary mt-1">批次匯入Excel交通價格表</div>
             </Button>
             <Button
               variant="outline"

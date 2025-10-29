@@ -17,6 +17,16 @@ coverage/
 # 設定檔
 *.config.js
 *.config.ts
+next-env.d.ts
+playwright.config.ts
+vitest.config.ts
+
+# Storybook
+.storybook/
+src/stories/
+
+# 根目錄工具檔案
+/*.js
 
 # 其他
 .env*

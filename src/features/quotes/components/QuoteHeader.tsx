@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Save, CheckCircle, Plane, Printer } from 'lucide-react';
+import { ArrowLeft, Save, CheckCircle, Plane, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { ParticipantCounts, VersionRecord } from '../types';
-import type { RegionName } from '@/data/region-options';
 
 interface QuoteHeaderProps {
   isSpecialTour: boolean;
@@ -18,8 +17,6 @@ interface QuoteHeaderProps {
   quote: any;
   quoteName: string;
   setQuoteName: (name: string) => void;
-  selectedRegion: RegionName;
-  setSelectedRegion: (region: RegionName) => void;
   participantCounts: ParticipantCounts;
   setParticipantCounts: React.Dispatch<React.SetStateAction<ParticipantCounts>>;
   saveSuccess: boolean;
@@ -28,7 +25,7 @@ interface QuoteHeaderProps {
   handleLoadVersion: (versionData: any) => void;
   handleFinalize: () => void;
   handleCreateTour: () => void;
-  handlePrintQuotation: () => void;
+  handleGenerateQuotation: () => void;
   router: any;
 }
 
@@ -49,8 +46,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   quote,
   quoteName,
   setQuoteName,
-  selectedRegion,
-  setSelectedRegion,
   participantCounts,
   setParticipantCounts,
   saveSuccess,
@@ -59,7 +54,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleLoadVersion,
   handleFinalize,
   handleCreateTour,
-  handlePrintQuotation,
+  handleGenerateQuotation,
   router
 }) => {
   return (
@@ -119,34 +114,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
         {/* 右區：功能區域 (原中+右合併) */}
         <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-1 whitespace-nowrap">
-            <span className="text-sm text-morandi-secondary">地區:</span>
-            {relatedTour ? (
-              // 有關聯旅遊團：顯示旅遊團地區（唯讀）
-              <input
-                type="text"
-                value={relatedTour.location}
-                readOnly
-                className="px-2 py-1 text-sm border border-border rounded bg-morandi-container/30 text-morandi-secondary cursor-not-allowed"
-                title="從旅遊團自動帶入"
-              />
-            ) : (
-              // 沒有關聯旅遊團：可選擇地區
-              <select
-                value={selectedRegion}
-                onChange={(e) => setSelectedRegion(e.target.value as RegionName)}
-                disabled={isReadOnly}
-                className={cn(
-                  "px-2 py-1 text-sm border border-border rounded bg-background text-morandi-primary",
-                  isReadOnly && "cursor-not-allowed opacity-60"
-                )}
-              >
-                <option value="清邁">清邁</option>
-                <option value="曼谷">曼谷</option>
-                <option value="東京">東京</option>
-              </select>
-            )}
-          </div>
 
           {/* 人數統計 - 5個身份 */}
           <div className="flex items-center space-x-2 whitespace-nowrap text-xs">
@@ -220,12 +187,13 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           </div>
 
           <Button
-            onClick={handlePrintQuotation}
-            className="h-8 px-3 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
-            title="列印報價單"
+            onClick={handleGenerateQuotation}
+            className="h-8 px-3 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white cursor-pointer z-50"
+            title="產生報價單預覽"
+            type="button"
           >
-            <Printer size={14} className="mr-1.5" />
-            列印報價單
+            <FileText size={14} className="mr-1.5" />
+            產生報價單
           </Button>
 
           <Button

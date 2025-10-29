@@ -25,6 +25,7 @@ import {
   Flag,
   Sparkles,
   FileSignature,
+  FileText,
   CircleDot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -95,6 +96,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/payments', label: '收款管理', icon: CreditCard, requiredPermission: 'payments' },
       { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
+      { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice' },
       { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
     ]
   },
@@ -118,7 +120,6 @@ const menuItems: MenuItem[] = [
     children: [
       { href: '/customers', label: '顧客管理', icon: Users, requiredPermission: 'customers' },
       { href: '/database/regions', label: '地區管理', icon: MapPin, requiredPermission: 'database' },
-      { href: '/database/transport', label: '交通選項', icon: ShoppingCart, requiredPermission: 'database' },
       { href: '/database/activities', label: '活動門票', icon: CheckSquare, requiredPermission: 'database' },
       { href: '/database/attractions', label: '景點管理', icon: MapPin, requiredPermission: 'database' },
       { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },

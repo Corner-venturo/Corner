@@ -39,7 +39,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
       // 從 HR 帶入員工資料
       setSenderName(user.display_name || user.username || '');
       // 從 user 物件取得電話,如果沒有就空白(可手動輸入)
-      const userPhone = (user as any).phone || (user as any).mobile || '';
+      const userPhone = (user as Record<string, unknown>).phone || (user as Record<string, unknown>).mobile || '';
       setSenderPhone(userPhone);
     }
   }, [isOpen, user]);

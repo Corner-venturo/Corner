@@ -19,13 +19,6 @@ export class OfflineAuthService {
     password: string
   ): Promise<{ success: boolean; profile?: LocalProfile; message?: string }> {
     try {
-      // 🚀 TODO: [上線修改] 改成 Supabase 優先，IndexedDB 備援
-      // 參考：docs/PRODUCTION_TODO.md
-
-      // 🚀 TODO: [上線修改] 這裡要改成：
-      // 1. 先嘗試從 Supabase 讀取
-      // 2. 成功則同步到 IndexedDB
-      // 3. 失敗則使用 IndexedDB 離線登入
       // 從 IndexedDB 讀取真實使用者
       await localDB.init(); // 確保資料庫已初始化
       const users = await localDB.getAll<unknown>(TABLES.EMPLOYEES as unknown);
@@ -266,7 +259,6 @@ export class OfflineAuthService {
         return false;
       }
 
-      // 🚀 TODO: [上線修改] 這裡需要實作 Supabase 同步
       // 目前暫時返回 false
       return false;
 

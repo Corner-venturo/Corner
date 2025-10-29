@@ -306,7 +306,7 @@ export const TourPayments = React.memo(function TourPayments({ tour, orderFilter
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
               <select
                 value={newPayment.status}
-                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value as any }))}
+                onChange={(e) => setNewPayment(prev => ({ ...prev, status: e.target.value }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="已確認">已確認</option>

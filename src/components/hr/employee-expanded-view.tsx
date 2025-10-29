@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 // 導入分頁組件
-import { BasicInfoTab } from './tabs/basic-info-tab';
+import { BasicInfoTab } from './tabs/basic-info';
 import { SalaryTab } from './tabs/salary-tab';
 import { PermissionsTab } from './tabs/permissions-tab';
 import { SYSTEM_PERMISSIONS } from '@/stores/types';

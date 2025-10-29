@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
 import { Tour } from '@/stores/types';
 import { useTourStore, useOrderStore, useMemberStore } from '@/stores';

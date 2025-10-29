@@ -1,3 +1,6 @@
+'use client';
+
+export { useTours } from './useTours-advanced';
 export { useTourPageState } from './useTourPageState';
 export { useTourOperations } from './useTourOperations';
 export { useTourScrollEffects } from './useTourScrollEffects';

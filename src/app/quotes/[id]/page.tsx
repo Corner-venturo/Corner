@@ -41,8 +41,6 @@ export default function QuoteDetailPage() {
     setVersionName,
     sellingPrices,
     setSellingPrices,
-    selectedRegion,
-    setSelectedRegion,
     selectedCity,
     availableCities,
     updateQuote,
@@ -113,14 +111,20 @@ export default function QuoteDetailPage() {
     }
   }, [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]);
 
-  // 列印報價單
-  const handlePrintQuotation = useCallback(() => {
-    const printElement = document.getElementById('printable-quotation');
-    if (printElement) {
-      printElement.style.display = 'block';
-      window.print();
-      printElement.style.display = 'none';
-    }
+  // 報價單預覽
+  const [showQuotationPreview, setShowQuotationPreview] = React.useState(false);
+
+  const handleGenerateQuotation = useCallback(() => {
+    console.log('顯示報價單預覽...');
+    setShowQuotationPreview(true);
+  }, []);
+
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setShowQuotationPreview(false);
   }, []);
 
   // Scroll handling
@@ -160,8 +164,6 @@ export default function QuoteDetailPage() {
         quote={quote}
         quoteName={quoteName}
         setQuoteName={setQuoteName}
-        selectedRegion={selectedRegion}
-        setSelectedRegion={setSelectedRegion}
         participantCounts={participantCounts}
         setParticipantCounts={setParticipantCounts}
         saveSuccess={saveSuccess}
@@ -170,7 +172,7 @@ export default function QuoteDetailPage() {
         handleLoadVersion={handleLoadVersion}
         handleFinalize={handleFinalize}
         handleCreateTour={handleCreateTour}
-        handlePrintQuotation={handlePrintQuotation}
+        handleGenerateQuotation={handleGenerateQuotation}
         router={router}
       />
 
@@ -275,6 +277,7 @@ export default function QuoteDetailPage() {
             setSellingPrices={setSellingPrices}
             identityProfits={identityProfits}
             isReadOnly={isReadOnly}
+            handleGenerateQuotation={handleGenerateQuotation}
           />
         </div>
       </div>
@@ -296,6 +299,9 @@ export default function QuoteDetailPage() {
         sellingPrices={sellingPrices}
         categories={updatedCategories}
         totalCost={total_cost}
+        isOpen={showQuotationPreview}
+        onClose={handleClosePreview}
+        onPrint={handlePrint}
       />
     </div>
   );

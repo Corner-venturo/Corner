@@ -110,7 +110,7 @@ export default function ContractsPage() {
     try {
       // 準備更新資料：只包含需要清除的欄位，使用空字串而不是 null
       const updateData: Partial<Tour> = {
-        contract_template: '' as any,
+        contract_template: null,
         contract_content: '',
         contract_created_at: '',
         contract_notes: '',

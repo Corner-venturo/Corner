@@ -40,14 +40,18 @@ export type Permission =
   | 'tours'          // 旅遊團
   | 'orders'         // 訂單
   | 'payments'       // 收款
+  | 'requests'       // 請款管理
   | 'disbursement'   // 出納
+  | 'travel_invoice' // 代轉發票/代收轉付
   | 'todos'          // 待辦事項
   | 'hr'             // 人資管理
   | 'reports'        // 報表
   | 'settings'       // 設定
   | 'customers'      // 客戶管理
   | 'suppliers'      // 供應商管理
+  | 'database'       // 資料管理
   | 'visas'          // 簽證管理
+  | 'contracts'      // 合約管理
   | 'accounting'     // 會計
   | 'templates';     // 模板管理
 

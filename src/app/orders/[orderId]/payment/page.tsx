@@ -20,8 +20,8 @@ export default function PaymentDetailPage() {
   const paymentStore: any = null;
 
   // 等待 store 載入
-  const orders = (orderStore as any).orders || [];
-  const paymentRequests = (paymentStore as any).payment_requests || [];
+  const orders = orderStore?.orders || [];
+  const paymentRequests = paymentStore?.payment_requests || [];
 
   const order = orders.find((o: any) => o.id === orderId);
   // 找出此訂單相關的請款單

@@ -10,6 +10,7 @@ interface SellingPriceSectionProps {
   setSellingPrices: React.Dispatch<React.SetStateAction<SellingPrices>>;
   identityProfits: IdentityProfits;
   isReadOnly: boolean;
+  handleGenerateQuotation: () => void;
 }
 
 export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
@@ -18,7 +19,8 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   sellingPrices,
   setSellingPrices,
   identityProfits,
-  isReadOnly
+  isReadOnly,
+  handleGenerateQuotation
 }) => {
   return (
     <div className="lg:col-span-3">
@@ -207,7 +209,10 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
         </table>
 
         <div className="p-4">
-          <Button className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+          <Button
+            onClick={handleGenerateQuotation}
+            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
             產生報價單
           </Button>
         </div>

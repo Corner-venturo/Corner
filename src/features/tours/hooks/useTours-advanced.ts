@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { tourService } from '../services/tour.service';
 import { Tour } from '@/stores/types';

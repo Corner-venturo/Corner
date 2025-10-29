@@ -3,7 +3,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuotes } from './useQuotes';
 import { useTourStore, useRegionStore } from '@/stores';
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types';
-import type { RegionName } from '@/data/region-options';
 
 export const useQuoteState = () => {
   const params = useParams();
@@ -117,10 +116,6 @@ export const useQuoteState = () => {
     infant: 0
   });
 
-  // 舊的 selectedRegion 保留用於 getRegionOptions
-  const [selectedRegion, setSelectedRegion] = useState<RegionName>(
-    relatedTour?.location as RegionName || '清邁'
-  );
 
   // 如果找不到報價單，返回列表頁（只有在資料已載入時才判斷）
   useEffect(() => {
@@ -175,8 +170,6 @@ export const useQuoteState = () => {
     setVersionName,
     sellingPrices,
     setSellingPrices,
-    selectedRegion,
-    setSelectedRegion,
     updateQuote,
     addTour,
     router

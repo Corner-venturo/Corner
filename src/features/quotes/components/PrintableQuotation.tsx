@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { morandiColors } from '@/lib/constants/morandi-colors';
 import { ParticipantCounts } from '../types';
 
 interface PrintableQuotationProps {
@@ -17,6 +16,9 @@ interface PrintableQuotationProps {
   };
   categories: any[];
   totalCost: number;
+  isOpen: boolean;
+  onClose: () => void;
+  onPrint: () => void;
 }
 
 export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
@@ -26,7 +28,12 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
   sellingPrices,
   categories,
   totalCost,
+  isOpen,
+  onClose,
+  onPrint,
 }) => {
+  if (!isOpen) return null;
+
   // 計算總收入
   const totalRevenue =
     (participantCounts.adult * sellingPrices.adult) +
@@ -35,39 +42,46 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
     (participantCounts.single_room * sellingPrices.single_room) +
     (participantCounts.infant * sellingPrices.infant);
 
-  const totalProfit = totalRevenue - totalCost;
-
-  // 整理行程包含項目（從 categories 中提取）
-  const inclusions: string[] = [];
-  const exclusions: string[] = [];
-
-  categories.forEach(category => {
-    if (category.items && category.items.length > 0) {
-      category.items.forEach((item: any) => {
-        if (item.description) {
-          inclusions.push(`${category.label}: ${item.description}`);
-        }
-      });
-    }
-  });
-
-  // 預設排除項目
-  exclusions.push('個人消費及自費項目');
-  exclusions.push('旅遊平安保險（建議自行投保）');
-  exclusions.push('行李超重費用');
-  exclusions.push('簽證費用（如需要）');
-
   return (
     <div
-      className="fixed inset-0 bg-white z-[9999] overflow-auto print:relative print:inset-auto"
-      style={{ display: 'none' }}
-      id="printable-quotation"
+      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-white print:block"
+      onClick={onClose}
+      id="printable-quotation-overlay"
     >
       <style>
         {`
           @media print {
-            #printable-quotation {
+            /* 隱藏所有其他元素 */
+            body > *:not(#printable-quotation-overlay) {
+              display: none !important;
+            }
+
+            /* 隱藏 sidebar 和 header */
+            nav, header, aside, .sidebar {
+              display: none !important;
+            }
+
+            #printable-quotation-overlay {
+              position: fixed !important;
+              top: 0 !important;
+              left: 0 !important;
+              right: 0 !important;
+              bottom: 0 !important;
+              background: white !important;
+              padding: 0 !important;
               display: block !important;
+              z-index: 9999 !important;
+            }
+
+            .print\\:hidden {
+              display: none !important;
+            }
+
+            #a4-preview {
+              transform: none !important;
+              width: 210mm !important;
+              height: 297mm !important;
+              margin: 0 !important;
             }
 
             @page {
@@ -76,321 +90,328 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             }
 
             body {
-              margin: 0;
-              padding: 0;
-            }
-
-            .print\\:hidden {
-              display: none !important;
-            }
-
-            .page-break {
-              page-break-after: always;
+              margin: 0 !important;
+              padding: 0 !important;
             }
           }
         `}
       </style>
 
-      {/* A4 容器 */}
+      {/* 控制按鈕 */}
+      <div className="fixed top-4 right-4 z-[10000] flex gap-2 print:hidden">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrint();
+          }}
+          className="px-4 py-2 bg-[#C9A961] hover:bg-[#B8954E] text-white rounded-lg shadow-lg font-medium"
+        >
+          列印
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow-lg font-medium"
+        >
+          關閉
+        </button>
+      </div>
+
+      {/* A4 報價單容器 - 縮放以適應螢幕 */}
       <div
-        className="mx-auto bg-white shadow-2xl"
+        id="a4-preview"
+        className="relative bg-[#FAF8F5] print:shadow-none print:bg-white"
+        onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '210mm',
-          minHeight: '297mm',
-          padding: '20mm',
-          backgroundColor: morandiColors.background.main,
+          width: '210mm',
+          height: '297mm',
+          transform: 'scale(0.75)',
+          transformOrigin: 'center',
         }}
       >
-        {/* 頁首：Logo 與品牌 */}
-        <header className="flex items-center justify-between mb-8 pb-6" style={{ borderBottom: `2px solid ${morandiColors.border.gold}` }}>
-          <div>
-            <h1 className="text-3xl font-bold mb-1" style={{ color: morandiColors.text.primary }}>
-              Venturo Travel
-            </h1>
-            <p className="text-sm" style={{ color: morandiColors.text.secondary }}>
-              專業旅遊規劃 · 精緻行程安排
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-sm mb-1" style={{ color: morandiColors.text.secondary }}>
-              報價單編號
-            </div>
-            <div className="text-lg font-bold font-mono" style={{ color: morandiColors.gold }}>
-              {quote?.code || 'Q-XXXXX'}
-            </div>
-          </div>
-        </header>
+        {/* 主要內容 */}
+        <div className="bg-white h-full shadow-[0_2px_20px_rgba(0,0,0,0.08)] rounded-2xl print:shadow-none print:rounded-none print:!m-0" style={{ margin: '6mm' }}>
+          <div className="p-3 h-full flex flex-col print:!h-full" style={{ height: 'calc(297mm - 12mm)' }}>
+            {/* 頭部區域 */}
+            <div className="mb-2">
+              <div className="flex items-start justify-between mb-2">
+                {/* Logo 與品牌 */}
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C9A961] to-[#B89851] flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h1 className="text-[#3D2914] tracking-wide text-lg font-semibold">
+                        Venturo Travel
+                      </h1>
+                      <p className="text-[#8B7355] text-xs">專業旅遊規劃</p>
+                    </div>
+                  </div>
+                </div>
 
-        {/* 行程標題 */}
-        <section className="mb-8">
-          <div
-            className="rounded-2xl p-6 text-center"
-            style={{
-              background: `linear-gradient(135deg, ${morandiColors.goldLight} 0%, ${morandiColors.background.cream} 100%)`,
-              border: `1px solid ${morandiColors.border.gold}`,
-            }}
-          >
-            <h2 className="text-2xl font-bold mb-2" style={{ color: morandiColors.text.primary }}>
-              {quoteName || '精選旅遊行程'}
-            </h2>
-            <p className="text-sm" style={{ color: morandiColors.text.secondary }}>
-              報價日期: {new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-          </div>
-        </section>
+                {/* 報價單標題 */}
+                <div className="text-right">
+                  <div className="inline-block bg-[#FAF8F5] rounded-xl px-4 py-2 border border-[#C9A961]/20">
+                    <p className="text-[#C9A961] text-[10px] mb-0.5 tracking-widest uppercase">Quotation</p>
+                    <h2 className="text-[#3D2914] text-base font-semibold">旅遊報價單</h2>
+                  </div>
+                </div>
+              </div>
 
-        {/* 客戶資訊與承辦人資訊 */}
-        <section className="grid grid-cols-2 gap-6 mb-8">
-          {/* 客戶資訊 */}
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              backgroundColor: morandiColors.background.white,
-              border: `1px solid ${morandiColors.border.light}`,
-            }}
-          >
-            <h3 className="text-sm font-bold mb-4 pb-2" style={{
-              color: morandiColors.text.primary,
-              borderBottom: `1px solid ${morandiColors.border.light}`
-            }}>
-              客戶資訊
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex">
-                <span className="w-20" style={{ color: morandiColors.text.secondary }}>姓名</span>
-                <span className="flex-1 border-b" style={{ borderColor: morandiColors.border.light, color: morandiColors.text.primary }}>
-                  _____________________
-                </span>
-              </div>
-              <div className="flex">
-                <span className="w-20" style={{ color: morandiColors.text.secondary }}>聯絡電話</span>
-                <span className="flex-1 border-b" style={{ borderColor: morandiColors.border.light, color: morandiColors.text.primary }}>
-                  _____________________
-                </span>
-              </div>
-              <div className="flex">
-                <span className="w-20" style={{ color: morandiColors.text.secondary }}>Email</span>
-                <span className="flex-1 border-b" style={{ borderColor: morandiColors.border.light, color: morandiColors.text.primary }}>
-                  _____________________
-                </span>
+              {/* 旅程標題 */}
+              <div className="bg-gradient-to-r from-[#FAF8F5] to-transparent rounded-xl p-3 border-l-4 border-[#C9A961]">
+                <p className="text-[#8B7355] text-xs mb-0.5">旅遊行程</p>
+                <h3 className="text-[#3D2914] text-xl font-semibold mb-1">
+                  {quoteName || '精選旅遊行程'}
+                </h3>
+                <p className="text-[#8B7355] text-xs">報價單編號：{quote?.code || 'A001'}</p>
               </div>
             </div>
-          </div>
 
-          {/* 承辦人資訊 */}
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              backgroundColor: morandiColors.background.white,
-              border: `1px solid ${morandiColors.border.light}`,
-            }}
-          >
-            <h3 className="text-sm font-bold mb-4 pb-2" style={{
-              color: morandiColors.text.primary,
-              borderBottom: `1px solid ${morandiColors.border.light}`
-            }}>
-              承辦人資訊
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex">
-                <span className="w-20" style={{ color: morandiColors.text.secondary }}>姓名</span>
-                <span className="flex-1" style={{ color: morandiColors.text.primary }}>王小明</span>
+            {/* 基本資訊區 */}
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {/* 客戶資訊 */}
+              <div className="bg-[#FAF8F5] rounded-xl p-2">
+                <h4 className="text-[#3D2914] text-sm font-semibold mb-1.5 pb-1.5 border-b border-[#C9A961]/20">
+                  客戶資訊
+                </h4>
+                <div className="space-y-1.5">
+                  <div>
+                    <p className="text-[#8B7355] text-[10px] mb-0.5">姓名</p>
+                    <p className="text-[#3D2914] text-xs font-medium border-b border-dotted border-gray-300 pb-0.5">　</p>
+                  </div>
+                  <div>
+                    <p className="text-[#8B7355] text-[10px] mb-0.5">聯絡電話</p>
+                    <p className="text-[#3D2914] text-xs font-medium border-b border-dotted border-gray-300 pb-0.5">　</p>
+                  </div>
+                  <div>
+                    <p className="text-[#8B7355] text-[10px] mb-0.5">Email</p>
+                    <p className="text-[#3D2914] text-xs font-medium border-b border-dotted border-gray-300 pb-0.5">　</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex">
-                <span className="w-20" style={{ color: morandiColors.text.secondary }}>聯絡電話</span>
-                <span className="flex-1" style={{ color: morandiColors.text.primary }}>0912-345-678</span>
+
+              {/* 承辦資訊 */}
+              <div className="bg-[#FAF8F5] rounded-xl p-2">
+                <h4 className="text-[#3D2914] text-sm font-semibold mb-1.5 pb-1.5 border-b border-[#C9A961]/20">
+                  承辦資訊
+                </h4>
+                <div className="space-y-1.5">
+                  <div>
+                    <p className="text-[#8B7355] text-[10px] mb-0.5">承辦人</p>
+                    <p className="text-[#3D2914] text-xs font-medium">王小明</p>
+                  </div>
+                  <div>
+                    <p className="text-[#8B7355] text-[10px] mb-0.5">聯絡電話</p>
+                    <p className="text-[#3D2914] text-xs font-medium">0912-345-678</p>
+                  </div>
+                  <div>
+                    <p className="text-[#8B7355] text-[10px] mb-0.5">Email</p>
+                    <p className="text-[#3D2914] text-xs font-medium">service@venturo.com</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex">
-                <span className="w-20" style={{ color: morandiColors.text.secondary }}>Email</span>
-                <span className="flex-1" style={{ color: morandiColors.text.primary }}>service@venturo.com</span>
+            </div>
+
+            {/* 價格區 */}
+            <div className="mb-2">
+              <div className="bg-gradient-to-br from-[#C9A961]/5 to-[#C9A961]/10 rounded-xl p-2 border border-[#C9A961]/20">
+                <h4 className="text-[#3D2914] text-sm font-semibold mb-2">
+                  團費報價
+                </h4>
+
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  {participantCounts.adult > 0 && (
+                    <div className="bg-white rounded-lg p-2">
+                      <p className="text-[#8B7355] text-xs mb-1">成人</p>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-[#3D2914] text-[10px]">NT$</span>
+                        <span className="text-[#C9A961] text-xl font-bold">{sellingPrices.adult.toLocaleString()}</span>
+                      </div>
+                      <p className="text-[#8B7355] text-[10px] mt-0.5">{participantCounts.adult} 人</p>
+                    </div>
+                  )}
+
+                  {participantCounts.child_with_bed > 0 && (
+                    <div className="bg-white rounded-lg p-2">
+                      <p className="text-[#8B7355] text-xs mb-1">小孩</p>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-[#3D2914] text-[10px]">NT$</span>
+                        <span className="text-[#C9A961] text-xl font-bold">{sellingPrices.child_with_bed.toLocaleString()}</span>
+                      </div>
+                      <p className="text-[#8B7355] text-[10px] mt-0.5">{participantCounts.child_with_bed} 人</p>
+                    </div>
+                  )}
+
+                  {participantCounts.child_no_bed > 0 && (
+                    <div className="bg-white rounded-lg p-2">
+                      <p className="text-[#8B7355] text-xs mb-1">不佔床</p>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-[#3D2914] text-[10px]">NT$</span>
+                        <span className="text-[#C9A961] text-xl font-bold">{sellingPrices.child_no_bed.toLocaleString()}</span>
+                      </div>
+                      <p className="text-[#8B7355] text-[10px] mt-0.5">{participantCounts.child_no_bed} 人</p>
+                    </div>
+                  )}
+
+                  {participantCounts.single_room > 0 && (
+                    <div className="bg-white rounded-lg p-2">
+                      <p className="text-[#8B7355] text-xs mb-1">單人房</p>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-[#3D2914] text-[10px]">NT$</span>
+                        <span className="text-[#C9A961] text-xl font-bold">{sellingPrices.single_room.toLocaleString()}</span>
+                      </div>
+                      <p className="text-[#8B7355] text-[10px] mt-0.5">{participantCounts.single_room} 人</p>
+                    </div>
+                  )}
+
+                  {participantCounts.infant > 0 && (
+                    <div className="bg-white rounded-lg p-2">
+                      <p className="text-[#8B7355] text-xs mb-1">嬰兒</p>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-[#3D2914] text-[10px]">NT$</span>
+                        <span className="text-[#C9A961] text-xl font-bold">{sellingPrices.infant.toLocaleString()}</span>
+                      </div>
+                      <p className="text-[#8B7355] text-[10px] mt-0.5">{participantCounts.infant} 人</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[#C9A961]/20">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-[#8B7355] text-xs">報價總額</span>
+                    <span className="text-[#C9A961] text-lg font-bold">NT$ {totalRevenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <svg className="w-3 h-3 text-[#C9A961]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-[#8B7355] text-[10px]">報價有效至 {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('zh-TW')}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 費用說明 */}
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {/* 費用包含 */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-6 h-6 rounded-lg bg-[#C9A961]/10 flex items-center justify-center">
+                    <svg className="w-3.5 h-3.5 text-[#C9A961]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h4 className="text-[#3D2914] text-xs font-semibold">費用包含</h4>
+                </div>
+                <div className="space-y-1">
+                  {[
+                    '行程表所列之交通費用',
+                    '行程表所列之住宿費用',
+                    '行程表所列之餐食費用',
+                    '行程表所列之門票費用',
+                    '專業導遊服務',
+                    '旅遊責任險 500 萬元'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-[#C9A961] mt-1.5"></div>
+                      <p className="text-[#3D2914] text-[10px]">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 費用不含 */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-6 h-6 rounded-lg bg-[#3D2914]/5 flex items-center justify-center">
+                    <svg className="w-3.5 h-3.5 text-[#8B7355]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <h4 className="text-[#3D2914] text-xs font-semibold">費用不含</h4>
+                </div>
+                <div className="space-y-1">
+                  {[
+                    '個人消費及自費項目',
+                    '旅遊平安保險（建議自行投保）',
+                    '行李超重費用',
+                    '簽證費用（如需要）',
+                    '小費（導遊、司機等）'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-[#8B7355] mt-1.5"></div>
+                      <p className="text-[#3D2914] text-[10px]">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 重要備註 */}
+            <div className="bg-[#FAF8F5] rounded-xl p-2 border-l-4 border-[#C9A961] mb-2">
+              <h4 className="text-[#3D2914] text-xs font-semibold mb-2">重要備註</h4>
+              <div className="space-y-1.5">
+                <div className="flex items-start gap-2">
+                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">01.</span>
+                  <p className="text-[#3D2914] text-[10px]">本報價單有效期限為報價日起 30 天內</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">02.</span>
+                  <p className="text-[#3D2914] text-[10px]">行程內容可能因天候、交通等因素彈性調整</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">03.</span>
+                  <p className="text-[#3D2914] text-[10px]">最終費用以簽約時確認之人數及價格為準</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[#C9A961] text-xs font-semibold mt-0.5">04.</span>
+                  <p className="text-[#3D2914] text-[10px]">付款方式：訂金 30%，出發前 7 天付清尾款</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 頁尾 */}
+            <div className="pt-2 mt-auto border-t border-[#C9A961]/20">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#C9A961] to-[#B89851] flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[#3D2914] text-xs font-semibold">Venturo Travel</p>
+                    <p className="text-[#8B7355] text-[10px]">專業旅遊規劃服務</p>
+                  </div>
+                </div>
+
+                <div className="text-right text-[10px]">
+                  <div className="flex items-center justify-end gap-1 text-[#8B7355] mb-0.5">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span>0912-345-678</span>
+                  </div>
+                  <div className="flex items-center justify-end gap-1 text-[#8B7355]">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>service@venturo.com</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </section>
 
-        {/* 報價明細 */}
-        <section className="mb-8">
-          <h3 className="text-lg font-bold mb-4" style={{ color: morandiColors.text.primary }}>
-            報價明細
-          </h3>
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{
-              border: `1px solid ${morandiColors.border.light}`,
-            }}
-          >
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ backgroundColor: morandiColors.goldLight }}>
-                  <th className="text-left py-3 px-4" style={{ color: morandiColors.text.primary }}>身份類別</th>
-                  <th className="text-center py-3 px-4" style={{ color: morandiColors.text.primary }}>人數</th>
-                  <th className="text-right py-3 px-4" style={{ color: morandiColors.text.primary }}>單價 (NT$)</th>
-                  <th className="text-right py-3 px-4" style={{ color: morandiColors.text.primary }}>小計 (NT$)</th>
-                </tr>
-              </thead>
-              <tbody style={{ backgroundColor: morandiColors.background.white }}>
-                {participantCounts.adult > 0 && (
-                  <tr style={{ borderBottom: `1px solid ${morandiColors.border.light}` }}>
-                    <td className="py-3 px-4" style={{ color: morandiColors.text.primary }}>成人</td>
-                    <td className="text-center py-3 px-4" style={{ color: morandiColors.text.secondary }}>{participantCounts.adult}</td>
-                    <td className="text-right py-3 px-4 font-medium" style={{ color: morandiColors.text.primary }}>
-                      {sellingPrices.adult.toLocaleString()}
-                    </td>
-                    <td className="text-right py-3 px-4 font-bold" style={{ color: morandiColors.gold }}>
-                      {(participantCounts.adult * sellingPrices.adult).toLocaleString()}
-                    </td>
-                  </tr>
-                )}
-                {participantCounts.child_with_bed > 0 && (
-                  <tr style={{ borderBottom: `1px solid ${morandiColors.border.light}` }}>
-                    <td className="py-3 px-4" style={{ color: morandiColors.text.primary }}>小孩佔床</td>
-                    <td className="text-center py-3 px-4" style={{ color: morandiColors.text.secondary }}>{participantCounts.child_with_bed}</td>
-                    <td className="text-right py-3 px-4 font-medium" style={{ color: morandiColors.text.primary }}>
-                      {sellingPrices.child_with_bed.toLocaleString()}
-                    </td>
-                    <td className="text-right py-3 px-4 font-bold" style={{ color: morandiColors.gold }}>
-                      {(participantCounts.child_with_bed * sellingPrices.child_with_bed).toLocaleString()}
-                    </td>
-                  </tr>
-                )}
-                {participantCounts.child_no_bed > 0 && (
-                  <tr style={{ borderBottom: `1px solid ${morandiColors.border.light}` }}>
-                    <td className="py-3 px-4" style={{ color: morandiColors.text.primary }}>小孩不佔床</td>
-                    <td className="text-center py-3 px-4" style={{ color: morandiColors.text.secondary }}>{participantCounts.child_no_bed}</td>
-                    <td className="text-right py-3 px-4 font-medium" style={{ color: morandiColors.text.primary }}>
-                      {sellingPrices.child_no_bed.toLocaleString()}
-                    </td>
-                    <td className="text-right py-3 px-4 font-bold" style={{ color: morandiColors.gold }}>
-                      {(participantCounts.child_no_bed * sellingPrices.child_no_bed).toLocaleString()}
-                    </td>
-                  </tr>
-                )}
-                {participantCounts.single_room > 0 && (
-                  <tr style={{ borderBottom: `1px solid ${morandiColors.border.light}` }}>
-                    <td className="py-3 px-4" style={{ color: morandiColors.text.primary }}>單人房</td>
-                    <td className="text-center py-3 px-4" style={{ color: morandiColors.text.secondary }}>{participantCounts.single_room}</td>
-                    <td className="text-right py-3 px-4 font-medium" style={{ color: morandiColors.text.primary }}>
-                      {sellingPrices.single_room.toLocaleString()}
-                    </td>
-                    <td className="text-right py-3 px-4 font-bold" style={{ color: morandiColors.gold }}>
-                      {(participantCounts.single_room * sellingPrices.single_room).toLocaleString()}
-                    </td>
-                  </tr>
-                )}
-                {participantCounts.infant > 0 && (
-                  <tr style={{ borderBottom: `1px solid ${morandiColors.border.light}` }}>
-                    <td className="py-3 px-4" style={{ color: morandiColors.text.primary }}>嬰兒</td>
-                    <td className="text-center py-3 px-4" style={{ color: morandiColors.text.secondary }}>{participantCounts.infant}</td>
-                    <td className="text-right py-3 px-4 font-medium" style={{ color: morandiColors.text.primary }}>
-                      {sellingPrices.infant.toLocaleString()}
-                    </td>
-                    <td className="text-right py-3 px-4 font-bold" style={{ color: morandiColors.gold }}>
-                      {(participantCounts.infant * sellingPrices.infant).toLocaleString()}
-                    </td>
-                  </tr>
-                )}
-                <tr style={{ backgroundColor: morandiColors.goldLight }}>
-                  <td colSpan={3} className="py-4 px-4 text-right font-bold" style={{ color: morandiColors.text.primary }}>
-                    報價總額
-                  </td>
-                  <td className="text-right py-4 px-4 text-xl font-bold" style={{ color: morandiColors.gold }}>
-                    NT$ {totalRevenue.toLocaleString()}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* 費用包含 */}
-        {inclusions.length > 0 && (
-          <section className="mb-6">
-            <h3 className="text-lg font-bold mb-4" style={{ color: morandiColors.text.primary }}>
-              費用包含
-            </h3>
-            <div
-              className="rounded-2xl p-5"
-              style={{
-                backgroundColor: morandiColors.background.white,
-                border: `1px solid ${morandiColors.border.light}`,
-              }}
-            >
-              <ul className="space-y-2 text-sm">
-                {inclusions.slice(0, 8).map((item, index) => (
-                  <li key={index} className="flex items-start">
-                    <span
-                      className="mr-3 mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: morandiColors.gold }}
-                    />
-                    <span style={{ color: morandiColors.text.secondary }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        )}
-
-        {/* 費用不包含 */}
-        <section className="mb-6">
-          <h3 className="text-lg font-bold mb-4" style={{ color: morandiColors.text.primary }}>
-            費用不包含
-          </h3>
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              backgroundColor: morandiColors.background.white,
-              border: `1px solid ${morandiColors.border.light}`,
-            }}
-          >
-            <ul className="space-y-2 text-sm">
-              {exclusions.map((item, index) => (
-                <li key={index} className="flex items-start">
-                  <span
-                    className="mr-3 mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: morandiColors.text.secondary }}
-                  />
-                  <span style={{ color: morandiColors.text.secondary }}>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* 重要說明 */}
-        <section className="mb-8">
-          <h3 className="text-lg font-bold mb-4" style={{ color: morandiColors.text.primary }}>
-            重要說明
-          </h3>
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              backgroundColor: morandiColors.background.cream,
-              border: `1px solid ${morandiColors.border.medium}`,
-            }}
-          >
-            <ul className="space-y-2 text-xs leading-relaxed" style={{ color: morandiColors.text.secondary }}>
-              <li>1. 本報價單有效期限為報價日起 30 天內</li>
-              <li>2. 行程內容可能因天候、交通等因素彈性調整</li>
-              <li>3. 最終費用以簽約時確認之人數及價格為準</li>
-              <li>4. 如有特殊需求請提前告知承辦人員</li>
-              <li>5. 付款方式：訂金 30%，出發前 7 天付清尾款</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* 頁尾裝飾條 */}
-        <footer className="mt-12 pt-6" style={{ borderTop: `1px solid ${morandiColors.border.light}` }}>
-          <div
-            className="h-2 rounded-full mb-4"
-            style={{
-              background: `linear-gradient(90deg, ${morandiColors.gold} 0%, ${morandiColors.goldLight} 100%)`,
-            }}
-          />
-          <div className="text-center text-xs" style={{ color: morandiColors.text.secondary }}>
-            <p className="mb-1">感謝您選擇 Venturo Travel</p>
-            <p>如有任何疑問，歡迎隨時與我們聯繫</p>
-          </div>
-        </footer>
+          {/* 底部裝飾條 */}
+          <div className="h-2 bg-gradient-to-r from-[#C9A961] via-[#D4B76E] to-[#C9A961]"></div>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+'use client';
+
 import { useTourStore } from '@/stores';
 import { tourService } from '../services/tour.service';
 import { Tour } from '@/stores/types';
