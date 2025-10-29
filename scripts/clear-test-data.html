@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>清理測試資料</title>
+</head>
+<body>
+  <h1>清理 IndexedDB 測試資料</h1>
+  <button onclick="clearTestData()">清理測試資料</button>
+  <pre id="output"></pre>
+
+  <script>
+    const log = (msg) => {
+      const output = document.getElementById('output');
+      output.textContent += msg + '\n';
+      console.log(msg);
+    };
+
+    async function clearTestData() {
+      try {
+        log('🔄 開始清理測試資料...');
+
+        // 開啟資料庫
+        const dbRequest = indexedDB.open('venturo-db', 2);
+
+        dbRequest.onerror = () => {
+          log('❌ 無法開啟資料庫: ' + dbRequest.error);
+        };
+
+        dbRequest.onsuccess = async () => {
+          const db = dbRequest.result;
+          log('✅ 資料庫已開啟');
+
+          try {
+            // 刪除 suppliers 測試資料
+            const suppliersTransaction = db.transaction('suppliers', 'readwrite');
+            const suppliersStore = suppliersTransaction.objectStore('suppliers');
+            const supplierDeleteRequest = suppliersStore.delete('80bf93fb-6d08-47ed-bd69-28848740d48e');
+
+            await new Promise((resolve, reject) => {
+              supplierDeleteRequest.onsuccess = () => {
+                log('✅ 已刪除 suppliers 測試資料');
+                resolve();
+              };
+              supplierDeleteRequest.onerror = () => {
+                log('⚠️ suppliers 測試資料可能不存在');
+                resolve(); // 繼續執行
+              };
+            });
+
+            // 刪除 itineraries 測試資料
+            const itinerariesTransaction = db.transaction('itineraries', 'readwrite');
+            const itinerariesStore = itinerariesTransaction.objectStore('itineraries');
+            const itineraryDeleteRequest = itinerariesStore.delete('4f103864-5140-4230-a97c-adfbefc4c17d');
+
+            await new Promise((resolve, reject) => {
+              itineraryDeleteRequest.onsuccess = () => {
+                log('✅ 已刪除 itineraries 測試資料');
+                resolve();
+              };
+              itineraryDeleteRequest.onerror = () => {
+                log('⚠️ itineraries 測試資料可能不存在');
+                resolve(); // 繼續執行
+              };
+            });
+
+            log('\n✅ 清理完成！請重新整理頁面');
+
+          } catch (error) {
+            log('❌ 錯誤: ' + error.message);
+          } finally {
+            db.close();
+          }
+        };
+
+      } catch (error) {
+        log('❌ 錯誤: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

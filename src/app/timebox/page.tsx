@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { StandardPageLayout } from '@/components/layout/standard-page-layout'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Calendar, Clock, Package2 } from 'lucide-react'
@@ -45,38 +45,36 @@ export default function TimeboxPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title="時間箱管理"
-        icon={Clock}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '箱型時間', href: '/timebox' }
-        ]}
-        actions={(
-          <div className="flex items-center gap-3">
-            <StatisticsPanel variant="inline" />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowBoxManager(true)}
-              className="hidden sm:inline-flex items-center gap-2 border-border hover:border-morandi-gold/40 text-morandi-secondary hover:text-morandi-primary"
-            >
-              <Package2 className="h-4 w-4" />
-              管理箱子
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowReviewDialog(true)}
-              className="hidden sm:inline-flex items-center gap-2 border-border hover:border-morandi-gold/40 text-morandi-secondary hover:text-morandi-primary"
-            >
-              <Calendar className="h-4 w-4" />
-              覆盤本週
-            </Button>
-          </div>
-        )}
-      >
+    <StandardPageLayout
+      title="時間箱管理"
+      icon={Clock}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '箱型時間', href: '/timebox' }
+      ]}
+      actions={(
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowBoxManager(true)}
+            className="items-center gap-2 border-border hover:border-morandi-gold/40 text-morandi-secondary hover:text-morandi-primary"
+          >
+            <Package2 className="h-4 w-4" />
+            <span className="hidden sm:inline">管理箱子</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowReviewDialog(true)}
+            className="items-center gap-2 border-border hover:border-morandi-gold/40 text-morandi-secondary hover:text-morandi-primary"
+          >
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">覆盤本週</span>
+          </Button>
+        </div>
+      )}
+      headerChildren={(
         <div className="flex items-center gap-6">
           {/* 週選擇器 */}
           <div className="flex items-center gap-2">
@@ -143,39 +141,22 @@ export default function TimeboxPage() {
               1小時
             </Button>
           </div>
-
-          <div className="flex items-center gap-2 sm:hidden">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowBoxManager(true)}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
-            >
-              管理箱子
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowReviewDialog(true)}
-              className="text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
-            >
-              覆盤本週
-            </Button>
-          </div>
         </div>
-      </ResponsiveHeader>
+      )}
+      contentOverflow="hidden"
+    >
+      {/* 統計面板 - 固定高度，不滾動 */}
+      <div className="flex-shrink-0 mb-6">
+        <StatisticsPanel variant="panel" />
+      </div>
 
-      <div className="flex-1 overflow-auto">
-      {/* 主要內容區域 */}
-      <div className="flex gap-6">
-        <div className="flex-1">
-          <div className="morandi-card overflow-hidden">
-            <WeekView
-              selectedWeek={selectedWeek}
-              timeInterval={timeInterval}
-            />
-          </div>
+      {/* 時間箱視圖 - 填滿剩餘空間，內部可滾動 */}
+      <div className="flex-1 min-h-0">
+        <div className="h-full border border-border rounded-lg bg-card shadow-sm overflow-hidden">
+          <WeekView
+            selectedWeek={selectedWeek}
+            timeInterval={timeInterval}
+          />
         </div>
       </div>
 
@@ -200,7 +181,6 @@ export default function TimeboxPage() {
           </DialogContent>
         </Dialog>
       )}
-      </div>
-    </div>
+    </StandardPageLayout>
   )
 }

@@ -24,6 +24,7 @@ import { SupabaseAdapter } from '../adapters/supabase-adapter';
 // 同步邏輯
 import { SyncCoordinator } from '../sync/coordinator';
 import { storeEventBus } from '../sync/event-bus';
+import { networkMonitor } from '@/lib/sync/network-monitor';
 
 // 操作
 import { fetchAll, fetchById } from '../operations/fetch';
@@ -162,6 +163,9 @@ export function createStore<T extends BaseEntity>(
               loading: false,
             }));
 
+            // 通知 NetworkMonitor 資料已變更
+            networkMonitor?.markDataChanged();
+
             logger.log(`✅ [${tableName}] 已建立:`, newItem.id);
 
             return newItem;
@@ -184,6 +188,9 @@ export function createStore<T extends BaseEntity>(
               items: state.items.map(item => item.id === id ? updatedItem : item),
               loading: false,
             }));
+
+            // 通知 NetworkMonitor 資料已變更
+            networkMonitor?.markDataChanged();
 
             logger.log(`✅ [${tableName}] 已更新:`, id);
 
@@ -208,9 +215,12 @@ export function createStore<T extends BaseEntity>(
               loading: false,
             }));
 
+            // 通知 NetworkMonitor 資料已變更
+            networkMonitor?.markDataChanged();
+
             logger.log(`✅ [${tableName}] 已刪除:`, id);
           } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : '刪除失敗';
+            const errorMessage = error instanceof Error ? error.message : '更新失敗';
             set({ error: errorMessage, loading: false });
             throw error;
           }
@@ -225,6 +235,9 @@ export function createStore<T extends BaseEntity>(
             items: [...state.items, ...results],
           }));
 
+          // 通知 NetworkMonitor 資料已變更
+          networkMonitor?.markDataChanged();
+
           return results;
         },
 
@@ -236,6 +249,9 @@ export function createStore<T extends BaseEntity>(
           set((state) => ({
             items: state.items.filter(item => !ids.includes(item.id)),
           }));
+
+          // 通知 NetworkMonitor 資料已變更
+          networkMonitor?.markDataChanged();
         },
 
         // 根據欄位查詢

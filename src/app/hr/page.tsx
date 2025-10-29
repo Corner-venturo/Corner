@@ -1,30 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { ListPageLayout } from '@/components/layout/list-page-layout';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useUserStore, userStoreHelpers } from '@/stores/user-store';
 import { Employee } from '@/stores/types';
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view';
 import { AddEmployeeForm } from '@/components/hr/add-employee';
-import { User, UserCheck, UserX, Clock, Phone, Mail, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-const statusFilters = [
-  { value: 'all', label: '全部' },
-  { value: 'active', label: '在職' },
-  { value: 'probation', label: '試用期' },
-  { value: 'leave', label: '請假' },
-  { value: 'terminated', label: '離職' }
-];
+import { Users, Edit2, Trash2, UserX } from 'lucide-react';
+import { TableColumn } from '@/components/ui/enhanced-table';
+import { DateCell, ActionCell } from '@/components/table-cells';
 
 export default function HRPage() {
-  const { items: users, fetchAll, loading: isLoading, update: updateUser, delete: deleteUser } = useUserStore();
-  const [statusFilter, setStatusFilter] = useState('all');
+  const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore();
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // 初始化時載入員工資料（只在沒有資料時載入）
@@ -33,26 +22,6 @@ export default function HRPage() {
       fetchAll();
     }
   }, [users.length, fetchAll]);
-
-  const filteredEmployees = useMemo(() => {
-    if (statusFilter === 'all') {
-      return searchTerm ? userStoreHelpers.searchUsers(searchTerm) : users;
-    } else {
-      return userStoreHelpers.getUsersByStatus(statusFilter as Employee['status']).filter((emp: Employee) =>
-        !searchTerm || userStoreHelpers.searchUsers(searchTerm).includes(emp)
-      );
-    }
-  }, [users, statusFilter, searchTerm]);
-
-  const getStatusColor = (status: Employee['status']) => {
-    const colorMap = {
-      active: 'text-green-600',
-      probation: 'text-yellow-600',
-      leave: 'text-blue-600',
-      terminated: 'text-morandi-red'
-    };
-    return colorMap[status];
-  };
 
   const getStatusLabel = (status: Employee['status']) => {
     const statusMap = {
@@ -64,14 +33,14 @@ export default function HRPage() {
     return statusMap[status];
   };
 
-  const getStatusIcon = (status: Employee['status']) => {
-    const iconMap = {
-      active: UserCheck,
-      probation: Clock,
-      leave: UserX,
-      terminated: UserX
+  const getStatusColor = (status: Employee['status']) => {
+    const colorMap = {
+      active: 'text-morandi-primary bg-morandi-container',
+      probation: 'text-yellow-600 bg-yellow-50',
+      leave: 'text-blue-600 bg-blue-50',
+      terminated: 'text-morandi-red bg-morandi-red/10'
     };
-    return iconMap[status];
+    return colorMap[status];
   };
 
   const handleEmployeeClick = (employee: Employee) => {
@@ -122,152 +91,105 @@ export default function HRPage() {
     }
   };
 
+  // 定義表格欄位
+  const columns: TableColumn<Employee>[] = useMemo(() => [
+    {
+      key: 'employee_number',
+      label: '員工編號',
+      sortable: true,
+      render: (value) => <span className="font-mono text-sm">{value}</span>,
+    },
+    {
+      key: 'display_name',
+      label: '姓名',
+      sortable: true,
+      render: (value, employee) => (
+        <span className="font-medium">{value || (employee as unknown).chinese_name || '未命名員工'}</span>
+      ),
+    },
+    {
+      key: 'job_info',
+      label: '職位',
+      sortable: false,
+      render: (value) => (
+        <span className="text-sm">{value?.position || '未設定'}</span>
+      ),
+    },
+    {
+      key: 'personal_info',
+      label: '聯絡方式',
+      sortable: false,
+      render: (value) => (
+        <div className="text-sm">
+          <div>{value?.phone || '未提供'}</div>
+          <div className="text-morandi-muted text-xs truncate max-w-[200px]">{value?.email || '未提供'}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: '狀態',
+      sortable: true,
+      render: (value) => (
+        <span className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(value)}`}>
+          {getStatusLabel(value)}
+        </span>
+      ),
+    },
+    {
+      key: 'job_info',
+      label: '入職日期',
+      sortable: true,
+      render: (value) => {
+        if (!value?.hire_date) return <span className="text-morandi-muted text-sm">未設定</span>;
+        return <DateCell value={value.hire_date} />;
+      },
+    },
+  ], []);
+
+  const renderActions = useCallback((employee: Employee) => (
+    <ActionCell
+      actions={[
+        {
+          icon: Edit2,
+          label: '編輯',
+          onClick: () => setExpandedEmployee(employee.id),
+        },
+        ...(employee.status !== 'terminated' ? [{
+          icon: UserX,
+          label: '辦理離職',
+          onClick: () => handleTerminateEmployee(employee),
+          variant: 'warning' as const,
+        }] : []),
+        {
+          icon: Trash2,
+          label: '刪除',
+          onClick: () => handleDeleteEmployee(employee),
+          variant: 'danger' as const,
+        },
+      ]}
+    />
+  ), []);
+
   return (
     <>
-      <ResponsiveHeader
+      <ListPageLayout
         title="人資管理"
-        showSearch={true}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        icon={Users}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '人資管理', href: '/hr' }
+        ]}
+        data={users}
+        columns={columns}
+        searchFields={['display_name', 'employee_number', 'personal_info.email', 'personal_info.phone']}
         searchPlaceholder="搜尋員工..."
+        onRowClick={handleEmployeeClick}
+        renderActions={renderActions}
         onAdd={() => setIsAddDialogOpen(true)}
-        addLabel="新增員工"
-      >
-        {/* 狀態篩選 */}
-        <div className="flex gap-2">
-          {statusFilters.map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setStatusFilter(filter.value)}
-              className={cn(
-                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
-                statusFilter === filter.value
-                  ? 'bg-morandi-gold text-white'
-                  : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
-              )}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
-      </ResponsiveHeader>
-
-      {/* 員工卡片網格 */}
-      <div className="mt-6">
-        {/* 載入中狀態 */}
-        {isLoading && (
-          <div className="text-center py-12 text-morandi-muted">
-            <div className="animate-spin w-8 h-8 border-2 border-morandi-gold border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p>載入員工資料中...</p>
-          </div>
-        )}
-
-        {/* 員工卡片 */}
-        {!isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredEmployees.map((employee) => {
-            const StatusIcon = getStatusIcon(employee.status);
-            return (
-              <div
-                key={employee.id}
-                onClick={() => handleEmployeeClick(employee)}
-                className="bg-white rounded-lg border border-border p-4 hover:shadow-md transition-shadow cursor-pointer relative group"
-              >
-                {/* 右上角操作按鈕 */}
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  {employee.status !== 'terminated' && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleTerminateEmployee(employee, e)}
-                      className="h-10 w-10 p-0 text-orange-600 hover:bg-orange-100"
-                      title="辦理離職"
-                    >
-                      <UserX size={14} />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => handleDeleteEmployee(employee, e)}
-                    className="h-10 w-10 p-0 text-morandi-red hover:bg-morandi-red/10"
-                    title="刪除（不建議）"
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                </div>
-
-                {/* 員工頭像與基本資訊 */}
-                <div className="flex flex-col items-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center mb-2">
-                    {employee.avatar ? (
-                      <img
-                        src={employee.avatar}
-                        alt={employee.display_name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User size={32} className="text-morandi-secondary" />
-                    )}
-                  </div>
-                  <h3 className="font-semibold text-morandi-primary text-center">
-                    {employee.display_name || (employee as unknown).chinese_name || '未命名員工'}
-                  </h3>
-                  <p className="text-sm text-morandi-muted">
-                    {employee.employee_number}
-                  </p>
-                </div>
-
-                {/* 聯絡資訊 */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone size={14} className="text-morandi-secondary" />
-                    <span className="text-morandi-primary">{employee.personal_info?.phone || '未提供'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail size={14} className="text-morandi-secondary" />
-                    <span className="text-morandi-primary truncate">{employee.personal_info?.email || '未提供'}</span>
-                  </div>
-                </div>
-
-                {/* 狀態標示 */}
-                <div className="flex items-center justify-between">
-                  <div className={cn('flex items-center gap-1 text-sm font-medium', getStatusColor(employee.status))}>
-                    <StatusIcon size={14} />
-                    <span>{getStatusLabel(employee.status)}</span>
-                  </div>
-
-                  {/* 權限數量 */}
-                  <div className="text-xs text-morandi-muted">
-                    {employee.permissions?.length || 0} 項權限
-                  </div>
-                </div>
-
-                {/* 入職日期 */}
-                <div className="mt-2 pt-2 border-t border-border/50">
-                  <p className="text-xs text-morandi-muted">
-                    入職：{employee.job_info?.hire_date ? new Date(employee.job_info.hire_date).toLocaleDateString() : '未設定'}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-          </div>
-        )}
-
-        {/* 無資料狀態 */}
-        {!isLoading && filteredEmployees.length === 0 && (
-          <div className="text-center py-12 text-morandi-secondary">
-            <User size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium text-morandi-primary mb-2">
-              {statusFilter === 'all' ? '還沒有任何員工' : `沒有找到「${statusFilters.find(f => f.value === statusFilter)?.label}」狀態的員工`}
-            </p>
-            <p className="text-sm text-morandi-secondary">
-              {statusFilter === 'all' ? '點擊右上角「新增員工」開始建立' : '嘗試調整篩選條件或新增員工'}
-            </p>
-          </div>
-        )}
-      </div>
+        addButtonLabel="新增員工"
+        bordered={true}
+      />
 
       {/* 員工詳細資料展開視圖 */}
       {expandedEmployee && (

@@ -66,85 +66,104 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
   }
 
   return (
-    <div className="bg-card border-b border-border px-6 py-4">
-      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${hasWorkoutStats ? '4' : '3'} gap-4`}>
-        <div className="morandi-card p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-morandi-secondary">本週完成率</p>
-              <p className="text-lg sm:text-2xl font-bold text-morandi-primary">
-                {Math.round(completionRate * 100)}%
-              </p>
-            </div>
-            <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-morandi-container flex items-center justify-center">
-              <div className="text-morandi-gold font-semibold text-xs sm:text-base">
-                {Math.round(completionRate * 100)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="morandi-card p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-morandi-secondary">運動時間</p>
-              <p className="text-lg sm:text-2xl font-bold text-morandi-primary">
-                <span className="hidden sm:inline">{formatTime(totalWorkoutTime)}</span>
-                <span className="sm:hidden">{Math.floor(totalWorkoutTime / 60)}h</span>
-              </p>
-            </div>
-            <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-morandi-container flex items-center justify-center">
-              <div className="text-morandi-green font-semibold text-xs sm:text-sm">
-                {Math.floor(totalWorkoutTime / 60)}h
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="morandi-card p-4">
+    <div className={`grid gap-4 ${hasWorkoutStats ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
+      {/* 完成率卡片 */}
+      <div className="morandi-card p-5 hover:shadow-md transition-shadow">
+        <div className="flex items-start justify-between mb-2">
           <div>
-            <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">完成項目</p>
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-morandi-secondary">運動</span>
-                <span className="font-medium text-morandi-primary">{completedByType.workout} 次</span>
+            <p className="text-sm font-medium text-morandi-secondary mb-1">本週完成率</p>
+            <p className="text-3xl font-bold text-morandi-primary">
+              {Math.round(completionRate * 100)}%
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-morandi-gold/10 flex items-center justify-center">
+            <span className="text-morandi-gold font-bold text-lg">
+              {Math.round(completionRate * 100)}
+            </span>
+          </div>
+        </div>
+        <div className="w-full bg-morandi-container rounded-full h-2 mt-3">
+          <div
+            className="bg-morandi-gold h-2 rounded-full transition-all duration-500"
+            style={{ width: `${Math.round(completionRate * 100)}%` }}
+          />
+        </div>
+      </div>
+
+      {/* 運動時間卡片 */}
+      <div className="morandi-card p-5 hover:shadow-md transition-shadow">
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <p className="text-sm font-medium text-morandi-secondary mb-1">運動時間</p>
+            <p className="text-3xl font-bold text-morandi-primary">
+              {formatTime(totalWorkoutTime)}
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+            <span className="text-green-600 font-bold text-sm">
+              {Math.floor(totalWorkoutTime / 60)}h
+            </span>
+          </div>
+        </div>
+        <p className="text-xs text-morandi-muted mt-3">
+          保持健康的生活習慣
+        </p>
+      </div>
+
+      {/* 完成項目卡片 */}
+      <div className="morandi-card p-5 hover:shadow-md transition-shadow">
+        <p className="text-sm font-medium text-morandi-secondary mb-3">完成項目</p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+              <span className="text-sm text-morandi-secondary">運動</span>
+            </div>
+            <span className="text-lg font-semibold text-morandi-primary">{completedByType.workout}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+              <span className="text-sm text-morandi-secondary">保養</span>
+            </div>
+            <span className="text-lg font-semibold text-morandi-primary">{completedByType.reminder}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+              <span className="text-sm text-morandi-secondary">其他</span>
+            </div>
+            <span className="text-lg font-semibold text-morandi-primary">{completedByType.basic}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 重訓統計卡片 */}
+      {hasWorkoutStats && (
+        <div className="morandi-card p-5 hover:shadow-md transition-shadow">
+          <p className="text-sm font-medium text-morandi-secondary mb-3">重訓統計</p>
+          <div className="space-y-2">
+            <div>
+              <p className="text-xs text-morandi-muted">本週訓練量</p>
+              <p className="text-2xl font-bold text-morandi-primary">
+                {totalWorkoutVolume.toLocaleString()} <span className="text-base font-normal">kg</span>
+              </p>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+              <div>
+                <p className="text-xs text-morandi-muted">訓練次數</p>
+                <p className="text-lg font-semibold text-morandi-primary">{totalWorkoutSessions} 次</p>
               </div>
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-morandi-secondary">保養</span>
-                <span className="font-medium text-morandi-primary">{completedByType.reminder} 次</span>
-              </div>
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-morandi-secondary">其他</span>
-                <span className="font-medium text-morandi-primary">{completedByType.basic} 次</span>
+              <div className="text-right">
+                <p className="text-xs text-morandi-muted">平均每次</p>
+                <p className="text-lg font-semibold text-morandi-primary">
+                  {Math.round(totalWorkoutVolume / (totalWorkoutSessions || 1))} kg
+                </p>
               </div>
             </div>
           </div>
         </div>
-
-        {hasWorkoutStats && (
-          <div className="morandi-card p-4">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">重訓統計</p>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-morandi-secondary">本週訓練量</span>
-                  <span className="font-medium text-morandi-primary">{totalWorkoutVolume.toLocaleString()} kg</span>
-                </div>
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-morandi-secondary">訓練次數</span>
-                  <span className="font-medium text-morandi-primary">{totalWorkoutSessions} 次</span>
-                </div>
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-morandi-secondary">平均每次</span>
-                  <span className="font-medium text-morandi-primary">
-                    {Math.round(totalWorkoutVolume / (totalWorkoutSessions || 1)).toLocaleString()} kg
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 }

@@ -39,7 +39,7 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
   const dayLabels = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
 
   return (
-    <div className="flex-1 overflow-hidden bg-card">
+    <div className="h-full flex flex-col overflow-hidden bg-card">
       {/* 日期標題列 */}
       <div className="grid grid-cols-8 border-b border-border bg-morandi-container/30">
         {/* 時間欄標題 */}
