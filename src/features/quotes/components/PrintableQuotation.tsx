@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ParticipantCounts } from '../types';
 
 interface PrintableQuotationProps {
@@ -32,7 +33,13 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
   onClose,
   onPrint,
 }) => {
-  if (!isOpen) return null;
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isOpen || !isMounted) return null;
 
   // 計算總收入
   const totalRevenue =
@@ -42,38 +49,38 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
     (participantCounts.single_room * sellingPrices.single_room) +
     (participantCounts.infant * sellingPrices.infant);
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-white print:block"
+      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-transparent print:block"
       onClick={onClose}
       id="printable-quotation-overlay"
     >
       <style>
         {`
           @media print {
-            /* 隱藏所有其他元素 */
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #FAF8F5 !important;
+            }
+
+            #printable-quotation-overlay {
+              position: static !important;
+              inset: auto !important;
+              width: 100% !important;
+              height: auto !important;
+              background: transparent !important;
+              padding: 0 !important;
+              display: block !important;
+              z-index: 1 !important;
+            }
+
+            /* 僅顯示報價單內容 */
             body > *:not(#printable-quotation-overlay) {
               display: none !important;
             }
 
-            /* 隱藏 sidebar 和 header */
-            nav, header, aside, .sidebar {
-              display: none !important;
-            }
-
-            #printable-quotation-overlay {
-              position: fixed !important;
-              top: 0 !important;
-              left: 0 !important;
-              right: 0 !important;
-              bottom: 0 !important;
-              background: white !important;
-              padding: 0 !important;
-              display: block !important;
-              z-index: 9999 !important;
-            }
-
-            .print\\:hidden {
+            #printable-quotation-overlay .print\\:hidden {
               display: none !important;
             }
 
@@ -81,17 +88,14 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
               transform: none !important;
               width: 210mm !important;
               height: 297mm !important;
-              margin: 0 !important;
+              margin: 0 auto !important;
+              box-shadow: none !important;
+              background: #FAF8F5 !important;
             }
 
             @page {
               size: A4;
               margin: 0;
-            }
-
-            body {
-              margin: 0 !important;
-              padding: 0 !important;
             }
           }
         `}
@@ -122,7 +126,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
       {/* A4 報價單容器 - 縮放以適應螢幕 */}
       <div
         id="a4-preview"
-        className="relative bg-[#FAF8F5] print:shadow-none print:bg-white"
+        className="relative bg-[#FAF8F5] print:shadow-none overflow-hidden print:overflow-visible"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '210mm',
@@ -132,8 +136,14 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
         }}
       >
         {/* 主要內容 */}
-        <div className="bg-white h-full shadow-[0_2px_20px_rgba(0,0,0,0.08)] rounded-2xl print:shadow-none print:rounded-none print:!m-0" style={{ margin: '6mm' }}>
-          <div className="p-3 h-full flex flex-col print:!h-full" style={{ height: 'calc(297mm - 12mm)' }}>
+        <div
+          className="bg-white h-full shadow-[0_2px_20px_rgba(0,0,0,0.08)] rounded-2xl print:shadow-none print:rounded-none flex flex-col"
+          style={{ margin: '6mm' }}
+        >
+          <div
+            className="p-3 h-full flex flex-col print:!h-full"
+            style={{ height: 'calc(297mm - 12mm)' }}
+          >
             {/* 頭部區域 */}
             <div className="mb-2">
               <div className="flex items-start justify-between mb-2">
@@ -413,6 +423,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           <div className="h-1.5 bg-gradient-to-r from-[#C9A961] via-[#D4B76E] to-[#C9A961]"></div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
