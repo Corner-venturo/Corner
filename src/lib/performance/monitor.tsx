@@ -5,6 +5,13 @@
 
 import * as React from 'react';
 
+// Window 擴展介面（開發工具）
+declare global {
+  interface Window {
+    __perfMonitor?: PerformanceMonitor;
+  }
+}
+
 interface PerformanceMetric {
   name: string;
   value: number;
@@ -249,5 +256,5 @@ export function reportWebVitals() {
 
 // 在開發環境自動啟用
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  (window as any).__perfMonitor = perfMonitor;
+  window.__perfMonitor = perfMonitor;
 }

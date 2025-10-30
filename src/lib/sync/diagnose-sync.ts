@@ -7,6 +7,15 @@ import { localDB } from '@/lib/db';
 import { TABLES } from '@/lib/db/schemas';
 import { logger } from '@/lib/utils/logger';
 
+// 可同步項目的基礎介面
+interface SyncableItem {
+  _needs_sync?: boolean;
+  _synced_at?: string;
+  _deleted?: boolean;
+  code?: string;
+  [key: string]: unknown;
+}
+
 export async function diagnosePendingSync() {
   logger.log('🔍 开始诊断待同步资料...');
 
@@ -94,7 +103,8 @@ export async function clearPendingSyncFlags(tableName: string) {
   const items = await localDB.getAll(tableName);
 
   for (const item of items) {
-    if ((item as any)._needs_sync === true) {
+    const syncableItem = item as SyncableItem;
+    if (syncableItem._needs_sync === true) {
       await localDB.put(tableName, {
         ...item,
         _needs_sync: false,

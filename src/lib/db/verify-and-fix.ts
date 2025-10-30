@@ -12,6 +12,15 @@
 import { localDB } from '@/lib/db';
 import { Employee as User } from '@/stores/types';
 
+// Window 擴展介面（開發工具）
+declare global {
+  interface Window {
+    verifyAndFix?: typeof verifyAndFix;
+    quickCheck?: typeof quickCheck;
+    clearAndRebuild?: typeof clearAndRebuild;
+  }
+}
+
 export async function verifyAndFix() {
 
   try {
@@ -148,7 +157,7 @@ export async function clearAndRebuild() {
 
 // 自動掛載到 window（方便 Console 使用）
 if (typeof window !== 'undefined') {
-  (window as any).verifyAndFix = verifyAndFix;
-  (window as any).quickCheck = quickCheck;
-  (window as any).clearAndRebuild = clearAndRebuild;
+  window.verifyAndFix = verifyAndFix;
+  window.quickCheck = quickCheck;
+  window.clearAndRebuild = clearAndRebuild;
 }
