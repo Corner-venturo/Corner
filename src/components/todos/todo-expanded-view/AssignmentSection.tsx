@@ -1,12 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Calendar, Clock, FileText, X } from 'lucide-react';
+import { Calendar, Clock, FileText, X, UserCheck } from 'lucide-react';
 import { AssignmentSectionProps } from './types';
+import { useEmployeesStore } from '@/stores/employees-store';
 
 export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
+  const { items: employees, loadItems } = useEmployeesStore();
+  const [assigneeName, setAssigneeName] = useState<string>('');
+
+  // 載入員工資料
+  useEffect(() => {
+    if (employees.length === 0) {
+      void loadItems();
+    }
+  }, [employees.length, loadItems]);
+
+  // 更新指派者名稱
+  useEffect(() => {
+    if (todo.assignee) {
+      const assignee = employees.find(e => e.id === todo.assignee);
+      setAssigneeName(assignee?.display_name || '未知員工');
+    } else {
+      setAssigneeName('');
+    }
+  }, [todo.assignee, employees]);
   const getDeadlineColor = () => {
     if (!todo.deadline) return 'text-morandi-secondary';
 
@@ -23,6 +43,24 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
   return (
     <div className="bg-card border border-border rounded-xl p-4 mb-4 shadow-sm">
       <div className="space-y-3">
+        {/* 指派給 */}
+        {assigneeName && (
+          <div className="flex items-center gap-3 pb-3 border-b border-border">
+            <UserCheck size={18} className="text-morandi-gold" />
+            <span className="text-sm text-morandi-secondary min-w-[60px]">指派給:</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg">
+              <span className="text-sm font-medium text-morandi-gold">{assigneeName}</span>
+              <button
+                onClick={() => onUpdate({ assignee: undefined })}
+                className="p-0.5 hover:bg-morandi-red/10 rounded text-morandi-secondary hover:text-morandi-red"
+                title="取消指派"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-3">
           <Calendar size={18} className="text-morandi-secondary" />
           <span className="text-sm text-morandi-secondary min-w-[60px]">期限:</span>

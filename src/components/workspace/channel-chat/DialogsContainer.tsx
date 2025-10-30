@@ -13,6 +13,7 @@ import {
 import { Trash2 } from 'lucide-react';
 import { ShareAdvanceDialog } from '../ShareAdvanceDialog';
 import { ShareOrdersDialog } from '../ShareOrdersDialog';
+import { ShareTodoDialog } from '../ShareTodoDialog';
 import { CreateReceiptDialog } from '../CreateReceiptDialog';
 import { CreatePaymentRequestDialog } from '../CreatePaymentRequestDialog';
 import { PLACEHOLDER_TEXT } from './constants';
@@ -341,43 +342,16 @@ export function DialogsContainer({
         </DialogContent>
       </Dialog>
 
-      {/* New Task Dialog */}
-      <Dialog open={showNewTaskDialog} onOpenChange={setShowNewTaskDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>新增任務</DialogTitle>
-            <DialogDescription>
-              建立新任務並分享到頻道
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">任務標題</label>
-              <Input placeholder={PLACEHOLDER_TEXT.TASK_TITLE} />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">任務描述</label>
-              <Input placeholder={PLACEHOLDER_TEXT.TASK_DESCRIPTION} />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">指派給</label>
-              <Input placeholder={PLACEHOLDER_TEXT.ASSIGNEE_NAME} />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">截止日期</label>
-              <Input type="date" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewTaskDialog(false)}>
-              取消
-            </Button>
-            <Button onClick={() => setShowNewTaskDialog(false)}>
-              建立並分享
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Share Todo Dialog */}
+      {showNewTaskDialog && selectedChannel && (
+        <ShareTodoDialog
+          channelId={selectedChannel.id}
+          onClose={() => setShowNewTaskDialog(false)}
+          onSuccess={() => {
+            setShowNewTaskDialog(false);
+          }}
+        />
+      )}
     </>
   );
 }
