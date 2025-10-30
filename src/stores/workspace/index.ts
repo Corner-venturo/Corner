@@ -52,6 +52,7 @@ export const useWorkspaceStore = () => {
     toggleChannelFavorite: channelsStore.toggleChannelFavorite,
     loadChannelGroups: channelsStore.loadChannelGroups,
     createChannelGroup: channelsStore.createChannelGroup,
+    deleteChannelGroup: channelsStore.deleteChannelGroup,
     toggleGroupCollapse: channelsStore.toggleGroupCollapse,
     setSearchQuery: channelsStore.setSearchQuery,
     setChannelFilter: channelsStore.setChannelFilter,

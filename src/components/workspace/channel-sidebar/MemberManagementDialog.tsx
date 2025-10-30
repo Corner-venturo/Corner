@@ -126,6 +126,15 @@ export function GroupDeleteDialog({
   onClose,
   onDelete,
 }: GroupDeleteDialogProps) {
+  const handleDelete = async () => {
+    console.log('[GroupDeleteDialog] Delete button clicked')
+    try {
+      await onDelete()
+    } catch (error) {
+      console.error('[GroupDeleteDialog] Delete failed:', error)
+    }
+  }
+
   return (
     <Dialog
       open={isDeleteDialogOpen}
@@ -149,6 +158,7 @@ export function GroupDeleteDialog({
         </div>
         <DialogFooter className="mt-4">
           <Button
+            type="button"
             variant="ghost"
             onClick={onClose}
             disabled={isDeletingGroup}
@@ -157,10 +167,10 @@ export function GroupDeleteDialog({
             取消
           </Button>
           <Button
+            type="button"
             variant="destructive"
-            onClick={onDelete}
+            onClick={handleDelete}
             disabled={isDeletingGroup}
-            className="bg-red-600 hover:bg-red-700 text-white"
           >
             {isDeletingGroup ? '刪除中...' : '刪除'}
           </Button>

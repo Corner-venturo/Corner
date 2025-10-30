@@ -575,38 +575,55 @@ export const useChannelsStore = create<ChannelsState>((set, get) => ({
     const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
     try {
+      console.log('[deleteChannelGroup] Deleting group:', id);
+
+      // 先取得該群組下的頻道（在更新 state 之前）
+      const channelsInGroup = get().channels.filter(ch => ch.group_id === id);
+      console.log('[deleteChannelGroup] Channels in group:', channelsInGroup.length);
+
+      // 從 Supabase 刪除群組
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         const { error } = await supabase
           .from('channel_groups')
           .delete()
           .eq('id', id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[deleteChannelGroup] Supabase delete error:', error);
+          throw error;
+        }
+        console.log('[deleteChannelGroup] Deleted from Supabase');
       }
 
-      // 同時從本地快取刪除
-      await localDB.delete('channel_groups', id);
-
-      // 將該群組下的頻道移到未分組
-      set(state => ({
-        channelGroups: state.channelGroups.filter(g => g.id !== id),
-        channels: state.channels.map(ch =>
-          ch.group_id === id ? { ...ch, group_id: null } : ch
-        )
-      }));
-
-      // 更新 Supabase 中的頻道群組關聯
-      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-        const channelsToUpdate = get().channels.filter(ch => ch.group_id === id);
-        for (const channel of channelsToUpdate) {
+      // 更新 Supabase 中的頻道群組關聯（在更新 state 之前）
+      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true' && channelsInGroup.length > 0) {
+        console.log('[deleteChannelGroup] Updating channels in Supabase...');
+        for (const channel of channelsInGroup) {
           await supabase
             .from('channels')
             .update({ group_id: null })
             .eq('id', channel.id);
         }
+        console.log('[deleteChannelGroup] Updated channels in Supabase');
       }
+
+      // 從本地快取刪除
+      await localDB.delete('channel_groups', id);
+      console.log('[deleteChannelGroup] Deleted from IndexedDB');
+
+      // 更新 state：將該群組下的頻道移到未分組
+      set(state => {
+        const newState = {
+          channelGroups: state.channelGroups.filter(g => g.id !== id),
+          channels: state.channels.map(ch =>
+            ch.group_id === id ? { ...ch, group_id: null } : ch
+          )
+        };
+        console.log('[deleteChannelGroup] Updated state. Remaining groups:', newState.channelGroups.length);
+        return newState;
+      });
     } catch (error) {
-      console.error('Failed to delete channel group:', error);
+      console.error('[deleteChannelGroup] Failed to delete channel group:', error);
       throw error;
     }
   },
