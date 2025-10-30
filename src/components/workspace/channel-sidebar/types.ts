@@ -22,4 +22,5 @@ export interface DroppableGroupHeaderProps {
   groupName: string
   isCollapsed: boolean
   onToggle: () => void
+  onDelete?: (groupId: string) => void
 }

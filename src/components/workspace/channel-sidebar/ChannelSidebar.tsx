@@ -42,7 +42,7 @@ import { addChannelMembers } from '@/services/workspace-members'
 import type { ChannelSidebarProps } from './types'
 import { SortableChannelItem } from './SortableChannelItem'
 import { DroppableGroupHeader } from './DroppableGroupHeader'
-import { MemberManagementDialog, ChannelDeleteDialog } from './MemberManagementDialog'
+import { MemberManagementDialog, ChannelDeleteDialog, GroupDeleteDialog } from './MemberManagementDialog'
 import { useChannelSidebar } from './useChannelSidebar'
 
 export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSidebarProps) {
@@ -63,6 +63,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     updateChannelOrder,
     updateChannel,
     deleteChannel,
+    deleteChannelGroup,
     createChannel,
   } = useWorkspaceStore()
   const { user } = useAuthStore()
@@ -75,6 +76,9 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const [channelToDelete, setChannelToDelete] = useState<Channel | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isDeletingChannel, setIsDeletingChannel] = useState(false)
+  const [groupToDelete, setGroupToDelete] = useState<import('@/stores/workspace-store').ChannelGroup | null>(null)
+  const [isGroupDeleteDialogOpen, setIsGroupDeleteDialogOpen] = useState(false)
+  const [isDeletingGroup, setIsDeletingGroup] = useState(false)
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelDescription, setNewChannelDescription] = useState('')
@@ -146,6 +150,31 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     if (channel) {
       setChannelToDelete(channel)
       setIsDeleteDialogOpen(true)
+    }
+  }
+
+  const handleDeleteGroup = async () => {
+    if (!groupToDelete) {
+      return
+    }
+
+    setIsDeletingGroup(true)
+    try {
+      await deleteChannelGroup(groupToDelete.id)
+      setIsGroupDeleteDialogOpen(false)
+      setGroupToDelete(null)
+    } catch (error) {
+      console.error('Failed to delete group:', error)
+    } finally {
+      setIsDeletingGroup(false)
+    }
+  }
+
+  const handleDeleteGroupClick = (groupId: string) => {
+    const group = channelGroups.find(g => g.id === groupId)
+    if (group) {
+      setGroupToDelete(group)
+      setIsGroupDeleteDialogOpen(true)
     }
   }
 
@@ -440,6 +469,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
                     groupName={group.name}
                     isCollapsed={group.is_collapsed}
                     onToggle={() => toggleGroupCollapse(group.id)}
+                    onDelete={handleDeleteGroupClick}
                   />
                 </div>
                 {!group.is_collapsed && groupChannels.length > 0 && (
@@ -627,6 +657,17 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
           setChannelToDelete(null)
         }}
         onDelete={handleDeleteChannel}
+      />
+
+      <GroupDeleteDialog
+        groupToDelete={groupToDelete}
+        isDeleteDialogOpen={isGroupDeleteDialogOpen}
+        isDeletingGroup={isDeletingGroup}
+        onClose={() => {
+          setIsGroupDeleteDialogOpen(false)
+          setGroupToDelete(null)
+        }}
+        onDelete={handleDeleteGroup}
       />
 
       {/* 編輯頻道 Dialog */}

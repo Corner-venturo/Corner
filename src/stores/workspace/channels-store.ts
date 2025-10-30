@@ -42,6 +42,7 @@ interface ChannelsState {
   // Channel group operations
   loadChannelGroups: (workspaceId?: string) => Promise<void>;
   createChannelGroup: (group: Omit<ChannelGroup, 'id' | 'created_at'>) => void;
+  deleteChannelGroup: (id: string) => Promise<void>;
   toggleGroupCollapse: (id: string) => void;
 
   // Filter and search
@@ -568,6 +569,46 @@ export const useChannelsStore = create<ChannelsState>((set, get) => ({
     set(state => ({
       channelGroups: [...state.channelGroups, newGroup]
     }));
+  },
+
+  deleteChannelGroup: async (id) => {
+    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
+
+    try {
+      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
+        const { error } = await supabase
+          .from('channel_groups')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+      }
+
+      // 同時從本地快取刪除
+      await localDB.delete('channel_groups', id);
+
+      // 將該群組下的頻道移到未分組
+      set(state => ({
+        channelGroups: state.channelGroups.filter(g => g.id !== id),
+        channels: state.channels.map(ch =>
+          ch.group_id === id ? { ...ch, group_id: null } : ch
+        )
+      }));
+
+      // 更新 Supabase 中的頻道群組關聯
+      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
+        const channelsToUpdate = get().channels.filter(ch => ch.group_id === id);
+        for (const channel of channelsToUpdate) {
+          await supabase
+            .from('channels')
+            .update({ group_id: null })
+            .eq('id', channel.id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete channel group:', error);
+      throw error;
+    }
   },
 
   toggleGroupCollapse: (id) => {

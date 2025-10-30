@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { ChannelMember } from '@/services/workspace-members'
-import type { Channel } from '@/stores/workspace-store'
+import type { Channel, ChannelGroup } from '@/stores/workspace-store'
 
 interface MemberManagementDialogProps {
   memberToRemove: ChannelMember | null
@@ -104,6 +104,65 @@ export function ChannelDeleteDialog({
             className="bg-red-600 hover:bg-red-700 text-white"
           >
             {isDeletingChannel ? '刪除中...' : '刪除'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+interface GroupDeleteDialogProps {
+  groupToDelete: ChannelGroup | null
+  isDeleteDialogOpen: boolean
+  isDeletingGroup: boolean
+  onClose: () => void
+  onDelete: () => Promise<void>
+}
+
+export function GroupDeleteDialog({
+  groupToDelete,
+  isDeleteDialogOpen,
+  isDeletingGroup,
+  onClose,
+  onDelete,
+}: GroupDeleteDialogProps) {
+  return (
+    <Dialog
+      open={isDeleteDialogOpen}
+      onOpenChange={open => {
+        if (!open) {
+          onClose()
+        }
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-morandi-primary">刪除群組</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2">
+          <p className="text-sm text-morandi-secondary">
+            確定要刪除群組「{groupToDelete?.name}」嗎？
+          </p>
+          <p className="text-sm text-morandi-secondary">
+            群組內的所有頻道將會移至「未分組」區域。此操作無法復原。
+          </p>
+        </div>
+        <DialogFooter className="mt-4">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={isDeletingGroup}
+            className="text-morandi-secondary hover:text-morandi-primary"
+          >
+            取消
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onDelete}
+            disabled={isDeletingGroup}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            {isDeletingGroup ? '刪除中...' : '刪除'}
           </Button>
         </DialogFooter>
       </DialogContent>

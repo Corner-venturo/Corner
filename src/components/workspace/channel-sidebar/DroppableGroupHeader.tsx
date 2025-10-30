@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import type { DroppableGroupHeaderProps } from './types'
@@ -10,23 +10,37 @@ export function DroppableGroupHeader({
   groupName,
   isCollapsed,
   onToggle,
+  onDelete,
 }: DroppableGroupHeaderProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: groupId,
   })
 
   return (
-    <button
-      ref={setNodeRef}
-      className={cn(
-        'flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider flex-1 hover:bg-morandi-container/20 rounded transition-colors',
-        isOver && 'bg-morandi-gold/20'
+    <div ref={setNodeRef} className="flex items-center gap-1 group/header w-full">
+      <button
+        className={cn(
+          'flex items-center gap-1 px-2 py-1 text-xs font-semibold text-morandi-secondary uppercase tracking-wider flex-1 hover:bg-morandi-container/20 rounded transition-colors',
+          isOver && 'bg-morandi-gold/20'
+        )}
+        onClick={onToggle}
+      >
+        {isCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+        <span>{groupName}</span>
+        {isOver && <span className="ml-auto text-morandi-gold">放開以移動</span>}
+      </button>
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(groupId)
+          }}
+          className="opacity-0 group-hover/header:opacity-100 p-1 rounded hover:bg-red-100 text-red-600 hover:text-red-700 transition-opacity"
+          title="刪除群組"
+        >
+          <Trash2 size={12} />
+        </button>
       )}
-      onClick={onToggle}
-    >
-      {isCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
-      <span>{groupName}</span>
-      {isOver && <span className="ml-auto text-morandi-gold">放開以移動</span>}
-    </button>
+    </div>
   )
 }
