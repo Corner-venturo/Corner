@@ -118,8 +118,8 @@ export function TableBody({
                   )}
                   style={{ width: column.width }}
                 >
-                  {column.render ? column.render((row as any)[column.key], row) : (
-                    <span>{(row as any)[column.key]}</span>
+                  {column.render ? column.render(row[column.key as keyof typeof row], row) : (
+                    <span>{String(row[column.key as keyof typeof row] ?? '')}</span>
                   )}
                 </td>
               ))}

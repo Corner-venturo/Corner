@@ -109,13 +109,22 @@ export function useCalendarEvents() {
 
         // 找出建立者姓名（用於詳細頁面）
         const creator = employees?.find(emp => emp.id === event.created_by)
-        const creatorName = creator?.name || (event.created_by ? '未知' : '')
+        const creatorName = creator?.display_name || creator?.name || '未知使用者'
+
+        // 🔥 修正 FullCalendar 的多日事件顯示問題
+        // 如果有 end，則需要加一天才能正確顯示跨日事件（FullCalendar 的 end 是 exclusive）
+        let end_date = event.end
+        if (end_date && end_date !== event.start) {
+          const endDateObj = new Date(end_date)
+          endDateObj.setDate(endDateObj.getDate() + 1)
+          end_date = endDateObj.toISOString().split('T')[0]
+        }
 
         return {
           id: event.id,
           title: event.title, // 行事曆上不顯示建立者
           start: event.start,
-          end: event.end,
+          end: end_date,
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {

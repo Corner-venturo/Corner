@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 export interface UseTableStateProps<T> {
   data: T[];
   searchTerm?: string;
-  searchableFields?: string[];
+  searchableFields?: (keyof T)[];
   initialPageSize?: number;
 }
 
@@ -28,7 +28,7 @@ export function useTableState<T>({
     if (searchTerm && searchableFields.length > 0) {
       filtered = filtered.filter(row =>
         searchableFields.some(field => {
-          const value = (row as any)[field];
+          const value = row[field];
           return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase());
         })
       );
@@ -38,7 +38,7 @@ export function useTableState<T>({
     Object.keys(filters).forEach(key => {
       if (filters[key]) {
         filtered = filtered.filter(row => {
-          const value = (row as any)[key];
+          const value = row[key as keyof T];
           return value && value.toString().toLowerCase().includes(filters[key].toLowerCase());
         });
       }
@@ -47,8 +47,8 @@ export function useTableState<T>({
     // 排序
     if (sortColumn) {
       filtered.sort((a, b) => {
-        const aValue = (a as any)[sortColumn];
-        const bValue = (b as any)[sortColumn];
+        const aValue = a[sortColumn as keyof T];
+        const bValue = b[sortColumn as keyof T];
 
         if (aValue === bValue) return 0;
 

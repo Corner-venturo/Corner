@@ -1,13 +1,13 @@
 import React from 'react';
 
-export interface TableColumn {
-  key: string;
+export interface TableColumn<T = any> {
+  key: keyof T | string;
   label: string | React.ReactNode;
   sortable?: boolean;
   filterable?: boolean;
   filterType?: 'text' | 'number' | 'date' | 'select';
   filterOptions?: Array<{ value: string; label: string }>;
-  render?: (value: unknown, row: any) => React.ReactNode;
+  render?: (value: T[keyof T] | unknown, row: T) => React.ReactNode;
   width?: string;
   align?: 'left' | 'center' | 'right';
   className?: string;
