@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useTodoStore } from '@/stores/todo-store';
-import { useEmployeesStore } from '@/stores/employees-store';
+import { useUserStore } from '@/stores/user-store';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { Send, CheckCircle2, AlertCircle, Search } from 'lucide-react';
@@ -27,7 +27,7 @@ interface ShareTodoDialogProps {
 
 export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDialogProps) {
   const { items: todos } = useTodoStore();
-  const { items: employees } = useEmployeesStore();
+  const { items: employees, loadItems } = useUserStore();
   const { sendMessage } = useWorkspaceStore();
   const { user } = useAuthStore();
 
@@ -38,14 +38,10 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
 
   // 載入員工資料
   useEffect(() => {
-    const loadEmployees = async () => {
-      const employeesStore = useEmployeesStore.getState();
-      if (employeesStore.items.length === 0) {
-        await employeesStore.loadItems();
-      }
-    };
-    void loadEmployees();
-  }, []);
+    if (employees.length === 0) {
+      void loadItems();
+    }
+  }, [employees.length, loadItems]);
 
   const selectedTodo = todos.find(t => t.id === selectedTodoId);
 

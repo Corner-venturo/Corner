@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Calendar, Clock, FileText, X, UserCheck } from 'lucide-react';
 import { AssignmentSectionProps } from './types';
-import { useEmployeesStore } from '@/stores/employees-store';
+import { useUserStore } from '@/stores/user-store';
 
 export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
-  const { items: employees, loadItems } = useEmployeesStore();
+  const { items: employees, loadItems } = useUserStore();
   const [assigneeName, setAssigneeName] = useState<string>('');
 
   // 載入員工資料
