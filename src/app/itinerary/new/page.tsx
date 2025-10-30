@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ResponsiveHeader } from "@/components/layout/responsive-header";
 import { TourForm } from "@/components/editor/TourForm";
@@ -244,7 +244,7 @@ const getDefaultTourData = () => ({
     ],
 });
 
-export default function NewItineraryPage() {
+function NewItineraryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tourId = searchParams.get('tour_id');
@@ -568,5 +568,20 @@ export default function NewItineraryPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NewItineraryPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto mb-4"></div>
+          <p className="text-morandi-secondary">載入中...</p>
+        </div>
+      </div>
+    }>
+      <NewItineraryPageContent />
+    </Suspense>
   );
 }

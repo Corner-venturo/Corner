@@ -337,44 +337,83 @@ export default function TodosPage() {
         </div>
       </ResponsiveHeader>
 
-      {/* 待辦事項卡片網格 */}
-      <div className="flex-1 overflow-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTodos.map((todo) => (
-            <TodoCard
-              key={todo.id}
-              todo={todo}
-              currentUserId={user?.id}
-              onClick={() => handleRowClick(todo)}
-              onToggleComplete={(e) => {
-                e.stopPropagation();
-                const newStatus = todo.status === 'completed' ? 'pending' : 'completed';
-                updateTodo(todo.id, {
-                  status: newStatus,
-                  completed: newStatus === 'completed'
-                });
-              }}
-              onEdit={(e) => {
-                e.stopPropagation();
-                setExpandedTodo(todo.id);
-              }}
-              onDelete={(e) => handleDeleteTodo(todo, e)}
-            />
-          ))}
-        </div>
+      {/* 待辦事項列表 */}
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+          columns={columns}
+          data={filteredTodos}
+          onRowClick={handleRowClick}
+          rowClassName={(todo: Todo) => {
+            // 判斷是否為共享待辦
+            const isShared = (todo.assignee && todo.assignee !== user?.id) ||
+              (todo.visibility && todo.visibility.length > 1);
 
-        {/* 空狀態 */}
-        {filteredTodos.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center mb-4">
-              <CheckCircle className="text-morandi-secondary" size={32} />
+            return cn(
+              // 移除所有預設邊框
+              "!border-0",
+              // 強制設置 margin bottom 為 2rem (32px)
+              "!mb-8",
+              // 卡片樣式：圓角、陰影、完整邊框
+              "!rounded-lg !shadow-md !outline !outline-1 outline-gray-200/60 transition-all hover:!shadow-lg hover:!-translate-y-0.5",
+              // 卡片內部上下 padding 加大
+              "[&>td]:!py-5",
+              // 確保每個 td 都有圓角（第一個左側圓角，最後一個右側圓角）
+              "[&>td:first-child]:!rounded-l-lg [&>td:last-child]:!rounded-r-lg",
+              // 移除 td 之間的邊框
+              "[&>td]:!border-0",
+              // 共享待辦使用藍色背景和輪廓
+              isShared
+                ? "!bg-blue-50 !outline-blue-200 hover:!bg-blue-100 hover:!outline-blue-300"
+                : "!bg-white hover:!outline-morandi-gold/40",
+              // 完成的待辦降低透明度
+              todo.status === 'completed' && "opacity-60"
+            );
+          }}
+          actions={(todo: Todo) => (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newStatus = todo.status === 'completed' ? 'pending' : 'completed';
+                  updateTodo(todo.id, {
+                    status: newStatus,
+                    completed: newStatus === 'completed'
+                  });
+                }}
+                className={cn(
+                  "p-1 rounded transition-colors",
+                  todo.status === 'completed'
+                    ? "text-green-600 hover:text-green-700 hover:bg-green-50"
+                    : "text-morandi-secondary hover:text-green-600 hover:bg-green-50"
+                )}
+                title={todo.status === 'completed' ? '取消完成' : '標記完成'}
+              >
+                <CheckCircle size={14} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedTodo(todo.id);
+                }}
+                className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+                title="編輯"
+              >
+                <Edit2 size={14} />
+              </button>
+              <button
+                onClick={(e) => handleDeleteTodo(todo, e)}
+                className="p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+                title="刪除"
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
-            <p className="text-morandi-secondary text-lg mb-2">沒有待辦事項</p>
-            <p className="text-morandi-secondary/60 text-sm">
-              {activeFilter === 'all' ? '點擊右上角「新增」按鈕建立待辦事項' : '切換其他篩選條件查看'}
-            </p>
-          </div>
-        )}
+          )}
+          searchableFields={['title']}
+          searchTerm={searchTerm}
+          showFilters={false}
+          initialPageSize={15}
+        />
       </div>
 
       {/* 展開的待辦事項視圖 */}

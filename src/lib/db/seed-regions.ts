@@ -7,11 +7,21 @@ import { COUNTRIES } from '@/data/region-hierarchy';
 import { localDB } from '@/lib/db';
 import type { Country, Region, City } from '@/stores/region-store-new';
 
+// 全域 flag 防止重複初始化
+let isSeeding = false;
+let hasSeeded = false;
+
 /**
  * 初始化地區資料
  * 將 region-hierarchy.ts 的資料轉換並匯入到資料庫
  */
 export async function seedRegions(): Promise<void> {
+  // 如果正在初始化或已完成，直接返回
+  if (isSeeding || hasSeeded) {
+    return;
+  }
+
+  isSeeding = true;
   console.log('🌍 [Seed] 開始初始化地區資料...');
 
   try {
@@ -19,6 +29,8 @@ export async function seedRegions(): Promise<void> {
     const existingCountries = await localDB.getAll<Country>('countries');
     if (existingCountries.length > 0) {
       console.log('✓ [Seed] 地區資料已存在，跳過初始化');
+      hasSeeded = true;
+      isSeeding = false;
       return;
     }
 
@@ -116,9 +128,12 @@ export async function seedRegions(): Promise<void> {
     console.log(`   📊 地區: ${finalRegions.length} 筆`);
     console.log(`   📊 城市: ${finalCities.length} 筆`);
 
+    hasSeeded = true;
   } catch (error) {
     console.error('❌ [Seed] 初始化失敗:', error);
     throw error;
+  } finally {
+    isSeeding = false;
   }
 }
 
