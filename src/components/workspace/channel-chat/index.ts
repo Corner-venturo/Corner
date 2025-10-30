@@ -1,6 +1,6 @@
-export { useChannelChat } from './useChannelChat';
-export { ChatHeader } from './ChatHeader';
-export { ChatMessages } from './ChatMessages';
-export { DialogsContainer } from './DialogsContainer';
-export * from './types';
-export * from './constants';
+export { useChannelChat } from './useChannelChat'
+export { ChatHeader } from './ChatHeader'
+export { ChatMessages } from './ChatMessages'
+export { DialogsContainer } from './DialogsContainer'
+export * from './types'
+export * from './constants'

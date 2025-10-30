@@ -1,30 +1,57 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
-import { NewItemFormData, categoryOptions } from '../types';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Plus } from 'lucide-react'
+import { NewItemFormData, categoryOptions } from '../types'
+import { SupplierSearchSelect } from './SupplierSearchSelect'
 
-interface RequestItemFormProps {
-  newItem: NewItemFormData;
-  setNewItem: (item: NewItemFormData | ((prev: NewItemFormData) => NewItemFormData)) => void;
-  onAddItem: () => void;
-  suppliers: Array<{ id: string; name: string }>;
+interface SupplierOption {
+  id: string
+  name: string
+  type: 'supplier' | 'employee'
+  group: string
 }
 
-export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: RequestItemFormProps) {
-  const subtotal = newItem.unit_price * newItem.quantity;
+interface RequestItemFormProps {
+  newItem: NewItemFormData
+  setNewItem: (item: NewItemFormData | ((prev: NewItemFormData) => NewItemFormData)) => void
+  onAddItem: () => void
+  suppliers: SupplierOption[]
+  supplierSearchValue: string
+  setSupplierSearchValue: (value: string) => void
+  showSupplierDropdown: boolean
+  setShowSupplierDropdown: (show: boolean) => void
+}
+
+export function RequestItemForm({
+  newItem,
+  setNewItem,
+  onAddItem,
+  suppliers,
+  supplierSearchValue,
+  setSupplierSearchValue,
+  showSupplierDropdown,
+  setShowSupplierDropdown,
+}: RequestItemFormProps) {
+  const subtotal = newItem.unit_price * newItem.quantity
 
   return (
-    <div className="border border-border rounded-lg p-6">
+    <div className="border border-border rounded-md p-6">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-medium text-morandi-primary">新增請款項目</h3>
         <Button
           type="button"
           onClick={onAddItem}
           disabled={!newItem.supplier_id || !newItem.description}
-          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-6"
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-6 rounded-md"
           size="lg"
         >
           <Plus size={18} className="mr-2" />
@@ -37,13 +64,13 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
           <label className="text-sm font-medium text-morandi-secondary">類別</label>
           <Select
             value={newItem.category}
-            onValueChange={(value) => setNewItem(prev => ({ ...prev, category: value as unknown }))}
+            onValueChange={value => setNewItem(prev => ({ ...prev, category: value as unknown }))}
           >
             <SelectTrigger className="mt-2 bg-background">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-background">
-              {categoryOptions.map((option) => (
+              {categoryOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -53,29 +80,26 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
         </div>
 
         <div className="col-span-3">
-          <label className="text-sm font-medium text-morandi-secondary">供應商</label>
-          <Select
-            value={newItem.supplier_id}
-            onValueChange={(value) => setNewItem(prev => ({ ...prev, supplier_id: value }))}
-          >
-            <SelectTrigger className="mt-2 bg-background">
-              <SelectValue placeholder="選擇供應商" />
-            </SelectTrigger>
-            <SelectContent className="bg-background">
-              {suppliers.map((supplier) => (
-                <SelectItem key={supplier.id} value={supplier.id}>
-                  {supplier.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SupplierSearchSelect
+            value={supplierSearchValue}
+            onChange={setSupplierSearchValue}
+            onSelect={supplier => {
+              setNewItem(prev => ({ ...prev, supplier_id: supplier.id }))
+              setSupplierSearchValue(supplier.name)
+            }}
+            suppliers={suppliers}
+            showDropdown={showSupplierDropdown}
+            onShowDropdown={setShowSupplierDropdown}
+            label="供應商"
+            placeholder="搜尋供應商或員工..."
+          />
         </div>
 
         <div className="col-span-4">
           <label className="text-sm font-medium text-morandi-secondary">項目描述</label>
           <Input
             value={newItem.description}
-            onChange={(e) => setNewItem(prev => ({ ...prev, description: e.target.value }))}
+            onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
             placeholder="輸入項目描述"
             className="mt-2"
           />
@@ -86,7 +110,9 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
           <Input
             type="number"
             value={newItem.unit_price}
-            onChange={(e) => setNewItem(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))}
+            onChange={e =>
+              setNewItem(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))
+            }
             placeholder="0"
             className="mt-2"
           />
@@ -97,7 +123,9 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
           <Input
             type="number"
             value={newItem.quantity}
-            onChange={(e) => setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+            onChange={e =>
+              setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
+            }
             placeholder="1"
             className="mt-2"
           />
@@ -106,7 +134,7 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
 
       {/* Subtotal display */}
       <div className="mt-4 flex justify-end">
-        <div className="bg-morandi-container/20 rounded px-4 py-2">
+        <div className="bg-morandi-container/20 rounded-md px-4 py-2">
           <span className="text-sm font-medium text-morandi-secondary mr-2">小計:</span>
           <span className="text-lg font-semibold text-morandi-gold">
             NT$ {subtotal.toLocaleString()}
@@ -114,5 +142,5 @@ export function RequestItemForm({ newItem, setNewItem, onAddItem, suppliers }: R
         </div>
       </div>
     </div>
-  );
+  )
 }

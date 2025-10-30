@@ -32,24 +32,32 @@ The main TourForm component now acts as an orchestrator, composing all the secti
 ## Architecture
 
 ### Types (`types.ts`)
+
 All TypeScript interfaces and types used across the form:
+
 - `TourFormData` - Main form data structure
 - `FlightInfo`, `Feature`, `FocusCard`, `Activity`, `DailyItinerary`, etc.
 
 ### Constants (`constants.ts`)
+
 Static data used throughout the form:
+
 - `iconOptions` - Icon choices for features
 - `cityImages` - City-to-image URL mappings
 - `timezoneOffset` - Timezone calculations for flight duration
 
 ### Utilities (`utils.ts`)
+
 Pure utility functions:
+
 - `calculateFlightDuration()` - Calculates flight time based on timezone differences
 
 ### Hooks
 
 #### `useTourFormHandlers.ts`
+
 Provides all form update handlers:
+
 - Field updates (basic, nested, city selection)
 - Flight field updates with auto-calculation
 - Feature management (add/update/remove)
@@ -58,7 +66,9 @@ Provides all form update handlers:
 - Activity and recommendation management
 
 #### `useRegionData.ts`
+
 Manages country and city data:
+
 - Lazy loads regions from the store
 - Provides country/city dropdown options
 - Maintains country selection state

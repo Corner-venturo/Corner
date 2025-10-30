@@ -1,20 +1,29 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { Shield, Search, Loader2, AlertCircle, Globe, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react'
+import {
+  Shield,
+  Search,
+  Loader2,
+  AlertCircle,
+  Globe,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface VisaResult {
-  passport: string;
-  passportName: string;
-  destination: string;
-  destinationName: string;
-  visaRequired: 'visa-free' | 'visa-on-arrival' | 'e-visa' | 'visa-required';
-  stayDuration?: string;
-  notes?: string;
+  passport: string
+  passportName: string
+  destination: string
+  destinationName: string
+  visaRequired: 'visa-free' | 'visa-on-arrival' | 'e-visa' | 'visa-required'
+  stayDuration?: string
+  notes?: string
 }
 
-const STORAGE_KEY = 'visa-widget-last-query';
+const STORAGE_KEY = 'visa-widget-last-query'
 
 // 常見護照國家
 const PASSPORT_COUNTRIES = [
@@ -30,7 +39,7 @@ const PASSPORT_COUNTRIES = [
   { code: 'GB', name: '英國' },
   { code: 'CA', name: '加拿大' },
   { code: 'AU', name: '澳洲' },
-];
+]
 
 // 常見目的地
 const DESTINATIONS = [
@@ -52,7 +61,7 @@ const DESTINATIONS = [
   { code: 'CA', name: '加拿大' },
   { code: 'AE', name: '阿聯酋' },
   { code: 'TR', name: '土耳其' },
-];
+]
 
 // 簽證狀態資訊
 const VISA_STATUS = {
@@ -61,62 +70,62 @@ const VISA_STATUS = {
     icon: CheckCircle,
     color: 'text-green-600',
     bgColor: 'bg-green-100',
-    description: '可直接入境，無需事先申請簽證'
+    description: '可直接入境，無需事先申請簽證',
   },
   'visa-on-arrival': {
     label: '落地簽',
     icon: Clock,
     color: 'text-blue-600',
     bgColor: 'bg-blue-100',
-    description: '抵達時於機場/口岸申請簽證'
+    description: '抵達時於機場/口岸申請簽證',
   },
   'e-visa': {
     label: '電子簽證',
     icon: Globe,
     color: 'text-purple-600',
     bgColor: 'bg-purple-100',
-    description: '需事先上網申請電子簽證'
+    description: '需事先上網申請電子簽證',
   },
   'visa-required': {
     label: '需要簽證',
     icon: XCircle,
     color: 'text-red-600',
     bgColor: 'bg-red-100',
-    description: '需事先至使館/領事館申請簽證'
+    description: '需事先至使館/領事館申請簽證',
   },
-};
+}
 
 export function VisaWidget() {
-  const [passport, setPassport] = useState('TW');
-  const [destination, setDestination] = useState('JP');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<VisaResult | null>(null);
+  const [passport, setPassport] = useState('TW')
+  const [destination, setDestination] = useState('JP')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<VisaResult | null>(null)
 
   // 載入上次查詢
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      const query = JSON.parse(saved);
-      setPassport(query.passport || 'TW');
-      setDestination(query.destination || 'JP');
+      const query = JSON.parse(saved)
+      setPassport(query.passport || 'TW')
+      setDestination(query.destination || 'JP')
     }
-  }, []);
+  }, [])
 
   // 查詢簽證資訊
   const checkVisa = async () => {
     if (!passport || !destination) {
-      setError('請選擇護照國家和目的地');
-      return;
+      setError('請選擇護照國家和目的地')
+      return
     }
 
     if (passport === destination) {
-      setError('護照國家和目的地不能相同');
-      return;
+      setError('護照國家和目的地不能相同')
+      return
     }
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
       // TODO: 替換為真實 API 呼叫
@@ -130,7 +139,7 @@ export function VisaWidget() {
       // });
 
       // 模擬 API 延遲
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       // 模擬資料
       const mockData: VisaResult = {
@@ -141,56 +150,55 @@ export function VisaWidget() {
         visaRequired: getMockVisaStatus(passport, destination),
         stayDuration: getMockStayDuration(passport, destination),
         notes: getMockNotes(passport, destination),
-      };
+      }
 
-      setResult(mockData);
+      setResult(mockData)
 
       // 儲存查詢記錄
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ passport, destination }));
-
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ passport, destination }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : '查詢失敗，請稍後再試');
-      setResult(null);
+      setError(err instanceof Error ? err.message : '查詢失敗，請稍後再試')
+      setResult(null)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // 模擬簽證狀態（實際使用時會從 API 取得）
   const getMockVisaStatus = (passport: string, destination: string): VisaResult['visaRequired'] => {
     // 台灣護照範例
     if (passport === 'TW') {
-      if (['JP', 'KR', 'SG', 'MY', 'TH'].includes(destination)) return 'visa-free';
-      if (['ID', 'VN'].includes(destination)) return 'visa-on-arrival';
-      if (['AU', 'NZ', 'TR'].includes(destination)) return 'e-visa';
-      return 'visa-required';
+      if (['JP', 'KR', 'SG', 'MY', 'TH'].includes(destination)) return 'visa-free'
+      if (['ID', 'VN'].includes(destination)) return 'visa-on-arrival'
+      if (['AU', 'NZ', 'TR'].includes(destination)) return 'e-visa'
+      return 'visa-required'
     }
-    return 'visa-required';
-  };
+    return 'visa-required'
+  }
 
   const getMockStayDuration = (passport: string, destination: string): string => {
     if (passport === 'TW') {
-      if (['JP', 'KR', 'SG'].includes(destination)) return '90 天';
-      if (['TH'].includes(destination)) return '30 天';
-      if (['MY'].includes(destination)) return '30 天';
+      if (['JP', 'KR', 'SG'].includes(destination)) return '90 天'
+      if (['TH'].includes(destination)) return '30 天'
+      if (['MY'].includes(destination)) return '30 天'
     }
-    return '依規定';
-  };
+    return '依規定'
+  }
 
   const getMockNotes = (passport: string, destination: string): string => {
     if (passport === 'TW' && destination === 'JP') {
-      return '需持有效護照，停留期限為 90 天';
+      return '需持有效護照，停留期限為 90 天'
     }
-    return '';
-  };
+    return ''
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      checkVisa();
+      checkVisa()
     }
-  };
+  }
 
-  const visaStatus = result ? VISA_STATUS[result.visaRequired] : null;
+  const visaStatus = result ? VISA_STATUS[result.visaRequired] : null
 
   return (
     <div className="h-full">
@@ -213,7 +221,9 @@ export function VisaWidget() {
               <Shield className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">簽證查詢</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
+                簽證查詢
+              </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
                 查詢簽證需求與停留期限
               </p>
@@ -230,11 +240,11 @@ export function VisaWidget() {
                 </label>
                 <select
                   value={passport}
-                  onChange={(e) => setPassport(e.target.value)}
+                  onChange={e => setPassport(e.target.value)}
                   onKeyPress={handleKeyPress}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 >
-                  {PASSPORT_COUNTRIES.map((country) => (
+                  {PASSPORT_COUNTRIES.map(country => (
                     <option key={country.code} value={country.code}>
                       {country.name}
                     </option>
@@ -249,11 +259,11 @@ export function VisaWidget() {
                 </label>
                 <select
                   value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
+                  onChange={e => setDestination(e.target.value)}
                   onKeyPress={handleKeyPress}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 >
-                  {DESTINATIONS.map((country) => (
+                  {DESTINATIONS.map(country => (
                     <option key={country.code} value={country.code}>
                       {country.name}
                     </option>
@@ -308,19 +318,27 @@ export function VisaWidget() {
                 <div className="text-morandi-secondary">→</div>
                 <div className="text-center">
                   <p className="text-xs text-morandi-secondary mb-1">目的地</p>
-                  <p className="font-bold text-base text-morandi-primary">{result.destinationName}</p>
+                  <p className="font-bold text-base text-morandi-primary">
+                    {result.destinationName}
+                  </p>
                 </div>
               </div>
 
               {/* 簽證狀態 */}
               <div className={cn('rounded-lg p-4', visaStatus.bgColor)}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={cn('w-10 h-10 rounded-full bg-white/50 flex items-center justify-center')}>
+                  <div
+                    className={cn(
+                      'w-10 h-10 rounded-full bg-white/50 flex items-center justify-center'
+                    )}
+                  >
                     <visaStatus.icon className={cn('w-6 h-6', visaStatus.color)} />
                   </div>
                   <div className="flex-1">
                     <p className={cn('font-bold text-lg', visaStatus.color)}>{visaStatus.label}</p>
-                    <p className="text-xs text-morandi-secondary mt-0.5">{visaStatus.description}</p>
+                    <p className="text-xs text-morandi-secondary mt-0.5">
+                      {visaStatus.description}
+                    </p>
                   </div>
                 </div>
 
@@ -328,7 +346,9 @@ export function VisaWidget() {
                 {result.stayDuration && (
                   <div className="bg-white/50 rounded-lg p-3 mt-3">
                     <p className="text-xs text-morandi-secondary mb-1">停留期限</p>
-                    <p className="font-semibold text-sm text-morandi-primary">{result.stayDuration}</p>
+                    <p className="font-semibold text-sm text-morandi-primary">
+                      {result.stayDuration}
+                    </p>
                   </div>
                 )}
 
@@ -352,5 +372,5 @@ export function VisaWidget() {
         </div>
       </div>
     </div>
-  );
+  )
 }

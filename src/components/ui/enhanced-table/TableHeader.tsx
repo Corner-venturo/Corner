@@ -1,28 +1,34 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronUp, ChevronDown, ChevronsUpDown, Filter } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { TableColumn, SelectionConfig } from './types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
+import { ChevronUp, ChevronDown, ChevronsUpDown, Filter } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { TableColumn, SelectionConfig } from './types'
 
 interface TableHeaderProps {
-  columns: TableColumn[];
-  sortColumn: string | null;
-  sortDirection: 'asc' | 'desc';
-  filters: Record<string, string>;
-  showFilters: boolean;
-  selection?: SelectionConfig;
-  actions?: (row: any) => React.ReactNode;
-  allVisibleSelected: boolean;
-  someVisibleSelected: boolean;
-  onSort: (columnKey: string) => void;
-  onFilterChange: (key: string, value: string) => void;
-  onToggleFilters: () => void;
-  onToggleSelectAll: () => void;
+  columns: TableColumn[]
+  sortColumn: string | null
+  sortDirection: 'asc' | 'desc'
+  filters: Record<string, string>
+  showFilters: boolean
+  selection?: SelectionConfig
+  actions?: (row: any) => React.ReactNode
+  allVisibleSelected: boolean
+  someVisibleSelected: boolean
+  onSort: (columnKey: string) => void
+  onFilterChange: (key: string, value: string) => void
+  onToggleFilters: () => void
+  onToggleSelectAll: () => void
 }
 
 export function TableHeader({
@@ -42,12 +48,14 @@ export function TableHeader({
 }: TableHeaderProps) {
   const getSortIcon = (columnKey: string) => {
     if (sortColumn !== columnKey) {
-      return <ChevronsUpDown size={12} className="text-morandi-secondary opacity-50" />;
+      return <ChevronsUpDown size={12} className="text-morandi-secondary opacity-50" />
     }
-    return sortDirection === 'asc' ?
-      <ChevronUp size={12} className="text-morandi-gold transition-colors" /> :
-      <ChevronDown size={12} className="text-morandi-gold transition-colors" />;
-  };
+    return sortDirection === 'asc' ? (
+      <ChevronUp size={12} className="text-morandi-gold transition-colors" />
+    ) : (
+      <ChevronDown size={12} className="text-morandi-gold transition-colors" />
+    )
+  }
 
   return (
     <thead className="sticky top-0 z-10 bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 backdrop-blur-sm">
@@ -66,10 +74,13 @@ export function TableHeader({
         )}
 
         {columns.map((column, index) => (
-          <th key={column.key} className={cn(
-            "text-left py-2.5 px-4 text-xs relative align-middle",
-            index === columns.length - 1 && "border-r-0"
-          )}>
+          <th
+            key={column.key}
+            className={cn(
+              'text-left py-2.5 px-4 text-xs relative align-middle',
+              index === columns.length - 1 && 'border-r-0'
+            )}
+          >
             {index < columns.length - 1 && (
               <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
             )}
@@ -94,10 +105,13 @@ export function TableHeader({
                   className="text-morandi-primary hover:text-morandi-primary"
                   onClick={onToggleFilters}
                 >
-                  <Filter size={12} className={cn(
-                    "transition-colors",
-                    showFilters ? "text-morandi-primary" : "text-morandi-muted"
-                  )} />
+                  <Filter
+                    size={12}
+                    className={cn(
+                      'transition-colors',
+                      showFilters ? 'text-morandi-primary' : 'text-morandi-muted'
+                    )}
+                  />
                 </Button>
               )}
             </div>
@@ -118,20 +132,20 @@ export function TableHeader({
           {/* Selection checkbox column - empty */}
           {selection && <td className="py-3 px-4"></td>}
 
-          {columns.map((column) => (
+          {columns.map(column => (
             <td key={column.key} className="py-3 px-4">
               {column.filterable ? (
                 column.filterType === 'select' ? (
                   <Select
                     value={filters[column.key] || '__all__'}
-                    onValueChange={(value) => onFilterChange(column.key, value)}
+                    onValueChange={value => onFilterChange(column.key, value)}
                   >
                     <SelectTrigger className="h-9 text-sm">
                       <SelectValue placeholder={`選擇${column.label}...`} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__all__">全部{column.label}</SelectItem>
-                      {column.filterOptions?.map((option) => (
+                      {column.filterOptions?.map(option => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
@@ -143,7 +157,7 @@ export function TableHeader({
                     type={column.filterType || 'text'}
                     placeholder={`搜尋${column.label}...`}
                     value={filters[column.key] || ''}
-                    onChange={(e) => onFilterChange(column.key, e.target.value)}
+                    onChange={e => onFilterChange(column.key, e.target.value)}
                     className="h-9 text-sm"
                   />
                 )
@@ -156,5 +170,5 @@ export function TableHeader({
         </tr>
       )}
     </thead>
-  );
+  )
 }

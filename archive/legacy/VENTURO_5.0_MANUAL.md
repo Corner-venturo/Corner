@@ -32,6 +32,7 @@
 ## 📖 文檔使用指南
 
 ### 使用指南
+
 1. 開始開發前閱讀本文件了解系統架構
 2. 遵循架構規範與開發檢查清單
 3. 參考範例程式碼確保正確實作
@@ -41,9 +42,11 @@
 ## 📋 系統概述
 
 ### 專案定位
+
 Venturo 是一個旅行社內部管理系統，目前處於開發階段，採用本地優先架構。
 
 ### 核心決策
+
 - **為什麼離線優先？** - 確保無網路時系統仍可運作，提升使用體驗
 - **為什麼 IndexedDB + Supabase？** - 本地快取 + 雲端同步 = 最佳方案
 - **為什麼保留現有 UI？** - UI/UX 已經驗證可用，只需修復資料層
@@ -56,12 +59,14 @@ Venturo 是一個旅行社內部管理系統，目前處於開發階段，採用
 ### 當前架構
 
 **離線優先 + 雲端同步**
+
 - Supabase 雲端資料庫（多人協作）
 - IndexedDB 本地快取（離線支援）
 - 自動同步機制
 - 角色卡快速登入
 
 ### 設計原則
+
 1. **簡單優先** - 不過度設計，夠用就好
 2. **漸進增強** - 先跑起來，再優化
 3. **保持彈性** - 預留擴充空間，但不預先實作
@@ -72,17 +77,18 @@ Venturo 是一個旅行社內部管理系統，目前處於開發階段，採用
 
 ### 五層架構定義
 
-| 層級 | 職責 | 技術實作 | 禁止事項 |
-|------|------|---------|---------|
-| **UI Layer** | 顯示資料、使用者互動 | React Components, Shadcn UI | 不可直接調用 Store/DB |
-| **Hook Layer** | 業務邏輯、資料編排 | Custom Hooks (useTours, useOrders) | 不可直接操作 DB |
-| **Service Layer** | API 抽象、資料轉換 | API Services（預留未來使用） | 不可包含業務規則 |
-| **Store Layer** | 狀態管理、快取 | Zustand + Persist | 不可包含業務邏輯 |
-| **DB Layer** | 資料持久化 | IndexedDB → Supabase | 不可包含業務規則 |
+| 層級              | 職責                 | 技術實作                           | 禁止事項              |
+| ----------------- | -------------------- | ---------------------------------- | --------------------- |
+| **UI Layer**      | 顯示資料、使用者互動 | React Components, Shadcn UI        | 不可直接調用 Store/DB |
+| **Hook Layer**    | 業務邏輯、資料編排   | Custom Hooks (useTours, useOrders) | 不可直接操作 DB       |
+| **Service Layer** | API 抽象、資料轉換   | API Services（預留未來使用）       | 不可包含業務規則      |
+| **Store Layer**   | 狀態管理、快取       | Zustand + Persist                  | 不可包含業務邏輯      |
+| **DB Layer**      | 資料持久化           | IndexedDB → Supabase               | 不可包含業務規則      |
 
 ### 資料流規範
 
 **✅ 正確流程**：
+
 ```
 登入流程：
 1. 有角色卡 → IndexedDB（離線快速登入）
@@ -95,6 +101,7 @@ UI → Hook → Store → Supabase（雲端）
 ```
 
 **❌ 錯誤流程**：
+
 ```
 UI → Store ❌ (跳過 Hook)
 UI → DB ❌ (跳過中間層)
@@ -104,6 +111,7 @@ Hook → DB ❌ (跳過 Store)
 ### 層級職責詳解
 
 #### 1. UI Layer - 純展示層
+
 ```typescript
 // ✅ 正確：只處理顯示邏輯
 function TourList() {
@@ -125,44 +133,47 @@ function BadTourList() {
 ```
 
 #### 2. Hook Layer - 業務邏輯層
+
 ```typescript
 // ✅ 正確：集中業務邏輯
 export function useTours() {
-  const store = useTourStore();
+  const store = useTourStore()
 
   const canEditTour = (tour: Tour): boolean => {
-    return tour.status === 'draft' && hasPermission('tour:edit');
-  };
+    return tour.status === 'draft' && hasPermission('tour:edit')
+  }
 
   const createTour = async (data: CreateTourData) => {
-    validateTourDates(data);
-    const enrichedData = calculateTourMetrics(data);
-    return await store.create(enrichedData);
-  };
+    validateTourDates(data)
+    const enrichedData = calculateTourMetrics(data)
+    return await store.create(enrichedData)
+  }
 
-  return { tours: store.items, canEditTour, createTour };
+  return { tours: store.items, canEditTour, createTour }
 }
 ```
 
 #### 3. Service Layer - API 抽象層（預留擴充）
+
 ```typescript
 // 預留未來擴充：統一 API 介面
 export class TourService {
   async getAll(): Promise<Tour[]> {
-    const response = await fetch('/api/tours');
-    return response.json();
+    const response = await fetch('/api/tours')
+    return response.json()
   }
 
   async create(data: CreateTourData): Promise<Tour> {
-    return await apiClient.post('/tours', data);
+    return await apiClient.post('/tours', data)
   }
 }
 ```
 
 #### 4. Store Layer - 狀態管理層
+
 ```typescript
 // ✅ 正確：純狀態管理，無業務邏輯
-export const useTourStore = createStore<Tour>('tours', 'T');
+export const useTourStore = createStore<Tour>('tours', 'T')
 
 // 自動提供：
 // - items: Tour[]
@@ -172,6 +183,7 @@ export const useTourStore = createStore<Tour>('tours', 'T');
 ```
 
 #### 5. DB Layer - 資料持久層
+
 ```typescript
 // ✅ 正確：純 CRUD 操作
 export class LocalDatabase {
@@ -188,11 +200,13 @@ export class LocalDatabase {
 #### 離線行為
 
 **編號策略**：
+
 - 編號格式：依各實體規則（如 `T20250001`、`O20250001`）
 - 離線建立時：**流水號部分留空**，等上線後由後端分配
 - 前端顯示：使用臨時編號（TEMP-xxx）供使用者識別
 
 **資料狀態標記**：
+
 ```typescript
 {
   id: "uuid-123",
@@ -219,6 +233,7 @@ export class LocalDatabase {
 3. 網路恢復時 - 偵測到連線恢復
 
 **同步流程**：
+
 1. 檢查網路連線
 2. 查詢 `sync_status = 'pending'` 的資料
 3. 批次上傳到後端 API
@@ -247,6 +262,7 @@ export class LocalDatabase {
 - 人工調整：事後可手動合併或刪除重複資料
 
 **範例流程**：
+
 - 離線建立：`code = null`, `temp_code = "TEMP-001"`
 - 上線同步：檢查當前最大流水號
 - 後端分配：`T20250009`（自動遞增）
@@ -256,16 +272,17 @@ export class LocalDatabase {
 
 **新增欄位（套用到所有實體表）**：
 
-| 欄位 | 型別 | 預設值 | 說明 |
-|------|------|--------|------|
-| `sync_status` | TEXT | 'pending' | pending: 待同步<br>synced: 已同步<br>conflict: 衝突 |
-| `temp_code` | TEXT | NULL | 離線時的臨時編號 |
-| `synced_at` | DATETIME | NULL | 最後同步時間 |
+| 欄位          | 型別     | 預設值    | 說明                                                |
+| ------------- | -------- | --------- | --------------------------------------------------- |
+| `sync_status` | TEXT     | 'pending' | pending: 待同步<br>synced: 已同步<br>conflict: 衝突 |
+| `temp_code`   | TEXT     | NULL      | 離線時的臨時編號                                    |
+| `synced_at`   | DATETIME | NULL      | 最後同步時間                                        |
 
 **Schema 更新**：
+
 ```typescript
 // src/lib/db/schemas.ts
-export const DB_VERSION = 8; // 從 7 升級到 8
+export const DB_VERSION = 8 // 從 7 升級到 8
 
 // 每個資料表都加入這兩個索引
 indexes: [
@@ -278,11 +295,13 @@ indexes: [
 #### UI 顯示規範
 
 **狀態標記**：
+
 - ✅ 已同步 - `sync_status === 'synced'`
 - ⏳ 待同步 - `sync_status === 'pending'`
-- ⚠️ 衝突   - `sync_status === 'conflict'`
+- ⚠️ 衝突 - `sync_status === 'conflict'`
 
 **編號顯示**：
+
 ```typescript
 // 顯示邏輯
 const displayCode = item.code || item.temp_code || '建立中...'
@@ -290,6 +309,7 @@ const statusIcon = item.sync_status === 'synced' ? '✅' : '⏳'
 ```
 
 **列表範例**：
+
 ```
 ✅ T20250001 - 東京五日遊
 ⏳ TEMP-001  - 大阪賞櫻團（待同步）
@@ -298,6 +318,7 @@ const statusIcon = item.sync_status === 'synced' ? '✅' : '⏳'
 #### 實作清單
 
 **同步機制**：
+
 - BaseEntity 包含 sync 相關欄位
 - DB_VERSION 8
 - Store 建立時預設 `sync_status = 'pending'`
@@ -308,6 +329,7 @@ const statusIcon = item.sync_status === 'synced' ? '✅' : '⏳'
 - 同步結果通知（成功/失敗）
 
 **未來擴充**：
+
 - Supabase 即時訂閱（付費方案後）
 - 多設備資料同步
 - 衝突解決 UI 介面
@@ -317,6 +339,7 @@ const statusIcon = item.sync_status === 'synced' ? '✅' : '⏳'
 ## 🎯 **核心概念總結**
 
 **不硬編碼的設計**：
+
 - ✅ 編號格式由各 Store 的 `codePrefix` 決定（T, O, C...）
 - ✅ 流水號邏輯在 `generateCode()` 函數
 - ✅ 離線時 `code = null`，顯示 `temp_code`
@@ -358,9 +381,7 @@ export default function YourPage() {
 ```tsx
 // src/components/layout/main-layout.tsx
 <main className="h-screen transition-all duration-300 pt-[72px] ...">
-  <div className="p-6 h-full">
-    {children}  // ← 頁面組件在這裡
-  </div>
+  <div className="p-6 h-full">{children} // ← 頁面組件在這裡</div>
 </main>
 ```
 
@@ -409,15 +430,16 @@ export default function BadPage() {
 
 ### 命名規則
 
-| 類型 | 格式 | 範例 |
-|------|------|------|
-| Component | kebab-case | `tour-list.tsx` |
-| Hook | use-* | `use-tours.ts` |
-| Store | kebab-case + .store | `tour.store.ts` |
-| Type | kebab-case + .types | `tour.types.ts` |
-| Util | kebab-case | `date-utils.ts` |
+| 類型      | 格式                | 範例            |
+| --------- | ------------------- | --------------- |
+| Component | kebab-case          | `tour-list.tsx` |
+| Hook      | use-\*              | `use-tours.ts`  |
+| Store     | kebab-case + .store | `tour.store.ts` |
+| Type      | kebab-case + .types | `tour.types.ts` |
+| Util      | kebab-case          | `date-utils.ts` |
 
 **⚠️ 重要說明（2025-01-06 修正）：**
+
 - 組件檔案統一用 `kebab-case`（文檔原寫 PascalCase 但專案實際用 kebab-case）
 - Hook 檔案統一 `use-*.ts` 格式
 - 詳細規範請見 [CODE_STANDARDS.md](./CODE_STANDARDS.md)
@@ -427,6 +449,7 @@ export default function BadPage() {
 **核心原則：全系統 100% 使用 snake_case**
 
 **決策理由（2025-10-08）：**
+
 - ✅ Local-First 架構：IndexedDB 是主要資料庫
 - ✅ 減少轉換層：未來接 Supabase 無痛對接
 - ✅ 資料庫標準：snake_case 是 SQL 標準
@@ -435,22 +458,23 @@ export default function BadPage() {
 ```typescript
 // ✅ 正確：全系統統一 snake_case
 interface Tour {
-  tour_name: string;
-  start_date: string;
-  created_at: string;
+  tour_name: string
+  start_date: string
+  created_at: string
 }
 
 // ❌ 錯誤：不要混用
 interface BadTour {
-  tourName: string;    // ❌ camelCase
-  start_date: string;  // ✅ snake_case
-  createdAt: string;   // ❌ camelCase
+  tourName: string // ❌ camelCase
+  start_date: string // ✅ snake_case
+  createdAt: string // ❌ camelCase
 }
 ```
 
 ### 🗄️ 資料表命名規範
 
 **全部使用 snake_case：**
+
 ```typescript
 // ✅ 正確
 'payment_requests'
@@ -471,33 +495,37 @@ interface BadTour {
 ### 🚨 命名檢查清單
 
 **Types 檔案 (src/types/\*.ts)：**
+
 - ✅ 所有 interface 欄位用 snake_case
 - ✅ 狀態值常量也用 snake_case（`'in_progress'`）
 
 **Stores 檔案 (src/stores/\*.ts)：**
+
 - ✅ 所有 interface 欄位用 snake_case
 - ✅ Store 內部操作欄位用 snake_case
 
 **Components 檔案 (src/components/\*\*/\*.tsx)：**
+
 - ✅ 所有資料物件欄位用 snake_case
 - ✅ IndexedDB 和 Supabase 都用 snake_case
 
 **API Routes 檔案 (src/app/api/\*\*/route.ts)：**
+
 - ✅ 全部用 snake_case
 - ✅ 前後端統一，無需轉換
 
 ### 📋 常見錯誤對照表
 
 | ❌ 錯誤寫法 (camelCase) | ✅ 正確寫法 (snake_case) |
-|-----------|-----------|
-| `employeeNumber` | `employee_number` |
-| `tourName` | `tour_name` |
-| `createdAt` | `created_at` |
-| `updatedAt` | `updated_at` |
-| `isActive` | `is_active` |
-| `fieldKey` | `field_key` |
-| `startDate` | `start_date` |
-| `endDate` | `end_date` |
+| ----------------------- | ------------------------ |
+| `employeeNumber`        | `employee_number`        |
+| `tourName`              | `tour_name`              |
+| `createdAt`             | `created_at`             |
+| `updatedAt`             | `updated_at`             |
+| `isActive`              | `is_active`              |
+| `fieldKey`              | `field_key`              |
+| `startDate`             | `start_date`             |
+| `endDate`               | `end_date`               |
 
 ---
 
@@ -506,6 +534,7 @@ interface BadTour {
 ### 核心理念：離線優先 + Supabase 準備
 
 VENTURO 5.0 認證系統採用「離線優先，雲端準備」的設計理念：
+
 - **當前架構**：本地 IndexedDB 認證，支援離線登入
 - **未來擴充**：Supabase Auth，支援多人協作
 - **架構設計**：UUID 準備、LocalProfile 機制，確保平滑升級
@@ -592,6 +621,7 @@ const userId = authData.user.id;  // ← 同樣是 UUID 格式！
 ```
 
 **優勢**：
+
 - ✅ 避免 ID 衝突（本地自增 ID vs Supabase UUID）
 - ✅ 未來遷移時，只需替換 ID 生成邏輯，其他代碼不變
 - ✅ 符合 Supabase Auth 標準（auth.user.id 就是 UUID）
@@ -603,15 +633,15 @@ const userId = authData.user.id;  // ← 同樣是 UUID 格式！
 ```typescript
 // 儲存位置：localStorage 'venturo:auth:profile'
 interface LocalProfile {
-  id: string;                    // UUID
-  employeeNumber: string;        // 員工編號
-  chineseName: string;           // 中文姓名
-  englishName: string;           // 英文姓名
-  department: string;            // 部門
-  position: string;              // 職位
-  permissions: string[];         // 權限列表
-  email: string;                 // Email
-  status: 'active' | 'terminated'; // 狀態
+  id: string // UUID
+  employeeNumber: string // 員工編號
+  chineseName: string // 中文姓名
+  englishName: string // 英文姓名
+  department: string // 部門
+  position: string // 職位
+  permissions: string[] // 權限列表
+  email: string // Email
+  status: 'active' | 'terminated' // 狀態
 }
 ```
 
@@ -633,21 +663,21 @@ export class OfflineAuthService {
     password: string
   ): Promise<{ success: boolean; profile?: LocalProfile; message?: string }> {
     // 1. 從 IndexedDB 查詢員工
-    const employees = await localDB.getAll<any>('users');
-    const employee = employees.find((emp: any) => emp.employeeNumber === employeeNumber);
+    const employees = await localDB.getAll<any>('users')
+    const employee = employees.find((emp: any) => emp.employeeNumber === employeeNumber)
 
     if (!employee) {
-      return { success: false, message: '員工編號不存在' };
+      return { success: false, message: '員工編號不存在' }
     }
 
     // 2. 檢查狀態
     if (employee.status !== 'active') {
-      return { success: false, message: '此帳號已停用' };
+      return { success: false, message: '此帳號已停用' }
     }
 
     // 3. 驗證密碼（預設密碼 = 員工編號）
     if (password !== employee.employeeNumber) {
-      return { success: false, message: '密碼錯誤' };
+      return { success: false, message: '密碼錯誤' }
     }
 
     // 4. 建立 LocalProfile
@@ -656,28 +686,28 @@ export class OfflineAuthService {
       employeeNumber: employee.employeeNumber,
       chineseName: employee.chineseName,
       // ... 其他欄位
-    };
+    }
 
     // 5. 存入 localStorage
-    this.saveProfile(profile);
+    this.saveProfile(profile)
 
-    return { success: true, profile };
+    return { success: true, profile }
   }
 
   // 儲存登入卡片
   static saveProfile(profile: LocalProfile): void {
-    localStorage.setItem('venturo:auth:profile', JSON.stringify(profile));
+    localStorage.setItem('venturo:auth:profile', JSON.stringify(profile))
   }
 
   // 取得登入卡片
   static getProfile(): LocalProfile | null {
-    const data = localStorage.getItem('venturo:auth:profile');
-    return data ? JSON.parse(data) : null;
+    const data = localStorage.getItem('venturo:auth:profile')
+    return data ? JSON.parse(data) : null
   }
 
   // 登出（清除卡片）
   static logout(): void {
-    localStorage.removeItem('venturo:auth:profile');
+    localStorage.removeItem('venturo:auth:profile')
   }
 }
 ```
@@ -685,11 +715,13 @@ export class OfflineAuthService {
 ### 密碼規則
 
 **當前實作**：
+
 - 預設密碼 = 員工編號
 - 範例：員工編號 `EMP001` → 預設密碼 `EMP001`
 - 首次登入後可在「設定頁」修改密碼
 
 **未來擴充**：
+
 - 強制密碼規則：至少 8 字元 + 英數混合
 - 首次登入必須修改密碼
 - 支援密碼重設流程（Email 驗證）
@@ -704,28 +736,25 @@ const handlePasswordUpdate = async () => {
     .from('users')
     .select('password_hash')
     .eq('employee_number', user.employeeNumber)
-    .single();
+    .single()
 
-  const isPasswordValid = await verifyPassword(
-    passwordData.currentPassword,
-    userData.password_hash
-  );
+  const isPasswordValid = await verifyPassword(passwordData.currentPassword, userData.password_hash)
 
   if (!isPasswordValid) {
-    alert('目前密碼錯誤！');
-    return;
+    alert('目前密碼錯誤！')
+    return
   }
 
   // 2. 更新新密碼
-  const hashedPassword = await hashPassword(passwordData.newPassword);
+  const hashedPassword = await hashPassword(passwordData.newPassword)
 
   await supabase
     .from('users')
     .update({ password_hash: hashedPassword })
-    .eq('employee_number', user.employeeNumber);
+    .eq('employee_number', user.employeeNumber)
 
-  alert('✅ 密碼更新成功！');
-};
+  alert('✅ 密碼更新成功！')
+}
 ```
 
 ### 權限檢查
@@ -734,7 +763,7 @@ const handlePasswordUpdate = async () => {
 
 ```typescript
 // LocalProfile.permissions
-const permissions = ['訂單管理', '客戶管理', '財務檢視'];
+const permissions = ['訂單管理', '客戶管理', '財務檢視']
 
 // 檢查權限
 if (profile.permissions.includes('訂單管理')) {
@@ -755,9 +784,9 @@ enum Permission {
 }
 
 // 檢查權限
-import { usePermissions } from '@/hooks/use-permissions';
+import { usePermissions } from '@/hooks/use-permissions'
 
-const { hasPermission } = usePermissions();
+const { hasPermission } = usePermissions()
 
 if (hasPermission(Permission.ORDER_WRITE)) {
   // 可以編輯訂單
@@ -767,12 +796,14 @@ if (hasPermission(Permission.ORDER_WRITE)) {
 ### 安全性考量
 
 **當前實作**（開發階段）：
+
 - ✅ 密碼本地驗證（bcrypt hash）
 - ✅ LocalProfile 儲存在 localStorage（僅限開發）
 - ⚠️ 無 HTTPS 強制要求
 - ⚠️ 無 Session 過期機制
 
 **未來擴充**（生產環境）：
+
 - ✅ Supabase Auth（行業標準）
 - ✅ JWT Token 自動管理
 - ✅ HTTPS 強制
@@ -783,16 +814,19 @@ if (hasPermission(Permission.ORDER_WRITE)) {
 ### 常見問題
 
 **Q1: 為什麼不直接用 Supabase Auth？**
+
 - 離線優先架構，Supabase Auth 需要網路
 - 避免開發階段的網路依賴，提高迭代速度
 - UUID 架構已準備好，未來升級無痛
 
 **Q2: LocalProfile 會不會不安全？**
+
 - 當前為內部開發環境，無公開暴露
 - 未來會替換為 Supabase Session，符合安全標準
 - 「先跑起來，再讓它對」的原則
 
 **Q3: 密碼預設為員工編號合理嗎？**
+
 - 開發階段方便測試
 - 設定頁已提供修改密碼功能
 - 未來會強制首次登入修改密碼
@@ -800,6 +834,7 @@ if (hasPermission(Permission.ORDER_WRITE)) {
 ### 實作清單
 
 **已完成**：
+
 - 登入頁面（員工編號 + 密碼表單）
 - OfflineAuthService（本地認證邏輯）
 - LocalProfile 機制（localStorage 儲存）
@@ -808,6 +843,7 @@ if (hasPermission(Permission.ORDER_WRITE)) {
 - 修改密碼功能（設定頁）
 
 **未來擴充**：
+
 - Session 過期處理
 - Supabase Auth 整合
 - 多設備登入管理
@@ -819,6 +855,7 @@ if (hasPermission(Permission.ORDER_WRITE)) {
 ### 核心問題：網路狂飆
 
 **問題描述**：
+
 - Sidebar/Layout 預先載入所有資料
 - 每個頁面都在重複讀取
 - IndexedDB/網路一直被查詢
@@ -867,25 +904,25 @@ function Sidebar() {
 
 **所有 stores 使用相同方法名：**
 
-| 方法 | 說明 | 範例 |
-|------|------|------|
-| `items` | 資料陣列 | `const { items: tours } = useTourStore()` |
-| `fetchAll()` | 載入所有 | `await fetchAll()` |
-| `fetchById(id)` | 載入單筆 | `await fetchById('123')` |
-| `create(data)` | 新增 | `await create({ name: '日本團' })` |
-| `update(id, data)` | 更新 | `await update('123', { name: '日本團2.0' })` |
-| `delete(id)` | 刪除 | `await delete('123')` |
-| `loading` | 載入狀態 | `const loading = useTourStore(s => s.loading)` |
-| `error` | 錯誤訊息 | `const error = useTourStore(s => s.error)` |
+| 方法               | 說明     | 範例                                           |
+| ------------------ | -------- | ---------------------------------------------- |
+| `items`            | 資料陣列 | `const { items: tours } = useTourStore()`      |
+| `fetchAll()`       | 載入所有 | `await fetchAll()`                             |
+| `fetchById(id)`    | 載入單筆 | `await fetchById('123')`                       |
+| `create(data)`     | 新增     | `await create({ name: '日本團' })`             |
+| `update(id, data)` | 更新     | `await update('123', { name: '日本團2.0' })`   |
+| `delete(id)`       | 刪除     | `await delete('123')`                          |
+| `loading`          | 載入狀態 | `const loading = useTourStore(s => s.loading)` |
+| `error`            | 錯誤訊息 | `const error = useTourStore(s => s.error)`     |
 
 ```typescript
 // ✅ 正確：使用工廠 store 標準方法
-import { useTourStore, useOrderStore } from '@/stores';
+import { useTourStore, useOrderStore } from '@/stores'
 
-const { items: tours, fetchAll, create, update, delete: deleteTour } = useTourStore();
+const { items: tours, fetchAll, create, update, delete: deleteTour } = useTourStore()
 
 // ❌ 錯誤：期待舊的自訂方法名
-const { tours, addTour, updateTour, deleteTour } = useTourStore(); // ❌ 這些方法不存在
+const { tours, addTour, updateTour, deleteTour } = useTourStore() // ❌ 這些方法不存在
 ```
 
 ### 資料流向
@@ -931,12 +968,14 @@ export default function ToursPage() {
 ### 效能對比
 
 **Before（舊架構）：**
+
 - ❌ Sidebar 載入所有資料
 - ❌ 每個頁面重複載入
 - ❌ localStorage persist 自動觸發
 - ❌ 首次進入任何頁面：載入 10+ 張表
 
 **After（新架構）：**
+
 - ✅ 只在進入頁面時載入該頁資料
 - ✅ Memory Cache (10s) 減少重複讀取
 - ✅ IndexedDB 按需讀取
@@ -945,12 +984,14 @@ export default function ToursPage() {
 ### 實作檢查清單
 
 **新增頁面時：**
+
 - [ ] 在頁面組件內呼叫 `fetchAll()`
 - [ ] 使用 `useEffect` 確保只載入一次
 - [ ] 使用工廠 store 的標準方法（`items`, `create`, `update`, `delete`）
 - [ ] 不在 Layout/Sidebar 載入資料
 
 **修改現有頁面時：**
+
 - [ ] 檢查是否有全域載入（Layout/useEffect）
 - [ ] 移除 Sidebar 的資料讀取
 - [ ] 改用 Route-based Loading
@@ -1015,6 +1056,7 @@ export default function ToursPage() {
 ### 基礎建設
 
 #### 型別系統
+
 - [x] 建立 `types/base.types.ts`
 - [x] 建立 `types/employee.types.ts`
 - [x] 建立 `types/tour.types.ts`
@@ -1029,6 +1071,7 @@ export default function ToursPage() {
 - [x] 移除所有 any 類型
 
 #### IndexedDB 層
+
 - [x] 建立 `lib/db/schemas.ts` - 資料表結構定義
 - [x] 建立 `lib/db/migrations.ts` - 版本升級邏輯
 - [x] 建立 `lib/db/index.ts` - LocalDatabase 主類別
@@ -1040,6 +1083,7 @@ export default function ToursPage() {
 - [x] 自動初始化與版本管理
 
 #### Store 系統
+
 - [x] 建立 `stores/create-store.ts` - Store 工廠函數
 - [x] 實作自動 CRUD 生成（create, read, update, delete）
 - [x] 實作批次操作（createMany, deleteMany）
@@ -1054,6 +1098,7 @@ export default function ToursPage() {
 ### 整合測試
 
 #### Hook 層
+
 - [x] 建立 useTours
 - [x] 建立 useOrders
 - [x] 建立 useCustomers
@@ -1064,18 +1109,21 @@ export default function ToursPage() {
 - [x] 加入資料驗證（Zod schemas）
 
 #### UI 整合
+
 - 替換舊的資料來源
 - 測試 CRUD 功能
 - 修復顯示問題
 - 確認資料綁定
 
 #### 認證系統
+
 - 建立 `auth.store.ts`
 - 實作登入邏輯
 - 加入 session 管理
 - 測試權限控制
 
 #### 錯誤處理
+
 - 加入全域錯誤邊界
 - 實作錯誤提示
 - 加入重試機制
@@ -1088,38 +1136,44 @@ export default function ToursPage() {
 ### 問題 1: 為什麼不直接用 Supabase？
 
 **原因**:
+
 - 開發階段頻繁改動，同步增加複雜度
 - 本地開發不需要網路，提高效率
 - 避免資料庫 schema 不一致問題
 
 **未來擴充**:
+
 - 會加入 Supabase 雲端同步
 - 只需修改 DB 層，其他層不用動
 
 ### 問題 2: 為什麼 Store 方法不統一？
 
 **原因**:
+
 - 歷史遺留問題
 - 不同開發者的習慣
 
 **解決方案**:
+
 ```typescript
 // 統一規範：所有方法返回 Promise
 interface StoreOperations<T> {
-  add: (data: T) => Promise<T>;
-  update: (id: string, data: T) => Promise<T>;
-  delete: (id: string) => Promise<void>;
+  add: (data: T) => Promise<T>
+  update: (id: string, data: T) => Promise<T>
+  delete: (id: string) => Promise<void>
 }
 ```
 
 ### 問題 3: TypeScript 錯誤太多
 
 **原因**:
+
 - 型別定義不完整
 - any 類型濫用
 - 介面不一致
 
 **解決優先順序**:
+
 1. 先修 TS2339（屬性不存在）
 2. 再修 TS2322（類型不匹配）
 3. 最後修其他錯誤
@@ -1143,15 +1197,16 @@ Member (團員)
 
 ### 編號規則
 
-| 實體 | 格式 | 範例 | 說明 |
-|------|------|------|------|
-| Tour | {目的地代碼}{MMDD}{3位數} | JPT0810001 | 目的地+出發日期+流水號 |
-| Order | {團號}-{3位數} | VISA2025001-001 | 團號+該團訂單流水號 |
-| Customer | C{year}{4位數} | C20240001 | 年份+流水號 |
-| Payment | P{year}{4位數} | P20240001 | 年份+流水號 |
-| Quote | Q{year}{4位數} | Q20240001 | 年份+流水號 |
+| 實體     | 格式                      | 範例            | 說明                   |
+| -------- | ------------------------- | --------------- | ---------------------- |
+| Tour     | {目的地代碼}{MMDD}{3位數} | JPT0810001      | 目的地+出發日期+流水號 |
+| Order    | {團號}-{3位數}            | VISA2025001-001 | 團號+該團訂單流水號    |
+| Customer | C{year}{4位數}            | C20240001       | 年份+流水號            |
+| Payment  | P{year}{4位數}            | P20240001       | 年份+流水號            |
+| Quote    | Q{year}{4位數}            | Q20240001       | 年份+流水號            |
 
 **訂單編號說明：**
+
 - 訂單編號依附於團號，每個團獨立流水號
 - 格式：`{團號}-{3位數流水號}`
 - 範例：
@@ -1168,6 +1223,7 @@ Member (團員)
 **日期**: 2025-01-06
 
 **原因**:
+
 - localStorage 只有 5-10MB 限制
 - IndexedDB 可存 GB 級資料
 - 支援索引和查詢
@@ -1178,6 +1234,7 @@ Member (團員)
 **日期**: 2025-01-06
 
 **原因**:
+
 - 更簡單的 API
 - 更少的樣板代碼
 - 內建 TypeScript 支援
@@ -1188,6 +1245,7 @@ Member (團員)
 **日期**: 2025-01-06
 
 **原因**:
+
 - 降低開發複雜度
 - 加快迭代速度
 - 避免網路問題
@@ -1198,12 +1256,14 @@ Member (團員)
 **日期**: 2025-01-06
 
 **原因**:
+
 - 避免重複代碼：統一 CRUD 邏輯
 - 維護更簡單：一個工廠管理所有
 - 自動編號生成：內建 code 生成邏輯
 - 型別安全：完整 TypeScript 支援
 
 **架構說明**:
+
 ```
 src/stores/
 ├── index.ts             # 用工廠建立所有 stores
@@ -1211,10 +1271,11 @@ src/stores/
 ```
 
 **使用方式**:
+
 ```typescript
 // 一行建立一個 Store
-export const useTourStore = createStore<Tour>('tours', 'T');
-export const useOrderStore = createStore<Order>('orders', 'O');
+export const useTourStore = createStore<Tour>('tours', 'T')
+export const useOrderStore = createStore<Order>('orders', 'O')
 ```
 
 ### Decision 005: 升級為五層架構
@@ -1222,12 +1283,14 @@ export const useOrderStore = createStore<Order>('orders', 'O');
 **日期**: 2025-01-06
 
 **原因**:
+
 - 職責分離：UI、業務邏輯、API、狀態、資料各司其職
 - 可擴展性：預留 Service Layer 供未來使用
 - 可測試性：每層可獨立測試
 - 可維護性：修改某層不影響其他層
 
 **架構定義**:
+
 ```
 UI Layer      → 純顯示與互動
 Hook Layer    → 業務邏輯與驗證
@@ -1237,6 +1300,7 @@ DB Layer      → 資料持久化
 ```
 
 **資料流**:
+
 - 當前: UI → Hook → Store → DB
 - 未來: UI → Hook → Service → API, 同時 Hook → Store (快取)
 
@@ -1245,17 +1309,20 @@ DB Layer      → 資料持久化
 **日期**: 2025-01-06
 
 **原因**:
+
 - 細粒度控制：每個操作都有對應權限
 - 角色導向：5 種角色對應不同權限組合
 - 多層防護：UI、Hook、Service 三層檢查
 - 可審計：所有權限操作都可追蹤
 
 **權限類型**:
-- 資源權限：tour:*, order:*, customer:*, payment:*, quote:*
+
+- 資源權限：tour:_, order:_, customer:_, payment:_, quote:\*
 - 操作權限：create, read, update, delete, approve, export
 - 系統權限：settings, users, backup, audit
 
 **角色定義**:
+
 - admin: 完整權限
 - manager: 業務 + 部分財務
 - sales: 旅遊 + 訂單 + 客戶
@@ -1267,12 +1334,14 @@ DB Layer      → 資料持久化
 **日期**: 2025-01-06
 
 **原因**:
+
 - 統一錯誤處理：5 種標準錯誤類別
 - 分級處理：warning、error、critical
 - 使用者友善：不同錯誤不同呈現方式
 - 開發友善：完整錯誤追蹤與日誌
 
 **錯誤分類**:
+
 ```typescript
 ValidationError   → 表單驗證錯誤 → Toast 提示
 PermissionError   → 權限不足 → 跳轉登入
@@ -1282,6 +1351,7 @@ NetworkError      → 網路錯誤 → Toast + 重試
 ```
 
 **處理流程**:
+
 1. Hook 層拋出特定錯誤
 2. ErrorBoundary 捕捉錯誤
 3. handleError 分類處理
@@ -1293,18 +1363,21 @@ NetworkError      → 網路錯誤 → Toast + 重試
 **日期**: 2025-01-06
 
 **原因**:
+
 - 清晰的領域邊界：4 個 Bounded Contexts
 - 業務邏輯封裝：Aggregates 保證一致性
 - 可擴展性：領域獨立演進
 - 團隊協作：明確的模組職責
 
 **Bounded Contexts**:
+
 1. Tour Management - 旅遊團管理
 2. Order Processing - 訂單處理
 3. Financial - 財務結算
 4. Customer Relationship - 客戶關係
 
 **核心概念**:
+
 - Aggregates: 聚合根保證一致性
 - Domain Events: 領域事件解耦
 - Anti-Corruption Layer: 防腐層隔離
@@ -1314,12 +1387,14 @@ NetworkError      → 網路錯誤 → Toast + 重試
 **日期**: 2025-01-06
 
 **原因**:
+
 - 解耦服務：透過事件通訊
 - 可追溯性：Event Sourcing 預留
 - 擴展性：新功能只需訂閱事件
 - 容錯性：事件重播機制
 
 **核心元件**:
+
 ```typescript
 Event Bus      → 事件發布/訂閱
 Event Store    → 事件持久化
@@ -1328,6 +1403,7 @@ Event Sourcing → 狀態重建
 ```
 
 **使用場景**:
+
 - 訂單建立 → 扣減庫存 + 發送郵件
 - 付款完成 → 更新訂單 + 財務記帳
 - 旅遊團取消 → 批次退款 + 通知客戶
@@ -1337,12 +1413,14 @@ Event Sourcing → 狀態重建
 **日期**: 2025-01-06
 
 **原因**:
+
 - 效能提升：減少 DB 查詢
 - 使用者體驗：快速回應
 - 成本控制：減少 API 呼叫
 - 離線支援：本地快取
 
 **快取架構**:
+
 ```
 L1: Memory (10s)     → LRU, 100 items
 L2: IndexedDB (1h)   → 10MB, persistent
@@ -1350,6 +1428,7 @@ L3: API/DB           → Source of truth
 ```
 
 **失效策略**:
+
 - Time-based: TTL 過期
 - Event-based: 監聽領域事件
 - Manual: 手動清除
@@ -1359,12 +1438,14 @@ L3: API/DB           → Source of truth
 **日期**: 2025-01-06
 
 **原因**:
+
 - 及早發現問題：Sentry 錯誤追蹤
 - 效能優化：Web Vitals 監控
 - 業務洞察：Business Metrics
 - 使用者體驗：效能追蹤
 
 **監控層級**:
+
 1. 錯誤監控 - Sentry
 2. 效能監控 - Core Web Vitals
 3. 業務指標 - Custom Analytics
@@ -1375,12 +1456,14 @@ L3: API/DB           → Source of truth
 **日期**: 2025-01-06
 
 **原因**:
+
 - 資料保護：敏感資料加密
 - 合規要求：GDPR、個資法
 - 風險控制：XSS/CSRF 防護
 - 可追蹤性：完整稽核日誌
 
 **安全措施**:
+
 - 資料加密：AES-256
 - PII 遮罩：日誌安全
 - XSS/CSRF 防護：Input Sanitization
@@ -1393,15 +1476,16 @@ L3: API/DB           → Source of truth
 
 ### 目標指標
 
-| 操作 | 目標時間 | 備註 |
-|------|---------|------|
-| 頁面載入 | < 2秒 | 首次載入 |
-| 資料查詢 | < 100ms | 1000筆內 |
-| 新增操作 | < 200ms | 含驗證 |
-| 更新操作 | < 200ms | 含驗證 |
-| 刪除操作 | < 100ms | 軟刪除 |
+| 操作     | 目標時間 | 備註     |
+| -------- | -------- | -------- |
+| 頁面載入 | < 2秒    | 首次載入 |
+| 資料查詢 | < 100ms  | 1000筆內 |
+| 新增操作 | < 200ms  | 含驗證   |
+| 更新操作 | < 200ms  | 含驗證   |
+| 刪除操作 | < 100ms  | 軟刪除   |
 
 ### 優化策略
+
 1. 虛擬滾動（超過 100 筆）
 2. 懶加載（分頁載入）
 3. 快取策略（LRU Cache）
@@ -1440,6 +1524,7 @@ DATABASE_URL=xxx
 ## 📦 型別系統實作
 
 ### 檔案清單
+
 1. **base.types.ts** (2.6KB)
    - BaseEntity 基礎介面
    - 分頁、篩選、排序型別
@@ -1485,6 +1570,7 @@ DATABASE_URL=xxx
    - 支援 `import { Tour } from '@/types'`
 
 ### 設計規範
+
 - **命名統一**：全部使用 snake_case
 - **繼承規範**：所有實體繼承 BaseEntity
 - **編號統一**：統一使用 `code` 欄位
@@ -1492,16 +1578,16 @@ DATABASE_URL=xxx
 - **日期格式**：統一使用 ISO 8601 字串
 
 ### 使用範例
+
 ```typescript
 // 從統一入口匯入
-import { Tour, Order, Customer, BaseEntity } from '@/types';
+import { Tour, Order, Customer, BaseEntity } from '@/types'
 
 // 型別安全的函數
 function createTour(data: CreateTourData): Promise<Tour> {
   // TypeScript 會自動檢查所有必填欄位
 }
 ```
-
 
 ---
 
@@ -1528,17 +1614,20 @@ function createTour(data: CreateTourData): Promise<Tour> {
 ### 核心功能
 
 #### 基本 CRUD
+
 - `create(table, data)` - 建立單筆
 - `read(table, id)` - 讀取單筆
 - `update(table, id, data)` - 更新單筆
 - `delete(table, id)` - 刪除單筆
 
 #### 批次操作
+
 - `createMany(table, dataArray)` - 批次建立
 - `updateMany(table, updates)` - 批次更新
 - `deleteMany(table, ids)` - 批次刪除
 
 #### 查詢功能
+
 - `getAll(table, options)` - 取得所有（支援排序、分頁）
 - `findByIndex(table, index, value)` - 索引查詢
 - `filter(table, conditions)` - 條件過濾
@@ -1546,6 +1635,7 @@ function createTour(data: CreateTourData): Promise<Tour> {
 - `exists(table, id)` - 檢查存在
 
 #### 工具方法
+
 - `clear(table)` - 清空單表
 - `clearAll()` - 清空所有
 - `export()` - 匯出資料
@@ -1568,11 +1658,11 @@ quoteItems, todos, visas, suppliers
 ### 使用範例
 
 ```typescript
-import { localDB } from '@/lib/db';
-import { Tour } from '@/types';
+import { localDB } from '@/lib/db'
+import { Tour } from '@/types'
 
 // 初始化（自動執行）
-await localDB.init();
+await localDB.init()
 
 // 建立資料
 const tour = await localDB.create<Tour>('tours', {
@@ -1580,20 +1670,20 @@ const tour = await localDB.create<Tour>('tours', {
   code: 'T20240001',
   name: '日本櫻花之旅',
   // ...
-});
+})
 
 // 查詢資料
 const tours = await localDB.getAll<Tour>('tours', {
   orderBy: 'startDate',
   direction: 'desc',
   limit: 10,
-});
+})
 
 // 條件過濾
 const activeTours = await localDB.filter<Tour>('tours', [
   { field: 'status', operator: 'eq', value: 'active' },
   { field: 'isActive', operator: 'eq', value: true },
-]);
+])
 ```
 
 ---
@@ -1618,6 +1708,7 @@ const activeTours = await localDB.filter<Tour>('tours', [
 ### 核心功能
 
 #### 自動 CRUD
+
 - `create(data)` - 建立單筆（自動生成 ID 和編號）
 - `fetchById(id)` - 取得單筆
 - `update(id, data)` - 更新單筆
@@ -1625,34 +1716,37 @@ const activeTours = await localDB.filter<Tour>('tours', [
 - `fetchAll()` - 取得所有資料
 
 #### 批次操作
+
 - `createMany(dataArray)` - 批次建立
 - `deleteMany(ids)` - 批次刪除
 
 #### 查詢功能
+
 - `findByField(field, value)` - 欄位查詢
 - `filter(predicate)` - 自訂過濾
 - `count()` - 計數
 
 #### 狀態管理
+
 - `loading` - 載入狀態
 - `error` - 錯誤訊息
 - `items` - 資料陣列
 
 ### 支援的 Stores（11 個）
 
-| Store | 編號前綴 | 範例 |
-|-------|---------|------|
-| useTourStore | T | T20240001 |
-| useOrderStore | O | O20240001 |
-| useCustomerStore | C | C20240001 |
-| usePaymentStore | P | P20240001 |
-| useQuoteStore | Q | Q20240001 |
-| usePaymentRequestStore | PR | PR20240001 |
-| useDisbursementOrderStore | DO | DO20240001 |
-| useReceiptOrderStore | RO | RO20240001 |
-| useMemberStore | - | 無編號 |
-| useQuoteItemStore | - | 無編號 |
-| useEmployeeStore | - | 使用 employeeNumber |
+| Store                     | 編號前綴 | 範例                |
+| ------------------------- | -------- | ------------------- |
+| useTourStore              | T        | T20240001           |
+| useOrderStore             | O        | O20240001           |
+| useCustomerStore          | C        | C20240001           |
+| usePaymentStore           | P        | P20240001           |
+| useQuoteStore             | Q        | Q20240001           |
+| usePaymentRequestStore    | PR       | PR20240001          |
+| useDisbursementOrderStore | DO       | DO20240001          |
+| useReceiptOrderStore      | RO       | RO20240001          |
+| useMemberStore            | -        | 無編號              |
+| useQuoteItemStore         | -        | 無編號              |
+| useEmployeeStore          | -        | 使用 employeeNumber |
 
 ### 設計特點
 
@@ -1714,14 +1808,17 @@ function TourList() {
 ### 架構優勢
 
 **對比傳統方式**：
+
 - ❌ 傳統：每個實體寫一個 Store 檔案（10+ 個檔案）
 - ✅ 新架構：只要 2 個檔案（create-store.ts + index.ts）
 
 **維護成本**：
+
 - ❌ 傳統：修改邏輯需要改 10+ 個檔案
 - ✅ 新架構：只需修改 create-store.ts
 
 **新增實體**：
+
 - ❌ 傳統：複製貼上整個檔案，容易出錯
 - ✅ 新架構：加一行 `export const useXxxStore = createStore(...)`
 
@@ -1769,65 +1866,69 @@ function TourList() {
 ### 核心設計模式
 
 #### 1. 業務邏輯分離
+
 ```typescript
 // ✅ 正確：業務邏輯集中在 Hook
 export function useTours() {
   const validateTourDates = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    const startDate = new Date(start)
+    const endDate = new Date(end)
 
     if (isNaN(startDate.getTime())) {
-      throw new TourDateValidationError('開始日期格式錯誤');
+      throw new TourDateValidationError('開始日期格式錯誤')
     }
     if (endDate <= startDate) {
-      throw new TourDateValidationError('結束日期必須晚於開始日期');
+      throw new TourDateValidationError('結束日期必須晚於開始日期')
     }
-  };
+  }
 
   const canEditTour = (tour: Tour): boolean => {
-    return tour.status === 'draft' || tour.status === 'active';
-  };
+    return tour.status === 'draft' || tour.status === 'active'
+  }
 }
 ```
 
 #### 2. 權限控制
+
 ```typescript
 // 每個 Hook 包含權限檢查
 const createTour = async (data: CreateTourData) => {
   if (!hasPermission('tour:create')) {
-    throw new TourPermissionError('沒有建立旅遊團的權限');
+    throw new TourPermissionError('沒有建立旅遊團的權限')
   }
   // ... 業務邏輯
-};
+}
 ```
 
 #### 3. 資料驗證
+
 ```typescript
 // 統一驗證模式
 const validateCustomerData = (data: Partial<Customer>) => {
   if (data.phone && !/^[0-9-+()]{8,15}$/.test(data.phone)) {
-    throw new Error('電話格式錯誤');
+    throw new Error('電話格式錯誤')
   }
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    throw new Error('Email 格式錯誤');
+    throw new Error('Email 格式錯誤')
   }
-};
+}
 ```
 
 #### 4. 自訂錯誤處理
+
 ```typescript
 // 專門的錯誤類別
 export class TourDateValidationError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'TourDateValidationError';
+    super(message)
+    this.name = 'TourDateValidationError'
   }
 }
 
 export class TourPermissionError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'TourPermissionError';
+    super(message)
+    this.name = 'TourPermissionError'
   }
 }
 ```
@@ -1835,6 +1936,7 @@ export class TourPermissionError extends Error {
 ### 業務功能完整度
 
 #### useTours - 旅遊團管理
+
 - ✅ 日期驗證與計算
 - ✅ 狀態管理（draft → active → completed → cancelled）
 - ✅ 權限控制（建立、編輯、刪除、查看）
@@ -1842,24 +1944,28 @@ export class TourPermissionError extends Error {
 - ✅ 統計功能（入住率、收入總額）
 
 #### useOrders - 訂單管理
+
 - ✅ 付款追蹤與計算
 - ✅ 自動狀態更新
 - ✅ 團員資料整合
 - ✅ 訂單查詢與篩選
 
 #### useCustomers - 客戶管理
+
 - ✅ 資料格式驗證
 - ✅ VIP 等級折扣
 - ✅ 智能搜尋（姓名、電話、Email）
 - ✅ VIP 客戶專屬查詢
 
 #### usePayments - 付款管理
+
 - ✅ 金額驗證
 - ✅ 付款方式管理
 - ✅ 訂單付款關聯
 - ✅ 待處理付款追蹤
 
 #### useQuotes - 報價管理
+
 - ✅ 編輯權限控制
 - ✅ 轉團資格檢查
 - ✅ 有效期限管理
@@ -1920,29 +2026,33 @@ function TourManagement() {
 ### 設計優勢
 
 **對比直接使用 Store**：
+
 - ❌ 舊方式：業務邏輯散落在各個 Component
 - ✅ 新方式：業務邏輯統一在 Hook 層
 
 **維護性提升**：
+
 - 統一的驗證邏輯
 - 統一的錯誤處理
 - 統一的權限控制
 - 可重用的業務規則
 
 **測試友善**：
+
 ```typescript
 // 可以獨立測試業務邏輯
 describe('useTours', () => {
   it('should validate tour dates correctly', () => {
-    const { validateTourDates } = useTours();
+    const { validateTourDates } = useTours()
     expect(() => {
-      validateTourDates('2024-01-10', '2024-01-01');
-    }).toThrow(TourDateValidationError);
-  });
-});
+      validateTourDates('2024-01-10', '2024-01-01')
+    }).toThrow(TourDateValidationError)
+  })
+})
 ```
 
 ### 下一步行動
+
 - ✅ Hook 層完成
 - ⏭️ 進入 Day 8: UI 整合測試
 - 📝 建立錯誤處理標準
@@ -1967,6 +2077,7 @@ describe('useTours', () => {
 ### 單元測試規範
 
 #### 1. Type System 測試
+
 ```typescript
 // types/__tests__/tour.types.test.ts
 describe('Tour Types', () => {
@@ -1976,77 +2087,78 @@ describe('Tour Types', () => {
       code: 'T20240001',
       name: '測試團',
       // TypeScript 會在編譯時檢查必填欄位
-    };
-  });
-});
+    }
+  })
+})
 ```
 
 #### 2. DB Layer 測試
+
 ```typescript
 // lib/db/__tests__/local-database.test.ts
 describe('LocalDatabase', () => {
   beforeEach(async () => {
-    await localDB.init();
-    await localDB.clearAll();
-  });
+    await localDB.init()
+    await localDB.clearAll()
+  })
 
   it('should create and retrieve data', async () => {
-    const tour = await localDB.create('tours', mockTour);
-    const retrieved = await localDB.read('tours', tour.id);
-    expect(retrieved).toEqual(tour);
-  });
+    const tour = await localDB.create('tours', mockTour)
+    const retrieved = await localDB.read('tours', tour.id)
+    expect(retrieved).toEqual(tour)
+  })
 
   it('should handle errors gracefully', async () => {
-    await expect(
-      localDB.read('tours', 'non-existent-id')
-    ).rejects.toThrow();
-  });
-});
+    await expect(localDB.read('tours', 'non-existent-id')).rejects.toThrow()
+  })
+})
 ```
 
 #### 3. Store Layer 測試
+
 ```typescript
 // stores/__tests__/tour-store.test.ts
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react'
 
 describe('useTourStore', () => {
   it('should create tour with auto-generated code', async () => {
-    const { result } = renderHook(() => useTourStore());
+    const { result } = renderHook(() => useTourStore())
 
     await act(async () => {
       await result.current.create({
         name: '測試團',
         // ... 其他欄位
-      });
-    });
+      })
+    })
 
-    expect(result.current.items[0].code).toMatch(/^T\d{8}$/);
-  });
-});
+    expect(result.current.items[0].code).toMatch(/^T\d{8}$/)
+  })
+})
 ```
 
 #### 4. Hook Layer 測試
+
 ```typescript
 // hooks/__tests__/useTours.test.ts
 describe('useTours', () => {
   it('should validate tour dates', () => {
-    const { result } = renderHook(() => useTours());
+    const { result } = renderHook(() => useTours())
 
     expect(() => {
-      result.current.validateTourDates('2024-01-10', '2024-01-01');
-    }).toThrow(TourDateValidationError);
-  });
+      result.current.validateTourDates('2024-01-10', '2024-01-01')
+    }).toThrow(TourDateValidationError)
+  })
 
   it('should check edit permission correctly', () => {
-    const { result } = renderHook(() => useTours());
+    const { result } = renderHook(() => useTours())
 
-    const draftTour = { ...mockTour, status: 'draft' };
-    expect(result.current.canEditTour(draftTour)).toBe(true);
+    const draftTour = { ...mockTour, status: 'draft' }
+    expect(result.current.canEditTour(draftTour)).toBe(true)
 
-    const completedTour = { ...mockTour, status: 'completed' };
-    expect(result.current.canEditTour(completedTour)).toBe(false);
-  });
-});
+    const completedTour = { ...mockTour, status: 'completed' }
+    expect(result.current.canEditTour(completedTour)).toBe(false)
+  })
+})
 ```
 
 ### 整合測試規範
@@ -2056,60 +2168,60 @@ describe('useTours', () => {
 describe('Tour Workflow Integration', () => {
   it('should complete full tour lifecycle', async () => {
     // 1. 建立旅遊團
-    const tour = await createTour(mockTourData);
-    expect(tour.status).toBe('draft');
+    const tour = await createTour(mockTourData)
+    expect(tour.status).toBe('draft')
 
     // 2. 新增訂單
     const order = await createOrder({
       tourId: tour.id,
       customerId: mockCustomer.id,
-    });
+    })
 
     // 3. 更新狀態
-    const updatedTour = await updateTourStatus(tour.id, 'active');
-    expect(updatedTour.status).toBe('active');
+    const updatedTour = await updateTourStatus(tour.id, 'active')
+    expect(updatedTour.status).toBe('active')
 
     // 4. 完成旅遊
-    const completedTour = await completeTour(tour.id);
-    expect(completedTour.status).toBe('completed');
-  });
-});
+    const completedTour = await completeTour(tour.id)
+    expect(completedTour.status).toBe('completed')
+  })
+})
 ```
 
 ### E2E 測試規範
 
 ```typescript
 // e2e/tour-management.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
 test('should create and manage tour', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+  await page.goto('http://localhost:3000')
 
   // 登入
-  await page.fill('[data-testid="username"]', 'admin');
-  await page.fill('[data-testid="password"]', 'password');
-  await page.click('[data-testid="login-btn"]');
+  await page.fill('[data-testid="username"]', 'admin')
+  await page.fill('[data-testid="password"]', 'password')
+  await page.click('[data-testid="login-btn"]')
 
   // 建立旅遊團
-  await page.click('[data-testid="create-tour-btn"]');
-  await page.fill('[data-testid="tour-name"]', '測試團');
-  await page.click('[data-testid="submit-btn"]');
+  await page.click('[data-testid="create-tour-btn"]')
+  await page.fill('[data-testid="tour-name"]', '測試團')
+  await page.click('[data-testid="submit-btn"]')
 
   // 驗證建立成功
-  await expect(page.locator('.toast-success')).toBeVisible();
-  await expect(page.locator('[data-tour-name="測試團"]')).toBeVisible();
-});
+  await expect(page.locator('.toast-success')).toBeVisible()
+  await expect(page.locator('[data-tour-name="測試團"]')).toBeVisible()
+})
 ```
 
 ### 測試覆蓋率目標
 
-| 層級 | 目標覆蓋率 | 重點項目 |
-|------|----------|---------|
-| Type System | 100% | 型別定義完整性 |
-| DB Layer | 90% | CRUD、錯誤處理 |
-| Store Layer | 85% | 狀態管理、持久化 |
-| Hook Layer | 80% | 業務邏輯、驗證 |
-| UI Layer | 70% | 關鍵使用者流程 |
+| 層級        | 目標覆蓋率 | 重點項目         |
+| ----------- | ---------- | ---------------- |
+| Type System | 100%       | 型別定義完整性   |
+| DB Layer    | 90%        | CRUD、錯誤處理   |
+| Store Layer | 85%        | 狀態管理、持久化 |
+| Hook Layer  | 80%        | 業務邏輯、驗證   |
+| UI Layer    | 70%        | 關鍵使用者流程   |
 
 ### 測試工具配置
 
@@ -2137,19 +2249,20 @@ test('should create and manage tour', async ({ page }) => {
 ## 🔒 權限系統設計
 
 > **設計原則**：
+>
 > - **管理員**：自動擁有全部權限（勾選時自動全選）
 > - **其他角色**：可自訂權限組合（保留彈性）
 > - **角色可擴充**：未來可新增自訂角色
 
 ### 權限矩陣
 
-| 角色 | 旅遊團 | 訂單 | 客戶 | 財務 | 報價 | 系統設定 | 說明 |
-|------|-------|------|------|------|------|---------|------|
-| **管理員** | ✅ 全部 | ✅ 全部 | ✅ 全部 | ✅ 全部 | ✅ 全部 | ✅ 全部 | 自動全選 |
-| **經理** | CRUD | CRUD | CRUD | RU | CRUD | R | 可自訂 |
-| **業務** | RU | CRUD | CRUD | R | CRUD | - | 可自訂 |
-| **會計** | R | R | R | CRUD | R | - | 可自訂 |
-| **客服** | R | RU | RU | - | R | - | 可自訂 |
+| 角色       | 旅遊團  | 訂單    | 客戶    | 財務    | 報價    | 系統設定 | 說明     |
+| ---------- | ------- | ------- | ------- | ------- | ------- | -------- | -------- |
+| **管理員** | ✅ 全部 | ✅ 全部 | ✅ 全部 | ✅ 全部 | ✅ 全部 | ✅ 全部  | 自動全選 |
+| **經理**   | CRUD    | CRUD    | CRUD    | RU      | CRUD    | R        | 可自訂   |
+| **業務**   | RU      | CRUD    | CRUD    | R       | CRUD    | -        | 可自訂   |
+| **會計**   | R       | R       | R       | CRUD    | R       | -        | 可自訂   |
+| **客服**   | R       | RU      | RU      | -       | R       | -        | 可自訂   |
 
 > C=Create, R=Read, U=Update, D=Delete
 
@@ -2160,23 +2273,23 @@ test('should create and manage tour', async ({ page }) => {
 ```typescript
 export type Permission =
   // 系統權限
-  | 'admin'          // 管理員（自動擁有全部權限）
+  | 'admin' // 管理員（自動擁有全部權限）
 
   // 功能模組權限（可自由組合）
-  | 'quotes'         // 報價單
-  | 'tours'          // 旅遊團
-  | 'orders'         // 訂單
-  | 'payments'       // 收款
-  | 'disbursement'   // 出納
-  | 'todos'          // 待辦事項
-  | 'hr'             // 人資管理
-  | 'reports'        // 報表
-  | 'settings'       // 設定
-  | 'customers'      // 客戶管理
-  | 'suppliers'      // 供應商管理
-  | 'visas'          // 簽證管理
-  | 'accounting'     // 會計
-  | 'templates';     // 模板管理
+  | 'quotes' // 報價單
+  | 'tours' // 旅遊團
+  | 'orders' // 訂單
+  | 'payments' // 收款
+  | 'disbursement' // 出納
+  | 'todos' // 待辦事項
+  | 'hr' // 人資管理
+  | 'reports' // 報表
+  | 'settings' // 設定
+  | 'customers' // 客戶管理
+  | 'suppliers' // 供應商管理
+  | 'visas' // 簽證管理
+  | 'accounting' // 會計
+  | 'templates' // 模板管理
 ```
 
 **未來擴充版本**：
@@ -2185,13 +2298,8 @@ export type Permission =
 // 細粒度權限（CRUD 分離）
 export type Permission =
   // 旅遊團權限
-  | 'tour:create'
-  | 'tour:read'
-  | 'tour:update'
-  | 'tour:delete'
-  | 'tour:publish'
-  | 'tour:cancel'
-  // ... 其他資源權限
+  'tour:create' | 'tour:read' | 'tour:update' | 'tour:delete' | 'tour:publish' | 'tour:cancel'
+// ... 其他資源權限
 ```
 
 ### 權限檢查實作
@@ -2203,21 +2311,22 @@ export type Permission =
 export function hasPermissionForRoute(userPermissions: string[], pathname: string): boolean {
   // 管理員有所有權限
   if (userPermissions.includes('admin')) {
-    return true;
+    return true
   }
 
   // 獲取所需權限
-  const requiredPermissions = getRequiredPermissions(pathname);
+  const requiredPermissions = getRequiredPermissions(pathname)
 
   // 檢查用戶是否有任一所需權限
-  return requiredPermissions.length === 0 ||
-         requiredPermissions.some(permission => userPermissions.includes(permission));
+  return (
+    requiredPermissions.length === 0 ||
+    requiredPermissions.some(permission => userPermissions.includes(permission))
+  )
 }
 
 // lib/auth.ts
 export function hasPermission(userPermissions: string[], requiredPermission: string): boolean {
-  return userPermissions.includes('admin') ||
-         userPermissions.includes(requiredPermission);
+  return userPermissions.includes('admin') || userPermissions.includes(requiredPermission)
 }
 ```
 
@@ -2229,12 +2338,18 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: ['*'], // 所有權限
 
   manager: [
-    'tour:create', 'tour:read', 'tour:update', 'tour:delete',
-    'order:create', 'order:read', 'order:update', 'order:delete',
+    'tour:create',
+    'tour:read',
+    'tour:update',
+    'tour:delete',
+    'order:create',
+    'order:read',
+    'order:update',
+    'order:delete',
     // ...
   ],
   // ...
-};
+}
 ```
 
 ### UI 權限控制實作
@@ -2244,32 +2359,32 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
 ```typescript
 // 管理員自動全選權限
 const handlePermissionToggle = (permissionId: string) => {
-  if (!isEditing) return;
+  if (!isEditing) return
 
   // 如果勾選管理員，自動全選所有權限
   if (permissionId === 'admin') {
-    const isAdminSelected = selectedPermissions.includes('admin');
+    const isAdminSelected = selectedPermissions.includes('admin')
     if (!isAdminSelected) {
-      setSelectedPermissions(SYSTEM_PERMISSIONS.map(p => p.id));
+      setSelectedPermissions(SYSTEM_PERMISSIONS.map(p => p.id))
     } else {
-      setSelectedPermissions([]);
+      setSelectedPermissions([])
     }
-    return;
+    return
   }
 
   // 如果取消勾選任何權限，自動取消管理員
   setSelectedPermissions(prev => {
     const newPermissions = prev.includes(permissionId)
       ? prev.filter(id => id !== permissionId)
-      : [...prev, permissionId];
+      : [...prev, permissionId]
 
     if (prev.includes('admin') && !newPermissions.includes(permissionId)) {
-      return newPermissions.filter(id => id !== 'admin');
+      return newPermissions.filter(id => id !== 'admin')
     }
 
-    return newPermissions;
-  });
-};
+    return newPermissions
+  })
+}
 ```
 
 ### 權限檢查使用範例
@@ -2303,16 +2418,19 @@ function TourActions({ tour }: { tour: Tour }) {
 ### 角色權限系統總結
 
 **當前實作**：
+
 - ✅ 管理員自動全權限
 - ✅ 功能模組級權限（14種）
 - ✅ UI 自動全選/取消邏輯
 - ✅ 路由權限檢查
 
 **規劃中**：
+
 - ⏭️ 角色預設權限模板
 - ⏭️ 權限審計日誌
 
 **未來擴充**：
+
 - ⏭️ 細粒度 CRUD 權限
 - ⏭️ 資源級權限控制
 - ⏭️ 動態角色管理
@@ -2328,41 +2446,56 @@ function TourActions({ tour }: { tour: Tour }) {
 
 // 1. 驗證錯誤
 export class ValidationError extends Error {
-  constructor(message: string, public field?: string) {
-    super(message);
-    this.name = 'ValidationError';
+  constructor(
+    message: string,
+    public field?: string
+  ) {
+    super(message)
+    this.name = 'ValidationError'
   }
 }
 
 // 2. 權限錯誤
 export class PermissionError extends Error {
-  constructor(message: string, public requiredPermission?: string) {
-    super(message);
-    this.name = 'PermissionError';
+  constructor(
+    message: string,
+    public requiredPermission?: string
+  ) {
+    super(message)
+    this.name = 'PermissionError'
   }
 }
 
 // 3. 業務邏輯錯誤
 export class BusinessError extends Error {
-  constructor(message: string, public code?: string) {
-    super(message);
-    this.name = 'BusinessError';
+  constructor(
+    message: string,
+    public code?: string
+  ) {
+    super(message)
+    this.name = 'BusinessError'
   }
 }
 
 // 4. 資料庫錯誤
 export class DatabaseError extends Error {
-  constructor(message: string, public operation?: string) {
-    super(message);
-    this.name = 'DatabaseError';
+  constructor(
+    message: string,
+    public operation?: string
+  ) {
+    super(message)
+    this.name = 'DatabaseError'
   }
 }
 
 // 5. 網路錯誤
 export class NetworkError extends Error {
-  constructor(message: string, public statusCode?: number) {
-    super(message);
-    this.name = 'NetworkError';
+  constructor(
+    message: string,
+    public statusCode?: number
+  ) {
+    super(message)
+    this.name = 'NetworkError'
   }
 }
 ```
@@ -2380,7 +2513,7 @@ export function handleError(error: Error): ErrorResponse {
       field: error.field,
       severity: 'warning',
       action: 'show_toast',
-    };
+    }
   }
 
   // 2. 權限錯誤
@@ -2390,7 +2523,7 @@ export function handleError(error: Error): ErrorResponse {
       message: error.message,
       severity: 'error',
       action: 'redirect_login',
-    };
+    }
   }
 
   // 3. 業務錯誤
@@ -2401,28 +2534,28 @@ export function handleError(error: Error): ErrorResponse {
       code: error.code,
       severity: 'error',
       action: 'show_dialog',
-    };
+    }
   }
 
   // 4. 資料庫錯誤
   if (error instanceof DatabaseError) {
-    console.error('[DB Error]', error);
+    console.error('[DB Error]', error)
     return {
       type: 'database',
       message: '資料操作失敗，請稍後再試',
       severity: 'error',
       action: 'show_toast',
-    };
+    }
   }
 
   // 5. 未知錯誤
-  console.error('[Unknown Error]', error);
+  console.error('[Unknown Error]', error)
   return {
     type: 'unknown',
     message: '系統發生錯誤，請聯絡技術支援',
     severity: 'critical',
     action: 'show_error_page',
-  };
+  }
 }
 ```
 
@@ -2481,28 +2614,27 @@ export function useTours() {
   const createTour = async (data: CreateTourData) => {
     try {
       // 1. 驗證資料
-      validateTourDates(data.startDate, data.endDate);
+      validateTourDates(data.startDate, data.endDate)
 
       // 2. 檢查權限
       if (!hasPermission('tour:create')) {
-        throw new PermissionError('沒有建立旅遊團的權限', 'tour:create');
+        throw new PermissionError('沒有建立旅遊團的權限', 'tour:create')
       }
 
       // 3. 業務邏輯
-      const tour = await store.create(data);
-      return tour;
-
+      const tour = await store.create(data)
+      return tour
     } catch (error) {
       // 4. 錯誤轉換
       if (error instanceof TourDateValidationError) {
-        throw new ValidationError(error.message, 'startDate');
+        throw new ValidationError(error.message, 'startDate')
       }
 
-      throw error; // 其他錯誤向上傳遞
+      throw error // 其他錯誤向上傳遞
     }
-  };
+  }
 
-  return { createTour };
+  return { createTour }
 }
 ```
 
@@ -2579,54 +2711,54 @@ GET /api/tours?status=active&page=1&limit=20&sort=-startDate
 ```typescript
 // services/tour.service.ts
 export class TourService {
-  private apiClient: APIClient;
+  private apiClient: APIClient
 
   async getAll(params?: QueryParams): Promise<PaginatedResponse<Tour>> {
-    const response = await this.apiClient.get('/tours', { params });
-    return response.data;
+    const response = await this.apiClient.get('/tours', { params })
+    return response.data
   }
 
   async getById(id: string): Promise<Tour> {
-    const response = await this.apiClient.get(`/tours/${id}`);
-    return response.data;
+    const response = await this.apiClient.get(`/tours/${id}`)
+    return response.data
   }
 
   async create(data: CreateTourData): Promise<Tour> {
-    const response = await this.apiClient.post('/tours', data);
-    return response.data;
+    const response = await this.apiClient.post('/tours', data)
+    return response.data
   }
 
   async update(id: string, data: UpdateTourData): Promise<Tour> {
-    const response = await this.apiClient.put(`/tours/${id}`, data);
-    return response.data;
+    const response = await this.apiClient.put(`/tours/${id}`, data)
+    return response.data
   }
 
   async delete(id: string): Promise<void> {
-    await this.apiClient.delete(`/tours/${id}`);
+    await this.apiClient.delete(`/tours/${id}`)
   }
 }
 
 // Hook 整合 Service
 export function useTours() {
-  const service = new TourService();
+  const service = new TourService()
 
   const createTour = async (data: CreateTourData) => {
-    validateTourDates(data.startDate, data.endDate);
+    validateTourDates(data.startDate, data.endDate)
 
     if (!hasPermission('tour:create')) {
-      throw new PermissionError('沒有建立權限');
+      throw new PermissionError('沒有建立權限')
     }
 
     // 呼叫 Service 而非直接操作 Store
-    const tour = await service.create(data);
+    const tour = await service.create(data)
 
     // 更新本地快取
-    store.addItem(tour);
+    store.addItem(tour)
 
-    return tour;
-  };
+    return tour
+  }
 
-  return { createTour };
+  return { createTour }
 }
 ```
 
@@ -2639,33 +2771,33 @@ export function useTours() {
 ```typescript
 // lib/migration/schema-migration.ts
 export async function migrateSchema() {
-  console.log('開始 Schema 資料遷移...');
+  console.log('開始 Schema 資料遷移...')
 
   // 1. 備份資料
-  const backup = await localDB.export();
-  await saveBackupToFile(backup, 'schema-backup.json');
+  const backup = await localDB.export()
+  await saveBackupToFile(backup, 'schema-backup.json')
 
   // 2. 加入新欄位
-  const tours = await localDB.getAll<Tour>('tours');
+  const tours = await localDB.getAll<Tour>('tours')
   for (const tour of tours) {
     await localDB.update('tours', tour.id, {
       ...tour,
       createdBy: 'system', // 新增欄位
       metadata: {}, // 新增欄位
-    });
+    })
   }
 
   // 3. 驗證遷移
-  const migratedTours = await localDB.getAll<Tour>('tours');
-  const hasAllFields = migratedTours.every(t =>
-    t.createdBy !== undefined && t.metadata !== undefined
-  );
+  const migratedTours = await localDB.getAll<Tour>('tours')
+  const hasAllFields = migratedTours.every(
+    t => t.createdBy !== undefined && t.metadata !== undefined
+  )
 
   if (!hasAllFields) {
-    throw new Error('資料遷移失敗');
+    throw new Error('資料遷移失敗')
   }
 
-  console.log('Schema 遷移完成');
+  console.log('Schema 遷移完成')
 }
 ```
 
@@ -2674,46 +2806,43 @@ export async function migrateSchema() {
 ```typescript
 // lib/migration/supabase-migration.ts
 export async function migrateToSupabase() {
-  console.log('開始 IndexedDB → Supabase 遷移...');
+  console.log('開始 IndexedDB → Supabase 遷移...')
 
   // 1. 備份 IndexedDB 資料
-  const localData = await localDB.export();
-  await uploadBackupToS3(localData);
+  const localData = await localDB.export()
+  await uploadBackupToS3(localData)
 
   // 2. 批次上傳到 Supabase
-  const tables = [
-    'tours', 'orders', 'customers', 'payments',
-    'quotes', 'members', 'employees'
-  ];
+  const tables = ['tours', 'orders', 'customers', 'payments', 'quotes', 'members', 'employees']
 
   for (const table of tables) {
-    const data = await localDB.getAll(table);
+    const data = await localDB.getAll(table)
 
     // 分批上傳（每次 100 筆）
     for (let i = 0; i < data.length; i += 100) {
-      const batch = data.slice(i, i + 100);
-      await supabase.from(table).insert(batch);
+      const batch = data.slice(i, i + 100)
+      await supabase.from(table).insert(batch)
     }
 
-    console.log(`✅ ${table}: ${data.length} 筆資料已遷移`);
+    console.log(`✅ ${table}: ${data.length} 筆資料已遷移`)
   }
 
   // 3. 驗證資料一致性
   for (const table of tables) {
-    const localCount = await localDB.count(table);
+    const localCount = await localDB.count(table)
     const { count: remoteCount } = await supabase
       .from(table)
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true })
 
     if (localCount !== remoteCount) {
-      throw new Error(`${table} 資料數量不一致`);
+      throw new Error(`${table} 資料數量不一致`)
     }
   }
 
-  console.log('✅ Supabase 遷移完成');
+  console.log('✅ Supabase 遷移完成')
 
   // 4. 更新資料來源
-  await updateDataSource('supabase');
+  await updateDataSource('supabase')
 
   // 5. 清理 IndexedDB（可選）
   // await localDB.clearAll();
@@ -2743,7 +2872,7 @@ export const MIGRATION_CHECKLIST = {
     '✅ 測試 CRUD 操作',
     '✅ 清理舊資料（可選）',
   ],
-};
+}
 ```
 
 ---
@@ -2774,72 +2903,86 @@ VENTURO 系統劃分為 4 個核心領域邊界：
 ```
 
 #### 1. Tour Management Context（旅遊團管理域）
+
 **職責**：
+
 - 旅遊團生命週期管理
 - 行程規劃與排程
 - 團員資訊管理
 - 旅遊資源調配
 
 **核心實體**：
+
 - Tour（聚合根）
 - Itinerary（行程）
 - TourMember（團員）
 - Destination（目的地）
 
 **對外介面**：
+
 ```typescript
 interface ITourManagement {
-  createTour(data: CreateTourData): Promise<Tour>;
-  publishTour(tourId: string): Promise<void>;
-  cancelTour(tourId: string, reason: string): Promise<void>;
-  getTourAvailability(tourId: string): Promise<Availability>;
+  createTour(data: CreateTourData): Promise<Tour>
+  publishTour(tourId: string): Promise<void>
+  cancelTour(tourId: string, reason: string): Promise<void>
+  getTourAvailability(tourId: string): Promise<Availability>
 }
 ```
 
 #### 2. Order Processing Context（訂單處理域）
+
 **職責**：
+
 - 訂單建立與確認
 - 付款追蹤
 - 訂單狀態管理
 - 退款處理
 
 **核心實體**：
+
 - Order（聚合根）
 - OrderItem（訂單項目）
 - Payment（付款）
 - Refund（退款）
 
 **對外介面**：
+
 ```typescript
 interface IOrderProcessing {
-  placeOrder(data: CreateOrderData): Promise<Order>;
-  confirmOrder(orderId: string): Promise<void>;
-  cancelOrder(orderId: string): Promise<Refund>;
-  processPayment(orderId: string, payment: PaymentData): Promise<Payment>;
+  placeOrder(data: CreateOrderData): Promise<Order>
+  confirmOrder(orderId: string): Promise<void>
+  cancelOrder(orderId: string): Promise<Refund>
+  processPayment(orderId: string, payment: PaymentData): Promise<Payment>
 }
 ```
 
 #### 3. Financial Context（財務結算域）
+
 **職責**：
+
 - 財務報表生成
 - 應收應付管理
 - 成本核算
 - 帳務對帳
 
 **核心實體**：
+
 - Invoice（發票）
 - FinancialReport（財務報表）
 - CostItem（成本項目）
 - Settlement（結算單）
 
 #### 4. Customer Relationship Context（客戶關係域）
+
 **職責**：
+
 - 客戶資料管理
 - VIP 等級管理
 - 客戶歷史追蹤
 - 行銷活動管理
 
 **核心實體**：
+
 - Customer（聚合根）
 - CustomerHistory（客戶歷史）
 - VipLevel（VIP等級）
@@ -2848,59 +2991,61 @@ interface IOrderProcessing {
 ### Aggregates 設計
 
 #### Tour Aggregate
+
 ```typescript
 class TourAggregate {
-  private tour: Tour;
-  private members: TourMember[];
-  private itinerary: Itinerary;
+  private tour: Tour
+  private members: TourMember[]
+  private itinerary: Itinerary
 
   // 聚合根保證一致性
   addMember(member: TourMember): void {
     if (this.members.length >= this.tour.maxCapacity) {
-      throw new BusinessError('旅遊團已滿');
+      throw new BusinessError('旅遊團已滿')
     }
     if (this.tour.status !== 'active') {
-      throw new BusinessError('旅遊團未開放報名');
+      throw new BusinessError('旅遊團未開放報名')
     }
-    this.members.push(member);
+    this.members.push(member)
   }
 
   publish(): void {
     if (!this.itinerary.isComplete()) {
-      throw new BusinessError('行程未完整');
+      throw new BusinessError('行程未完整')
     }
     if (this.members.length < this.tour.minCapacity) {
-      throw new BusinessError('報名人數未達最低標準');
+      throw new BusinessError('報名人數未達最低標準')
     }
-    this.tour.status = 'published';
+    this.tour.status = 'published'
   }
 }
 ```
 
 #### Order Aggregate
+
 ```typescript
 class OrderAggregate {
-  private order: Order;
-  private payments: Payment[];
-  private refunds: Refund[];
+  private order: Order
+  private payments: Payment[]
+  private refunds: Refund[]
 
   calculateRemainingAmount(): number {
-    const totalPaid = this.payments.reduce((sum, p) => sum + p.amount, 0);
-    const totalRefund = this.refunds.reduce((sum, r) => sum + r.amount, 0);
-    return this.order.totalAmount - totalPaid + totalRefund;
+    const totalPaid = this.payments.reduce((sum, p) => sum + p.amount, 0)
+    const totalRefund = this.refunds.reduce((sum, r) => sum + r.amount, 0)
+    return this.order.totalAmount - totalPaid + totalRefund
   }
 
   processPayment(payment: Payment): void {
-    this.payments.push(payment);
-    this.updatePaymentStatus();
+    this.payments.push(payment)
+    this.updatePaymentStatus()
   }
 
   private updatePaymentStatus(): void {
-    const remaining = this.calculateRemainingAmount();
+    const remaining = this.calculateRemainingAmount()
     if (remaining === 0) {
-      this.order.paymentStatus = 'paid';
+      this.order.paymentStatus = 'paid'
     } else if (remaining < this.order.totalAmount) {
-      this.order.paymentStatus = 'partial';
+      this.order.paymentStatus = 'partial'
     }
   }
 }
@@ -2911,17 +3056,17 @@ class OrderAggregate {
 ```typescript
 // 領域事件基礎介面
 interface DomainEvent {
-  eventId: string;
-  aggregateId: string;
-  eventType: string;
-  occurredAt: string;
-  userId: string;
-  payload: unknown;
+  eventId: string
+  aggregateId: string
+  eventType: string
+  occurredAt: string
+  userId: string
+  payload: unknown
 }
 
 // 旅遊團領域事件
 class TourCreatedEvent implements DomainEvent {
-  eventType = 'TourCreated';
+  eventType = 'TourCreated'
   constructor(
     public eventId: string,
     public aggregateId: string,
@@ -2932,23 +3077,23 @@ class TourCreatedEvent implements DomainEvent {
 }
 
 class TourPublishedEvent implements DomainEvent {
-  eventType = 'TourPublished';
+  eventType = 'TourPublished'
   // 觸發：通知客戶、更新庫存、發送郵件
 }
 
 class TourCancelledEvent implements DomainEvent {
-  eventType = 'TourCancelled';
+  eventType = 'TourCancelled'
   // 觸發：退款流程、通知客戶、釋放資源
 }
 
 // 訂單領域事件
 class OrderPlacedEvent implements DomainEvent {
-  eventType = 'OrderPlaced';
+  eventType = 'OrderPlaced'
   // 觸發：扣減庫存、發送確認信、建立待付款紀錄
 }
 
 class PaymentReceivedEvent implements DomainEvent {
-  eventType = 'PaymentReceived';
+  eventType = 'PaymentReceived'
   // 觸發：更新訂單狀態、發送收據、觸發財務記帳
 }
 ```
@@ -2956,6 +3101,7 @@ class PaymentReceivedEvent implements DomainEvent {
 ### 領域邊界通訊
 
 **Anti-Corruption Layer（防腐層）**:
+
 ```typescript
 // Tour Context 呼叫 Order Context 需要透過防腐層
 class TourToOrderAdapter {
@@ -2965,14 +3111,16 @@ class TourToOrderAdapter {
       tourId: tour.id,
       customerId: customer.id,
       totalAmount: tour.price,
-      items: [{
-        name: tour.name,
-        quantity: 1,
-        unitPrice: tour.price,
-      }],
-    };
+      items: [
+        {
+          name: tour.name,
+          quantity: 1,
+          unitPrice: tour.price,
+        },
+      ],
+    }
 
-    return await orderService.placeOrder(orderData);
+    return await orderService.placeOrder(orderData)
   }
 }
 ```
@@ -2986,51 +3134,51 @@ class TourToOrderAdapter {
 ```typescript
 // 事件總線核心
 class EventBus {
-  private subscribers: Map<string, EventHandler[]> = new Map();
-  private eventStore: DomainEvent[] = [];
+  private subscribers: Map<string, EventHandler[]> = new Map()
+  private eventStore: DomainEvent[] = []
 
   // 訂閱事件
   subscribe(eventType: string, handler: EventHandler): void {
     if (!this.subscribers.has(eventType)) {
-      this.subscribers.set(eventType, []);
+      this.subscribers.set(eventType, [])
     }
-    this.subscribers.get(eventType)!.push(handler);
+    this.subscribers.get(eventType)!.push(handler)
   }
 
   // 發布事件
   async publish(event: DomainEvent): Promise<void> {
     // 1. 儲存事件（Event Sourcing）
-    this.eventStore.push(event);
-    await this.persistEvent(event);
+    this.eventStore.push(event)
+    await this.persistEvent(event)
 
     // 2. 通知所有訂閱者
-    const handlers = this.subscribers.get(event.eventType) || [];
-    await Promise.all(handlers.map(handler => handler(event)));
+    const handlers = this.subscribers.get(event.eventType) || []
+    await Promise.all(handlers.map(handler => handler(event)))
 
     // 3. 記錄日誌
-    console.log(`[EventBus] Published: ${event.eventType}`, event);
+    console.log(`[EventBus] Published: ${event.eventType}`, event)
   }
 
   // 事件重播（用於恢復狀態）
   async replay(from: Date, to: Date): Promise<void> {
     const events = this.eventStore.filter(e => {
-      const occurredAt = new Date(e.occurredAt);
-      return occurredAt >= from && occurredAt <= to;
-    });
+      const occurredAt = new Date(e.occurredAt)
+      return occurredAt >= from && occurredAt <= to
+    })
 
     for (const event of events) {
-      await this.publish(event);
+      await this.publish(event)
     }
   }
 
   // 持久化事件
   private async persistEvent(event: DomainEvent): Promise<void> {
-    await localDB.create('events', event);
+    await localDB.create('events', event)
   }
 }
 
 // 全域事件總線實例
-export const eventBus = new EventBus();
+export const eventBus = new EventBus()
 ```
 
 ### 事件處理器範例
@@ -3038,47 +3186,47 @@ export const eventBus = new EventBus();
 ```typescript
 // 訂單建立事件處理器
 eventBus.subscribe('OrderPlaced', async (event: OrderPlacedEvent) => {
-  const { order } = event.payload;
+  const { order } = event.payload
 
   // 1. 扣減旅遊團庫存
-  await tourService.decreaseAvailability(order.tourId, order.quantity);
+  await tourService.decreaseAvailability(order.tourId, order.quantity)
 
   // 2. 發送確認郵件
-  await emailService.sendOrderConfirmation(order);
+  await emailService.sendOrderConfirmation(order)
 
   // 3. 建立待付款記錄
-  await paymentService.createPendingPayment(order.id, order.totalAmount);
-});
+  await paymentService.createPendingPayment(order.id, order.totalAmount)
+})
 
 // 付款完成事件處理器
 eventBus.subscribe('PaymentReceived', async (event: PaymentReceivedEvent) => {
-  const { payment } = event.payload;
+  const { payment } = event.payload
 
   // 1. 更新訂單狀態
-  await orderService.updatePaymentStatus(payment.orderId);
+  await orderService.updatePaymentStatus(payment.orderId)
 
   // 2. 發送收據
-  await emailService.sendReceipt(payment);
+  await emailService.sendReceipt(payment)
 
   // 3. 觸發財務記帳
-  await financialService.recordRevenue(payment);
-});
+  await financialService.recordRevenue(payment)
+})
 
 // 旅遊團取消事件處理器
 eventBus.subscribe('TourCancelled', async (event: TourCancelledEvent) => {
-  const { tour, reason } = event.payload;
+  const { tour, reason } = event.payload
 
   // 1. 查詢所有相關訂單
-  const orders = await orderService.getOrdersByTour(tour.id);
+  const orders = await orderService.getOrdersByTour(tour.id)
 
   // 2. 批次退款
   for (const order of orders) {
-    await refundService.processRefund(order.id, reason);
+    await refundService.processRefund(order.id, reason)
   }
 
   // 3. 通知所有客戶
-  await notificationService.notifyTourCancellation(tour.id, reason);
-});
+  await notificationService.notifyTourCancellation(tour.id, reason)
+})
 ```
 
 ### Event Sourcing 預留設計
@@ -3089,40 +3237,38 @@ class TourEventSourcing {
   async rebuildTourFromEvents(tourId: string): Promise<Tour> {
     // 1. 取得所有相關事件
     const events = await localDB.filter<DomainEvent>('events', [
-      { field: 'aggregateId', operator: 'eq', value: tourId }
-    ]);
+      { field: 'aggregateId', operator: 'eq', value: tourId },
+    ])
 
     // 2. 按時間排序
-    events.sort((a, b) =>
-      new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
-    );
+    events.sort((a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime())
 
     // 3. 重播事件重建狀態
-    let tour: Tour = {} as Tour;
+    let tour: Tour = {} as Tour
 
     for (const event of events) {
-      tour = this.applyEvent(tour, event);
+      tour = this.applyEvent(tour, event)
     }
 
-    return tour;
+    return tour
   }
 
   private applyEvent(tour: Tour, event: DomainEvent): Tour {
     switch (event.eventType) {
       case 'TourCreated':
-        return { ...(event.payload as any).tour };
+        return { ...(event.payload as any).tour }
 
       case 'TourUpdated':
-        return { ...tour, ...(event.payload as any).updates };
+        return { ...tour, ...(event.payload as any).updates }
 
       case 'TourPublished':
-        return { ...tour, status: 'published' };
+        return { ...tour, status: 'published' }
 
       case 'TourCancelled':
-        return { ...tour, status: 'cancelled' };
+        return { ...tour, status: 'cancelled' }
 
       default:
-        return tour;
+        return tour
     }
   }
 }
@@ -3158,68 +3304,68 @@ class TourEventSourcing {
 ```typescript
 // LRU Cache 實作
 class LRUCache<T> {
-  private cache: Map<string, { value: T; timestamp: number }> = new Map();
-  private maxSize: number = 100;
-  private ttl: number = 10000; // 10 秒
+  private cache: Map<string, { value: T; timestamp: number }> = new Map()
+  private maxSize: number = 100
+  private ttl: number = 10000 // 10 秒
 
   get(key: string): T | null {
-    const item = this.cache.get(key);
+    const item = this.cache.get(key)
 
-    if (!item) return null;
+    if (!item) return null
 
     // 檢查是否過期
     if (Date.now() - item.timestamp > this.ttl) {
-      this.cache.delete(key);
-      return null;
+      this.cache.delete(key)
+      return null
     }
 
     // LRU: 移到最後（最近使用）
-    this.cache.delete(key);
-    this.cache.set(key, item);
+    this.cache.delete(key)
+    this.cache.set(key, item)
 
-    return item.value;
+    return item.value
   }
 
   set(key: string, value: T): void {
     // 達到上限，刪除最久未使用
     if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      const firstKey = this.cache.keys().next().value
+      this.cache.delete(firstKey)
     }
 
     this.cache.set(key, {
       value,
-      timestamp: Date.now()
-    });
+      timestamp: Date.now(),
+    })
   }
 
   clear(): void {
-    this.cache.clear();
+    this.cache.clear()
   }
 }
 
 // 全域 Memory Cache
-export const memoryCache = new LRUCache();
+export const memoryCache = new LRUCache()
 ```
 
 ### L2: IndexedDB Cache 實作
 
 ```typescript
 class IndexedDBCache {
-  private ttl: number = 3600000; // 1 小時
+  private ttl: number = 3600000 // 1 小時
 
   async get<T>(key: string): Promise<T | null> {
-    const cached = await localDB.read<CacheItem>('cache', key);
+    const cached = await localDB.read<CacheItem>('cache', key)
 
-    if (!cached) return null;
+    if (!cached) return null
 
     // 檢查過期
     if (Date.now() - cached.timestamp > this.ttl) {
-      await localDB.delete('cache', key);
-      return null;
+      await localDB.delete('cache', key)
+      return null
     }
 
-    return cached.value as T;
+    return cached.value as T
   }
 
   async set<T>(key: string, value: T): Promise<void> {
@@ -3227,20 +3373,18 @@ class IndexedDBCache {
       id: key,
       value,
       timestamp: Date.now(),
-    });
+    })
   }
 
   async invalidate(pattern: string): Promise<void> {
-    const allKeys = await localDB.getAll<CacheItem>('cache');
-    const keysToDelete = allKeys
-      .filter(item => item.id.startsWith(pattern))
-      .map(item => item.id);
+    const allKeys = await localDB.getAll<CacheItem>('cache')
+    const keysToDelete = allKeys.filter(item => item.id.startsWith(pattern)).map(item => item.id)
 
-    await localDB.deleteMany('cache', keysToDelete);
+    await localDB.deleteMany('cache', keysToDelete)
   }
 }
 
-export const indexedDBCache = new IndexedDBCache();
+export const indexedDBCache = new IndexedDBCache()
 ```
 
 ### Cache-Aside Pattern（旁路快取）
@@ -3249,29 +3393,29 @@ export const indexedDBCache = new IndexedDBCache();
 // 統一快取查詢模式
 async function getCachedTour(tourId: string): Promise<Tour> {
   // L1: Memory Cache
-  let tour = memoryCache.get<Tour>(`tour:${tourId}`);
+  let tour = memoryCache.get<Tour>(`tour:${tourId}`)
   if (tour) {
-    console.log('[Cache] L1 Hit');
-    return tour;
+    console.log('[Cache] L1 Hit')
+    return tour
   }
 
   // L2: IndexedDB Cache
-  tour = await indexedDBCache.get<Tour>(`tour:${tourId}`);
+  tour = await indexedDBCache.get<Tour>(`tour:${tourId}`)
   if (tour) {
-    console.log('[Cache] L2 Hit');
-    memoryCache.set(`tour:${tourId}`, tour); // 回填 L1
-    return tour;
+    console.log('[Cache] L2 Hit')
+    memoryCache.set(`tour:${tourId}`, tour) // 回填 L1
+    return tour
   }
 
   // L3: Database
-  console.log('[Cache] Miss - Fetching from DB');
-  tour = await localDB.read<Tour>('tours', tourId);
+  console.log('[Cache] Miss - Fetching from DB')
+  tour = await localDB.read<Tour>('tours', tourId)
 
   // 回填所有快取層
-  memoryCache.set(`tour:${tourId}`, tour);
-  await indexedDBCache.set(`tour:${tourId}`, tour);
+  memoryCache.set(`tour:${tourId}`, tour)
+  await indexedDBCache.set(`tour:${tourId}`, tour)
 
-  return tour;
+  return tour
 }
 ```
 
@@ -3282,30 +3426,30 @@ async function getCachedTour(tourId: string): Promise<Tour> {
 class CacheInvalidator {
   // 策略 1: 刪除特定快取
   async invalidateTour(tourId: string): Promise<void> {
-    memoryCache.clear(); // 簡單粗暴：清空所有
-    await indexedDBCache.invalidate(`tour:${tourId}`);
+    memoryCache.clear() // 簡單粗暴：清空所有
+    await indexedDBCache.invalidate(`tour:${tourId}`)
   }
 
   // 策略 2: 刪除相關模式
   async invalidateTourList(): Promise<void> {
-    await indexedDBCache.invalidate('tours:list:');
+    await indexedDBCache.invalidate('tours:list:')
   }
 
   // 策略 3: 事件驅動失效
   setupEventListeners(): void {
-    eventBus.subscribe('TourUpdated', async (event) => {
-      await this.invalidateTour(event.aggregateId);
-    });
+    eventBus.subscribe('TourUpdated', async event => {
+      await this.invalidateTour(event.aggregateId)
+    })
 
-    eventBus.subscribe('TourDeleted', async (event) => {
-      await this.invalidateTour(event.aggregateId);
-      await this.invalidateTourList();
-    });
+    eventBus.subscribe('TourDeleted', async event => {
+      await this.invalidateTour(event.aggregateId)
+      await this.invalidateTourList()
+    })
   }
 }
 
-export const cacheInvalidator = new CacheInvalidator();
-cacheInvalidator.setupEventListeners();
+export const cacheInvalidator = new CacheInvalidator()
+cacheInvalidator.setupEventListeners()
 ```
 
 ### HTTP Cache（未來擴充）
@@ -3313,28 +3457,28 @@ cacheInvalidator.setupEventListeners();
 ```typescript
 // API 回應加入 Cache-Control
 app.get('/api/tours/:id', async (req, res) => {
-  const tour = await tourService.getById(req.params.id);
+  const tour = await tourService.getById(req.params.id)
 
   // 設定快取頭
   res.set({
     'Cache-Control': 'public, max-age=300', // 5 分鐘
-    'ETag': generateETag(tour),
+    ETag: generateETag(tour),
     'Last-Modified': tour.updatedAt,
-  });
+  })
 
-  res.json(tour);
-});
+  res.json(tour)
+})
 
 // 客戶端請求時附帶 If-None-Match
 const response = await fetch(`/api/tours/${id}`, {
   headers: {
     'If-None-Match': lastETag,
   },
-});
+})
 
 if (response.status === 304) {
   // 使用本地快取
-  return cachedTour;
+  return cachedTour
 }
 ```
 
@@ -3372,7 +3516,7 @@ if (response.status === 304) {
 
 ```typescript
 // lib/monitoring/sentry.ts
-import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/react'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -3394,12 +3538,12 @@ Sentry.init({
   beforeSend(event) {
     // 移除敏感資訊
     if (event.request) {
-      delete event.request.cookies;
-      delete event.request.headers?.Authorization;
+      delete event.request.cookies
+      delete event.request.headers?.Authorization
     }
-    return event;
+    return event
   },
-});
+})
 
 // 自訂錯誤追蹤
 export function captureError(error: Error, context?: Record<string, any>) {
@@ -3409,15 +3553,14 @@ export function captureError(error: Error, context?: Record<string, any>) {
       severity: context?.severity || 'error',
     },
     extra: context,
-  });
+  })
 }
 
 // 效能追蹤
 export function trackPerformance(name: string, operation: () => Promise<any>) {
-  const transaction = Sentry.startTransaction({ name });
+  const transaction = Sentry.startTransaction({ name })
 
-  return operation()
-    .finally(() => transaction.finish());
+  return operation().finally(() => transaction.finish())
 }
 ```
 
@@ -3427,7 +3570,7 @@ export function trackPerformance(name: string, operation: () => Promise<any>) {
 // lib/monitoring/performance.ts
 
 // 1. Core Web Vitals 監控
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
 
 function sendToAnalytics(metric: Metric) {
   const body = JSON.stringify({
@@ -3436,80 +3579,77 @@ function sendToAnalytics(metric: Metric) {
     rating: metric.rating,
     delta: metric.delta,
     id: metric.id,
-  });
+  })
 
   // 發送到分析服務
   if (navigator.sendBeacon) {
-    navigator.sendBeacon('/api/analytics', body);
+    navigator.sendBeacon('/api/analytics', body)
   }
 }
 
-getCLS(sendToAnalytics);
-getFID(sendToAnalytics);
-getFCP(sendToAnalytics);
-getLCP(sendToAnalytics);
-getTTFB(sendToAnalytics);
+getCLS(sendToAnalytics)
+getFID(sendToAnalytics)
+getFCP(sendToAnalytics)
+getLCP(sendToAnalytics)
+getTTFB(sendToAnalytics)
 
 // 2. API 回應時間監控
 class APIPerformanceMonitor {
-  private metrics: Map<string, number[]> = new Map();
+  private metrics: Map<string, number[]> = new Map()
 
   track(endpoint: string, duration: number): void {
     if (!this.metrics.has(endpoint)) {
-      this.metrics.set(endpoint, []);
+      this.metrics.set(endpoint, [])
     }
-    this.metrics.get(endpoint)!.push(duration);
+    this.metrics.get(endpoint)!.push(duration)
   }
 
   getStats(endpoint: string) {
-    const durations = this.metrics.get(endpoint) || [];
+    const durations = this.metrics.get(endpoint) || []
     return {
       count: durations.length,
       avg: durations.reduce((a, b) => a + b, 0) / durations.length,
       p95: this.percentile(durations, 95),
       p99: this.percentile(durations, 99),
-    };
+    }
   }
 
   private percentile(arr: number[], p: number): number {
-    const sorted = [...arr].sort((a, b) => a - b);
-    const index = Math.ceil((p / 100) * sorted.length) - 1;
-    return sorted[index];
+    const sorted = [...arr].sort((a, b) => a - b)
+    const index = Math.ceil((p / 100) * sorted.length) - 1
+    return sorted[index]
   }
 }
 
-export const apiMonitor = new APIPerformanceMonitor();
+export const apiMonitor = new APIPerformanceMonitor()
 
 // 3. 資料庫查詢效能
 class DBPerformanceMonitor {
-  async trackQuery<T>(
-    operation: string,
-    query: () => Promise<T>
-  ): Promise<T> {
-    const start = performance.now();
+  async trackQuery<T>(operation: string, query: () => Promise<T>): Promise<T> {
+    const start = performance.now()
 
     try {
-      const result = await query();
-      const duration = performance.now() - start;
+      const result = await query()
+      const duration = performance.now() - start
 
       // 記錄慢查詢（> 100ms）
       if (duration > 100) {
-        console.warn(`[Slow Query] ${operation}: ${duration}ms`);
+        console.warn(`[Slow Query] ${operation}: ${duration}ms`)
         captureError(new Error(`Slow query: ${operation}`), {
           duration,
           operation,
-        });
+        })
       }
 
-      return result;
+      return result
     } catch (error) {
-      captureError(error as Error, { operation });
-      throw error;
+      captureError(error as Error, { operation })
+      throw error
     }
   }
 }
 
-export const dbMonitor = new DBPerformanceMonitor();
+export const dbMonitor = new DBPerformanceMonitor()
 ```
 
 ### 業務指標監控
@@ -3525,7 +3665,7 @@ class BusinessMetrics {
       destination: tour.destination,
       price: tour.price,
       capacity: tour.maxCapacity,
-    });
+    })
   }
 
   async trackOrderPlaced(order: Order): Promise<void> {
@@ -3533,7 +3673,7 @@ class BusinessMetrics {
       orderId: order.id,
       amount: order.totalAmount,
       tourId: order.tourId,
-    });
+    })
   }
 
   async trackPaymentReceived(payment: Payment): Promise<void> {
@@ -3541,7 +3681,7 @@ class BusinessMetrics {
       paymentId: payment.id,
       amount: payment.amount,
       method: payment.method,
-    });
+    })
   }
 
   // 統一追蹤方法
@@ -3551,59 +3691,59 @@ class BusinessMetrics {
       properties,
       timestamp: new Date().toISOString(),
       userId: getCurrentUser()?.id,
-    };
+    }
 
     // 發送到分析平台
     await fetch('/api/analytics/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    });
+    })
   }
 
   // 即時儀表板數據
   async getDashboardMetrics() {
-    const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const today = new Date()
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0))
 
     return {
       todayRevenue: await this.getTodayRevenue(startOfDay),
       todayOrders: await this.getTodayOrders(startOfDay),
       activeTours: await this.getActiveTours(),
       pendingPayments: await this.getPendingPayments(),
-    };
+    }
   }
 
   private async getTodayRevenue(startOfDay: Date): Promise<number> {
     const payments = await localDB.filter<Payment>('payments', [
       { field: 'createdAt', operator: 'gte', value: startOfDay.toISOString() },
-    ]);
-    return payments.reduce((sum, p) => sum + p.amount, 0);
+    ])
+    return payments.reduce((sum, p) => sum + p.amount, 0)
   }
 
   private async getTodayOrders(startOfDay: Date): Promise<number> {
     const orders = await localDB.filter<Order>('orders', [
       { field: 'createdAt', operator: 'gte', value: startOfDay.toISOString() },
-    ]);
-    return orders.length;
+    ])
+    return orders.length
   }
 
   private async getActiveTours(): Promise<number> {
     const tours = await localDB.filter<Tour>('tours', [
       { field: 'status', operator: 'eq', value: 'active' },
-    ]);
-    return tours.length;
+    ])
+    return tours.length
   }
 
   private async getPendingPayments(): Promise<number> {
     const payments = await localDB.filter<Payment>('payments', [
       { field: 'status', operator: 'eq', value: 'pending' },
-    ]);
-    return payments.reduce((sum, p) => sum + p.amount, 0);
+    ])
+    return payments.reduce((sum, p) => sum + p.amount, 0)
   }
 }
 
-export const businessMetrics = new BusinessMetrics();
+export const businessMetrics = new BusinessMetrics()
 ```
 
 ---
@@ -3614,34 +3754,34 @@ export const businessMetrics = new BusinessMetrics();
 
 ```typescript
 // lib/security/encryption.ts
-import { AES, enc } from 'crypto-js';
+import { AES, enc } from 'crypto-js'
 
 class DataEncryption {
-  private readonly key = process.env.ENCRYPTION_KEY!;
+  private readonly key = process.env.ENCRYPTION_KEY!
 
   // 加密敏感資料
   encrypt(data: string): string {
-    return AES.encrypt(data, this.key).toString();
+    return AES.encrypt(data, this.key).toString()
   }
 
   // 解密
   decrypt(encrypted: string): string {
-    const bytes = AES.decrypt(encrypted, this.key);
-    return bytes.toString(enc.Utf8);
+    const bytes = AES.decrypt(encrypted, this.key)
+    return bytes.toString(enc.Utf8)
   }
 
   // 加密物件
   encryptObject<T>(obj: T): string {
-    return this.encrypt(JSON.stringify(obj));
+    return this.encrypt(JSON.stringify(obj))
   }
 
   // 解密物件
   decryptObject<T>(encrypted: string): T {
-    return JSON.parse(this.decrypt(encrypted));
+    return JSON.parse(this.decrypt(encrypted))
   }
 }
 
-export const encryption = new DataEncryption();
+export const encryption = new DataEncryption()
 
 // 使用範例：儲存敏感資料
 async function saveCustomerWithEncryption(customer: Customer) {
@@ -3649,12 +3789,10 @@ async function saveCustomerWithEncryption(customer: Customer) {
     ...customer,
     // 加密敏感欄位
     idNumber: encryption.encrypt(customer.idNumber),
-    creditCard: customer.creditCard
-      ? encryption.encrypt(customer.creditCard)
-      : undefined,
-  };
+    creditCard: customer.creditCard ? encryption.encrypt(customer.creditCard) : undefined,
+  }
 
-  await localDB.create('customers', encryptedData);
+  await localDB.create('customers', encryptedData)
 }
 ```
 
@@ -3666,32 +3804,32 @@ async function saveCustomerWithEncryption(customer: Customer) {
 class PIIMasking {
   // 遮罩身分證字號
   maskIDNumber(id: string): string {
-    if (id.length < 4) return '****';
-    return id.slice(0, 2) + '****' + id.slice(-2);
+    if (id.length < 4) return '****'
+    return id.slice(0, 2) + '****' + id.slice(-2)
   }
 
   // 遮罩信用卡號
   maskCreditCard(card: string): string {
-    const cleaned = card.replace(/\s/g, '');
-    if (cleaned.length < 4) return '****';
-    return '**** **** **** ' + cleaned.slice(-4);
+    const cleaned = card.replace(/\s/g, '')
+    if (cleaned.length < 4) return '****'
+    return '**** **** **** ' + cleaned.slice(-4)
   }
 
   // 遮罩電話號碼
   maskPhone(phone: string): string {
-    if (phone.length < 4) return '****';
-    return phone.slice(0, 4) + '****' + phone.slice(-2);
+    if (phone.length < 4) return '****'
+    return phone.slice(0, 4) + '****' + phone.slice(-2)
   }
 
   // 遮罩 Email
   maskEmail(email: string): string {
-    const [name, domain] = email.split('@');
-    if (name.length <= 2) return '**@' + domain;
-    return name[0] + '***' + name.slice(-1) + '@' + domain;
+    const [name, domain] = email.split('@')
+    if (name.length <= 2) return '**@' + domain
+    return name[0] + '***' + name.slice(-1) + '@' + domain
   }
 }
 
-export const piiMasking = new PIIMasking();
+export const piiMasking = new PIIMasking()
 
 // 日誌輸出時自動遮罩
 function logWithMasking(message: string, data: any) {
@@ -3700,9 +3838,9 @@ function logWithMasking(message: string, data: any) {
     idNumber: data.idNumber ? piiMasking.maskIDNumber(data.idNumber) : undefined,
     phone: data.phone ? piiMasking.maskPhone(data.phone) : undefined,
     email: data.email ? piiMasking.maskEmail(data.email) : undefined,
-  };
+  }
 
-  console.log(message, masked);
+  console.log(message, masked)
 }
 ```
 
@@ -3710,56 +3848,56 @@ function logWithMasking(message: string, data: any) {
 
 ```typescript
 // lib/security/xss-protection.ts
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'isomorphic-dompurify'
 
 // XSS 防護
 export function sanitizeHTML(dirty: string): string {
   return DOMPurify.sanitize(dirty, {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br'],
     ALLOWED_ATTR: ['href', 'target'],
-  });
+  })
 }
 
 // CSRF Token 生成
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'crypto'
 
 class CSRFProtection {
-  private tokens: Map<string, number> = new Map();
+  private tokens: Map<string, number> = new Map()
 
   generateToken(): string {
-    const token = randomBytes(32).toString('hex');
-    this.tokens.set(token, Date.now());
-    return token;
+    const token = randomBytes(32).toString('hex')
+    this.tokens.set(token, Date.now())
+    return token
   }
 
   validateToken(token: string): boolean {
-    const timestamp = this.tokens.get(token);
-    if (!timestamp) return false;
+    const timestamp = this.tokens.get(token)
+    if (!timestamp) return false
 
     // Token 有效期 1 小時
-    const isValid = Date.now() - timestamp < 3600000;
+    const isValid = Date.now() - timestamp < 3600000
 
     if (!isValid) {
-      this.tokens.delete(token);
+      this.tokens.delete(token)
     }
 
-    return isValid;
+    return isValid
   }
 
   cleanupExpiredTokens(): void {
-    const now = Date.now();
+    const now = Date.now()
     for (const [token, timestamp] of this.tokens.entries()) {
       if (now - timestamp > 3600000) {
-        this.tokens.delete(token);
+        this.tokens.delete(token)
       }
     }
   }
 }
 
-export const csrfProtection = new CSRFProtection();
+export const csrfProtection = new CSRFProtection()
 
 // 定期清理過期 Token
-setInterval(() => csrfProtection.cleanupExpiredTokens(), 600000); // 10 分鐘
+setInterval(() => csrfProtection.cleanupExpiredTokens(), 600000) // 10 分鐘
 ```
 
 ### Rate Limiting
@@ -3768,60 +3906,58 @@ setInterval(() => csrfProtection.cleanupExpiredTokens(), 600000); // 10 分鐘
 // lib/security/rate-limit.ts
 
 class RateLimiter {
-  private requests: Map<string, number[]> = new Map();
+  private requests: Map<string, number[]> = new Map()
 
   // 檢查是否超過限制
   isAllowed(key: string, limit: number, windowMs: number): boolean {
-    const now = Date.now();
-    const timestamps = this.requests.get(key) || [];
+    const now = Date.now()
+    const timestamps = this.requests.get(key) || []
 
     // 過濾掉超出時間窗口的請求
-    const validTimestamps = timestamps.filter(
-      timestamp => now - timestamp < windowMs
-    );
+    const validTimestamps = timestamps.filter(timestamp => now - timestamp < windowMs)
 
     if (validTimestamps.length >= limit) {
-      return false;
+      return false
     }
 
-    validTimestamps.push(now);
-    this.requests.set(key, validTimestamps);
-    return true;
+    validTimestamps.push(now)
+    this.requests.set(key, validTimestamps)
+    return true
   }
 
   // 清理舊資料
   cleanup(): void {
-    const now = Date.now();
+    const now = Date.now()
     for (const [key, timestamps] of this.requests.entries()) {
-      const valid = timestamps.filter(t => now - t < 3600000);
+      const valid = timestamps.filter(t => now - t < 3600000)
       if (valid.length === 0) {
-        this.requests.delete(key);
+        this.requests.delete(key)
       } else {
-        this.requests.set(key, valid);
+        this.requests.set(key, valid)
       }
     }
   }
 }
 
-export const rateLimiter = new RateLimiter();
+export const rateLimiter = new RateLimiter()
 
 // 使用範例
 async function apiHandler(req: Request, res: Response) {
-  const userId = req.user?.id || req.ip;
+  const userId = req.user?.id || req.ip
 
   // 限制：每分鐘 60 次請求
   if (!rateLimiter.isAllowed(userId, 60, 60000)) {
     return res.status(429).json({
       error: 'Too Many Requests',
       message: '請求過於頻繁，請稍後再試',
-    });
+    })
   }
 
   // 處理請求...
 }
 
 // 定期清理
-setInterval(() => rateLimiter.cleanup(), 300000); // 5 分鐘
+setInterval(() => rateLimiter.cleanup(), 300000) // 5 分鐘
 ```
 
 ### Audit Logging（稽核日誌）
@@ -3830,15 +3966,15 @@ setInterval(() => rateLimiter.cleanup(), 300000); // 5 分鐘
 // lib/security/audit-log.ts
 
 interface AuditLog {
-  id: string;
-  userId: string;
-  action: string;
-  resource: string;
-  resourceId: string;
-  changes?: Record<string, { before: any; after: any }>;
-  ipAddress?: string;
-  userAgent?: string;
-  timestamp: string;
+  id: string
+  userId: string
+  action: string
+  resource: string
+  resourceId: string
+  changes?: Record<string, { before: any; after: any }>
+  ipAddress?: string
+  userAgent?: string
+  timestamp: string
 }
 
 class AuditLogger {
@@ -3847,20 +3983,20 @@ class AuditLogger {
       ...params,
       id: `audit-${Date.now()}`,
       timestamp: new Date().toISOString(),
-    };
+    }
 
     // 儲存到專用的稽核資料表
-    await localDB.create('audit_logs', auditLog);
+    await localDB.create('audit_logs', auditLog)
 
     // 重要操作額外記錄到遠端
     if (this.isCriticalAction(params.action)) {
-      await this.sendToRemoteLog(auditLog);
+      await this.sendToRemoteLog(auditLog)
     }
   }
 
   private isCriticalAction(action: string): boolean {
-    const critical = ['delete', 'update_permission', 'export_data'];
-    return critical.some(a => action.includes(a));
+    const critical = ['delete', 'update_permission', 'export_data']
+    return critical.some(a => action.includes(a))
   }
 
   private async sendToRemoteLog(log: AuditLog): Promise<void> {
@@ -3869,41 +4005,41 @@ class AuditLogger {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(log),
-    });
+    })
   }
 
   // 查詢稽核日誌
   async query(filters: {
-    userId?: string;
-    action?: string;
-    resource?: string;
-    startDate?: string;
-    endDate?: string;
+    userId?: string
+    action?: string
+    resource?: string
+    startDate?: string
+    endDate?: string
   }): Promise<AuditLog[]> {
-    const conditions = [];
+    const conditions = []
 
     if (filters.userId) {
-      conditions.push({ field: 'userId', operator: 'eq', value: filters.userId });
+      conditions.push({ field: 'userId', operator: 'eq', value: filters.userId })
     }
     if (filters.action) {
-      conditions.push({ field: 'action', operator: 'eq', value: filters.action });
+      conditions.push({ field: 'action', operator: 'eq', value: filters.action })
     }
     if (filters.startDate) {
-      conditions.push({ field: 'timestamp', operator: 'gte', value: filters.startDate });
+      conditions.push({ field: 'timestamp', operator: 'gte', value: filters.startDate })
     }
     if (filters.endDate) {
-      conditions.push({ field: 'timestamp', operator: 'lte', value: filters.endDate });
+      conditions.push({ field: 'timestamp', operator: 'lte', value: filters.endDate })
     }
 
-    return await localDB.filter<AuditLog>('audit_logs', conditions);
+    return await localDB.filter<AuditLog>('audit_logs', conditions)
   }
 }
 
-export const auditLogger = new AuditLogger();
+export const auditLogger = new AuditLogger()
 
 // 使用範例
 async function deleteTour(tourId: string, userId: string) {
-  const tour = await localDB.read<Tour>('tours', tourId);
+  const tour = await localDB.read<Tour>('tours', tourId)
 
   // 刪除前記錄
   await auditLogger.log({
@@ -3914,9 +4050,9 @@ async function deleteTour(tourId: string, userId: string) {
     changes: {
       status: { before: tour.status, after: 'deleted' },
     },
-  });
+  })
 
-  await localDB.delete('tours', tourId);
+  await localDB.delete('tours', tourId)
 }
 ```
 
@@ -4040,12 +4176,14 @@ jobs:
 ## Code Review Checklist
 
 ### 功能性
+
 - [ ] 程式碼符合需求規格
 - [ ] 所有測試通過
 - [ ] 邊界條件已處理
 - [ ] 錯誤處理完整
 
 ### 程式碼品質
+
 - [ ] 遵循專案命名規範
 - [ ] 無重複代碼（DRY）
 - [ ] 函數職責單一（SRP）
@@ -4054,18 +4192,21 @@ jobs:
 - [ ] 防禦性程式設計完整（見下方規範）
 
 ### 安全性
+
 - [ ] 無 SQL Injection 風險
 - [ ] 無 XSS 風險
 - [ ] 敏感資料已加密
 - [ ] 權限檢查完整
 
 ### 效能
+
 - [ ] 無 N+1 查詢
 - [ ] 有適當快取
 - [ ] 無記憶體洩漏
 - [ ] 資料庫索引正確
 
 ### 測試
+
 - [ ] 單元測試覆蓋率 > 80%
 - [ ] 整合測試完整
 - [ ] 測試案例有意義
@@ -4204,6 +4345,7 @@ const tourOrders = (orders || []).filter(o => o?.tourId === tour?.id)
 每次執行任務時必須：
 
 #### 1. **防禦性程式設計檢查**
+
 - [ ] 所有陣列操作加 `|| []` 或 `?? []`
 - [ ] 所有物件存取用 `?.` optional chaining
 - [ ] 所有函數參數檢查 null/undefined
@@ -4211,18 +4353,21 @@ const tourOrders = (orders || []).filter(o => o?.tourId === tour?.id)
 - [ ] 日期解析用 try-catch 包裝
 
 #### 2. **完整錯誤處理**
+
 - [ ] async 函數有 try-catch
 - [ ] 錯誤訊息明確且可追蹤
 - [ ] 提供 fallback 或預設值
 - [ ] 使用 console.warn 記錄異常情況
 
 #### 3. **程式碼驗證**
+
 - [ ] 列出可能的邊界情況
 - [ ] 提供測試案例（至少 3 個）
 - [ ] 確認 TypeScript 型別正確
 - [ ] 無 `any` 型別（除非必要）
 
 #### 4. **交付清單**
+
 - [ ] 修改的檔案列表
 - [ ] 修改內容摘要
 - [ ] 潛在風險說明
@@ -4281,7 +4426,7 @@ const getBirthdaysThisMonth = (
         id: member.id || 'unknown',
         name: member.name || '未知姓名',
         date: member.birthday!, // 上面已檢查
-        type: 'birthday' as const
+        type: 'birthday' as const,
       }
     })
 
@@ -4300,14 +4445,14 @@ console.assert(
 
 ### 9. 常見錯誤模式與修正
 
-| 錯誤模式 | 修正方式 |
-|---------|---------|
-| `data.map()` | `(data || []).map()` |
-| `obj.prop` | `obj?.prop` |
+| 錯誤模式        | 修正方式                              |
+| --------------- | ------------------------------------- | --- | ---------- |
+| `data.map()`    | `(data                                |     | []).map()` |
+| `obj.prop`      | `obj?.prop`                           |
 | `new Date(str)` | `try { new Date(str) } catch { ... }` |
-| `arr[0]` | `arr?.[0]` |
-| `func(param)` | `func(param ?? defaultValue)` |
-| `await api()` | `try { await api() } catch { ... }` |
+| `arr[0]`        | `arr?.[0]`                            |
+| `func(param)`   | `func(param ?? defaultValue)`         |
+| `await api()`   | `try { await api() } catch { ... }`   |
 
 ### 10. TypeScript 嚴格模式配置
 
@@ -4365,6 +4510,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 ## 🎯 架構成熟度路線圖
 
 ### Level 1: MVP（當前）
+
 ```
 ✅ 基本 CRUD
 ✅ 本地儲存（IndexedDB）
@@ -4375,6 +4521,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 ```
 
 ### Level 2: Production（未來擴充）
+
 ```
 ⏳ 多用戶協作
 ⏳ 後端 API（Supabase）
@@ -4385,6 +4532,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 ```
 
 ### Level 3: Scale（6個月後）
+
 ```
 ⏳ 事件驅動架構
 ⏳ 三層快取策略
@@ -4395,6 +4543,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 ```
 
 ### Level 4: Enterprise（1年後）
+
 ```
 ⏳ 微服務架構
 ⏳ Event Sourcing
@@ -4407,6 +4556,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 ### 遷移路徑
 
 #### 雲端同步準備工作
+
 1. **資料遷移**
    - 匯出 IndexedDB 資料
    - 建立 Supabase schema
@@ -4426,6 +4576,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
    - Dashboard 建置
 
 #### 進階功能準備工作
+
 1. **事件驅動改造**
    - 實作 Event Bus
    - 領域事件定義
@@ -4448,37 +4599,40 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 
 ## 📝 版本歷史
 
-| 版本 | 日期 | 變更內容 |
-|------|------|---------|
-| 5.2.0 | 2025-01-06 | 🚀 企業級架構完成：DDD、事件驅動、快取策略、監控、安全性、CI/CD |
+| 版本  | 日期       | 變更內容                                                                   |
+| ----- | ---------- | -------------------------------------------------------------------------- |
+| 5.2.0 | 2025-01-06 | 🚀 企業級架構完成：DDD、事件驅動、快取策略、監控、安全性、CI/CD            |
 | 5.1.0 | 2025-01-06 | 🎉 升級為專業五層架構，新增測試策略、權限系統、錯誤處理、API設計、資料遷移 |
-| 5.0.6 | 2025-01-06 | 完成 Hook 層（6個檔案，業務邏輯完整） |
-| 5.0.5 | 2025-01-06 | 完成 Store 系統（簡化版，2個檔案） |
-| 5.0.3 | 2025-01-06 | 完成 IndexedDB 層（3個檔案） |
-| 5.0.2 | 2025-01-06 | 完成型別系統（9個檔案） |
-| 5.0.1 | 2025-01-06 | 加入文檔使用指南 |
-| 5.0.0 | 2025-01-06 | 初始架構設計 |
-| 4.0.0 | 2025-01-03 | 離線架構嘗試（未完成）|
-| 3.0.0 | 2024-12 | Supabase 整合（問題多）|
-| 2.0.0 | 2024-11 | localStorage 版本 |
-| 1.0.0 | 2024-10 | 初始原型 |
+| 5.0.6 | 2025-01-06 | 完成 Hook 層（6個檔案，業務邏輯完整）                                      |
+| 5.0.5 | 2025-01-06 | 完成 Store 系統（簡化版，2個檔案）                                         |
+| 5.0.3 | 2025-01-06 | 完成 IndexedDB 層（3個檔案）                                               |
+| 5.0.2 | 2025-01-06 | 完成型別系統（9個檔案）                                                    |
+| 5.0.1 | 2025-01-06 | 加入文檔使用指南                                                           |
+| 5.0.0 | 2025-01-06 | 初始架構設計                                                               |
+| 4.0.0 | 2025-01-03 | 離線架構嘗試（未完成）                                                     |
+| 3.0.0 | 2024-12    | Supabase 整合（問題多）                                                    |
+| 2.0.0 | 2024-11    | localStorage 版本                                                          |
+| 1.0.0 | 2024-10    | 初始原型                                                                   |
 
 ---
 
 ## 🎓 給開發者的話
 
 ### 為什麼這樣設計？
+
 - **不是偷懶**：是階段性策略
 - **不是技術債**：是計劃內的簡化
 - **不是沒想到**：是刻意延後
 
 ### 記住原則
+
 1. 先讓它動 → 再讓它對 → 最後讓它快
 2. 不要預先優化
 3. 不要過度設計
 4. 保持簡單
 
 ### 下一位接手時
+
 請先讀這份文檔，理解設計決策，不要急著重構。系統正在按計劃演進。
 
 ---
@@ -4500,12 +4654,14 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 ## 📋 完整章節索引
 
 ### 基礎架構
+
 1. **型別系統** (9 檔案) - 完整 TypeScript 定義
 2. **資料庫層** (3 檔案) - IndexedDB 管理
 3. **狀態管理** (2 檔案) - Zustand Store 工廠
 4. **業務邏輯** (6 檔案) - Custom Hooks
 
 ### 專業架構
+
 5. **五層架構** - UI → Hook → Service → Store → DB
 6. **測試策略** - 單元、整合、E2E
 7. **權限系統** - RBAC 權限矩陣
@@ -4513,6 +4669,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 9. **API 設計** - RESTful 規範
 
 ### 企業級功能
+
 10. **領域驅動設計** - 4 個 Bounded Contexts
 11. **事件驅動架構** - Event Bus + Event Sourcing
 12. **快取策略** - 三層快取架構
@@ -4522,6 +4679,7 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 16. **DevOps** - Code Review + 環境管理
 
 ### 實作指南
+
 17. **資料遷移** - Schema 升級與雲端同步策略
 18. **架構成熟度路線圖** - MVP → Enterprise
 19. **技術決策記錄** - 12 個關鍵決策
@@ -4541,20 +4699,23 @@ NEXT_PUBLIC_FEATURE_EVENT_BUS=true
 在系統合規檢查中發現**嚴重的雙資料庫問題**：
 
 #### 問題現象
+
 - 用戶可以登入（使用 `VenturoOfflineDB`）
 - 但 HR 頁面顯示無員工資料（查詢 `VenturoLocalDB`）
 - 兩個資料庫實例各自獨立，資料不同步
 
 #### 根本原因
+
 v4.0 → v5.0 遷移未完成，舊的 `offline-database.ts` 未移除，導致：
+
 ```typescript
 // 登入系統使用
-import { getOfflineDB } from '@/lib/offline/offline-database';
-const db = getOfflineDB(); // → VenturoOfflineDB
+import { getOfflineDB } from '@/lib/offline/offline-database'
+const db = getOfflineDB() // → VenturoOfflineDB
 
 // HR 系統使用
-import { localDB } from '@/lib/db';
-await localDB.getAll('users'); // → VenturoLocalDB
+import { localDB } from '@/lib/db'
+await localDB.getAll('users') // → VenturoLocalDB
 ```
 
 ---
@@ -4563,37 +4724,40 @@ await localDB.getAll('users'); // → VenturoLocalDB
 
 ✅ **已完成全部 7 項任務**
 
-| 任務 | 狀態 | 檔案數 | 說明 |
-|------|------|--------|------|
-| 1. 修復 accounting-store 混用 | ✅ | 1 | 統一使用 localDB |
-| 2. 修復 calendar-store | ✅ | 1 | 統一使用 localDB |
-| 3. 停用 create-complex-store | ✅ | 1 | 標記 @deprecated |
-| 4. user-store 確認 | ✅ | 1 | 已正確使用 localDB |
-| 5. 檢查頁面防衛性程式碼 | ✅ | 3 | 修復 15 個問題 |
-| 6. 標記 VenturoOfflineDB | ✅ | 1 | 加入遷移指南 |
-| 7. 更新 5.0 MANUAL | ✅ | 1 | 本文檔 |
+| 任務                          | 狀態 | 檔案數 | 說明               |
+| ----------------------------- | ---- | ------ | ------------------ |
+| 1. 修復 accounting-store 混用 | ✅   | 1      | 統一使用 localDB   |
+| 2. 修復 calendar-store        | ✅   | 1      | 統一使用 localDB   |
+| 3. 停用 create-complex-store  | ✅   | 1      | 標記 @deprecated   |
+| 4. user-store 確認            | ✅   | 1      | 已正確使用 localDB |
+| 5. 檢查頁面防衛性程式碼       | ✅   | 3      | 修復 15 個問題     |
+| 6. 標記 VenturoOfflineDB      | ✅   | 1      | 加入遷移指南       |
+| 7. 更新 5.0 MANUAL            | ✅   | 1      | 本文檔             |
 
 ---
 
 ### 詳細修復清單
 
 #### 1. offline-auth.service.ts
+
 **問題**: 登入驗證使用錯誤的資料庫
 
 **修復前**:
+
 ```typescript
-const { getOfflineDB } = await import('@/lib/offline/offline-database');
-const db = getOfflineDB();
-const employees = await db.getAll('users');
-const employee = employees.find((emp: any) => emp.employeeNumber === employeeNumber);
+const { getOfflineDB } = await import('@/lib/offline/offline-database')
+const db = getOfflineDB()
+const employees = await db.getAll('users')
+const employee = employees.find((emp: any) => emp.employeeNumber === employeeNumber)
 ```
 
 **修復後**:
+
 ```typescript
-import { localDB } from '@/lib/db';
-import { User } from '@/types';
-const employees = await localDB.getAll<User>('users');
-const employee = employees.find((emp) => emp.employeeNumber === employeeNumber);
+import { localDB } from '@/lib/db'
+import { User } from '@/types'
+const employees = await localDB.getAll<User>('users')
+const employee = employees.find(emp => emp.employeeNumber === employeeNumber)
 ```
 
 **影響**: 登入系統現在查詢正確的資料庫
@@ -4601,22 +4765,25 @@ const employee = employees.find((emp) => emp.employeeNumber === employeeNumber);
 ---
 
 #### 2. init-admin-user.ts
+
 **問題**: 初始化管理員寫入錯誤的資料庫
 
 **修復前**:
+
 ```typescript
-import { getOfflineDB } from './offline-database';
-const db = getOfflineDB();
-const existingUsers = await db.getAll('users');
-await db.add('users', adminUser);
+import { getOfflineDB } from './offline-database'
+const db = getOfflineDB()
+const existingUsers = await db.getAll('users')
+await db.add('users', adminUser)
 ```
 
 **修復後**:
+
 ```typescript
-import { localDB } from '@/lib/db';
-import { User } from '@/types';
-const existingUsers = await localDB.getAll<User>('users');
-await localDB.create<User>('users', adminUser);
+import { localDB } from '@/lib/db'
+import { User } from '@/types'
+const existingUsers = await localDB.getAll<User>('users')
+await localDB.create<User>('users', adminUser)
 ```
 
 **影響**: 管理員資料正確寫入 VenturoLocalDB
@@ -4624,29 +4791,32 @@ await localDB.create<User>('users', adminUser);
 ---
 
 #### 3. create-complex-store.ts (工廠函數)
+
 **問題**: 所有使用此工廠的 Store 都調用錯誤資料庫
 
 **修復**: 統一替換 6 處資料庫調用
+
 ```typescript
 // 修改前
-import { getOfflineDB } from '@/lib/offline/offline-database';
-const db = getOfflineDB();
-await db.getAll(tableName);
-await db.getById(tableName, id);
-await db.create(tableName, data);
-await db.update(tableName, id, data);
-await db.delete(tableName, id);
+import { getOfflineDB } from '@/lib/offline/offline-database'
+const db = getOfflineDB()
+await db.getAll(tableName)
+await db.getById(tableName, id)
+await db.create(tableName, data)
+await db.update(tableName, id, data)
+await db.delete(tableName, id)
 
 // 修改後
-import { localDB } from '@/lib/db';
-await localDB.getAll(tableName);
-await localDB.getById(tableName, id);
-await localDB.create(tableName, data);
-await localDB.update(tableName, id, data);
-await localDB.delete(tableName, id);
+import { localDB } from '@/lib/db'
+await localDB.getAll(tableName)
+await localDB.getById(tableName, id)
+await localDB.create(tableName, data)
+await localDB.update(tableName, id, data)
+await localDB.delete(tableName, id)
 ```
 
 **同時加入棄用標記**:
+
 ```typescript
 /**
  * @deprecated 此工廠函數已停止開發，請使用 `createStore` 代替
@@ -4657,27 +4827,31 @@ await localDB.delete(tableName, id);
 ```
 
 **影響範圍**: 自動修復所有使用此工廠的 Store
+
 - ✅ accounting-store.ts (4 個子實體)
 - ✅ 其他使用 createComplexStore 的 Store
 
 ---
 
 #### 4. accounting-store.ts
+
 **問題**: 自訂業務方法中直接調用 getOfflineDB
 
 **修復**: 替換 5 處直接調用
+
 ```typescript
 // 修改前（createTransaction 方法）
-const { getOfflineDB } = await import('@/lib/offline/offline-database');
-const localDB = getOfflineDB(); // ❌ 變數名誤導
-await localDB.create('transactions', transaction);
+const { getOfflineDB } = await import('@/lib/offline/offline-database')
+const localDB = getOfflineDB() // ❌ 變數名誤導
+await localDB.create('transactions', transaction)
 
 // 修改後
-import { localDB } from '@/lib/db';
-await localDB.create('transactions', transaction);
+import { localDB } from '@/lib/db'
+await localDB.create('transactions', transaction)
 ```
 
 **修復位置**:
+
 1. Line 73-74: createTransaction
 2. Line 111-113: updateTransaction
 3. Line 151-153: deleteTransaction
@@ -4689,29 +4863,32 @@ await localDB.create('transactions', transaction);
 ---
 
 #### 5. calendar-store.ts
+
 **問題**: 4 處調用錯誤資料庫
 
 **修復**:
+
 ```typescript
 // 修改前
-import { getOfflineDB } from '@/lib/offline/offline-database';
-const db = getOfflineDB();
-await db.add('calendarEvents', newEvent);
-await db.get<CalendarEvent>('calendarEvents', id);
-await db.update('calendarEvents', updatedEvent);
-await db.delete('calendarEvents', id);
-await db.getAll<CalendarEvent>('calendarEvents');
+import { getOfflineDB } from '@/lib/offline/offline-database'
+const db = getOfflineDB()
+await db.add('calendarEvents', newEvent)
+await db.get<CalendarEvent>('calendarEvents', id)
+await db.update('calendarEvents', updatedEvent)
+await db.delete('calendarEvents', id)
+await db.getAll<CalendarEvent>('calendarEvents')
 
 // 修改後
-import { localDB } from '@/lib/db';
-await localDB.create('calendarEvents', newEvent);
-await localDB.getById<CalendarEvent>('calendarEvents', id);
-await localDB.update('calendarEvents', id, updatedData);
-await localDB.delete('calendarEvents', id);
-await localDB.getAll<CalendarEvent>('calendarEvents');
+import { localDB } from '@/lib/db'
+await localDB.create('calendarEvents', newEvent)
+await localDB.getById<CalendarEvent>('calendarEvents', id)
+await localDB.update('calendarEvents', id, updatedData)
+await localDB.delete('calendarEvents', id)
+await localDB.getAll<CalendarEvent>('calendarEvents')
 ```
 
 **修復位置**:
+
 1. Line 64: addEvent
 2. Line 84-91: updateEvent
 3. Line 107: deleteEvent
@@ -4732,6 +4909,7 @@ await localDB.getAll<CalendarEvent>('calendarEvents');
 ##### 修復的頁面:
 
 **hr/page.tsx** (4 處)
+
 ```typescript
 // Before
 getUsersByStatus(...).filter(...)
@@ -4746,6 +4924,7 @@ filteredEmployees.map(employee => ...)
 ```
 
 **finance/payments/page.tsx** (7 處)
+
 ```typescript
 // Before
 orderAllocations.map(...)
@@ -4763,6 +4942,7 @@ paymentItems.forEach(...)
 ```
 
 **finance/requests/page.tsx** (4 處)
+
 ```typescript
 // Before
 suppliers.find(s => s.id === id)
@@ -4781,7 +4961,8 @@ requestItems.map(...)
 #### 7. offline-database.ts 標記棄用
 
 **加入遷移指南**:
-```typescript
+
+````typescript
 /**
  * @deprecated 此檔案已棄用，請使用 @/lib/db 中的 localDB 代替
  *
@@ -4810,13 +4991,14 @@ requestItems.map(...)
  * 維護狀態：僅修復 critical bugs，不新增功能
  * 移除計劃：未來完全移除此檔案
  */
-```
+````
 
 ---
 
 ### 修復成果
 
 #### 解決的問題
+
 ✅ 登入系統與 HR 系統資料同步
 ✅ 所有 Store 統一使用 localDB
 ✅ 移除資料庫混用情況
@@ -4825,6 +5007,7 @@ requestItems.map(...)
 ✅ 清晰的棄用標記和文檔
 
 #### 資料庫架構現況
+
 ```
 ✅ VenturoLocalDB (主要資料庫)
    ├─ users (員工資料)
@@ -4844,6 +5027,7 @@ requestItems.map(...)
 ```
 
 #### 程式碼品質提升
+
 - **Type Safety**: 所有資料庫調用現在使用 TypeScript 泛型
 - **API 一致性**: 統一使用 create/getById/update/delete
 - **防衛性程式碼**: 所有陣列操作加入 `|| []` 和 null 檢查
@@ -4854,6 +5038,7 @@ requestItems.map(...)
 ### 遷移檢查清單
 
 **Phase 1 完成項目**:
+
 - [x] 統一所有 Store 使用 localDB
 - [x] 移除所有 getOfflineDB() 調用
 - [x] 加入防衛性程式碼
@@ -4861,12 +5046,14 @@ requestItems.map(...)
 - [x] 更新文檔
 
 **Phase 2 待辦**:
+
 - [ ] 完全移除 offline-database.ts
 - [ ] 清理 VenturoOfflineDB 實例
 - [ ] 資料遷移驗證
 - [ ] 單元測試更新
 
 **Phase 3 準備**:
+
 - [ ] Supabase 整合準備
 - [ ] 雙向同步機制
 - [ ] 資料一致性驗證
@@ -4876,48 +5063,58 @@ requestItems.map(...)
 ### 技術決策記錄
 
 #### 為什麼不直接刪除 offline-database.ts？
+
 **決策**: 保留但標記 @deprecated
 
 **原因**:
+
 1. **向下相容**: 可能還有未發現的調用
 2. **漸進遷移**: 逐步完全移除舊系統
 3. **風險控制**: 避免破壞性變更
 4. **文檔價值**: 遷移指南對開發者有幫助
 
 #### 為什麼保留 createComplexStore？
+
 **決策**: 維護但不開發新功能
 
 **原因**:
+
 1. **業務邏輯複雜**: accounting-store 有複雜的餘額計算
 2. **穩定性優先**: 已在使用且運作正常
 3. **5.0 規範允許**: 複雜 Store 可手寫
 4. **重構成本高**: 非必要重構
 
 #### user-store 為何不用工廠？
+
 **決策**: 保持手寫 Store
 
 **原因**:
+
 1. **已符合規範**: 正確使用 localDB
 2. **架構清晰**: 手寫代碼可讀性高
 3. **業務邏輯多**: 薪資、出勤、合約管理
 4. **5.0 允許**: 複雜業務邏輯 Store 可手寫
 
 #### Store 架構統一專案（2025-10-15）
+
 **決策**: Quote、Order、Member、Customer Store 統一遷移至 createStore 模式
 
 **成果**:
+
 1. **TypeScript 錯誤減少 40.8%**: 從 184 個降至 109 個
 2. **核心 Store 完成統一**: 4 個主要 Store 全部遷移
 3. **三層架構確立**: Pages/Components → Hooks → Services → Stores
 4. **API 標準化**: 統一使用 `items`, `create()`, `update()`, `delete()`, `fetchAll()`
 
 **技術細節**:
+
 - **Quote Store**: 修正型別衝突（統一使用 `@/stores/types`）
 - **Order Store**: 更新所有業務方法使用 `store.items`
 - **Member Store**: 從 `useTourStore()` 遷移至 `useMemberStore()`
 - **Customer Store**: 從 `useTourStore()` 遷移至 `useCustomerStore()`
 
 **Payment Store 特殊處理**:
+
 - **決策**: 暫時保留舊架構，標記 `@deprecated`
 - **原因**:
   1. 包含 PaymentRequest 和 DisbursementOrder 兩種實體
@@ -4926,45 +5123,53 @@ requestItems.map(...)
 - **遷移計畫**: 5 個 Phase 逐步遷移（預計 1-2 週後開始）
 
 **架構改進**:
+
 ```typescript
 // 標準 Store API
 interface StoreAPI<T> {
-  items: T[];                          // 統一資料列表名稱
-  create: (data: Partial<T>) => Promise<T>;
-  update: (id: string, data: Partial<T>) => Promise<T>;
-  delete: (id: string) => Promise<void>;
-  fetchAll: () => Promise<T[]>;
+  items: T[] // 統一資料列表名稱
+  create: (data: Partial<T>) => Promise<T>
+  update: (id: string, data: Partial<T>) => Promise<T>
+  delete: (id: string) => Promise<void>
+  fetchAll: () => Promise<T[]>
 }
 ```
 
 **文檔**:
+
 - 詳細記錄：`/tmp/store-unification-summary.md`
 - 修改檔案：15+ 個（Hooks、Services、Pages、Components）
 - 備份檔案：4 個 `.deprecated.ts` 檔案
 
 #### Tour Store 遷移完成（2025-10-15）
+
 **決策**: Tour Store 遷移至 createStore 模式
 
 **成果**:
+
 1. **TypeScript 錯誤再減少 48.6%**: 從 109 個降至 56 個
 2. **核心 Store 100% 完成**: 5/5 全部遷移（Quote、Order、Member、Customer、Tour）
 3. **總錯誤減少 69.6%**: 從 184 個降至 56 個
 
 **技術細節**:
+
 - **useTours Hook**: 移除 orders/customers/members，改用獨立 Store
 - **tour.service.ts**: 更新 getStore() 使用新 Store API
 - **requests/page.tsx**: 同時使用 useTours() 和 useOrders()
 
 **清理工作**:
+
 - `src/hooks/useQuotes.ts` → `.deprecated.ts`
 - `tsconfig.json` 排除 `**/*.deprecated.ts`
 - 移除 stores/index.ts 中重複的 usePaymentStore 聲明
 
 **剩餘工作**:
+
 - ~52 個 Payment Store 錯誤（待處理）
 - 4 個零散錯誤（型別約束、其他）
 
 **文檔**:
+
 - 詳細記錄：`/tmp/tour-store-migration-complete.md`
 - 修改檔案：7 個（Hooks、Services、Pages、Config）
 
@@ -4973,18 +5178,21 @@ interface StoreAPI<T> {
 ### 後續工作建議
 
 #### 短期（本週）
+
 1. ✅ 測試登入功能
 2. ✅ 測試 HR 頁面員工顯示
 3. ✅ 測試會計功能
 4. ✅ 測試行事曆功能
 
 #### 中期（下週）
+
 1. 完整功能測試
 2. 效能監控
 3. 錯誤追蹤
 4. 使用者反饋
 
 #### 長期計劃
+
 1. 移除 offline-database.ts
 2. 評估是否重構 createComplexStore
 3. 準備 Supabase 整合
@@ -4995,12 +5203,14 @@ interface StoreAPI<T> {
 ### 經驗教訓
 
 #### ✅ 做對的事
+
 1. **系統性檢查**: 使用 SYSTEM_COMPLIANCE_CHECK.md 發現問題
 2. **自動化修復**: Task Agent 批次修復防衛性程式碼
 3. **完整文檔**: 每個修復都有清晰記錄
 4. **漸進遷移**: 不做破壞性變更
 
 #### ⚠️ 未來注意
+
 1. **版本升級檢查**: v4 → v5 應該要完整移除舊檔案
 2. **資料庫實例管理**: 單一真相來源原則
 3. **型別安全**: 避免使用 `any`
@@ -5027,6 +5237,7 @@ interface StoreAPI<T> {
 ### 🎯 功能總覽
 
 工作空間是 Venturo 的團隊協作中心，提供：
+
 - **頻道系統**：固定頻道、旅遊團頻道、自訂頻道
 - **訊息功能**：發送、反應、釘選、回覆串
 - **Canvas 協作**：待辦清單、文件、檔案庫
@@ -5160,6 +5371,7 @@ type CanvasType = 'checklist' | 'document' | 'files';
 ```
 
 **功能特色：**
+
 - ✅ 一次可看 10+ 個任務（列表式）
 - ✅ 點擊展開看詳情
 - ✅ 直接勾選完成（主任務 + 子任務）
@@ -5195,7 +5407,7 @@ useEffect(() => {
 // 在 tour-store.ts 或 workspace-store.ts
 function createTourChannel(tour: Tour) {
   // 只為「確認」「執行中」狀態建立頻道
-  if (tour.status === '提案') return;
+  if (tour.status === '提案') return
 
   const channel: Channel = {
     id: tour.id,
@@ -5203,15 +5415,15 @@ function createTourChannel(tour: Tour) {
     type: 'tour',
     tourId: tour.id,
     members: [
-      tour.salesPersonId,    // 業務
-      tour.assistantId,      // 助理
-      'william-uuid',        // 威廉（系統管理員）
+      tour.salesPersonId, // 業務
+      tour.assistantId, // 助理
+      'william-uuid', // 威廉（系統管理員）
     ],
     isArchived: tour.status === '結案',
-  };
+  }
 
   // 同時建立 Canvas
-  createCanvas(channel.id, 'checklist');
+  createCanvas(channel.id, 'checklist')
 }
 ```
 
@@ -5350,24 +5562,24 @@ function createTourChannel(tour: Tour) {
 // workspace-store.ts (200行)
 interface WorkspaceStore {
   // 頻道管理
-  channels: Channel[];
-  activeChannelId: string | null;
-  createChannel: (data: CreateChannelData) => void;
-  archiveChannel: (channelId: string) => void;
+  channels: Channel[]
+  activeChannelId: string | null
+  createChannel: (data: CreateChannelData) => void
+  archiveChannel: (channelId: string) => void
 
   // 訊息管理
-  messages: Message[];
-  sendMessage: (channelId: string, content: string) => void;
-  addReaction: (messageId: string, emoji: string) => void;
-  togglePin: (messageId: string) => void;
+  messages: Message[]
+  sendMessage: (channelId: string, content: string) => void
+  addReaction: (messageId: string, emoji: string) => void
+  togglePin: (messageId: string) => void
 
   // Canvas 管理
-  canvasDocuments: CanvasDocument[];
-  createCanvas: (channelId: string, type: CanvasType) => void;
+  canvasDocuments: CanvasDocument[]
+  createCanvas: (channelId: string, type: CanvasType) => void
 
   // 檔案管理（預留）
-  files: ChannelFile[];
-  uploadFile: (channelId: string, file: File) => void;
+  files: ChannelFile[]
+  uploadFile: (channelId: string, file: File) => void
 }
 ```
 
@@ -5376,39 +5588,39 @@ interface WorkspaceStore {
 ```typescript
 // Channel 頻道
 interface Channel {
-  id: string;
-  name: string;
-  type: 'fixed' | 'tour' | 'custom';
-  tourId?: string;        // 旅遊團頻道專用
-  members: string[];      // 成員 UUID 列表
-  isArchived: boolean;    // 是否封存
-  createdAt: string;
-  createdBy: string;
+  id: string
+  name: string
+  type: 'fixed' | 'tour' | 'custom'
+  tourId?: string // 旅遊團頻道專用
+  members: string[] // 成員 UUID 列表
+  isArchived: boolean // 是否封存
+  createdAt: string
+  createdBy: string
 }
 
 // Message 訊息
 interface Message {
-  id: string;
-  channelId: string;
-  content: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar: string;
-  createdAt: string;
-  reactions: { emoji: string; users: string[] }[];
-  isPinned: boolean;
-  threadId?: string;      // 回覆串（預留）
+  id: string
+  channelId: string
+  content: string
+  senderId: string
+  senderName: string
+  senderAvatar: string
+  createdAt: string
+  reactions: { emoji: string; users: string[] }[]
+  isPinned: boolean
+  threadId?: string // 回覆串（預留）
 }
 
 // Canvas 文件
 interface CanvasDocument {
-  id: string;
-  channelId: string;
-  type: 'checklist' | 'document' | 'files';
-  title: string;
-  content?: string;       // 富文本內容（預留）
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  channelId: string
+  type: 'checklist' | 'document' | 'files'
+  title: string
+  content?: string // 富文本內容（預留）
+  createdAt: string
+  updatedAt: string
 }
 ```
 
@@ -5417,6 +5629,7 @@ interface CanvasDocument {
 ### ✨ 已實作功能清單
 
 #### ✅ 頻道系統
+
 - [x] 固定頻道（公告、常用空間）
 - [x] 旅遊團頻道（自動建立）
 - [x] 自訂頻道（手動建立）
@@ -5424,6 +5637,7 @@ interface CanvasDocument {
 - [x] 顯示/隱藏封存頻道開關
 
 #### ✅ 訊息功能
+
 - [x] 發送文字訊息
 - [x] Enter 送出，Shift+Enter 換行
 - [x] 表情符號反應
@@ -5434,6 +5648,7 @@ interface CanvasDocument {
 - [x] 自動滾動到最新訊息
 
 #### ✅ Canvas 功能
+
 - [x] 待辦清單類型
 - [x] 列表式設計
 - [x] 展開/收起詳情
@@ -5445,6 +5660,7 @@ interface CanvasDocument {
 - [x] 已完成任務半透明
 
 #### ✅ 任務整合
+
 - [x] 與 useTodoStore 統一資料
 - [x] 旅遊團管理顯示任務（表格式）
 - [x] 工作空間顯示任務（列表式）
@@ -5458,6 +5674,7 @@ interface CanvasDocument {
 ### 🔮 待實作功能（架構已預留）
 
 #### 📝 富文本編輯器
+
 ```typescript
 // 架構：Canvas 文件類型已預留
 // 需要：整合 Tiptap 或 Slate
@@ -5470,6 +5687,7 @@ type: 'document'
 ```
 
 #### 📁 檔案上傳
+
 ```typescript
 // 架構：Store 方法已預留
 uploadFile: (channelId: string, file: File) => void
@@ -5481,6 +5699,7 @@ uploadFile: (channelId: string, file: File) => void
 ```
 
 #### 💬 回覆串
+
 ```typescript
 // 架構：Message.threadId 已預留
 interface Message {
@@ -5494,6 +5713,7 @@ interface Message {
 ```
 
 #### 🔔 通知系統
+
 ```typescript
 // 架構：可監聽 Store 變化
 功能：
@@ -5504,6 +5724,7 @@ interface Message {
 ```
 
 #### 👥 成員管理
+
 ```typescript
 // 架構：Channel.members 已預留
 功能：
@@ -5513,6 +5734,7 @@ interface Message {
 ```
 
 #### 💰 快速請款單
+
 ```typescript
 // 架構：可在訊息區加按鈕
 功能：
@@ -5526,6 +5748,7 @@ interface Message {
 ### 🎯 設計亮點
 
 #### 1. 資料統一，無需同步
+
 ```typescript
 // ❌ 錯誤做法：雙向同步
 旅遊團任務 ←同步邏輯→ 工作空間任務
@@ -5537,6 +5760,7 @@ useTodoStore
 ```
 
 #### 2. 列表式設計，資訊密度高
+
 ```
 ✅ 一次可看 10+ 個任務
 ✅ 點擊展開看詳情
@@ -5545,6 +5769,7 @@ useTodoStore
 ```
 
 #### 3. 智能跳轉
+
 ```
 旅遊團 → 點擊按鈕 → 工作空間
   ↓
@@ -5556,6 +5781,7 @@ useTodoStore
 ```
 
 #### 4. 無縫整合
+
 ```
 建立任務（旅遊團）→ 即時顯示（工作空間）
 完成任務（工作空間）→ 即時更新（旅遊團）
@@ -5567,6 +5793,7 @@ useTodoStore
 ### 🚦 開發檢查清單
 
 #### 核心功能
+
 - [x] workspace-store.ts
 - [x] workspace/page.tsx
 - [x] channel-list.tsx
@@ -5577,6 +5804,7 @@ useTodoStore
 - [x] tour-task-assignment.tsx（加入跳轉按鈕）
 
 #### 測試驗證
+
 - [ ] 測試旅遊團頻道自動建立
 - [ ] 測試任務同步
 - [ ] 測試訊息發送
@@ -5585,6 +5813,7 @@ useTodoStore
 - [ ] 測試封存功能
 
 #### Phase 3: 進階功能 ⏳ 待實作
+
 - [ ] 富文本編輯器整合
 - [ ] 檔案上傳功能
 - [ ] 成員邀請功能
@@ -5597,6 +5826,7 @@ useTodoStore
 ### 📈 效能考量
 
 #### IndexedDB 查詢優化
+
 ```typescript
 // ✅ 好的做法：按頻道查詢
 messages.where('channelId').equals(channelId).toArray();
@@ -5606,20 +5836,22 @@ messages.toArray().then(all => all.filter(...));
 ```
 
 #### 訊息分頁載入
+
 ```typescript
 // 建議：每次載入 50 則
-const MESSAGES_PER_PAGE = 50;
+const MESSAGES_PER_PAGE = 50
 
 // 實作：向上滾動載入更多
 onScroll(() => {
-  if (scrollTop === 0) loadMoreMessages();
-});
+  if (scrollTop === 0) loadMoreMessages()
+})
 ```
 
 #### Canvas 文件快取
+
 ```typescript
 // 建議：切換頻道時保留前一個頻道的 Canvas
-const canvasCache = new Map<string, CanvasDocument>();
+const canvasCache = new Map<string, CanvasDocument>()
 ```
 
 ---
@@ -5627,35 +5859,37 @@ const canvasCache = new Map<string, CanvasDocument>();
 ### 🔒 安全考量
 
 #### 權限檢查（Phase 2 實作）
+
 ```typescript
 // 檢查是否為頻道成員
 function canAccessChannel(userId: string, channel: Channel) {
-  return channel.members.includes(userId);
+  return channel.members.includes(userId)
 }
 
 // 檢查是否可刪除訊息
 function canDeleteMessage(userId: string, message: Message) {
-  return message.senderId === userId || isAdmin(userId);
+  return message.senderId === userId || isAdmin(userId)
 }
 
 // 檢查是否可封存頻道
 function canArchiveChannel(userId: string, channel: Channel) {
-  if (channel.type === 'fixed') return false;  // 固定頻道不可封存
-  if (channel.type === 'tour') return isAdmin(userId);
-  return channel.createdBy === userId;
+  if (channel.type === 'fixed') return false // 固定頻道不可封存
+  if (channel.type === 'tour') return isAdmin(userId)
+  return channel.createdBy === userId
 }
 ```
 
 #### 資料驗證
+
 ```typescript
 // 訊息長度限制
-const MAX_MESSAGE_LENGTH = 5000;
+const MAX_MESSAGE_LENGTH = 5000
 
 // 頻道名稱規則
-const CHANNEL_NAME_PATTERN = /^[a-zA-Z0-9\u4e00-\u9fa5-_]{1,50}$/;
+const CHANNEL_NAME_PATTERN = /^[a-zA-Z0-9\u4e00-\u9fa5-_]{1,50}$/
 
 // 檔案大小限制
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 ```
 
 ---
@@ -5663,11 +5897,13 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 ### 📚 參考資料
 
 #### 設計靈感
+
 - Slack（頻道系統、訊息介面）
 - Notion（Canvas 文件、任務清單）
 - Linear（任務列表式設計）
 
 #### 技術參考
+
 - Zustand（狀態管理）
 - Dexie.js（IndexedDB）
 - shadcn/ui（UI 組件）
@@ -5678,12 +5914,14 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 ### 🎓 經驗教訓
 
 #### ✅ 做對的事
+
 1. **資料統一**：用 useTodoStore 做唯一資料來源
 2. **參考現有**：使用相同的 Store 模式和組件風格
 3. **列表設計**：高資訊密度，可展開詳情
 4. **預留擴充**：架構支援未來功能，但不預先實作
 
 #### ⚠️ 未來注意
+
 1. **效能優化**：大量訊息時需要分頁載入
 2. **即時同步**：多人協作時需要 WebSocket
 3. **通知系統**：需要整合瀏覽器通知 API
@@ -5705,12 +5943,12 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 **定案聲明**: 此架構已定案，不再修改。混合架構是務實選擇，不是技術債。
 
-| 決策項目 | 決定 | 原因 |
-|---------|------|------|
-| 新功能 Store | 使用 create-store | 統一、簡單、可維護 |
-| 複雜業務 Store | 保留個別檔案 | 特殊邏輯需要獨立管理 |
-| 混合架構 | ✅ 接受 | 務實選擇，各取所長 |
-| 技術債 | ❌ 不是 | 這是經過評估的設計決策 |
+| 決策項目       | 決定              | 原因                   |
+| -------------- | ----------------- | ---------------------- |
+| 新功能 Store   | 使用 create-store | 統一、簡單、可維護     |
+| 複雜業務 Store | 保留個別檔案      | 特殊邏輯需要獨立管理   |
+| 混合架構       | ✅ 接受           | 務實選擇，各取所長     |
+| 技術債         | ❌ 不是           | 這是經過評估的設計決策 |
 
 ---
 
@@ -5719,6 +5957,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 #### ✅ 使用 create-store 工廠（統一架構）
 
 **核心業務 Store**：
+
 - `useTourStore` - 旅遊團管理
 - `useOrderStore` - 訂單管理
 - `useCustomerStore` - 客戶管理
@@ -5726,11 +5965,13 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 - `useQuoteStore` - 報價單管理
 
 **財務管理 Store**：
+
 - `usePaymentRequestStore` - 請款單
 - `useDisbursementOrderStore` - 支出單
 - `useReceiptOrderStore` - 收據管理
 
 **輔助功能 Store**：
+
 - `useTodoStore` - 待辦事項 ✅ 已統一
 - `useVisaStore` - 簽證管理 ✅ 已統一
 - `useSupplierStore` - 供應商管理 ✅ 已統一
@@ -5741,42 +5982,46 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 #### ⛔ 保留個別檔案（特殊邏輯）
 
-| Store | 檔案 | 代碼量 | 保留原因 |
-|-------|------|--------|----------|
-| `useAccountingStore` | accounting-store.ts | 500+ 行 | 4個子實體、複雜交易邏輯 |
-| `useWorkspaceStore` | workspace-store.ts | 1000+ 行 | 頻道、訊息、Canvas 整合 |
-| `useTimeboxStore` | timebox-store.ts | 400+ 行 | 計時器、狀態機邏輯 |
-| `useAuthStore` | auth-store.ts | 300+ 行 | 認證、權限特殊處理 |
-| `useUserStore` | user-store.ts | 200+ 行 | 人資複雜權限邏輯 |
+| Store                | 檔案                | 代碼量   | 保留原因                |
+| -------------------- | ------------------- | -------- | ----------------------- |
+| `useAccountingStore` | accounting-store.ts | 500+ 行  | 4個子實體、複雜交易邏輯 |
+| `useWorkspaceStore`  | workspace-store.ts  | 1000+ 行 | 頻道、訊息、Canvas 整合 |
+| `useTimeboxStore`    | timebox-store.ts    | 400+ 行  | 計時器、狀態機邏輯      |
+| `useAuthStore`       | auth-store.ts       | 300+ 行  | 認證、權限特殊處理      |
+| `useUserStore`       | user-store.ts       | 200+ 行  | 人資複雜權限邏輯        |
 
 ---
 
 ### 📝 使用規範
 
 #### 新功能開發
+
 ```typescript
 // ✅ 正確：使用 create-store
-export const useNewFeatureStore = createStore<NewFeature>('table_name', 'PREFIX');
+export const useNewFeatureStore = createStore<NewFeature>('table_name', 'PREFIX')
 ```
 
 #### 引用 Store
+
 ```typescript
 // ✅ 正確：統一從 @/stores 引入
-import { useTourStore, useOrderStore } from '@/stores';
+import { useTourStore, useOrderStore } from '@/stores'
 
 // ❌ 錯誤：直接引入個別檔案
-import { useTourStore } from '@/stores/tour-store'; // 已刪除
+import { useTourStore } from '@/stores/tour-store' // 已刪除
 ```
 
 #### 何時使用 create-store？
 
 ✅ **適合使用 create-store**：
+
 - 簡單的 CRUD 操作
 - 標準的資料表對應
 - 狀態管理邏輯簡單
 - 可復用的業務模式
 
 ❌ **不適合使用 create-store**：
+
 - 複雜的業務邏輯（如會計規則）
 - 特殊的狀態管理需求（如時間盒）
 - 全域設定型 Store（如主題、工作空間）
@@ -5789,12 +6034,14 @@ import { useTourStore } from '@/stores/tour-store'; // 已刪除
 #### 2025-01-07 統一任務
 
 **刪除的檔案** (4個)：
+
 - ❌ `src/stores/calendar-store.ts` → 改用 `useCalendarEventStore`
 - ❌ `src/stores/todo-store.ts` → 改用 `useTodoStore`
 - ❌ `src/stores/visa-store.ts` → 改用 `useVisaStore`
 - ❌ `src/stores/supplier-store.ts` → 改用 `useSupplierStore`
 
 **更新的引用** (9個檔案)：
+
 - ✅ `src/app/todos/page.tsx`
 - ✅ `src/features/todos/hooks/useTodos.ts`
 - ✅ `src/features/todos/services/todo.service.ts`
@@ -5806,6 +6053,7 @@ import { useTourStore } from '@/stores/tour-store'; // 已刪除
 - ✅ `src/features/suppliers/services/supplier.service.ts`
 
 **保留的檔案** (5個)：
+
 - ✅ `src/stores/accounting-store.ts` - 特殊邏輯
 - ✅ `src/stores/workspace-store.ts` - 特殊邏輯
 - ✅ `src/stores/timebox-store.ts` - 特殊邏輯
@@ -5816,14 +6064,14 @@ import { useTourStore } from '@/stores/tour-store'; // 已刪除
 
 ### 📊 統計數據
 
-| 項目 | 數量 | 說明 |
-|------|------|------|
-| create-store Store | 16 個 | 統一架構 |
-| 個別檔案 Store | 5 個 | 特殊邏輯保留 |
-| 總 Store 數量 | 21 個 | 完整涵蓋 |
-| 統一率 | 76% | 16/21 = 76% |
-| 刪除重複檔案 | 4 個 | 減少維護負擔 |
-| 更新引用 | 9 個 | 統一引用方式 |
+| 項目               | 數量  | 說明         |
+| ------------------ | ----- | ------------ |
+| create-store Store | 16 個 | 統一架構     |
+| 個別檔案 Store     | 5 個  | 特殊邏輯保留 |
+| 總 Store 數量      | 21 個 | 完整涵蓋     |
+| 統一率             | 76%   | 16/21 = 76%  |
+| 刪除重複檔案       | 4 個  | 減少維護負擔 |
+| 更新引用           | 9 個  | 統一引用方式 |
 
 ---
 
@@ -5910,16 +6158,19 @@ import { useNewStore } from '@/stores'; // ✅ 正確
 ### 核心原則
 
 #### 1. 簡單優先
+
 - 不過度設計
 - 夠用就好
 - 避免預先優化
 
 #### 2. 漸進增強
+
 - 先讓它動
 - 再讓它對
 - 最後讓它快
 
 #### 3. 保持彈性
+
 - 預留擴充空間
 - 但不預先實作
 - 按需調整
@@ -5931,6 +6182,7 @@ import { useNewStore } from '@/stores'; // ✅ 正確
 #### 禁止 1: 直接修改 Store 架構
 
 **錯誤示範**：
+
 ```typescript
 // ❌ 直接修改 create-store.ts
 export function createStore<T>(tableName: string) {
@@ -5939,6 +6191,7 @@ export function createStore<T>(tableName: string) {
 ```
 
 **正確做法**：
+
 1. 先在團隊群組討論
 2. 評估影響範圍
 3. 更新文檔
@@ -5947,30 +6200,34 @@ export function createStore<T>(tableName: string) {
 #### 禁止 2: 混用資料庫
 
 **錯誤示範**：
+
 ```typescript
 // ❌ 直接使用 Supabase（應該透過 Store）
-import { supabase } from '@/lib/supabase/client';
-const { data } = await supabase.from('tours').select();
+import { supabase } from '@/lib/supabase/client'
+const { data } = await supabase.from('tours').select()
 
 // ❌ 直接使用 localStorage
-localStorage.setItem('tour-data', JSON.stringify(tours));
+localStorage.setItem('tour-data', JSON.stringify(tours))
 ```
 
 **正確做法**：
+
 ```typescript
 // ✅ 統一使用 localDB
-import { localDB } from '@/lib/db';
-const tours = await localDB.getAll('tours');
+import { localDB } from '@/lib/db'
+const tours = await localDB.getAll('tours')
 ```
 
 #### 禁止 3: 跳過規格直接寫程式碼
 
 **錯誤流程**：
+
 ```
 接到需求 → 立刻寫程式碼 → 發現問題 → 重寫 → 浪費時間
 ```
 
 **正確流程**：
+
 ```
 接到需求 → 寫規格文檔 → 討論確認 → 開始實作 → 測試 → 上線
 ```
@@ -5978,11 +6235,13 @@ const tours = await localDB.getAll('tours');
 #### 禁止 4: 不更新文檔
 
 **錯誤示範**：
+
 - 改了程式碼但不更新 README
 - 新增功能但不寫規格
 - 修 Bug 但不記錄
 
 **正確做法**：
+
 - 每次 commit 都確認文檔是否需要更新
 - 每週五固定更新 WORK_LOG.md
 - 重要變更立即更新 SYSTEM_STATUS.md
@@ -5995,25 +6254,25 @@ const tours = await localDB.getAll('tours');
 
 ```typescript
 // ✅ 正確
-import { localDB } from '@/lib/db';
+import { localDB } from '@/lib/db'
 
 // 建立
-await localDB.create('tours', tourData);
+await localDB.create('tours', tourData)
 
 // 讀取
-const tour = await localDB.read('tours', id);
+const tour = await localDB.read('tours', id)
 
 // 更新
-await localDB.update('tours', id, { name: '新名稱' });
+await localDB.update('tours', id, { name: '新名稱' })
 
 // 刪除
-await localDB.delete('tours', id);
+await localDB.delete('tours', id)
 
 // 查詢
-const tours = await localDB.getAll('tours');
+const tours = await localDB.getAll('tours')
 const filtered = await localDB.filter('tours', [
-  { field: 'status', operator: 'eq', value: 'active' }
-]);
+  { field: 'status', operator: 'eq', value: 'active' },
+])
 ```
 
 #### 欄位命名規範
@@ -6021,26 +6280,27 @@ const filtered = await localDB.filter('tours', [
 ```typescript
 // ✅ 統一使用 snake_case（前後端一致）
 interface Tour {
-  id: string;
-  code: string;
-  name: string;
-  start_date: string;
-  end_date: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  id: string
+  code: string
+  name: string
+  start_date: string
+  end_date: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
 // ❌ 不要使用 camelCase
 interface BadTour {
-  tourId: string;      // ❌
-  tourName: string;    // ❌
-  startDate: string;   // ❌
-  createdAt: string;   // ❌
+  tourId: string // ❌
+  tourName: string // ❌
+  startDate: string // ❌
+  createdAt: string // ❌
 }
 ```
 
 **重要說明：**
+
 - VENTURO 系統統一使用 **snake_case** 命名
 - 與資料庫（IndexedDB/Supabase）保持一致
 - 避免前後端欄位名稱轉換
@@ -6053,20 +6313,20 @@ interface BadTour {
 
 ```typescript
 // ✅ 適合：簡單 CRUD
-import { useTourStore } from '@/stores/tour-store';
+import { useTourStore } from '@/stores/tour-store'
 
-const tours = useTourStore(state => state.items);
-const addTour = useTourStore(state => state.add);
+const tours = useTourStore(state => state.items)
+const addTour = useTourStore(state => state.add)
 ```
 
 #### 何時使用獨立 Store？
 
 ```typescript
 // ✅ 適合：複雜業務邏輯
-import { useAccountingStore } from '@/stores/accounting-store';
+import { useAccountingStore } from '@/stores/accounting-store'
 
 // 複雜的會計計算邏輯
-const calculateTax = useAccountingStore(state => state.calculateTax);
+const calculateTax = useAccountingStore(state => state.calculateTax)
 ```
 
 ---
@@ -6145,23 +6405,27 @@ test
 ## 📋 Code Review 檢查清單
 
 ### 資料層檢查
+
 - [ ] 透過 Store 操作資料（不直接使用 Supabase 或 IndexedDB）
 - [ ] 沒有使用 localStorage 儲存業務資料
 - [ ] 所有欄位命名統一使用 snake_case
 - [ ] 沒有混用 camelCase 和 snake_case
 
 ### Store 檢查
+
 - [ ] 選擇正確的 Store 架構（create-store vs 獨立）
 - [ ] 沒有修改 create-store.ts 核心邏輯
 - [ ] Store 命名符合規範（useXxxStore）
 
 ### TypeScript 型別
+
 - [ ] 所有函數都有型別定義
 - [ ] 沒有使用 `any` 型別（除非必要）
 - [ ] interface/type 命名清楚
 - [ ] 有匯出需要共用的型別
 
 ### 程式碼品質
+
 - [ ] 變數命名清楚易懂
 - [ ] 函數單一職責
 - [ ] 沒有重複程式碼
@@ -6170,6 +6434,7 @@ test
 - [ ] 移除註解掉的程式碼
 
 ### UI/UX
+
 - [ ] 使用 shadcn/ui 組件
 - [ ] 響應式設計（手機/平板/桌面）
 - [ ] Loading 狀態處理
@@ -6177,18 +6442,21 @@ test
 - [ ] 成功提示清楚
 
 ### 測試
+
 - [ ] 手動測試功能正常
 - [ ] 測試邊界情況
 - [ ] 測試錯誤處理
 - [ ] 有測試資料（在 init-local-data.ts）
 
 ### 文檔
+
 - [ ] 更新相關文檔
 - [ ] 新功能有規格文檔
 - [ ] 重大變更記錄在 WORK_LOG.md
 - [ ] README 需要更新的已更新
 
 ### Git
+
 - [ ] Commit message 符合規範
 - [ ] 沒有包含不必要的檔案
 - [ ] 沒有包含敏感資訊（密碼、API Key）
@@ -6199,22 +6467,24 @@ test
 ### 正確示範
 
 #### 資料庫操作
+
 ```typescript
 // ✅ 正確：使用 localDB
-import { localDB } from '@/lib/db';
+import { localDB } from '@/lib/db'
 
 async function getTours() {
   try {
-    const tours = await localDB.getAll('tours');
-    return { success: true, data: tours };
+    const tours = await localDB.getAll('tours')
+    return { success: true, data: tours }
   } catch (error) {
-    console.error('取得旅遊團失敗:', error);
-    return { success: false, error: '無法取得資料' };
+    console.error('取得旅遊團失敗:', error)
+    return { success: false, error: '無法取得資料' }
   }
 }
 ```
 
 #### Store 使用
+
 ```typescript
 // ✅ 正確：使用 create-store
 import { useTourStore } from '@/stores/tour-store';
@@ -6238,49 +6508,51 @@ function TourList() {
 ```
 
 #### 型別定義
+
 ```typescript
 // ✅ 正確：清楚的型別定義
 interface Tour {
-  id: string;
-  name: string;
-  start_date: string;
-  end_date: string;
-  price: number;
-  status: 'draft' | 'published' | 'archived';
+  id: string
+  name: string
+  start_date: string
+  end_date: string
+  price: number
+  status: 'draft' | 'published' | 'archived'
 }
 
 interface TourListProps {
-  tours: Tour[];
-  onSelect: (tour: Tour) => void;
+  tours: Tour[]
+  onSelect: (tour: Tour) => void
 }
 ```
 
 #### 錯誤處理
+
 ```typescript
 // ✅ 正確：完整的錯誤處理
 async function createTour(tourData: CreateTourInput) {
   try {
     // 驗證資料
     if (!tourData.name || !tourData.start_date) {
-      throw new Error('必填欄位不可為空');
+      throw new Error('必填欄位不可為空')
     }
 
     // 建立資料
     const tour = await localDB.create('tours', {
       id: generateUUID(),
       ...tourData,
-    });
+    })
 
     // 更新 Store
-    useTourStore.getState().add(tour);
+    useTourStore.getState().add(tour)
 
-    return { success: true, data: tour };
+    return { success: true, data: tour }
   } catch (error) {
-    console.error('建立旅遊團失敗:', error);
+    console.error('建立旅遊團失敗:', error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : '建立失敗'
-    };
+      error: error instanceof Error ? error.message : '建立失敗',
+    }
   }
 }
 ```
@@ -6290,45 +6562,48 @@ async function createTour(tourData: CreateTourInput) {
 ### 錯誤示範
 
 #### 資料庫操作
+
 ```typescript
 // ❌ 錯誤：直接使用 Supabase（應該透過 Store）
-import { supabase } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client'
 
 async function getTours() {
-  const { data } = await supabase.from('tours').select();
-  return data;
+  const { data } = await supabase.from('tours').select()
+  return data
 }
 
 // ❌ 錯誤：使用 localStorage
 function saveTour(tour: Tour) {
-  localStorage.setItem('current-tour', JSON.stringify(tour));
+  localStorage.setItem('current-tour', JSON.stringify(tour))
 }
 ```
 
 #### Store 使用
+
 ```typescript
 // ❌ 錯誤：直接修改 state
 function TourList() {
-  const tours = useTourStore(state => state.items);
+  const tours = useTourStore(state => state.items)
 
   // ❌ 直接修改
-  tours.push(newTour);
+  tours.push(newTour)
 
   // ✅ 應該使用 action
-  useTourStore.getState().add(newTour);
+  useTourStore.getState().add(newTour)
 }
 ```
 
 #### 型別定義
+
 ```typescript
 // ❌ 錯誤：使用 any
 function processTour(data: any) {
-  return data.name;
+  return data.name
 }
 
 // ❌ 錯誤：缺少型別
 function getTourPrice(tour) {
-  return tour.price;
+  return tour.price
 }
 ```
 
@@ -6339,6 +6614,7 @@ function getTourPrice(tour) {
 ### 資料庫相關問題
 
 **問題**：資料沒有儲存
+
 ```typescript
 // 檢查步驟：
 1. 訪問 /system-health 查看資料表狀態
@@ -6348,6 +6624,7 @@ function getTourPrice(tour) {
 ```
 
 **問題**：找不到資料
+
 ```typescript
 // 檢查步驟：
 1. 確認資料確實存在（/system-health）
@@ -6359,6 +6636,7 @@ function getTourPrice(tour) {
 ### Store 相關問題
 
 **問題**：Store 狀態不更新
+
 ```typescript
 // 檢查步驟：
 1. 確認使用正確的 Store
@@ -6380,4 +6658,3 @@ function getTourPrice(tour) {
 
 **最後更新**：2025-01-21
 **維護者**：William Chien
-

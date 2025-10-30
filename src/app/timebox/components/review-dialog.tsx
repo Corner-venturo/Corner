@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface ReviewDialogProps {
@@ -22,7 +28,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
     archiveCurrentWeek,
     copyToNextWeek,
     weekRecords,
-    initializeCurrentWeek
+    initializeCurrentWeek,
   } = useTimeboxStore()
 
   const [archiveName, setArchiveName] = useState('')
@@ -87,12 +93,10 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
   if (!isOpen) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            本週覆盤 ({formatDateRange()})
-          </DialogTitle>
+          <DialogTitle>本週覆盤 ({formatDateRange()})</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -111,7 +115,9 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
               {stats.totalWorkoutVolume && stats.totalWorkoutVolume > 0 && (
                 <div className="col-span-2">
                   <span className="text-morandi-secondary">總訓練量：</span>
-                  <span className="font-medium">{stats.totalWorkoutVolume.toLocaleString()} kg</span>
+                  <span className="font-medium">
+                    {stats.totalWorkoutVolume.toLocaleString()} kg
+                  </span>
                 </div>
               )}
             </div>
@@ -128,12 +134,10 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
 
           {/* 存檔名稱 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">
-              存檔名稱
-            </label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">存檔名稱</label>
             <Input
               value={archiveName}
-              onChange={(e) => setArchiveName(e.target.value)}
+              onChange={e => setArchiveName(e.target.value)}
               placeholder={getDefaultArchiveName()}
             />
           </div>
@@ -145,7 +149,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             </label>
             <Textarea
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={e => setNotes(e.target.value)}
               placeholder="記錄本週的心得、改進建議或下週計劃..."
               rows={3}
             />
@@ -157,7 +161,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
               <Checkbox
                 id="copyToNext"
                 checked={copyToNext}
-                onCheckedChange={(checked) => setCopyToNext(checked as boolean)}
+                onCheckedChange={checked => setCopyToNext(checked as boolean)}
               />
               <label htmlFor="copyToNext" className="text-sm font-medium">
                 複製排程到下週（清除完成狀態）
@@ -178,16 +182,15 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
                     {weekRecords
                       .filter(record => record.archived)
                       .slice(-10) // 只顯示最近10週
-                      .map((record) => (
+                      .map(record => (
                         <SelectItem key={record.id} value={record.id}>
-                          {record.name} (完成率: {Math.round(record.statistics.completionRate * 100)}%)
+                          {record.name} (完成率:{' '}
+                          {Math.round(record.statistics.completionRate * 100)}%)
                         </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-morandi-secondary mt-1">
-                  選擇模板會複製該週的排程安排
-                </p>
+                <p className="text-xs text-morandi-secondary mt-1">選擇模板會複製該週的排程安排</p>
               </div>
             )}
           </div>
@@ -197,9 +200,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             <Button variant="outline" onClick={onClose}>
               取消
             </Button>
-            <Button onClick={handleArchive}>
-              存檔
-            </Button>
+            <Button onClick={handleArchive}>存檔</Button>
           </div>
         </div>
       </DialogContent>

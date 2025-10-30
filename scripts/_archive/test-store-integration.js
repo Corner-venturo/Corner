@@ -6,49 +6,49 @@
  * 使用 Supabase client 模擬前端 Store 的操作
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { config } from 'dotenv';
+import { createClient } from '@supabase/supabase-js'
+import { config } from 'dotenv'
 
-config();
+config()
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+)
 
 // 測試結果統計
 const results = {
   total: 0,
   passed: 0,
   failed: 0,
-  errors: []
-};
+  errors: [],
+}
 
 function logTest(name, success, error = null) {
-  results.total++;
+  results.total++
   if (success) {
-    results.passed++;
-    console.log(`✅ ${name}`);
+    results.passed++
+    console.log(`✅ ${name}`)
   } else {
-    results.failed++;
-    results.errors.push({ test: name, error });
-    console.log(`❌ ${name}`);
-    if (error) console.error(`   錯誤: ${error.message || error}`);
+    results.failed++
+    results.errors.push({ test: name, error })
+    console.log(`❌ ${name}`)
+    if (error) console.error(`   錯誤: ${error.message || error}`)
   }
 }
 
 // 清理測試資料
 async function cleanup() {
-  console.log('\n🗑️  清理測試資料...');
+  console.log('\n🗑️  清理測試資料...')
 
   try {
     // 刪除測試資料（以 test- 開頭的 ID）
-    await supabase.from('orders').delete().like('id', 'test-%');
-    await supabase.from('tours').delete().like('id', 'test-%');
-    await supabase.from('quotes').delete().like('id', 'test-%');
-    console.log('✅ 清理完成');
+    await supabase.from('orders').delete().like('id', 'test-%')
+    await supabase.from('tours').delete().like('id', 'test-%')
+    await supabase.from('quotes').delete().like('id', 'test-%')
+    console.log('✅ 清理完成')
   } catch (error) {
-    console.error('清理失敗:', error.message);
+    console.error('清理失敗:', error.message)
   }
 }
 
@@ -56,41 +56,41 @@ async function cleanup() {
  * 測試 1: Store 讀取功能
  */
 async function testStoreFetch() {
-  console.log('\n📖 測試 1: Store 讀取功能\n');
+  console.log('\n📖 測試 1: Store 讀取功能\n')
 
   try {
     // 模擬 Store fetchAll
     const { data: tours, error: tourError } = await supabase
       .from('tours')
       .select('*')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
 
-    if (tourError) throw tourError;
-    logTest('讀取 Tours', true);
-    console.log(`   找到 ${tours.length} 筆資料`);
+    if (tourError) throw tourError
+    logTest('讀取 Tours', true)
+    console.log(`   找到 ${tours.length} 筆資料`)
 
     const { data: orders, error: orderError } = await supabase
       .from('orders')
       .select('*')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
 
-    if (orderError) throw orderError;
-    logTest('讀取 Orders', true);
-    console.log(`   找到 ${orders.length} 筆資料`);
+    if (orderError) throw orderError
+    logTest('讀取 Orders', true)
+    console.log(`   找到 ${orders.length} 筆資料`)
 
     const { data: quotes, error: quoteError } = await supabase
       .from('quotes')
       .select('*')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
 
-    if (quoteError) throw quoteError;
-    logTest('讀取 Quotes', true);
-    console.log(`   找到 ${quotes.length} 筆資料`);
+    if (quoteError) throw quoteError
+    logTest('讀取 Quotes', true)
+    console.log(`   找到 ${quotes.length} 筆資料`)
 
-    return { tours, orders, quotes };
+    return { tours, orders, quotes }
   } catch (error) {
-    logTest('Store 讀取', false, error);
-    return null;
+    logTest('Store 讀取', false, error)
+    return null
   }
 }
 
@@ -98,13 +98,13 @@ async function testStoreFetch() {
  * 測試 2: Store 建立功能
  */
 async function testStoreCreate() {
-  console.log('\n📝 測試 2: Store 建立功能\n');
+  console.log('\n📝 測試 2: Store 建立功能\n')
 
-  const createdItems = {};
+  const createdItems = {}
 
   try {
     // 建立 Tour (模擬 Store create)
-    const timestamp = Date.now();
+    const timestamp = Date.now()
     const tourData = {
       id: `test-tour-${timestamp}`,
       code: `T${timestamp.toString().slice(-6)}`,
@@ -121,20 +121,20 @@ async function testStoreCreate() {
       profit: 0,
       is_active: true,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+      updated_at: new Date().toISOString(),
+    }
 
     const { data: tour, error: tourError } = await supabase
       .from('tours')
       .insert([tourData])
       .select()
-      .single();
+      .single()
 
-    if (tourError) throw tourError;
-    createdItems.tour = tour;
-    logTest('建立 Tour', true);
-    console.log(`   Tour ID: ${tour.id}`);
-    console.log(`   Tour Code: ${tour.code}`);
+    if (tourError) throw tourError
+    createdItems.tour = tour
+    logTest('建立 Tour', true)
+    console.log(`   Tour ID: ${tour.id}`)
+    console.log(`   Tour Code: ${tour.code}`)
 
     // 建立 Order
     const orderData = {
@@ -151,20 +151,20 @@ async function testStoreCreate() {
       paid_amount: 0,
       remaining_amount: 100000,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+      updated_at: new Date().toISOString(),
+    }
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert([orderData])
       .select()
-      .single();
+      .single()
 
-    if (orderError) throw orderError;
-    createdItems.order = order;
-    logTest('建立 Order', true);
-    console.log(`   Order ID: ${order.id}`);
-    console.log(`   Order Code: ${order.code}`);
+    if (orderError) throw orderError
+    createdItems.order = order
+    logTest('建立 Order', true)
+    console.log(`   Order ID: ${order.id}`)
+    console.log(`   Order Code: ${order.code}`)
 
     // 建立 Quote
     const quoteData = {
@@ -182,25 +182,25 @@ async function testStoreCreate() {
       version: 1,
       is_active: true,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+      updated_at: new Date().toISOString(),
+    }
 
     const { data: quote, error: quoteError } = await supabase
       .from('quotes')
       .insert([quoteData])
       .select()
-      .single();
+      .single()
 
-    if (quoteError) throw quoteError;
-    createdItems.quote = quote;
-    logTest('建立 Quote', true);
-    console.log(`   Quote ID: ${quote.id}`);
-    console.log(`   Quote Code: ${quote.code}`);
+    if (quoteError) throw quoteError
+    createdItems.quote = quote
+    logTest('建立 Quote', true)
+    console.log(`   Quote ID: ${quote.id}`)
+    console.log(`   Quote Code: ${quote.code}`)
 
-    return createdItems;
+    return createdItems
   } catch (error) {
-    logTest('Store 建立', false, error);
-    return createdItems;
+    logTest('Store 建立', false, error)
+    return createdItems
   }
 }
 
@@ -208,12 +208,12 @@ async function testStoreCreate() {
  * 測試 3: Store 更新功能
  */
 async function testStoreUpdate(createdItems) {
-  console.log('\n✏️  測試 3: Store 更新功能\n');
+  console.log('\n✏️  測試 3: Store 更新功能\n')
 
   try {
     if (!createdItems.tour) {
-      console.log('   跳過：沒有 Tour 可更新');
-      return;
+      console.log('   跳過：沒有 Tour 可更新')
+      return
     }
 
     // 更新 Tour (模擬 Store update)
@@ -222,35 +222,34 @@ async function testStoreUpdate(createdItems) {
       .update({
         status: '進行中',
         current_participants: 15,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', createdItems.tour.id)
       .select()
-      .single();
+      .single()
 
-    if (tourError) throw tourError;
-    logTest('更新 Tour', true);
-    console.log(`   新狀態: ${updatedTour.status}`);
-    console.log(`   參加人數: ${updatedTour.current_participants}`);
+    if (tourError) throw tourError
+    logTest('更新 Tour', true)
+    console.log(`   新狀態: ${updatedTour.status}`)
+    console.log(`   參加人數: ${updatedTour.current_participants}`)
 
     // 驗證更新
     const { data: verified, error: verifyError } = await supabase
       .from('tours')
       .select('*')
       .eq('id', createdItems.tour.id)
-      .single();
+      .single()
 
-    if (verifyError) throw verifyError;
+    if (verifyError) throw verifyError
 
     if (verified.status === '進行中' && verified.current_participants === 15) {
-      logTest('驗證更新', true);
-      console.log('   更新已確認');
+      logTest('驗證更新', true)
+      console.log('   更新已確認')
     } else {
-      throw new Error('更新驗證失敗：資料不一致');
+      throw new Error('更新驗證失敗：資料不一致')
     }
-
   } catch (error) {
-    logTest('Store 更新', false, error);
+    logTest('Store 更新', false, error)
   }
 }
 
@@ -258,7 +257,7 @@ async function testStoreUpdate(createdItems) {
  * 測試 4: Store 刪除功能
  */
 async function testStoreDelete(createdItems) {
-  console.log('\n🗑️  測試 4: Store 刪除功能\n');
+  console.log('\n🗑️  測試 4: Store 刪除功能\n')
 
   try {
     // 刪除 Order
@@ -266,10 +265,10 @@ async function testStoreDelete(createdItems) {
       const { error: orderError } = await supabase
         .from('orders')
         .delete()
-        .eq('id', createdItems.order.id);
+        .eq('id', createdItems.order.id)
 
-      if (orderError) throw orderError;
-      logTest('刪除 Order', true);
+      if (orderError) throw orderError
+      logTest('刪除 Order', true)
     }
 
     // 刪除 Quote
@@ -277,10 +276,10 @@ async function testStoreDelete(createdItems) {
       const { error: quoteError } = await supabase
         .from('quotes')
         .delete()
-        .eq('id', createdItems.quote.id);
+        .eq('id', createdItems.quote.id)
 
-      if (quoteError) throw quoteError;
-      logTest('刪除 Quote', true);
+      if (quoteError) throw quoteError
+      logTest('刪除 Quote', true)
     }
 
     // 刪除 Tour
@@ -288,10 +287,10 @@ async function testStoreDelete(createdItems) {
       const { error: tourError } = await supabase
         .from('tours')
         .delete()
-        .eq('id', createdItems.tour.id);
+        .eq('id', createdItems.tour.id)
 
-      if (tourError) throw tourError;
-      logTest('刪除 Tour', true);
+      if (tourError) throw tourError
+      logTest('刪除 Tour', true)
     }
 
     // 驗證刪除
@@ -300,18 +299,17 @@ async function testStoreDelete(createdItems) {
         .from('tours')
         .select('*')
         .eq('id', createdItems.tour.id)
-        .single();
+        .single()
 
       if (!verified) {
-        logTest('驗證刪除', true);
-        console.log('   刪除已確認');
+        logTest('驗證刪除', true)
+        console.log('   刪除已確認')
       } else {
-        throw new Error('刪除驗證失敗：資料仍存在');
+        throw new Error('刪除驗證失敗：資料仍存在')
       }
     }
-
   } catch (error) {
-    logTest('Store 刪除', false, error);
+    logTest('Store 刪除', false, error)
   }
 }
 
@@ -319,51 +317,51 @@ async function testStoreDelete(createdItems) {
  * 主測試流程
  */
 async function runTests() {
-  console.log('='.repeat(60));
-  console.log('🧪 VENTURO Phase 2 - Store 整合測試');
-  console.log('='.repeat(60));
+  console.log('='.repeat(60))
+  console.log('🧪 VENTURO Phase 2 - Store 整合測試')
+  console.log('='.repeat(60))
 
   // 清理舊測試資料
-  await cleanup();
+  await cleanup()
 
   // 執行測試
-  const initialData = await testStoreFetch();
-  const createdItems = await testStoreCreate();
+  const initialData = await testStoreFetch()
+  const createdItems = await testStoreCreate()
 
   // 等待一下確保資料同步
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 1000))
 
-  await testStoreUpdate(createdItems);
-  await testStoreDelete(createdItems);
+  await testStoreUpdate(createdItems)
+  await testStoreDelete(createdItems)
 
   // 最終驗證
-  console.log('\n📊 最終驗證\n');
-  await testStoreFetch();
+  console.log('\n📊 最終驗證\n')
+  await testStoreFetch()
 
   // 顯示測試結果
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 測試結果統計');
-  console.log('='.repeat(60));
-  console.log(`總測試數: ${results.total}`);
-  console.log(`✅ 通過: ${results.passed}`);
-  console.log(`❌ 失敗: ${results.failed}`);
-  console.log(`成功率: ${((results.passed / results.total) * 100).toFixed(1)}%`);
+  console.log('\n' + '='.repeat(60))
+  console.log('📊 測試結果統計')
+  console.log('='.repeat(60))
+  console.log(`總測試數: ${results.total}`)
+  console.log(`✅ 通過: ${results.passed}`)
+  console.log(`❌ 失敗: ${results.failed}`)
+  console.log(`成功率: ${((results.passed / results.total) * 100).toFixed(1)}%`)
 
   if (results.errors.length > 0) {
-    console.log('\n❌ 失敗的測試:');
+    console.log('\n❌ 失敗的測試:')
     results.errors.forEach(({ test, error }) => {
-      console.log(`   - ${test}`);
-      console.log(`     ${error.message || error}`);
-    });
+      console.log(`   - ${test}`)
+      console.log(`     ${error.message || error}`)
+    })
   }
 
-  console.log('\n' + '='.repeat(60));
+  console.log('\n' + '='.repeat(60))
 
   // 最終清理
-  await cleanup();
+  await cleanup()
 
-  process.exit(results.failed > 0 ? 1 : 0);
+  process.exit(results.failed > 0 ? 1 : 0)
 }
 
 // 執行測試
-runTests();
+runTests()

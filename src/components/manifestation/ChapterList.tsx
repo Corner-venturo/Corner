@@ -1,46 +1,44 @@
-'use client';
+'use client'
 
-import { chapters } from '@/data/manifestation-chapters';
-import { cn } from '@/lib/utils';
-import { Check, Lock } from 'lucide-react';
-import { useManifestationStore } from '@/stores/manifestation-store';
+import { chapters } from '@/data/manifestation-chapters'
+import { cn } from '@/lib/utils'
+import { Check, Lock } from 'lucide-react'
+import { useManifestationStore } from '@/stores/manifestation-store'
 
 interface ChapterListProps {
-  currentChapter: number;
-  onChapterSelect: (chapterId: number) => void;
+  currentChapter: number
+  onChapterSelect: (chapterId: number) => void
 }
 
 export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProps) {
-  const { entries } = useManifestationStore();
+  const { entries } = useManifestationStore()
 
   // 檢查章節是否已完成
   const isChapterCompleted = (chapterId: number) => {
-    return entries.some(entry =>
-      entry.chapter_number === chapterId && entry.is_completed
-    );
-  };
+    return entries.some(entry => entry.chapter_number === chapterId && entry.is_completed)
+  }
 
   // 檢查章節是否已開始
   const isChapterStarted = (chapterId: number) => {
-    return entries.some(entry => entry.chapter_number === chapterId);
-  };
+    return entries.some(entry => entry.chapter_number === chapterId)
+  }
 
   // 檢查章節是否解鎖（前一章完成或是第一章）
   const isChapterUnlocked = (chapterId: number) => {
-    if (chapterId === 1) return true;
-    return isChapterCompleted(chapterId - 1);
-  };
+    if (chapterId === 1) return true
+    return isChapterCompleted(chapterId - 1)
+  }
 
   return (
     <div className="space-y-2">
       <h3 className="text-lg font-medium text-morandi-primary mb-4">15 個魔法章節</h3>
 
       <div className="space-y-2">
-        {chapters.map((chapter) => {
-          const completed = isChapterCompleted(chapter.id);
-          const started = isChapterStarted(chapter.id);
-          const unlocked = isChapterUnlocked(chapter.id);
-          const isCurrent = chapter.id === currentChapter;
+        {chapters.map(chapter => {
+          const completed = isChapterCompleted(chapter.id)
+          const started = isChapterStarted(chapter.id)
+          const unlocked = isChapterUnlocked(chapter.id)
+          const isCurrent = chapter.id === currentChapter
 
           return (
             <button
@@ -56,7 +54,7 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
               )}
               style={{
                 backgroundColor: isCurrent ? `${chapter.color}10` : undefined,
-                borderColor: isCurrent ? chapter.color : undefined
+                borderColor: isCurrent ? chapter.color : undefined,
               }}
             >
               <div className="flex items-start gap-3">
@@ -66,7 +64,10 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0',
                     completed && 'bg-green-100 text-green-700',
                     !completed && started && 'bg-morandi-gold/20 text-morandi-gold',
-                    !completed && !started && unlocked && 'bg-morandi-container text-morandi-secondary',
+                    !completed &&
+                      !started &&
+                      unlocked &&
+                      'bg-morandi-container text-morandi-secondary',
                     !unlocked && 'bg-gray-100 text-gray-400'
                   )}
                 >
@@ -84,9 +85,7 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
                     )}
                   </div>
                   {chapter.subtitle && (
-                    <p className="text-xs text-morandi-secondary mt-0.5">
-                      {chapter.subtitle}
-                    </p>
+                    <p className="text-xs text-morandi-secondary mt-0.5">{chapter.subtitle}</p>
                   )}
                 </div>
 
@@ -98,9 +97,9 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
                 )}
               </div>
             </button>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

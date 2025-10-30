@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import TourPage from "@/components/TourPage";
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import TourPage from '@/components/TourPage'
 import {
   IconBuilding,
   IconToolsKitchen2,
@@ -10,7 +10,7 @@ import {
   IconCalendar,
   IconPlane,
   IconMapPin,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react'
 
 // Icon mapping
 const iconMap: any = {
@@ -20,62 +20,63 @@ const iconMap: any = {
   IconCalendar,
   IconPlane,
   IconMapPin,
-};
+}
 
 export default function ViewItineraryPage() {
-  const params = useParams();
-  const id = params.id as string;
+  const params = useParams()
+  const id = params.id as string
 
-  const [tourData, setTourData] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [tourData, setTourData] = useState<unknown>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // 載入行程資料（使用 API route 來繞過 RLS）
   useEffect(() => {
     const loadItinerary = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        setLoading(true)
+        setError(null)
 
         // 使用 API route 來取得行程資料（不需要認證）
-        const response = await fetch(`/api/itineraries/${id}`);
+        const response = await fetch(`/api/itineraries/${id}`)
 
         if (!response.ok) {
           if (response.status === 404) {
-            setError('找不到此行程');
+            setError('找不到此行程')
           } else {
-            setError('載入行程失敗');
+            setError('載入行程失敗')
           }
-          setTourData(null);
-          return;
+          setTourData(null)
+          return
         }
 
-        const itinerary = await response.json();
+        const itinerary = await response.json()
 
         if (itinerary) {
           // Convert icon strings to components
           const processedData = {
             ...itinerary,
-            features: itinerary.features?.map((f: any) => ({
-              ...f,
-              iconComponent: iconMap[f.icon] || IconSparkles,
-            })) || [],
-          };
-          setTourData(processedData);
+            features:
+              itinerary.features?.map((f: any) => ({
+                ...f,
+                iconComponent: iconMap[f.icon] || IconSparkles,
+              })) || [],
+          }
+          setTourData(processedData)
         } else {
-          setError('找不到此行程');
+          setError('找不到此行程')
         }
       } catch (error) {
-                setError('載入行程時發生錯誤');
+        setError('載入行程時發生錯誤')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     if (id) {
-      loadItinerary();
+      loadItinerary()
     }
-  }, [id]);
+  }, [id])
 
   // 載入中狀態
   if (loading) {
@@ -85,7 +86,7 @@ export default function ViewItineraryPage() {
           <p className="text-lg text-gray-600">載入中...</p>
         </div>
       </div>
-    );
+    )
   }
 
   // 錯誤或找不到資料
@@ -96,8 +97,8 @@ export default function ViewItineraryPage() {
           <p className="text-lg text-gray-600">{error || '找不到此行程'}</p>
         </div>
       </div>
-    );
+    )
   }
 
-  return <TourPage data={tourData} viewMode="desktop" />;
+  return <TourPage data={tourData} viewMode="desktop" />
 }

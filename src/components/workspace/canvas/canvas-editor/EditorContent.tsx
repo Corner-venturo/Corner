@@ -2,19 +2,19 @@
  * Editor Content - rich text editing area with drag & drop support
  */
 
-'use client';
+'use client'
 
-import { EditorContent as TiptapEditorContent } from '@tiptap/react';
-import { Editor } from '@tiptap/react';
-import { Image as ImageIcon } from 'lucide-react';
+import { EditorContent as TiptapEditorContent } from '@tiptap/react'
+import { Editor } from '@tiptap/react'
+import { Image as ImageIcon } from 'lucide-react'
 
 interface EditorContentProps {
-  editor: Editor;
-  isDragging: boolean;
-  uploadProgress: number | null;
-  onDragOver: (e: React.DragEvent) => void;
-  onDragLeave: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
+  editor: Editor
+  isDragging: boolean
+  uploadProgress: number | null
+  onDragOver: (e: React.DragEvent) => void
+  onDragLeave: (e: React.DragEvent) => void
+  onDrop: (e: React.DragEvent) => void
 }
 
 export function EditorContent({
@@ -23,7 +23,7 @@ export function EditorContent({
   uploadProgress,
   onDragOver,
   onDragLeave,
-  onDrop
+  onDrop,
 }: EditorContentProps) {
   return (
     <div
@@ -101,5 +101,5 @@ export function EditorContent({
         }
       `}</style>
     </div>
-  );
+  )
 }

@@ -3,30 +3,32 @@
  * 在 workspace 頁面載入時執行一次
  */
 
-import { useEffect, useRef } from 'react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useUserStore } from '@/stores/user-store';
-import { supabase } from '@/lib/supabase/client';
+import { useEffect, useRef } from 'react'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useUserStore } from '@/stores/user-store'
+import { supabase } from '@/lib/supabase/client'
 
 export function useAutoCreateCompanyChannel() {
-  const { currentWorkspace, channelGroups, channels, loadChannelGroups, loadChannels } = useWorkspaceStore();
-  const { items: users } = useUserStore();
-  const isProcessingRef = useRef(false);
+  const { currentWorkspace, channelGroups, channels, loadChannelGroups, loadChannels } =
+    useWorkspaceStore()
+  const { items: users } = useUserStore()
+  const isProcessingRef = useRef(false)
+  const hasInitializedRef = useRef(false)
 
   useEffect(() => {
-    // 防止並發執行
-    if (isProcessingRef.current || !currentWorkspace) {
-      return;
+    // 防止並發執行和重複初始化
+    if (isProcessingRef.current || !currentWorkspace || hasInitializedRef.current) {
+      return
     }
 
     const createCompanyChannel = async () => {
-      isProcessingRef.current = true;
+      isProcessingRef.current = true
 
       try {
         // 1. 檢查是否已存在「公司公告」群組
-        const companyGroup = channelGroups.find(g => g.name === '📢 公司公告');
+        const companyGroup = channelGroups.find(g => g.name === '📢 公司公告')
 
-        let groupId: string;
+        let groupId: string
 
         if (!companyGroup) {
           // 創建群組
@@ -39,21 +41,21 @@ export function useAutoCreateCompanyChannel() {
               is_collapsed: false,
             })
             .select()
-            .single();
+            .single()
 
-          if (groupError) throw groupError;
-          groupId = newGroup.id;
+          if (groupError) throw groupError
+          groupId = newGroup.id
 
           // 重新載入群組
-          await loadChannelGroups(currentWorkspace.id);
+          await loadChannelGroups(currentWorkspace.id)
         } else {
-          groupId = companyGroup.id;
+          groupId = companyGroup.id
         }
 
         // 2. 檢查是否已存在「總部辦公室」頻道
-        const headquartersChannel = channels.find(c => c.name === '🏢 總部辦公室');
+        const headquartersChannel = channels.find(c => c.name === '🏢 總部辦公室')
 
-        let channelId: string;
+        let channelId: string
 
         if (!headquartersChannel) {
           // 創建頻道
@@ -69,15 +71,15 @@ export function useAutoCreateCompanyChannel() {
               order: 0,
             })
             .select()
-            .single();
+            .single()
 
-          if (channelError) throw channelError;
-          channelId = newChannel.id;
+          if (channelError) throw channelError
+          channelId = newChannel.id
 
           // 重新載入頻道
-          await loadChannels(currentWorkspace.id);
+          await loadChannels(currentWorkspace.id)
         } else {
-          channelId = headquartersChannel.id;
+          channelId = headquartersChannel.id
         }
 
         // 3. 確保所有員工都在頻道中
@@ -89,28 +91,31 @@ export function useAutoCreateCompanyChannel() {
             employee_id: user.id,
             role: 'member' as const,
             status: 'active' as const,
-          }));
+          }))
 
           const { error: membersError } = await supabase
             .from('channel_members')
             .upsert(membersToAdd, {
               onConflict: 'workspace_id,channel_id,employee_id',
               ignoreDuplicates: true,
-            });
+            })
 
           if (membersError) {
             // 靜默失敗，可能是權限問題
-            console.warn('Failed to add all members to headquarters channel:', membersError);
+            console.warn('Failed to add all members to headquarters channel:', membersError)
           }
         }
+
+        // 標記已初始化
+        hasInitializedRef.current = true
       } catch (error) {
         // 靜默失敗
-        console.error('Failed to create company channel:', error);
+        console.error('Failed to create company channel:', error)
       } finally {
-        isProcessingRef.current = false;
+        isProcessingRef.current = false
       }
-    };
+    }
 
-    void createCompanyChannel();
-  }, [currentWorkspace?.id, channelGroups.length, channels.length]);
+    void createCompanyChannel()
+  }, [currentWorkspace?.id])
 }

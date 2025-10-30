@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { userStoreHelpers } from '@/stores/user-store';
-import { EmployeeFormData } from './types';
+import React from 'react'
+import { Input } from '@/components/ui/input'
+import { userStoreHelpers } from '@/stores/user-store'
+import { EmployeeFormData } from './types'
 
 interface BasicInfoFieldsProps {
-  formData: EmployeeFormData;
-  setFormData: (data: EmployeeFormData) => void;
+  formData: EmployeeFormData
+  setFormData: (data: EmployeeFormData) => void
 }
 
 export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps) {
@@ -17,22 +17,18 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">
-            顯示名稱 *
-          </label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">顯示名稱 *</label>
           <Input
             value={formData.display_name}
-            onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
+            onChange={e => setFormData({ ...formData, display_name: e.target.value })}
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">
-            中文姓名
-          </label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">中文姓名</label>
           <Input
             value={formData.chinese_name}
-            onChange={(e) => setFormData({ ...formData, chinese_name: e.target.value })}
+            onChange={e => setFormData({ ...formData, chinese_name: e.target.value })}
             placeholder="例：王小明"
           />
         </div>
@@ -45,7 +41,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
           </label>
           <Input
             value={formData.english_name}
-            onChange={(e) => setFormData({ ...formData, english_name: e.target.value })}
+            onChange={e => setFormData({ ...formData, english_name: e.target.value })}
             placeholder="例：John"
             required
           />
@@ -60,7 +56,11 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
             員工編號（自動生成）
           </label>
           <Input
-            value={formData.english_name ? userStoreHelpers.generateUserNumber(formData.english_name) : ''}
+            value={
+              formData.english_name
+                ? userStoreHelpers.generateUserNumber(formData.english_name)
+                : ''
+            }
             disabled
             className="bg-morandi-container/20"
           />
@@ -71,10 +71,12 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
         <label className="block text-sm font-medium text-morandi-primary mb-1">身分證號</label>
         <Input
           value={formData.personal_info.national_id}
-          onChange={(e) => setFormData({
-            ...formData,
-            personal_info: { ...formData.personal_info, national_id: e.target.value }
-          })}
+          onChange={e =>
+            setFormData({
+              ...formData,
+              personal_info: { ...formData.personal_info, national_id: e.target.value },
+            })
+          }
         />
       </div>
 
@@ -83,12 +85,14 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
         <Input
           type="date"
           value={formData.personal_info.birthday}
-          onChange={(e) => setFormData({
-            ...formData,
-            personal_info: { ...formData.personal_info, birthday: e.target.value }
-          })}
+          onChange={e =>
+            setFormData({
+              ...formData,
+              personal_info: { ...formData.personal_info, birthday: e.target.value },
+            })
+          }
         />
       </div>
     </div>
-  );
+  )
 }

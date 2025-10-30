@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'
 
 /**
  * 日式浪花動畫組件 - 手繪風格
@@ -187,5 +187,5 @@ export function WavePattern() {
         }}
       />
     </div>
-  );
+  )
 }

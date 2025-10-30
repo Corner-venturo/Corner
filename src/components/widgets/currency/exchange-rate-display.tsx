@@ -1,22 +1,22 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { RefreshCw } from 'lucide-react';
-import { Currency } from './currencyData';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { RefreshCw } from 'lucide-react'
+import { Currency } from './currencyData'
 
 interface ExchangeRateDisplayProps {
-  currentRate: number;
-  fromCurrency: string;
-  toCurrency: string;
-  isEditing: boolean;
-  editRate: string;
-  onEditRate: (rate: string) => void;
-  onStartEdit: () => void;
-  onUpdateRate: () => void;
-  onCancelEdit: () => void;
-  convertedAmount: number | null;
-  amount: string;
-  fromCurrencyInfo: Currency;
-  toCurrencyInfo: Currency;
+  currentRate: number
+  fromCurrency: string
+  toCurrency: string
+  isEditing: boolean
+  editRate: string
+  onEditRate: (rate: string) => void
+  onStartEdit: () => void
+  onUpdateRate: () => void
+  onCancelEdit: () => void
+  convertedAmount: number | null
+  amount: string
+  fromCurrencyInfo: Currency
+  toCurrencyInfo: Currency
 }
 
 /**
@@ -62,7 +62,7 @@ export const ExchangeRateDisplay = ({
               type="number"
               step="0.0001"
               value={editRate}
-              onChange={(e) => onEditRate(e.target.value)}
+              onChange={e => onEditRate(e.target.value)}
               className="flex-1 h-8 text-xs rounded-lg"
               placeholder="輸入新匯率"
             />
@@ -99,10 +99,12 @@ export const ExchangeRateDisplay = ({
               {fromCurrencyInfo.symbol} {parseFloat(amount).toLocaleString()} {fromCurrency}
             </div>
             <div className="text-lg font-bold text-morandi-gold">
-              {toCurrencyInfo.symbol} {convertedAmount.toLocaleString(undefined, {
+              {toCurrencyInfo.symbol}{' '}
+              {convertedAmount.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-              })} {toCurrency}
+                maximumFractionDigits: 2,
+              })}{' '}
+              {toCurrency}
             </div>
           </div>
         </div>
@@ -113,5 +115,5 @@ export const ExchangeRateDisplay = ({
         ※ 匯率僅供參考，實際匯率以銀行公告為準
       </div>
     </>
-  );
-};
+  )
+}

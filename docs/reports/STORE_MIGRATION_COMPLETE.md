@@ -1,6 +1,7 @@
 # Store 架構統一完成報告
 
 ## 執行時間
+
 2025-10-25
 
 ## 修復內容總覽
@@ -8,14 +9,16 @@
 ### ✅ 1. Payment Store 實作 (已完成)
 
 **新增：**
+
 - `usePaymentStore` - 簡化版 Payment Store
 - `usePaymentRequestStore` - 請款單 Store (已存在)
 - `useDisbursementOrderStore` - 出納單 Store (已存在)
 - `useReceiptOrderStore` - 收款單 Store (已存在)
 
 **更新的檔案：** 6 個
+
 - src/app/finance/page.tsx
-- src/app/finance/payments/page.tsx  
+- src/app/finance/payments/page.tsx
 - src/app/orders/[orderId]/payment/page.tsx
 - src/components/tours/tour-costs.tsx
 - src/components/tours/tour-payments.tsx
@@ -24,32 +27,37 @@
 ### ✅ 2. User Store 遷移 (已完成)
 
 **策略：**
+
 - 將 `useUserStore` 從舊的 `create-store.ts` 遷移到新的 `create-store-new.ts`
 - 將 `useEmployeeStore` 設為 `useUserStore` 的 alias (兩者指向同一個 'employees' 表)
 - 保留所有 userStoreHelpers 功能
 
 **修改檔案：**
+
 1. **src/stores/user-store.ts**
+
    ```typescript
    // 舊版
-   import { createStore } from './create-store';
-   export const useUserStore = createStore<User>(TABLES.EMPLOYEES, undefined, true);
-   
+   import { createStore } from './create-store'
+   export const useUserStore = createStore<User>(TABLES.EMPLOYEES, undefined, true)
+
    // 新版
-   import { createStore as createStoreNew } from './core/create-store-new';
-   export const useUserStore = createStoreNew<User>('employees');
+   import { createStore as createStoreNew } from './core/create-store-new'
+   export const useUserStore = createStoreNew<User>('employees')
    ```
 
 2. **src/stores/index.ts**
+
    ```typescript
    // 舊版
-   export const useEmployeeStore = createStore<Employee>('employees');
-   
+   export const useEmployeeStore = createStore<Employee>('employees')
+
    // 新版
-   export { useUserStore as useEmployeeStore } from './user-store';
+   export { useUserStore as useEmployeeStore } from './user-store'
    ```
 
 **影響的檔案：** 11 個 (全部自動兼容)
+
 - src/components/hr/tabs/permissions-tab.tsx ✅
 - src/components/hr/add-employee-form.tsx ✅
 - src/components/todos/todo-expanded-view.tsx ✅
@@ -65,10 +73,12 @@
 ### ✅ 3. 舊架構移除狀態
 
 **create-store.ts 使用狀態：**
+
 - ❌ 無任何檔案使用
 - ✅ 可以安全保留作為參考或將來刪除
 
 **統一後的架構：**
+
 ```
 src/stores/
 ├── core/
@@ -84,16 +94,19 @@ src/stores/
 ## 類型統一
 
 ### Payment 類型
+
 - `'收款'` → `'receipt'`
-- `'請款'` → `'request'`  
+- `'請款'` → `'request'`
 - `'出納'` → `'disbursement'`
 
 ### Payment Status
+
 - `'待確認'` → `'pending'`
 - `'已確認'` → `'confirmed'`
 - `'已完成'` → `'completed'`
 
 ### User vs Employee
+
 - **User** (stores/types.ts): 完整的員工資料結構 (包含薪資、考勤等)
 - **Employee** (@/types): 簡化版員工資料
 - 兩者都指向 `employees` 表，`useEmployeeStore` 是 `useUserStore` 的 alias
@@ -101,6 +114,7 @@ src/stores/
 ## 測試結果
 
 ### ✅ Build Test
+
 ```bash
 npm run build
 ✓ Compiled successfully in 7.5s
@@ -109,12 +123,14 @@ npm run build
 ```
 
 ### ✅ Lint Test
+
 ```bash
 npx next lint
 ✔ No ESLint warnings or errors
 ```
 
 ### ✅ Store 架構檢查
+
 ```bash
 # 無任何檔案使用舊的 create-store.ts
 grep -r "from.*create-store'" src/
@@ -153,6 +169,7 @@ grep -r "from.*create-store'" src/
 ## 可選的後續工作
 
 ### 低優先級
+
 1. **刪除舊架構**
    - 可考慮刪除 `src/stores/create-store.ts` (已無使用)
    - 建議保留一段時間作為參考
@@ -168,6 +185,7 @@ grep -r "from.*create-store'" src/
 ## 結論
 
 所有 Store 架構已成功統一到新的 create-store-new 模式：
+
 - ✅ Payment Store 完整實作
 - ✅ User Store 遷移完成
 - ✅ 11 個使用 useUserStore 的檔案全部兼容

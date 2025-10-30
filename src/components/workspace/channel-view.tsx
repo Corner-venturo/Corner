@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react'
 
-import { Send, Paperclip, Smile, MoreVertical, Pin } from 'lucide-react';
+import { Send, Paperclip, Smile, MoreVertical, Pin } from 'lucide-react'
 
-import { CanvasView } from './canvas-view';
-import { Button } from '@/components/ui/button';
-import type { Channel } from '@/stores/workspace-store';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useAuthStore } from '@/stores/auth-store';
+import { CanvasView } from './canvas-view'
+import { Button } from '@/components/ui/button'
+import type { Channel } from '@/stores/workspace-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
 
 interface ChannelViewProps {
-  channel: Channel;
+  channel: Channel
 }
 
 export function ChannelView({ channel }: ChannelViewProps) {
@@ -23,32 +23,38 @@ export function ChannelView({ channel }: ChannelViewProps) {
     togglePinMessage,
     addReaction,
     activeCanvasTab,
-    setActiveCanvasTab
-  } = useWorkspaceStore();
+    setActiveCanvasTab,
+  } = useWorkspaceStore()
 
   // ✅ 從 auth-store 讀取當前登入者資訊
-  const { user } = useAuthStore();
-  const currentUserId = user?.id || '';
-  const currentUserName = user?.display_name || '未知使用者';
+  const { user } = useAuthStore()
+  const currentUserId = user?.id || ''
+  const currentUserName =
+    user?.display_name ||
+    user?.chinese_name ||
+    user?.english_name ||
+    user?.name ||
+    user?.email ||
+    '未知使用者'
 
-  const [messageInput, setMessageInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const [messageInput, setMessageInput] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
   // 獲取該頻道的訊息
   const channelMessages = messages
     .filter(m => m.channel_id === channel.id)
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-  
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
   // 釘選的訊息
-  const pinnedMessages = channelMessages.filter(m => m.is_pinned);
-  
+  const pinnedMessages = channelMessages.filter(m => m.is_pinned)
+
   // 自動滾動到底部
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [channelMessages.length]);
-  
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [channelMessages.length])
+
   const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
+    if (!messageInput.trim()) return
 
     // ✅ 使用正確的 author 資料結構
     addMessage({
@@ -59,30 +65,30 @@ export function ChannelView({ channel }: ChannelViewProps) {
         id: currentUserId,
         display_name: currentUserName,
       },
-    });
+    })
 
-    setMessageInput('');
-  };
-  
+    setMessageInput('')
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+      e.preventDefault()
+      handleSendMessage()
     }
-  };
-  
+  }
+
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+    const date = new Date(timestamp)
+    const now = new Date()
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+
     if (diffInHours < 24) {
-      return date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
     } else {
-      return date.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' });
+      return date.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' })
     }
-  };
-  
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* 頻道標題 */}
@@ -132,7 +138,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
         </div>
       </div>
       <div className="mx-4 border-b border-border"></div>
-      
+
       {/* 內容區 */}
       {activeCanvasTab === 'messages' ? (
         <>
@@ -147,11 +153,11 @@ export function ChannelView({ channel }: ChannelViewProps) {
               </div>
             </div>
           )}
-          
+
           {/* 訊息列表 */}
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            {channelMessages.map((message) => (
-              <div 
+            {channelMessages.map(message => (
+              <div
                 key={message.id}
                 className={cn(
                   'group relative',
@@ -163,7 +169,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
                     <Pin size={12} className="text-morandi-gold" />
                   </div>
                 )}
-                
+
                 <div className="flex items-start gap-3">
                   {/* 頭像 */}
                   <div className="w-8 h-8 rounded-full bg-morandi-gold/20 flex items-center justify-center text-sm font-medium text-morandi-primary flex-shrink-0">
@@ -183,7 +189,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
                     <div className="text-sm text-morandi-primary whitespace-pre-wrap break-words">
                       {message.content}
                     </div>
-                    
+
                     {/* 反應 */}
                     {Object.keys(message.reactions).length > 0 && (
                       <div className="flex items-center gap-1 mt-2">
@@ -205,7 +211,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* 操作按鈕（懸停顯示） */}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                     <button
@@ -226,7 +232,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
                 </div>
               </div>
             ))}
-            
+
             {channelMessages.length === 0 && (
               <div className="flex items-center justify-center h-full text-morandi-secondary">
                 <div className="text-center">
@@ -235,10 +241,10 @@ export function ChannelView({ channel }: ChannelViewProps) {
                 </div>
               </div>
             )}
-            
+
             <div ref={messagesEndRef} />
           </div>
-          
+
           {/* 訊息輸入區 */}
           <div className="px-6 py-4">
             <div className="border-t border-border mb-4 -mx-2"></div>
@@ -246,11 +252,11 @@ export function ChannelView({ channel }: ChannelViewProps) {
               <button className="p-2 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/20 rounded transition-colors">
                 <Paperclip size={20} />
               </button>
-              
+
               <div className="flex-1">
                 <textarea
                   value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
+                  onChange={e => setMessageInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={`在 ${channel.name} 傳送訊息...`}
                   className="w-full px-4 py-2 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
@@ -264,7 +270,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
                   Enter 傳送，Shift + Enter 換行
                 </div>
               </div>
-              
+
               <Button
                 onClick={handleSendMessage}
                 disabled={!messageInput.trim()}
@@ -283,5 +289,5 @@ export function ChannelView({ channel }: ChannelViewProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

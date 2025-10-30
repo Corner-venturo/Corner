@@ -1,23 +1,23 @@
-'use client';
+'use client'
 
-import React, { useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { useOrderStore, useTourStore } from '@/stores';
-import { ArrowLeft} from 'lucide-react';
-import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table';
+import React, { useRef } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { useOrderStore, useTourStore } from '@/stores'
+import { ArrowLeft } from 'lucide-react'
+import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
 
 export default function MemberDetailPage() {
-  const router = useRouter();
-  const params = useParams();
-  const orderId = params.orderId as string;
+  const router = useRouter()
+  const params = useParams()
+  const orderId = params.orderId as string
   const { items: orders } = useOrderStore()
-  const { items: tours } = useTourStore();
-  const memberTableRef = useRef<MemberTableRef | null>(null);
+  const { items: tours } = useTourStore()
+  const memberTableRef = useRef<MemberTableRef | null>(null)
 
-  const order = orders.find(o => o.id === orderId);
-  const tour = tours.find(t => t.id === order?.tour_id);
+  const order = orders.find(o => o.id === orderId)
+  const tour = tours.find(t => t.id === order?.tour_id)
 
   if (!order) {
     return (
@@ -30,7 +30,7 @@ export default function MemberDetailPage() {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -77,5 +77,5 @@ export default function MemberDetailPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

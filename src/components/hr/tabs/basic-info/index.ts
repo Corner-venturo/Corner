@@ -1,2 +1,2 @@
-export { BasicInfoTab } from './BasicInfoTab';
-export type { BasicInfoTabProps, BasicInfoFormData, PasswordData } from './types';
+export { BasicInfoTab } from './BasicInfoTab'
+export type { BasicInfoTabProps, BasicInfoFormData, PasswordData } from './types'

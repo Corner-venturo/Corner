@@ -5,8 +5,8 @@
  * 處理從舊版 LocalProfile 遷移到新版 IndexedDB
  */
 
-import { localDB } from '@/lib/db';
-import { Employee as User } from '@/stores/types';
+import { localDB } from '@/lib/db'
+import { Employee as User } from '@/stores/types'
 
 export class DatabaseInitializer {
   /**
@@ -14,17 +14,15 @@ export class DatabaseInitializer {
    */
   static async ensureInitialized(): Promise<void> {
     try {
-
       // 1. 檢查 users 表
-      const userCount = await this.checkUsersTable();
+      const userCount = await this.checkUsersTable()
 
       if (userCount === 0) {
-        await this.initializeDatabase();
+        await this.initializeDatabase()
       } else {
       }
-
     } catch (error) {
-            // 不拋出錯誤，讓應用繼續運行
+      // 不拋出錯誤，讓應用繼續運行
     }
   }
 
@@ -33,10 +31,10 @@ export class DatabaseInitializer {
    */
   private static async checkUsersTable(): Promise<number> {
     try {
-      const users = await localDB.getAll<User>('employees');
-      return Array.isArray(users) ? users.length : 0;
+      const users = await localDB.getAll<User>('employees')
+      return Array.isArray(users) ? users.length : 0
     } catch (error) {
-            return 0;
+      return 0
     }
   }
 
@@ -49,14 +47,14 @@ export class DatabaseInitializer {
    */
   private static async initializeDatabase(): Promise<void> {
     // Step 1: 嘗試從 LocalProfile 遷移
-    const migratedCount = await this.migrateFromLocalProfile();
+    const migratedCount = await this.migrateFromLocalProfile()
 
     if (migratedCount > 0) {
-      return;
+      return
     }
 
     // Step 2: 沒有 LocalProfile，建立預設管理員
-    await this.createDefaultAdmin();
+    await this.createDefaultAdmin()
   }
 
   /**
@@ -65,20 +63,19 @@ export class DatabaseInitializer {
   private static async migrateFromLocalProfile(): Promise<number> {
     try {
       // 讀取 localStorage 中的 LocalProfile
-      const authStoreRaw = localStorage.getItem('venturo-local-auth-store');
+      const authStoreRaw = localStorage.getItem('venturo-local-auth-store')
       if (!authStoreRaw) {
-        return 0;
+        return 0
       }
 
-      const authStore = JSON.parse(authStoreRaw);
-      const profiles = authStore?.state?.profiles || [];
+      const authStore = JSON.parse(authStoreRaw)
+      const profiles = authStore?.state?.profiles || []
 
       if (profiles.length === 0) {
-        return 0;
+        return 0
       }
 
-
-      let migratedCount = 0;
+      let migratedCount = 0
 
       for (const profile of profiles) {
         try {
@@ -96,37 +93,34 @@ export class DatabaseInitializer {
               phone: '',
               email: profile.email || '',
               address: '',
-              emergency_contact: { name: '', relationship: '', phone: '' }
+              emergency_contact: { name: '', relationship: '', phone: '' },
             },
             job_info: {
-              hire_date: new Date().toISOString()
+              hire_date: new Date().toISOString(),
             },
             salary_info: {
               base_salary: 0,
               allowances: [],
-              salary_history: []
+              salary_history: [],
             },
             attendance: {
               leave_records: [],
-              overtime_records: []
+              overtime_records: [],
             },
             contracts: [],
             status: 'active',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
+            updated_at: new Date().toISOString(),
+          }
 
-          await localDB.create<User>('employees', user);
-          migratedCount++;
-
-        } catch (error) {
-                  }
+          await localDB.create<User>('employees', user)
+          migratedCount++
+        } catch (error) {}
       }
 
-      return migratedCount;
-
+      return migratedCount
     } catch (error) {
-            return 0;
+      return 0
     }
   }
 
@@ -136,11 +130,11 @@ export class DatabaseInitializer {
   private static async createDefaultAdmin(): Promise<void> {
     try {
       // 先檢查是否已經存在
-      const existing = await localDB.getAll<User>('employees');
-      const hasWilliam = existing?.some(u => u.employee_number === 'william01');
+      const existing = await localDB.getAll<User>('employees')
+      const hasWilliam = existing?.some(u => u.employee_number === 'william01')
 
       if (hasWilliam) {
-        return;
+        return
       }
 
       const adminUser: User = {
@@ -159,7 +153,7 @@ export class DatabaseInitializer {
           'hr',
           'database',
           'reports',
-          'settings'
+          'settings',
         ],
         personal_info: {
           national_id: '',
@@ -167,29 +161,29 @@ export class DatabaseInitializer {
           phone: '',
           email: 'william@venturo.com',
           address: '',
-          emergency_contact: { name: '', relationship: '', phone: '' }
+          emergency_contact: { name: '', relationship: '', phone: '' },
         },
         job_info: {
-          hire_date: new Date().toISOString()
+          hire_date: new Date().toISOString(),
         },
         salary_info: {
           base_salary: 0,
           allowances: [],
-          salary_history: []
+          salary_history: [],
         },
         attendance: {
           leave_records: [],
-          overtime_records: []
+          overtime_records: [],
         },
         contracts: [],
         status: 'active',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+        updated_at: new Date().toISOString(),
+      }
 
-      await localDB.create<User>('employees', adminUser);
+      await localDB.create<User>('employees', adminUser)
     } catch (error) {
-            // 不拋出錯誤，可能已經存在
+      // 不拋出錯誤，可能已經存在
     }
   }
 
@@ -197,11 +191,11 @@ export class DatabaseInitializer {
    * 手動觸發初始化（用於測試或修復）
    */
   static async forceInitialize(): Promise<void> {
-    await this.initializeDatabase();
+    await this.initializeDatabase()
   }
 }
 
 // 瀏覽器環境中提供全域訪問
 if (typeof window !== 'undefined') {
-  (window as unknown).DatabaseInitializer = DatabaseInitializer;
+  ;(window as unknown).DatabaseInitializer = DatabaseInitializer
 }

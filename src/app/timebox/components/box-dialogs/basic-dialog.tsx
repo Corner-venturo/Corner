@@ -34,18 +34,18 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
       message: '確定要移除此排程嗎？',
       details: [
         `箱子：${box?.name}`,
-        `時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}`
+        `時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}`,
       ],
       confirmLabel: '確認移除',
-      cancelLabel: '取消'
-    });
+      cancelLabel: '取消',
+    })
 
     if (!confirmed) {
-      return;
+      return
     }
 
-    removeScheduledBox(scheduledBox.id);
-    onClose();
+    removeScheduledBox(scheduledBox.id)
+    onClose()
   }
 
   if (!box) return null
@@ -65,7 +65,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
   }
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
@@ -83,7 +83,9 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">狀態：</span>
-                <span className={`font-medium ${scheduledBox.completed ? 'text-green-600' : 'text-gray-600'}`}>
+                <span
+                  className={`font-medium ${scheduledBox.completed ? 'text-green-600' : 'text-gray-600'}`}
+                >
                   {scheduledBox.completed ? '已完成' : '未完成'}
                 </span>
               </div>

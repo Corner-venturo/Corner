@@ -12,4 +12,4 @@
 // - src/features/attractions/components/AttractionsList.tsx
 // - src/features/attractions/components/AttractionsDialog.tsx
 
-export { default } from '@/features/attractions/components/AttractionsPage';
+export { default } from '@/features/attractions/components/AttractionsPage'

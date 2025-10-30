@@ -1,6 +1,6 @@
-export const DEFAULT_CHANNEL_NAME = '一般討論';
+export const DEFAULT_CHANNEL_NAME = '一般討論'
 
-export const CHANNEL_SWITCH_DELAY = 150;
+export const CHANNEL_SWITCH_DELAY = 150
 
 export const DIALOG_TYPES = {
   SHARE_QUOTE: 'shareQuote',
@@ -13,7 +13,7 @@ export const DIALOG_TYPES = {
   CREATE_RECEIPT: 'createReceipt',
   CREATE_PAYMENT: 'createPayment',
   SETTINGS: 'settings',
-} as const;
+} as const
 
 export const ALERT_MESSAGES = {
   LOGIN_REQUIRED: '請先登入才能發送訊息',
@@ -24,7 +24,7 @@ export const ALERT_MESSAGES = {
   CHANNEL_NAME_REQUIRED: '頻道名稱不能為空',
   UPDATE_SUCCESS: '頻道設定已更新',
   UPDATE_FAILED: '更新頻道失敗，請稍後再試',
-} as const;
+} as const
 
 export const PLACEHOLDER_TEXT = {
   QUOTE_SEARCH: '輸入報價單編號搜尋...',
@@ -40,4 +40,4 @@ export const PLACEHOLDER_TEXT = {
   ASSIGNEE_NAME: '輸入成員名稱...',
   CHANNEL_NAME: '頻道名稱',
   CHANNEL_DESCRIPTION: '頻道描述（選填）',
-} as const;
+} as const

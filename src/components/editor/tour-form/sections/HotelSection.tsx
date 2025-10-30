@@ -1,35 +1,38 @@
-import React from "react";
-import { TourFormData, HotelInfo } from "../types";
-import { Plus, X } from "lucide-react";
+import React from 'react'
+import { TourFormData, HotelInfo } from '../types'
+import { Plus, X } from 'lucide-react'
 
 interface HotelSectionProps {
-  data: TourFormData;
-  updateField: (field: string, value: unknown) => void;
+  data: TourFormData
+  updateField: (field: string, value: unknown) => void
 }
 
 export function HotelSection({ data, updateField }: HotelSectionProps) {
-  const hotels = data.hotels || [];
+  const hotels = data.hotels || []
 
   const addHotel = () => {
-    updateField("hotels", [
+    updateField('hotels', [
       ...hotels,
       {
-        name: "",
-        description: "",
-        image: "",
-      }
-    ]);
-  };
+        name: '',
+        description: '',
+        image: '',
+      },
+    ])
+  }
 
   const updateHotel = (index: number, field: keyof HotelInfo, value: string) => {
-    const updated = [...hotels];
-    updated[index] = { ...updated[index], [field]: value };
-    updateField("hotels", updated);
-  };
+    const updated = [...hotels]
+    updated[index] = { ...updated[index], [field]: value }
+    updateField('hotels', updated)
+  }
 
   const removeHotel = (index: number) => {
-    updateField("hotels", hotels.filter((_, i) => i !== index));
-  };
+    updateField(
+      'hotels',
+      hotels.filter((_, i) => i !== index)
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -41,7 +44,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
           <input
             type="checkbox"
             checked={data.showHotels !== false}
-            onChange={(e) => updateField("showHotels", e.target.checked)}
+            onChange={e => updateField('showHotels', e.target.checked)}
             className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
           />
           <span className="text-morandi-primary">顯示此區塊</span>
@@ -50,9 +53,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
       <div className="bg-green-50 p-4 rounded-lg space-y-3">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-green-800">
-            新增入住的飯店資訊，可以加入多間飯店
-          </p>
+          <p className="text-sm text-green-800">新增入住的飯店資訊，可以加入多間飯店</p>
           <button
             type="button"
             onClick={addHotel}
@@ -71,7 +72,10 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         )}
 
         {hotels.map((hotel, index) => (
-          <div key={index} className="bg-white p-4 rounded-lg border border-green-200 space-y-3 relative">
+          <div
+            key={index}
+            className="bg-white p-4 rounded-lg border border-green-200 space-y-3 relative"
+          >
             <button
               type="button"
               onClick={() => removeHotel(index)}
@@ -92,7 +96,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                   <input
                     type="text"
                     value={hotel.name}
-                    onChange={(e) => updateHotel(index, "name", e.target.value)}
+                    onChange={e => updateHotel(index, 'name', e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     placeholder="例如: 福岡海鷹希爾頓酒店"
                   />
@@ -104,7 +108,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                   </label>
                   <textarea
                     value={hotel.description}
-                    onChange={(e) => updateHotel(index, "description", e.target.value)}
+                    onChange={e => updateHotel(index, 'description', e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 min-h-[80px]"
                     placeholder="介紹飯店特色、位置、設施等..."
                   />
@@ -116,8 +120,8 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                   </label>
                   <input
                     type="url"
-                    value={hotel.image || ""}
-                    onChange={(e) => updateHotel(index, "image", e.target.value)}
+                    value={hotel.image || ''}
+                    onChange={e => updateHotel(index, 'image', e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     placeholder="https://example.com/hotel.jpg"
                   />
@@ -126,8 +130,8 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                       src={hotel.image}
                       alt={hotel.name}
                       className="mt-2 w-full h-32 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+                      onError={e => {
+                        e.currentTarget.style.display = 'none'
                       }}
                     />
                   )}
@@ -138,5 +142,5 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         ))}
       </div>
     </div>
-  );
+  )
 }

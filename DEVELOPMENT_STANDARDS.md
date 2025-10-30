@@ -24,35 +24,38 @@
 ## 🎯 核心原則
 
 ### 1. 離線優先 (Offline-First)
+
 ```tsx
 // ✅ 正確：先從 IndexedDB 載入，背景同步
 const { cached, fresh } = await loadWithSync({
   tableName: 'tours',
   filter: { field: 'status', value: 'active' },
-});
+})
 
-set({ items: cached, loading: false });
-if (fresh) set({ items: fresh });
+set({ items: cached, loading: false })
+if (fresh) set({ items: fresh })
 
 // ❌ 錯誤：直接從 Supabase 載入
-const { data } = await supabase.from('tours').select();
-set({ items: data });
+const { data } = await supabase.from('tours').select()
+set({ items: data })
 ```
 
 ### 2. 型別安全 (Type Safety)
+
 ```tsx
 // ✅ 正確：明確型別定義
 interface Tour {
-  id: string;
-  name: string;
-  start_date: string | null;
+  id: string
+  name: string
+  start_date: string | null
 }
 
 // ❌ 錯誤：使用 any
-const tour: any = getTour();
+const tour: any = getTour()
 ```
 
 ### 3. 效能優先 (Performance First)
+
 ```tsx
 // ✅ 正確：使用 memoized selector
 const stats = useAccountingStats();
@@ -68,6 +71,7 @@ const balance = transactions.filter(t => t.id === id).reduce(...);
 ## 🏗️ 專案架構
 
 ### 目錄結構
+
 ```
 src/
 ├── app/                    # Next.js App Router 頁面
@@ -136,24 +140,25 @@ src/
 ```tsx
 // ✅ 正確：明確的介面定義
 interface User {
-  id: string;
-  name: string;
-  email: string | null;
-  role: 'admin' | 'user';
-  createdAt: Date;
+  id: string
+  name: string
+  email: string | null
+  role: 'admin' | 'user'
+  createdAt: Date
 }
 
 // ✅ 正確：使用 Utility Types
-type PartialUser = Partial<User>;
-type UserWithoutId = Omit<User, 'id'>;
-type UserRole = User['role'];
+type PartialUser = Partial<User>
+type UserWithoutId = Omit<User, 'id'>
+type UserRole = User['role']
 
 // ❌ 錯誤：使用 any
-const user: any = getUser();
+const user: any = getUser()
 
 // ❌ 錯誤：隱式 any
-function process(data) { // missing type
-  return data;
+function process(data) {
+  // missing type
+  return data
 }
 ```
 
@@ -161,11 +166,11 @@ function process(data) { // missing type
 
 ```tsx
 // ✅ 正確：使用 type 關鍵字匯出
-export type { User, UserRole };
-export type { Tour } from './tour.types';
+export type { User, UserRole }
+export type { Tour } from './tour.types'
 
 // ❌ 錯誤：混用 export 和型別
-export { User }; // runtime export
+export { User } // runtime export
 ```
 
 ---
@@ -176,52 +181,52 @@ export { User }; // runtime export
 
 ```tsx
 // ✅ 標準組件結構
-'use client'; // 如果需要
+'use client' // 如果需要
 
 // 1. React & Next.js imports
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 // 2. External libraries
-import { Calendar, User } from 'lucide-react';
+import { Calendar, User } from 'lucide-react'
 
 // 3. Types
-import type { Tour } from '@/types/tour.types';
+import type { Tour } from '@/types/tour.types'
 
 // 4. Stores & Selectors
-import { useTourStore } from '@/stores';
-import { useAccountingStats } from '@/stores/selectors';
+import { useTourStore } from '@/stores'
+import { useAccountingStats } from '@/stores/selectors'
 
 // 5. Components
-import { Button } from '@/components/ui/button';
-import { TourCard } from '@/components/tours/tour-card';
+import { Button } from '@/components/ui/button'
+import { TourCard } from '@/components/tours/tour-card'
 
 // 6. Utilities & Constants
-import { cn } from '@/lib/utils';
-import { HEADER_HEIGHT_PX } from '@/lib/constants';
+import { cn } from '@/lib/utils'
+import { HEADER_HEIGHT_PX } from '@/lib/constants'
 
 // 7. Interface definition
 interface TourListProps {
-  initialTours?: Tour[];
-  filter?: 'active' | 'completed';
+  initialTours?: Tour[]
+  filter?: 'active' | 'completed'
 }
 
 // 8. Component implementation
 export function TourList({ initialTours, filter = 'active' }: TourListProps) {
   // Hooks (按順序)
-  const router = useRouter();
-  const [selected, setSelected] = useState<string | null>(null);
-  const tours = useTourStore(state => state.items);
+  const router = useRouter()
+  const [selected, setSelected] = useState<string | null>(null)
+  const tours = useTourStore(state => state.items)
 
   // Effects
   useEffect(() => {
     // load data
-  }, []);
+  }, [])
 
   // Handlers
   const handleSelect = (id: string) => {
-    setSelected(id);
-  };
+    setSelected(id)
+  }
 
   // Render
   return (
@@ -235,7 +240,7 @@ export function TourList({ initialTours, filter = 'active' }: TourListProps) {
         />
       ))}
     </div>
-  );
+  )
 }
 ```
 
@@ -251,25 +256,21 @@ export function TourList({ initialTours, filter = 'active' }: TourListProps) {
 ```tsx
 // ✅ 正確：明確的 Props 介面
 interface CardProps {
-  title: string;
-  description?: string;
-  onClick?: () => void;
-  children?: React.ReactNode;
-  className?: string;
+  title: string
+  description?: string
+  onClick?: () => void
+  children?: React.ReactNode
+  className?: string
 }
 
 // ✅ 正確：使用 default parameters
-function Card({
-  title,
-  description = '',
-  className = ''
-}: CardProps) {
+function Card({ title, description = '', className = '' }: CardProps) {
   // ...
 }
 
 // ❌ 錯誤：Props 沒有型別
 function Card(props) {
-  return <div>{props.title}</div>;
+  return <div>{props.title}</div>
 }
 ```
 
@@ -283,15 +284,15 @@ function Card(props) {
 // ✅ 正確：清晰的 Store 定義
 interface TourStore {
   // State
-  items: Tour[];
-  loading: boolean;
-  error: string | null;
+  items: Tour[]
+  loading: boolean
+  error: string | null
 
   // Actions
-  load: () => Promise<void>;
-  create: (tour: Omit<Tour, 'id'>) => Promise<Tour>;
-  update: (id: string, data: Partial<Tour>) => Promise<void>;
-  delete: (id: string) => Promise<void>;
+  load: () => Promise<void>
+  create: (tour: Omit<Tour, 'id'>) => Promise<Tour>
+  update: (id: string, data: Partial<Tour>) => Promise<void>
+  delete: (id: string) => Promise<void>
 }
 
 export const useTourStore = create<TourStore>()(
@@ -304,37 +305,37 @@ export const useTourStore = create<TourStore>()(
       load: async () => {
         const { cached, fresh } = await loadWithSync({
           tableName: 'tours',
-        });
-        set({ items: cached, loading: false });
-        if (fresh) set({ items: fresh });
+        })
+        set({ items: cached, loading: false })
+        if (fresh) set({ items: fresh })
       },
 
       // ... other actions
     }),
     { name: 'tour-store' }
   )
-);
+)
 ```
 
 ### Selector 使用
 
 ```tsx
 // ✅ 正確：使用 memoized selector
-const stats = useAccountingStats();
-const balance = useAccountBalance(accountId);
-const tours = useTourStore(state => state.items);
+const stats = useAccountingStats()
+const balance = useAccountBalance(accountId)
+const tours = useTourStore(state => state.items)
 
 // ✅ 正確：自訂 selector with equality
 const activeTours = useTourStore(
   state => state.items.filter(t => t.status === 'active'),
   shallow // from 'zustand/shallow'
-);
+)
 
 // ❌ 錯誤：直接計算
-const stats = calculateStats(useAccountingStore.getState().transactions);
+const stats = calculateStats(useAccountingStore.getState().transactions)
 
 // ❌ 錯誤：訂閱整個 store
-const store = useTourStore();
+const store = useTourStore()
 ```
 
 ---
@@ -345,48 +346,44 @@ const store = useTourStore();
 
 ```tsx
 // ✅ 正確：使用統一的 sync helper
-import { loadWithSync, createWithSync, updateWithSync } from '@/stores/utils/sync-helper';
+import { loadWithSync, createWithSync, updateWithSync } from '@/stores/utils/sync-helper'
 
 // Load
 const { cached, fresh, error } = await loadWithSync({
   tableName: 'tours',
   filter: { field: 'status', value: 'active' },
   orderBy: { field: 'created_at', ascending: false },
-});
+})
 
 // Create
-const { data, error } = await createWithSync('tours', newTour);
+const { data, error } = await createWithSync('tours', newTour)
 
 // Update
-const { data, error } = await updateWithSync('tours', tourId, updates);
+const { data, error } = await updateWithSync('tours', tourId, updates)
 
 // ❌ 錯誤：直接使用 Supabase
-const { data } = await supabase.from('tours').select();
+const { data } = await supabase.from('tours').select()
 ```
 
 ### 錯誤處理
 
 ```tsx
 // ✅ 正確：使用 error handler
-import { handleError, createAppError, ErrorType } from '@/lib/error-handler';
+import { handleError, createAppError, ErrorType } from '@/lib/error-handler'
 
 try {
-  await saveTour(tour);
+  await saveTour(tour)
 } catch (error) {
-  const appError = handleError(error);
-  showErrorToUser(appError);
+  const appError = handleError(error)
+  showErrorToUser(appError)
 }
 
 // ✅ 正確：使用 tryCatch wrapper
-const [result, error] = await tryCatch(
-  () => loadTours(),
-  ErrorType.DATABASE,
-  '載入旅遊資料失敗'
-);
+const [result, error] = await tryCatch(() => loadTours(), ErrorType.DATABASE, '載入旅遊資料失敗')
 
 if (error) {
-  showErrorToUser(error);
-  return;
+  showErrorToUser(error)
+  return
 }
 ```
 
@@ -399,16 +396,16 @@ if (error) {
 ```tsx
 // ✅ 正確：useMemo for expensive calculations
 const sortedTours = useMemo(() => {
-  return tours.sort((a, b) => a.date.localeCompare(b.date));
-}, [tours]);
+  return tours.sort((a, b) => a.date.localeCompare(b.date))
+}, [tours])
 
 // ✅ 正確：useCallback for event handlers
 const handleClick = useCallback((id: string) => {
-  setSelected(id);
-}, []);
+  setSelected(id)
+}, [])
 
 // ❌ 錯誤：每次 render 都重新排序
-const sortedTours = tours.sort((a, b) => a.date.localeCompare(b.date));
+const sortedTours = tours.sort((a, b) => a.date.localeCompare(b.date))
 ```
 
 ### 2. 避免不必要的 Re-render
@@ -416,19 +413,19 @@ const sortedTours = tours.sort((a, b) => a.date.localeCompare(b.date));
 ```tsx
 // ✅ 正確：使用 React.memo
 export const TourCard = React.memo(function TourCard({ tour }: Props) {
-  return <div>{tour.name}</div>;
-});
+  return <div>{tour.name}</div>
+})
 
 // ✅ 正確：拆分組件
 function ParentComponent() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   return (
     <>
       <button onClick={() => setCount(c => c + 1)}>{count}</button>
       <ExpensiveComponent /> {/* 不會因為 count 改變而重新渲染 */}
     </>
-  );
+  )
 }
 ```
 
@@ -436,16 +433,16 @@ function ParentComponent() {
 
 ```tsx
 // ✅ 使用 Performance Monitor
-import { perfMonitor } from '@/lib/performance/monitor';
+import { perfMonitor } from '@/lib/performance/monitor'
 
 // 測量函數執行時間
 await perfMonitor.measure('loadTours', async () => {
-  return await loadTours();
-});
+  return await loadTours()
+})
 
 // 查看統計
-console.log(perfMonitor.getStats('loadTours'));
-console.log(perfMonitor.getSlowest(10));
+console.log(perfMonitor.getStats('loadTours'))
+console.log(perfMonitor.getSlowest(10))
 ```
 
 ### 4. 圖片優化
@@ -475,8 +472,8 @@ import Image from 'next/image';
 
 ```tsx
 // tour.test.ts
-import { describe, it, expect } from 'vitest';
-import { calculateTourCost } from './tour-utils';
+import { describe, it, expect } from 'vitest'
+import { calculateTourCost } from './tour-utils'
 
 describe('calculateTourCost', () => {
   it('should calculate total cost correctly', () => {
@@ -484,38 +481,38 @@ describe('calculateTourCost', () => {
       baseCost: 1000,
       participants: 10,
       discount: 0.1,
-    });
+    })
 
-    expect(result).toBe(9000);
-  });
+    expect(result).toBe(9000)
+  })
 
   it('should handle zero participants', () => {
     const result = calculateTourCost({
       baseCost: 1000,
       participants: 0,
       discount: 0,
-    });
+    })
 
-    expect(result).toBe(0);
-  });
-});
+    expect(result).toBe(0)
+  })
+})
 ```
 
 ### 組件測試
 
 ```tsx
 // TourCard.test.tsx
-import { render, screen } from '@testing-library/react';
-import { TourCard } from './TourCard';
+import { render, screen } from '@testing-library/react'
+import { TourCard } from './TourCard'
 
 describe('TourCard', () => {
   it('renders tour information', () => {
-    render(<TourCard tour={mockTour} />);
+    render(<TourCard tour={mockTour} />)
 
-    expect(screen.getByText('Tokyo Tour')).toBeInTheDocument();
-    expect(screen.getByText('2024-03-15')).toBeInTheDocument();
-  });
-});
+    expect(screen.getByText('Tokyo Tour')).toBeInTheDocument()
+    expect(screen.getByText('2024-03-15')).toBeInTheDocument()
+  })
+})
 ```
 
 ---
@@ -625,22 +622,22 @@ src/
 
 ### 目標指標
 
-| 指標 | 目標值 | 測量方式 |
-|------|--------|----------|
-| First Contentful Paint | < 1.5s | Lighthouse |
-| Largest Contentful Paint | < 2.5s | Lighthouse |
-| Time to Interactive | < 3s | Lighthouse |
-| Total Blocking Time | < 300ms | Lighthouse |
-| Cumulative Layout Shift | < 0.1 | Lighthouse |
+| 指標                     | 目標值  | 測量方式   |
+| ------------------------ | ------- | ---------- |
+| First Contentful Paint   | < 1.5s  | Lighthouse |
+| Largest Contentful Paint | < 2.5s  | Lighthouse |
+| Time to Interactive      | < 3s    | Lighthouse |
+| Total Blocking Time      | < 300ms | Lighthouse |
+| Cumulative Layout Shift  | < 0.1   | Lighthouse |
 
 ### Store 操作基準
 
-| 操作 | 目標時間 |
-|------|---------|
-| Dashboard 統計計算 | < 10ms |
-| 列表頁面渲染 | < 50ms |
-| Store 資料載入 | < 100ms |
-| API 同步 | < 500ms |
+| 操作               | 目標時間 |
+| ------------------ | -------- |
+| Dashboard 統計計算 | < 10ms   |
+| 列表頁面渲染       | < 50ms   |
+| Store 資料載入     | < 100ms  |
+| API 同步           | < 500ms  |
 
 ---
 
@@ -677,53 +674,54 @@ src/
 
 ```tsx
 // src/stores/my-feature-store.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { loadWithSync } from './utils/sync-helper';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { loadWithSync } from './utils/sync-helper'
 
 interface MyFeatureStore {
-  items: Item[];
-  load: () => Promise<void>;
+  items: Item[]
+  load: () => Promise<void>
 }
 
 export const useMyFeatureStore = create<MyFeatureStore>()(
   persist(
-    (set) => ({
+    set => ({
       items: [],
       load: async () => {
         const { cached, fresh } = await loadWithSync({
           tableName: 'my_table',
-        });
-        set({ items: cached });
-        if (fresh) set({ items: fresh });
+        })
+        set({ items: cached })
+        if (fresh) set({ items: fresh })
       },
     }),
     { name: 'my-feature-store' }
   )
-);
+)
 ```
 
 ### 建立 Selector
 
 ```tsx
 // src/stores/selectors/my-feature-selectors.ts
-import { useMyFeatureStore } from '../my-feature-store';
-import { useMemo } from 'react';
+import { useMyFeatureStore } from '../my-feature-store'
+import { useMemo } from 'react'
 
 export function useActiveItems() {
-  return useMyFeatureStore(
-    state => state.items.filter(item => item.status === 'active')
-  );
+  return useMyFeatureStore(state => state.items.filter(item => item.status === 'active'))
 }
 
 export function useItemStats() {
-  const items = useMyFeatureStore(state => state.items);
+  const items = useMyFeatureStore(state => state.items)
 
-  return useMemo(() => ({
-    total: items.length,
-    active: items.filter(i => i.status === 'active').length,
-    completed: items.filter(i => i.status === 'completed').length,
-  }), [items]);
+  return useMemo(
+    () => ({
+      total: items.length,
+      active: items.filter(i => i.status === 'active').length,
+      completed: items.filter(i => i.status === 'completed').length,
+    }),
+    [items]
+  )
 }
 ```
 

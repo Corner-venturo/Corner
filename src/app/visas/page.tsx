@@ -1,3 +1,3 @@
-import { VisasPage } from '@/features/visas';
+import { VisasPage } from '@/features/visas'
 
-export default VisasPage;
+export default VisasPage

@@ -24,43 +24,43 @@
  * ```
  */
 
-'use client';
+'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ReactNode } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { ReactNode } from 'react'
 
 export interface FormDialogProps {
   /** 對話框開啟狀態 */
-  open: boolean;
+  open: boolean
   /** 對話框狀態變更回調 */
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (open: boolean) => void
   /** 對話框標題 */
-  title: string;
+  title: string
   /** 對話框副標題（可選） */
-  subtitle?: string;
+  subtitle?: string
   /** 表單內容 */
-  children: ReactNode;
+  children: ReactNode
   /** 提交處理函數 */
-  onSubmit: () => void | Promise<void>;
+  onSubmit: () => void | Promise<void>
   /** 取消處理函數（可選，預設為關閉對話框） */
-  onCancel?: () => void;
+  onCancel?: () => void
   /** 提交按鈕文字（預設：確定） */
-  submitLabel?: string;
+  submitLabel?: string
   /** 取消按鈕文字（預設：取消） */
-  cancelLabel?: string;
+  cancelLabel?: string
   /** 提交中狀態 */
-  loading?: boolean;
+  loading?: boolean
   /** 是否禁用提交按鈕 */
-  submitDisabled?: boolean;
+  submitDisabled?: boolean
   /** 最大寬度 */
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl'
   /** 自定義內容樣式類名 */
-  contentClassName?: string;
+  contentClassName?: string
   /** 是否顯示 Footer（預設：true） */
-  showFooter?: boolean;
+  showFooter?: boolean
   /** 自定義 Footer 內容 */
-  footer?: ReactNode;
+  footer?: ReactNode
 }
 
 const maxWidthClasses = {
@@ -74,7 +74,7 @@ const maxWidthClasses = {
   '5xl': 'max-w-5xl',
   '6xl': 'max-w-6xl',
   '7xl': 'max-w-7xl',
-};
+}
 
 export function FormDialog({
   open,
@@ -95,46 +95,35 @@ export function FormDialog({
 }: FormDialogProps) {
   const handleCancel = () => {
     if (onCancel) {
-      onCancel();
+      onCancel()
     } else {
-      onOpenChange(false);
+      onOpenChange(false)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit();
-  };
+    e.preventDefault()
+    await onSubmit()
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {subtitle && (
-            <p className="text-sm text-morandi-secondary mt-1">
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <p className="text-sm text-morandi-secondary mt-1">{subtitle}</p>}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 表單內容區域 */}
-          <div className="space-y-4">
-            {children}
-          </div>
+          <div className="space-y-4">{children}</div>
 
           {/* Footer 按鈕組 */}
           {showFooter && (
             <div className="flex justify-end gap-2 pt-4 border-t border-border">
               {footer || (
                 <>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleCancel}
-                    disabled={loading}
-                  >
+                  <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
                     {cancelLabel}
                   </Button>
                   <Button
@@ -151,5 +140,5 @@ export function FormDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 
 interface TourLeaderSectionProps {
-  data: any;
-  viewMode: 'desktop' | 'mobile';
+  data: any
+  viewMode: 'desktop' | 'mobile'
 }
 
 export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
@@ -15,7 +15,13 @@ export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className={viewMode === 'mobile' ? 'text-2xl font-bold text-morandi-primary mb-4' : 'text-4xl font-bold text-morandi-primary mb-4'}>
+          <h2
+            className={
+              viewMode === 'mobile'
+                ? 'text-2xl font-bold text-morandi-primary mb-4'
+                : 'text-4xl font-bold text-morandi-primary mb-4'
+            }
+          >
             領隊與集合資訊
           </h2>
         </motion.div>
@@ -35,15 +41,21 @@ export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">領隊姓名</p>
-                <p className="text-lg font-semibold text-morandi-primary">{data.leader?.name || "待定"}</p>
+                <p className="text-lg font-semibold text-morandi-primary">
+                  {data.leader?.name || '待定'}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">國內電話</p>
-                <p className="text-lg font-semibold text-morandi-primary">{data.leader?.domesticPhone || "待定"}</p>
+                <p className="text-lg font-semibold text-morandi-primary">
+                  {data.leader?.domesticPhone || '待定'}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">國外電話</p>
-                <p className="text-lg font-semibold text-morandi-primary">{data.leader?.overseasPhone || "待定"}</p>
+                <p className="text-lg font-semibold text-morandi-primary">
+                  {data.leader?.overseasPhone || '待定'}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -63,13 +75,13 @@ export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">集合時間</p>
                 <p className="text-xl font-semibold text-blue-600">
-                  {data.meetingInfo?.time || "待定"}
+                  {data.meetingInfo?.time || '待定'}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">集合地點</p>
                 <p className="text-lg font-semibold text-morandi-primary">
-                  {data.meetingInfo?.location || "待定"}
+                  {data.meetingInfo?.location || '待定'}
                 </p>
               </div>
             </div>
@@ -77,5 +89,5 @@ export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
         </div>
       </div>
     </section>
-  );
+  )
 }

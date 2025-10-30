@@ -1,62 +1,62 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useMemo } from 'react';
-import { X, Calendar } from 'lucide-react';
-import { useTourStore, usePaymentRequestStore } from '@/stores';
-import { useWorkspaceStore, AdvanceItem } from '@/stores/workspace-store';
+import { useState, useEffect, useMemo } from 'react'
+import { X, Calendar } from 'lucide-react'
+import { useTourStore, usePaymentRequestStore } from '@/stores'
+import { useWorkspaceStore, AdvanceItem } from '@/stores/workspace-store'
 
 interface CreatePaymentRequestDialogProps {
-  items: AdvanceItem | AdvanceItem[]; // 單項或批次
-  listId: string;
-  onClose: () => void;
-  onSuccess: () => void;
+  items: AdvanceItem | AdvanceItem[] // 單項或批次
+  listId: string
+  onClose: () => void
+  onSuccess: () => void
 }
 
 export function CreatePaymentRequestDialog({
   items,
   listId,
   onClose,
-  onSuccess
+  onSuccess,
 }: CreatePaymentRequestDialogProps) {
-  const { items: tours } = useTourStore();
-  const { create: createPaymentRequest } = usePaymentRequestStore();
-  const { processAdvanceItem } = useWorkspaceStore();
+  const { items: tours } = useTourStore()
+  const { create: createPaymentRequest } = usePaymentRequestStore()
+  const { processAdvanceItem } = useWorkspaceStore()
 
-  const itemsArray = useMemo(() => Array.isArray(items) ? items : [items], [items]);
-  const isBatch = Array.isArray(items);
+  const itemsArray = useMemo(() => (Array.isArray(items) ? items : [items]), [items])
+  const isBatch = Array.isArray(items)
 
-  const [selectedTourId, setSelectedTourId] = useState('');
-  const [category, setCategory] = useState('其他');
-  const [supplier, setSupplier] = useState('');
-  const [requestDate, setRequestDate] = useState('');
+  const [selectedTourId, setSelectedTourId] = useState('')
+  const [category, setCategory] = useState('其他')
+  const [supplier, setSupplier] = useState('')
+  const [requestDate, setRequestDate] = useState('')
 
   // 計算總金額
-  const totalAmount = itemsArray.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount = itemsArray.reduce((sum, item) => sum + item.amount, 0)
 
   // 自動設定供應商為第一個代墊人
   useEffect(() => {
     if (itemsArray.length > 0) {
-      setSupplier(`員工代墊-${itemsArray[0].advance_person}`);
+      setSupplier(`員工代墊-${itemsArray[0].advance_person}`)
     }
-  }, [itemsArray]);
+  }, [itemsArray])
 
   // 獲取下個週四
   useEffect(() => {
     const getNextThursday = () => {
-      const today = new Date();
-      const dayOfWeek = today.getDay();
-      const daysUntilThursday = (4 - dayOfWeek + 7) % 7;
-      const nextThursday = new Date(today);
-      nextThursday.setDate(today.getDate() + (daysUntilThursday === 0 ? 7 : daysUntilThursday));
-      return nextThursday.toISOString().split('T')[0];
-    };
-    setRequestDate(getNextThursday());
-  }, []);
+      const today = new Date()
+      const dayOfWeek = today.getDay()
+      const daysUntilThursday = (4 - dayOfWeek + 7) % 7
+      const nextThursday = new Date(today)
+      nextThursday.setDate(today.getDate() + (daysUntilThursday === 0 ? 7 : daysUntilThursday))
+      return nextThursday.toISOString().split('T')[0]
+    }
+    setRequestDate(getNextThursday())
+  }, [])
 
   const handleCreate = async () => {
     if (!selectedTourId) {
-      alert('請選擇關聯旅遊團');
-      return;
+      alert('請選擇關聯旅遊團')
+      return
     }
 
     try {
@@ -74,12 +74,12 @@ export function CreatePaymentRequestDialog({
           quantity: 1,
           subtotal: item.amount,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })),
         status: 'pending',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      } as unknown);
+        updated_at: new Date().toISOString(),
+      } as unknown)
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {
@@ -88,19 +88,22 @@ export function CreatePaymentRequestDialog({
           item.id,
           paymentRequest.id,
           'current-user' // 從 auth store 取得當前用戶 ID
-        );
+        )
       }
 
-      onSuccess();
-      onClose();
+      onSuccess()
+      onClose()
     } catch (error) {
-            alert('建立請款單失敗，請稍後再試');
+      alert('建立請款單失敗，請稍後再試')
     }
-  };
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="card-morandi-elevated w-[600px]" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div className="card-morandi-elevated w-[600px]" onClick={e => e.stopPropagation()}>
         {/* 標題列 */}
         <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
           <h3 className="text-lg font-semibold text-morandi-primary">
@@ -143,7 +146,7 @@ export function CreatePaymentRequestDialog({
             </label>
             <select
               value={selectedTourId}
-              onChange={(e) => setSelectedTourId(e.target.value)}
+              onChange={e => setSelectedTourId(e.target.value)}
               className=""
             >
               <option value="">請選擇旅遊團</option>
@@ -157,26 +160,22 @@ export function CreatePaymentRequestDialog({
 
           {/* 類別 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
-              類別
-            </label>
+            <label className="block text-sm font-medium text-morandi-secondary mb-2">類別</label>
             <input
               type="text"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={e => setCategory(e.target.value)}
               className=""
             />
           </div>
 
           {/* 供應商 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
-              供應商
-            </label>
+            <label className="block text-sm font-medium text-morandi-secondary mb-2">供應商</label>
             <input
               type="text"
               value={supplier}
-              onChange={(e) => setSupplier(e.target.value)}
+              onChange={e => setSupplier(e.target.value)}
               className=""
             />
           </div>
@@ -190,10 +189,13 @@ export function CreatePaymentRequestDialog({
               <input
                 type="date"
                 value={requestDate}
-                onChange={(e) => setRequestDate(e.target.value)}
+                onChange={e => setRequestDate(e.target.value)}
                 className="input-morandi pl-10"
               />
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" size={16} />
+              <Calendar
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+                size={16}
+              />
             </div>
           </div>
         </div>
@@ -209,5 +211,5 @@ export function CreatePaymentRequestDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

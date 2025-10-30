@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { Book3D, BookFrame, Page, Spine } from './Book3D';
+import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { Book3D, BookFrame, Page, Spine } from './Book3D'
 
 interface OpeningSpreadProps {
-  onComplete: () => void;
+  onComplete: () => void
 }
 
 /**
@@ -13,29 +13,29 @@ interface OpeningSpreadProps {
  * 左頁固定，右頁可切換圖片內容（帶不規則 mask）
  */
 export function OpeningSpread({ onComplete }: OpeningSpreadProps) {
-  const [currentImage, setCurrentImage] = useState(0);
+  const [currentImage, setCurrentImage] = useState(0)
 
   // 示例圖片數據（可替換為真實旅遊圖片）
   const images = [
     { id: 1, title: '巴黎鐵塔', location: '法國', color: '#E8D5C4' },
     { id: 2, title: '富士山', location: '日本', color: '#D5E8E0' },
     { id: 3, title: '大峽谷', location: '美國', color: '#E8DDD5' },
-  ];
+  ]
 
   const handleNext = () => {
     if (currentImage < images.length - 1) {
-      setCurrentImage(currentImage + 1);
+      setCurrentImage(currentImage + 1)
     } else {
       // 結束瀏覽，進入收合
-      onComplete();
+      onComplete()
     }
-  };
+  }
 
   const handlePrev = () => {
     if (currentImage > 0) {
-      setCurrentImage(currentImage - 1);
+      setCurrentImage(currentImage - 1)
     }
-  };
+  }
 
   return (
     <motion.div
@@ -163,10 +163,7 @@ export function OpeningSpread({ onComplete }: OpeningSpreadProps) {
                   {/* 圖片佔位（可替換為真實圖片） */}
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-center">
-                      <div
-                        className="text-6xl mb-4"
-                        style={{ opacity: 0.3 }}
-                      >
+                      <div className="text-6xl mb-4" style={{ opacity: 0.3 }}>
                         🗺️
                       </div>
                       <p
@@ -248,5 +245,5 @@ export function OpeningSpread({ onComplete }: OpeningSpreadProps) {
         </BookFrame>
       </Book3D>
     </motion.div>
-  );
+  )
 }

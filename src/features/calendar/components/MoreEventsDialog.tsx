@@ -18,17 +18,14 @@ export function MoreEventsDialog({
   getEventDuration,
 }: MoreEventsDialogProps) {
   return (
-    <Dialog open={dialog.open} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>
               {dialog.date} 的所有事件 ({dialog.events.length})
             </DialogTitle>
-            <button
-              onClick={onClose}
-              className="text-morandi-secondary hover:text-morandi-primary"
-            >
+            <button onClick={onClose} className="text-morandi-secondary hover:text-morandi-primary">
               <X size={20} />
             </button>
           </div>
@@ -66,9 +63,7 @@ export function MoreEventsDialog({
                         <Icon size={14} />
                         <span className="capitalize">{event.extendedProps.type}</span>
                       </div>
-                      {event.extendedProps.location && (
-                        <span>{event.extendedProps.location}</span>
-                      )}
+                      {event.extendedProps.location && <span>{event.extendedProps.location}</span>}
                       {event.extendedProps.participants && (
                         <span>
                           {event.extendedProps.participants}/{event.extendedProps.max_participants}

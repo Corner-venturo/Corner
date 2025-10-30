@@ -6,14 +6,15 @@
 
 ### 重構成果統計
 
-| 頁面 | 原始行數 | 重構後行數 | 減少行數 | 減少比例 |
-|------|---------|-----------|---------|---------|
-| Quotes Page | 394 | 307 | -87 | -22.1% |
-| Contracts Page | 280 | 212 | -68 | -24.3% |
-| Itinerary Page | 221 | 161 | -60 | -27.1% |
-| **總計** | **895** | **680** | **-215** | **-24.0%** |
+| 頁面           | 原始行數 | 重構後行數 | 減少行數 | 減少比例   |
+| -------------- | -------- | ---------- | -------- | ---------- |
+| Quotes Page    | 394      | 307        | -87      | -22.1%     |
+| Contracts Page | 280      | 212        | -68      | -24.3%     |
+| Itinerary Page | 221      | 161        | -60      | -27.1%     |
+| **總計**       | **895**  | **680**    | **-215** | **-24.0%** |
 
 ### Orders Page 分析
+
 - **決策**: 保留使用自定義 `SimpleOrderTable` 組件
 - **原因**:
   - 已有專門優化的表格組件，具備獨特功能（快速收款/請款按鈕）
@@ -26,9 +27,11 @@
 ## 重構詳情
 
 ### 1. Quotes Page (報價單管理)
+
 **檔案**: `src/app/quotes/page.tsx`
 
 **改進內容**:
+
 - ✅ 使用 `ListPageLayout` 替換 ResponsiveHeader + EnhancedTable
 - ✅ 使用 `StatusCell` 顯示狀態（整合 status-config.ts）
 - ✅ 使用 `DateCell` 顯示建立時間
@@ -37,6 +40,7 @@
 - ✅ 使用 `ActionCell` 統一操作按鈕
 
 **重構前**:
+
 ```tsx
 // 手動狀態渲染
 {
@@ -61,6 +65,7 @@ actions={(quote) => (
 ```
 
 **重構後**:
+
 ```tsx
 // 使用 StatusCell
 {
@@ -99,6 +104,7 @@ const renderActions = (quote: any) => (
 ```
 
 **收益**:
+
 - 刪除 87 行代碼 (-22.1%)
 - 移除所有手動過濾邏輯（由 ListPageLayout 處理）
 - 移除手動狀態顏色邏輯（由 StatusCell 處理）
@@ -107,9 +113,11 @@ const renderActions = (quote: any) => (
 ---
 
 ### 2. Contracts Page (合約管理)
+
 **檔案**: `src/app/contracts/page.tsx`
 
 **改進內容**:
+
 - ✅ 使用 `ListPageLayout` 替換 ResponsiveHeader + EnhancedTable
 - ✅ 使用 `DateCell` 顯示出發時間
 - ✅ 使用 `NumberCell` 顯示人數
@@ -117,6 +125,7 @@ const renderActions = (quote: any) => (
 - ✅ 移除手動搜尋/排序狀態管理
 
 **重構前**:
+
 ```tsx
 const [searchQuery, setSearchQuery] = useState('');
 const [currentPage, setCurrentPage] = useState(1);
@@ -167,6 +176,7 @@ const renderActions = useCallback((tour: Tour) => {
 ```
 
 **重構後**:
+
 ```tsx
 // 簡化數據過濾
 const contractTours = useMemo(() => {
@@ -210,6 +220,7 @@ const renderActions = useCallback((tour: Tour) => (
 ```
 
 **收益**:
+
 - 刪除 68 行代碼 (-24.3%)
 - 移除 4 個手動狀態管理（searchQuery, currentPage, sortBy, sortOrder）
 - 移除手動過濾邏輯（由 ListPageLayout 處理）
@@ -219,9 +230,11 @@ const renderActions = useCallback((tour: Tour) => (
 ---
 
 ### 3. Itinerary Page (行程管理)
+
 **檔案**: `src/app/itinerary/page.tsx`
 
 **改進內容**:
+
 - ✅ 使用 `ListPageLayout` 替換 ResponsiveHeader + EnhancedTable
 - ✅ 使用 `DateCell` 顯示建立時間
 - ✅ 使用 `ActionCell` 統一 3 個操作按鈕（分享/複製/刪除）
@@ -229,6 +242,7 @@ const renderActions = useCallback((tour: Tour) => (
 - ✅ 移除手動過濾邏輯
 
 **重構前**:
+
 ```tsx
 const [statusFilter, setStatusFilter] = useState<string>('全部');
 const [searchTerm, setSearchTerm] = useState('');
@@ -301,6 +315,7 @@ const filteredItineraries = useMemo(() => {
 ```
 
 **重構後**:
+
 ```tsx
 // 不需要手動狀態管理
 
@@ -349,6 +364,7 @@ const renderActions = useCallback((itinerary: Itinerary) => (
 ```
 
 **收益**:
+
 - 刪除 60 行代碼 (-27.1%)
 - 移除 2 個手動狀態管理（statusFilter, searchTerm）
 - 移除整個 `filteredItineraries` useMemo（由 ListPageLayout 處理）
@@ -361,62 +377,73 @@ const renderActions = useCallback((itinerary: Itinerary) => (
 ## 組件使用統計
 
 ### ListPageLayout 使用情況
-| 頁面 | 功能 | 狀態標籤頁 | 搜尋欄位數 | 操作按鈕數 |
-|------|------|-----------|-----------|-----------|
-| Quotes | 報價單管理 | 3 個（全部/提案/已核准） | 3 個 | 3 個 |
-| Contracts | 合約管理 | 無 | 3 個 | 4 個 |
-| Itinerary | 行程管理 | 3 個（全部/草稿/已發布） | 6 個 | 3 個 |
+
+| 頁面      | 功能       | 狀態標籤頁               | 搜尋欄位數 | 操作按鈕數 |
+| --------- | ---------- | ------------------------ | ---------- | ---------- |
+| Quotes    | 報價單管理 | 3 個（全部/提案/已核准） | 3 個       | 3 個       |
+| Contracts | 合約管理   | 無                       | 3 個       | 4 個       |
+| Itinerary | 行程管理   | 3 個（全部/草稿/已發布） | 6 個       | 3 個       |
 
 ### Table Cell Components 使用統計
-| 組件 | Quotes | Contracts | Itinerary | 總使用次數 |
-|------|--------|-----------|-----------|-----------|
-| DateCell | ✅ 1 | ✅ 1 | ✅ 1 | 3 |
-| StatusCell | ✅ 1 | ❌ | ❌ | 1 |
-| CurrencyCell | ✅ 1 | ❌ | ❌ | 1 |
-| NumberCell | ✅ 1 | ✅ 1 | ❌ | 2 |
-| ActionCell | ✅ 1 | ✅ 1 | ✅ 1 | 3 |
-| **總計** | **5** | **3** | **2** | **10** |
+
+| 組件         | Quotes | Contracts | Itinerary | 總使用次數 |
+| ------------ | ------ | --------- | --------- | ---------- |
+| DateCell     | ✅ 1   | ✅ 1      | ✅ 1      | 3          |
+| StatusCell   | ✅ 1   | ❌        | ❌        | 1          |
+| CurrencyCell | ✅ 1   | ❌        | ❌        | 1          |
+| NumberCell   | ✅ 1   | ✅ 1      | ❌        | 2          |
+| ActionCell   | ✅ 1   | ✅ 1      | ✅ 1      | 3          |
+| **總計**     | **5**  | **3**     | **2**     | **10**     |
 
 ---
 
 ## 代碼品質改善
 
 ### 1. 一致性提升
+
 **之前**: 每個頁面用不同方式處理相同功能
+
 - Quotes: 手動狀態顏色映射
 - Contracts: inline 日期格式化
 - Itinerary: 自定義狀態按鈕
 
 **現在**: 所有頁面使用統一組件
+
 - 統一使用 `DateCell` 處理日期（含錯誤處理）
 - 統一使用 `ActionCell` 處理操作按鈕（含 stopPropagation）
 - 統一使用 `ListPageLayout` 處理搜尋/過濾
 
 ### 2. 維護性提升
+
 **範例**: 如果需要修改日期格式
+
 - **之前**: 需要修改 3 個不同的檔案，每個實現方式不同
 - **現在**: 只需修改 `DateCell` 組件一處
 
 **範例**: 如果需要修改操作按鈕樣式
+
 - **之前**: 需要修改每個頁面的按鈕樣式
 - **現在**: 只需修改 `ActionCell` 組件
 
 ### 3. 錯誤處理改善
+
 **DateCell 錯誤處理**:
+
 ```tsx
 // 自動處理 null/undefined
 if (!date) {
-  return <span className="text-sm text-morandi-red">未設定</span>;
+  return <span className="text-sm text-morandi-red">未設定</span>
 }
 
 // 自動處理無效日期
-const dateObj = new Date(date);
+const dateObj = new Date(date)
 if (isNaN(dateObj.getTime())) {
-  return <span className="text-sm text-morandi-red">無效日期</span>;
+  return <span className="text-sm text-morandi-red">無效日期</span>
 }
 ```
 
 **ActionCell 事件處理**:
+
 ```tsx
 // 自動處理 stopPropagation 和 disabled 狀態
 onClick={(e) => {
@@ -428,19 +455,21 @@ onClick={(e) => {
 ```
 
 ### 4. Type Safety 提升
+
 所有組件都是完全 TypeScript 型別化:
+
 ```tsx
 export interface ActionButton {
-  icon: LucideIcon;
-  label: string;
-  onClick: () => void;
-  variant?: 'default' | 'danger' | 'success';
-  disabled?: boolean;
+  icon: LucideIcon
+  label: string
+  onClick: () => void
+  variant?: 'default' | 'danger' | 'success'
+  disabled?: boolean
 }
 
 export interface ActionCellProps {
-  actions: ActionButton[];
-  className?: string;
+  actions: ActionButton[]
+  className?: string
 }
 ```
 
@@ -464,6 +493,7 @@ Route (app)                     Size      First Load JS
 ```
 
 **Bundle Size 影響**:
+
 - Quotes: -4.57 kB (-48.7%)
 - Contracts: -2.47 kB (-31.9%)
 - Itinerary: -2.58 kB (-48.3%)
@@ -476,23 +506,29 @@ Route (app)                     Size      First Load JS
 ## 可重用性驗證
 
 ### 成功應用模式
+
 ✅ **ListPageLayout**: 完美適用於標準列表頁
+
 - Quotes: 帶狀態標籤頁的報價單列表
 - Contracts: 簡單的合約列表
 - Itinerary: 帶多欄位搜尋的行程列表
 
 ✅ **ActionCell**: 適用於所有操作按鈕場景
+
 - 自動處理 3-4 個操作按鈕
 - 自動 stopPropagation
 - 統一 hover 效果
 
 ✅ **DateCell**: 適用於所有日期顯示
+
 - 自動錯誤處理
 - 統一格式化
 - 可選圖標
 
 ### 不適用場景分析
+
 ❌ **Orders Page**: 不使用 ListPageLayout
+
 - **原因**: 已有專門優化的 `SimpleOrderTable`
 - **特殊功能**: 快速收款/請款按鈕
 - **額外功能**: 待辦事項警示系統
@@ -505,7 +541,9 @@ Route (app)                     Size      First Load JS
 ## 未來擴展建議
 
 ### 1. 繼續應用到更多頁面
+
 可應用 ListPageLayout 的候選頁面:
+
 - `src/app/todos/page.tsx` (待辦事項列表)
 - `src/app/customers/page.tsx` (客戶管理)
 - `src/app/hr/page.tsx` (人事管理)
@@ -513,18 +551,23 @@ Route (app)                     Size      First Load JS
 預計可減少額外 150-200 行代碼。
 
 ### 2. 創建更多專用組件
+
 基於 Phase 1 分析報告中的建議:
+
 - `TourStatsSummary`: 旅遊團統計摘要
 - `OrderPaymentStatus`: 訂單付款狀態組件
 - `EntityDetailLayout`: 統一的詳情頁佈局
 
 ### 3. 增強現有組件
+
 #### ListPageLayout 可能的增強:
+
 - 支援批量操作（多選）
 - 支援列展開（展開查看詳情）
 - 支援自定義工具欄
 
 #### Table Cells 可能的增強:
+
 - `ProgressCell`: 進度條顯示
 - `TagsCell`: 標籤列表顯示
 - `AvatarCell`: 頭像+名稱顯示
@@ -534,6 +577,7 @@ Route (app)                     Size      First Load JS
 ## 總結
 
 ### 成就
+
 ✅ 成功重構 3 個頁面
 ✅ 減少 215 行代碼 (-24.0%)
 ✅ 減少 bundle size 9.62 kB (-43.0%)
@@ -542,24 +586,29 @@ Route (app)                     Size      First Load JS
 ✅ Build 驗證通過
 
 ### 收益分析
+
 **時間投資**:
+
 - Phase 1 創建組件: ~2 小時
 - Phase 2 應用組件: ~1.5 小時
 - **總投資**: ~3.5 小時
 
 **未來節省**:
+
 - 每新增一個列表頁: 節省 ~2 小時（不需要重複寫搜尋/過濾/排序邏輯）
 - 每次修改表格單元格樣式: 節省 ~30 分鐘（只需改一個組件）
 - 每次添加新的狀態類型: 節省 ~15 分鐘（只需更新 status-config.ts）
 - **預計 ROI**: 在接下來的 3-5 個列表頁開發中回收投資
 
 **代碼品質**:
+
 - 重複代碼減少 ~40%
 - 類型安全性 100%
 - 一致性提升顯著
 - 維護成本降低 ~50%
 
 ### 下一步建議
+
 1. ✅ 繼續應用到 Todos, Customers, HR 頁面
 2. ✅ 創建 TourStatsSummary 等業務組件
 3. ✅ 考慮將 status-config.ts 擴展為完整的配置系統

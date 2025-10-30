@@ -1,6 +1,7 @@
 # 顯化魔法功能整合報告
 
 ## 執行時間
+
 2025-10-25
 
 ## 完成項目
@@ -22,6 +23,7 @@
 ```
 
 **效果：**
+
 - 擁有「人資管理」權限的用戶可以訪問顯化魔法頁面
 - 顯化魔法現在歸屬於管理類別
 
@@ -30,6 +32,7 @@
 **新增檔案：** `src/features/dashboard/components/manifestation-widget.tsx`
 
 **功能特色：**
+
 - 📊 顯示練習進度（已完成章節數 x/10）
 - 📅 追蹤最後練習時間
 - 🎯 顯示當前章節資訊
@@ -43,15 +46,22 @@
 ```typescript
 export const AVAILABLE_WIDGETS: WidgetConfig[] = [
   { id: 'stats', name: '統計資訊', icon: BarChart3, component: StatsWidget, span: 2 },
-  { id: 'manifestation', name: '顯化魔法', icon: Sparkles, component: ManifestationWidget, span: 1 }, // ← 新增
+  {
+    id: 'manifestation',
+    name: '顯化魔法',
+    icon: Sparkles,
+    component: ManifestationWidget,
+    span: 1,
+  }, // ← 新增
   { id: 'calculator', name: '計算機', icon: Calculator, component: CalculatorWidget },
   // ...
-];
+]
 ```
 
 ### ✅ 3. 功能保留
 
 **保留的頁面和功能：**
+
 - ✅ `/manifestation` 頁面完整保留
 - ✅ 所有章節內容保持不變
 - ✅ 呼吸練習功能正常
@@ -110,6 +120,7 @@ export const AVAILABLE_WIDGETS: WidgetConfig[] = [
 ## 測試結果
 
 ### ✅ Build Test
+
 ```bash
 npm run build
 ✓ Compiled successfully in 7.4s
@@ -118,12 +129,14 @@ npm run build
 ```
 
 ### ✅ Lint Test
+
 ```bash
 npx next lint
 ✔ No ESLint warnings or errors
 ```
 
 ### ✅ 檔案檢查
+
 ```bash
 # 新增檔案
 + src/features/dashboard/components/manifestation-widget.tsx
@@ -138,16 +151,19 @@ M src/features/dashboard/components/widget-config.tsx
 ### 小工具組件特色
 
 **狀態管理：**
+
 - 使用 `useManifestationStore` 獲取資料
 - 自動計算練習進度
 - 智能提醒系統（根據最後練習時間）
 
 **視覺設計：**
+
 - 漸層背景（rose/amber/purple）
 - 響應式卡片布局
 - 流暢的動畫過渡
 
 **互動功能：**
+
 - 展開/收起快速練習視圖
 - 新分頁開啟完整頁面
 - 點擊章節查看詳情
@@ -156,13 +172,13 @@ M src/features/dashboard/components/widget-config.tsx
 
 ```typescript
 // 使用現有的 manifestation store
-const { entries, progress, fetchEntries, fetchProgress } = useManifestationStore();
+const { entries, progress, fetchEntries, fetchProgress } = useManifestationStore()
 
 // 使用現有的章節資料
-import { getChapter } from '@/data/manifestation-chapters';
+import { getChapter } from '@/data/manifestation-chapters'
 
 // 使用現有的提醒系統
-import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder';
+import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder'
 ```
 
 ## 系統現況
@@ -190,6 +206,7 @@ import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder';
 ## 結論
 
 顯化魔法已成功整合為：
+
 - ✅ 人資管理權限下的獨立頁面
 - ✅ 工作空間可用的小工具
 - ✅ 所有功能完整保留
@@ -200,7 +217,9 @@ import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder';
 ## 2025-10-25 更新：小工具整合優化
 
 ### 問題修正
+
 用戶反饋原本的 `ManifestationReminderWidget` 是**浮動顯示在右上角**，希望改成：
+
 - 只在首頁的小工具系統中顯示
 - 和其他小工具一樣的呈現方式，不要獨立浮現
 
@@ -211,10 +230,12 @@ import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder';
 **修改檔案：** `src/components/layout/main-layout.tsx`
 
 移除了兩處 `ManifestationReminderWidget` 的引用：
+
 - 移除 import 語句
 - 移除兩個 `{isClient && <ManifestationReminderWidget />}` 渲染
 
 **效果：**
+
 - 顯化魔法小工具不再全域浮動在右上角
 - 減少了不必要的全域元件
 
@@ -223,6 +244,7 @@ import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder';
 **修改檔案：** `src/features/dashboard/components/manifestation-widget.tsx`
 
 整合了原本 `ManifestationReminderWidget` 的功能：
+
 - ✅ 週曆線圖（本週顯化紀錄）
 - ✅ 連續天數顯示
 - ✅ 智能提醒系統（根據最後練習時間）
@@ -230,38 +252,41 @@ import { getManifestationReminderSnapshot } from '@/lib/manifestation/reminder';
 - ✅ 快速練習視圖切換
 
 **新增功能：**
+
 ```typescript
 // 週曆線圖
 const week = useMemo(() => {
-  const range = getWeekRange();
+  const range = getWeekRange()
   return range.map((day, index) => ({
     day,
     label: dayLabels[index],
-    completed: snapshot.history.includes(day)
-  }));
-}, [snapshot.history]);
+    completed: snapshot.history.includes(day),
+  }))
+}, [snapshot.history])
 
 // 實時同步提醒資料
 useEffect(() => {
   const syncFromStorage = () => {
-    setSnapshot(getManifestationReminderSnapshot());
-  };
+    setSnapshot(getManifestationReminderSnapshot())
+  }
   // 監聽 MANIFESTATION_EVENT 和視窗焦點變化
-  window.addEventListener(MANIFESTATION_EVENT, handleUpdate);
-  window.addEventListener('focus', syncFromStorage);
+  window.addEventListener(MANIFESTATION_EVENT, handleUpdate)
+  window.addEventListener('focus', syncFromStorage)
   // ...
-}, []);
+}, [])
 ```
 
 ### 測試結果
 
 #### ✅ Lint Test
+
 ```bash
 npx next lint
 ✔ No ESLint warnings or errors
 ```
 
 #### ✅ Build Test
+
 ```bash
 npm run build
 ✓ Compiled successfully in 7.5s

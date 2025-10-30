@@ -1,125 +1,131 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useRef, useEffect } from 'react'
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface DatePickerProps {
-  value: string;
-  onChange: (date: string) => void;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
+  value: string
+  onChange: (date: string) => void
+  placeholder?: string
+  className?: string
+  disabled?: boolean
 }
 
-export function DatePicker({ value, onChange, placeholder = '選擇日期', className, disabled }: DatePickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+export function DatePicker({
+  value,
+  onChange,
+  placeholder = '選擇日期',
+  className,
+  disabled,
+}: DatePickerProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [currentMonth, setCurrentMonth] = useState(new Date())
+  const containerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // 格式化顯示日期
   const formatDisplayDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
+    if (!dateString) return ''
+    const date = new Date(dateString)
     return date.toLocaleDateString('zh-TW', {
       year: 'numeric',
       month: '2-digit',
-      day: '2-digit'
-    });
-  };
+      day: '2-digit',
+    })
+  }
 
   // 格式化 value 為 YYYY-MM-DD
   const formatValueDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
+    return date.toISOString().split('T')[0]
+  }
 
   // 處理日期選擇
   const handleDateSelect = (date: Date) => {
-    const formattedDate = formatValueDate(date);
-    onChange(formattedDate);
-    setIsOpen(false);
-  };
+    const formattedDate = formatValueDate(date)
+    onChange(formattedDate)
+    setIsOpen(false)
+  }
 
   // 處理月份切換
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentMonth(prev => {
-      const newMonth = new Date(prev);
+      const newMonth = new Date(prev)
       if (direction === 'prev') {
-        newMonth.setMonth(newMonth.getMonth() - 1);
+        newMonth.setMonth(newMonth.getMonth() - 1)
       } else {
-        newMonth.setMonth(newMonth.getMonth() + 1);
+        newMonth.setMonth(newMonth.getMonth() + 1)
       }
-      return newMonth;
-    });
-  };
+      return newMonth
+    })
+  }
 
   // 生成日曆日期
   const generateCalendarDays = () => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
+    const year = currentMonth.getFullYear()
+    const month = currentMonth.getMonth()
 
     // 本月第一天
-    const firstDay = new Date(year, month, 1);
+    const firstDay = new Date(year, month, 1)
     // 本月最後一天
-    const lastDay = new Date(year, month + 1, 0);
+    const lastDay = new Date(year, month + 1, 0)
 
     // 計算第一週需要顯示的上個月日期
-    const start_date = new Date(firstDay);
-    start_date.setDate(firstDay.getDate() - firstDay.getDay());
+    const start_date = new Date(firstDay)
+    start_date.setDate(firstDay.getDate() - firstDay.getDay())
 
     // 計算最後一週需要顯示的下個月日期
-    const end_date = new Date(lastDay);
-    end_date.setDate(lastDay.getDate() + (6 - lastDay.getDay()));
+    const end_date = new Date(lastDay)
+    end_date.setDate(lastDay.getDate() + (6 - lastDay.getDay()))
 
-    const days = [];
-    const currentDate = new Date(start_date);
+    const days = []
+    const currentDate = new Date(start_date)
 
     while (currentDate <= end_date) {
-      days.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
+      days.push(new Date(currentDate))
+      currentDate.setDate(currentDate.getDate() + 1)
     }
 
-    return days;
-  };
+    return days
+  }
 
   // 判斷是否為今日
   const isToday = (date: Date) => {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  };
+    const today = new Date()
+    return date.toDateString() === today.toDateString()
+  }
 
   // 判斷是否為選中日期
   const isSelected = (date: Date) => {
-    if (!value) return false;
-    const selectedDate = new Date(value);
-    return date.toDateString() === selectedDate.toDateString();
-  };
+    if (!value) return false
+    const selectedDate = new Date(value)
+    return date.toDateString() === selectedDate.toDateString()
+  }
 
   // 判斷是否為本月日期
   const isCurrentMonth = (date: Date) => {
-    return date.getMonth() === currentMonth.getMonth();
-  };
+    return date.getMonth() === currentMonth.getMonth()
+  }
 
   // 點擊外部關閉
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
+    }
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
 
-  const days = generateCalendarDays();
-  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+  const days = generateCalendarDays()
+  const weekDays = ['日', '一', '二', '三', '四', '五', '六']
 
   return (
     <div ref={containerRef} className="relative">
@@ -136,9 +142,7 @@ export function DatePicker({ value, onChange, placeholder = '選擇日期', clas
         )}
       >
         <div className="flex items-center justify-between w-full">
-          <span className={cn(
-            value ? 'text-foreground' : 'text-muted-foreground'
-          )}>
+          <span className={cn(value ? 'text-foreground' : 'text-muted-foreground')}>
             {value ? formatDisplayDate(value) : placeholder}
           </span>
           <Calendar size={16} className="text-muted-foreground" />
@@ -183,9 +187,7 @@ export function DatePicker({ value, onChange, placeholder = '選擇日期', clas
                 onClick={() => handleDateSelect(date)}
                 className={cn(
                   'p-2 text-sm rounded hover:bg-morandi-container/20 transition-colors',
-                  isCurrentMonth(date)
-                    ? 'text-foreground'
-                    : 'text-muted-foreground',
+                  isCurrentMonth(date) ? 'text-foreground' : 'text-muted-foreground',
                   isToday(date) && 'bg-morandi-blue/10 text-morandi-blue font-semibold',
                   isSelected(date) && 'bg-morandi-gold text-white hover:bg-morandi-gold/90'
                 )}
@@ -207,5 +209,5 @@ export function DatePicker({ value, onChange, placeholder = '選擇日期', clas
         </div>
       )}
     </div>
-  );
+  )
 }

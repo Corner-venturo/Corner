@@ -1,12 +1,12 @@
-import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
 /**
  * IndexedDB 版本管理器
  * 自動偵測版本變化並處理升級
  */
 
-import { DB_NAME, DB_VERSION } from './schemas';
+import { DB_NAME, DB_VERSION } from './schemas'
 
-const VERSION_KEY = 'venturo_db_version';
+const VERSION_KEY = 'venturo_db_version'
 
 /**
  * 檢查版本並處理升級
@@ -14,30 +14,29 @@ const VERSION_KEY = 'venturo_db_version';
  */
 export async function checkAndHandleVersion(): Promise<boolean> {
   // 取得上次記錄的版本
-  const lastVersion = localStorage.getItem(VERSION_KEY);
-  const currentVersion = DB_VERSION.toString();
-
+  const lastVersion = localStorage.getItem(VERSION_KEY)
+  const currentVersion = DB_VERSION.toString()
 
   // 第一次使用（沒有記錄）
   if (!lastVersion) {
-    localStorage.setItem(VERSION_KEY, currentVersion);
-    return false; // 不需要重新同步
+    localStorage.setItem(VERSION_KEY, currentVersion)
+    return false // 不需要重新同步
   }
 
   // 版本相同，正常使用
   if (lastVersion === currentVersion) {
-    return false;
+    return false
   }
 
   // 版本不同，需要處理升級
-  console.log(`🔄 [IndexedDB] 偵測到版本變化: v${lastVersion} -> v${currentVersion}`);
+  console.log(`🔄 [IndexedDB] 偵測到版本變化: v${lastVersion} -> v${currentVersion}`)
 
   // ✅ 不清空資料庫，直接更新版本記錄
   // IndexedDB 的 onupgradeneeded 會自動處理表格建立
-  localStorage.setItem(VERSION_KEY, currentVersion);
+  localStorage.setItem(VERSION_KEY, currentVersion)
 
-  console.log('✅ [IndexedDB] 版本更新完成（資料保留）');
-  return false; // 不需要重新同步，資料都還在
+  console.log('✅ [IndexedDB] 版本更新完成（資料保留）')
+  return false // 不需要重新同步，資料都還在
 }
 
 /**
@@ -45,7 +44,7 @@ export async function checkAndHandleVersion(): Promise<boolean> {
  */
 async function confirmUpgrade(oldVersion: number, newVersion: number): Promise<boolean> {
   // 方案 1：自動升級（推薦）
-  return true;
+  return true
 
   // 方案 2：詢問使用者（可選）
   // return confirm(
@@ -62,42 +61,41 @@ async function confirmUpgrade(oldVersion: number, newVersion: number): Promise<b
  */
 async function clearDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
-
-    const request = indexedDB.deleteDatabase(DB_NAME);
+    const request = indexedDB.deleteDatabase(DB_NAME)
 
     request.onsuccess = () => {
-      resolve();
-    };
+      resolve()
+    }
 
     request.onerror = () => {
-            reject(request.error);
-    };
+      reject(request.error)
+    }
 
     request.onblocked = () => {
-            // 等待一下再試
-      setTimeout(() => resolve(), UI_DELAYS.AUTO_SAVE);
-    };
-  });
+      // 等待一下再試
+      setTimeout(() => resolve(), UI_DELAYS.AUTO_SAVE)
+    }
+  })
 }
 
 /**
  * 取得當前版本
  */
 export function getCurrentVersion(): number {
-  return DB_VERSION;
+  return DB_VERSION
 }
 
 /**
  * 取得上次版本
  */
 export function getLastVersion(): number | null {
-  const version = localStorage.getItem(VERSION_KEY);
-  return version ? parseInt(version) : null;
+  const version = localStorage.getItem(VERSION_KEY)
+  return version ? parseInt(version) : null
 }
 
 /**
  * 重設版本（僅供開發測試）
  */
 export function resetVersion(): void {
-  localStorage.removeItem(VERSION_KEY);
+  localStorage.removeItem(VERSION_KEY)
 }

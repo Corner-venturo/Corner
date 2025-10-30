@@ -1,28 +1,41 @@
 // Widgets (advance lists, shared orders) management store
-import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
-import { supabase } from '@/lib/supabase/client';
-import type { AdvanceItem, AdvanceList, SharedOrderList } from './types';
+import { create } from 'zustand'
+import { v4 as uuidv4 } from 'uuid'
+import { supabase } from '@/lib/supabase/client'
+import type { AdvanceItem, AdvanceList, SharedOrderList } from './types'
 
 interface WidgetsState {
-  advanceLists: AdvanceList[];
-  sharedOrderLists: SharedOrderList[];
-  loading: boolean;
+  advanceLists: AdvanceList[]
+  sharedOrderLists: SharedOrderList[]
+  loading: boolean
 
   // Advance list operations
-  shareAdvanceList: (channelId: string, items: Omit<AdvanceItem, 'id' | 'status'>[], currentUserId: string) => Promise<void>;
-  processAdvanceItem: (listId: string, itemId: string, paymentRequestId: string, processedBy: string) => Promise<void>;
-  updateAdvanceStatus: (listId: string, itemId: string, status: AdvanceItem['status']) => Promise<void>;
-  loadAdvanceLists: (channelId: string) => Promise<void>;
-  deleteAdvanceList: (listId: string) => Promise<void>;
+  shareAdvanceList: (
+    channelId: string,
+    items: Omit<AdvanceItem, 'id' | 'status'>[],
+    currentUserId: string
+  ) => Promise<void>
+  processAdvanceItem: (
+    listId: string,
+    itemId: string,
+    paymentRequestId: string,
+    processedBy: string
+  ) => Promise<void>
+  updateAdvanceStatus: (
+    listId: string,
+    itemId: string,
+    status: AdvanceItem['status']
+  ) => Promise<void>
+  loadAdvanceLists: (channelId: string) => Promise<void>
+  deleteAdvanceList: (listId: string) => Promise<void>
 
   // Shared order list operations
-  shareOrderList: (channelId: string, orderIds: string[], currentUserId: string) => Promise<void>;
-  updateOrderReceiptStatus: (listId: string, orderId: string, receiptId: string) => Promise<void>;
-  loadSharedOrderLists: (channelId: string) => Promise<void>;
+  shareOrderList: (channelId: string, orderIds: string[], currentUserId: string) => Promise<void>
+  updateOrderReceiptStatus: (listId: string, orderId: string, receiptId: string) => Promise<void>
+  loadSharedOrderLists: (channelId: string) => Promise<void>
 
   // Internal state
-  clearWidgets: () => void;
+  clearWidgets: () => void
 }
 
 export const useWidgetsStore = create<WidgetsState>((set, get) => ({
@@ -31,62 +44,57 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
   loading: false,
 
   shareAdvanceList: async (channelId, items, currentUserId) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
+    const isOnline = typeof navigator !== 'undefined' && navigator.onLine
 
-    const listId = uuidv4();
+    const listId = uuidv4()
     const advanceItems = items.map(item => ({
       ...item,
       id: uuidv4(),
-      status: 'pending' as const
-    }));
+      status: 'pending' as const,
+    }))
 
     const newList: AdvanceList = {
       id: listId,
       channel_id: channelId,
       items: advanceItems,
       created_by: currentUserId,
-      created_at: new Date().toISOString()
-    };
+      created_at: new Date().toISOString(),
+    }
 
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: listError } = await (supabase as unknown)
-          .from('advance_lists')
-          .insert({
-            id: listId,
-            channel_id: channelId,
-            created_by: currentUserId,
-            created_at: newList.created_at
-          });
+        const { error: listError } = await (supabase as unknown).from('advance_lists').insert({
+          id: listId,
+          channel_id: channelId,
+          created_by: currentUserId,
+          created_at: newList.created_at,
+        })
 
-        if (listError) throw listError;
+        if (listError) throw listError
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: itemsError } = await (supabase as unknown)
-          .from('advance_items')
-          .insert(
-            advanceItems.map(item => ({
-              id: item.id,
-              advance_list_id: listId,
-              name: item.name,
-              description: item.description,
-              amount: item.amount,
-              advance_person: item.advance_person,
-              status: item.status,
-              created_at: newList.created_at
-            }))
-          );
+        const { error: itemsError } = await (supabase as unknown).from('advance_items').insert(
+          advanceItems.map(item => ({
+            id: item.id,
+            advance_list_id: listId,
+            name: item.name,
+            description: item.description,
+            amount: item.amount,
+            advance_person: item.advance_person,
+            status: item.status,
+            created_at: newList.created_at,
+          }))
+        )
 
-        if (itemsError) throw itemsError;
+        if (itemsError) throw itemsError
       } else {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
 
     set(state => ({
-      advanceLists: [...state.advanceLists, newList]
-    }));
+      advanceLists: [...state.advanceLists, newList],
+    }))
   },
 
   processAdvanceItem: async (listId, itemId, paymentRequestId, processedBy) => {
@@ -102,14 +110,14 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
                       status: 'completed' as const,
                       payment_request_id: paymentRequestId,
                       processed_by: processedBy,
-                      processed_at: new Date().toISOString()
+                      processed_at: new Date().toISOString(),
                     }
                   : item
-              )
+              ),
             }
           : list
-      )
-    }));
+      ),
+    }))
   },
 
   updateAdvanceStatus: async (listId, itemId, status) => {
@@ -118,19 +126,17 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
         list.id === listId
           ? {
               ...list,
-              items: list.items.map(item =>
-                item.id === itemId ? { ...item, status } : item
-              )
+              items: list.items.map(item => (item.id === itemId ? { ...item, status } : item)),
             }
           : list
-      )
-    }));
+      ),
+    }))
   },
 
-  loadAdvanceLists: async (channelId) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
+  loadAdvanceLists: async channelId => {
+    const isOnline = typeof navigator !== 'undefined' && navigator.onLine
 
-    set({ loading: true });
+    set({ loading: true })
 
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
@@ -139,42 +145,42 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
           .from('advance_lists')
           .select('*')
           .eq('channel_id', channelId)
-          .order('created_at', { ascending: true });
+          .order('created_at', { ascending: true })
 
-        if (listsError) throw listsError;
+        if (listsError) throw listsError
 
-        const advanceLists: AdvanceList[] = [];
+        const advanceLists: AdvanceList[] = []
         for (const list of lists || []) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { data: items, error: itemsError } = await (supabase as unknown)
             .from('advance_items')
             .select('*')
             .eq('advance_list_id', list.id)
-            .order('created_at', { ascending: true });
+            .order('created_at', { ascending: true })
 
-          if (itemsError) throw itemsError;
+          if (itemsError) throw itemsError
 
           advanceLists.push({
             ...list,
-            items: items || []
-          });
+            items: items || [],
+          })
         }
 
-        set({ advanceLists, loading: false });
+        set({ advanceLists, loading: false })
       } else {
-        const allLists = get().advanceLists;
-        const filtered = allLists.filter(list => list.channel_id === channelId);
-        set({ advanceLists: filtered, loading: false });
+        const allLists = get().advanceLists
+        const filtered = allLists.filter(list => list.channel_id === channelId)
+        set({ advanceLists: filtered, loading: false })
       }
     } catch (error) {
-      const allLists = get().advanceLists;
-      const filtered = allLists.filter(list => list.channel_id === channelId);
-      set({ advanceLists: filtered, loading: false });
+      const allLists = get().advanceLists
+      const filtered = allLists.filter(list => list.channel_id === channelId)
+      set({ advanceLists: filtered, loading: false })
     }
   },
 
-  deleteAdvanceList: async (listId) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
+  deleteAdvanceList: async listId => {
+    const isOnline = typeof navigator !== 'undefined' && navigator.onLine
 
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
@@ -182,32 +188,31 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
         const { error } = await (supabase as unknown)
           .from('advance_lists')
           .delete()
-          .eq('id', listId);
+          .eq('id', listId)
 
-        if (error) throw error;
+        if (error) throw error
       } else {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
 
     set(state => ({
-      advanceLists: state.advanceLists.filter(list => list.id !== listId)
-    }));
+      advanceLists: state.advanceLists.filter(list => list.id !== listId),
+    }))
   },
 
   shareOrderList: async (channelId, orderIds, currentUserId) => {
-    const { useOrderStore } = await import('../index');
-    const allOrders = useOrderStore.getState().items;
+    const { useOrderStore } = await import('../index')
+    const allOrders = useOrderStore.getState().items
 
     const orders = orderIds
       .map(orderId => {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return null;
+        const order = allOrders.find(o => o.id === orderId)
+        if (!order) return null
 
-        const totalCost = order.total_amount || 0;
-        const collected = order.paid_amount || 0;
-        const gap = totalCost - collected;
-        const collectionRate = totalCost > 0 ? (collected / totalCost) * 100 : 0;
+        const totalCost = order.total_amount || 0
+        const collected = order.paid_amount || 0
+        const gap = totalCost - collected
+        const collectionRate = totalCost > 0 ? (collected / totalCost) * 100 : 0
 
         return {
           id: order.id,
@@ -218,22 +223,22 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
           gap,
           collection_rate: collectionRate,
           invoice_status: 'not_invoiced' as const,
-          receipt_status: 'not_received' as const
-        };
+          receipt_status: 'not_received' as const,
+        }
       })
-      .filter((order): order is NonNullable<typeof order> => order !== null);
+      .filter((order): order is NonNullable<typeof order> => order !== null)
 
     const newList: SharedOrderList = {
       id: uuidv4(),
       channel_id: channelId,
       orders,
       created_by: currentUserId,
-      created_at: new Date().toISOString()
-    };
+      created_at: new Date().toISOString(),
+    }
 
     set(state => ({
-      sharedOrderLists: [...state.sharedOrderLists, newList]
-    }));
+      sharedOrderLists: [...state.sharedOrderLists, newList],
+    }))
   },
 
   updateOrderReceiptStatus: async (listId, orderId, _receiptId) => {
@@ -243,29 +248,27 @@ export const useWidgetsStore = create<WidgetsState>((set, get) => ({
           ? {
               ...list,
               orders: list.orders.map(order =>
-                order.id === orderId
-                  ? { ...order, receipt_status: 'received' as const }
-                  : order
-              )
+                order.id === orderId ? { ...order, receipt_status: 'received' as const } : order
+              ),
             }
           : list
-      )
-    }));
+      ),
+    }))
   },
 
-  loadSharedOrderLists: async (channelId) => {
-    set({ loading: true });
+  loadSharedOrderLists: async channelId => {
+    set({ loading: true })
 
-    const allLists = get().sharedOrderLists;
-    const filtered = allLists.filter(list => list.channel_id === channelId);
+    const allLists = get().sharedOrderLists
+    const filtered = allLists.filter(list => list.channel_id === channelId)
 
-    set({ sharedOrderLists: filtered, loading: false });
+    set({ sharedOrderLists: filtered, loading: false })
   },
 
   clearWidgets: () => {
     set({
       advanceLists: [],
-      sharedOrderLists: []
-    });
+      sharedOrderLists: [],
+    })
   },
-}));
+}))

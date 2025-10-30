@@ -3,10 +3,10 @@
  * 封裝所有 Supabase 操作
  */
 
-import type { BaseEntity } from '@/types';
-import type { TableName } from '@/lib/db/schemas';
-import type { RemoteAdapter } from '../core/types';
-import { logger } from '@/lib/utils/logger';
+import type { BaseEntity } from '@/types'
+import type { TableName } from '@/lib/db/schemas'
+import type { RemoteAdapter } from '../core/types'
+import { logger } from '@/lib/utils/logger'
 
 export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
   constructor(
@@ -19,31 +19,31 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    */
   async fetchAll(signal?: AbortSignal): Promise<T[]> {
     if (!this.enabled || typeof window === 'undefined') {
-      return [];
+      return []
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client');
+      const { supabase } = await import('@/lib/supabase/client')
       const query = supabase
         .from(this.tableName)
         .select('*')
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true })
 
       if (signal) {
-        query.abortSignal(signal);
+        query.abortSignal(signal)
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query
 
-      if (error) throw error;
+      if (error) throw error
 
-      const items = (data || []) as T[];
-      logger.log(`☁️ [${this.tableName}] Supabase fetchAll:`, items.length, '筆');
+      const items = (data || []) as T[]
+      logger.log(`☁️ [${this.tableName}] Supabase fetchAll:`, items.length, '筆')
 
-      return items;
+      return items
     } catch (error) {
-      logger.warn(`⚠️ [${this.tableName}] Supabase fetchAll 失敗:`, error);
-      throw error;
+      logger.warn(`⚠️ [${this.tableName}] Supabase fetchAll 失敗:`, error)
+      throw error
     }
   }
 
@@ -52,24 +52,24 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    */
   async insert(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<T> {
     if (!this.enabled || typeof window === 'undefined') {
-      throw new Error('Supabase not enabled');
+      throw new Error('Supabase not enabled')
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client');
+      const { supabase } = await import('@/lib/supabase/client')
       const { data: result, error } = await supabase
         .from(this.tableName)
         .insert(data)
         .select()
-        .single();
+        .single()
 
-      if (error) throw error;
+      if (error) throw error
 
-      logger.log(`☁️ [${this.tableName}] Supabase insert:`, result.id);
-      return result as T;
+      logger.log(`☁️ [${this.tableName}] Supabase insert:`, result.id)
+      return result as T
     } catch (error) {
-      logger.error(`❌ [${this.tableName}] Supabase insert 失敗:`, error);
-      throw error;
+      logger.error(`❌ [${this.tableName}] Supabase insert 失敗:`, error)
+      throw error
     }
   }
 
@@ -78,23 +78,19 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    */
   async getById(id: string): Promise<T | null> {
     if (!this.enabled || typeof window === 'undefined') {
-      throw new Error('Supabase not enabled');
+      throw new Error('Supabase not enabled')
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client');
-      const { data, error } = await supabase
-        .from(this.tableName)
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { supabase } = await import('@/lib/supabase/client')
+      const { data, error } = await supabase.from(this.tableName).select('*').eq('id', id).single()
 
-      if (error) throw error;
+      if (error) throw error
 
-      return data as T;
+      return data as T
     } catch (error) {
-      logger.warn(`⚠️ [${this.tableName}] Supabase getById 失敗:`, error);
-      throw error;
+      logger.warn(`⚠️ [${this.tableName}] Supabase getById 失敗:`, error)
+      throw error
     }
   }
 
@@ -102,7 +98,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    * 取得所有資料（別名）
    */
   async getAll(): Promise<T[]> {
-    return this.fetchAll();
+    return this.fetchAll()
   }
 
   /**
@@ -111,21 +107,19 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
   async put(item: T): Promise<void> {
     // Supabase 使用 upsert
     if (!this.enabled || typeof window === 'undefined') {
-      return;
+      return
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client');
-      const { error } = await supabase
-        .from(this.tableName)
-        .upsert(item);
+      const { supabase } = await import('@/lib/supabase/client')
+      const { error } = await supabase.from(this.tableName).upsert(item)
 
-      if (error) throw error;
+      if (error) throw error
 
-      logger.log(`☁️ [${this.tableName}] Supabase upsert:`, item.id);
+      logger.log(`☁️ [${this.tableName}] Supabase upsert:`, item.id)
     } catch (error) {
-      logger.error(`❌ [${this.tableName}] Supabase upsert 失敗:`, error);
-      throw error;
+      logger.error(`❌ [${this.tableName}] Supabase upsert 失敗:`, error)
+      throw error
     }
   }
 
@@ -134,22 +128,19 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    */
   async update(id: string, data: Partial<T>): Promise<void> {
     if (!this.enabled || typeof window === 'undefined') {
-      return;
+      return
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client');
-      const { error } = await supabase
-        .from(this.tableName)
-        .update(data)
-        .eq('id', id);
+      const { supabase } = await import('@/lib/supabase/client')
+      const { error } = await supabase.from(this.tableName).update(data).eq('id', id)
 
-      if (error) throw error;
+      if (error) throw error
 
-      logger.log(`☁️ [${this.tableName}] Supabase update:`, id);
+      logger.log(`☁️ [${this.tableName}] Supabase update:`, id)
     } catch (error) {
-      logger.error(`❌ [${this.tableName}] Supabase update 失敗:`, error);
-      throw error;
+      logger.error(`❌ [${this.tableName}] Supabase update 失敗:`, error)
+      throw error
     }
   }
 
@@ -158,22 +149,19 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    */
   async delete(id: string): Promise<void> {
     if (!this.enabled || typeof window === 'undefined') {
-      return;
+      return
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client');
-      const { error } = await supabase
-        .from(this.tableName)
-        .delete()
-        .eq('id', id);
+      const { supabase } = await import('@/lib/supabase/client')
+      const { error } = await supabase.from(this.tableName).delete().eq('id', id)
 
-      if (error) throw error;
+      if (error) throw error
 
-      logger.log(`☁️ [${this.tableName}] Supabase delete:`, id);
+      logger.log(`☁️ [${this.tableName}] Supabase delete:`, id)
     } catch (error) {
-      logger.error(`❌ [${this.tableName}] Supabase delete 失敗:`, error);
-      throw error;
+      logger.error(`❌ [${this.tableName}] Supabase delete 失敗:`, error)
+      throw error
     }
   }
 
@@ -181,7 +169,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
    * 清空所有資料
    */
   async clear(): Promise<void> {
-    logger.warn(`⚠️ [${this.tableName}] Supabase clear 未實作（安全考量）`);
+    logger.warn(`⚠️ [${this.tableName}] Supabase clear 未實作（安全考量）`)
     // 不實作，避免誤刪雲端資料
   }
 }

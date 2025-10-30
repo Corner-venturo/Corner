@@ -1,25 +1,25 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Combobox, ComboboxOption } from '@/components/ui/combobox';
-import type { VisaApplicant, VisaContactInfo } from '@/hooks';
+import React from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Combobox, ComboboxOption } from '@/components/ui/combobox'
+import type { VisaApplicant, VisaContactInfo } from '@/hooks'
 
 interface AddVisaDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  contactInfo: VisaContactInfo;
-  setContactInfo: React.Dispatch<React.SetStateAction<VisaContactInfo>>;
-  applicants: VisaApplicant[];
-  updateApplicant: (id: string, field: keyof VisaApplicant, value: unknown) => void;
-  addApplicant: () => void;
-  removeApplicant: (id: string) => void;
-  tourOptions: ComboboxOption[];
-  orderOptions: ComboboxOption[];
-  calculateFee: (country: string) => number;
-  handleAddVisa: () => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  contactInfo: VisaContactInfo
+  setContactInfo: React.Dispatch<React.SetStateAction<VisaContactInfo>>
+  applicants: VisaApplicant[]
+  updateApplicant: (id: string, field: keyof VisaApplicant, value: unknown) => void
+  addApplicant: () => void
+  removeApplicant: (id: string) => void
+  tourOptions: ComboboxOption[]
+  orderOptions: ComboboxOption[]
+  calculateFee: (country: string) => number
+  handleAddVisa: () => void
 }
 
 /**
@@ -55,8 +55,8 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
                 <Combobox
                   value={contactInfo.tour_id}
-                  onChange={(value) => {
-                    setContactInfo(prev => ({ ...prev, tour_id: value, order_id: '' }));
+                  onChange={value => {
+                    setContactInfo(prev => ({ ...prev, tour_id: value, order_id: '' }))
                   }}
                   options={tourOptions}
                   placeholder="請輸入或選擇團號（例如：0810）"
@@ -67,13 +67,14 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
               </div>
               <div>
                 <label className="text-sm font-medium text-morandi-primary">
-                  選擇訂單 <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
+                  選擇訂單{' '}
+                  <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
                 </label>
                 <Combobox
                   value={contactInfo.order_id}
-                  onChange={(value) => setContactInfo(prev => ({ ...prev, order_id: value }))}
+                  onChange={value => setContactInfo(prev => ({ ...prev, order_id: value }))}
                   options={orderOptions}
-                  placeholder={contactInfo.tour_id ? "請選擇訂單或留空自動建立" : "請先選擇團號"}
+                  placeholder={contactInfo.tour_id ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
                   className="mt-1"
                   disabled={!contactInfo.tour_id}
                   showSearchIcon
@@ -87,7 +88,9 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
                 <Input
                   value={contactInfo.contact_person}
-                  onChange={(e) => setContactInfo(prev => ({ ...prev, contact_person: e.target.value }))}
+                  onChange={e =>
+                    setContactInfo(prev => ({ ...prev, contact_person: e.target.value }))
+                  }
                   className="mt-1"
                   placeholder="請輸入聯絡人"
                 />
@@ -96,7 +99,9 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <label className="text-sm font-medium text-morandi-primary">申請人</label>
                 <Input
                   value={contactInfo.applicant_name}
-                  onChange={(e) => setContactInfo(prev => ({ ...prev, applicant_name: e.target.value }))}
+                  onChange={e =>
+                    setContactInfo(prev => ({ ...prev, applicant_name: e.target.value }))
+                  }
                   className="mt-1"
                   placeholder="請輸入申請人姓名"
                 />
@@ -105,7 +110,9 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
                 <Input
                   value={contactInfo.contact_phone}
-                  onChange={(e) => setContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
+                  onChange={e =>
+                    setContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))
+                  }
                   className="mt-1"
                   placeholder="請輸入聯絡電話"
                 />
@@ -122,14 +129,14 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
               <div key={applicant.id} className="flex gap-2 items-center">
                 <Input
                   value={applicant.name}
-                  onChange={(e) => updateApplicant(applicant.id, 'name', e.target.value)}
-                  placeholder={index === 0 ? "辦理人（自動帶入）" : "辦理人"}
+                  onChange={e => updateApplicant(applicant.id, 'name', e.target.value)}
+                  placeholder={index === 0 ? '辦理人（自動帶入）' : '辦理人'}
                   className="flex-[1.5]"
                 />
 
                 <select
                   value={applicant.country}
-                  onChange={(e) => updateApplicant(applicant.id, 'country', e.target.value)}
+                  onChange={e => updateApplicant(applicant.id, 'country', e.target.value)}
                   className="flex-[2] p-2 border border-border rounded-md bg-background h-10"
                 >
                   <option value="護照 成人">護照 成人</option>
@@ -144,7 +151,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <Input
                   type="date"
                   value={applicant.submission_date}
-                  onChange={(e) => updateApplicant(applicant.id, 'submission_date', e.target.value)}
+                  onChange={e => updateApplicant(applicant.id, 'submission_date', e.target.value)}
                   className="flex-1"
                 />
 
@@ -165,7 +172,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <Input
                   type="number"
                   value={applicant.cost}
-                  onChange={(e) => updateApplicant(applicant.id, 'cost', Number(e.target.value))}
+                  onChange={e => updateApplicant(applicant.id, 'cost', Number(e.target.value))}
                   placeholder="成本"
                   className="w-20"
                 />
@@ -174,7 +181,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                   <input
                     type="checkbox"
                     checked={applicant.is_urgent}
-                    onChange={(e) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
+                    onChange={e => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
                     className="w-4 h-4"
                   />
                   <span className="text-sm whitespace-nowrap">急件</span>
@@ -182,12 +189,18 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
 
                 <Button
                   type="button"
-                  onClick={index === applicants.length - 1 ? addApplicant : () => removeApplicant(applicant.id)}
+                  onClick={
+                    index === applicants.length - 1
+                      ? addApplicant
+                      : () => removeApplicant(applicant.id)
+                  }
                   size="sm"
-                  className={index === applicants.length - 1
-                    ? "h-8 w-8 p-0 flex-shrink-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                    : "h-8 w-8 p-0 flex-shrink-0 text-morandi-red hover:bg-red-50"}
-                  variant={index === applicants.length - 1 ? "default" : "ghost"}
+                  className={
+                    index === applicants.length - 1
+                      ? 'h-8 w-8 p-0 flex-shrink-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                      : 'h-8 w-8 p-0 flex-shrink-0 text-morandi-red hover:bg-red-50'
+                  }
+                  variant={index === applicants.length - 1 ? 'default' : 'ghost'}
                 >
                   {index === applicants.length - 1 ? '+' : '✕'}
                 </Button>
@@ -197,10 +210,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
         </div>
 
         <div className="flex justify-end space-x-2 pt-4 border-t border-border mt-4">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             取消
           </Button>
           <Button
@@ -213,5 +223,5 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}

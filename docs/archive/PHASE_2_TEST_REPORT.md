@@ -11,12 +11,12 @@
 
 ### 測試結果總覽
 
-| 測試類型 | 測試數量 | 通過 | 失敗 | 成功率 |
-|---------|---------|------|------|--------|
-| 後端 API 測試 | 2 | 2 | 0 | 100% |
-| 資料寫入測試 | 8 | 8 | 0 | 100% |
-| Store 整合測試 | 15 | 15 | 0 | 100% |
-| **總計** | **25** | **25** | **0** | **100%** |
+| 測試類型       | 測試數量 | 通過   | 失敗  | 成功率   |
+| -------------- | -------- | ------ | ----- | -------- |
+| 後端 API 測試  | 2        | 2      | 0     | 100%     |
+| 資料寫入測試   | 8        | 8      | 0     | 100%     |
+| Store 整合測試 | 15       | 15     | 0     | 100%     |
+| **總計**       | **25**   | **25** | **0** | **100%** |
 
 ### 關鍵成就 ✨
 
@@ -69,6 +69,7 @@ GET /api/health
 ```
 
 **驗證項目**:
+
 - ✅ HTTP 200 狀態碼
 - ✅ 資料庫連線正常
 - ✅ 回應時間 < 3 秒
@@ -111,6 +112,7 @@ GET /api/health/detailed
 ```
 
 **驗證項目**:
+
 - ✅ 9 個核心表全部查詢成功
 - ✅ 無錯誤訊息
 - ✅ Phase 進度正確顯示
@@ -139,6 +141,7 @@ GET /api/health/detailed
 #### 測試 2.1: Tours CRUD
 
 **建立測試**:
+
 ```javascript
 {
   code: "T104458",
@@ -155,10 +158,12 @@ GET /api/health/detailed
 **結果**: ✅ 建立成功
 
 **讀取測試**:
+
 - ✅ 可正常讀取剛建立的資料
 - ✅ 所有欄位值正確
 
 **更新測試**:
+
 ```javascript
 {
   status: "進行中",
@@ -169,12 +174,14 @@ GET /api/health/detailed
 **結果**: ✅ 更新成功
 
 **刪除測試**:
+
 - ✅ 刪除成功
 - ✅ 資料確認不存在
 
 #### 測試 2.2: Orders CRUD
 
 **建立測試**:
+
 ```javascript
 {
   code: "O105901",
@@ -191,6 +198,7 @@ GET /api/health/detailed
 **結果**: ✅ 建立成功
 
 **必填欄位驗證**:
+
 - ✅ `code` - 必填
 - ✅ `contact_phone` - 必填
 - ✅ `contact_person` - 必填
@@ -201,11 +209,13 @@ GET /api/health/detailed
 - ✅ `total_amount`, `paid_amount`, `remaining_amount` - 必填
 
 **刪除測試**:
+
 - ✅ 刪除成功
 
 #### 測試 2.3: Quotes CRUD
 
 **建立測試**:
+
 ```javascript
 {
   code: "Q106268",
@@ -225,6 +235,7 @@ GET /api/health/detailed
 **結果**: ✅ 建立成功
 
 **必填欄位驗證**:
+
 - ✅ `code` - 必填
 - ✅ `customer_name` - 必填
 - ✅ `destination` - 必填
@@ -235,6 +246,7 @@ GET /api/health/detailed
 - ✅ `status`, `version` - 必填
 
 **刪除測試**:
+
 - ✅ 刪除成功
 
 ---
@@ -249,13 +261,11 @@ GET /api/health/detailed
 
 ```javascript
 // 模擬 Store.fetchAll()
-const { data } = await supabase
-  .from('tours')
-  .select('*')
-  .order('created_at', { ascending: true });
+const { data } = await supabase.from('tours').select('*').order('created_at', { ascending: true })
 ```
 
 **結果**: ✅ 通過（3/3 表）
+
 - ✅ Tours 讀取成功
 - ✅ Orders 讀取成功
 - ✅ Quotes 讀取成功
@@ -264,14 +274,11 @@ const { data } = await supabase
 
 ```javascript
 // 模擬 Store.create()
-const { data: tour } = await supabase
-  .from('tours')
-  .insert([tourData])
-  .select()
-  .single();
+const { data: tour } = await supabase.from('tours').insert([tourData]).select().single()
 ```
 
 **結果**: ✅ 通過（3/3 表）
+
 - ✅ Tour 建立成功 (ID: test-tour-1760543399207)
 - ✅ Order 建立成功 (ID: test-order-1760543399207)
 - ✅ Quote 建立成功 (ID: test-quote-1760543399207)
@@ -285,10 +292,11 @@ const { data: updated } = await supabase
   .update({ status: '進行中', current_participants: 15 })
   .eq('id', tourId)
   .select()
-  .single();
+  .single()
 ```
 
 **結果**: ✅ 通過
+
 - ✅ 更新成功
 - ✅ 驗證更新：status = '進行中', current_participants = 15
 
@@ -296,13 +304,11 @@ const { data: updated } = await supabase
 
 ```javascript
 // 模擬 Store.delete()
-const { error } = await supabase
-  .from('tours')
-  .delete()
-  .eq('id', tourId);
+const { error } = await supabase.from('tours').delete().eq('id', tourId)
 ```
 
 **結果**: ✅ 通過（3/3 表）
+
 - ✅ Order 刪除成功
 - ✅ Quote 刪除成功
 - ✅ Tour 刪除成功
@@ -314,29 +320,29 @@ const { error } = await supabase
 
 ### 資料庫連線
 
-| 指標 | 數值 | 狀態 |
-|------|------|------|
+| 指標         | 數值   | 狀態    |
+| ------------ | ------ | ------- |
 | 平均回應時間 | 2.4 秒 | ✅ 正常 |
-| 首次查詢 | 2.7 秒 | ✅ 正常 |
-| 後續查詢 | 2.1 秒 | ✅ 正常 |
-| 連線穩定性 | 100% | ✅ 穩定 |
+| 首次查詢     | 2.7 秒 | ✅ 正常 |
+| 後續查詢     | 2.1 秒 | ✅ 正常 |
+| 連線穩定性   | 100%   | ✅ 穩定 |
 
 ### 資料寫入效能
 
-| 操作 | 平均時間 | 狀態 |
-|------|---------|------|
-| Tour 建立 | ~300ms | ✅ 快速 |
-| Order 建立 | ~250ms | ✅ 快速 |
-| Quote 建立 | ~250ms | ✅ 快速 |
-| Tour 更新 | ~200ms | ✅ 快速 |
-| 資料刪除 | ~150ms | ✅ 快速 |
+| 操作       | 平均時間 | 狀態    |
+| ---------- | -------- | ------- |
+| Tour 建立  | ~300ms   | ✅ 快速 |
+| Order 建立 | ~250ms   | ✅ 快速 |
+| Quote 建立 | ~250ms   | ✅ 快速 |
+| Tour 更新  | ~200ms   | ✅ 快速 |
+| 資料刪除   | ~150ms   | ✅ 快速 |
 
 ### API 端點效能
 
-| 端點 | 回應時間 | 狀態 |
-|------|---------|------|
-| /api/health | ~2.1 秒 | ✅ 正常 |
-| /api/health/detailed | ~2.7 秒 | ✅ 正常 |
+| 端點                 | 回應時間 | 狀態    |
+| -------------------- | -------- | ------- |
+| /api/health          | ~2.1 秒  | ✅ 正常 |
+| /api/health/detailed | ~2.7 秒  | ✅ 正常 |
 
 ---
 
@@ -345,18 +351,21 @@ const { error } = await supabase
 ### 已解決
 
 #### 問題 1: 欄位名稱不一致
+
 **症狀**: 測試腳本使用 `tour_number`, `tour_name` 等舊欄位
 **影響**: 資料寫入失敗
 **解決**: 更新為 `code`, `name`, `location` 等新欄位
 **狀態**: ✅ 已解決
 
 #### 問題 2: Orders 表必填欄位未知
+
 **症狀**: 不清楚 orders 表的必填欄位
 **影響**: 無法建立 Order 測試
 **解決**: 逐步測試找出所有必填欄位
 **狀態**: ✅ 已解決
 
 #### 問題 3: Quotes 表缺少 customer_name
+
 **症狀**: Quote 建立失敗，NOT NULL 約束
 **影響**: Quote 測試無法通過
 **解決**: 加入 customer_name 必填欄位
@@ -365,15 +374,18 @@ const { error } = await supabase
 ### 待處理
 
 #### 觀察 1: 資料庫回應時間較長
+
 **現象**: 首次查詢需要 2-3 秒
 **影響**: 使用者體驗可能受影響
 **建議**:
+
 - 實作前端 loading 狀態
 - 優化查詢語句
 - 考慮使用 Connection Pooling
-**優先級**: 中
+  **優先級**: 中
 
 #### 觀察 2: IndexedDB 快取未驗證
+
 **現象**: 尚未測試離線寫入 → 上線同步
 **影響**: 離線功能未確認
 **建議**: 建立離線測試場景
@@ -385,26 +397,26 @@ const { error } = await supabase
 
 ### 功能覆蓋
 
-| 功能 | 覆蓋率 | 測試數 |
-|------|--------|--------|
-| 資料讀取 (R) | 100% | 6 |
-| 資料建立 (C) | 100% | 6 |
-| 資料更新 (U) | 100% | 2 |
-| 資料刪除 (D) | 100% | 6 |
-| API 端點 | 100% | 2 |
-| **總計** | **100%** | **22** |
+| 功能         | 覆蓋率   | 測試數 |
+| ------------ | -------- | ------ |
+| 資料讀取 (R) | 100%     | 6      |
+| 資料建立 (C) | 100%     | 6      |
+| 資料更新 (U) | 100%     | 2      |
+| 資料刪除 (D) | 100%     | 6      |
+| API 端點     | 100%     | 2      |
+| **總計**     | **100%** | **22** |
 
 ### 資料表覆蓋
 
-| 資料表 | 測試狀態 | 測試項目 |
-|--------|---------|---------|
-| tours | ✅ 完整 | C, R, U, D |
-| orders | ✅ 完整 | C, R, D |
-| quotes | ✅ 完整 | C, R, D |
-| members | ⏳ 待測試 | - |
-| customers | ⏳ 待測試 | - |
-| employees | ✅ 基本 | R |
-| todos | ✅ 基本 | R |
+| 資料表    | 測試狀態  | 測試項目   |
+| --------- | --------- | ---------- |
+| tours     | ✅ 完整   | C, R, U, D |
+| orders    | ✅ 完整   | C, R, D    |
+| quotes    | ✅ 完整   | C, R, D    |
+| members   | ⏳ 待測試 | -          |
+| customers | ⏳ 待測試 | -          |
+| employees | ✅ 基本   | R          |
+| todos     | ✅ 基本   | R          |
 
 ---
 
@@ -415,6 +427,7 @@ const { error } = await supabase
 **Phase 2 資料寫入功能：✅ 完全可用**
 
 所有測試項目 100% 通過，包括：
+
 - ✅ 後端 API 健康檢查
 - ✅ Supabase 資料庫 CRUD 操作
 - ✅ 前端 Store 整合測試
@@ -425,6 +438,7 @@ const { error } = await supabase
 **建議進入**: IndexedDB 同步驗證
 
 **理由**:
+
 1. Supabase 雲端讀寫功能完全正常
 2. 資料結構驗證完成
 3. 效能指標符合預期
@@ -435,16 +449,19 @@ const { error } = await supabase
 #### Week 3 (2025-10-16 - 2025-10-22)
 
 **優先級 1: IndexedDB 同步測試**
+
 - [ ] 測試資料寫入後 IndexedDB 快取更新
 - [ ] 測試離線寫入 → 上線同步流程
 - [ ] 驗證快取失效機制
 
 **優先級 2: Members 表測試**
+
 - [ ] 檢查 members 表 schema
 - [ ] 建立 Member CRUD 測試
 - [ ] 驗證 Member ↔ Order 關聯
 
 **優先級 3: 壓力測試**
+
 - [ ] 大量資料讀取測試 (100+ 筆)
 - [ ] 並發寫入測試
 - [ ] 網路中斷模擬測試

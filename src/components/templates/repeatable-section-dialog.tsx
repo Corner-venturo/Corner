@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-import { RepeatableSection } from '@/types/template';
+import { RepeatableSection } from '@/types/template'
 
 interface RepeatableSectionDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (section: RepeatableSection) => void;
-  editingSection?: RepeatableSection | null;
-  maxRows: number;
+  isOpen: boolean
+  onClose: () => void
+  onSave: (section: RepeatableSection) => void
+  editingSection?: RepeatableSection | null
+  maxRows: number
 }
 
 export function RepeatableSectionDialog({
@@ -21,52 +21,56 @@ export function RepeatableSectionDialog({
   onClose,
   onSave,
   editingSection,
-  maxRows
+  maxRows,
 }: RepeatableSectionDialogProps) {
-  const [name, setName] = useState('');
-  const [startRow, setStartRow] = useState('');
-  const [endRow, setEndRow] = useState('');
-  const [maxInstances, setMaxInstances] = useState('');
-  const [minInstances, setMinInstances] = useState('1');
+  const [name, setName] = useState('')
+  const [startRow, setStartRow] = useState('')
+  const [endRow, setEndRow] = useState('')
+  const [maxInstances, setMaxInstances] = useState('')
+  const [minInstances, setMinInstances] = useState('1')
 
   useEffect(() => {
     if (editingSection) {
-      setName(editingSection.name);
-      setStartRow(String(editingSection.range.start_row + 1)); // 顯示時轉為 1-based
-      setEndRow(String(editingSection.range.end_row + 1));
-      setMaxInstances(editingSection.repeat_config?.max ? String(editingSection.repeat_config.max) : '');
-      setMinInstances(editingSection.repeat_config?.min ? String(editingSection.repeat_config.min) : '1');
+      setName(editingSection.name)
+      setStartRow(String(editingSection.range.start_row + 1)) // 顯示時轉為 1-based
+      setEndRow(String(editingSection.range.end_row + 1))
+      setMaxInstances(
+        editingSection.repeat_config?.max ? String(editingSection.repeat_config.max) : ''
+      )
+      setMinInstances(
+        editingSection.repeat_config?.min ? String(editingSection.repeat_config.min) : '1'
+      )
     } else {
-      setName('');
-      setStartRow('');
-      setEndRow('');
-      setMaxInstances('');
-      setMinInstances('1');
+      setName('')
+      setStartRow('')
+      setEndRow('')
+      setMaxInstances('')
+      setMinInstances('1')
     }
-  }, [editingSection, isOpen]);
+  }, [editingSection, isOpen])
 
   const handleSave = () => {
-    const startRowNum = parseInt(startRow) - 1; // 轉回 0-based
-    const endRowNum = parseInt(endRow) - 1;
+    const startRowNum = parseInt(startRow) - 1 // 轉回 0-based
+    const endRowNum = parseInt(endRow) - 1
 
     if (!name.trim()) {
-      alert('請輸入區塊名稱');
-      return;
+      alert('請輸入區塊名稱')
+      return
     }
 
     if (isNaN(startRowNum) || isNaN(endRowNum)) {
-      alert('請輸入有效的列號');
-      return;
+      alert('請輸入有效的列號')
+      return
     }
 
     if (startRowNum < 0 || endRowNum >= maxRows) {
-      alert(`列號必須在 1 到 ${maxRows} 之間`);
-      return;
+      alert(`列號必須在 1 到 ${maxRows} 之間`)
+      return
     }
 
     if (startRowNum >= endRowNum) {
-      alert('結束列必須大於起始列');
-      return;
+      alert('結束列必須大於起始列')
+      return
     }
 
     const section: RepeatableSection = {
@@ -89,13 +93,13 @@ export function RepeatableSectionDialog({
         enabled: false,
         after_count: 1,
       },
-    };
+    }
 
-    onSave(section);
-    onClose();
-  };
+    onSave(section)
+    onClose()
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -112,7 +116,7 @@ export function RepeatableSectionDialog({
             <Input
               id="section-name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="例如：住宿資訊"
               className="mt-1"
             />
@@ -129,7 +133,7 @@ export function RepeatableSectionDialog({
                 min="1"
                 max={maxRows}
                 value={startRow}
-                onChange={(e) => setStartRow(e.target.value)}
+                onChange={e => setStartRow(e.target.value)}
                 placeholder="1"
                 className="mt-1"
               />
@@ -144,7 +148,7 @@ export function RepeatableSectionDialog({
                 min="1"
                 max={maxRows}
                 value={endRow}
-                onChange={(e) => setEndRow(e.target.value)}
+                onChange={e => setEndRow(e.target.value)}
                 placeholder="5"
                 className="mt-1"
               />
@@ -161,7 +165,7 @@ export function RepeatableSectionDialog({
                 type="number"
                 min="1"
                 value={minInstances}
-                onChange={(e) => setMinInstances(e.target.value)}
+                onChange={e => setMinInstances(e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -174,7 +178,7 @@ export function RepeatableSectionDialog({
                 type="number"
                 min="1"
                 value={maxInstances}
-                onChange={(e) => setMaxInstances(e.target.value)}
+                onChange={e => setMaxInstances(e.target.value)}
                 placeholder="不限制"
                 className="mt-1"
               />
@@ -192,14 +196,11 @@ export function RepeatableSectionDialog({
           <Button variant="outline" onClick={onClose}>
             取消
           </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover"
-          >
+          <Button onClick={handleSave} className="bg-morandi-gold hover:bg-morandi-gold-hover">
             {editingSection ? '更新' : '新增'}
           </Button>
         </div>
       </div>
     </div>
-  );
+  )
 }

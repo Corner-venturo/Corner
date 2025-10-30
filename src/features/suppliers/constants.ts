@@ -2,15 +2,7 @@
  * Suppliers feature constants
  */
 
-import {
-  Hotel,
-  UtensilsCrossed,
-  Car,
-  Ticket,
-  UserCheck,
-  Plane,
-  Package
-} from 'lucide-react';
+import { Hotel, UtensilsCrossed, Car, Ticket, UserCheck, Plane, Package } from 'lucide-react'
 
 export const SUPPLIER_TYPE_ICONS = {
   hotel: Hotel,
@@ -19,8 +11,8 @@ export const SUPPLIER_TYPE_ICONS = {
   ticket: Ticket,
   guide: UserCheck,
   travel_agency: Plane,
-  other: Package
-} as const;
+  other: Package,
+} as const
 
 export const SUPPLIER_TYPE_LABELS = {
   hotel: '飯店住宿',
@@ -29,8 +21,8 @@ export const SUPPLIER_TYPE_LABELS = {
   ticket: '門票',
   guide: '導遊',
   travel_agency: '旅行社',
-  other: '其他'
-} as const;
+  other: '其他',
+} as const
 
 export const SUPPLIER_TYPE_COLORS = {
   hotel: 'bg-blue-500',
@@ -39,5 +31,5 @@ export const SUPPLIER_TYPE_COLORS = {
   ticket: 'bg-purple-500',
   guide: 'bg-pink-500',
   travel_agency: 'bg-cyan-500',
-  other: 'bg-gray-500'
-} as const;
+  other: 'bg-gray-500',
+} as const

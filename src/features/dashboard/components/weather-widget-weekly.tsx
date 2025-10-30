@@ -1,29 +1,29 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { Cloud, MapPin, Loader2, AlertCircle, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react'
+import { Cloud, MapPin, Loader2, AlertCircle, Calendar } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface DailyWeather {
-  date: string;
-  maxTemp: number;
-  minTemp: number;
-  weatherCode: number;
+  date: string
+  maxTemp: number
+  minTemp: number
+  weatherCode: number
 }
 
 interface City {
-  name: string;
-  lat: number;
-  lon: number;
+  name: string
+  lat: number
+  lon: number
 }
 
-const STORAGE_KEY = 'weather-widget-weekly-city';
-const STORAGE_DATE_KEY = 'weather-widget-weekly-date';
+const STORAGE_KEY = 'weather-widget-weekly-city'
+const STORAGE_DATE_KEY = 'weather-widget-weekly-date'
 
 // 全球主要城市座標
 const CITIES: City[] = [
   // 台灣
-  { name: '台北', lat: 25.0330, lon: 121.5654 },
+  { name: '台北', lat: 25.033, lon: 121.5654 },
   { name: '台中', lat: 24.1477, lon: 120.6736 },
   { name: '台南', lat: 22.9998, lon: 120.2269 },
   { name: '高雄', lat: 22.6273, lon: 120.3014 },
@@ -41,7 +41,7 @@ const CITIES: City[] = [
   { name: '沖繩', lat: 26.2124, lon: 127.6809 },
 
   // 韓國
-  { name: '首爾', lat: 37.5665, lon: 126.9780 },
+  { name: '首爾', lat: 37.5665, lon: 126.978 },
   { name: '釜山', lat: 35.1796, lon: 129.0756 },
   { name: '濟州', lat: 33.4996, lon: 126.5312 },
 
@@ -53,22 +53,22 @@ const CITIES: City[] = [
 
   // 東南亞
   { name: '新加坡', lat: 1.3521, lon: 103.8198 },
-  { name: '吉隆坡', lat: 3.1390, lon: 101.6869 },
+  { name: '吉隆坡', lat: 3.139, lon: 101.6869 },
   { name: '河內', lat: 21.0285, lon: 105.8542 },
   { name: '胡志明市', lat: 10.8231, lon: 106.6297 },
   { name: '雅加達', lat: -6.2088, lon: 106.8456 },
   { name: '馬尼拉', lat: 14.5995, lon: 120.9842 },
 
   // 其他亞洲
-  { name: '峇里島', lat: -8.3405, lon: 115.0920 },
-  { name: '吳哥窟', lat: 13.4125, lon: 103.8670 },
+  { name: '峇里島', lat: -8.3405, lon: 115.092 },
+  { name: '吳哥窟', lat: 13.4125, lon: 103.867 },
 
   // 歐美（常見旅遊地）
   { name: '倫敦', lat: 51.5074, lon: -0.1278 },
   { name: '巴黎', lat: 48.8566, lon: 2.3522 },
-  { name: '紐約', lat: 40.7128, lon: -74.0060 },
+  { name: '紐約', lat: 40.7128, lon: -74.006 },
   { name: '洛杉磯', lat: 34.0522, lon: -118.2437 },
-];
+]
 
 // Open-Meteo 天氣代碼對應
 const WEATHER_DESCRIPTIONS: Record<number, { label: string; icon: string }> = {
@@ -93,138 +93,138 @@ const WEATHER_DESCRIPTIONS: Record<number, { label: string; icon: string }> = {
   95: { label: '雷', icon: '⛈️' },
   96: { label: '雷', icon: '⛈️' },
   99: { label: '雷', icon: '⛈️' },
-};
+}
 
 export function WeatherWidgetWeekly() {
   const loadSavedCity = (): City => {
-    if (typeof window === 'undefined') return CITIES[0];
-    const saved = localStorage.getItem(STORAGE_KEY);
+    if (typeof window === 'undefined') return CITIES[0]
+    const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      return JSON.parse(saved);
+      return JSON.parse(saved)
     }
-    return CITIES[0];
-  };
+    return CITIES[0]
+  }
 
   const loadSavedDate = (): string => {
-    if (typeof window === 'undefined') return new Date().toISOString().split('T')[0];
-    const saved = localStorage.getItem(STORAGE_DATE_KEY);
-    return saved || new Date().toISOString().split('T')[0];
-  };
+    if (typeof window === 'undefined') return new Date().toISOString().split('T')[0]
+    const saved = localStorage.getItem(STORAGE_DATE_KEY)
+    return saved || new Date().toISOString().split('T')[0]
+  }
 
-  const [weeklyWeather, setWeeklyWeather] = useState<DailyWeather[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState<City>(loadSavedCity);
-  const [startDate, setStartDate] = useState<string>(loadSavedDate);
+  const [weeklyWeather, setWeeklyWeather] = useState<DailyWeather[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedCity, setSelectedCity] = useState<City>(loadSavedCity)
+  const [startDate, setStartDate] = useState<string>(loadSavedDate)
 
   const saveCity = (city: City) => {
-    setSelectedCity(city);
+    setSelectedCity(city)
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(city));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(city))
     }
-  };
+  }
 
   const saveDate = (date: string) => {
-    setStartDate(date);
+    setStartDate(date)
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_DATE_KEY, date);
+      localStorage.setItem(STORAGE_DATE_KEY, date)
     }
-  };
+  }
 
   // 獲取7天天氣
   const fetchWeeklyWeather = async (city: City, startDate: string) => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
-      const { lat, lon } = city;
+      const { lat, lon } = city
 
       // 計算結束日期（開始日期 + 6天）
-      const start = new Date(startDate);
-      const end = new Date(startDate);
-      end.setDate(end.getDate() + 6);
+      const start = new Date(startDate)
+      const end = new Date(startDate)
+      end.setDate(end.getDate() + 6)
 
-      const endDate = end.toISOString().split('T')[0];
+      const endDate = end.toISOString().split('T')[0]
 
       // 使用預報 API（支援未來16天）
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia/Taipei&forecast_days=16`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia/Taipei&forecast_days=16`
 
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await fetch(url)
+      const data = await response.json()
 
       if (!data.daily) {
-        throw new Error('無法取得天氣資料');
+        throw new Error('無法取得天氣資料')
       }
 
       // 找到開始日期的索引
-      const startIndex = data.daily.time.findIndex((t: string) => t === startDate);
+      const startIndex = data.daily.time.findIndex((t: string) => t === startDate)
       if (startIndex === -1) {
-        throw new Error('所選日期超出預報範圍');
+        throw new Error('所選日期超出預報範圍')
       }
 
       // 提取7天的資料
-      const weekData: DailyWeather[] = [];
+      const weekData: DailyWeather[] = []
       for (let i = 0; i < 7; i++) {
-        const index = startIndex + i;
+        const index = startIndex + i
         if (index < data.daily.time.length) {
           weekData.push({
             date: data.daily.time[index],
             maxTemp: Math.round(data.daily.temperature_2m_max[index]),
             minTemp: Math.round(data.daily.temperature_2m_min[index]),
             weatherCode: data.daily.weathercode[index] || 0,
-          });
+          })
         }
       }
 
-      setWeeklyWeather(weekData);
+      setWeeklyWeather(weekData)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '獲取天氣資料失敗');
+      setError(err instanceof Error ? err.message : '獲取天氣資料失敗')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchWeeklyWeather(selectedCity, startDate);
-  }, []);
+    fetchWeeklyWeather(selectedCity, startDate)
+  }, [])
 
   const handleCityChange = (cityName: string) => {
-    const city = CITIES.find(c => c.name === cityName);
+    const city = CITIES.find(c => c.name === cityName)
     if (city) {
-      saveCity(city);
-      fetchWeeklyWeather(city, startDate);
+      saveCity(city)
+      fetchWeeklyWeather(city, startDate)
     }
-  };
+  }
 
   const handleDateChange = (date: string) => {
-    saveDate(date);
-    fetchWeeklyWeather(selectedCity, date);
-  };
+    saveDate(date)
+    fetchWeeklyWeather(selectedCity, date)
+  }
 
   // 格式化日期顯示
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = new Date(dateStr)
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
 
-    const dateOnly = dateStr;
-    const todayStr = today.toISOString().split('T')[0];
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const dateOnly = dateStr
+    const todayStr = today.toISOString().split('T')[0]
+    const tomorrowStr = tomorrow.toISOString().split('T')[0]
 
-    if (dateOnly === todayStr) return '今天';
-    if (dateOnly === tomorrowStr) return '明天';
+    if (dateOnly === todayStr) return '今天'
+    if (dateOnly === tomorrowStr) return '明天'
 
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekday = weekdays[date.getDay()];
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const weekday = weekdays[date.getDay()]
 
-    return `${month}/${day} (${weekday})`;
-  };
+    return `${month}/${day} (${weekday})`
+  }
 
-  const maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() + 9); // 最多往後10天（因為要顯示7天）
+  const maxDate = new Date()
+  maxDate.setDate(maxDate.getDate() + 9) // 最多往後10天（因為要顯示7天）
 
   return (
     <div className="h-full">
@@ -247,7 +247,9 @@ export function WeatherWidgetWeekly() {
               <Cloud className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">天氣週報</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
+                天氣週報
+              </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
                 查看未來7天天氣預報
               </p>
@@ -264,10 +266,10 @@ export function WeatherWidgetWeekly() {
                 </label>
                 <select
                   value={selectedCity.name}
-                  onChange={(e) => handleCityChange(e.target.value)}
+                  onChange={e => handleCityChange(e.target.value)}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 >
-                  {CITIES.map((city) => (
+                  {CITIES.map(city => (
                     <option key={city.name} value={city.name}>
                       {city.name}
                     </option>
@@ -283,7 +285,7 @@ export function WeatherWidgetWeekly() {
                 <input
                   type="date"
                   value={startDate}
-                  onChange={(e) => handleDateChange(e.target.value)}
+                  onChange={e => handleDateChange(e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
                   max={maxDate.toISOString().split('T')[0]}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
@@ -311,8 +313,9 @@ export function WeatherWidgetWeekly() {
             <div className="flex-1 overflow-hidden">
               <div className="grid grid-cols-7 gap-2 h-full">
                 {weeklyWeather.map((day, index) => {
-                  const weatherInfo = WEATHER_DESCRIPTIONS[day.weatherCode] || WEATHER_DESCRIPTIONS[0];
-                  const isToday = day.date === new Date().toISOString().split('T')[0];
+                  const weatherInfo =
+                    WEATHER_DESCRIPTIONS[day.weatherCode] || WEATHER_DESCRIPTIONS[0]
+                  const isToday = day.date === new Date().toISOString().split('T')[0]
 
                   return (
                     <div
@@ -327,10 +330,12 @@ export function WeatherWidgetWeekly() {
                       <div className="flex flex-col items-center justify-between h-full space-y-2">
                         {/* 日期 */}
                         <div className="text-center">
-                          <p className={cn(
-                            'text-xs font-semibold',
-                            isToday ? 'text-sky-700' : 'text-morandi-primary'
-                          )}>
+                          <p
+                            className={cn(
+                              'text-xs font-semibold',
+                              isToday ? 'text-sky-700' : 'text-morandi-primary'
+                            )}
+                          >
                             {formatDate(day.date)}
                           </p>
                         </div>
@@ -347,16 +352,12 @@ export function WeatherWidgetWeekly() {
 
                         {/* 溫度 */}
                         <div className="text-center">
-                          <p className="text-lg font-bold text-morandi-primary">
-                            {day.maxTemp}°
-                          </p>
-                          <p className="text-xs text-morandi-secondary">
-                            {day.minTemp}°
-                          </p>
+                          <p className="text-lg font-bold text-morandi-primary">{day.maxTemp}°</p>
+                          <p className="text-xs text-morandi-secondary">{day.minTemp}°</p>
                         </div>
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -364,5 +365,5 @@ export function WeatherWidgetWeekly() {
         </div>
       </div>
     </div>
-  );
+  )
 }

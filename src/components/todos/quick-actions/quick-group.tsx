@@ -1,53 +1,73 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import { Users } from 'lucide-react';
+import { Users } from 'lucide-react'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { SmartDateInput } from '@/components/ui/smart-date-input';
-import { useTourStore, useOrderStore } from '@/stores';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { SmartDateInput } from '@/components/ui/smart-date-input'
+import { DestinationSelector } from '@/components/shared/destination-selector'
+import { useTourStore, useOrderStore } from '@/stores'
 
 interface QuickGroupProps {
-  onSubmit?: () => void;
+  onSubmit?: () => void
 }
 
 export function QuickGroup({ onSubmit }: QuickGroupProps) {
-  const tourStore = useTourStore();
-  const orderStore = useOrderStore();
-  const [submitting, setSubmitting] = useState(false);
+  const tourStore = useTourStore()
+  const orderStore = useOrderStore()
+  const [submitting, setSubmitting] = useState(false)
 
   const [newTour, setNewTour] = useState({
     name: '',
-    location: 'Tokyo',
+    countryCode: '',
+    cityCode: '',
+    customLocation: '',
     departure_date: '',
     return_date: '',
     price: 0,
     max_participants: 20,
     description: '',
-    isSpecial: false
-  });
+    isSpecial: false,
+  })
 
   const [newOrder, setNewOrder] = useState({
     contact_person: '',
     sales_person: '',
     assistant: '',
     member_count: 1,
-    total_amount: 0
-  });
+    total_amount: 0,
+  })
 
   const handleSubmit = async () => {
     if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
-      alert('請填寫必填欄位（團名、出發日期、返回日期）');
-      return;
+      alert('請填寫必填欄位（團名、出發日期、返回日期）')
+      return
     }
 
-    setSubmitting(true);
+    if (!newTour.countryCode) {
+      alert('請選擇國家/地區')
+      return
+    }
+
+    if (newTour.countryCode !== '__custom__' && !newTour.cityCode) {
+      alert('請選擇城市')
+      return
+    }
+
+    if (newTour.countryCode === '__custom__' && !newTour.customLocation) {
+      alert('請輸入自訂目的地')
+      return
+    }
+
+    setSubmitting(true)
     try {
       const tourData: any = {
         name: newTour.name,
-        location: newTour.location,
+        country_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.countryCode,
+        city_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.cityCode,
+        custom_location: newTour.countryCode === '__custom__' ? newTour.customLocation : null,
         departure_date: newTour.departure_date,
         return_date: newTour.return_date,
         price: newTour.price,
@@ -57,10 +77,10 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         contract_status: 'pending' as const,
         total_revenue: 0,
         total_cost: 0,
-        profit: 0
-      };
+        profit: 0,
+      }
 
-      const createdTour = await tourStore.create(tourData);
+      const createdTour = await tourStore.create(tourData)
 
       // 如果有填寫聯絡人，同時建立訂單
       if (newOrder.contact_person.trim()) {
@@ -75,39 +95,41 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           total_amount: newOrder.total_amount,
           paid_amount: 0,
           remaining_amount: newOrder.total_amount,
-          payment_status: 'unpaid' as const
-        };
+          payment_status: 'unpaid' as const,
+        }
 
-        await orderStore.create(orderData);
+        await orderStore.create(orderData)
       }
 
       // 重置表單
       setNewTour({
         name: '',
-        location: 'Tokyo',
+        countryCode: '',
+        cityCode: '',
+        customLocation: '',
         departure_date: '',
         return_date: '',
         price: 0,
         max_participants: 20,
         description: '',
-        isSpecial: false
-      });
+        isSpecial: false,
+      })
       setNewOrder({
         contact_person: '',
         sales_person: '',
         assistant: '',
         member_count: 1,
-        total_amount: 0
-      });
+        total_amount: 0,
+      })
 
-      alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！');
-      onSubmit?.();
+      alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！')
+      onSubmit?.()
     } catch (error) {
-            alert('建立失敗，請稍後再試');
+      alert('建立失敗，請稍後再試')
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -119,30 +141,30 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           </label>
           <Input
             value={newTour.name}
-            onChange={(e) => setNewTour(prev => ({ ...prev, name: e.target.value }))}
+            onChange={e => setNewTour(prev => ({ ...prev, name: e.target.value }))}
             placeholder="例如：東京五日遊"
             className="border-morandi-container/30"
           />
         </div>
 
-        <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-            目的地 <span className="text-morandi-red">*</span>
-          </label>
-          <select
-            value={newTour.location}
-            onChange={(e) => setNewTour(prev => ({ ...prev, location: e.target.value }))}
-            className="w-full p-2 border border-morandi-container/30 rounded-md bg-background text-sm"
-          >
-            <option value="Tokyo">Tokyo 東京</option>
-            <option value="Okinawa">Okinawa 沖繩</option>
-            <option value="Osaka">Osaka 大阪</option>
-            <option value="Kyoto">Kyoto 京都</option>
-            <option value="Hokkaido">Hokkaido 北海道</option>
-            <option value="Fukuoka">Fukuoka 福岡</option>
-            <option value="Other">其他</option>
-          </select>
-        </div>
+        <DestinationSelector
+          countryCode={newTour.countryCode}
+          cityCode={newTour.cityCode}
+          customLocation={newTour.customLocation}
+          onCountryChange={(countryCode, cities) => {
+            setNewTour(prev => ({
+              ...prev,
+              countryCode,
+              cityCode: countryCode === '__custom__' ? '__custom__' : cities[0]?.code || '',
+              customLocation: '',
+            }))
+          }}
+          onCityChange={cityCode => setNewTour(prev => ({ ...prev, cityCode }))}
+          onCustomLocationChange={customLocation =>
+            setNewTour(prev => ({ ...prev, customLocation }))
+          }
+          showCustomFields={false}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -151,13 +173,14 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             </label>
             <SmartDateInput
               value={newTour.departure_date}
-              onChange={(departure_date) => {
+              onChange={departure_date => {
                 setNewTour(prev => {
-                  const newReturnDate = prev.return_date && prev.return_date < departure_date
-                    ? departure_date
-                    : prev.return_date;
-                  return { ...prev, departure_date, return_date: newReturnDate };
-                });
+                  const newReturnDate =
+                    prev.return_date && prev.return_date < departure_date
+                      ? departure_date
+                      : prev.return_date
+                  return { ...prev, departure_date, return_date: newReturnDate }
+                })
               }}
               min={new Date().toISOString().split('T')[0]}
               className="border-morandi-container/30"
@@ -170,8 +193,8 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             </label>
             <SmartDateInput
               value={newTour.return_date}
-              onChange={(return_date) => {
-                setNewTour(prev => ({ ...prev, return_date }));
+              onChange={return_date => {
+                setNewTour(prev => ({ ...prev, return_date }))
               }}
               min={newTour.departure_date || new Date().toISOString().split('T')[0]}
               className="border-morandi-container/30"
@@ -182,13 +205,11 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-              價格
-            </label>
+            <label className="text-sm font-medium text-morandi-secondary mb-2 block">價格</label>
             <Input
               type="number"
               value={newTour.price}
-              onChange={(e) => setNewTour(prev => ({ ...prev, price: Number(e.target.value) }))}
+              onChange={e => setNewTour(prev => ({ ...prev, price: Number(e.target.value) }))}
               className="border-morandi-container/30"
             />
           </div>
@@ -199,7 +220,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             <Input
               type="number"
               value={newTour.max_participants}
-              onChange={(e) => setNewTour(prev => ({ ...prev, max_participants: Number(e.target.value) }))}
+              onChange={e =>
+                setNewTour(prev => ({ ...prev, max_participants: Number(e.target.value) }))
+              }
               className="border-morandi-container/30"
             />
           </div>
@@ -210,10 +233,12 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             type="checkbox"
             id="isSpecial-quick"
             checked={newTour.isSpecial}
-            onChange={(e) => setNewTour(prev => ({ ...prev, isSpecial: e.target.checked }))}
+            onChange={e => setNewTour(prev => ({ ...prev, isSpecial: e.target.checked }))}
             className="rounded"
           />
-          <label htmlFor="isSpecial-quick" className="text-sm text-morandi-primary">特殊團</label>
+          <label htmlFor="isSpecial-quick" className="text-sm text-morandi-primary">
+            特殊團
+          </label>
         </div>
       </div>
 
@@ -222,12 +247,10 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         <h4 className="text-sm font-semibold text-morandi-primary">同時新增訂單（選填）</h4>
 
         <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-            聯絡人
-          </label>
+          <label className="text-sm font-medium text-morandi-secondary mb-2 block">聯絡人</label>
           <Input
             value={newOrder.contact_person}
-            onChange={(e) => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
+            onChange={e => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
             placeholder="留空則不建立訂單"
             className="border-morandi-container/30"
           />
@@ -241,18 +264,16 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
               </label>
               <Input
                 value={newOrder.sales_person}
-                onChange={(e) => setNewOrder(prev => ({ ...prev, sales_person: e.target.value }))}
+                onChange={e => setNewOrder(prev => ({ ...prev, sales_person: e.target.value }))}
                 className="border-morandi-container/30"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                助理
-              </label>
+              <label className="text-sm font-medium text-morandi-secondary mb-2 block">助理</label>
               <Input
                 value={newOrder.assistant}
-                onChange={(e) => setNewOrder(prev => ({ ...prev, assistant: e.target.value }))}
+                onChange={e => setNewOrder(prev => ({ ...prev, assistant: e.target.value }))}
                 className="border-morandi-container/30"
               />
             </div>
@@ -265,7 +286,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                 <Input
                   type="number"
                   value={newOrder.member_count}
-                  onChange={(e) => setNewOrder(prev => ({ ...prev, member_count: Number(e.target.value) }))}
+                  onChange={e =>
+                    setNewOrder(prev => ({ ...prev, member_count: Number(e.target.value) }))
+                  }
                   min="1"
                   className="border-morandi-container/30"
                 />
@@ -277,7 +300,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                 <Input
                   type="number"
                   value={newOrder.total_amount}
-                  onChange={(e) => setNewOrder(prev => ({ ...prev, total_amount: Number(e.target.value) }))}
+                  onChange={e =>
+                    setNewOrder(prev => ({ ...prev, total_amount: Number(e.target.value) }))
+                  }
                   className="border-morandi-container/30"
                 />
               </div>
@@ -295,12 +320,14 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       {/* 提交按鈕 */}
       <Button
         onClick={handleSubmit}
-        disabled={submitting || !newTour.name.trim() || !newTour.departure_date || !newTour.return_date}
+        disabled={
+          submitting || !newTour.name.trim() || !newTour.departure_date || !newTour.return_date
+        }
         className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
       >
         <Users size={16} className="mr-2" />
-        {submitting ? '建立中...' : (newOrder.contact_person ? '建立旅遊團 & 訂單' : '建立旅遊團')}
+        {submitting ? '建立中...' : newOrder.contact_person ? '建立旅遊團 & 訂單' : '建立旅遊團'}
       </Button>
     </div>
-  );
+  )
 }

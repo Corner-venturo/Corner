@@ -1,17 +1,32 @@
-import React from 'react';
-import { Tour } from '@/stores/types';
-import { Calendar, FileText, MapPin, Calculator, BarChart3, ShoppingCart, Users, FileCheck, AlertCircle, Clipboard, Plus, Package, RefreshCw, Edit2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ExpandableOrderTable } from '@/components/orders/expandable-order-table';
-import { TourMembers } from '@/components/tours/tour-members';
-import { TourOperations } from '@/components/tours/tour-operations';
-import { TourAddOns } from '@/components/tours/tour-add-ons';
-import { TourRefunds } from '@/components/tours/tour-refunds';
-import { TourPayments } from '@/components/tours/tour-payments';
-import { TourCosts } from '@/components/tours/tour-costs';
-import { TourTaskAssignment } from '@/components/tours/tour-task-assignment';
-import { TourOverviewTab } from './TourOverviewTab';
-import { TourOperationsAddButton } from './TourOperationsAddButton';
+import React from 'react'
+import { Tour } from '@/stores/types'
+import {
+  Calendar,
+  FileText,
+  MapPin,
+  Calculator,
+  BarChart3,
+  ShoppingCart,
+  Users,
+  FileCheck,
+  AlertCircle,
+  Clipboard,
+  Plus,
+  Package,
+  RefreshCw,
+  Edit2,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { ExpandableOrderTable } from '@/components/orders/expandable-order-table'
+import { TourMembers } from '@/components/tours/tour-members'
+import { TourOperations } from '@/components/tours/tour-operations'
+import { TourAddOns } from '@/components/tours/tour-add-ons'
+import { TourRefunds } from '@/components/tours/tour-refunds'
+import { TourPayments } from '@/components/tours/tour-payments'
+import { TourCosts } from '@/components/tours/tour-costs'
+import { TourTaskAssignment } from '@/components/tours/tour-task-assignment'
+import { TourOverviewTab } from './TourOverviewTab'
+import { TourOperationsAddButton } from './TourOperationsAddButton'
 
 const tourTabs = [
   { id: 'overview', label: '總覽', icon: BarChart3 },
@@ -24,24 +39,24 @@ const tourTabs = [
   { id: 'costs', label: '成本支出', icon: AlertCircle },
   { id: 'documents', label: '文件確認', icon: FileCheck },
   { id: 'tasks', label: '指派任務', icon: Edit2 },
-];
+]
 
 interface TourExpandedViewProps {
-  tour: Tour;
-  orders: any[];
-  activeTabs: Record<string, string>;
-  setActiveTab: (tourId: string, tabId: string) => void;
-  openDialog: (type: string, data?: any) => void;
-  tourExtraFields: Record<string, any>;
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
-  triggerAddOnAdd: Record<string, boolean>;
-  setTriggerAddOnAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  triggerRefundAdd: Record<string, boolean>;
-  setTriggerRefundAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  triggerPaymentAdd: Record<string, boolean>;
-  setTriggerPaymentAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  triggerCostAdd: Record<string, boolean>;
-  setTriggerCostAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  tour: Tour
+  orders: any[]
+  activeTabs: Record<string, string>
+  setActiveTab: (tourId: string, tabId: string) => void
+  openDialog: (type: string, data?: any) => void
+  tourExtraFields: Record<string, any>
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
+  triggerAddOnAdd: Record<string, boolean>
+  setTriggerAddOnAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  triggerRefundAdd: Record<string, boolean>
+  setTriggerRefundAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  triggerPaymentAdd: Record<string, boolean>
+  setTriggerPaymentAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  triggerCostAdd: Record<string, boolean>
+  setTriggerCostAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
 }
 
 export function TourExpandedView({
@@ -67,8 +82,8 @@ export function TourExpandedView({
       <div className="flex border-b border-border justify-between items-center">
         {/* Left: Tabs */}
         <div className="flex">
-          {tourTabs.map((tab) => {
-            const is_active = activeTabs[tour.id] === tab.id;
+          {tourTabs.map(tab => {
+            const is_active = activeTabs[tour.id] === tab.id
             return (
               <button
                 key={tab.id}
@@ -83,7 +98,7 @@ export function TourExpandedView({
                 <tab.icon size={16} />
                 <span>{tab.label}</span>
               </button>
-            );
+            )
           })}
         </div>
 
@@ -108,7 +123,11 @@ export function TourExpandedView({
             </button>
           )}
           {activeTabs[tour.id] === 'operations' && (
-            <TourOperationsAddButton tour={tour} tourExtraFields={tourExtraFields} setTourExtraFields={setTourExtraFields} />
+            <TourOperationsAddButton
+              tour={tour}
+              tourExtraFields={tourExtraFields}
+              setTourExtraFields={setTourExtraFields}
+            />
           )}
           {activeTabs[tour.id] === 'addons' && (
             <button
@@ -151,19 +170,15 @@ export function TourExpandedView({
 
       {/* Tab content */}
       <div>
-        {activeTabs[tour.id] === 'overview' && (
-          <TourOverviewTab tour={tour} />
-        )}
+        {activeTabs[tour.id] === 'overview' && <TourOverviewTab tour={tour} />}
         {activeTabs[tour.id] === 'orders' && (
           <ExpandableOrderTable
-            orders={orders.filter((order) => order.tour_id === tour.id)}
+            orders={orders.filter(order => order.tour_id === tour.id)}
             showTourInfo={false}
             tourDepartureDate={tour.departure_date}
           />
         )}
-        {activeTabs[tour.id] === 'members' && (
-          <TourMembers tour={tour} />
-        )}
+        {activeTabs[tour.id] === 'members' && <TourMembers tour={tour} />}
         {activeTabs[tour.id] === 'operations' && (
           <TourOperations tour={tour} extraFields={tourExtraFields[tour.id]} />
         )}
@@ -178,23 +193,28 @@ export function TourExpandedView({
           <TourRefunds
             tour={tour}
             triggerAdd={triggerRefundAdd[tour.id] || false}
-            onTriggerAddComplete={() => setTriggerRefundAdd(prev => ({ ...prev, [tour.id]: false }))}
+            onTriggerAddComplete={() =>
+              setTriggerRefundAdd(prev => ({ ...prev, [tour.id]: false }))
+            }
           />
         )}
         {activeTabs[tour.id] === 'payments' && (
           <TourPayments
             tour={tour}
             triggerAdd={triggerPaymentAdd[tour.id] || false}
-            onTriggerAddComplete={() => setTriggerPaymentAdd(prev => ({ ...prev, [tour.id]: false }))}
+            onTriggerAddComplete={() =>
+              setTriggerPaymentAdd(prev => ({ ...prev, [tour.id]: false }))
+            }
           />
         )}
         {activeTabs[tour.id] === 'costs' && (
           <TourCosts
-            {...{
+            {...({
               tour,
               triggerAdd: triggerCostAdd[tour.id] || false,
-              onTriggerAddComplete: () => setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))
-            } as unknown}
+              onTriggerAddComplete: () =>
+                setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false })),
+            } as unknown)}
           />
         )}
         {activeTabs[tour.id] === 'documents' && (
@@ -203,10 +223,8 @@ export function TourExpandedView({
             <p>文件確認功能開發中...</p>
           </div>
         )}
-        {activeTabs[tour.id] === 'tasks' && (
-          <TourTaskAssignment tour={tour} />
-        )}
+        {activeTabs[tour.id] === 'tasks' && <TourTaskAssignment tour={tour} />}
       </div>
     </div>
-  );
+  )
 }

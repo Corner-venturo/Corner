@@ -4,27 +4,27 @@
  * 避免在各 store 重複相同的同步邏輯
  */
 
-import { localDB } from '@/services/storage/local-db';
-import { supabase } from '@/lib/supabase/client';
-import { logger } from '@/lib/utils/logger';
+import { localDB } from '@/services/storage/local-db'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 export interface SyncOptions<T> {
-  tableName: string;
+  tableName: string
   filter?: {
-    field: string;
-    value: unknown;
-  };
+    field: string
+    value: unknown
+  }
   orderBy?: {
-    field: string;
-    ascending?: boolean;
-  };
-  select?: string;
+    field: string
+    ascending?: boolean
+  }
+  select?: string
 }
 
 export interface SyncResult<T> {
-  cached: T[];
-  fresh: T[] | null;
-  error: Error | null;
+  cached: T[]
+  fresh: T[] | null
+  error: Error | null
 }
 
 /**
@@ -35,75 +35,71 @@ export interface SyncResult<T> {
 export async function loadWithSync<T extends { id: string }>(
   options: SyncOptions<T>
 ): Promise<SyncResult<T>> {
-  const { tableName, filter, orderBy, select = '*' } = options;
-  const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+  const { tableName, filter, orderBy, select = '*' } = options
+  const isOnline = typeof navigator !== 'undefined' && navigator.onLine
+  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 
   try {
     // 1. 從 IndexedDB 載入 (快速)
-    let cached = (await localDB.getAll(tableName)) as T[];
+    let cached = (await localDB.getAll(tableName)) as T[]
 
     // 套用過濾條件
     if (filter) {
-      cached = cached.filter(
-        (item) => {
-          const value = item[filter.field as keyof T];
-          return value === filter.value;
-        }
-      );
+      cached = cached.filter(item => {
+        const value = item[filter.field as keyof T]
+        return value === filter.value
+      })
     }
 
     // 2. 背景同步 (如果在線上且啟用 Supabase)
     if (isOnline && supabaseEnabled) {
       try {
-        let query = supabase.from(tableName).select(select);
+        let query = supabase.from(tableName).select(select)
 
         // 套用過濾
         if (filter) {
-          query = query.eq(filter.field, filter.value);
+          query = query.eq(filter.field, filter.value)
         }
 
         // 套用排序
         if (orderBy) {
           query = query.order(orderBy.field, {
             ascending: orderBy.ascending ?? true,
-          });
+          })
         }
 
-        const { data, error } = await query;
+        const { data, error } = await query
 
         if (error) {
-          logger.warn(`Supabase sync failed for ${tableName}:`, error);
-          return { cached, fresh: null, error };
+          logger.warn(`Supabase sync failed for ${tableName}:`, error)
+          return { cached, fresh: null, error }
         }
 
         // 更新 IndexedDB
         if (data) {
-          await Promise.all(
-            data.map((item: T) => localDB.put(tableName, item))
-          );
+          await Promise.all(data.map((item: T) => localDB.put(tableName, item)))
         }
 
-        return { cached, fresh: data || [], error: null };
+        return { cached, fresh: data || [], error: null }
       } catch (syncError) {
-        logger.error(`Sync error for ${tableName}:`, syncError);
+        logger.error(`Sync error for ${tableName}:`, syncError)
         return {
           cached,
           fresh: null,
           error: syncError instanceof Error ? syncError : new Error(String(syncError)),
-        };
+        }
       }
     }
 
     // 離線或未啟用 Supabase - 只返回快取
-    return { cached, fresh: null, error: null };
+    return { cached, fresh: null, error: null }
   } catch (error) {
-    logger.error(`Load error for ${tableName}:`, error);
+    logger.error(`Load error for ${tableName}:`, error)
     return {
       cached: [],
       fresh: null,
       error: error instanceof Error ? error : new Error(String(error)),
-    };
+    }
   }
 }
 
@@ -114,33 +110,31 @@ export async function createWithSync<T extends { id: string }>(
   tableName: string,
   data: T
 ): Promise<{ data: T | null; error: Error | null }> {
-  const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+  const isOnline = typeof navigator !== 'undefined' && navigator.onLine
+  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 
   try {
     // 1. 先寫入 IndexedDB (本地優先)
-    await localDB.put(tableName, data);
+    await localDB.put(tableName, data)
 
     // 2. 同步到 Supabase (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await supabase
-        .from(tableName)
-        .insert(data);
+      const { error } = await supabase.from(tableName).insert(data)
 
       if (error) {
-        logger.warn(`Supabase create failed for ${tableName}:`, error);
+        logger.warn(`Supabase create failed for ${tableName}:`, error)
         // 本地已寫入，標記為待同步
-        return { data, error };
+        return { data, error }
       }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    logger.error(`Create error for ${tableName}:`, error);
+    logger.error(`Create error for ${tableName}:`, error)
     return {
       data: null,
       error: error instanceof Error ? error : new Error(String(error)),
-    };
+    }
   }
 }
 
@@ -152,41 +146,38 @@ export async function updateWithSync<T extends { id: string }>(
   id: string,
   updates: Partial<T>
 ): Promise<{ data: T | null; error: Error | null }> {
-  const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+  const isOnline = typeof navigator !== 'undefined' && navigator.onLine
+  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 
   try {
     // 1. 從 IndexedDB 取得當前資料
-    const current = await localDB.get(tableName, id);
+    const current = await localDB.get(tableName, id)
     if (!current) {
-      return { data: null, error: new Error('Item not found') };
+      return { data: null, error: new Error('Item not found') }
     }
 
-    const updated = { ...current, ...updates } as T;
+    const updated = { ...current, ...updates } as T
 
     // 2. 更新 IndexedDB
-    await localDB.put(tableName, updated);
+    await localDB.put(tableName, updated)
 
     // 3. 同步到 Supabase (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await supabase
-        .from(tableName)
-        .update(updates)
-        .eq('id', id);
+      const { error } = await supabase.from(tableName).update(updates).eq('id', id)
 
       if (error) {
-        logger.warn(`Supabase update failed for ${tableName}:`, error);
-        return { data: updated, error };
+        logger.warn(`Supabase update failed for ${tableName}:`, error)
+        return { data: updated, error }
       }
     }
 
-    return { data: updated, error: null };
+    return { data: updated, error: null }
   } catch (error) {
-    logger.error(`Update error for ${tableName}:`, error);
+    logger.error(`Update error for ${tableName}:`, error)
     return {
       data: null,
       error: error instanceof Error ? error : new Error(String(error)),
-    };
+    }
   }
 }
 
@@ -197,33 +188,30 @@ export async function deleteWithSync(
   tableName: string,
   id: string
 ): Promise<{ success: boolean; error: Error | null }> {
-  const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+  const isOnline = typeof navigator !== 'undefined' && navigator.onLine
+  const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 
   try {
     // 1. 從 IndexedDB 刪除
-    await localDB.delete(tableName, id);
+    await localDB.delete(tableName, id)
 
     // 2. 從 Supabase 刪除 (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await supabase
-        .from(tableName)
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from(tableName).delete().eq('id', id)
 
       if (error) {
-        logger.warn(`Supabase delete failed for ${tableName}:`, error);
-        return { success: true, error }; // 本地已刪除
+        logger.warn(`Supabase delete failed for ${tableName}:`, error)
+        return { success: true, error } // 本地已刪除
       }
     }
 
-    return { success: true, error: null };
+    return { success: true, error: null }
   } catch (error) {
-    logger.error(`Delete error for ${tableName}:`, error);
+    logger.error(`Delete error for ${tableName}:`, error)
     return {
       success: false,
       error: error instanceof Error ? error : new Error(String(error)),
-    };
+    }
   }
 }
 
@@ -238,32 +226,30 @@ export async function batchUpdateWithSync<T extends { id: string }>(
     // 1. 批次更新 IndexedDB
     await Promise.all(
       updates.map(async ({ id, data }) => {
-        const current = await localDB.get(tableName, id);
+        const current = await localDB.get(tableName, id)
         if (current) {
-          await localDB.put(tableName, { ...current, ...data });
+          await localDB.put(tableName, { ...current, ...data })
         }
       })
-    );
+    )
 
     // 2. 批次更新 Supabase (如果需要)
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-    const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true';
+    const isOnline = typeof navigator !== 'undefined' && navigator.onLine
+    const supabaseEnabled = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
 
     if (isOnline && supabaseEnabled) {
       // Supabase 不支援真正的批次更新，但可以用 Promise.all
       await Promise.all(
-        updates.map(({ id, data }) =>
-          supabase.from(tableName).update(data).eq('id', id)
-        )
-      );
+        updates.map(({ id, data }) => supabase.from(tableName).update(data).eq('id', id))
+      )
     }
 
-    return { success: true, error: null };
+    return { success: true, error: null }
   } catch (error) {
-    logger.error(`Batch update error for ${tableName}:`, error);
+    logger.error(`Batch update error for ${tableName}:`, error)
     return {
       success: false,
       error: error instanceof Error ? error : new Error(String(error)),
-    };
+    }
   }
 }

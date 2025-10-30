@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { ContentContainer } from '@/components/layout/content-container';
-import { Briefcase } from 'lucide-react';
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentContainer } from '@/components/layout/content-container'
+import { Briefcase } from 'lucide-react'
 
 export default function BusinessPage() {
   return (
@@ -16,5 +16,5 @@ export default function BusinessPage() {
         </div>
       </ContentContainer>
     </div>
-  );
+  )
 }

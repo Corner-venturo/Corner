@@ -2,6 +2,6 @@
  * Suppliers page - delegates to feature module
  */
 
-import { SuppliersPage } from '@/features/suppliers';
+import { SuppliersPage } from '@/features/suppliers'
 
-export default SuppliersPage;
+export default SuppliersPage

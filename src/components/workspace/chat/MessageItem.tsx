@@ -1,34 +1,33 @@
-'use client';
+'use client'
 
-import { Trash2, Download, FileText, Image as ImageIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { Message, MessageAttachment } from '@/stores/workspace-store';
-import { formatMessageTime, formatFileSize, resolveAttachmentUrl } from './utils';
-import { QUICK_REACTIONS } from './constants';
-import { downloadFile } from '@/lib/files';
+import { Trash2, Download, FileText, Image as ImageIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import type { Message, MessageAttachment } from '@/stores/workspace-store'
+import { formatMessageTime, formatFileSize, resolveAttachmentUrl } from './utils'
+import { QUICK_REACTIONS } from './constants'
+import { downloadFile } from '@/lib/files'
 
 interface MessageItemProps {
-  message: Message;
-  currentUserId?: string;
-  onReaction: (messageId: string, emoji: string) => void;
-  onDelete: (messageId: string) => void;
+  message: Message
+  currentUserId?: string
+  onReaction: (messageId: string, emoji: string) => void
+  onDelete: (messageId: string) => void
 }
 
 export function MessageItem({ message, currentUserId, onReaction, onDelete }: MessageItemProps) {
   const handleDownloadAttachment = async (attachment: MessageAttachment) => {
-    const fileName = attachment.fileName || attachment.name || '未命名檔案';
-    const targetUrl = resolveAttachmentUrl(attachment);
+    const fileName = attachment.fileName || attachment.name || '未命名檔案'
+    const targetUrl = resolveAttachmentUrl(attachment)
 
     if (!targetUrl) {
-      alert('找不到檔案下載連結');
-      return;
+      alert('找不到檔案下載連結')
+      return
     }
 
     try {
-      await downloadFile(targetUrl, fileName);
-    } catch (error) {
-          }
-  };
+      await downloadFile(targetUrl, fileName)
+    } catch (error) {}
+  }
 
   return (
     <div className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
@@ -61,14 +60,19 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
         {message.attachments && message.attachments.length > 0 && (
           <div className="mt-2 space-y-2">
             {message.attachments.map((attachment, index) => {
-              const mimeType = attachment.mimeType || attachment.fileType || attachment.type || 'application/octet-stream';
-              const fileName = attachment.fileName || attachment.name || '未命名檔案';
-              const fileSize = typeof attachment.fileSize === 'number'
-                ? attachment.fileSize
-                : typeof attachment.size === 'number'
-                  ? attachment.size
-                  : 0;
-              const isImage = mimeType.startsWith('image/');
+              const mimeType =
+                attachment.mimeType ||
+                attachment.fileType ||
+                attachment.type ||
+                'application/octet-stream'
+              const fileName = attachment.fileName || attachment.name || '未命名檔案'
+              const fileSize =
+                typeof attachment.fileSize === 'number'
+                  ? attachment.fileSize
+                  : typeof attachment.size === 'number'
+                    ? attachment.size
+                    : 0
+              const isImage = mimeType.startsWith('image/')
               return (
                 <div
                   key={index}
@@ -83,9 +87,7 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
                     <p className="text-sm text-morandi-primary truncate max-w-[200px]">
                       {fileName}
                     </p>
-                    <p className="text-xs text-morandi-secondary">
-                      {formatFileSize(fileSize)}
-                    </p>
+                    <p className="text-xs text-morandi-secondary">{formatFileSize(fileSize)}</p>
                   </div>
                   <button
                     onClick={() => handleDownloadAttachment(attachment)}
@@ -95,7 +97,7 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
                     <Download size={14} className="text-morandi-gold" />
                   </button>
                 </div>
-              );
+              )
             })}
           </div>
         )}
@@ -108,10 +110,10 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
                 key={emoji}
                 onClick={() => onReaction(message.id, emoji)}
                 className={cn(
-                  "flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors",
+                  'flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors',
                   users.includes(currentUserId || '')
-                    ? "bg-morandi-gold/20 border-morandi-gold text-morandi-primary"
-                    : "bg-morandi-container/20 border-border text-morandi-secondary hover:bg-morandi-container/30"
+                    ? 'bg-morandi-gold/20 border-morandi-gold text-morandi-primary'
+                    : 'bg-morandi-container/20 border-border text-morandi-secondary hover:bg-morandi-container/30'
                 )}
               >
                 <span>{emoji}</span>
@@ -140,7 +142,7 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
             <button
               onClick={() => {
                 if (confirm('確定要刪除這則訊息嗎？')) {
-                  onDelete(message.id);
+                  onDelete(message.id)
                 }
               }}
               className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-red/10 rounded border border-morandi-container hover:border-morandi-red/40 transition-all hover:scale-110"
@@ -152,5 +154,5 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
         </div>
       </div>
     </div>
-  );
+  )
 }

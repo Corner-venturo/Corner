@@ -1,9 +1,9 @@
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Save, X, FileText, Trash2, CheckSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useChecklists } from './useChecklists';
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Plus, Save, X, FileText, Trash2, CheckSquare } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useChecklists } from './useChecklists'
 
 export function Checklist() {
   const {
@@ -18,8 +18,8 @@ export function Checklist() {
     toggleChecklistItem,
     startNewChecklist,
     startEditingChecklist,
-    cancelEditing
-  } = useChecklists();
+    cancelEditing,
+  } = useChecklists()
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -37,7 +37,9 @@ export function Checklist() {
                   <label className="block text-sm font-medium mb-1">清單標題</label>
                   <Input
                     value={editingChecklist.title}
-                    onChange={(e) => setEditingChecklist({ ...editingChecklist, title: e.target.value })}
+                    onChange={e =>
+                      setEditingChecklist({ ...editingChecklist, title: e.target.value })
+                    }
                     placeholder="清單標題"
                   />
                 </div>
@@ -60,7 +62,7 @@ export function Checklist() {
                       <div key={item.id} className="flex gap-2">
                         <Input
                           value={item.text}
-                          onChange={(e) => updateChecklistItem(item.id, { text: e.target.value })}
+                          onChange={e => updateChecklistItem(item.id, { text: e.target.value })}
                           placeholder="項目內容"
                           className="flex-1"
                         />
@@ -138,12 +140,14 @@ export function Checklist() {
                           onChange={() => toggleChecklistItem(checklist.id, item.id)}
                           className="rounded"
                         />
-                        <span className={cn(
-                          "text-sm",
-                          item.completed
-                            ? "line-through text-morandi-secondary"
-                            : "text-morandi-primary"
-                        )}>
+                        <span
+                          className={cn(
+                            'text-sm',
+                            item.completed
+                              ? 'line-through text-morandi-secondary'
+                              : 'text-morandi-primary'
+                          )}
+                        >
                           {item.text}
                         </span>
                       </div>
@@ -151,7 +155,8 @@ export function Checklist() {
                   </div>
 
                   <div className="text-xs text-morandi-secondary mt-3">
-                    {checklist.items.filter(item => item.completed).length} / {checklist.items.length} 完成
+                    {checklist.items.filter(item => item.completed).length} /{' '}
+                    {checklist.items.length} 完成
                   </div>
                 </Card>
               ))
@@ -160,5 +165,5 @@ export function Checklist() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Book3D, BookFrame, Page, Spine } from './Book3D';
+import { motion, AnimatePresence } from 'framer-motion'
+import { Book3D, BookFrame, Page, Spine } from './Book3D'
 
 interface FoldTransitionProps {
-  isOpen: boolean;
-  direction: 'opening' | 'closing';
-  onComplete: () => void;
+  isOpen: boolean
+  direction: 'opening' | 'closing'
+  onComplete: () => void
 }
 
 /**
@@ -15,9 +15,9 @@ interface FoldTransitionProps {
  * Closing: 右頁旋轉 -180 → 0°，書體先右滑峰值 +120~140px，再回中央
  */
 export function FoldTransition({ isOpen, direction, onComplete }: FoldTransitionProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const isOpening = direction === 'opening';
+  const isOpening = direction === 'opening'
 
   return (
     <AnimatePresence onExitComplete={onComplete}>
@@ -59,11 +59,7 @@ export function FoldTransition({ isOpen, direction, onComplete }: FoldTransition
               </Page>
 
               {/* 右頁 - 翻轉動畫 */}
-              <Page
-                side="right"
-                isFlipping={isOpen}
-                rotateY={isOpening ? -180 : 0}
-              >
+              <Page side="right" isFlipping={isOpen} rotateY={isOpening ? -180 : 0}>
                 <div className="w-full h-full flex items-center justify-center p-12">
                   {/* 右頁內容（翻轉時不太可見） */}
                   <div
@@ -122,5 +118,5 @@ export function FoldTransition({ isOpen, direction, onComplete }: FoldTransition
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }

@@ -1,14 +1,14 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { useEmployeeForm } from './useEmployeeForm';
-import { BasicInfoFields } from './BasicInfoFields';
-import { ContactFields } from './ContactFields';
-import { PasswordAndRoleFields } from './PasswordAndRoleFields';
-import { JobInfoFields } from './JobInfoFields';
-import { SuccessDialog } from './SuccessDialog';
-import { AddEmployeeFormProps } from './types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { useEmployeeForm } from './useEmployeeForm'
+import { BasicInfoFields } from './BasicInfoFields'
+import { ContactFields } from './ContactFields'
+import { PasswordAndRoleFields } from './PasswordAndRoleFields'
+import { JobInfoFields } from './JobInfoFields'
+import { SuccessDialog } from './SuccessDialog'
+import { AddEmployeeFormProps } from './types'
 
 export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
   const {
@@ -20,8 +20,8 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
     copiedField,
     handleSubmit,
     copyToClipboard,
-    handleCloseSuccess
-  } = useEmployeeForm(onSubmit);
+    handleCloseSuccess,
+  } = useEmployeeForm(onSubmit)
 
   return (
     <>
@@ -50,5 +50,5 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
         onClose={handleCloseSuccess}
       />
     </>
-  );
+  )
 }

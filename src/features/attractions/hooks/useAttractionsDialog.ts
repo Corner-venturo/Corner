@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Attraction, AttractionFormData } from '../types';
+import { useState } from 'react'
+import { Attraction, AttractionFormData } from '../types'
 
 // ============================================
 // Hook: 對話框狀態管理
@@ -21,25 +21,25 @@ const initialFormData: AttractionFormData = {
   images: '',
   notes: '',
   is_active: true,
-};
+}
 
 export function useAttractionsDialog() {
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingAttraction, setEditingAttraction] = useState<Attraction | null>(null);
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editingAttraction, setEditingAttraction] = useState<Attraction | null>(null)
 
-  const openAdd = () => setIsAddOpen(true);
-  const closeAdd = () => setIsAddOpen(false);
+  const openAdd = () => setIsAddOpen(true)
+  const closeAdd = () => setIsAddOpen(false)
 
   const openEdit = (attraction: Attraction) => {
-    setEditingAttraction(attraction);
-    setIsEditOpen(true);
-  };
+    setEditingAttraction(attraction)
+    setIsEditOpen(true)
+  }
 
   const closeEdit = () => {
-    setIsEditOpen(false);
-    setEditingAttraction(null);
-  };
+    setIsEditOpen(false)
+    setEditingAttraction(null)
+  }
 
   return {
     // 新增對話框
@@ -53,5 +53,5 @@ export function useAttractionsDialog() {
     closeEdit,
     // 初始表單資料
     initialFormData,
-  };
+  }
 }

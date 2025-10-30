@@ -1,21 +1,12 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { useAccountingStore } from '@/stores/accounting-store';
-import { Button } from '@/components/ui/button';
-import {
-  Wallet,
-  CreditCard,
-  PiggyBank,
-  TrendingUp,
-  Edit,
-  Trash2,
-  Eye,
-  EyeOff
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
-import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import React, { useState } from 'react'
+import { useAccountingStore } from '@/stores/accounting-store'
+import { Button } from '@/components/ui/button'
+import { Wallet, CreditCard, PiggyBank, TrendingUp, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 const accountTypeIcons = {
   cash: Wallet,
@@ -23,7 +14,7 @@ const accountTypeIcons = {
   credit: CreditCard,
   investment: TrendingUp,
   other: PiggyBank,
-};
+}
 
 const accountTypeLabels = {
   cash: '現金',
@@ -31,16 +22,16 @@ const accountTypeLabels = {
   credit: '信用卡',
   investment: '投資帳戶',
   other: '其他帳戶',
-};
+}
 
 export const AccountsManagement = React.memo(function AccountsManagement() {
-  const { accounts, updateAccount, deleteAccount } = useAccountingStore();
-  const [_expandedAccount, _setExpandedAccount] = useState<string | null>(null);
-  const { confirm, confirmDialogProps } = useConfirmDialog();
+  const { accounts, updateAccount, deleteAccount } = useAccountingStore()
+  const [_expandedAccount, _setExpandedAccount] = useState<string | null>(null)
+  const { confirm, confirmDialogProps } = useConfirmDialog()
 
   const handleToggleActive = (account_id: string, is_active: boolean) => {
-    updateAccount(account_id, { is_active: !is_active });
-  };
+    updateAccount(account_id, { is_active: !is_active })
+  }
 
   const handleDeleteAccount = async (account_id: string, account_name: string) => {
     const confirmed = await confirm({
@@ -49,21 +40,24 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
       message: `確定要刪除帳戶「${account_name}」嗎？`,
       details: ['此操作無法復原'],
       confirmLabel: '確認刪除',
-      cancelLabel: '取消'
-    });
+      cancelLabel: '取消',
+    })
     if (confirmed) {
-      deleteAccount(account_id);
+      deleteAccount(account_id)
     }
-  };
+  }
 
   // 按帳戶類型分組
-  const accountsByType = accounts.reduce((groups, account) => {
-    if (!groups[account.type]) {
-      groups[account.type] = [];
-    }
-    groups[account.type].push(account);
-    return groups;
-  }, {} as Record<string, typeof accounts>);
+  const accountsByType = accounts.reduce(
+    (groups, account) => {
+      if (!groups[account.type]) {
+        groups[account.type] = []
+      }
+      groups[account.type].push(account)
+      return groups
+    },
+    {} as Record<string, typeof accounts>
+  )
 
   return (
     <div className="space-y-6">
@@ -77,9 +71,9 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
       {/* 帳戶列表 */}
       <div className="space-y-8">
         {Object.entries(accountsByType).map(([type, accountsOfType]) => {
-          const Icon = accountTypeIcons[type as keyof typeof accountTypeIcons] || Wallet;
-          const typeLabel = accountTypeLabels[type as keyof typeof accountTypeLabels] || type;
-          const totalBalance = accountsOfType.reduce((sum, acc) => sum + acc.balance, 0);
+          const Icon = accountTypeIcons[type as keyof typeof accountTypeIcons] || Wallet
+          const typeLabel = accountTypeLabels[type as keyof typeof accountTypeLabels] || type
+          const totalBalance = accountsOfType.reduce((sum, acc) => sum + acc.balance, 0)
 
           return (
             <div key={type} className="space-y-4">
@@ -89,27 +83,31 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                   <Icon size={24} className="text-morandi-secondary" />
                   <div>
                     <div className="font-semibold text-morandi-primary">{typeLabel}</div>
-                    <div className="text-sm text-morandi-secondary">{accountsOfType.length} 個帳戶</div>
+                    <div className="text-sm text-morandi-secondary">
+                      {accountsOfType.length} 個帳戶
+                    </div>
                   </div>
                 </div>
-                <div className={cn(
-                  "text-xl font-bold",
-                  totalBalance >= 0 ? "text-morandi-green" : "text-morandi-red"
-                )}>
+                <div
+                  className={cn(
+                    'text-xl font-bold',
+                    totalBalance >= 0 ? 'text-morandi-green' : 'text-morandi-red'
+                  )}
+                >
                   {totalBalance >= 0 ? '+' : ''}NT$ {totalBalance.toLocaleString()}
                 </div>
               </div>
 
               {/* 該類型的帳戶卡片 */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {accountsOfType.map((account) => (
+                {accountsOfType.map(account => (
                   <div
                     key={account.id}
                     className={cn(
-                      "border rounded-xl p-6 transition-all duration-200 hover:shadow-lg",
+                      'border rounded-xl p-6 transition-all duration-200 hover:shadow-lg',
                       account.is_active
-                        ? "border-border bg-white hover:border-morandi-gold/20"
-                        : "border-morandi-container bg-morandi-container/30 opacity-75"
+                        ? 'border-border bg-white hover:border-morandi-gold/20'
+                        : 'border-morandi-container bg-morandi-container/30 opacity-75'
                     )}
                   >
                     {/* 帳戶標題 */}
@@ -122,7 +120,9 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                         <div>
                           <div className="font-semibold text-morandi-primary">{account.name}</div>
                           {account.description && (
-                            <div className="text-sm text-morandi-secondary">{account.description}</div>
+                            <div className="text-sm text-morandi-secondary">
+                              {account.description}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -142,11 +142,14 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                       <div className="text-sm text-morandi-secondary mb-1">
                         {account.type === 'credit' ? '目前欠款' : '帳戶餘額'}
                       </div>
-                      <div className={cn(
-                        "text-2xl font-bold",
-                        account.balance >= 0 ? "text-morandi-green" : "text-morandi-red"
-                      )}>
-                        {account.balance >= 0 ? '+' : ''}NT$ {Math.abs(account.balance).toLocaleString()}
+                      <div
+                        className={cn(
+                          'text-2xl font-bold',
+                          account.balance >= 0 ? 'text-morandi-green' : 'text-morandi-red'
+                        )}
+                      >
+                        {account.balance >= 0 ? '+' : ''}NT${' '}
+                        {Math.abs(account.balance).toLocaleString()}
                       </div>
                     </div>
 
@@ -169,20 +172,26 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                         <div className="mt-3">
                           <div className="flex justify-between text-xs text-morandi-secondary mb-1">
                             <span>使用率</span>
-                            <span>{(((Math.abs(account.balance) / (account.credit_limit || 1)) * 100)).toFixed(1)}%</span>
+                            <span>
+                              {(
+                                (Math.abs(account.balance) / (account.credit_limit || 1)) *
+                                100
+                              ).toFixed(1)}
+                              %
+                            </span>
                           </div>
                           <div className="w-full bg-morandi-container/30 rounded-full h-2">
                             <div
                               className={cn(
-                                "h-2 rounded-full transition-all duration-300",
+                                'h-2 rounded-full transition-all duration-300',
                                 Math.abs(account.balance) / (account.credit_limit || 1) > 0.8
-                                  ? "bg-morandi-red"
+                                  ? 'bg-morandi-red'
                                   : Math.abs(account.balance) / (account.credit_limit || 1) > 0.5
-                                  ? "bg-morandi-gold"
-                                  : "bg-morandi-green"
+                                    ? 'bg-morandi-gold'
+                                    : 'bg-morandi-green'
                               )}
                               style={{
-                                width: `${Math.min(((Math.abs(account.balance) / (account.credit_limit || 1)) * 100), 100)}%`
+                                width: `${Math.min((Math.abs(account.balance) / (account.credit_limit || 1)) * 100, 100)}%`,
                               }}
                             />
                           </div>
@@ -198,10 +207,10 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                           size="sm"
                           onClick={() => handleToggleActive(account.id, account.is_active)}
                           className={cn(
-                            "text-xs",
+                            'text-xs',
                             account.is_active
-                              ? "text-morandi-secondary hover:text-morandi-red"
-                              : "text-morandi-secondary hover:text-morandi-green"
+                              ? 'text-morandi-secondary hover:text-morandi-red'
+                              : 'text-morandi-secondary hover:text-morandi-green'
                           )}
                         >
                           {account.is_active ? (
@@ -247,7 +256,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
                 ))}
               </div>
             </div>
-          );
+          )
         })}
 
         {accounts.length === 0 && (
@@ -260,5 +269,5 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
       </div>
       <ConfirmDialog {...confirmDialogProps} />
     </div>
-  );
-});
+  )
+})

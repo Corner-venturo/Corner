@@ -1,31 +1,34 @@
-'use client';
+'use client'
 
-import React, { useEffect, useRef } from 'react';
-import { FileSignature, Save, Printer } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useRef } from 'react'
+import { FileSignature, Save, Printer } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { ContractTemplate } from '@/types/tour.types';
-import { ContractDialogProps } from './types';
-import { useContractForm } from './useContractForm';
-import { ContractFormFields } from './ContractFormFields';
+} from '@/components/ui/dialog'
+import { ContractTemplate } from '@/types/tour.types'
+import { ContractDialogProps } from './types'
+import { useContractForm } from './useContractForm'
+import { ContractFormFields } from './ContractFormFields'
 
 const CONTRACT_TEMPLATES = [
   { value: 'domestic' as ContractTemplate, label: '國內旅遊定型化契約（1120908修訂版）' },
   { value: 'international' as ContractTemplate, label: '國外旅遊定型化契約（1120908修訂版）' },
-  { value: 'individual_international' as ContractTemplate, label: '國外個別旅遊定型化契約（1120908修訂版）' },
-];
+  {
+    value: 'individual_international' as ContractTemplate,
+    label: '國外個別旅遊定型化契約（1120908修訂版）',
+  },
+]
 
 const CONTRACT_TEMPLATE_LABELS = {
   domestic: '國內旅遊定型化契約（1120908修訂版）',
   international: '國外旅遊定型化契約（1120908修訂版）',
   individual_international: '國外個別旅遊定型化契約（1120908修訂版）',
-};
+}
 
 export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogProps) {
   const {
@@ -48,30 +51,30 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
     selectedOrderId,
     setSelectedOrderId,
     selectedOrder,
-  } = useContractForm({ tour, mode, isOpen });
+  } = useContractForm({ tour, mode, isOpen })
 
   const onSave = async () => {
-    const success = await handleSave();
+    const success = await handleSave()
     if (success) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
   // 當對話框開啟時，重置捲動位置到頂部
   useEffect(() => {
     if (isOpen) {
       // 等待 DOM 更新後重置捲動
       setTimeout(() => {
-        const dialogContent = document.querySelector('[role="dialog"]');
+        const dialogContent = document.querySelector('[role="dialog"]')
         if (dialogContent) {
-          dialogContent.scrollTop = 0;
+          dialogContent.scrollTop = 0
         }
-      }, 100);
+      }, 100)
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -109,15 +112,18 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
           {/* 選擇訂單（如果有多個訂單） */}
           {tourOrders.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-morandi-primary mb-3">選擇訂單（旅客資料來源）</h3>
+              <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+                選擇訂單（旅客資料來源）
+              </h3>
               <select
                 value={selectedOrderId}
-                onChange={(e) => setSelectedOrderId(e.target.value)}
+                onChange={e => setSelectedOrderId(e.target.value)}
                 className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
               >
-                {tourOrders.map((order) => (
+                {tourOrders.map(order => (
                   <option key={order.id} value={order.id}>
-                    {order.order_number} - {order.contact_person} ({order.contact_phone || '無電話'})
+                    {order.order_number} - {order.contact_person} ({order.contact_phone || '無電話'}
+                    )
                   </option>
                 ))}
               </select>
@@ -134,7 +140,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             <div>
               <h3 className="text-sm font-semibold text-morandi-primary mb-3">選擇合約範本</h3>
               <div className="grid grid-cols-3 gap-4">
-                {CONTRACT_TEMPLATES.map((template) => (
+                {CONTRACT_TEMPLATES.map(template => (
                   <button
                     key={template.value}
                     onClick={() => setSelectedTemplate(template.value)}
@@ -146,7 +152,9 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   >
                     <div className="text-center">
                       <FileSignature className="mx-auto mb-1" size={24} />
-                      <div className="text-sm font-medium text-morandi-primary">{template.label}</div>
+                      <div className="text-sm font-medium text-morandi-primary">
+                        {template.label}
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -184,17 +192,14 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             </div>
           )}
 
-          <ContractFormFields
-            contractData={contractData}
-            onFieldChange={handleFieldChange}
-          />
+          <ContractFormFields contractData={contractData} onFieldChange={handleFieldChange} />
 
           {/* 備註 */}
           <div>
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">備註</h3>
             <textarea
               value={contractNotes}
-              onChange={(e) => setContractNotes(e.target.value)}
+              onChange={e => setContractNotes(e.target.value)}
               placeholder="請輸入備註..."
               className="w-full h-24 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none text-sm"
             />
@@ -208,7 +213,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 <input
                   type="checkbox"
                   checked={contractCompleted}
-                  onChange={(e) => setContractCompleted(e.target.checked)}
+                  onChange={e => setContractCompleted(e.target.checked)}
                   className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold/50 rounded"
                 />
                 <span className="text-sm text-morandi-primary">合約已完成</span>
@@ -219,7 +224,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               <input
                 type="date"
                 value={archivedDate}
-                onChange={(e) => setArchivedDate(e.target.value)}
+                onChange={e => setArchivedDate(e.target.value)}
                 className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
               />
             </div>
@@ -227,17 +232,10 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={saving}
-          >
+          <Button variant="outline" onClick={onClose} disabled={saving}>
             取消
           </Button>
-          <Button
-            onClick={onSave}
-            disabled={saving || (mode === 'create' && !selectedTemplate)}
-          >
+          <Button onClick={onSave} disabled={saving || (mode === 'create' && !selectedTemplate)}>
             <Save size={16} className="mr-2" />
             {saving ? '儲存中...' : mode === 'create' ? '建立合約' : '儲存'}
           </Button>
@@ -252,5 +250,5 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

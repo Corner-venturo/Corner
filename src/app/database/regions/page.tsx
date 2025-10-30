@@ -1,3 +1,3 @@
-import { RegionsPage } from '@/features/regions';
+import { RegionsPage } from '@/features/regions'
 
-export default RegionsPage;
+export default RegionsPage

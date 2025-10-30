@@ -1,31 +1,31 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { TIMER_INTERVAL, SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from '@/lib/constants';
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { TIMER_INTERVAL, SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from '@/lib/constants'
 
 export function TimerWidget() {
-  const [seconds, setSeconds] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
+  const [seconds, setSeconds] = useState(0)
+  const [isRunning, setIsRunning] = useState(false)
 
   useEffect(() => {
-    let interval: unknown;
+    let interval: unknown
     if (isRunning) {
       interval = setInterval(() => {
-        setSeconds((s) => s + 1);
-      }, TIMER_INTERVAL);
+        setSeconds(s => s + 1)
+      }, TIMER_INTERVAL)
     }
-    return () => clearInterval(interval);
-  }, [isRunning]);
+    return () => clearInterval(interval)
+  }, [isRunning])
 
   const formatTime = (s: number) => {
-    const hrs = Math.floor(s / SECONDS_PER_HOUR);
-    const mins = Math.floor((s % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
-    const secs = s % SECONDS_PER_MINUTE;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+    const hrs = Math.floor(s / SECONDS_PER_HOUR)
+    const mins = Math.floor((s % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE)
+    const secs = s % SECONDS_PER_MINUTE
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
 
   return (
     <div className="h-full">
@@ -33,15 +33,19 @@ export function TimerWidget() {
         <div className="p-5 space-y-4 h-full flex flex-col">
           {/* Header with Icon */}
           <div className="flex items-start gap-3">
-            <div className={cn(
-              'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
-              'bg-gradient-to-br from-slate-200/60 to-blue-100/60',
-              'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
-            )}>
+            <div
+              className={cn(
+                'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
+                'bg-gradient-to-br from-slate-200/60 to-blue-100/60',
+                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+              )}
+            >
               <Clock className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">計時器</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
+                計時器
+              </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
                 精準計時，掌握每分每秒
               </p>
@@ -88,8 +92,8 @@ export function TimerWidget() {
               variant="outline"
               size="sm"
               onClick={() => {
-                setSeconds(0);
-                setIsRunning(false);
+                setSeconds(0)
+                setIsRunning(false)
               }}
               className="bg-white/90 border-2 border-white/60 hover:bg-red-50 hover:text-red-600 hover:border-red-400 hover:shadow-md transition-all rounded-xl font-semibold"
             >
@@ -99,5 +103,5 @@ export function TimerWidget() {
         </div>
       </div>
     </div>
-  );
+  )
 }

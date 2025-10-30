@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
-import { X, FileText, Image as ImageIcon } from 'lucide-react';
-import { formatFileSize } from './utils';
+import { X, FileText, Image as ImageIcon } from 'lucide-react'
+import { formatFileSize } from './utils'
 
 interface FilePreviewProps {
-  files: File[];
-  onRemove: (index: number) => void;
+  files: File[]
+  onRemove: (index: number) => void
 }
 
 export function FilePreview({ files, onRemove }: FilePreviewProps) {
-  if (files.length === 0) return null;
+  if (files.length === 0) return null
 
   return (
     <div className="mb-3 flex flex-wrap gap-2">
       {files.map((file, index) => {
-        const isImage = file.type.startsWith('image/');
+        const isImage = file.type.startsWith('image/')
         return (
           <div
             key={index}
@@ -37,8 +37,8 @@ export function FilePreview({ files, onRemove }: FilePreviewProps) {
               <X size={14} />
             </button>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

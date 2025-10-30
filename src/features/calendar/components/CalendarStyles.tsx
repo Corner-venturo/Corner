@@ -40,7 +40,12 @@ export function CalendarStyles() {
       }
 
       .fc .fc-col-header-cell {
-        background: linear-gradient(to right, rgba(232, 230, 227, 0.4), rgba(196, 165, 114, 0.1), rgba(232, 230, 227, 0.4));
+        background: linear-gradient(
+          to right,
+          rgba(232, 230, 227, 0.4),
+          rgba(196, 165, 114, 0.1),
+          rgba(232, 230, 227, 0.4)
+        );
         padding: 0.625rem 1rem;
         font-weight: 500;
         font-size: 0.75rem;

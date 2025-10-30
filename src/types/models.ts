@@ -7,8 +7,8 @@ import { Database } from '@/lib/supabase/types'
 
 // ==================== 基礎型別 ====================
 
-export type ID = string  // 統一使用 string
-export type ISODateTime = string  // ISO 8601 格式時間戳記
+export type ID = string // 統一使用 string
+export type ISODateTime = string // ISO 8601 格式時間戳記
 export type Email = string
 export type URL = string
 
@@ -120,14 +120,7 @@ export interface Widget {
   size?: WidgetSize
 }
 
-export type WidgetType =
-  | 'calculator'
-  | 'weather'
-  | 'map'
-  | 'todo'
-  | 'calendar'
-  | 'clock'
-  | 'notes'
+export type WidgetType = 'calculator' | 'weather' | 'map' | 'todo' | 'calendar' | 'clock' | 'notes'
 
 export interface WidgetConfig {
   [key: string]: unknown

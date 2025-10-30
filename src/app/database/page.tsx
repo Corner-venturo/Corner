@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import { MapPin, MapIcon, Calculator, Building2 } from 'lucide-react';
+import { useRouter } from 'next/navigation'
+import { MapPin, MapIcon, Calculator, Building2 } from 'lucide-react'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const databaseModules = [
   {
@@ -15,7 +15,7 @@ const databaseModules = [
     icon: MapPin,
     href: '/database/regions',
     color: 'bg-blue-500',
-    count: 3
+    count: 3,
   },
   {
     id: 'activities',
@@ -24,7 +24,7 @@ const databaseModules = [
     icon: MapIcon,
     href: '/database/activities',
     color: 'bg-purple-500',
-    count: 18
+    count: 18,
   },
   {
     id: 'attractions',
@@ -33,7 +33,7 @@ const databaseModules = [
     icon: MapIcon,
     href: '/database/attractions',
     color: 'bg-rose-500',
-    count: 0
+    count: 0,
   },
   {
     id: 'suppliers',
@@ -42,18 +42,20 @@ const databaseModules = [
     icon: Building2,
     href: '/database/suppliers',
     color: 'bg-indigo-500',
-    count: 12
-  }
-];
+    count: 12,
+  },
+]
 
 export default function DatabasePage() {
-  const router = useRouter();
+  const router = useRouter()
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="資料庫管理"
-        onAdd={() => {/* 批次匯入邏輯 */}}
+        onAdd={() => {
+          /* 批次匯入邏輯 */
+        }}
         addLabel="批次匯入"
       />
 
@@ -86,8 +88,8 @@ export default function DatabasePage() {
 
         {/* 功能模組卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {databaseModules.map((module) => {
-            const Icon = module.icon;
+          {databaseModules.map(module => {
+            const Icon = module.icon
             return (
               <div
                 key={module.id}
@@ -95,10 +97,12 @@ export default function DatabasePage() {
                 className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-all duration-200 cursor-pointer hover:border-morandi-gold/20"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={cn(
-                    'w-12 h-12 rounded-lg flex items-center justify-center',
-                    module.color
-                  )}>
+                  <div
+                    className={cn(
+                      'w-12 h-12 rounded-lg flex items-center justify-center',
+                      module.color
+                    )}
+                  >
                     <Icon size={24} className="text-white" />
                   </div>
                   <div className="text-right">
@@ -107,12 +111,8 @@ export default function DatabasePage() {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-medium text-morandi-primary mb-2">
-                  {module.title}
-                </h3>
-                <p className="text-sm text-morandi-secondary">
-                  {module.description}
-                </p>
+                <h3 className="text-lg font-medium text-morandi-primary mb-2">{module.title}</h3>
+                <p className="text-sm text-morandi-secondary">{module.description}</p>
 
                 <div className="mt-4 pt-4 border-t border-border">
                   <Button
@@ -124,7 +124,7 @@ export default function DatabasePage() {
                   </Button>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
 
@@ -152,5 +152,5 @@ export default function DatabasePage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

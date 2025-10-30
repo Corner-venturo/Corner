@@ -66,25 +66,28 @@ Main page: src/app/page.tsx        (80 lines)  - Orchestrates dashboard layout
 ## Hooks
 
 ### useWidgets
+
 Manages widget activation state and persistence.
 
 ```tsx
-const { activeWidgets, toggleWidget } = useWidgets();
+const { activeWidgets, toggleWidget } = useWidgets()
 ```
 
 ### useStatsData
+
 Calculates all business statistics from tour and order data.
 
 ```tsx
-const allStats = useStatsData();
+const allStats = useStatsData()
 ```
 
 ### useStatsConfig
+
 Loads and saves stats configuration.
 
 ```tsx
-const activeStats = useStatsConfig();
-saveStatsConfig(newStats);
+const activeStats = useStatsConfig()
+saveStatsConfig(newStats)
 ```
 
 ## Types
@@ -102,33 +105,28 @@ saveStatsConfig(newStats);
 The refactored main page is now only 80 lines (down from 1109):
 
 ```tsx
-import { useWidgets } from '@/features/dashboard/hooks';
-import { WidgetSettingsDialog, AVAILABLE_WIDGETS } from '@/features/dashboard/components';
+import { useWidgets } from '@/features/dashboard/hooks'
+import { WidgetSettingsDialog, AVAILABLE_WIDGETS } from '@/features/dashboard/components'
 
 export default function Home() {
-  const { activeWidgets, toggleWidget } = useWidgets();
+  const { activeWidgets, toggleWidget } = useWidgets()
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="首頁"
         actions={
-          <WidgetSettingsDialog
-            activeWidgets={activeWidgets}
-            onToggleWidget={toggleWidget}
-          />
+          <WidgetSettingsDialog activeWidgets={activeWidgets} onToggleWidget={toggleWidget} />
         }
       />
       <div className="flex-1 overflow-auto">
-        {AVAILABLE_WIDGETS.filter((w) => activeWidgets.includes(w.id)).map(
-          (widget) => {
-            const Component = widget.component;
-            return <Component key={widget.id} />;
-          }
-        )}
+        {AVAILABLE_WIDGETS.filter(w => activeWidgets.includes(w.id)).map(widget => {
+          const Component = widget.component
+          return <Component key={widget.id} />
+        })}
       </div>
     </div>
-  );
+  )
 }
 ```
 

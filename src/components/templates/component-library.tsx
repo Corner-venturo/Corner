@@ -1,23 +1,32 @@
-'use client';
+'use client'
 
-import { FileText, Image as ImageIcon, Table, AlignLeft, Calendar, Users, DollarSign, Plane } from 'lucide-react';
+import {
+  FileText,
+  Image as ImageIcon,
+  Table,
+  AlignLeft,
+  Calendar,
+  Users,
+  DollarSign,
+  Plane,
+} from 'lucide-react'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 
-import { _cn } from '@/lib/utils';
+import { _cn } from '@/lib/utils'
 
 interface Component {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  description: string;
-  template: string[][];  // Excel 資料格式
+  id: string
+  name: string
+  icon: React.ElementType
+  description: string
+  template: string[][] // Excel 資料格式
 }
 
 interface ComponentCategory {
-  name: string;
-  icon: React.ElementType;
-  components: Component[];
+  name: string
+  icon: React.ElementType
+  components: Component[]
 }
 
 // 定義組件庫
@@ -34,19 +43,17 @@ const componentCategories: ComponentCategory[] = [
         template: [
           ['【Logo 區】', '', ''],
           ['', '', ''],
-          ['', '', '']
-        ]
+          ['', '', ''],
+        ],
       },
       {
         id: 'title',
         name: '主標題',
         icon: FileText,
         description: '報價單標題',
-        template: [
-          ['', '團體旅遊報價單', '', '', '']
-        ]
-      }
-    ]
+        template: [['', '團體旅遊報價單', '', '', '']],
+      },
+    ],
   },
   {
     name: '基本資訊',
@@ -61,8 +68,8 @@ const componentCategories: ComponentCategory[] = [
           ['客戶名稱', '{customer_name}', '', '報價日期', '{quote_date}'],
           ['聯絡人', '{contact_person}', '', '承辦業務', '{sales_person}'],
           ['聯絡電話', '{phone}', '', '預計日期', '{departure_date}'],
-          ['地址', '{address}', '', '', '']
-        ]
+          ['地址', '{address}', '', '', ''],
+        ],
       },
       {
         id: 'tour-info',
@@ -73,10 +80,10 @@ const componentCategories: ComponentCategory[] = [
           ['旅遊名稱', '{tour_name}'],
           ['出發日期', '{departure_date}'],
           ['返回日期', '{return_date}'],
-          ['預計人數', '{participants}', '人']
-        ]
-      }
-    ]
+          ['預計人數', '{participants}', '人'],
+        ],
+      },
+    ],
   },
   {
     name: '行程與費用',
@@ -91,8 +98,8 @@ const componentCategories: ComponentCategory[] = [
           ['天數', '行程內容', '早餐', '午餐', '晚餐', '住宿'],
           ['第1天', '', '飯店', '機上', '當地餐廳', ''],
           ['第2天', '', '飯店', '當地餐廳', '當地餐廳', ''],
-          ['第3天', '', '飯店', '當地餐廳', '當地餐廳', '']
-        ]
+          ['第3天', '', '飯店', '當地餐廳', '當地餐廳', ''],
+        ],
       },
       {
         id: 'price-table',
@@ -103,8 +110,8 @@ const componentCategories: ComponentCategory[] = [
           ['項目', '', '', '單位金額'],
           ['大人費用', '', '', '$'],
           ['小孩不佔床', '(滿12歲以下)', '', '$'],
-          ['嬰兒', '', '', '$']
-        ]
+          ['嬰兒', '', '', '$'],
+        ],
       },
       {
         id: 'flight-info',
@@ -113,10 +120,10 @@ const componentCategories: ComponentCategory[] = [
         description: '航班時刻表',
         template: [
           ['航空公司', '航班代號', '出發機場', '抵達機場', '航行時間'],
-          ['', '', '', '', '']
-        ]
-      }
-    ]
+          ['', '', '', '', ''],
+        ],
+      },
+    ],
   },
   {
     name: '說明與備註',
@@ -127,12 +134,7 @@ const componentCategories: ComponentCategory[] = [
         name: '備註區',
         icon: FileText,
         description: '注意事項與備註',
-        template: [
-          ['備註'],
-          ['1. '],
-          ['2. '],
-          ['3. ']
-        ]
+        template: [['備註'], ['1. '], ['2. '], ['3. ']],
       },
       {
         id: 'inclusions',
@@ -144,8 +146,8 @@ const componentCategories: ComponentCategory[] = [
           ['• 來回機票（含稅金）'],
           ['• 行程表所列之住宿費用'],
           ['• 行程表所列之餐食費用'],
-          ['• 旅遊期間參加活動費用']
-        ]
+          ['• 旅遊期間參加活動費用'],
+        ],
       },
       {
         id: 'exclusions',
@@ -157,30 +159,28 @@ const componentCategories: ComponentCategory[] = [
           ['• 新辦護照費用'],
           ['• 導遊、司機小費'],
           ['• 個人消費'],
-          ['• 旅遊平安保險（建議自行投保）']
-        ]
-      }
-    ]
-  }
-];
+          ['• 旅遊平安保險（建議自行投保）'],
+        ],
+      },
+    ],
+  },
+]
 
 interface ComponentLibraryProps {
-  onInsert: (componentData: string[][]) => void;
+  onInsert: (componentData: string[][]) => void
 }
 
 export function ComponentLibrary({ onInsert }: ComponentLibraryProps) {
   const handleComponentClick = (component: Component) => {
-    onInsert(component.template);
+    onInsert(component.template)
 
     // 同時複製到剪貼簿
-    const templateText = component.template
-      .map(row => row.join('\t'))
-      .join('\n');
-    navigator.clipboard.writeText(templateText);
-  };
+    const templateText = component.template.map(row => row.join('\t')).join('\n')
+    navigator.clipboard.writeText(templateText)
+  }
 
   // 扁平化所有組件
-  const allComponents = componentCategories.flatMap(category => category.components);
+  const allComponents = componentCategories.flatMap(category => category.components)
 
   return (
     <div className="px-6 py-3">
@@ -188,8 +188,8 @@ export function ComponentLibrary({ onInsert }: ComponentLibraryProps) {
         <span className="text-sm font-medium text-morandi-secondary whitespace-nowrap mr-2">
           快速插入：
         </span>
-        {allComponents.map((component) => {
-          const Icon = component.icon;
+        {allComponents.map(component => {
+          const Icon = component.icon
           return (
             <Button
               key={component.id}
@@ -202,9 +202,9 @@ export function ComponentLibrary({ onInsert }: ComponentLibraryProps) {
               <Icon size={14} className="mr-1.5" />
               {component.name}
             </Button>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

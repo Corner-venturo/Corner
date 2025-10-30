@@ -1,22 +1,22 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { useOrderStore, useTourStore } from '@/stores';
-import { ArrowLeft, BarChart3, User, CreditCard } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { useOrderStore, useTourStore } from '@/stores'
+import { ArrowLeft, BarChart3, User, CreditCard } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function OrderOverviewPage() {
-  const router = useRouter();
-  const params = useParams();
-  const orderId = params.orderId as string;
+  const router = useRouter()
+  const params = useParams()
+  const orderId = params.orderId as string
   const { items: orders } = useOrderStore()
-  const { items: tours } = useTourStore();
+  const { items: tours } = useTourStore()
 
-  const order = orders.find(o => o.id === orderId);
-  const tour = tours.find(t => t.id === order?.tour_id);
+  const order = orders.find(o => o.id === orderId)
+  const tour = tours.find(t => t.id === order?.tour_id)
 
   if (!order) {
     return (
@@ -29,29 +29,22 @@ export default function OrderOverviewPage() {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   const getPaymentBadge = (status: string) => {
     const badges: Record<string, string> = {
-      '已收款': 'bg-morandi-green text-white',
-      '部分收款': 'bg-morandi-gold text-white',
-      '未收款': 'bg-morandi-red text-white'
-    };
-    return badges[status] || 'bg-morandi-container text-morandi-secondary';
-  };
+      已收款: 'bg-morandi-green text-white',
+      部分收款: 'bg-morandi-gold text-white',
+      未收款: 'bg-morandi-red text-white',
+    }
+    return badges[status] || 'bg-morandi-container text-morandi-secondary'
+  }
 
   return (
     <div className="space-y-6 ">
-      <ResponsiveHeader
-        title={`訂單總覽 - ${order.order_number}`}
-      >
-        <Button
-          onClick={() => router.push('/orders')}
-          variant="ghost"
-          size="sm"
-          className="p-2"
-        >
+      <ResponsiveHeader title={`訂單總覽 - ${order.order_number}`}>
+        <Button onClick={() => router.push('/orders')} variant="ghost" size="sm" className="p-2">
           <ArrowLeft size={16} />
         </Button>
       </ResponsiveHeader>
@@ -79,7 +72,9 @@ export default function OrderOverviewPage() {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">最後更新</span>
-                <span className="text-morandi-primary">{new Date(order.updated_at).toLocaleDateString()}</span>
+                <span className="text-morandi-primary">
+                  {new Date(order.updated_at).toLocaleDateString()}
+                </span>
               </div>
               {tour && (
                 <>
@@ -148,10 +143,12 @@ export default function OrderOverviewPage() {
                 <div className="text-morandi-secondary text-sm">待收款</div>
               </div>
               <div className="text-center">
-                <span className={cn(
-                  'inline-flex items-center px-3 py-2 rounded text-sm font-medium',
-                  getPaymentBadge(order.payment_status)
-                )}>
+                <span
+                  className={cn(
+                    'inline-flex items-center px-3 py-2 rounded text-sm font-medium',
+                    getPaymentBadge(order.payment_status)
+                  )}
+                >
                   {order.payment_status}
                 </span>
                 <div className="text-morandi-secondary text-sm mt-1">付款狀態</div>
@@ -181,5 +178,5 @@ export default function OrderOverviewPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

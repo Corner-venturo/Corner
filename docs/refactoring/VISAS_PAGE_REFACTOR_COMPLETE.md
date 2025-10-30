@@ -3,11 +3,13 @@
 ## 📊 重構成果總覽
 
 ### 程式碼行數變化
+
 - **重構前**: 1,082 lines
 - **重構後**: 469 lines
 - **減少**: 613 lines (-57%)
 
 ### 建置狀態
+
 ✅ **Build 成功** - 無 TypeScript 錯誤
 
 ---
@@ -15,9 +17,11 @@
 ## 🎯 各階段完成詳情
 
 ### Phase 1: 提取簽證常數 ✅
+
 **目標**: 將所有常數提取到獨立檔案
 
 **執行內容**:
+
 - 創建 `/src/constants/visa-info.ts` (170 lines)
 - 提取護照和台胞證的收費選項
 - 提取所有申請要求和注意事項
@@ -26,6 +30,7 @@
 **成果**: 1,082 → 942 lines (-140 lines, -13%)
 
 **新增檔案**:
+
 ```
 src/constants/visa-info.ts
 ├── PASSPORT_DELIVERY_OPTIONS
@@ -41,9 +46,11 @@ src/constants/visa-info.ts
 ---
 
 ### Phase 2: 建立 Visa Hooks ✅
+
 **目標**: 提取業務邏輯到可重用的 Hooks
 
 **執行內容**:
+
 - 創建 `use-visa-date-calculator.ts` - 日期計算邏輯
 - 創建 `use-visa-fee-calculator.ts` - 費用計算邏輯
 - 創建 `use-copy-visa-info.ts` - 複製簽證資訊邏輯
@@ -53,6 +60,7 @@ src/constants/visa-info.ts
 **成果**: 942 → 748 lines (-194 lines, -21%)
 
 **新增 Hooks**:
+
 ```
 src/hooks/
 ├── use-visa-date-calculator.ts (38 lines)
@@ -77,9 +85,11 @@ src/hooks/
 ---
 
 ### Phase 3: 拆分 VisaInfoDialog 組件 ✅
+
 **目標**: 將簽證資訊對話框獨立成組件
 
 **執行內容**:
+
 - 創建 `/src/components/visas/VisaInfoDialog.tsx` (168 lines)
 - 包含護照和台胞證資訊的 Tab 切換
 - 支援勾選和複製功能
@@ -88,6 +98,7 @@ src/hooks/
 **成果**: 748 → 646 lines (-102 lines, -14%)
 
 **組件結構**:
+
 ```tsx
 <VisaInfoDialog>
   ├── DialogHeader (複製按鈕 + 狀態顯示)
@@ -105,9 +116,11 @@ src/hooks/
 ---
 
 ### Phase 4: 拆分 AddVisaDialog 組件 ✅
+
 **目標**: 將新增簽證對話框獨立成組件
 
 **執行內容**:
+
 - 創建 `/src/components/visas/AddVisaDialog.tsx` (230 lines)
 - 包含聯絡人資訊表單
 - 包含批次辦理人動態列表
@@ -116,6 +129,7 @@ src/hooks/
 **成果**: 646 → 489 lines (-157 lines, -24%)
 
 **組件結構**:
+
 ```tsx
 <AddVisaDialog>
   ├── 聯絡人資訊區
@@ -142,9 +156,11 @@ src/hooks/
 ---
 
 ### Phase 5: 簡化主頁面 ✅
+
 **目標**: 移除未使用的 imports，最終清理
 
 **執行內容**:
+
 - 移除未使用的 UI 組件 imports (Dialog, Input, Tabs 等)
 - 移除未使用的常數 imports
 - 移除未使用的 icon imports
@@ -177,21 +193,25 @@ src/
 ## 🎉 重構優勢
 
 ### 1. 可維護性 ⬆️
+
 - 每個檔案職責單一，易於理解
 - 業務邏輯集中在 Hooks，易於測試
 - 常數集中管理，修改一處即可
 
 ### 2. 可重用性 ⬆️
+
 - Hooks 可在其他頁面重用
 - 組件可在其他地方引用
 - 常數可跨頁面共享
 
 ### 3. 可讀性 ⬆️
+
 - 主頁面從 1,082 行減少到 469 行 (-57%)
 - 邏輯分層清晰：UI → Hooks → Services
 - 命名語意化，易於理解
 
 ### 4. 可測試性 ⬆️
+
 - Hooks 可單獨測試
 - 組件可獨立測試
 - 業務邏輯與 UI 分離
@@ -201,6 +221,7 @@ src/
 ## 🔧 技術亮點
 
 ### 自定義 Hooks 模式
+
 ```typescript
 // 表單狀態管理
 const { contactInfo, applicants, addApplicant, ... } = useVisaForm();
@@ -213,9 +234,10 @@ const { calculateReceivedDate } = useVisaDateCalculator();
 ```
 
 ### 組件解耦
+
 ```typescript
 // 主頁面只需傳遞 props
-<VisaInfoDialog 
+<VisaInfoDialog
   open={isInfoDialogOpen}
   onOpenChange={setIsInfoDialogOpen}
   // ... 其他 props
@@ -229,6 +251,7 @@ const { calculateReceivedDate } = useVisaDateCalculator();
 ```
 
 ### 常數集中管理
+
 ```typescript
 // 所有簽證相關常數統一從一處 import
 import {
@@ -236,21 +259,21 @@ import {
   PASSPORT_REQUIREMENTS,
   formatCurrency,
   // ...
-} from '@/constants/visa-info';
+} from '@/constants/visa-info'
 ```
 
 ---
 
 ## 📈 數據對比
 
-| 指標 | 重構前 | 重構後 | 改善 |
-|------|--------|--------|------|
-| 主頁面行數 | 1,082 | 469 | -57% |
-| 單一檔案最大行數 | 1,082 | 230 | -79% |
-| 常數散布位置 | 1 (內嵌) | 1 (獨立) | 集中化 |
-| Hooks 數量 | 0 | 4 | +4 |
-| 組件數量 | 1 | 3 | +2 |
-| 可重用模組 | 0 | 6 | +6 |
+| 指標             | 重構前   | 重構後   | 改善   |
+| ---------------- | -------- | -------- | ------ |
+| 主頁面行數       | 1,082    | 469      | -57%   |
+| 單一檔案最大行數 | 1,082    | 230      | -79%   |
+| 常數散布位置     | 1 (內嵌) | 1 (獨立) | 集中化 |
+| Hooks 數量       | 0        | 4        | +4     |
+| 組件數量         | 1        | 3        | +2     |
+| 可重用模組       | 0        | 6        | +6     |
 
 ---
 
@@ -266,11 +289,13 @@ import {
 ## 🚀 後續建議
 
 ### 可選優化 (非必要)
+
 1. **類型系統統一** - 將 `/src/stores/types.ts` 與 `/src/types/` 合併 (風險較高，建議獨立規劃)
 2. **測試覆蓋** - 為新的 Hooks 添加單元測試
 3. **Tour Hooks 重構** - 參考此次重構經驗，優化 Tour 相關 Hooks
 
 ### 維護注意事項
+
 - 修改簽證常數時，統一在 `/src/constants/visa-info.ts` 修改
 - 新增簽證相關邏輯時，優先考慮擴展現有 Hooks
 - 保持組件職責單一，避免回到大組件模式
@@ -281,4 +306,3 @@ import {
 **重構執行**: Claude AI  
 **重構策略**: 漸進式重構 (5 個階段，每階段驗證)  
 **風險等級**: 低 (每階段都經過 build 驗證)
-

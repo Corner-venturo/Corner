@@ -1,35 +1,39 @@
-'use client';
+'use client'
 
-import React, { useState, useCallback } from 'react';
-import { Tour } from '@/stores/types';
-import { useTourStore, useOrderStore, useMemberStore } from '@/stores';
-import { Plus, FileText, Package, RefreshCw } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { TourExtraFields } from '../types';
+import React, { useState, useCallback } from 'react'
+import { Tour } from '@/stores/types'
+import { useTourStore, useOrderStore, useMemberStore } from '@/stores'
+import { Plus, FileText, Package, RefreshCw } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { TourExtraFields } from '../types'
 
 interface TourOperationsAddButtonProps {
-  tour: Tour;
-  tourExtraFields: Record<string, any>;
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  tour: Tour
+  tourExtraFields: Record<string, any>
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
 }
 
-export function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFields }: TourOperationsAddButtonProps) {
-  const orderStore = useOrderStore();
-  const memberStore = useMemberStore();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+export function TourOperationsAddButton({
+  tour,
+  tourExtraFields,
+  setTourExtraFields,
+}: TourOperationsAddButtonProps) {
+  const orderStore = useOrderStore()
+  const memberStore = useMemberStore()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // Get all orders for this tour
-  const tourOrders = orderStore.items.filter((order) => order.tour_id === tour.id);
+  const tourOrders = orderStore.items.filter(order => order.tour_id === tour.id)
 
   // Get member data
-  const allTourMembers = memberStore.items.filter((member) =>
-    tourOrders.some((order) => order.id === member.order_id)
-  );
+  const allTourMembers = memberStore.items.filter(member =>
+    tourOrders.some(order => order.id === member.order_id)
+  )
 
   // Calculate assigned members
-  const assignedMembers = allTourMembers.filter((member) => member.assignedRoom).length;
+  const assignedMembers = allTourMembers.filter(member => member.assignedRoom).length
 
   return (
     <>
@@ -57,74 +61,83 @@ export function TourOperationsAddButton({ tour, tourExtraFields, setTourExtraFie
         setTourExtraFields={setTourExtraFields}
       />
     </>
-  );
+  )
 }
 
 interface TourOperationsAddDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  tour: Tour;
-  tourExtraFields: Record<string, any>;
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  isOpen: boolean
+  onClose: () => void
+  tour: Tour
+  tourExtraFields: Record<string, any>
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
 }
 
-function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTourExtraFields }: TourOperationsAddDialogProps) {
-  const handleOptionSelect = useCallback((option: string) => {
-    const tour_id = tour.id;
+function TourOperationsAddDialog({
+  isOpen,
+  onClose,
+  tour,
+  tourExtraFields,
+  setTourExtraFields,
+}: TourOperationsAddDialogProps) {
+  const handleOptionSelect = useCallback(
+    (option: string) => {
+      const tour_id = tour.id
 
-    // Initialize field state for this tour if not exists
-    if (!tourExtraFields[tour_id]) {
-      setTourExtraFields(prev => ({
-        ...prev,
-        [tour_id]: {
-          addOns: false,
-          refunds: false,
-          customFields: []
-        }
-      }));
-    }
-
-    switch (option) {
-      case 'addon':
+      // Initialize field state for this tour if not exists
+      if (!tourExtraFields[tour_id]) {
         setTourExtraFields(prev => ({
           ...prev,
           [tour_id]: {
-            ...prev[tour_id],
-            addOns: true
-          }
-        }));
-        break;
+            addOns: false,
+            refunds: false,
+            customFields: [],
+          },
+        }))
+      }
 
-      case 'refund':
-        setTourExtraFields(prev => ({
-          ...prev,
-          [tour_id]: {
-            ...prev[tour_id],
-            refunds: true
-          }
-        }));
-        break;
-
-      case 'blank':
-        const fieldName = prompt('請輸入欄位名稱:');
-        if (fieldName && fieldName.trim()) {
-          const fieldId = Date.now().toString();
+      switch (option) {
+        case 'addon':
           setTourExtraFields(prev => ({
             ...prev,
             [tour_id]: {
               ...prev[tour_id],
-              customFields: [
-                ...(prev[tour_id]?.customFields || []),
-                { id: fieldId, name: fieldName.trim() }
-              ]
-            }
-          }));
-        }
-        break;
-    }
+              addOns: true,
+            },
+          }))
+          break
 
-    onClose();
-  }, [tour.id, tourExtraFields, setTourExtraFields, onClose]);
+        case 'refund':
+          setTourExtraFields(prev => ({
+            ...prev,
+            [tour_id]: {
+              ...prev[tour_id],
+              refunds: true,
+            },
+          }))
+          break
+
+        case 'blank':
+          const fieldName = prompt('請輸入欄位名稱:')
+          if (fieldName && fieldName.trim()) {
+            const fieldId = Date.now().toString()
+            setTourExtraFields(prev => ({
+              ...prev,
+              [tour_id]: {
+                ...prev[tour_id],
+                customFields: [
+                  ...(prev[tour_id]?.customFields || []),
+                  { id: fieldId, name: fieldName.trim() },
+                ],
+              },
+            }))
+          }
+          break
+      }
+
+      onClose()
+    },
+    [tour.id, tourExtraFields, setTourExtraFields, onClose]
+  )
 
   const options = [
     {
@@ -133,7 +146,7 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
       description: '新增自定義空白項目',
       icon: FileText,
       color: 'text-morandi-secondary',
-      bgColor: 'hover:bg-morandi-container/30'
+      bgColor: 'hover:bg-morandi-container/30',
     },
     {
       id: 'addon',
@@ -141,7 +154,7 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
       description: '新增額外購買項目',
       icon: Package,
       color: 'text-morandi-blue',
-      bgColor: 'hover:bg-morandi-blue/10'
+      bgColor: 'hover:bg-morandi-blue/10',
     },
     {
       id: 'refund',
@@ -149,12 +162,12 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
       description: '新增退款相關項目',
       icon: RefreshCw,
       color: 'text-morandi-red',
-      bgColor: 'hover:bg-morandi-red/10'
-    }
-  ];
+      bgColor: 'hover:bg-morandi-red/10',
+    },
+  ]
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>新增項目</DialogTitle>
@@ -165,8 +178,8 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
             為旅遊團「{tour.name}」選擇要新增的項目類型：
           </div>
 
-          {options.map((option) => {
-            const Icon = option.icon;
+          {options.map(option => {
+            const Icon = option.icon
             return (
               <button
                 key={option.id}
@@ -176,7 +189,12 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
                   option.bgColor
                 )}
               >
-                <div className={cn('w-10 h-10 rounded-full bg-morandi-container/20 flex items-center justify-center', option.color)}>
+                <div
+                  className={cn(
+                    'w-10 h-10 rounded-full bg-morandi-container/20 flex items-center justify-center',
+                    option.color
+                  )}
+                >
                   <Icon size={18} />
                 </div>
                 <div className="flex-1">
@@ -187,7 +205,7 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
                   <FileText size={16} />
                 </div>
               </button>
-            );
+            )
           })}
         </div>
 
@@ -198,5 +216,5 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

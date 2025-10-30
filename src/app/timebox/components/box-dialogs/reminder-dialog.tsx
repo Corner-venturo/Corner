@@ -33,7 +33,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
   const handleUpdate = () => {
     const reminderData: ReminderData = {
       text,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     }
 
     updateReminderData(scheduledBox.id, reminderData)
@@ -59,15 +59,15 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
       message: '確定要移除此提醒排程嗎？',
       details: [`箱子：${box?.name}`],
       confirmLabel: '確認移除',
-      cancelLabel: '取消'
-    });
+      cancelLabel: '取消',
+    })
 
     if (!confirmed) {
-      return;
+      return
     }
 
-    removeScheduledBox(scheduledBox.id);
-    onClose();
+    removeScheduledBox(scheduledBox.id)
+    onClose()
   }
 
   if (!box) return null
@@ -88,7 +88,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
   }
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
@@ -99,13 +99,11 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
         <div className="space-y-4">
           {/* 提示內容 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              提示內容
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">提示內容</label>
             <Textarea
               placeholder="例如：保濕程序&#10;1. 卸妝&#10;2. 洗臉&#10;3. 化妝水&#10;4. 精華液&#10;5. 乳液&#10;6. 面膜敷30分鐘"
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={e => setText(e.target.value)}
               rows={10}
               className="resize-none"
             />
@@ -113,9 +111,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
 
           {/* 最後更新時間 */}
           {getLastUpdated() && (
-            <div className="text-sm text-gray-500">
-              最後更新：{getLastUpdated()}
-            </div>
+            <div className="text-sm text-gray-500">最後更新：{getLastUpdated()}</div>
           )}
 
           {/* 按鈕 */}
@@ -132,9 +128,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
               <Button variant="outline" onClick={onClose}>
                 取消
               </Button>
-              <Button onClick={handleUpdate}>
-                更新內容
-              </Button>
+              <Button onClick={handleUpdate}>更新內容</Button>
               <Button onClick={handleComplete}>
                 {scheduledBox.completed ? '已完成' : '標記完成'}
               </Button>

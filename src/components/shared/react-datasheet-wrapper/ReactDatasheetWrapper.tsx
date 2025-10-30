@@ -1,16 +1,16 @@
-'use client';
+'use client'
 
-import React, { useCallback, useMemo } from 'react';
-import ReactDataSheet from 'react-datasheet';
-import { calculateFormula, getMemberContext } from '@/lib/formula-calculator';
-import { cn } from '@/lib/utils';
-import 'react-datasheet/lib/react-datasheet.css';
+import React, { useCallback, useMemo } from 'react'
+import ReactDataSheet from 'react-datasheet'
+import { calculateFormula, getMemberContext } from '@/lib/formula-calculator'
+import { cn } from '@/lib/utils'
+import 'react-datasheet/lib/react-datasheet.css'
 
-import { DataSheetProps, CellData } from './types';
-import { useDatasheetState } from './useDatasheetState';
-import { useDatasheetHandlers } from './useDatasheetHandlers';
-import { DatasheetCell } from './DatasheetCell';
-import { DatasheetStyles } from './DatasheetStyles';
+import { DataSheetProps, CellData } from './types'
+import { useDatasheetState } from './useDatasheetState'
+import { useDatasheetHandlers } from './useDatasheetHandlers'
+import { DatasheetCell } from './DatasheetCell'
+import { DatasheetStyles } from './DatasheetStyles'
 
 export function ReactDatasheetWrapper({
   columns,
@@ -31,7 +31,7 @@ export function ReactDatasheetWrapper({
   enableColumnResize = true,
   enableRowDrag = true,
   tour_id,
-  tourId
+  tourId,
 }: DataSheetProps) {
   // State management
   const {
@@ -44,14 +44,14 @@ export function ReactDatasheetWrapper({
     visibleColumns,
     saveColumnWidth,
     getColumnWidth,
-    sheetData: initialSheetData
+    sheetData: initialSheetData,
   } = useDatasheetState({
     columns,
     data,
     hiddenColumns,
     tour_id,
-    tourId
-  });
+    tourId,
+  })
 
   // Event handlers
   const {
@@ -62,7 +62,7 @@ export function ReactDatasheetWrapper({
     handleCellsChanged,
     handleKeyDown,
     handleSelect,
-    parsePaste
+    parsePaste,
   } = useDatasheetHandlers({
     data,
     visibleColumns,
@@ -72,39 +72,39 @@ export function ReactDatasheetWrapper({
     enableRowDrag,
     onDataUpdate,
     onCellsChanged,
-    saveColumnWidth
-  });
+    saveColumnWidth,
+  })
 
   // Apply formula calculations and formula styling to sheet data
   const sheetData = useMemo(() => {
     return initialSheetData.map((row, rowIndex) => {
-      if (rowIndex === 0) return row; // Keep header as is
+      if (rowIndex === 0) return row // Keep header as is
 
       return row.map(cell => {
-        const value = cell.value;
-        let displayValue = value;
-        let className = cell.className;
+        const value = cell.value
+        let displayValue = value
+        let className = cell.className
 
         // Calculate formulas
         if (typeof value === 'string' && value.startsWith('=')) {
-          const context = getMemberContext(cell.rowData || {}, tour_add_ons, tourPrice);
-          displayValue = calculateFormula(value, context);
-          className = cn(className, 'datasheet-formula');
+          const context = getMemberContext(cell.rowData || {}, tour_add_ons, tourPrice)
+          displayValue = calculateFormula(value, context)
+          className = cn(className, 'datasheet-formula')
         }
 
         // Add readonly styling
         if (cell.readOnly) {
-          className = cn(className, 'datasheet-readonly');
+          className = cn(className, 'datasheet-readonly')
         }
 
         return {
           ...cell,
           displayValue,
-          className: cn('datasheet-cell', className)
-        };
-      });
-    });
-  }, [initialSheetData, tour_add_ons, tourPrice]);
+          className: cn('datasheet-cell', className),
+        }
+      })
+    })
+  }, [initialSheetData, tour_add_ons, tourPrice])
 
   // Custom value renderer
   const valueRenderer = useCallback(
@@ -125,7 +125,7 @@ export function ReactDatasheetWrapper({
           onColumnDelete={onColumnDelete}
           onColumnResize={handleColumnResize}
         />
-      );
+      )
     },
     [
       visibleColumns,
@@ -137,29 +137,29 @@ export function ReactDatasheetWrapper({
       isRoomFull,
       onColumnHide,
       onColumnDelete,
-      handleColumnResize
+      handleColumnResize,
     ]
-  );
+  )
 
   // Row renderer with drag support
   const rowRenderer = useCallback(
     (props: any) => {
-      const rowIndex = props['data-row'];
-      const isDraggable = enableRowDrag && rowIndex > 0;
-      const isDragging = draggedRow === rowIndex - 1;
+      const rowIndex = props['data-row']
+      const isDraggable = enableRowDrag && rowIndex > 0
+      const isDragging = draggedRow === rowIndex - 1
 
       return (
         <tr
           {...props}
           draggable={isDraggable}
-          onDragStart={(e) => {
-            handleRowDragStart(e, rowIndex);
-            setDraggedRow(rowIndex - 1);
+          onDragStart={e => {
+            handleRowDragStart(e, rowIndex)
+            setDraggedRow(rowIndex - 1)
           }}
           onDragOver={handleRowDragOver}
-          onDrop={(e) => {
-            handleRowDrop(e, draggedRow, rowIndex);
-            setDraggedRow(null);
+          onDrop={e => {
+            handleRowDrop(e, draggedRow, rowIndex)
+            setDraggedRow(null)
           }}
           className={cn(
             props.className,
@@ -168,46 +168,54 @@ export function ReactDatasheetWrapper({
           )}
           style={{
             ...props.style,
-            borderLeft: isDragging ? '3px solid #d97706' : undefined
+            borderLeft: isDragging ? '3px solid #d97706' : undefined,
           }}
         />
-      );
+      )
     },
     [enableRowDrag, draggedRow, handleRowDragStart, handleRowDragOver, handleRowDrop, setDraggedRow]
-  );
+  )
 
   // Cell renderer with width support
-  const cellRenderer = useCallback(
-    (props: any) => {
-      const { editing, selected, updated, width, columnKey, rowIndex, attributesRenderer, valueRenderer, dataRenderer, ...tdProps } = props;
-      const cellWidth = width || 100;
+  const cellRenderer = useCallback((props: any) => {
+    const {
+      editing,
+      selected,
+      updated,
+      width,
+      columnKey,
+      rowIndex,
+      attributesRenderer,
+      valueRenderer,
+      dataRenderer,
+      ...tdProps
+    } = props
+    const cellWidth = width || 100
 
-      return (
-        <td
-          {...tdProps}
-          style={{
-            ...props.style,
-            padding: 0,
-            width: `${cellWidth}px`,
-            minWidth: `${cellWidth}px`,
-            maxWidth: `${cellWidth}px`
-          }}
-        />
-      );
-    },
-    []
-  );
+    return (
+      <td
+        {...tdProps}
+        style={{
+          ...props.style,
+          padding: 0,
+          width: `${cellWidth}px`,
+          minWidth: `${cellWidth}px`,
+          maxWidth: `${cellWidth}px`,
+        }}
+      />
+    )
+  }, [])
 
   return (
     <div className={cn('excel-datasheet-wrapper', className)}>
       <DatasheetStyles />
 
       <div
-        onKeyDown={(e) => {
-          handleKeyDown(e);
+        onKeyDown={e => {
+          handleKeyDown(e)
           if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-            e.preventDefault();
-            e.stopPropagation();
+            e.preventDefault()
+            e.stopPropagation()
           }
         }}
         tabIndex={0}
@@ -217,15 +225,15 @@ export function ReactDatasheetWrapper({
           data={sheetData}
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
-          dataRenderer={(cell) => cell.value}
+          dataRenderer={cell => cell.value}
           onContextMenu={(e: any, cell: any, _i: any, j: any) => e.preventDefault()}
           onSelect={handleSelect}
           parsePaste={parsePaste}
           tabBehaviour="default"
-          onKeyDown={(e) => {
+          onKeyDown={e => {
             if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-              e.preventDefault();
-              e.stopPropagation();
+              e.preventDefault()
+              e.stopPropagation()
             }
           }}
           rowRenderer={rowRenderer}
@@ -233,5 +241,5 @@ export function ReactDatasheetWrapper({
         />
       </div>
     </div>
-  );
+  )
 }

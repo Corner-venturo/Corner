@@ -2,24 +2,24 @@
  * Shared types for canvas components
  */
 
-export type ViewMode = 'grid' | 'list';
-export type EditMode = 'view' | 'create' | 'edit';
+export type ViewMode = 'grid' | 'list'
+export type EditMode = 'view' | 'create' | 'edit'
 
 export interface CanvasEditorProps {
-  channelId: string;
-  canvasId?: string;
+  channelId: string
+  canvasId?: string
 }
 
 export interface PersonalCanvasProps {
-  canvasId?: string;
+  canvasId?: string
 }
 
 export interface DocumentFilter {
-  searchTerm: string;
-  selectedTag: string;
+  searchTerm: string
+  selectedTag: string
 }
 
 export interface EditorState {
-  isDragging: boolean;
-  uploadProgress: number | null;
+  isDragging: boolean
+  uploadProgress: number | null
 }

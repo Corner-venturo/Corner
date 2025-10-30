@@ -37,18 +37,23 @@ SQL 檔案位置：`src/lib/db/migrations/create_manifestation_entries.sql`
 ## 已創建的檔案清單
 
 ### 1. 資料庫相關
+
 - `src/lib/db/migrations/create_manifestation_entries.sql` - 資料庫 migration SQL
 
 ### 2. 類型定義
+
 - `src/types/manifestation.ts` - TypeScript 類型定義
 
 ### 3. 數據檔案
+
 - `src/data/manifestation-chapters.ts` - 15 章節完整內容
 
 ### 4. Store
+
 - `src/stores/manifestation-store.ts` - Zustand 狀態管理
 
 ### 5. 元件
+
 - `src/components/manifestation/BreathingExercise.tsx` - 呼吸練習元件
 - `src/components/manifestation/ChapterList.tsx` - 章節列表元件
 - `src/components/manifestation/ChapterContent.tsx` - 章節內容元件
@@ -56,15 +61,18 @@ SQL 檔案位置：`src/lib/db/migrations/create_manifestation_entries.sql`
 - `src/components/manifestation/VisionBoard.tsx` - 願景板元件
 
 ### 6. 頁面
+
 - `src/app/manifestation/layout.tsx` - 顯化魔法佈局
 - `src/app/manifestation/page.tsx` - 顯化魔法主頁面
 
 ### 7. 側邊欄更新
+
 - `src/components/layout/sidebar.tsx` - 已添加「顯化魔法」入口
 
 ## 功能說明
 
 ### 核心功能
+
 1. **15 章節練習** - 完整的靈性成長課程
 2. **呼吸儀式** - 首次進入時的引導動畫
 3. **記錄系統** - 可儲存每章的練習記錄
@@ -72,10 +80,12 @@ SQL 檔案位置：`src/lib/db/migrations/create_manifestation_entries.sql`
 5. **進度追蹤** - 自動記錄完成進度
 
 ### 權限設定
+
 - 需要 `hr` 權限才能訪問
 - 用戶只能查看和修改自己的記錄（RLS 已設置）
 
 ### 設計特色
+
 - 使用 Morandi 色系（柔和、溫暖）
 - 卡片式佈局
 - 流暢的動畫效果
@@ -87,6 +97,7 @@ SQL 檔案位置：`src/lib/db/migrations/create_manifestation_entries.sql`
    - 按照上述方式之一執行 SQL
 
 2. **啟動開發服務器**
+
    ```bash
    npm run dev
    ```
@@ -121,15 +132,18 @@ SQL 檔案位置：`src/lib/db/migrations/create_manifestation_entries.sql`
 ## 可能的問題與解決
 
 ### 問題 1：無法看到「顯化魔法」入口
+
 - 確認使用者有 `hr` 權限
 - 檢查 `sidebar.tsx` 的權限設定
 
 ### 問題 2：資料無法儲存
+
 - 確認資料庫表格已創建
 - 檢查 Supabase 連線設定
 - 查看瀏覽器 Console 錯誤訊息
 
 ### 問題 3：RLS 權限錯誤
+
 - 確認已執行完整的 migration SQL
 - 檢查 Supabase RLS 政策是否正確
 

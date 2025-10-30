@@ -14,8 +14,10 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
 
   // 初始化當前週
   useEffect(() => {
-    if (!currentWeek ||
-        new Date(currentWeek.weekStart).getTime() !== getWeekStart(selectedWeek).getTime()) {
+    if (
+      !currentWeek ||
+      new Date(currentWeek.weekStart).getTime() !== getWeekStart(selectedWeek).getTime()
+    ) {
       initializeCurrentWeek(selectedWeek)
     }
   }, [selectedWeek, currentWeek, initializeCurrentWeek])
@@ -57,9 +59,15 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
                 isToday ? 'bg-morandi-gold/10' : ''
               }`}
             >
-              <div className={`text-xs font-medium ${isToday ? 'text-morandi-gold' : 'text-morandi-secondary'}`}>
-                <span className="hidden sm:inline">{dayLabels[day.getDay()]} {day.getDate()}</span>
-                <span className="sm:hidden">{dayLabels[day.getDay()].slice(1)} {day.getDate()}</span>
+              <div
+                className={`text-xs font-medium ${isToday ? 'text-morandi-gold' : 'text-morandi-secondary'}`}
+              >
+                <span className="hidden sm:inline">
+                  {dayLabels[day.getDay()]} {day.getDate()}
+                </span>
+                <span className="sm:hidden">
+                  {dayLabels[day.getDay()].slice(1)} {day.getDate()}
+                </span>
               </div>
             </div>
           )
@@ -68,10 +76,7 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
 
       {/* 時間網格 */}
       <div className="flex-1 overflow-auto scrollable-content">
-        <TimeGrid
-          weekDays={weekDays}
-          timeInterval={timeInterval}
-        />
+        <TimeGrid weekDays={weekDays} timeInterval={timeInterval} />
       </div>
     </div>
   )

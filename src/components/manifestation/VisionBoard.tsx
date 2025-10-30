@@ -1,25 +1,25 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Type, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { VisionBoardData, VisionBoardText } from '@/types/manifestation';
-import { _cn } from '@/lib/utils';
+import { useState } from 'react'
+import { Type, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { VisionBoardData, VisionBoardText } from '@/types/manifestation'
+import { _cn } from '@/lib/utils'
 
 interface VisionBoardProps {
-  data?: VisionBoardData;
-  onChange: (data: VisionBoardData) => void;
+  data?: VisionBoardData
+  onChange: (data: VisionBoardData) => void
 }
 
 export function VisionBoard({ data, onChange }: VisionBoardProps) {
-  const [mode, setMode] = useState<'view' | 'add-text'>('view');
-  const [newText, setNewText] = useState('');
+  const [mode, setMode] = useState<'view' | 'add-text'>('view')
+  const [newText, setNewText] = useState('')
 
-  const texts = data?.texts || [];
+  const texts = data?.texts || []
 
   const handleAddText = () => {
-    if (!newText.trim()) return;
+    if (!newText.trim()) return
 
     const newTextItem: VisionBoardText = {
       id: Date.now().toString(),
@@ -28,36 +28,32 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
       style: {
         fontSize: 16,
         color: '#8b7355',
-        fontWeight: 'normal'
-      }
-    };
+        fontWeight: 'normal',
+      },
+    }
 
     onChange({
       ...data,
-      texts: [...texts, newTextItem]
-    });
+      texts: [...texts, newTextItem],
+    })
 
-    setNewText('');
-    setMode('view');
-  };
+    setNewText('')
+    setMode('view')
+  }
 
   const handleDeleteText = (id: string) => {
     onChange({
       ...data,
-      texts: texts.filter(t => t.id !== id)
-    });
-  };
+      texts: texts.filter(t => t.id !== id),
+    })
+  }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium text-morandi-primary">願景板</h3>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setMode('add-text')}
-          >
+          <Button variant="outline" size="sm" onClick={() => setMode('add-text')}>
             <Type className="mr-2" size={16} />
             添加文字
           </Button>
@@ -79,14 +75,14 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
         )}
 
         {/* 渲染文字 */}
-        {texts.map((text) => (
+        {texts.map(text => (
           <div
             key={text.id}
             className="absolute group"
             style={{
               left: `${text.position.x}%`,
               top: `${text.position.y}%`,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
             }}
           >
             <div className="relative">
@@ -94,7 +90,7 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
                 style={{
                   fontSize: text.style?.fontSize || 16,
                   color: text.style?.color || '#8b7355',
-                  fontWeight: text.style?.fontWeight || 'normal'
+                  fontWeight: text.style?.fontWeight || 'normal',
                 }}
               >
                 {text.content}
@@ -115,9 +111,9 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
         <div className="p-4 bg-morandi-container rounded-lg space-y-3">
           <Input
             value={newText}
-            onChange={(e) => setNewText(e.target.value)}
+            onChange={e => setNewText(e.target.value)}
             placeholder="輸入你想顯化的文字..."
-            onKeyDown={(e) => e.key === 'Enter' && handleAddText()}
+            onKeyDown={e => e.key === 'Enter' && handleAddText()}
           />
           <div className="flex gap-2">
             <Button onClick={handleAddText} size="sm">
@@ -126,8 +122,8 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
             <Button
               variant="outline"
               onClick={() => {
-                setMode('view');
-                setNewText('');
+                setMode('view')
+                setNewText('')
               }}
               size="sm"
             >
@@ -142,7 +138,7 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-morandi-primary">已添加的元素</h4>
           <div className="space-y-1">
-            {texts.map((text) => (
+            {texts.map(text => (
               <div
                 key={text.id}
                 className="flex items-center justify-between p-2 bg-morandi-container rounded text-sm"
@@ -160,7 +156,7 @@ export function VisionBoard({ data, onChange }: VisionBoardProps) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function Sparkles({ className, size }: { className?: string; size?: number }) {
@@ -178,5 +174,5 @@ function Sparkles({ className, size }: { className?: string; size?: number }) {
     >
       <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z" />
     </svg>
-  );
+  )
 }

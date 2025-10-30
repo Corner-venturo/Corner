@@ -183,5 +183,5 @@ export function DatasheetStyles() {
         user-select: none;
       }
     `}</style>
-  );
+  )
 }

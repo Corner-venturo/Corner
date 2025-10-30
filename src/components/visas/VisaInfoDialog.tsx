@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Copy } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import {
   PASSPORT_DELIVERY_OPTIONS,
   PASSPORT_REQUIREMENTS,
@@ -16,18 +16,18 @@ import {
   formatCurrency,
   type DeliveryOption,
   type RequirementSection,
-} from '@/constants/visa-info';
+} from '@/constants/visa-info'
 
 interface VisaInfoDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  visaInfoTab: 'passport' | 'taiwan';
-  setVisaInfoTab: (tab: 'passport' | 'taiwan') => void;
-  selectedPassportTypes: Set<number>;
-  selectedTaiwanTypes: Set<number>;
-  copyStatus: 'idle' | 'success' | 'error';
-  handleCopyVisaInfo: (tabType: 'passport' | 'taiwan') => void;
-  toggleSelection: (tabType: 'passport' | 'taiwan', index: number) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  visaInfoTab: 'passport' | 'taiwan'
+  setVisaInfoTab: (tab: 'passport' | 'taiwan') => void
+  selectedPassportTypes: Set<number>
+  selectedTaiwanTypes: Set<number>
+  copyStatus: 'idle' | 'success' | 'error'
+  handleCopyVisaInfo: (tabType: 'passport' | 'taiwan') => void
+  toggleSelection: (tabType: 'passport' | 'taiwan', index: number) => void
 }
 
 /**
@@ -49,9 +49,9 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
     options: DeliveryOption[],
     requirements: RequirementSection[],
     notes: string[],
-    tabType: 'passport' | 'taiwan',
+    tabType: 'passport' | 'taiwan'
   ) => {
-    const selectedSet = tabType === 'passport' ? selectedPassportTypes : selectedTaiwanTypes;
+    const selectedSet = tabType === 'passport' ? selectedPassportTypes : selectedTaiwanTypes
 
     return (
       <div className="space-y-6">
@@ -75,8 +75,8 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
 
         <div className="space-y-5">
           {requirements.map((section, index) => {
-            const isChild = section.title.includes('未滿14歲');
-            const fee = tabType === 'taiwan' ? 1800 : (isChild ? 1400 : 1800);
+            const isChild = section.title.includes('未滿14歲')
+            const fee = tabType === 'taiwan' ? 1800 : isChild ? 1400 : 1800
 
             return (
               <div key={section.title} className="space-y-3">
@@ -99,7 +99,7 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
 
@@ -111,8 +111,8 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
           </ul>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,12 +123,17 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
             variant="outline"
             onClick={() => handleCopyVisaInfo(visaInfoTab)}
             className="flex items-center gap-2 h-10"
-            disabled={visaInfoTab === 'passport' ? selectedPassportTypes.size === 0 : selectedTaiwanTypes.size === 0}
+            disabled={
+              visaInfoTab === 'passport'
+                ? selectedPassportTypes.size === 0
+                : selectedTaiwanTypes.size === 0
+            }
           >
             <Copy size={16} />
-            複製已勾選 {visaInfoTab === 'passport'
-              ? (selectedPassportTypes.size > 0 && `(${selectedPassportTypes.size})`)
-              : (selectedTaiwanTypes.size > 0 && `(${selectedTaiwanTypes.size})`)}
+            複製已勾選{' '}
+            {visaInfoTab === 'passport'
+              ? selectedPassportTypes.size > 0 && `(${selectedPassportTypes.size})`
+              : selectedTaiwanTypes.size > 0 && `(${selectedTaiwanTypes.size})`}
           </Button>
         </DialogHeader>
         {copyStatus !== 'idle' && (
@@ -141,13 +146,22 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
             {copyStatus === 'success' ? '已複製選取的簽證資訊' : '複製失敗，請至少勾選一個項目。'}
           </p>
         )}
-        <Tabs value={visaInfoTab} onValueChange={(v) => setVisaInfoTab(v as 'passport' | 'taiwan')} className="flex-1 flex flex-col overflow-hidden">
+        <Tabs
+          value={visaInfoTab}
+          onValueChange={v => setVisaInfoTab(v as 'passport' | 'taiwan')}
+          className="flex-1 flex flex-col overflow-hidden"
+        >
           <TabsList className="h-10 rounded-lg bg-morandi-container text-sm text-morandi-secondary flex-shrink-0">
             <TabsTrigger value="passport">護照</TabsTrigger>
             <TabsTrigger value="taiwan">台胞證</TabsTrigger>
           </TabsList>
           <TabsContent value="passport" className="flex-1 overflow-y-auto mt-4">
-            {renderVisaInfoContent(PASSPORT_DELIVERY_OPTIONS, PASSPORT_REQUIREMENTS, PASSPORT_NOTES, 'passport')}
+            {renderVisaInfoContent(
+              PASSPORT_DELIVERY_OPTIONS,
+              PASSPORT_REQUIREMENTS,
+              PASSPORT_NOTES,
+              'passport'
+            )}
           </TabsContent>
           <TabsContent value="taiwan" className="flex-1 overflow-y-auto mt-4">
             {renderVisaInfoContent(
@@ -160,5 +174,5 @@ export const VisaInfoDialog: React.FC<VisaInfoDialogProps> = ({
         </Tabs>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}

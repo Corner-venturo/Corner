@@ -1,20 +1,20 @@
 export interface DeliveryOption {
-  method: string;
-  adult: number;
-  child: number;
+  method: string
+  adult: number
+  child: number
 }
 
 export interface RequirementSection {
-  title: string;
-  items: string[];
-  fee?: number; // 該類別的簽證代辦費用
+  title: string
+  items: string[]
+  fee?: number // 該類別的簽證代辦費用
 }
 
 export const PASSPORT_DELIVERY_OPTIONS: DeliveryOption[] = [
   { method: '自取', adult: 1800, child: 1400 },
   { method: '郵政寄回', adult: 2000, child: 1600 },
   { method: '雙北快遞寄回', adult: 2100, child: 1700 },
-];
+]
 
 export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
   {
@@ -73,19 +73,19 @@ export const PASSPORT_REQUIREMENTS: RequirementSection[] = [
       '法定代理人身分證（提供父／母其中一位身分證正本即可）',
     ],
   },
-];
+]
 
 export const PASSPORT_NOTES: string[] = [
   '＊申請人應繳交最近6個月內所攝彩色正面、脫帽、五官清晰、白色背景的護照專用照片。',
   '＊因近期受理案件較多，正常護照代辦時程改為14個工作天（不含例假日）；急件為4個工作天（不含例假日），每件費用+900元。',
   '＊若護照遺失但效期未逾期，請先至警局備案，並提供相關證明文件，代辦時程需多加1個工作天。',
-];
+]
 
 export const TAIWAN_COMPATRIOT_DELIVERY_OPTIONS: DeliveryOption[] = [
   { method: '自取', adult: 1800, child: 1800 },
   { method: '郵政寄回', adult: 2000, child: 2000 },
   { method: '雙北快遞寄回', adult: 2100, child: 2100 },
-];
+]
 
 export const TAIWAN_COMPATRIOT_REQUIREMENTS: RequirementSection[] = [
   {
@@ -98,16 +98,16 @@ export const TAIWAN_COMPATRIOT_REQUIREMENTS: RequirementSection[] = [
       '戶籍謄本正本（如有改名或個人身份資料更改者、未滿14歲未領身份證者，需附上3個月內戶籍謄本正本，記事不可省略或部分省略，需有完整詳細說明）',
     ],
   },
-];
+]
 
 export const TAIWAN_COMPATRIOT_NOTES: string[] = [
   '＊申請人應繳交最近6個月內所攝彩色正面、脫帽、五官清晰、白色背景的護照專用照片。',
   '＊因近期受理案件較多，正常台胞證代辦時程改為9個工作天（不含例假日）；急件為6個工作天（不含例假日），每件費用+900元。',
   '＊若台胞證遺失但效期未逾期，請先至警局備案，並提供相關證明文件，另需支付罰金1,100元。',
-];
+]
 
 export function formatCurrency(amount: number): string {
-  return `NT$${amount.toLocaleString()}`;
+  return `NT$${amount.toLocaleString()}`
 }
 
 export function buildVisaInfoText(): string {
@@ -124,36 +124,38 @@ export function buildVisaInfoText(): string {
       requirements: TAIWAN_COMPATRIOT_REQUIREMENTS,
       notes: TAIWAN_COMPATRIOT_NOTES,
     },
-  ];
+  ]
 
-  const lines: string[] = [];
+  const lines: string[] = []
 
   sections.forEach((section, sectionIndex) => {
-    lines.push(section.title);
-    lines.push('取貨方式／身份');
+    lines.push(section.title)
+    lines.push('取貨方式／身份')
     section.options.forEach(option => {
-      lines.push(`  ${option.method}：成人 ${formatCurrency(option.adult)}／兒童（未滿14歲） ${formatCurrency(option.child)}`);
-    });
-    lines.push('');
+      lines.push(
+        `  ${option.method}：成人 ${formatCurrency(option.adult)}／兒童（未滿14歲） ${formatCurrency(option.child)}`
+      )
+    })
+    lines.push('')
 
     section.requirements.forEach(requirement => {
-      lines.push(`－${requirement.title}`);
+      lines.push(`－${requirement.title}`)
       requirement.items.forEach((item, itemIndex) => {
-        lines.push(`  ${itemIndex + 1}. ${item}`);
-      });
-      lines.push('');
-    });
+        lines.push(`  ${itemIndex + 1}. ${item}`)
+      })
+      lines.push('')
+    })
 
     section.notes.forEach(note => {
-      lines.push(note);
-    });
+      lines.push(note)
+    })
 
     if (sectionIndex < sections.length - 1) {
-      lines.push('');
+      lines.push('')
     }
-  });
+  })
 
-  return lines.join('\n');
+  return lines.join('\n')
 }
 
-export const VISA_INFO_TEXT = buildVisaInfoText();
+export const VISA_INFO_TEXT = buildVisaInfoText()

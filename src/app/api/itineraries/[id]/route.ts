@@ -1,38 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
 // 使用 service role key 繞過 RLS（server-side only）
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
-const supabaseAdmin = supabaseUrl && supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
-  : null;
+const supabaseAdmin =
+  supabaseUrl && supabaseServiceKey
+    ? createClient(supabaseUrl, supabaseServiceKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      })
+    : null
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
+    const { id } = await params
 
     if (!id) {
-      return NextResponse.json(
-        { error: 'Missing itinerary ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing itinerary ID' }, { status: 400 })
     }
 
     if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Supabase not configured' }, { status: 503 })
     }
 
     // 使用 admin client 查詢（跳過 RLS）
@@ -40,29 +33,20 @@ export async function GET(
       .from('itineraries')
       .select('*')
       .eq('id', id)
-      .single();
+      .single()
 
     if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json(
-        { error: 'Itinerary not found' },
-        { status: 404 }
-      );
+      console.error('Supabase error:', error)
+      return NextResponse.json({ error: 'Itinerary not found' }, { status: 404 })
     }
 
     if (!data) {
-      return NextResponse.json(
-        { error: 'Itinerary not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Itinerary not found' }, { status: 404 })
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data)
   } catch (error) {
-    console.error('API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

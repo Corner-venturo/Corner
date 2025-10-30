@@ -31,37 +31,37 @@
 \`\`\`sql
 -- 建立使用者偏好設定表
 CREATE TABLE IF NOT EXISTS user_preferences (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
-  preference_key TEXT NOT NULL,
-  preference_value JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, preference_key)
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+user_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+preference_key TEXT NOT NULL,
+preference_value JSONB NOT NULL,
+created_at TIMESTAMPTZ DEFAULT NOW(),
+updated_at TIMESTAMPTZ DEFAULT NOW(),
+UNIQUE(user_id, preference_key)
 );
 
 -- 建立便條紙表
 CREATE TABLE IF NOT EXISTS notes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
-  tab_id TEXT NOT NULL,
-  tab_name TEXT NOT NULL DEFAULT '筆記',
-  content TEXT NOT NULL DEFAULT '',
-  tab_order INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, tab_id)
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+user_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+tab_id TEXT NOT NULL,
+tab_name TEXT NOT NULL DEFAULT '筆記',
+content TEXT NOT NULL DEFAULT '',
+tab_order INTEGER NOT NULL DEFAULT 0,
+created_at TIMESTAMPTZ DEFAULT NOW(),
+updated_at TIMESTAMPTZ DEFAULT NOW(),
+UNIQUE(user_id, tab_id)
 );
 
 -- 建立顯化魔法記錄表
 CREATE TABLE IF NOT EXISTS manifestation_records (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
-  record_date DATE NOT NULL,
-  content TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, record_date)
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+user_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+record_date DATE NOT NULL,
+content TEXT,
+created_at TIMESTAMPTZ DEFAULT NOW(),
+updated_at TIMESTAMPTZ DEFAULT NOW(),
+UNIQUE(user_id, record_date)
 );
 
 -- 建立索引
@@ -77,54 +77,54 @@ ALTER TABLE manifestation_records ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策：使用者只能存取自己的資料
 CREATE POLICY "Users can view own preferences"
-  ON user_preferences FOR SELECT
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON user_preferences FOR SELECT
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can insert own preferences"
-  ON user_preferences FOR INSERT
-  WITH CHECK (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON user_preferences FOR INSERT
+WITH CHECK (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can update own preferences"
-  ON user_preferences FOR UPDATE
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON user_preferences FOR UPDATE
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can delete own preferences"
-  ON user_preferences FOR DELETE
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON user_preferences FOR DELETE
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 -- Notes 政策
 CREATE POLICY "Users can view own notes"
-  ON notes FOR SELECT
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON notes FOR SELECT
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can insert own notes"
-  ON notes FOR INSERT
-  WITH CHECK (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON notes FOR INSERT
+WITH CHECK (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can update own notes"
-  ON notes FOR UPDATE
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON notes FOR UPDATE
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can delete own notes"
-  ON notes FOR DELETE
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON notes FOR DELETE
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 -- Manifestation 政策
 CREATE POLICY "Users can view own manifestation records"
-  ON manifestation_records FOR SELECT
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON manifestation_records FOR SELECT
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can insert own manifestation records"
-  ON manifestation_records FOR INSERT
-  WITH CHECK (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON manifestation_records FOR INSERT
+WITH CHECK (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can update own manifestation records"
-  ON manifestation_records FOR UPDATE
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON manifestation_records FOR UPDATE
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 
 CREATE POLICY "Users can delete own manifestation records"
-  ON manifestation_records FOR DELETE
-  USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
+ON manifestation_records FOR DELETE
+USING (user_id = auth.uid() OR user_id IN (SELECT id FROM employees WHERE id = auth.uid()));
 \`\`\`
 
 ---
@@ -147,7 +147,7 @@ Migration 執行完成後，以下功能將自動啟用跨裝置同步：
 SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public'
-  AND table_name IN ('user_preferences', 'notes', 'manifestation_records');
+AND table_name IN ('user_preferences', 'notes', 'manifestation_records');
 \`\`\`
 
 應該看到三筆結果。
@@ -164,6 +164,7 @@ A: 確認用戶的 `auth.uid()` 與 `employees.id` 一致。
 
 **Q: 資料沒有同步**
 A:
+
 1. 檢查瀏覽器 Console 是否有錯誤
 2. 到 Table Editor 確認資料是否已儲存
 3. 確認用戶已登入（useAuthStore 的 user.id 存在）

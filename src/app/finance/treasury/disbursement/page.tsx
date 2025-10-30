@@ -3,8 +3,8 @@
  * 使用 feature-based 架構重構
  */
 
-'use client';
+'use client'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
-export { DisbursementPage as default } from '@/features/disbursement';
+export { DisbursementPage as default } from '@/features/disbursement'

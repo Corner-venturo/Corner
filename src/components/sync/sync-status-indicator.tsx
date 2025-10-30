@@ -1,194 +1,194 @@
-'use client';
+'use client'
 
-import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
 
-import React, { useEffect, useState } from 'react';
-import { backgroundSyncService } from '@/lib/sync/background-sync-service';
-import { _localDB } from '@/lib/db';
-import { TABLES } from '@/lib/db/schemas';
+import React, { useEffect, useState } from 'react'
+import { backgroundSyncService } from '@/lib/sync/background-sync-service'
+import { _localDB } from '@/lib/db'
+import { TABLES } from '@/lib/db/schemas'
 import {
-  Wifi, WifiOff, Cloud, CloudOff,
-  RefreshCw, AlertCircle, Clock,
-  ChevronDown, ChevronUp, X
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
+  Wifi,
+  WifiOff,
+  Cloud,
+  CloudOff,
+  RefreshCw,
+  AlertCircle,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  X,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { formatDistanceToNow } from 'date-fns'
+import { zhTW } from 'date-fns/locale'
 
 /**
  * 檢查所有表格的待同步數量
  */
 async function checkPendingCount(): Promise<number> {
-  let totalCount = 0;
+  let totalCount = 0
 
   for (const tableName of Object.values(TABLES)) {
     try {
-      const count = await backgroundSyncService.getPendingCount(tableName);
-      totalCount += count;
-    } catch (error) {
-          }
+      const count = await backgroundSyncService.getPendingCount(tableName)
+      totalCount += count
+    } catch (error) {}
   }
 
-  return totalCount;
+  return totalCount
 }
 
 /**
  * 檢查網路連線狀態
  */
 function checkOnline(): boolean {
-  return typeof navigator !== 'undefined' ? navigator.onLine : true;
+  return typeof navigator !== 'undefined' ? navigator.onLine : true
 }
 
 // ===== 主要同步狀態指示器（FastIn 架構版本）=====
 export function SyncStatusIndicator() {
-  const [isOnline, setIsOnline] = useState(checkOnline());
-  const [hasPendingChanges, setHasPendingChanges] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isOnline, setIsOnline] = useState(checkOnline())
+  const [hasPendingChanges, setHasPendingChanges] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [showNotification, setShowNotification] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   // 監聽網路狀態
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setIsMounted(true)
+  }, [])
 
   // 定期檢查待同步數量（每 15 秒）
   useEffect(() => {
     const checkSync = async () => {
-      const count = await checkPendingCount();
-      setPendingCount(count);
-      setHasPendingChanges(count > 0);
-    };
+      const count = await checkPendingCount()
+      setPendingCount(count)
+      setHasPendingChanges(count > 0)
+    }
 
     // 立即執行一次
-    checkSync();
+    checkSync()
 
     // 每 15 秒檢查一次
-    const interval = setInterval(checkSync, 15000);
+    const interval = setInterval(checkSync, 15000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   // 監聽網路狀態變化，顯示通知
   useEffect(() => {
     const handleOnline = () => {
-      setIsOnline(true);
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
-    };
+      setIsOnline(true)
+      setShowNotification(true)
+      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY)
+    }
 
     const handleOffline = () => {
-      setIsOnline(false);
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
-    };
+      setIsOnline(false)
+      setShowNotification(true)
+      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY)
+    }
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   const handleManualSync = async () => {
-    if (!isOnline || isSyncing) return;
+    if (!isOnline || isSyncing) return
 
-    setIsSyncing(true);
+    setIsSyncing(true)
     try {
-      await backgroundSyncService.syncAllTables();
-      setShowNotification(true);
-      setLastSyncTime(new Date());
-      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY);
+      await backgroundSyncService.syncAllTables()
+      setShowNotification(true)
+      setLastSyncTime(new Date())
+      setTimeout(() => setShowNotification(false), UI_DELAYS.MESSAGE_DISPLAY)
     } catch (error) {
-          } finally {
-      setIsSyncing(false);
+    } finally {
+      setIsSyncing(false)
     }
-  };
+  }
 
   const getStatusColor = () => {
-    if (!isOnline) return 'text-red-500';
-    if (isSyncing) return 'text-yellow-500';
-    if (hasPendingChanges) return 'text-orange-500';
-    return 'text-green-500';
-  };
+    if (!isOnline) return 'text-red-500'
+    if (isSyncing) return 'text-yellow-500'
+    if (hasPendingChanges) return 'text-orange-500'
+    return 'text-green-500'
+  }
 
   const getStatusIcon = () => {
-    if (!isMounted) return <Cloud className="w-4 h-4" />; // 預設顯示 Cloud 避免 hydration 錯誤
-    if (!isOnline) return <CloudOff className="w-4 h-4" />;
-    if (isSyncing) return <RefreshCw className="w-4 h-4 animate-spin" />;
-    if (hasPendingChanges) return <Cloud className="w-4 h-4" />;
-    return <Cloud className="w-4 h-4" />; // 已同步也顯示 Cloud
-  };
+    if (!isMounted) return <Cloud className="w-4 h-4" /> // 預設顯示 Cloud 避免 hydration 錯誤
+    if (!isOnline) return <CloudOff className="w-4 h-4" />
+    if (isSyncing) return <RefreshCw className="w-4 h-4 animate-spin" />
+    if (hasPendingChanges) return <Cloud className="w-4 h-4" />
+    return <Cloud className="w-4 h-4" /> // 已同步也顯示 Cloud
+  }
 
   const getStatusText = () => {
-    if (!isOnline) return '離線模式';
-    if (isSyncing) return '同步中...';
-    if (hasPendingChanges) return `${pendingCount} 個待同步`;
-    return '已同步';
-  };
+    if (!isOnline) return '離線模式'
+    if (isSyncing) return '同步中...'
+    if (hasPendingChanges) return `${pendingCount} 個待同步`
+    return '已同步'
+  }
 
   const formatLastSyncTime = () => {
-    if (!lastSyncTime) return '尚未同步';
+    if (!lastSyncTime) return '尚未同步'
 
     try {
       return formatDistanceToNow(new Date(lastSyncTime), {
         addSuffix: true,
-        locale: zhTW
-      });
+        locale: zhTW,
+      })
     } catch {
-      return '尚未同步';
+      return '尚未同步'
     }
-  };
+  }
 
   return (
     <>
       <div className="fixed bottom-4 right-4 z-50">
-        <div className={cn(
-          "bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300",
-          isExpanded ? "w-80" : "w-auto"
-        )}>
+        <div
+          className={cn(
+            'bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300',
+            isExpanded ? 'w-80' : 'w-auto'
+          )}
+        >
           <div
             className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             <div className="flex items-center gap-3">
-              <div className={cn("transition-colors", getStatusColor())}>
-                {getStatusIcon()}
-              </div>
+              <div className={cn('transition-colors', getStatusColor())}>{getStatusIcon()}</div>
               <div className="text-sm">
-                <div className={cn("font-medium", getStatusColor())}>
-                  {getStatusText()}
-                </div>
-                {!isExpanded && (
-                  <div className="text-xs text-gray-500">
-                    {formatLastSyncTime()}
-                  </div>
-                )}
+                <div className={cn('font-medium', getStatusColor())}>{getStatusText()}</div>
+                {!isExpanded && <div className="text-xs text-gray-500">{formatLastSyncTime()}</div>}
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               {isOnline && !isSyncing && hasPendingChanges && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleManualSync();
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleManualSync()
                   }}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
                   title="立即同步"
@@ -223,9 +223,7 @@ export function SyncStatusIndicator() {
                 <span className="text-gray-600 dark:text-gray-400">最後同步</span>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-700 dark:text-gray-300">
-                    {formatLastSyncTime()}
-                  </span>
+                  <span className="text-gray-700 dark:text-gray-300">{formatLastSyncTime()}</span>
                 </div>
               </div>
 
@@ -246,10 +244,10 @@ export function SyncStatusIndicator() {
                   onClick={handleManualSync}
                   disabled={isSyncing || !hasPendingChanges}
                   className={cn(
-                    "w-full py-2 px-3 rounded text-sm font-medium transition-colors",
+                    'w-full py-2 px-3 rounded text-sm font-medium transition-colors',
                     isSyncing || !hasPendingChanges
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
                   )}
                 >
                   {isSyncing ? (
@@ -270,42 +268,38 @@ export function SyncStatusIndicator() {
       </div>
 
       {showNotification && (
-        <SyncNotification
-          isOnline={isOnline}
-          onClose={() => setShowNotification(false)}
-        />
+        <SyncNotification isOnline={isOnline} onClose={() => setShowNotification(false)} />
       )}
     </>
-  );
+  )
 }
 
 /**
  * 顯示待同步項目列表
  */
 function PendingChangesList() {
-  const [pendingByTable, setPendingByTable] = useState<Record<string, number>>({});
+  const [pendingByTable, setPendingByTable] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const loadPendingCounts = async () => {
-      const counts: Record<string, number> = {};
+      const counts: Record<string, number> = {}
 
       for (const tableName of Object.values(TABLES)) {
         try {
-          const count = await backgroundSyncService.getPendingCount(tableName);
+          const count = await backgroundSyncService.getPendingCount(tableName)
           if (count > 0) {
-            counts[tableName] = count;
+            counts[tableName] = count
           }
-        } catch (error) {
-                  }
+        } catch (error) {}
       }
 
-      setPendingByTable(counts);
-    };
+      setPendingByTable(counts)
+    }
 
-    loadPendingCounts();
-  }, []);
+    loadPendingCounts()
+  }, [])
 
-  if (Object.keys(pendingByTable).length === 0) return null;
+  if (Object.keys(pendingByTable).length === 0) return null
 
   return (
     <div className="mt-2 space-y-1">
@@ -315,68 +309,53 @@ function PendingChangesList() {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-function SyncNotification({
-  isOnline,
-  onClose
-}: {
-  isOnline: boolean;
-  onClose: () => void;
-}) {
+function SyncNotification({ isOnline, onClose }: { isOnline: boolean; onClose: () => void }) {
   return (
-    <div className={cn(
-      "fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border animate-slide-in-right",
-      isOnline
-        ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800"
-        : "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800"
-    )}>
+    <div
+      className={cn(
+        'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border animate-slide-in-right',
+        isOnline
+          ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+          : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+      )}
+    >
       <div className="flex items-center gap-3">
         {isOnline ? (
           <>
             <Wifi className="w-5 h-5 text-green-500" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                已恢復連線
-              </p>
-              <p className="text-xs text-green-600 dark:text-green-400">
-                系統將自動同步您的資料
-              </p>
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">已恢復連線</p>
+              <p className="text-xs text-green-600 dark:text-green-400">系統將自動同步您的資料</p>
             </div>
           </>
         ) : (
           <>
             <WifiOff className="w-5 h-5 text-red-500" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                離線模式
-              </p>
-              <p className="text-xs text-red-600 dark:text-red-400">
-                您的變更將在恢復連線後同步
-              </p>
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">離線模式</p>
+              <p className="text-xs text-red-600 dark:text-red-400">您的變更將在恢復連線後同步</p>
             </div>
           </>
         )}
-        <button
-          onClick={onClose}
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-        >
+        <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
           <X className="w-4 h-4 text-gray-500" />
         </button>
       </div>
     </div>
-  );
+  )
 }
 
 export function ConflictResolutionDialog({
   conflicts,
-  onResolve
+  onResolve,
 }: {
-  conflicts: unknown[];
-  onResolve: (conflictId: string, resolution: 'local' | 'remote') => void;
+  conflicts: unknown[]
+  onResolve: (conflictId: string, resolution: 'local' | 'remote') => void
 }) {
-  if (conflicts.length === 0) return null;
+  if (conflicts.length === 0) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -392,8 +371,11 @@ export function ConflictResolutionDialog({
         </div>
 
         <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
-          {conflicts.map((conflict) => (
-            <div key={conflict.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          {conflicts.map(conflict => (
+            <div
+              key={conflict.id}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+            >
               <div className="mb-3">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {conflict.table} - {conflict.id}
@@ -436,5 +418,5 @@ export function ConflictResolutionDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

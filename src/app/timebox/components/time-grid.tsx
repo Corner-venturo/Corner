@@ -14,13 +14,7 @@ interface TimeGridProps {
 }
 
 export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
-  const {
-    scheduledBoxes,
-    addScheduledBox,
-    currentWeek,
-    boxes,
-    createBox,
-  } = useTimeboxStore()
+  const { scheduledBoxes, addScheduledBox, currentWeek, boxes, createBox } = useTimeboxStore()
 
   const slotMinutes = timeInterval
   const startHour = 6
@@ -36,14 +30,17 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     return slots
   }, [timeInterval])
 
-  const [selectorTarget, setSelectorTarget] = useState<{ dayOfWeek: number; start_time: string } | null>(null)
+  const [selectorTarget, setSelectorTarget] = useState<{
+    dayOfWeek: number
+    start_time: string
+  } | null>(null)
   const [slotHeight, setSlotHeight] = useState<number>(timeInterval === 30 ? 36 : 48)
   const measureRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!measureRef.current) return
 
-    const observer = new ResizeObserver((entries) => {
+    const observer = new ResizeObserver(entries => {
       if (!entries[0]) return
       const { height } = entries[0].contentRect
       if (height > 0) {
@@ -64,7 +61,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     const startMinutes = timeToMinutes(start_time)
     const endMinutes = startMinutes + duration
 
-    return scheduledBoxes.some((box) => {
+    return scheduledBoxes.some(box => {
       if (box.dayOfWeek !== dayOfWeek) return false
       if (currentWeek?.id && box.weekId !== currentWeek.id) return false
 
@@ -76,7 +73,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   }
 
   const ensureBasicBox = () => {
-    const existing = boxes.find((box) => box.type === 'basic')
+    const existing = boxes.find(box => box.type === 'basic')
     if (existing) return existing
 
     createBox({
@@ -86,12 +83,12 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       user_id: 'current-user',
     })
 
-    return boxes.find((box) => box.type === 'basic') ?? null
+    return boxes.find(box => box.type === 'basic') ?? null
   }
 
   const handleCellClick = (dayOfWeek: number, timeSlot: string) => {
     const startMinutes = timeToMinutes(timeSlot)
-    const overlap = scheduledBoxes.some((box) => {
+    const overlap = scheduledBoxes.some(box => {
       if (box.dayOfWeek !== dayOfWeek) return false
       if (currentWeek?.id && box.weekId !== currentWeek.id) return false
       const boxStart = timeToMinutes(box.start_time)
@@ -151,8 +148,8 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
         </div>
 
         {weekDays.map((_day, dayIndex) => {
-          const boxesInDay = scheduledBoxes
-            .filter((box) => {
+          const boxesInDay = (scheduledBoxes || [])
+            .filter(box => {
               if (box.dayOfWeek !== dayIndex) return false
               if (currentWeek?.id && box.weekId !== currentWeek.id) return false
               return true
@@ -177,7 +174,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                 ))}
               </div>
 
-              {boxesInDay.map((box) => {
+              {boxesInDay.map(box => {
                 const startMinutes = Math.max(timeToMinutes(box.start_time), dayStartMinutes)
                 const boxStartOffset = Math.max(0, startMinutes - dayStartMinutes)
                 const adjustedDuration = Math.min(box.duration, totalMinutes - boxStartOffset)

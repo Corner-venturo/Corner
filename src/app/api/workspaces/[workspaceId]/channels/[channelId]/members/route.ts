@@ -1,25 +1,22 @@
-import { NextResponse } from 'next/server';
-import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { NextResponse } from 'next/server'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 type RouteParams = {
   params: Promise<{
-    workspaceId: string;
-    channelId: string;
-  }>;
-};
+    workspaceId: string
+    channelId: string
+  }>
+}
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  const { workspaceId, channelId } = await params;
+  const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
-    return NextResponse.json(
-      { error: 'workspaceId and channelId are required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
   }
 
   try {
-    const supabase = getSupabaseAdminClient();
+    const supabase = getSupabaseAdminClient()
 
     const { data, error } = await supabase
       .from('channel_members' as unknown)
@@ -45,11 +42,11 @@ export async function GET(_request: Request, { params }: RouteParams) {
       )
       .eq('workspace_id', workspaceId)
       .eq('channel_id', channelId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
 
     if (error) {
-      console.error('Failed to load channel members:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Failed to load channel members:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     const members = (data || []).map((member: any) => ({
@@ -72,33 +69,30 @@ export async function GET(_request: Request, { params }: RouteParams) {
             status: member.employees.status as string | null,
           }
         : null,
-    }));
+    }))
 
-    return NextResponse.json({ members });
+    return NextResponse.json({ members })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to load channel members' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to load channel members' }, { status: 500 })
   }
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
-  const { workspaceId, channelId } = await params;
+  const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
-    return NextResponse.json(
-      { error: 'workspaceId and channelId are required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
   }
 
-  const body = await request.json().catch(() => ({}));
-  const { employeeIds, role = 'member' } = body;
+  const body = await request.json().catch(() => ({}))
+  const { employeeIds, role = 'member' } = body
 
   if (!employeeIds || !Array.isArray(employeeIds) || employeeIds.length === 0) {
-    return NextResponse.json({ error: 'employeeIds array is required' }, { status: 400 });
+    return NextResponse.json({ error: 'employeeIds array is required' }, { status: 400 })
   }
 
   try {
-    const supabase = getSupabaseAdminClient();
+    const supabase = getSupabaseAdminClient()
 
     // 準備批次插入的資料（使用 upsert 防止重複）
     const membersToInsert = employeeIds.map(employeeId => ({
@@ -107,7 +101,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       employee_id: employeeId,
       role,
       status: 'active',
-    }));
+    }))
 
     const { data, error } = await supabase
       .from('channel_members')
@@ -115,52 +109,49 @@ export async function POST(request: Request, { params }: RouteParams) {
         onConflict: 'workspace_id,channel_id,employee_id',
         ignoreDuplicates: false, // 返回所有成員（包括已存在的）
       })
-      .select();
+      .select()
 
     if (error) {
-      console.error('Failed to add channel members:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Failed to add channel members:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ members: data || [], count: data?.length || 0 });
+    return NextResponse.json({ members: data || [], count: data?.length || 0 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to add channel members' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to add channel members' }, { status: 500 })
   }
 }
 
 export async function DELETE(request: Request, { params }: RouteParams) {
-  const { workspaceId, channelId } = await params;
+  const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
-    return NextResponse.json(
-      { error: 'workspaceId and channelId are required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
   }
 
-  const { memberId } = await request.json().catch(() => ({ memberId: undefined }));
+  const { memberId } = await request.json().catch(() => ({ memberId: undefined }))
 
   if (!memberId) {
-    return NextResponse.json({ error: 'memberId is required' }, { status: 400 });
+    return NextResponse.json({ error: 'memberId is required' }, { status: 400 })
   }
 
   try {
-    const supabase = getSupabaseAdminClient();
+    const supabase = getSupabaseAdminClient()
 
     const { error } = await supabase
       .from('channel_members' as unknown)
       .delete()
       .eq('workspace_id', workspaceId)
       .eq('channel_id', channelId)
-      .eq('id', memberId);
+      .eq('id', memberId)
 
     if (error) {
-      console.error('Failed to remove channel member:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Failed to remove channel member:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to remove channel member' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to remove channel member' }, { status: 500 })
   }
 }

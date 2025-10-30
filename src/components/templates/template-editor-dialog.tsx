@@ -1,23 +1,29 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { useTemplateStore } from '@/stores/template-store';
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { useTemplateStore } from '@/stores/template-store'
 
-import { Template, TemplateType, TemplateField } from '@/types/template';
+import { Template, TemplateType, TemplateField } from '@/types/template'
 
-import { FieldMappingEditor } from './field-mapping-editor';
+import { FieldMappingEditor } from './field-mapping-editor'
 
 interface TemplateEditorDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  template: Template | null; // null = 新增模式
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  template: Template | null // null = 新增模式
 }
 
 // 預設範本
@@ -25,16 +31,51 @@ const TEMPLATE_PRESETS = {
   blank: {
     name: '空白模板',
     fields: [],
-    excel: Array.from({ length: 60 }, () => Array.from({ length: 12 }, () => ''))
+    excel: Array.from({ length: 60 }, () => Array.from({ length: 12 }, () => '')),
   },
   confirmation: {
     name: '行程確認單',
     fields: [
-      { id: '1', field_key: 'customer_name', display_name: '客戶名稱', field_type: 'text', data_source: 'manual', is_required: true },
-      { id: '2', field_key: 'contact_person', display_name: '聯絡人', field_type: 'text', data_source: 'manual', is_required: true },
-      { id: '3', field_key: 'phone', display_name: '聯絡電話', field_type: 'text', data_source: 'manual', is_required: true },
-      { id: '4', field_key: 'departure_date', display_name: '出發日期', field_type: 'date', data_source: 'manual', is_required: true },
-      { id: '5', field_key: 'destination', display_name: '目的地', field_type: 'text', data_source: 'manual', is_required: true },
+      {
+        id: '1',
+        field_key: 'customer_name',
+        display_name: '客戶名稱',
+        field_type: 'text',
+        data_source: 'manual',
+        is_required: true,
+      },
+      {
+        id: '2',
+        field_key: 'contact_person',
+        display_name: '聯絡人',
+        field_type: 'text',
+        data_source: 'manual',
+        is_required: true,
+      },
+      {
+        id: '3',
+        field_key: 'phone',
+        display_name: '聯絡電話',
+        field_type: 'text',
+        data_source: 'manual',
+        is_required: true,
+      },
+      {
+        id: '4',
+        field_key: 'departure_date',
+        display_name: '出發日期',
+        field_type: 'date',
+        data_source: 'manual',
+        is_required: true,
+      },
+      {
+        id: '5',
+        field_key: 'destination',
+        display_name: '目的地',
+        field_type: 'text',
+        data_source: 'manual',
+        is_required: true,
+      },
     ],
     excel: [
       ['#標題'],
@@ -55,24 +96,24 @@ const TEMPLATE_PRESETS = {
       ['1. 本確認單僅供參考，實際行程以出團通知為準'],
       ['2. 如有任何問題，請隨時與我們聯繫'],
       [''],
-      ...Array.from({ length: 40 }, () => Array.from({ length: 12 }, () => ''))
-    ]
-  }
-};
+      ...Array.from({ length: 40 }, () => Array.from({ length: 12 }, () => '')),
+    ],
+  },
+}
 
 export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateEditorDialogProps) {
-  const { addTemplate, updateTemplate } = useTemplateStore();
-  const isEdit = !!template;
+  const { addTemplate, updateTemplate } = useTemplateStore()
+  const isEdit = !!template
 
-  const [selectedPreset, setSelectedPreset] = useState<'blank' | 'confirmation'>('blank');
+  const [selectedPreset, setSelectedPreset] = useState<'blank' | 'confirmation'>('blank')
   const [formData, setFormData] = useState({
     name: '',
     type: 'quote' as TemplateType,
     description: '',
-  });
+  })
 
-  const [fields, setFields] = useState<TemplateField[]>([]);
-  const [excelData, setExcelData] = useState<unknown>(null);
+  const [fields, setFields] = useState<TemplateField[]>([])
+  const [excelData, setExcelData] = useState<unknown>(null)
 
   // 載入編輯的模板資料
   useEffect(() => {
@@ -81,30 +122,30 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
         name: template.name,
         type: template.type,
         description: template.description || '',
-      });
-      setFields(template.field_mappings || []);
-      setExcelData(template.excel_structure);
+      })
+      setFields(template.field_mappings || [])
+      setExcelData(template.excel_structure)
     } else {
       // 重置表單
-      setFormData({ name: '', type: 'quote', description: '' });
-      setSelectedPreset('blank');
-      setFields([]);
-      setExcelData(null);
+      setFormData({ name: '', type: 'quote', description: '' })
+      setSelectedPreset('blank')
+      setFields([])
+      setExcelData(null)
     }
-  }, [template, open]);
+  }, [template, open])
 
   // 當選擇範本時，載入範本資料
   const handlePresetChange = (preset: 'blank' | 'confirmation') => {
-    setSelectedPreset(preset);
-    const presetData = TEMPLATE_PRESETS[preset];
-    setFields(presetData.fields as TemplateField[]);
-    setExcelData(presetData.excel);
-  };
+    setSelectedPreset(preset)
+    const presetData = TEMPLATE_PRESETS[preset]
+    setFields(presetData.fields as TemplateField[])
+    setExcelData(presetData.excel)
+  }
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
-      alert('請輸入模板名稱');
-      return;
+      alert('請輸入模板名稱')
+      return
     }
 
     try {
@@ -116,7 +157,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
           description: formData.description,
           field_mappings: fields,
           excel_structure: excelData,
-        });
+        })
       } else {
         // 新增模板
         await addTemplate({
@@ -136,14 +177,14 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
           excel_structure: excelData || { data: [['']], settings: {} },
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        } as unknown);
+        } as unknown)
       }
 
-      onOpenChange(false);
+      onOpenChange(false)
     } catch (error) {
-            alert('儲存失敗，請稍後再試');
+      alert('儲存失敗，請稍後再試')
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -189,7 +230,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
                 </label>
                 <Input
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
                   placeholder="例如：2025 清邁行程報價單"
                 />
               </div>
@@ -200,7 +241,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
                 </label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value) => setFormData({ ...formData, type: value as TemplateType })}
+                  onValueChange={value => setFormData({ ...formData, type: value as TemplateType })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -221,7 +262,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
                 </label>
                 <Textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
                   placeholder="簡單描述這個模板的用途..."
                   rows={3}
                 />
@@ -238,9 +279,7 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
               <div className="bg-morandi-container/5 rounded-lg p-8 text-center">
                 <div className="text-4xl mb-4">📊</div>
                 <h3 className="text-lg font-bold text-morandi-primary mb-2">Excel 編輯器</h3>
-                <p className="text-sm text-morandi-secondary mb-4">
-                  即將整合 Handsontable 編輯器
-                </p>
+                <p className="text-sm text-morandi-secondary mb-4">即將整合 Handsontable 編輯器</p>
                 <p className="text-xs text-morandi-muted">
                   目前可以先設定基本資訊和欄位，稍後再設計 Excel 樣式
                 </p>
@@ -260,5 +299,5 @@ export function TemplateEditorDialog({ open, onOpenChange, template }: TemplateE
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

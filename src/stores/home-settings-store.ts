@@ -1,18 +1,18 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 interface HomeSettingsState {
   // 選中的小工具 ID
-  selectedWidgets: string[];
+  selectedWidgets: string[]
   // 選中的統計資料 ID
-  selectedStats: string[];
+  selectedStats: string[]
 
   // 更新小工具設定
-  setSelectedWidgets: (widgets: string[]) => void;
+  setSelectedWidgets: (widgets: string[]) => void
   // 更新統計資料設定
-  setSelectedStats: (stats: string[]) => void;
+  setSelectedStats: (stats: string[]) => void
   // 同時更新兩者
-  updateSettings: (widgets: string[], stats: string[]) => void;
+  updateSettings: (widgets: string[], stats: string[]) => void
 }
 
 /**
@@ -22,21 +22,20 @@ interface HomeSettingsState {
  */
 export const useHomeSettingsStore = create<HomeSettingsState>()(
   persist(
-    (set) => ({
+    set => ({
       // 預設顯示所有小工具
       selectedWidgets: ['calculator', 'currency'],
       // 預設顯示所有統計資料
       selectedStats: ['tours', 'orders', 'customers', 'todos', 'revenue', 'payments'],
 
-      setSelectedWidgets: (widgets) => set({ selectedWidgets: widgets }),
+      setSelectedWidgets: widgets => set({ selectedWidgets: widgets }),
 
-      setSelectedStats: (stats) => set({ selectedStats: stats }),
+      setSelectedStats: stats => set({ selectedStats: stats }),
 
-      updateSettings: (widgets, stats) =>
-        set({ selectedWidgets: widgets, selectedStats: stats }),
+      updateSettings: (widgets, stats) => set({ selectedWidgets: widgets, selectedStats: stats }),
     }),
     {
       name: 'home-settings-storage',
     }
   )
-);
+)

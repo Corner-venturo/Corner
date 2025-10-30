@@ -3,13 +3,13 @@
  */
 
 // Components
-export { ToursPage } from './components';
+export { ToursPage } from './components'
 
 // Hooks
-export * from './hooks';
+export * from './hooks'
 
 // Services
-export { tourService } from './services/tour.service';
+export { tourService } from './services/tour.service'
 
 // Types
-export type { NewTourData, TourExtraFields, DeleteConfirmState } from './types';
+export type { NewTourData, TourExtraFields, DeleteConfirmState } from './types'

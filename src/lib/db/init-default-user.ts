@@ -3,27 +3,25 @@
  * 只建立必要的真實管理員帳號
  */
 
-import { localDB } from '@/lib/db';
-import { Employee as User } from '@/stores/types';
+import { localDB } from '@/lib/db'
+import { Employee as User } from '@/stores/types'
 
 export async function initDefaultUser(): Promise<void> {
   try {
-
     // 確保資料庫已初始化
-    await localDB.init();
+    await localDB.init()
 
     // 檢查是否已有使用者
-    const count = await localDB.count('employees');
+    const count = await localDB.count('employees')
 
     if (count === 0) {
-
       // 動態載入 bcrypt（避免服務端/客戶端問題）
-      const bcrypt = (await import('bcryptjs')).default;
-      const defaultPassword = await bcrypt.hash('william123', 10);
+      const bcrypt = (await import('bcryptjs')).default
+      const defaultPassword = await bcrypt.hash('william123', 10)
 
       // 只建立 William 管理員帳號（使用固定的 UUID 以便識別）
       const adminUser: User = {
-        id: '00000000-0000-0000-0000-000000000001',  // ✨ 改用 UUID 格式
+        id: '00000000-0000-0000-0000-000000000001', // ✨ 改用 UUID 格式
         employee_number: 'william01',
         english_name: 'William',
         display_name: 'William Chien',
@@ -41,41 +39,37 @@ export async function initDefaultUser(): Promise<void> {
           emergency_contact: {
             name: '緊急聯絡人',
             relationship: '家人',
-            phone: '0912-345-678'
-          }
+            phone: '0912-345-678',
+          },
         },
 
         job_info: {
-          hire_date: '2024-01-01'
+          hire_date: '2024-01-01',
         },
 
         salary_info: {
           base_salary: 0,
           allowances: [],
-          salary_history: []
+          salary_history: [],
         },
 
         attendance: {
           leave_records: [],
-          overtime_records: []
+          overtime_records: [],
         },
 
-        permissions: [
-          'super_admin',
-          'all_access'
-        ],
+        permissions: ['super_admin', 'all_access'],
 
         contracts: [],
         // notes: '系統管理員', // Employee 類型不包含 notes 屬性
         avatar: undefined,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+        updated_at: new Date().toISOString(),
+      }
 
-      await localDB.put('employees', adminUser);
+      await localDB.put('employees', adminUser)
     }
-    
   } catch (error) {
-        throw error;
+    throw error
   }
 }

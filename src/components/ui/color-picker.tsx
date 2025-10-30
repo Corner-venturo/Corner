@@ -13,7 +13,7 @@ export default function ColorPicker({ value, onChange, className = '' }: ColorPi
     <div className={className}>
       {/* 顏色選擇面板 - 直接展開 */}
       <div className="grid grid-cols-4 gap-2">
-        {morandiColors.map((color) => (
+        {morandiColors.map(color => (
           <button
             key={color.value}
             type="button"

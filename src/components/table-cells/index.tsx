@@ -1,59 +1,64 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { getStatusColor, getStatusLabel, getStatusBgColor, getStatusIcon } from '@/lib/status-config';
-import type { LucideIcon } from 'lucide-react';
+import React from 'react'
+import { Calendar } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import {
+  getStatusColor,
+  getStatusLabel,
+  getStatusBgColor,
+  getStatusIcon,
+} from '@/lib/status-config'
+import type { LucideIcon } from 'lucide-react'
 
 // ========== 類型定義 ==========
 
-type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa';
+type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa'
 
 export interface DateCellProps {
-  date?: string | Date | null;
-  format?: 'short' | 'long' | 'time';
-  fallback?: string;
-  className?: string;
-  showIcon?: boolean;
+  date?: string | Date | null
+  format?: 'short' | 'long' | 'time'
+  fallback?: string
+  className?: string
+  showIcon?: boolean
 }
 
 export interface StatusCellProps {
-  type: StatusType;
-  status: string;
-  variant?: 'badge' | 'text';
-  showIcon?: boolean;
-  className?: string;
+  type: StatusType
+  status: string
+  variant?: 'badge' | 'text'
+  showIcon?: boolean
+  className?: string
 }
 
 export interface CurrencyCellProps {
-  amount: number;
-  currency?: 'TWD' | 'USD' | 'CNY';
-  variant?: 'default' | 'income' | 'expense';
-  showSign?: boolean;
-  className?: string;
+  amount: number
+  currency?: 'TWD' | 'USD' | 'CNY'
+  variant?: 'default' | 'income' | 'expense'
+  showSign?: boolean
+  className?: string
 }
 
 export interface DateRangeCellProps {
-  start?: string | Date | null;
-  end?: string | Date | null;
-  format?: 'short' | 'long';
-  showDuration?: boolean;
-  className?: string;
+  start?: string | Date | null
+  end?: string | Date | null
+  format?: 'short' | 'long'
+  showDuration?: boolean
+  className?: string
 }
 
 export interface ActionButton {
-  icon: LucideIcon;
-  label: string;
-  onClick: () => void;
-  variant?: 'default' | 'danger' | 'success';
-  disabled?: boolean;
+  icon: LucideIcon
+  label: string
+  onClick: () => void
+  variant?: 'default' | 'danger' | 'success'
+  disabled?: boolean
 }
 
 export interface ActionCellProps {
-  actions: ActionButton[];
-  className?: string;
+  actions: ActionButton[]
+  className?: string
 }
 
 // ========== 輔助函數 ==========
@@ -69,7 +74,7 @@ function formatDate(date: Date, format: 'short' | 'long' | 'time' = 'short'): st
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    })
   }
 
   if (format === 'long') {
@@ -78,19 +83,19 @@ function formatDate(date: Date, format: 'short' | 'long' | 'time' = 'short'): st
       month: 'long',
       day: 'numeric',
       weekday: 'short',
-    });
+    })
   }
 
   // short format (default)
-  return date.toLocaleDateString('zh-TW');
+  return date.toLocaleDateString('zh-TW')
 }
 
 /**
  * 計算日期區間天數
  */
 function calculateDuration(start: Date, end: Date): number {
-  const diff = end.getTime() - start.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1; // +1 包含起始日
+  const diff = end.getTime() - start.getTime()
+  return Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1 // +1 包含起始日
 }
 
 /**
@@ -101,9 +106,9 @@ function formatCurrency(amount: number, currency: 'TWD' | 'USD' | 'CNY' = 'TWD')
     TWD: 'NT$ ',
     USD: '$ ',
     CNY: '¥ ',
-  }[currency];
+  }[currency]
 
-  return `${prefix}${Math.abs(amount).toLocaleString()}`;
+  return `${prefix}${Math.abs(amount).toLocaleString()}`
 }
 
 // ========== 組件 ==========
@@ -127,12 +132,12 @@ export function DateCell({
   showIcon = true,
 }: DateCellProps) {
   if (!date) {
-    return <span className={cn('text-sm text-morandi-red', className)}>{fallback}</span>;
+    return <span className={cn('text-sm text-morandi-red', className)}>{fallback}</span>
   }
 
-  const dateObj = new Date(date);
+  const dateObj = new Date(date)
   if (isNaN(dateObj.getTime())) {
-    return <span className={cn('text-sm text-morandi-red', className)}>無效日期</span>;
+    return <span className={cn('text-sm text-morandi-red', className)}>無效日期</span>
   }
 
   return (
@@ -140,7 +145,7 @@ export function DateCell({
       {showIcon && <Calendar size={14} className="text-morandi-secondary flex-shrink-0" />}
       <span>{formatDate(dateObj, format)}</span>
     </div>
-  );
+  )
 }
 
 /**
@@ -161,18 +166,18 @@ export function StatusCell({
   showIcon = false,
   className,
 }: StatusCellProps) {
-  const color = getStatusColor(type, status);
-  const label = getStatusLabel(type, status);
-  const IconComponent = getStatusIcon(type, status);
+  const color = getStatusColor(type, status)
+  const label = getStatusLabel(type, status)
+  const IconComponent = getStatusIcon(type, status)
 
   if (variant === 'badge') {
-    const bgColor = getStatusBgColor(type, status);
+    const bgColor = getStatusBgColor(type, status)
     return (
       <Badge className={cn('text-white', bgColor, className)}>
         {showIcon && IconComponent && <IconComponent className="w-3 h-3 mr-1" />}
         {label}
       </Badge>
-    );
+    )
   }
 
   // variant === 'text'
@@ -181,7 +186,7 @@ export function StatusCell({
       {showIcon && IconComponent && <IconComponent className="w-3 h-3 mr-1 inline" />}
       {label}
     </span>
-  );
+  )
 }
 
 /**
@@ -203,7 +208,7 @@ export function CurrencyCell({
   showSign = false,
   className,
 }: CurrencyCellProps) {
-  const isNegative = amount < 0;
+  const isNegative = amount < 0
 
   const colorClass = cn(
     'text-sm font-medium',
@@ -212,14 +217,14 @@ export function CurrencyCell({
     variant === 'default' && isNegative && 'text-morandi-red',
     variant === 'default' && !isNegative && 'text-morandi-primary',
     className
-  );
+  )
 
   return (
     <div className={colorClass}>
       {showSign && (isNegative ? '-' : '+')}
       {formatCurrency(amount, currency)}
     </div>
-  );
+  )
 }
 
 /**
@@ -240,28 +245,26 @@ export function DateRangeCell({
   className,
 }: DateRangeCellProps) {
   if (!start || !end) {
-    return <span className="text-sm text-morandi-secondary">-</span>;
+    return <span className="text-sm text-morandi-secondary">-</span>
   }
 
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  const startDate = new Date(start)
+  const endDate = new Date(end)
 
   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    return <span className="text-sm text-morandi-red">無效日期</span>;
+    return <span className="text-sm text-morandi-red">無效日期</span>
   }
 
-  const duration = calculateDuration(startDate, endDate);
+  const duration = calculateDuration(startDate, endDate)
 
   return (
     <div className={cn('text-sm', className)}>
       <div className="text-morandi-primary">
         {formatDate(startDate, format)} ~ {formatDate(endDate, format)}
       </div>
-      {showDuration && (
-        <div className="text-xs text-morandi-secondary">共 {duration} 天</div>
-      )}
+      {showDuration && <div className="text-xs text-morandi-secondary">共 {duration} 天</div>}
     </div>
-  );
+  )
 }
 
 /**
@@ -283,25 +286,23 @@ export function ActionCell({ actions, className }: ActionCellProps) {
   return (
     <div className={cn('flex items-center gap-1', className)}>
       {actions.map((action, index) => {
-        const IconComponent = action.icon;
+        const IconComponent = action.icon
         const buttonClass = cn(
           'p-1 rounded transition-colors',
-          action.variant === 'danger' &&
-            'text-morandi-red hover:bg-morandi-red/10',
-          action.variant === 'success' &&
-            'text-morandi-green hover:bg-morandi-green/10',
+          action.variant === 'danger' && 'text-morandi-red hover:bg-morandi-red/10',
+          action.variant === 'success' && 'text-morandi-green hover:bg-morandi-green/10',
           (!action.variant || action.variant === 'default') &&
             'text-morandi-gold hover:bg-morandi-gold/10',
           action.disabled && 'opacity-50 cursor-not-allowed'
-        );
+        )
 
         return (
           <button
             key={index}
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={e => {
+              e.stopPropagation()
               if (!action.disabled) {
-                action.onClick();
+                action.onClick()
               }
             }}
             className={buttonClass}
@@ -310,10 +311,10 @@ export function ActionCell({ actions, className }: ActionCellProps) {
           >
             <IconComponent size={14} />
           </button>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
 /**
@@ -331,13 +332,12 @@ export function TextCell({
   maxLength,
   className,
 }: {
-  text: string;
-  maxLength?: number;
-  className?: string;
+  text: string
+  maxLength?: number
+  className?: string
 }) {
-  const displayText = maxLength && text.length > maxLength
-    ? `${text.substring(0, maxLength)}...`
-    : text;
+  const displayText =
+    maxLength && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
 
   return (
     <span
@@ -346,7 +346,7 @@ export function TextCell({
     >
       {displayText}
     </span>
-  );
+  )
 }
 
 /**
@@ -365,10 +365,10 @@ export function NumberCell({
   suffix,
   className,
 }: {
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  className?: string;
+  value: number
+  prefix?: string
+  suffix?: string
+  className?: string
 }) {
   return (
     <span className={cn('text-sm font-medium text-morandi-primary', className)}>
@@ -376,5 +376,5 @@ export function NumberCell({
       {value.toLocaleString()}
       {suffix}
     </span>
-  );
+  )
 }

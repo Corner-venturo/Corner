@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 /**
  * Playwright 配置 - IndexedDB 同步測試
@@ -9,10 +9,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1, // 單執行緒，避免 IndexedDB 衝突
-  reporter: [
-    ['html'],
-    ['list'],
-  ],
+  reporter: [['html'], ['list']],
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
@@ -32,4 +29,4 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
-});
+})

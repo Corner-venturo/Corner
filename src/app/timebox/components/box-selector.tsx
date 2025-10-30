@@ -29,10 +29,10 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
   const [selectedBox, setSelectedBox] = useState<string | null>(null)
   const [duration, setDuration] = useState(timeInterval)
 
-
   // 生成持續時間選項（30分鐘的倍數）
   const durationOptions = []
-  for (let i = timeInterval; i <= 480; i += timeInterval) { // 最多8小時
+  for (let i = timeInterval; i <= 480; i += timeInterval) {
+    // 最多8小時
     durationOptions.push(i)
   }
 
@@ -52,7 +52,7 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
   }
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>選擇箱子</DialogTitle>
@@ -71,7 +71,9 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                   onClick={() => {
                     onClose()
                     // 觸發建立箱子對話框
-                    const createButton = document.querySelector('[data-create-box]') as HTMLButtonElement
+                    const createButton = document.querySelector(
+                      '[data-create-box]'
+                    ) as HTMLButtonElement
                     if (createButton) {
                       createButton.click()
                     }
@@ -83,7 +85,7 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
               </div>
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
-                {boxes.map((box) => {
+                {boxes.map(box => {
                   const Icon = typeIcons[box.type]
                   return (
                     <button
@@ -105,7 +107,9 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                         </div>
                         <div className="flex-1">
                           <div className="font-medium text-morandi-primary">{box.name}</div>
-                          <div className="text-sm text-morandi-secondary">{typeLabels[box.type]}</div>
+                          <div className="text-sm text-morandi-secondary">
+                            {typeLabels[box.type]}
+                          </div>
                         </div>
                       </div>
                     </button>
@@ -122,7 +126,7 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
                 持續時間
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {durationOptions.slice(0, 12).map((option) => (
+                {durationOptions.slice(0, 12).map(option => (
                   <button
                     key={option}
                     type="button"
@@ -142,13 +146,14 @@ export default function BoxSelector({ onSelect, onClose, timeInterval }: BoxSele
 
           {/* 按鈕 */}
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={onClose} className="text-morandi-secondary border-border">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="text-morandi-secondary border-border"
+            >
               取消
             </Button>
-            <Button
-              onClick={handleConfirm}
-              disabled={!selectedBox}
-            >
+            <Button onClick={handleConfirm} disabled={!selectedBox}>
               確認
             </Button>
           </div>

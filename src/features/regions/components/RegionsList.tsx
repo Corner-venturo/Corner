@@ -1,30 +1,36 @@
-'use client';
+'use client'
 
-import { MapPin, ChevronRight, ChevronDown, Plus, Edit2, Power, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { Country, City } from '@/stores';
+import {
+  MapPin,
+  ChevronRight,
+  ChevronDown,
+  Plus,
+  Edit2,
+  Power,
+  Trash2,
+  Upload,
+  Image as ImageIcon,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import type { Country, City } from '@/stores'
 
-type SortField = 'name' | 'airport_code' | 'display_order';
-type SortDirection = 'asc' | 'desc';
+type SortField = 'name' | 'airport_code' | 'display_order'
+type SortDirection = 'asc' | 'desc'
 
 // ============================================
 // 排序指示器
 // ============================================
 
 interface SortIndicatorProps {
-  field: SortField;
-  currentField: SortField;
-  direction: SortDirection;
+  field: SortField
+  currentField: SortField
+  direction: SortDirection
 }
 
 function SortIndicator({ field, currentField, direction }: SortIndicatorProps) {
-  if (currentField !== field) return null;
-  return (
-    <span className="ml-1 text-morandi-gold">
-      {direction === 'asc' ? '↑' : '↓'}
-    </span>
-  );
+  if (currentField !== field) return null
+  return <span className="ml-1 text-morandi-gold">{direction === 'asc' ? '↑' : '↓'}</span>
 }
 
 // ============================================
@@ -32,29 +38,29 @@ function SortIndicator({ field, currentField, direction }: SortIndicatorProps) {
 // ============================================
 
 interface RegionsListProps {
-  loading: boolean;
-  filteredCountries: Country[];
-  expandedCountries: Set<string>;
-  expandedRegions: Set<string>;
-  sortField: SortField;
-  sortDirection: SortDirection;
-  toggleCountry: (id: string) => void;
-  toggleRegion: (id: string) => void;
-  toggleCountryStatus: (country: Country) => void;
-  toggleCityStatus: (city: City) => void;
-  handleSort: (field: SortField) => void;
-  handleDeleteCountry: (id: string) => void;
-  handleDeleteRegion: (id: string) => void;
-  handleDeleteCity: (id: string) => void;
-  onAddCountry: () => void;
-  onAddRegion: (countryId: string) => void;
-  onAddCity: (countryId: string, regionId?: string) => void;
-  onEditCity: (city: City) => void;
-  onEditImage: (city: City) => void;
-  getRegionsByCountry: (countryId: string) => any[];
-  getCitiesByCountry: (countryId: string) => City[];
-  getCitiesByRegion: (regionId: string) => City[];
-  sortCities: (cities: City[]) => City[];
+  loading: boolean
+  filteredCountries: Country[]
+  expandedCountries: Set<string>
+  expandedRegions: Set<string>
+  sortField: SortField
+  sortDirection: SortDirection
+  toggleCountry: (id: string) => void
+  toggleRegion: (id: string) => void
+  toggleCountryStatus: (country: Country) => void
+  toggleCityStatus: (city: City) => void
+  handleSort: (field: SortField) => void
+  handleDeleteCountry: (id: string) => void
+  handleDeleteRegion: (id: string) => void
+  handleDeleteCity: (id: string) => void
+  onAddCountry: () => void
+  onAddRegion: (countryId: string) => void
+  onAddCity: (countryId: string, regionId?: string) => void
+  onEditCity: (city: City) => void
+  onEditImage: (city: City) => void
+  getRegionsByCountry: (countryId: string) => any[]
+  getCitiesByCountry: (countryId: string) => City[]
+  getCitiesByRegion: (regionId: string) => City[]
+  sortCities: (cities: City[]) => City[]
 }
 
 export function RegionsList({
@@ -92,7 +98,7 @@ export function RegionsList({
         {/* 縮排 */}
         <div className="w-6"></div>
         <div className="w-6"></div>
-        <div className={cn(isUnderRegion ? "w-6" : "w-4")}></div>
+        <div className={cn(isUnderRegion ? 'w-6' : 'w-4')}></div>
 
         {/* 國家欄位（空白） */}
         <div className="w-48 ml-2"></div>
@@ -108,12 +114,14 @@ export function RegionsList({
 
         {/* 機場代碼 */}
         <div className="w-32 flex items-center">
-          <span className={cn(
-            'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-            city.airport_code
-              ? 'bg-morandi-blue/10 text-morandi-blue'
-              : 'bg-morandi-container text-morandi-muted'
-          )}>
+          <span
+            className={cn(
+              'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+              city.airport_code
+                ? 'bg-morandi-blue/10 text-morandi-blue'
+                : 'bg-morandi-container text-morandi-muted'
+            )}
+          >
             {city.airport_code || '-'}
           </span>
         </div>
@@ -176,12 +184,14 @@ export function RegionsList({
 
         {/* 狀態 */}
         <div className="w-24 flex items-center justify-center">
-          <span className={cn(
-            'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-            city.is_active
-              ? 'bg-morandi-green/80 text-white'
-              : 'bg-morandi-container text-morandi-secondary'
-          )}>
+          <span
+            className={cn(
+              'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+              city.is_active
+                ? 'bg-morandi-green/80 text-white'
+                : 'bg-morandi-container text-morandi-secondary'
+            )}
+          >
             {city.is_active ? '啟用' : '停用'}
           </span>
         </div>
@@ -204,9 +214,10 @@ export function RegionsList({
             className="h-8 px-2"
             title={city.is_active ? '停用' : '啟用'}
           >
-            <Power size={12} className={
-              city.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
-            } />
+            <Power
+              size={12}
+              className={city.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
+            />
           </Button>
           <Button
             variant="ghost"
@@ -220,7 +231,7 @@ export function RegionsList({
         </div>
       </div>
     </div>
-  );
+  )
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card shadow-sm min-h-full flex flex-col">
@@ -240,7 +251,12 @@ export function RegionsList({
             onClick={() => handleSort('airport_code')}
             className="w-32 text-sm font-medium text-morandi-primary text-left hover:text-morandi-gold transition-colors cursor-pointer"
           >
-            機場代碼 <SortIndicator field="airport_code" currentField={sortField} direction={sortDirection} />
+            機場代碼{' '}
+            <SortIndicator
+              field="airport_code"
+              currentField={sortField}
+              direction={sortDirection}
+            />
           </button>
           <div className="w-32 text-sm font-medium text-morandi-primary text-center">城市圖片</div>
           <div className="flex-1"></div>
@@ -275,11 +291,11 @@ export function RegionsList({
       {/* 國家列表 */}
       {!loading && filteredCountries.length > 0 && (
         <div className="flex-1">
-          {filteredCountries.map((country) => {
-            const isCountryExpanded = expandedCountries.has(country.id);
-            const countryRegions = getRegionsByCountry(country.id);
-            const countryCities = getCitiesByCountry(country.id);
-            const totalCities = countryCities.length;
+          {filteredCountries.map(country => {
+            const isCountryExpanded = expandedCountries.has(country.id)
+            const countryRegions = getRegionsByCountry(country.id)
+            const countryCities = getCitiesByCountry(country.id)
+            const totalCities = countryCities.length
 
             return (
               <div key={country.id} className="border-b border-border last:border-b-0">
@@ -312,18 +328,18 @@ export function RegionsList({
                     </div>
 
                     {/* 城市欄位 */}
-                    <div className="flex-1 text-sm text-morandi-muted">
-                      {totalCities} 個城市
-                    </div>
+                    <div className="flex-1 text-sm text-morandi-muted">{totalCities} 個城市</div>
 
                     {/* 狀態 */}
                     <div className="w-24 flex items-center justify-center">
-                      <span className={cn(
-                        'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                        country.is_active
-                          ? 'bg-morandi-green text-white'
-                          : 'bg-morandi-container text-morandi-secondary'
-                      )}>
+                      <span
+                        className={cn(
+                          'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
+                          country.is_active
+                            ? 'bg-morandi-green text-white'
+                            : 'bg-morandi-container text-morandi-secondary'
+                        )}
+                      >
                         {country.is_active ? '啟用' : '停用'}
                       </span>
                     </div>
@@ -359,9 +375,12 @@ export function RegionsList({
                         className="h-8 px-2"
                         title={country.is_active ? '停用' : '啟用'}
                       >
-                        <Power size={14} className={
-                          country.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
-                        } />
+                        <Power
+                          size={14}
+                          className={
+                            country.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
+                          }
+                        />
                       </Button>
                       <Button
                         variant="ghost"
@@ -379,89 +398,92 @@ export function RegionsList({
                 {/* 展開內容：地區 or 城市 */}
                 {isCountryExpanded && (
                   <div className="bg-morandi-container/5">
-                    {country.has_regions ? (
-                      // 有地區分類
-                      countryRegions.map((region) => {
-                        const isRegionExpanded = expandedRegions.has(region.id);
-                        const regionCities = getCitiesByRegion(region.id);
+                    {country.has_regions
+                      ? // 有地區分類
+                        countryRegions.map(region => {
+                          const isRegionExpanded = expandedRegions.has(region.id)
+                          const regionCities = getCitiesByRegion(region.id)
 
-                        return (
-                          <div key={region.id} className="border-t border-border/50">
-                            {/* 地區行 */}
-                            <div className="hover:bg-morandi-container/20 transition-colors">
-                              <div className="flex items-center px-4 py-2.5">
-                                <div className="w-6"></div>
-                                <div className="w-6 flex items-center justify-center">
-                                  <button
-                                    onClick={() => toggleRegion(region.id)}
-                                    className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-                                  >
-                                    {isRegionExpanded ? (
-                                      <ChevronDown size={14} className="text-morandi-gold" />
-                                    ) : (
-                                      <ChevronRight size={14} className="text-morandi-secondary" />
-                                    )}
-                                  </button>
-                                </div>
+                          return (
+                            <div key={region.id} className="border-t border-border/50">
+                              {/* 地區行 */}
+                              <div className="hover:bg-morandi-container/20 transition-colors">
+                                <div className="flex items-center px-4 py-2.5">
+                                  <div className="w-6"></div>
+                                  <div className="w-6 flex items-center justify-center">
+                                    <button
+                                      onClick={() => toggleRegion(region.id)}
+                                      className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+                                    >
+                                      {isRegionExpanded ? (
+                                        <ChevronDown size={14} className="text-morandi-gold" />
+                                      ) : (
+                                        <ChevronRight
+                                          size={14}
+                                          className="text-morandi-secondary"
+                                        />
+                                      )}
+                                    </button>
+                                  </div>
 
-                                <div className="w-48 ml-2"></div>
+                                  <div className="w-48 ml-2"></div>
 
-                                <div className="w-48 flex items-center">
-                                  <div className="w-2 h-2 rounded-full bg-morandi-gold mr-3"></div>
-                                  <span className="font-medium text-morandi-primary">{region.name}</span>
-                                </div>
+                                  <div className="w-48 flex items-center">
+                                    <div className="w-2 h-2 rounded-full bg-morandi-gold mr-3"></div>
+                                    <span className="font-medium text-morandi-primary">
+                                      {region.name}
+                                    </span>
+                                  </div>
 
-                                <div className="flex-1 text-sm text-morandi-muted">
-                                  {regionCities.length} 個城市
-                                </div>
+                                  <div className="flex-1 text-sm text-morandi-muted">
+                                    {regionCities.length} 個城市
+                                  </div>
 
-                                <div className="w-24"></div>
+                                  <div className="w-24"></div>
 
-                                <div className="w-40 flex items-center justify-end gap-1">
-                                  <div className="h-8 w-8"></div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onAddCity(country.id, region.id)}
-                                    className="h-8 px-2 text-morandi-green hover:bg-morandi-green/10"
-                                    title="新增城市"
-                                  >
-                                    <Plus size={14} />
-                                  </Button>
-                                  <div className="h-8 w-8"></div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDeleteRegion(region.id)}
-                                    className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                                    title="刪除"
-                                  >
-                                    <Trash2 size={14} />
-                                  </Button>
+                                  <div className="w-40 flex items-center justify-end gap-1">
+                                    <div className="h-8 w-8"></div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => onAddCity(country.id, region.id)}
+                                      className="h-8 px-2 text-morandi-green hover:bg-morandi-green/10"
+                                      title="新增城市"
+                                    >
+                                      <Plus size={14} />
+                                    </Button>
+                                    <div className="h-8 w-8"></div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeleteRegion(region.id)}
+                                      className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+                                      title="刪除"
+                                    >
+                                      <Trash2 size={14} />
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
+
+                              {/* 地區的城市列表 */}
+                              {isRegionExpanded && regionCities.length > 0 && (
+                                <div className="bg-morandi-container/10">
+                                  {sortCities(regionCities).map(city => renderCityRow(city))}
+                                </div>
+                              )}
                             </div>
-
-                            {/* 地區的城市列表 */}
-                            {isRegionExpanded && regionCities.length > 0 && (
-                              <div className="bg-morandi-container/10">
-                                {sortCities(regionCities).map((city) => renderCityRow(city))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      // 無地區分類，直接顯示城市
-                      sortCities(countryCities).map((city) => renderCityRow(city, false))
-                    )}
+                          )
+                        })
+                      : // 無地區分類，直接顯示城市
+                        sortCities(countryCities).map(city => renderCityRow(city, false))}
                   </div>
                 )}
               </div>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
+  )
 }

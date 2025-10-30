@@ -1,22 +1,22 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import type { ChannelMember } from '@/services/workspace-members';
-import type { Channel } from '@/stores/workspace-store';
+} from '@/components/ui/dialog'
+import type { ChannelMember } from '@/services/workspace-members'
+import type { Channel } from '@/stores/workspace-store'
 
 interface MemberManagementDialogProps {
-  memberToRemove: ChannelMember | null;
-  isRemoveDialogOpen: boolean;
-  isRemovingMember: boolean;
-  onClose: () => void;
-  onRemove: () => Promise<void>;
+  memberToRemove: ChannelMember | null
+  isRemoveDialogOpen: boolean
+  isRemovingMember: boolean
+  onClose: () => void
+  onRemove: () => Promise<void>
 }
 
 export function MemberManagementDialog({
@@ -29,9 +29,9 @@ export function MemberManagementDialog({
   return (
     <Dialog
       open={isRemoveDialogOpen}
-      onOpenChange={(open) => {
+      onOpenChange={open => {
         if (!open) {
-          onClose();
+          onClose()
         }
       }}
     >
@@ -40,35 +40,29 @@ export function MemberManagementDialog({
           <DialogTitle>移除頻道成員</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-morandi-secondary">
-          確定要將「{memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || '此成員'}」移出頻道嗎？
+          確定要將「
+          {memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || '此成員'}
+          」移出頻道嗎？
         </p>
         <DialogFooter className="mt-4">
-          <Button
-            variant="ghost"
-            onClick={onClose}
-            disabled={isRemovingMember}
-          >
+          <Button variant="ghost" onClick={onClose} disabled={isRemovingMember}>
             取消
           </Button>
-          <Button
-            variant="destructive"
-            onClick={onRemove}
-            disabled={isRemovingMember}
-          >
+          <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember}>
             {isRemovingMember ? '移除中...' : '移除'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
 interface ChannelDeleteDialogProps {
-  channelToDelete: Channel | null;
-  isDeleteDialogOpen: boolean;
-  isDeletingChannel: boolean;
-  onClose: () => void;
-  onDelete: () => Promise<void>;
+  channelToDelete: Channel | null
+  isDeleteDialogOpen: boolean
+  isDeletingChannel: boolean
+  onClose: () => void
+  onDelete: () => Promise<void>
 }
 
 export function ChannelDeleteDialog({
@@ -81,9 +75,9 @@ export function ChannelDeleteDialog({
   return (
     <Dialog
       open={isDeleteDialogOpen}
-      onOpenChange={(open) => {
+      onOpenChange={open => {
         if (!open) {
-          onClose();
+          onClose()
         }
       }}
     >
@@ -114,5 +108,5 @@ export function ChannelDeleteDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,54 +1,59 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import { useEnterSubmit } from '@/hooks/useEnterSubmit';
-import { Check, X, CheckCircle, Edit2 } from 'lucide-react';
-import { generateUUID } from '@/lib/utils/uuid';
-import { SubTasksSectionProps } from './types';
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
+import { useEnterSubmit } from '@/hooks/useEnterSubmit'
+import { Check, X, CheckCircle, Edit2 } from 'lucide-react'
+import { generateUUID } from '@/lib/utils/uuid'
+import { SubTasksSectionProps } from './types'
 
 export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
-  const [newSubTask, setNewSubTask] = useState('');
-  const [editingSubTaskId, setEditingSubTaskId] = useState<string | null>(null);
-  const [editingSubTaskContent, setEditingSubTaskContent] = useState('');
+  const [newSubTask, setNewSubTask] = useState('')
+  const [editingSubTaskId, setEditingSubTaskId] = useState<string | null>(null)
+  const [editingSubTaskContent, setEditingSubTaskContent] = useState('')
 
   const addSubTask = () => {
-    if (!newSubTask.trim()) return;
+    if (!newSubTask.trim()) return
 
     const newTask = {
       id: generateUUID(),
       title: newSubTask,
       done: false,
-    };
+    }
 
     // 如果目前狀態是「待辦」，自動切換到「進行中」
     const updates: Partial<typeof todo> = {
-      sub_tasks: [...(todo.sub_tasks || []), newTask]
-    };
-
-    if (todo.status === 'pending') {
-      updates.status = 'in_progress';
+      sub_tasks: [...(todo.sub_tasks || []), newTask],
     }
 
-    onUpdate(updates);
-    setNewSubTask('');
-  };
+    if (todo.status === 'pending') {
+      updates.status = 'in_progress'
+    }
 
-  const { handleKeyDown: handleSubTaskKeyDown, compositionProps: subTaskCompositionProps } = useEnterSubmit(addSubTask);
+    onUpdate(updates)
+    setNewSubTask('')
+  }
+
+  const { handleKeyDown: handleSubTaskKeyDown, compositionProps: subTaskCompositionProps } =
+    useEnterSubmit(addSubTask)
 
   const toggleSubTask = (taskId: string) => {
     const updatedSubTasks = (todo.sub_tasks || []).map(task =>
       task.id === taskId
-        ? { ...task, done: !task.done, completed_at: !task.done ? new Date().toISOString() : undefined }
+        ? {
+            ...task,
+            done: !task.done,
+            completed_at: !task.done ? new Date().toISOString() : undefined,
+          }
         : task
-    );
+    )
 
-    onUpdate({ sub_tasks: updatedSubTasks });
-  };
+    onUpdate({ sub_tasks: updatedSubTasks })
+  }
 
-  const completedSubTasks = (todo.sub_tasks || []).filter(task => task.done).length;
+  const completedSubTasks = (todo.sub_tasks || []).filter(task => task.done).length
 
   return (
     <div className="mb-4 bg-card border border-border rounded-xl p-4 shadow-sm">
@@ -63,8 +68,11 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
       </div>
 
       <div className="space-y-1.5 mb-3">
-        {(todo.sub_tasks || []).map((task) => (
-          <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-morandi-container/10 hover:bg-morandi-container/20 transition-colors border border-transparent hover:border-morandi-gold/20 group relative">
+        {(todo.sub_tasks || []).map(task => (
+          <div
+            key={task.id}
+            className="flex items-center gap-2 p-2 rounded-lg bg-morandi-container/10 hover:bg-morandi-container/20 transition-colors border border-transparent hover:border-morandi-gold/20 group relative"
+          >
             {editingSubTaskId === task.id ? (
               // 編輯模式
               <>
@@ -81,7 +89,7 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
                 </button>
                 <Input
                   value={editingSubTaskContent}
-                  onChange={(e) => setEditingSubTaskContent(e.target.value)}
+                  onChange={e => setEditingSubTaskContent(e.target.value)}
                   className="text-xs h-7 flex-1"
                   autoFocus
                 />
@@ -90,9 +98,9 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
                   onClick={() => {
                     const updatedSubTasks = (todo.sub_tasks || []).map(t =>
                       t.id === task.id ? { ...t, title: editingSubTaskContent } : t
-                    );
-                    onUpdate({ sub_tasks: updatedSubTasks });
-                    setEditingSubTaskId(null);
+                    )
+                    onUpdate({ sub_tasks: updatedSubTasks })
+                    setEditingSubTaskId(null)
                   }}
                   className="bg-morandi-gold hover:bg-morandi-gold/90 h-7 text-xs px-2"
                 >
@@ -121,19 +129,19 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
                 >
                   {task.done && <Check size={12} className="text-white" />}
                 </button>
-                <span className={cn(
-                  'text-xs flex-1 font-medium',
-                  task.done
-                    ? 'line-through text-morandi-muted'
-                    : 'text-morandi-primary'
-                )}>
+                <span
+                  className={cn(
+                    'text-xs flex-1 font-medium',
+                    task.done ? 'line-through text-morandi-muted' : 'text-morandi-primary'
+                  )}
+                >
                   {task.title}
                 </span>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                   <button
                     onClick={() => {
-                      setEditingSubTaskId(task.id);
-                      setEditingSubTaskContent(task.title);
+                      setEditingSubTaskId(task.id)
+                      setEditingSubTaskContent(task.title)
                     }}
                     className="p-1 hover:bg-morandi-gold/10 rounded text-morandi-secondary hover:text-morandi-gold"
                     title="編輯子任務"
@@ -142,8 +150,8 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
                   </button>
                   <button
                     onClick={() => {
-                      const updatedSubTasks = (todo.sub_tasks || []).filter(t => t.id !== task.id);
-                      onUpdate({ sub_tasks: updatedSubTasks });
+                      const updatedSubTasks = (todo.sub_tasks || []).filter(t => t.id !== task.id)
+                      onUpdate({ sub_tasks: updatedSubTasks })
                     }}
                     className="p-1 hover:bg-morandi-red/10 rounded text-morandi-red"
                     title="刪除子任務"
@@ -161,7 +169,7 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
         <Input
           placeholder="新增子任務... (Enter)"
           value={newSubTask}
-          onChange={(e) => setNewSubTask(e.target.value)}
+          onChange={e => setNewSubTask(e.target.value)}
           onKeyDown={handleSubTaskKeyDown}
           {...subTaskCompositionProps}
           className="text-sm border-morandi-container/30 focus-visible:ring-morandi-gold"
@@ -171,5 +179,5 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
         </Button>
       </div>
     </div>
-  );
+  )
 }

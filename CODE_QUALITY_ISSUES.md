@@ -14,6 +14,7 @@
 #### 🔴 高優先級修復
 
 **BulletinBoard.tsx**
+
 ```typescript
 // ❌ 問題
 type: bulletin.type as unknown
@@ -26,19 +27,21 @@ onChange={(e) => setNewBulletin({...newBulletin, type: e.target.value as Bulleti
 ```
 
 **ChannelChat.tsx**
+
 ```typescript
 // ❌ 問題
 al.items?.some((i: any) => i.id === itemId)
 
 // ✅ 應該
 interface AdvanceItem {
-  id: string;
+  id: string
   // ... other properties
 }
 al.items?.some((i: AdvanceItem) => i.id === itemId)
 ```
 
 **CreatePaymentRequestDialog.tsx**
+
 ```typescript
 // ❌ 問題
 } as unknown);
@@ -51,6 +54,7 @@ interface PaymentRequest {
 ```
 
 **CreateReceiptDialog.tsx**
+
 ```typescript
 // ❌ 問題
 const receipt = await createReceipt(receiptData as unknown);
@@ -67,6 +71,7 @@ onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
 #### 🟡 中優先級修復
 
 **OrderListCard.tsx**
+
 ```typescript
 // ❌ 問題
 onCreateReceipt: (orderId: string, order: any) => void;
@@ -77,22 +82,24 @@ onCreateReceipt: (orderId: string, order: Order) => void;
 ```
 
 **ShareAdvanceDialog.tsx**
+
 ```typescript
 // ❌ 問題
-const notDeleted = !(emp as unknown)._deleted;
-const isActive = (emp as unknown).status === 'active';
+const notDeleted = !(emp as unknown)._deleted
+const isActive = (emp as unknown).status === 'active'
 
 // ✅ 應該
 interface Employee {
-  _deleted?: boolean;
-  status: 'active' | 'inactive';
+  _deleted?: boolean
+  status: 'active' | 'inactive'
   // ... other properties
 }
-const notDeleted = !emp._deleted;
-const isActive = emp.status === 'active';
+const notDeleted = !emp._deleted
+const isActive = emp.status === 'active'
 ```
 
 **canvas-view.tsx**
+
 ```typescript
 // ❌ 問題
 .sort((a: any, b: any) => a.order - b.order);
@@ -112,19 +119,21 @@ tour_id={(channel as ChannelWithTour).tour_id}
 ```
 
 **channel-list.tsx**
+
 ```typescript
 // ❌ 問題
-const isArchived = (channel as unknown).isArchived;
+const isArchived = (channel as unknown).isArchived
 
 // ✅ 應該
 interface Channel {
-  isArchived?: boolean;
+  isArchived?: boolean
   // ...
 }
-const isArchived = channel.isArchived;
+const isArchived = channel.isArchived
 ```
 
 **workspace-task-list.tsx**
+
 ```typescript
 // ❌ 問題
 const getProgressInfo = (todo: any) => {
@@ -154,11 +163,11 @@ interface Note {
 
 ## 📊 統計
 
-| 問題類型 | 數量 | 優先級 |
-|---------|------|--------|
-| `as any` | 5 | 🔴 高 |
-| `as unknown` | 12 | 🔴 高 |
-| 缺少 interface 定義 | 8 | 🟡 中 |
+| 問題類型            | 數量 | 優先級 |
+| ------------------- | ---- | ------ |
+| `as any`            | 5    | 🔴 高  |
+| `as unknown`        | 12   | 🔴 高  |
+| 缺少 interface 定義 | 8    | 🟡 中  |
 
 ---
 
@@ -167,54 +176,56 @@ interface Note {
 ### Phase 1: 定義缺失的 Types (2-3 小時)
 
 1. **創建 workspace types**
+
 ```typescript
 // src/types/workspace.types.ts
-export type BulletinType = 'announcement' | 'update' | 'warning';
-export type PaymentMethod = 'cash' | 'card' | 'transfer';
+export type BulletinType = 'announcement' | 'update' | 'warning'
+export type PaymentMethod = 'cash' | 'card' | 'transfer'
 
 export interface AdvanceItem {
-  id: string;
-  amount: number;
-  description: string;
-  status: 'pending' | 'approved' | 'rejected';
-  created_by: string;
-  created_at: string;
+  id: string
+  amount: number
+  description: string
+  status: 'pending' | 'approved' | 'rejected'
+  created_by: string
+  created_at: string
 }
 
 export interface SubTask {
-  id: string;
-  title: string;
-  done: boolean;
+  id: string
+  title: string
+  done: boolean
 }
 
 export interface Todo {
-  id: string;
-  title: string;
-  sub_tasks?: SubTask[];
+  id: string
+  title: string
+  sub_tasks?: SubTask[]
   // ...
 }
 
 export interface ChannelWithTour extends Channel {
-  tour_id?: string;
+  tour_id?: string
 }
 
 export interface Note {
-  id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
+  id: string
+  user_id: string
+  content: string
+  created_at: string
 }
 ```
 
 2. **更新 Employee interface**
+
 ```typescript
 // src/types/employee.types.ts
 export interface Employee {
-  id: string;
-  name: string;
-  display_name: string;
-  status: 'active' | 'inactive';
-  _deleted?: boolean;
+  id: string
+  name: string
+  display_name: string
+  status: 'active' | 'inactive'
+  _deleted?: boolean
   // ...
 }
 ```
@@ -258,6 +269,7 @@ npm test
 ## 📈 改善後的效益
 
 ### Before (現在)
+
 ```typescript
 ❌ Type safety: 60% (很多 any/unknown)
 ⚠️ 可維護性: 中
@@ -265,6 +277,7 @@ npm test
 ```
 
 ### After (修復後)
+
 ```typescript
 ✅ Type safety: 95%+
 ✅ 可維護性: 高

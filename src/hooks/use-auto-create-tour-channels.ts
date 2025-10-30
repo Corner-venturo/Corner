@@ -3,51 +3,51 @@
  * 當新旅遊團建立時，自動建立對應的頻道，並自動加入創建者
  */
 
-import { useEffect, useRef } from 'react';
-import { useTourStore } from '@/stores';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useAuthStore } from '@/stores/auth-store';
-import { addChannelMembers } from '@/services/workspace-members';
+import { useEffect, useRef } from 'react'
+import { useTourStore } from '@/stores'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
+import { addChannelMembers } from '@/services/workspace-members'
 
 export function useAutoCreateTourChannels() {
-  const { items: tours } = useTourStore();
-  const { channels, createChannel, currentWorkspace } = useWorkspaceStore();
-  const { user } = useAuthStore();
-  const isProcessingRef = useRef(false);
+  const { items: tours } = useTourStore()
+  const { channels, createChannel, currentWorkspace } = useWorkspaceStore()
+  const { user } = useAuthStore()
+  const isProcessingRef = useRef(false)
 
   useEffect(() => {
     // 防止並發執行
     if (isProcessingRef.current) {
-      return;
+      return
     }
 
     // 資料未就緒時靜默返回
     if (!currentWorkspace || tours.length === 0) {
-      return;
+      return
     }
 
     // 檢查每個旅遊團是否有對應的頻道
     const createMissingChannels = async () => {
-      isProcessingRef.current = true;
+      isProcessingRef.current = true
 
       try {
         for (const tour of tours) {
           // 跳過資料不完整的旅遊團
           if (!tour.code || !tour.name || !tour.id) {
-            continue;
+            continue
           }
 
           // 跳過已封存的旅遊團
           if (tour.archived) {
-            continue;
+            continue
           }
 
           // ✅ 關鍵改進：直接檢查 channels 陣列，不使用 ref
-          const existingChannel = channels.find(ch => ch.tour_id === tour.id);
+          const existingChannel = channels.find(ch => ch.tour_id === tour.id)
 
           // 如果已經有頻道，跳過
           if (existingChannel) {
-            continue;
+            continue
           }
 
           // 自動建立頻道
@@ -58,20 +58,20 @@ export function useAutoCreateTourChannels() {
               description: `${tour.name} 的工作頻道`,
               type: 'public',
               tour_id: tour.id,
-            });
+            })
 
             // 如果有旅遊團的創建者資訊，將創建者加入頻道
             if (newChannel && tour.created_by && user?.id) {
               try {
                 // 🔥 修正：User 類型只有 id，沒有 employee_id
-                const creatorEmployeeId = tour.created_by === user.id ? user.id : tour.created_by;
+                const creatorEmployeeId = tour.created_by === user.id ? user.id : tour.created_by
                 if (creatorEmployeeId) {
                   await addChannelMembers(
                     currentWorkspace.id,
                     newChannel.id,
                     [creatorEmployeeId],
                     'owner'
-                  );
+                  )
                 }
               } catch (error) {
                 // Silently fail - creator may already be added
@@ -82,11 +82,11 @@ export function useAutoCreateTourChannels() {
           }
         }
       } finally {
-        isProcessingRef.current = false;
+        isProcessingRef.current = false
       }
-    };
+    }
 
-    createMissingChannels();
+    createMissingChannels()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tours.length, currentWorkspace?.id]);
+  }, [tours.length, currentWorkspace?.id])
 }

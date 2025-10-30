@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import { Book3D, BookFrame, Page, Spine } from './Book3D';
+import { motion } from 'framer-motion'
+import { Book3D, BookFrame, Page, Spine } from './Book3D'
 
 interface ClosingSceneProps {
-  onReset: () => void;
+  onReset: () => void
 }
 
 /**
@@ -31,10 +31,7 @@ export function ClosingScene({ onReset }: ClosingSceneProps) {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
               >
-                <div
-                  className="text-6xl mb-4"
-                  style={{ opacity: 0.2 }}
-                >
+                <div className="text-6xl mb-4" style={{ opacity: 0.2 }}>
                   ✨
                 </div>
               </motion.div>
@@ -102,5 +99,5 @@ export function ClosingScene({ onReset }: ClosingSceneProps) {
         </div>
       </motion.div>
     </motion.div>
-  );
+  )
 }

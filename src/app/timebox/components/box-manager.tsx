@@ -5,8 +5,20 @@ import { useTimeboxStore, morandiColors } from '@/stores/timebox-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import ColorPicker from '@/components/ui/color-picker'
 import { Plus, Dumbbell, MessageSquare, Package, Edit, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
@@ -82,7 +94,7 @@ export default function BoxManager() {
       message: '確定要刪除這個箱子嗎？',
       details: ['此操作無法復原'],
       confirmLabel: '確認刪除',
-      cancelLabel: '取消'
+      cancelLabel: '取消',
     })
     if (confirmed) {
       deleteBox(id)
@@ -105,9 +117,7 @@ export default function BoxManager() {
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>
-                {editingBox ? '編輯箱子' : '新增箱子'}
-              </DialogTitle>
+              <DialogTitle>{editingBox ? '編輯箱子' : '新增箱子'}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -116,7 +126,7 @@ export default function BoxManager() {
                 </label>
                 <Input
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
                   placeholder="請輸入箱子名稱"
                 />
               </div>
@@ -148,7 +158,7 @@ export default function BoxManager() {
                 </label>
                 <ColorPicker
                   value={formData.color}
-                  onChange={(color) => setFormData({ ...formData, color })}
+                  onChange={color => setFormData({ ...formData, color })}
                 />
               </div>
 
@@ -179,12 +189,10 @@ export default function BoxManager() {
 
       <div className="flex-1 overflow-y-auto">
         {boxes.length === 0 ? (
-          <div className="text-center text-morandi-secondary/80 py-16">
-            還沒有建立任何箱子
-          </div>
+          <div className="text-center text-morandi-secondary/80 py-16">還沒有建立任何箱子</div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {boxes.map((box) => {
+            {boxes.map(box => {
               const Icon = typeIcons[box.type]
               return (
                 <div
@@ -192,11 +200,14 @@ export default function BoxManager() {
                   className="group relative flex items-center gap-3 rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   style={{ borderLeft: `4px solid ${box.color}` }}
                   draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('application/json', JSON.stringify({
-                      type: 'box',
-                      boxId: box.id,
-                    }))
+                  onDragStart={e => {
+                    e.dataTransfer.setData(
+                      'application/json',
+                      JSON.stringify({
+                        type: 'box',
+                        boxId: box.id,
+                      })
+                    )
                   }}
                 >
                   <div
@@ -207,12 +218,8 @@ export default function BoxManager() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-morandi-primary truncate">
-                      {box.name}
-                    </div>
-                    <div className="text-sm text-morandi-secondary">
-                      {typeLabels[box.type]}
-                    </div>
+                    <div className="font-medium text-morandi-primary truncate">{box.name}</div>
+                    <div className="text-sm text-morandi-secondary">{typeLabels[box.type]}</div>
                   </div>
 
                   <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
@@ -220,7 +227,7 @@ export default function BoxManager() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 text-morandi-secondary hover:text-morandi-primary"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         handleEdit(box)
                       }}
@@ -231,7 +238,7 @@ export default function BoxManager() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 text-morandi-secondary hover:text-destructive"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         handleDelete(box.id)
                       }}

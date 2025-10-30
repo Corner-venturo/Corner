@@ -1,19 +1,25 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { StarRating } from '@/components/ui/star-rating';
-import { EnhancedTable } from '@/components/ui/enhanced-table';
-import { Tour, Todo } from '@/stores/types';
-import { useTodoStore } from '@/stores';
-import { taskTemplates, calculateDeadlineFromDeparture } from '@/lib/task-templates';
-import { cn } from '@/lib/utils';
-import { Plus, Eye, Calendar, User, CheckCircle, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { StarRating } from '@/components/ui/star-rating'
+import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { Tour, Todo } from '@/stores/types'
+import { useTodoStore } from '@/stores'
+import { taskTemplates, calculateDeadlineFromDeparture } from '@/lib/task-templates'
+import { cn } from '@/lib/utils'
+import { Plus, Eye, Calendar, User, CheckCircle, Clock } from 'lucide-react'
 
 interface TourTaskAssignmentProps {
-  tour: Tour;
+  tour: Tour
 }
 
 const employees = [
@@ -21,79 +27,82 @@ const employees = [
   { id: '2', name: '李助理', role: 'OP' },
   { id: '3', name: '王財務', role: '財務' },
   { id: '4', name: '陳業務', role: '業務' },
-];
+]
 
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
-  const { items: todos, create: addTodo, update: _updateTodo } = useTodoStore();
-  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const { items: todos, create: addTodo, update: _updateTodo } = useTodoStore()
+  const [selectedTemplate, setSelectedTemplate] = useState('')
   const [taskForm, setTaskForm] = useState({
     title: '',
     assignee: '',
     deadline: '',
     priority: 3 as 1 | 2 | 3 | 4 | 5,
-    sub_tasks: [''] as string[]
-  });
+    sub_tasks: [''] as string[],
+  })
 
   // 獲取與此旅遊團相關的任務
   const tourTasks = todos.filter(todo =>
     todo.related_items.some(item => item.type === 'group' && item.id === tour.id)
-  );
+  )
 
   useEffect(() => {
     // 根據出發日期設定預設期限
     if (tour.departure_date) {
-      const defaultDeadline = calculateDeadlineFromDeparture(tour.departure_date, -7);
-      setTaskForm(prev => ({ ...prev, deadline: defaultDeadline }));
+      const defaultDeadline = calculateDeadlineFromDeparture(tour.departure_date, -7)
+      setTaskForm(prev => ({ ...prev, deadline: defaultDeadline }))
     }
-  }, [tour.departure_date]);
+  }, [tour.departure_date])
 
   const handleTemplateChange = (templateId: string) => {
-    setSelectedTemplate(templateId);
+    setSelectedTemplate(templateId)
 
     if (templateId && taskTemplates[templateId]) {
-      const template = taskTemplates[templateId];
-      const deadline = calculateDeadlineFromDeparture(tour.departure_date, template.defaultDeadlineDays);
+      const template = taskTemplates[templateId]
+      const deadline = calculateDeadlineFromDeparture(
+        tour.departure_date,
+        template.defaultDeadlineDays
+      )
 
       setTaskForm({
         title: template.title,
         assignee: '',
         deadline,
         priority: template.defaultPriority,
-        sub_tasks: [...template.sub_tasks, ''] // 加一個空欄位供自訂
-      });
+        sub_tasks: [...template.sub_tasks, ''], // 加一個空欄位供自訂
+      })
     }
-  };
+  }
 
   const handleSubTaskChange = (index: number, value: string) => {
-    const newSubTasks = [...taskForm.sub_tasks];
-    newSubTasks[index] = value;
-    setTaskForm(prev => ({ ...prev, sub_tasks: newSubTasks }));
-  };
+    const newSubTasks = [...taskForm.sub_tasks]
+    newSubTasks[index] = value
+    setTaskForm(prev => ({ ...prev, sub_tasks: newSubTasks }))
+  }
 
   const addSubTask = () => {
     setTaskForm(prev => ({
       ...prev,
-      sub_tasks: [...prev.sub_tasks, '']
-    }));
-  };
+      sub_tasks: [...prev.sub_tasks, ''],
+    }))
+  }
 
   const removeSubTask = (index: number) => {
     if (taskForm.sub_tasks.length > 1) {
-      const newSubTasks = taskForm.sub_tasks.filter((_, i) => i !== index);
-      setTaskForm(prev => ({ ...prev, sub_tasks: newSubTasks }));
+      const newSubTasks = taskForm.sub_tasks.filter((_, i) => i !== index)
+      setTaskForm(prev => ({ ...prev, sub_tasks: newSubTasks }))
     }
-  };
+  }
 
   const handleCreateTask = () => {
-    if (!taskForm.title.trim() || !taskForm.assignee) return;
+    if (!taskForm.title.trim() || !taskForm.assignee) return
 
     const sub_tasks = taskForm.sub_tasks
       .filter((task: string) => task.trim())
       .map((task: string, index: number) => ({
         id: `${Date.now()}-${index}`,
         title: task.trim(),
-        done: false
-      }));
+        done: false,
+      }))
 
     const newTodo: any = {
       title: taskForm.title,
@@ -107,19 +116,19 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
         {
           type: 'group' as const,
           id: tour.id,
-          title: tour.name
-        }
+          title: tour.name,
+        },
       ],
       sub_tasks,
       notes: [
         {
           timestamp: new Date().toISOString(),
-          content: `從旅遊團「${tour.name}」指派的任務`
-        }
-      ]
-    };
+          content: `從旅遊團「${tour.name}」指派的任務`,
+        },
+      ],
+    }
 
-    addTodo(newTodo);
+    addTodo(newTodo)
 
     // 重置表單
     setTaskForm({
@@ -127,40 +136,40 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       assignee: '',
       deadline: calculateDeadlineFromDeparture(tour.departure_date, -7),
       priority: 3,
-      sub_tasks: ['']
-    });
-    setSelectedTemplate('');
-  };
+      sub_tasks: [''],
+    })
+    setSelectedTemplate('')
+  }
 
   const getStatusLabel = (status: Todo['status']) => {
     const statusMap = {
       pending: '待辦',
       in_progress: '進行中',
       completed: '完成',
-      cancelled: '取消'
-    };
-    return statusMap[status];
-  };
+      cancelled: '取消',
+    }
+    return statusMap[status]
+  }
 
   const getStatusColor = (status: Todo['status']) => {
     const colorMap = {
       pending: 'text-morandi-muted',
       in_progress: 'text-blue-600',
       completed: 'text-green-600',
-      cancelled: 'text-morandi-red'
-    };
-    return colorMap[status];
-  };
+      cancelled: 'text-morandi-red',
+    }
+    return colorMap[status]
+  }
 
   const getEmployeeName = (employee_id: string) => {
-    return employees.find(emp => emp.id === employee_id)?.name || '未指派';
-  };
+    return employees.find(emp => emp.id === employee_id)?.name || '未指派'
+  }
 
   const getProgressInfo = (todo: Todo) => {
-    const completed = todo.sub_tasks.filter(task => task.done).length;
-    const total = todo.sub_tasks.length;
-    return { completed, total, percentage: total > 0 ? (completed / total) * 100 : 0 };
-  };
+    const completed = todo.sub_tasks.filter(task => task.done).length
+    const total = todo.sub_tasks.length
+    return { completed, total, percentage: total > 0 ? (completed / total) * 100 : 0 }
+  }
 
   // 任務列表表格欄位
   const taskColumns = [
@@ -173,7 +182,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           <StarRating value={todo.priority} readonly size="sm" />
           <span className="font-medium text-morandi-primary">{value}</span>
         </div>
-      )
+      ),
     },
     {
       key: 'assignee',
@@ -183,7 +192,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           <User size={14} className="text-morandi-secondary" />
           <span className="text-morandi-primary">{getEmployeeName(value)}</span>
         </div>
-      )
+      ),
     },
     {
       key: 'deadline',
@@ -196,13 +205,13 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
             {value ? new Date(value).toLocaleDateString() : '未設定'}
           </span>
         </div>
-      )
+      ),
     },
     {
       key: 'progress',
       label: '進度',
       render: (value: unknown, todo: Todo) => {
-        const { completed, total, percentage } = getProgressInfo(todo);
+        const { completed, total, percentage } = getProgressInfo(todo)
         return (
           <div className="flex items-center gap-2">
             <div className="w-16 bg-morandi-container/30 rounded-full h-2">
@@ -215,19 +224,24 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
               {completed}/{total}
             </span>
           </div>
-        );
-      }
+        )
+      },
     },
     {
       key: 'status',
       label: '狀態',
       render: (value: Todo['status']) => (
-        <span className={cn('inline-flex items-center gap-1 text-sm font-medium', getStatusColor(value))}>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 text-sm font-medium',
+            getStatusColor(value)
+          )}
+        >
           {value === 'completed' && <CheckCircle size={14} />}
           {value === 'in_progress' && <Clock size={14} />}
           {getStatusLabel(value)}
         </span>
-      )
+      ),
     },
     {
       key: 'actions',
@@ -238,15 +252,15 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           variant="outline"
           onClick={() => {
             // 這裡可以實現跳轉到待辦事項詳細頁面
-            window.location.href = `/todos?expand=${todo.id}`;
+            window.location.href = `/todos?expand=${todo.id}`
           }}
         >
           <Eye size={14} className="mr-1" />
           查看
         </Button>
-      )
-    }
-  ];
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
@@ -258,7 +272,9 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           {/* 左側：基本資訊 */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-morandi-primary mb-2">選擇任務模板</label>
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
+                選擇任務模板
+              </label>
               <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="選擇預設模板或自訂任務" />
@@ -276,22 +292,27 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-morandi-primary mb-2">任務標題</label>
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
+                任務標題
+              </label>
               <Input
                 value={taskForm.title}
-                onChange={(e) => setTaskForm(prev => ({ ...prev, title: e.target.value }))}
+                onChange={e => setTaskForm(prev => ({ ...prev, title: e.target.value }))}
                 placeholder={`例：準備${tour.name}相關資料`}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">指派給</label>
-              <Select value={taskForm.assignee} onValueChange={(value) => setTaskForm(prev => ({ ...prev, assignee: value }))}>
+              <Select
+                value={taskForm.assignee}
+                onValueChange={value => setTaskForm(prev => ({ ...prev, assignee: value }))}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="選擇負責人" />
                 </SelectTrigger>
                 <SelectContent>
-                  {employees.map((emp) => (
+                  {employees.map(emp => (
                     <SelectItem key={emp.id} value={emp.id}>
                       {emp.name} ({emp.role})
                     </SelectItem>
@@ -306,14 +327,18 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
                 <Input
                   type="date"
                   value={taskForm.deadline}
-                  onChange={(e) => setTaskForm(prev => ({ ...prev, deadline: e.target.value }))}
+                  onChange={e => setTaskForm(prev => ({ ...prev, deadline: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-2">緊急度</label>
+                <label className="block text-sm font-medium text-morandi-primary mb-2">
+                  緊急度
+                </label>
                 <StarRating
                   value={taskForm.priority}
-                  onChange={(value) => setTaskForm(prev => ({ ...prev, priority: value as 1 | 2 | 3 | 4 | 5 }))}
+                  onChange={value =>
+                    setTaskForm(prev => ({ ...prev, priority: value as 1 | 2 | 3 | 4 | 5 }))
+                  }
                 />
               </div>
             </div>
@@ -333,7 +358,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
                 <div key={index} className="flex gap-2">
                   <Input
                     value={subTask}
-                    onChange={(e) => handleSubTaskChange(index, e.target.value)}
+                    onChange={e => handleSubTaskChange(index, e.target.value)}
                     placeholder={`子任務 ${index + 1}`}
                     className="text-sm"
                   />
@@ -391,5 +416,5 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,14 +1,14 @@
-import React from 'react';
-import { FormDialog } from '@/components/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React from 'react'
+import { FormDialog } from '@/components/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface SaveVersionDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  versionName: string;
-  setVersionName: (name: string) => void;
-  onSave: (versionName: string) => void;
+  isOpen: boolean
+  onClose: () => void
+  versionName: string
+  setVersionName: (name: string) => void
+  onSave: (versionName: string) => void
 }
 
 export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
@@ -16,18 +16,18 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
   onClose,
   versionName,
   setVersionName,
-  onSave
+  onSave,
 }) => {
   const handleSubmit = () => {
-    onSave(versionName);
-    onClose();
-    setVersionName('');
-  };
+    onSave(versionName)
+    onClose()
+    setVersionName('')
+  }
 
   const handleCancel = () => {
-    onClose();
-    setVersionName('');
-  };
+    onClose()
+    setVersionName('')
+  }
 
   return (
     <FormDialog
@@ -40,11 +40,7 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
       maxWidth="md"
       footer={
         <div className="flex justify-end space-x-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-          >
+          <Button type="button" variant="outline" onClick={handleCancel}>
             取消
           </Button>
           <Button
@@ -61,12 +57,12 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
         <label className="text-sm font-medium text-morandi-primary">版本名稱</label>
         <Input
           value={versionName}
-          onChange={(e) => setVersionName(e.target.value)}
+          onChange={e => setVersionName(e.target.value)}
           placeholder="例如：初版、修正版、最終版等"
           className="mt-1"
           autoFocus
         />
       </div>
     </FormDialog>
-  );
-};
+  )
+}

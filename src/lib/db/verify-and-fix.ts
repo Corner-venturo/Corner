@@ -9,36 +9,34 @@
  * 2. 或直接在任何頁面執行（已自動掛載到 window）
  */
 
-import { localDB } from '@/lib/db';
-import { Employee as User } from '@/stores/types';
+import { localDB } from '@/lib/db'
+import { Employee as User } from '@/stores/types'
 
 // Window 擴展介面（開發工具）
 declare global {
   interface Window {
-    verifyAndFix?: typeof verifyAndFix;
-    quickCheck?: typeof quickCheck;
-    clearAndRebuild?: typeof clearAndRebuild;
+    verifyAndFix?: typeof verifyAndFix
+    quickCheck?: typeof quickCheck
+    clearAndRebuild?: typeof clearAndRebuild
   }
 }
 
 export async function verifyAndFix() {
-
   try {
     // 1. 檢查 IndexedDB
-    const users = await localDB.getAll<User>('employees');
+    const users = await localDB.getAll<User>('employees')
 
     if (users.length > 0) {
       users.forEach(u => {
-        console.log(`User: ${u.employee_number}, Status: ${u.status}`);
-      });
+        console.log(`User: ${u.employee_number}, Status: ${u.status}`)
+      })
     }
 
     // 2. 檢查 William
-    const william = users.find(u => u.employee_number === 'william01');
+    const william = users.find(u => u.employee_number === 'william01')
 
     if (william) {
-
-      return { status: 'ok', user: william };
+      return { status: 'ok', user: william }
     }
 
     // 3. William 不存在，需要建立
@@ -59,7 +57,7 @@ export async function verifyAndFix() {
         'hr',
         'database',
         'reports',
-        'settings'
+        'settings',
       ],
       personal_info: {
         national_id: '',
@@ -67,36 +65,34 @@ export async function verifyAndFix() {
         phone: '',
         email: 'william@venturo.com',
         address: '',
-        emergency_contact: { name: '', relationship: '', phone: '' }
+        emergency_contact: { name: '', relationship: '', phone: '' },
       },
       job_info: {
-        hire_date: new Date().toISOString()
+        hire_date: new Date().toISOString(),
       },
       salary_info: {
         base_salary: 0,
         allowances: [],
-        salary_history: []
+        salary_history: [],
       },
       attendance: {
         leave_records: [],
-        overtime_records: []
+        overtime_records: [],
       },
       contracts: [],
       status: 'active',
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+      updated_at: new Date().toISOString(),
+    }
 
-    await localDB.create<User>('employees', newWilliam);
+    await localDB.create<User>('employees', newWilliam)
 
     // 4. 驗證建立結果
-    const verify = await localDB.getAll<User>('employees');
+    const verify = await localDB.getAll<User>('employees')
 
-
-    return { status: 'fixed', user: newWilliam };
-
+    return { status: 'fixed', user: newWilliam }
   } catch (error) {
-        return { status: 'error', error };
+    return { status: 'error', error }
   }
 }
 
@@ -104,28 +100,24 @@ export async function verifyAndFix() {
  * 快速檢查（不修復）
  */
 export async function quickCheck() {
-
   try {
-    const users = await localDB.getAll<User>('employees');
-    const william = users.find(u => u.employee_number === 'william01');
-
+    const users = await localDB.getAll<User>('employees')
+    const william = users.find(u => u.employee_number === 'william01')
 
     if (william) {
     }
 
     // 檢查 LocalStorage
-    const authStore = localStorage.getItem('auth-storage');
-    const localAuthStore = localStorage.getItem('venturo-local-auth-store');
-
+    const authStore = localStorage.getItem('auth-storage')
+    const localAuthStore = localStorage.getItem('venturo-local-auth-store')
 
     if (authStore) {
-      const parsed = JSON.parse(authStore);
+      const parsed = JSON.parse(authStore)
     }
 
-    return { users, william, hasAuth: !!authStore };
-
+    return { users, william, hasAuth: !!authStore }
   } catch (error) {
-        return { error };
+    return { error }
   }
 }
 
@@ -135,29 +127,27 @@ export async function quickCheck() {
 export async function clearAndRebuild() {
   const confirm = window.confirm(
     '⚠️ 這會刪除所有員工資料並重新建立 William 帳號。\n\n確定要繼續嗎？'
-  );
+  )
 
   if (!confirm) {
-    return;
+    return
   }
-
 
   try {
     // 清除所有員工
-    await localDB.clear('employees');
+    await localDB.clear('employees')
 
     // 重新建立 William
-    const result = await verifyAndFix();
-    return result;
-
+    const result = await verifyAndFix()
+    return result
   } catch (error) {
-        return { status: 'error', error };
+    return { status: 'error', error }
   }
 }
 
 // 自動掛載到 window（方便 Console 使用）
 if (typeof window !== 'undefined') {
-  window.verifyAndFix = verifyAndFix;
-  window.quickCheck = quickCheck;
-  window.clearAndRebuild = clearAndRebuild;
+  window.verifyAndFix = verifyAndFix
+  window.quickCheck = quickCheck
+  window.clearAndRebuild = clearAndRebuild
 }

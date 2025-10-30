@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+
+export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 
@@ -29,21 +31,15 @@ export default function Error({
         {/* 錯誤標題 */}
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-foreground">發生錯誤</h1>
-          <p className="text-muted-foreground">
-            很抱歉，應用程式遇到了一些問題
-          </p>
+          <p className="text-muted-foreground">很抱歉，應用程式遇到了一些問題</p>
         </div>
 
         {/* 錯誤詳情（開發模式） */}
         {process.env.NODE_ENV === 'development' && (
           <div className="rounded-lg bg-card border border-border p-4 text-left">
-            <p className="text-sm font-mono text-destructive break-words">
-              {error.message}
-            </p>
+            <p className="text-sm font-mono text-destructive break-words">{error.message}</p>
             {error.digest && (
-              <p className="text-xs text-muted-foreground mt-2">
-                錯誤 ID: {error.digest}
-              </p>
+              <p className="text-xs text-muted-foreground mt-2">錯誤 ID: {error.digest}</p>
             )}
           </div>
         )}
@@ -61,9 +57,7 @@ export default function Error({
         </div>
 
         {/* 提示訊息 */}
-        <p className="text-sm text-muted-foreground">
-          如果問題持續發生，請聯繫技術支援
-        </p>
+        <p className="text-sm text-muted-foreground">如果問題持續發生，請聯繫技術支援</p>
       </div>
     </div>
   )

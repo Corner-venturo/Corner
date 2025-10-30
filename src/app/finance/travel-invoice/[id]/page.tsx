@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
-import { ArrowLeft, FileX} from 'lucide-react'
+import { ArrowLeft, FileX } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -118,7 +118,9 @@ export default function InvoiceDetailPage() {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">總金額</p>
-            <p className="font-medium text-lg">NT$ {currentInvoice.total_amount.toLocaleString()}</p>
+            <p className="font-medium text-lg">
+              NT$ {currentInvoice.total_amount.toLocaleString()}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -158,21 +160,39 @@ export default function InvoiceDetailPage() {
             <table className="w-full">
               <thead className="bg-morandi-container/40 border-b border-border/60">
                 <tr>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">商品名稱</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">數量</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">單位</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">單價</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">金額</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">
+                    商品名稱
+                  </th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">
+                    數量
+                  </th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">
+                    單位
+                  </th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border/40 last:border-r-0">
+                    單價
+                  </th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">
+                    金額
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {currentInvoice.items.map((item, index) => (
                   <tr key={index} className="border-b border-border/40 last:border-b-0">
                     <td className="py-3 px-4 text-sm text-morandi-primary">{item.item_name}</td>
-                    <td className="py-3 px-4 text-sm text-morandi-primary text-center">{item.item_count}</td>
-                    <td className="py-3 px-4 text-sm text-morandi-primary text-center">{item.item_unit}</td>
-                    <td className="py-3 px-4 text-sm text-morandi-primary text-right">NT$ {item.item_price.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-sm text-morandi-primary text-right font-medium">NT$ {item.itemAmt.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-center">
+                      {item.item_count}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-center">
+                      {item.item_unit}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-right">
+                      NT$ {item.item_price.toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-morandi-primary text-right font-medium">
+                      NT$ {item.itemAmt.toLocaleString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

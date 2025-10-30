@@ -1,27 +1,27 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { BarChart3, Settings } from 'lucide-react';
-import { useStatsData, useStatsConfig, saveStatsConfig } from '../hooks/use-stats-data';
-import type { StatType } from '../types';
+import { useState } from 'react'
+import { Card } from '@/components/ui/card'
+import { BarChart3, Settings } from 'lucide-react'
+import { useStatsData, useStatsConfig, saveStatsConfig } from '../hooks/use-stats-data'
+import type { StatType } from '../types'
 
 export function StatsWidget() {
-  const allStats = useStatsData();
-  const [activeStats, setActiveStats] = useState<StatType[]>(useStatsConfig());
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const allStats = useStatsData()
+  const [activeStats, setActiveStats] = useState<StatType[]>(useStatsConfig())
+  const [isConfigOpen, setIsConfigOpen] = useState(false)
 
   // 儲存設定
   const toggleStat = (statId: StatType) => {
     const newStats = activeStats.includes(statId)
       ? activeStats.filter(id => id !== statId)
-      : [...activeStats, statId];
-    setActiveStats(newStats);
-    saveStatsConfig(newStats);
-  };
+      : [...activeStats, statId]
+    setActiveStats(newStats)
+    saveStatsConfig(newStats)
+  }
 
   // 只顯示使用者選擇的統計
-  const stats = allStats.filter(stat => activeStats.includes(stat.id as StatType));
+  const stats = allStats.filter(stat => activeStats.includes(stat.id as StatType))
 
   return (
     <Card className="overflow-hidden flex flex-col h-full border border-morandi-gold/20 shadow-sm rounded-2xl hover:shadow-md hover:border-morandi-gold/20 transition-all duration-200">
@@ -45,7 +45,7 @@ export function StatsWidget() {
           <div className="mt-3 pt-3 border-t border-morandi-gold/20">
             <div className="text-xs text-morandi-secondary mb-2">選擇要顯示的統計項目</div>
             <div className="grid grid-cols-2 gap-2">
-              {allStats.map((stat) => (
+              {allStats.map(stat => (
                 <label
                   key={stat.id}
                   className="flex items-center gap-2 cursor-pointer text-xs p-2 rounded-lg hover:bg-white/50 transition-all"
@@ -74,8 +74,8 @@ export function StatsWidget() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {stats.map((stat) => {
-              const Icon = stat.icon as React.ComponentType<{ className?: string }>;
+            {stats.map(stat => {
+              const Icon = stat.icon as React.ComponentType<{ className?: string }>
               return (
                 <div
                   key={stat.id}
@@ -89,11 +89,11 @@ export function StatsWidget() {
                   <div className="text-xs text-morandi-secondary mb-1">{stat.label}</div>
                   <div className="text-lg font-bold text-morandi-primary">{stat.value}</div>
                 </div>
-              );
+              )
             })}
           </div>
         )}
       </div>
     </Card>
-  );
+  )
 }

@@ -14,6 +14,7 @@
 **狀態**: 完成
 
 **包含內容**:
+
 - `StoreState<T>` - Store 狀態介面
 - `CodeConfig` - 編號生成配置
 - `StoreConfig` - Store 配置選項
@@ -22,6 +23,7 @@
 - `RemoteAdapter<T>` - 遠端適配器介面
 
 **優點**:
+
 - 🎯 清晰的型別定義
 - 📝 完整的 TypeScript 支援
 - 🔧 易於擴充
@@ -36,12 +38,14 @@
 **狀態**: 完成
 
 **功能**:
+
 ```typescript
 generateCode({ prefix: 'T', year: 2025 }, existingTours)
 // => 'T20250001'
 ```
 
 **改善**:
+
 - ✅ 從 25 行內嵌邏輯 → 43 行獨立模組
 - ✅ 可測試
 - ✅ 可重用
@@ -52,20 +56,22 @@ generateCode({ prefix: 'T', year: 2025 }, existingTours)
 **狀態**: 完成
 
 **功能**:
+
 - 自動清理 AbortController
 - 防止記憶體洩漏
 - 統一的請求取消機制
 
 **使用範例**:
+
 ```typescript
-const abortManager = new AbortManager();
-const controller = abortManager.create();
+const abortManager = new AbortManager()
+const controller = abortManager.create()
 
 // 請求時使用
-fetch('/api/data', { signal: controller.signal });
+fetch('/api/data', { signal: controller.signal })
 
 // 自動清理
-abortManager.abort(); // 顯式清除參考
+abortManager.abort() // 顯式清除參考
 ```
 
 ---
@@ -78,6 +84,7 @@ abortManager.abort(); // 顯式清除參考
 **狀態**: 完成
 
 **功能**:
+
 - `getAll()` - 取得所有資料（帶超時保護）
 - `getById()` - 取得單筆資料
 - `put()` - 新增或更新
@@ -87,6 +94,7 @@ abortManager.abort(); // 顯式清除參考
 - `batchPut()` - 批次寫入（帶超時保護）
 
 **改善**:
+
 - ✅ 封裝 IndexedDB 操作
 - ✅ 統一錯誤處理
 - ✅ 超時保護機制
@@ -98,6 +106,7 @@ abortManager.abort(); // 顯式清除參考
 **狀態**: 完成
 
 **功能**:
+
 - `fetchAll()` - 取得所有資料（支援 AbortSignal）
 - `insert()` - 新增
 - `getById()` - 取得單筆
@@ -106,6 +115,7 @@ abortManager.abort(); // 顯式清除參考
 - `delete()` - 刪除
 
 **改善**:
+
 - ✅ 封裝 Supabase 操作
 - ✅ 統一錯誤處理
 - ✅ 支援請求取消
@@ -119,27 +129,30 @@ abortManager.abort(); // 顯式清除參考
 **狀態**: 完成
 
 **功能**:
+
 - 單例模式 Event Bus
 - 避免記憶體洩漏的監聽器管理
 - 使用 Symbol 避免 HMR 重複註冊
 
 **使用範例**:
+
 ```typescript
-import { storeEventBus } from '@/stores/sync/event-bus';
+import { storeEventBus } from '@/stores/sync/event-bus'
 
 // 註冊監聽器
 const unsubscribe = storeEventBus.onSyncCompleted('tours', () => {
-  console.log('旅遊團同步完成！');
-});
+  console.log('旅遊團同步完成！')
+})
 
 // 觸發事件
-storeEventBus.emitSyncCompleted('tours');
+storeEventBus.emitSyncCompleted('tours')
 
 // 取消監聽
-unsubscribe();
+unsubscribe()
 ```
 
 **改善**:
+
 - ✅ 解決 HMR 重複註冊問題
 - ✅ 提供取消註冊機制
 - ✅ 偵錯友善（可查看監聽器數量）
@@ -154,12 +167,14 @@ unsubscribe();
 **狀態**: 待建立
 
 **規劃功能**:
+
 - 協調 IndexedDB 和 Supabase 之間的同步
 - 上傳本地待同步資料
 - 下載遠端最新資料
 - 處理同步失敗
 
 **骨架**:
+
 ```typescript
 export class SyncCoordinator<T> {
   async syncPending(): Promise<void>
@@ -177,11 +192,13 @@ export class SyncCoordinator<T> {
 **狀態**: 待建立
 
 **規劃功能**:
+
 - 合併本地和遠端資料
 - 衝突解決策略（Last Write Wins）
 - 軟刪除處理
 
 **骨架**:
+
 ```typescript
 export class MergeStrategy<T> {
   merge(local: T[], remote: T[]): T[]
@@ -198,6 +215,7 @@ export class MergeStrategy<T> {
 **狀態**: 待建立
 
 **規劃檔案**:
+
 - `fetch.ts` (~150 行) - fetchAll + fetchById
 - `create.ts` (~80 行) - create + createMany
 - `update.ts` (~80 行) - update
@@ -211,6 +229,7 @@ export class MergeStrategy<T> {
 **狀態**: 待重構
 
 **規劃結構**:
+
 ```typescript
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter';
 import { SupabaseAdapter } from '../adapters/supabase-adapter';
@@ -240,31 +259,31 @@ export function createStore<T>(config: StoreConfig) {
 
 ### 程式碼行數
 
-| 模組 | 計劃 | 完成 | 狀態 |
-|------|------|------|------|
-| **core/types.ts** | 80 | 97 | ✅ 完成 |
-| **utils/code-generator.ts** | 50 | 43 | ✅ 完成 |
-| **utils/abort-manager.ts** | 40 | 47 | ✅ 完成 |
-| **adapters/indexeddb.ts** | 120 | 110 | ✅ 完成 |
-| **adapters/supabase.ts** | 100 | 181 | ✅ 完成 |
-| **sync/event-bus.ts** | 60 | 85 | ✅ 完成 |
-| **sync/coordinator.ts** | 120 | 0 | ⏳ 待完成 |
-| **sync/merge-strategy.ts** | 100 | 0 | ⏳ 待完成 |
-| **operations/fetch.ts** | 150 | 0 | ⏳ 待完成 |
-| **operations/create.ts** | 80 | 0 | ⏳ 待完成 |
-| **operations/update.ts** | 80 | 0 | ⏳ 待完成 |
-| **operations/delete.ts** | 80 | 0 | ⏳ 待完成 |
-| **core/create-store.ts** | 150 | 0 | ⏳ 待重構 |
-| **總計** | 1210 | 563 | **46.5%** |
+| 模組                        | 計劃 | 完成 | 狀態      |
+| --------------------------- | ---- | ---- | --------- |
+| **core/types.ts**           | 80   | 97   | ✅ 完成   |
+| **utils/code-generator.ts** | 50   | 43   | ✅ 完成   |
+| **utils/abort-manager.ts**  | 40   | 47   | ✅ 完成   |
+| **adapters/indexeddb.ts**   | 120  | 110  | ✅ 完成   |
+| **adapters/supabase.ts**    | 100  | 181  | ✅ 完成   |
+| **sync/event-bus.ts**       | 60   | 85   | ✅ 完成   |
+| **sync/coordinator.ts**     | 120  | 0    | ⏳ 待完成 |
+| **sync/merge-strategy.ts**  | 100  | 0    | ⏳ 待完成 |
+| **operations/fetch.ts**     | 150  | 0    | ⏳ 待完成 |
+| **operations/create.ts**    | 80   | 0    | ⏳ 待完成 |
+| **operations/update.ts**    | 80   | 0    | ⏳ 待完成 |
+| **operations/delete.ts**    | 80   | 0    | ⏳ 待完成 |
+| **core/create-store.ts**    | 150  | 0    | ⏳ 待重構 |
+| **總計**                    | 1210 | 563  | **46.5%** |
 
 ### 功能模組進度
 
-| 類別 | 完成度 | 說明 |
-|------|--------|------|
-| 🎯 **基礎架構** | 100% | 型別定義、工具函數、適配器、事件系統 |
-| 🔄 **同步邏輯** | 10% | EventBus 完成，Coordinator 和 MergeStrategy 待完成 |
-| 📝 **CRUD 操作** | 0% | 所有操作模組待建立 |
-| 🏗️ **主入口** | 0% | 待重構 |
+| 類別             | 完成度 | 說明                                               |
+| ---------------- | ------ | -------------------------------------------------- |
+| 🎯 **基礎架構**  | 100%   | 型別定義、工具函數、適配器、事件系統               |
+| 🔄 **同步邏輯**  | 10%    | EventBus 完成，Coordinator 和 MergeStrategy 待完成 |
+| 📝 **CRUD 操作** | 0%     | 所有操作模組待建立                                 |
+| 🏗️ **主入口**    | 0%     | 待重構                                             |
 
 ---
 
@@ -274,11 +293,13 @@ export function createStore<T>(config: StoreConfig) {
 
 **預估時間**: 3-4 小時
 **優點**:
+
 - ✅ 完整的模組化架構
 - ✅ 代碼可測試性大幅提升
 - ✅ 未來維護容易
 
 **待完成**:
+
 1. 建立 `sync/coordinator.ts` (1 小時)
 2. 建立 `sync/merge-strategy.ts` (45 分鐘)
 3. 建立 `operations/` 所有檔案 (1.5 小時)
@@ -289,6 +310,7 @@ export function createStore<T>(config: StoreConfig) {
 
 **預估時間**: 1-2 小時
 **方案**:
+
 1. 先完成 `sync/coordinator.ts`（簡化版）
 2. 完成 `operations/fetch.ts`（最常用）
 3. 建立簡化版 `core/create-store.ts`
@@ -297,6 +319,7 @@ export function createStore<T>(config: StoreConfig) {
 ### 選項 C: 暫停重構，先修復其他 P1 問題
 
 **轉向**:
+
 - 清理 Store 層的 `as unknown` 型別斷言（214 處）
 - 完善同步衝突處理機制
 
@@ -309,6 +332,7 @@ export function createStore<T>(config: StoreConfig) {
 ### 🚀 **推薦方案：選項 A（繼續完成）**
 
 **理由**:
+
 1. 基礎架構已完成 60%，放棄可惜
 2. 剩餘工作量可控（3-4 小時）
 3. 完成後的收益巨大：
@@ -331,6 +355,7 @@ export function createStore<T>(config: StoreConfig) {
 ## 📈 預期成果
 
 ### 重構前 (create-store.ts)
+
 - 📄 1 個檔案
 - 📏 696 行
 - 🔴 複雜度: 高
@@ -338,6 +363,7 @@ export function createStore<T>(config: StoreConfig) {
 - 🔧 維護性: 困難
 
 ### 重構後（模組化）
+
 - 📄 13 個檔案
 - 📏 最大 181 行/檔案（平均 ~93 行）
 - 🟢 複雜度: 低-中
@@ -347,12 +373,12 @@ export function createStore<T>(config: StoreConfig) {
 
 ### 改善指標
 
-| 指標 | 改善幅度 |
-|------|----------|
+| 指標     | 改善幅度                |
+| -------- | ----------------------- |
 | 檔案大小 | -74% (696 → 181 行最大) |
-| 可測試性 | +300% |
-| 維護性 | +200% |
-| 擴充性 | +150% |
+| 可測試性 | +300%                   |
+| 維護性   | +200%                   |
+| 擴充性   | +150%                   |
 
 ---
 

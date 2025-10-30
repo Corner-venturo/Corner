@@ -8,9 +8,11 @@
 ## ✅ 已完成項目
 
 ### 1. 規範文件重新整理
+
 **檔案**: `.claude/CLAUDE.md`
 
 **更新內容**:
+
 - ✅ 移除過時的 Supabase 設定指令
 - ✅ 移除 Electron 相關歷史指令
 - ✅ 精簡為最新架構資訊
@@ -23,9 +25,11 @@
 ---
 
 ### 2. Console.log 部分清理
+
 **狀態**: ✅ 完成核心檔案清理
 
 **已處理檔案** (6 個):
+
 ```
 ✅ src/stores/user-store.ts
    - Line 62: console.log → logger.debug
@@ -39,6 +43,7 @@
 ```
 
 **統計**:
+
 - 總計 541 個 console 使用
 - 已清理 6 個核心檔案
 - 剩餘 ~535 個 (建議後續批量處理)
@@ -48,6 +53,7 @@
 ---
 
 ### 3. Build 驗證
+
 **命令**: `npm run build`
 **結果**: ✅ 成功
 
@@ -64,9 +70,11 @@ Bundle size: 穩定
 ## 🔄 進行中項目
 
 ### 4. 型別斷言修復
+
 **狀態**: 🔄 準備開始
 
 **目標檔案** (Top 5):
+
 1. `src/components/workspace/ChannelChat.tsx`
    - Line 48: `useState<unknown>(null)` → 應改為 `Order | null`
    - Line 49: `useState<unknown>(null)` → 應改為 `AdvanceItem | null`
@@ -90,14 +98,16 @@ Bundle size: 穩定
 ## 📋 待執行項目
 
 ### 5. ChannelChat.tsx State 重構
+
 **問題**: 11 個獨立 boolean states
 
 **解決方案**: 合併為單一物件
+
 ```tsx
 interface DialogState {
-  memberSidebar: boolean;
-  shareQuote: boolean;
-  shareTour: boolean;
+  memberSidebar: boolean
+  shareQuote: boolean
+  shareTour: boolean
   // ... 8 more
 }
 ```
@@ -107,7 +117,9 @@ interface DialogState {
 ---
 
 ### 6. 提取 inline 常數
+
 **目標檔案**:
+
 - `src/components/layout/sidebar.tsx` (Line 41-128)
   - 20+ menu items 應提取為 SIDEBAR_MENU_ITEMS
 
@@ -119,9 +131,11 @@ interface DialogState {
 ---
 
 ### 7. 建立 useDialogState Hook
+
 **位置**: `src/hooks/useDialogState.ts`
 
 **功能**:
+
 ```tsx
 export function useDialogState<K extends string>(keys: K[]) {
   const [openDialogs, setOpenDialogs] = useState<Set<K>>(new Set());
@@ -142,34 +156,39 @@ export function useDialogState<K extends string>(keys: K[]) {
 ## 📊 優化成果統計
 
 ### 已完成
-| 項目 | 檔案數 | 行數變化 | 狀態 |
-|------|--------|----------|------|
-| 規範精簡 | 1 | -12 | ✅ |
-| Console 清理 | 6 | N/A | ✅ |
-| Build 驗證 | - | - | ✅ |
+
+| 項目         | 檔案數 | 行數變化 | 狀態 |
+| ------------ | ------ | -------- | ---- |
+| 規範精簡     | 1      | -12      | ✅   |
+| Console 清理 | 6      | N/A      | ✅   |
+| Build 驗證   | -      | -        | ✅   |
 
 ### 待完成
-| 項目 | 預估檔案數 | 預估時間 |
-|------|-----------|---------|
-| 型別斷言 | 5 | 30-40min |
-| State 重構 | 1 | 45min |
-| 常數提取 | 2 | 20min |
-| Hook 建立 | 1 | 30min |
-| **總計** | **9** | **2-2.5 小時** |
+
+| 項目       | 預估檔案數 | 預估時間       |
+| ---------- | ---------- | -------------- |
+| 型別斷言   | 5          | 30-40min       |
+| State 重構 | 1          | 45min          |
+| 常數提取   | 2          | 20min          |
+| Hook 建立  | 1          | 30min          |
+| **總計**   | **9**      | **2-2.5 小時** |
 
 ---
 
 ## 🎯 下一步建議
 
 ### 立即執行 (今天)
+
 1. 完成型別斷言修復 (40min)
 2. 提取 inline 常數 (20min)
 
 ### 本週執行
+
 3. ChannelChat State 重構 (45min)
 4. 建立 useDialogState hook (30min)
 
 ### 下週執行
+
 5. 命名一致性標準化
 6. 建立 EmployeeLookupService
 7. React.memo 優化
@@ -179,15 +198,18 @@ export function useDialogState<K extends string>(keys: K[]) {
 ## 🔍 發現的問題
 
 ### 1. Console.log 數量驚人
+
 - **發現**: 541 個 console 使用
 - **建議**: 建立自動化腳本批量替換
 
 ### 2. Type Safety 問題嚴重
+
 - **發現**: 188 個 `as any`/`as unknown`
 - **影響**: 降低 TypeScript 型別檢查效果
 - **建議**: 優先修復核心檔案
 
 ### 3. State 管理混亂
+
 - **範例**: ChannelChat.tsx 有 11 個 dialog states
 - **建議**: 建立 useDialogState hook 統一管理
 

@@ -1,6 +1,6 @@
 // 生成完整的修正 SQL
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 
 const sql = `
 -- ============================================
@@ -122,24 +122,24 @@ ORDER BY table_name, column_name;
 -- 完成！
 -- ============================================
 SELECT '✅ 所有 employee ID 引用欄位已統一為 TEXT 格式' as status;
-`;
+`
 
 // 儲存 SQL 檔案
-const migrationPath = path.join(__dirname, '../supabase/migrations/fix_employee_id_references.sql');
-fs.writeFileSync(migrationPath, sql);
+const migrationPath = path.join(__dirname, '../supabase/migrations/fix_employee_id_references.sql')
+fs.writeFileSync(migrationPath, sql)
 
-console.log('📝 完整修正 SQL 已生成\n');
-console.log('='.repeat(60));
-console.log(sql);
-console.log('='.repeat(60));
-console.log(`\n✅ SQL 已儲存到: ${migrationPath}`);
-console.log('\n📋 修正範圍：');
-console.log('   1. messages.author_id: UUID → TEXT');
-console.log('   2. bulletins.author_id: UUID → TEXT');
-console.log('   3. channels.created_by: UUID → TEXT');
-console.log('   4. workspaces.created_by: UUID → TEXT');
-console.log('   5. advance_lists.created_by: UUID → TEXT');
-console.log('   6. advance_items.processed_by: UUID → TEXT');
-console.log('\n💡 這是統一的解決方案，一次修正所有不一致的地方。');
-console.log('\n⚠️  請在 Supabase Dashboard 執行此 SQL：');
-console.log('   https://pfqvdacxowpgfamuvnsn.supabase.co/project/_/sql');
+console.log('📝 完整修正 SQL 已生成\n')
+console.log('='.repeat(60))
+console.log(sql)
+console.log('='.repeat(60))
+console.log(`\n✅ SQL 已儲存到: ${migrationPath}`)
+console.log('\n📋 修正範圍：')
+console.log('   1. messages.author_id: UUID → TEXT')
+console.log('   2. bulletins.author_id: UUID → TEXT')
+console.log('   3. channels.created_by: UUID → TEXT')
+console.log('   4. workspaces.created_by: UUID → TEXT')
+console.log('   5. advance_lists.created_by: UUID → TEXT')
+console.log('   6. advance_items.processed_by: UUID → TEXT')
+console.log('\n💡 這是統一的解決方案，一次修正所有不一致的地方。')
+console.log('\n⚠️  請在 Supabase Dashboard 執行此 SQL：')
+console.log('   https://pfqvdacxowpgfamuvnsn.supabase.co/project/_/sql')

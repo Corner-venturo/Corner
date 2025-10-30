@@ -1,86 +1,87 @@
-'use client';
+'use client'
 
-import React, { useState, useMemo } from 'react';
-import { Plus, Trash2, X } from 'lucide-react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useUserStore } from '@/stores/user-store';
-import { Combobox } from '@/components/ui/combobox';
+import React, { useState, useMemo } from 'react'
+import { Plus, Trash2, X } from 'lucide-react'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useUserStore } from '@/stores/user-store'
+import { Combobox } from '@/components/ui/combobox'
 
 interface AdvanceRow {
-  name: string;
-  description: string;
-  amount: string;
-  advance_person: string;
+  name: string
+  description: string
+  amount: string
+  advance_person: string
 }
 
 interface ShareAdvanceDialogProps {
-  channelId: string;
-  currentUserId: string;
-  onClose: () => void;
-  onSuccess: () => void;
+  channelId: string
+  currentUserId: string
+  onClose: () => void
+  onSuccess: () => void
 }
 
 export function ShareAdvanceDialog({
   channelId,
   currentUserId,
   onClose,
-  onSuccess
+  onSuccess,
 }: ShareAdvanceDialogProps) {
-  const { shareAdvanceList } = useWorkspaceStore();
-  const { items: employees, fetchAll: fetchEmployees } = useUserStore();
+  const { shareAdvanceList } = useWorkspaceStore()
+  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
 
   const [rows, setRows] = useState<AdvanceRow[]>([
     { name: '', description: '', amount: '', advance_person: '' },
     { name: '', description: '', amount: '', advance_person: '' },
-    { name: '', description: '', amount: '', advance_person: '' }
-  ]);
+    { name: '', description: '', amount: '', advance_person: '' },
+  ])
 
   // 載入員工資料
   React.useEffect(() => {
     if (employees.length === 0) {
-      fetchEmployees();
+      fetchEmployees()
     }
-  }, [employees.length, fetchEmployees]);
+  }, [employees.length, fetchEmployees])
 
   // 篩選活躍員工
   const activeEmployees = useMemo(() => {
     return employees.filter(emp => {
-      const notDeleted = !(emp as unknown)._deleted;
-      const isActive = (emp as unknown).status === 'active';
-      return notDeleted && isActive;
-    });
-  }, [employees]);
+      const notDeleted = !(emp as unknown)._deleted
+      const isActive = (emp as unknown).status === 'active'
+      return notDeleted && isActive
+    })
+  }, [employees])
 
   const addRow = () => {
-    setRows([...rows, { name: '', description: '', amount: '', advance_person: '' }]);
-  };
+    setRows([...rows, { name: '', description: '', amount: '', advance_person: '' }])
+  }
 
   const removeRow = (index: number) => {
     if (rows.length > 1) {
-      setRows(rows.filter((_, i) => i !== index));
+      setRows(rows.filter((_, i) => i !== index))
     }
-  };
+  }
 
   const updateRow = (index: number, field: keyof AdvanceRow, value: string) => {
-    const newRows = [...rows];
-    newRows[index][field] = value;
-    setRows(newRows);
-  };
+    const newRows = [...rows]
+    newRows[index][field] = value
+    setRows(newRows)
+  }
 
   const totalAmount = rows.reduce((sum, row) => {
-    const amount = parseFloat(row.amount) || 0;
-    return sum + amount;
-  }, 0);
+    const amount = parseFloat(row.amount) || 0
+    return sum + amount
+  }, 0)
 
   const handleShare = async () => {
     // 驗證：至少有一筆有效資料
     const validRows = rows.filter(
-      row => row.name.trim() && row.amount && parseFloat(row.amount) > 0 && row.advance_person.trim()
-    );
+      row =>
+        row.name.trim() && row.amount && parseFloat(row.amount) > 0 && row.advance_person.trim()
+    )
 
     if (validRows.length === 0) {
-      alert('請至少填寫一筆完整的代墊項目');
-      return;
+      alert('請至少填寫一筆完整的代墊項目')
+      return
     }
 
     try {
@@ -88,20 +89,26 @@ export function ShareAdvanceDialog({
         name: row.name.trim(),
         description: row.description.trim(),
         amount: parseFloat(row.amount),
-        advance_person: row.advance_person.trim()
-      }));
+        advance_person: row.advance_person.trim(),
+      }))
 
-      await shareAdvanceList(channelId, items, currentUserId);
-      onSuccess();
-      onClose();
+      await shareAdvanceList(channelId, items, currentUserId)
+      onSuccess()
+      onClose()
     } catch (error) {
-            alert('分享失敗，請稍後再試');
+      alert('分享失敗，請稍後再試')
     }
-  };
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="card-morandi-elevated w-[800px] max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="card-morandi-elevated w-[800px] max-h-[80vh] overflow-hidden flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
         {/* 標題列 */}
         <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
           <h3 className="text-lg font-semibold text-morandi-primary">記錄代墊項目</h3>
@@ -115,10 +122,18 @@ export function ShareAdvanceDialog({
           <table className="w-full">
             <thead className="sticky top-0 bg-morandi-container/5 border-b border-morandi-gold/20">
               <tr>
-                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[30%]">品項</th>
-                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[25%]">說明</th>
-                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">金額</th>
-                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">代墊人</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[30%]">
+                  品項
+                </th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[25%]">
+                  說明
+                </th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">
+                  金額
+                </th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">
+                  代墊人
+                </th>
                 <th className="w-[5%] py-2.5 px-4 text-xs"></th>
               </tr>
             </thead>
@@ -129,7 +144,7 @@ export function ShareAdvanceDialog({
                     <input
                       type="text"
                       value={row.name}
-                      onChange={(e) => updateRow(index, 'name', e.target.value)}
+                      onChange={e => updateRow(index, 'name', e.target.value)}
                       placeholder="品項名稱"
                       className="input-morandi !py-1.5 text-sm w-full"
                     />
@@ -138,7 +153,7 @@ export function ShareAdvanceDialog({
                     <input
                       type="text"
                       value={row.description}
-                      onChange={(e) => updateRow(index, 'description', e.target.value)}
+                      onChange={e => updateRow(index, 'description', e.target.value)}
                       placeholder="說明"
                       className="input-morandi !py-1.5 text-sm w-full"
                     />
@@ -147,19 +162,19 @@ export function ShareAdvanceDialog({
                     <input
                       type="number"
                       value={row.amount}
-                      onChange={(e) => updateRow(index, 'amount', e.target.value)}
+                      onChange={e => updateRow(index, 'amount', e.target.value)}
                       placeholder="0"
                       className="input-morandi !py-1.5 text-sm w-full"
                     />
                   </td>
                   <td className="py-2 px-2">
                     <Combobox
-                      options={activeEmployees.map((emp) => ({
+                      options={activeEmployees.map(emp => ({
                         value: emp.display_name || emp.english_name,
-                        label: `${emp.display_name || emp.english_name} (${emp.employee_number})`
+                        label: `${emp.display_name || emp.english_name} (${emp.employee_number})`,
                       }))}
                       value={row.advance_person}
-                      onChange={(value) => updateRow(index, 'advance_person', value)}
+                      onChange={value => updateRow(index, 'advance_person', value)}
                       placeholder="選擇代墊人..."
                       emptyMessage="找不到員工"
                       showSearchIcon={true}
@@ -210,5 +225,5 @@ export function ShareAdvanceDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

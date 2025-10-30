@@ -1,18 +1,24 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 
 interface TablePaginationProps {
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
-  startIndex: number;
-  totalItems: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
+  currentPage: number
+  totalPages: number
+  pageSize: number
+  startIndex: number
+  totalItems: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (size: number) => void
 }
 
 export function TablePagination({
@@ -24,14 +30,17 @@ export function TablePagination({
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) {
-  if (totalItems === 0) return null;
+  if (totalItems === 0) return null
 
   return (
     <div className="p-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border/40 bg-morandi-container/10">
       {/* 左側：資料統計 */}
       <div className="text-sm text-morandi-secondary">
-        顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> 到 <span className="font-medium text-morandi-primary">{Math.min(startIndex + pageSize, totalItems)}</span> 筆，
-        共 <span className="font-medium text-morandi-primary">{totalItems}</span> 筆資料
+        顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> 到{' '}
+        <span className="font-medium text-morandi-primary">
+          {Math.min(startIndex + pageSize, totalItems)}
+        </span>{' '}
+        筆， 共 <span className="font-medium text-morandi-primary">{totalItems}</span> 筆資料
       </div>
 
       {/* 右側：分頁控制 */}
@@ -39,7 +48,10 @@ export function TablePagination({
         {/* 每頁顯示筆數 */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-morandi-secondary">每頁</span>
-          <Select value={pageSize.toString()} onValueChange={(value) => onPageSizeChange(Number(value))}>
+          <Select
+            value={pageSize.toString()}
+            onValueChange={value => onPageSizeChange(Number(value))}
+          >
             <SelectTrigger className="w-20 h-9 text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -71,31 +83,31 @@ export function TablePagination({
 
             <div className="flex items-center gap-0.5 sm:gap-1">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
+                let pageNum
                 if (totalPages <= 5) {
-                  pageNum = i + 1;
+                  pageNum = i + 1
                 } else if (currentPage <= 3) {
-                  pageNum = i + 1;
+                  pageNum = i + 1
                 } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
+                  pageNum = totalPages - 4 + i
                 } else {
-                  pageNum = currentPage - 2 + i;
+                  pageNum = currentPage - 2 + i
                 }
 
                 return (
                   <Button
                     key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
+                    variant={currentPage === pageNum ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
                     className={cn(
-                      "w-9 h-9 p-0 text-sm",
-                      currentPage === pageNum ? "" : "text-morandi-primary"
+                      'w-9 h-9 p-0 text-sm',
+                      currentPage === pageNum ? '' : 'text-morandi-primary'
                     )}
                   >
                     {pageNum}
                   </Button>
-                );
+                )
               })}
             </div>
 
@@ -112,5 +124,5 @@ export function TablePagination({
         )}
       </div>
     </div>
-  );
+  )
 }

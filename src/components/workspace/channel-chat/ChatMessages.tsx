@@ -1,34 +1,34 @@
-'use client';
+'use client'
 
-import { MessageList, MessageInput, MemberSidebar, theme } from '../chat';
+import { MessageList, MessageInput, MemberSidebar, theme } from '../chat'
 
 interface ChatMessagesProps {
-  messages: any[];
-  advanceLists: any[];
-  sharedOrderLists: any[];
-  channelName: string;
-  currentUserId?: string;
-  isLoading: boolean;
-  showMemberSidebar: boolean;
-  messageText: string;
-  attachedFiles: File[];
-  uploadingFiles: string[];
-  uploadProgress: Record<string, number>;
-  messagesEndRef: React.RefObject<HTMLDivElement>;
-  onReaction: (messageId: string, emoji: string) => void;
-  onDeleteMessage: (messageId: string) => Promise<void>;
-  onCreatePayment: (itemId: string, item: any) => void;
-  onDeleteAdvanceList: (listId: string) => Promise<void>;
-  onCreateReceipt: (orderId: string, order: any) => void;
-  onMessageChange: (text: string) => void;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  onFilesChange: (files: File[]) => void;
-  onShowShareOrders: () => void;
-  onShowShareQuote: () => void;
-  onShowNewPayment: () => void;
-  onShowNewReceipt: () => void;
-  onShowShareAdvance: () => void;
-  onShowNewTask: () => void;
+  messages: any[]
+  advanceLists: any[]
+  sharedOrderLists: any[]
+  channelName: string
+  currentUserId?: string
+  isLoading: boolean
+  showMemberSidebar: boolean
+  messageText: string
+  attachedFiles: File[]
+  uploadingFiles: string[]
+  uploadProgress: Record<string, number>
+  messagesEndRef: React.RefObject<HTMLDivElement>
+  onReaction: (messageId: string, emoji: string) => void
+  onDeleteMessage: (messageId: string) => Promise<void>
+  onCreatePayment: (itemId: string, item: any) => void
+  onDeleteAdvanceList: (listId: string) => Promise<void>
+  onCreateReceipt: (orderId: string, order: any) => void
+  onMessageChange: (text: string) => void
+  onSubmit: (e: React.FormEvent) => Promise<void>
+  onFilesChange: (files: File[]) => void
+  onShowShareOrders: () => void
+  onShowShareQuote: () => void
+  onShowNewPayment: () => void
+  onShowNewReceipt: () => void
+  onShowShareAdvance: () => void
+  onShowNewTask: () => void
 }
 
 export function ChatMessages({
@@ -98,5 +98,5 @@ export function ChatMessages({
         onShowNewTask={onShowNewTask}
       />
     </>
-  );
+  )
 }

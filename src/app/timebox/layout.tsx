@@ -5,10 +5,6 @@ export const metadata: Metadata = {
   description: '智能時間管理系統',
 }
 
-export default function TimeboxLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function TimeboxLayout({ children }: { children: React.ReactNode }) {
   return children
 }

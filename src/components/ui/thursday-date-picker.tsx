@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts';
+import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
 
 import * as React from 'react'
 import { format } from 'date-fns'
@@ -29,9 +29,7 @@ export function ThursdayDatePicker({
   className,
   allowAnyDay = false,
 }: ThursdayDatePickerProps) {
-  const [date, setDate] = React.useState<Date | undefined>(
-    value ? new Date(value) : undefined
-  )
+  const [date, setDate] = React.useState<Date | undefined>(value ? new Date(value) : undefined)
   const [showWarning, setShowWarning] = React.useState(false)
 
   // 同步外部 value 到內部 state

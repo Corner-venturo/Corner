@@ -117,16 +117,16 @@ npm run storybook
 
 ## 🎯 常用指令
 
-| 指令 | 說明 |
-|------|------|
-| `npm run dev` | 啟動開發服務器 |
-| `npm run build` | 建置生產版本 |
-| `npm run start` | 啟動生產服務器 |
-| `npm test` | 運行測試 |
-| `npm run lint` | 檢查代碼品質 |
-| `npm run lint:fix` | 自動修復 lint 錯誤 |
+| 指令                 | 說明                |
+| -------------------- | ------------------- |
+| `npm run dev`        | 啟動開發服務器      |
+| `npm run build`      | 建置生產版本        |
+| `npm run start`      | 啟動生產服務器      |
+| `npm test`           | 運行測試            |
+| `npm run lint`       | 檢查代碼品質        |
+| `npm run lint:fix`   | 自動修復 lint 錯誤  |
 | `npm run type-check` | TypeScript 類型檢查 |
-| `npm run storybook` | 啟動 Storybook |
+| `npm run storybook`  | 啟動 Storybook      |
 
 ---
 
@@ -198,9 +198,9 @@ import dynamic from 'next/dynamic';
 
 const HeavyComponent = dynamic(
   () => import('./HeavyComponent'),
-  { 
+  {
     loading: () => <Skeleton />,
-    ssr: false 
+    ssr: false
   }
 );
 ```
@@ -208,26 +208,23 @@ const HeavyComponent = dynamic(
 ### 使用 Memoization 優化性能
 
 ```typescript
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react'
 
-const expensiveValue = useMemo(() => 
-  computeExpensiveValue(a, b),
-  [a, b]
-);
+const expensiveValue = useMemo(() => computeExpensiveValue(a, b), [a, b])
 
 const handleClick = useCallback(() => {
-  doSomething(a);
-}, [a]);
+  doSomething(a)
+}, [a])
 ```
 
 ### 使用 Zustand Selectors
 
 ```typescript
 // ❌ 避免 - 會導致不必要的 re-render
-const store = useStore();
+const store = useStore()
 
 // ✅ 推薦 - 只在需要的數據改變時 re-render
-const items = useStore(state => state.items);
+const items = useStore(state => state.items)
 ```
 
 ---

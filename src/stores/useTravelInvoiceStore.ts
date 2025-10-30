@@ -161,7 +161,7 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
     }
   },
 
-  issueInvoice: async (data) => {
+  issueInvoice: async data => {
     set({ isLoading: true, error: null })
     try {
       const response = await fetch('/api/travel-invoice/issue', {
@@ -245,6 +245,6 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
     }
   },
 
-  setCurrentInvoice: (invoice) => set({ currentInvoice: invoice }),
+  setCurrentInvoice: invoice => set({ currentInvoice: invoice }),
   clearError: () => set({ error: null }),
 }))

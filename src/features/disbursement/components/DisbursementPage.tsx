@@ -3,16 +3,16 @@
  * 出納單管理主頁面
  */
 
-'use client';
+'use client'
 
-import { useCallback } from 'react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { FileText, Calendar, Wallet } from 'lucide-react';
-import { useDisbursementData } from '../hooks/useDisbursementData';
-import { useDisbursementFilters } from '../hooks/useDisbursementFilters';
-import { useDisbursementForm } from '../hooks/useDisbursementForm';
-import { PendingList, CurrentOrderList, EmptyCurrentOrder, HistoryList } from './DisbursementList';
-import { DisbursementDialog } from './DisbursementDialog';
+import { useCallback } from 'react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { FileText, Calendar, Wallet } from 'lucide-react'
+import { useDisbursementData } from '../hooks/useDisbursementData'
+import { useDisbursementFilters } from '../hooks/useDisbursementFilters'
+import { useDisbursementForm } from '../hooks/useDisbursementForm'
+import { PendingList, CurrentOrderList, EmptyCurrentOrder, HistoryList } from './DisbursementList'
+import { DisbursementDialog } from './DisbursementDialog'
 
 export function DisbursementPage() {
   // 獲取數據
@@ -26,11 +26,18 @@ export function DisbursementPage() {
     removeFromDisbursementOrder,
     confirmDisbursementOrder,
     createDisbursementOrder,
-    generateDisbursementNumber
-  } = useDisbursementData();
+    generateDisbursementNumber,
+  } = useDisbursementData()
 
   // 篩選和搜尋
-  const { activeTab, setActiveTab, searchTerm, setSearchTerm, dialogSearchTerm, setDialogSearchTerm } = useDisbursementFilters();
+  const {
+    activeTab,
+    setActiveTab,
+    searchTerm,
+    setSearchTerm,
+    dialogSearchTerm,
+    setDialogSearchTerm,
+  } = useDisbursementFilters()
 
   // 表單狀態
   const {
@@ -44,46 +51,52 @@ export function DisbursementPage() {
     handleSelectRequestForNew,
     handleSelectAllForNew,
     resetForm,
-    clearSelections
-  } = useDisbursementForm(pendingRequests);
+    clearSelections,
+  } = useDisbursementForm(pendingRequests)
 
   // 加入出納單
   const handleAddToDisbursement = useCallback(() => {
-    if (selectedRequests.length === 0) return;
-    addToCurrentDisbursementOrder(selectedRequests);
-    clearSelections();
-  }, [selectedRequests, addToCurrentDisbursementOrder, clearSelections]);
+    if (selectedRequests.length === 0) return
+    addToCurrentDisbursementOrder(selectedRequests)
+    clearSelections()
+  }, [selectedRequests, addToCurrentDisbursementOrder, clearSelections])
 
   // 從出納單移除
   const handleRemoveFromDisbursement = useCallback(
     (paymentRequestId: string) => {
-      if (!currentOrder) return;
-      removeFromDisbursementOrder(currentOrder.id, paymentRequestId);
+      if (!currentOrder) return
+      removeFromDisbursementOrder(currentOrder.id, paymentRequestId)
     },
     [currentOrder, removeFromDisbursementOrder]
-  );
+  )
 
   // 確認出納單
   const handleConfirmDisbursement = useCallback(() => {
-    if (!currentOrder) return;
-    confirmDisbursementOrder(currentOrder.id, '1'); // 使用實際用戶ID
-  }, [currentOrder, confirmDisbursementOrder]);
+    if (!currentOrder) return
+    confirmDisbursementOrder(currentOrder.id, '1') // 使用實際用戶ID
+  }, [currentOrder, confirmDisbursementOrder])
 
   // 新增出納單
   const handleCreateDisbursement = useCallback(() => {
-    if (selectedRequestsForNew.length === 0) return;
-    createDisbursementOrder(selectedRequestsForNew);
-    setDialogSearchTerm('');
-    resetForm();
-    setActiveTab('current'); // 切換到本週出帳查看新建的出納單
-  }, [selectedRequestsForNew, createDisbursementOrder, resetForm, setActiveTab, setDialogSearchTerm]);
+    if (selectedRequestsForNew.length === 0) return
+    createDisbursementOrder(selectedRequestsForNew)
+    setDialogSearchTerm('')
+    resetForm()
+    setActiveTab('current') // 切換到本週出帳查看新建的出納單
+  }, [
+    selectedRequestsForNew,
+    createDisbursementOrder,
+    resetForm,
+    setActiveTab,
+    setDialogSearchTerm,
+  ])
 
   // 取消新增對話框
   const handleCancelDialog = useCallback(() => {
-    setIsAddDialogOpen(false);
-    resetForm();
-    setDialogSearchTerm('');
-  }, [resetForm, setIsAddDialogOpen, setDialogSearchTerm]);
+    setIsAddDialogOpen(false)
+    resetForm()
+    setDialogSearchTerm('')
+  }, [resetForm, setIsAddDialogOpen, setDialogSearchTerm])
 
   return (
     <div className="h-full flex flex-col">
@@ -92,10 +105,10 @@ export function DisbursementPage() {
         tabs={[
           { value: 'pending', label: '待出帳', icon: FileText },
           { value: 'current', label: '本週出帳', icon: Calendar },
-          { value: 'all', label: '出納單列表', icon: Wallet }
+          { value: 'all', label: '出納單列表', icon: Wallet },
         ]}
         activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as 'pending' | 'current' | 'all')}
+        onTabChange={tab => setActiveTab(tab as 'pending' | 'current' | 'all')}
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增出納單"
         showSearch={true}
@@ -156,5 +169,5 @@ export function DisbursementPage() {
         onCancel={handleCancelDialog}
       />
     </div>
-  );
+  )
 }

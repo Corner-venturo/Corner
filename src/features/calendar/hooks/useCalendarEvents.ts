@@ -1,5 +1,13 @@
 import { useMemo, useCallback } from 'react'
-import { useTourStore, useOrderStore, useMemberStore, useCalendarStore, useCalendarEventStore, useAuthStore, useEmployeeStore } from '@/stores'
+import {
+  useTourStore,
+  useOrderStore,
+  useMemberStore,
+  useCalendarStore,
+  useCalendarEventStore,
+  useAuthStore,
+  useEmployeeStore,
+} from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
 
@@ -16,12 +24,12 @@ export function useCalendarEvents() {
   const getEventColor = useCallback((type: string, status?: Tour['status']) => {
     if (type === 'tour' && status) {
       const colors: Record<Tour['status'], { bg: string; border: string }> = {
-        draft: { bg: '#9BB5D6', border: '#8AA4C5' },       // 提案
-        active: { bg: '#A8C4A2', border: '#97B391' },      // 進行中
+        draft: { bg: '#9BB5D6', border: '#8AA4C5' }, // 提案
+        active: { bg: '#A8C4A2', border: '#97B391' }, // 進行中
         pending_close: { bg: '#D4B896', border: '#C3A785' }, // 待結案
-        closed: { bg: '#B8B3AE', border: '#A7A29D' },      // 結案
-        cancelled: { bg: '#B8B3AE', border: '#A7A29D' },   // 已取消
-        special: { bg: '#D4A5A5', border: '#C39494' },     // 特殊團
+        closed: { bg: '#B8B3AE', border: '#A7A29D' }, // 結案
+        cancelled: { bg: '#B8B3AE', border: '#A7A29D' }, // 已取消
+        special: { bg: '#D4A5A5', border: '#C39494' }, // 特殊團
       }
       return colors[status] || colors.draft
     }
@@ -79,10 +87,7 @@ export function useCalendarEvents() {
     if (!user?.id) return []
 
     return (calendarEvents || [])
-      .filter(event =>
-        event.visibility === 'personal' &&
-        event.created_by === user.id
-      )
+      .filter(event => event.visibility === 'personal' && event.created_by === user.id)
       .map(event => {
         const color = getEventColor('personal')
         return {
@@ -111,10 +116,21 @@ export function useCalendarEvents() {
         // 優先檢查當前登入用戶，再檢查員工列表
         let creatorName = '未知使用者'
         if (user?.id === event.created_by) {
-          creatorName = user.display_name || user.name || user.email || '未知使用者'
+          creatorName =
+            user.display_name ||
+            user.chinese_name ||
+            user.english_name ||
+            user.name ||
+            user.email ||
+            '未知使用者'
         } else {
           const creator = employees?.find(emp => emp.id === event.created_by)
-          creatorName = creator?.display_name || creator?.name || '未知使用者'
+          creatorName =
+            creator?.display_name ||
+            creator?.chinese_name ||
+            creator?.english_name ||
+            creator?.name ||
+            '未知使用者'
         }
 
         // 🔥 修正 FullCalendar 的多日事件顯示問題

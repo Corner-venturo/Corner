@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Banknote, Search, Loader2, AlertCircle, TrendingDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState } from 'react'
+import { Banknote, Search, Loader2, AlertCircle, TrendingDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface RemittanceOption {
-  provider: string;
-  fee: number;
-  exchangeRate: number;
-  total: number;
-  deliveryTime: string;
+  provider: string
+  fee: number
+  exchangeRate: number
+  total: number
+  deliveryTime: string
 }
 
 const COUNTRIES = [
@@ -22,38 +22,38 @@ const COUNTRIES = [
   { code: 'US', name: '美國', currency: 'USD', symbol: '$' },
   { code: 'GB', name: '英國', currency: 'GBP', symbol: '£' },
   { code: 'AU', name: '澳洲', currency: 'AUD', symbol: 'A$' },
-];
+]
 
 export function RemittanceWidget() {
-  const [from, setFrom] = useState('TW');
-  const [to, setTo] = useState('TH');
-  const [amount, setAmount] = useState('10000');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<RemittanceOption[]>([]);
+  const [from, setFrom] = useState('TW')
+  const [to, setTo] = useState('TH')
+  const [amount, setAmount] = useState('10000')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [results, setResults] = useState<RemittanceOption[]>([])
 
-  const fromCountry = COUNTRIES.find(c => c.code === from);
-  const toCountry = COUNTRIES.find(c => c.code === to);
+  const fromCountry = COUNTRIES.find(c => c.code === from)
+  const toCountry = COUNTRIES.find(c => c.code === to)
 
   const compareRates = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      setError('請輸入有效金額');
-      return;
+      setError('請輸入有效金額')
+      return
     }
 
     if (from === to) {
-      setError('匯款國家和收款國家不能相同');
-      return;
+      setError('匯款國家和收款國家不能相同')
+      return
     }
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
       // TODO: 接入 World Bank API
       // const response = await fetch(`https://api.worldbank.org/v2/country/${from}/indicator/SI.RMT.COST.IB.ZS?format=json`);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       // 模擬資料
       const mockResults: RemittanceOption[] = [
@@ -78,40 +78,39 @@ export function RemittanceWidget() {
           total: 0,
           deliveryTime: '1-2 工作天',
         },
-      ];
+      ]
 
       // 計算總成本
       mockResults.forEach(option => {
-        option.total = (parseFloat(amount) - option.fee) * option.exchangeRate;
-      });
+        option.total = (parseFloat(amount) - option.fee) * option.exchangeRate
+      })
 
       // 按最划算排序
-      mockResults.sort((a, b) => b.total - a.total);
+      mockResults.sort((a, b) => b.total - a.total)
 
-      setResults(mockResults);
-
+      setResults(mockResults)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '查詢失敗，請稍後再試');
-      setResults([]);
+      setError(err instanceof Error ? err.message : '查詢失敗，請稍後再試')
+      setResults([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getMockExchangeRate = (from: string, to: string): number => {
     const rates: Record<string, Record<string, number>> = {
-      'TW': { 'TH': 1.05, 'JP': 4.5, 'US': 0.032 },
-      'US': { 'TW': 31.5, 'TH': 33, 'JP': 140 },
-    };
+      TW: { TH: 1.05, JP: 4.5, US: 0.032 },
+      US: { TW: 31.5, TH: 33, JP: 140 },
+    }
 
-    return rates[from]?.[to] || 1;
-  };
+    return rates[from]?.[to] || 1
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      compareRates();
+      compareRates()
     }
-  };
+  }
 
   return (
     <div className="h-full">
@@ -134,7 +133,9 @@ export function RemittanceWidget() {
               <Banknote className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">匯款比較</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
+                匯款比較
+              </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
                 比較不同匯款管道的手續費
               </p>
@@ -150,10 +151,10 @@ export function RemittanceWidget() {
                 </label>
                 <select
                   value={from}
-                  onChange={(e) => setFrom(e.target.value)}
+                  onChange={e => setFrom(e.target.value)}
                   className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 >
-                  {COUNTRIES.map((country) => (
+                  {COUNTRIES.map(country => (
                     <option key={country.code} value={country.code}>
                       {country.name}
                     </option>
@@ -167,10 +168,10 @@ export function RemittanceWidget() {
                 </label>
                 <select
                   value={to}
-                  onChange={(e) => setTo(e.target.value)}
+                  onChange={e => setTo(e.target.value)}
                   className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 >
-                  {COUNTRIES.map((country) => (
+                  {COUNTRIES.map(country => (
                     <option key={country.code} value={country.code}>
                       {country.name}
                     </option>
@@ -185,7 +186,7 @@ export function RemittanceWidget() {
                 <input
                   type="number"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={e => setAmount(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="10000"
                   className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
@@ -247,10 +248,12 @@ export function RemittanceWidget() {
                           <TrendingDown className="w-3.5 h-3.5 text-white" />
                         </div>
                       )}
-                      <p className={cn(
-                        'font-bold text-sm',
-                        index === 0 ? 'text-green-700' : 'text-morandi-primary'
-                      )}>
+                      <p
+                        className={cn(
+                          'font-bold text-sm',
+                          index === 0 ? 'text-green-700' : 'text-morandi-primary'
+                        )}
+                      >
                         {option.provider}
                       </p>
                       {index === 0 && (
@@ -266,7 +269,8 @@ export function RemittanceWidget() {
                     <div className="bg-white/50 rounded-lg p-2">
                       <p className="text-xs text-morandi-secondary mb-1">手續費</p>
                       <p className="font-semibold text-xs text-red-600">
-                        -{fromCountry?.symbol}{option.fee.toFixed(0)}
+                        -{fromCountry?.symbol}
+                        {option.fee.toFixed(0)}
                       </p>
                     </div>
                     <div className="bg-white/50 rounded-lg p-2">
@@ -278,7 +282,8 @@ export function RemittanceWidget() {
                     <div className="bg-white/50 rounded-lg p-2">
                       <p className="text-xs text-morandi-secondary mb-1">實收</p>
                       <p className="font-bold text-sm text-green-600">
-                        {toCountry?.symbol}{option.total.toFixed(0)}
+                        {toCountry?.symbol}
+                        {option.total.toFixed(0)}
                       </p>
                     </div>
                   </div>
@@ -296,5 +301,5 @@ export function RemittanceWidget() {
         </div>
       </div>
     </div>
-  );
+  )
 }

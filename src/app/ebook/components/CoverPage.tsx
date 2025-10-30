@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import { WavePattern } from './WavePattern';
+import { motion } from 'framer-motion'
+import { WavePattern } from './WavePattern'
 
 interface CoverPageProps {
-  onOpen: () => void;
+  onOpen: () => void
 }
 
 export function CoverPage({ onOpen }: CoverPageProps) {
@@ -163,12 +163,11 @@ export function CoverPage({ onOpen }: CoverPageProps) {
           <div
             className="absolute inset-0 pointer-events-none rounded-lg"
             style={{
-              background:
-                'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)',
             }}
           />
         </motion.div>
       </motion.div>
     </motion.div>
-  );
+  )
 }

@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -9,71 +9,71 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Trash2 } from 'lucide-react';
-import { ShareAdvanceDialog } from '../ShareAdvanceDialog';
-import { ShareOrdersDialog } from '../ShareOrdersDialog';
-import { ShareTodoDialog } from '../ShareTodoDialog';
-import { CreateReceiptDialog } from '../CreateReceiptDialog';
-import { CreatePaymentRequestDialog } from '../CreatePaymentRequestDialog';
-import { PLACEHOLDER_TEXT } from './constants';
+} from '@/components/ui/dialog'
+import { Trash2 } from 'lucide-react'
+import { ShareAdvanceDialog } from '../ShareAdvanceDialog'
+import { ShareOrdersDialog } from '../ShareOrdersDialog'
+import { ShareTodoDialog } from '../ShareTodoDialog'
+import { CreateReceiptDialog } from '../CreateReceiptDialog'
+import { CreatePaymentRequestDialog } from '../CreatePaymentRequestDialog'
+import { PLACEHOLDER_TEXT } from './constants'
 
 interface DialogsContainerProps {
   // Share Advance Dialog
-  showShareAdvanceDialog: boolean;
-  setShowShareAdvanceDialog: (show: boolean) => void;
-  selectedChannel: any;
-  user: any;
+  showShareAdvanceDialog: boolean
+  setShowShareAdvanceDialog: (show: boolean) => void
+  selectedChannel: any
+  user: any
 
   // Share Orders Dialog
-  showShareOrdersDialog: boolean;
-  setShowShareOrdersDialog: (show: boolean) => void;
-  onShareOrdersSuccess: () => void;
+  showShareOrdersDialog: boolean
+  setShowShareOrdersDialog: (show: boolean) => void
+  onShareOrdersSuccess: () => void
 
   // Create Receipt Dialog
-  showCreateReceiptDialog: boolean;
-  setShowCreateReceiptDialog: (show: boolean) => void;
-  selectedOrder: unknown;
-  setSelectedOrder: (order: unknown) => void;
+  showCreateReceiptDialog: boolean
+  setShowCreateReceiptDialog: (show: boolean) => void
+  selectedOrder: unknown
+  setSelectedOrder: (order: unknown) => void
 
   // Create Payment Dialog
-  showCreatePaymentDialog: boolean;
-  setShowCreatePaymentDialog: (show: boolean) => void;
-  selectedAdvanceItem: unknown;
-  setSelectedAdvanceItem: (item: unknown) => void;
-  selectedAdvanceListId: string;
-  setSelectedAdvanceListId: (id: string) => void;
-  onCreatePaymentSuccess: () => void;
+  showCreatePaymentDialog: boolean
+  setShowCreatePaymentDialog: (show: boolean) => void
+  selectedAdvanceItem: unknown
+  setSelectedAdvanceItem: (item: unknown) => void
+  selectedAdvanceListId: string
+  setSelectedAdvanceListId: (id: string) => void
+  onCreatePaymentSuccess: () => void
 
   // Settings Dialog
-  showSettingsDialog: boolean;
-  setShowSettingsDialog: (show: boolean) => void;
-  editChannelName: string;
-  setEditChannelName: (name: string) => void;
-  editChannelDescription: string;
-  setEditChannelDescription: (description: string) => void;
-  onDeleteChannel: () => Promise<void>;
-  onUpdateChannel: () => Promise<void>;
+  showSettingsDialog: boolean
+  setShowSettingsDialog: (show: boolean) => void
+  editChannelName: string
+  setEditChannelName: (name: string) => void
+  editChannelDescription: string
+  setEditChannelDescription: (description: string) => void
+  onDeleteChannel: () => Promise<void>
+  onUpdateChannel: () => Promise<void>
 
   // Share Quote Dialog
-  showShareQuoteDialog: boolean;
-  setShowShareQuoteDialog: (show: boolean) => void;
+  showShareQuoteDialog: boolean
+  setShowShareQuoteDialog: (show: boolean) => void
 
   // Share Tour Dialog
-  showShareTourDialog: boolean;
-  setShowShareTourDialog: (show: boolean) => void;
+  showShareTourDialog: boolean
+  setShowShareTourDialog: (show: boolean) => void
 
   // New Payment Dialog
-  showNewPaymentDialog: boolean;
-  setShowNewPaymentDialog: (show: boolean) => void;
+  showNewPaymentDialog: boolean
+  setShowNewPaymentDialog: (show: boolean) => void
 
   // New Receipt Dialog
-  showNewReceiptDialog: boolean;
-  setShowNewReceiptDialog: (show: boolean) => void;
+  showNewReceiptDialog: boolean
+  setShowNewReceiptDialog: (show: boolean) => void
 
   // New Task Dialog
-  showNewTaskDialog: boolean;
-  setShowNewTaskDialog: (show: boolean) => void;
+  showNewTaskDialog: boolean
+  setShowNewTaskDialog: (show: boolean) => void
 }
 
 export function DialogsContainer({
@@ -123,7 +123,7 @@ export function DialogsContainer({
           currentUserId={user.id}
           onClose={() => setShowShareAdvanceDialog(false)}
           onSuccess={() => {
-            setShowShareAdvanceDialog(false);
+            setShowShareAdvanceDialog(false)
           }}
         />
       )}
@@ -142,12 +142,12 @@ export function DialogsContainer({
         <CreateReceiptDialog
           order={selectedOrder}
           onClose={() => {
-            setShowCreateReceiptDialog(false);
-            setSelectedOrder(null);
+            setShowCreateReceiptDialog(false)
+            setSelectedOrder(null)
           }}
-          onSuccess={(receiptId) => {
-            setShowCreateReceiptDialog(false);
-            setSelectedOrder(null);
+          onSuccess={receiptId => {
+            setShowCreateReceiptDialog(false)
+            setSelectedOrder(null)
           }}
         />
       )}
@@ -158,9 +158,9 @@ export function DialogsContainer({
           items={selectedAdvanceItem}
           listId={selectedAdvanceListId}
           onClose={() => {
-            setShowCreatePaymentDialog(false);
-            setSelectedAdvanceItem(null);
-            setSelectedAdvanceListId('');
+            setShowCreatePaymentDialog(false)
+            setSelectedAdvanceItem(null)
+            setSelectedAdvanceListId('')
           }}
           onSuccess={onCreatePaymentSuccess}
         />
@@ -171,16 +171,14 @@ export function DialogsContainer({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>頻道設定</DialogTitle>
-            <DialogDescription>
-              管理 #{selectedChannel?.name} 的設定
-            </DialogDescription>
+            <DialogDescription>管理 #{selectedChannel?.name} 的設定</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-morandi-primary">頻道名稱</label>
               <Input
                 value={editChannelName}
-                onChange={(e) => setEditChannelName(e.target.value)}
+                onChange={e => setEditChannelName(e.target.value)}
                 placeholder={PLACEHOLDER_TEXT.CHANNEL_NAME}
               />
             </div>
@@ -188,16 +186,12 @@ export function DialogsContainer({
               <label className="text-sm font-medium text-morandi-primary">頻道描述</label>
               <Input
                 value={editChannelDescription}
-                onChange={(e) => setEditChannelDescription(e.target.value)}
+                onChange={e => setEditChannelDescription(e.target.value)}
                 placeholder={PLACEHOLDER_TEXT.CHANNEL_DESCRIPTION}
               />
             </div>
             <div className="pt-4 border-t border-border">
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={onDeleteChannel}
-              >
+              <Button variant="destructive" className="w-full" onClick={onDeleteChannel}>
                 <Trash2 size={16} className="mr-2" />
                 刪除頻道
               </Button>
@@ -207,9 +201,7 @@ export function DialogsContainer({
             <Button variant="outline" onClick={() => setShowSettingsDialog(false)}>
               取消
             </Button>
-            <Button onClick={onUpdateChannel}>
-              儲存變更
-            </Button>
+            <Button onClick={onUpdateChannel}>儲存變更</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -219,9 +211,7 @@ export function DialogsContainer({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>分享報價單</DialogTitle>
-            <DialogDescription>
-              選擇要分享到頻道的報價單
-            </DialogDescription>
+            <DialogDescription>選擇要分享到頻道的報價單</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -237,9 +227,7 @@ export function DialogsContainer({
             <Button variant="outline" onClick={() => setShowShareQuoteDialog(false)}>
               取消
             </Button>
-            <Button onClick={() => setShowShareQuoteDialog(false)}>
-              分享到頻道
-            </Button>
+            <Button onClick={() => setShowShareQuoteDialog(false)}>分享到頻道</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -249,9 +237,7 @@ export function DialogsContainer({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>分享團況</DialogTitle>
-            <DialogDescription>
-              選擇要分享到頻道的團況資訊
-            </DialogDescription>
+            <DialogDescription>選擇要分享到頻道的團況資訊</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -267,9 +253,7 @@ export function DialogsContainer({
             <Button variant="outline" onClick={() => setShowShareTourDialog(false)}>
               取消
             </Button>
-            <Button onClick={() => setShowShareTourDialog(false)}>
-              分享到頻道
-            </Button>
+            <Button onClick={() => setShowShareTourDialog(false)}>分享到頻道</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -279,9 +263,7 @@ export function DialogsContainer({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>新增請款單</DialogTitle>
-            <DialogDescription>
-              建立新請款單並分享到頻道
-            </DialogDescription>
+            <DialogDescription>建立新請款單並分享到頻道</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -301,9 +283,7 @@ export function DialogsContainer({
             <Button variant="outline" onClick={() => setShowNewPaymentDialog(false)}>
               取消
             </Button>
-            <Button onClick={() => setShowNewPaymentDialog(false)}>
-              建立並分享
-            </Button>
+            <Button onClick={() => setShowNewPaymentDialog(false)}>建立並分享</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -313,9 +293,7 @@ export function DialogsContainer({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>新增收款單</DialogTitle>
-            <DialogDescription>
-              建立新收款單並分享到頻道
-            </DialogDescription>
+            <DialogDescription>建立新收款單並分享到頻道</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -335,9 +313,7 @@ export function DialogsContainer({
             <Button variant="outline" onClick={() => setShowNewReceiptDialog(false)}>
               取消
             </Button>
-            <Button onClick={() => setShowNewReceiptDialog(false)}>
-              建立並分享
-            </Button>
+            <Button onClick={() => setShowNewReceiptDialog(false)}>建立並分享</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -348,10 +324,10 @@ export function DialogsContainer({
           channelId={selectedChannel.id}
           onClose={() => setShowNewTaskDialog(false)}
           onSuccess={() => {
-            setShowNewTaskDialog(false);
+            setShowNewTaskDialog(false)
           }}
         />
       )}
     </>
-  );
+  )
 }

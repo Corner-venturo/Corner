@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 
 interface CalculatorButtonsProps {
-  onNumberClick: (num: string) => void;
-  onOperationClick: (op: string) => void;
-  onClear: () => void;
-  onCalculate: () => void;
+  onNumberClick: (num: string) => void
+  onOperationClick: (op: string) => void
+  onClear: () => void
+  onCalculate: () => void
 }
 
 /**
@@ -18,11 +18,7 @@ export const CalculatorButtons = ({
 }: CalculatorButtonsProps) => {
   return (
     <div className="grid grid-cols-4 gap-1.5">
-      <Button
-        variant="outline"
-        onClick={onClear}
-        className="col-span-2 h-9 text-xs rounded-lg"
-      >
+      <Button variant="outline" onClick={onClear} className="col-span-2 h-9 text-xs rounded-lg">
         清除
       </Button>
       <Button
@@ -141,5 +137,5 @@ export const CalculatorButtons = ({
         .
       </Button>
     </div>
-  );
-};
+  )
+}

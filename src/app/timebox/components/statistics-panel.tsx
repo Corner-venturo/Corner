@@ -49,7 +49,8 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
         <div className="rounded-lg border border-border/40 bg-morandi-container/30 px-3 py-1.5">
           <p className="text-[10px] font-medium text-morandi-muted mb-0.5">完成項目</p>
           <p className="text-xs font-medium text-morandi-secondary">
-            運動 {completedByType.workout} / 保養 {completedByType.reminder} / 其他 {completedByType.basic}
+            運動 {completedByType.workout} / 保養 {completedByType.reminder} / 其他{' '}
+            {completedByType.basic}
           </p>
         </div>
 
@@ -66,7 +67,9 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
   }
 
   return (
-    <div className={`grid gap-4 ${hasWorkoutStats ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
+    <div
+      className={`grid gap-4 ${hasWorkoutStats ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}
+    >
       {/* 完成率卡片 */}
       <div className="morandi-card p-5 hover:shadow-md transition-shadow">
         <div className="flex items-start justify-between mb-2">
@@ -105,9 +108,7 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
             </span>
           </div>
         </div>
-        <p className="text-xs text-morandi-muted mt-3">
-          保持健康的生活習慣
-        </p>
+        <p className="text-xs text-morandi-muted mt-3">保持健康的生活習慣</p>
       </div>
 
       {/* 完成項目卡片 */}
@@ -119,21 +120,27 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
               <span className="text-sm text-morandi-secondary">運動</span>
             </div>
-            <span className="text-lg font-semibold text-morandi-primary">{completedByType.workout}</span>
+            <span className="text-lg font-semibold text-morandi-primary">
+              {completedByType.workout}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-purple-500"></div>
               <span className="text-sm text-morandi-secondary">保養</span>
             </div>
-            <span className="text-lg font-semibold text-morandi-primary">{completedByType.reminder}</span>
+            <span className="text-lg font-semibold text-morandi-primary">
+              {completedByType.reminder}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-gray-400"></div>
               <span className="text-sm text-morandi-secondary">其他</span>
             </div>
-            <span className="text-lg font-semibold text-morandi-primary">{completedByType.basic}</span>
+            <span className="text-lg font-semibold text-morandi-primary">
+              {completedByType.basic}
+            </span>
           </div>
         </div>
       </div>
@@ -146,13 +153,16 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
             <div>
               <p className="text-xs text-morandi-muted">本週訓練量</p>
               <p className="text-2xl font-bold text-morandi-primary">
-                {totalWorkoutVolume.toLocaleString()} <span className="text-base font-normal">kg</span>
+                {totalWorkoutVolume.toLocaleString()}{' '}
+                <span className="text-base font-normal">kg</span>
               </p>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border/50">
               <div>
                 <p className="text-xs text-morandi-muted">訓練次數</p>
-                <p className="text-lg font-semibold text-morandi-primary">{totalWorkoutSessions} 次</p>
+                <p className="text-lg font-semibold text-morandi-primary">
+                  {totalWorkoutSessions} 次
+                </p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-morandi-muted">平均每次</p>

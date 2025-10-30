@@ -1,28 +1,32 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button'
+import { Settings } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
-import type { WidgetType } from '../types';
-import { AVAILABLE_WIDGETS } from './widget-config';
+} from '@/components/ui/dialog'
+import { Checkbox } from '@/components/ui/checkbox'
+import type { WidgetType } from '../types'
+import { AVAILABLE_WIDGETS } from './widget-config'
 
 interface WidgetSettingsDialogProps {
-  activeWidgets: WidgetType[];
-  onToggleWidget: (widgetId: WidgetType) => void;
+  activeWidgets: WidgetType[]
+  onToggleWidget: (widgetId: WidgetType) => void
 }
 
 export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSettingsDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
+        >
           <Settings className="h-4 w-4" />
           小工具設定
         </Button>
@@ -33,8 +37,8 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
           <p className="text-sm text-morandi-muted mt-1">勾選你想在首頁顯示的小工具</p>
         </DialogHeader>
         <div className="space-y-2 py-4">
-          {AVAILABLE_WIDGETS.map((widget) => {
-            const Icon = widget.icon as React.ComponentType<{ className?: string }>;
+          {AVAILABLE_WIDGETS.map(widget => {
+            const Icon = widget.icon as React.ComponentType<{ className?: string }>
             return (
               <div
                 key={widget.id}
@@ -52,10 +56,10 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
                   <span className="font-medium text-morandi-primary">{widget.name}</span>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

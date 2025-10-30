@@ -8,7 +8,7 @@
  * 解決 Supabase insert 型別推斷為 never 的問題
  */
 export function safeInsert<T = any>(data: T): any {
-  return data as unknown;
+  return data as unknown
 }
 
 /**
@@ -16,7 +16,7 @@ export function safeInsert<T = any>(data: T): any {
  * 解決 Supabase update 型別推斷為 never 的問題
  */
 export function safeUpdate<T = any>(data: Partial<T>): any {
-  return data as unknown;
+  return data as unknown
 }
 
 /**
@@ -24,5 +24,5 @@ export function safeUpdate<T = any>(data: Partial<T>): any {
  * 處理 Supabase 查詢結果的型別問題
  */
 export function safeData<T = any>(data: unknown): T {
-  return data as T;
+  return data as T
 }

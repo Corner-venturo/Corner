@@ -10,12 +10,12 @@
 
 ### 嚴重程度分類
 
-| 等級 | 數量 | 影響 | 優先級 |
-|------|------|------|--------|
-| 🔴 **Critical** | 0 | 阻止運行 | P0 |
-| 🟠 **High** | 45 | 影響品質 | P1 |
-| 🟡 **Medium** | 73 | 代碼規範 | P2 |
-| 🟢 **Low** | 0 | 可忽略 | P3 |
+| 等級            | 數量 | 影響     | 優先級 |
+| --------------- | ---- | -------- | ------ |
+| 🔴 **Critical** | 0    | 阻止運行 | P0     |
+| 🟠 **High**     | 45   | 影響品質 | P1     |
+| 🟡 **Medium**   | 73   | 代碼規範 | P2     |
+| 🟢 **Low**      | 0    | 可忽略   | P3     |
 
 ---
 
@@ -26,6 +26,7 @@
 **位置**: `scripts/_archive/**/*.js`
 
 **問題**:
+
 ```javascript
 // ❌ 錯誤 1: Node.js globals 未定義
 console.log()  // 'console' is not defined
@@ -43,6 +44,7 @@ import { createClient }     // sourceType: module error
 **影響**: 🟡 **Medium** (這些是舊檔案，已歸檔)
 
 **建議方案**:
+
 ```javascript
 // 方案 1: 忽略 archive 檔案 (推薦)
 // .eslintignore
@@ -65,10 +67,12 @@ scripts/_archive/**
 ### 2. **分析工具檔案問題** (28 錯誤)
 
 **位置**:
+
 - `analyze-code-quality.js`
 - `auto-fix-code.js`
 
 **問題**:
+
 ```javascript
 // ❌ 相同問題
 const fs = require('fs')      // 'require' is not defined
@@ -89,19 +93,21 @@ console.log()                  // 'console' is not defined
 **檢查結果**:
 
 #### ✅ **優點** (已符合新規範):
+
 1. **Import 組織完美**:
+
    ```typescript
    // React & Hooks
-   import { useState, useEffect } from 'react';
+   import { useState, useEffect } from 'react'
 
    // Types
-   import type { Order } from '@/types/order.types';
+   import type { Order } from '@/types/order.types'
 
    // Stores
-   import { useEmployeeStore } from '@/stores';
+   import { useEmployeeStore } from '@/stores'
 
    // Custom Hooks
-   import { useDialogState } from '@/hooks/useDialogState';
+   import { useDialogState } from '@/hooks/useDialogState'
    ```
 
 2. **使用了 useDialogState** (新的 hook 抽象)
@@ -111,6 +117,7 @@ console.log()                  // 'console' is not defined
 #### ⚠️ **需要改進的地方**:
 
 ##### 問題 1: ChannelChat.tsx 仍然過大 (736 行)
+
 ```typescript
 // 當前: 736 行，包含太多職責
 export function ChannelChat() {
@@ -146,6 +153,7 @@ export function ChannelChat() {
 ```
 
 ##### 問題 2: 缺少 Memoization
+
 ```typescript
 // ❌ 當前: 沒有 useMemo/useCallback
 const handleSendMessage = () => { ... }
@@ -160,6 +168,7 @@ const filteredMessages = useMemo(() =>
 ```
 
 ##### 問題 3: 部分 Magic Numbers
+
 ```typescript
 // ❌ 在代碼中發現
 <div style={{ maxHeight: '600px' }}>  // Magic number
@@ -256,13 +265,13 @@ npm run lint
 
 ## 📊 修復後的預期改善
 
-| 指標 | 當前 | 修復後 | 改善 |
-|------|------|--------|------|
-| ESLint 錯誤 | 118 | **0** | -100% |
-| 最大組件行數 | 736 | **~300** | -59% |
-| Re-render 次數 | ~10/action | **~3/action** | -70% |
-| 測試覆蓋率 | ~10% | **~40%** | +300% |
-| Code Quality | 98/100 | **100/100** | +2 |
+| 指標           | 當前       | 修復後        | 改善  |
+| -------------- | ---------- | ------------- | ----- |
+| ESLint 錯誤    | 118        | **0**         | -100% |
+| 最大組件行數   | 736        | **~300**      | -59%  |
+| Re-render 次數 | ~10/action | **~3/action** | -70%  |
+| 測試覆蓋率     | ~10%       | **~40%**      | +300% |
+| Code Quality   | 98/100     | **100/100**   | +2    |
 
 ---
 
@@ -342,12 +351,14 @@ const MemoizedMessageInput = React.memo(MessageInput)
 ### ✅ 工作空間代碼品質：**85/100**
 
 **優點**:
+
 - ✅ Import 組織完美
 - ✅ 使用新的 hooks (useDialogState)
 - ✅ 組件模組化良好 (chat/)
 - ✅ TypeScript 類型正確
 
 **需改進**:
+
 - ⚠️ 主組件過大 (736 行)
 - ⚠️ 缺少 memoization
 - ⚠️ 部分 magic numbers
@@ -361,6 +372,7 @@ const MemoizedMessageInput = React.memo(MessageInput)
 4. **長期改善** (2小時): 測試擴充
 
 **修復後預期**:
+
 - ESLint 錯誤: **118 → 0**
 - Code Quality: **98 → 100**
 - Performance: **+30%**

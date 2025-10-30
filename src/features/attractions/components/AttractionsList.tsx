@@ -1,24 +1,24 @@
-import { MapPin, Trash2, Power, Edit2, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { Attraction, SortField, SortDirection } from '../types';
+import { MapPin, Trash2, Power, Edit2, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Attraction, SortField, SortDirection } from '../types'
 
 // ============================================
 // 景點列表組件
 // ============================================
 
 interface AttractionsListProps {
-  loading: boolean;
-  sortedAttractions: Attraction[];
-  countries: any[];
-  cities: any[];
-  sortField: SortField | null;
-  sortDirection: SortDirection;
-  handleSort: (field: SortField) => void;
-  onEdit: (attraction: Attraction) => void;
-  onToggleStatus: (attraction: Attraction) => void;
-  onDelete: (id: string) => void;
-  onAddNew: () => void;
+  loading: boolean
+  sortedAttractions: Attraction[]
+  countries: any[]
+  cities: any[]
+  sortField: SortField | null
+  sortDirection: SortDirection
+  handleSort: (field: SortField) => void
+  onEdit: (attraction: Attraction) => void
+  onToggleStatus: (attraction: Attraction) => void
+  onDelete: (id: string) => void
+  onAddNew: () => void
 }
 
 export function AttractionsList({
@@ -45,7 +45,7 @@ export function AttractionsList({
       {sortField === field && sortDirection === 'desc' && <ArrowDown size={14} />}
       {sortField !== field && <ArrowUpDown size={14} className="opacity-30" />}
     </button>
-  );
+  )
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card shadow-sm min-h-full flex flex-col">
@@ -104,9 +104,9 @@ export function AttractionsList({
       {/* 景點列表 */}
       {!loading && sortedAttractions.length > 0 && (
         <div className="flex-1">
-          {sortedAttractions.map((attraction) => {
-            const country = countries.find(c => c.id === attraction.country_id);
-            const city = cities.find(c => c.id === attraction.city_id);
+          {sortedAttractions.map(attraction => {
+            const country = countries.find(c => c.id === attraction.country_id)
+            const city = cities.find(c => c.id === attraction.city_id)
 
             return (
               <div
@@ -131,9 +131,13 @@ export function AttractionsList({
 
                   {/* 景點名稱 */}
                   <div className="w-48">
-                    <div className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</div>
+                    <div className="font-medium text-morandi-primary line-clamp-1">
+                      {attraction.name}
+                    </div>
                     {attraction.name_en && (
-                      <div className="text-xs text-morandi-muted line-clamp-1">{attraction.name_en}</div>
+                      <div className="text-xs text-morandi-muted line-clamp-1">
+                        {attraction.name_en}
+                      </div>
                     )}
                   </div>
 
@@ -158,7 +162,9 @@ export function AttractionsList({
 
                   {/* 時長 */}
                   <div className="w-20 text-center text-sm text-morandi-secondary">
-                    {attraction.duration_minutes ? `${Math.floor(attraction.duration_minutes / 60)}h` : '-'}
+                    {attraction.duration_minutes
+                      ? `${Math.floor(attraction.duration_minutes / 60)}h`
+                      : '-'}
                   </div>
 
                   {/* 標籤 */}
@@ -172,18 +178,22 @@ export function AttractionsList({
                       </span>
                     ))}
                     {(attraction.tags?.length || 0) > 2 && (
-                      <span className="text-xs text-morandi-muted">+{(attraction.tags?.length || 0) - 2}</span>
+                      <span className="text-xs text-morandi-muted">
+                        +{(attraction.tags?.length || 0) - 2}
+                      </span>
                     )}
                   </div>
 
                   {/* 狀態 */}
                   <div className="w-20 text-center">
-                    <span className={cn(
-                      'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-                      attraction.is_active
-                        ? 'bg-morandi-green/80 text-white'
-                        : 'bg-morandi-container text-morandi-secondary'
-                    )}>
+                    <span
+                      className={cn(
+                        'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                        attraction.is_active
+                          ? 'bg-morandi-green/80 text-white'
+                          : 'bg-morandi-container text-morandi-secondary'
+                      )}
+                    >
                       {attraction.is_active ? '啟用' : '停用'}
                     </span>
                   </div>
@@ -206,9 +216,12 @@ export function AttractionsList({
                       className="h-8 px-2"
                       title={attraction.is_active ? '停用' : '啟用'}
                     >
-                      <Power size={14} className={
-                        attraction.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
-                      } />
+                      <Power
+                        size={14}
+                        className={
+                          attraction.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
+                        }
+                      />
                     </Button>
                     <Button
                       variant="ghost"
@@ -222,10 +235,10 @@ export function AttractionsList({
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
+  )
 }

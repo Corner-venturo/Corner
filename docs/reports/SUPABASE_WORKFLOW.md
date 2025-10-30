@@ -1,26 +1,31 @@
 # Supabase 工作流程指南
 
 ## 🎯 目標
+
 建立一套簡單的流程，讓你不用在前端和 Supabase Dashboard 之間跑來跑去。
 
 ## 📋 一次性設定（已完成）
 
 ✅ 1. 安裝 Supabase CLI
+
 ```bash
 npm install -D supabase
 ```
 
 ✅ 2. 取得 Personal Access Token
+
 - 網址：https://supabase.com/dashboard/account/tokens
 - 已取得：`sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0`
 
 ✅ 3. 連結到專案
+
 ```bash
 export SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0
 npx supabase link --project-ref pfqvdacxowpgfamuvnsn
 ```
 
 ✅ 4. 生成 TypeScript 類型
+
 ```bash
 npm run db:types
 ```
@@ -91,6 +96,7 @@ npm run db:reset
 ### 建立新功能時：
 
 1. **描述你要的功能**
+
    ```
    "我想新增一個manifestation功能，需要一個表格儲存用戶的manifestation記錄"
    ```
@@ -129,6 +135,7 @@ venturo-new/
 檔案名稱必須符合：`YYYYMMDDHHMMSS_description.sql`
 
 例如：
+
 - ✅ `20251025143022_add_manifestation.sql`
 - ❌ `add_manifestation.sql`（會被跳過）
 
@@ -154,11 +161,12 @@ venturo-new/
   - bulletins
   - advance_lists
   - shared_order_lists
-- [x] 舊的 migration 檔案已整理到 _archive 資料夾
+- [x] 舊的 migration 檔案已整理到 \_archive 資料夾
 
 ## 📚 Migration 執行記錄
 
 ### 2025-10-27: 新增 channels.order 欄位
+
 - **Migration**: `20251027000000_add_channel_order.sql`
 - **目的**: 支援頻道拖曳排序功能
 - **執行方式**: `npm run db:push`（使用 CLI + Personal Access Token）

@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { _Input } from '@/components/ui/input';
-import { _DollarSign } from 'lucide-react';
+import { _Input } from '@/components/ui/input'
+import { _DollarSign } from 'lucide-react'
 // import { useCurrency } from './currency/useCurrency';
 // import { currencies } from './currency/currencyData';
 // import { getCurrencyInfo, getCurrentRate, convertAmount } from './currency/currencyUtils';
@@ -17,5 +17,5 @@ import { _DollarSign } from 'lucide-react';
 export function CurrencyWidget() {
   // 待實作: 貨幣轉換功能
   // 需要實作 currency 子模組才能啟用此功能
-  return <div className="p-4 text-morandi-secondary">貨幣轉換功能開發中...</div>;
+  return <div className="p-4 text-morandi-secondary">貨幣轉換功能開發中...</div>
 }

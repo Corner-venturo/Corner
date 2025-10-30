@@ -11,21 +11,21 @@
  * }
  */
 
-import { ValidationError, NotFoundError } from '@/core/errors/app-errors';
-import { logger } from '@/lib/utils/logger';
+import { ValidationError, NotFoundError } from '@/core/errors/app-errors'
+import { logger } from '@/lib/utils/logger'
 
 export interface ErrorLogEntry {
-  timestamp: string;
-  level: 'error' | 'warn' | 'info';
-  context: string;
-  message: string;
-  stack?: string;
-  metadata?: Record<string, unknown>;
+  timestamp: string
+  level: 'error' | 'warn' | 'info'
+  context: string
+  message: string
+  stack?: string
+  metadata?: Record<string, unknown>
 }
 
 class ErrorHandler {
-  private logs: ErrorLogEntry[] = [];
-  private maxLogs = 1000;
+  private logs: ErrorLogEntry[] = []
+  private maxLogs = 1000
 
   /**
    * 處理錯誤並記錄
@@ -37,14 +37,14 @@ class ErrorHandler {
       message: this.extractMessage(error),
       stack: error instanceof Error ? error.stack : undefined,
       metadata,
-    };
+    }
 
-    this.log(entry);
-    this.notifyUser(error, context);
+    this.log(entry)
+    this.notifyUser(error, context)
 
     // 如果是開發環境，直接拋出以便調試
     if (process.env.NODE_ENV === 'development') {
-      logger.error(`[${context}]`, error);
+      logger.error(`[${context}]`, error)
     }
   }
 
@@ -52,17 +52,17 @@ class ErrorHandler {
    * 記錄錯誤
    */
   private log(entry: ErrorLogEntry): void {
-    this.logs.push(entry);
+    this.logs.push(entry)
 
     // 限制日誌數量
     if (this.logs.length > this.maxLogs) {
-      this.logs.shift();
+      this.logs.shift()
     }
 
     // 持久化到 localStorage（可選）
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('venturo-error-logs', JSON.stringify(this.logs.slice(-100)));
+        localStorage.setItem('venturo-error-logs', JSON.stringify(this.logs.slice(-100)))
       } catch (_e) {
         // localStorage 可能已滿，忽略
       }
@@ -74,18 +74,18 @@ class ErrorHandler {
    */
   private extractMessage(error: unknown): string {
     if (error instanceof ValidationError) {
-      return `驗證錯誤: ${(error as unknown).field} - ${error.message}`;
+      return `驗證錯誤: ${(error as unknown).field} - ${error.message}`
     }
 
     if (error instanceof NotFoundError) {
-      return `找不到資源: ${(error as unknown).resource} (ID: ${(error as unknown).id})`;
+      return `找不到資源: ${(error as unknown).resource} (ID: ${(error as unknown).id})`
     }
 
     if (error instanceof Error) {
-      return error.message;
+      return error.message
     }
 
-    return String(error);
+    return String(error)
   }
 
   /**
@@ -93,11 +93,11 @@ class ErrorHandler {
    */
   private notifyUser(error: unknown, context: string): void {
     // 整合 Toast 通知系統
-    const message = this.getUserFriendlyMessage(error);
+    const message = this.getUserFriendlyMessage(error)
 
     // 未來可以這樣：
     // toast.error(message);
-    logger.warn(`[用戶通知] ${message}`);
+    logger.warn(`[用戶通知] ${message}`)
   }
 
   /**
@@ -105,43 +105,43 @@ class ErrorHandler {
    */
   private getUserFriendlyMessage(error: unknown): string {
     if (error instanceof ValidationError) {
-      return `輸入錯誤：${error.message}`;
+      return `輸入錯誤：${error.message}`
     }
 
     if (error instanceof NotFoundError) {
-      return `找不到資料，請重新整理後再試`;
+      return `找不到資料，請重新整理後再試`
     }
 
     if (error instanceof Error) {
       // 隱藏技術細節
       if (error.message.includes('network') || error.message.includes('fetch')) {
-        return '網路連線異常，請檢查網路後再試';
+        return '網路連線異常，請檢查網路後再試'
       }
 
       if (error.message.includes('timeout')) {
-        return '操作逾時，請稍後再試';
+        return '操作逾時，請稍後再試'
       }
 
-      return '操作失敗，請稍後再試';
+      return '操作失敗，請稍後再試'
     }
 
-    return '發生未知錯誤';
+    return '發生未知錯誤'
   }
 
   /**
    * 獲取錯誤日誌
    */
   getLogs(limit = 100): ErrorLogEntry[] {
-    return this.logs.slice(-limit);
+    return this.logs.slice(-limit)
   }
 
   /**
    * 清除錯誤日誌
    */
   clearLogs(): void {
-    this.logs = [];
+    this.logs = []
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('venturo-error-logs');
+      localStorage.removeItem('venturo-error-logs')
     }
   }
 
@@ -149,12 +149,12 @@ class ErrorHandler {
    * 導出日誌為 JSON（供調試使用）
    */
   exportLogs(): string {
-    return JSON.stringify(this.logs, null, 2);
+    return JSON.stringify(this.logs, null, 2)
   }
 }
 
 // 單例模式
-export const errorHandler = new ErrorHandler();
+export const errorHandler = new ErrorHandler()
 
 /**
  * 便捷函數：處理錯誤
@@ -164,7 +164,7 @@ export function handleError(
   context: string,
   metadata?: Record<string, unknown>
 ): void {
-  errorHandler.handle(error, metadata);
+  errorHandler.handle(error, metadata)
 }
 
 /**
@@ -176,21 +176,18 @@ export async function withErrorHandling<T>(
   metadata?: Record<string, unknown>
 ): Promise<T | null> {
   try {
-    return await fn();
+    return await fn()
   } catch (error) {
-    handleError(error, metadata);
-    return null;
+    handleError(error, metadata)
+    return null
   }
 }
 
 /**
  * React Error Boundary 用的錯誤處理
  */
-export function handleReactError(
-  error: Error,
-  errorInfo: { componentStack: string }
-): void {
+export function handleReactError(error: Error, errorInfo: { componentStack: string }): void {
   handleError(error, 'React Error Boundary', {
     componentStack: errorInfo.componentStack,
-  });
+  })
 }

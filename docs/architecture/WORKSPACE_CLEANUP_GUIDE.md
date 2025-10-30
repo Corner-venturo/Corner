@@ -3,6 +3,7 @@
 ## 📋 問題說明
 
 之前的工作空間出現以下問題：
+
 1. **重複的夥伴頻道**：同一個員工有多個重複的私訊頻道
 2. **排版錯位**：成員側邊欄打開時會擠壓訊息列表
 3. **自動建立邏輯錯誤**：系統持續建立重複頻道
@@ -10,38 +11,48 @@
 ## ✅ 已完成的修正
 
 ### 1. 修正自動建立頻道邏輯
+
 **檔案**：`src/hooks/use-auto-create-team-channel.ts`
 
 **修正內容**：
+
 - 更嚴格的頻道名稱檢查（完全匹配）
 - 先過濾出夥伴群組中的現有頻道
 - 避免重複建立同名頻道
 - 添加更清楚的日誌訊息
 
 ### 2. 修正排版問題
+
 **檔案**：
+
 - `src/components/workspace/ChannelChat.tsx`
 - `src/components/workspace/chat/MemberSidebar.tsx`
 
 **修正內容**：
+
 - MemberSidebar 改用絕對定位（absolute positioning）
 - 使用滑動動畫顯示/隱藏成員側邊欄
 - MessageList 不再被擠壓，保持固定寬度
 - 添加陰影效果，提升視覺層次
 
 ### 3. 建立清理工具
+
 建立了兩個清理工具來處理現有的重複頻道：
 
 #### 工具 1：瀏覽器清理工具（推薦使用）
+
 **檔案**：`public/cleanup-channels.html`
 
 **使用步驟**：
+
 1. 啟動開發服務器：
+
    ```bash
    npm run dev
    ```
 
 2. 在瀏覽器中打開：
+
    ```
    http://localhost:3000/cleanup-channels.html
    ```
@@ -55,6 +66,7 @@
 6. 重新整理工作空間頁面 (F5)
 
 **功能特點**：
+
 - ✅ 自動掃描「夥伴」群組中的所有頻道
 - ✅ 找出同名的重複頻道
 - ✅ 保留最早建立的頻道
@@ -63,6 +75,7 @@
 - ✅ 美觀的界面設計
 
 #### 工具 2：TypeScript 清理腳本
+
 **檔案**：`scripts/cleanup-duplicate-channels.ts`
 
 這是一個自動化腳本，功能與瀏覽器工具相同，但需要在 Node.js 環境中執行。
@@ -72,9 +85,11 @@
 ### 第一次清理（推薦）
 
 1. **使用瀏覽器工具清理**：
+
    ```bash
    npm run dev
    ```
+
    然後訪問：`http://localhost:3000/cleanup-channels.html`
 
 2. **分析重複頻道**：
@@ -115,7 +130,9 @@
 如果清理後仍有問題，可以使用以下方法診斷：
 
 ### 檢查 IndexedDB
+
 在瀏覽器開發者工具中：
+
 1. 打開 DevTools (F12)
 2. 切換到 Application 標籤
 3. 展開 IndexedDB > venturo-workspace-db
@@ -123,7 +140,9 @@
 5. 檢查是否還有重複的頻道
 
 ### 查看控制台日誌
+
 打開瀏覽器控制台 (F12 > Console)，查找：
+
 - `ℹ️ 頻道已存在，跳過: XXX` - 表示正確避免了重複建立
 - `🔨 建立與 XXX 的頻道...` - 正在建立新頻道
 - `✅ 建立頻道成功: XXX` - 頻道建立成功
@@ -131,6 +150,7 @@
 ## 📊 預期結果
 
 清理完成後：
+
 - ✅ 每個員工在「夥伴」群組中只有一個頻道
 - ✅ 成員側邊欄打開時不會擠壓訊息列表
 - ✅ 訊息顯示正常，沒有排版錯位
@@ -155,27 +175,31 @@
 ### 修正的核心邏輯
 
 **之前的問題**：
+
 ```typescript
 // ❌ 問題：檢查條件太寬鬆，可能重複建立
 const existingChannel = channels.find(
-  ch => ch.group_id === teamGroup!.id &&
-  (ch.name === (employee.display_name || employee.name) ||
-   ch.name === employee.name ||
-   ch.name === employee.display_name)
-);
+  ch =>
+    ch.group_id === teamGroup!.id &&
+    (ch.name === (employee.display_name || employee.name) ||
+      ch.name === employee.name ||
+      ch.name === employee.display_name)
+)
 ```
 
 **修正後**：
+
 ```typescript
 // ✅ 修正：先過濾群組頻道，名稱完全匹配
-const teamChannels = channels.filter(ch => ch.group_id === teamGroup!.id);
-const employeeName = employee.display_name || employee.name;
-const existingChannel = teamChannels.find(ch => ch.name === employeeName);
+const teamChannels = channels.filter(ch => ch.group_id === teamGroup!.id)
+const employeeName = employee.display_name || employee.name
+const existingChannel = teamChannels.find(ch => ch.name === employeeName)
 ```
 
 ### 排版修正
 
 **之前**：
+
 ```tsx
 // ❌ 問題：flex 容器中並排，會互相擠壓
 <div className="flex-1 flex">
@@ -185,6 +209,7 @@ const existingChannel = teamChannels.find(ch => ch.name === employeeName);
 ```
 
 **修正後**：
+
 ```tsx
 // ✅ 修正：使用絕對定位，不影響主要內容
 <div className="flex-1 flex relative">
@@ -204,6 +229,7 @@ const existingChannel = teamChannels.find(ch => ch.name === employeeName);
 ## 🎉 完成！
 
 所有修正已經完成，現在您可以：
+
 1. 使用清理工具移除重複頻道
 2. 享受正常的工作空間排版
 3. 不用擔心頻道會繼續重複建立

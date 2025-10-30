@@ -1,46 +1,62 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Calendar, User, ShoppingCart } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Order } from '@/stores/types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Calendar, User, ShoppingCart } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Order } from '@/stores/types'
 
 interface OrderListProps {
-  orders: Order[];
-  showTourInfo?: boolean; // 是否顯示旅遊團資訊欄位
-  showContainer?: boolean; // 是否顯示外層容器和邊框
+  orders: Order[]
+  showTourInfo?: boolean // 是否顯示旅遊團資訊欄位
+  showContainer?: boolean // 是否顯示外層容器和邊框
 }
 
 // 獲取付款狀態樣式
 const getPaymentBadge = (status: string) => {
   const badges: Record<string, string> = {
-    '已收款': 'bg-morandi-green text-white',
-    '部分收款': 'bg-morandi-gold text-white',
-    '未收款': 'bg-morandi-red text-white'
-  };
-  return badges[status] || 'bg-morandi-container text-morandi-secondary';
-};
+    已收款: 'bg-morandi-green text-white',
+    部分收款: 'bg-morandi-gold text-white',
+    未收款: 'bg-morandi-red text-white',
+  }
+  return badges[status] || 'bg-morandi-container text-morandi-secondary'
+}
 
-export const OrderList = React.memo(function OrderList({ orders, showTourInfo = true, showContainer = true }: OrderListProps) {
+export const OrderList = React.memo(function OrderList({
+  orders,
+  showTourInfo = true,
+  showContainer = true,
+}: OrderListProps) {
   if (orders.length === 0) {
     return (
       <div className="text-center py-8 text-morandi-secondary">
         <ShoppingCart size={24} className="mx-auto mb-4 opacity-50" />
         <p>沒有找到訂單</p>
       </div>
-    );
+    )
   }
 
   const tableContent = (
     <table className="w-full">
       <thead className="bg-morandi-container/30">
         <tr className="relative">
-          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">訂單編號</th>
-          {showTourInfo && <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">旅遊團</th>}
-          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">聯絡人</th>
-          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">業務/助理</th>
-          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">金額/收款</th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+            訂單編號
+          </th>
+          {showTourInfo && (
+            <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+              旅遊團
+            </th>
+          )}
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+            聯絡人
+          </th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+            業務/助理
+          </th>
+          <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+            金額/收款
+          </th>
           <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">狀態</th>
           <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">操作</th>
           <td className="absolute bottom-0 left-4 right-4 h-[1px] bg-border"></td>
@@ -93,10 +109,12 @@ export const OrderList = React.memo(function OrderList({ orders, showTourInfo = 
             </td>
 
             <td className="py-4 px-4">
-              <span className={cn(
-                'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                getPaymentBadge(order.payment_status)
-              )}>
+              <span
+                className={cn(
+                  'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
+                  getPaymentBadge(order.payment_status)
+                )}
+              >
                 {order.payment_status}
               </span>
             </td>
@@ -115,23 +133,17 @@ export const OrderList = React.memo(function OrderList({ orders, showTourInfo = 
         ))}
       </tbody>
     </table>
-  );
+  )
 
   // 如果 showContainer 為 false，直接返回表格內容
   if (!showContainer) {
-    return (
-      <div className="overflow-x-auto">
-        {tableContent}
-      </div>
-    );
+    return <div className="overflow-x-auto">{tableContent}</div>
   }
 
   // 否則返回帶容器的完整結構
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card">
-      <div className="overflow-x-auto">
-        {tableContent}
-      </div>
+      <div className="overflow-x-auto">{tableContent}</div>
     </div>
-  );
-});
+  )
+})

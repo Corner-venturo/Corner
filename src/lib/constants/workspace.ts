@@ -10,7 +10,7 @@ export const WORKSPACE_LAYOUT = {
   MESSAGE_LIST_HEIGHT: 500,
   INPUT_HEIGHT: 100,
   HEADER_HEIGHT: 64,
-} as const;
+} as const
 
 // 限制
 export const WORKSPACE_LIMITS = {
@@ -19,7 +19,7 @@ export const WORKSPACE_LIMITS = {
   MAX_MEMBERS_PER_CHANNEL: 100,
   MAX_CHANNELS: 50,
   MAX_ATTACHMENTS: 5,
-} as const;
+} as const
 
 // 延遲時間
 export const WORKSPACE_DELAYS = {
@@ -27,7 +27,7 @@ export const WORKSPACE_DELAYS = {
   TYPING_INDICATOR: 3000, // 3s
   MESSAGE_FADE: 5000, // 5s
   DEBOUNCE_SEARCH: 300, // 300ms
-} as const;
+} as const
 
 // 訊息類型
 export const MESSAGE_TYPES = {
@@ -40,7 +40,7 @@ export const MESSAGE_TYPES = {
   ADVANCE: 'advance',
   RECEIPT: 'receipt',
   PAYMENT: 'payment',
-} as const;
+} as const
 
 // Channel 類型
 export const CHANNEL_TYPES = {
@@ -48,7 +48,7 @@ export const CHANNEL_TYPES = {
   TOUR: 'tour',
   PROJECT: 'project',
   GENERAL: 'general',
-} as const;
+} as const
 
 // 檔案類型
 export const ALLOWED_FILE_TYPES = {
@@ -60,7 +60,7 @@ export const ALLOWED_FILE_TYPES = {
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   ],
-} as const;
+} as const
 
 // 預設值
 export const WORKSPACE_DEFAULTS = {
@@ -68,4 +68,4 @@ export const WORKSPACE_DEFAULTS = {
   CHANNEL_DESCRIPTION: '',
   MESSAGE_PLACEHOLDER: '輸入訊息...',
   EMPTY_STATE_TEXT: '尚無訊息',
-} as const;
+} as const

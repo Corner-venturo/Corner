@@ -1,41 +1,50 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Tour } from '@/stores/types';
-import { useTourAddOnStore } from '@/stores';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Trash2, ShoppingCart } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react'
+import { Tour } from '@/stores/types'
+import { useTourAddOnStore } from '@/stores'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Trash2, ShoppingCart } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface TourAddOnsProps {
-  tour: Tour;
-  triggerAdd?: boolean;
-  onTriggerAddComplete?: () => void;
+  tour: Tour
+  triggerAdd?: boolean
+  onTriggerAddComplete?: () => void
 }
 
-export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onTriggerAddComplete }: TourAddOnsProps) {
-  const { items: tour_add_ons, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
-  const [isAddingNew, setIsAddingNew] = useState(false);
+export const TourAddOns = React.memo(function TourAddOns({
+  tour,
+  triggerAdd,
+  onTriggerAddComplete,
+}: TourAddOnsProps) {
+  const {
+    items: tour_add_ons,
+    create: addTourAddOn,
+    update: updateTourAddOn,
+    delete: deleteTourAddOn,
+  } = useTourAddOnStore()
+  const [isAddingNew, setIsAddingNew] = useState(false)
   const [newAddOn, setNewAddOn] = useState({
     name: '',
     price: 0,
-    description: ''
-  });
+    description: '',
+  })
 
   // 監聽外部觸發新增
   React.useEffect(() => {
     if (triggerAdd) {
-      setIsAddingNew(true);
-      onTriggerAddComplete?.();
+      setIsAddingNew(true)
+      onTriggerAddComplete?.()
     }
-  }, [triggerAdd, onTriggerAddComplete]);
+  }, [triggerAdd, onTriggerAddComplete])
 
   // 獲取此旅遊團的加購項目
-  const addOns = tour_add_ons.filter((addOn: any) => addOn.tour_id === tour.id);
+  const addOns = tour_add_ons.filter((addOn: any) => addOn.tour_id === tour.id)
 
   const handleAddNew = () => {
-    if (!newAddOn.name.trim()) return;
+    if (!newAddOn.name.trim()) return
 
     addTourAddOn({
       tour_id: tour.id,
@@ -43,26 +52,25 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
       price: newAddOn.price,
       description: newAddOn.description,
       is_active: true,
-    });
+    })
 
-    setNewAddOn({ name: '', price: 0, description: '' });
-    setIsAddingNew(false);
-  };
+    setNewAddOn({ name: '', price: 0, description: '' })
+    setIsAddingNew(false)
+  }
 
   const handleDelete = (id: string) => {
-    deleteTourAddOn(id);
-  };
+    deleteTourAddOn(id)
+  }
 
   const toggleActive = (id: string) => {
-    const addOn = addOns.find((item) => item.id === id);
+    const addOn = addOns.find(item => item.id === id)
     if (addOn) {
-      updateTourAddOn(id, { is_active: !addOn.is_active });
+      updateTourAddOn(id, { is_active: !addOn.is_active })
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
-
       {/* 加購項目列表 */}
       <div className="border border-border rounded-lg overflow-hidden">
         {addOns.length === 0 && !isAddingNew ? (
@@ -76,11 +84,21 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
             <table className="w-full">
               <thead className="bg-morandi-container/30">
                 <tr>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">項目名稱</th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">價格</th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">說明</th>
-                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">狀態</th>
-                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">操作</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    項目名稱
+                  </th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    價格
+                  </th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    說明
+                  </th>
+                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    狀態
+                  </th>
+                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    操作
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +108,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                     <td className="py-3 px-4">
                       <Input
                         value={newAddOn.name}
-                        onChange={(e) => setNewAddOn({...newAddOn, name: e.target.value})}
+                        onChange={e => setNewAddOn({ ...newAddOn, name: e.target.value })}
                         placeholder="項目名稱"
                         className="h-8"
                         autoFocus
@@ -100,7 +118,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                       <Input
                         type="number"
                         value={newAddOn.price}
-                        onChange={(e) => setNewAddOn({...newAddOn, price: Number(e.target.value)})}
+                        onChange={e => setNewAddOn({ ...newAddOn, price: Number(e.target.value) })}
                         placeholder="價格"
                         className="h-8"
                       />
@@ -108,7 +126,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                     <td className="py-3 px-4">
                       <Input
                         value={newAddOn.description}
-                        onChange={(e) => setNewAddOn({...newAddOn, description: e.target.value})}
+                        onChange={e => setNewAddOn({ ...newAddOn, description: e.target.value })}
                         placeholder="說明（選填）"
                         className="h-8"
                       />
@@ -127,8 +145,8 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                         </Button>
                         <Button
                           onClick={() => {
-                            setIsAddingNew(false);
-                            setNewAddOn({ name: '', price: 0, description: '' });
+                            setIsAddingNew(false)
+                            setNewAddOn({ name: '', price: 0, description: '' })
                           }}
                           size="sm"
                           variant="ghost"
@@ -143,9 +161,7 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
                 {/* 現有項目列表 */}
                 {addOns.map((addOn: any) => (
                   <tr key={addOn.id} className="border-b border-border">
-                    <td className="py-3 px-4 font-medium text-morandi-primary">
-                      {addOn.name}
-                    </td>
+                    <td className="py-3 px-4 font-medium text-morandi-primary">{addOn.name}</td>
                     <td className="py-3 px-4 text-morandi-primary">
                       NT$ {addOn.price.toLocaleString()}
                     </td>
@@ -196,5 +212,5 @@ export const TourAddOns = React.memo(function TourAddOns({ tour, triggerAdd, onT
         </ul>
       </div>
     </div>
-  );
-});
+  )
+})

@@ -1,25 +1,34 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { ContentContainer } from '@/components/layout/content-container';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tour } from '@/stores/types';
-import { FileText, Upload, Download, Eye, CheckCircle, AlertCircle, Clock, Plus } from 'lucide-react';
+import { useState } from 'react'
+import { ContentContainer } from '@/components/layout/content-container'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Tour } from '@/stores/types'
+import {
+  FileText,
+  Upload,
+  Download,
+  Eye,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  Plus,
+} from 'lucide-react'
 
 interface TourDocumentsProps {
-  tour: Tour;
-  orderFilter?: string; // 選填：只顯示特定訂單的文件
+  tour: Tour
+  orderFilter?: string // 選填：只顯示特定訂單的文件
 }
 
 export function TourDocuments({ orderFilter }: TourDocumentsProps) {
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [newDocument, setNewDocument] = useState({
     name: '',
     type: 'contract',
-    description: ''
-  });
+    description: '',
+  })
 
   // 模擬文件資料（實際使用時會從 store 取得）
   const allMockDocuments = [
@@ -32,7 +41,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
       size: '2.5 MB',
       format: 'PDF',
       description: '客戶已簽署完成',
-      signedBy: '王小明'
+      signedBy: '王小明',
     },
     {
       id: '2',
@@ -43,7 +52,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
       size: '1.2 MB',
       format: 'PDF',
       description: '詳細行程安排',
-      signedBy: ''
+      signedBy: '',
     },
     {
       id: '3',
@@ -54,7 +63,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
       size: '800 KB',
       format: 'PDF',
       description: '旅遊保險證明',
-      signedBy: ''
+      signedBy: '',
     },
     {
       id: '4',
@@ -65,7 +74,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
       size: '1.5 MB',
       format: 'PDF',
       description: '航班資訊確認',
-      signedBy: ''
+      signedBy: '',
     },
     {
       id: '5',
@@ -76,68 +85,71 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
       size: '900 KB',
       format: 'PDF',
       description: '住宿預訂確認',
-      signedBy: ''
-    }
-  ];
+      signedBy: '',
+    },
+  ]
 
   // 根據 orderFilter 過濾文件（實際使用時會從 store 根據 order_id 過濾）
   const mockDocuments = orderFilter
     ? allMockDocuments.filter(doc => {
         // 模擬：當有 orderFilter 時，只顯示部分文件
         // 實際使用時會根據 doc.order_id === orderFilter 過濾
-        return doc.type === '合約' || doc.type === '行程表';
+        return doc.type === '合約' || doc.type === '行程表'
       })
-    : allMockDocuments;
+    : allMockDocuments
 
   const handleUploadDocument = () => {
-    if (!newDocument.name) return;
+    if (!newDocument.name) return
 
     // TODO: Implement document upload logic
 
     setNewDocument({
       name: '',
       type: 'contract',
-      description: ''
-    });
-    setIsUploadDialogOpen(false);
-  };
+      description: '',
+    })
+    setIsUploadDialogOpen(false)
+  }
 
   const getStatusIcon = (status: string) => {
     const icons: Record<string, unknown> = {
-      '已簽署': CheckCircle,
-      '已確認': CheckCircle,
-      '待確認': Clock,
-      '待簽署': AlertCircle
-    };
-    return icons[status] || Clock;
-  };
+      已簽署: CheckCircle,
+      已確認: CheckCircle,
+      待確認: Clock,
+      待簽署: AlertCircle,
+    }
+    return icons[status] || Clock
+  }
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
-      '已簽署': 'bg-morandi-green text-white',
-      '已確認': 'bg-morandi-green text-white',
-      '待確認': 'bg-morandi-gold text-white',
-      '待簽署': 'bg-morandi-red text-white'
-    };
-    return badges[status] || 'bg-morandi-container text-morandi-secondary';
-  };
+      已簽署: 'bg-morandi-green text-white',
+      已確認: 'bg-morandi-green text-white',
+      待確認: 'bg-morandi-gold text-white',
+      待簽署: 'bg-morandi-red text-white',
+    }
+    return badges[status] || 'bg-morandi-container text-morandi-secondary'
+  }
 
   const getTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      '合約': 'text-red-600',
-      '行程': 'text-blue-600',
-      '保險': 'text-green-600',
-      '票務': 'text-purple-600',
-      '住宿': 'text-orange-600'
-    };
-    return colors[type] || 'text-gray-600';
-  };
+      合約: 'text-red-600',
+      行程: 'text-blue-600',
+      保險: 'text-green-600',
+      票務: 'text-purple-600',
+      住宿: 'text-orange-600',
+    }
+    return colors[type] || 'text-gray-600'
+  }
 
-  const documentsByType = mockDocuments.reduce((acc, doc) => {
-    if (!acc[doc.type]) acc[doc.type] = [];
-    acc[doc.type].push(doc);
-    return acc;
-  }, {} as Record<string, typeof mockDocuments>);
+  const documentsByType = mockDocuments.reduce(
+    (acc, doc) => {
+      if (!acc[doc.type]) acc[doc.type] = []
+      acc[doc.type].push(doc)
+      return acc
+    },
+    {} as Record<string, typeof mockDocuments>
+  )
 
   return (
     <div className="space-y-6">
@@ -146,9 +158,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">文件狀態概覽</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-primary">
-              {mockDocuments.length}
-            </div>
+            <div className="text-2xl font-bold text-morandi-primary">{mockDocuments.length}</div>
             <div className="text-sm text-morandi-secondary">總文件數</div>
           </div>
           <div className="bg-morandi-container p-4 rounded-lg">
@@ -202,18 +212,23 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
             </div>
 
             <div className="space-y-2">
-              {documents.map((doc) => {
-                const StatusIcon = getStatusIcon(doc.status);
+              {documents.map(doc => {
+                const StatusIcon = getStatusIcon(doc.status)
                 return (
-                  <div key={doc.id} className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg hover:shadow-md transition-shadow">
+                  <div
+                    key={doc.id}
+                    className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg hover:shadow-md transition-shadow"
+                  >
                     <div className="col-span-3">
                       <div className="flex items-center">
                         <StatusIcon
                           size={16}
                           className={
-                            doc.status.includes('已') ? 'text-morandi-green' :
-                            doc.status.includes('待') ? 'text-morandi-gold' :
-                            'text-morandi-red'
+                            doc.status.includes('已')
+                              ? 'text-morandi-green'
+                              : doc.status.includes('待')
+                                ? 'text-morandi-gold'
+                                : 'text-morandi-red'
                           }
                         />
                         <div className="ml-2">
@@ -228,9 +243,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
                     <div className="col-span-3">
                       <div className="text-sm text-morandi-primary">{doc.description}</div>
                       {doc.signedBy && (
-                        <div className="text-xs text-morandi-secondary">
-                          簽署人：{doc.signedBy}
-                        </div>
+                        <div className="text-xs text-morandi-secondary">簽署人：{doc.signedBy}</div>
                       )}
                     </div>
 
@@ -239,7 +252,9 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
                     </div>
 
                     <div className="col-span-2">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(doc.status)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(doc.status)}`}
+                      >
                         {doc.status}
                       </span>
                     </div>
@@ -257,7 +272,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </ContentContainer>
@@ -275,7 +290,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
               <label className="text-sm font-medium text-morandi-primary">文件名稱</label>
               <Input
                 value={newDocument.name}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, name: e.target.value }))}
+                onChange={e => setNewDocument(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="輸入文件名稱"
                 className="mt-1"
               />
@@ -285,7 +300,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
               <label className="text-sm font-medium text-morandi-primary">文件類型</label>
               <select
                 value={newDocument.type}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, type: e.target.value }))}
+                onChange={e => setNewDocument(prev => ({ ...prev, type: e.target.value }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="contract">合約</option>
@@ -301,19 +316,19 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
               <label className="text-sm font-medium text-morandi-primary">說明</label>
               <Input
                 value={newDocument.description}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e => setNewDocument(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="文件說明"
                 className="mt-1"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">選擇檔案</label>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                選擇檔案
+              </label>
               <div className="border-2 border-dashed border-morandi-container rounded-lg p-6 text-center">
                 <Upload size={32} className="mx-auto mb-2 text-morandi-secondary" />
-                <p className="text-sm text-morandi-secondary mb-2">
-                  拖拽檔案到此處或點擊選擇
-                </p>
+                <p className="text-sm text-morandi-secondary mb-2">拖拽檔案到此處或點擊選擇</p>
                 <Button variant="outline" size="sm">
                   選擇檔案
                 </Button>
@@ -321,10 +336,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsUploadDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
                 取消
               </Button>
               <Button
@@ -338,5 +350,5 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 /**
  * 電子書展示首頁 - 用於測試和展示
@@ -196,5 +196,5 @@ export default function EbookDemoPage() {
         </motion.div>
       </motion.div>
     </div>
-  );
+  )
 }

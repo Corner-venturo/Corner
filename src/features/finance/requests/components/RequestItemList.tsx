@@ -1,27 +1,35 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
-import { RequestItem, categoryOptions } from '../types';
+import { Button } from '@/components/ui/button'
+import { Trash2 } from 'lucide-react'
+import { RequestItem, categoryOptions } from '../types'
 
 interface RequestItemListProps {
-  items: RequestItem[];
-  onRemoveItem: (itemId: string) => void;
-  showBatchTotal?: boolean;
-  batchCount?: number;
+  items: RequestItem[]
+  onRemoveItem: (itemId: string) => void
+  showBatchTotal?: boolean
+  batchCount?: number
 }
 
-export function RequestItemList({ items, onRemoveItem, showBatchTotal, batchCount = 1 }: RequestItemListProps) {
-  const total_amount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
+export function RequestItemList({
+  items,
+  onRemoveItem,
+  showBatchTotal,
+  batchCount = 1,
+}: RequestItemListProps) {
+  const total_amount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
 
-  if (items.length === 0) return null;
+  if (items.length === 0) return null
 
   return (
-    <div className="border border-border rounded-lg p-4">
+    <div className="border border-border rounded-md p-4">
       <h3 className="text-sm font-medium text-morandi-primary mb-4">請款項目列表</h3>
       <div className="space-y-2">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-3 bg-morandi-container/10 rounded">
+        {items.map(item => (
+          <div
+            key={item.id}
+            className="flex items-center justify-between p-3 bg-morandi-container/10 rounded-md"
+          >
             <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
               <div>
                 <span className="text-xs text-morandi-secondary">類別:</span>
@@ -84,5 +92,5 @@ export function RequestItemList({ items, onRemoveItem, showBatchTotal, batchCoun
         )}
       </div>
     </div>
-  );
+  )
 }

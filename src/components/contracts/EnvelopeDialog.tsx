@@ -1,65 +1,66 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { Mail, Printer } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react'
+import { Mail, Printer } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Tour, EnvelopeRecord } from '@/types/tour.types';
-import { useAuthStore } from '@/stores/auth-store';
-import { useTourStore } from '@/stores';
-import { generateUUID } from '@/lib/utils/uuid';
+} from '@/components/ui/dialog'
+import { Tour, EnvelopeRecord } from '@/types/tour.types'
+import { useAuthStore } from '@/stores/auth-store'
+import { useTourStore } from '@/stores'
+import { generateUUID } from '@/lib/utils/uuid'
 
 interface EnvelopeDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  tour: Tour;
+  isOpen: boolean
+  onClose: () => void
+  tour: Tour
 }
 
 export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
-  const { user } = useAuthStore();
-  const { update: updateTour } = useTourStore();
-  const [recipient, setRecipient] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [recipientPhone, setRecipientPhone] = useState('');
+  const { user } = useAuthStore()
+  const { update: updateTour } = useTourStore()
+  const [recipient, setRecipient] = useState('')
+  const [recipientAddress, setRecipientAddress] = useState('')
+  const [recipientPhone, setRecipientPhone] = useState('')
 
   // 寄件人資訊
-  const [senderName, setSenderName] = useState('');
-  const [senderPhone, setSenderPhone] = useState('');
-  const senderAddress = '台北市大同區重慶北路一段67號8樓之2';
-  const senderCompany = '角落旅行社';
+  const [senderName, setSenderName] = useState('')
+  const [senderPhone, setSenderPhone] = useState('')
+  const senderAddress = '台北市大同區重慶北路一段67號8樓之2'
+  const senderCompany = '角落旅行社'
 
   useEffect(() => {
     if (isOpen && user) {
       // 從 HR 帶入員工資料
-      setSenderName(user.display_name || user.username || '');
+      setSenderName(user.display_name || user.username || '')
       // 從 user 物件取得電話，如果沒有就使用公司總機（可手動修改）
-      const userPhone = (user as Record<string, unknown>).phone || (user as Record<string, unknown>).mobile || '';
-      setSenderPhone(userPhone || '02-7751-6051');
+      const userPhone =
+        (user as Record<string, unknown>).phone || (user as Record<string, unknown>).mobile || ''
+      setSenderPhone(userPhone || '02-7751-6051')
     } else if (!isOpen) {
       // 對話框關閉時重置欄位
-      setRecipient('');
-      setRecipientAddress('');
-      setRecipientPhone('');
-      setSenderName('');
-      setSenderPhone('');
+      setRecipient('')
+      setRecipientAddress('')
+      setRecipientPhone('')
+      setSenderName('')
+      setSenderPhone('')
     }
-  }, [isOpen, user]);
+  }, [isOpen, user])
 
   const handlePrint = async () => {
     if (!recipient || !recipientAddress || !recipientPhone) {
-      alert('請填寫完整的收件人資訊');
-      return;
+      alert('請填寫完整的收件人資訊')
+      return
     }
 
     if (!senderName || !senderPhone) {
-      alert('請填寫完整的寄件人資訊(姓名和電話)');
-      return;
+      alert('請填寫完整的寄件人資訊(姓名和電話)')
+      return
     }
 
     // 儲存寄件紀錄
@@ -72,35 +73,34 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         recipient_phone: recipientPhone,
         sender_name: senderName,
         sender_phone: senderPhone,
-      };
+      }
 
       // 取得現有紀錄
-      let existingRecords: EnvelopeRecord[] = [];
+      let existingRecords: EnvelopeRecord[] = []
       if (tour.envelope_records) {
         try {
-          existingRecords = JSON.parse(tour.envelope_records);
+          existingRecords = JSON.parse(tour.envelope_records)
         } catch {
-          existingRecords = [];
+          existingRecords = []
         }
       }
 
       // 新增紀錄
-      const updatedRecords = [...existingRecords, newRecord];
+      const updatedRecords = [...existingRecords, newRecord]
 
       // 更新 tour
       await updateTour(tour.id, {
         envelope_records: JSON.stringify(updatedRecords),
-      });
-
+      })
     } catch (error) {
-            // 繼續列印，不因儲存失敗而中斷
+      // 繼續列印，不因儲存失敗而中斷
     }
 
     // 產生列印內容
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank')
     if (!printWindow) {
-      alert('請允許彈出視窗以進行列印');
-      return;
+      alert('請允許彈出視窗以進行列印')
+      return
     }
 
     const printContent = `
@@ -245,14 +245,14 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
           </script>
         </body>
       </html>
-    `;
+    `
 
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-  };
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -279,7 +279,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 <input
                   type="text"
                   value={recipient}
-                  onChange={(e) => setRecipient(e.target.value)}
+                  onChange={e => setRecipient(e.target.value)}
                   placeholder="請輸入收件人姓名"
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
                 />
@@ -289,7 +289,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 <input
                   type="text"
                   value={recipientAddress}
-                  onChange={(e) => setRecipientAddress(e.target.value)}
+                  onChange={e => setRecipientAddress(e.target.value)}
                   placeholder="請輸入收件地址"
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
                 />
@@ -299,7 +299,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 <input
                   type="text"
                   value={recipientPhone}
-                  onChange={(e) => setRecipientPhone(e.target.value)}
+                  onChange={e => setRecipientPhone(e.target.value)}
                   placeholder="請輸入收件人電話"
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
                 />
@@ -328,7 +328,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   <input
                     type="text"
                     value={senderName}
-                    onChange={(e) => setSenderName(e.target.value)}
+                    onChange={e => setSenderName(e.target.value)}
                     placeholder="請輸入員工姓名（可修改）"
                     className="w-full text-sm"
                   />
@@ -350,7 +350,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 <input
                   type="text"
                   value={senderPhone}
-                  onChange={(e) => setSenderPhone(e.target.value)}
+                  onChange={e => setSenderPhone(e.target.value)}
                   placeholder="請輸入聯絡電話（可修改）"
                   className="w-full text-sm"
                 />
@@ -374,5 +374,5 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

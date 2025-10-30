@@ -1,33 +1,57 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { useAccountingStore } from '@/stores/accounting-store';
-import { FormDialog } from '@/components/dialog';
-import { Input } from '@/components/ui/input';
-import {
-  Wallet,
-  CreditCard,
-  PiggyBank,
-  TrendingUp,
-  Building2
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useEnterSubmit } from '@/hooks/useEnterSubmit';
+import React, { useState } from 'react'
+import { useAccountingStore } from '@/stores/accounting-store'
+import { FormDialog } from '@/components/dialog'
+import { Input } from '@/components/ui/input'
+import { Wallet, CreditCard, PiggyBank, TrendingUp, Building2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useEnterSubmit } from '@/hooks/useEnterSubmit'
 
 interface AddAccountDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
-type AccountType = 'cash' | 'bank' | 'credit' | 'investment' | 'other';
+type AccountType = 'cash' | 'bank' | 'credit' | 'investment' | 'other'
 
-const accountTypes: Array<{ id: AccountType; label: string; icon: typeof Wallet; color: string; description: string }> = [
+const accountTypes: Array<{
+  id: AccountType
+  label: string
+  icon: typeof Wallet
+  color: string
+  description: string
+}> = [
   { id: 'cash', label: '現金', icon: Wallet, color: '#10B981', description: '現金錢包、零錢' },
-  { id: 'bank', label: '銀行帳戶', icon: Building2, color: '#3B82F6', description: '儲蓄帳戶、活期存款' },
-  { id: 'credit', label: '信用卡', icon: CreditCard, color: '#EF4444', description: '信用卡、信貸額度' },
-  { id: 'investment', label: '投資帳戶', icon: TrendingUp, color: '#8B5CF6', description: '股票、基金、投資' },
-  { id: 'other', label: '其他帳戶', icon: PiggyBank, color: '#F59E0B', description: '數位錢包、其他資產' },
-] as const;
+  {
+    id: 'bank',
+    label: '銀行帳戶',
+    icon: Building2,
+    color: '#3B82F6',
+    description: '儲蓄帳戶、活期存款',
+  },
+  {
+    id: 'credit',
+    label: '信用卡',
+    icon: CreditCard,
+    color: '#EF4444',
+    description: '信用卡、信貸額度',
+  },
+  {
+    id: 'investment',
+    label: '投資帳戶',
+    icon: TrendingUp,
+    color: '#8B5CF6',
+    description: '股票、基金、投資',
+  },
+  {
+    id: 'other',
+    label: '其他帳戶',
+    icon: PiggyBank,
+    color: '#F59E0B',
+    description: '數位錢包、其他資產',
+  },
+] as const
 
 const predefinedColors = [
   '#10B981', // 綠色
@@ -38,17 +62,17 @@ const predefinedColors = [
   '#EC4899', // 粉紅
   '#6B7280', // 灰色
   '#84CC16', // 萊姆綠
-];
+]
 
 export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
-  const { addAccount } = useAccountingStore();
+  const { addAccount } = useAccountingStore()
   const [formData, setFormData] = useState<{
-    name: string;
-    type: AccountType;
-    balance: string;
-    credit_limit: string;
-    color: string;
-    description: string;
+    name: string
+    type: AccountType
+    balance: string
+    credit_limit: string
+    color: string
+    description: string
   }>({
     name: '',
     type: 'cash',
@@ -56,12 +80,12 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
     credit_limit: '', // 信用額度
     color: '#10B981',
     description: '',
-  });
+  })
 
   const handleSubmit = () => {
-    if (!formData.name.trim()) return;
+    if (!formData.name.trim()) return
 
-    const selectedType = accountTypes.find(t => t.id === formData.type);
+    const selectedType = accountTypes.find(t => t.id === formData.type)
 
     const accountData = {
       name: formData.name.trim(),
@@ -75,14 +99,15 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       // 信用卡相關欄位
       ...(formData.type === 'credit' && {
         credit_limit: parseFloat(formData.credit_limit) || 0,
-        available_credit: (parseFloat(formData.credit_limit) || 0) + (parseFloat(formData.balance) || 0),
+        available_credit:
+          (parseFloat(formData.credit_limit) || 0) + (parseFloat(formData.balance) || 0),
       }),
-    };
+    }
 
-    addAccount(accountData);
-    resetForm();
-    onClose();
-  };
+    addAccount(accountData)
+    resetForm()
+    onClose()
+  }
 
   const resetForm = () => {
     setFormData({
@@ -92,21 +117,21 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       credit_limit: '',
       color: '#10B981',
       description: '',
-    });
-  };
+    })
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+    resetForm()
+    onClose()
+  }
 
-  const selectedAccountType = accountTypes.find(t => t.id === formData.type);
-  const { handleKeyDown, compositionProps } = useEnterSubmit(handleSubmit);
+  const selectedAccountType = accountTypes.find(t => t.id === formData.type)
+  const { handleKeyDown, compositionProps } = useEnterSubmit(handleSubmit)
 
   return (
     <FormDialog
       open={isOpen}
-      onOpenChange={(open) => !open && handleClose()}
+      onOpenChange={open => !open && handleClose()}
       title="新增帳戶"
       onSubmit={handleSubmit}
       onCancel={handleClose}
@@ -118,18 +143,20 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       <div>
         <label className="text-sm font-medium text-morandi-primary mb-3 block">帳戶類型</label>
         <div className="grid grid-cols-1 gap-3">
-          {accountTypes.map((type) => {
-            const Icon = type.icon;
-            const isSelected = formData.type === type.id;
+          {accountTypes.map(type => {
+            const Icon = type.icon
+            const isSelected = formData.type === type.id
             return (
               <button
                 key={type.id}
                 type="button"
-                onClick={() => setFormData(prev => ({
-                  ...prev,
-                  type: type.id,
-                  color: type.color
-                }))}
+                onClick={() =>
+                  setFormData(prev => ({
+                    ...prev,
+                    type: type.id,
+                    color: type.color,
+                  }))
+                }
                 className={cn(
                   'p-4 rounded-lg border-2 transition-all flex items-center space-x-4 text-left',
                   isSelected
@@ -148,7 +175,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                   <div className="text-sm text-morandi-secondary">{type.description}</div>
                 </div>
               </button>
-            );
+            )
           })}
         </div>
       </div>
@@ -158,7 +185,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         <label className="text-sm font-medium text-morandi-primary">帳戶名稱</label>
         <Input
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder={`輸入${selectedAccountType?.label}名稱`}
@@ -172,11 +199,13 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
           {formData.type === 'credit' ? '目前欠款金額' : '初始餘額'}
         </label>
         <div className="mt-1 relative">
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-morandi-secondary">NT$</span>
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-morandi-secondary">
+            NT$
+          </span>
           <Input
             type="number"
             value={formData.balance}
-            onChange={(e) => setFormData(prev => ({ ...prev, balance: e.target.value }))}
+            onChange={e => setFormData(prev => ({ ...prev, balance: e.target.value }))}
             onKeyDown={handleKeyDown}
             {...compositionProps}
             placeholder="0"
@@ -196,11 +225,13 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         <div>
           <label className="text-sm font-medium text-morandi-primary">信用額度</label>
           <div className="mt-1 relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-morandi-secondary">NT$</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-morandi-secondary">
+              NT$
+            </span>
             <Input
               type="number"
               value={formData.credit_limit}
-              onChange={(e) => setFormData(prev => ({ ...prev, credit_limit: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, credit_limit: e.target.value }))}
               onKeyDown={handleKeyDown}
               {...compositionProps}
               placeholder="50000"
@@ -209,9 +240,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               step="1000"
             />
           </div>
-          <div className="text-xs text-morandi-secondary mt-1">
-            設定這張信用卡的總額度限制
-          </div>
+          <div className="text-xs text-morandi-secondary mt-1">設定這張信用卡的總額度限制</div>
         </div>
       )}
 
@@ -219,7 +248,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       <div>
         <label className="text-sm font-medium text-morandi-primary">顏色標識</label>
         <div className="mt-2 flex flex-wrap gap-3">
-          {predefinedColors.map((color) => (
+          {predefinedColors.map(color => (
             <button
               key={color}
               type="button"
@@ -241,7 +270,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         <label className="text-sm font-medium text-morandi-primary">備註說明</label>
         <Input
           value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder="輸入帳戶備註（選填）"
@@ -254,20 +283,19 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         <div className="p-4 bg-morandi-container/10 rounded-lg">
           <div className="text-sm font-medium text-morandi-secondary mb-2">預覽</div>
           <div className="flex items-center space-x-3">
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: formData.color }}
-            />
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: formData.color }} />
             <div className="flex-1">
               <div className="font-medium text-morandi-primary">{formData.name}</div>
               {formData.description && (
                 <div className="text-sm text-morandi-secondary">{formData.description}</div>
               )}
             </div>
-            <div className={cn(
-              "font-semibold",
-              parseFloat(formData.balance) >= 0 ? "text-morandi-green" : "text-morandi-red"
-            )}>
+            <div
+              className={cn(
+                'font-semibold',
+                parseFloat(formData.balance) >= 0 ? 'text-morandi-green' : 'text-morandi-red'
+              )}
+            >
               {parseFloat(formData.balance) >= 0 ? '+' : ''}
               NT$ {Math.abs(parseFloat(formData.balance) || 0).toLocaleString()}
             </div>
@@ -275,5 +303,5 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         </div>
       )}
     </FormDialog>
-  );
+  )
 }

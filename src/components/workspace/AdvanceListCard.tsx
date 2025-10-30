@@ -1,16 +1,16 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Receipt, Check, Trash2 } from 'lucide-react';
-import { AdvanceList } from '@/stores/workspace-store';
+import { useState } from 'react'
+import { Receipt, Check, Trash2 } from 'lucide-react'
+import { AdvanceList } from '@/stores/workspace-store'
 
 interface AdvanceListCardProps {
-  advanceList: AdvanceList;
-  userName?: string;
-  onCreatePayment: (itemId: string, item: unknown) => void;
-  onDelete?: (listId: string) => void;
-  currentUserId: string;
-  userRole?: 'admin' | 'finance' | 'member';
+  advanceList: AdvanceList
+  userName?: string
+  onCreatePayment: (itemId: string, item: unknown) => void
+  onDelete?: (listId: string) => void
+  currentUserId: string
+  userRole?: 'admin' | 'finance' | 'member'
 }
 
 export function AdvanceListCard({
@@ -18,36 +18,36 @@ export function AdvanceListCard({
   userName = '使用者',
   onCreatePayment,
   onDelete,
-  userRole = 'member'
+  userRole = 'member',
 }: AdvanceListCardProps) {
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
 
-  const pendingItems = advanceList.items.filter(item => item.status === 'pending');
-  const totalAmount = advanceList.items.reduce((sum, item) => sum + item.amount, 0);
-  const canProcess = userRole === 'admin' || userRole === 'finance';
+  const pendingItems = advanceList.items.filter(item => item.status === 'pending')
+  const totalAmount = advanceList.items.reduce((sum, item) => sum + item.amount, 0)
+  const canProcess = userRole === 'admin' || userRole === 'finance'
 
   const toggleSelection = (itemId: string) => {
-    const newSelected = new Set(selectedItems);
+    const newSelected = new Set(selectedItems)
     if (newSelected.has(itemId)) {
-      newSelected.delete(itemId);
+      newSelected.delete(itemId)
     } else {
-      newSelected.add(itemId);
+      newSelected.add(itemId)
     }
-    setSelectedItems(newSelected);
-  };
+    setSelectedItems(newSelected)
+  }
 
   const handleBatchPayment = () => {
-    const itemsToProcess = advanceList.items.filter(item => selectedItems.has(item.id));
+    const itemsToProcess = advanceList.items.filter(item => selectedItems.has(item.id))
     if (itemsToProcess.length > 0) {
-      onCreatePayment('batch', itemsToProcess);
+      onCreatePayment('batch', itemsToProcess)
     }
-  };
+  }
 
   const handleDelete = () => {
     if (window.confirm('確定要刪除這個代墊清單嗎？（已建立的請款單不會被刪除）')) {
-      onDelete?.(advanceList.id);
+      onDelete?.(advanceList.id)
     }
-  };
+  }
 
   return (
     <div className="card-morandi-elevated my-3">
@@ -55,9 +55,7 @@ export function AdvanceListCard({
       <div className="flex items-start gap-2 mb-3">
         <Receipt className="text-morandi-gold shrink-0 mt-1" size={20} />
         <div className="flex-1">
-          <div className="font-medium text-morandi-primary">
-            {userName} 分享了代墊清單
-          </div>
+          <div className="font-medium text-morandi-primary">{userName} 分享了代墊清單</div>
           <div className="text-xs text-morandi-secondary mt-1">
             {new Date(advanceList.created_at).toLocaleString('zh-TW')}
           </div>
@@ -101,9 +99,7 @@ export function AdvanceListCard({
               }`}
             >
               {/* 序號 */}
-              <div className="text-sm font-medium text-morandi-secondary w-6">
-                {index + 1}
-              </div>
+              <div className="text-sm font-medium text-morandi-secondary w-6">{index + 1}</div>
 
               {/* 複選框（僅未處理項目且有權限時顯示） */}
               {item.status === 'pending' && canProcess && (
@@ -172,5 +168,5 @@ export function AdvanceListCard({
         )}
       </div>
     </div>
-  );
+  )
 }

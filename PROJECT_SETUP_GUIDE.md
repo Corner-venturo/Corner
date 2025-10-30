@@ -17,6 +17,7 @@
 ## 專案資訊
 
 ### 基本資訊
+
 - **專案名稱**: Venturo ERP
 - **主要技術**: Next.js 14, TypeScript, Tailwind CSS, Supabase
 - **工作目錄**: `/Users/william/Projects/venturo-new`
@@ -24,6 +25,7 @@
 - **GitHub 倉庫**: https://github.com/Corner-venturo/Corner
 
 ### 專案架構
+
 ```
 venturo-new/
 ├── src/
@@ -51,6 +53,7 @@ venturo-new/
 # 🚨 最優先規範 - 必須第一時間執行
 
 **開始任何工作前，必須先讀取系統架構文件：**
+
 - 📖 **優先讀取**：`/Users/william/Projects/venturo-new/VENTURO_SYSTEM_INDEX.md`
 - 這個檔案包含最新的系統架構、命名規範、資料庫設計等重要資訊
 - **所有概念、修正、更新都會持續記錄在這個檔案中**
@@ -65,24 +68,28 @@ venturo-new/
 ## 行為控制指示 - 最高優先級
 
 **核心原則：**
+
 - 用戶問問題時，只回答問題，不要主動執行任何操作
 - 不要自作主張修正或改善任何東西
 - 等用戶明確說「執行」、「修正」、「開始」等動作指令才開始實際操作
 - 問什麼答什麼，簡潔回答即可
 
 **回應模式：**
+
 - 問題 → 直接回答 (例如：問"是不是沒有圓角" → 答"對")
 - 等明確動作指令才開始操作
 
 ## Venturo 專案規範
 
 **專案資訊：**
+
 - 這是 Venturo 專案的專門 AI 助手
 - 工作目錄：/Users/william/Projects/venturo-new
 - 專用開發端口：port 3000 (http://localhost:3000)
 - 如果 port 3000 被佔用，代表專案已經在運行中，直接使用該端口
 
 **開發服務器規範：**
+
 - 專案開發服務器固定使用 port 3000
 - 如遇 port 被佔用，優先確認是否為本專案服務
 - 不要隨意 kill port 3000 的程序，可能是專案正在運行
@@ -241,6 +248,7 @@ bash scripts/setup-supabase.sh
 ```
 
 重要的 migration 檔案：
+
 - `20251025134200_complete_workspace_schema.sql` - 工作空間架構
 - `20251026030000_create_heroic_summon_schema.sql` - 英靈招喚系統
 - `20251026040000_create_user_data_tables.sql` - 用戶資料表
@@ -350,6 +358,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 Type 類型：
+
 - `feat`: 新功能
 - `fix`: 修復 bug
 - `refactor`: 重構
@@ -359,6 +368,7 @@ Type 類型：
 - `chore`: 建置、工具相關
 
 範例：
+
 ```bash
 git commit -m "feat(workspace): add channel member list functionality
 
@@ -391,6 +401,7 @@ refactor/xxx  # 重構
 ### 主要資料表
 
 #### 1. workspaces (工作空間)
+
 ```sql
 CREATE TABLE workspaces (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -404,6 +415,7 @@ CREATE TABLE workspaces (
 ```
 
 #### 2. channels (頻道)
+
 ```sql
 CREATE TABLE channels (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -417,6 +429,7 @@ CREATE TABLE channels (
 ```
 
 #### 3. employees (員工)
+
 ```sql
 CREATE TABLE employees (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -431,6 +444,7 @@ CREATE TABLE employees (
 ```
 
 #### 4. messages (訊息)
+
 ```sql
 CREATE TABLE messages (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -467,17 +481,17 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     label: '系統管理員',
     category: '全部',
     routes: ['*'],
-    description: '擁有系統所有權限'
+    description: '擁有系統所有權限',
   },
   {
     id: 'workspace',
     label: '工作空間',
     category: '全部',
     routes: ['/workspace'],
-    description: '個人工作空間'
+    description: '個人工作空間',
   },
   // ... 其他權限
-];
+]
 ```
 
 ### 2. 狀態管理
@@ -486,23 +500,23 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
 
 ```typescript
 // Store 定義範例
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 interface MyState {
-  data: any[];
-  loading: boolean;
-  loadData: () => Promise<void>;
+  data: any[]
+  loading: boolean
+  loadData: () => Promise<void>
 }
 
-export const useMyStore = create<MyState>((set) => ({
+export const useMyStore = create<MyState>(set => ({
   data: [],
   loading: false,
   loadData: async () => {
-    set({ loading: true });
+    set({ loading: true })
     // ... 載入資料
-    set({ loading: false });
-  }
-}));
+    set({ loading: false })
+  },
+}))
 ```
 
 ### 3. 離線優先策略
@@ -517,17 +531,17 @@ export const useMyStore = create<MyState>((set) => ({
 // 離線優先範例
 const loadData = async () => {
   // 1. 快速載入快取
-  const cached = await localDB.getAll('table');
-  set({ data: cached, loading: false });
+  const cached = await localDB.getAll('table')
+  set({ data: cached, loading: false })
 
   // 2. 背景同步
   if (navigator.onLine) {
-    const { data } = await supabase.from('table').select('*');
-    set({ data });
+    const { data } = await supabase.from('table').select('*')
+    set({ data })
     // 更新快取
-    await localDB.putAll('table', data);
+    await localDB.putAll('table', data)
   }
-};
+}
 ```
 
 ### 4. 命名規範
@@ -539,6 +553,7 @@ const loadData = async () => {
 - **類型命名**: `PascalCase` (大駝峰)
 
 範例：
+
 ```typescript
 // 檔案: user-profile-card.tsx
 export function UserProfileCard() { ... }  // 組件
@@ -588,6 +603,7 @@ PORT=3001 npm run dev
 #### 2. Supabase 連線失敗
 
 檢查：
+
 1. `.env.local` 是否正確設定
 2. `NEXT_PUBLIC_ENABLE_SUPABASE=true` 是否啟用
 3. Supabase URL 和 Key 是否正確
@@ -637,6 +653,7 @@ location.reload();
 ### A. 實用腳本
 
 #### 快速重置開發環境
+
 ```bash
 #!/bin/bash
 # scripts/reset-dev.sh
@@ -654,6 +671,7 @@ npm run dev
 ```
 
 #### 備份資料庫
+
 ```bash
 #!/bin/bash
 # scripts/backup-db.sh

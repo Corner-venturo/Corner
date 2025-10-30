@@ -1,33 +1,37 @@
-import React from "react";
-import { TourFormData, MeetingPoint } from "../types";
-import { Plus, X } from "lucide-react";
+import React from 'react'
+import { TourFormData, MeetingPoint } from '../types'
+import { Plus, X } from 'lucide-react'
 
 interface LeaderMeetingSectionProps {
-  data: TourFormData;
-  updateNestedField: (parent: string, field: string, value: unknown) => void;
-  updateField: (field: string, value: unknown) => void;
+  data: TourFormData
+  updateNestedField: (parent: string, field: string, value: unknown) => void
+  updateField: (field: string, value: unknown) => void
 }
 
-export function LeaderMeetingSection({ data, updateNestedField, updateField }: LeaderMeetingSectionProps) {
+export function LeaderMeetingSection({
+  data,
+  updateNestedField,
+  updateField,
+}: LeaderMeetingSectionProps) {
   // 確保 meetingPoints 是陣列
-  const meetingPoints = data.meetingPoints || [];
+  const meetingPoints = data.meetingPoints || []
 
   const addMeetingPoint = () => {
-    updateField("meetingPoints", [
-      ...meetingPoints,
-      { time: "", location: "" }
-    ]);
-  };
+    updateField('meetingPoints', [...meetingPoints, { time: '', location: '' }])
+  }
 
   const updateMeetingPoint = (index: number, field: keyof MeetingPoint, value: string) => {
-    const updated = [...meetingPoints];
-    updated[index] = { ...updated[index], [field]: value };
-    updateField("meetingPoints", updated);
-  };
+    const updated = [...meetingPoints]
+    updated[index] = { ...updated[index], [field]: value }
+    updateField('meetingPoints', updated)
+  }
 
   const removeMeetingPoint = (index: number) => {
-    updateField("meetingPoints", meetingPoints.filter((_, i) => i !== index));
-  };
+    updateField(
+      'meetingPoints',
+      meetingPoints.filter((_, i) => i !== index)
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -39,7 +43,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
           <input
             type="checkbox"
             checked={data.showLeaderMeeting !== false}
-            onChange={(e) => updateField("showLeaderMeeting", e.target.checked)}
+            onChange={e => updateField('showLeaderMeeting', e.target.checked)}
             className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
           />
           <span className="text-morandi-primary">顯示此區塊</span>
@@ -52,8 +56,8 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
           <label className="block text-sm font-medium text-morandi-primary mb-1">領隊姓名</label>
           <input
             type="text"
-            value={data.leader?.name || ""}
-            onChange={(e) => updateNestedField("leader", "name", e.target.value)}
+            value={data.leader?.name || ''}
+            onChange={e => updateNestedField('leader', 'name', e.target.value)}
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
             placeholder="鍾惠如 小姐"
           />
@@ -63,8 +67,8 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
             <label className="block text-sm font-medium text-morandi-primary mb-1">國內電話</label>
             <input
               type="text"
-              value={data.leader?.domesticPhone || ""}
-              onChange={(e) => updateNestedField("leader", "domesticPhone", e.target.value)}
+              value={data.leader?.domesticPhone || ''}
+              onChange={e => updateNestedField('leader', 'domesticPhone', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
               placeholder="+886 0928402897"
             />
@@ -73,8 +77,8 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
             <label className="block text-sm font-medium text-morandi-primary mb-1">國外電話</label>
             <input
               type="text"
-              value={data.leader?.overseasPhone || ""}
-              onChange={(e) => updateNestedField("leader", "overseasPhone", e.target.value)}
+              value={data.leader?.overseasPhone || ''}
+              onChange={e => updateNestedField('leader', 'overseasPhone', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
               placeholder="+81 08074371189"
             />
@@ -102,7 +106,10 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
         )}
 
         {meetingPoints.map((point, index) => (
-          <div key={index} className="bg-white p-3 rounded-lg border border-blue-200 space-y-3 relative">
+          <div
+            key={index}
+            className="bg-white p-3 rounded-lg border border-blue-200 space-y-3 relative"
+          >
             <button
               type="button"
               onClick={() => removeMeetingPoint(index)}
@@ -120,7 +127,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
                 <input
                   type="text"
                   value={point.time}
-                  onChange={(e) => updateMeetingPoint(index, "time", e.target.value)}
+                  onChange={e => updateMeetingPoint(index, 'time', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="2025/10/21 04:50"
                 />
@@ -132,7 +139,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
                 <input
                   type="text"
                   value={point.location}
-                  onChange={(e) => updateMeetingPoint(index, "location", e.target.value)}
+                  onChange={e => updateMeetingPoint(index, 'location', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="桃園機場華航第二航廈 7號櫃台"
                 />
@@ -142,5 +149,5 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
         ))}
       </div>
     </div>
-  );
+  )
 }

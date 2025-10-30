@@ -2,16 +2,16 @@
  * Personal Canvas - main component for personal workspace canvas management
  */
 
-'use client';
+'use client'
 
-import { RichTextEditor } from '@/components/workspace/RichTextEditor';
-import { usePersonalCanvas } from './usePersonalCanvas';
-import { useCanvasState } from '../shared/useCanvasState';
-import { CanvasList, CanvasListHeader } from './CanvasList';
-import { DocumentList } from './DocumentList';
-import { DocumentViewer } from './DocumentViewer';
-import { PersonalCanvasProps } from '../shared/types';
-import { RichDocument } from '@/stores/workspace-store';
+import { RichTextEditor } from '@/components/workspace/RichTextEditor'
+import { usePersonalCanvas } from './usePersonalCanvas'
+import { useCanvasState } from '../shared/useCanvasState'
+import { CanvasList, CanvasListHeader } from './CanvasList'
+import { DocumentList } from './DocumentList'
+import { DocumentViewer } from './DocumentViewer'
+import { PersonalCanvasProps } from '../shared/types'
+import { RichDocument } from '@/stores/workspace-store'
 
 export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
   const {
@@ -26,7 +26,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
     handleSaveDocument,
     handleDeleteDocument,
     handleToggleFavorite,
-  } = usePersonalCanvas(canvasId);
+  } = usePersonalCanvas(canvasId)
 
   const {
     viewMode,
@@ -37,50 +37,57 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
     setSearchTerm,
     selectedTag,
     setSelectedTag,
-  } = useCanvasState();
+  } = useCanvasState()
 
   // Filter documents
   const filteredDocuments = richDocuments.filter((doc: RichDocument) => {
-    const matchesSearch = !searchTerm ||
+    const matchesSearch =
+      !searchTerm ||
       doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTag = !selectedTag || (doc.tags?.includes(selectedTag) ?? false);
-    return matchesSearch && matchesTag;
-  });
+      doc.content.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesTag = !selectedTag || (doc.tags?.includes(selectedTag) ?? false)
+    return matchesSearch && matchesTag
+  })
 
   // Get all unique tags
-  const allTags = [...new Set(richDocuments.flatMap((doc: RichDocument) => doc.tags || []).filter(Boolean))];
+  const allTags = [
+    ...new Set(richDocuments.flatMap((doc: RichDocument) => doc.tags || []).filter(Boolean)),
+  ]
 
   // Handler functions
   const handleCreateDocument = () => {
-    setSelectedDocument(null);
-    setEditMode('create');
-  };
+    setSelectedDocument(null)
+    setEditMode('create')
+  }
 
   const handleEditDocument = (document: RichDocument) => {
-    setSelectedDocument(document);
-    setEditMode('edit');
-  };
+    setSelectedDocument(document)
+    setEditMode('edit')
+  }
 
   const handleViewDocument = (document: RichDocument) => {
-    setSelectedDocument(document);
-    setEditMode('view');
-  };
+    setSelectedDocument(document)
+    setEditMode('view')
+  }
 
-  const handleSave = async (title: string, content: string, formatData: Record<string, unknown>) => {
-    await handleSaveDocument(title, content, formatData, editMode as 'create' | 'edit');
-    setEditMode('view');
-  };
+  const handleSave = async (
+    title: string,
+    content: string,
+    formatData: Record<string, unknown>
+  ) => {
+    await handleSaveDocument(title, content, formatData, editMode as 'create' | 'edit')
+    setEditMode('view')
+  }
 
   const handleCancel = () => {
-    setEditMode('view');
-    setSelectedDocument(null);
-  };
+    setEditMode('view')
+    setSelectedDocument(null)
+  }
 
   const handleBackToList = () => {
-    setEditMode('view');
-    setSelectedDocument(null);
-  };
+    setEditMode('view')
+    setSelectedDocument(null)
+  }
 
   // Render document editing/creating
   if (editMode === 'create' || (editMode === 'edit' && selectedDocument)) {
@@ -94,7 +101,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
           className="h-full"
         />
       </div>
-    );
+    )
   }
 
   // Render document viewer
@@ -107,17 +114,14 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
         onToggleFavorite={() => handleToggleFavorite(selectedDocument)}
         onBack={handleBackToList}
       />
-    );
+    )
   }
 
   // If no active canvas selected, show canvas selection
   if (!activeCanvasId) {
     return (
       <div className="h-full flex flex-col">
-        <CanvasListHeader
-          canvasCount={personalCanvases.length}
-          onAddCanvas={addNewCanvas}
-        />
+        <CanvasListHeader canvasCount={personalCanvases.length} onAddCanvas={addNewCanvas} />
         <div className="flex-1 overflow-auto p-6">
           <CanvasList
             canvases={personalCanvases}
@@ -126,7 +130,7 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
           />
         </div>
       </div>
-    );
+    )
   }
 
   // Render document list for selected canvas
@@ -148,5 +152,5 @@ export function PersonalCanvas({ canvasId }: PersonalCanvasProps) {
       onCreateDocument={handleCreateDocument}
       onBackToCanvasList={() => setActiveCanvasId(null)}
     />
-  );
+  )
 }

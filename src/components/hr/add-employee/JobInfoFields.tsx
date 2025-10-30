@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { EmployeeFormData } from './types';
+import React from 'react'
+import { Input } from '@/components/ui/input'
+import { EmployeeFormData } from './types'
 
 interface JobInfoFieldsProps {
-  formData: EmployeeFormData;
-  setFormData: (data: EmployeeFormData) => void;
+  formData: EmployeeFormData
+  setFormData: (data: EmployeeFormData) => void
 }
 
 export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
@@ -20,10 +20,12 @@ export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
           <Input
             type="date"
             value={formData.job_info.hire_date}
-            onChange={(e) => setFormData({
-              ...formData,
-              job_info: { ...formData.job_info, hire_date: e.target.value }
-            })}
+            onChange={e =>
+              setFormData({
+                ...formData,
+                job_info: { ...formData.job_info, hire_date: e.target.value },
+              })
+            }
           />
         </div>
         <div>
@@ -31,14 +33,16 @@ export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
           <Input
             type="number"
             value={formData.salary_info.base_salary}
-            onChange={(e) => setFormData({
-              ...formData,
-              salary_info: { ...formData.salary_info, base_salary: Number(e.target.value) }
-            })}
+            onChange={e =>
+              setFormData({
+                ...formData,
+                salary_info: { ...formData.salary_info, base_salary: Number(e.target.value) },
+              })
+            }
             placeholder="0"
           />
         </div>
       </div>
     </div>
-  );
+  )
 }

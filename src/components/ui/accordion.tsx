@@ -3,24 +3,24 @@
  * 替代重複的 expanded state 管理
  */
 
-'use client';
+'use client'
 
-import React, { useState, ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, ReactNode } from 'react'
+import { cn } from '@/lib/utils'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 // ============================================
 // Single Accordion Item
 // ============================================
 
 export interface AccordionItemProps {
-  title: string | ReactNode;
-  children: ReactNode;
-  defaultOpen?: boolean;
-  icon?: ReactNode;
-  badge?: ReactNode;
-  className?: string;
-  onToggle?: (isOpen: boolean) => void;
+  title: string | ReactNode
+  children: ReactNode
+  defaultOpen?: boolean
+  icon?: ReactNode
+  badge?: ReactNode
+  className?: string
+  onToggle?: (isOpen: boolean) => void
 }
 
 export function AccordionItem({
@@ -32,15 +32,15 @@ export function AccordionItem({
   className,
   onToggle,
 }: AccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(defaultOpen)
 
   const handleToggle = () => {
-    const newState = !isOpen;
-    setIsOpen(newState);
+    const newState = !isOpen
+    setIsOpen(newState)
     if (onToggle) {
-      onToggle(newState);
+      onToggle(newState)
     }
-  };
+  }
 
   return (
     <div className={cn('border border-morandi-container/20 rounded-lg', className)}>
@@ -50,9 +50,7 @@ export function AccordionItem({
       >
         <div className="flex items-center gap-3 flex-1">
           {icon && <div className="flex-shrink-0 text-morandi-gold">{icon}</div>}
-          <div className="flex-1 font-medium text-morandi-primary">
-            {title}
-          </div>
+          <div className="flex-1 font-medium text-morandi-primary">{title}</div>
           {badge && <div className="flex-shrink-0">{badge}</div>}
         </div>
         <div className="flex-shrink-0 ml-4 text-morandi-secondary">
@@ -60,13 +58,9 @@ export function AccordionItem({
         </div>
       </button>
 
-      {isOpen && (
-        <div className="p-4 border-t border-morandi-container/20">
-          {children}
-        </div>
-      )}
+      {isOpen && <div className="p-4 border-t border-morandi-container/20">{children}</div>}
     </div>
-  );
+  )
 }
 
 // ============================================
@@ -74,24 +68,19 @@ export function AccordionItem({
 // ============================================
 
 export interface AccordionProps {
-  children: ReactNode;
-  gap?: number;
-  className?: string;
-  type?: 'single' | 'multiple'; // single: 一次只能展開一個
+  children: ReactNode
+  gap?: number
+  className?: string
+  type?: 'single' | 'multiple' // single: 一次只能展開一個
 }
 
-export function Accordion({
-  children,
-  gap = 2,
-  className,
-  type = 'multiple',
-}: AccordionProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+export function Accordion({ children, gap = 2, className, type = 'multiple' }: AccordionProps) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
-  const gapClass = `space-y-${gap}`;
+  const gapClass = `space-y-${gap}`
 
   // 如果是 single 模式，需要處理展開狀態
-  const childrenArray = React.Children.toArray(children);
+  const childrenArray = React.Children.toArray(children)
 
   if (type === 'single') {
     return (
@@ -103,25 +92,26 @@ export function Accordion({
               defaultOpen: openIndex === index,
               onToggle: (isOpen: boolean) => {
                 if (isOpen) {
-                  setOpenIndex(index);
+                  setOpenIndex(index)
                 } else if (openIndex === index) {
-                  setOpenIndex(null);
+                  setOpenIndex(null)
                 }
                 // 調用原有的 onToggle
-                const originalOnToggle = (child as React.ReactElement<AccordionItemProps>).props.onToggle;
+                const originalOnToggle = (child as React.ReactElement<AccordionItemProps>).props
+                  .onToggle
                 if (originalOnToggle) {
-                  originalOnToggle(isOpen);
+                  originalOnToggle(isOpen)
                 }
               },
-            });
+            })
           }
-          return child;
+          return child
         })}
       </div>
-    );
+    )
   }
 
-  return <div className={cn(gapClass, className)}>{children}</div>;
+  return <div className={cn(gapClass, className)}>{children}</div>
 }
 
 // ============================================
@@ -129,10 +119,10 @@ export function Accordion({
 // ============================================
 
 export interface SimpleAccordionProps {
-  trigger: ReactNode;
-  children: ReactNode;
-  defaultOpen?: boolean;
-  className?: string;
+  trigger: ReactNode
+  children: ReactNode
+  defaultOpen?: boolean
+  className?: string
 }
 
 export function SimpleAccordion({
@@ -141,7 +131,7 @@ export function SimpleAccordion({
   defaultOpen = false,
   className,
 }: SimpleAccordionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(defaultOpen)
 
   return (
     <div className={className}>
@@ -154,7 +144,7 @@ export function SimpleAccordion({
       </button>
       {isOpen && <div className="mt-2">{children}</div>}
     </div>
-  );
+  )
 }
 
 // ============================================

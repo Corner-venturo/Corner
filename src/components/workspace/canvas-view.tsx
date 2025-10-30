@@ -1,53 +1,51 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { FileText, CheckSquare, Folder, Plus } from 'lucide-react';
+import { FileText, CheckSquare, Folder, Plus } from 'lucide-react'
 
-import { WorkspaceTaskList } from './workspace-task-list';
-import { Button } from '@/components/ui/button';
-import type { Channel } from '@/stores/workspace-store';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { WorkspaceTaskList } from './workspace-task-list'
+import { Button } from '@/components/ui/button'
+import type { Channel } from '@/stores/workspace-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
 
 interface CanvasViewProps {
-  channel: Channel;
+  channel: Channel
 }
 
 export function CanvasView({ channel }: CanvasViewProps) {
-  const { personalCanvases, createPersonalCanvas } = useWorkspaceStore();
-  const [activeDocId, setActiveDocId] = useState<string | null>(null);
+  const { personalCanvases, createPersonalCanvas } = useWorkspaceStore()
+  const [activeDocId, setActiveDocId] = useState<string | null>(null)
 
   // 獲取該頻道的 Canvas 文件
   const channelDocs = personalCanvases
-    .filter((doc) => doc.channelId === channel.id)
-    .sort((a: any, b: any) => a.order - b.order);
-  
+    .filter(doc => doc.channelId === channel.id)
+    .sort((a: any, b: any) => a.order - b.order)
+
   // 如果沒有選擇文件，自動選擇第一個
-  const activeDoc = activeDocId
-    ? channelDocs.find((doc) => doc.id === activeDocId)
-    : channelDocs[0];
-  
+  const activeDoc = activeDocId ? channelDocs.find(doc => doc.id === activeDocId) : channelDocs[0]
+
   const getDocIcon = (type: string) => {
     switch (type) {
       case 'document':
-        return FileText;
+        return FileText
       case 'tasks':
-        return CheckSquare;
+        return CheckSquare
       case 'files':
-        return Folder;
+        return Folder
       default:
-        return FileText;
+        return FileText
     }
-  };
-  
+  }
+
   const handleCreateDoc = (type: 'document' | 'tools' | 'custom') => {
     const typeNames = {
       document: '新文件',
       tools: '待辦清單',
       custom: '檔案庫',
-    };
+    }
 
     createPersonalCanvas({
       employee_id: '1', // 從 auth store 獲取
@@ -57,9 +55,9 @@ export function CanvasView({ channel }: CanvasViewProps) {
       type,
       content: {},
       layout: {},
-    } as unknown);
-  };
-  
+    } as unknown)
+  }
+
   return (
     <div className="flex-1 flex overflow-hidden">
       {/* 左側：Canvas 文件列表 */}
@@ -76,11 +74,11 @@ export function CanvasView({ channel }: CanvasViewProps) {
             新增文件
           </Button>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto py-2">
-          {channelDocs.map((doc) => {
-            const Icon = getDocIcon(doc.type);
-            const is_active = activeDoc?.id === doc.id;
+          {channelDocs.map(doc => {
+            const Icon = getDocIcon(doc.type)
+            const is_active = activeDoc?.id === doc.id
 
             return (
               <button
@@ -96,9 +94,9 @@ export function CanvasView({ channel }: CanvasViewProps) {
                 <Icon size={14} className="flex-shrink-0" />
                 <span className="flex-1 truncate">{doc.title}</span>
               </button>
-            );
+            )
           })}
-          
+
           {channelDocs.length === 0 && (
             <div className="px-3 py-8 text-center text-xs text-morandi-secondary">
               <p>尚無 Canvas 文件</p>
@@ -107,43 +105,34 @@ export function CanvasView({ channel }: CanvasViewProps) {
           )}
         </div>
       </div>
-      
+
       {/* 右側：Canvas 內容 */}
       <div className="flex-1 overflow-y-auto">
         {activeDoc ? (
           <div className="p-6">
             <div className="mb-6">
-              <h3 className="text-xl font-semibold text-morandi-primary mb-2">
-                {activeDoc.title}
-              </h3>
+              <h3 className="text-xl font-semibold text-morandi-primary mb-2">{activeDoc.title}</h3>
               <div className="text-sm text-morandi-secondary">
                 {activeDoc.type === 'tools' && '管理團隊待辦事項'}
                 {activeDoc.type === 'document' && '共同編輯文件'}
                 {activeDoc.type === 'custom' && '共享檔案庫'}
               </div>
             </div>
-            
+
             {/* 根據類型渲染不同內容 */}
             {activeDoc.type === 'tools' && (
-              <WorkspaceTaskList
-                channelId={channel.id}
-                tour_id={(channel as unknown).tour_id}
-              />
+              <WorkspaceTaskList channelId={channel.id} tour_id={(channel as unknown).tour_id} />
             )}
-            
+
             {activeDoc.type === 'document' && (
               <div className="border border-border rounded-lg p-4 bg-white">
-                <p className="text-sm text-morandi-secondary">
-                  富文本編輯器開發中...
-                </p>
+                <p className="text-sm text-morandi-secondary">富文本編輯器開發中...</p>
               </div>
             )}
-            
+
             {activeDoc.type === 'custom' && (
               <div className="border border-border rounded-lg p-4 bg-white">
-                <p className="text-sm text-morandi-secondary">
-                  檔案庫功能開發中...
-                </p>
+                <p className="text-sm text-morandi-secondary">檔案庫功能開發中...</p>
               </div>
             )}
           </div>
@@ -158,5 +147,5 @@ export function CanvasView({ channel }: CanvasViewProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

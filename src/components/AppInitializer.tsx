@@ -3,26 +3,23 @@
  * 在應用啟動時自動初始化本地資料庫
  */
 
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { initLocalDatabase } from '@/lib/db/init-local-data';
+import { useEffect } from 'react'
+import { initLocalDatabase } from '@/lib/db/init-local-data'
 
 export function AppInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // 初始化本地資料庫
     const init = async () => {
       try {
-        
         // 初始化 IndexedDB
-        await initLocalDatabase();
-        
-      } catch (error) {
-              }
-    };
+        await initLocalDatabase()
+      } catch (error) {}
+    }
 
-    init();
-  }, []);
+    init()
+  }, [])
 
-  return <>{children}</>;
+  return <>{children}</>
 }

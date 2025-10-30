@@ -3,34 +3,36 @@
  * 替代重複的 card-morandi, card-morandi-elevated 等類別
  */
 
-'use client';
+'use client'
 
-import React, { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import React, { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 // ============================================
 // Card Variants
 // ============================================
 
-export type CardVariant = 'default' | 'elevated' | 'outline' | 'ghost';
+export type CardVariant = 'default' | 'elevated' | 'outline' | 'ghost'
 
 const CARD_VARIANTS = {
-  default: 'bg-card rounded-xl p-6 border border-morandi-container/20 hover:border-morandi-gold/20 transition-colors',
+  default:
+    'bg-card rounded-xl p-6 border border-morandi-container/20 hover:border-morandi-gold/20 transition-colors',
   elevated: 'bg-card rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow',
-  outline: 'bg-transparent rounded-xl p-6 border-2 border-morandi-gold/20 hover:border-morandi-gold transition-colors',
+  outline:
+    'bg-transparent rounded-xl p-6 border-2 border-morandi-gold/20 hover:border-morandi-gold transition-colors',
   ghost: 'bg-morandi-container/5 rounded-xl p-6 hover:bg-morandi-container/10 transition-colors',
-};
+}
 
 // ============================================
 // Base Card Component
 // ============================================
 
 export interface CardProps {
-  variant?: CardVariant;
-  className?: string;
-  children: ReactNode;
-  onClick?: () => void;
-  hoverable?: boolean;
+  variant?: CardVariant
+  className?: string
+  children: ReactNode
+  onClick?: () => void
+  hoverable?: boolean
 }
 
 export function Card({
@@ -52,7 +54,7 @@ export function Card({
     >
       {children}
     </div>
-  );
+  )
 }
 
 // ============================================
@@ -60,42 +62,26 @@ export function Card({
 // ============================================
 
 export interface CardHeaderProps {
-  icon?: ReactNode;
-  title: string;
-  subtitle?: string;
-  action?: ReactNode;
-  className?: string;
+  icon?: ReactNode
+  title: string
+  subtitle?: string
+  action?: ReactNode
+  className?: string
 }
 
-export function CardHeader({
-  icon,
-  title,
-  subtitle,
-  action,
-  className,
-}: CardHeaderProps) {
+export function CardHeader({ icon, title, subtitle, action, className }: CardHeaderProps) {
   return (
     <div className={cn('flex items-start justify-between mb-4', className)}>
       <div className="flex items-center gap-3 flex-1">
-        {icon && (
-          <div className="flex-shrink-0 text-morandi-gold">
-            {icon}
-          </div>
-        )}
+        {icon && <div className="flex-shrink-0 text-morandi-gold">{icon}</div>}
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-morandi-primary truncate">
-            {title}
-          </h3>
-          {subtitle && (
-            <p className="text-sm text-morandi-secondary mt-0.5">
-              {subtitle}
-            </p>
-          )}
+          <h3 className="text-lg font-semibold text-morandi-primary truncate">{title}</h3>
+          {subtitle && <p className="text-sm text-morandi-secondary mt-0.5">{subtitle}</p>}
         </div>
       </div>
       {action && <div className="flex-shrink-0 ml-4">{action}</div>}
     </div>
-  );
+  )
 }
 
 // ============================================
@@ -103,16 +89,12 @@ export function CardHeader({
 // ============================================
 
 export interface CardContentProps {
-  children: ReactNode;
-  className?: string;
+  children: ReactNode
+  className?: string
 }
 
 export function CardContent({ children, className }: CardContentProps) {
-  return (
-    <div className={cn('text-morandi-primary', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('text-morandi-primary', className)}>{children}</div>
 }
 
 // ============================================
@@ -120,22 +102,18 @@ export function CardContent({ children, className }: CardContentProps) {
 // ============================================
 
 export interface CardActionsProps {
-  children: ReactNode;
-  className?: string;
-  align?: 'left' | 'center' | 'right' | 'between';
+  children: ReactNode
+  className?: string
+  align?: 'left' | 'center' | 'right' | 'between'
 }
 
-export function CardActions({
-  children,
-  className,
-  align = 'right',
-}: CardActionsProps) {
+export function CardActions({ children, className, align = 'right' }: CardActionsProps) {
   const alignClasses = {
     left: 'justify-start',
     center: 'justify-center',
     right: 'justify-end',
     between: 'justify-between',
-  };
+  }
 
   return (
     <div
@@ -147,7 +125,7 @@ export function CardActions({
     >
       {children}
     </div>
-  );
+  )
 }
 
 // ============================================
@@ -155,9 +133,7 @@ export function CardActions({
 // ============================================
 
 export function CardDivider({ className }: { className?: string }) {
-  return (
-    <hr className={cn('border-t border-morandi-container/20 my-4', className)} />
-  );
+  return <hr className={cn('border-t border-morandi-container/20 my-4', className)} />
 }
 
 // ============================================
@@ -165,24 +141,19 @@ export function CardDivider({ className }: { className?: string }) {
 // ============================================
 
 export interface CardGridProps {
-  children: ReactNode;
-  cols?: 1 | 2 | 3 | 4;
-  gap?: 2 | 3 | 4 | 6 | 8;
-  className?: string;
+  children: ReactNode
+  cols?: 1 | 2 | 3 | 4
+  gap?: 2 | 3 | 4 | 6 | 8
+  className?: string
 }
 
-export function CardGrid({
-  children,
-  cols = 3,
-  gap = 4,
-  className,
-}: CardGridProps) {
+export function CardGrid({ children, cols = 3, gap = 4, className }: CardGridProps) {
   const colsClasses = {
     1: 'grid-cols-1',
     2: 'grid-cols-1 md:grid-cols-2',
     3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
     4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-  };
+  }
 
   const gapClasses = {
     2: 'gap-2',
@@ -190,13 +161,9 @@ export function CardGrid({
     4: 'gap-4',
     6: 'gap-6',
     8: 'gap-8',
-  };
+  }
 
-  return (
-    <div className={cn('grid', colsClasses[cols], gapClasses[gap], className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('grid', colsClasses[cols], gapClasses[gap], className)}>{children}</div>
 }
 
 // ============================================

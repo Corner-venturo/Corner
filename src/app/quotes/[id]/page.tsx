@@ -1,23 +1,23 @@
-'use client';
+'use client'
 
-import React, { useRef, useEffect, useCallback } from 'react';
-import { cn } from '@/lib/utils';
-import { ParticipantCounts } from '@/features/quotes/types';
-import { useQuoteState } from '@/features/quotes/hooks/useQuoteState';
-import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations';
-import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations';
-import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions';
+import React, { useRef, useEffect, useCallback } from 'react'
+import { cn } from '@/lib/utils'
+import { ParticipantCounts } from '@/features/quotes/types'
+import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
+import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
+import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
+import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
 import {
   QuoteHeader,
   CategorySection,
   SellingPriceSection,
   SaveVersionDialog,
-  PrintableQuotation
-} from '@/features/quotes/components';
+  PrintableQuotation,
+} from '@/features/quotes/components'
 
 export default function QuoteDetailPage() {
   // State management hook
-  const quoteState = useQuoteState();
+  const quoteState = useQuoteState()
   const {
     quote,
     relatedTour,
@@ -45,8 +45,8 @@ export default function QuoteDetailPage() {
     availableCities,
     updateQuote,
     addTour,
-    router
-  } = quoteState;
+    router,
+  } = quoteState
 
   // Category operations hook
   const categoryOps = useCategoryOperations({
@@ -55,23 +55,23 @@ export default function QuoteDetailPage() {
     accommodationDays,
     setAccommodationDays,
     groupSize,
-    groupSizeForGuide
-  });
+    groupSizeForGuide,
+  })
 
   // Calculations hook
   const calculations = useQuoteCalculations({
     categories,
     participantCounts,
-    sellingPrices
-  });
+    sellingPrices,
+  })
   const {
     accommodationSummary,
     accommodationTotal,
     updatedCategories,
     identityCosts,
     identityProfits,
-    total_cost
-  } = calculations;
+    total_cost,
+  } = calculations
 
   // Actions hook
   const actions = useQuoteActions({
@@ -91,72 +91,70 @@ export default function QuoteDetailPage() {
     setSaveSuccess,
     setCategories,
     selectedCity,
-    availableCities
-  });
-  const {
-    handleSaveVersion,
-    formatDateTime,
-    handleFinalize,
-    handleCreateTour
-  } = actions;
+    availableCities,
+  })
+  const { handleSaveVersion, formatDateTime, handleFinalize, handleCreateTour } = actions
 
   // 載入特定版本
-  const handleLoadVersion = useCallback((versionData: any) => {
-    console.log('🔄 載入版本資料:', versionData);
-    setCategories(versionData.categories);
-    setAccommodationDays(versionData.accommodation_days || 0);
-    if (versionData.participant_counts) {
-      setParticipantCounts(versionData.participant_counts);
-    }
-    if (versionData.selling_prices) {
-      setSellingPrices(versionData.selling_prices);
-    }
-    console.log('✅ 版本載入完成');
-  }, [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]);
+  const handleLoadVersion = useCallback(
+    (versionData: any) => {
+      console.log('🔄 載入版本資料:', versionData)
+      setCategories(versionData.categories)
+      setAccommodationDays(versionData.accommodation_days || 0)
+      if (versionData.participant_counts) {
+        setParticipantCounts(versionData.participant_counts)
+      }
+      if (versionData.selling_prices) {
+        setSellingPrices(versionData.selling_prices)
+      }
+      console.log('✅ 版本載入完成')
+    },
+    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]
+  )
 
   // 報價單預覽
-  const [showQuotationPreview, setShowQuotationPreview] = React.useState(false);
+  const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
 
   const handleGenerateQuotation = useCallback(() => {
-    console.log('顯示報價單預覽...');
-    setShowQuotationPreview(true);
-  }, []);
+    console.log('顯示報價單預覽...')
+    setShowQuotationPreview(true)
+  }, [])
 
   const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+    window.print()
+  }, [])
 
   const handleClosePreview = useCallback(() => {
-    setShowQuotationPreview(false);
-  }, []);
+    setShowQuotationPreview(false)
+  }, [])
 
   // Scroll handling
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
-        scrollRef.current.classList.add('scrolling');
+        scrollRef.current.classList.add('scrolling')
 
         if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
+          clearTimeout(scrollTimeoutRef.current)
         }
 
         scrollTimeoutRef.current = setTimeout(() => {
           if (scrollRef.current) {
-            scrollRef.current.classList.remove('scrolling');
+            scrollRef.current.classList.remove('scrolling')
           }
-        }, 1000);
+        }, 1000)
       }
-    };
-
-    const element = scrollRef.current;
-    if (element) {
-      element.addEventListener('scroll', handleScroll);
-      return () => element.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+
+    const element = scrollRef.current
+    if (element) {
+      element.addEventListener('scroll', handleScroll)
+      return () => element.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   return (
     <div className="w-full max-w-full space-y-6 pb-6">
@@ -182,25 +180,39 @@ export default function QuoteDetailPage() {
       <div className="w-full pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
           {/* 左側：成本計算表格 - 70% */}
-          <div className={cn(
-            "lg:col-span-7",
-            isReadOnly && "opacity-70 pointer-events-none select-none"
-          )}>
+          <div
+            className={cn(
+              'lg:col-span-7',
+              isReadOnly && 'opacity-70 pointer-events-none select-none'
+            )}
+          >
             <div className="border border-border bg-card rounded-xl shadow-sm">
               <div ref={scrollRef} className="overflow-x-auto">
                 <table className="w-full min-w-[800px] border-collapse">
                   <thead className="bg-morandi-container/40 border-b border-border/60">
                     <tr>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary w-12 table-divider">分類</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-70 table-divider">項目</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-8 table-divider">數量</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider">單價</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider whitespace-nowrap">小計</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-24">操作</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary w-12 table-divider">
+                        分類
+                      </th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-70 table-divider">
+                        項目
+                      </th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-8 table-divider">
+                        數量
+                      </th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider">
+                        單價
+                      </th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider whitespace-nowrap">
+                        小計
+                      </th>
+                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-24">
+                        操作
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {categories.map((category) => (
+                    {categories.map(category => (
                       <CategorySection
                         key={category.id}
                         category={category}
@@ -260,5 +272,5 @@ export default function QuoteDetailPage() {
         accommodationSummary={accommodationSummary}
       />
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
 interface CalculatorDisplayProps {
-  expression: string;
-  display: string;
+  expression: string
+  display: string
 }
 
 /**
@@ -18,5 +18,5 @@ export const CalculatorDisplay = ({ expression, display }: CalculatorDisplayProp
         {display}
       </div>
     </div>
-  );
-};
+  )
+}

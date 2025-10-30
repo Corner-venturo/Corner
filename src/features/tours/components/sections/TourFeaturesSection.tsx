@@ -1,14 +1,14 @@
-import { motion } from "framer-motion";
-import { IconSparkles } from "@tabler/icons-react";
-import { morandiColors } from "@/lib/constants/morandi-colors";
+import { motion } from 'framer-motion'
+import { IconSparkles } from '@tabler/icons-react'
+import { morandiColors } from '@/lib/constants/morandi-colors'
 
 interface TourFeaturesSectionProps {
-  data: any;
-  viewMode: 'desktop' | 'mobile';
+  data: any
+  viewMode: 'desktop' | 'mobile'
 }
 
 export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps) {
-  const features = data.features || [];
+  const features = data.features || []
 
   return (
     <section
@@ -30,9 +30,11 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
           </h2>
         </motion.div>
 
-        <div className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-2 md:grid-cols-3 gap-7'}>
+        <div
+          className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-2 md:grid-cols-3 gap-7'}
+        >
           {features.map((feature: any, index: number) => {
-            const FeatureIcon = feature.iconComponent || IconSparkles;
+            const FeatureIcon = feature.iconComponent || IconSparkles
             return (
               <motion.div
                 key={index}
@@ -41,18 +43,26 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -4 }}
-                className={viewMode === 'mobile' ? 'flex items-center gap-4 p-4 rounded-[20px]' : 'p-6 rounded-[24px]'}
+                className={
+                  viewMode === 'mobile'
+                    ? 'flex items-center gap-4 p-4 rounded-[20px]'
+                    : 'p-6 rounded-[24px]'
+                }
                 style={{
                   backgroundColor: morandiColors.background.white,
                   border: `1px solid ${morandiColors.border.light}`,
-                  boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`
+                  boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`,
                 }}
               >
                 <div
-                  className={viewMode === 'mobile' ? 'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0' : 'w-16 h-16 rounded-xl flex items-center justify-center mb-4'}
+                  className={
+                    viewMode === 'mobile'
+                      ? 'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0'
+                      : 'w-16 h-16 rounded-xl flex items-center justify-center mb-4'
+                  }
                   style={{
                     backgroundColor: morandiColors.goldLight,
-                    border: `1px solid ${morandiColors.border.gold}`
+                    border: `1px solid ${morandiColors.border.gold}`,
                   }}
                 >
                   <FeatureIcon
@@ -62,7 +72,9 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
                 </div>
                 <div className={viewMode === 'mobile' ? 'flex-1 min-w-0' : ''}>
                   <h3
-                    className={viewMode === 'mobile' ? 'font-bold text-base mb-1' : 'font-bold text-lg mb-2'}
+                    className={
+                      viewMode === 'mobile' ? 'font-bold text-base mb-1' : 'font-bold text-lg mb-2'
+                    }
                     style={{ color: morandiColors.text.primary }}
                   >
                     {feature.title}
@@ -75,10 +87,10 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
                   </p>
                 </div>
               </motion.div>
-            );
+            )
           })}
         </div>
       </div>
     </section>
-  );
+  )
 }

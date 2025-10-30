@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import { useDroppable } from '@dnd-kit/core';
-import { cn } from '@/lib/utils';
-import type { DroppableGroupHeaderProps } from './types';
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useDroppable } from '@dnd-kit/core'
+import { cn } from '@/lib/utils'
+import type { DroppableGroupHeaderProps } from './types'
 
 export function DroppableGroupHeader({
   groupId,
   groupName,
   isCollapsed,
-  onToggle
+  onToggle,
 }: DroppableGroupHeaderProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: groupId,
-  });
+  })
 
   return (
     <button
@@ -28,5 +28,5 @@ export function DroppableGroupHeader({
       <span>{groupName}</span>
       {isOver && <span className="ml-auto text-morandi-gold">放開以移動</span>}
     </button>
-  );
+  )
 }

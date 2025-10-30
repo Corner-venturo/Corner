@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { StarRating } from '@/components/ui/star-rating';
-import { Check, Calendar, X } from 'lucide-react';
-import { TodoExpandedViewProps } from './types';
-import { useTodoExpandedView } from './useTodoExpandedView';
-import { SubTasksSection } from './SubTasksSection';
-import { NotesSection } from './NotesSection';
-import { AssignmentSection } from './AssignmentSection';
-import { QuickActionsSection, QuickActionContent } from './QuickActionsSection';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { StarRating } from '@/components/ui/star-rating'
+import { Check, Calendar, X } from 'lucide-react'
+import { TodoExpandedViewProps } from './types'
+import { useTodoExpandedView } from './useTodoExpandedView'
+import { SubTasksSection } from './SubTasksSection'
+import { NotesSection } from './NotesSection'
+import { AssignmentSection } from './AssignmentSection'
+import { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
 
 export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewProps) {
-  const { activeTab, setActiveTab } = useTodoExpandedView();
+  const { activeTab, setActiveTab } = useTodoExpandedView()
 
   return (
     <div
@@ -22,7 +22,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
     >
       <div
         className="bg-background rounded-2xl shadow-2xl w-full max-w-[1400px] h-[90vh] flex flex-col relative border border-border"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* 右上角關閉按鈕 */}
         <button
@@ -43,7 +43,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                 <div className="flex-1">
                   <Input
                     value={todo.title}
-                    onChange={(e) => onUpdate({ title: e.target.value })}
+                    onChange={e => onUpdate({ title: e.target.value })}
                     className="text-lg font-bold border-none shadow-none p-0 h-auto focus-visible:ring-0 bg-transparent"
                     placeholder="輸入任務標題..."
                   />
@@ -54,7 +54,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   <span className="text-xs text-morandi-secondary">優先級:</span>
                   <StarRating
                     value={todo.priority}
-                    onChange={(value) => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })}
+                    onChange={value => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })}
                     size="sm"
                   />
                 </div>
@@ -85,8 +85,8 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
             <div className="flex gap-2 mt-4">
               <Button
                 onClick={() => {
-                  onUpdate({ status: 'completed', completed: true });
-                  onClose();
+                  onUpdate({ status: 'completed', completed: true })
+                  onClose()
                 }}
                 className="flex-1 bg-gradient-to-r from-morandi-gold to-yellow-400 hover:from-morandi-gold/90 hover:to-yellow-400/90 text-white shadow-md hover:shadow-lg transition-all"
               >
@@ -96,9 +96,9 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
               <Button
                 variant="outline"
                 onClick={() => {
-                  const newDeadline = new Date();
-                  newDeadline.setDate(newDeadline.getDate() + 7);
-                  onUpdate({ deadline: newDeadline.toISOString().split('T')[0] });
+                  const newDeadline = new Date()
+                  newDeadline.setDate(newDeadline.getDate() + 7)
+                  onUpdate({ deadline: newDeadline.toISOString().split('T')[0] })
                 }}
                 className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/20 shadow-sm transition-all"
               >
@@ -110,5 +110,5 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -10,27 +10,28 @@
 
 ```typescript
 // chat-store.ts (第 37-98 行)
-loadMessages: async (channelId) => {
+loadMessages: async channelId => {
   // ✅ 步驟 1: 先從 IndexedDB 快速載入 (0.1 秒)
-  const cachedMessages = await localDB.getAll('messages');
-  set({ channelMessages: { [channelId]: cachedMessages } });
+  const cachedMessages = await localDB.getAll('messages')
+  set({ channelMessages: { [channelId]: cachedMessages } })
 
   // ⏰ 步驟 2: 背景從 Supabase 同步 (使用 setTimeout)
   setTimeout(async () => {
-    const { data } = await supabase.from('messages').select('*');
+    const { data } = await supabase.from('messages').select('*')
     // 更新到 IndexedDB 和 state
-  }, 0);
+  }, 0)
 }
 ```
 
 ### 特點
-| 項目 | 說明 |
-|------|------|
-| **觸發方式** | 手動呼叫 `loadMessages()` |
-| **同步時機** | 頁面載入時、用戶手動刷新 |
-| **即時性** | ❌ 不即時 |
-| **其他用戶更新** | ❌ 看不到 |
-| **需要** | 手動重新載入頁面 |
+
+| 項目             | 說明                      |
+| ---------------- | ------------------------- |
+| **觸發方式**     | 手動呼叫 `loadMessages()` |
+| **同步時機**     | 頁面載入時、用戶手動刷新  |
+| **即時性**       | ❌ 不即時                 |
+| **其他用戶更新** | ❌ 看不到                 |
+| **需要**         | 手動重新載入頁面          |
 
 ---
 
@@ -42,26 +43,31 @@ loadMessages: async (channelId) => {
 // 加入 Realtime 後
 const channel = supabase
   .channel(`room:${channelId}`)
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'messages',
-    filter: `channel_id=eq.${channelId}`
-  }, (payload) => {
-    // 🎯 其他人發訊息時，立即收到通知！
-    addMessage(payload.new);
-  })
-  .subscribe();
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: `channel_id=eq.${channelId}`,
+    },
+    payload => {
+      // 🎯 其他人發訊息時，立即收到通知！
+      addMessage(payload.new)
+    }
+  )
+  .subscribe()
 ```
 
 ### 特點
-| 項目 | 說明 |
-|------|------|
-| **觸發方式** | Supabase 資料庫變更時自動推送 |
-| **同步時機** | 資料變更的瞬間 |
-| **即時性** | ✅ 即時 (0.1-0.5 秒) |
-| **其他用戶更新** | ✅ 立即看到 |
-| **需要** | 保持連線 |
+
+| 項目             | 說明                          |
+| ---------------- | ----------------------------- |
+| **觸發方式**     | Supabase 資料庫變更時自動推送 |
+| **同步時機**     | 資料變更的瞬間                |
+| **即時性**       | ✅ 即時 (0.1-0.5 秒)          |
+| **其他用戶更新** | ✅ 立即看到                   |
+| **需要**         | 保持連線                      |
 
 ---
 
@@ -70,6 +76,7 @@ const channel = supabase
 ### 差異 1: **推 vs 拉**
 
 #### 目前機制 (Pull - 拉)
+
 ```
 用戶 A 發訊息
     ↓
@@ -83,6 +90,7 @@ const channel = supabase
 ```
 
 #### Realtime (Push - 推)
+
 ```
 用戶 A 發訊息
     ↓
@@ -100,11 +108,13 @@ Supabase 自動推送給所有訂閱者 ← 自動推送
 ### 差異 2: **頁面範圍**
 
 #### 目前機制
+
 - ✅ 適用於所有功能 (tours, orders, employees 等)
 - ✅ Offline-first (離線可用)
 - ❌ 需要手動刷新才能看到其他人的更新
 
 #### Realtime
+
 - ⚠️ **只適用於需要即時協作的功能**
 - ⚠️ **需要保持在該頁面**
 - ✅ 其他用戶的變更立即可見
@@ -117,6 +127,7 @@ Supabase 自動推送給所有訂閱者 ← 自動推送
 ### 原因 1: **大部分功能不需要即時性**
 
 **不需要 Realtime 的功能**:
+
 ```
 ❌ Tours (旅遊團管理)
   - 編輯團資訊：不需要其他人立即看到
@@ -136,6 +147,7 @@ Supabase 自動推送給所有訂閱者 ← 自動推送
 ```
 
 **需要 Realtime 的功能**:
+
 ```
 ✅ Workspace Chat (工作空間聊天)
   - 訊息：需要立即看到
@@ -154,6 +166,7 @@ Supabase 自動推送給所有訂閱者 ← 自動推送
 ### 原因 2: **連線成本考量**
 
 #### Realtime 連線數限制
+
 ```
 Free Tier: 200 個同時連線
 
@@ -203,14 +216,14 @@ vs
 
 ### 建議的混合架構
 
-| 功能 | 使用機制 | 原因 |
-|------|---------|------|
-| **Workspace Chat** | ✅ Realtime | 需要即時協作 |
-| **Tours** | ✅ Offline-First | 離線可用更重要 |
-| **Orders** | ✅ Offline-First | 不需要即時 |
-| **Employees** | ✅ Offline-First | 更新頻率低 |
-| **Accounting** | ✅ Offline-First | 穩定性優先 |
-| **Notifications** | ✅ Realtime | 需要即時推送 |
+| 功能               | 使用機制         | 原因           |
+| ------------------ | ---------------- | -------------- |
+| **Workspace Chat** | ✅ Realtime      | 需要即時協作   |
+| **Tours**          | ✅ Offline-First | 離線可用更重要 |
+| **Orders**         | ✅ Offline-First | 不需要即時     |
+| **Employees**      | ✅ Offline-First | 更新頻率低     |
+| **Accounting**     | ✅ Offline-First | 穩定性優先     |
+| **Notifications**  | ✅ Realtime      | 需要即時推送   |
 
 ---
 
@@ -221,47 +234,50 @@ vs
 ```typescript
 // chat-store.ts
 export const useChatStore = create<ChatState>((set, get) => ({
-
   // 新增: Realtime 訂閱
   subscribeToChannel: (channelId: string) => {
     const channel = supabase
       .channel(`chat:${channelId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `channel_id=eq.${channelId}`
-      }, (payload) => {
-        // 其他用戶發訊息時，自動更新
-        const newMessage = payload.new as Message;
-        set((state) => ({
-          channelMessages: {
-            ...state.channelMessages,
-            [channelId]: [...(state.channelMessages[channelId] || []), newMessage]
-          }
-        }));
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `channel_id=eq.${channelId}`,
+        },
+        payload => {
+          // 其他用戶發訊息時，自動更新
+          const newMessage = payload.new as Message
+          set(state => ({
+            channelMessages: {
+              ...state.channelMessages,
+              [channelId]: [...(state.channelMessages[channelId] || []), newMessage],
+            },
+          }))
 
-        // 同時更新到 IndexedDB
-        localDB.put('messages', newMessage);
-      })
-      .subscribe();
+          // 同時更新到 IndexedDB
+          localDB.put('messages', newMessage)
+        }
+      )
+      .subscribe()
 
     return () => {
-      channel.unsubscribe();
-    };
+      channel.unsubscribe()
+    }
   },
 
   // 保留: 原本的載入機制 (Offline-First)
-  loadMessages: async (channelId) => {
+  loadMessages: async channelId => {
     // 先從 IndexedDB 快速載入
-    const cached = await localDB.getAll('messages');
-    set({ channelMessages: { [channelId]: cached } });
+    const cached = await localDB.getAll('messages')
+    set({ channelMessages: { [channelId]: cached } })
 
     // 背景同步
-    const { data } = await supabase.from('messages').select('*');
+    const { data } = await supabase.from('messages').select('*')
     // ...
-  }
-}));
+  },
+}))
 ```
 
 ### 使用方式
@@ -270,15 +286,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
 // ChannelChat.tsx
 useEffect(() => {
   // 1. 先用 Offline-First 快速載入
-  loadMessages(channelId);
+  loadMessages(channelId)
 
   // 2. 訂閱 Realtime 更新
-  const unsubscribe = subscribeToChannel(channelId);
+  const unsubscribe = subscribeToChannel(channelId)
 
   return () => {
-    unsubscribe(); // 離開頁面時取消訂閱
-  };
-}, [channelId]);
+    unsubscribe() // 離開頁面時取消訂閱
+  }
+}, [channelId])
 ```
 
 ---
@@ -286,6 +302,7 @@ useEffect(() => {
 ## 📊 效益比較
 
 ### 只用 Offline-First (目前)
+
 ```
 優點:
 ✅ 離線可用
@@ -298,6 +315,7 @@ useEffect(() => {
 ```
 
 ### Offline-First + Realtime (建議)
+
 ```
 優點:
 ✅ 離線可用 (主要功能)
@@ -315,6 +333,7 @@ useEffect(() => {
 ## ❓ 回答你的問題
 
 ### Q1: Realtime 是針對目前停留在這頁面上是嗎？
+
 **A**: ✅ **是的！**
 
 - Realtime 連線只在**當前頁面有效**
@@ -325,6 +344,7 @@ useEffect(() => {
 ---
 
 ### Q2: 如果免費為什麼之前不用這概念？
+
 **A**: 因為**大部分功能不需要即時性**
 
 ```
@@ -341,20 +361,22 @@ Tours、Orders、Employees 等功能：
 ---
 
 ### Q3: 差別用意在哪裡？
+
 **A**: **不同功能有不同需求**
 
-| 需求 | 適合機制 | 範例 |
-|------|---------|------|
-| **即時協作** | Realtime | Chat, 通知 |
+| 需求         | 適合機制      | 範例          |
+| ------------ | ------------- | ------------- |
+| **即時協作** | Realtime      | Chat, 通知    |
 | **離線可用** | Offline-First | Tours, Orders |
-| **穩定優先** | Offline-First | 會計, 員工 |
-| **快速載入** | Offline-First | 所有列表頁面 |
+| **穩定優先** | Offline-First | 會計, 員工    |
+| **快速載入** | Offline-First | 所有列表頁面  |
 
 ---
 
 ## 🎯 總結
 
 ### 為什麼要加 Realtime 到 Chat？
+
 ```
 ✅ Chat 是協作功能，需要即時性
 ✅ 免費額度足夠 (200 連線 + 2M 訊息)
@@ -362,6 +384,7 @@ Tours、Orders、Employees 等功能：
 ```
 
 ### 為什麼其他功能保持 Offline-First？
+
 ```
 ✅ 不需要即時性
 ✅ 離線可用更重要
@@ -370,6 +393,7 @@ Tours、Orders、Employees 等功能：
 ```
 
 ### 最佳方案
+
 ```
 🎯 混合架構：
   - Chat: Realtime (即時)

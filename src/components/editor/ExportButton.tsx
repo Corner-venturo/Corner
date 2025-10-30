@@ -1,17 +1,17 @@
-"use client";
+'use client'
 
 export function ExportButton({ data }: { data: any }) {
   const exportHTML = () => {
-    const html = generateFullHTML(data);
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${data.tourCode || 'tour'}.html`;
-    a.click();
-  };
+    const html = generateFullHTML(data)
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${data.tourCode || 'tour'}.html`
+    a.click()
+  }
 
-  const generateFullHTML = (data) => {
+  const generateFullHTML = data => {
     return `
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -48,7 +48,9 @@ export function ExportButton({ data }: { data: any }) {
       <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-4xl font-bold text-center mb-12">精選景點</h2>
         <div class="grid md:grid-cols-3 gap-6">
-          ${data.attractions.map((a) => `
+          ${data.attractions
+            .map(
+              a => `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
               <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-400"></div>
               <div class="p-6">
@@ -56,7 +58,9 @@ export function ExportButton({ data }: { data: any }) {
                 <p class="text-gray-600">${a.description}</p>
               </div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
     </section>
@@ -85,8 +89,8 @@ export function ExportButton({ data }: { data: any }) {
     </section>
 </body>
 </html>
-    `;
-  };
+    `
+  }
 
   return (
     <button
@@ -95,5 +99,5 @@ export function ExportButton({ data }: { data: any }) {
     >
       📥 匯出 HTML
     </button>
-  );
+  )
 }

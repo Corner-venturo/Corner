@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Copy } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Copy } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 import {
   PASSPORT_DELIVERY_OPTIONS,
   PASSPORT_REQUIREMENTS,
@@ -16,86 +16,86 @@ import {
   formatCurrency,
   type DeliveryOption,
   type RequirementSection,
-} from '../constants/visa-info';
+} from '../constants/visa-info'
 
 interface VisasInfoDialogProps {
-  open: boolean;
-  onClose: () => void;
+  open: boolean
+  onClose: () => void
 }
 
 export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const copyStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [selectedSections, setSelectedSections] = useState<Set<string>>(new Set());
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const copyStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [selectedSections, setSelectedSections] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     return () => {
       if (copyStatusTimeoutRef.current) {
-        clearTimeout(copyStatusTimeoutRef.current);
+        clearTimeout(copyStatusTimeoutRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   // 切換勾選類別
   const toggleSection = (sectionTitle: string) => {
     setSelectedSections(prev => {
-      const newSet = new Set(prev);
+      const newSet = new Set(prev)
       if (newSet.has(sectionTitle)) {
-        newSet.delete(sectionTitle);
+        newSet.delete(sectionTitle)
       } else {
-        newSet.add(sectionTitle);
+        newSet.add(sectionTitle)
       }
-      return newSet;
-    });
-  };
+      return newSet
+    })
+  }
 
   // 複製已選擇的類別
   const handleCopySelected = useCallback(async () => {
     if (selectedSections.size === 0) {
-      setCopyStatus('error');
-      return;
+      setCopyStatus('error')
+      return
     }
 
     try {
-      const selectedText = Array.from(selectedSections).join('\n\n');
-      let copied = false;
+      const selectedText = Array.from(selectedSections).join('\n\n')
+      let copied = false
 
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(selectedText);
-        copied = true;
+        await navigator.clipboard.writeText(selectedText)
+        copied = true
       } else if (typeof document !== 'undefined') {
-        const textarea = document.createElement('textarea');
-        textarea.value = selectedText;
-        textarea.setAttribute('readonly', '');
-        textarea.style.position = 'absolute';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.select();
-        copied = document.execCommand('copy');
-        document.body.removeChild(textarea);
+        const textarea = document.createElement('textarea')
+        textarea.value = selectedText
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'absolute'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        copied = document.execCommand('copy')
+        document.body.removeChild(textarea)
       }
 
       if (!copied) {
-        throw new Error('Clipboard not supported');
+        throw new Error('Clipboard not supported')
       }
 
-      setCopyStatus('success');
+      setCopyStatus('success')
     } catch (error) {
-      setCopyStatus('error');
+      setCopyStatus('error')
     } finally {
       if (copyStatusTimeoutRef.current) {
-        clearTimeout(copyStatusTimeoutRef.current);
+        clearTimeout(copyStatusTimeoutRef.current)
       }
       copyStatusTimeoutRef.current = setTimeout(() => {
-        setCopyStatus('idle');
-      }, 2000);
+        setCopyStatus('idle')
+      }, 2000)
     }
-  }, [selectedSections]);
+  }, [selectedSections])
 
   const renderVisaInfoContent = (
     options: DeliveryOption[],
     requirements: RequirementSection[],
-    notes: string[],
+    notes: string[]
   ) => (
     <div className="space-y-6">
       <div className="rounded-lg border border-border overflow-hidden">
@@ -118,7 +118,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
 
       <div className="space-y-5">
         {requirements.map(section => {
-          const sectionText = `－${section.title}${section.fee ? ` ${formatCurrency(section.fee)}` : ''}\n${section.items.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}`;
+          const sectionText = `－${section.title}${section.fee ? ` ${formatCurrency(section.fee)}` : ''}\n${section.items.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}`
 
           return (
             <label
@@ -147,7 +147,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
                 ))}
               </ol>
             </label>
-          );
+          )
         })}
       </div>
 
@@ -159,10 +159,10 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
         </ul>
       </div>
     </div>
-  );
+  )
 
   return (
-    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <DialogTitle>簽證資訊總覽</DialogTitle>
@@ -185,7 +185,11 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
               copyStatus === 'success' ? 'text-emerald-600' : 'text-red-500'
             )}
           >
-            {copyStatus === 'success' ? `已複製 ${selectedSections.size} 個項目` : selectedSections.size === 0 ? '請先勾選要複製的項目' : '複製失敗，請重試'}
+            {copyStatus === 'success'
+              ? `已複製 ${selectedSections.size} 個項目`
+              : selectedSections.size === 0
+                ? '請先勾選要複製的項目'
+                : '複製失敗，請重試'}
           </p>
         )}
         <Tabs defaultValue="passport" className="mt-4">
@@ -194,17 +198,21 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
             <TabsTrigger value="taiwan">台胞證</TabsTrigger>
           </TabsList>
           <TabsContent value="passport" className="mt-4">
-            {renderVisaInfoContent(PASSPORT_DELIVERY_OPTIONS, PASSPORT_REQUIREMENTS, PASSPORT_NOTES)}
+            {renderVisaInfoContent(
+              PASSPORT_DELIVERY_OPTIONS,
+              PASSPORT_REQUIREMENTS,
+              PASSPORT_NOTES
+            )}
           </TabsContent>
           <TabsContent value="taiwan" className="mt-4">
             {renderVisaInfoContent(
               TAIWAN_COMPATRIOT_DELIVERY_OPTIONS,
               TAIWAN_COMPATRIOT_REQUIREMENTS,
-              TAIWAN_COMPATRIOT_NOTES,
+              TAIWAN_COMPATRIOT_NOTES
             )}
           </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

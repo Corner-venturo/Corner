@@ -1,136 +1,135 @@
-'use client';
+'use client'
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { FileSignature, X, Printer } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useMemo, useState, useEffect } from 'react'
+import { FileSignature, X, Printer } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Tour } from '@/types/tour.types';
-import { ContractData } from '@/lib/contract-utils';
+} from '@/components/ui/dialog'
+import { Tour } from '@/types/tour.types'
+import { ContractData } from '@/lib/contract-utils'
 
 interface ContractViewDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  tour: Tour;
+  isOpen: boolean
+  onClose: () => void
+  tour: Tour
 }
 
 export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialogProps) {
-  const [printing, setPrinting] = useState(false);
-  const [contractHtml, setContractHtml] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  const [printing, setPrinting] = useState(false)
+  const [contractHtml, setContractHtml] = useState<string>('')
+  const [loading, setLoading] = useState(true)
 
   // 解析儲存的合約資料
   const contractData = useMemo<Partial<ContractData>>(() => {
     if (!tour.contract_content) {
-      return {};
+      return {}
     }
     try {
-      return JSON.parse(tour.contract_content);
+      return JSON.parse(tour.contract_content)
     } catch (error) {
-      return {};
+      return {}
     }
-  }, [tour.contract_content]);
+  }, [tour.contract_content])
 
   // 載入並渲染完整合約
   useEffect(() => {
     if (!isOpen || !tour.contract_template || !tour.contract_content) {
-      return;
+      return
     }
 
     const loadContract = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
 
         // 讀取合約範本
         const templateMap = {
-          'domestic': 'domestic.html',
-          'international': 'international.html',
-          'individual_international': 'individual_international_full.html',
-        };
-        const templateFile = templateMap[tour.contract_template as keyof typeof templateMap] || 'international.html';
-        const response = await fetch(`/contract-templates/${templateFile}`);
+          domestic: 'domestic.html',
+          international: 'international.html',
+          individual_international: 'individual_international_full.html',
+        }
+        const templateFile =
+          templateMap[tour.contract_template as keyof typeof templateMap] || 'international.html'
+        const response = await fetch(`/contract-templates/${templateFile}`)
 
         if (!response.ok) {
-          throw new Error('無法載入合約範本');
+          throw new Error('無法載入合約範本')
         }
 
-        let template = await response.text();
+        let template = await response.text()
 
         // 替換所有變數
         Object.entries(contractData).forEach(([key, value]) => {
-          const regex = new RegExp(`{{${key}}}`, 'g');
-          template = template.replace(regex, value || '');
-        });
+          const regex = new RegExp(`{{${key}}}`, 'g')
+          template = template.replace(regex, value || '')
+        })
 
-        setContractHtml(template);
+        setContractHtml(template)
       } catch (error) {
-        console.error('載入合約失敗:', error);
-        setContractHtml('<p class="text-red-500">載入合約範本失敗，請稍後再試</p>');
+        console.error('載入合約失敗:', error)
+        setContractHtml('<p class="text-red-500">載入合約範本失敗，請稍後再試</p>')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    loadContract();
-  }, [isOpen, tour.contract_template, tour.contract_content, contractData]);
+    loadContract()
+  }, [isOpen, tour.contract_template, tour.contract_content, contractData])
 
   const handlePrint = async () => {
     if (!contractHtml) {
-      alert('無合約資料可列印');
-      return;
+      alert('無合約資料可列印')
+      return
     }
 
     try {
-      setPrinting(true);
+      setPrinting(true)
 
       // 開啟新視窗並列印
-      const printWindow = window.open('', '_blank');
+      const printWindow = window.open('', '_blank')
       if (!printWindow) {
-        alert('請允許彈出視窗以進行列印');
-        return;
+        alert('請允許彈出視窗以進行列印')
+        return
       }
 
-      printWindow.document.write(contractHtml);
-      printWindow.document.close();
+      printWindow.document.write(contractHtml)
+      printWindow.document.close()
 
       // 等待內容載入後列印
       printWindow.onload = () => {
-        printWindow.print();
+        printWindow.print()
         // 列印後關閉視窗
         printWindow.onafterprint = () => {
-          printWindow.close();
-        };
-      };
+          printWindow.close()
+        }
+      }
     } catch (error) {
-      console.error('列印錯誤:', error);
-      alert('列印合約時發生錯誤，請稍後再試');
+      console.error('列印錯誤:', error)
+      alert('列印合約時發生錯誤，請稍後再試')
     } finally {
-      setPrinting(false);
+      setPrinting(false)
     }
-  };
+  }
 
   if (!tour.contract_content) {
     return (
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>無合約資料</DialogTitle>
           </DialogHeader>
-          <div className="py-4 text-morandi-secondary">
-            此旅遊團尚未儲存合約資料。
-          </div>
+          <div className="py-4 text-morandi-secondary">此旅遊團尚未儲存合約資料。</div>
         </DialogContent>
       </Dialog>
-    );
+    )
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -168,5 +167,5 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

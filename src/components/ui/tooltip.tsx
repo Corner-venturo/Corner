@@ -1,57 +1,57 @@
-'use client';
+'use client'
 
-import * as React from 'react';
+import * as React from 'react'
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
 
 interface TooltipContextValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
 const TooltipContext = React.createContext<TooltipContextValue>({
   open: false,
   setOpen: () => {},
-});
+})
 
 export function TooltipProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <>{children}</>
 }
 
 export function Tooltip({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
 
   return (
     <TooltipContext.Provider value={{ open, setOpen }}>
       <div className="relative inline-block">{children}</div>
     </TooltipContext.Provider>
-  );
+  )
 }
 
 export function TooltipTrigger({
   children,
-  asChild = false
+  asChild = false,
 }: {
-  children: React.ReactNode;
-  asChild?: boolean;
+  children: React.ReactNode
+  asChild?: boolean
 }) {
-  const { setOpen } = React.useContext(TooltipContext);
+  const { setOpen } = React.useContext(TooltipContext)
 
-  const handleMouseEnter = () => setOpen(true);
-  const handleMouseLeave = () => setOpen(false);
+  const handleMouseEnter = () => setOpen(true)
+  const handleMouseLeave = () => setOpen(false)
 
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
-    });
+    })
   }
 
   return (
     <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {children}
     </div>
-  );
+  )
 }
 
 export function TooltipContent({
@@ -59,12 +59,12 @@ export function TooltipContent({
   className,
   ...props
 }: {
-  children: React.ReactNode;
-  className?: string;
+  children: React.ReactNode
+  className?: string
 }) {
-  const { open } = React.useContext(TooltipContext);
+  const { open } = React.useContext(TooltipContext)
 
-  if (!open) return null;
+  if (!open) return null
 
   return (
     <div
@@ -77,5 +77,5 @@ export function TooltipContent({
     >
       {children}
     </div>
-  );
+  )
 }

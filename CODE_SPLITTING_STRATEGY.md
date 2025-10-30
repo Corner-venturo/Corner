@@ -9,12 +9,12 @@
 
 ### 最大頁面 (需優化)
 
-| 頁面 | Size | First Load | 優先級 |
-|------|------|-----------|--------|
-| `/templates/[id]` | 299 kB | 583 kB | 🔴 HIGH |
-| `/workspace` | 161 kB | 512 kB | 🔴 HIGH |
-| `/calendar` | 83.3 kB | 434 kB | 🟡 MEDIUM |
-| `/tours` | 39.2 kB | 458 kB | 🟡 MEDIUM |
+| 頁面              | Size    | First Load | 優先級    |
+| ----------------- | ------- | ---------- | --------- |
+| `/templates/[id]` | 299 kB  | 583 kB     | 🔴 HIGH   |
+| `/workspace`      | 161 kB  | 512 kB     | 🔴 HIGH   |
+| `/calendar`       | 83.3 kB | 434 kB     | 🟡 MEDIUM |
+| `/tours`          | 39.2 kB | 458 kB     | 🟡 MEDIUM |
 
 ### Shared Chunks
 
@@ -39,25 +39,22 @@ First Load JS shared by all: 102 kB
 
 ```tsx
 // Before
-import { TourEditorCanvas } from '@/components/editor/TourEditorCanvas';
+import { TourEditorCanvas } from '@/components/editor/TourEditorCanvas'
 
 export default function TemplatePage() {
-  return <TourEditorCanvas />;
+  return <TourEditorCanvas />
 }
 
 // After
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
-const TourEditorCanvas = dynamic(
-  () => import('@/components/editor/TourEditorCanvas'),
-  {
-    loading: () => <EditorLoadingSkeleton />,
-    ssr: false, // Editor 不需要 SSR
-  }
-);
+const TourEditorCanvas = dynamic(() => import('@/components/editor/TourEditorCanvas'), {
+  loading: () => <EditorLoadingSkeleton />,
+  ssr: false, // Editor 不需要 SSR
+})
 
 export default function TemplatePage() {
-  return <TourEditorCanvas />;
+  return <TourEditorCanvas />
 }
 ```
 
@@ -73,29 +70,35 @@ export default function TemplatePage() {
 
 ```tsx
 // Before
-import { ChannelChat } from './ChannelChat';
-import { PersonalCanvas } from './PersonalCanvas';
-import { QuickTools } from './QuickTools';
+import { ChannelChat } from './ChannelChat'
+import { PersonalCanvas } from './PersonalCanvas'
+import { QuickTools } from './QuickTools'
 
 // After
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
 const ChannelChat = dynamic(() => import('./ChannelChat'), {
   loading: () => <ChatSkeleton />,
-});
+})
 
 const PersonalCanvas = dynamic(() => import('./PersonalCanvas'), {
   loading: () => <CanvasSkeleton />,
-});
+})
 
 const QuickTools = dynamic(() => import('./QuickTools'), {
   loading: () => <ToolsSkeleton />,
-});
+})
 
 // 只載入當前 active 的 tab
-{activeTab === 'chat' && <ChannelChat />}
-{activeTab === 'canvas' && <PersonalCanvas />}
-{activeTab === 'tools' && <QuickTools />}
+{
+  activeTab === 'chat' && <ChannelChat />
+}
+{
+  activeTab === 'canvas' && <PersonalCanvas />
+}
+{
+  activeTab === 'tools' && <QuickTools />
+}
 ```
 
 **預期改善**: 161 kB → ~80 kB (-50%)
@@ -110,10 +113,9 @@ const QuickTools = dynamic(() => import('./QuickTools'), {
 
 ```tsx
 // After
-const Calendar = dynamic(
-  () => import('@fullcalendar/react').then(mod => mod.Calendar),
-  { ssr: false }
-);
+const Calendar = dynamic(() => import('@fullcalendar/react').then(mod => mod.Calendar), {
+  ssr: false,
+})
 ```
 
 **預期改善**: 83.3 kB → ~15 kB (-82%)
@@ -129,17 +131,18 @@ Next.js 已自動 split routes，但可以優化共享代碼：
 **目標**: 減少 shared chunks 從 102 kB → 80 kB
 
 **方法**:
+
 1. 移除未使用的依賴
 2. Tree-shaking 優化
 3. 重型庫按需載入
 
 ```tsx
 // ❌ 錯誤：整個 lodash
-import _ from 'lodash';
+import _ from 'lodash'
 
 // ✅ 正確：只載入需要的
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
+import debounce from 'lodash/debounce'
+import throttle from 'lodash/throttle'
 ```
 
 ---
@@ -150,20 +153,19 @@ import throttle from 'lodash/throttle';
 
 ```tsx
 // Dialog 只在需要時載入
-const CreateTourDialog = dynamic(
-  () => import('@/components/tours/CreateTourDialog'),
-  { ssr: false }
-);
+const CreateTourDialog = dynamic(() => import('@/components/tours/CreateTourDialog'), {
+  ssr: false,
+})
 
 function ToursPage() {
-  const [showDialog, setShowDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false)
 
   return (
     <>
       <Button onClick={() => setShowDialog(true)}>新增旅遊</Button>
       {showDialog && <CreateTourDialog />}
     </>
-  );
+  )
 }
 ```
 
@@ -173,7 +175,7 @@ function ToursPage() {
 const Charts = dynamic(() => import('recharts'), {
   loading: () => <ChartSkeleton />,
   ssr: false,
-});
+})
 ```
 
 ---
@@ -223,11 +225,11 @@ export default {
             },
           },
         },
-      };
+      }
     }
-    return config;
+    return config
   },
-};
+}
 ```
 
 ---
@@ -241,6 +243,7 @@ export default {
 3. ✅ **calendar** - Dynamic FullCalendar
 
 **預期改善**:
+
 - templates: 299 kB → 50 kB
 - workspace: 161 kB → 80 kB
 - calendar: 83.3 kB → 15 kB
@@ -263,11 +266,11 @@ export default {
 
 ### 目標 (Phase 1 完成後)
 
-| 指標 | Current | Target | 改善 |
-|------|---------|--------|------|
-| 最大頁面 | 583 kB | < 250 kB | **-57%** |
+| 指標            | Current | Target   | 改善     |
+| --------------- | ------- | -------- | -------- |
+| 最大頁面        | 583 kB  | < 250 kB | **-57%** |
 | 平均 First Load | ~350 kB | < 250 kB | **-29%** |
-| Shared Chunks | 102 kB | < 80 kB | **-22%** |
+| Shared Chunks   | 102 kB  | < 80 kB  | **-22%** |
 
 ### 監控方式
 
@@ -331,14 +334,14 @@ import { debounce } from 'lodash-es';
 
 ```tsx
 // 1. 不要載入整個庫
-import _ from 'lodash'; // ❌
-import * as Icons from 'lucide-react'; // ❌
+import _ from 'lodash' // ❌
+import * as Icons from 'lucide-react' // ❌
 
 // 2. 不要總是 render heavy components
-<FullCalendar /> // 即使隱藏也載入
+;<FullCalendar /> // 即使隱藏也載入
 
 // 3. 不要同步載入大型組件
-import { TourEditor } from './TourEditor'; // 299 kB!
+import { TourEditor } from './TourEditor' // 299 kB!
 
 // 4. 不要過度 split
 // 每個組件都 dynamic() 會造成更多請求

@@ -1,68 +1,74 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Tour, Member } from '@/stores/types';
-import { useOrderStore, useMemberStore, usePaymentRequestStore } from '@/stores';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import { Bed, Users, AlertTriangle, Home } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react'
+import { Tour, Member } from '@/stores/types'
+import { useOrderStore, useMemberStore, usePaymentRequestStore } from '@/stores'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+import { Bed, Users, AlertTriangle, Home } from 'lucide-react'
 
 interface RoomAllocationProps {
-  tour: Tour;
+  tour: Tour
 }
 
 interface RoomOption {
-  value: string;
-  label: string;
-  room_type: string;
-  capacity: number;
-  currentCount: number;
+  value: string
+  label: string
+  room_type: string
+  capacity: number
+  currentCount: number
 }
 
 interface MemberWithRoom extends Member {
-  assignedRoom?: string;
+  assignedRoom?: string
 }
 
 export function RoomAllocation({ tour }: RoomAllocationProps) {
-  const { items: orders } = useOrderStore();
-  const { items: members } = useMemberStore();
-  const { items: paymentRequests } = usePaymentRequestStore();
-  const [roomOptions, setRoomOptions] = useState<RoomOption[]>([]);
-  const [membersWithRooms, setMembersWithRooms] = useState<MemberWithRoom[]>([]);
+  const { items: orders } = useOrderStore()
+  const { items: members } = useMemberStore()
+  const { items: paymentRequests } = usePaymentRequestStore()
+  const [roomOptions, setRoomOptions] = useState<RoomOption[]>([])
+  const [membersWithRooms, setMembersWithRooms] = useState<MemberWithRoom[]>([])
 
   // 獲取屬於這個旅遊團的所有訂單和團員
-  const tourOrders = orders.filter(order => order.tour_id === tour.id);
+  const tourOrders = orders.filter(order => order.tour_id === tour.id)
   const tourMembers = members.filter(member =>
     tourOrders.some(order => order.id === member.order_id)
-  );
+  )
 
   // 根據房型名稱推算容量
   const getRoomCapacity = useCallback((room_type: string): number => {
-    if (room_type.includes('單人')) return 1;
-    if (room_type.includes('雙人')) return 2;
-    if (room_type.includes('三人')) return 3;
-    if (room_type.includes('四人')) return 4;
-    return 2; // 預設雙人房
-  }, []);
+    if (room_type.includes('單人')) return 1
+    if (room_type.includes('雙人')) return 2
+    if (room_type.includes('三人')) return 3
+    if (room_type.includes('四人')) return 4
+    return 2 // 預設雙人房
+  }, [])
 
   // 從請款單解析房間配額，生成房間選項
   const generateRoomOptions = useCallback((): RoomOption[] => {
-    const tourPaymentRequests = paymentRequests.filter((request) => request.tour_id === tour.id);
-    const roomOptions: RoomOption[] = [];
+    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id)
+    const roomOptions: RoomOption[] = []
 
-    tourPaymentRequests.forEach((request) => {
-      request.items.forEach((item) => {
+    tourPaymentRequests.forEach(request => {
+      request.items.forEach(item => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
-          const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g);
+          const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g)
           if (roomMatches) {
             roomMatches.forEach((match: any) => {
-              const matchResult = match.match(/(\S+房)\s*[x×]\s*(\d+)/);
+              const matchResult = match.match(/(\S+房)\s*[x×]\s*(\d+)/)
               if (matchResult) {
-                const [, room_type, quantity] = matchResult;
+                const [, room_type, quantity] = matchResult
                 if (room_type && quantity) {
-                  const capacity = getRoomCapacity(room_type);
-                  const roomCount = parseInt(quantity);
+                  const capacity = getRoomCapacity(room_type)
+                  const roomCount = parseInt(quantity)
 
                   // 生成具體房間選項（如：雙人房-1、雙人房-2...）
                   for (let i = 1; i <= roomCount; i++) {
@@ -71,65 +77,63 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                       label: `${room_type}-${i}`,
                       room_type,
                       capacity,
-                      currentCount: 0
-                    });
+                      currentCount: 0,
+                    })
                   }
                 }
               }
-            });
+            })
           }
         }
-      });
-    });
+      })
+    })
 
-    return roomOptions;
-  }, [paymentRequests, tour.id, getRoomCapacity]);
+    return roomOptions
+  }, [paymentRequests, tour.id, getRoomCapacity])
 
   // 初始化資料
   useEffect(() => {
-    const rooms = generateRoomOptions();
-    setRoomOptions(rooms);
+    const rooms = generateRoomOptions()
+    setRoomOptions(rooms)
     // 保留 members 中原有的 assignedRoom 數據
-    setMembersWithRooms(tourMembers.map(member => ({ ...member } as MemberWithRoom)));
-  }, [tour.id, paymentRequests, tourMembers, generateRoomOptions]);
+    setMembersWithRooms(tourMembers.map(member => ({ ...member }) as MemberWithRoom))
+  }, [tour.id, paymentRequests, tourMembers, generateRoomOptions])
 
   // 分配房間
   const assignMemberToRoom = (member_id: string, roomValue: string) => {
     setMembersWithRooms(prev =>
       prev.map(member =>
-        member.id === member_id
-          ? { ...member, assignedRoom: roomValue || undefined }
-          : member
+        member.id === member_id ? { ...member, assignedRoom: roomValue || undefined } : member
       )
-    );
+    )
 
     // 更新房間使用情況
-    updateRoomCounts();
-  };
+    updateRoomCounts()
+  }
 
   // 更新房間使用人數
   const updateRoomCounts = () => {
     setRoomOptions(prev =>
       prev.map(room => ({
         ...room,
-        currentCount: membersWithRooms.filter(member => member.assignedRoom === room.value).length
+        currentCount: membersWithRooms.filter(member => member.assignedRoom === room.value).length,
       }))
-    );
-  };
+    )
+  }
 
   // 統計資料
-  const totalRooms = roomOptions.length;
-  const assignedCount = membersWithRooms.filter(member => member.assignedRoom).length;
-  const unassignedCount = membersWithRooms.length - assignedCount;
-  const totalCapacity = roomOptions.reduce((sum, room) => sum + room.capacity, 0);
+  const totalRooms = roomOptions.length
+  const assignedCount = membersWithRooms.filter(member => member.assignedRoom).length
+  const unassignedCount = membersWithRooms.length - assignedCount
+  const totalCapacity = roomOptions.reduce((sum, room) => sum + room.capacity, 0)
 
   // 檢查房間是否已滿
   const isRoomFull = (roomValue: string) => {
-    const room = roomOptions.find(r => r.value === roomValue);
-    if (!room) return false;
-    const currentOccupancy = membersWithRooms.filter(m => m.assignedRoom === roomValue).length;
-    return currentOccupancy >= room.capacity;
-  };
+    const room = roomOptions.find(r => r.value === roomValue)
+    if (!room) return false
+    const currentOccupancy = membersWithRooms.filter(m => m.assignedRoom === roomValue).length
+    return currentOccupancy >= room.capacity
+  }
 
   return (
     <div className="space-y-6">
@@ -166,24 +170,34 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
           <table className="w-full text-sm border-collapse">
             <thead className="bg-morandi-container/30">
               <tr>
-                <th className="w-[40px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">序號</th>
-                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">姓名</th>
-                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">性別</th>
-                <th className="min-w-[60px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">年齡</th>
-                <th className="min-w-[120px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">分房</th>
-                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">狀態</th>
+                <th className="w-[40px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">
+                  序號
+                </th>
+                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">
+                  姓名
+                </th>
+                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">
+                  性別
+                </th>
+                <th className="min-w-[60px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">
+                  年齡
+                </th>
+                <th className="min-w-[120px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">
+                  分房
+                </th>
+                <th className="min-w-[80px] py-2.5 px-4 text-left text-xs font-medium text-morandi-secondary border border-morandi-gold/20">
+                  狀態
+                </th>
               </tr>
             </thead>
             <tbody>
               {membersWithRooms.map((member, index) => {
-                const assignedRoom = member.assignedRoom;
-                const roomIsFull = assignedRoom && isRoomFull(assignedRoom);
+                const assignedRoom = member.assignedRoom
+                const roomIsFull = assignedRoom && isRoomFull(assignedRoom)
 
                 return (
                   <tr key={member.id} className="hover:bg-morandi-container/10">
-                    <td className="py-3 px-4 text-center border border-gray-300">
-                      {index + 1}
-                    </td>
+                    <td className="py-3 px-4 text-center border border-gray-300">{index + 1}</td>
                     <td className="py-3 px-4 font-medium text-morandi-primary border border-gray-300">
                       {member.name}
                     </td>
@@ -196,7 +210,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                     <td className="py-3 px-4 border border-gray-300">
                       <Select
                         value={member.assignedRoom || ''}
-                        onValueChange={(value) => assignMemberToRoom(member.id, value)}
+                        onValueChange={value => assignMemberToRoom(member.id, value)}
                       >
                         <SelectTrigger className="w-full h-8">
                           <SelectValue placeholder="選擇房間" />
@@ -204,35 +218,33 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                         <SelectContent>
                           <SelectItem value="">未分配</SelectItem>
                           {roomOptions.map(room => {
-                            const isFull = isRoomFull(room.value);
-                            const isCurrentRoom = member.assignedRoom === room.value;
+                            const isFull = isRoomFull(room.value)
+                            const isCurrentRoom = member.assignedRoom === room.value
 
                             return (
                               <SelectItem
                                 key={room.value}
                                 value={room.value}
                                 disabled={isFull && !isCurrentRoom}
-                                className={cn(
-                                  isFull && !isCurrentRoom && "text-gray-400"
-                                )}
+                                className={cn(isFull && !isCurrentRoom && 'text-gray-400')}
                               >
                                 {room.label} ({room.currentCount}/{room.capacity})
-                                {isFull && !isCurrentRoom && " - 已滿"}
+                                {isFull && !isCurrentRoom && ' - 已滿'}
                               </SelectItem>
-                            );
+                            )
                           })}
                         </SelectContent>
                       </Select>
                     </td>
                     <td className="py-3 px-4 border border-gray-300">
                       {assignedRoom ? (
-                        <span className={cn(
-                          "inline-flex items-center px-2 py-1 rounded text-xs font-medium",
-                          roomIsFull
-                            ? "bg-morandi-red text-white"
-                            : "bg-morandi-green text-white"
-                        )}>
-                          {roomIsFull ? "已滿房" : "已分房"}
+                        <span
+                          className={cn(
+                            'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
+                            roomIsFull ? 'bg-morandi-red text-white' : 'bg-morandi-green text-white'
+                          )}
+                        >
+                          {roomIsFull ? '已滿房' : '已分房'}
                         </span>
                       ) : (
                         <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-morandi-container text-morandi-secondary">
@@ -241,7 +253,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                       )}
                     </td>
                   </tr>
-                );
+                )
               })}
 
               {membersWithRooms.length === 0 && (
@@ -263,22 +275,27 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
           <h3 className="text-lg font-semibold text-morandi-primary mb-4">房間使用狀況</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {roomOptions.map(room => {
-              const occupants = membersWithRooms.filter(m => m.assignedRoom === room.value);
-              const isFull = occupants.length >= room.capacity;
+              const occupants = membersWithRooms.filter(m => m.assignedRoom === room.value)
+              const isFull = occupants.length >= room.capacity
 
               return (
-                <div key={room.value} className={cn(
-                  "bg-card border rounded-lg p-4",
-                  isFull ? "border-morandi-red" : "border-border"
-                )}>
+                <div
+                  key={room.value}
+                  className={cn(
+                    'bg-card border rounded-lg p-4',
+                    isFull ? 'border-morandi-red' : 'border-border'
+                  )}
+                >
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-morandi-primary">{room.label}</h4>
-                    <span className={cn(
-                      "text-xs px-2 py-1 rounded",
-                      isFull
-                        ? "bg-morandi-red text-white"
-                        : "bg-morandi-container text-morandi-secondary"
-                    )}>
+                    <span
+                      className={cn(
+                        'text-xs px-2 py-1 rounded',
+                        isFull
+                          ? 'bg-morandi-red text-white'
+                          : 'bg-morandi-container text-morandi-secondary'
+                      )}
+                    >
                       {occupants.length}/{room.capacity}
                     </span>
                   </div>
@@ -295,7 +312,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                     )}
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -309,5 +326,5 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

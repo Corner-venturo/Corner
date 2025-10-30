@@ -179,7 +179,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   loading: false,
   error: null,
 
-  setCurrentUserId: (user_id) => {
+  setCurrentUserId: user_id => {
     set({ currentUserId: user_id })
   },
 
@@ -192,7 +192,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     try {
       const boxes = await VenturoAPI.read<BaseBox>('timebox_boxes', {
         filters: { user_id: currentUserId },
-        orderBy: { column: 'created_at', ascending: false }
+        orderBy: { column: 'created_at', ascending: false },
       })
       set({ boxes, loading: false })
     } catch (error) {
@@ -202,16 +202,16 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 建立箱子
-  createBox: async (boxData) => {
+  createBox: async boxData => {
     const { currentUserId } = get()
     if (!currentUserId) return
 
     try {
       const newBox = await VenturoAPI.create<BaseBox>('timebox_boxes', {
         ...boxData,
-        user_id: currentUserId
+        user_id: currentUserId,
       })
-      set((state) => ({ boxes: [newBox, ...state.boxes] }))
+      set(state => ({ boxes: [newBox, ...state.boxes] }))
     } catch (error) {
       logger.error('建立箱子失敗:', error)
       set({ error: '建立箱子失敗' })
@@ -222,8 +222,8 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   updateBox: async (id, updates) => {
     try {
       const updatedBox = await VenturoAPI.update<BaseBox>('timebox_boxes', id, updates)
-      set((state) => ({
-        boxes: state.boxes.map((box) => (box.id === id ? updatedBox : box))
+      set(state => ({
+        boxes: state.boxes.map(box => (box.id === id ? updatedBox : box)),
       }))
     } catch (error) {
       logger.error('更新箱子失敗:', error)
@@ -232,12 +232,12 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 刪除箱子
-  deleteBox: async (id) => {
+  deleteBox: async id => {
     try {
       await VenturoAPI.delete('timebox_boxes', id)
-      set((state) => ({
-        boxes: state.boxes.filter((box) => box.id !== id),
-        scheduledBoxes: state.scheduledBoxes.filter((sb) => sb.boxId !== id)
+      set(state => ({
+        boxes: state.boxes.filter(box => box.id !== id),
+        scheduledBoxes: state.scheduledBoxes.filter(sb => sb.boxId !== id),
       }))
     } catch (error) {
       logger.error('刪除箱子失敗:', error)
@@ -260,8 +260,8 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         filters: {
           user_id: currentUserId,
           weekStart: weekStart.toISOString().split('T')[0],
-          archived: false
-        }
+          archived: false,
+        },
       })
 
       if (weeks.length > 0) {
@@ -286,7 +286,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     try {
       const records = await VenturoAPI.read<WeekRecord>('timebox_weeks', {
         filters: { user_id: currentUserId, archived: true },
-        orderBy: { column: 'weekStart', ascending: false }
+        orderBy: { column: 'weekStart', ascending: false },
       })
       set({ weekRecords: records })
     } catch (error) {
@@ -296,7 +296,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 初始化當前週
-  initializeCurrentWeek: async (weekStart) => {
+  initializeCurrentWeek: async weekStart => {
     const { currentUserId } = get()
     if (!currentUserId) return
 
@@ -309,7 +309,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         archived: false,
         completionRate: 0,
         completedCount: 0,
-        totalCount: 0
+        totalCount: 0,
       })
 
       set({ currentWeek: newWeek, scheduledBoxes: [] })
@@ -320,13 +320,13 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 封存當前週
-  archiveCurrentWeek: async (name) => {
+  archiveCurrentWeek: async name => {
     const { currentWeek, scheduledBoxes } = get()
     if (!currentWeek) return
 
     try {
       // 計算統計資料
-      const completedCount = scheduledBoxes.filter((box) => box.completed).length
+      const completedCount = scheduledBoxes.filter(box => box.completed).length
       const totalCount = scheduledBoxes.length
       const completionRate = totalCount > 0 ? completedCount / totalCount : 0
 
@@ -335,7 +335,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
         archived: true,
         completionRate,
         completedCount,
-        totalCount
+        totalCount,
       })
 
       // 重新載入
@@ -348,11 +348,11 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 載入排程
-  loadScheduledBoxes: async (weekId) => {
+  loadScheduledBoxes: async weekId => {
     try {
       const schedules = await VenturoAPI.read<ScheduledBox>('timebox_schedules', {
         filters: { weekId },
-        orderBy: { column: 'dayOfWeek', ascending: true }
+        orderBy: { column: 'dayOfWeek', ascending: true },
       })
       set({ scheduledBoxes: schedules })
     } catch (error) {
@@ -362,17 +362,17 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 新增排程
-  addScheduledBox: async (boxData) => {
+  addScheduledBox: async boxData => {
     const { currentUserId } = get()
     if (!currentUserId) return
 
     try {
       const newSchedule = await VenturoAPI.create<ScheduledBox>('timebox_schedules', {
         ...boxData,
-        user_id: currentUserId
+        user_id: currentUserId,
       })
-      set((state) => ({
-        scheduledBoxes: [...state.scheduledBoxes, newSchedule]
+      set(state => ({
+        scheduledBoxes: [...state.scheduledBoxes, newSchedule],
       }))
     } catch (error) {
       logger.error('新增排程失敗:', error)
@@ -384,8 +384,8 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   updateScheduledBox: async (id, updates) => {
     try {
       const updated = await VenturoAPI.update<ScheduledBox>('timebox_schedules', id, updates)
-      set((state) => ({
-        scheduledBoxes: state.scheduledBoxes.map((box) => (box.id === id ? updated : box))
+      set(state => ({
+        scheduledBoxes: state.scheduledBoxes.map(box => (box.id === id ? updated : box)),
       }))
     } catch (error) {
       logger.error('更新排程失敗:', error)
@@ -394,11 +394,11 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 刪除排程
-  removeScheduledBox: async (id) => {
+  removeScheduledBox: async id => {
     try {
       await VenturoAPI.delete('timebox_schedules', id)
-      set((state) => ({
-        scheduledBoxes: state.scheduledBoxes.filter((box) => box.id !== id)
+      set(state => ({
+        scheduledBoxes: state.scheduledBoxes.filter(box => box.id !== id),
       }))
     } catch (error) {
       logger.error('刪除排程失敗:', error)
@@ -407,30 +407,32 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   },
 
   // 切換完成狀態
-  toggleBoxCompletion: async (id) => {
-    const box = get().scheduledBoxes.find((b) => b.id === id)
+  toggleBoxCompletion: async id => {
+    const box = get().scheduledBoxes.find(b => b.id === id)
     if (!box) return
 
     await get().updateScheduledBox(id, {
       completed: !box.completed,
-      completedAt: !box.completed ? new Date() : undefined
+      completedAt: !box.completed ? new Date() : undefined,
     })
   },
 
   // 切換組別完成
   toggleSetCompletion: async (boxId, setIndex) => {
-    const box = get().scheduledBoxes.find((b) => b.id === boxId)
+    const box = get().scheduledBoxes.find(b => b.id === boxId)
     if (!box) return
 
     const currentData = box.workoutData || {
       setsCompleted: [],
       completedSetsTime: [],
-      totalVolume: 0
+      totalVolume: 0,
     }
 
     const updated = { ...currentData }
     updated.setsCompleted[setIndex] = !updated.setsCompleted[setIndex]
-    updated.completedSetsTime[setIndex] = updated.setsCompleted[setIndex] ? new Date() : null as unknown
+    updated.completedSetsTime[setIndex] = updated.setsCompleted[setIndex]
+      ? new Date()
+      : (null as unknown)
 
     await get().updateScheduledBox(boxId, { workoutData: updated })
   },
@@ -438,7 +440,7 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
   // 統計
   getWeekStatistics: () => {
     const { scheduledBoxes, boxes } = get()
-    const completedBoxes = scheduledBoxes.filter((box) => box.completed)
+    const completedBoxes = scheduledBoxes.filter(box => box.completed)
     const totalBoxes = scheduledBoxes.length
 
     const completedByType = {
@@ -451,8 +453,8 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     let totalWorkoutVolume = 0
     let totalWorkoutSessions = 0
 
-    completedBoxes.forEach((box) => {
-      const baseBox = boxes.find((b) => b.id === box.boxId)
+    completedBoxes.forEach(box => {
+      const baseBox = boxes.find(b => b.id === box.boxId)
       if (baseBox) {
         completedByType[baseBox.type]++
 

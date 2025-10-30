@@ -10,15 +10,12 @@
 // import { useAutoSync } from '@/lib/offline/auto-sync-provider'
 import { _Badge } from '@/components/ui/badge'
 import { _Button } from '@/components/ui/button'
-import {
-  _AlertCircle
-} from 'lucide-react'
-import {
-} from '@/components/ui/tooltip'
+import { _AlertCircle } from 'lucide-react'
+import {} from '@/components/ui/tooltip'
 
 export function SyncIndicator() {
   // 待實作: 自動同步功能
-  return null;
+  return null
 
   /* const { syncStatus, isOnline, triggerSync } = useAutoSync()
 

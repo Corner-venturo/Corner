@@ -3,6 +3,7 @@
 ## 🚀 快速開始
 
 ### 1. 建立 Supabase 專案
+
 1. 前往 [Supabase](https://supabase.com)
 2. 建立新專案
 3. 記下以下資訊：
@@ -38,31 +39,31 @@ CREATE TABLE employees (
   chinese_name VARCHAR(100) NOT NULL,
   english_name VARCHAR(100) NOT NULL,
   password_hash TEXT NOT NULL,
-  
+
   -- 個人資訊 (JSONB 格式)
   personal_info JSONB DEFAULT '{}'::JSONB,
   job_info JSONB DEFAULT '{}'::JSONB,
   salary_info JSONB DEFAULT '{}'::JSONB,
-  
+
   -- 權限和狀態
   permissions TEXT[] DEFAULT ARRAY[]::TEXT[],
   status VARCHAR(20) DEFAULT 'active',
-  
+
   -- 出勤資訊
   attendance JSONB DEFAULT '{"leaveRecords": [], "overtimeRecords": []}'::JSONB,
-  
+
   -- 合約資訊
   contracts JSONB DEFAULT '[]'::JSONB,
-  
+
   -- 其他
   avatar TEXT,
-  
+
   -- 時間戳記
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   last_login_at TIMESTAMPTZ,
   deleted_at TIMESTAMPTZ,
-  
+
   -- 索引
   CONSTRAINT valid_status CHECK (status IN ('active', 'probation', 'leave', 'terminated'))
 );
@@ -178,11 +179,11 @@ async function hybridLogin(email: string, password: string) {
         .select('*')
         .eq('employee_number', email)
         .single()
-      
+
       if (data) {
         // 驗證密碼
         const isValid = await bcrypt.compare(password, data.password_hash)
-        
+
         if (isValid) {
           // 同步到本地
           await localDB.put('employees', data)
@@ -206,23 +207,28 @@ async function hybridLogin(email: string, password: string) {
 ## 📊 資料同步策略
 
 ### 線上 → 離線
+
 ```typescript
 // 背景同步
-setInterval(async () => {
-  if (navigator.onLine) {
-    const { data } = await supabase
-      .from('employees')
-      .select('*')
-      .order('updated_at', { ascending: false })
-    
-    for (const emp of data || []) {
-      await localDB.put('employees', emp)
+setInterval(
+  async () => {
+    if (navigator.onLine) {
+      const { data } = await supabase
+        .from('employees')
+        .select('*')
+        .order('updated_at', { ascending: false })
+
+      for (const emp of data || []) {
+        await localDB.put('employees', emp)
+      }
     }
-  }
-}, 5 * 60 * 1000) // 每 5 分鐘
+  },
+  5 * 60 * 1000
+) // 每 5 分鐘
 ```
 
 ### 離線 → 線上
+
 ```typescript
 // 操作隊列
 const syncQueue = []

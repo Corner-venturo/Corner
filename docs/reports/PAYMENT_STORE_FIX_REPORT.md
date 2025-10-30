@@ -1,6 +1,7 @@
 # Payment Store 實作完成報告
 
 ## 執行時間
+
 2025-10-25
 
 ## 修復內容
@@ -8,14 +9,16 @@
 ### ✅ 1. Payment Store 架構實作
 
 **新增檔案：**
+
 - `src/stores/index.ts` - 新增 `usePaymentStore` (line 148)
 
 **Store 架構：**
+
 ```typescript
-export const usePaymentStore = createStore<Payment>('payments');
-export const usePaymentRequestStore = createStore<PaymentRequest>('payment_requests', 'PR');
-export const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursement_orders', 'DO');
-export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 'RO');
+export const usePaymentStore = createStore<Payment>('payments')
+export const usePaymentRequestStore = createStore<PaymentRequest>('payment_requests', 'PR')
+export const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursement_orders', 'DO')
+export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 'RO')
 ```
 
 ### ✅ 2. 更新的檔案 (6個)
@@ -50,11 +53,13 @@ export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 
 ### ✅ 3. 類型標準化
 
 **Payment Type 映射：**
+
 - `'收款'` → `'receipt'`
 - `'請款'` → `'request'`
 - `'出納'` → `'disbursement'`
 
 **Payment Status 映射：**
+
 - `'待確認'` → `'pending'`
 - `'已確認'` → `'confirmed'`
 - `'已完成'` → `'completed'`
@@ -62,6 +67,7 @@ export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 
 ## 測試結果
 
 ### ✅ Build Test
+
 ```
 npm run build
 ✓ Compiled successfully in 14.8s
@@ -70,12 +76,14 @@ npm run build
 ```
 
 ### ✅ Lint Test
+
 ```
 npx next lint
 ✔ No ESLint warnings or errors
 ```
 
 ### ✅ 檔案檢查
+
 ```bash
 # Modified files
 M src/app/finance/page.tsx
@@ -92,11 +100,13 @@ M src/stores/index.ts
 ### ⏸️ 延後項目: user-store 遷移
 
 **原因：**
+
 - 影響 11 個檔案
 - 需要完整的整合測試
 - 使用舊的 `create-store.ts` 架構
 
 **受影響檔案：**
+
 1. src/components/hr/tabs/permissions-tab.tsx
 2. src/components/hr/add-employee-form.tsx
 3. src/components/todos/todo-expanded-view.tsx

@@ -1,14 +1,14 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Trash2 } from 'lucide-react';
-import { EmployeeFormData } from './types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Plus, Trash2 } from 'lucide-react'
+import { EmployeeFormData } from './types'
 
 interface ContactFieldsProps {
-  formData: EmployeeFormData;
-  setFormData: (data: EmployeeFormData) => void;
+  formData: EmployeeFormData
+  setFormData: (data: EmployeeFormData) => void
 }
 
 export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
@@ -26,9 +26,9 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
                 ...formData,
                 personal_info: {
                   ...formData.personal_info,
-                  phone: [...formData.personal_info.phone, '']
-                }
-              });
+                  phone: [...formData.personal_info.phone, ''],
+                },
+              })
             }}
             className="h-6 text-xs"
           >
@@ -41,13 +41,13 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
             <div key={index} className="flex gap-2">
               <Input
                 value={phone}
-                onChange={(e) => {
-                  const phones = [...formData.personal_info.phone];
-                  phones[index] = e.target.value;
+                onChange={e => {
+                  const phones = [...formData.personal_info.phone]
+                  phones[index] = e.target.value
                   setFormData({
                     ...formData,
-                    personal_info: { ...formData.personal_info, phone: phones }
-                  });
+                    personal_info: { ...formData.personal_info, phone: phones },
+                  })
                 }}
                 placeholder={`電話 ${index + 1}`}
               />
@@ -57,11 +57,11 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    const phones = formData.personal_info.phone.filter((_, i) => i !== index);
+                    const phones = formData.personal_info.phone.filter((_, i) => i !== index)
                     setFormData({
                       ...formData,
-                      personal_info: { ...formData.personal_info, phone: phones }
-                    });
+                      personal_info: { ...formData.personal_info, phone: phones },
+                    })
                   }}
                   className="text-red-500 hover:text-red-700"
                 >
@@ -78,12 +78,14 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
         <Input
           type="email"
           value={formData.personal_info.email}
-          onChange={(e) => setFormData({
-            ...formData,
-            personal_info: { ...formData.personal_info, email: e.target.value }
-          })}
+          onChange={e =>
+            setFormData({
+              ...formData,
+              personal_info: { ...formData.personal_info, email: e.target.value },
+            })
+          }
         />
       </div>
     </>
-  );
+  )
 }
