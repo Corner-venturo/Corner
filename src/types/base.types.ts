@@ -15,8 +15,8 @@ export interface BaseEntity {
   id: string;
   created_at: string;  // ISO 8601 格式
   updated_at: string;  // ISO 8601 格式
-  created_by?: string;
-  updated_by?: string;
+  created_by?: string | null;
+  updated_by?: string | null;
 }
 
 /**

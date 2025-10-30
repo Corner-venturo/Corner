@@ -29,7 +29,7 @@ export function ChannelView({ channel }: ChannelViewProps) {
   // ✅ 從 auth-store 讀取當前登入者資訊
   const { user } = useAuthStore();
   const currentUserId = user?.id || '';
-  const currentUserName = user?.display_name || '未知使用者';
+  const currentUserName = user?.display_name || user?.chinese_name || user?.english_name || user?.name || user?.email || '未知使用者';
 
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);

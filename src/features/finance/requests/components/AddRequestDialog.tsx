@@ -27,12 +27,17 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     setTourSearchValue,
     orderSearchValue,
     setOrderSearchValue,
+    supplierSearchValue,
+    setSupplierSearchValue,
     showTourDropdown,
     setShowTourDropdown,
     showOrderDropdown,
     setShowOrderDropdown,
+    showSupplierDropdown,
+    setShowSupplierDropdown,
     filteredTours,
     filteredOrders,
+    filteredSuppliers,
     total_amount,
     addItemToList,
     removeItem,
@@ -79,7 +84,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
         <div className="space-y-6">
           {/* Basic Info */}
-          <div className="border border-border rounded-lg p-4">
+          <div className="border border-border rounded-md p-4">
             <h3 className="text-sm font-medium text-morandi-primary mb-4">基本資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TourSearchSelect
@@ -144,7 +149,11 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
             newItem={newItem}
             setNewItem={setNewItem}
             onAddItem={addItemToList}
-            suppliers={suppliers}
+            suppliers={filteredSuppliers}
+            supplierSearchValue={supplierSearchValue}
+            setSupplierSearchValue={setSupplierSearchValue}
+            showSupplierDropdown={showSupplierDropdown}
+            setShowSupplierDropdown={setShowSupplierDropdown}
           />
 
           {/* Item List */}
@@ -161,7 +170,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
             <Button
               onClick={handleSubmit}
               disabled={!formData.tour_id || requestItems.length === 0}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md"
             >
               新增請款單 (共 {requestItems.length} 項，NT$ {total_amount.toLocaleString()})
             </Button>

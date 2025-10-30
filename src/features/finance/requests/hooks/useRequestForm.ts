@@ -1,13 +1,14 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTours } from '@/features/tours/hooks/useTours';
 import { useOrders } from '@/features/orders/hooks/useOrders';
-import { useSupplierStore } from '@/stores';
+import { useSupplierStore, useEmployeeStore } from '@/stores';
 import { RequestFormData, RequestItem, NewItemFormData } from '../types';
 
 export function useRequestForm() {
   const { tours } = useTours();
   const { orders } = useOrders();
   const { items: suppliers } = useSupplierStore();
+  const { items: employees } = useEmployeeStore();
 
   const [formData, setFormData] = useState<RequestFormData>({
     tour_id: '',
@@ -31,8 +32,10 @@ export function useRequestForm() {
   // Search states
   const [tourSearchValue, setTourSearchValue] = useState('');
   const [orderSearchValue, setOrderSearchValue] = useState('');
+  const [supplierSearchValue, setSupplierSearchValue] = useState('');
   const [showTourDropdown, setShowTourDropdown] = useState(false);
   const [showOrderDropdown, setShowOrderDropdown] = useState(false);
+  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
 
   // Filter tours by search
   const filteredTours = useMemo(() =>
@@ -72,18 +75,46 @@ export function useRequestForm() {
     requestItems.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0)
   , [requestItems]);
 
+  // Combine suppliers and employees into one list
+  const combinedSuppliers = useMemo(() => {
+    const supplierList = suppliers.map(s => ({
+      id: s.id,
+      name: s.name,
+      type: 'supplier' as const,
+      group: '供應商'
+    }));
+
+    const employeeList = employees.map(e => ({
+      id: e.id,
+      name: e.name,
+      type: 'employee' as const,
+      group: '員工'
+    }));
+
+    return [...supplierList, ...employeeList];
+  }, [suppliers, employees]);
+
+  // Filter suppliers by search
+  const filteredSuppliers = useMemo(() =>
+    combinedSuppliers.filter(supplier => {
+      const searchTerm = supplierSearchValue.toLowerCase();
+      if (!searchTerm) return true;
+      return supplier.name.toLowerCase().includes(searchTerm);
+    })
+  , [combinedSuppliers, supplierSearchValue]);
+
   // Add item to list
   const addItemToList = useCallback(() => {
     if (!newItem.supplier_id || !newItem.description) return;
 
-    const selectedSupplier = suppliers.find(s => s.id === newItem.supplier_id);
-    if (!selectedSupplier) return;
+    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id);
+    if (!selected) return;
 
     const itemId = Math.random().toString(36).substr(2, 9);
     setRequestItems(prev => [...prev, {
       id: itemId,
       ...newItem,
-      supplierName: selectedSupplier.name,
+      supplierName: selected.name,
     }]);
 
     setNewItem({
@@ -93,7 +124,8 @@ export function useRequestForm() {
       unit_price: 0,
       quantity: 1
     });
-  }, [newItem, suppliers]);
+    setSupplierSearchValue('');
+  }, [newItem, combinedSuppliers]);
 
   // Remove item from list
   const removeItem = useCallback((itemId: string) => {
@@ -120,8 +152,10 @@ export function useRequestForm() {
     });
     setTourSearchValue('');
     setOrderSearchValue('');
+    setSupplierSearchValue('');
     setShowTourDropdown(false);
     setShowOrderDropdown(false);
+    setShowSupplierDropdown(false);
   }, []);
 
   return {
@@ -135,17 +169,22 @@ export function useRequestForm() {
     setTourSearchValue,
     orderSearchValue,
     setOrderSearchValue,
+    supplierSearchValue,
+    setSupplierSearchValue,
     showTourDropdown,
     setShowTourDropdown,
     showOrderDropdown,
     setShowOrderDropdown,
+    showSupplierDropdown,
+    setShowSupplierDropdown,
     filteredTours,
     filteredOrders,
+    filteredSuppliers,
     total_amount,
     addItemToList,
     removeItem,
     resetForm,
-    suppliers,
+    suppliers: combinedSuppliers,
     tours,
     orders
   };

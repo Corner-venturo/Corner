@@ -121,7 +121,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             author_id: newMessage.author_id,
             content: newMessage.content,
             reactions: newMessage.reactions,
-            attachments: newMessage.attachments || [],
+            attachments: (newMessage.attachments || []) as unknown,
             created_at: newMessage.created_at
           });
 

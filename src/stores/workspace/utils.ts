@@ -64,5 +64,6 @@ export const ensureMessageAttachments = (attachments: unknown): MessageAttachmen
 
 export const normalizeMessage = (message: RawMessage): Message => ({
   ...message,
+  created_at: message.created_at || new Date().toISOString(),
   attachments: ensureMessageAttachments(message.attachments),
 });

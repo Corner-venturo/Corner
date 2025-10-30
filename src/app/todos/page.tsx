@@ -517,7 +517,7 @@ function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data) => void; onCance
           </option>
           {users && users.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.display_name} ({user.employee_number})
+              {user.display_name || user.chinese_name || user.english_name || user.name || user.email || '未命名'} ({user.employee_number})
             </option>
           ))}
         </select>

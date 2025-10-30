@@ -12,10 +12,11 @@ export function useAutoCreateCompanyChannel() {
   const { currentWorkspace, channelGroups, channels, loadChannelGroups, loadChannels } = useWorkspaceStore();
   const { items: users } = useUserStore();
   const isProcessingRef = useRef(false);
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => {
-    // 防止並發執行
-    if (isProcessingRef.current || !currentWorkspace) {
+    // 防止並發執行和重複初始化
+    if (isProcessingRef.current || !currentWorkspace || hasInitializedRef.current) {
       return;
     }
 
@@ -103,6 +104,9 @@ export function useAutoCreateCompanyChannel() {
             console.warn('Failed to add all members to headquarters channel:', membersError);
           }
         }
+
+        // 標記已初始化
+        hasInitializedRef.current = true;
       } catch (error) {
         // 靜默失敗
         console.error('Failed to create company channel:', error);
@@ -112,5 +116,5 @@ export function useAutoCreateCompanyChannel() {
     };
 
     void createCompanyChannel();
-  }, [currentWorkspace?.id, channelGroups.length, channels.length]);
+  }, [currentWorkspace?.id]);
 }

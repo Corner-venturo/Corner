@@ -303,7 +303,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-2 px-3 py-2 bg-morandi-container rounded-lg">
                 <User className="h-4 w-4 text-morandi-secondary" />
                 <span className="text-sm font-medium text-morandi-primary">
-                  {user.display_name}
+                  {user.display_name || user.chinese_name || user.english_name || user.name || user.email || '使用者'}
                 </span>
               </div>
             )}

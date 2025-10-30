@@ -46,9 +46,13 @@ export interface ChannelGroup {
   id: string;
   workspace_id: string;
   name: string;
-  is_collapsed: boolean;
-  order: number;
-  created_at?: string;
+  is_collapsed: boolean | null;
+  order: number | null;
+  created_at: string | null;
+  updated_at?: string | null;
+  _deleted?: boolean | null;
+  _needs_sync?: boolean | null;
+  _synced_at?: string | null;
 }
 
 export interface MessageAttachment {
@@ -81,9 +85,15 @@ export interface Message {
     display_name: string;
     avatar?: string;
   };
+  _deleted?: boolean | null;
+  _needs_sync?: boolean | null;
+  _synced_at?: string | null;
 }
 
-export type RawMessage = Omit<Message, 'attachments'> & { attachments?: unknown };
+export type RawMessage = Omit<Message, 'attachments' | 'created_at'> & {
+  attachments?: unknown;
+  created_at: string | null;
+};
 
 export interface PersonalCanvas {
   id: string;
@@ -146,7 +156,7 @@ export interface SharedOrderList {
   channel_id: string;
   orders: Array<{
     id: string;
-    order_number: string;
+    order_number: string | null;
     contact_person: string;
     total_amount: number;
     paid_amount: number;

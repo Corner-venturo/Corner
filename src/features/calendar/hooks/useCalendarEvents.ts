@@ -111,10 +111,10 @@ export function useCalendarEvents() {
         // 優先檢查當前登入用戶，再檢查員工列表
         let creatorName = '未知使用者'
         if (user?.id === event.created_by) {
-          creatorName = user.display_name || user.name || user.email || '未知使用者'
+          creatorName = user.display_name || user.chinese_name || user.english_name || user.name || user.email || '未知使用者'
         } else {
           const creator = employees?.find(emp => emp.id === event.created_by)
-          creatorName = creator?.display_name || creator?.name || '未知使用者'
+          creatorName = creator?.display_name || creator?.chinese_name || creator?.english_name || creator?.name || '未知使用者'
         }
 
         // 🔥 修正 FullCalendar 的多日事件顯示問題

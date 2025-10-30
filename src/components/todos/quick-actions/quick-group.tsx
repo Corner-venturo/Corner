@@ -7,6 +7,7 @@ import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SmartDateInput } from '@/components/ui/smart-date-input';
+import { DestinationSelector } from '@/components/shared/destination-selector';
 import { useTourStore, useOrderStore } from '@/stores';
 
 interface QuickGroupProps {
@@ -20,7 +21,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
   const [newTour, setNewTour] = useState({
     name: '',
-    location: 'Tokyo',
+    countryCode: '',
+    cityCode: '',
+    customLocation: '',
     departure_date: '',
     return_date: '',
     price: 0,
@@ -43,11 +46,28 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       return;
     }
 
+    if (!newTour.countryCode) {
+      alert('請選擇國家/地區');
+      return;
+    }
+
+    if (newTour.countryCode !== '__custom__' && !newTour.cityCode) {
+      alert('請選擇城市');
+      return;
+    }
+
+    if (newTour.countryCode === '__custom__' && !newTour.customLocation) {
+      alert('請輸入自訂目的地');
+      return;
+    }
+
     setSubmitting(true);
     try {
       const tourData: any = {
         name: newTour.name,
-        location: newTour.location,
+        country_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.countryCode,
+        city_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.cityCode,
+        custom_location: newTour.countryCode === '__custom__' ? newTour.customLocation : null,
         departure_date: newTour.departure_date,
         return_date: newTour.return_date,
         price: newTour.price,
@@ -84,7 +104,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       // 重置表單
       setNewTour({
         name: '',
-        location: 'Tokyo',
+        countryCode: '',
+        cityCode: '',
+        customLocation: '',
         departure_date: '',
         return_date: '',
         price: 0,
@@ -125,24 +147,22 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           />
         </div>
 
-        <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-            目的地 <span className="text-morandi-red">*</span>
-          </label>
-          <select
-            value={newTour.location}
-            onChange={(e) => setNewTour(prev => ({ ...prev, location: e.target.value }))}
-            className="w-full p-2 border border-morandi-container/30 rounded-md bg-background text-sm"
-          >
-            <option value="Tokyo">Tokyo 東京</option>
-            <option value="Okinawa">Okinawa 沖繩</option>
-            <option value="Osaka">Osaka 大阪</option>
-            <option value="Kyoto">Kyoto 京都</option>
-            <option value="Hokkaido">Hokkaido 北海道</option>
-            <option value="Fukuoka">Fukuoka 福岡</option>
-            <option value="Other">其他</option>
-          </select>
-        </div>
+        <DestinationSelector
+          countryCode={newTour.countryCode}
+          cityCode={newTour.cityCode}
+          customLocation={newTour.customLocation}
+          onCountryChange={(countryCode, cities) => {
+            setNewTour(prev => ({
+              ...prev,
+              countryCode,
+              cityCode: countryCode === '__custom__' ? '__custom__' : cities[0]?.code || '',
+              customLocation: ''
+            }));
+          }}
+          onCityChange={(cityCode) => setNewTour(prev => ({ ...prev, cityCode }))}
+          onCustomLocationChange={(customLocation) => setNewTour(prev => ({ ...prev, customLocation }))}
+          showCustomFields={false}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
