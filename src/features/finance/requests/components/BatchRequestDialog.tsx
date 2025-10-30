@@ -11,7 +11,7 @@ import { useBatchRequestForm } from '../hooks/useBatchRequestForm';
 import { useRequestOperations } from '../hooks/useRequestOperations';
 import { RequestItem, NewItemFormData } from '../types';
 import { useState, useCallback, useMemo } from 'react';
-import { useSupplierStore } from '@/stores';
+import { useSupplierStore, useEmployeeStore } from '@/stores';
 
 interface BatchRequestDialogProps {
   open: boolean;
@@ -35,6 +35,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
   } = useBatchRequestForm();
 
   const { items: suppliers } = useSupplierStore();
+  const { items: employees } = useEmployeeStore();
   const { createBatchRequests } = useRequestOperations();
 
   // Local state for items (shared between single and batch)
@@ -47,6 +48,38 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
     quantity: 1
   });
 
+  // Supplier search states
+  const [supplierSearchValue, setSupplierSearchValue] = useState('');
+  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
+
+  // Combine suppliers and employees
+  const combinedSuppliers = useMemo(() => {
+    const supplierList = suppliers.map(s => ({
+      id: s.id,
+      name: s.name,
+      type: 'supplier' as const,
+      group: '供應商'
+    }));
+
+    const employeeList = employees.map(e => ({
+      id: e.id,
+      name: e.name,
+      type: 'employee' as const,
+      group: '員工'
+    }));
+
+    return [...supplierList, ...employeeList];
+  }, [suppliers, employees]);
+
+  // Filter suppliers by search
+  const filteredSuppliers = useMemo(() =>
+    combinedSuppliers.filter(supplier => {
+      const searchTerm = supplierSearchValue.toLowerCase();
+      if (!searchTerm) return true;
+      return supplier.name.toLowerCase().includes(searchTerm);
+    })
+  , [combinedSuppliers, supplierSearchValue]);
+
   // Calculate total amount
   const total_amount = useMemo(() =>
     requestItems.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0)
@@ -56,14 +89,14 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
   const addItemToList = useCallback(() => {
     if (!newItem.supplier_id || !newItem.description) return;
 
-    const selectedSupplier = suppliers.find(s => s.id === newItem.supplier_id);
-    if (!selectedSupplier) return;
+    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id);
+    if (!selected) return;
 
     const itemId = Math.random().toString(36).substr(2, 9);
     setRequestItems(prev => [...prev, {
       id: itemId,
       ...newItem,
-      supplierName: selectedSupplier.name,
+      supplierName: selected.name,
     }]);
 
     setNewItem({
@@ -73,7 +106,8 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
       unit_price: 0,
       quantity: 1
     });
-  }, [newItem, suppliers]);
+    setSupplierSearchValue('');
+  }, [newItem, combinedSuppliers]);
 
   // Remove item from list
   const removeItem = useCallback((itemId: string) => {
@@ -110,6 +144,8 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
       unit_price: 0,
       quantity: 1
     });
+    setSupplierSearchValue('');
+    setShowSupplierDropdown(false);
     onOpenChange(false);
   };
 
@@ -138,7 +174,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
           />
 
           {/* Basic Info */}
-          <div className="border border-border rounded-lg p-4">
+          <div className="border border-border rounded-md p-4">
             <h3 className="text-sm font-medium text-morandi-primary mb-4">基本資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <RequestDateInput
@@ -169,7 +205,11 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
             newItem={newItem}
             setNewItem={setNewItem}
             onAddItem={addItemToList}
-            suppliers={suppliers}
+            suppliers={filteredSuppliers}
+            supplierSearchValue={supplierSearchValue}
+            setSupplierSearchValue={setSupplierSearchValue}
+            showSupplierDropdown={showSupplierDropdown}
+            setShowSupplierDropdown={setShowSupplierDropdown}
           />
 
           {/* Item List */}
@@ -188,7 +228,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
             <Button
               onClick={handleSubmit}
               disabled={selectedTourIds.length === 0 || requestItems.length === 0}
-              className="bg-morandi-primary hover:bg-morandi-primary/90 text-white"
+              className="bg-morandi-primary hover:bg-morandi-primary/90 text-white rounded-md"
             >
               建立批次請款 ({selectedTourIds.length} 個團，共 {requestItems.length} 項，總計 NT$ {(total_amount * selectedTourIds.length).toLocaleString()})
             </Button>
