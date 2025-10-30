@@ -6,18 +6,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { useEnterSubmitWithShift } from '@/hooks/useEnterSubmit';
 import { MessageSquare, Edit2, X } from 'lucide-react';
 import { NotesSectionProps } from './types';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const [newNote, setNewNote] = useState('');
   const [editingNoteIndex, setEditingNoteIndex] = useState<number | null>(null);
   const [editingNoteContent, setEditingNoteContent] = useState('');
+  const { user } = useAuthStore();
 
   const addNote = () => {
-    if (!newNote.trim()) return;
+    if (!newNote.trim() || !user) return;
 
     const note = {
       timestamp: new Date().toISOString(),
-      content: newNote
+      content: newNote,
+      author_id: user.id,
+      author_name: user.display_name || user.chinese_name || user.english_name || user.name || user.email || '未知使用者'
     };
 
     // 如果目前狀態是「待辦」，自動切換到「進行中」
@@ -105,10 +109,15 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
                     <X size={12} />
                   </button>
                 </div>
-                <span className="text-xs text-morandi-muted font-medium">
-                  {new Date(note.timestamp).toLocaleString()}
-                </span>
-                <div className="text-xs text-morandi-primary mt-1.5 leading-relaxed whitespace-pre-wrap">{note.content}</div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-medium text-morandi-primary">
+                    {note.author_name || '未知使用者'}
+                  </span>
+                  <span className="text-xs text-morandi-muted">
+                    {new Date(note.timestamp).toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-xs text-morandi-primary leading-relaxed whitespace-pre-wrap mt-1">{note.content}</div>
               </>
             )}
           </div>

@@ -125,6 +125,8 @@ export interface Todo {
   notes: {
     timestamp: string;
     content: string;
+    author_id: string;        // 留言者 ID
+    author_name: string;      // 留言者名稱
   }[];
 
   // 快速功能設定
