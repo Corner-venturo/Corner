@@ -29,20 +29,23 @@ import { useChatStore } from '@/stores/workspace/chat-store';
  * ```
  */
 export function useChatRealtime(channelId: string | null | undefined) {
-  const subscribeToMessages = useChatStore(state => state.subscribeToMessages);
-  const unsubscribeFromMessages = useChatStore(state => state.unsubscribeFromMessages);
-
   useEffect(() => {
     if (!channelId) {
       return;
     }
+
+    console.log(`[useChatRealtime] 訂閱 channel: ${channelId}`);
+
+    // 直接從 store 取得函數（避免 dependency 問題）
+    const { subscribeToMessages, unsubscribeFromMessages } = useChatStore.getState();
 
     // 訂閱當前 channel 的 messages
     subscribeToMessages(channelId);
 
     // 清理函數：取消訂閱
     return () => {
+      console.log(`[useChatRealtime] 取消訂閱 channel: ${channelId}`);
       unsubscribeFromMessages();
     };
-  }, [channelId, subscribeToMessages, unsubscribeFromMessages]);
+  }, [channelId]); // ✅ 只依賴 channelId
 }

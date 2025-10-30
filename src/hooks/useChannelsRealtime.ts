@@ -28,20 +28,24 @@ import { useChannelsStore } from '@/stores/workspace/channels-store';
  */
 export function useChannelsRealtime() {
   const currentWorkspace = useChannelsStore(state => state.currentWorkspace);
-  const subscribeToChannels = useChannelsStore(state => state.subscribeToChannels);
-  const unsubscribeFromChannels = useChannelsStore(state => state.unsubscribeFromChannels);
 
   useEffect(() => {
     if (!currentWorkspace?.id) {
       return;
     }
 
+    console.log(`[useChannelsRealtime] 訂閱 workspace: ${currentWorkspace.id}`);
+
+    // 直接從 store 取得函數（避免 dependency 問題）
+    const { subscribeToChannels, unsubscribeFromChannels } = useChannelsStore.getState();
+
     // 訂閱當前 workspace 的 channels
     subscribeToChannels(currentWorkspace.id);
 
     // 清理函數：取消訂閱
     return () => {
+      console.log(`[useChannelsRealtime] 取消訂閱 workspace: ${currentWorkspace.id}`);
       unsubscribeFromChannels();
     };
-  }, [currentWorkspace?.id, subscribeToChannels, unsubscribeFromChannels]);
+  }, [currentWorkspace?.id]); // ✅ 只依賴 workspace ID
 }
