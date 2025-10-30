@@ -185,6 +185,8 @@ export const useChannelsStore = create<ChannelsState>((set, get) => ({
     const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
     set({ loading: true });
 
+    console.log(`[channels-store] Loading channels for workspace: ${currentWorkspaceId}`);
+
     try {
       if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
         // ✅ 直接從 Supabase 查詢（不延遲）
@@ -197,12 +199,14 @@ export const useChannelsStore = create<ChannelsState>((set, get) => ({
         if (error) throw error;
 
         const freshChannels = data || [];
+        console.log(`[channels-store] Loaded ${freshChannels.length} channels from Supabase`);
 
         // ✅ 同步到 IndexedDB（僅作為離線備份）
         for (const channel of freshChannels) {
           await localDB.put('channels', channel);
         }
 
+        // 🔥 直接設置（防重複邏輯在 Realtime onInsert 中）
         set({ channels: freshChannels, loading: false });
       } else {
         // 離線模式：從 IndexedDB 載入
