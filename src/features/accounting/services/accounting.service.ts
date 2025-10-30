@@ -10,10 +10,10 @@ class AccountingService extends BaseService<Account> {
   protected getStore = (): StoreOperations<Account> => {
     const store = useAccountingStore.getState();
     return {
-      getAll: () => store.accounts as unknown,
-      getById: (id: string) => store.accounts.find(a => a.id === id) as unknown,
+      getAll: () => store.accounts,
+      getById: (id: string) => store.accounts.find(a => a.id === id),
       add: async (account: Account) => {
-        await store.addAccount(account as unknown);
+        await store.addAccount(account);
         return account;
       },
       update: async (id: string, data: Partial<Account>) => {
@@ -117,7 +117,7 @@ class CategoryService extends BaseService<Category> {
       getAll: () => store.categories,
       getById: (id: string) => store.categories.find(c => c.id === id),
       add: async (category: Category) => {
-        await store.addCategory(category as unknown);
+        await store.addCategory(category);
         return category;
       },
       update: async (id: string, data: Partial<Category>) => {

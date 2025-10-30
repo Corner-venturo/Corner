@@ -98,7 +98,7 @@ export class BackgroundSyncService {
 
           // 上傳到 Supabase（會自動生成正式編號）
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: supabaseData, error } = await (supabase.from(tableName) as unknown)
+          const { data: supabaseData, error } = await supabase.from(tableName)
             .insert([itemData])
             .select()
             .single();
@@ -171,7 +171,7 @@ export class BackgroundSyncService {
 
           // 🔥 特殊處理：為 quotes 表補充必填欄位的預設值
           if (tableName === 'quotes') {
-            const quoteData = syncData as unknown;
+            const quoteData = syncData;
             // 如果缺少 customer_name，提供預設值
             if (!(quoteData as { customer_name?: string }).customer_name) {
               (quoteData as { customer_name: string }).customer_name = '待指定';
@@ -210,7 +210,7 @@ export class BackgroundSyncService {
           if (existing) {
             // 更新
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.from(tableName) as unknown)
+            const { error } = await supabase.from(tableName)
               .update(syncData)
               .eq('id', item.id);
 
@@ -219,7 +219,7 @@ export class BackgroundSyncService {
           } else {
             // 新增
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.from(tableName) as unknown)
+            const { error } = await supabase.from(tableName)
               .insert([syncData]);
 
             if (error) throw error;
