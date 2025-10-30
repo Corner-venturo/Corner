@@ -35,47 +35,13 @@ export async function fetchAll<T extends BaseEntity>(
         cachedItems = [];
       }
 
-      // 2. 檢查是否需要首次初始化下載
-      const initFlag = `${tableName}_initialized`;
-      const isInitialized = localStorage.getItem(initFlag);
+      // 2. ✅ 離線優先策略（無論首次或後續）
+      // 策略：
+      // - 有快取 → 立即返回，背景同步
+      // - 無快取 → 返回空陣列，背景下載（不阻擋 UI）
 
-      if (!isInitialized && cachedItems.length === 0) {
-        // 🔄 首次載入 + 本地為空 → 前景完整下載
-        logger.log(`🔄 [${tableName}] 首次初始化，從 Supabase 下載資料...`);
-
-        try {
-          const items = await supabase.fetchAll(controller?.signal);
-
-          // 批次存入 IndexedDB（靜默失敗，不阻擋 UI）
-          try {
-            await indexedDB.batchPut(items, 1000);
-          } catch (cacheError) {
-            logger.warn(`⚠️ [${tableName}] IndexedDB 快取失敗（不影響功能）`);
-          }
-
-          // 設置初始化標記
-          localStorage.setItem(initFlag, 'true');
-
-          logger.log(`✅ [${tableName}] 初始化完成:`, items.length, '筆');
-          return items;
-        } catch (initError) {
-          logger.warn(`⚠️ [${tableName}] Supabase 初始化失敗，繼續使用空資料`);
-          return [];
-        }
-      }
-
-      // 3. 已初始化或有快取資料 → 離線優先策略
-
-      // 🎯 策略：立即返回 IndexedDB 快取，同時啟動背景同步
-      // 好處：
-      // 1. UI 立即顯示（0.1秒）
-      // 2. 背景同步確保資料最新
-      // 3. Realtime 訂閱處理即時變更
-
-      logger.log(`✅ [${tableName}] 採用離線優先策略`);
-
-      // 如果有快取資料，立即返回
       if (cachedItems.length > 0) {
+        // 情境 A：有快取資料 → 立即返回
         logger.log(`💾 [${tableName}] 立即返回快取:`, cachedItems.length, '筆');
 
         // 背景同步（不阻擋 UI）
@@ -86,22 +52,46 @@ export async function fetchAll<T extends BaseEntity>(
         return cachedItems;
       }
 
-      // 沒有快取資料，需要等待 Supabase（首次載入後的情況）
-      logger.log(`☁️ [${tableName}] 無快取，從 Supabase 載入...`);
+      // 情境 B：無快取資料 → 顯示 loading，快速下載前 100 筆
+      logger.log(`🔄 [${tableName}] 無快取，快速載入前 100 筆...`);
 
       try {
-        await sync.uploadLocalChanges();
-        const remoteItems = await supabase.fetchAll(controller?.signal);
+        // ✅ 策略：先快速下載前 100 筆顯示（1 秒內）
+        const { data: initialItems, error: fetchError } = await supabase.supabase
+          .from(tableName)
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
 
-        if (remoteItems.length > 0) {
-          logger.log(`✅ [${tableName}] Supabase 載入成功:`, remoteItems.length, '筆');
-          await indexedDB.batchPut(remoteItems, 1000);
-          return remoteItems;
+        if (fetchError) throw fetchError;
+
+        const typedInitialItems = (initialItems || []) as T[];
+
+        if (typedInitialItems.length > 0) {
+          // 存入快取
+          await indexedDB.batchPut(typedInitialItems, 1000);
+          logger.log(`✅ [${tableName}] 快速載入完成:`, typedInitialItems.length, '筆');
+
+          // 🎯 背景下載剩餘資料（不阻擋 UI）
+          Promise.resolve().then(async () => {
+            try {
+              const allItems = await supabase.fetchAll();
+              if (allItems.length > typedInitialItems.length) {
+                await indexedDB.batchPut(allItems, 1000);
+                logger.log(`✅ [${tableName}] 背景下載完成:`, allItems.length, '筆（含前面的 ${typedInitialItems.length} 筆）');
+              }
+            } catch (err) {
+              logger.warn(`⚠️ [${tableName}] 背景下載失敗:`, err);
+            }
+          });
+
+          return typedInitialItems;
         }
 
+        // 沒有資料，返回空陣列
         return [];
-      } catch (syncError) {
-        logger.warn(`⚠️ [${tableName}] Supabase 載入失敗:`, syncError);
+      } catch (err) {
+        logger.warn(`⚠️ [${tableName}] 快速載入失敗:`, err);
         return [];
       }
     } else {
