@@ -188,10 +188,14 @@ export const useChannelsStore = create<ChannelsState>()(
           const cachedChannels = (await localDB.getAll('channels') as Channel[])
             .filter(ch => ch.workspace_id === currentWorkspaceId);
 
-          // 3. 智慧合併：優先使用 IndexedDB（更新）、其次 persist（離線備份）
+          // 3. 智慧合併 + 去重：優先使用 IndexedDB（更新）、其次 persist（離線備份）
+          const otherWorkspaceChannels = get().channels.filter(ch => ch.workspace_id !== currentWorkspaceId);
           const channelMap = new Map<string, Channel>();
 
-          // 先加入 persist 的資料（作為備份）
+          // 先加入其他 workspace 的頻道
+          otherWorkspaceChannels.forEach(ch => channelMap.set(ch.id, ch));
+
+          // 加入 persist 的資料（作為備份）
           existingChannels.forEach(ch => channelMap.set(ch.id, ch));
 
           // IndexedDB 的資料覆蓋 persist（更可靠）
@@ -237,7 +241,7 @@ export const useChannelsStore = create<ChannelsState>()(
                   await localDB.put('channels', channel);
                 }
 
-                // 🔥 智慧更新：只有真正變化時才更新 state
+                // 🔥 智慧更新 + 去重：確保不會有重複頻道
                 const currentChannels = get().channels.filter(ch => ch.workspace_id === currentWorkspaceId);
                 const hasChanges = freshChannels.length !== currentChannels.length ||
                   freshChannels.some(fresh =>
@@ -249,9 +253,19 @@ export const useChannelsStore = create<ChannelsState>()(
                   );
 
                 if (hasChanges) {
-                  // 保留其他 workspace 的頻道，只更新當前 workspace
+                  // 保留其他 workspace 的頻道
                   const otherWorkspaceChannels = get().channels.filter(ch => ch.workspace_id !== currentWorkspaceId);
-                  set({ channels: [...otherWorkspaceChannels, ...freshChannels] });
+
+                  // 🔥 使用 Map 去重：確保每個 ID 只出現一次
+                  const channelMap = new Map<string, Channel>();
+
+                  // 先加入其他 workspace 的頻道
+                  otherWorkspaceChannels.forEach(ch => channelMap.set(ch.id, ch));
+
+                  // Supabase 的資料覆蓋（作為權威來源）
+                  freshChannels.forEach(ch => channelMap.set(ch.id, ch));
+
+                  set({ channels: Array.from(channelMap.values()) });
                 }
               } catch (syncError) {
                               }
