@@ -10,6 +10,21 @@
 
 import { cacheStrategy } from '@/lib/cache/cache-strategy';
 
+// Chrome 專屬 API 型別擴展
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface ChromePerformance extends Performance {
+  memory?: PerformanceMemory;
+}
+
+interface ChromeWindow extends Window {
+  gc?: () => void;
+}
+
 interface MemoryStats {
   /** 使用的記憶體（MB） */
   usedMemory: number;
@@ -67,11 +82,11 @@ class MemoryManager {
    * 獲取記憶體統計資訊
    */
   getMemoryStats(): MemoryStats | null {
-    if (typeof window === 'undefined' || !(performance as any).memory) {
+    if (typeof window === 'undefined' || !(performance as ChromePerformance).memory) {
       return null;
     }
 
-    const memory = (performance as any).memory;
+    const memory = (performance as ChromePerformance).memory!;
     const usedMemory = memory.usedJSHeapSize / 1024 / 1024; // 轉換為 MB
     const totalMemory = memory.jsHeapSizeLimit / 1024 / 1024;
     const usagePercent = (usedMemory / totalMemory) * 100;
@@ -112,9 +127,9 @@ class MemoryManager {
     }
 
     // 觸發垃圾回收（如果瀏覽器支援）
-    if (typeof window !== 'undefined' && (window as any).gc) {
+    if (typeof window !== 'undefined' && (window as ChromeWindow).gc) {
       try {
-        (window as any).gc();
+        (window as ChromeWindow).gc!();
       } catch {
         // 忽略錯誤
       }

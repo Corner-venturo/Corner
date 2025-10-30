@@ -24,7 +24,7 @@ describe('accounting-selectors', () => {
         { id: 'acc-2', name: 'Bank', balance: 50000 },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) =>
         selector({ accounts: mockAccounts })
       );
 
@@ -38,7 +38,7 @@ describe('accounting-selectors', () => {
         { id: 'acc-1', name: 'Cash', balance: 10000 },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) =>
         selector({ accounts: mockAccounts })
       );
 
@@ -48,7 +48,7 @@ describe('accounting-selectors', () => {
     });
 
     it('should return 0 for empty accounts', () => {
-      (useAccountingStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) =>
         selector({ accounts: [] })
       );
 
@@ -71,7 +71,7 @@ describe('accounting-selectors', () => {
         { id: 't-3', category_id: 'cat-2', amount: 5000, date: '2025-10-22' },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) => {
         const state = {
           categories: mockCategories,
           transactions: mockTransactions,
@@ -96,7 +96,7 @@ describe('accounting-selectors', () => {
         { id: 't-3', category_id: 'cat-1', amount: 3000, date: '2025-10-30' },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) => {
         const state = {
           categories: mockCategories,
           transactions: mockTransactions,
@@ -118,7 +118,7 @@ describe('accounting-selectors', () => {
         { id: 'cat-2', name: 'Hotel', type: 'expense' },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) => {
         const state = {
           categories: mockCategories,
           transactions: [],
@@ -141,7 +141,7 @@ describe('accounting-selectors', () => {
         { id: 't-3', date: '2025-10-25', amount: 3000 },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) =>
         selector({ transactions: mockTransactions })
       );
 
@@ -157,7 +157,7 @@ describe('accounting-selectors', () => {
         { id: 't-1', date: '2025-10-15', amount: 1000 },
       ];
 
-      (useAccountingStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useAccountingStore).mockImplementation((selector: any) =>
         selector({ transactions: mockTransactions })
       );
 

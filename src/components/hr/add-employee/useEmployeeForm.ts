@@ -88,7 +88,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         status: 'active'
       };
 
-      addUser(dbEmployeeData as any);
+      addUser(dbEmployeeData);
 
       setCreatedEmployee({
         display_name: formData.display_name,

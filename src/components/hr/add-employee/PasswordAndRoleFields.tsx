@@ -9,8 +9,10 @@ interface PasswordAndRoleFieldsProps {
   setFormData: (data: EmployeeFormData) => void;
 }
 
+type EmployeeRole = 'user' | 'employee' | 'admin' | 'tour_leader' | 'sales' | 'accountant' | 'assistant';
+
 export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRoleFieldsProps) {
-  const toggleRole = (role: EmployeeFormData['roles'][number]) => {
+  const toggleRole = (role: EmployeeRole) => {
     if (formData.roles.includes(role)) {
       setFormData({ ...formData, roles: formData.roles.filter(r => r !== role) });
     } else {
@@ -41,7 +43,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
           附加身份標籤（可複選）
         </label>
         <div className="flex flex-wrap gap-4">
-          {[
+          {([
             { value: 'user', label: '普通使用者' },
             { value: 'employee', label: '員工' },
             { value: 'admin', label: '管理員' },
@@ -49,13 +51,13 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
             { value: 'sales', label: '業務' },
             { value: 'accountant', label: '會計' },
             { value: 'assistant', label: '助理' }
-          ].map(({ value, label }) => (
+          ] as const).map(({ value, label }) => (
             <label key={value} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 value={value}
-                checked={formData.roles.includes(value as any)}
-                onChange={() => toggleRole(value as any)}
+                checked={formData.roles.includes(value)}
+                onChange={() => toggleRole(value)}
                 className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold rounded"
               />
               <span className="text-sm text-morandi-primary">{label}</span>

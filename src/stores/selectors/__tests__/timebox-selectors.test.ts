@@ -9,7 +9,7 @@ import {
 
 // Mock the timebox store
 vi.mock('@/stores/timebox-store', () => ({
-  useTimeboxStore: vi.fn(),
+  useTimeboxStore: vi.fn() as ReturnType<typeof vi.fn>,
 }));
 
 describe('timebox-selectors', () => {
@@ -31,7 +31,7 @@ describe('timebox-selectors', () => {
         { id: 's-4', boxId: 'box-2', completed: true, duration: 60 },
       ];
 
-      (useTimeboxStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useTimeboxStore).mockImplementation((selector) => {
         const state = {
           boxes: mockBoxes,
           scheduledBoxes: mockScheduledBoxes,
@@ -49,7 +49,7 @@ describe('timebox-selectors', () => {
     });
 
     it('should handle empty boxes correctly', () => {
-      (useTimeboxStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useTimeboxStore).mockImplementation(selector => {
         const state = {
           boxes: [],
           scheduledBoxes: [],
@@ -74,7 +74,7 @@ describe('timebox-selectors', () => {
         { id: 's-2', boxId: 'non-existent', completed: true }, // Should be ignored in stats
       ];
 
-      (useTimeboxStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useTimeboxStore).mockImplementation((selector) => {
         const state = {
           boxes: mockBoxes,
           scheduledBoxes: mockScheduledBoxes,
@@ -106,7 +106,7 @@ describe('timebox-selectors', () => {
         completed: i % 2 === 0,
       }));
 
-      (useTimeboxStore as any).mockImplementation((selector: any) => {
+      vi.mocked(useTimeboxStore).mockImplementation((selector) => {
         const state = {
           boxes: mockBoxes,
           scheduledBoxes: mockScheduledBoxes,
@@ -130,7 +130,7 @@ describe('timebox-selectors', () => {
         { id: 's-3', boxId: 'box-3', scheduledDate: '2025-10-28T09:00' }, // Next week
       ];
 
-      (useTimeboxStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useTimeboxStore).mockImplementation(selector =>
         selector({ scheduledBoxes: mockScheduledBoxes })
       );
 
@@ -147,7 +147,7 @@ describe('timebox-selectors', () => {
         { id: 's-1', boxId: 'box-1', scheduledDate: '2025-10-20T09:00' },
       ];
 
-      (useTimeboxStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useTimeboxStore).mockImplementation(selector =>
         selector({ scheduledBoxes: mockScheduledBoxes })
       );
 
@@ -170,7 +170,7 @@ describe('timebox-selectors', () => {
         { id: 's-3', boxId: 'box-3', scheduledDate: `${today}T14:00` },
       ];
 
-      (useTimeboxStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useTimeboxStore).mockImplementation(selector =>
         selector({ scheduledBoxes: mockScheduledBoxes })
       );
 
@@ -190,7 +190,7 @@ describe('timebox-selectors', () => {
         { id: 's-1', boxId: 'box-1', scheduledDate: `${tomorrowStr}T09:00` },
       ];
 
-      (useTimeboxStore as any).mockImplementation((selector: any) =>
+      vi.mocked(useTimeboxStore).mockImplementation(selector =>
         selector({ scheduledBoxes: mockScheduledBoxes })
       );
 

@@ -43,7 +43,7 @@ export function PersonalInfoSection({ employee, isEditing, formData, setFormData
                 onChange={(e) => setFormData({ ...formData, chinese_name: e.target.value })}
               />
             ) : (
-              <p className="text-morandi-primary py-2">{(employee as any).chinese_name || '-'}</p>
+              <p className="text-morandi-primary py-2">{employee.chinese_name || '-'}</p>
             )}
           </div>
         </div>

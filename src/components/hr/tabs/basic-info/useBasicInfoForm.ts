@@ -8,7 +8,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
 
   const [formData, setFormData] = useState<BasicInfoFormData>({
     display_name: employee.display_name || '',
-    chinese_name: (employee as any).chinese_name || '',
+    chinese_name: employee.chinese_name || '',
     english_name: employee.english_name || '',
     personal_info: {
       national_id: employee.personal_info?.national_id || '',
@@ -59,7 +59,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
   const handleCancel = () => {
     setFormData({
       display_name: employee.display_name || '',
-      chinese_name: (employee as any).chinese_name || '',
+      chinese_name: employee.chinese_name || '',
       english_name: employee.english_name || '',
       personal_info: {
         national_id: employee.personal_info?.national_id || '',

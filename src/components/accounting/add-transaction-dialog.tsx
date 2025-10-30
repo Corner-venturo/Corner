@@ -13,9 +13,11 @@ interface AddTransactionDialogProps {
   onClose: () => void;
 }
 
+type TransactionType = 'income' | 'expense' | 'transfer';
+
 export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogProps) {
   const { accounts, categories, addTransaction } = useAccountingStore();
-  const [transactionType, setTransactionType] = useState<'income' | 'expense' | 'transfer'>('expense');
+  const [transactionType, setTransactionType] = useState<TransactionType>('expense');
   const [formData, setFormData] = useState({
     account_id: accounts.length > 0 ? accounts[0].id : '',
     category_id: '',
@@ -76,11 +78,17 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
     transactionType === 'transfer' ? category.type === 'transfer' : category.type === transactionType
   );
 
-  const transactionTypes = [
+  const transactionTypes: Array<{
+    id: TransactionType;
+    label: string;
+    icon: typeof ArrowUpRight;
+    color: string;
+    bgColor: string;
+  }> = [
     { id: 'income', label: '收入', icon: ArrowUpRight, color: 'text-morandi-green', bgColor: 'bg-morandi-green/10' },
     { id: 'expense', label: '支出', icon: ArrowDownRight, color: 'text-morandi-red', bgColor: 'bg-morandi-red/10' },
     { id: 'transfer', label: '轉帳', icon: ArrowRightLeft, color: 'text-morandi-blue', bgColor: 'bg-morandi-blue/10' },
-  ];
+  ] as const;
 
   const { handleKeyDown, compositionProps } = useEnterSubmit(handleSubmit);
 
@@ -110,7 +118,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
               <button
                 key={type.id}
                 type="button"
-                onClick={() => setTransactionType(type.id as any)}
+                onClick={() => setTransactionType(type.id)}
                 className={cn(
                   'p-3 rounded-lg border-2 transition-all flex flex-col items-center space-y-2',
                   isSelected

@@ -19,13 +19,15 @@ interface AddAccountDialogProps {
   onClose: () => void;
 }
 
-const accountTypes = [
+type AccountType = 'cash' | 'bank' | 'credit' | 'investment' | 'other';
+
+const accountTypes: Array<{ id: AccountType; label: string; icon: typeof Wallet; color: string; description: string }> = [
   { id: 'cash', label: '現金', icon: Wallet, color: '#10B981', description: '現金錢包、零錢' },
   { id: 'bank', label: '銀行帳戶', icon: Building2, color: '#3B82F6', description: '儲蓄帳戶、活期存款' },
   { id: 'credit', label: '信用卡', icon: CreditCard, color: '#EF4444', description: '信用卡、信貸額度' },
   { id: 'investment', label: '投資帳戶', icon: TrendingUp, color: '#8B5CF6', description: '股票、基金、投資' },
   { id: 'other', label: '其他帳戶', icon: PiggyBank, color: '#F59E0B', description: '數位錢包、其他資產' },
-];
+] as const;
 
 const predefinedColors = [
   '#10B981', // 綠色
@@ -42,7 +44,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
   const { addAccount } = useAccountingStore();
   const [formData, setFormData] = useState<{
     name: string;
-    type: 'cash' | 'bank' | 'credit' | 'investment' | 'other';
+    type: AccountType;
     balance: string;
     credit_limit: string;
     color: string;
@@ -125,7 +127,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                 type="button"
                 onClick={() => setFormData(prev => ({
                   ...prev,
-                  type: type.id as any,
+                  type: type.id,
                   color: type.color
                 }))}
                 className={cn(
