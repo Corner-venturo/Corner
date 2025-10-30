@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+
+export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 
