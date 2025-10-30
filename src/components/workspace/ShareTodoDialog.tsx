@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodoStore } from '@/stores';
 import { useUserStore } from '@/stores/user-store';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useAuthStore } from '@/stores/auth-store';
