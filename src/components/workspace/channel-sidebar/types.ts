@@ -11,6 +11,10 @@ export interface SortableChannelItemProps {
   onSelectChannel: (channel: Channel) => void;
   toggleChannelFavorite: (id: string) => void;
   onDelete?: (id: string) => void;
+  onEdit?: (id: string) => void;
+  isAdmin?: boolean;
+  isMember?: boolean;
+  onJoinChannel?: (channelId: string) => void;
 }
 
 export interface DroppableGroupHeaderProps {

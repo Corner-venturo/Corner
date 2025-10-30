@@ -201,7 +201,9 @@ export const useChannelsStore = create<ChannelsState>()(
           // IndexedDB 的資料覆蓋 persist（更可靠）
           cachedChannels.forEach(ch => channelMap.set(ch.id, ch));
 
-          const mergedChannels = Array.from(channelMap.values());
+          // 按創建時間排序（與 Supabase 查詢保持一致）
+          const mergedChannels = Array.from(channelMap.values())
+            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
           set({ channels: mergedChannels, loading: false });
 
@@ -504,9 +506,10 @@ export const useChannelsStore = create<ChannelsState>()(
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
         try {
-          // 1. 快速載入 IndexedDB 快取
+          // 1. 快速載入 IndexedDB 快取（並排序）
           const cachedGroups = (await localDB.getAll('channel_groups') as ChannelGroup[])
-            .filter(g => g.workspace_id === currentWorkspaceId);
+            .filter(g => g.workspace_id === currentWorkspaceId)
+            .sort((a, b) => (a.order || 0) - (b.order || 0)); // 按 order 排序
 
           set({ channelGroups: cachedGroups });
 

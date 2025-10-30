@@ -1,6 +1,6 @@
 'use client';
 
-import { Hash, Lock, Star, Trash2 } from 'lucide-react';
+import { Hash, Lock, Star, Trash2, UserPlus, Edit2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,11 @@ export function SortableChannelItem({
   isActive,
   onSelectChannel,
   toggleChannelFavorite,
-  onDelete
+  onDelete,
+  onEdit,
+  isAdmin = false,
+  isMember = true,
+  onJoinChannel
 }: SortableChannelItemProps) {
   const {
     attributes,
@@ -53,6 +57,33 @@ export function SortableChannelItem({
         <span className="flex-1 truncate">{channel.name}</span>
       </div>
       <div className="flex items-center gap-1" onPointerDown={(e) => e.stopPropagation()}>
+        {/* 管理員可加入旅遊團頻道 */}
+        {isTourChannel && isAdmin && !isMember && onJoinChannel && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onJoinChannel(channel.id);
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 text-morandi-gold transition-opacity"
+            title="加入頻道"
+          >
+            <UserPlus size={12} />
+          </button>
+        )}
+        {/* 編輯按鈕 */}
+        {onEdit && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(channel.id);
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 text-morandi-secondary transition-opacity"
+            title="編輯頻道"
+          >
+            <Edit2 size={12} />
+          </button>
+        )}
+        {/* 收藏按鈕 */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -65,6 +96,7 @@ export function SortableChannelItem({
         >
           <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
         </button>
+        {/* 刪除按鈕（非旅遊團頻道） */}
         {!isTourChannel && onDelete && (
           <button
             onClick={(e) => {

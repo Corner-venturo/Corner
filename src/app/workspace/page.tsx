@@ -7,6 +7,7 @@ import { useTourStore, useWorkspaceStore } from '@/stores';
 import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
 import { useAutoAddVisaMembers } from '@/hooks/use-auto-add-visa-members';
 import { useAutoCreateCompanyChannel } from '@/hooks/use-auto-create-company-channel';
+import { useAutoAddOrderMembers } from '@/hooks/use-auto-add-order-members';
 
 export default function WorkspacePage() {
   const { items: tours } = useTourStore();
@@ -20,6 +21,9 @@ export default function WorkspacePage() {
 
   // 自動將所有員工加入簽證頻道
   useAutoAddVisaMembers();
+
+  // 自動將訂單的業務和助理加入旅遊團頻道
+  useAutoAddOrderMembers();
 
   // 載入工作空間
   useEffect(() => {

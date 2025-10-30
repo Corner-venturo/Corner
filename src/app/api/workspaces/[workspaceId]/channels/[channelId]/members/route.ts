@@ -100,7 +100,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   try {
     const supabase = getSupabaseAdminClient();
 
-    // 準備批次插入的資料
+    // 準備批次插入的資料（使用 upsert 防止重複）
     const membersToInsert = employeeIds.map(employeeId => ({
       workspace_id: workspaceId,
       channel_id: channelId,
@@ -111,7 +111,10 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     const { data, error } = await supabase
       .from('channel_members')
-      .insert(membersToInsert)
+      .upsert(membersToInsert, {
+        onConflict: 'workspace_id,channel_id,employee_id',
+        ignoreDuplicates: false, // 返回所有成員（包括已存在的）
+      })
       .select();
 
     if (error) {

@@ -38,6 +38,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useAuthStore } from '@/stores/auth-store';
+import { addChannelMembers } from '@/services/workspace-members';
 import type { ChannelSidebarProps } from './types';
 import { SortableChannelItem } from './SortableChannelItem';
 import { DroppableGroupHeader } from './DroppableGroupHeader';
@@ -78,6 +79,10 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const [newChannelName, setNewChannelName] = useState('');
   const [newChannelDescription, setNewChannelDescription] = useState('');
   const [newChannelType, setNewChannelType] = useState<'public' | 'private'>('public');
+  const [showEditChannelDialog, setShowEditChannelDialog] = useState(false);
+  const [channelToEdit, setChannelToEdit] = useState<Channel | null>(null);
+  const [editChannelName, setEditChannelName] = useState('');
+  const [editChannelDescription, setEditChannelDescription] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -141,6 +146,45 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     if (channel) {
       setChannelToDelete(channel);
       setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const handleJoinChannel = async (channelId: string) => {
+    if (!user || !currentWorkspace) return;
+
+    try {
+      await addChannelMembers(currentWorkspace.id, channelId, [user.id], 'member');
+      // 重新載入頻道成員
+      await loadChannelMembers(currentWorkspace.id, channelId);
+    } catch (error) {
+      console.error('Failed to join channel:', error);
+    }
+  };
+
+  const handleEditClick = (channelId: string) => {
+    const channel = channels.find(ch => ch.id === channelId);
+    if (channel) {
+      setChannelToEdit(channel);
+      setEditChannelName(channel.name);
+      setEditChannelDescription(channel.description || '');
+      setShowEditChannelDialog(true);
+    }
+  };
+
+  const handleEditChannel = async () => {
+    if (!channelToEdit || !editChannelName.trim()) return;
+
+    try {
+      await updateChannel(channelToEdit.id, {
+        name: editChannelName.trim(),
+        description: editChannelDescription.trim() || undefined,
+      });
+      setShowEditChannelDialog(false);
+      setChannelToEdit(null);
+      setEditChannelName('');
+      setEditChannelDescription('');
+    } catch (error) {
+      console.error('Failed to update channel:', error);
     }
   };
 
@@ -216,6 +260,15 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     channels: filteredChannels.filter(ch => ch.group_id === group.id)
   }));
 
+  // 檢查當前用戶是否為管理員
+  const isAdmin = user?.permissions?.includes('admin') ?? false;
+
+  // 檢查當前用戶是否為頻道成員
+  const checkIsMember = (channelId: string): boolean => {
+    const members = channelMembers[channelId] || [];
+    return members.some(m => m.employeeId === user?.id);
+  };
+
   const renderChannelList = (channelList: Channel[]) => {
     return (
       <div className="space-y-0.5">
@@ -227,6 +280,10 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
             onSelectChannel={onSelectChannel}
             toggleChannelFavorite={toggleChannelFavorite}
             onDelete={handleDeleteClick}
+            onEdit={handleEditClick}
+            isAdmin={isAdmin}
+            isMember={checkIsMember(channel.id)}
+            onJoinChannel={handleJoinChannel}
           />
         ))}
       </div>
@@ -534,6 +591,61 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         }}
         onDelete={handleDeleteChannel}
       />
+
+      {/* 編輯頻道 Dialog */}
+      {showEditChannelDialog && channelToEdit && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[400px] shadow-xl">
+            <h3 className="text-lg font-semibold text-morandi-primary mb-4">編輯頻道</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-morandi-secondary mb-1">
+                  頻道名稱
+                </label>
+                <input
+                  type="text"
+                  value={editChannelName}
+                  onChange={(e) => setEditChannelName(e.target.value)}
+                  className="w-full px-3 py-2 border border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
+                  placeholder="輸入頻道名稱"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-morandi-secondary mb-1">
+                  描述（可選）
+                </label>
+                <textarea
+                  value={editChannelDescription}
+                  onChange={(e) => setEditChannelDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
+                  placeholder="輸入頻道描述"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={() => {
+                  setShowEditChannelDialog(false);
+                  setChannelToEdit(null);
+                  setEditChannelName('');
+                  setEditChannelDescription('');
+                }}
+                className="flex-1 px-4 py-2 border border-morandi-gold/30 rounded-lg text-morandi-secondary hover:bg-morandi-container/20 transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleEditChannel}
+                disabled={!editChannelName.trim()}
+                className="flex-1 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                儲存
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
