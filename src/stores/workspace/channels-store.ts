@@ -184,7 +184,12 @@ export const useChannelsStore = create<ChannelsState>()(
           const cachedChannels = (await localDB.getAll('channels') as Channel[])
             .filter(ch => ch.workspace_id === currentWorkspaceId);
 
-          set({ channels: cachedChannels, loading: false });
+          // 🔥 強制去重：使用 Map 確保 ID 唯一
+          const uniqueChannels = Array.from(
+            new Map(cachedChannels.map(ch => [ch.id, ch])).values()
+          );
+
+          set({ channels: uniqueChannels, loading: false });
 
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             setTimeout(async () => {
@@ -223,7 +228,12 @@ export const useChannelsStore = create<ChannelsState>()(
                   await localDB.put('channels', channel);
                 }
 
-                set({ channels: freshChannels });
+                // 🔥 強制去重：確保從 Supabase 來的也唯一
+                const uniqueFreshChannels = Array.from(
+                  new Map(freshChannels.map(ch => [ch.id, ch])).values()
+                );
+
+                set({ channels: uniqueFreshChannels });
               } catch (syncError) {
                               }
             }, 0);
@@ -284,9 +294,17 @@ export const useChannelsStore = create<ChannelsState>()(
                   }
 
         await localDB.put('channels', newChannel);
-        set(state => ({
-          channels: [...state.channels, newChannel]
-        }));
+
+        // 🔥 防止重複：檢查是否已存在
+        set(state => {
+          const exists = state.channels.some(ch => ch.id === newChannel.id);
+          if (exists) {
+            return state; // 已存在，不做任何改變
+          }
+          return {
+            channels: [...state.channels, newChannel]
+          };
+        });
 
         return newChannel;
       },
@@ -534,10 +552,9 @@ export const useChannelsStore = create<ChannelsState>()(
       partialize: (state) => ({
         workspaces: state.workspaces,
         currentWorkspace: state.currentWorkspace,
-        bulletins: state.bulletins,
-        channels: state.channels,
-        channelGroups: state.channelGroups,
         selectedChannel: state.selectedChannel
+        // ❌ 移除 channels, channelGroups, bulletins
+        // 這些應該只存在 IndexedDB，避免與 localStorage 雙重快取衝突
       })
     }
   )
