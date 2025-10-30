@@ -44,12 +44,12 @@ export function TodoCard({
     return 'text-gray-400'
   }
 
-  // 狀態標籤
+  // 狀態標籤 - 使用 Morandi 配色
   const statusConfig = {
-    pending: { label: '待辦', color: 'bg-gray-100 text-gray-600' },
-    in_progress: { label: '進行中', color: 'bg-blue-100 text-blue-600' },
-    completed: { label: '完成', color: 'bg-green-100 text-green-600' },
-    cancelled: { label: '取消', color: 'bg-red-100 text-red-600' },
+    pending: { label: '待辦', color: 'bg-morandi-container/30 text-morandi-secondary' },
+    in_progress: { label: '進行中', color: 'bg-morandi-gold/20 text-morandi-gold' },
+    completed: { label: '完成', color: 'bg-morandi-green/20 text-morandi-green' },
+    cancelled: { label: '取消', color: 'bg-morandi-red/20 text-morandi-red' },
   }
 
   const status = statusConfig[todo.status]
