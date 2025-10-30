@@ -72,7 +72,7 @@ export class LocalAuthService {
           const hashedPassword = await bcrypt.hash(password, 10);
           await localDB.update('employees', employee.id, {
             password_hash: hashedPassword
-          };
+          });
           isValidPassword = true;
         }
       }
@@ -100,7 +100,7 @@ export class LocalAuthService {
         lastLoginAt: new Date().toISOString(),
         loginAttempts: 0,
         lockedUntil: null
-      };
+      });
 
       // 6. 建立使用者物件
       const user: any = {
@@ -167,7 +167,7 @@ export class LocalAuthService {
       await localDB.update('employees', user_id, {
         password_hash: newPasswordHash,
         updated_at: new Date().toISOString()
-      };
+      });
 
       return { success: true };
 
@@ -196,7 +196,7 @@ export class LocalAuthService {
         loginAttempts: 0,
         lockedUntil: null,
         updated_at: new Date().toISOString()
-      };
+      });
 
       return { success: true };
 

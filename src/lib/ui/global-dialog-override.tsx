@@ -30,7 +30,7 @@ export function GlobalDialogOverride() {
       }
 
       // 移除 emoji 後作為 title（如果訊息很短）
-      const cleanMsg = msg.replace(/[\u2705\u274c\u26a0\ufe0f]/g, '').trim();
+      const cleanMsg = msg.replace(/[\u2705\u274c\u26a0]|\ufe0f/g, '').trim();
 
       // 調用我們的自訂 alert（異步但不等待，模擬原生行為）
       customAlert(cleanMsg, type);
