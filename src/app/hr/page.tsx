@@ -58,7 +58,7 @@ export default function HRPage() {
     const confirmed = await confirm({
       type: 'warning',
       title: '辦理離職',
-      message: `確定要將員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」辦理離職嗎？`,
+      message: `確定要將員工「${employee.display_name || employee.chinese_name || '未命名員工'}」辦理離職嗎？`,
       details: [
         '離職後將無法登入系統',
         '歷史記錄會被保留',
@@ -90,7 +90,7 @@ export default function HRPage() {
     const confirmed = await confirm({
       type: 'danger',
       title: '刪除員工',
-      message: `確定要刪除員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」嗎？`,
+      message: `確定要刪除員工「${employee.display_name || employee.chinese_name || '未命名員工'}」嗎？`,
       details: [
         '⚠️ 永久刪除員工所有資料',
         '⚠️ 移除所有歷史記錄',
@@ -130,7 +130,7 @@ export default function HRPage() {
       label: '姓名',
       sortable: true,
       render: (value, employee) => (
-        <span className="font-medium">{value || (employee as unknown).chinese_name || '未命名員工'}</span>
+        <span className="font-medium">{value || employee.chinese_name || '未命名員工'}</span>
       ),
     },
     {
