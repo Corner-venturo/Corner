@@ -6,9 +6,11 @@ import { cn } from '@/lib/utils';
 import { Calendar, Clock, FileText, X, UserCheck } from 'lucide-react';
 import { AssignmentSectionProps } from './types';
 import { useUserStore } from '@/stores/user-store';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
   const { items: employees, loadItems } = useUserStore();
+  const { user } = useAuthStore();
   const [assigneeName, setAssigneeName] = useState<string>('');
 
   // 載入員工資料
@@ -21,12 +23,17 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
   // 更新指派者名稱
   useEffect(() => {
     if (todo.assignee) {
-      const assignee = employees.find(e => e.id === todo.assignee);
-      setAssigneeName(assignee?.display_name || '未知員工');
+      // 優先檢查當前登入用戶，再檢查員工列表
+      if (user?.id === todo.assignee) {
+        setAssigneeName(user.display_name || user.name || user.email || '未知員工');
+      } else {
+        const assignee = employees.find(e => e.id === todo.assignee);
+        setAssigneeName(assignee?.display_name || assignee?.name || '未知員工');
+      }
     } else {
       setAssigneeName('');
     }
-  }, [todo.assignee, employees]);
+  }, [todo.assignee, employees, user]);
   const getDeadlineColor = () => {
     if (!todo.deadline) return 'text-morandi-secondary';
 

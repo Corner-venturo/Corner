@@ -108,8 +108,14 @@ export function useCalendarEvents() {
         const color = getEventColor('company')
 
         // 找出建立者姓名（用於詳細頁面）
-        const creator = employees?.find(emp => emp.id === event.created_by)
-        const creatorName = creator?.display_name || creator?.name || '未知使用者'
+        // 優先檢查當前登入用戶，再檢查員工列表
+        let creatorName = '未知使用者'
+        if (user?.id === event.created_by) {
+          creatorName = user.display_name || user.name || user.email || '未知使用者'
+        } else {
+          const creator = employees?.find(emp => emp.id === event.created_by)
+          creatorName = creator?.display_name || creator?.name || '未知使用者'
+        }
 
         // 🔥 修正 FullCalendar 的多日事件顯示問題
         // 如果有 end，則需要加一天才能正確顯示跨日事件（FullCalendar 的 end 是 exclusive）
