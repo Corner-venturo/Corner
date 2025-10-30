@@ -6,10 +6,14 @@ import { ChannelChat } from '@/components/workspace/ChannelChat';
 import { useTourStore, useWorkspaceStore } from '@/stores';
 import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
 import { useAutoAddVisaMembers } from '@/hooks/use-auto-add-visa-members';
+import { useAutoCreateCompanyChannel } from '@/hooks/use-auto-create-company-channel';
 
 export default function WorkspacePage() {
   const { items: tours } = useTourStore();
   const { loadWorkspaces, loadChannelGroups, currentWorkspace } = useWorkspaceStore();
+
+  // 自動創建公司公告群組和總部辦公室頻道
+  useAutoCreateCompanyChannel();
 
   // 自動建立旅遊團頻道
   useAutoCreateTourChannels();

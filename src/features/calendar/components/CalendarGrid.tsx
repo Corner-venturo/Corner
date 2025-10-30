@@ -8,7 +8,7 @@ import { EventClickArg } from '@fullcalendar/core'
 import { FullCalendarEvent } from '../types'
 
 interface CalendarGridProps {
-  calendarRef: RefObject<FullCalendar>
+  calendarRef: RefObject<FullCalendar | null>
   events: FullCalendarEvent[]
   onDateClick: (info: any) => void
   onEventClick: (info: EventClickArg) => void

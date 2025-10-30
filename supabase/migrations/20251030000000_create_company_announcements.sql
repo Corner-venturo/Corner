@@ -1,88 +1,83 @@
 -- 創建公司公告群組和頻道
+-- 注意：此 migration 會在第一個 workspace 中創建公告群組
 BEGIN;
 
--- 獲取第一個 workspace（通常是總部辦公室）
-DO $$
-DECLARE
-  v_workspace_id UUID;
-  v_group_id UUID;
-  v_channel_id UUID;
-BEGIN
-  -- 1. 獲取第一個 workspace ID
-  SELECT id INTO v_workspace_id
-  FROM public.workspaces
+-- 1. 創建「公司公告」群組（使用第一個 workspace）
+WITH first_workspace AS (
+  SELECT id FROM public.workspaces
   WHERE is_active = true
   ORDER BY created_at ASC
-  LIMIT 1;
-
-  IF v_workspace_id IS NULL THEN
-    RAISE EXCEPTION 'No active workspace found';
-  END IF;
-
-  RAISE NOTICE 'Using workspace ID: %', v_workspace_id;
-
-  -- 2. 創建「公司公告」群組（如果不存在）
+  LIMIT 1
+),
+new_group AS (
   INSERT INTO public.channel_groups (id, workspace_id, name, "order", is_collapsed, created_at, updated_at)
-  VALUES (
+  SELECT
     gen_random_uuid(),
-    v_workspace_id,
+    first_workspace.id,
     '📢 公司公告',
-    0,  -- 最高優先順序，置頂
+    0,
     false,
     NOW(),
     NOW()
+  FROM first_workspace
+  WHERE NOT EXISTS (
+    SELECT 1 FROM public.channel_groups cg, first_workspace fw
+    WHERE cg.workspace_id = fw.id AND cg.name = '📢 公司公告'
   )
-  ON CONFLICT (workspace_id, name) DO NOTHING
-  RETURNING id INTO v_group_id;
-
-  -- 如果群組已存在，獲取其 ID
-  IF v_group_id IS NULL THEN
-    SELECT id INTO v_group_id
-    FROM public.channel_groups
-    WHERE workspace_id = v_workspace_id AND name = '📢 公司公告'
-    LIMIT 1;
-  END IF;
-
-  RAISE NOTICE 'Group ID: %', v_group_id;
-
-  -- 3. 創建「總部辦公室」頻道（如果不存在）
+  RETURNING id, workspace_id
+),
+existing_group AS (
+  SELECT cg.id, cg.workspace_id
+  FROM public.channel_groups cg, first_workspace fw
+  WHERE cg.workspace_id = fw.id AND cg.name = '📢 公司公告'
+),
+selected_group AS (
+  SELECT * FROM new_group
+  UNION ALL
+  SELECT * FROM existing_group
+  LIMIT 1
+),
+-- 2. 創建「總部辦公室」頻道
+new_channel AS (
   INSERT INTO public.channels (id, workspace_id, name, description, type, group_id, is_favorite, "order", created_at)
-  VALUES (
+  SELECT
     gen_random_uuid(),
-    v_workspace_id,
+    sg.workspace_id,
     '🏢 總部辦公室',
     '公司重要公告與全體通知',
     'public',
-    v_group_id,
-    true,  -- 標記為最愛（置頂效果）
+    sg.id,
+    true,
     0,
     NOW()
+  FROM selected_group sg
+  WHERE NOT EXISTS (
+    SELECT 1 FROM public.channels c, selected_group sg2
+    WHERE c.workspace_id = sg2.workspace_id AND c.name = '🏢 總部辦公室'
   )
-  ON CONFLICT (workspace_id, name) DO NOTHING
-  RETURNING id INTO v_channel_id;
-
-  -- 如果頻道已存在，獲取其 ID
-  IF v_channel_id IS NULL THEN
-    SELECT id INTO v_channel_id
-    FROM public.channels
-    WHERE workspace_id = v_workspace_id AND name = '🏢 總部辦公室'
-    LIMIT 1;
-  END IF;
-
-  RAISE NOTICE 'Channel ID: %', v_channel_id;
-
-  -- 4. 自動將所有員工加入「總部辦公室」頻道
-  INSERT INTO public.channel_members (workspace_id, channel_id, employee_id, role, status)
-  SELECT
-    v_workspace_id,
-    v_channel_id,
-    users.id,
-    'member',
-    'active'
-  FROM public.users
-  ON CONFLICT (workspace_id, channel_id, employee_id) DO NOTHING;
-
-  RAISE NOTICE 'Added all users to headquarters channel';
-END $$;
+  RETURNING id, workspace_id
+),
+existing_channel AS (
+  SELECT c.id, c.workspace_id
+  FROM public.channels c, selected_group sg
+  WHERE c.workspace_id = sg.workspace_id AND c.name = '🏢 總部辦公室'
+),
+selected_channel AS (
+  SELECT * FROM new_channel
+  UNION ALL
+  SELECT * FROM existing_channel
+  LIMIT 1
+)
+-- 3. 自動將所有員工加入「總部辦公室」頻道
+INSERT INTO public.channel_members (workspace_id, channel_id, employee_id, role, status)
+SELECT
+  sc.workspace_id,
+  sc.id,
+  u.id,
+  'member',
+  'active'
+FROM selected_channel sc
+CROSS JOIN public.users u
+ON CONFLICT (workspace_id, channel_id, employee_id) DO NOTHING;
 
 COMMIT;
