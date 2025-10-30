@@ -19,6 +19,7 @@ import { StarRating } from '@/components/ui/star-rating';
 import { Todo } from '@/stores/types';
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { TodoCard } from '@/components/todos/todo-card';
 
 export const dynamic = 'force-dynamic';
 
@@ -336,57 +337,44 @@ export default function TodosPage() {
         </div>
       </ResponsiveHeader>
 
-      {/* 待辦事項列表 */}
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={columns}
-          data={filteredTodos}
-          onRowClick={handleRowClick}
-          actions={(todo: Todo) => (
-            <div className="flex items-center gap-1">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const newStatus = todo.status === 'completed' ? 'pending' : 'completed';
-                  updateTodo(todo.id, {
-                    status: newStatus,
-                    completed: newStatus === 'completed'
-                  });
-                }}
-                className={cn(
-                  "p-1 rounded transition-colors",
-                  todo.status === 'completed'
-                    ? "text-green-600 hover:text-green-700 hover:bg-green-50"
-                    : "text-morandi-secondary hover:text-green-600 hover:bg-green-50"
-                )}
-                title={todo.status === 'completed' ? '取消完成' : '標記完成'}
-              >
-                <CheckCircle size={14} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpandedTodo(todo.id);
-                }}
-                className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-                title="編輯"
-              >
-                <Edit2 size={14} />
-              </button>
-              <button
-                onClick={(e) => handleDeleteTodo(todo, e)}
-                className="p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-                title="刪除"
-              >
-                <Trash2 size={14} />
-              </button>
+      {/* 待辦事項卡片網格 */}
+      <div className="flex-1 overflow-auto p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredTodos.map((todo) => (
+            <TodoCard
+              key={todo.id}
+              todo={todo}
+              currentUserId={user?.id}
+              onClick={() => handleRowClick(todo)}
+              onToggleComplete={(e) => {
+                e.stopPropagation();
+                const newStatus = todo.status === 'completed' ? 'pending' : 'completed';
+                updateTodo(todo.id, {
+                  status: newStatus,
+                  completed: newStatus === 'completed'
+                });
+              }}
+              onEdit={(e) => {
+                e.stopPropagation();
+                setExpandedTodo(todo.id);
+              }}
+              onDelete={(e) => handleDeleteTodo(todo, e)}
+            />
+          ))}
+        </div>
+
+        {/* 空狀態 */}
+        {filteredTodos.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center mb-4">
+              <CheckCircle className="text-morandi-secondary" size={32} />
             </div>
-          )}
-          searchableFields={['title']}
-          searchTerm={searchTerm}
-          showFilters={false}
-          initialPageSize={15}
-        />
+            <p className="text-morandi-secondary text-lg mb-2">沒有待辦事項</p>
+            <p className="text-morandi-secondary/60 text-sm">
+              {activeFilter === 'all' ? '點擊右上角「新增」按鈕建立待辦事項' : '切換其他篩選條件查看'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 展開的待辦事項視圖 */}
