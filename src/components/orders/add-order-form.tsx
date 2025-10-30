@@ -7,6 +7,11 @@ import { Combobox } from '@/components/ui/combobox';
 import { useTourStore } from '@/stores';
 import { useUserStore } from '@/stores/user-store';
 import { useAuthStore } from '@/stores/auth-store';
+import type { Employee } from '@/stores/types';
+import type { SyncableEntity } from '@/types';
+
+// 型別守衛：檢查 Employee 是否包含同步欄位
+type EmployeeWithSync = Employee & Partial<SyncableEntity>;
 
 export interface OrderFormData {
   tour_id: string;
@@ -80,13 +85,14 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
   // 篩選業務人員（roles 包含 'sales'，如果沒有則顯示全部）
   const salesPersons = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
-      const notDeleted = !(emp as unknown)._deleted;
-      const isActive = (emp as unknown).status === 'active';
+      const empWithSync = emp as EmployeeWithSync;
+      const notDeleted = !empWithSync._deleted;
+      const isActive = emp.status === 'active';
       return notDeleted && isActive;
     });
 
     const salesOnly = activeEmployees.filter(emp =>
-      (emp as unknown).roles?.includes('sales')
+      emp.roles?.includes('sales')
     );
 
     // 如果有標記業務的就只顯示業務，沒有就顯示所有人
@@ -96,13 +102,14 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
   // 篩選助理（roles 包含 'assistant'，如果沒有則顯示全部）
   const assistants = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
-      const notDeleted = !(emp as unknown)._deleted;
-      const isActive = (emp as unknown).status === 'active';
+      const empWithSync = emp as EmployeeWithSync;
+      const notDeleted = !empWithSync._deleted;
+      const isActive = emp.status === 'active';
       return notDeleted && isActive;
     });
 
     const assistantsOnly = activeEmployees.filter(emp =>
-      (emp as unknown).roles?.includes('assistant')
+      emp.roles?.includes('assistant')
     );
 
     // 如果有標記助理的就只顯示助理，沒有就顯示所有人
