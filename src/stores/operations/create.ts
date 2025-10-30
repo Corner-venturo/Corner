@@ -4,7 +4,7 @@
  */
 
 import type { BaseEntity } from '@/types';
-import type { StoreConfig } from '../core/types';
+import type { StoreConfig, CreateInput } from '../core/types';
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter';
 import { SupabaseAdapter } from '../adapters/supabase-adapter';
 import { SyncCoordinator } from '../sync/coordinator';
@@ -18,7 +18,7 @@ import { logger } from '@/lib/utils/logger';
  * 建立資料（FastIn 模式）
  */
 export async function create<T extends BaseEntity>(
-  data: Omit<T, 'id' | 'created_at' | 'updated_at'>,
+  data: CreateInput<T>,
   existingItems: T[],
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
@@ -83,7 +83,7 @@ export async function create<T extends BaseEntity>(
  * 批次建立資料
  */
 export async function createMany<T extends BaseEntity>(
-  dataArray: Omit<T, 'id' | 'created_at' | 'updated_at'>[],
+  dataArray: CreateInput<T>[],
   existingItems: T[],
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,

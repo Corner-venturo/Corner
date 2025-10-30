@@ -6,6 +6,27 @@ import { BaseEntity } from '@/types';
 import { TableName } from '@/lib/db/schemas';
 
 /**
+ * 建立資料的輸入型別
+ * 移除系統自動生成的欄位，允許覆寫預設值
+ */
+export type CreateInput<T extends BaseEntity> = Omit<
+  T,
+  'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'
+> & {
+  // 允許覆寫預設值（選填）
+  is_active?: boolean;
+  sync_status?: 'pending' | 'synced' | 'error';
+};
+
+/**
+ * 更新資料的輸入型別
+ * 所有欄位都是選填的，但不能修改 id 和 created_at
+ */
+export type UpdateInput<T extends BaseEntity> = Partial<
+  Omit<T, 'id' | 'created_at'>
+>;
+
+/**
  * Store 狀態介面
  */
 export interface StoreState<T extends BaseEntity> {
@@ -20,12 +41,12 @@ export interface StoreState<T extends BaseEntity> {
   // CRUD 操作
   fetchAll: () => Promise<void>;
   fetchById: (id: string) => Promise<T | null>;
-  create: (data: Omit<T, 'id' | 'created_at' | 'updated_at'>) => Promise<T>;
-  update: (id: string, data: Partial<T>) => Promise<T>;
+  create: (data: CreateInput<T>) => Promise<T>;
+  update: (id: string, data: UpdateInput<T>) => Promise<T>;
   delete: (id: string) => Promise<void>;
 
   // 批次操作
-  createMany: (dataArray: Omit<T, 'id' | 'created_at' | 'updated_at'>[]) => Promise<T[]>;
+  createMany: (dataArray: CreateInput<T>[]) => Promise<T[]>;
   deleteMany: (ids: string[]) => Promise<void>;
 
   // 查詢操作

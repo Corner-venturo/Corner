@@ -197,14 +197,14 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     }
 
     // 創建新週記錄
-    const newWeek: Omit<WeekRecord, 'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'> = {
+    const newWeek = {
       user_id: userId,
       week_start: start.toISOString().split('T')[0],
       week_end: end.toISOString().split('T')[0],
       archived: false,
     };
 
-    const createdWeek = await useWeeksStore.getState().create(newWeek as any);
+    const createdWeek = await useWeeksStore.getState().create(newWeek);
     if (createdWeek) {
       set({ currentWeekId: createdWeek.id });
     }
@@ -297,14 +297,14 @@ export const timeboxHelpers = {
    * 創建箱子並返回 ID
    */
   createBox: async (boxData: Omit<BaseBox, 'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'>) => {
-    return await useBoxesStore.getState().create(boxData as any);
+    return await useBoxesStore.getState().create(boxData);
   },
 
   /**
    * 添加排程箱子
    */
   addScheduledBox: async (data: Omit<ScheduledBox, 'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'>) => {
-    return await useScheduledBoxesStore.getState().create(data as any);
+    return await useScheduledBoxesStore.getState().create(data);
   },
 
   /**
@@ -317,7 +317,7 @@ export const timeboxHelpers = {
     await useScheduledBoxesStore.getState().update(scheduledBoxId, {
       completed: !box.completed,
       completed_at: !box.completed ? new Date().toISOString() : undefined,
-    } as any);
+    });
   },
 
   /**
@@ -325,8 +325,8 @@ export const timeboxHelpers = {
    */
   updateWorkoutData: async (scheduledBoxId: string, data: WorkoutData) => {
     await useScheduledBoxesStore.getState().update(scheduledBoxId, {
-      data: data as any,
-    } as any);
+      data: data,
+    });
   },
 
   /**
@@ -336,7 +336,7 @@ export const timeboxHelpers = {
     await useWeeksStore.getState().update(weekId, {
       archived: true,
       name,
-    } as any);
+    });
   },
 
   /**

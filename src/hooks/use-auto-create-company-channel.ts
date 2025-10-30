@@ -35,7 +35,7 @@ export function useAutoCreateCompanyChannel() {
             .insert({
               workspace_id: currentWorkspace.id,
               name: '📢 公司公告',
-              order: 0,
+              order: -999, // 使用負數確保永遠在最上面
               is_collapsed: false,
             })
             .select()
