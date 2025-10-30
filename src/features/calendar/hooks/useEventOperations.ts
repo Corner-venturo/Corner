@@ -68,6 +68,7 @@ export function useEventOperations() {
         type: 'other',
         visibility: newEvent.visibility,
         owner_id: user.id,
+        created_by: user.id,
       })
 
       // 重置表單

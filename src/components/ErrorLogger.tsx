@@ -43,7 +43,7 @@ export function ErrorLogger() {
     }
 
     // 捕獲 React Hydration 錯誤
-    const originalConsoleError = console.error
+    const originalConsoleError = console.error.bind(console)
     console.error = (...args) => {
       originalConsoleError(...args)
 

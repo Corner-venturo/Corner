@@ -148,7 +148,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
         </div>
 
         {weekDays.map((_day, dayIndex) => {
-          const boxesInDay = scheduledBoxes
+          const boxesInDay = (scheduledBoxes || [])
             .filter(box => {
               if (box.dayOfWeek !== dayIndex) return false
               if (currentWeek?.id && box.weekId !== currentWeek.id) return false
