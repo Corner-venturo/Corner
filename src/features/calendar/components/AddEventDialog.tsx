@@ -88,7 +88,7 @@ export function AddEventDialog({
               <select
                 value={newEvent.visibility}
                 onChange={e => onNewEventChange({ ...newEvent, visibility: e.target.value as 'personal' | 'company' })}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-white"
+                className="mt-1"
               >
                 <option value="personal">個人行事曆</option>
                 <option value="company">公司行事曆</option>
@@ -100,7 +100,7 @@ export function AddEventDialog({
               <select
                 value={newEvent.start_time}
                 onChange={e => onNewEventChange({ ...newEvent, start_time: e.target.value })}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-white"
+                className="mt-1"
               >
                 <option value="">不指定時間</option>
                 {timeOptions.map(time => (
@@ -119,7 +119,7 @@ export function AddEventDialog({
               <select
                 value={newEvent.end_time}
                 onChange={e => onNewEventChange({ ...newEvent, end_time: e.target.value })}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-white"
+                className="mt-1"
               >
                 <option value="">不指定時間</option>
                 {timeOptions.map(time => (

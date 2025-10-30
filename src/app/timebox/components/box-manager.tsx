@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ColorPicker from '@/components/ui/color-picker'
 import { Plus, Dumbbell, MessageSquare, Package, Edit, Trash2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -27,6 +29,7 @@ export default function BoxManager() {
   const { user } = useAuthStore()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingBox, setEditingBox] = useState<string | null>(null)
+  const { confirm, confirmDialogProps } = useConfirmDialog()
 
   // 新增/編輯表單狀態
   const [formData, setFormData] = useState({
@@ -72,8 +75,16 @@ export default function BoxManager() {
     setIsCreateDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm('確定要刪除這個箱子嗎？')) {
+  const handleDelete = async (id: string) => {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除箱子',
+      message: '確定要刪除這個箱子嗎？',
+      details: ['此操作無法復原'],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    })
+    if (confirmed) {
       deleteBox(id)
     }
   }
@@ -234,6 +245,7 @@ export default function BoxManager() {
           </div>
         )}
       </div>
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   )
 }

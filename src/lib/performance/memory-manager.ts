@@ -19,6 +19,10 @@ interface MemoryStats {
   usagePercent: number;
   /** 是否處於記憶體壓力狀態 */
   isUnderPressure: boolean;
+  /** 原始使用的 JS Heap 大小（MB） */
+  usedJSHeapSize?: number;
+  /** 原始 JS Heap 大小限制（MB） */
+  jsHeapSizeLimit?: number;
 }
 
 interface CleanupOptions {
@@ -63,11 +67,11 @@ class MemoryManager {
    * 獲取記憶體統計資訊
    */
   getMemoryStats(): MemoryStats | null {
-    if (typeof window === 'undefined' || !(performance as unknown).memory) {
+    if (typeof window === 'undefined' || !(performance as any).memory) {
       return null;
     }
 
-    const memory = (performance as unknown).memory;
+    const memory = (performance as any).memory;
     const usedMemory = memory.usedJSHeapSize / 1024 / 1024; // 轉換為 MB
     const totalMemory = memory.jsHeapSizeLimit / 1024 / 1024;
     const usagePercent = (usedMemory / totalMemory) * 100;
@@ -76,7 +80,9 @@ class MemoryManager {
       usedMemory: Math.round(usedMemory * 100) / 100,
       totalMemory: Math.round(totalMemory * 100) / 100,
       usagePercent: Math.round(usagePercent * 100) / 100,
-      isUnderPressure: usagePercent / 100 > this.pressureThreshold
+      isUnderPressure: usagePercent / 100 > this.pressureThreshold,
+      usedJSHeapSize: usedMemory,
+      jsHeapSizeLimit: totalMemory,
     };
   }
 
@@ -106,9 +112,9 @@ class MemoryManager {
     }
 
     // 觸發垃圾回收（如果瀏覽器支援）
-    if (typeof window !== 'undefined' && (window as unknown).gc) {
+    if (typeof window !== 'undefined' && (window as any).gc) {
       try {
-        (window as unknown).gc();
+        (window as any).gc();
       } catch {
         // 忽略錯誤
       }
@@ -161,11 +167,13 @@ class MemoryManager {
     setInterval(() => {
       const stats = this.getMemoryStats();
       if (stats) {
-        const emoji = stats.isUnderPressure ? '⚠️' : '✅';`
-        );
+        const emoji = stats.isUnderPressure ? '⚠️' : '✅';
+        console.log(`${emoji} Memory: ${stats.usedMemory}MB / ${stats.totalMemory}MB (${stats.usagePercent}%)`);
 
         if (stats.isUnderPressure) {
-                  }
+          console.warn('Memory pressure detected, cleaning up...');
+          this.cleanup({ clearHot: true, force: true });
+        }
       }
     }, interval);
   }

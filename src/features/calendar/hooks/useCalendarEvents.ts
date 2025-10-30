@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { useTourStore, useOrderStore, useMemberStore, useCalendarStore, useCalendarEventStore } from '@/stores'
+import { useTourStore, useOrderStore, useMemberStore, useCalendarStore, useCalendarEventStore, useAuthStore, useEmployeeStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
 
@@ -9,6 +9,8 @@ export function useCalendarEvents() {
   const { items: members } = useMemberStore()
   const { settings } = useCalendarStore()
   const { items: calendarEvents } = useCalendarEventStore()
+  const { user } = useAuthStore()
+  const { items: employees } = useEmployeeStore()
 
   // 根據類型取得顏色 - 使用莫蘭迪配色
   const getEventColor = useCallback((type: string, status?: Tour['status']) => {
@@ -72,10 +74,15 @@ export function useCalendarEvents() {
       })
   }, [tours, orders, members, getEventColor])
 
-  // 轉換個人事項為日曆事件
+  // 轉換個人事項為日曆事件（只顯示當前用戶的個人事項）
   const personalCalendarEvents: FullCalendarEvent[] = useMemo(() => {
+    if (!user?.id) return []
+
     return (calendarEvents || [])
-      .filter(event => event.visibility === 'personal')
+      .filter(event =>
+        event.visibility === 'personal' &&
+        event.created_by === user.id
+      )
       .map(event => {
         const color = getEventColor('personal')
         return {
@@ -91,7 +98,7 @@ export function useCalendarEvents() {
           },
         }
       })
-  }, [calendarEvents, getEventColor])
+  }, [calendarEvents, getEventColor, user?.id])
 
   // 轉換公司事項為日曆事件
   const companyCalendarEvents: FullCalendarEvent[] = useMemo(() => {
@@ -99,9 +106,14 @@ export function useCalendarEvents() {
       .filter(event => event.visibility === 'company')
       .map(event => {
         const color = getEventColor('company')
+
+        // 找出建立者姓名（用於詳細頁面）
+        const creator = employees?.find(emp => emp.id === event.created_by)
+        const creatorName = creator?.name || (event.created_by ? '未知' : '')
+
         return {
           id: event.id,
-          title: event.title,
+          title: event.title, // 行事曆上不顯示建立者
           start: event.start,
           end: event.end,
           backgroundColor: color.bg,
@@ -109,10 +121,12 @@ export function useCalendarEvents() {
           extendedProps: {
             type: 'company' as const,
             description: event.description,
+            created_by: event.created_by,
+            creator_name: creatorName, // 保留在 extendedProps，詳細頁面可以用
           },
         }
       })
-  }, [calendarEvents, getEventColor])
+  }, [calendarEvents, getEventColor, employees])
 
   // 轉換會員生日為日曆事件
   const birthdayEvents: FullCalendarEvent[] = useMemo(() => {

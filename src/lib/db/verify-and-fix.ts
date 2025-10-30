@@ -19,7 +19,8 @@ export async function verifyAndFix() {
     const users = await localDB.getAll<User>('employees');
 
     if (users.length > 0) {
-      users.forEach(u => { [${u.status}]`);
+      users.forEach(u => {
+        console.log(`User: ${u.employee_number}, Status: ${u.status}`);
       });
     }
 
@@ -147,8 +148,7 @@ export async function clearAndRebuild() {
 
 // 自動掛載到 window（方便 Console 使用）
 if (typeof window !== 'undefined') {
-  (window as unknown).verifyAndFix = verifyAndFix;
-  (window as unknown).quickCheck = quickCheck;
-  (window as unknown).clearAndRebuild = clearAndRebuild;
-
+  (window as any).verifyAndFix = verifyAndFix;
+  (window as any).quickCheck = quickCheck;
+  (window as any).clearAndRebuild = clearAndRebuild;
 }

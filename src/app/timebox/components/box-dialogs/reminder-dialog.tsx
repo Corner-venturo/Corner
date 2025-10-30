@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Trash2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 interface ReminderDialogProps {
   scheduledBox: ScheduledBox
@@ -15,6 +17,7 @@ interface ReminderDialogProps {
 export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialogProps) {
   const { boxes, updateReminderData, toggleBoxCompletion, removeScheduledBox } = useTimeboxStore()
   const [text, setText] = useState('')
+  const { confirm, confirmDialogProps } = useConfirmDialog()
 
   const box = boxes.find(b => b.id === scheduledBox.boxId)
 
@@ -49,10 +52,17 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
   }
 
   // 刪除排程
-  const handleDelete = () => {
-    const confirmMessage = `確定要移除此提醒排程嗎？\n\n箱子：${box?.name}`;
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      type: 'warning',
+      title: '移除排程',
+      message: '確定要移除此提醒排程嗎？',
+      details: [`箱子：${box?.name}`],
+      confirmLabel: '確認移除',
+      cancelLabel: '取消'
+    });
 
-    if (!confirm(confirmMessage)) {
+    if (!confirmed) {
       return;
     }
 
@@ -78,7 +88,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
@@ -132,6 +142,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
           </div>
         </div>
       </DialogContent>
+      <ConfirmDialog {...confirmDialogProps} />
     </Dialog>
   )
 }

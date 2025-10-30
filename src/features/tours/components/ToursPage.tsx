@@ -106,7 +106,8 @@ export const ToursPage: React.FC = () => {
     if (countries.length === 0) {
       fetchRegions();
     }
-  }, [countries.length, fetchRegions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countries.length]);  // 只監聽 countries.length，避免無限迴圈
 
   // Get active countries from new region store
   const activeCountries = useMemo(() => {
@@ -146,7 +147,9 @@ export const ToursPage: React.FC = () => {
 
       // Try to find matching city from destinations
       for (const country of activeCountries) {
-        const citiesInCountry = getCitiesByCountryId(country.id);
+        const citiesInCountry = getCitiesByCountry(country.id)
+          .filter(c => c.is_active)
+          .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name, country_id: c.country_id }));
         const matchedCity = citiesInCountry.find(city => city.name === tour.location);
         if (matchedCity) {
           countryCode = country.code;
@@ -176,7 +179,8 @@ export const ToursPage: React.FC = () => {
         description: tour.description || '',
       });
     }
-  }, [dialog.type, dialog.data, activeCountries, getCitiesByCountryId, setNewTour, setAvailableCities]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dialog.type, dialog.data, activeCountries]);
 
   // Handle navigation from quote
   useEffect(() => {

@@ -13,7 +13,7 @@ import { test, expect, Page } from '@playwright/test';
 async function getIndexedDBCount(page: Page, storeName: string): Promise<number> {
   return await page.evaluate(async (store) => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('venturo-db', 1);
+      const request = indexedDB.open('VenturoOfflineDB', 2);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -35,7 +35,7 @@ async function getIndexedDBCount(page: Page, storeName: string): Promise<number>
 async function getAllFromIndexedDB(page: Page, storeName: string): Promise<any[]> {
   return await page.evaluate(async (store) => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('venturo-db', 1);
+      const request = indexedDB.open('VenturoOfflineDB', 2);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -57,7 +57,7 @@ async function getAllFromIndexedDB(page: Page, storeName: string): Promise<any[]
 async function _clearIndexedDB(page: Page): Promise<void> {
   await page.evaluate(async () => {
     await new Promise<void>((resolve) => {
-      const request = indexedDB.deleteDatabase('venturo-db');
+      const request = indexedDB.deleteDatabase('VenturoOfflineDB');
       request.onsuccess = () => resolve();
       request.onerror = () => resolve(); // 即使失敗也繼續
     });
@@ -84,7 +84,7 @@ test.describe('IndexedDB 同步測試', () => {
       const databases = await (window as any).indexedDB?.databases?.();
       if (databases) {
         for (const db of databases) {
-          if (db.name === 'venturo-db') {
+          if (db.name === 'VenturoOfflineDB') {
             await new Promise<void>((resolve) => {
               const request = indexedDB.deleteDatabase(db.name);
               request.onsuccess = () => resolve();

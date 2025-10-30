@@ -35,10 +35,10 @@ export function CoverInfoSection({
 }: CoverInfoSectionProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-gray-800 border-b-2 border-amber-500 pb-2">📸 封面設定</h2>
+      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-amber-500 pb-2">📸 封面設定</h2>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">標籤文字</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">標籤文字</label>
         <input
           type="text"
           value={data.tagline || ""}
@@ -50,7 +50,7 @@ export function CoverInfoSection({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">主標題</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">主標題</label>
           <input
             type="text"
             value={data.title || ""}
@@ -60,7 +60,7 @@ export function CoverInfoSection({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">副標題</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">副標題</label>
           <input
             type="text"
             value={data.subtitle || ""}
@@ -72,7 +72,7 @@ export function CoverInfoSection({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
         <input
           type="text"
           value={data.description || ""}
@@ -84,7 +84,7 @@ export function CoverInfoSection({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">國家</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">國家</label>
           <Combobox
             value={selectedCountry}
             onChange={(newCountry) => {
@@ -106,7 +106,7 @@ export function CoverInfoSection({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">城市</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">城市</label>
           <Combobox
             value={data.city || ""}
             onChange={(value) => updateCity(value)}
@@ -121,7 +121,7 @@ export function CoverInfoSection({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">出發日期</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">出發日期</label>
           <input
             type="text"
             value={data.departureDate || ""}
@@ -131,7 +131,7 @@ export function CoverInfoSection({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">行程代碼</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">行程代碼</label>
           <input
             type="text"
             value={data.tourCode || ""}

@@ -352,7 +352,7 @@ npx supabase migration list
 1. **Chrome DevTools**
    - 開啟 DevTools (F12)
    - Application → Storage → IndexedDB
-   - 選擇 `venturo-db`
+   - 選擇 `VenturoOfflineDB`
 
 2. **程式碼查詢**
 ```typescript

@@ -10,6 +10,7 @@ import { Sparkles, ChevronRight, RotateCcw, BookOpen, Trophy } from 'lucide-reac
 import { cn } from '@/lib/utils';
 import { PHASES, QUESTIONS, getQuestionById, calculateProgress } from '@/data/heroic-summon-questions';
 import type { Question } from '@/data/heroic-summon-questions';
+import { confirm } from '@/lib/ui/alert-dialog';
 
 export default function HeroicSummonPage() {
   const { user } = useAuthStore();
@@ -53,8 +54,12 @@ export default function HeroicSummonPage() {
     }
   };
 
-  const handleReset = () => {
-    if (confirm('確定要重新開始測驗嗎？所有進度將會清除。')) {
+  const handleReset = async () => {
+    const confirmed = await confirm('確定要重新開始測驗嗎？所有進度將會清除。', {
+      type: 'warning',
+      title: '重置測驗',
+    });
+    if (confirmed) {
       setStarted(false);
       setCurrentPhase(1);
       setCurrentQuestionIndex(0);

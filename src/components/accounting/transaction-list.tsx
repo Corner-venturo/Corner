@@ -13,6 +13,9 @@ import {
   Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { alertError } from '@/lib/ui/alert-dialog';
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 const transactionTypeIcons = {
   income: ArrowUpRight,
@@ -25,18 +28,31 @@ export const TransactionList = React.memo(function TransactionList() {
   const [searchText, setSearchText] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense' | 'transfer'>('all');
   const [dateRange, setDateRange] = useState<'all' | 'today' | 'week' | 'month'>('month');
+  const { confirm, confirmDialogProps } = useConfirmDialog();
 
-  const handleDeleteTransaction = (transactionId: string, description: string, amount: number) => {
-    const confirmMessage = `確定要刪除此筆交易嗎？\n\n金額：NT$ ${amount.toLocaleString()}\n說明：${description || '無'}\n\n此操作會影響帳戶餘額統計。`;
+  const handleDeleteTransaction = async (transactionId: string, description: string, amount: number) => {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除交易',
+      message: '確定要刪除此筆交易嗎？',
+      details: [
+        `金額：NT$ ${amount.toLocaleString()}`,
+        `說明：${description || '無'}`,
+        '',
+        '⚠️ 此操作會影響帳戶餘額統計'
+      ],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
 
-    if (!confirm(confirmMessage)) {
+    if (!confirmed) {
       return;
     }
 
     try {
       deleteTransaction(transactionId);
     } catch (err) {
-            alert('刪除失敗，請稍後再試');
+      await alertError('刪除失敗，請稍後再試');
     }
   };
 
@@ -371,6 +387,7 @@ export const TransactionList = React.memo(function TransactionList() {
           </Button>
         </div>
       )}
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 });

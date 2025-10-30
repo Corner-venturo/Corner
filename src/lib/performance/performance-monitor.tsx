@@ -62,13 +62,13 @@ export function PerformanceMonitor() {
                       style={{ width: `${stats.usagePercent}%` }}
                     />
                   </div>
-                  <div className="text-right mt-1 text-gray-400">
+                  <div className="text-right mt-1 text-morandi-muted">
                     {stats.usagePercent}%
                   </div>
                 </div>
               </>
             ) : (
-              <div className="text-gray-400">無法取得記憶體資訊</div>
+              <div className="text-morandi-muted">無法取得記憶體資訊</div>
             )}
           </div>
 
@@ -79,17 +79,17 @@ export function PerformanceMonitor() {
               <>
                 <div className="space-y-1">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">熱快取 (記憶體):</span>
+                    <span className="text-morandi-muted">熱快取 (記憶體):</span>
                     <span>{cacheStats.hot.size} 項</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">溫快取 (Session):</span>
+                    <span className="text-morandi-muted">溫快取 (Session):</span>
                     <span>{cacheStats.warm.size} 項</span>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="text-gray-400">載入中...</div>
+              <div className="text-morandi-muted">載入中...</div>
             )}
           </div>
 

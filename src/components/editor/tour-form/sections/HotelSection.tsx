@@ -34,7 +34,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-800 border-b-2 border-green-500 pb-2 flex-1">
+        <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-green-500 pb-2 flex-1">
           🏨 飯店資訊
         </h2>
         <label className="flex items-center gap-2 text-sm">
@@ -44,7 +44,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
             onChange={(e) => updateField("showHotels", e.target.checked)}
             className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
           />
-          <span className="text-gray-700">顯示此區塊</span>
+          <span className="text-morandi-primary">顯示此區塊</span>
         </label>
       </div>
 
@@ -65,7 +65,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
         {hotels.length === 0 && (
           <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-green-300">
-            <p className="text-sm text-gray-500 mb-2">尚未新增飯店資訊</p>
+            <p className="text-sm text-morandi-secondary mb-2">尚未新增飯店資訊</p>
             <p className="text-xs text-gray-400">點擊「新增飯店」按鈕開始</p>
           </div>
         )}
@@ -86,7 +86,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-morandi-primary mb-1">
                     飯店名稱 *
                   </label>
                   <input
@@ -99,7 +99,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-morandi-primary mb-1">
                     飯店簡介
                   </label>
                   <textarea
@@ -111,7 +111,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-morandi-primary mb-1">
                     飯店圖片網址
                   </label>
                   <input

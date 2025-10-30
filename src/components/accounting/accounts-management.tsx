@@ -14,6 +14,8 @@ import {
   EyeOff
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 const accountTypeIcons = {
   cash: Wallet,
@@ -34,13 +36,22 @@ const accountTypeLabels = {
 export const AccountsManagement = React.memo(function AccountsManagement() {
   const { accounts, updateAccount, deleteAccount } = useAccountingStore();
   const [_expandedAccount, _setExpandedAccount] = useState<string | null>(null);
+  const { confirm, confirmDialogProps } = useConfirmDialog();
 
   const handleToggleActive = (account_id: string, is_active: boolean) => {
     updateAccount(account_id, { is_active: !is_active });
   };
 
-  const handleDeleteAccount = (account_id: string, account_name: string) => {
-    if (confirm(`確定要刪除帳戶「${account_name}」嗎？這個操作無法復原。`)) {
+  const handleDeleteAccount = async (account_id: string, account_name: string) => {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除帳戶',
+      message: `確定要刪除帳戶「${account_name}」嗎？`,
+      details: ['此操作無法復原'],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
+    if (confirmed) {
       deleteAccount(account_id);
     }
   };
@@ -247,6 +258,7 @@ export const AccountsManagement = React.memo(function AccountsManagement() {
           </div>
         )}
       </div>
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 });

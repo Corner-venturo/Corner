@@ -23,25 +23,10 @@ export interface FullCalendarEvent {
   }
 }
 
-export interface PersonalEvent {
-  id: string
-  title: string
-  date: string
-  end_date?: string
-  time?: string
-  type: 'meeting' | 'deadline' | 'task'
-  description?: string
-}
-
 export interface MoreEventsDialogState {
   open: boolean
   date: string
   events: FullCalendarEvent[]
-}
-
-export interface EventDetailDialogState {
-  open: boolean
-  event: PersonalEvent | null
 }
 
 export interface AddEventDialogState {
@@ -52,7 +37,6 @@ export interface AddEventDialogState {
 export interface NewEventForm {
   title: string
   visibility: 'personal' | 'company'
-  event_type: 'meeting' | 'deadline' | 'task' | 'other'
   description: string
   end_date: string
   start_time: string

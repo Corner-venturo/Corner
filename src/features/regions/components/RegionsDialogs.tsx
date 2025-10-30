@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FormDialog } from '@/components/dialog';
 import { Input } from '@/components/ui/input';
 import type { City } from '@/stores';
 
@@ -28,8 +27,7 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
     is_active: true,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const result = await onCreate(formData);
     if (result) {
       onClose();
@@ -47,75 +45,68 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>新增國家</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">ID（英文）*</label>
-            <Input
-              value={formData.id}
-              onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
-              placeholder="例如: japan"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">中文名稱 *</label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="例如: 日本"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">英文名稱 *</label>
-            <Input
-              value={formData.name_en}
-              onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
-              placeholder="例如: Japan"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">Emoji</label>
-            <Input
-              value={formData.emoji}
-              onChange={(e) => setFormData(prev => ({ ...prev, emoji: e.target.value }))}
-              placeholder="例如: 🇯🇵"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">國家代碼</label>
-            <Input
-              value={formData.code}
-              onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
-              placeholder="例如: JP"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.has_regions}
-              onChange={(e) => setFormData(prev => ({ ...prev, has_regions: e.target.checked }))}
-              className="w-4 h-4"
-            />
-            <label className="text-sm">此國家有地區分類（如日本的九州、關東）</label>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
-            </Button>
-            <Button type="submit" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-              新增
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <FormDialog
+      open={open}
+      onOpenChange={(open) => !open && onClose()}
+      title="新增國家"
+      onSubmit={handleSubmit}
+      submitLabel="新增"
+      submitDisabled={!formData.id || !formData.name || !formData.name_en}
+      maxWidth="md"
+    >
+      <div>
+        <label className="text-sm font-medium">ID（英文）*</label>
+        <Input
+          value={formData.id}
+          onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+          placeholder="例如: japan"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">中文名稱 *</label>
+        <Input
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="例如: 日本"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">英文名稱 *</label>
+        <Input
+          value={formData.name_en}
+          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          placeholder="例如: Japan"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">Emoji</label>
+        <Input
+          value={formData.emoji}
+          onChange={(e) => setFormData(prev => ({ ...prev, emoji: e.target.value }))}
+          placeholder="例如: 🇯🇵"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">國家代碼</label>
+        <Input
+          value={formData.code}
+          onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+          placeholder="例如: JP"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={formData.has_regions}
+          onChange={(e) => setFormData(prev => ({ ...prev, has_regions: e.target.checked }))}
+          className="w-4 h-4"
+        />
+        <label className="text-sm">此國家有地區分類（如日本的九州、關東）</label>
+      </div>
+    </FormDialog>
   );
 }
 
@@ -139,8 +130,7 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
     is_active: true,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const result = await onCreate({
       ...formData,
       country_id: countryId,
@@ -158,49 +148,42 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>新增地區</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">ID（英文）*</label>
-            <Input
-              value={formData.id}
-              onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
-              placeholder="例如: kyushu"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">中文名稱 *</label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="例如: 九州"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">英文名稱</label>
-            <Input
-              value={formData.name_en}
-              onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
-              placeholder="例如: Kyushu"
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
-            </Button>
-            <Button type="submit" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-              新增
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <FormDialog
+      open={open}
+      onOpenChange={(open) => !open && onClose()}
+      title="新增地區"
+      onSubmit={handleSubmit}
+      submitLabel="新增"
+      submitDisabled={!formData.id || !formData.name}
+      maxWidth="md"
+    >
+      <div>
+        <label className="text-sm font-medium">ID（英文）*</label>
+        <Input
+          value={formData.id}
+          onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+          placeholder="例如: kyushu"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">中文名稱 *</label>
+        <Input
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="例如: 九州"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">英文名稱</label>
+        <Input
+          value={formData.name_en}
+          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          placeholder="例如: Kyushu"
+        />
+      </div>
+    </FormDialog>
   );
 }
 
@@ -226,8 +209,7 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
     is_active: true,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const result = await onCreate({
       ...formData,
       country_id: countryId,
@@ -247,64 +229,57 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>新增城市</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">ID（英文）*</label>
-            <Input
-              value={formData.id}
-              onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
-              placeholder="例如: fukuoka"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">中文名稱 *</label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="例如: 福岡"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">英文名稱</label>
-            <Input
-              value={formData.name_en}
-              onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
-              placeholder="例如: Fukuoka"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">機場代碼（3 碼）</label>
-            <Input
-              value={formData.airport_code}
-              onChange={(e) => {
-                const value = e.target.value.toUpperCase().slice(0, 3);
-                setFormData(prev => ({ ...prev, airport_code: value }));
-              }}
-              placeholder="例如: FUK"
-              maxLength={3}
-            />
-            <p className="text-xs text-morandi-secondary mt-1">
-              用於生成團號，建議使用 IATA 機場代碼
-            </p>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
-            </Button>
-            <Button type="submit" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-              新增
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <FormDialog
+      open={open}
+      onOpenChange={(open) => !open && onClose()}
+      title="新增城市"
+      onSubmit={handleSubmit}
+      submitLabel="新增"
+      submitDisabled={!formData.id || !formData.name}
+      maxWidth="md"
+    >
+      <div>
+        <label className="text-sm font-medium">ID（英文）*</label>
+        <Input
+          value={formData.id}
+          onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+          placeholder="例如: fukuoka"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">中文名稱 *</label>
+        <Input
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="例如: 福岡"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">英文名稱</label>
+        <Input
+          value={formData.name_en}
+          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          placeholder="例如: Fukuoka"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">機場代碼（3 碼）</label>
+        <Input
+          value={formData.airport_code}
+          onChange={(e) => {
+            const value = e.target.value.toUpperCase().slice(0, 3);
+            setFormData(prev => ({ ...prev, airport_code: value }));
+          }}
+          placeholder="例如: FUK"
+          maxLength={3}
+        />
+        <p className="text-xs text-morandi-secondary mt-1">
+          用於生成團號，建議使用 IATA 機場代碼
+        </p>
+      </div>
+    </FormDialog>
   );
 }
 
@@ -338,8 +313,7 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
     }
   }, [city]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!city) return;
 
     const result = await onUpdate(city.id, formData);
@@ -351,65 +325,58 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
   if (!city) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>編輯城市</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">中文名稱 *</label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="例如: 福岡"
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">英文名稱</label>
-            <Input
-              value={formData.name_en}
-              onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
-              placeholder="例如: Fukuoka"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">機場代碼（3 碼）</label>
-            <Input
-              value={formData.airport_code}
-              onChange={(e) => {
-                const value = e.target.value.toUpperCase().slice(0, 3);
-                setFormData(prev => ({ ...prev, airport_code: value }));
-              }}
-              placeholder="例如: FUK"
-              maxLength={3}
-            />
-            <p className="text-xs text-morandi-secondary mt-1">
-              用於生成團號，建議使用 IATA 機場代碼
-            </p>
-          </div>
-          <div>
-            <label className="text-sm font-medium">時區（IANA 格式）</label>
-            <Input
-              value={formData.timezone}
-              onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
-              placeholder="例如: Asia/Tokyo"
-            />
-            <p className="text-xs text-morandi-secondary mt-1">
-              IANA 時區標識符，會自動處理夏令時（例如歐美冬令時）
-            </p>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
-            </Button>
-            <Button type="submit" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-              儲存
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <FormDialog
+      open={open}
+      onOpenChange={(open) => !open && onClose()}
+      title="編輯城市"
+      onSubmit={handleSubmit}
+      submitLabel="儲存"
+      submitDisabled={!formData.name}
+      maxWidth="md"
+    >
+      <div>
+        <label className="text-sm font-medium">中文名稱 *</label>
+        <Input
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="例如: 福岡"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">英文名稱</label>
+        <Input
+          value={formData.name_en}
+          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          placeholder="例如: Fukuoka"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">機場代碼（3 碼）</label>
+        <Input
+          value={formData.airport_code}
+          onChange={(e) => {
+            const value = e.target.value.toUpperCase().slice(0, 3);
+            setFormData(prev => ({ ...prev, airport_code: value }));
+          }}
+          placeholder="例如: FUK"
+          maxLength={3}
+        />
+        <p className="text-xs text-morandi-secondary mt-1">
+          用於生成團號，建議使用 IATA 機場代碼
+        </p>
+      </div>
+      <div>
+        <label className="text-sm font-medium">時區（IANA 格式）</label>
+        <Input
+          value={formData.timezone}
+          onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
+          placeholder="例如: Asia/Tokyo"
+        />
+        <p className="text-xs text-morandi-secondary mt-1">
+          IANA 時區標識符，會自動處理夏令時（例如歐美冬令時）
+        </p>
+      </div>
+    </FormDialog>
   );
 }

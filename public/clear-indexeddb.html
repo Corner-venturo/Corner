@@ -95,9 +95,9 @@
 
     async function clearMessages() {
       log('🧹 開始清理訊息快取...');
-      
+
       try {
-        const dbName = 'venturo-db';
+        const dbName = 'VenturoOfflineDB';
         const request = indexedDB.open(dbName);
         
         request.onsuccess = function(event) {
@@ -130,9 +130,9 @@
       }
 
       log('🧹 開始清理所有 IndexedDB 資料...');
-      
+
       try {
-        const dbName = 'venturo-db';
+        const dbName = 'VenturoOfflineDB';
         const deleteRequest = indexedDB.deleteDatabase(dbName);
         
         deleteRequest.onsuccess = function() {

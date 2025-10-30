@@ -5,6 +5,7 @@ import { MapIcon, Edit, Trash2, Ticket } from 'lucide-react';
 
 import { ContentContainer } from '@/components/layout/content-container';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
+import { confirm } from '@/lib/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table';
@@ -171,8 +172,12 @@ export default function ActivitiesPage() {
     setIsAddDialogOpen(true);
   };
 
-  const handleDeleteActivity = (_activityId: string) => {
-    if (confirm('確定要刪除此活動選項嗎？')) {
+  const handleDeleteActivity = async (_activityId: string) => {
+    const confirmed = await confirm('確定要刪除此活動選項嗎？', {
+      type: 'warning',
+      title: '刪除確認',
+    });
+    if (confirmed) {
       // 功能: 刪除活動選項從資料庫
     }
   };

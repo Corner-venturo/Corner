@@ -8,6 +8,8 @@ import { NetworkMonitorInitializer } from "@/components/network-monitor-initiali
 import { ErrorLogger } from '@/components/ErrorLogger';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AppInitializer } from '@/components/AppInitializer';
+import { GlobalDialogs } from '@/lib/ui/alert-dialog';
+import { GlobalDialogOverride } from '@/lib/ui/global-dialog-override';
 // import { DevAutoLogin } from '@/components/dev-auto-login'; // 停用自動登入
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +42,8 @@ export default function RootLayout({
       >
         <ErrorLogger />
         <NetworkMonitorInitializer />
+        <GlobalDialogs />
+        <GlobalDialogOverride />
         <AppInitializer>
           <ErrorBoundary>
             <ThemeProvider>

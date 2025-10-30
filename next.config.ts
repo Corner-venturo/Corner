@@ -25,6 +25,18 @@ const nextConfig: NextConfig = {
   },
   // 跳過靜態頁面優化
   skipTrailingSlashRedirect: true,
+  // 修復 WebSocket HMR 連接問題
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: /node_modules/,
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

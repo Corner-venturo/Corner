@@ -25,6 +25,5 @@ export const NO_SIDEBAR_PAGES = [
 
 // Pages with custom layout
 export const CUSTOM_LAYOUT_PAGES = [
-  '/timebox',
   '/editor',
 ];

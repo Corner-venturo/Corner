@@ -18,7 +18,7 @@ export function MoreEventsDialog({
   getEventDuration,
 }: MoreEventsDialogProps) {
   return (
-    <Dialog open={dialog.open} onOpenChange={onClose}>
+    <Dialog open={dialog.open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <div className="flex items-center justify-between">

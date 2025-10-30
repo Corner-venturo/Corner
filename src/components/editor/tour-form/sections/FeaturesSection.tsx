@@ -18,7 +18,7 @@ export function FeaturesSection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-orange-500 pb-2">
-        <h2 className="text-lg font-bold text-gray-800">✨ 行程特色</h2>
+        <h2 className="text-lg font-bold text-morandi-primary">✨ 行程特色</h2>
         <button
           onClick={addFeature}
           className="px-3 py-1 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600"
@@ -39,7 +39,7 @@ export function FeaturesSection({
             </button>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">圖標</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">圖標</label>
             <select
               value={feature.icon}
               onChange={(e) => updateFeature(index, "icon", e.target.value)}
@@ -51,7 +51,7 @@ export function FeaturesSection({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">標題</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">標題</label>
             <input
               type="text"
               value={feature.title}
@@ -61,7 +61,7 @@ export function FeaturesSection({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
             <input
               type="text"
               value={feature.description}

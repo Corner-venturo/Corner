@@ -144,7 +144,7 @@ export function CreatePaymentRequestDialog({
             <select
               value={selectedTourId}
               onChange={(e) => setSelectedTourId(e.target.value)}
-              className="input-morandi"
+              className=""
             >
               <option value="">請選擇旅遊團</option>
               {tours.map(tour => (
@@ -164,7 +164,7 @@ export function CreatePaymentRequestDialog({
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="input-morandi"
+              className=""
             />
           </div>
 
@@ -177,7 +177,7 @@ export function CreatePaymentRequestDialog({
               type="text"
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
-              className="input-morandi"
+              className=""
             />
           </div>
 

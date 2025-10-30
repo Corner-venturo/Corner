@@ -191,7 +191,8 @@ export function Sidebar() {
       clearTimeout(timeoutRef.current);
     }
 
-    if (item.children) {
+    // 方案 B：側邊欄收起時不顯示子選單，必須先展開側邊欄
+    if (item.children && (isSidebarHovered || !sidebarCollapsed)) {
       const rect = element.getBoundingClientRect();
       setDropdownPosition({
         top: rect.top,
@@ -358,8 +359,9 @@ export function Sidebar() {
                   // 有子選單的項目
                   <div
                     className={cn(
-                      'w-full relative h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors cursor-pointer',
-                      is_active(item.href) && 'bg-morandi-container text-morandi-primary'
+                      'w-full relative h-10 text-sm text-morandi-secondary transition-all duration-200 cursor-pointer',
+                      'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
+                      is_active(item.href) && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
                     )}
                     onMouseEnter={(e) => handleMouseEnter(item, e.currentTarget)}
                     onMouseLeave={handleMouseLeave}
@@ -384,8 +386,9 @@ export function Sidebar() {
                     href={item.href}
                     prefetch={false}
                     className={cn(
-                      'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                      is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold/20'
+                      'w-full relative block h-10 text-sm text-morandi-secondary transition-all duration-200',
+                      'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
+                      is_active(item.href) && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold shadow-sm'
                     )}
                   >
                     <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -425,8 +428,9 @@ export function Sidebar() {
                   href={item.href}
                   prefetch={false}
                   className={cn(
-                    'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                    is_active(item.href) && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold/20'
+                    'w-full relative block h-10 text-sm text-morandi-secondary transition-all duration-200',
+                    'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
+                    is_active(item.href) && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold shadow-sm'
                   )}
                 >
                   <item.icon size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -453,8 +457,9 @@ export function Sidebar() {
                 href="/settings"
                 prefetch={false}
                 className={cn(
-                  'w-full relative block h-10 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                  mounted && pathname === '/settings' && 'bg-morandi-container text-morandi-primary border-r-2 border-morandi-gold/20'
+                  'w-full relative block h-10 text-sm text-morandi-secondary transition-all duration-200',
+                  'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
+                  mounted && pathname === '/settings' && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold shadow-sm'
                 )}
               >
                 <Settings size={20} className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -493,8 +498,9 @@ export function Sidebar() {
               href={child.href}
               prefetch={false}
               className={cn(
-                'flex items-center px-4 py-2 text-sm text-morandi-secondary hover:bg-morandi-container hover:text-morandi-primary transition-colors',
-                is_active(child.href) && 'bg-morandi-container text-morandi-primary'
+                'flex items-center px-4 py-2 text-sm text-morandi-secondary transition-all duration-200',
+                'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold',
+                is_active(child.href) && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
               )}
             >
               <child.icon size={16} className="mr-3" />

@@ -31,32 +31,32 @@ function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
 
   if (variant === 'inline') {
     return (
-      <div className="hidden lg:flex items-center gap-4">
-        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium text-morandi-secondary">本週完成率</p>
-          <p className="text-xl font-semibold text-morandi-primary">
+      <div className="hidden lg:flex items-center gap-3">
+        <div className="rounded-lg border border-border/40 bg-morandi-container/30 px-3 py-1.5">
+          <p className="text-[10px] font-medium text-morandi-muted mb-0.5">本週完成率</p>
+          <p className="text-xs font-semibold text-morandi-primary">
             {Math.round(completionRate * 100)}%
           </p>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium text-morandi-secondary">運動時間</p>
-          <p className="text-xl font-semibold text-morandi-primary">
+        <div className="rounded-lg border border-border/40 bg-morandi-container/30 px-3 py-1.5">
+          <p className="text-[10px] font-medium text-morandi-muted mb-0.5">運動時間</p>
+          <p className="text-xs font-semibold text-morandi-primary">
             {formatTime(totalWorkoutTime)}
           </p>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium text-morandi-secondary">完成項目</p>
-          <p className="text-sm font-semibold text-morandi-primary">
+        <div className="rounded-lg border border-border/40 bg-morandi-container/30 px-3 py-1.5">
+          <p className="text-[10px] font-medium text-morandi-muted mb-0.5">完成項目</p>
+          <p className="text-xs font-medium text-morandi-secondary">
             運動 {completedByType.workout} / 保養 {completedByType.reminder} / 其他 {completedByType.basic}
           </p>
         </div>
 
         {hasWorkoutStats && (
-          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-            <p className="text-xs font-medium text-morandi-secondary">訓練量</p>
-            <p className="text-sm font-semibold text-morandi-primary">
+          <div className="rounded-lg border border-border/40 bg-morandi-container/30 px-3 py-1.5">
+            <p className="text-[10px] font-medium text-morandi-muted mb-0.5">訓練量</p>
+            <p className="text-xs font-medium text-morandi-secondary">
               {totalWorkoutVolume.toLocaleString()} kg · {totalWorkoutSessions} 次
             </p>
           </div>

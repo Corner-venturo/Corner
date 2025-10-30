@@ -9,13 +9,13 @@ interface FlightInfoSectionProps {
 export function FlightInfoSection({ data, updateFlightField }: FlightInfoSectionProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-gray-800 border-b-2 border-blue-500 pb-2">✈️ 航班資訊</h2>
+      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-blue-500 pb-2">✈️ 航班資訊</h2>
 
       <div className="bg-blue-50 p-4 rounded-lg space-y-3">
         <h3 className="font-bold text-blue-900">去程航班</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">航空公司</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">航空公司</label>
             <input
               type="text"
               value={data.outboundFlight?.airline || ""}
@@ -25,7 +25,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">航班號碼</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">航班號碼</label>
             <input
               type="text"
               value={data.outboundFlight?.flightNumber || ""}
@@ -35,7 +35,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">出發機場</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">出發機場</label>
             <input
               type="text"
               value={data.outboundFlight?.departureAirport || ""}
@@ -45,7 +45,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">出發時間</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">出發時間</label>
             <input
               type="text"
               value={data.outboundFlight?.departureTime || ""}
@@ -55,7 +55,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">出發日期</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">出發日期</label>
             <input
               type="text"
               value={data.outboundFlight?.departureDate || ""}
@@ -65,7 +65,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">抵達機場</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">抵達機場</label>
             <input
               type="text"
               value={data.outboundFlight?.arrivalAirport || ""}
@@ -75,7 +75,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">抵達時間</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">抵達時間</label>
             <input
               type="text"
               value={data.outboundFlight?.arrivalTime || ""}
@@ -85,8 +85,8 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">飛行時間（自動計算）</label>
-            <div className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-gray-700">
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">飛行時間（自動計算）</label>
+            <div className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-morandi-primary">
               {data.outboundFlight?.duration || "請輸入出發/抵達時間"}
             </div>
           </div>
@@ -97,7 +97,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
         <h3 className="font-bold text-indigo-900">回程航班</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">航空公司</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">航空公司</label>
             <input
               type="text"
               value={data.returnFlight?.airline || ""}
@@ -107,7 +107,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">航班號碼</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">航班號碼</label>
             <input
               type="text"
               value={data.returnFlight?.flightNumber || ""}
@@ -117,7 +117,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">出發機場</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">出發機場</label>
             <input
               type="text"
               value={data.returnFlight?.departureAirport || ""}
@@ -127,7 +127,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">出發時間</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">出發時間</label>
             <input
               type="text"
               value={data.returnFlight?.departureTime || ""}
@@ -137,7 +137,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">出發日期</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">出發日期</label>
             <input
               type="text"
               value={data.returnFlight?.departureDate || ""}
@@ -147,7 +147,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">抵達機場</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">抵達機場</label>
             <input
               type="text"
               value={data.returnFlight?.arrivalAirport || ""}
@@ -157,7 +157,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">抵達時間</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">抵達時間</label>
             <input
               type="text"
               value={data.returnFlight?.arrivalTime || ""}
@@ -167,8 +167,8 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">飛行時間（自動計算）</label>
-            <div className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-gray-700">
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">飛行時間（自動計算）</label>
+            <div className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-morandi-primary">
               {data.returnFlight?.duration || "請輸入出發/抵達時間"}
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useTimeboxStore } from '@/stores/timebox-store'
+import { alert } from '@/lib/ui/alert-dialog'
 
 import ScheduledBoxItem from './scheduled-box-item'
 import BoxSelector from './box-selector'
@@ -36,7 +37,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   }, [timeInterval])
 
   const [selectorTarget, setSelectorTarget] = useState<{ dayOfWeek: number; start_time: string } | null>(null)
-  const [slotHeight, setSlotHeight] = useState<number>(timeInterval === 30 ? 56 : 96)
+  const [slotHeight, setSlotHeight] = useState<number>(timeInterval === 30 ? 36 : 48)
   const measureRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -104,7 +105,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     setSelectorTarget({ dayOfWeek, start_time: timeSlot })
   }
 
-  const handleSelectBox = (boxId: string, duration: number) => {
+  const handleSelectBox = async (boxId: string, duration: number) => {
     if (!selectorTarget) return
     if (!currentWeek?.id) {
       setSelectorTarget(null)
@@ -114,7 +115,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     const { dayOfWeek, start_time } = selectorTarget
 
     if (hasConflict(dayOfWeek, start_time, duration)) {
-      alert('此時段已有其他箱子，請選擇其他時間')
+      await alert('此時段已有其他箱子，請選擇其他時間', 'warning', '時段衝突')
       return
     }
 
@@ -130,13 +131,13 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     setSelectorTarget(null)
   }
 
-  const slotClass = timeInterval === 30 ? 'min-h-[3.5rem]' : 'min-h-[4.75rem]'
+  const slotClass = timeInterval === 30 ? 'min-h-[2.25rem]' : 'min-h-[3rem]'
   const dayStartMinutes = startHour * 60
   const totalMinutes = (endHour - startHour) * 60
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-8 min-h-[600px]">
+      <div className="grid grid-cols-8">
         <div className="border-r border-border bg-morandi-container/10">
           {timeSlots.map((timeSlot, index) => (
             <div

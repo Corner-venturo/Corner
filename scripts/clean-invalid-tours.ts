@@ -10,7 +10,7 @@ async function cleanInvalidTours() {
 
   try {
     // 開啟 IndexedDB
-    const db = await openDB('venturo-db', 1);
+    const db = await openDB('VenturoOfflineDB', 2);
 
     // 讀取所有旅遊團
     const allTours = await db.getAll('tours');

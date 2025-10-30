@@ -322,7 +322,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
           placeholder="搜尋頻道..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="input-morandi h-8 text-sm"
+          className="h-8 text-sm"
         />
       </div>
 
@@ -453,7 +453,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
                   placeholder="說明這個頻道的用途"
                   value={newChannelDescription}
                   onChange={(e) => setNewChannelDescription(e.target.value)}
-                  className="input-morandi resize-none"
+                  className="resize-none"
                   rows={3}
                 />
               </div>

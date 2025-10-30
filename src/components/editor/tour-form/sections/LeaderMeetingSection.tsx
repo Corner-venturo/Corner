@@ -32,7 +32,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-800 border-b-2 border-purple-500 pb-2 flex-1">
+        <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-purple-500 pb-2 flex-1">
           👤 領隊與集合資訊
         </h2>
         <label className="flex items-center gap-2 text-sm">
@@ -42,14 +42,14 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
             onChange={(e) => updateField("showLeaderMeeting", e.target.checked)}
             className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
           />
-          <span className="text-gray-700">顯示此區塊</span>
+          <span className="text-morandi-primary">顯示此區塊</span>
         </label>
       </div>
 
       <div className="bg-purple-50 p-4 rounded-lg space-y-3">
         <h3 className="font-bold text-purple-900">領隊資訊</h3>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">領隊姓名</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">領隊姓名</label>
           <input
             type="text"
             value={data.leader?.name || ""}
@@ -60,7 +60,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">國內電話</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">國內電話</label>
             <input
               type="text"
               value={data.leader?.domesticPhone || ""}
@@ -70,7 +70,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">國外電話</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">國外電話</label>
             <input
               type="text"
               value={data.leader?.overseasPhone || ""}
@@ -96,7 +96,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
         </div>
 
         {meetingPoints.length === 0 && (
-          <p className="text-sm text-gray-500 text-center py-4">
+          <p className="text-sm text-morandi-secondary text-center py-4">
             尚未新增集合地點，點擊「新增集合地點」按鈕開始
           </p>
         )}
@@ -114,7 +114,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-morandi-primary mb-1">
                   集合時間 {index + 1}
                 </label>
                 <input
@@ -126,7 +126,7 @@ export function LeaderMeetingSection({ data, updateNestedField, updateField }: L
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-morandi-primary mb-1">
                   集合地點 {index + 1}
                 </label>
                 <input

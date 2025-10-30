@@ -252,7 +252,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -330,7 +330,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
                     placeholder="請輸入員工姓名（可修改）"
-                    className="w-full p-2 border-2 border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold focus:border-morandi-gold text-sm bg-white"
+                    className="w-full text-sm"
                   />
                 </div>
               </div>
@@ -352,7 +352,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   value={senderPhone}
                   onChange={(e) => setSenderPhone(e.target.value)}
                   placeholder="請輸入聯絡電話（可修改）"
-                  className="w-full p-2 border-2 border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold focus:border-morandi-gold text-sm bg-white"
+                  className="w-full text-sm"
                 />
               </div>
             </div>

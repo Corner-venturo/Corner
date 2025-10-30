@@ -49,7 +49,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>新增箱子</DialogTitle>

@@ -4,6 +4,8 @@ import { useTimeboxStore, ScheduledBox } from '@/stores/timebox-store'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Trash2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 interface BasicDialogProps {
   scheduledBox: ScheduledBox
@@ -12,6 +14,7 @@ interface BasicDialogProps {
 
 export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps) {
   const { boxes, toggleBoxCompletion, removeScheduledBox } = useTimeboxStore()
+  const { confirm, confirmDialogProps } = useConfirmDialog()
 
   const box = boxes.find(b => b.id === scheduledBox.boxId)
 
@@ -24,10 +27,20 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
   }
 
   // 刪除排程
-  const handleDelete = () => {
-    const confirmMessage = `確定要移除此排程嗎？\n\n箱子：${box?.name}\n時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}`;
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      type: 'warning',
+      title: '移除排程',
+      message: '確定要移除此排程嗎？',
+      details: [
+        `箱子：${box?.name}`,
+        `時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}`
+      ],
+      confirmLabel: '確認移除',
+      cancelLabel: '取消'
+    });
 
-    if (!confirm(confirmMessage)) {
+    if (!confirmed) {
       return;
     }
 
@@ -52,7 +65,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
@@ -106,6 +119,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
           </div>
         </div>
       </DialogContent>
+      <ConfirmDialog {...confirmDialogProps} />
     </Dialog>
   )
 }

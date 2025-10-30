@@ -6,6 +6,7 @@ import { ListPageLayout } from '@/components/layout/list-page-layout';
 import { FileSignature, Edit2, Trash2, Eye, Mail } from 'lucide-react';
 import { useTourStore, useOrderStore, useMemberStore } from '@/stores';
 import { useToast } from '@/components/ui/use-toast';
+import { confirm } from '@/lib/ui/alert-dialog';
 import { Tour } from '@/stores/types';
 import { TableColumn } from '@/components/ui/enhanced-table';
 import { DateCell, ActionCell, NumberCell } from '@/components/table-cells';
@@ -126,7 +127,12 @@ export default function ContractsPage() {
   ], [orders, members]);
 
   const handleDeleteContract = useCallback(async (tour: Tour) => {
-    if (!confirm(`確定要刪除「${tour.name}」的合約嗎？`)) {
+    const confirmed = await confirm(`確定要刪除「${tour.name}」的合約嗎？`, {
+      type: 'warning',
+      title: '刪除合約',
+    });
+
+    if (!confirmed) {
       return;
     }
 

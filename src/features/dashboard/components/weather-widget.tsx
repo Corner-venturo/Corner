@@ -271,7 +271,7 @@ export function WeatherWidget() {
                 <select
                   value={selectedCity.name}
                   onChange={(e) => handleCityChange(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 transition-all outline-none shadow-sm backdrop-blur-sm"
+                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 >
                   {CITIES.map((city) => (
                     <option key={city.name} value={city.name}>
@@ -298,7 +298,7 @@ export function WeatherWidget() {
                   onChange={(e) => handleDateChange(e.target.value)}
                   min={minDate.toISOString().split('T')[0]}
                   max={maxDate.toISOString().split('T')[0]}
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/20 transition-all outline-none shadow-sm backdrop-blur-sm"
+                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 />
               </div>
             </div>

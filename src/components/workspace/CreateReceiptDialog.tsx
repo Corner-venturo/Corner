@@ -116,7 +116,7 @@ export function CreateReceiptDialog({
                 type="date"
                 value={receiptDate}
                 onChange={(e) => setReceiptDate(e.target.value)}
-                className="input-morandi pl-10"
+                className="pl-10"
               />
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" size={16} />
             </div>
@@ -130,7 +130,6 @@ export function CreateReceiptDialog({
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as unknown)}
-              className="input-morandi"
             >
               <option value="現金">現金</option>
               <option value="匯款">匯款</option>
@@ -148,7 +147,6 @@ export function CreateReceiptDialog({
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="input-morandi"
               placeholder="輸入收款金額"
             />
           </div>
@@ -161,7 +159,6 @@ export function CreateReceiptDialog({
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="input-morandi"
               rows={3}
               placeholder="輸入備註..."
             />

@@ -181,15 +181,25 @@ export const useChannelsStore = create<ChannelsState>()(
         const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
         try {
+          // 1. 取得現有的頻道（可能來自 persist）
+          const existingChannels = get().channels.filter(ch => ch.workspace_id === currentWorkspaceId);
+
+          // 2. 從 IndexedDB 載入
           const cachedChannels = (await localDB.getAll('channels') as Channel[])
             .filter(ch => ch.workspace_id === currentWorkspaceId);
 
-          // 🔥 強制去重：使用 Map 確保 ID 唯一
-          const uniqueChannels = Array.from(
-            new Map(cachedChannels.map(ch => [ch.id, ch])).values()
-          );
+          // 3. 智慧合併：優先使用 IndexedDB（更新）、其次 persist（離線備份）
+          const channelMap = new Map<string, Channel>();
 
-          set({ channels: uniqueChannels, loading: false });
+          // 先加入 persist 的資料（作為備份）
+          existingChannels.forEach(ch => channelMap.set(ch.id, ch));
+
+          // IndexedDB 的資料覆蓋 persist（更可靠）
+          cachedChannels.forEach(ch => channelMap.set(ch.id, ch));
+
+          const mergedChannels = Array.from(channelMap.values());
+
+          set({ channels: mergedChannels, loading: false });
 
           if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
             setTimeout(async () => {
@@ -206,8 +216,7 @@ export const useChannelsStore = create<ChannelsState>()(
 
                 const freshChannels = data || [];
 
-                // 🔥 修正：清理舊資料，只保留 Supabase 的真實資料
-                // 1. 取得 IndexedDB 中所有該 workspace 的頻道
+                // 清理舊資料，只保留 Supabase 的真實資料
                 const allCachedChannels = await localDB.getAll('channels') as Channel[];
                 const workspaceChannelIds = new Set(
                   allCachedChannels
@@ -215,7 +224,7 @@ export const useChannelsStore = create<ChannelsState>()(
                     .map(ch => ch.id)
                 );
 
-                // 2. 刪除不在 Supabase 中的頻道（已被刪除的頻道）
+                // 刪除不在 Supabase 中的頻道（已被刪除的頻道）
                 const freshChannelIds = new Set(freshChannels.map(ch => ch.id));
                 for (const cachedId of workspaceChannelIds) {
                   if (!freshChannelIds.has(cachedId)) {
@@ -223,17 +232,27 @@ export const useChannelsStore = create<ChannelsState>()(
                   }
                 }
 
-                // 3. 更新/新增 Supabase 中的頻道
+                // 更新/新增 Supabase 中的頻道到 IndexedDB
                 for (const channel of freshChannels) {
                   await localDB.put('channels', channel);
                 }
 
-                // 🔥 強制去重：確保從 Supabase 來的也唯一
-                const uniqueFreshChannels = Array.from(
-                  new Map(freshChannels.map(ch => [ch.id, ch])).values()
-                );
+                // 🔥 智慧更新：只有真正變化時才更新 state
+                const currentChannels = get().channels.filter(ch => ch.workspace_id === currentWorkspaceId);
+                const hasChanges = freshChannels.length !== currentChannels.length ||
+                  freshChannels.some(fresh =>
+                    !currentChannels.find(current =>
+                      current.id === fresh.id &&
+                      current.name === fresh.name &&
+                      current.is_favorite === fresh.is_favorite
+                    )
+                  );
 
-                set({ channels: uniqueFreshChannels });
+                if (hasChanges) {
+                  // 保留其他 workspace 的頻道，只更新當前 workspace
+                  const otherWorkspaceChannels = get().channels.filter(ch => ch.workspace_id !== currentWorkspaceId);
+                  set({ channels: [...otherWorkspaceChannels, ...freshChannels] });
+                }
               } catch (syncError) {
                               }
             }, 0);
@@ -552,9 +571,10 @@ export const useChannelsStore = create<ChannelsState>()(
       partialize: (state) => ({
         workspaces: state.workspaces,
         currentWorkspace: state.currentWorkspace,
+        bulletins: state.bulletins,
+        channels: state.channels,
+        channelGroups: state.channelGroups,
         selectedChannel: state.selectedChannel
-        // ❌ 移除 channels, channelGroups, bulletins
-        // 這些應該只存在 IndexedDB，避免與 localStorage 雙重快取衝突
       })
     }
   )

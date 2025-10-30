@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} fr
 import { useTodoStore } from '@/stores';
 import { useUserStore } from '@/stores/user-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { alertError, alertWarning } from '@/lib/ui/alert-dialog';
 import { CheckCircle, Clock, Calendar, ChevronDown, X, Star, Receipt, FileText, Users, DollarSign, UserPlus, AlertCircle, Trash2, Edit2} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
@@ -16,6 +17,8 @@ import { EnhancedTable } from '@/components/ui/enhanced-table';
 import { TodoExpandedView } from '@/components/todos/todo-expanded-view';
 import { StarRating } from '@/components/ui/star-rating';
 import { Todo } from '@/stores/types';
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +42,8 @@ export default function TodosPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isLoading, _setIsLoading] = useState(false); // 使用快取資料，不需要載入
   const [isSubmitting, setIsSubmitting] = useState(false); // 防止重複提交
-  const [isComposing, setIsComposing] = useState(false); // 中文輸入法狀態
+  const [quickAddValue, setQuickAddValue] = useState(''); // 快速新增輸入框的值
+  const { confirm, confirmDialogProps } = useConfirmDialog();
 
   // 載入待辦事項資料
   useEffect(() => {
@@ -191,12 +195,19 @@ export default function TodosPage() {
     setExpandedTodo(todo.id);
   }, []);
 
-  const handleDeleteTodo = useCallback((todo: Todo, e?: React.MouseEvent) => {
+  const handleDeleteTodo = useCallback(async (todo: Todo, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
 
-    const confirmMessage = `確定要刪除待辦事項「${todo.title}」嗎？\n\n此操作無法復原。`;
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除待辦事項',
+      message: `確定要刪除待辦事項「${todo.title}」嗎？`,
+      details: ['此操作無法復原'],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
 
-    if (!confirm(confirmMessage)) {
+    if (!confirmed) {
       return;
     }
 
@@ -208,13 +219,13 @@ export default function TodosPage() {
       }
     } catch (err) {
       logger.error('刪除待辦事項失敗:', err);
-      alert('刪除失敗，請稍後再試');
+      await alertError('刪除失敗，請稍後再試');
     }
-  }, [deleteTodo, expandedTodo]);
+  }, [deleteTodo, expandedTodo, confirm]);
 
   const handleAddTodo = useCallback(async (formData: any) => {
     if (!user?.id) {
-      alert('請先登入');
+      await alertWarning('請先登入');
       return;
     }
 
@@ -244,7 +255,7 @@ export default function TodosPage() {
       setIsAddDialogOpen(false);
     } catch (error) {
       logger.error('新增待辦事項失敗:', error);
-      alert('新增失敗，請稍後再試');
+      await alertError('新增失敗，請稍後再試');
     }
   }, [addTodo, user?.id]);
 
@@ -262,19 +273,18 @@ export default function TodosPage() {
           <Input
             placeholder="快速新增... (Enter)"
             className="w-64"
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
+            value={quickAddValue}
+            onChange={(e) => setQuickAddValue(e.target.value)}
             onKeyDown={async (e) => {
-              // 如果正在使用輸入法（如注音、拼音），不要觸發新增
-              if (e.key === 'Enter' && e.currentTarget.value.trim() && !isSubmitting && !isComposing) {
+              // 使用原生事件檢查輸入法狀態，避免 React 狀態更新時序問題
+              if (e.key === 'Enter' && quickAddValue.trim() && !isSubmitting && !e.nativeEvent.isComposing) {
                 e.preventDefault();
                 if (!user?.id) {
-                  alert('請先登入');
+                  await alertWarning('請先登入');
                   return;
                 }
-                const title = e.currentTarget.value.trim();
-                const inputElement = e.currentTarget;
-                inputElement.value = '';
+                const title = quickAddValue.trim();
+                setQuickAddValue(''); // 清空受控組件的值
                 setIsSubmitting(true);
 
                 const newTodoData = {
@@ -297,10 +307,8 @@ export default function TodosPage() {
                   logger.log('✅ 待辦事項新增成功');
                 } catch (error) {
                   logger.error('快速新增失敗:', error);
-                  if (inputElement) {
-                    inputElement.value = title;
-                  }
-                  alert('新增失敗，請稍後再試');
+                  setQuickAddValue(title); // 失敗時恢復輸入內容
+                  await alertError('新增失敗，請稍後再試');
                 } finally {
                   setIsSubmitting(false);
                 }
@@ -400,6 +408,9 @@ export default function TodosPage() {
           <AddTodoForm onSubmit={handleAddTodo} onCancel={() => setIsAddDialogOpen(false)} />
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 }

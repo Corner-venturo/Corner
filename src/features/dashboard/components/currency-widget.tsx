@@ -118,7 +118,7 @@ export function CurrencyWidget() {
                 setSelectedCurrency(e.target.value as keyof typeof DEFAULT_RATES);
                 setUseCustomRate(false);
               }}
-              className="w-full px-3.5 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white focus:border-morandi-gold/60 focus:ring-2 focus:ring-morandi-gold/20 transition-all outline-none shadow-sm backdrop-blur-sm"
+              className="w-full px-3.5 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
             >
               {Object.entries(DEFAULT_RATES).map(([code, info]) => (
                 <option key={code} value={code}>
@@ -140,7 +140,7 @@ export function CurrencyWidget() {
                     type="number"
                     value={twdAmount}
                     onChange={(e) => handleTwdChange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white focus:border-morandi-gold/60 focus:ring-2 focus:ring-morandi-gold/20 transition-all outline-none shadow-sm backdrop-blur-sm"
+                    className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                     placeholder="10000"
                   />
                 </div>
@@ -168,7 +168,7 @@ export function CurrencyWidget() {
                     type="number"
                     value={foreignAmount}
                     onChange={(e) => handleForeignChange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white focus:border-morandi-gold/60 focus:ring-2 focus:ring-morandi-gold/20 transition-all outline-none shadow-sm backdrop-blur-sm"
+                    className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                     placeholder="0.00"
                   />
                 </div>
@@ -200,7 +200,7 @@ export function CurrencyWidget() {
                 setCustomRate(e.target.value);
                 setUseCustomRate(true);
               }}
-              className="w-full px-3.5 py-2.5 border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white focus:border-morandi-gold/60 focus:ring-2 focus:ring-morandi-gold/20 transition-all outline-none shadow-sm backdrop-blur-sm"
+              className="w-full px-3.5 py-2.5 border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
               placeholder="輸入匯率"
             />
             <div className="flex items-center gap-1.5 text-xs text-morandi-secondary/90 bg-white/40 px-2.5 py-1.5 rounded-lg">

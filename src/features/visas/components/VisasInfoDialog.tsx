@@ -162,7 +162,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
   );
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <DialogTitle>簽證資訊總覽</DialogTitle>

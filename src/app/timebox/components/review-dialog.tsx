@@ -87,7 +87,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
   if (!isOpen) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
@@ -101,23 +101,23 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             <h3 className="font-medium mb-3">本週統計</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600">完成率：</span>
+                <span className="text-morandi-secondary">完成率：</span>
                 <span className="font-medium">{Math.round(stats.completionRate * 100)}%</span>
               </div>
               <div>
-                <span className="text-gray-600">運動時間：</span>
+                <span className="text-morandi-secondary">運動時間：</span>
                 <span className="font-medium">{formatTime(stats.totalWorkoutTime)}</span>
               </div>
               {stats.totalWorkoutVolume && stats.totalWorkoutVolume > 0 && (
                 <div className="col-span-2">
-                  <span className="text-gray-600">總訓練量：</span>
+                  <span className="text-morandi-secondary">總訓練量：</span>
                   <span className="font-medium">{stats.totalWorkoutVolume.toLocaleString()} kg</span>
                 </div>
               )}
             </div>
 
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="text-sm text-gray-600">完成項目分布：</div>
+              <div className="text-sm text-morandi-secondary">完成項目分布：</div>
               <div className="flex space-x-4 mt-1 text-sm">
                 <span>運動 {stats.completedByType.workout} 次</span>
                 <span>保養 {stats.completedByType.reminder} 次</span>
@@ -128,7 +128,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
 
           {/* 存檔名稱 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               存檔名稱
             </label>
             <Input
@@ -140,7 +140,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
 
           {/* 覆盤筆記 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               覆盤筆記 (選填)
             </label>
             <Textarea
@@ -167,7 +167,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             {/* 模板選擇 */}
             {copyToNext && weekRecords.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-morandi-primary mb-2">
                   選擇存檔模板（選填）
                 </label>
                 <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
@@ -185,7 +185,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
                       ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-morandi-secondary mt-1">
                   選擇模板會複製該週的排程安排
                 </p>
               </div>

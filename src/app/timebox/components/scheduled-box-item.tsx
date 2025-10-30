@@ -56,12 +56,12 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
 
   return (
     <div
-      className={`absolute inset-x-2 rounded-xl shadow-sm border border-border/40 px-3 py-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
+      className={`absolute inset-x-0.5 rounded-xl shadow-sm border border-border/40 px-3 py-2 text-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
         scheduledBox.completed ? 'opacity-80' : ''
       }`}
       style={{
-        top: `${topOffset}px`,
-        height: `${height}px`,
+        top: `${topOffset + 2}px`,
+        height: `${height - 4}px`,
         backgroundColor: box.color,
         borderLeft: `4px solid ${scheduledBox.completed ? 'var(--morandi-green)' : box.color}`,
       }}

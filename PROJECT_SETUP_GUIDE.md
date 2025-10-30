@@ -609,7 +609,7 @@ psql postgresql://[connection-string] < migration.sql
 
 ```bash
 # 在瀏覽器 Console 執行
-indexedDB.deleteDatabase('venturo-db');
+indexedDB.deleteDatabase('VenturoOfflineDB');
 location.reload();
 ```
 

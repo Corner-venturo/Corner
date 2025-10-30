@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useTimeboxStore, WorkoutData, WorkoutExercise, ScheduledBox } from '@/stores/timebox-store'
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 interface WorkoutDialogProps {
   scheduledBox: ScheduledBox
@@ -35,6 +37,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
     reps: 0,
     sets: 3,
   })
+  const { confirm, confirmDialogProps } = useConfirmDialog()
 
   const box = boxes.find(b => b.id === scheduledBox.boxId)
 
@@ -99,8 +102,16 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
   }
 
   // 刪除動作
-  const handleDeleteExercise = (exerciseId: string) => {
-    if (!confirm('確定要刪除此動作嗎？')) return
+  const handleDeleteExercise = async (exerciseId: string) => {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除動作',
+      message: '確定要刪除此動作嗎？',
+      details: ['此操作無法復原'],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    })
+    if (!confirmed) return
     removeWorkoutExercise(scheduledBox.id, exerciseId)
   }
 
@@ -129,8 +140,16 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
   }
 
   // 刪除排程
-  const handleDelete = () => {
-    if (!confirm(`確定要移除此訓練排程嗎？\n\n箱子：${box?.name}`)) return
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      type: 'warning',
+      title: '移除排程',
+      message: `確定要移除此訓練排程嗎？`,
+      details: [`箱子：${box?.name}`],
+      confirmLabel: '確認移除',
+      cancelLabel: '取消'
+    })
+    if (!confirmed) return
     removeScheduledBox(scheduledBox.id)
     onClose()
   }
@@ -445,6 +464,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
           </div>
         </div>
       </DialogContent>
+      <ConfirmDialog {...confirmDialogProps} />
     </Dialog>
   )
 }

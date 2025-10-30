@@ -29,7 +29,7 @@
 - [ ] 資料過濾邏輯正確性
 
 ### 5. 命名與規範層 (Naming & Standards)
-- [ ] 資料庫名稱統一（VenturoOfflineDB vs venturo-db）
+- [ ] 資料庫名稱統一（VenturoOfflineDB vs VenturoOfflineDB）
 - [ ] 欄位命名規範（snake_case 一致性）
 - [ ] 程式碼風格一致性
 
@@ -64,7 +64,7 @@
 #### 2. 資料庫名稱不一致
 **問題描述**：
 - Schema 定義：`VenturoOfflineDB`
-- 實際使用：`venturo-db`（多處）
+- 實際使用：`VenturoOfflineDB`（多處）
 
 **影響範圍**：
 - clear-cache.html
@@ -106,7 +106,7 @@
 
 #### 5. 快取清除工具指向錯誤
 **問題描述**：
-- clear-cache.html 清除 `venturo-db`
+- clear-cache.html 清除 `VenturoOfflineDB`
 - 實際資料庫是 `VenturoOfflineDB`
 
 **解決方案**：

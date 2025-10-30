@@ -9,6 +9,8 @@ import { useRegionsHierarchy } from '../hooks/useRegionsHierarchy';
 import { RegionsList } from './RegionsList';
 import { AddCountryDialog, AddRegionDialog, AddCityDialog, EditCityDialog } from './RegionsDialogs';
 import { EditCityImageDialog } from './EditCityImageDialog';
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 // ============================================
 // 地區管理主頁面
@@ -56,6 +58,7 @@ export default function RegionsPage() {
   const [selectedCountryId, setSelectedCountryId] = useState<string>('');
   const [selectedRegionId, setSelectedRegionId] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
+  const { confirm, confirmDialogProps } = useConfirmDialog();
 
   // 載入資料
   useEffect(() => {
@@ -73,19 +76,49 @@ export default function RegionsPage() {
 
   // 刪除處理
   const handleDeleteCountry = async (id: string) => {
-    if (confirm('確定要刪除此國家？這將同時刪除所有關聯的地區和城市。')) {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除國家',
+      message: '確定要刪除此國家嗎？',
+      details: [
+        '⚠️ 這將同時刪除所有關聯的地區和城市',
+        '⚠️ 此操作無法復原'
+      ],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
+    if (confirmed) {
       await deleteCountry(id);
     }
   };
 
   const handleDeleteRegion = async (id: string) => {
-    if (confirm('確定要刪除此地區？這將同時刪除所有關聯的城市。')) {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除地區',
+      message: '確定要刪除此地區嗎？',
+      details: [
+        '⚠️ 這將同時刪除所有關聯的城市',
+        '⚠️ 此操作無法復原'
+      ],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
+    if (confirmed) {
       await deleteRegion(id);
     }
   };
 
   const handleDeleteCity = async (id: string) => {
-    if (confirm('確定要刪除此城市？')) {
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除城市',
+      message: '確定要刪除此城市嗎？',
+      details: ['此操作無法復原'],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
+    if (confirmed) {
       await deleteCity(id);
     }
   };
@@ -195,6 +228,7 @@ export default function RegionsPage() {
         city={selectedCity}
         onUpdate={updateCity}
       />
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 }

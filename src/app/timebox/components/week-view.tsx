@@ -43,7 +43,7 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
       {/* 日期標題列 */}
       <div className="grid grid-cols-8 border-b border-border bg-morandi-container/30">
         {/* 時間欄標題 */}
-        <div className="p-2 sm:p-4 text-xs sm:text-sm font-medium text-morandi-secondary border-r border-border flex items-center justify-center">
+        <div className="py-2.5 px-4 text-xs font-medium text-morandi-secondary border-r border-border flex items-center justify-center">
           時間
         </div>
 
@@ -53,11 +53,11 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
           return (
             <div
               key={index}
-              className={`p-2 sm:p-4 text-center border-r border-border last:border-r-0 flex items-center justify-center ${
+              className={`py-2.5 px-4 text-center border-r border-border last:border-r-0 flex items-center justify-center ${
                 isToday ? 'bg-morandi-gold/10' : ''
               }`}
             >
-              <div className={`text-xs sm:text-sm font-medium ${isToday ? 'text-morandi-gold' : 'text-morandi-secondary'}`}>
+              <div className={`text-xs font-medium ${isToday ? 'text-morandi-gold' : 'text-morandi-secondary'}`}>
                 <span className="hidden sm:inline">{dayLabels[day.getDay()]} {day.getDate()}</span>
                 <span className="sm:hidden">{dayLabels[day.getDay()].slice(1)} {day.getDate()}</span>
               </div>

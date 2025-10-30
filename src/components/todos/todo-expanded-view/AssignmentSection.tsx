@@ -45,14 +45,14 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
         <div className="flex items-center gap-3">
           <Clock size={16} className="text-morandi-secondary" />
           <span className="text-xs text-morandi-secondary min-w-[50px]">狀態:</span>
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => onUpdate({ status: 'pending' })}
               className={cn(
-                'px-3 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'pending'
-                  ? 'bg-morandi-muted text-white shadow-sm'
-                  : 'bg-white/60 border border-morandi-container/30 text-morandi-secondary hover:bg-white hover:border-morandi-muted/50'
+                  ? 'bg-morandi-muted text-white shadow-md'
+                  : 'bg-morandi-container/30 border border-morandi-muted/20 text-morandi-secondary hover:bg-morandi-muted/10 hover:border-morandi-muted/40 hover:text-morandi-muted'
               )}
             >
               待辦
@@ -60,10 +60,10 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
             <button
               onClick={() => onUpdate({ status: 'in_progress' })}
               className={cn(
-                'px-3 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'in_progress'
-                  ? 'bg-morandi-gold text-white shadow-sm'
-                  : 'bg-white/60 border border-morandi-container/30 text-morandi-secondary hover:bg-white hover:border-morandi-gold/20'
+                  ? 'bg-morandi-gold text-white shadow-md'
+                  : 'bg-morandi-container/30 border border-morandi-gold/20 text-morandi-secondary hover:bg-morandi-gold/10 hover:border-morandi-gold/40 hover:text-morandi-gold'
               )}
             >
               進行中
@@ -71,10 +71,10 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
             <button
               onClick={() => onUpdate({ status: 'completed' })}
               className={cn(
-                'px-3 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'completed'
-                  ? 'bg-morandi-green text-white shadow-sm'
-                  : 'bg-white/60 border border-morandi-container/30 text-morandi-secondary hover:bg-white hover:border-morandi-green/50'
+                  ? 'bg-morandi-green text-white shadow-md'
+                  : 'bg-morandi-container/30 border border-morandi-green/20 text-morandi-secondary hover:bg-morandi-green/10 hover:border-morandi-green/40 hover:text-morandi-green'
               )}
             >
               完成
@@ -82,10 +82,10 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
             <button
               onClick={() => onUpdate({ status: 'cancelled' })}
               className={cn(
-                'px-3 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'cancelled'
-                  ? 'bg-morandi-red text-white shadow-sm'
-                  : 'bg-white/60 border border-morandi-container/30 text-morandi-secondary hover:bg-white hover:border-morandi-red/50'
+                  ? 'bg-morandi-red text-white shadow-md'
+                  : 'bg-morandi-container/30 border border-morandi-red/20 text-morandi-secondary hover:bg-morandi-red/10 hover:border-morandi-red/40 hover:text-morandi-red'
               )}
             >
               取消

@@ -78,7 +78,7 @@ export function DailyItinerarySection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-red-500 pb-2">
-        <h2 className="text-lg font-bold text-gray-800">📅 逐日行程</h2>
+        <h2 className="text-lg font-bold text-morandi-primary">📅 逐日行程</h2>
         <button
           onClick={addDailyItinerary}
           className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
@@ -88,7 +88,7 @@ export function DailyItinerarySection({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">行程副標題</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">行程副標題</label>
         <input
           type="text"
           value={data.itinerarySubtitle || ""}
@@ -105,7 +105,7 @@ export function DailyItinerarySection({
               <span className="bg-red-500 text-white px-3 py-1.5 rounded-full font-semibold text-sm tracking-wide">
                 {day.dayLabel}
               </span>
-              <span className="text-gray-500 text-sm">{day.date}</span>
+              <span className="text-morandi-secondary text-sm">{day.date}</span>
             </div>
             <button
               onClick={() => removeDailyItinerary(dayIndex)}
@@ -117,7 +117,7 @@ export function DailyItinerarySection({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Day 標籤</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">Day 標籤</label>
               <input
                 type="text"
                 value={day.dayLabel}
@@ -127,7 +127,7 @@ export function DailyItinerarySection({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">日期</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">日期</label>
               <input
                 type="text"
                 value={day.date}
@@ -139,7 +139,7 @@ export function DailyItinerarySection({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">行程標題</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">行程標題</label>
             <input
               type="text"
               value={day.title}
@@ -150,7 +150,7 @@ export function DailyItinerarySection({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">特別安排 (highlight)</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">特別安排 (highlight)</label>
             <input
               type="text"
               value={day.highlight || ""}
@@ -161,7 +161,7 @@ export function DailyItinerarySection({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
             <textarea
               value={day.description || ""}
               onChange={(e) => updateDailyItinerary(dayIndex, "description", e.target.value)}
@@ -175,8 +175,8 @@ export function DailyItinerarySection({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium text-gray-700">每日圖片</label>
-                <p className="text-xs text-gray-500 mt-1">建議尺寸 1600 × 900 以上，可依序新增多張照片</p>
+                <label className="text-sm font-medium text-morandi-primary">每日圖片</label>
+                <p className="text-xs text-morandi-secondary mt-1">建議尺寸 1600 × 900 以上，可依序新增多張照片</p>
               </div>
               <button
                 onClick={() => addDayImage(dayIndex)}
@@ -214,7 +214,7 @@ export function DailyItinerarySection({
           {/* 活動 */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-gray-700">景點活動</label>
+              <label className="text-sm font-medium text-morandi-primary">景點活動</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleOpenAttractionSelector(dayIndex)}
@@ -281,7 +281,7 @@ export function DailyItinerarySection({
           {/* 推薦行程 */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-gray-700">推薦行程</label>
+              <label className="text-sm font-medium text-morandi-primary">推薦行程</label>
               <button
                 onClick={() => addRecommendation(dayIndex)}
                 className="px-2 py-1 bg-green-500 text-white rounded text-xs"
@@ -311,7 +311,7 @@ export function DailyItinerarySection({
           {/* 餐食 */}
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">早餐</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">早餐</label>
               <input
                 type="text"
                 value={day.meals?.breakfast || ""}
@@ -321,7 +321,7 @@ export function DailyItinerarySection({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">午餐</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">午餐</label>
               <input
                 type="text"
                 value={day.meals?.lunch || ""}
@@ -331,7 +331,7 @@ export function DailyItinerarySection({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">晚餐</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">晚餐</label>
               <input
                 type="text"
                 value={day.meals?.dinner || ""}
@@ -344,7 +344,7 @@ export function DailyItinerarySection({
 
           {/* 住宿 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">住宿</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">住宿</label>
             <input
               type="text"
               value={day.accommodation || ""}

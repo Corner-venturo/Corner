@@ -1,106 +1,93 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+/**
+ * Timebox Store - 整合 Supabase 版本
+ * 使用 Offline-First 架構：Supabase（雲端）+ IndexedDB（快取）
+ */
 
-const generateId = () => crypto.randomUUID()
+import { create } from 'zustand';
+import { BaseEntity } from '@/types';
+import { TABLES } from '@/lib/db/schemas';
+import { createStore } from './core/create-store-new';
+import { generateUUID } from '@/lib/utils/uuid';
 
-// 基礎類型定義
-export interface BaseBox {
-  id: string
-  name: string
-  color: string
-  type: 'workout' | 'reminder' | 'basic'
-  user_id: string
-  created_at: Date
-  updated_at: Date
-  // 重訓專用欄位
-  equipment?: string // 器材
-  weight?: number    // 重量 (kg)
-  reps?: number      // 次數
-  sets?: number      // 組數
+const generateId = () => generateUUID();
+
+// ============================================
+// 型別定義
+// ============================================
+
+// 基礎箱子類型
+export interface BaseBox extends BaseEntity {
+  name: string;
+  color: string;
+  type: 'workout' | 'reminder' | 'basic';
+  user_id: string;
 }
 
 // 單個重訓動作
 export interface WorkoutExercise {
-  id: string
-  equipment: string // 器材/動作名稱
-  weight: number    // 重量 (kg)
-  reps: number      // 次數
-  sets: number      // 組數
-  setsCompleted: boolean[] // 每組的完成狀態
-  completedSetsTime: (Date | null)[] // 每組完成的時間
+  id: string;
+  equipment: string; // 器材/動作名稱
+  weight: number;    // 重量 (kg)
+  reps: number;      // 次數
+  sets: number;      // 組數
+  setsCompleted: boolean[]; // 每組的完成狀態
+  completedSetsTime: (string | null)[]; // 每組完成的時間（ISO string）
 }
 
-// 重訓資料 - 支援多個動作
+// 重訓資料
 export interface WorkoutData {
-  exercises: WorkoutExercise[] // 多個動作
-  totalVolume?: number     // 總訓練量 (重量 × 次數 × 組數)
+  exercises: WorkoutExercise[]; // 多個動作
+  totalVolume?: number;     // 總訓練量
 }
 
 // 提醒資料
 export interface ReminderData {
-  text: string
-  lastUpdated: Date
+  text: string;
+  lastUpdated: string; // ISO string
 }
 
 // 排程箱子實例
-export interface ScheduledBox {
-  id: string
-  boxId: string
-  weekId: string
-  dayOfWeek: number // 0-6 (週日到週六)
-  start_time: string // "HH:mm" 格式
-  duration: number // 分鐘數
-  completed: boolean
-  completedAt?: Date
-  data?: WorkoutData | ReminderData
-  // 重訓組別進度追蹤
-  setsProgress?: {
-    completed: number // 已完成組數
-    total: number     // 總組數
-  }
+export interface ScheduledBox extends BaseEntity {
+  box_id: string;
+  week_id: string;
+  day_of_week: number; // 0-6
+  start_time: string; // "HH:mm"
+  duration: number; // 分鐘數
+  completed: boolean;
+  completed_at?: string; // ISO string
+  data?: WorkoutData | ReminderData;
 }
 
 // 週記錄
-export interface WeekRecord {
-  id: string
-  user_id: string
-  weekStart: Date
-  weekEnd: Date
-  name?: string
-  archived: boolean
-  scheduledBoxes: ScheduledBox[]
-  statistics: {
-    completionRate: number
-    totalWorkoutVolume?: number
-    totalWorkoutSessions?: number
-    completedCount: number
-    totalCount: number
-  }
-  review?: {
-    notes: string
-    created_at: Date
-  }
+export interface WeekRecord extends BaseEntity {
+  user_id: string;
+  week_start: string; // ISO date string
+  week_end: string; // ISO date string
+  name?: string;
+  archived: boolean;
+  review_notes?: string;
+  review_created_at?: string; // ISO string
 }
 
 // 統計資料
 export interface WeekStatistics {
-  completionRate: number
-  totalWorkoutTime: number
+  completionRate: number;
+  totalWorkoutTime: number;
   completedByType: {
-    workout: number
-    reminder: number
-    basic: number
-  }
-  totalWorkoutVolume?: number
-  totalWorkoutSessions?: number
+    workout: number;
+    reminder: number;
+    basic: number;
+  };
+  totalWorkoutVolume?: number;
+  totalWorkoutSessions?: number;
 }
 
 // 趨勢資料
 export interface WorkoutTrend {
-  week: string
-  volume: number
-  sessions: number
-  completionRate: number
+  week: string;
+  volume: number;
+  sessions: number;
+  completionRate: number;
 }
 
 // 莫蘭迪配色選項
@@ -121,455 +108,267 @@ export const morandiColors = [
   { name: '苔蘚綠', value: '#B8C4B8', hover: '#A5B3A5' },
   { name: '砂岩褐', value: '#C8B8B0', hover: '#B9A59C' },
   { name: '月光白', value: '#E8E8E8', hover: '#DEDEDE' },
-]
+];
+
+// ============================================
+// 基礎 Stores（使用 createStore）
+// ============================================
+
+// 箱子 Store
+export const useBoxesStore = createStore<BaseBox>(
+  TABLES.TIMEBOX_BOXES,
+  undefined,
+  true // enableSupabase
+);
+
+// 週記錄 Store
+export const useWeeksStore = createStore<WeekRecord>(
+  TABLES.TIMEBOX_WEEKS,
+  undefined,
+  true // enableSupabase
+);
+
+// 排程箱子 Store
+export const useScheduledBoxesStore = createStore<ScheduledBox>(
+  TABLES.TIMEBOX_SCHEDULED_BOXES,
+  undefined,
+  true // enableSupabase
+);
+
+// ============================================
+// 組合 Store（高階 API）
+// ============================================
 
 interface TimeboxState {
-  // 箱子管理
-  boxes: BaseBox[]
-  createBox: (box: Omit<BaseBox, 'id' | 'created_at' | 'updated_at'>) => void
-  updateBox: (id: string, updates: Partial<BaseBox>) => void
-  deleteBox: (id: string) => void
+  // 當前週記錄
+  currentWeekId: string | null;
+  setCurrentWeekId: (weekId: string | null) => void;
 
-  // 週排程
-  currentWeek: WeekRecord | null
-  scheduledBoxes: ScheduledBox[]
-  addScheduledBox: (box: Omit<ScheduledBox, 'id'>) => void
-  updateScheduledBox: (id: string, updates: Partial<ScheduledBox>) => void
-  removeScheduledBox: (id: string) => void
-  toggleBoxCompletion: (id: string) => void
+  // 初始化當前週
+  initializeCurrentWeek: (weekStart: Date, userId: string) => Promise<void>;
 
-  // 重訓資料
-  updateWorkoutData: (boxId: string, data: WorkoutData) => void
-  addWorkoutExercise: (boxId: string, exercise: Omit<WorkoutExercise, 'id'>) => void
-  removeWorkoutExercise: (boxId: string, exerciseId: string) => void
-  updateWorkoutExercise: (boxId: string, exerciseId: string, updates: Partial<WorkoutExercise>) => void
-  toggleSetCompletion: (boxId: string, exerciseId: string, setIndex: number) => void
+  // 獲取當前週的排程箱子
+  getCurrentWeekScheduledBoxes: () => ScheduledBox[];
 
-  // 文字提示資料
-  updateReminderData: (boxId: string, data: ReminderData) => void
+  // 獲取週統計
+  getWeekStatistics: (weekId: string) => Promise<WeekStatistics>;
 
-  // 週記錄
-  weekRecords: WeekRecord[]
-  archiveCurrentWeek: (name: string) => void
-  loadWeekRecord: (id: string) => void
-  copyToNextWeek: (recordId: string) => void
-
-  // 統計
-  getWeekStatistics: () => WeekStatistics
-  getWorkoutTrends: (weeks: number) => WorkoutTrend[]
-
-  // 初始化
-  initializeCurrentWeek: (weekStart: Date) => void
+  // 獲取訓練趨勢
+  getWorkoutTrends: (weeks: number, userId: string) => Promise<WorkoutTrend[]>;
 }
 
 // 輔助函數
 const getWeekStart = (date: Date) => {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1) // 調整為週一開始
-  return new Date(d.setDate(diff))
-}
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 
 const getWeekEnd = (date: Date) => {
-  const start = getWeekStart(date)
-  const end = new Date(start)
-  end.setDate(start.getDate() + 6)
-  return end
-}
+  const start = getWeekStart(date);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+};
 
-export const useTimeboxStore = create<TimeboxState>()(
-  persist(
-    (set, get) => ({
-      // 初始狀態
-      boxes: [],
-      currentWeek: null,
-      scheduledBoxes: [],
-      weekRecords: [],
+// 組合 Store
+export const useTimeboxStore = create<TimeboxState>((set, get) => ({
+  currentWeekId: null,
 
-      // 箱子管理
-      createBox: (boxData) => {
-        const newBox: BaseBox = {
-          ...boxData,
-          id: generateId(),
-          created_at: new Date(),
-          updated_at: new Date(),
-        }
-        set((state) => ({
-          boxes: [...state.boxes, newBox]
-        }))
-      },
+  setCurrentWeekId: (weekId) => set({ currentWeekId: weekId }),
 
-      updateBox: (id, updates) => {
-        set((state) => ({
-          boxes: state.boxes.map((box) =>
-            box.id === id ? { ...box, ...updates, updated_at: new Date() } : box
-          )
-        }))
-      },
+  initializeCurrentWeek: async (weekStart, userId) => {
+    const start = getWeekStart(weekStart);
+    const end = getWeekEnd(weekStart);
 
-      deleteBox: (id) => {
-        set((state) => ({
-          boxes: state.boxes.filter((box) => box.id !== id),
-          scheduledBoxes: state.scheduledBoxes.filter((sb) => sb.boxId !== id)
-        }))
-      },
+    // 檢查是否已存在該週記錄
+    const weeks = useWeeksStore.getState().items;
+    const existingWeek = weeks.find(
+      w => w.week_start === start.toISOString().split('T')[0] && w.user_id === userId
+    );
 
-      // 週排程
-      addScheduledBox: (boxData) => {
-        const newScheduledBox: ScheduledBox = {
-          ...boxData,
-          id: generateId(),
-        }
-        set((state) => ({
-          scheduledBoxes: [...state.scheduledBoxes, newScheduledBox]
-        }))
-      },
-
-      updateScheduledBox: (id, updates) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) =>
-            box.id === id ? { ...box, ...updates } : box
-          )
-        }))
-      },
-
-      removeScheduledBox: (id) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.filter((box) => box.id !== id)
-        }))
-      },
-
-      toggleBoxCompletion: (id) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) =>
-            box.id === id
-              ? {
-                  ...box,
-                  completed: !box.completed,
-                  completedAt: !box.completed ? new Date() : undefined
-                }
-              : box
-          )
-        }))
-      },
-
-      // 重訓資料
-      updateWorkoutData: (boxId, data) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) =>
-            box.id === boxId ? { ...box, data } : box
-          )
-        }))
-      },
-
-      addWorkoutExercise: (boxId, exercise) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) => {
-            if (box.id !== boxId) return box
-
-            const currentData = (box.data as WorkoutData) || { exercises: [] }
-            const newExercise: WorkoutExercise = {
-              ...exercise,
-              id: generateId(),
-              setsCompleted: Array(exercise.sets).fill(false),
-              completedSetsTime: Array(exercise.sets).fill(null),
-            }
-
-            return {
-              ...box,
-              data: {
-                ...currentData,
-                exercises: [...currentData.exercises, newExercise]
-              }
-            }
-          })
-        }))
-      },
-
-      removeWorkoutExercise: (boxId, exerciseId) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) => {
-            if (box.id !== boxId) return box
-
-            const currentData = box.data as WorkoutData
-            if (!currentData) return box
-
-            return {
-              ...box,
-              data: {
-                ...currentData,
-                exercises: currentData.exercises.filter(ex => ex.id !== exerciseId)
-              }
-            }
-          })
-        }))
-      },
-
-      updateWorkoutExercise: (boxId, exerciseId, updates) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) => {
-            if (box.id !== boxId) return box
-
-            const currentData = box.data as WorkoutData
-            if (!currentData) return box
-
-            return {
-              ...box,
-              data: {
-                ...currentData,
-                exercises: currentData.exercises.map(ex => {
-                  if (ex.id !== exerciseId) return ex
-
-                  // 如果修改了組數，需要調整陣列長度
-                  const newSets = updates.sets ?? ex.sets
-                  let newSetsCompleted = ex.setsCompleted
-                  let newCompletedTime = ex.completedSetsTime
-
-                  if (newSets !== ex.sets) {
-                    if (newSets > ex.sets) {
-                      // 增加組數，補充 false 和 null
-                      newSetsCompleted = [...ex.setsCompleted, ...Array(newSets - ex.sets).fill(false)]
-                      newCompletedTime = [...ex.completedSetsTime, ...Array(newSets - ex.sets).fill(null)]
-                    } else {
-                      // 減少組數，截斷陣列
-                      newSetsCompleted = ex.setsCompleted.slice(0, newSets)
-                      newCompletedTime = ex.completedSetsTime.slice(0, newSets)
-                    }
-                  }
-
-                  return {
-                    ...ex,
-                    ...updates,
-                    setsCompleted: newSetsCompleted,
-                    completedSetsTime: newCompletedTime
-                  }
-                })
-              }
-            }
-          })
-        }))
-      },
-
-      toggleSetCompletion: (boxId, exerciseId, setIndex) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) => {
-            if (box.id !== boxId) return box
-
-            const currentData = box.data as WorkoutData
-            if (!currentData) return box
-
-            return {
-              ...box,
-              data: {
-                ...currentData,
-                exercises: currentData.exercises.map(ex => {
-                  if (ex.id !== exerciseId) return ex
-
-                  const updatedSetsCompleted = [...ex.setsCompleted]
-                  const updatedCompletedTime = [...ex.completedSetsTime]
-
-                  // 切換該組的完成狀態
-                  updatedSetsCompleted[setIndex] = !updatedSetsCompleted[setIndex]
-                  updatedCompletedTime[setIndex] = updatedSetsCompleted[setIndex] ? new Date() : null
-
-                  return {
-                    ...ex,
-                    setsCompleted: updatedSetsCompleted,
-                    completedSetsTime: updatedCompletedTime
-                  }
-                })
-              }
-            }
-          })
-        }))
-      },
-
-      // 文字提示資料
-      updateReminderData: (boxId, data) => {
-        set((state) => ({
-          scheduledBoxes: state.scheduledBoxes.map((box) =>
-            box.id === boxId ? { ...box, data } : box
-          )
-        }))
-      },
-
-      // 週記錄
-      archiveCurrentWeek: (name) => {
-        const { currentWeek, scheduledBoxes } = get()
-        if (!currentWeek) return
-
-        const completedCount = scheduledBoxes.filter((box) => box.completed).length
-        const totalCount = scheduledBoxes.length
-        const completionRate = totalCount > 0 ? completedCount / totalCount : 0
-
-        const workoutBoxes = scheduledBoxes.filter((box) => {
-          const baseBox = get().boxes.find((b) => b.id === box.boxId)
-          return baseBox?.type === 'workout' && box.completed
-        })
-
-        const totalWorkoutVolume = workoutBoxes.reduce((total, box) => {
-          if (box.data) {
-            const workoutData = box.data as WorkoutData
-            // 新格式：計算所有動作的訓練量
-            if (workoutData.exercises && workoutData.exercises.length > 0) {
-              return total + workoutData.exercises.reduce((exerciseTotal, exercise) => {
-                const completedSets = exercise.setsCompleted.filter(Boolean).length
-                return exerciseTotal + (completedSets * exercise.weight * exercise.reps)
-              }, 0)
-            }
-            // 舊格式相容（已廢棄）
-            if (workoutData.totalVolume) {
-              return total + workoutData.totalVolume
-            }
-          }
-          return total
-        }, 0)
-
-        const archivedWeek: WeekRecord = {
-          ...currentWeek,
-          name,
-          archived: true,
-          scheduledBoxes,
-          statistics: {
-            completionRate,
-            totalWorkoutVolume,
-            totalWorkoutSessions: workoutBoxes.length,
-            completedCount,
-            totalCount,
-          }
-        }
-
-        set((state) => ({
-          weekRecords: [...state.weekRecords, archivedWeek]
-        }))
-      },
-
-      loadWeekRecord: (id) => {
-        const { weekRecords } = get()
-        const record = weekRecords.find((r) => r.id === id)
-        if (record) {
-          set({
-            currentWeek: record,
-            scheduledBoxes: record.scheduledBoxes
-          })
-        }
-      },
-
-      copyToNextWeek: (recordId) => {
-        const { weekRecords } = get()
-        const record = weekRecords.find((r) => r.id === recordId)
-        if (!record) return
-
-        const nextWeekStart = new Date(record.weekEnd)
-        nextWeekStart.setDate(nextWeekStart.getDate() + 1)
-
-        get().initializeCurrentWeek(nextWeekStart)
-
-        // 複製排程但清除完成狀態
-        const copiedBoxes = record.scheduledBoxes.map((box) => ({
-          ...box,
-          id: generateId(),
-          weekId: get().currentWeek!.id,
-          completed: false,
-          completedAt: undefined,
-        }))
-
-        set({
-          scheduledBoxes: copiedBoxes
-        })
-      },
-
-      // 統計
-      getWeekStatistics: () => {
-        const { scheduledBoxes, boxes } = get()
-        const completedBoxes = scheduledBoxes.filter((box) => box.completed)
-        const totalBoxes = scheduledBoxes.length
-
-        const completedByType = {
-          workout: 0,
-          reminder: 0,
-          basic: 0,
-        }
-
-        let totalWorkoutTime = 0
-        let totalWorkoutVolume = 0
-        let totalWorkoutSessions = 0
-
-        completedBoxes.forEach((box) => {
-          const baseBox = boxes.find((b) => b.id === box.boxId)
-          if (baseBox) {
-            completedByType[baseBox.type]++
-
-            if (baseBox.type === 'workout') {
-              totalWorkoutTime += box.duration
-              totalWorkoutSessions++
-
-              // 計算重訓量：從 box.data 獲取所有動作的資料
-              if (box.data) {
-                const workoutData = box.data as WorkoutData
-                // 新格式：計算所有動作的訓練量
-                if (workoutData.exercises && workoutData.exercises.length > 0) {
-                  totalWorkoutVolume += workoutData.exercises.reduce((exerciseTotal, exercise) => {
-                    const completedSets = exercise.setsCompleted.filter(Boolean).length
-                    return exerciseTotal + (completedSets * exercise.weight * exercise.reps)
-                  }, 0)
-                }
-                // 舊格式相容（已廢棄）
-                else if (workoutData.totalVolume) {
-                  totalWorkoutVolume += workoutData.totalVolume
-                }
-              }
-            }
-          }
-        })
-
-        return {
-          completionRate: totalBoxes > 0 ? completedBoxes.length / totalBoxes : 0,
-          totalWorkoutTime,
-          completedByType,
-          totalWorkoutVolume,
-          totalWorkoutSessions,
-        }
-      },
-
-      getWorkoutTrends: (weeks) => {
-        const { weekRecords } = get()
-        return weekRecords
-          .slice(-weeks)
-          .map((record) => ({
-            week: `${record.weekStart.getMonth() + 1}/${record.weekStart.getDate()}`,
-            volume: record.statistics.totalWorkoutVolume || 0,
-            sessions: record.statistics.totalWorkoutSessions || 0,
-            completionRate: record.statistics.completionRate,
-          }))
-      },
-
-      // 初始化
-      initializeCurrentWeek: (weekStart) => {
-        const weekEnd = getWeekEnd(weekStart)
-        const newWeek: WeekRecord = {
-          id: generateId(),
-          user_id: 'current-user', // 注意: 需要實際用戶ID
-          weekStart: getWeekStart(weekStart),
-          weekEnd,
-          archived: false,
-          scheduledBoxes: [],
-          statistics: {
-            completionRate: 0,
-            completedCount: 0,
-            totalCount: 0,
-          },
-        }
-
-        set({
-          currentWeek: newWeek,
-          scheduledBoxes: [],
-        })
-      },
-    }),
-    {
-      name: 'timebox-storage',
-      version: 1,
+    if (existingWeek) {
+      set({ currentWeekId: existingWeek.id });
+      return;
     }
-  )
-)
+
+    // 創建新週記錄
+    const newWeek: Omit<WeekRecord, 'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'> = {
+      user_id: userId,
+      week_start: start.toISOString().split('T')[0],
+      week_end: end.toISOString().split('T')[0],
+      archived: false,
+    };
+
+    const createdWeek = await useWeeksStore.getState().create(newWeek as any);
+    if (createdWeek) {
+      set({ currentWeekId: createdWeek.id });
+    }
+  },
+
+  getCurrentWeekScheduledBoxes: () => {
+    const { currentWeekId } = get();
+    if (!currentWeekId) return [];
+
+    const scheduledBoxes = useScheduledBoxesStore.getState().items;
+    return scheduledBoxes.filter(sb => sb.week_id === currentWeekId);
+  },
+
+  getWeekStatistics: async (weekId) => {
+    const scheduledBoxes = useScheduledBoxesStore.getState().items.filter(
+      sb => sb.week_id === weekId
+    );
+    const boxes = useBoxesStore.getState().items;
+
+    const totalBoxes = scheduledBoxes.length;
+    const completedBoxes = scheduledBoxes.filter(sb => sb.completed);
+
+    const completedByType = {
+      workout: 0,
+      reminder: 0,
+      basic: 0,
+    };
+
+    let totalWorkoutTime = 0;
+    let totalWorkoutVolume = 0;
+    let totalWorkoutSessions = 0;
+
+    scheduledBoxes.forEach(sb => {
+      if (sb.completed) {
+        const box = boxes.find(b => b.id === sb.box_id);
+        if (box) {
+          completedByType[box.type]++;
+          totalWorkoutTime += sb.duration;
+
+          if (box.type === 'workout' && sb.data) {
+            const workoutData = sb.data as WorkoutData;
+            if (workoutData.totalVolume) {
+              totalWorkoutVolume += workoutData.totalVolume;
+            }
+            totalWorkoutSessions++;
+          }
+        }
+      }
+    });
+
+    return {
+      completionRate: totalBoxes > 0 ? completedBoxes.length / totalBoxes : 0,
+      totalWorkoutTime,
+      completedByType,
+      totalWorkoutVolume,
+      totalWorkoutSessions,
+    };
+  },
+
+  getWorkoutTrends: async (weeks, userId) => {
+    const weekRecords = useWeeksStore.getState().items
+      .filter(w => w.user_id === userId && !w.archived)
+      .sort((a, b) => new Date(a.week_start).getTime() - new Date(b.week_start).getTime())
+      .slice(-weeks);
+
+    const trends: WorkoutTrend[] = [];
+
+    for (const record of weekRecords) {
+      const stats = await get().getWeekStatistics(record.id);
+      const weekStart = new Date(record.week_start);
+
+      trends.push({
+        week: `${weekStart.getMonth() + 1}/${weekStart.getDate()}`,
+        volume: stats.totalWorkoutVolume || 0,
+        sessions: stats.totalWorkoutSessions || 0,
+        completionRate: stats.completionRate,
+      });
+    }
+
+    return trends;
+  },
+}));
+
+// ============================================
+// Helper Functions
+// ============================================
+
+export const timeboxHelpers = {
+  /**
+   * 創建箱子並返回 ID
+   */
+  createBox: async (boxData: Omit<BaseBox, 'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'>) => {
+    return await useBoxesStore.getState().create(boxData as any);
+  },
+
+  /**
+   * 添加排程箱子
+   */
+  addScheduledBox: async (data: Omit<ScheduledBox, 'id' | 'created_at' | 'updated_at' | 'is_active' | 'sync_status'>) => {
+    return await useScheduledBoxesStore.getState().create(data as any);
+  },
+
+  /**
+   * 切換箱子完成狀態
+   */
+  toggleBoxCompletion: async (scheduledBoxId: string) => {
+    const box = useScheduledBoxesStore.getState().items.find(b => b.id === scheduledBoxId);
+    if (!box) return;
+
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, {
+      completed: !box.completed,
+      completed_at: !box.completed ? new Date().toISOString() : undefined,
+    } as any);
+  },
+
+  /**
+   * 更新重訓資料
+   */
+  updateWorkoutData: async (scheduledBoxId: string, data: WorkoutData) => {
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, {
+      data: data as any,
+    } as any);
+  },
+
+  /**
+   * 歸檔當前週
+   */
+  archiveWeek: async (weekId: string, name: string) => {
+    await useWeeksStore.getState().update(weekId, {
+      archived: true,
+      name,
+    } as any);
+  },
+
+  /**
+   * 複製週記錄到下一週
+   */
+  copyToNextWeek: async (weekId: string, userId: string) => {
+    const sourceWeek = useWeeksStore.getState().items.find(w => w.id === weekId);
+    if (!sourceWeek) return;
+
+    const sourceScheduled = useScheduledBoxesStore.getState().items.filter(
+      sb => sb.week_id === weekId
+    );
+
+    // 創建新週（下週）
+    const nextWeekStart = new Date(sourceWeek.week_start);
+    nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+
+    await useTimeboxStore.getState().initializeCurrentWeek(nextWeekStart, userId);
+    const newWeekId = useTimeboxStore.getState().currentWeekId;
+
+    if (!newWeekId) return;
+
+    // 複製排程箱子
+    for (const scheduled of sourceScheduled) {
+      await timeboxHelpers.addScheduledBox({
+        box_id: scheduled.box_id,
+        week_id: newWeekId,
+        day_of_week: scheduled.day_of_week,
+        start_time: scheduled.start_time,
+        duration: scheduled.duration,
+        completed: false,
+      });
+    }
+  },
+};

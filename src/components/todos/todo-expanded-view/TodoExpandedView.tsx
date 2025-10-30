@@ -17,23 +17,23 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="bg-gray-50 rounded-2xl shadow-2xl w-full max-w-[1400px] h-[90vh] flex flex-col relative"
+        className="bg-background rounded-2xl shadow-2xl w-full max-w-[1400px] h-[90vh] flex flex-col relative border border-border"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 右上角關閉按鈕 */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 p-1 hover:bg-morandi-red/10 hover:text-morandi-red transition-colors rounded-lg text-morandi-secondary"
+          className="absolute top-4 right-4 z-10 p-2 hover:bg-morandi-red/10 hover:text-morandi-red transition-colors rounded-lg text-morandi-secondary"
         >
-          <X size={14} />
+          <X size={18} />
         </button>
 
         {/* 主要內容區 */}
-        <div className="flex flex-1 overflow-hidden pt-4">
+        <div className="flex flex-1 overflow-hidden pt-12">
           {/* 左半部：詳情資料 */}
           <div className="w-1/2 px-6 py-4 border-r border-border flex flex-col">
             {/* 標題與星級 */}
@@ -78,7 +78,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
             {/* 分頁內容 */}
             <div className="flex-1 bg-card border border-border rounded-xl p-4 overflow-y-auto shadow-sm">
-              <QuickActionContent activeTab={activeTab} todo={todo} />
+              <QuickActionContent activeTab={activeTab} todo={todo} onUpdate={onUpdate} />
             </div>
 
             {/* 快速操作按鈕 */}

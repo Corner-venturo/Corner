@@ -24,7 +24,11 @@ export function CalendarSettingsDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-2 border-morandi-gold/30 bg-card text-morandi-secondary hover:bg-morandi-gold/10 hover:text-morandi-gold hover:border-morandi-gold transition-all shadow-sm"
+        >
           <Settings size={16} />
           顯示設定
         </Button>

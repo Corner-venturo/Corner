@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Wrench, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { confirm } from '@/lib/ui/alert-dialog';
 
 interface _FixResult {
   success: boolean;
@@ -302,7 +303,11 @@ export default function FixDatabasePage() {
   };
 
   const clearDatabase = async () => {
-    if (!confirm('確定要完全重置資料庫嗎？所有資料將被刪除！')) {
+    const confirmed = await confirm('確定要完全重置資料庫嗎？所有資料將被刪除！', {
+      type: 'warning',
+      title: '完全重置',
+    });
+    if (!confirmed) {
       return;
     }
 
@@ -312,7 +317,7 @@ export default function FixDatabasePage() {
       localStorage.clear();
       addLog('✅ 資料庫已完全重置');
       addLog('請重新整理頁面');
-      
+
       setTimeout(() => {
         window.location.reload();
       }, 2000);

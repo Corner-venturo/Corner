@@ -113,8 +113,8 @@ export function CountriesSection({
   return (
     <div className="space-y-4">
       <div className="border-b-2 border-red-500 pb-2">
-        <h2 className="text-lg font-bold text-gray-800">🌍 旅遊國家/地區</h2>
-        <p className="text-xs text-gray-500 mt-1">設定此行程會前往的國家，方便後續選擇景點</p>
+        <h2 className="text-lg font-bold text-morandi-primary">🌍 旅遊國家/地區</h2>
+        <p className="text-xs text-morandi-secondary mt-1">設定此行程會前往的國家，方便後續選擇景點</p>
       </div>
 
       {/* 主要國家 */}
@@ -127,7 +127,7 @@ export function CountriesSection({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">國家</label>
               <Combobox
                 value={primaryCountry.country_id}
                 onChange={(value) => {
@@ -144,7 +144,7 @@ export function CountriesSection({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">主要城市（選填）</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">主要城市（選填）</label>
               <Combobox
                 value={primaryCountry.main_city_id || ''}
                 onChange={(value) => {
@@ -170,7 +170,7 @@ export function CountriesSection({
         return (
           <div key={actualIndex} className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
             <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-semibold text-gray-700">其他國家 #{index + 1}</label>
+              <label className="text-sm font-semibold text-morandi-primary">其他國家 #{index + 1}</label>
               <button
                 onClick={() => removeCountry(actualIndex)}
                 className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
@@ -182,7 +182,7 @@ export function CountriesSection({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">國家</label>
                 <Combobox
                   value={country.country_id}
                   onChange={(value) => updateCountry(actualIndex, 'country_id', value)}
@@ -194,7 +194,7 @@ export function CountriesSection({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">主要城市（選填）</label>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">主要城市（選填）</label>
                 <Combobox
                   value={country.main_city_id || ''}
                   onChange={(value) => updateCountry(actualIndex, 'main_city_id', value)}
@@ -213,7 +213,7 @@ export function CountriesSection({
       {/* 新增按鈕 */}
       <button
         onClick={addCountry}
-        className="w-full px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+        className="w-full px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-morandi-secondary hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
       >
         + 新增其他國家
       </button>

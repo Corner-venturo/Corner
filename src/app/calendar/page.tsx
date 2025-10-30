@@ -19,7 +19,7 @@ import {
   useEventOperations,
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
-import { useTourStore, useOrderStore, useMemberStore, useCalendarEventStore } from '@/stores'
+import { useTourStore, useOrderStore, useMemberStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
 
 export default function CalendarPage() {
   // Stores
@@ -27,6 +27,7 @@ export default function CalendarPage() {
   const { fetchAll: fetchOrders } = useOrderStore()
   const { fetchAll: fetchMembers } = useMemberStore()
   const { fetchAll: fetchCalendarEvents } = useCalendarEventStore()
+  const { fetchAll: fetchEmployees } = useEmployeeStore()
 
   // 初始載入所有資料
   useEffect(() => {
@@ -36,10 +37,11 @@ export default function CalendarPage() {
         fetchOrders(),
         fetchMembers(),
         fetchCalendarEvents(),
+        fetchEmployees(),
       ])
     }
     loadData()
-  }, [fetchTours, fetchOrders, fetchMembers, fetchCalendarEvents])
+  }, [fetchTours, fetchOrders, fetchMembers, fetchCalendarEvents, fetchEmployees])
 
   // Custom hooks for calendar logic
   const { filteredEvents } = useCalendarEvents()
@@ -83,16 +85,26 @@ export default function CalendarPage() {
             { label: '行事曆', href: '/calendar' },
           ]}
           actions={
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* 月份切換 */}
-              <div className="flex items-center gap-2 border border-border rounded-lg p-1">
-                <Button variant="ghost" size="sm" onClick={handlePrevMonth} className="h-8 w-8 p-0">
+              <div className="flex items-center gap-2 bg-card border border-border rounded-lg shadow-sm">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all"
+                >
                   ←
                 </Button>
-                <span className="text-sm font-medium text-morandi-primary min-w-[120px] text-center">
+                <span className="text-sm font-semibold text-morandi-primary min-w-[120px] text-center px-2">
                   {getCurrentMonthYear()}
                 </span>
-                <Button variant="ghost" size="sm" onClick={handleNextMonth} className="h-8 w-8 p-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all"
+                >
                   →
                 </Button>
               </div>
@@ -101,7 +113,7 @@ export default function CalendarPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleToday}
-                className="border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
+                className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium"
               >
                 今天
               </Button>
@@ -114,9 +126,9 @@ export default function CalendarPage() {
                   const today = new Date().toISOString().split('T')[0]
                   setAddEventDialog({ open: true, selectedDate: today })
                 }}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium"
               >
-                <Plus size={16} className="mr-1" />
+                <Plus size={16} className="mr-1.5" />
                 新增事項
               </Button>
             </div>
@@ -124,7 +136,7 @@ export default function CalendarPage() {
         />
 
         <div className="flex-1 overflow-hidden">
-          <Card className="h-full border-morandi-container flex flex-col">
+          <div className="h-full bg-card rounded-lg border border-border shadow-sm flex flex-col overflow-hidden">
             {/* 日曆主體 */}
             <div className="flex-1 overflow-hidden">
               <CalendarGrid
@@ -135,7 +147,7 @@ export default function CalendarPage() {
                 onMoreLinkClick={(info) => handleMoreLinkClick(info, filteredEvents)}
               />
             </div>
-          </Card>
+          </div>
         </div>
       </div>
 
@@ -150,7 +162,8 @@ export default function CalendarPage() {
 
       {/* 事件詳情對話框 */}
       <EventDetailDialog
-        dialog={eventDetailDialog}
+        open={eventDetailDialog.open}
+        event={eventDetailDialog.event}
         onClose={() => setEventDetailDialog({ open: false, event: null })}
         onDelete={handleDeleteEvent}
       />

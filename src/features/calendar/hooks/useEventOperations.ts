@@ -4,17 +4,15 @@ import { EventClickArg } from '@fullcalendar/core'
 import { useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
+import { FullCalendarEvent } from '@/features/calendar/types'
 import {
   AddEventDialogState,
-  EventDetailDialogState,
   NewEventForm,
-  PersonalEvent
 } from '../types'
 
 const initialNewEventState: NewEventForm = {
   title: '',
   visibility: 'personal',
-  event_type: 'meeting',
   description: '',
   end_date: '',
   start_time: '',
@@ -26,7 +24,10 @@ export function useEventOperations() {
   const { user } = useAuthStore()
   const { items: calendarEvents, create: addEvent, delete: deleteEvent } = useCalendarEventStore()
 
-  const [eventDetailDialog, setEventDetailDialog] = useState<EventDetailDialogState>({
+  const [eventDetailDialog, setEventDetailDialog] = useState<{
+    open: boolean
+    event: FullCalendarEvent | null
+  }>({
     open: false,
     event: null,
   })
@@ -61,16 +62,13 @@ export function useEventOperations() {
         ? `${endDate}T${newEvent.end_time}:00`
         : `${endDate}T23:59:59`
 
-      // 映射 event_type: deadline → reminder
-      const mappedType = newEvent.event_type === 'deadline' ? 'reminder' : newEvent.event_type
-
       await addEvent({
         title: newEvent.title,
         description: newEvent.description,
         start: startDateTime,
         end: endDateTime,
         all_day: !newEvent.start_time && !newEvent.end_time,
-        type: mappedType as 'tour' | 'meeting' | 'task' | 'reminder' | 'other',
+        type: 'other',
         visibility: newEvent.visibility,
         owner_id: user.id,
       })
@@ -95,25 +93,20 @@ export function useEventOperations() {
       const member_id = info.event.extendedProps.memberId
       router.push(`/orders?member=${member_id}`)
     } else if (eventType === 'personal' || eventType === 'company') {
-      // 找到對應的事項
-      const eventId = info.event.id
-      const event = calendarEvents.find(e => e.id === eventId)
-      if (event) {
-        // 轉換為 PersonalEvent 格式以兼容現有 Dialog
-        const personalEventFormat: PersonalEvent = {
-          id: event.id,
-          title: event.title,
-          date: event.start,
-          end_date: event.end,
-          time: event.start,
-          type: event.type as 'meeting' | 'deadline' | 'task',
-          description: event.description,
-        }
-        setEventDetailDialog({
-          open: true,
-          event: personalEventFormat,
-        })
+      // 直接傳遞 FullCalendarEvent
+      const fullCalendarEvent: FullCalendarEvent = {
+        id: info.event.id,
+        title: info.event.title,
+        start: info.event.startStr,
+        end: info.event.endStr,
+        backgroundColor: info.event.backgroundColor || '',
+        borderColor: info.event.borderColor || '',
+        extendedProps: info.event.extendedProps,
       }
+      setEventDetailDialog({
+        open: true,
+        event: fullCalendarEvent,
+      })
     }
   }
 

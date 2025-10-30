@@ -154,7 +154,7 @@ function TourOperationsAddDialog({ isOpen, onClose, tour, tourExtraFields, setTo
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>新增項目</DialogTitle>

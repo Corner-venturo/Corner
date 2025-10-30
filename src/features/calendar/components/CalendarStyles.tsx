@@ -40,25 +40,45 @@ export function CalendarStyles() {
       }
 
       .fc .fc-col-header-cell {
-        background-color: #f6f4f1;
-        padding: 1rem 0.5rem;
+        background: linear-gradient(to right, rgba(232, 230, 227, 0.4), rgba(196, 165, 114, 0.1), rgba(232, 230, 227, 0.4));
+        padding: 0.625rem 1rem;
         font-weight: 500;
+        font-size: 0.75rem;
         color: #8b8680;
-        border-color: #e8e6e3;
+        border-color: rgba(196, 165, 114, 0.2);
+        border-bottom-width: 2px;
       }
 
       .fc .fc-daygrid-day {
-        border-color: #e8e6e3;
+        border-color: rgba(232, 230, 227, 0.4);
       }
 
       .fc .fc-daygrid-day-frame {
         min-height: 120px;
+        background-color: transparent;
+      }
+
+      .fc-theme-standard td,
+      .fc-theme-standard th {
+        border-color: rgba(232, 230, 227, 0.4);
+      }
+
+      .fc-theme-standard .fc-scrollgrid {
+        border-color: transparent;
+      }
+
+      .fc .fc-daygrid-day-top {
+        flex-direction: row;
       }
 
       .fc .fc-daygrid-day-number {
         color: #3a3633;
-        padding: 0.5rem;
+        padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
+      }
+
+      .fc .fc-daygrid-day-events {
+        margin-top: 0;
       }
 
       .fc .fc-day-today {

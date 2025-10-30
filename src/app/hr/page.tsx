@@ -10,11 +10,14 @@ import { AddEmployeeForm } from '@/components/hr/add-employee';
 import { Users, Edit2, Trash2, UserX } from 'lucide-react';
 import { TableColumn } from '@/components/ui/enhanced-table';
 import { DateCell, ActionCell } from '@/components/table-cells';
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore();
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { confirm, confirmDialogProps } = useConfirmDialog();
 
   // 初始化時載入員工資料（只在沒有資料時載入）
   useEffect(() => {
@@ -52,9 +55,20 @@ export default function HRPage() {
       e.stopPropagation();
     }
 
-    const confirmMessage = `⚠️ 確定要將員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」辦理離職嗎？\n\n離職後將無法登入系統，但歷史記錄會保留。`;
+    const confirmed = await confirm({
+      type: 'warning',
+      title: '辦理離職',
+      message: `確定要將員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」辦理離職嗎？`,
+      details: [
+        '離職後將無法登入系統',
+        '歷史記錄會被保留',
+        '可以隨時修改狀態回復在職'
+      ],
+      confirmLabel: '確認離職',
+      cancelLabel: '取消'
+    });
 
-    if (!confirm(confirmMessage)) {
+    if (!confirmed) {
       return;
     }
 
@@ -64,7 +78,7 @@ export default function HRPage() {
         setExpandedEmployee(null);
       }
     } catch (err) {
-            alert('操作失敗，請稍後再試');
+      console.error('辦理離職失敗:', err);
     }
   };
 
@@ -73,9 +87,22 @@ export default function HRPage() {
       e.stopPropagation();
     }
 
-    const confirmMessage = `⚠️⚠️⚠️ 確定要刪除員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」嗎？\n\n此操作會：\n- 永久刪除員工所有資料\n- 移除所有歷史記錄\n- 無法復原\n\n建議使用「辦理離職」功能來保留歷史記錄。\n\n真的要刪除嗎？`;
+    const confirmed = await confirm({
+      type: 'danger',
+      title: '刪除員工',
+      message: `確定要刪除員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」嗎？`,
+      details: [
+        '⚠️ 永久刪除員工所有資料',
+        '⚠️ 移除所有歷史記錄',
+        '⚠️ 此操作無法復原',
+        '',
+        '💡 建議使用「辦理離職」來保留歷史記錄'
+      ],
+      confirmLabel: '確認刪除',
+      cancelLabel: '取消'
+    });
 
-    if (!confirm(confirmMessage)) {
+    if (!confirmed) {
       return;
     }
 
@@ -84,10 +111,9 @@ export default function HRPage() {
       if (expandedEmployee === employee.id) {
         setExpandedEmployee(null);
       }
-      alert(`✅ 員工「${employee.display_name || (employee as unknown).chinese_name || '未命名員工'}」已成功刪除`);
     } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : '未知錯誤';
-      alert(`❌ 刪除失敗：${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : '未知錯誤';
+      console.error('刪除員工失敗:', errorMessage);
     }
   };
 
@@ -211,6 +237,9 @@ export default function HRPage() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog {...confirmDialogProps} />
     </>
   );
 }

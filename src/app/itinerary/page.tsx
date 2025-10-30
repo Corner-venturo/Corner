@@ -8,6 +8,7 @@ import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { MapPin, Eye, Copy, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useItineraryStore, type Itinerary } from '@/stores';
+import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog';
 
 const statusFilters = ['全部', '草稿', '已發布'];
 
@@ -24,13 +25,17 @@ export default function ItineraryPage() {
 
   // 刪除行程
   const handleDelete = useCallback(async (id: string) => {
-    if (confirm('確定要刪除這個行程嗎？')) {
+    const confirmed = await confirm('確定要刪除這個行程嗎？', {
+      type: 'warning',
+      title: '刪除行程',
+    });
+    if (confirmed) {
       try {
         await deleteItinerary(id);
-        alert('✅ 刪除成功！');
+        await alertSuccess('刪除成功！');
         // Store 會自動更新，不需要重新載入
       } catch (error) {
-                alert('❌ 刪除失敗，請稍後再試');
+        await alertError('刪除失敗，請稍後再試');
       }
     }
   }, [deleteItinerary]);
@@ -115,9 +120,9 @@ export default function ItineraryPage() {
 
               // 複製到剪貼簿
               navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('✅ 分享連結已複製！\n\n' + shareUrl);
+                alertSuccess('分享連結已複製！\n\n' + shareUrl);
               }).catch(err => {
-                                alert('❌ 複製失敗，請手動複製：\n' + shareUrl);
+                alertError('複製失敗，請手動複製：\n' + shareUrl);
               });
             }}
             className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"

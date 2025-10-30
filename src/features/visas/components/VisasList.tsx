@@ -5,6 +5,8 @@ import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { cn } from '@/lib/utils';
 import { getVisaStatusLabel } from '@/constants/status-maps';
 import type { Visa } from '@/stores/types';
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface VisasListProps {
   filteredVisas: Visa[];
@@ -21,6 +23,8 @@ export function VisasList({
   onSelectionChange,
   onDelete,
 }: VisasListProps) {
+  const { confirm, confirmDialogProps } = useConfirmDialog();
+
   // Table 欄位定義
   const columns: TableColumn[] = [
     {
@@ -91,9 +95,17 @@ export function VisasList({
           <Edit2 size={14} />
         </button>
         <button
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            if (confirm('確定要刪除此簽證記錄嗎？')) {
+            const confirmed = await confirm({
+              type: 'danger',
+              title: '刪除簽證記錄',
+              message: '確定要刪除此簽證記錄嗎？',
+              details: ['此操作無法復原'],
+              confirmLabel: '確認刪除',
+              cancelLabel: '取消'
+            });
+            if (confirmed) {
               onDelete(visa.id);
             }
           }}
@@ -107,17 +119,20 @@ export function VisasList({
   };
 
   return (
-    <EnhancedTable
-      className="min-h-full"
-      columns={columns}
-      data={filteredVisas}
-      loading={false}
-      selection={canManageVisas ? {
-        selected: selectedRows,
-        onChange: onSelectionChange,
-      } : undefined}
-      actions={renderActions}
-      bordered={true}
-    />
+    <>
+      <EnhancedTable
+        className="min-h-full"
+        columns={columns}
+        data={filteredVisas}
+        loading={false}
+        selection={canManageVisas ? {
+          selected: selectedRows,
+          onChange: onSelectionChange,
+        } : undefined}
+        actions={renderActions}
+        bordered={true}
+      />
+      <ConfirmDialog {...confirmDialogProps} />
+    </>
   );
 }

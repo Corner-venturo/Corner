@@ -138,7 +138,7 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
   const hasChanges = selectedFile1 || selectedFile2 || city.primary_image !== primaryImage;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>編輯城市圖片 - {city.name}</DialogTitle>

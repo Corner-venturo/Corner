@@ -11,14 +11,14 @@
 ### 1. 清空 IndexedDB
 ```javascript
 // 在瀏覽器 Console 執行
-indexedDB.deleteDatabase('venturo-db');
+indexedDB.deleteDatabase('VenturoOfflineDB');
 console.log('✅ IndexedDB 已清空');
 ```
 
 ### 2. 開啟開發者工具
 - 按 F12 打開 DevTools
 - 切換到 Application 標籤
-- 展開 IndexedDB > venturo-db
+- 展開 IndexedDB > VenturoOfflineDB
 
 ---
 
@@ -39,7 +39,7 @@ console.log('✅ IndexedDB 已清空');
 // 在 Console 執行
 (async () => {
   const db = await new Promise((resolve, reject) => {
-    const request = indexedDB.open('venturo-db', 1);
+    const request = indexedDB.open('VenturoOfflineDB', 1);
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
@@ -77,7 +77,7 @@ console.log('✅ IndexedDB 已清空');
 // 建立前
 (async () => {
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
   const tx = db.transaction('tours', 'readonly');
@@ -93,7 +93,7 @@ console.log('✅ IndexedDB 已清空');
 // 等待 2 秒後檢查
 setTimeout(async () => {
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
   const tx = db.transaction('tours', 'readonly');
@@ -126,7 +126,7 @@ setTimeout(async () => {
 // 找出第一筆 tour
 (async () => {
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
   const tx = db.transaction('tours', 'readonly');
@@ -147,7 +147,7 @@ setTimeout(async () => {
 // 等待 2 秒後檢查
 setTimeout(async () => {
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
   const tx = db.transaction('tours', 'readonly');
@@ -185,7 +185,7 @@ setTimeout(async () => {
 // 刪除前
 (async () => {
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
 
@@ -205,7 +205,7 @@ setTimeout(async () => {
 // 等待 2 秒後檢查
 setTimeout(async () => {
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
 
@@ -269,7 +269,7 @@ setTimeout(async () => {
 
   // 2. 從 IndexedDB 讀取
   const db = await new Promise(resolve => {
-    const req = indexedDB.open('venturo-db', 1);
+    const req = indexedDB.open('VenturoOfflineDB', 1);
     req.onsuccess = () => resolve(req.result);
   });
 

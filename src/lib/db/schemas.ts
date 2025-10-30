@@ -491,15 +491,47 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     ],
   },
 
-  // 時間箱表
+  // 時間箱 - 箱子定義表
   {
-    name: 'timebox_sessions',
+    name: 'timebox_boxes',
     keyPath: 'id',
     autoIncrement: false,
     indexes: [
-      { name: 'date', keyPath: 'date', unique: false },
-      { name: 'status', keyPath: 'status', unique: false },
-      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'user_id', keyPath: 'user_id', unique: false },
+      { name: 'type', keyPath: 'type', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 時間箱 - 週記錄表
+  {
+    name: 'timebox_weeks',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'user_id', keyPath: 'user_id', unique: false },
+      { name: 'week_start', keyPath: 'week_start', unique: false },
+      { name: 'archived', keyPath: 'archived', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 時間箱 - 排程箱子實例表
+  {
+    name: 'timebox_scheduled_boxes',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'box_id', keyPath: 'box_id', unique: false },
+      { name: 'week_id', keyPath: 'week_id', unique: false },
+      { name: 'day_of_week', keyPath: 'day_of_week', unique: false },
+      { name: 'completed', keyPath: 'completed', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
       // Offline-First 同步欄位
@@ -662,7 +694,9 @@ export const TABLES = {
   TRANSACTIONS: 'transactions',
   BUDGETS: 'budgets',
   WORKSPACE_ITEMS: 'workspace_items',
-  TIMEBOX_SESSIONS: 'timebox_sessions',
+  TIMEBOX_BOXES: 'timebox_boxes',
+  TIMEBOX_WEEKS: 'timebox_weeks',
+  TIMEBOX_SCHEDULED_BOXES: 'timebox_scheduled_boxes',
   TEMPLATES: 'templates',
   // Workspace 相關（v2 新增）
   WORKSPACES: 'workspaces',

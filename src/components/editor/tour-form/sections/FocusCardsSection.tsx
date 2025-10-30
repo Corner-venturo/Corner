@@ -17,7 +17,7 @@ export function FocusCardsSection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-green-500 pb-2">
-        <h2 className="text-lg font-bold text-gray-800">📍 精選景點</h2>
+        <h2 className="text-lg font-bold text-morandi-primary">📍 精選景點</h2>
         <button
           onClick={addFocusCard}
           className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600"
@@ -38,7 +38,7 @@ export function FocusCardsSection({
             </button>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">景點名稱</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">景點名稱</label>
             <input
               type="text"
               value={card.title}
@@ -48,7 +48,7 @@ export function FocusCardsSection({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">圖片網址</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">圖片網址</label>
             <input
               type="text"
               value={card.src}
@@ -56,7 +56,7 @@ export function FocusCardsSection({
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="https://images.unsplash.com/..."
             />
-            <p className="mt-1 text-xs text-gray-500">建議使用 16:9 高解析度圖片，營造一致的 Morandi 色調。</p>
+            <p className="mt-1 text-xs text-morandi-secondary">建議使用 16:9 高解析度圖片，營造一致的 Morandi 色調。</p>
           </div>
         </div>
       ))}

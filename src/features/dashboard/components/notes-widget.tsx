@@ -139,7 +139,7 @@ export function NotesWidget() {
           <textarea
             value={activeTab.content}
             onChange={(e) => updateContent(activeTab.id, e.target.value)}
-            className="w-full h-full p-4 border border-white/60 rounded-xl resize-none bg-white/90 hover:bg-white hover:border-white/80 hover:shadow-md focus:bg-white focus:border-morandi-gold/60 focus:ring-2 focus:ring-morandi-gold/20 transition-all outline-none font-mono text-sm leading-relaxed shadow-sm backdrop-blur-sm"
+            className="w-full h-full p-4 border border-white/60 rounded-xl resize-none bg-white/90 hover:bg-white hover:border-white/80 hover:shadow-md focus:bg-white transition-all outline-none font-mono text-sm leading-relaxed shadow-sm backdrop-blur-sm"
             placeholder="在這裡寫下你的筆記..."
           />
           <p className="text-xs text-morandi-secondary/90 mt-2.5 font-medium flex items-center gap-2">
