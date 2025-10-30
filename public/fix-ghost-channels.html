@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔥 緊急修復：清除幽靈頻道</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .card {
+      background: #2a2a2a;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #ff6b6b;
+      margin-top: 0;
+    }
+    button {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      width: 100%;
+    }
+    button:hover {
+      background: #ff5252;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .success {
+      background: #2a7a2a;
+      color: white;
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .error {
+      background: #7a2a2a;
+      color: white;
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .info {
+      background: #2a4a7a;
+      color: white;
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    pre {
+      background: #1a1a1a;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .warning {
+      background: #7a5a2a;
+      color: white;
+      padding: 16px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔥 緊急修復：清除幽靈頻道</h1>
+
+    <div class="info">
+      <strong>問題現象：</strong>
+      <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+        <li>工作空間頁面無法載入或卡住</li>
+        <li>頻道重複顯示</li>
+        <li>Console 出現大量 500 錯誤</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ 此工具會做以下操作：</strong>
+      <ol style="margin: 10px 0 0 0; padding-left: 20px;">
+        <li>清空 localStorage 的所有 channels</li>
+        <li>清空 IndexedDB 的所有 channels</li>
+        <li>清空 localStorage 的 channelGroups 和 bulletins</li>
+        <li>自動重新載入頁面</li>
+      </ol>
+      <p style="margin-top: 10px;"><strong>重要：</strong>下次開啟工作空間時，會從 Supabase 重新同步正確的資料。</p>
+    </div>
+
+    <button id="fixBtn" onclick="emergencyFix()">🚨 立即修復</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function emergencyFix() {
+      const btn = document.getElementById('fixBtn');
+      const result = document.getElementById('result');
+
+      btn.disabled = true;
+      btn.textContent = '修復中...';
+
+      try {
+        // Step 1: 清理 localStorage
+        console.log('🔧 Step 1: 清理 localStorage...');
+        const storageKey = 'channels-storage';
+        const rawData = localStorage.getItem(storageKey);
+
+        let before = { channels: 0, channelGroups: 0, bulletins: 0 };
+
+        if (rawData) {
+          const data = JSON.parse(rawData);
+          before = {
+            channels: data.state?.channels?.length || 0,
+            channelGroups: data.state?.channelGroups?.length || 0,
+            bulletins: data.state?.bulletins?.length || 0
+          };
+
+          // 清空所有頻道相關資料
+          const cleaned = {
+            state: {
+              workspaces: data.state?.workspaces || [],
+              currentWorkspace: data.state?.currentWorkspace || null,
+              selectedChannel: null,
+              channels: [],
+              channelGroups: [],
+              bulletins: [],
+              loading: false,
+              error: null,
+              searchQuery: '',
+              channelFilter: 'all'
+            },
+            version: data.version || 0
+          };
+
+          localStorage.setItem(storageKey, JSON.stringify(cleaned));
+          console.log('✅ localStorage 已清理');
+        }
+
+        // Step 2: 清理 IndexedDB
+        console.log('🔧 Step 2: 清理 IndexedDB...');
+        const dbName = 'local-db';
+        const dbPromise = indexedDB.open(dbName);
+
+        await new Promise((resolve, reject) => {
+          dbPromise.onsuccess = async (event) => {
+            try {
+              const db = event.target.result;
+
+              // 清空 channels 表
+              if (db.objectStoreNames.contains('channels')) {
+                const transaction = db.transaction(['channels'], 'readwrite');
+                const store = transaction.objectStore('channels');
+                const clearRequest = store.clear();
+
+                clearRequest.onsuccess = () => {
+                  console.log('✅ IndexedDB channels 已清理');
+                };
+              }
+
+              // 清空 channel_groups 表
+              if (db.objectStoreNames.contains('channel_groups')) {
+                const transaction = db.transaction(['channel_groups'], 'readwrite');
+                const store = transaction.objectStore('channel_groups');
+                store.clear();
+                console.log('✅ IndexedDB channel_groups 已清理');
+              }
+
+              db.close();
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          };
+
+          dbPromise.onerror = () => {
+            console.warn('⚠️ 無法開啟 IndexedDB，跳過');
+            resolve(); // 繼續執行
+          };
+        });
+
+        result.innerHTML = `
+          <div class="success">
+            <strong>✅ 修復完成！</strong>
+            <pre style="background: rgba(255,255,255,0.1); margin-top: 10px;">清理前：
+- localStorage channels: ${before.channels} 個
+- localStorage channelGroups: ${before.channelGroups} 個
+- localStorage bulletins: ${before.bulletins} 個
+- IndexedDB channels: 已清空
+- IndexedDB channel_groups: 已清空
+
+清理後：全部清空 ✨</pre>
+            <p style="margin-top: 16px; font-size: 14px;">
+              <strong>📍 下一步：</strong><br>
+              頁面將在 2 秒後自動重新載入...<br>
+              請重新開啟工作空間，系統會從 Supabase 重新同步正確的資料。
+            </p>
+          </div>
+        `;
+
+        setTimeout(() => {
+          window.location.href = '/workspace';
+        }, 2000);
+
+      } catch (error) {
+        console.error('修復失敗:', error);
+        result.innerHTML = `
+          <div class="error">
+            <strong>❌ 修復失敗：</strong><br>${error.message}
+            <pre style="background: rgba(255,255,255,0.1); margin-top: 10px;">${error.stack}</pre>
+            <p style="margin-top: 10px;">請重新整理頁面後再試一次，或聯繫技術支援。</p>
+          </div>
+        `;
+        btn.disabled = false;
+        btn.textContent = '🚨 立即修復';
+      }
+    }
+  </script>
+</body>
+</html>
