@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase/client';
 import { localDB } from '@/lib/db';
+import { realtimeManager } from '@/lib/realtime';
 import type { Message, RawMessage } from './types';
 import { ensureMessageAttachments, normalizeMessage } from './utils';
 
@@ -10,6 +11,7 @@ interface ChatState {
   messages: Message[];
   channelMessages: Record<string, Message[]>;
   messagesLoading: Record<string, boolean>;
+  currentChannelId: string | null;
 
   // Message operations
   loadMessages: (channelId: string) => Promise<void>;
@@ -27,21 +29,61 @@ interface ChatState {
   // Internal state management
   setCurrentChannelMessages: (channelId: string, messages: Message[]) => void;
   clearMessages: () => void;
+
+  // Realtime subscriptions
+  subscribeToMessages: (channelId: string) => void;
+  unsubscribeFromMessages: () => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   channelMessages: {},
   messagesLoading: {},
+  currentChannelId: null,
 
   loadMessages: async (channelId) => {
     const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
 
     set((state) => ({
-      messagesLoading: { ...state.messagesLoading, [channelId]: true }
+      messagesLoading: { ...state.messagesLoading, [channelId]: true },
+      currentChannelId: channelId
     }));
 
     try {
+      // 優先從 Supabase 載入（即時資料）
+      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
+        const { data, error } = await supabase
+          .from('messages')
+          .select(`
+            *,
+            author:employees!author_id(id, display_name, avatar)
+          `)
+          .eq('channel_id', channelId)
+          .order('created_at', { ascending: true });
+
+        if (!error && data) {
+          const freshMessages = (data || []).map(normalizeMessage);
+
+          // 更新 IndexedDB 快取
+          for (const message of freshMessages) {
+            await localDB.put('messages', message);
+          }
+
+          set((state) => ({
+            channelMessages: {
+              ...state.channelMessages,
+              [channelId]: freshMessages
+            },
+            messagesLoading: {
+              ...state.messagesLoading,
+              [channelId]: false
+            }
+          }));
+          return;
+        }
+      }
+
+      // 離線時從 IndexedDB 載入
       const cachedMessages = (await localDB.getAll('messages') as RawMessage[])
         .filter(m => m.channel_id === channelId)
         .map(normalizeMessage);
@@ -56,40 +98,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
           [channelId]: false
         }
       }));
-
-      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-        setTimeout(async () => {
-          try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data, error } = await supabase
-              .from('messages')
-              .select(`
-                *,
-                author:employees!author_id(id, display_name, avatar)
-              `)
-              .eq('channel_id', channelId)
-              .order('created_at', { ascending: true });
-
-            if (error) {
-                            return;
-            }
-
-            const freshMessages = (data || []).map(normalizeMessage);
-
-            for (const message of freshMessages) {
-              await localDB.put('messages', message);
-            }
-
-            set((state) => ({
-              channelMessages: {
-                ...state.channelMessages,
-                [channelId]: freshMessages
-              }
-            }));
-          } catch (syncError) {
-                      }
-        }, 0);
-      }
     } catch (error) {
       set((state) => ({
         messagesLoading: { ...state.messagesLoading, [channelId]: false }
@@ -316,4 +324,103 @@ export const useChatStore = create<ChatState>((set, get) => ({
   clearMessages: () => {
     set({ messages: [] });
   },
+
+  // ==================== Realtime 訂閱 ====================
+
+  subscribeToMessages: (channelId) => {
+    const subscriptionId = `messages-${channelId}`;
+
+    realtimeManager.subscribe<RawMessage>({
+      table: 'messages',
+      filter: `channel_id=eq.${channelId}`,
+      subscriptionId,
+      handlers: {
+        // 新訊息插入
+        onInsert: async (rawMessage) => {
+          const newMessage = normalizeMessage(rawMessage);
+
+          // 更新 IndexedDB
+          await localDB.put('messages', newMessage);
+
+          // 更新 Zustand 狀態
+          set((state) => {
+            const existingMessages = state.channelMessages[channelId] || [];
+
+            // 避免重複（如果訊息已存在）
+            if (existingMessages.some(m => m.id === newMessage.id)) {
+              return state;
+            }
+
+            return {
+              channelMessages: {
+                ...state.channelMessages,
+                [channelId]: [...existingMessages, newMessage]
+              }
+            };
+          });
+        },
+
+        // 訊息更新（編輯/反應/置頂）
+        onUpdate: async (rawMessage) => {
+          const updatedMessage = normalizeMessage(rawMessage);
+
+          // 更新 IndexedDB
+          await localDB.put('messages', updatedMessage);
+
+          // 更新 Zustand 狀態
+          set((state) => {
+            const existingMessages = state.channelMessages[channelId] || [];
+            const index = existingMessages.findIndex(m => m.id === updatedMessage.id);
+
+            if (index === -1) {
+              return state;
+            }
+
+            const newMessages = [...existingMessages];
+            newMessages[index] = updatedMessage;
+
+            return {
+              channelMessages: {
+                ...state.channelMessages,
+                [channelId]: newMessages
+              }
+            };
+          });
+        },
+
+        // 訊息刪除
+        onDelete: async (rawMessage) => {
+          const messageId = rawMessage.id;
+
+          // 從 IndexedDB 刪除
+          await localDB.delete('messages', messageId);
+
+          // 從 Zustand 狀態刪除
+          set((state) => {
+            const existingMessages = state.channelMessages[channelId] || [];
+
+            return {
+              channelMessages: {
+                ...state.channelMessages,
+                [channelId]: existingMessages.filter(m => m.id !== messageId)
+              }
+            };
+          });
+        }
+      }
+    });
+
+    set({ currentChannelId: channelId });
+  },
+
+  unsubscribeFromMessages: () => {
+    const { currentChannelId } = get();
+
+    if (currentChannelId) {
+      const subscriptionId = `messages-${currentChannelId}`;
+      realtimeManager.unsubscribe(subscriptionId);
+    }
+
+    set({ currentChannelId: null });
+  }
 }));

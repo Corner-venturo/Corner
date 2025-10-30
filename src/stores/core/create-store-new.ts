@@ -9,10 +9,10 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { BaseEntity } from '@/types';
 import { TableName } from '@/lib/db/schemas';
 import { memoryCache } from '@/lib/cache/memory-cache';
+import { realtimeManager } from '@/lib/realtime';
 
 // 型別定義
 import type { StoreState, StoreConfig } from './types';
@@ -87,13 +87,13 @@ export function createStore<T extends BaseEntity>(
   const abortManager = new AbortManager();
 
   // 建立 Zustand Store
-  const store = create<StoreState<T>>()(
-    persist(
-      (set, get) => ({
-        // 初始狀態
-        items: [],
-        loading: false,
-        error: null,
+  // ⚠️ 不使用 persist middleware（避免跨裝置同步問題）
+  // 資料持久化完全由 IndexedDB 負責
+  const store = create<StoreState<T>>()((set, get) => ({
+    // 初始狀態
+    items: [],
+    loading: false,
+    error: null,
 
         // 設定載入狀態
         setLoading: (loading: boolean) => set({ loading }),
@@ -299,14 +299,7 @@ export function createStore<T extends BaseEntity>(
           set({ loading: false });
           logger.log(`🛑 [${tableName}] 已取消進行中的請求`);
         },
-      }),
-      {
-        name: `${tableName}-storage`,
-        // 只持久化 items，不持久化 loading 和 error
-        partialize: (state) => ({ items: state.items }),
-      }
-    )
-  );
+      }));
 
   // 註冊同步完成監聽器
   if (typeof window !== 'undefined') {
@@ -314,6 +307,10 @@ export function createStore<T extends BaseEntity>(
       logger.log(`📥 [${tableName}] 收到同步完成通知，重新載入資料...`);
       store.getState().fetchAll();
     });
+
+    // ⚠️ Realtime 訂閱已改為「按需訂閱」
+    // 不再自動訂閱，需在各頁面使用 useRealtimeFor[Table]() Hook
+    // 範例：useRealtimeForTours()
   }
 
   return store;

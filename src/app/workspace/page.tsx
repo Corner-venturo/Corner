@@ -8,10 +8,14 @@ import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels
 import { useAutoAddVisaMembers } from '@/hooks/use-auto-add-visa-members';
 import { useAutoCreateCompanyChannel } from '@/hooks/use-auto-create-company-channel';
 import { useAutoAddOrderMembers } from '@/hooks/use-auto-add-order-members';
+import { useChannelsRealtime } from '@/hooks/useChannelsRealtime';
 
 export default function WorkspacePage() {
   const { items: tours } = useTourStore();
   const { loadWorkspaces, loadChannelGroups, currentWorkspace } = useWorkspaceStore();
+
+  // ✅ 訂閱 Channels Realtime（即時同步）
+  useChannelsRealtime();
 
   // 自動創建公司公告群組和總部辦公室頻道
   useAutoCreateCompanyChannel();

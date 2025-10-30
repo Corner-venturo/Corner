@@ -64,44 +64,46 @@ export async function fetchAll<T extends BaseEntity>(
         }
       }
 
-      // 3. 已初始化或有快取資料 → 使用快取優先策略
-      logger.log(`💾 [${tableName}] 從 IndexedDB 快速載入...`);
+      // 3. 已初始化或有快取資料 → 離線優先策略
 
-      // 立即返回快取資料（不等 Supabase）
-      const cachedResult = [...cachedItems];
+      // 🎯 策略：立即返回 IndexedDB 快取，同時啟動背景同步
+      // 好處：
+      // 1. UI 立即顯示（0.1秒）
+      // 2. 背景同步確保資料最新
+      // 3. Realtime 訂閱處理即時變更
 
-      // 4. 背景同步 Supabase（不阻塞 UI）
-      setTimeout(async () => {
-        try {
-          // Step 1: 先上傳待同步資料
-          logger.log(`📤 [${tableName}] 上傳待同步資料...`);
-          await sync.uploadLocalChanges();
-          logger.log(`✅ [${tableName}] 待同步資料已上傳`);
+      logger.log(`✅ [${tableName}] 採用離線優先策略`);
 
-          // Step 2: 下載最新資料
-          logger.log(`☁️ [${tableName}] 背景同步 Supabase...`);
-          const remoteItems = await supabase.fetchAll(controller?.signal);
+      // 如果有快取資料，立即返回
+      if (cachedItems.length > 0) {
+        logger.log(`💾 [${tableName}] 立即返回快取:`, cachedItems.length, '筆');
 
-          if (remoteItems.length > 0) {
-            logger.log(`✅ [${tableName}] Supabase 同步成功:`, remoteItems.length, '筆');
+        // 背景同步（不阻擋 UI）
+        sync.uploadLocalChanges()
+          .then(() => logger.log(`📤 [${tableName}] 背景上傳完成`))
+          .catch((err) => logger.warn(`⚠️ [${tableName}] 背景上傳失敗:`, err));
 
-            // Step 3: 合併資料
-            const merger = new MergeStrategy<T>();
-            const mergedItems = merger.merge(cachedItems, remoteItems, tableName);
+        return cachedItems;
+      }
 
-            // Step 4: 更新 IndexedDB 快取（分批）
-            await indexedDB.batchPut(remoteItems, 1000);
-            logger.log(`✅ [${tableName}] IndexedDB 快取完成`);
+      // 沒有快取資料，需要等待 Supabase（首次載入後的情況）
+      logger.log(`☁️ [${tableName}] 無快取，從 Supabase 載入...`);
 
-            // 返回合併後的資料（這裡無法直接更新 UI，需要在外層處理）
-            return mergedItems;
-          }
-        } catch (syncError) {
-          logger.warn(`⚠️ [${tableName}] 背景同步失敗:`, syncError);
+      try {
+        await sync.uploadLocalChanges();
+        const remoteItems = await supabase.fetchAll(controller?.signal);
+
+        if (remoteItems.length > 0) {
+          logger.log(`✅ [${tableName}] Supabase 載入成功:`, remoteItems.length, '筆');
+          await indexedDB.batchPut(remoteItems, 1000);
+          return remoteItems;
         }
-      }, 0);
 
-      return cachedResult;
+        return [];
+      } catch (syncError) {
+        logger.warn(`⚠️ [${tableName}] Supabase 載入失敗:`, syncError);
+        return [];
+      }
     } else {
       // 從 IndexedDB 讀取（離線模式或未啟用 Supabase）
       logger.log(`💾 [${tableName}] 從 IndexedDB 載入資料（離線模式）...`);

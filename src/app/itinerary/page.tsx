@@ -9,10 +9,13 @@ import { MapPin, Eye, Copy, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useItineraryStore, type Itinerary } from '@/stores';
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog';
+import { useRealtimeForItineraries } from '@/hooks/use-realtime-hooks';
 
 const statusFilters = ['全部', '草稿', '已發布'];
 
 export default function ItineraryPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForItineraries();
   const router = useRouter();
   const { items: itineraries, delete: deleteItinerary } = useItineraryStore();
   const [statusFilter, setStatusFilter] = useState<string>('全部');

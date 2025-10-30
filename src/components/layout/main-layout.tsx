@@ -15,6 +15,7 @@ import {
   SIDEBAR_WIDTH_COLLAPSED_PX,
   LAYOUT_TRANSITION_DURATION,
 } from '@/lib/constants';
+import { PermanentRealtimeSubscriptions } from '@/components/PermanentRealtimeSubscriptions';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -111,6 +112,9 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ✅ 永久 Realtime 訂閱（user_roles, workspaces, employees） */}
+      <PermanentRealtimeSubscriptions />
+
       {/* 左下象限 - 側邊欄 */}
       <Sidebar />
 

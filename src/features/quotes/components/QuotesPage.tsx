@@ -15,8 +15,13 @@ import { useQuotesFilters } from '../hooks/useQuotesFilters';
 import { useQuoteForm } from '../hooks/useQuoteForm';
 import { useQuoteTourSync } from '../hooks/useQuoteTourSync';
 import { STATUS_FILTERS } from '../constants';
+import { useRealtimeForQuotes, useRealtimeForTours, useRealtimeForQuoteItems } from '@/hooks/use-realtime-hooks';
 
 export const QuotesPage: React.FC = () => {
+  // ✅ Realtime 訂閱
+  useRealtimeForQuotes();
+  useRealtimeForTours();
+  useRealtimeForQuoteItems();
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);

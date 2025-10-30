@@ -20,8 +20,14 @@ import {
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
 import { useTourStore, useOrderStore, useMemberStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
+import { useRealtimeForCalendarEvents, useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers } from '@/hooks/use-realtime-hooks'
 
 export default function CalendarPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForCalendarEvents();
+  useRealtimeForTours();
+  useRealtimeForOrders();
+  useRealtimeForMembers();
   // Stores
   const { fetchAll: fetchTours } = useTourStore()
   const { fetchAll: fetchOrders } = useOrderStore()

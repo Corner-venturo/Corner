@@ -12,12 +12,19 @@ import { useVisasDialog } from '../hooks/useVisasDialog';
 import { VisasList } from './VisasList';
 import { VisasInfoDialog } from './VisasInfoDialog';
 import { AddVisaDialog } from './AddVisaDialog';
+import { useRealtimeForVisas, useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers, useRealtimeForCustomers } from '@/hooks/use-realtime-hooks';
 
 // ============================================
 // 簽證管理主頁面
 // ============================================
 
 export default function VisasPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForVisas();
+  useRealtimeForTours();
+  useRealtimeForOrders();
+  useRealtimeForMembers();
+  useRealtimeForCustomers();
   // 資料管理
   const {
     visas,

@@ -12,8 +12,12 @@ import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { SimpleOrderTable } from '@/components/orders/simple-order-table';
 import { AddOrderForm } from '@/components/orders/add-order-form';
 import { cn } from '@/lib/utils';
+import { useRealtimeForOrders, useRealtimeForTours } from '@/hooks/use-realtime-hooks';
 
 export default function OrdersPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForOrders();
+  useRealtimeForTours();
   const router = useRouter();
   const { items: orders, create: addOrder } = useOrderStore();
   const { items: tours } = useTourStore();

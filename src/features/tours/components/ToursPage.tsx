@@ -21,8 +21,15 @@ import { useTourOperations } from '../hooks/useTourOperations';
 import { TourForm } from './TourForm';
 import { TourExpandedView } from './TourExpandedView';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers, useRealtimeForQuotes } from '@/hooks/use-realtime-hooks';
 
 export const ToursPage: React.FC = () => {
+  // ✅ Realtime 訂閱（進入頁面時訂閱，離開時自動取消）
+  useRealtimeForTours();
+  useRealtimeForOrders();
+  useRealtimeForMembers();
+  useRealtimeForQuotes();
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderStore = useOrderStore();

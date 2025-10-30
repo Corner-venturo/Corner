@@ -56,19 +56,17 @@ export async function create<T extends BaseEntity>(
       : recordData;
 
     await indexedDB.put(recordData);
-    logger.log(`💾 [${tableName}] FastIn: 已寫入本地 IndexedDB`);
+    logger.log(`💾 [${tableName}] 已寫入本地 IndexedDB`);
 
-    // FastIn Step 2: 背景同步到 Supabase（不阻塞 UI）
+    // 即時同步到 Supabase
     if (enableSupabase && typeof window !== 'undefined' && needsSyncFields) {
-      setTimeout(async () => {
-        try {
-          logger.log(`☁️ [${tableName}] FastIn: 開始背景同步...`);
-          await sync.uploadLocalChanges();
-          logger.log(`✅ [${tableName}] FastIn: 背景同步完成`);
-        } catch (syncError) {
-          logger.warn(`⚠️ [${tableName}] FastIn: 背景同步失敗（不影響本地資料）`, syncError);
-        }
-      }, 0);
+      try {
+        logger.log(`☁️ [${tableName}] 即時同步到 Supabase...`);
+        await sync.uploadLocalChanges();
+        logger.log(`✅ [${tableName}] 同步完成`);
+      } catch (syncError) {
+        logger.warn(`⚠️ [${tableName}] 同步失敗（本地資料已保存）`, syncError);
+      }
     }
 
     return recordData;

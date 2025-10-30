@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useWorkspaceStore } from '@/stores/workspace-store';
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat';
+import { useChatRealtime } from '@/hooks/useChatRealtime';
 import { DEFAULT_CHANNEL_NAME, CHANNEL_SWITCH_DELAY, ALERT_MESSAGES } from './constants';
 import { UI_DELAYS } from '@/lib/constants/timeouts';
 
@@ -58,6 +59,9 @@ export function useChannelChat() {
   const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations();
   const { attachedFiles, setAttachedFiles, uploadingFiles, uploadProgress, uploadFiles, clearFiles } = useFileUpload();
   const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0);
+
+  // Realtime subscription for messages
+  useChatRealtime(selectedChannel?.id);
 
   // Effects
   useEffect(() => {

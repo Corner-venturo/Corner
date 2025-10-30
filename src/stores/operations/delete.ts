@@ -45,21 +45,19 @@ export async function deleteItem<T extends BaseEntity>(
       }
     }
 
-    // FastIn Step 2: 立即從 IndexedDB 刪除
+    // 立即從 IndexedDB 刪除
     await indexedDB.delete(id);
-    logger.log(`💾 [${tableName}] FastIn: 已從本地刪除`);
+    logger.log(`💾 [${tableName}] 已從本地刪除`);
 
-    // FastIn Step 3: 背景同步到 Supabase（不阻塞 UI）
+    // 即時同步到 Supabase
     if (enableSupabase && typeof window !== 'undefined') {
-      setTimeout(async () => {
-        try {
-          logger.log(`☁️ [${tableName}] FastIn: 開始背景同步刪除...`);
-          await sync.uploadLocalChanges();
-          logger.log(`✅ [${tableName}] FastIn: 背景同步刪除完成`);
-        } catch (syncError) {
-          logger.warn(`⚠️ [${tableName}] FastIn: 背景同步刪除失敗（不影響本地）`, syncError);
-        }
-      }, 0);
+      try {
+        logger.log(`☁️ [${tableName}] 即時同步刪除到 Supabase...`);
+        await sync.uploadLocalChanges();
+        logger.log(`✅ [${tableName}] 同步刪除完成`);
+      } catch (syncError) {
+        logger.warn(`⚠️ [${tableName}] 同步刪除失敗（本地已刪除）`, syncError);
+      }
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '刪除失敗';

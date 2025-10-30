@@ -38,9 +38,9 @@ export async function update<T extends BaseEntity>(
       } as Partial<T>;
     }
 
-    // FastIn Step 2: 立即更新 IndexedDB
+    // 立即更新 IndexedDB
     await indexedDB.update(id, syncData);
-    logger.log(`💾 [${tableName}] FastIn: 已更新本地 IndexedDB`);
+    logger.log(`💾 [${tableName}] 已更新本地 IndexedDB`);
 
     // 取得更新後的完整資料
     const updatedItem = await indexedDB.getById(id);
@@ -48,17 +48,15 @@ export async function update<T extends BaseEntity>(
       throw new Error('找不到要更新的項目');
     }
 
-    // FastIn Step 3: 背景同步到 Supabase（不阻塞 UI）
+    // 即時同步到 Supabase
     if (enableSupabase && typeof window !== 'undefined' && needsSyncFields) {
-      setTimeout(async () => {
-        try {
-          logger.log(`☁️ [${tableName}] FastIn: 開始背景同步...`);
-          await sync.uploadLocalChanges();
-          logger.log(`✅ [${tableName}] FastIn: 背景同步完成`);
-        } catch (syncError) {
-          logger.warn(`⚠️ [${tableName}] FastIn: 背景同步失敗（不影響本地資料）`, syncError);
-        }
-      }, 0);
+      try {
+        logger.log(`☁️ [${tableName}] 即時同步到 Supabase...`);
+        await sync.uploadLocalChanges();
+        logger.log(`✅ [${tableName}] 同步完成`);
+      } catch (syncError) {
+        logger.warn(`⚠️ [${tableName}] 同步失敗（本地資料已保存）`, syncError);
+      }
     }
 
     return updatedItem;

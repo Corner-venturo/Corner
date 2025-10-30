@@ -13,8 +13,13 @@ import { DateCell, ActionCell, NumberCell } from '@/components/table-cells';
 import { ContractDialog } from '@/components/contracts/ContractDialog';
 import { ContractViewDialog } from '@/components/contracts/ContractViewDialog';
 import { EnvelopeDialog } from '@/components/contracts/EnvelopeDialog';
+import { useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers } from '@/hooks/use-realtime-hooks';
 
 export default function ContractsPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForTours();
+  useRealtimeForOrders();
+  useRealtimeForMembers();
   const router = useRouter();
   const searchParams = useSearchParams();
   const tourIdParam = searchParams?.get('tour_id');

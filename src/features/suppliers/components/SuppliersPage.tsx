@@ -12,8 +12,11 @@ import { SuppliersDialog } from './SuppliersDialog';
 import { useSuppliersData } from '../hooks/useSuppliersData';
 import { useSuppliersFilters } from '../hooks/useSuppliersFilters';
 import { useSupplierForm } from '../hooks/useSupplierForm';
+import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks';
 
 export const SuppliersPage: React.FC = () => {
+  // ✅ Realtime 訂閱
+  useRealtimeForSuppliers();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 

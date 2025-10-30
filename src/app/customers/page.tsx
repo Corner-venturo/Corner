@@ -9,8 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { Input } from '@/components/ui/input';
 import { useTourStore, useOrderStore, useCustomerStore } from '@/stores';
+import { useRealtimeForCustomers, useRealtimeForOrders, useRealtimeForTours } from '@/hooks/use-realtime-hooks';
 
 export default function CustomersPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForCustomers();
+  useRealtimeForOrders();
+  useRealtimeForTours();
   const { items: customers, create: addCustomer } = useCustomerStore();
   const { items: orders } = useOrderStore();
   const { items: tours } = useTourStore();

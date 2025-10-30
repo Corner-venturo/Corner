@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useOrderStore } from '@/stores';
 import {  Calendar, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRealtimeForOrders } from '@/hooks/use-realtime-hooks';
 
 // 收款方式選項
 const paymentMethods = [
@@ -42,6 +43,9 @@ interface PaymentItem {
 }
 
 export default function PaymentsPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForOrders();
+
   const { items: orders } = useOrderStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 

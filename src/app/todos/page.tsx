@@ -20,6 +20,7 @@ import { Todo } from '@/stores/types';
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { TodoCard } from '@/components/todos/todo-card';
+import { useRealtimeForTodos } from '@/hooks/use-realtime-hooks';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,9 @@ const statusFilters = [
 ];
 
 export default function TodosPage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForTodos();
+
   const todoStore = useTodoStore();
   const todos = todoStore.items;
   const { create: addTodo, update: updateTodo, delete: deleteTodo, fetchAll } = todoStore;
