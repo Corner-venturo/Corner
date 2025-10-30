@@ -238,7 +238,6 @@ BADGE_CONFIGS = {
 ```tsx
 import { EmptyState } from '@/components/ui/empty-state'
 import { MapPin, Plus } from 'lucide-react'
-
 ;<EmptyState
   variant="search"
   title="沒有找到景點"
