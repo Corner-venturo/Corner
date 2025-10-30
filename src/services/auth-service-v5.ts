@@ -52,7 +52,7 @@ export class AuthServiceV5 {
       }
 
       // 檢查狀態
-      if (!(user as unknown).is_active || user.status === 'terminated') {
+      if (!user.is_active || user.status === 'terminated') {
         return {
           success: false,
           message: '帳號已停用'
@@ -81,7 +81,7 @@ export class AuthServiceV5 {
     try {
       const now = new Date().toISOString();
 
-      await (supabase as unknown)
+      await supabase
         .from('employees')
         .update({
           last_login: now,

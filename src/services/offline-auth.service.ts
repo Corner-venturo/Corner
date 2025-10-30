@@ -21,7 +21,7 @@ export class OfflineAuthService {
     try {
       // 從 IndexedDB 讀取真實使用者
       await localDB.init(); // 確保資料庫已初始化
-      const users = await localDB.getAll<unknown>(TABLES.EMPLOYEES as unknown);
+      const users = await localDB.getAll(TABLES.EMPLOYEES);
       const employee = users.find(u => u.employee_number === email || u.employee_number === email);
 
       if (!employee) {
