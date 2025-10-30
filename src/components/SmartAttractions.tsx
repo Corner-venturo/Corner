@@ -1,21 +1,21 @@
-"use client";
+'use client'
 
-import { FocusCards } from "@/components/ui/focus-cards";
-import { motion } from "framer-motion";
-import Image from "next/image";
+import { FocusCards } from '@/components/ui/focus-cards'
+import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 interface Attraction {
-  title: string;
-  src: string;
-  description?: string;
+  title: string
+  src: string
+  description?: string
 }
 
 export function SmartAttractions({ attractions }: { attractions: Attraction[] }) {
-  const count = attractions.length;
+  const count = attractions.length
 
   // 1個景點 - 全寬英雄卡片
   if (count === 1) {
-    const item = attractions[0];
+    const item = attractions[0]
     return (
       <div className="max-w-7xl mx-auto px-4">
         <motion.div
@@ -24,22 +24,15 @@ export function SmartAttractions({ attractions }: { attractions: Attraction[] })
           viewport={{ once: true }}
           className="relative h-[500px] rounded-3xl overflow-hidden"
         >
-          <Image
-            src={item.src}
-            alt={item.title}
-            fill
-            className="object-cover"
-          />
+          <Image src={item.src} alt={item.title} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-12">
             <h3 className="text-5xl font-bold text-white mb-4">{item.title}</h3>
-            {item.description && (
-              <p className="text-xl text-white/80">{item.description}</p>
-            )}
+            {item.description && <p className="text-xl text-white/80">{item.description}</p>}
           </div>
         </motion.div>
       </div>
-    );
+    )
   }
 
   // 2個景點 - 左右對稱大卡片
@@ -64,15 +57,13 @@ export function SmartAttractions({ attractions }: { attractions: Attraction[] })
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <h3 className="text-3xl font-bold text-white mb-2">{item.title}</h3>
-                {item.description && (
-                  <p className="text-white/80">{item.description}</p>
-                )}
+                {item.description && <p className="text-white/80">{item.description}</p>}
               </div>
             </motion.div>
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   // 3個景點 - 三等分卡片
@@ -108,19 +99,19 @@ export function SmartAttractions({ attractions }: { attractions: Attraction[] })
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   // 4-6個景點 - 使用 FocusCards
   if (count >= 4 && count <= 6) {
-    return <FocusCards cards={attractions} />;
+    return <FocusCards cards={attractions} />
   }
 
   // 7個以上 - 橫向滾動
   return (
     <div className="max-w-full">
       <div className="overflow-x-auto pb-6">
-        <div className="flex gap-6 px-4 md:px-8" style={{ width: "max-content" }}>
+        <div className="flex gap-6 px-4 md:px-8" style={{ width: 'max-content' }}>
           {attractions.map((item, index) => (
             <motion.div
               key={item.title}
@@ -151,13 +142,10 @@ export function SmartAttractions({ attractions }: { attractions: Attraction[] })
       <div className="flex justify-center mt-4">
         <div className="flex gap-2">
           {[...Array(Math.ceil(count / 3))].map((_, i) => (
-            <div
-              key={i}
-              className="w-2 h-2 rounded-full bg-gray-400"
-            />
+            <div key={i} className="w-2 h-2 rounded-full bg-gray-400" />
           ))}
         </div>
       </div>
     </div>
-  );
+  )
 }

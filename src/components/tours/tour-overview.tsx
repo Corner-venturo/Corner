@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { ContentContainer } from '@/components/layout/content-container';
-import { Button } from '@/components/ui/button';
-import { Tour } from '@/stores/types';
-import { useOrderStore } from '@/stores';
+import React from 'react'
+import { Card } from '@/components/ui/card'
+import { ContentContainer } from '@/components/layout/content-container'
+import { Button } from '@/components/ui/button'
+import { Tour } from '@/stores/types'
+import { useOrderStore } from '@/stores'
 import {
   Calendar,
   MapPin,
@@ -14,109 +14,118 @@ import {
   FileText,
   TrendingUp,
   AlertCircle,
-  CheckCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  CheckCircle,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface TourOverviewProps {
-  tour: Tour;
-  orderFilter?: string; // 選填：顯示特定訂單的總覽信息
+  tour: Tour
+  orderFilter?: string // 選填：顯示特定訂單的總覽信息
 }
 
-export const TourOverview = React.memo(function TourOverview({ tour, orderFilter }: TourOverviewProps) {
-  const { items: orders } = useOrderStore();
+export const TourOverview = React.memo(function TourOverview({
+  tour,
+  orderFilter,
+}: TourOverviewProps) {
+  const { items: orders } = useOrderStore()
 
   // 如果有 orderFilter，取得該訂單的資料
-  const order = orderFilter ? orders.find(o => o.id === orderFilter) : null;
+  const order = orderFilter ? orders.find(o => o.id === orderFilter) : null
 
   // 根據是否為訂單視圖，顯示不同的卡片資料
-  const overviewCards = order ? [
-    {
-      title: '訂單金額',
-      value: `NT$ ${order.total_amount.toLocaleString()}`,
-      icon: DollarSign,
-      color: 'text-morandi-gold'
-    },
-    {
-      title: '付款狀態',
-      value: order.payment_status,
-      icon: order.payment_status === 'paid' ? CheckCircle : AlertCircle,
-      color: order.payment_status === 'paid' ? 'text-morandi-green' :
-             order.payment_status === 'partial' ? 'text-morandi-gold' : 'text-morandi-red'
-    },
-    {
-      title: '已付金額',
-      value: `NT$ ${order.paid_amount.toLocaleString()}`,
-      icon: TrendingUp,
-      color: 'text-morandi-green'
-    },
-    {
-      title: '未付金額',
-      value: `NT$ ${order.remaining_amount.toLocaleString()}`,
-      icon: TrendingUp,
-      color: 'text-morandi-red'
-    },
-    {
-      title: '訂單人數',
-      value: `${order.member_count} 人`,
-      icon: Users,
-      color: 'text-morandi-gold'
-    },
-    {
-      title: '聯絡人',
-      value: order.contact_person,
-      icon: Users,
-      color: 'text-morandi-primary'
-    }
-  ] : [
-    {
-      title: '報價單價格',
-      value: `NT$ ${tour.price.toLocaleString()}`,
-      icon: DollarSign,
-      color: 'text-morandi-gold'
-    },
-    {
-      title: '合約狀態',
-      value: tour.contract_status,
-      icon: tour.contract_status === 'signed' ? CheckCircle : AlertCircle,
-      color: tour.contract_status === 'signed' ? 'text-morandi-green' : 'text-morandi-red'
-    },
-    {
-      title: '總收入',
-      value: `NT$ ${tour.total_revenue.toLocaleString()}`,
-      icon: TrendingUp,
-      color: 'text-morandi-green'
-    },
-    {
-      title: '總支出',
-      value: `NT$ ${tour.total_cost.toLocaleString()}`,
-      icon: TrendingUp,
-      color: 'text-morandi-red'
-    },
-    {
-      title: '淨利潤',
-      value: `NT$ ${tour.profit.toLocaleString()}`,
-      icon: TrendingUp,
-      color: tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-    },
-    {
-      title: '總訂單數',
-      value: `${orders.filter(o => o.tour_id === tour.id).length} 筆`,
-      icon: FileText,
-      color: 'text-morandi-gold'
-    }
-  ];
+  const overviewCards = order
+    ? [
+        {
+          title: '訂單金額',
+          value: `NT$ ${order.total_amount.toLocaleString()}`,
+          icon: DollarSign,
+          color: 'text-morandi-gold',
+        },
+        {
+          title: '付款狀態',
+          value: order.payment_status,
+          icon: order.payment_status === 'paid' ? CheckCircle : AlertCircle,
+          color:
+            order.payment_status === 'paid'
+              ? 'text-morandi-green'
+              : order.payment_status === 'partial'
+                ? 'text-morandi-gold'
+                : 'text-morandi-red',
+        },
+        {
+          title: '已付金額',
+          value: `NT$ ${order.paid_amount.toLocaleString()}`,
+          icon: TrendingUp,
+          color: 'text-morandi-green',
+        },
+        {
+          title: '未付金額',
+          value: `NT$ ${order.remaining_amount.toLocaleString()}`,
+          icon: TrendingUp,
+          color: 'text-morandi-red',
+        },
+        {
+          title: '訂單人數',
+          value: `${order.member_count} 人`,
+          icon: Users,
+          color: 'text-morandi-gold',
+        },
+        {
+          title: '聯絡人',
+          value: order.contact_person,
+          icon: Users,
+          color: 'text-morandi-primary',
+        },
+      ]
+    : [
+        {
+          title: '報價單價格',
+          value: `NT$ ${tour.price.toLocaleString()}`,
+          icon: DollarSign,
+          color: 'text-morandi-gold',
+        },
+        {
+          title: '合約狀態',
+          value: tour.contract_status,
+          icon: tour.contract_status === 'signed' ? CheckCircle : AlertCircle,
+          color: tour.contract_status === 'signed' ? 'text-morandi-green' : 'text-morandi-red',
+        },
+        {
+          title: '總收入',
+          value: `NT$ ${tour.total_revenue.toLocaleString()}`,
+          icon: TrendingUp,
+          color: 'text-morandi-green',
+        },
+        {
+          title: '總支出',
+          value: `NT$ ${tour.total_cost.toLocaleString()}`,
+          icon: TrendingUp,
+          color: 'text-morandi-red',
+        },
+        {
+          title: '淨利潤',
+          value: `NT$ ${tour.profit.toLocaleString()}`,
+          icon: TrendingUp,
+          color: tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red',
+        },
+        {
+          title: '總訂單數',
+          value: `${orders.filter(o => o.tour_id === tour.id).length} 筆`,
+          icon: FileText,
+          color: 'text-morandi-gold',
+        },
+      ]
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
-      '提案': 'bg-morandi-gold text-white',
-      '進行中': 'bg-morandi-green text-white',
-      '待結案': 'bg-morandi-gold text-white',
-      '結案': 'bg-morandi-container text-morandi-secondary',
-      '特殊團': 'bg-morandi-red text-white'
-    };
-    return badges[status] || 'bg-morandi-container text-morandi-secondary';
-  };
+      提案: 'bg-morandi-gold text-white',
+      進行中: 'bg-morandi-green text-white',
+      待結案: 'bg-morandi-gold text-white',
+      結案: 'bg-morandi-container text-morandi-secondary',
+      特殊團: 'bg-morandi-red text-white',
+    }
+    return badges[status] || 'bg-morandi-container text-morandi-secondary'
+  }
 
   return (
     <div className="space-y-6">
@@ -142,10 +151,12 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
               </div>
               <div className="flex items-center">
                 <span className="mr-3 text-morandi-secondary">狀態：</span>
-                <span className={cn(
-                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                  getStatusBadge(tour.status)
-                )}>
+                <span
+                  className={cn(
+                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                    getStatusBadge(tour.status)
+                  )}
+                >
                   {tour.status}
                 </span>
               </div>
@@ -202,5 +213,5 @@ export const TourOverview = React.memo(function TourOverview({ tour, orderFilter
         </div>
       </ContentContainer>
     </div>
-  );
-});
+  )
+})

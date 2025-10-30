@@ -9,14 +9,16 @@
  * @returns 轉換後的半形字串
  */
 export function toHalfWidth(str: string): string {
-  if (!str) return str;
+  if (!str) return str
 
-  return str.replace(/[！-～]/g, (char) => {
-    // 全形字符範圍：！(0xFF01) 到 ～(0xFF5E)
-    // 轉換為半形：!(0x0021) 到 ~(0x007E)
-    const code = char.charCodeAt(0);
-    return String.fromCharCode(code - 0xFEE0);
-  }).replace(/　/g, ' '); // 全形空格轉半形空格
+  return str
+    .replace(/[！-～]/g, char => {
+      // 全形字符範圍：！(0xFF01) 到 ～(0xFF5E)
+      // 轉換為半形：!(0x0021) 到 ~(0x007E)
+      const code = char.charCodeAt(0)
+      return String.fromCharCode(code - 0xfee0)
+    })
+    .replace(/　/g, ' ') // 全形空格轉半形空格
 }
 
 /**
@@ -26,18 +28,18 @@ export function toHalfWidth(str: string): string {
 export function withHalfWidthConversion<T extends HTMLInputElement | HTMLTextAreaElement>(
   originalOnChange?: React.ChangeEventHandler<T>
 ): React.ChangeEventHandler<T> {
-  return (e) => {
+  return e => {
     // 轉換為半形
-    const convertedValue = toHalfWidth(e.target.value);
+    const convertedValue = toHalfWidth(e.target.value)
 
     // 如果值有改變，更新 input 的值
     if (convertedValue !== e.target.value) {
-      e.target.value = convertedValue;
+      e.target.value = convertedValue
     }
 
     // 呼叫原本的 onChange
     if (originalOnChange) {
-      originalOnChange(e);
+      originalOnChange(e)
     }
-  };
+  }
 }

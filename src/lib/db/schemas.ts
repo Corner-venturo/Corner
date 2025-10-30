@@ -4,16 +4,16 @@
  */
 
 export interface TableSchema {
-  name: string;
-  keyPath: string;
-  autoIncrement: boolean;
-  indexes: IndexSchema[];
+  name: string
+  keyPath: string
+  autoIncrement: boolean
+  indexes: IndexSchema[]
 }
 
 export interface IndexSchema {
-  name: string;
-  keyPath: string | string[];
-  unique: boolean;
+  name: string
+  keyPath: string | string[]
+  unique: boolean
 }
 
 /**
@@ -21,13 +21,13 @@ export interface IndexSchema {
  * v1: 完整的 Offline-First 架構，包含所有資料表（含 regions 和 workspace）
  * v2: 新增 countries 和 cities 表（不刪除任何資料）
  */
-export const DB_VERSION = 2;
+export const DB_VERSION = 2
 
 /**
  * 資料庫名稱
  * 離線優先架構專用資料庫
  */
-export const DB_NAME = 'VenturoOfflineDB';
+export const DB_NAME = 'VenturoOfflineDB'
 
 /**
  * 所有資料表的 Schema 定義
@@ -656,12 +656,12 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'created_at', keyPath: 'created_at', unique: false },
     ],
   },
-];
+]
 
 /**
  * 取得所有資料表名稱
  */
-export const TABLE_NAMES = TABLE_SCHEMAS.map((schema) => schema.name);
+export const TABLE_NAMES = TABLE_SCHEMAS.map(schema => schema.name)
 
 /**
  * 資料表名稱常數（用於型別安全）
@@ -706,6 +706,6 @@ export const TABLES = {
   BULLETINS: 'bulletins',
   ADVANCE_LISTS: 'advance_lists',
   SHARED_ORDER_LISTS: 'shared_order_lists',
-} as const;
+} as const
 
-export type TableName = (typeof TABLES)[keyof typeof TABLES];
+export type TableName = (typeof TABLES)[keyof typeof TABLES]

@@ -1,12 +1,12 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ResponsiveHeader } from "@/components/layout/responsive-header";
-import { TourForm } from "@/components/editor/TourForm";
-import { TourPreview } from "@/components/editor/TourPreview";
-import { PublishButton } from "@/components/editor/PublishButton";
-import { useItineraryStore } from "@/stores";
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { TourForm } from '@/components/editor/TourForm'
+import { TourPreview } from '@/components/editor/TourPreview'
+import { PublishButton } from '@/components/editor/PublishButton'
+import { useItineraryStore } from '@/stores'
 import {
   IconBuilding,
   IconToolsKitchen2,
@@ -17,7 +17,7 @@ import {
   IconDeviceDesktop,
   IconDeviceMobile,
   IconClock,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react'
 
 // Icon mapping
 const iconMap: any = {
@@ -27,189 +27,209 @@ const iconMap: any = {
   IconCalendar,
   IconPlane,
   IconMapPin,
-};
+}
 
 export default function EditItineraryPage() {
-  const params = useParams();
-  const router = useRouter();
-  const slug = params.slug as string;
-  const { fetchById } = useItineraryStore();
+  const params = useParams()
+  const router = useRouter()
+  const slug = params.slug as string
+  const { fetchById } = useItineraryStore()
 
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [scale, setScale] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [itineraryData, setItineraryData] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
+  const [scale, setScale] = useState(1)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [itineraryData, setItineraryData] = useState<unknown>(null)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
 
   // 載入行程資料或從旅遊團建立
   useEffect(() => {
     const loadOrCreateItinerary = async () => {
       try {
         // 1. 先嘗試載入行程
-        const itinerary = await fetchById(slug);
+        const itinerary = await fetchById(slug)
         if (itinerary) {
-          setItineraryData(itinerary);
-          setLoading(false);
-          return;
+          setItineraryData(itinerary)
+          setLoading(false)
+          return
         }
 
         // 2. 找不到行程，嘗試從旅遊團載入
-        const { useTourStore } = await import('@/stores');
-        const tour = useTourStore.getState().items.find(t => t.id === slug);
+        const { useTourStore } = await import('@/stores')
+        const tour = useTourStore.getState().items.find(t => t.id === slug)
 
         if (tour) {
           // 從旅遊團建立行程資料
-          const { useRegionStoreNew } = await import('@/stores');
-          const { countries, cities } = useRegionStoreNew.getState();
+          const { useRegionStoreNew } = await import('@/stores')
+          const { countries, cities } = useRegionStoreNew.getState()
 
           // 找到國家和城市名稱
-          const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null;
-          const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null;
+          const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
+          const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
 
           // 計算天數
-          const departureDate = new Date(tour.departure_date);
-          const returnDate = new Date(tour.return_date);
-          const days = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+          const departureDate = new Date(tour.departure_date)
+          const returnDate = new Date(tour.return_date)
+          const days =
+            Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
           // 建立預設行程資料
           const newItinerary = {
             id: slug,
             tour_id: slug,
-            tagline: "Corner Travel 2025",
+            tagline: 'Corner Travel 2025',
             title: tour.name,
-            subtitle: "精緻旅遊",
-            description: tour.description || "",
+            subtitle: '精緻旅遊',
+            description: tour.description || '',
             departureDate: departureDate.toLocaleDateString('zh-TW'),
             tourCode: tour.code,
-            coverImage: city?.background_image_url || "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop",
-            country: country?.name || tour.location || "",
-            city: city?.name || tour.location || "",
-            status: "草稿",
+            coverImage:
+              city?.background_image_url ||
+              'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop',
+            country: country?.name || tour.location || '',
+            city: city?.name || tour.location || '',
+            status: '草稿',
             outboundFlight: {
-              airline: "",
-              flightNumber: "",
-              departureAirport: "TPE",
-              departureTime: "",
-              departureDate: departureDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
-              arrivalAirport: city?.airport_code || "",
-              arrivalTime: "",
-              duration: "",
+              airline: '',
+              flightNumber: '',
+              departureAirport: 'TPE',
+              departureTime: '',
+              departureDate: departureDate.toLocaleDateString('zh-TW', {
+                month: '2-digit',
+                day: '2-digit',
+              }),
+              arrivalAirport: city?.airport_code || '',
+              arrivalTime: '',
+              duration: '',
             },
             returnFlight: {
-              airline: "",
-              flightNumber: "",
-              departureAirport: city?.airport_code || "",
-              departureTime: "",
-              departureDate: returnDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
-              arrivalAirport: "TPE",
-              arrivalTime: "",
-              duration: "",
+              airline: '',
+              flightNumber: '',
+              departureAirport: city?.airport_code || '',
+              departureTime: '',
+              departureDate: returnDate.toLocaleDateString('zh-TW', {
+                month: '2-digit',
+                day: '2-digit',
+              }),
+              arrivalAirport: 'TPE',
+              arrivalTime: '',
+              duration: '',
             },
             features: [],
             focusCards: [],
             leader: {
-              name: "",
-              domesticPhone: "",
-              overseasPhone: "",
+              name: '',
+              domesticPhone: '',
+              overseasPhone: '',
             },
             meetingInfo: {
-              time: "",
-              location: "",
+              time: '',
+              location: '',
             },
             itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,
             dailyItinerary: Array.from({ length: days }, (_, i) => ({
               dayLabel: `Day ${i + 1}`,
-              date: new Date(departureDate.getTime() + i * 24 * 60 * 60 * 1000).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
-              title: i === 0 ? `台北 ✈ ${city?.name || tour.location}` :
-                     i === days - 1 ? `${city?.name || tour.location} ✈ 台北` :
-                     `${city?.name || tour.location} 自由活動`,
-              highlight: "",
-              description: "",
+              date: new Date(departureDate.getTime() + i * 24 * 60 * 60 * 1000).toLocaleDateString(
+                'zh-TW',
+                { month: '2-digit', day: '2-digit' }
+              ),
+              title:
+                i === 0
+                  ? `台北 ✈ ${city?.name || tour.location}`
+                  : i === days - 1
+                    ? `${city?.name || tour.location} ✈ 台北`
+                    : `${city?.name || tour.location} 自由活動`,
+              highlight: '',
+              description: '',
               activities: [],
               recommendations: [],
               meals: {
-                breakfast: i === 0 ? "溫暖的家" : "飯店內早餐",
-                lunch: "敬請自理",
-                dinner: i === days - 1 ? "溫暖的家" : "敬請自理",
+                breakfast: i === 0 ? '溫暖的家' : '飯店內早餐',
+                lunch: '敬請自理',
+                dinner: i === days - 1 ? '溫暖的家' : '敬請自理',
               },
-              accommodation: i === days - 1 ? "" : "待安排",
+              accommodation: i === days - 1 ? '' : '待安排',
             })),
-          };
+          }
 
-          setItineraryData(newItinerary);
-          setLoading(false);
-          return;
+          setItineraryData(newItinerary)
+          setLoading(false)
+          return
         }
 
         // 3. 都找不到，顯示錯誤
-        setNotFound(true);
-        setLoading(false);
+        setNotFound(true)
+        setLoading(false)
       } catch (error) {
-                setNotFound(true);
-        setLoading(false);
+        setNotFound(true)
+        setLoading(false)
       }
-    };
+    }
 
-    loadOrCreateItinerary();
-  }, [slug, fetchById, router]);
+    loadOrCreateItinerary()
+  }, [slug, fetchById, router])
 
   // Convert icon strings to components for preview
-  const processedData = itineraryData ? {
-    ...itineraryData,
-    features: itineraryData.features?.map((f) => ({
-      ...f,
-      iconComponent: iconMap[f.icon] || IconSparkles,
-    })) || [],
-  } : null;
+  const processedData = itineraryData
+    ? {
+        ...itineraryData,
+        features:
+          itineraryData.features?.map(f => ({
+            ...f,
+            iconComponent: iconMap[f.icon] || IconSparkles,
+          })) || [],
+      }
+    : null
 
-  const typedItinerary = useMemo(() => itineraryData, [itineraryData]);
+  const typedItinerary = useMemo(() => itineraryData, [itineraryData])
   const totalDays = useMemo(
-    () => (Array.isArray(typedItinerary?.dailyItinerary) ? typedItinerary.dailyItinerary.length : 0),
+    () =>
+      Array.isArray(typedItinerary?.dailyItinerary) ? typedItinerary.dailyItinerary.length : 0,
     [typedItinerary]
-  );
+  )
   const featureCount = useMemo(
     () => (Array.isArray(typedItinerary?.features) ? typedItinerary.features.length : 0),
     [typedItinerary]
-  );
+  )
   const travelRange = useMemo(() => {
-    if (!typedItinerary?.departureDate || !typedItinerary?.returnFlight?.departureDate) return null;
-    return `${typedItinerary.departureDate} - ${typedItinerary.returnFlight.departureDate}`;
-  }, [typedItinerary]);
+    if (!typedItinerary?.departureDate || !typedItinerary?.returnFlight?.departureDate) return null
+    return `${typedItinerary.departureDate} - ${typedItinerary.returnFlight.departureDate}`
+  }, [typedItinerary])
   const locationLabel = useMemo(
-    () => typedItinerary?.city || typedItinerary?.country || "",
+    () => typedItinerary?.city || typedItinerary?.country || '',
     [typedItinerary]
-  );
-  const statusLabel = typedItinerary?.status ?? "草稿";
-  const previewSubtitle = typedItinerary?.subtitle || typedItinerary?.tagline || "隨時查看最新行程預覽";
+  )
+  const statusLabel = typedItinerary?.status ?? '草稿'
+  const previewSubtitle =
+    typedItinerary?.subtitle || typedItinerary?.tagline || '隨時查看最新行程預覽'
 
   // 計算縮放比例
   useEffect(() => {
     const calculateScale = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current) return
 
-      const container = containerRef.current;
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
+      const container = containerRef.current
+      const containerWidth = container.clientWidth
+      const containerHeight = container.clientHeight
 
       // 目標尺寸
-      const targetWidth = viewMode === 'mobile' ? 400 : 1200; // 手機含框架
-      const targetHeight = viewMode === 'mobile' ? 850 : 800;
+      const targetWidth = viewMode === 'mobile' ? 400 : 1200 // 手機含框架
+      const targetHeight = viewMode === 'mobile' ? 850 : 800
 
       // 計算縮放比例（寬高都要考慮）
-      const scaleX = containerWidth / targetWidth;
-      const scaleY = containerHeight / targetHeight;
+      const scaleX = containerWidth / targetWidth
+      const scaleY = containerHeight / targetHeight
 
       // 取較小值確保完全顯示
-      const finalScale = Math.min(scaleX, scaleY, 1);
+      const finalScale = Math.min(scaleX, scaleY, 1)
 
-      setScale(finalScale);
-    };
+      setScale(finalScale)
+    }
 
-    calculateScale();
-    window.addEventListener('resize', calculateScale);
-    return () => window.removeEventListener('resize', calculateScale);
-  }, [viewMode]);
+    calculateScale()
+    window.addEventListener('resize', calculateScale)
+    return () => window.removeEventListener('resize', calculateScale)
+  }, [viewMode])
 
   // 載入中狀態
   if (loading) {
@@ -219,10 +239,12 @@ export default function EditItineraryPage() {
         <div className="relative z-10 rounded-3xl border border-white/60 bg-white/80 px-10 py-8 text-center shadow-2xl backdrop-blur-xl">
           <p className="text-sm uppercase tracking-[0.4em] text-morandi-muted">Loading</p>
           <p className="mt-3 text-lg font-semibold text-morandi-primary">行程資料載入中...</p>
-          <p className="mt-2 text-morandi-secondary">我們正在為您整理每一個旅遊細節，請稍候片刻。</p>
+          <p className="mt-2 text-morandi-secondary">
+            我們正在為您整理每一個旅遊細節，請稍候片刻。
+          </p>
         </div>
       </div>
-    );
+    )
   }
 
   // 找不到行程
@@ -238,7 +260,7 @@ export default function EditItineraryPage() {
           breadcrumb={[
             { label: '首頁', href: '/' },
             { label: '行程管理', href: '/itinerary' },
-            { label: '錯誤', href: '#' }
+            { label: '錯誤', href: '#' },
           ]}
           showBackButton={true}
           onBack={() => router.push('/itinerary')}
@@ -253,23 +275,17 @@ export default function EditItineraryPage() {
               行程可能已被刪除，或是您輸入的網址不正確。
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <button
-                onClick={() => router.push('/itinerary')}
-                className="btn-morandi-secondary"
-              >
+              <button onClick={() => router.push('/itinerary')} className="btn-morandi-secondary">
                 返回行程列表
               </button>
-              <button
-                onClick={() => router.push('/itinerary/new')}
-                className="btn-morandi-primary"
-              >
+              <button onClick={() => router.push('/itinerary/new')} className="btn-morandi-primary">
                 建立新行程
               </button>
             </div>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -287,7 +303,7 @@ export default function EditItineraryPage() {
           breadcrumb={[
             { label: '首頁', href: '/' },
             { label: '行程管理', href: '/itinerary' },
-            { label: '編輯行程', href: '#' }
+            { label: '編輯行程', href: '#' },
           ]}
           showBackButton={true}
           onBack={() => router.push('/itinerary')}
@@ -301,7 +317,9 @@ export default function EditItineraryPage() {
               <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl shadow-[#9ad6ff]/30 backdrop-blur-lg">
                 <div className="flex flex-wrap items-end justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.4em] text-morandi-muted">Itinerary overview</p>
+                    <p className="text-xs uppercase tracking-[0.4em] text-morandi-muted">
+                      Itinerary overview
+                    </p>
                     <h1 className="mt-3 text-2xl font-semibold text-morandi-primary">
                       {typedItinerary?.title || '尚未命名的旅程'}
                     </h1>
@@ -348,7 +366,9 @@ export default function EditItineraryPage() {
 
               <div className="flex flex-col justify-center gap-3">
                 <div className="rounded-2xl border border-white/60 bg-white/60 px-5 py-4 shadow-lg shadow-[#9ad6ff]/40 backdrop-blur">
-                  <p className="text-xs uppercase tracking-[0.4em] text-morandi-muted">Preview sync</p>
+                  <p className="text-xs uppercase tracking-[0.4em] text-morandi-muted">
+                    Preview sync
+                  </p>
                   <p className="mt-2 text-sm text-morandi-secondary">
                     左側修改會即時反映於右側預覽，協助團隊快速確認呈現效果。
                   </p>
@@ -367,8 +387,12 @@ export default function EditItineraryPage() {
               <div className="flex min-h-[720px] flex-col overflow-hidden rounded-[32px] border border-white/60 bg-white/90 shadow-2xl shadow-[#9ad6ff]/25 backdrop-blur-xl">
                 <div className="flex items-center justify-between border-b border-white/50 px-8 py-6">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.35em] text-morandi-muted">Itinerary designer</p>
-                    <h2 className="mt-2 text-xl font-semibold text-morandi-primary">行程編輯表單</h2>
+                    <p className="text-xs uppercase tracking-[0.35em] text-morandi-muted">
+                      Itinerary designer
+                    </p>
+                    <h2 className="mt-2 text-xl font-semibold text-morandi-primary">
+                      行程編輯表單
+                    </h2>
                   </div>
                   <div className="hidden items-center gap-2 text-sm text-morandi-secondary xl:flex">
                     <IconSparkles size={18} stroke={1.6} />
@@ -384,9 +408,13 @@ export default function EditItineraryPage() {
               <div className="relative flex min-h-[720px] flex-col overflow-hidden rounded-[32px] border border-white/40 bg-gradient-to-br from-white/85 via-[#f0f9ff]/80 to-[#dff3ff]/90 shadow-2xl shadow-[#9ad6ff]/25 backdrop-blur-xl">
                 <div className="flex items-center justify-between border-b border-white/50 px-8 py-6">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.35em] text-morandi-muted">Live preview</p>
+                    <p className="text-xs uppercase tracking-[0.35em] text-morandi-muted">
+                      Live preview
+                    </p>
                     <h2 className="mt-2 text-xl font-semibold text-morandi-primary">即時預覽</h2>
-                    <p className="mt-1 text-sm text-morandi-secondary">切換裝置尺寸，檢視行程於不同介面的呈現。</p>
+                    <p className="mt-1 text-sm text-morandi-secondary">
+                      切換裝置尺寸，檢視行程於不同介面的呈現。
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 rounded-full bg-white/70 p-1 shadow-inner shadow-white/60">
                     <button
@@ -420,7 +448,7 @@ export default function EditItineraryPage() {
                     <div
                       style={{
                         transform: `scale(${scale})`,
-                        transformOrigin: 'center center'
+                        transformOrigin: 'center center',
                       }}
                     >
                       {viewMode === 'mobile' ? (
@@ -450,7 +478,7 @@ export default function EditItineraryPage() {
                           className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-[0_40px_120px_rgba(15,110,234,0.18)]"
                           style={{
                             width: '1200px',
-                            height: '800px'
+                            height: '800px',
                           }}
                         >
                           <div className="h-full w-full overflow-y-auto">
@@ -471,5 +499,5 @@ export default function EditItineraryPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

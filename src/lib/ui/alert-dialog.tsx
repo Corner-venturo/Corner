@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { create } from 'zustand';
-import { AlertCircle, CheckCircle, Info, XCircle, AlertTriangle } from 'lucide-react';
+import { create } from 'zustand'
+import { AlertCircle, CheckCircle, Info, XCircle, AlertTriangle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -9,42 +9,45 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
-type AlertType = 'info' | 'success' | 'warning' | 'error';
+type AlertType = 'info' | 'success' | 'warning' | 'error'
 
 interface AlertState {
-  isOpen: boolean;
-  type: AlertType;
-  title?: string;
-  message: string;
-  onClose?: () => void;
+  isOpen: boolean
+  type: AlertType
+  title?: string
+  message: string
+  onClose?: () => void
 }
 
 interface ConfirmState {
-  isOpen: boolean;
-  type: AlertType;
-  title?: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  onConfirm?: () => void;
-  onCancel?: () => void;
+  isOpen: boolean
+  type: AlertType
+  title?: string
+  message: string
+  confirmText?: string
+  cancelText?: string
+  onConfirm?: () => void
+  onCancel?: () => void
 }
 
 interface DialogStore {
-  alert: AlertState;
-  confirm: ConfirmState;
-  showAlert: (message: string, type?: AlertType, title?: string) => Promise<void>;
-  showConfirm: (message: string, options?: {
-    type?: AlertType;
-    title?: string;
-    confirmText?: string;
-    cancelText?: string;
-  }) => Promise<boolean>;
-  closeAlert: () => void;
-  closeConfirm: (confirmed: boolean) => void;
+  alert: AlertState
+  confirm: ConfirmState
+  showAlert: (message: string, type?: AlertType, title?: string) => Promise<void>
+  showConfirm: (
+    message: string,
+    options?: {
+      type?: AlertType
+      title?: string
+      confirmText?: string
+      cancelText?: string
+    }
+  ) => Promise<boolean>
+  closeAlert: () => void
+  closeConfirm: (confirmed: boolean) => void
 }
 
 const useDialogStore = create<DialogStore>((set, get) => ({
@@ -59,7 +62,7 @@ const useDialogStore = create<DialogStore>((set, get) => ({
     message: '',
   },
   showAlert: (message, type = 'info', title) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       set({
         alert: {
           isOpen: true,
@@ -67,15 +70,15 @@ const useDialogStore = create<DialogStore>((set, get) => ({
           title,
           message,
           onClose: () => {
-            get().closeAlert();
-            resolve();
+            get().closeAlert()
+            resolve()
           },
         },
-      });
-    });
+      })
+    })
   },
   showConfirm: (message, options = {}) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       set({
         confirm: {
           isOpen: true,
@@ -85,28 +88,28 @@ const useDialogStore = create<DialogStore>((set, get) => ({
           confirmText: options.confirmText || '確認',
           cancelText: options.cancelText || '取消',
           onConfirm: () => {
-            get().closeConfirm(true);
-            resolve(true);
+            get().closeConfirm(true)
+            resolve(true)
           },
           onCancel: () => {
-            get().closeConfirm(false);
-            resolve(false);
+            get().closeConfirm(false)
+            resolve(false)
           },
         },
-      });
-    });
+      })
+    })
   },
   closeAlert: () => {
-    set((state) => ({
+    set(state => ({
       alert: { ...state.alert, isOpen: false },
-    }));
+    }))
   },
-  closeConfirm: (confirmed) => {
-    set((state) => ({
+  closeConfirm: confirmed => {
+    set(state => ({
       confirm: { ...state.confirm, isOpen: false },
-    }));
+    }))
   },
-}));
+}))
 
 const typeConfig: Record<AlertType, { icon: React.ReactNode; color: string; bgColor: string }> = {
   info: {
@@ -129,25 +132,21 @@ const typeConfig: Record<AlertType, { icon: React.ReactNode; color: string; bgCo
     color: 'text-red-600',
     bgColor: 'bg-red-50',
   },
-};
+}
 
 function AlertDialogComponent() {
-  const { alert, closeAlert } = useDialogStore();
-  const config = typeConfig[alert.type];
+  const { alert, closeAlert } = useDialogStore()
+  const config = typeConfig[alert.type]
 
   return (
-    <Dialog open={alert.isOpen} onOpenChange={(open) => !open && closeAlert()}>
+    <Dialog open={alert.isOpen} onOpenChange={open => !open && closeAlert()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-start gap-3">
-            <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>
-              {config.icon}
-            </div>
+            <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
             <div className="flex-1">
               {alert.title && (
-                <DialogTitle className="text-morandi-primary mb-2">
-                  {alert.title}
-                </DialogTitle>
+                <DialogTitle className="text-morandi-primary mb-2">{alert.title}</DialogTitle>
               )}
               <DialogDescription className="text-morandi-secondary whitespace-pre-wrap">
                 {alert.message}
@@ -165,26 +164,22 @@ function AlertDialogComponent() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
 function ConfirmDialogComponent() {
-  const { confirm, closeConfirm } = useDialogStore();
-  const config = typeConfig[confirm.type];
+  const { confirm, closeConfirm } = useDialogStore()
+  const config = typeConfig[confirm.type]
 
   return (
-    <Dialog open={confirm.isOpen} onOpenChange={(open) => !open && confirm.onCancel?.()}>
+    <Dialog open={confirm.isOpen} onOpenChange={open => !open && confirm.onCancel?.()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-start gap-3">
-            <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>
-              {config.icon}
-            </div>
+            <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
             <div className="flex-1">
               {confirm.title && (
-                <DialogTitle className="text-morandi-primary mb-2">
-                  {confirm.title}
-                </DialogTitle>
+                <DialogTitle className="text-morandi-primary mb-2">{confirm.title}</DialogTitle>
               )}
               <DialogDescription className="text-morandi-secondary whitespace-pre-wrap">
                 {confirm.message}
@@ -209,7 +204,7 @@ function ConfirmDialogComponent() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
 // 全局對話框容器
@@ -219,25 +214,28 @@ export function GlobalDialogs() {
       <AlertDialogComponent />
       <ConfirmDialogComponent />
     </>
-  );
+  )
 }
 
 // 導出易用的 API
 export const alert = (message: string, type: AlertType = 'info', title?: string) => {
-  return useDialogStore.getState().showAlert(message, type, title);
-};
+  return useDialogStore.getState().showAlert(message, type, title)
+}
 
-export const confirm = (message: string, options?: {
-  type?: AlertType;
-  title?: string;
-  confirmText?: string;
-  cancelText?: string;
-}) => {
-  return useDialogStore.getState().showConfirm(message, options);
-};
+export const confirm = (
+  message: string,
+  options?: {
+    type?: AlertType
+    title?: string
+    confirmText?: string
+    cancelText?: string
+  }
+) => {
+  return useDialogStore.getState().showConfirm(message, options)
+}
 
 // 便捷方法
-export const alertSuccess = (message: string, title?: string) => alert(message, 'success', title);
-export const alertError = (message: string, title?: string) => alert(message, 'error', title);
-export const alertWarning = (message: string, title?: string) => alert(message, 'warning', title);
-export const alertInfo = (message: string, title?: string) => alert(message, 'info', title);
+export const alertSuccess = (message: string, title?: string) => alert(message, 'success', title)
+export const alertError = (message: string, title?: string) => alert(message, 'error', title)
+export const alertWarning = (message: string, title?: string) => alert(message, 'warning', title)
+export const alertInfo = (message: string, title?: string) => alert(message, 'info', title)

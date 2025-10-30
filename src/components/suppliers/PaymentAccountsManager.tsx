@@ -1,22 +1,32 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Star } from 'lucide-react';
-import type { SupplierPaymentAccount } from '@/types/supplier.types';
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Plus, Trash2, Star } from 'lucide-react'
+import type { SupplierPaymentAccount } from '@/types/supplier.types'
 
 interface PaymentAccountsManagerProps {
-  accounts: Omit<SupplierPaymentAccount, 'id' | 'supplier_id' | 'created_at' | 'updated_at'>[];
-  onChange: (accounts: Omit<SupplierPaymentAccount, 'id' | 'supplier_id' | 'created_at' | 'updated_at'>[]) => void;
+  accounts: Omit<SupplierPaymentAccount, 'id' | 'supplier_id' | 'created_at' | 'updated_at'>[]
+  onChange: (
+    accounts: Omit<SupplierPaymentAccount, 'id' | 'supplier_id' | 'created_at' | 'updated_at'>[]
+  ) => void
 }
 
 export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsManagerProps) {
-  const [showForm, setShowForm] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [formData, setFormData] = useState<Omit<SupplierPaymentAccount, 'id' | 'supplier_id' | 'created_at' | 'updated_at'>>({
+  const [showForm, setShowForm] = useState(false)
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [formData, setFormData] = useState<
+    Omit<SupplierPaymentAccount, 'id' | 'supplier_id' | 'created_at' | 'updated_at'>
+  >({
     account_name: '',
     account_holder: '',
     bank_name: '',
@@ -28,56 +38,61 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
     account_type: 'checking',
     is_default: accounts.length === 0, // 第一個帳戶自動設為預設
     is_active: true,
-    note: ''
-  });
+    note: '',
+  })
 
   const handleAddAccount = () => {
-    if (!formData.account_name.trim() || !formData.account_holder.trim() || !formData.bank_name.trim() || !formData.account_number.trim()) {
-      alert('請填寫必填欄位：帳戶名稱、戶名、銀行名稱、帳號');
-      return;
+    if (
+      !formData.account_name.trim() ||
+      !formData.account_holder.trim() ||
+      !formData.bank_name.trim() ||
+      !formData.account_number.trim()
+    ) {
+      alert('請填寫必填欄位：帳戶名稱、戶名、銀行名稱、帳號')
+      return
     }
 
-    const newAccounts = [...accounts];
+    const newAccounts = [...accounts]
 
     // 如果設為預設，將其他帳戶改為非預設
     if (formData.is_default) {
-      newAccounts.forEach(acc => acc.is_default = false);
+      newAccounts.forEach(acc => (acc.is_default = false))
     }
 
     if (editingIndex !== null) {
-      newAccounts[editingIndex] = formData;
+      newAccounts[editingIndex] = formData
     } else {
-      newAccounts.push(formData);
+      newAccounts.push(formData)
     }
 
-    onChange(newAccounts);
-    resetForm();
-  };
+    onChange(newAccounts)
+    resetForm()
+  }
 
   const handleEditAccount = (index: number) => {
-    setFormData(accounts[index]);
-    setEditingIndex(index);
-    setShowForm(true);
-  };
+    setFormData(accounts[index])
+    setEditingIndex(index)
+    setShowForm(true)
+  }
 
   const handleDeleteAccount = (index: number) => {
-    const newAccounts = accounts.filter((_, i) => i !== index);
+    const newAccounts = accounts.filter((_, i) => i !== index)
 
     // 如果刪除的是預設帳戶，將第一個帳戶設為預設
     if (accounts[index].is_default && newAccounts.length > 0) {
-      newAccounts[0].is_default = true;
+      newAccounts[0].is_default = true
     }
 
-    onChange(newAccounts);
-  };
+    onChange(newAccounts)
+  }
 
   const handleSetDefault = (index: number) => {
     const newAccounts = accounts.map((acc, i) => ({
       ...acc,
-      is_default: i === index
-    }));
-    onChange(newAccounts);
-  };
+      is_default: i === index,
+    }))
+    onChange(newAccounts)
+  }
 
   const resetForm = () => {
     setFormData({
@@ -92,11 +107,11 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
       account_type: 'checking',
       is_default: accounts.length === 0,
       is_active: true,
-      note: ''
-    });
-    setEditingIndex(null);
-    setShowForm(false);
-  };
+      note: '',
+    })
+    setEditingIndex(null)
+    setShowForm(false)
+  }
 
   return (
     <div className="space-y-4">
@@ -142,7 +157,9 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
                   </div>
                   <div className="mt-1 text-sm text-morandi-secondary">
                     <div>{account.account_holder}</div>
-                    <div>{account.bank_name} {account.bank_branch && `- ${account.bank_branch}`}</div>
+                    <div>
+                      {account.bank_name} {account.bank_branch && `- ${account.bank_branch}`}
+                    </div>
                     <div className="font-mono">{account.account_number}</div>
                   </div>
                 </div>
@@ -194,7 +211,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">帳戶名稱 *</label>
               <Input
                 value={formData.account_name}
-                onChange={(e) => setFormData({ ...formData, account_name: e.target.value })}
+                onChange={e => setFormData({ ...formData, account_name: e.target.value })}
                 placeholder="如：主要帳戶、泰國當地帳戶"
                 className="mt-1"
               />
@@ -204,7 +221,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">戶名 *</label>
               <Input
                 value={formData.account_holder}
-                onChange={(e) => setFormData({ ...formData, account_holder: e.target.value })}
+                onChange={e => setFormData({ ...formData, account_holder: e.target.value })}
                 placeholder="帳戶持有人姓名"
                 className="mt-1"
               />
@@ -214,7 +231,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">銀行名稱 *</label>
               <Input
                 value={formData.bank_name}
-                onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+                onChange={e => setFormData({ ...formData, bank_name: e.target.value })}
                 placeholder="如：台灣銀行、Bangkok Bank"
                 className="mt-1"
               />
@@ -224,7 +241,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">帳號 *</label>
               <Input
                 value={formData.account_number}
-                onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+                onChange={e => setFormData({ ...formData, account_number: e.target.value })}
                 placeholder="銀行帳號"
                 className="mt-1"
               />
@@ -234,7 +251,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">銀行代碼</label>
               <Input
                 value={formData.bank_code || ''}
-                onChange={(e) => setFormData({ ...formData, bank_code: e.target.value })}
+                onChange={e => setFormData({ ...formData, bank_code: e.target.value })}
                 placeholder="如：004"
                 className="mt-1"
               />
@@ -244,7 +261,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">分行名稱</label>
               <Input
                 value={formData.bank_branch || ''}
-                onChange={(e) => setFormData({ ...formData, bank_branch: e.target.value })}
+                onChange={e => setFormData({ ...formData, bank_branch: e.target.value })}
                 placeholder="如：松山分行"
                 className="mt-1"
               />
@@ -254,7 +271,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">SWIFT Code</label>
               <Input
                 value={formData.swift_code || ''}
-                onChange={(e) => setFormData({ ...formData, swift_code: e.target.value })}
+                onChange={e => setFormData({ ...formData, swift_code: e.target.value })}
                 placeholder="國際匯款用"
                 className="mt-1"
               />
@@ -264,7 +281,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">幣別</label>
               <Select
                 value={formData.currency}
-                onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                onValueChange={value => setFormData({ ...formData, currency: value })}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -284,7 +301,9 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">帳戶類型</label>
               <Select
                 value={formData.account_type || 'checking'}
-                onValueChange={(value: 'checking' | 'savings') => setFormData({ ...formData, account_type: value })}
+                onValueChange={(value: 'checking' | 'savings') =>
+                  setFormData({ ...formData, account_type: value })
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -300,7 +319,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <input
                 type="checkbox"
                 checked={formData.is_default}
-                onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
+                onChange={e => setFormData({ ...formData, is_default: e.target.checked })}
                 className="rounded border-morandi-gold text-morandi-gold focus:ring-morandi-gold"
               />
               <label className="text-sm text-morandi-primary">設為預設帳戶</label>
@@ -310,7 +329,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
               <label className="text-sm font-medium text-morandi-primary">備註</label>
               <Input
                 value={formData.note || ''}
-                onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                onChange={e => setFormData({ ...formData, note: e.target.value })}
                 placeholder="其他說明"
                 className="mt-1"
               />
@@ -318,11 +337,7 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={resetForm}
-            >
+            <Button type="button" variant="outline" onClick={resetForm}>
               取消
             </Button>
             <Button
@@ -337,10 +352,8 @@ export function PaymentAccountsManager({ accounts, onChange }: PaymentAccountsMa
       )}
 
       {accounts.length === 0 && !showForm && (
-        <div className="text-center py-8 text-morandi-secondary text-sm">
-          尚未新增付款帳戶
-        </div>
+        <div className="text-center py-8 text-morandi-secondary text-sm">尚未新增付款帳戶</div>
       )}
     </div>
-  );
+  )
 }

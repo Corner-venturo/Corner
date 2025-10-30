@@ -1,26 +1,26 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* 莫蘭迪主題（預設） */
 :root,
-[data-theme="morandi"] {
+[data-theme='morandi'] {
   /* 主色系 */
-  --morandi-primary: #3A3633;
-  --morandi-secondary: #8B8680;
-  --morandi-gold: #C9AA7C;
-  --morandi-gold-hover: #B8996B;
-  --morandi-green: #9FA68F;
-  --morandi-red: #C08374;
-  --morandi-container: #E8E5E0;
-  --morandi-muted: #B8B2AA;
+  --morandi-primary: #3a3633;
+  --morandi-secondary: #8b8680;
+  --morandi-gold: #c9aa7c;
+  --morandi-gold-hover: #b8996b;
+  --morandi-green: #9fa68f;
+  --morandi-red: #c08374;
+  --morandi-container: #e8e5e0;
+  --morandi-muted: #b8b2aa;
 
   /* 背景色 */
-  --background: #F6F4F1;
-  --card: #FFFFFF;
-  --border: #D4C4B0;
-  --popover: #FFFFFF;
-  --popover-foreground: #3A3633;
-  --accent: #E8E5E0;
-  --accent-foreground: #3A3633;
+  --background: #f6f4f1;
+  --card: #ffffff;
+  --border: #d4c4b0;
+  --popover: #ffffff;
+  --popover-foreground: #3a3633;
+  --accent: #e8e5e0;
+  --accent-foreground: #3a3633;
 
   /* 設定對應變數 */
   --foreground: var(--morandi-primary);
@@ -28,34 +28,34 @@
   --border-muted: var(--morandi-container);
 
   /* 表單元素專用變數 */
-  --input-border: #D4C4B0;
-  --input-border-hover: #C4A572;
-  --input-border-focus: #C4A572;
-  --input-bg: #FFFFFF;
-  --input-text: #3A3633;
-  --input-placeholder: #B8B2AA;
+  --input-border: #d4c4b0;
+  --input-border-hover: #c4a572;
+  --input-border-focus: #c4a572;
+  --input-bg: #ffffff;
+  --input-text: #3a3633;
+  --input-placeholder: #b8b2aa;
 }
 
 /* Discord 風格深色主題 */
-[data-theme="modern-dark"] {
+[data-theme='modern-dark'] {
   /* 主色系 - Discord 風格柔和配色 */
-  --morandi-primary: #dcddde;        /* 主要文字 - 柔和白 */
-  --morandi-secondary: #b9bbbe;      /* 次要文字 - 灰白 */
-  --morandi-gold: #5865f2;           /* 主要強調色 - Discord 紫藍 */
-  --morandi-gold-hover: #4752c4;     /* hover 狀態 - 深紫藍 */
-  --morandi-green: #3ba55d;          /* 成功/正面 - 柔和綠 */
-  --morandi-red: #ed4245;            /* 錯誤/負面 - 柔和紅 */
-  --morandi-container: #2f3136;      /* 容器背景 - 次要背景 */
-  --morandi-muted: #72767d;          /* 淡化文字 - 深灰 */
+  --morandi-primary: #dcddde; /* 主要文字 - 柔和白 */
+  --morandi-secondary: #b9bbbe; /* 次要文字 - 灰白 */
+  --morandi-gold: #5865f2; /* 主要強調色 - Discord 紫藍 */
+  --morandi-gold-hover: #4752c4; /* hover 狀態 - 深紫藍 */
+  --morandi-green: #3ba55d; /* 成功/正面 - 柔和綠 */
+  --morandi-red: #ed4245; /* 錯誤/負面 - 柔和紅 */
+  --morandi-container: #2f3136; /* 容器背景 - 次要背景 */
+  --morandi-muted: #72767d; /* 淡化文字 - 深灰 */
 
   /* 背景色 */
-  --background: #36393f;             /* 主背景 - 深灰帶藍 */
-  --card: #2f3136;                   /* 卡片背景 - 更深灰 */
-  --border: #202225;                 /* 邊框 - 深色 */
-  --popover: #2f3136;                /* 下拉選單背景 */
-  --popover-foreground: #dcddde;     /* 下拉選單文字 */
-  --accent: #4f545c;                 /* 強調背景 - 較亮灰 */
-  --accent-foreground: #dcddde;      /* 強調文字 */
+  --background: #36393f; /* 主背景 - 深灰帶藍 */
+  --card: #2f3136; /* 卡片背景 - 更深灰 */
+  --border: #202225; /* 邊框 - 深色 */
+  --popover: #2f3136; /* 下拉選單背景 */
+  --popover-foreground: #dcddde; /* 下拉選單文字 */
+  --accent: #4f545c; /* 強調背景 - 較亮灰 */
+  --accent-foreground: #dcddde; /* 強調文字 */
 
   /* 設定對應變數 */
   --foreground: #dcddde;
@@ -72,119 +72,123 @@
 }
 
 /* 深色主題的純色背景（Discord 風格不用漸層） */
-[data-theme="modern-dark"] body {
+[data-theme='modern-dark'] body {
   background: #36393f;
   min-height: 100vh;
 }
 
 /* 深色主題的卡片陰影調整 */
-[data-theme="modern-dark"] .morandi-card {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+[data-theme='modern-dark'] .morandi-card {
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.3),
+    0 1px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
-[data-theme="modern-dark"] .morandi-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+[data-theme='modern-dark'] .morandi-card:hover {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 /* 深色主題的按鈕樣式 - Discord 紫藍色（柔和設計） */
-[data-theme="modern-dark"] .btn-morandi-primary {
+[data-theme='modern-dark'] .btn-morandi-primary {
   background: linear-gradient(to right, #5865f2, #4752c4);
   color: white;
   box-shadow: 0 2px 8px rgba(88, 101, 242, 0.2);
 }
 
-[data-theme="modern-dark"] .btn-morandi-primary:hover {
+[data-theme='modern-dark'] .btn-morandi-primary:hover {
   background: linear-gradient(to right, #4752c4, #3c45a5);
   box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
   transform: scale(1.02);
 }
 
-[data-theme="modern-dark"] .btn-morandi-primary:active {
+[data-theme='modern-dark'] .btn-morandi-primary:active {
   transform: scale(0.98);
   box-shadow: 0 1px 4px rgba(88, 101, 242, 0.2);
 }
 
 /* 深色主題的次要按鈕 - 半透明柔和 */
-[data-theme="modern-dark"] .btn-morandi-secondary {
+[data-theme='modern-dark'] .btn-morandi-secondary {
   background: rgba(47, 49, 54, 0.8);
   color: #5865f2;
   border-color: rgba(88, 101, 242, 0.3);
 }
 
-[data-theme="modern-dark"] .btn-morandi-secondary:hover {
+[data-theme='modern-dark'] .btn-morandi-secondary:hover {
   background: rgba(47, 49, 54, 1);
   border-color: #5865f2;
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(88, 101, 242, 0.15);
 }
 
-[data-theme="modern-dark"] .btn-morandi-secondary:active {
+[data-theme='modern-dark'] .btn-morandi-secondary:active {
   transform: scale(0.98);
 }
 
 /* 深色主題的圖標按鈕 */
-[data-theme="modern-dark"] .btn-icon-morandi {
+[data-theme='modern-dark'] .btn-icon-morandi {
   background: rgba(88, 101, 242, 0.1);
   color: #5865f2;
 }
 
-[data-theme="modern-dark"] .btn-icon-morandi:hover {
+[data-theme='modern-dark'] .btn-icon-morandi:hover {
   background: linear-gradient(135deg, #5865f2, #4752c4);
   color: white;
   box-shadow: 0 4px 8px rgba(88, 101, 242, 0.3);
 }
 
 /* 深色主題的選單項目 - 淡淡的背景 */
-[data-theme="modern-dark"] .menu-item-morandi:hover {
+[data-theme='modern-dark'] .menu-item-morandi:hover {
   background: rgba(88, 101, 242, 0.08);
 }
 
-[data-theme="modern-dark"] .menu-item-morandi.active {
+[data-theme='modern-dark'] .menu-item-morandi.active {
   background: rgba(88, 101, 242, 0.12);
   transform: scale(1.05);
 }
 
-[data-theme="modern-dark"] .menu-item-morandi.active::after {
+[data-theme='modern-dark'] .menu-item-morandi.active::after {
   background: linear-gradient(to bottom, #5865f2, #4752c4);
 }
 
 /* 深色主題的卡片 - 柔和邊框 */
-[data-theme="modern-dark"] .card-morandi-elevated {
+[data-theme='modern-dark'] .card-morandi-elevated {
   border-color: rgba(88, 101, 242, 0.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="modern-dark"] .card-morandi-elevated:hover {
+[data-theme='modern-dark'] .card-morandi-elevated:hover {
   border-color: rgba(88, 101, 242, 0.3);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* 深色主題的輸入框 */
-[data-theme="modern-dark"] .input-morandi {
+[data-theme='modern-dark'] .input-morandi {
   background: rgba(47, 49, 54, 0.5);
   border-color: rgba(32, 34, 37, 0.8);
   color: #dcddde;
 }
 
-[data-theme="modern-dark"] .input-morandi::placeholder {
+[data-theme='modern-dark'] .input-morandi::placeholder {
   color: rgba(185, 187, 190, 0.4);
 }
 
-[data-theme="modern-dark"] .input-morandi:focus {
+[data-theme='modern-dark'] .input-morandi:focus {
   background: rgba(47, 49, 54, 0.7);
   border-color: #5865f2;
   box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.2);
 }
 
 /* 深色主題的徽章 - 淡淡的背景 */
-[data-theme="modern-dark"] .badge-morandi {
+[data-theme='modern-dark'] .badge-morandi {
   background: rgba(88, 101, 242, 0.12);
   color: #5865f2;
   border-color: rgba(88, 101, 242, 0.25);
 }
 
 /* 深色主題的分隔線 */
-[data-theme="modern-dark"] .divider-gradient {
+[data-theme='modern-dark'] .divider-gradient {
   background: linear-gradient(
     to right,
     transparent,
@@ -196,12 +200,12 @@
 }
 
 /* 深色主題的下拉選單項目 */
-[data-theme="modern-dark"] .dropdown-item-morandi:hover {
+[data-theme='modern-dark'] .dropdown-item-morandi:hover {
   background: rgba(88, 101, 242, 0.15);
 }
 
 /* 深色主題的工具提示 */
-[data-theme="modern-dark"] .tooltip-morandi {
+[data-theme='modern-dark'] .tooltip-morandi {
   background: linear-gradient(135deg, #2f3136, #36393f);
   border-color: rgba(88, 101, 242, 0.3);
 }
@@ -236,7 +240,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* 金色質感提升 - 左邊框加入細微漸層陰影 */
@@ -305,12 +311,20 @@ body {
 /* 莫蘭迪色系工具類 */
 
 /* 背景色 */
-.bg-morandi-container { background-color: var(--morandi-container); }
+.bg-morandi-container {
+  background-color: var(--morandi-container);
+}
 
 /* 文字色 */
-.text-morandi-primary { color: var(--morandi-primary); }
-.text-morandi-secondary { color: var(--morandi-secondary); }
-.text-morandi-muted { color: var(--morandi-muted); }
+.text-morandi-primary {
+  color: var(--morandi-primary);
+}
+.text-morandi-secondary {
+  color: var(--morandi-secondary);
+}
+.text-morandi-muted {
+  color: var(--morandi-muted);
+}
 
 /* 功能色 - 背景 */
 .bg-morandi-gold {
@@ -319,30 +333,50 @@ body {
 .bg-morandi-gold-hover:hover {
   background: linear-gradient(to bottom right, #c9b896, #bfad87, #b5a378);
 }
-.bg-morandi-red { background-color: var(--morandi-red); }
-.bg-morandi-green { background-color: var(--morandi-green); }
+.bg-morandi-red {
+  background-color: var(--morandi-red);
+}
+.bg-morandi-green {
+  background-color: var(--morandi-green);
+}
 
 /* 功能色 - 文字 */
-.text-morandi-gold { color: var(--morandi-gold); }
-.text-morandi-red { color: var(--morandi-red); }
-.text-morandi-green { color: var(--morandi-green); }
+.text-morandi-gold {
+  color: var(--morandi-gold);
+}
+.text-morandi-red {
+  color: var(--morandi-red);
+}
+.text-morandi-green {
+  color: var(--morandi-green);
+}
 
 /* 功能色 - 邊框 */
-.border-morandi-gold { border-color: var(--morandi-gold); }
-.border-morandi-red { border-color: var(--morandi-red); }
-.border-morandi-green { border-color: var(--morandi-green); }
+.border-morandi-gold {
+  border-color: var(--morandi-gold);
+}
+.border-morandi-red {
+  border-color: var(--morandi-red);
+}
+.border-morandi-green {
+  border-color: var(--morandi-green);
+}
 
 /* 莫蘭迪卡片樣式 */
 .morandi-card {
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 1px 3px 0 rgba(58, 54, 51, 0.1), 0 1px 2px 0 rgba(58, 54, 51, 0.06);
+  box-shadow:
+    0 1px 3px 0 rgba(58, 54, 51, 0.1),
+    0 1px 2px 0 rgba(58, 54, 51, 0.06);
   transition: all 0.2s ease-in-out;
 }
 
 .morandi-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(58, 54, 51, 0.1), 0 2px 4px -1px rgba(58, 54, 51, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(58, 54, 51, 0.1),
+    0 2px 4px -1px rgba(58, 54, 51, 0.06);
   border-color: var(--morandi-gold);
 }
 
@@ -363,7 +397,10 @@ body {
 
 /* 主題切換動畫 */
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* 全域分割線樣式 - 水平分割線左右留白 */
@@ -404,7 +441,8 @@ body {
 /* Divider 組件樣式 */
 .divider-inset {
   height: 1px;
-  background: linear-gradient(to right,
+  background: linear-gradient(
+    to right,
     transparent 0.75rem,
     var(--border) 0.75rem,
     var(--border) calc(100% - 0.75rem),
@@ -419,7 +457,7 @@ body {
 
 /* 主要按鈕 - 柔和漸層（參考記帳頁面） */
 .btn-morandi-primary {
-  background: linear-gradient(to right, #B5986A, #D4C4A8);
+  background: linear-gradient(to right, #b5986a, #d4c4a8);
   color: white;
   font-weight: 500;
   padding: 0.5rem 1.25rem;
@@ -431,7 +469,7 @@ body {
 }
 
 .btn-morandi-primary:hover {
-  background: linear-gradient(to right, #A08968, #C4B89A);
+  background: linear-gradient(to right, #a08968, #c4b89a);
   box-shadow: 0 4px 12px rgba(181, 152, 106, 0.25);
   transform: scale(1.02);
 }
@@ -522,7 +560,7 @@ body {
   top: 20%;
   bottom: 20%;
   width: 3px;
-  background: linear-gradient(to bottom, #B5986A, #D4C4A8);
+  background: linear-gradient(to bottom, #b5986a, #d4c4a8);
   border-radius: 2px 0 0 2px;
 }
 
@@ -611,7 +649,7 @@ body {
 
 /* 工具提示氣泡 */
 .tooltip-morandi {
-  background: linear-gradient(135deg, #3A3633, #4A4540);
+  background: linear-gradient(135deg, #3a3633, #4a4540);
   color: rgba(255, 255, 255, 0.95);
   padding: 0.5rem 0.875rem;
   border-radius: 0.5rem;
@@ -625,16 +663,16 @@ body {
    ============================================ */
 
 /* 原生 <input> 統一樣式 */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-input[type="url"],
-input[type="search"],
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"] {
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='tel'],
+input[type='url'],
+input[type='search'],
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'] {
   width: 100%;
   height: 2.5rem;
   padding: 0.5rem 0.75rem;
@@ -649,18 +687,18 @@ input[type="datetime-local"] {
 }
 
 /* 數字輸入自動加上最小值限制（防止負數） */
-input[type="number"] {
+input[type='number'] {
   min: 0;
 }
 
 /* 移除數字輸入的上下箭頭 */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
@@ -672,30 +710,30 @@ input::placeholder {
 }
 
 /* Hover 狀態 */
-input[type="text"]:hover,
-input[type="email"]:hover,
-input[type="password"]:hover,
-input[type="number"]:hover,
-input[type="tel"]:hover,
-input[type="url"]:hover,
-input[type="search"]:hover,
-input[type="date"]:hover,
-input[type="time"]:hover,
-input[type="datetime-local"]:hover {
+input[type='text']:hover,
+input[type='email']:hover,
+input[type='password']:hover,
+input[type='number']:hover,
+input[type='tel']:hover,
+input[type='url']:hover,
+input[type='search']:hover,
+input[type='date']:hover,
+input[type='time']:hover,
+input[type='datetime-local']:hover {
   border-color: var(--input-border-hover);
 }
 
 /* Focus 狀態 - 統一使用莫蘭迪金 */
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="number"]:focus,
-input[type="tel"]:focus,
-input[type="url"]:focus,
-input[type="search"]:focus,
-input[type="date"]:focus,
-input[type="time"]:focus,
-input[type="datetime-local"]:focus {
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+input[type='tel']:focus,
+input[type='url']:focus,
+input[type='search']:focus,
+input[type='date']:focus,
+input[type='time']:focus,
+input[type='datetime-local']:focus {
   border-color: var(--input-border-focus);
   box-shadow: 0 0 0 3px rgba(196, 165, 114, 0.1);
 }
@@ -780,23 +818,23 @@ textarea:disabled {
 }
 
 /* 特殊情況：表格內嵌 input 保持透明背景 */
-table input[type="text"],
-table input[type="number"] {
+table input[type='text'],
+table input[type='number'] {
   background-color: transparent;
   border: 0;
   padding: 0.25rem 0.5rem;
   height: auto;
 }
 
-table input[type="text"]:focus,
-table input[type="number"]:focus {
+table input[type='text']:focus,
+table input[type='number']:focus {
   background-color: white;
   border: 1px solid var(--input-border-focus);
   box-shadow: none;
 }
 
 /* 深色主題的 select 下拉箭頭顏色 */
-[data-theme="modern-dark"] select {
+[data-theme='modern-dark'] select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b9bbbe' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 

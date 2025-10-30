@@ -1,33 +1,29 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { X, DollarSign, Calendar } from 'lucide-react';
-import { useReceiptOrderStore } from '@/stores';
+import { useState } from 'react'
+import { X, DollarSign, Calendar } from 'lucide-react'
+import { useReceiptOrderStore } from '@/stores'
 
 interface CreateReceiptDialogProps {
   order: {
-    id: string;
-    order_number: string;
-    contact_person: string;
-    total_amount: number;
-    paid_amount: number;
-    gap: number;
-  };
-  onClose: () => void;
-  onSuccess: (receiptId: string) => void;
+    id: string
+    order_number: string
+    contact_person: string
+    total_amount: number
+    paid_amount: number
+    gap: number
+  }
+  onClose: () => void
+  onSuccess: (receiptId: string) => void
 }
 
-export function CreateReceiptDialog({
-  order,
-  onClose,
-  onSuccess
-}: CreateReceiptDialogProps) {
-  const { create: createReceipt } = useReceiptOrderStore();
+export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceiptDialogProps) {
+  const { create: createReceipt } = useReceiptOrderStore()
 
-  const [receiptDate, setReceiptDate] = useState(new Date().toISOString().split('T')[0]);
-  const [paymentMethod, setPaymentMethod] = useState<'現金' | '匯款' | '刷卡' | '支票'>('匯款');
-  const [amount, setAmount] = useState(order.gap.toString());
-  const [note, setNote] = useState('');
+  const [receiptDate, setReceiptDate] = useState(new Date().toISOString().split('T')[0])
+  const [paymentMethod, setPaymentMethod] = useState<'現金' | '匯款' | '刷卡' | '支票'>('匯款')
+  const [amount, setAmount] = useState(order.gap.toString())
+  const [note, setNote] = useState('')
 
   const handleCreate = async () => {
     try {
@@ -44,28 +40,31 @@ export function CreateReceiptDialog({
             payment_method: paymentMethod,
             amount: parseFloat(amount),
             transaction_date: receiptDate,
-            note
-          }
+            note,
+          },
         ],
         total_amount: parseFloat(amount),
         status: '已收款' as const,
         note,
         created_by: 'current-user', // 從 auth store 取得
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+        updated_at: new Date().toISOString(),
+      }
 
-      const receipt = await createReceipt(receiptData as unknown);
-      onSuccess(receipt.id);
-      onClose();
+      const receipt = await createReceipt(receiptData as unknown)
+      onSuccess(receipt.id)
+      onClose()
     } catch (error) {
-            alert('建立收款單失敗，請稍後再試');
+      alert('建立收款單失敗，請稍後再試')
     }
-  };
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="card-morandi-elevated w-[500px]" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div className="card-morandi-elevated w-[500px]" onClick={e => e.stopPropagation()}>
         {/* 標題列 */}
         <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
           <div className="flex items-center gap-2">
@@ -101,7 +100,9 @@ export function CreateReceiptDialog({
               </div>
               <div className="flex items-center justify-between text-sm pt-2 border-t border-morandi-gold/20">
                 <span className="text-morandi-secondary">待收金額：</span>
-                <span className="text-lg font-semibold text-red-600">${order.gap.toLocaleString()}</span>
+                <span className="text-lg font-semibold text-red-600">
+                  ${order.gap.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
@@ -115,10 +116,13 @@ export function CreateReceiptDialog({
               <input
                 type="date"
                 value={receiptDate}
-                onChange={(e) => setReceiptDate(e.target.value)}
+                onChange={e => setReceiptDate(e.target.value)}
                 className="pl-10"
               />
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" size={16} />
+              <Calendar
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+                size={16}
+              />
             </div>
           </div>
 
@@ -129,7 +133,7 @@ export function CreateReceiptDialog({
             </label>
             <select
               value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value as unknown)}
+              onChange={e => setPaymentMethod(e.target.value as unknown)}
             >
               <option value="現金">現金</option>
               <option value="匯款">匯款</option>
@@ -146,7 +150,7 @@ export function CreateReceiptDialog({
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={e => setAmount(e.target.value)}
               placeholder="輸入收款金額"
             />
           </div>
@@ -158,7 +162,7 @@ export function CreateReceiptDialog({
             </label>
             <textarea
               value={note}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={e => setNote(e.target.value)}
               rows={3}
               placeholder="輸入備註..."
             />
@@ -180,5 +184,5 @@ export function CreateReceiptDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

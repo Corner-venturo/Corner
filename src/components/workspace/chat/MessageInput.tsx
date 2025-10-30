@@ -1,30 +1,30 @@
-'use client';
+'use client'
 
-import { useRef, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Send, Smile, Paperclip } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { FilePreview } from './FilePreview';
-import { UploadProgress } from './UploadProgress';
-import { QuickActionMenu, createQuickActions, type QuickAction } from './QuickActionMenu';
-import { validateFile } from './utils';
+import { useRef, useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Plus, Send, Smile, Paperclip } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { FilePreview } from './FilePreview'
+import { UploadProgress } from './UploadProgress'
+import { QuickActionMenu, createQuickActions, type QuickAction } from './QuickActionMenu'
+import { validateFile } from './utils'
 
 interface MessageInputProps {
-  channelName: string;
-  value: string;
-  onChange: (value: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  attachedFiles: File[];
-  onFilesChange: (files: File[]) => void;
-  uploadingFiles: boolean;
-  uploadProgress: number;
-  onShowShareOrders: () => void;
-  onShowShareQuote: () => void;
-  onShowNewPayment: () => void;
-  onShowNewReceipt: () => void;
-  onShowShareAdvance: () => void;
-  onShowNewTask: () => void;
+  channelName: string
+  value: string
+  onChange: (value: string) => void
+  onSubmit: (e: React.FormEvent) => void
+  attachedFiles: File[]
+  onFilesChange: (files: File[]) => void
+  uploadingFiles: boolean
+  uploadProgress: number
+  onShowShareOrders: () => void
+  onShowShareQuote: () => void
+  onShowNewPayment: () => void
+  onShowNewReceipt: () => void
+  onShowShareAdvance: () => void
+  onShowNewTask: () => void
 }
 
 export function MessageInput({
@@ -41,199 +41,199 @@ export function MessageInput({
   onShowNewPayment,
   onShowNewReceipt,
   onShowShareAdvance,
-  onShowNewTask
+  onShowNewTask,
 }: MessageInputProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [showQuickMenu, setShowQuickMenu] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const messageInputRef = useRef<HTMLDivElement>(null);
-  const quickMenuRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false)
+  const [showQuickMenu, setShowQuickMenu] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const messageInputRef = useRef<HTMLDivElement>(null)
+  const quickMenuRef = useRef<HTMLDivElement>(null)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles: File[] = [];
-    const errors: string[] = [];
+    const files = Array.from(e.target.files || [])
+    const validFiles: File[] = []
+    const errors: string[] = []
 
     files.forEach(file => {
-      const validation = validateFile(file);
+      const validation = validateFile(file)
       if (validation.valid) {
-        validFiles.push(file);
+        validFiles.push(file)
       } else if (validation.error) {
-        errors.push(validation.error);
+        errors.push(validation.error)
       }
-    });
+    })
 
     if (errors.length > 0) {
-      alert(errors.join('\n'));
+      alert(errors.join('\n'))
     }
 
     if (validFiles.length > 0) {
-      onFilesChange([...attachedFiles, ...validFiles]);
+      onFilesChange([...attachedFiles, ...validFiles])
     }
 
     if (e.target) {
-      e.target.value = '';
+      e.target.value = ''
     }
-  };
+  }
 
   const handleRemoveFile = (index: number) => {
-    onFilesChange(attachedFiles.filter((_, i) => i !== index));
-  };
+    onFilesChange(attachedFiles.filter((_, i) => i !== index))
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
     // 只在真的離開容器時才設為 false
     if (e.currentTarget === e.target) {
-      setIsDragging(false);
+      setIsDragging(false)
     }
-  };
+  }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
 
-    const files = Array.from(e.dataTransfer.files);
+    const files = Array.from(e.dataTransfer.files)
 
-    const validFiles: File[] = [];
-    const errors: string[] = [];
+    const validFiles: File[] = []
+    const errors: string[] = []
 
     files.forEach(file => {
-      const validation = validateFile(file);
+      const validation = validateFile(file)
       if (validation.valid) {
-        validFiles.push(file);
+        validFiles.push(file)
       } else if (validation.error) {
-        errors.push(validation.error);
+        errors.push(validation.error)
       }
-    });
+    })
 
     if (errors.length > 0) {
-      alert(errors.join('\n'));
+      alert(errors.join('\n'))
     }
 
     if (validFiles.length > 0) {
-      onFilesChange([...attachedFiles, ...validFiles]);
+      onFilesChange([...attachedFiles, ...validFiles])
     } else {
     }
-  };
+  }
 
   const handlePaste = (e: React.ClipboardEvent) => {
-    const items = e.clipboardData.items;
-    const files: File[] = [];
+    const items = e.clipboardData.items
+    const files: File[] = []
 
     for (let i = 0; i < items.length; i++) {
       if (items[i].kind === 'file') {
-        const file = items[i].getAsFile();
-        if (file) files.push(file);
+        const file = items[i].getAsFile()
+        if (file) files.push(file)
       }
     }
 
     if (files.length > 0) {
-      e.preventDefault();
-      const validFiles: File[] = [];
-      const errors: string[] = [];
+      e.preventDefault()
+      const validFiles: File[] = []
+      const errors: string[] = []
 
       files.forEach(file => {
-        const validation = validateFile(file);
+        const validation = validateFile(file)
         if (validation.valid) {
-          validFiles.push(file);
+          validFiles.push(file)
         } else if (validation.error) {
-          errors.push(validation.error);
+          errors.push(validation.error)
         }
-      });
+      })
 
       if (errors.length > 0) {
-        alert(errors.join('\n'));
+        alert(errors.join('\n'))
       }
 
       if (validFiles.length > 0) {
-        onFilesChange([...attachedFiles, ...validFiles]);
+        onFilesChange([...attachedFiles, ...validFiles])
       }
     }
-  };
+  }
 
   const quickActions: QuickAction[] = createQuickActions({
     onShareOrders: () => {
-      onShowShareOrders();
-      setShowQuickMenu(false);
+      onShowShareOrders()
+      setShowQuickMenu(false)
     },
     onShareQuote: () => {
-      onShowShareQuote();
-      setShowQuickMenu(false);
+      onShowShareQuote()
+      setShowQuickMenu(false)
     },
     onNewPayment: () => {
-      onShowNewPayment();
-      setShowQuickMenu(false);
+      onShowNewPayment()
+      setShowQuickMenu(false)
     },
     onNewReceipt: () => {
-      onShowNewReceipt();
-      setShowQuickMenu(false);
+      onShowNewReceipt()
+      setShowQuickMenu(false)
     },
     onShareAdvance: () => {
-      onShowShareAdvance();
-      setShowQuickMenu(false);
+      onShowShareAdvance()
+      setShowQuickMenu(false)
     },
     onNewTask: () => {
-      onShowNewTask();
-      setShowQuickMenu(false);
+      onShowNewTask()
+      setShowQuickMenu(false)
     },
     onUploadFile: () => {
-      fileInputRef.current?.click();
-      setShowQuickMenu(false);
-    }
-  });
+      fileInputRef.current?.click()
+      setShowQuickMenu(false)
+    },
+  })
 
   // 🔥 阻止整個頁面的拖曳預設行為（防止圖片在新分頁打開）
   useEffect(() => {
     const preventDefaults = (e: DragEvent) => {
       // 只在拖曳區域外阻止預設行為
-      const messageInputContainer = messageInputRef.current?.closest('.p-4');
-      const isInDropZone = messageInputContainer?.contains(e.target as Node);
+      const messageInputContainer = messageInputRef.current?.closest('.p-4')
+      const isInDropZone = messageInputContainer?.contains(e.target as Node)
 
       if (e.dataTransfer?.types?.includes('Files') && !isInDropZone) {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault()
+        e.stopPropagation()
       }
-    };
+    }
 
     // 只阻止 document body 上的事件，不影響拖曳區域
-    document.body.addEventListener('dragover', preventDefaults);
-    document.body.addEventListener('drop', preventDefaults);
+    document.body.addEventListener('dragover', preventDefaults)
+    document.body.addEventListener('drop', preventDefaults)
 
     return () => {
-      document.body.removeEventListener('dragover', preventDefaults);
-      document.body.removeEventListener('drop', preventDefaults);
-    };
-  }, []);
+      document.body.removeEventListener('dragover', preventDefaults)
+      document.body.removeEventListener('drop', preventDefaults)
+    }
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (quickMenuRef.current && !quickMenuRef.current.contains(event.target as Node)) {
-        setShowQuickMenu(false);
+        setShowQuickMenu(false)
       }
-    };
+    }
 
     if (showQuickMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showQuickMenu]);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showQuickMenu])
 
   return (
     <div
       className={cn(
-        "p-4 border-t border-morandi-gold/20 bg-white shrink-0 transition-colors",
-        isDragging && "bg-morandi-gold/10 border-morandi-gold"
+        'p-4 border-t border-morandi-gold/20 bg-white shrink-0 transition-colors',
+        isDragging && 'bg-morandi-gold/10 border-morandi-gold'
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -255,11 +255,7 @@ export function MessageInput({
             <Plus size={18} />
           </Button>
 
-          <QuickActionMenu
-            ref={quickMenuRef}
-            isOpen={showQuickMenu}
-            actions={quickActions}
-          />
+          <QuickActionMenu ref={quickMenuRef} isOpen={showQuickMenu} actions={quickActions} />
 
           <input
             ref={fileInputRef}
@@ -271,14 +267,10 @@ export function MessageInput({
           />
         </div>
 
-        <div
-          className="flex-1 relative"
-          ref={messageInputRef}
-          onPaste={handlePaste}
-        >
+        <div className="flex-1 relative" ref={messageInputRef} onPaste={handlePaste}>
           <Input
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={e => onChange(e.target.value)}
             placeholder={`在 #${channelName} 中輸入訊息...`}
             className="pr-10 bg-white border-morandi-container"
           />
@@ -312,5 +304,5 @@ export function MessageInput({
         </div>
       )}
     </div>
-  );
+  )
 }

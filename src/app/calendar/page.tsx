@@ -19,7 +19,13 @@ import {
   useEventOperations,
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
-import { useTourStore, useOrderStore, useMemberStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
+import {
+  useTourStore,
+  useOrderStore,
+  useMemberStore,
+  useCalendarEventStore,
+  useEmployeeStore,
+} from '@/stores'
 
 export default function CalendarPage() {
   // Stores
@@ -45,13 +51,8 @@ export default function CalendarPage() {
 
   // Custom hooks for calendar logic
   const { filteredEvents } = useCalendarEvents()
-  const {
-    calendarRef,
-    handlePrevMonth,
-    handleNextMonth,
-    handleToday,
-    getCurrentMonthYear,
-  } = useCalendarNavigation()
+  const { calendarRef, handlePrevMonth, handleNextMonth, handleToday, getCurrentMonthYear } =
+    useCalendarNavigation()
 
   const {
     eventDetailDialog,
@@ -144,7 +145,7 @@ export default function CalendarPage() {
                 events={filteredEvents}
                 onDateClick={handleDateClick}
                 onEventClick={handleEventClick}
-                onMoreLinkClick={(info) => handleMoreLinkClick(info, filteredEvents)}
+                onMoreLinkClick={info => handleMoreLinkClick(info, filteredEvents)}
               />
             </div>
           </div>

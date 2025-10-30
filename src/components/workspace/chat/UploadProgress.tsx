@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
 interface UploadProgressProps {
-  progress: number;
+  progress: number
 }
 
 export function UploadProgress({ progress }: UploadProgressProps) {
-  if (progress === 0) return null;
+  if (progress === 0) return null
 
   return (
     <div className="mb-3">
@@ -20,5 +20,5 @@ export function UploadProgress({ progress }: UploadProgressProps) {
         />
       </div>
     </div>
-  );
+  )
 }

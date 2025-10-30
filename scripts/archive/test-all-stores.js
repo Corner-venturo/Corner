@@ -5,26 +5,26 @@
  * 測試所有核心 Store 的 CRUD 操作
  */
 
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js'
+import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // 載入環境變數
-dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') })
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ 缺少 Supabase 環境變數');
-  process.exit(1);
+  console.error('❌ 缺少 Supabase 環境變數')
+  process.exit(1)
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 測試統計
 const stats = {
@@ -32,16 +32,16 @@ const stats = {
   passed: 0,
   failed: 0,
   skipped: 0,
-};
+}
 
 function logTest(name, status, message = '') {
-  stats.total++;
-  const icon = status === 'pass' ? '✅' : status === 'skip' ? '⏭️' : '❌';
-  console.log(`  ${icon} ${name}`);
-  if (message) console.log(`     ${message}`);
-  if (status === 'pass') stats.passed++;
-  if (status === 'fail') stats.failed++;
-  if (status === 'skip') stats.skipped++;
+  stats.total++
+  const icon = status === 'pass' ? '✅' : status === 'skip' ? '⏭️' : '❌'
+  console.log(`  ${icon} ${name}`)
+  if (message) console.log(`     ${message}`)
+  if (status === 'pass') stats.passed++
+  if (status === 'fail') stats.failed++
+  if (status === 'skip') stats.skipped++
 }
 
 // ============================================
@@ -49,10 +49,10 @@ function logTest(name, status, message = '') {
 // ============================================
 
 async function testMembersStore() {
-  console.log('\n🧪 Members Store 測試');
+  console.log('\n🧪 Members Store 測試')
 
-  const timestamp = Date.now();
-  let memberId = null;
+  const timestamp = Date.now()
+  let memberId = null
 
   try {
     // 1. Create
@@ -73,52 +73,48 @@ async function testMembersStore() {
       is_active: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    };
+    }
 
     const { data: member, error: createError } = await supabase
       .from('members')
       .insert([memberData])
       .select()
-      .single();
+      .single()
 
-    if (createError) throw createError;
-    memberId = member.id;
-    logTest('Create Member', 'pass');
+    if (createError) throw createError
+    memberId = member.id
+    logTest('Create Member', 'pass')
 
     // 2. Read
     const { data: readMember, error: readError } = await supabase
       .from('members')
       .select('*')
       .eq('id', memberId)
-      .single();
+      .single()
 
-    if (readError) throw readError;
-    if (readMember.name !== '測試團員') throw new Error('資料不一致');
-    logTest('Read Member', 'pass');
+    if (readError) throw readError
+    if (readMember.name !== '測試團員') throw new Error('資料不一致')
+    logTest('Read Member', 'pass')
 
     // 3. Update
     const { error: updateError } = await supabase
       .from('members')
       .update({ phone: '0999999999' })
-      .eq('id', memberId);
+      .eq('id', memberId)
 
-    if (updateError) throw updateError;
-    logTest('Update Member', 'pass');
+    if (updateError) throw updateError
+    logTest('Update Member', 'pass')
 
     // 4. Delete
-    const { error: deleteError } = await supabase
-      .from('members')
-      .delete()
-      .eq('id', memberId);
+    const { error: deleteError } = await supabase.from('members').delete().eq('id', memberId)
 
-    if (deleteError) throw deleteError;
-    logTest('Delete Member', 'pass');
-
+    if (deleteError) throw deleteError
+    logTest('Delete Member', 'pass')
   } catch (error) {
-    logTest('Members Store', 'fail', error.message);
+    logTest('Members Store', 'fail', error.message)
     // 清理
     if (memberId) {
-      await supabase.from('members').delete().eq('id', memberId);
+      await supabase.from('members').delete().eq('id', memberId)
     }
   }
 }
@@ -128,10 +124,10 @@ async function testMembersStore() {
 // ============================================
 
 async function testCustomersStore() {
-  console.log('\n🧪 Customers Store 測試');
+  console.log('\n🧪 Customers Store 測試')
 
-  const timestamp = Date.now();
-  let customerId = null;
+  const timestamp = Date.now()
+  let customerId = null
 
   try {
     // 1. Create
@@ -150,52 +146,48 @@ async function testCustomersStore() {
       is_active: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    };
+    }
 
     const { data: customer, error: createError } = await supabase
       .from('customers')
       .insert([customerData])
       .select()
-      .single();
+      .single()
 
-    if (createError) throw createError;
-    customerId = customer.id;
-    logTest('Create Customer', 'pass');
+    if (createError) throw createError
+    customerId = customer.id
+    logTest('Create Customer', 'pass')
 
     // 2. Read
     const { data: readCustomer, error: readError } = await supabase
       .from('customers')
       .select('*')
       .eq('id', customerId)
-      .single();
+      .single()
 
-    if (readError) throw readError;
-    if (readCustomer.name !== '測試客戶') throw new Error('資料不一致');
-    logTest('Read Customer', 'pass');
+    if (readError) throw readError
+    if (readCustomer.name !== '測試客戶') throw new Error('資料不一致')
+    logTest('Read Customer', 'pass')
 
     // 3. Update
     const { error: updateError } = await supabase
       .from('customers')
       .update({ phone: '0999999999' })
-      .eq('id', customerId);
+      .eq('id', customerId)
 
-    if (updateError) throw updateError;
-    logTest('Update Customer', 'pass');
+    if (updateError) throw updateError
+    logTest('Update Customer', 'pass')
 
     // 4. Delete
-    const { error: deleteError } = await supabase
-      .from('customers')
-      .delete()
-      .eq('id', customerId);
+    const { error: deleteError } = await supabase.from('customers').delete().eq('id', customerId)
 
-    if (deleteError) throw deleteError;
-    logTest('Delete Customer', 'pass');
-
+    if (deleteError) throw deleteError
+    logTest('Delete Customer', 'pass')
   } catch (error) {
-    logTest('Customers Store', 'fail', error.message);
+    logTest('Customers Store', 'fail', error.message)
     // 清理
     if (customerId) {
-      await supabase.from('customers').delete().eq('id', customerId);
+      await supabase.from('customers').delete().eq('id', customerId)
     }
   }
 }
@@ -205,10 +197,10 @@ async function testCustomersStore() {
 // ============================================
 
 async function testEmployeesStore() {
-  console.log('\n🧪 Employees Store 測試');
+  console.log('\n🧪 Employees Store 測試')
 
-  const timestamp = Date.now();
-  let employeeId = null;
+  const timestamp = Date.now()
+  let employeeId = null
 
   try {
     // 1. Create
@@ -225,52 +217,48 @@ async function testEmployeesStore() {
       is_active: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    };
+    }
 
     const { data: employee, error: createError } = await supabase
       .from('employees')
       .insert([employeeData])
       .select()
-      .single();
+      .single()
 
-    if (createError) throw createError;
-    employeeId = employee.id;
-    logTest('Create Employee', 'pass');
+    if (createError) throw createError
+    employeeId = employee.id
+    logTest('Create Employee', 'pass')
 
     // 2. Read
     const { data: readEmployee, error: readError } = await supabase
       .from('employees')
       .select('*')
       .eq('id', employeeId)
-      .single();
+      .single()
 
-    if (readError) throw readError;
-    if (readEmployee.name !== '測試員工') throw new Error('資料不一致');
-    logTest('Read Employee', 'pass');
+    if (readError) throw readError
+    if (readEmployee.name !== '測試員工') throw new Error('資料不一致')
+    logTest('Read Employee', 'pass')
 
     // 3. Update
     const { error: updateError } = await supabase
       .from('employees')
       .update({ position: '資深業務專員' })
-      .eq('id', employeeId);
+      .eq('id', employeeId)
 
-    if (updateError) throw updateError;
-    logTest('Update Employee', 'pass');
+    if (updateError) throw updateError
+    logTest('Update Employee', 'pass')
 
     // 4. Delete
-    const { error: deleteError } = await supabase
-      .from('employees')
-      .delete()
-      .eq('id', employeeId);
+    const { error: deleteError } = await supabase.from('employees').delete().eq('id', employeeId)
 
-    if (deleteError) throw deleteError;
-    logTest('Delete Employee', 'pass');
-
+    if (deleteError) throw deleteError
+    logTest('Delete Employee', 'pass')
   } catch (error) {
-    logTest('Employees Store', 'fail', error.message);
+    logTest('Employees Store', 'fail', error.message)
     // 清理
     if (employeeId) {
-      await supabase.from('employees').delete().eq('id', employeeId);
+      await supabase.from('employees').delete().eq('id', employeeId)
     }
   }
 }
@@ -280,10 +268,10 @@ async function testEmployeesStore() {
 // ============================================
 
 async function testSuppliersStore() {
-  console.log('\n🧪 Suppliers Store 測試');
+  console.log('\n🧪 Suppliers Store 測試')
 
-  const timestamp = Date.now();
-  let supplierId = null;
+  const timestamp = Date.now()
+  let supplierId = null
 
   try {
     // 1. Create
@@ -303,52 +291,48 @@ async function testSuppliersStore() {
       is_active: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    };
+    }
 
     const { data: supplier, error: createError } = await supabase
       .from('suppliers')
       .insert([supplierData])
       .select()
-      .single();
+      .single()
 
-    if (createError) throw createError;
-    supplierId = supplier.id;
-    logTest('Create Supplier', 'pass');
+    if (createError) throw createError
+    supplierId = supplier.id
+    logTest('Create Supplier', 'pass')
 
     // 2. Read
     const { data: readSupplier, error: readError } = await supabase
       .from('suppliers')
       .select('*')
       .eq('id', supplierId)
-      .single();
+      .single()
 
-    if (readError) throw readError;
-    if (readSupplier.name !== '測試供應商') throw new Error('資料不一致');
-    logTest('Read Supplier', 'pass');
+    if (readError) throw readError
+    if (readSupplier.name !== '測試供應商') throw new Error('資料不一致')
+    logTest('Read Supplier', 'pass')
 
     // 3. Update
     const { error: updateError } = await supabase
       .from('suppliers')
       .update({ phone: '02-87654321' })
-      .eq('id', supplierId);
+      .eq('id', supplierId)
 
-    if (updateError) throw updateError;
-    logTest('Update Supplier', 'pass');
+    if (updateError) throw updateError
+    logTest('Update Supplier', 'pass')
 
     // 4. Delete
-    const { error: deleteError } = await supabase
-      .from('suppliers')
-      .delete()
-      .eq('id', supplierId);
+    const { error: deleteError } = await supabase.from('suppliers').delete().eq('id', supplierId)
 
-    if (deleteError) throw deleteError;
-    logTest('Delete Supplier', 'pass');
-
+    if (deleteError) throw deleteError
+    logTest('Delete Supplier', 'pass')
   } catch (error) {
-    logTest('Suppliers Store', 'fail', error.message);
+    logTest('Suppliers Store', 'fail', error.message)
     // 清理
     if (supplierId) {
-      await supabase.from('suppliers').delete().eq('id', supplierId);
+      await supabase.from('suppliers').delete().eq('id', supplierId)
     }
   }
 }
@@ -358,30 +342,30 @@ async function testSuppliersStore() {
 // ============================================
 
 async function main() {
-  console.log('='.repeat(60));
-  console.log('🧪 完整 Store 測試');
-  console.log('='.repeat(60));
+  console.log('='.repeat(60))
+  console.log('🧪 完整 Store 測試')
+  console.log('='.repeat(60))
 
-  await testMembersStore();
-  await testCustomersStore();
-  await testEmployeesStore();
-  await testSuppliersStore();
+  await testMembersStore()
+  await testCustomersStore()
+  await testEmployeesStore()
+  await testSuppliersStore()
 
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 測試統計');
-  console.log('='.repeat(60));
-  console.log(`總測試數: ${stats.total}`);
-  console.log(`✅ 通過: ${stats.passed}`);
-  console.log(`❌ 失敗: ${stats.failed}`);
-  console.log(`⏭️  跳過: ${stats.skipped}`);
+  console.log('\n' + '='.repeat(60))
+  console.log('📊 測試統計')
+  console.log('='.repeat(60))
+  console.log(`總測試數: ${stats.total}`)
+  console.log(`✅ 通過: ${stats.passed}`)
+  console.log(`❌ 失敗: ${stats.failed}`)
+  console.log(`⏭️  跳過: ${stats.skipped}`)
 
-  const successRate = ((stats.passed / stats.total) * 100).toFixed(1);
-  console.log(`成功率: ${successRate}%`);
-  console.log('='.repeat(60));
+  const successRate = ((stats.passed / stats.total) * 100).toFixed(1)
+  console.log(`成功率: ${successRate}%`)
+  console.log('='.repeat(60))
 
   if (stats.failed > 0) {
-    process.exit(1);
+    process.exit(1)
   }
 }
 
-main().catch(console.error);
+main().catch(console.error)

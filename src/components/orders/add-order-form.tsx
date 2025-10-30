@@ -1,53 +1,52 @@
-'use client';
+'use client'
 
-import React, { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Combobox } from '@/components/ui/combobox';
-import { useTourStore } from '@/stores';
-import { useUserStore } from '@/stores/user-store';
-import { useAuthStore } from '@/stores/auth-store';
-import type { Employee } from '@/stores/types';
-import type { SyncableEntity } from '@/types';
+import React, { useState, useMemo } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Combobox } from '@/components/ui/combobox'
+import { useTourStore } from '@/stores'
+import { useUserStore } from '@/stores/user-store'
+import { useAuthStore } from '@/stores/auth-store'
+import type { Employee } from '@/stores/types'
+import type { SyncableEntity } from '@/types'
 
 // 型別守衛：檢查 Employee 是否包含同步欄位
-type EmployeeWithSync = Employee & Partial<SyncableEntity>;
+type EmployeeWithSync = Employee & Partial<SyncableEntity>
 
 export interface OrderFormData {
-  tour_id: string;
-  contact_person: string;
-  sales_person: string;
-  assistant: string;
-  member_count: number;
-  total_amount: number;
+  tour_id: string
+  contact_person: string
+  sales_person: string
+  assistant: string
+  member_count: number
+  total_amount: number
 }
 
 interface AddOrderFormProps {
-  tourId?: string; // 如果從旅遊團頁面打開，會帶入 tour_id
+  tourId?: string // 如果從旅遊團頁面打開，會帶入 tour_id
 
   // 獨立模式（用於 Dialog）
-  onSubmit?: (orderData: OrderFormData) => void;
-  onCancel?: () => void;
+  onSubmit?: (orderData: OrderFormData) => void
+  onCancel?: () => void
 
   // 嵌入模式（用於嵌入其他表單）
-  value?: Partial<OrderFormData>;
-  onChange?: (orderData: Partial<OrderFormData>) => void;
+  value?: Partial<OrderFormData>
+  onChange?: (orderData: Partial<OrderFormData>) => void
 }
 
 export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: AddOrderFormProps) {
-  const { items: tours } = useTourStore();
-  const { items: employees, fetchAll: fetchEmployees } = useUserStore();
-  const { currentProfile } = useAuthStore();
+  const { items: tours } = useTourStore()
+  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
+  const { currentProfile } = useAuthStore()
 
   // 判斷是否為嵌入模式
-  const isEmbedded = !!onChange;
+  const isEmbedded = !!onChange
 
   // Debug: 檢查員工資料
-  React.useEffect(() => {
-  }, [employees]);
+  React.useEffect(() => {}, [employees])
 
   // 取得當前登入使用者的顯示名稱
-  const currentUserName = currentProfile?.display_name || currentProfile?.english_name || '';
+  const currentUserName = currentProfile?.display_name || currentProfile?.english_name || ''
 
   // 內部 state（獨立模式使用）
   const [internalFormData, setInternalFormData] = useState<Partial<OrderFormData>>({
@@ -57,75 +56,71 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
     assistant: '',
     member_count: 1,
     total_amount: 0,
-  });
+  })
 
   // 使用外部 state 或內部 state
-  const formData = isEmbedded ? (value || {}) : internalFormData;
-  const updateFormData = isEmbedded ? onChange : setInternalFormData;
+  const formData = isEmbedded ? value || {} : internalFormData
+  const updateFormData = isEmbedded ? onChange : setInternalFormData
 
   // 載入員工資料
   React.useEffect(() => {
     if (employees.length === 0) {
-      fetchEmployees();
+      fetchEmployees()
     }
-  }, [employees.length, fetchEmployees]);
+  }, [employees.length, fetchEmployees])
 
   // 只在初始化時自動填入業務欄位（之後允許用戶清空）
-  const hasInitialized = React.useRef(false);
+  const hasInitialized = React.useRef(false)
   React.useEffect(() => {
     if (!isEmbedded && currentUserName && !hasInitialized.current) {
       setInternalFormData(prev => ({
         ...prev,
-        sales_person: currentUserName
-      }));
-      hasInitialized.current = true;
+        sales_person: currentUserName,
+      }))
+      hasInitialized.current = true
     }
-  }, [currentUserName, isEmbedded]);
+  }, [currentUserName, isEmbedded])
 
   // 篩選業務人員（roles 包含 'sales'，如果沒有則顯示全部）
   const salesPersons = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
-      const empWithSync = emp as EmployeeWithSync;
-      const notDeleted = !empWithSync._deleted;
-      const isActive = emp.status === 'active';
-      return notDeleted && isActive;
-    });
+      const empWithSync = emp as EmployeeWithSync
+      const notDeleted = !empWithSync._deleted
+      const isActive = emp.status === 'active'
+      return notDeleted && isActive
+    })
 
-    const salesOnly = activeEmployees.filter(emp =>
-      emp.roles?.includes('sales')
-    );
+    const salesOnly = activeEmployees.filter(emp => emp.roles?.includes('sales'))
 
     // 如果有標記業務的就只顯示業務，沒有就顯示所有人
-    return salesOnly.length > 0 ? salesOnly : activeEmployees;
-  }, [employees]);
+    return salesOnly.length > 0 ? salesOnly : activeEmployees
+  }, [employees])
 
   // 篩選助理（roles 包含 'assistant'，如果沒有則顯示全部）
   const assistants = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
-      const empWithSync = emp as EmployeeWithSync;
-      const notDeleted = !empWithSync._deleted;
-      const isActive = emp.status === 'active';
-      return notDeleted && isActive;
-    });
+      const empWithSync = emp as EmployeeWithSync
+      const notDeleted = !empWithSync._deleted
+      const isActive = emp.status === 'active'
+      return notDeleted && isActive
+    })
 
-    const assistantsOnly = activeEmployees.filter(emp =>
-      emp.roles?.includes('assistant')
-    );
+    const assistantsOnly = activeEmployees.filter(emp => emp.roles?.includes('assistant'))
 
     // 如果有標記助理的就只顯示助理，沒有就顯示所有人
-    return assistantsOnly.length > 0 ? assistantsOnly : activeEmployees;
-  }, [employees]);
+    return assistantsOnly.length > 0 ? assistantsOnly : activeEmployees
+  }, [employees])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (onSubmit && !isEmbedded) {
-      onSubmit(formData as OrderFormData);
+      onSubmit(formData as OrderFormData)
     }
-  };
+  }
 
   // 嵌入模式用 div，獨立模式用 form
-  const Container = isEmbedded ? 'div' : 'form';
-  const containerProps = isEmbedded ? {} : { onSubmit: handleSubmit };
+  const Container = isEmbedded ? 'div' : 'form'
+  const containerProps = isEmbedded ? {} : { onSubmit: handleSubmit }
 
   return (
     <Container {...containerProps} className="space-y-4">
@@ -134,13 +129,13 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         <div>
           <label className="text-sm font-medium text-morandi-primary">選擇旅遊團</label>
           <Combobox
-            options={tours.map((tour) => ({
+            options={tours.map(tour => ({
               value: tour.id,
               label: `${tour.code} - ${tour.name}`,
-              data: tour
+              data: tour,
             }))}
             value={formData.tour_id || ''}
-            onChange={(value) => updateFormData?.({ ...formData, tour_id: value })}
+            onChange={value => updateFormData?.({ ...formData, tour_id: value })}
             placeholder="搜尋或選擇旅遊團..."
             emptyMessage="找不到旅遊團"
             className="mt-1"
@@ -153,7 +148,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
         <Input
           value={formData.contact_person || ''}
-          onChange={(e) => updateFormData?.({ ...formData, contact_person: e.target.value })}
+          onChange={e => updateFormData?.({ ...formData, contact_person: e.target.value })}
           placeholder="輸入聯絡人姓名"
           className="mt-1"
           required={!isEmbedded}
@@ -165,12 +160,12 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         <div>
           <label className="text-sm font-medium text-morandi-primary">業務</label>
           <Combobox
-            options={salesPersons.map((emp) => ({
+            options={salesPersons.map(emp => ({
               value: emp.display_name || emp.english_name,
-              label: `${emp.display_name || emp.english_name} (${emp.employee_number})`
+              label: `${emp.display_name || emp.english_name} (${emp.employee_number})`,
             }))}
             value={formData.sales_person || ''}
-            onChange={(value) => updateFormData?.({ ...formData, sales_person: value })}
+            onChange={value => updateFormData?.({ ...formData, sales_person: value })}
             placeholder="選擇業務人員..."
             emptyMessage="找不到業務人員"
             showSearchIcon={true}
@@ -181,12 +176,12 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         <div>
           <label className="text-sm font-medium text-morandi-primary">助理</label>
           <Combobox
-            options={assistants.map((emp) => ({
+            options={assistants.map(emp => ({
               value: emp.display_name || emp.english_name,
-              label: `${emp.display_name || emp.english_name} (${emp.employee_number})`
+              label: `${emp.display_name || emp.english_name} (${emp.employee_number})`,
             }))}
             value={formData.assistant || ''}
-            onChange={(value) => updateFormData?.({ ...formData, assistant: value })}
+            onChange={value => updateFormData?.({ ...formData, assistant: value })}
             placeholder="選擇助理..."
             emptyMessage="找不到助理"
             showSearchIcon={true}
@@ -203,7 +198,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           <Input
             type="number"
             value={formData.member_count || 1}
-            onChange={(e) => updateFormData?.({ ...formData, member_count: Number(e.target.value) })}
+            onChange={e => updateFormData?.({ ...formData, member_count: Number(e.target.value) })}
             className="mt-1"
             min="1"
           />
@@ -213,7 +208,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           <Input
             type="number"
             value={formData.total_amount || 0}
-            onChange={(e) => updateFormData?.({ ...formData, total_amount: Number(e.target.value) })}
+            onChange={e => updateFormData?.({ ...formData, total_amount: Number(e.target.value) })}
             placeholder="0"
             className="mt-1"
           />
@@ -223,11 +218,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       {/* 按鈕（只在獨立模式顯示） */}
       {!isEmbedded && (
         <div className="flex justify-end space-x-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-          >
+          <Button type="button" variant="outline" onClick={onCancel}>
             取消
           </Button>
           <Button
@@ -240,5 +231,5 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         </div>
       )}
     </Container>
-  );
+  )
 }

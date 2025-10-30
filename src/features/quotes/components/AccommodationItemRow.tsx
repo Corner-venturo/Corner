@@ -1,13 +1,18 @@
-import React from 'react';
-import { CostItem } from '../types';
+import React from 'react'
+import { CostItem } from '../types'
 
 interface AccommodationItemRowProps {
-  item: CostItem;
-  categoryId: string;
-  day: number;
-  roomIndex: number;
-  handleUpdateItem: (categoryId: string, itemId: string, field: keyof CostItem, value: unknown) => void;
-  handleRemoveItem: (categoryId: string, itemId: string) => void;
+  item: CostItem
+  categoryId: string
+  day: number
+  roomIndex: number
+  handleUpdateItem: (
+    categoryId: string,
+    itemId: string,
+    field: keyof CostItem,
+    value: unknown
+  ) => void
+  handleRemoveItem: (categoryId: string, itemId: string) => void
 }
 
 export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
@@ -16,7 +21,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
   day,
   roomIndex,
   handleUpdateItem,
-  handleRemoveItem
+  handleRemoveItem,
 }) => {
   return (
     <tr className="border-b border-border hover:bg-morandi-container/10 transition-colors">
@@ -30,7 +35,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <input
           type="text"
           value={item.name}
-          onChange={(e) => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
+          onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
           className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
           placeholder="房型名稱"
         />
@@ -41,7 +46,9 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <input
           type="number"
           value={item.quantity && item.quantity !== 1 ? item.quantity : ''}
-          onChange={(e) => handleUpdateItem(categoryId, item.id, 'quantity', Number(e.target.value) || 0)}
+          onChange={e =>
+            handleUpdateItem(categoryId, item.id, 'quantity', Number(e.target.value) || 0)
+          }
           className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           placeholder="人數"
         />
@@ -52,7 +59,9 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <input
           type="number"
           value={item.unit_price || ''}
-          onChange={(e) => handleUpdateItem(categoryId, item.id, 'unit_price', Number(e.target.value) || 0)}
+          onChange={e =>
+            handleUpdateItem(categoryId, item.id, 'unit_price', Number(e.target.value) || 0)
+          }
           className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           placeholder="單價"
         />
@@ -69,7 +78,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
           <input
             type="text"
             value={item.note || ''}
-            onChange={(e) => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
+            onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
             className="flex-1 px-1 py-1 text-sm bg-transparent border-0 focus:outline-none focus:bg-white"
             placeholder="備註"
           />
@@ -83,5 +92,5 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         </div>
       </td>
     </tr>
-  );
-};
+  )
+}

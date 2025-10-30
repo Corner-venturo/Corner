@@ -1,22 +1,22 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Lock, Eye, EyeOff } from 'lucide-react';
-import { Employee } from '@/stores/types';
-import { PasswordData } from './types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Lock, Eye, EyeOff } from 'lucide-react'
+import { Employee } from '@/stores/types'
+import { PasswordData } from './types'
 
 interface PasswordManagementSectionProps {
-  employee: Employee;
-  showPasswordSection: boolean;
-  setShowPasswordSection: (show: boolean) => void;
-  passwordData: PasswordData;
-  setPasswordData: (data: PasswordData) => void;
-  showPassword: boolean;
-  setShowPassword: (show: boolean) => void;
-  passwordUpdateLoading: boolean;
-  handlePasswordUpdate: () => void;
+  employee: Employee
+  showPasswordSection: boolean
+  setShowPasswordSection: (show: boolean) => void
+  passwordData: PasswordData
+  setPasswordData: (data: PasswordData) => void
+  showPassword: boolean
+  setShowPassword: (show: boolean) => void
+  passwordUpdateLoading: boolean
+  handlePasswordUpdate: () => void
 }
 
 export function PasswordManagementSection({
@@ -28,7 +28,7 @@ export function PasswordManagementSection({
   showPassword,
   setShowPassword,
   passwordUpdateLoading,
-  handlePasswordUpdate
+  handlePasswordUpdate,
 }: PasswordManagementSectionProps) {
   return (
     <div className="bg-morandi-container/10 rounded-lg p-4 border-l-4 border-morandi-gold">
@@ -56,17 +56,17 @@ export function PasswordManagementSection({
       {showPasswordSection && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">
-              新密碼
-            </label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">新密碼</label>
             <div className="relative">
               <Input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 value={passwordData.newPassword}
-                onChange={(e) => setPasswordData({
-                  ...passwordData,
-                  newPassword: e.target.value
-                })}
+                onChange={e =>
+                  setPasswordData({
+                    ...passwordData,
+                    newPassword: e.target.value,
+                  })
+                }
                 placeholder="至少8個字元"
                 className="pr-10"
               />
@@ -85,12 +85,14 @@ export function PasswordManagementSection({
               確認新密碼
             </label>
             <Input
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               value={passwordData.confirmPassword}
-              onChange={(e) => setPasswordData({
-                ...passwordData,
-                confirmPassword: e.target.value
-              })}
+              onChange={e =>
+                setPasswordData({
+                  ...passwordData,
+                  confirmPassword: e.target.value,
+                })
+              }
               placeholder="再次輸入新密碼"
             />
           </div>
@@ -109,7 +111,12 @@ export function PasswordManagementSection({
             <Button
               size="sm"
               onClick={handlePasswordUpdate}
-              disabled={passwordUpdateLoading || !passwordData.newPassword || passwordData.newPassword !== passwordData.confirmPassword || passwordData.newPassword.length < 8}
+              disabled={
+                passwordUpdateLoading ||
+                !passwordData.newPassword ||
+                passwordData.newPassword !== passwordData.confirmPassword ||
+                passwordData.newPassword.length < 8
+              }
               className="bg-morandi-gold hover:bg-morandi-gold-hover"
             >
               {passwordUpdateLoading ? '更新中...' : '更新密碼'}
@@ -118,8 +125,8 @@ export function PasswordManagementSection({
               size="sm"
               variant="outline"
               onClick={() => {
-                setShowPasswordSection(false);
-                setPasswordData({ newPassword: '', confirmPassword: '' });
+                setShowPasswordSection(false)
+                setPasswordData({ newPassword: '', confirmPassword: '' })
               }}
             >
               取消
@@ -137,5 +144,5 @@ export function PasswordManagementSection({
         </div>
       )}
     </div>
-  );
+  )
 }

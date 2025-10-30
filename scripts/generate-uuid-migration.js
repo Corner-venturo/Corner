@@ -1,6 +1,6 @@
 // 生成 employees.id 遷移到 UUID 的完整方案
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 
 const migrationSQL = `
 -- ============================================
@@ -271,34 +271,34 @@ COMMIT;
 -- 完成！
 -- ============================================
 SELECT '✅ employees.id 已成功遷移到 UUID 格式' AS status;
-`;
+`
 
 // 儲存 SQL 檔案
-const migrationPath = path.join(__dirname, '../supabase/migrations/migrate_employees_to_uuid.sql');
-fs.writeFileSync(migrationPath, migrationSQL);
+const migrationPath = path.join(__dirname, '../supabase/migrations/migrate_employees_to_uuid.sql')
+fs.writeFileSync(migrationPath, migrationSQL)
 
-console.log('📝 完整的 UUID 遷移方案已生成\n');
-console.log('='.repeat(80));
-console.log('\n✅ SQL 已儲存到:', migrationPath);
-console.log('\n📋 遷移步驟：');
-console.log('');
-console.log('   第 1 步：新增 uuid_new 欄位並生成 UUID');
-console.log('   第 2 步：建立 ID 映射表');
-console.log('   第 3 步：更新所有引用 employees.id 的表');
-console.log('   第 4 步：切換到新的 UUID');
-console.log('   第 5 步：驗證遷移結果');
-console.log('');
-console.log('💡 這是正確的架構重構方案，統一使用 UUID');
-console.log('');
-console.log('⚠️  執行前請確認：');
-console.log('   1. 已備份資料庫');
-console.log('   2. 在非生產環境測試');
-console.log('   3. 通知相關人員（會有短暫停機）');
-console.log('');
-console.log('🔗 執行 SQL：');
-console.log('   https://pfqvdacxowpgfamuvnsn.supabase.co/project/_/sql');
-console.log('');
-console.log('📌 重要提醒：');
-console.log('   - 使用 BEGIN/COMMIT 確保原子性');
-console.log('   - 如果失敗會自動回滾');
-console.log('   - 執行後需要清除前端 localStorage 並重新登入');
+console.log('📝 完整的 UUID 遷移方案已生成\n')
+console.log('='.repeat(80))
+console.log('\n✅ SQL 已儲存到:', migrationPath)
+console.log('\n📋 遷移步驟：')
+console.log('')
+console.log('   第 1 步：新增 uuid_new 欄位並生成 UUID')
+console.log('   第 2 步：建立 ID 映射表')
+console.log('   第 3 步：更新所有引用 employees.id 的表')
+console.log('   第 4 步：切換到新的 UUID')
+console.log('   第 5 步：驗證遷移結果')
+console.log('')
+console.log('💡 這是正確的架構重構方案，統一使用 UUID')
+console.log('')
+console.log('⚠️  執行前請確認：')
+console.log('   1. 已備份資料庫')
+console.log('   2. 在非生產環境測試')
+console.log('   3. 通知相關人員（會有短暫停機）')
+console.log('')
+console.log('🔗 執行 SQL：')
+console.log('   https://pfqvdacxowpgfamuvnsn.supabase.co/project/_/sql')
+console.log('')
+console.log('📌 重要提醒：')
+console.log('   - 使用 BEGIN/COMMIT 確保原子性')
+console.log('   - 如果失敗會自動回滾')
+console.log('   - 執行後需要清除前端 localStorage 並重新登入')

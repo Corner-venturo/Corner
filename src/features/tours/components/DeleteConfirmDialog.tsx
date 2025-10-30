@@ -1,19 +1,24 @@
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
-import { Tour } from '@/stores/types';
+import React from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { AlertCircle } from 'lucide-react'
+import { Tour } from '@/stores/types'
 
 interface DeleteConfirmDialogProps {
-  isOpen: boolean;
-  tour: Tour | null;
-  onClose: () => void;
-  onConfirm: () => void;
+  isOpen: boolean
+  tour: Tour | null
+  onClose: () => void
+  onConfirm: () => void
 }
 
-export function DeleteConfirmDialog({ isOpen, tour, onClose, onConfirm }: DeleteConfirmDialogProps) {
+export function DeleteConfirmDialog({
+  isOpen,
+  tour,
+  onClose,
+  onConfirm,
+}: DeleteConfirmDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-morandi-red">
@@ -36,20 +41,14 @@ export function DeleteConfirmDialog({ isOpen, tour, onClose, onConfirm }: Delete
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
-          <Button
-            variant="outline"
-            onClick={onClose}
-          >
+          <Button variant="outline" onClick={onClose}>
             取消
           </Button>
-          <Button
-            onClick={onConfirm}
-            className="bg-morandi-red hover:bg-morandi-red/90 text-white"
-          >
+          <Button onClick={onConfirm} className="bg-morandi-red hover:bg-morandi-red/90 text-white">
             確認刪除
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

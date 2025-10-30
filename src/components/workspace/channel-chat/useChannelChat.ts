@@ -1,32 +1,32 @@
-import { useState, useEffect } from 'react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat';
-import { DEFAULT_CHANNEL_NAME, CHANNEL_SWITCH_DELAY, ALERT_MESSAGES } from './constants';
-import { UI_DELAYS } from '@/lib/constants/timeouts';
+import { useState, useEffect } from 'react'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
+import { DEFAULT_CHANNEL_NAME, CHANNEL_SWITCH_DELAY, ALERT_MESSAGES } from './constants'
+import { UI_DELAYS } from '@/lib/constants/timeouts'
 
 export function useChannelChat() {
   // State
-  const [messageText, setMessageText] = useState('');
-  const [showMemberSidebar, setShowMemberSidebar] = useState(false);
-  const [isSwitching, setIsSwitching] = useState(false);
-  const [showShareQuoteDialog, setShowShareQuoteDialog] = useState(false);
-  const [showShareTourDialog, setShowShareTourDialog] = useState(false);
-  const [showNewPaymentDialog, setShowNewPaymentDialog] = useState(false);
-  const [showNewReceiptDialog, setShowNewReceiptDialog] = useState(false);
-  const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
-  const [showShareAdvanceDialog, setShowShareAdvanceDialog] = useState(false);
-  const [showShareOrdersDialog, setShowShareOrdersDialog] = useState(false);
-  const [showCreateReceiptDialog, setShowCreateReceiptDialog] = useState(false);
-  const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
-  const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null);
-  const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('');
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-  const [editChannelName, setEditChannelName] = useState('');
-  const [editChannelDescription, setEditChannelDescription] = useState('');
+  const [messageText, setMessageText] = useState('')
+  const [showMemberSidebar, setShowMemberSidebar] = useState(false)
+  const [isSwitching, setIsSwitching] = useState(false)
+  const [showShareQuoteDialog, setShowShareQuoteDialog] = useState(false)
+  const [showShareTourDialog, setShowShareTourDialog] = useState(false)
+  const [showNewPaymentDialog, setShowNewPaymentDialog] = useState(false)
+  const [showNewReceiptDialog, setShowNewReceiptDialog] = useState(false)
+  const [showNewTaskDialog, setShowNewTaskDialog] = useState(false)
+  const [showShareAdvanceDialog, setShowShareAdvanceDialog] = useState(false)
+  const [showShareOrdersDialog, setShowShareOrdersDialog] = useState(false)
+  const [showCreateReceiptDialog, setShowCreateReceiptDialog] = useState(false)
+  const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<unknown>(null)
+  const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null)
+  const [selectedAdvanceListId, setSelectedAdvanceListId] = useState<string>('')
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false)
+  const [editChannelName, setEditChannelName] = useState('')
+  const [editChannelDescription, setEditChannelDescription] = useState('')
 
   // Store
-  const store = useWorkspaceStore();
+  const store = useWorkspaceStore()
   const {
     channels,
     currentWorkspace,
@@ -43,148 +43,157 @@ export function useChannelChat() {
     loadSharedOrderLists,
     deleteAdvanceList,
     channelMessages,
-    messagesLoading
-  } = store;
+    messagesLoading,
+  } = store
 
   // Derived state
-  const currentMessages = selectedChannel?.id && channelMessages?.[selectedChannel.id]
-    ? channelMessages[selectedChannel.id]
-    : [];
+  const currentMessages =
+    selectedChannel?.id && channelMessages?.[selectedChannel.id]
+      ? channelMessages[selectedChannel.id]
+      : []
   const isMessagesLoading = selectedChannel?.id
     ? (messagesLoading?.[selectedChannel.id] ?? false)
-    : false;
+    : false
 
   // Hooks
-  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations();
-  const { attachedFiles, setAttachedFiles, uploadingFiles, uploadProgress, uploadFiles, clearFiles } = useFileUpload();
-  const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0);
+  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations()
+  const {
+    attachedFiles,
+    setAttachedFiles,
+    uploadingFiles,
+    uploadProgress,
+    uploadFiles,
+    clearFiles,
+  } = useFileUpload()
+  const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0)
 
   // Effects
   useEffect(() => {
     if (currentWorkspace?.id) {
-      loadChannels(currentWorkspace.id);
+      loadChannels(currentWorkspace.id)
     }
-  }, [currentWorkspace?.id, loadChannels]);
+  }, [currentWorkspace?.id, loadChannels])
 
   useEffect(() => {
     if (channels.length > 0 && !selectedChannel) {
-      const defaultChannel = channels.find(c => c.name === DEFAULT_CHANNEL_NAME) || channels[0];
-      selectChannel(defaultChannel);
+      const defaultChannel = channels.find(c => c.name === DEFAULT_CHANNEL_NAME) || channels[0]
+      selectChannel(defaultChannel)
     }
-  }, [channels, selectedChannel, selectChannel]);
+  }, [channels, selectedChannel, selectChannel])
 
   useEffect(() => {
     if (showSettingsDialog && selectedChannel) {
-      setEditChannelName(selectedChannel.name);
-      setEditChannelDescription(selectedChannel.description || '');
+      setEditChannelName(selectedChannel.name)
+      setEditChannelDescription(selectedChannel.description || '')
     }
-  }, [showSettingsDialog, selectedChannel]);
+  }, [showSettingsDialog, selectedChannel])
 
   useEffect(() => {
     if (!selectedChannel?.id) {
-      return;
+      return
     }
 
     Promise.all([
       loadMessages(selectedChannel.id),
       loadAdvanceLists(selectedChannel.id),
-      loadSharedOrderLists(selectedChannel.id)
-    ]).catch((error) => {
+      loadSharedOrderLists(selectedChannel.id),
+    ]).catch(error => {
       // Silent error handling
-    });
-  }, [selectedChannel?.id, loadMessages, loadAdvanceLists, loadSharedOrderLists]);
+    })
+  }, [selectedChannel?.id, loadMessages, loadAdvanceLists, loadSharedOrderLists])
 
   // Handlers
   const handleSubmitMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!messageText.trim() && attachedFiles.length === 0) {
-      return;
+      return
     }
 
     if (!selectedChannel) {
-      return;
+      return
     }
 
     if (!user) {
-      alert(ALERT_MESSAGES.LOGIN_REQUIRED);
-      return;
+      alert(ALERT_MESSAGES.LOGIN_REQUIRED)
+      return
     }
 
     try {
-      const uploadedAttachments = attachedFiles.length > 0
-        ? await uploadFiles(selectedChannel.id)
-        : undefined;
+      const uploadedAttachments =
+        attachedFiles.length > 0 ? await uploadFiles(selectedChannel.id) : undefined
 
-      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments);
+      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments)
 
-      setMessageText('');
-      clearFiles();
+      setMessageText('')
+      clearFiles()
     } catch (error) {
-      alert(ALERT_MESSAGES.SEND_FAILED);
+      alert(ALERT_MESSAGES.SEND_FAILED)
     }
-  };
+  }
 
   const handleReactionClick = (messageId: string, emoji: string) => {
-    handleReaction(messageId, emoji, currentMessages);
-  };
+    handleReaction(messageId, emoji, currentMessages)
+  }
 
   const handleDeleteMessageClick = async (messageId: string) => {
-    await handleDeleteMessage(messageId);
-  };
+    await handleDeleteMessage(messageId)
+  }
 
   const handleChannelSwitch = (channel: typeof selectedChannel) => {
     if (selectedChannel?.id !== channel?.id) {
-      setIsSwitching(true);
+      setIsSwitching(true)
 
       setTimeout(() => {
-        selectChannel(channel);
+        selectChannel(channel)
 
-        setTimeout(() => setIsSwitching(false), UI_DELAYS.FAST_FEEDBACK);
-      }, CHANNEL_SWITCH_DELAY);
+        setTimeout(() => setIsSwitching(false), UI_DELAYS.FAST_FEEDBACK)
+      }, CHANNEL_SWITCH_DELAY)
     }
-  };
+  }
 
   const handleDeleteChannel = async () => {
     if (!selectedChannel) {
-      return;
+      return
     }
 
-    const confirmed = confirm(`${ALERT_MESSAGES.DELETE_CHANNEL_CONFIRM.replace('頻道', `#${selectedChannel.name} 頻道`)}`);
+    const confirmed = confirm(
+      `${ALERT_MESSAGES.DELETE_CHANNEL_CONFIRM.replace('頻道', `#${selectedChannel.name} 頻道`)}`
+    )
 
     if (confirmed) {
       try {
-        await deleteChannel(selectedChannel.id);
-        selectChannel(null);
-        setShowSettingsDialog(false);
-        alert(ALERT_MESSAGES.CHANNEL_DELETED);
+        await deleteChannel(selectedChannel.id)
+        selectChannel(null)
+        setShowSettingsDialog(false)
+        alert(ALERT_MESSAGES.CHANNEL_DELETED)
       } catch (error) {
-        alert(ALERT_MESSAGES.DELETE_FAILED);
+        alert(ALERT_MESSAGES.DELETE_FAILED)
       }
     }
-  };
+  }
 
   const handleUpdateChannel = async () => {
     if (!selectedChannel) {
-      return;
+      return
     }
 
     if (!editChannelName.trim()) {
-      alert(ALERT_MESSAGES.CHANNEL_NAME_REQUIRED);
-      return;
+      alert(ALERT_MESSAGES.CHANNEL_NAME_REQUIRED)
+      return
     }
 
     try {
       await updateChannel(selectedChannel.id, {
         name: editChannelName.toLowerCase().replace(/\s+/g, '-'),
-        description: editChannelDescription.trim() || undefined
-      });
-      setShowSettingsDialog(false);
-      alert(ALERT_MESSAGES.UPDATE_SUCCESS);
+        description: editChannelDescription.trim() || undefined,
+      })
+      setShowSettingsDialog(false)
+      alert(ALERT_MESSAGES.UPDATE_SUCCESS)
     } catch (error) {
-      alert(ALERT_MESSAGES.UPDATE_FAILED);
+      alert(ALERT_MESSAGES.UPDATE_FAILED)
     }
-  };
+  }
 
   return {
     // State
@@ -259,5 +268,5 @@ export function useChannelChat() {
     handleChannelSwitch,
     handleDeleteChannel,
     handleUpdateChannel,
-  };
+  }
 }

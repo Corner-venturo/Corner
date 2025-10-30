@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { TemplateField, RepeatableSection } from '@/types/template';
+import { TemplateField, RepeatableSection } from '@/types/template'
 
 interface TemplatePDFPreviewProps {
-  data: unknown;
-  columnWidths?: number[];
-  fieldMappings?: TemplateField[];
-  _repeatableSections?: RepeatableSection[];
-  highlightedSection?: RepeatableSection | null;
+  data: unknown
+  columnWidths?: number[]
+  fieldMappings?: TemplateField[]
+  _repeatableSections?: RepeatableSection[]
+  highlightedSection?: RepeatableSection | null
 }
 
 export function TemplatePDFPreview({
   data,
   columnWidths = [80, 100, 150, 120, 100, 100, 100, 100, 100, 100, 100, 100],
-  _repeatableSections = []
+  _repeatableSections = [],
 }: TemplatePDFPreviewProps) {
   // 如果沒有資料，顯示空白 A4
   if (!data || !Array.isArray(data) || data.length === 0) {
@@ -23,7 +23,9 @@ export function TemplatePDFPreview({
           <div className="bg-card rounded-lg border border-morandi-container/20 px-6 py-4">
             <div>
               <h2 className="text-base font-bold text-morandi-primary">即時預覽</h2>
-              <p className="text-xs text-morandi-secondary mt-1">A4 尺寸 (21cm × 29.7cm) · 3mm 出血</p>
+              <p className="text-xs text-morandi-secondary mt-1">
+                A4 尺寸 (21cm × 29.7cm) · 3mm 出血
+              </p>
             </div>
           </div>
         </div>
@@ -34,68 +36,74 @@ export function TemplatePDFPreview({
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // 偵測區塊類型標記
   const detectBlockType = (row: unknown[]) => {
-    const firstCell = String(row[0] || '').trim();
+    const firstCell = String(row[0] || '').trim()
 
-    if (firstCell.startsWith('#標題')) return 'title';
-    if (firstCell.startsWith('#客戶資訊') || firstCell.startsWith('#客戶')) return 'customer-info';
-    if (firstCell.startsWith('#表格') || firstCell.startsWith('#價格表')) return 'table';
-    if (firstCell.startsWith('#備註') || firstCell.startsWith('#說明')) return 'notes';
-    if (firstCell.startsWith('#總計') || firstCell.startsWith('#合計')) return 'total';
-    if (firstCell.startsWith('#行程')) return 'itinerary';
-    if (firstCell.startsWith('#Logo') || firstCell.startsWith('#logo')) return 'logo';
+    if (firstCell.startsWith('#標題')) return 'title'
+    if (firstCell.startsWith('#客戶資訊') || firstCell.startsWith('#客戶')) return 'customer-info'
+    if (firstCell.startsWith('#表格') || firstCell.startsWith('#價格表')) return 'table'
+    if (firstCell.startsWith('#備註') || firstCell.startsWith('#說明')) return 'notes'
+    if (firstCell.startsWith('#總計') || firstCell.startsWith('#合計')) return 'total'
+    if (firstCell.startsWith('#行程')) return 'itinerary'
+    if (firstCell.startsWith('#Logo') || firstCell.startsWith('#logo')) return 'logo'
 
-    return null;
-  };
+    return null
+  }
 
   // 智能判斷儲存格類型
-  const getCellStyle = (cell: any, rowIndex: number, colIndex: number, blockType: string | null) => {
-    const cellStr = String(cell || '');
+  const getCellStyle = (
+    cell: any,
+    rowIndex: number,
+    colIndex: number,
+    blockType: string | null
+  ) => {
+    const cellStr = String(cell || '')
 
     // 標籤判斷（冒號前的內容）
-    const isLabel = cellStr.includes('：') || cellStr.includes(':');
+    const isLabel = cellStr.includes('：') || cellStr.includes(':')
 
     // 價格判斷
-    const isPrice = cellStr.includes('$') || cellStr.includes('NT') ||
-      /^\d+,?\d*$/.test(cellStr.trim());
+    const isPrice =
+      cellStr.includes('$') || cellStr.includes('NT') || /^\d+,?\d*$/.test(cellStr.trim())
 
     // 動態變數
-    const isDynamic = typeof cell === 'string' && cell.match(/\{.+?\}/);
+    const isDynamic = typeof cell === 'string' && cell.match(/\{.+?\}/)
 
     // 是否為表頭（表格區塊的第一列）
-    const isTableHeader = blockType === 'table';
+    const isTableHeader = blockType === 'table'
 
-    return { isLabel, isPrice, isDynamic, isTableHeader };
-  };
+    return { isLabel, isPrice, isDynamic, isTableHeader }
+  }
 
   // 將 Excel 資料轉換成美化的莫蘭迪風格預覽
   const renderContent = () => {
-    let currentBlockType: string | null = null;
-    let isFirstRowOfBlock = false;
+    let currentBlockType: string | null = null
+    let isFirstRowOfBlock = false
 
     return (
       <div className="space-y-4">
         {data.map((row: unknown[], rowIndex: number) => {
           // 檢查這一列是否全部為空
-          const isEmpty = row.every(cell => !cell || cell === '');
-          if (isEmpty) return null;
+          const isEmpty = row.every(cell => !cell || cell === '')
+          if (isEmpty) return null
 
           // 檢測是否為新區塊標記
-          const detectedBlockType = detectBlockType(row);
+          const detectedBlockType = detectBlockType(row)
           if (detectedBlockType) {
-            currentBlockType = detectedBlockType;
-            isFirstRowOfBlock = true;
-            return null; // 不顯示標記列，只記錄區塊類型
+            currentBlockType = detectedBlockType
+            isFirstRowOfBlock = true
+            return null // 不顯示標記列，只記錄區塊類型
           }
 
           // 區塊樣式配置
           const blockStyles = {
             title: {
-              container: 'bg-gradient-to-r from-morandi-primary to-morandi-primary/80 text-white py-6 px-8 rounded-lg shadow-md mb-6',
+              container:
+                'bg-gradient-to-r from-morandi-primary to-morandi-primary/80 text-white py-6 px-8 rounded-lg shadow-md mb-6',
               text: 'text-center text-2xl font-bold tracking-wide',
             },
             'customer-info': {
@@ -109,7 +117,8 @@ export function TemplatePDFPreview({
               text: 'text-sm',
             },
             notes: {
-              container: 'bg-morandi-container/10 rounded-lg p-4 border border-morandi-container/30',
+              container:
+                'bg-morandi-container/10 rounded-lg p-4 border border-morandi-container/30',
               text: 'text-xs text-morandi-secondary leading-relaxed',
             },
             total: {
@@ -117,12 +126,14 @@ export function TemplatePDFPreview({
               text: 'text-base font-bold text-morandi-gold',
             },
             logo: {
-              container: 'flex items-center justify-center py-8 border-2 border-dashed border-morandi-container/30 rounded-lg bg-morandi-container/5',
+              container:
+                'flex items-center justify-center py-8 border-2 border-dashed border-morandi-container/30 rounded-lg bg-morandi-container/5',
               text: 'text-morandi-muted',
             },
-          };
+          }
 
-          const currentStyle = currentBlockType && blockStyles[currentBlockType as keyof typeof blockStyles];
+          const currentStyle =
+            currentBlockType && blockStyles[currentBlockType as keyof typeof blockStyles]
 
           const content = (
             <div key={rowIndex} className="relative">
@@ -130,10 +141,15 @@ export function TemplatePDFPreview({
               <div className={`flex items-center ${(currentStyle as unknown)?.container || ''}`}>
                 {row.map((cell: any, colIndex: number) => {
                   // 跳過空白儲存格（不渲染）
-                  if (!cell || cell === '') return null;
+                  if (!cell || cell === '') return null
 
-                  const { isLabel, isPrice, isDynamic } = getCellStyle(cell, rowIndex, colIndex, currentBlockType);
-                  const width = columnWidths[colIndex] || 100;
+                  const { isLabel, isPrice, isDynamic } = getCellStyle(
+                    cell,
+                    rowIndex,
+                    colIndex,
+                    currentBlockType
+                  )
+                  const width = columnWidths[colIndex] || 100
 
                   return (
                     <div
@@ -156,18 +172,18 @@ export function TemplatePDFPreview({
                     >
                       {cell}
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
-          );
+          )
 
-          isFirstRowOfBlock = false;
-          return content;
+          isFirstRowOfBlock = false
+          return content
         })}
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -177,7 +193,9 @@ export function TemplatePDFPreview({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-morandi-primary">即時預覽</h2>
-              <p className="text-xs text-morandi-secondary mt-1">A4 尺寸 (21cm × 29.7cm) · 3mm 出血</p>
+              <p className="text-xs text-morandi-secondary mt-1">
+                A4 尺寸 (21cm × 29.7cm) · 3mm 出血
+              </p>
             </div>
           </div>
         </div>
@@ -190,35 +208,37 @@ export function TemplatePDFPreview({
           <div
             className="relative bg-gray-100 shadow-2xl"
             style={{
-              width: 'calc(21cm + 6mm)',  // A4 + 左右各 3mm
-              minHeight: 'calc(29.7cm + 6mm)',  // A4 + 上下各 3mm
-              padding: '3mm'
+              width: 'calc(21cm + 6mm)', // A4 + 左右各 3mm
+              minHeight: 'calc(29.7cm + 6mm)', // A4 + 上下各 3mm
+              padding: '3mm',
             }}
           >
-        {/* 出血提示線 */}
-        <div className="absolute inset-[3mm] border-2 border-dashed border-red-400 pointer-events-none z-10">
-          <div className="absolute -top-5 left-0 text-xs text-red-500 font-medium">安全線</div>
-        </div>
-        <div className="absolute top-0 left-0 right-0 bottom-0 border-2 border-dashed border-blue-400 pointer-events-none z-10">
-          <div className="absolute -top-5 right-0 text-xs text-blue-500 font-medium">出血線</div>
-        </div>
+            {/* 出血提示線 */}
+            <div className="absolute inset-[3mm] border-2 border-dashed border-red-400 pointer-events-none z-10">
+              <div className="absolute -top-5 left-0 text-xs text-red-500 font-medium">安全線</div>
+            </div>
+            <div className="absolute top-0 left-0 right-0 bottom-0 border-2 border-dashed border-blue-400 pointer-events-none z-10">
+              <div className="absolute -top-5 right-0 text-xs text-blue-500 font-medium">
+                出血線
+              </div>
+            </div>
 
-        {/* A4 實際內容區 */}
-        <div
-          className="bg-white relative"
-          style={{
-            width: '21cm',
-            minHeight: '29.7cm',
-            padding: '0',
-            fontSize: '12px',
-            lineHeight: '1.5'
-          }}
-        >
-          {renderContent()}
-        </div>
+            {/* A4 實際內容區 */}
+            <div
+              className="bg-white relative"
+              style={{
+                width: '21cm',
+                minHeight: '29.7cm',
+                padding: '0',
+                fontSize: '12px',
+                lineHeight: '1.5',
+              }}
+            >
+              {renderContent()}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

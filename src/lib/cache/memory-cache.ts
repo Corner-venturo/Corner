@@ -4,47 +4,47 @@
  */
 
 interface CacheItem<T> {
-  value: T;
-  timestamp: number;
-  hits: number;
+  value: T
+  timestamp: number
+  hits: number
 }
 
 export class LRUCache<T = any> {
-  private cache: Map<string, CacheItem<T>> = new Map();
-  private maxSize: number;
-  private ttl: number;
+  private cache: Map<string, CacheItem<T>> = new Map()
+  private maxSize: number
+  private ttl: number
 
   constructor(
     maxSize: number = 100, // 最多 100 個項目
     ttl: number = 10000 // 10 秒 TTL
   ) {
-    this.maxSize = maxSize;
-    this.ttl = ttl;
+    this.maxSize = maxSize
+    this.ttl = ttl
   }
 
   /**
    * 取得快取資料
    */
   get(key: string): T | null {
-    const item = this.cache.get(key);
+    const item = this.cache.get(key)
 
     if (!item) {
-      return null;
+      return null
     }
 
     // 檢查是否過期
-    const now = Date.now();
+    const now = Date.now()
     if (now - item.timestamp > this.ttl) {
-      this.cache.delete(key);
-      return null;
+      this.cache.delete(key)
+      return null
     }
 
     // LRU: 更新位置（移到最後 = 最近使用）
-    item.hits++;
-    this.cache.delete(key);
-    this.cache.set(key, item);
+    item.hits++
+    this.cache.delete(key)
+    this.cache.set(key, item)
 
-    return item.value;
+    return item.value
   }
 
   /**
@@ -53,64 +53,63 @@ export class LRUCache<T = any> {
   set(key: string, value: T): void {
     // 如果已達上限，刪除最久未使用的項目（第一個）
     if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
-      const firstKey = this.cache.keys().next().value as string;
-      this.cache.delete(firstKey);
+      const firstKey = this.cache.keys().next().value as string
+      this.cache.delete(firstKey)
     }
 
     this.cache.set(key, {
       value,
       timestamp: Date.now(),
       hits: 0,
-    });
+    })
   }
 
   /**
    * 刪除特定快取
    */
   delete(key: string): boolean {
-    return this.cache.delete(key);
+    return this.cache.delete(key)
   }
 
   /**
    * 清空所有快取
    */
   clear(): void {
-    this.cache.clear();
+    this.cache.clear()
   }
 
   /**
    * 取得快取統計
    */
   getStats() {
-    const items = Array.from(this.cache.values());
+    const items = Array.from(this.cache.values())
     return {
       size: this.cache.size,
       maxSize: this.maxSize,
       ttl: this.ttl,
       totalHits: items.reduce((sum, item) => sum + item.hits, 0),
-      avgHits: items.length > 0
-        ? items.reduce((sum, item) => sum + item.hits, 0) / items.length
-        : 0,
-    };
+      avgHits:
+        items.length > 0 ? items.reduce((sum, item) => sum + item.hits, 0) / items.length : 0,
+    }
   }
 
   /**
    * 批次刪除（根據 pattern）
    */
   invalidatePattern(pattern: string): number {
-    let count = 0;
+    let count = 0
     for (const key of this.cache.keys()) {
       if (key.startsWith(pattern)) {
-        this.cache.delete(key);
-        count++;
+        this.cache.delete(key)
+        count++
       }
     }
-    return count;
+    return count
   }
 }
 
 // 全域 Memory Cache 實例
-export const memoryCache = new LRUCache();
+export const memoryCache = new LRUCache()
 
 // 快取 key 產生器
 export const cacheKeys = {
@@ -122,4 +121,4 @@ export const cacheKeys = {
   customerList: () => `customers:list`,
   payment: (id: string) => `payment:${id}`,
   paymentList: (order_id?: string) => `payments:list:${order_id || 'all'}`,
-};
+}

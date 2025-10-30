@@ -1,44 +1,53 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Tour } from '@/stores/types';
-import { useTourAddOnStore } from '@/stores';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Trash2, CreditCard } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react'
+import { Tour } from '@/stores/types'
+import { useTourAddOnStore } from '@/stores'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Trash2, CreditCard } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface TourRefundsProps {
-  tour: Tour;
-  triggerAdd?: boolean;
-  onTriggerAddComplete?: () => void;
+  tour: Tour
+  triggerAdd?: boolean
+  onTriggerAddComplete?: () => void
 }
 
-export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, onTriggerAddComplete }: TourRefundsProps) {
+export const TourRefunds = React.memo(function TourRefunds({
+  tour,
+  triggerAdd,
+  onTriggerAddComplete,
+}: TourRefundsProps) {
   // 使用 tour_add_ons 相同的 store 結構，但用於退費項目管理
-  const { items: tourAddOns, create: addTourAddOn, update: updateTourAddOn, delete: deleteTourAddOn } = useTourAddOnStore();
-  const [isAddingNew, setIsAddingNew] = useState(false);
+  const {
+    items: tourAddOns,
+    create: addTourAddOn,
+    update: updateTourAddOn,
+    delete: deleteTourAddOn,
+  } = useTourAddOnStore()
+  const [isAddingNew, setIsAddingNew] = useState(false)
   const [newRefund, setNewRefund] = useState({
     name: '',
     price: 0,
-    description: ''
-  });
+    description: '',
+  })
 
   // 監聽外部觸發新增
   React.useEffect(() => {
     if (triggerAdd) {
-      setIsAddingNew(true);
-      onTriggerAddComplete?.();
+      setIsAddingNew(true)
+      onTriggerAddComplete?.()
     }
-  }, [triggerAdd, onTriggerAddComplete]);
+  }, [triggerAdd, onTriggerAddComplete])
 
   // 獲取此旅遊團的退費項目 (使用 tourAddOns 但標記為退費類型)
-  const refunds = tourAddOns.filter(item =>
-    item.tour_id === tour.id && item.description?.includes('[REFUND]')
-  );
+  const refunds = tourAddOns.filter(
+    item => item.tour_id === tour.id && item.description?.includes('[REFUND]')
+  )
 
   const handleAddNew = () => {
-    if (!newRefund.name.trim()) return;
+    if (!newRefund.name.trim()) return
 
     addTourAddOn({
       tour_id: tour.id,
@@ -46,22 +55,22 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
       price: -Math.abs(newRefund.price), // 退費金額為負值
       description: `[REFUND] ${newRefund.description}`, // 標記為退費項目
       is_active: true,
-    });
+    })
 
-    setNewRefund({ name: '', price: 0, description: '' });
-    setIsAddingNew(false);
-  };
+    setNewRefund({ name: '', price: 0, description: '' })
+    setIsAddingNew(false)
+  }
 
   const handleDelete = (id: string) => {
-    deleteTourAddOn(id);
-  };
+    deleteTourAddOn(id)
+  }
 
   const toggleActive = (id: string) => {
-    const refund = refunds.find(item => item.id === id);
+    const refund = refunds.find(item => item.id === id)
     if (refund) {
-      updateTourAddOn(id, { is_active: !refund.is_active });
+      updateTourAddOn(id, { is_active: !refund.is_active })
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -78,11 +87,21 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
             <table className="w-full">
               <thead className="bg-morandi-container/30">
                 <tr>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">項目名稱</th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">退費金額</th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">說明</th>
-                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">狀態</th>
-                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">操作</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    項目名稱
+                  </th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    退費金額
+                  </th>
+                  <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    說明
+                  </th>
+                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    狀態
+                  </th>
+                  <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">
+                    操作
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -92,7 +111,7 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
                     <td className="py-3 px-4">
                       <Input
                         value={newRefund.name}
-                        onChange={(e) => setNewRefund({...newRefund, name: e.target.value})}
+                        onChange={e => setNewRefund({ ...newRefund, name: e.target.value })}
                         placeholder="退費項目名稱 (如：機票退費、飯店退費)"
                         className="h-8"
                         autoFocus
@@ -102,7 +121,9 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
                       <Input
                         type="number"
                         value={newRefund.price}
-                        onChange={(e) => setNewRefund({...newRefund, price: Number(e.target.value)})}
+                        onChange={e =>
+                          setNewRefund({ ...newRefund, price: Number(e.target.value) })
+                        }
                         placeholder="退費金額"
                         className="h-8"
                       />
@@ -110,7 +131,7 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
                     <td className="py-3 px-4">
                       <Input
                         value={newRefund.description}
-                        onChange={(e) => setNewRefund({...newRefund, description: e.target.value})}
+                        onChange={e => setNewRefund({ ...newRefund, description: e.target.value })}
                         placeholder="退費說明（選填）"
                         className="h-8"
                       />
@@ -129,8 +150,8 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
                         </Button>
                         <Button
                           onClick={() => {
-                            setIsAddingNew(false);
-                            setNewRefund({ name: '', price: 0, description: '' });
+                            setIsAddingNew(false)
+                            setNewRefund({ name: '', price: 0, description: '' })
                           }}
                           size="sm"
                           variant="ghost"
@@ -143,11 +164,9 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
                 )}
 
                 {/* 現有項目列表 */}
-                {refunds.map((refund) => (
+                {refunds.map(refund => (
                   <tr key={refund.id} className="border-b border-border">
-                    <td className="py-3 px-4 font-medium text-morandi-primary">
-                      {refund.name}
-                    </td>
+                    <td className="py-3 px-4 font-medium text-morandi-primary">{refund.name}</td>
                     <td className="py-3 px-4 text-morandi-red font-medium">
                       -NT$ {Math.abs(refund.price).toLocaleString()}
                     </td>
@@ -198,5 +217,5 @@ export const TourRefunds = React.memo(function TourRefunds({ tour, triggerAdd, o
         </ul>
       </div>
     </div>
-  );
-});
+  )
+})

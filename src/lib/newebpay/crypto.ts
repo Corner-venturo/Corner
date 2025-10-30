@@ -74,7 +74,7 @@ export function generateCheckCode(
   // 將參數轉為查詢字串格式
   const queryString = Object.keys(params)
     .sort()
-    .map((key) => {
+    .map(key => {
       const value = params[key]
       return `${key}=${typeof value === 'object' ? JSON.stringify(value) : value}`
     })

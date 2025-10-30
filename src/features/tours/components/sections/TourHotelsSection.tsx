@@ -1,15 +1,15 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 
 interface TourHotelsSectionProps {
-  data: any;
-  viewMode: 'desktop' | 'mobile';
+  data: any
+  viewMode: 'desktop' | 'mobile'
 }
 
 export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
-  const hotels = data.hotels || [];
+  const hotels = data.hotels || []
 
   if (!data.showHotels && hotels.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -21,7 +21,13 @@ export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className={viewMode === 'mobile' ? 'text-2xl font-bold text-morandi-primary mb-4' : 'text-4xl font-bold text-morandi-primary mb-4'}>
+          <h2
+            className={
+              viewMode === 'mobile'
+                ? 'text-2xl font-bold text-morandi-primary mb-4'
+                : 'text-4xl font-bold text-morandi-primary mb-4'
+            }
+          >
             飯店資訊
           </h2>
         </motion.div>
@@ -38,19 +44,15 @@ export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
             >
               {hotel.image && (
                 <div className="aspect-video w-full overflow-hidden">
-                  <img
-                    src={hotel.image}
-                    alt={hotel.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={hotel.image} alt={hotel.name} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="p-6">
                 <h3 className="text-xl font-bold text-morandi-primary mb-3">
-                  {hotel.name || "飯店名稱"}
+                  {hotel.name || '飯店名稱'}
                 </h3>
                 <p className="text-morandi-secondary leading-relaxed whitespace-pre-wrap">
-                  {hotel.description || "飯店簡介..."}
+                  {hotel.description || '飯店簡介...'}
                 </p>
               </div>
             </motion.div>
@@ -58,5 +60,5 @@ export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
         </div>
       </div>
     </section>
-  );
+  )
 }

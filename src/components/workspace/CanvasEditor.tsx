@@ -6,5 +6,5 @@
  * src/components/workspace/canvas/canvas-editor/
  */
 
-export { CanvasEditor } from './canvas/canvas-editor';
-export type { CanvasEditorProps } from './canvas/shared/types';
+export { CanvasEditor } from './canvas/canvas-editor'
+export type { CanvasEditorProps } from './canvas/shared/types'

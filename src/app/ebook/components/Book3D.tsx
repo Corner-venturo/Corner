@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
 
 interface Book3DProps {
-  children: ReactNode;
-  state: 'cover' | 'opening' | 'spread' | 'closing';
+  children: ReactNode
+  state: 'cover' | 'opening' | 'spread' | 'closing'
 }
 
 /**
@@ -21,35 +21,35 @@ export function Book3D({ children, state }: Book3DProps) {
           x: 0,
           scale: 1.0,
           boxShadow: '0 10px 24px rgba(0,0,0,0.10)',
-        };
+        }
       case 'opening':
         return {
           x: 80, // 展開時右移 80px
           scale: 1.05,
           boxShadow: '0 12px 30px rgba(0,0,0,0.14)',
-        };
+        }
       case 'spread':
         return {
           x: 80,
           scale: 1.05,
           boxShadow: '0 12px 30px rgba(0,0,0,0.14)',
-        };
+        }
       case 'closing':
         return {
           x: 0,
           scale: 0.95, // 收合後微縮
           boxShadow: '0 6px 18px rgba(0,0,0,0.10)',
-        };
+        }
       default:
         return {
           x: 0,
           scale: 1.0,
           boxShadow: '0 10px 24px rgba(0,0,0,0.10)',
-        };
+        }
     }
-  };
+  }
 
-  const transformValues = getTransformValues();
+  const transformValues = getTransformValues()
 
   return (
     <motion.div
@@ -81,12 +81,12 @@ export function Book3D({ children, state }: Book3DProps) {
         {children}
       </motion.div>
     </motion.div>
-  );
+  )
 }
 
 interface BookFrameProps {
-  isOpen: boolean;
-  children: ReactNode;
+  isOpen: boolean
+  children: ReactNode
 }
 
 /**
@@ -110,21 +110,21 @@ export function BookFrame({ isOpen, children }: BookFrameProps) {
     >
       {children}
     </motion.div>
-  );
+  )
 }
 
 interface PageProps {
-  side: 'left' | 'right';
-  children: ReactNode;
-  isFlipping?: boolean;
-  rotateY?: number;
+  side: 'left' | 'right'
+  children: ReactNode
+  isFlipping?: boolean
+  rotateY?: number
 }
 
 /**
  * 書頁組件 - 左頁固定，右頁可翻轉
  */
 export function Page({ side, children, isFlipping = false, rotateY = 0 }: PageProps) {
-  const isLeft = side === 'left';
+  const isLeft = side === 'left'
 
   return (
     <motion.div
@@ -199,18 +199,17 @@ export function Page({ side, children, isFlipping = false, rotateY = 0 }: PagePr
       <div
         className="absolute inset-0 pointer-events-none rounded-lg"
         style={{
-          background:
-            isLeft
-              ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 40%)'
-              : 'linear-gradient(225deg, rgba(255,255,255,0.2) 0%, transparent 40%)',
+          background: isLeft
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 40%)'
+            : 'linear-gradient(225deg, rgba(255,255,255,0.2) 0%, transparent 40%)',
         }}
       />
     </motion.div>
-  );
+  )
 }
 
 interface SpineProps {
-  opacity?: number;
+  opacity?: number
 }
 
 /**
@@ -230,5 +229,5 @@ export function Spine({ opacity = 0.8 }: SpineProps) {
       animate={{ opacity }}
       transition={{ duration: 0.6 }}
     />
-  );
+  )
 }

@@ -1,7 +1,15 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import type { Meta, StoryObj } from '@storybook/react'
+import { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 const meta = {
   title: 'UI/Dialog',
@@ -10,10 +18,10 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Dialog>;
+} satisfies Meta<typeof Dialog>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   render: () => (
@@ -24,9 +32,7 @@ export const Default: Story = {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Dialog Title</DialogTitle>
-          <DialogDescription>
-            This is a description of what this dialog does.
-          </DialogDescription>
+          <DialogDescription>This is a description of what this dialog does.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <p className="text-sm">Dialog content goes here.</p>
@@ -38,7 +44,7 @@ export const Default: Story = {
       </DialogContent>
     </Dialog>
   ),
-};
+}
 
 export const WithForm: Story = {
   render: () => (
@@ -49,9 +55,7 @@ export const WithForm: Story = {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Item</DialogTitle>
-          <DialogDescription>
-            Fill in the details below to create a new item.
-          </DialogDescription>
+          <DialogDescription>Fill in the details below to create a new item.</DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <div>
@@ -60,7 +64,11 @@ export const WithForm: Story = {
           </div>
           <div>
             <label className="text-sm font-medium">Description</label>
-            <textarea className="w-full mt-1 px-3 py-2 border rounded-md" rows={3} placeholder="Enter description" />
+            <textarea
+              className="w-full mt-1 px-3 py-2 border rounded-md"
+              rows={3}
+              placeholder="Enter description"
+            />
           </div>
         </div>
         <DialogFooter>
@@ -70,4 +78,4 @@ export const WithForm: Story = {
       </DialogContent>
     </Dialog>
   ),
-};
+}

@@ -24,38 +24,38 @@
  * ```
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react'
 
 export interface UseDialogStateReturn<K extends string> {
   /**
    * 檢查指定 Dialog 是否開啟
    */
-  isOpen: (key: K) => boolean;
+  isOpen: (key: K) => boolean
 
   /**
    * 開啟指定 Dialog
    */
-  open: (key: K) => void;
+  open: (key: K) => void
 
   /**
    * 關閉指定 Dialog
    */
-  close: (key: K) => void;
+  close: (key: K) => void
 
   /**
    * 切換指定 Dialog 的開啟/關閉狀態
    */
-  toggle: (key: K) => void;
+  toggle: (key: K) => void
 
   /**
    * 關閉所有 Dialog
    */
-  closeAll: () => void;
+  closeAll: () => void
 
   /**
    * 取得所有開啟的 Dialog keys
    */
-  getOpenDialogs: () => K[];
+  getOpenDialogs: () => K[]
 }
 
 /**
@@ -64,53 +64,51 @@ export interface UseDialogStateReturn<K extends string> {
  * @param keys - Dialog key 陣列（建議使用 const assertion）
  * @returns Dialog 狀態管理方法
  */
-export function useDialogState<K extends string>(
-  keys: readonly K[]
-): UseDialogStateReturn<K> {
-  const [openDialogs, setOpenDialogs] = useState<Set<K>>(new Set());
+export function useDialogState<K extends string>(keys: readonly K[]): UseDialogStateReturn<K> {
+  const [openDialogs, setOpenDialogs] = useState<Set<K>>(new Set())
 
   const isOpen = useCallback(
     (key: K): boolean => {
-      return openDialogs.has(key);
+      return openDialogs.has(key)
     },
     [openDialogs]
-  );
+  )
 
   const open = useCallback((key: K) => {
     setOpenDialogs(prev => {
-      const next = new Set(prev);
-      next.add(key);
-      return next;
-    });
-  }, []);
+      const next = new Set(prev)
+      next.add(key)
+      return next
+    })
+  }, [])
 
   const close = useCallback((key: K) => {
     setOpenDialogs(prev => {
-      const next = new Set(prev);
-      next.delete(key);
-      return next;
-    });
-  }, []);
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
+  }, [])
 
   const toggle = useCallback((key: K) => {
     setOpenDialogs(prev => {
-      const next = new Set(prev);
+      const next = new Set(prev)
       if (next.has(key)) {
-        next.delete(key);
+        next.delete(key)
       } else {
-        next.add(key);
+        next.add(key)
       }
-      return next;
-    });
-  }, []);
+      return next
+    })
+  }, [])
 
   const closeAll = useCallback(() => {
-    setOpenDialogs(new Set());
-  }, []);
+    setOpenDialogs(new Set())
+  }, [])
 
   const getOpenDialogs = useCallback((): K[] => {
-    return Array.from(openDialogs);
-  }, [openDialogs]);
+    return Array.from(openDialogs)
+  }, [openDialogs])
 
   return {
     isOpen,
@@ -119,7 +117,7 @@ export function useDialogState<K extends string>(
     toggle,
     closeAll,
     getOpenDialogs,
-  };
+  }
 }
 
 /**

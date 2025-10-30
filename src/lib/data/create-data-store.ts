@@ -10,12 +10,12 @@
  * 生成唯一 ID
  */
 export const generateId = (): string => {
-  return crypto.randomUUID();
-};
+  return crypto.randomUUID()
+}
 
 /**
  * 生成時間戳
  */
 export const generateTimestamp = (): string => {
-  return new Date().toISOString();
-};
+  return new Date().toISOString()
+}

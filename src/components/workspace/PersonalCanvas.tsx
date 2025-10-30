@@ -6,5 +6,5 @@
  * src/components/workspace/canvas/personal-canvas/
  */
 
-export { PersonalCanvas } from './canvas/personal-canvas';
-export type { PersonalCanvasProps } from './canvas/shared/types';
+export { PersonalCanvas } from './canvas/personal-canvas'
+export type { PersonalCanvasProps } from './canvas/shared/types'

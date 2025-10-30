@@ -1,67 +1,67 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { X } from 'lucide-react'
 
 interface BreathingExerciseProps {
-  onComplete: () => void;
-  onSkip: () => void;
+  onComplete: () => void
+  onSkip: () => void
 }
 
 export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps) {
-  const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
-  const [count, setCount] = useState(0);
-  const [cycleCount, setCycleCount] = useState(0);
-  const totalCycles = 3;
+  const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale')
+  const [count, setCount] = useState(0)
+  const [cycleCount, setCycleCount] = useState(0)
+  const totalCycles = 3
 
   useEffect(() => {
     if (cycleCount >= totalCycles) {
       const timer = setTimeout(() => {
-        onComplete();
-      }, 1000);
-      return () => clearTimeout(timer);
+        onComplete()
+      }, 1000)
+      return () => clearTimeout(timer)
     }
 
     const timer = setInterval(() => {
       setCount(prev => {
-        const next = prev + 1;
+        const next = prev + 1
 
         // 吸氣 4 秒
         if (phase === 'inhale' && next >= 4) {
-          setPhase('hold');
-          return 0;
+          setPhase('hold')
+          return 0
         }
         // 屏息 4 秒
         if (phase === 'hold' && next >= 4) {
-          setPhase('exhale');
-          return 0;
+          setPhase('exhale')
+          return 0
         }
         // 呼氣 4 秒
         if (phase === 'exhale' && next >= 4) {
-          setCycleCount(c => c + 1);
-          setPhase('inhale');
-          return 0;
+          setCycleCount(c => c + 1)
+          setPhase('inhale')
+          return 0
         }
 
-        return next;
-      });
-    }, 1000);
+        return next
+      })
+    }, 1000)
 
-    return () => clearInterval(timer);
-  }, [phase, count, cycleCount, onComplete]);
+    return () => clearInterval(timer)
+  }, [phase, count, cycleCount, onComplete])
 
   const phaseText = {
     inhale: '深深吸氣',
     hold: '暫停呼吸',
-    exhale: '緩緩呼氣'
-  };
+    exhale: '緩緩呼氣',
+  }
 
   const circleScale = {
     inhale: 1.5,
     hold: 1.5,
-    exhale: 0.8
-  };
+    exhale: 0.8,
+  }
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -76,11 +76,11 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
         <motion.div
           className="w-64 h-64 mx-auto mb-8 rounded-full bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 border-2 border-morandi-gold/20"
           animate={{
-            scale: circleScale[phase]
+            scale: circleScale[phase],
           }}
           transition={{
             duration: 4,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
         />
 
@@ -99,9 +99,7 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
               {cycleCount + 1} / {totalCycles}
             </p>
 
-            <p className="text-white/40 text-sm mt-8">
-              讓我們先深呼吸，準備好進入顯化的旅程
-            </p>
+            <p className="text-white/40 text-sm mt-8">讓我們先深呼吸，準備好進入顯化的旅程</p>
           </>
         ) : (
           <motion.h2
@@ -114,5 +112,5 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -4,17 +4,10 @@
  */
 
 // Public Routes (不需登入)
-export const PUBLIC_ROUTES = [
-  '/login',
-  '/unauthorized',
-] as const;
+export const PUBLIC_ROUTES = ['/login', '/unauthorized'] as const
 
 // Admin Only Routes
-export const ADMIN_ROUTES = [
-  '/hr',
-  '/settings',
-  '/database',
-] as const;
+export const ADMIN_ROUTES = ['/hr', '/settings', '/database'] as const
 
 // Finance Routes
 export const FINANCE_ROUTES = [
@@ -23,7 +16,7 @@ export const FINANCE_ROUTES = [
   '/finance/requests',
   '/finance/reports',
   '/finance/treasury',
-] as const;
+] as const
 
 // API Routes
 export const API_ROUTES = {
@@ -31,8 +24,8 @@ export const API_ROUTES = {
   HEALTH_DETAILED: '/api/health/detailed',
   LOG_ERROR: '/api/log-error',
   WORKSPACES: '/api/workspaces',
-} as const;
+} as const
 
-export type PublicRoute = typeof PUBLIC_ROUTES[number];
-export type AdminRoute = typeof ADMIN_ROUTES[number];
-export type FinanceRoute = typeof FINANCE_ROUTES[number];
+export type PublicRoute = (typeof PUBLIC_ROUTES)[number]
+export type AdminRoute = (typeof ADMIN_ROUTES)[number]
+export type FinanceRoute = (typeof FINANCE_ROUTES)[number]

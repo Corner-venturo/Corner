@@ -107,27 +107,27 @@ const checkIndexedDBScript = `
     };
   });
 })();
-`;
+`
 
-console.log('='.repeat(60));
-console.log('🔍 IndexedDB 快取檢查工具');
-console.log('='.repeat(60));
-console.log('');
-console.log('⚠️  注意：IndexedDB 只能在瀏覽器環境中存取');
-console.log('');
-console.log('📋 使用步驟：');
-console.log('');
-console.log('1. 開啟瀏覽器訪問：http://localhost:3000');
-console.log('2. 打開開發者工具（F12）');
-console.log('3. 切換到 Console 標籤');
-console.log('4. 複製以下腳本並貼上執行：');
-console.log('');
-console.log('='.repeat(60));
-console.log(checkIndexedDBScript);
-console.log('='.repeat(60));
-console.log('');
-console.log('💡 提示：');
-console.log('  - 也可以在 Application 標籤 > IndexedDB 查看資料');
-console.log('  - 資料庫名稱：venturo-db');
-console.log('  - 檢查 tours, orders, quotes 等表');
-console.log('');
+console.log('='.repeat(60))
+console.log('🔍 IndexedDB 快取檢查工具')
+console.log('='.repeat(60))
+console.log('')
+console.log('⚠️  注意：IndexedDB 只能在瀏覽器環境中存取')
+console.log('')
+console.log('📋 使用步驟：')
+console.log('')
+console.log('1. 開啟瀏覽器訪問：http://localhost:3000')
+console.log('2. 打開開發者工具（F12）')
+console.log('3. 切換到 Console 標籤')
+console.log('4. 複製以下腳本並貼上執行：')
+console.log('')
+console.log('='.repeat(60))
+console.log(checkIndexedDBScript)
+console.log('='.repeat(60))
+console.log('')
+console.log('💡 提示：')
+console.log('  - 也可以在 Application 標籤 > IndexedDB 查看資料')
+console.log('  - 資料庫名稱：venturo-db')
+console.log('  - 檢查 tours, orders, quotes 等表')
+console.log('')

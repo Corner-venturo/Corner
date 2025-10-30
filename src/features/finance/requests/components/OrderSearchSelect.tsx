@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { Input } from '@/components/ui/input';
-import { UI_DELAYS } from '@/lib/constants/timeouts';
+import { Input } from '@/components/ui/input'
+import { UI_DELAYS } from '@/lib/constants/timeouts'
 
 interface Order {
-  id: string;
-  order_number: string;
-  contact_person: string;
+  id: string
+  order_number: string
+  contact_person: string
 }
 
 interface OrderSearchSelectProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSelect: (order: Order) => void;
-  orders: Order[];
-  showDropdown: boolean;
-  onShowDropdown: (show: boolean) => void;
-  disabled?: boolean;
-  placeholder?: string;
-  label?: string;
+  value: string
+  onChange: (value: string) => void
+  onSelect: (order: Order) => void
+  orders: Order[]
+  showDropdown: boolean
+  onShowDropdown: (show: boolean) => void
+  disabled?: boolean
+  placeholder?: string
+  label?: string
 }
 
 export function OrderSearchSelect({
@@ -29,19 +29,17 @@ export function OrderSearchSelect({
   showDropdown,
   onShowDropdown,
   disabled = false,
-  placeholder = "請先選擇旅遊團",
-  label = "選擇訂單（可選）"
+  placeholder = '請先選擇旅遊團',
+  label = '選擇訂單（可選）',
 }: OrderSearchSelectProps) {
   return (
     <div>
-      {label && (
-        <label className="text-sm font-medium text-morandi-primary">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium text-morandi-primary">{label}</label>}
       <div className="relative">
         <Input
-          placeholder={disabled ? placeholder : "搜尋訂單號或聯絡人..."}
+          placeholder={disabled ? placeholder : '搜尋訂單號或聯絡人...'}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           onClick={() => !disabled && onShowDropdown(true)}
           onBlur={() => setTimeout(() => onShowDropdown(false), UI_DELAYS.SHORT_DELAY)}
           className="mt-1 bg-background"
@@ -50,12 +48,12 @@ export function OrderSearchSelect({
         {showDropdown && !disabled && (
           <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-[200px] overflow-y-auto">
             {orders.length > 0 ? (
-              orders.map((order) => (
+              orders.map(order => (
                 <div
                   key={order.id}
                   onClick={() => {
-                    onSelect(order);
-                    onShowDropdown(false);
+                    onSelect(order)
+                    onShowDropdown(false)
                   }}
                   className="p-3 hover:bg-morandi-container/20 cursor-pointer border-b border-border last:border-b-0"
                 >
@@ -72,5 +70,5 @@ export function OrderSearchSelect({
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,9 +1,9 @@
 interface TourGalleryOverlayProps {
-  showGallery: boolean;
-  focusCards: any[];
-  currentImageIndex: number;
-  setCurrentImageIndex: (index: number) => void;
-  onClose: () => void;
+  showGallery: boolean
+  focusCards: any[]
+  currentImageIndex: number
+  setCurrentImageIndex: (index: number) => void
+  onClose: () => void
 }
 
 export function TourGalleryOverlay({
@@ -13,7 +13,7 @@ export function TourGalleryOverlay({
   setCurrentImageIndex,
   onClose,
 }: TourGalleryOverlayProps) {
-  if (!showGallery) return null;
+  if (!showGallery) return null
 
   return (
     <div className="fixed inset-0 bg-black z-[100] animate-fadeIn flex flex-col">
@@ -32,12 +32,12 @@ export function TourGalleryOverlay({
         <div
           className="w-full h-full overflow-x-auto snap-x snap-mandatory flex hide-scrollbar"
           style={{ scrollSnapType: 'x mandatory' }}
-          onScroll={(e) => {
-            const container = e.currentTarget;
-            const scrollLeft = container.scrollLeft;
-            const cardWidth = container.clientWidth;
-            const index = Math.round(scrollLeft / cardWidth);
-            setCurrentImageIndex(index);
+          onScroll={e => {
+            const container = e.currentTarget
+            const scrollLeft = container.scrollLeft
+            const cardWidth = container.clientWidth
+            const index = Math.round(scrollLeft / cardWidth)
+            setCurrentImageIndex(index)
           }}
         >
           {focusCards.map((card: any, index: number) => (
@@ -50,9 +50,7 @@ export function TourGalleryOverlay({
                 alt={card.title}
                 className="max-w-full max-h-[50vh] object-contain rounded-xl"
               />
-              <h3 className="text-white text-center text-xl font-medium">
-                {card.title}
-              </h3>
+              <h3 className="text-white text-center text-xl font-medium">{card.title}</h3>
             </div>
           ))}
         </div>
@@ -65,14 +63,12 @@ export function TourGalleryOverlay({
             <div
               key={index}
               className={`h-2 rounded-full transition-all duration-300 ${
-                currentImageIndex === index
-                  ? 'bg-white w-8'
-                  : 'bg-white/40 w-2'
+                currentImageIndex === index ? 'bg-white w-8' : 'bg-white/40 w-2'
               }`}
             />
           ))}
         </div>
       </div>
     </div>
-  );
+  )
 }

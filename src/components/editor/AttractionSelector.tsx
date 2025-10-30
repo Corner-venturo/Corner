@@ -1,32 +1,38 @@
-'use client';
+'use client'
 
-import React, { useState, useMemo } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, MapPin } from 'lucide-react';
-import { supabase } from '@/lib/supabase/client';
-import { TourCountry } from './tour-form/types';
+import React, { useState, useMemo } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Search, MapPin } from 'lucide-react'
+import { supabase } from '@/lib/supabase/client'
+import { TourCountry } from './tour-form/types'
 
 interface Attraction {
-  id: string;
-  name: string;
-  name_en: string | null;
-  category: string | null;
-  description: string | null;
-  thumbnail: string | null;
-  country_id: string;
-  region_id: string | null;
-  city_id: string;
-  city_name?: string;
-  region_name?: string;
+  id: string
+  name: string
+  name_en: string | null
+  category: string | null
+  description: string | null
+  thumbnail: string | null
+  country_id: string
+  region_id: string | null
+  city_id: string
+  city_name?: string
+  region_name?: string
 }
 
 interface AttractionSelectorProps {
-  isOpen: boolean;
-  onClose: () => void;
-  tourCountries?: TourCountry[];  // 行程涵蓋的國家
-  onSelect: (attractions: Attraction[]) => void;
+  isOpen: boolean
+  onClose: () => void
+  tourCountries?: TourCountry[] // 行程涵蓋的國家
+  onSelect: (attractions: Attraction[]) => void
 }
 
 export function AttractionSelector({
@@ -35,28 +41,29 @@ export function AttractionSelector({
   tourCountries = [],
   onSelect,
 }: AttractionSelectorProps) {
-  const [selectedCountryId, setSelectedCountryId] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [attractions, setAttractions] = useState<Attraction[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
+  const [selectedCountryId, setSelectedCountryId] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [attractions, setAttractions] = useState<Attraction[]>([])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [loading, setLoading] = useState(false)
 
   // 序列化 tourCountries 避免無限迴圈
   const tourCountryIds = useMemo(
     () => tourCountries.map(c => c.country_id).filter(Boolean),
     [tourCountries]
-  );
+  )
 
   // 載入景點資料
   React.useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return
 
     const loadAttractions = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
         let query = supabase
           .from('attractions')
-          .select(`
+          .select(
+            `
             id,
             name,
             name_en,
@@ -69,21 +76,22 @@ export function AttractionSelector({
             cities!inner (
               name
             )
-          `)
+          `
+          )
           .eq('is_active', true)
-          .order('name');
+          .order('name')
 
         // 如果有選擇國家，篩選該國家的景點
         if (selectedCountryId) {
-          query = query.eq('country_id', selectedCountryId);
+          query = query.eq('country_id', selectedCountryId)
         } else if (tourCountryIds.length > 0) {
           // 如果沒選擇國家，但行程有設定國家，就篩選這些國家的景點
-          query = query.in('country_id', tourCountryIds);
+          query = query.in('country_id', tourCountryIds)
         }
 
-        const { data, error } = await query;
+        const { data, error } = await query
 
-        if (error) throw error;
+        if (error) throw error
 
         // 轉換資料格式
         const formatted = (data || []).map((item: any) => ({
@@ -97,59 +105,60 @@ export function AttractionSelector({
           region_id: item.region_id,
           city_id: item.city_id,
           city_name: item.cities?.name || '',
-        }));
+        }))
 
-        setAttractions(formatted);
+        setAttractions(formatted)
       } catch (error) {
         // 靜默失敗，使用空陣列
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    loadAttractions();
+    loadAttractions()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, selectedCountryId, tourCountryIds.join(',')]);
+  }, [isOpen, selectedCountryId, tourCountryIds.join(',')])
 
   // 搜尋過濾
   const filteredAttractions = useMemo(() => {
-    if (!searchQuery) return attractions;
+    if (!searchQuery) return attractions
 
-    const query = searchQuery.toLowerCase();
-    return attractions.filter(a =>
-      a.name.toLowerCase().includes(query) ||
-      a.name_en?.toLowerCase().includes(query) ||
-      a.city_name?.toLowerCase().includes(query) ||
-      a.category?.toLowerCase().includes(query)
-    );
-  }, [attractions, searchQuery]);
+    const query = searchQuery.toLowerCase()
+    return attractions.filter(
+      a =>
+        a.name.toLowerCase().includes(query) ||
+        a.name_en?.toLowerCase().includes(query) ||
+        a.city_name?.toLowerCase().includes(query) ||
+        a.category?.toLowerCase().includes(query)
+    )
+  }, [attractions, searchQuery])
 
   // 切換選擇
   const toggleSelection = (id: string) => {
-    const newSet = new Set(selectedIds);
+    const newSet = new Set(selectedIds)
     if (newSet.has(id)) {
-      newSet.delete(id);
+      newSet.delete(id)
     } else {
-      newSet.add(id);
+      newSet.add(id)
     }
-    setSelectedIds(newSet);
-  };
+    setSelectedIds(newSet)
+  }
 
   // 確認選擇
   const handleConfirm = () => {
-    const selected = attractions.filter(a => selectedIds.has(a.id));
-    onSelect(selected);
-    setSelectedIds(new Set());
-    setSearchQuery('');
-    onClose();
-  };
+    const selected = attractions.filter(a => selectedIds.has(a.id))
+    onSelect(selected)
+    setSelectedIds(new Set())
+    setSearchQuery('')
+    onClose()
+  }
 
   // 取消
   const handleCancel = () => {
-    setSelectedIds(new Set());
-    setSearchQuery('');
-    onClose();
-  };
+    setSelectedIds(new Set())
+    setSearchQuery('')
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
@@ -168,14 +177,14 @@ export function AttractionSelector({
             {tourCountries.length > 0 && (
               <select
                 value={selectedCountryId}
-                onChange={(e) => {
-                  setSelectedCountryId(e.target.value);
-                  setSearchQuery('');
+                onChange={e => {
+                  setSelectedCountryId(e.target.value)
+                  setSearchQuery('')
                 }}
                 className="px-3 py-2 border rounded-lg text-sm bg-white min-w-[150px]"
               >
                 <option value="">全部國家</option>
-                {tourCountries.map((country) => (
+                {tourCountries.map(country => (
                   <option key={country.country_id} value={country.country_id}>
                     {country.country_name}
                   </option>
@@ -185,10 +194,13 @@ export function AttractionSelector({
 
             {/* 搜尋框 */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={16}
+              />
               <Input
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 placeholder="搜尋景點名稱、城市..."
                 className="pl-9"
               />
@@ -205,7 +217,7 @@ export function AttractionSelector({
               </div>
             ) : (
               <div className="divide-y">
-                {filteredAttractions.map((attraction) => (
+                {filteredAttractions.map(attraction => (
                   <label
                     key={attraction.id}
                     className="flex items-start gap-3 p-3 hover:bg-morandi-container/10 cursor-pointer transition-colors"
@@ -253,7 +265,8 @@ export function AttractionSelector({
           {/* 已選擇提示 */}
           {selectedIds.size > 0 && (
             <div className="text-sm text-morandi-secondary bg-morandi-container/10 px-3 py-2 rounded">
-              已選擇 <span className="font-semibold text-morandi-gold">{selectedIds.size}</span> 個景點
+              已選擇 <span className="font-semibold text-morandi-gold">{selectedIds.size}</span>{' '}
+              個景點
             </div>
           )}
         </div>
@@ -272,5 +285,5 @@ export function AttractionSelector({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

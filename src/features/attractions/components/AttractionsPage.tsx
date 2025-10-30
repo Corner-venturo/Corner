@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { MapPin } from 'lucide-react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { useRegionStoreNew } from '@/stores';
-import { useAttractionsData } from '../hooks/useAttractionsData';
-import { useAttractionsFilters } from '../hooks/useAttractionsFilters';
-import { useAttractionsDialog } from '../hooks/useAttractionsDialog';
-import { AttractionsFilters } from './AttractionsFilters';
-import { AttractionsList } from './AttractionsList';
-import { AttractionsDialog } from './AttractionsDialog';
+import { useEffect } from 'react'
+import { MapPin } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { useRegionStoreNew } from '@/stores'
+import { useAttractionsData } from '../hooks/useAttractionsData'
+import { useAttractionsFilters } from '../hooks/useAttractionsFilters'
+import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
+import { AttractionsFilters } from './AttractionsFilters'
+import { AttractionsList } from './AttractionsList'
+import { AttractionsDialog } from './AttractionsDialog'
 
 // ============================================
 // 景點管理主頁面
@@ -25,17 +25,11 @@ export default function AttractionsPage() {
     getRegionsByCountry,
     getCitiesByCountry,
     getCitiesByRegion,
-  } = useRegionStoreNew();
+  } = useRegionStoreNew()
 
   // 景點資料管理（載入所有資料）
-  const {
-    attractions,
-    loading,
-    addAttraction,
-    updateAttraction,
-    deleteAttraction,
-    toggleStatus,
-  } = useAttractionsData();
+  const { attractions, loading, addAttraction, updateAttraction, deleteAttraction, toggleStatus } =
+    useAttractionsData()
 
   // 篩選邏輯（在前端進行篩選和排序）
   const {
@@ -55,7 +49,7 @@ export default function AttractionsPage() {
     sortDirection,
     handleSort,
     sortedAttractions,
-  } = useAttractionsFilters({ attractions, cities });
+  } = useAttractionsFilters({ attractions, cities })
 
   // 對話框管理
   const {
@@ -67,23 +61,23 @@ export default function AttractionsPage() {
     openEdit,
     closeEdit,
     initialFormData,
-  } = useAttractionsDialog();
+  } = useAttractionsDialog()
 
   // 載入地區資料（只執行一次，避免無限迴圈）
   useEffect(() => {
-    fetchAll();
+    fetchAll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   // 取得當前篩選的地區資訊
-  const availableRegions = selectedCountry ? getRegionsByCountry(selectedCountry) : [];
+  const availableRegions = selectedCountry ? getRegionsByCountry(selectedCountry) : []
   const availableCities = selectedRegion
     ? getCitiesByRegion(selectedRegion)
     : selectedCountry
-    ? getCitiesByCountry(selectedCountry)
-    : [];
+      ? getCitiesByCountry(selectedCountry)
+      : []
 
-  const categories = ['all', '景點', '餐廳', '住宿', '購物', '交通'];
+  const categories = ['all', '景點', '餐廳', '住宿', '購物', '交通']
 
   return (
     <div className="h-full flex flex-col">
@@ -93,7 +87,7 @@ export default function AttractionsPage() {
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
-          { label: '景點管理', href: '/database/attractions' }
+          { label: '景點管理', href: '/database/attractions' },
         ]}
         showSearch={true}
         searchTerm={searchTerm}
@@ -156,7 +150,7 @@ export default function AttractionsPage() {
       <AttractionsDialog
         open={isEditOpen}
         onClose={closeEdit}
-        onSubmit={(formData) => updateAttraction(editingAttraction!.id, formData)}
+        onSubmit={formData => updateAttraction(editingAttraction!.id, formData)}
         attraction={editingAttraction}
         countries={countries}
         regions={regions}
@@ -167,5 +161,5 @@ export default function AttractionsPage() {
         initialFormData={initialFormData}
       />
     </div>
-  );
+  )
 }

@@ -1,24 +1,30 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
-import { getAvailableFields, getSourceLabel, validateField } from '@/lib/template-helpers';
+import { getAvailableFields, getSourceLabel, validateField } from '@/lib/template-helpers'
 
-import { TemplateField, DataSource } from '@/types/template';
+import { TemplateField, DataSource } from '@/types/template'
 
 interface FieldMappingEditorProps {
-  fields: TemplateField[];
-  onChange: (fields: TemplateField[]) => void;
+  fields: TemplateField[]
+  onChange: (fields: TemplateField[]) => void
 }
 
 export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const addField = () => {
     const newField: TemplateField = {
@@ -28,57 +34,55 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
       field_type: 'text',
       is_required: false,
       data_source: 'manual',
-    };
+    }
 
-    onChange([...fields, newField]);
-  };
+    onChange([...fields, newField])
+  }
 
   const updateField = (index: number, key: keyof TemplateField, value: unknown) => {
-    const newFields = [...fields];
-    newFields[index] = { ...newFields[index], [key]: value };
+    const newFields = [...fields]
+    newFields[index] = { ...newFields[index], [key]: value }
 
     // 如果切換資料來源，清空 source_field
     if (key === 'data_source') {
-      newFields[index].source_field = undefined;
+      newFields[index].source_field = undefined
     }
 
-    onChange(newFields);
+    onChange(newFields)
 
     // 清除該欄位的錯誤
-    const newErrors = { ...errors };
-    delete newErrors[newFields[index].id];
-    setErrors(newErrors);
-  };
+    const newErrors = { ...errors }
+    delete newErrors[newFields[index].id]
+    setErrors(newErrors)
+  }
 
   const removeField = (index: number) => {
-    const newFields = fields.filter((_, i) => i !== index);
-    onChange(newFields);
-  };
+    const newFields = fields.filter((_, i) => i !== index)
+    onChange(newFields)
+  }
 
   const _validateAllFields = () => {
-    const newErrors: Record<string, string> = {};
-    let hasError = false;
+    const newErrors: Record<string, string> = {}
+    let hasError = false
 
-    fields.forEach((field) => {
-      const validation = validateField(field as unknown);
+    fields.forEach(field => {
+      const validation = validateField(field as unknown)
       if (!validation.valid) {
-        newErrors[field.id] = validation.error!;
-        hasError = true;
+        newErrors[field.id] = validation.error!
+        hasError = true
       }
-    });
+    })
 
-    setErrors(newErrors);
-    return !hasError;
-  };
+    setErrors(newErrors)
+    return !hasError
+  }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-morandi-primary">欄位關聯設定</h3>
-          <p className="text-sm text-morandi-secondary mt-1">
-            定義模板中需要的資料欄位及其來源
-          </p>
+          <p className="text-sm text-morandi-secondary mt-1">定義模板中需要的資料欄位及其來源</p>
         </div>
         <Button size="sm" onClick={addField}>
           <Plus size={16} className="mr-2" />
@@ -89,9 +93,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
       {/* 欄位列表 */}
       {fields.length === 0 ? (
         <div className="bg-morandi-container/5 rounded-lg p-8 text-center">
-          <p className="text-sm text-morandi-secondary mb-4">
-            尚未新增任何欄位
-          </p>
+          <p className="text-sm text-morandi-secondary mb-4">尚未新增任何欄位</p>
           <Button size="sm" onClick={addField} variant="outline">
             <Plus size={16} className="mr-2" />
             新增第一個欄位
@@ -113,7 +115,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
                   </label>
                   <Input
                     value={field.field_key}
-                    onChange={(e) => updateField(index, 'field_key', e.target.value)}
+                    onChange={e => updateField(index, 'field_key', e.target.value)}
                     placeholder="例如：tour_name"
                     className="font-mono text-sm"
                   />
@@ -127,7 +129,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
                   </label>
                   <Input
                     value={field.display_name}
-                    onChange={(e) => updateField(index, 'display_name', e.target.value)}
+                    onChange={e => updateField(index, 'display_name', e.target.value)}
                     placeholder="例如：旅遊團名稱"
                   />
                 </div>
@@ -140,7 +142,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
                   </label>
                   <Select
                     value={field.data_source}
-                    onValueChange={(v) => updateField(index, 'data_source', v as DataSource)}
+                    onValueChange={v => updateField(index, 'data_source', v as DataSource)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -165,14 +167,14 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
                   </label>
                   <Select
                     value={field.source_field || ''}
-                    onValueChange={(v) => updateField(index, 'source_field', v)}
+                    onValueChange={v => updateField(index, 'source_field', v)}
                     disabled={field.data_source === 'manual'}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="選擇欄位" />
                     </SelectTrigger>
                     <SelectContent>
-                      {getAvailableFields(field.data_source).map((f) => (
+                      {getAvailableFields(field.data_source).map(f => (
                         <SelectItem key={f.key} value={f.key}>
                           {f.label}
                         </SelectItem>
@@ -196,9 +198,7 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
 
               {/* 錯誤訊息 */}
               {errors[field.id] && (
-                <div className="mt-2 text-xs text-morandi-red">
-                  {errors[field.id]}
-                </div>
+                <div className="mt-2 text-xs text-morandi-red">{errors[field.id]}</div>
               )}
 
               {/* 預覽 */}
@@ -221,5 +221,5 @@ export function FieldMappingEditor({ fields, onChange }: FieldMappingEditorProps
         </div>
       )}
     </div>
-  );
+  )
 }

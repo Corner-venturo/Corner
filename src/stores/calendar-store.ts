@@ -4,30 +4,30 @@
  * 事件資料請使用 useCalendarEventStore
  */
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 interface CalendarSettings {
-  showPersonal: boolean;
-  showCompany: boolean;
-  showTours: boolean;
-  showBirthdays: boolean;
+  showPersonal: boolean
+  showCompany: boolean
+  showTours: boolean
+  showBirthdays: boolean
 }
 
 interface CalendarStore {
-  selectedDate: Date | null;
-  view: 'month' | 'week' | 'day';
-  settings: CalendarSettings;
+  selectedDate: Date | null
+  view: 'month' | 'week' | 'day'
+  settings: CalendarSettings
 
   // Actions
-  setSelectedDate: (date: Date | null) => void;
-  setView: (view: 'month' | 'week' | 'day') => void;
-  updateSettings: (settings: Partial<CalendarSettings>) => void;
+  setSelectedDate: (date: Date | null) => void
+  setView: (view: 'month' | 'week' | 'day') => void
+  updateSettings: (settings: Partial<CalendarSettings>) => void
 }
 
 export const useCalendarStore = create<CalendarStore>()(
   persist(
-    (set) => ({
+    set => ({
       selectedDate: new Date(),
       view: 'month',
       settings: {
@@ -37,22 +37,22 @@ export const useCalendarStore = create<CalendarStore>()(
         showBirthdays: true,
       },
 
-      setSelectedDate: (date) => {
-        set({ selectedDate: date });
+      setSelectedDate: date => {
+        set({ selectedDate: date })
       },
 
-      setView: (view) => {
-        set({ view });
+      setView: view => {
+        set({ view })
       },
 
-      updateSettings: (newSettings) => {
-        set((state) => ({
+      updateSettings: newSettings => {
+        set(state => ({
           settings: { ...state.settings, ...newSettings },
-        }));
+        }))
       },
     }),
     {
       name: 'calendar-ui-storage',
     }
   )
-);
+)

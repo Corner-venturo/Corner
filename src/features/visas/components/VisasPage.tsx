@@ -1,17 +1,17 @@
-'use client';
+'use client'
 
-import React, { useEffect } from 'react';
-import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { logger } from '@/lib/utils/logger';
-import { tourService } from '@/features/tours/services/tour.service';
-import { useVisasData } from '../hooks/useVisasData';
-import { useVisasFilters } from '../hooks/useVisasFilters';
-import { useVisasDialog } from '../hooks/useVisasDialog';
-import { VisasList } from './VisasList';
-import { VisasInfoDialog } from './VisasInfoDialog';
-import { AddVisaDialog } from './AddVisaDialog';
+import React, { useEffect } from 'react'
+import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { logger } from '@/lib/utils/logger'
+import { tourService } from '@/features/tours/services/tour.service'
+import { useVisasData } from '../hooks/useVisasData'
+import { useVisasFilters } from '../hooks/useVisasFilters'
+import { useVisasDialog } from '../hooks/useVisasDialog'
+import { VisasList } from './VisasList'
+import { VisasInfoDialog } from './VisasInfoDialog'
+import { AddVisaDialog } from './AddVisaDialog'
 
 // ============================================
 // 簽證管理主頁面
@@ -31,16 +31,11 @@ export default function VisasPage() {
     addTour,
     fetchTours,
     addOrder,
-  } = useVisasData();
+  } = useVisasData()
 
   // 篩選管理
-  const {
-    activeTab,
-    setActiveTab,
-    selectedRows,
-    setSelectedRows,
-    filteredVisas,
-  } = useVisasFilters(visas);
+  const { activeTab, setActiveTab, selectedRows, setSelectedRows, filteredVisas } =
+    useVisasFilters(visas)
 
   // 對話框管理
   const {
@@ -56,62 +51,62 @@ export default function VisasPage() {
     removeApplicant,
     updateApplicant,
     resetForm,
-  } = useVisasDialog(tours);
+  } = useVisasDialog(tours)
 
-  const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false)
 
   // 當頁面載入時，自動取得或建立當年度簽證專用團
   useEffect(() => {
     const initVisaTour = async () => {
       try {
-        const visaTour = await tourService.getOrCreateVisaTour();
-        await fetchTours();
+        const visaTour = await tourService.getOrCreateVisaTour()
+        await fetchTours()
 
         if (visaTour && !contact_info.tour_id) {
-          setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
+          setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }))
         }
       } catch (error) {
-                logger.error('Failed to get or create visa tour', error);
+        logger.error('Failed to get or create visa tour', error)
       }
-    };
+    }
 
-    initVisaTour();
-  }, [contact_info.tour_id, fetchTours, setContactInfo]);
+    initVisaTour()
+  }, [contact_info.tour_id, fetchTours, setContactInfo])
 
   // 權限檢查：清除選擇
   useEffect(() => {
     if (!canManageVisas && selectedRows.length > 0) {
-      setSelectedRows([]);
+      setSelectedRows([])
     }
-  }, [canManageVisas, selectedRows.length, setSelectedRows]);
+  }, [canManageVisas, selectedRows.length, setSelectedRows])
 
   // 第一個辦理人自動帶入申請人姓名
   useEffect(() => {
     if (applicants.length > 0) {
       setApplicants(prev => {
-        const updated = [...prev];
-        updated[0].name = contact_info.applicant_name;
-        return updated;
-      });
+        const updated = [...prev]
+        updated[0].name = contact_info.applicant_name
+        return updated
+      })
     }
-  }, [contact_info.applicant_name, applicants.length, setApplicants]);
+  }, [contact_info.applicant_name, applicants.length, setApplicants])
 
   // 處理批次新增簽證
   const handleAddVisa = async () => {
-    if (!canManageVisas || !contact_info.applicant_name || !user) return;
+    if (!canManageVisas || !contact_info.applicant_name || !user) return
 
-    let selectedTour;
+    let selectedTour
 
     // 如果沒選團號，自動建立或使用預設的「簽證代辦團」
     if (!contact_info.tour_id) {
-      const currentYear = new Date().getFullYear();
-      const defaultTourCode = `VISA-${currentYear}`;
-      const existingDefaultTour = tours.find(t => t.code === defaultTourCode);
+      const currentYear = new Date().getFullYear()
+      const defaultTourCode = `VISA-${currentYear}`
+      const existingDefaultTour = tours.find(t => t.code === defaultTourCode)
 
       if (existingDefaultTour) {
-        selectedTour = existingDefaultTour;
+        selectedTour = existingDefaultTour
       } else {
-        const endOfYear = `${currentYear}-12-31`;
+        const endOfYear = `${currentYear}-12-31`
         selectedTour = await addTour({
           name: `${currentYear}年度簽證代辦`,
           departure_date: endOfYear,
@@ -124,24 +119,24 @@ export default function VisasPage() {
           total_revenue: 0,
           total_cost: 0,
           profit: 0,
-        } as unknown);
+        } as unknown)
       }
     } else {
-      selectedTour = tours.find(t => t.id === contact_info.tour_id);
-      if (!selectedTour) return;
+      selectedTour = tours.find(t => t.id === contact_info.tour_id)
+      if (!selectedTour) return
     }
 
     // 取得或建立訂單
-    const totalFee = applicants.reduce((sum, a) => sum + calculateFee(a.country), 0);
-    let targetOrder;
+    const totalFee = applicants.reduce((sum, a) => sum + calculateFee(a.country), 0)
+    let targetOrder
 
     if (contact_info.order_id) {
-      targetOrder = orders.find(o => o.id === contact_info.order_id);
-      if (!targetOrder) return;
+      targetOrder = orders.find(o => o.id === contact_info.order_id)
+      if (!targetOrder) return
     } else {
-      const tourOrders = orders.filter(o => o.tour_id === selectedTour.id);
-      const nextNumber = (tourOrders.length + 1).toString().padStart(3, '0');
-      const order_number = `${selectedTour.code}-${nextNumber}`;
+      const tourOrders = orders.filter(o => o.tour_id === selectedTour.id)
+      const nextNumber = (tourOrders.length + 1).toString().padStart(3, '0')
+      const order_number = `${selectedTour.code}-${nextNumber}`
 
       targetOrder = await addOrder({
         order_number,
@@ -156,20 +151,20 @@ export default function VisasPage() {
         paid_amount: 0,
         remaining_amount: totalFee,
         payment_status: 'unpaid' as const,
-      });
+      })
     }
 
     if (!targetOrder) {
-      logger.error('訂單建立失敗');
-      return;
+      logger.error('訂單建立失敗')
+      return
     }
 
     // 批次建立簽證
-    applicants.forEach((applicant) => {
-      if (!applicant.name) return;
+    applicants.forEach(applicant => {
+      if (!applicant.name) return
 
-      const fee = calculateFee(applicant.country);
-      const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost;
+      const fee = calculateFee(applicant.country)
+      const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
       addVisa({
         applicant_name: applicant.name,
@@ -188,28 +183,28 @@ export default function VisasPage() {
         code: selectedTour.code,
         created_by: user.id,
         note: '',
-      });
-    });
+      })
+    })
 
     // 重置表單
-    const currentYear = new Date().getFullYear();
-    const visaCode = `VISA${currentYear}001`;
-    const defaultVisaTour = tours.find(t => t.code === visaCode);
-    resetForm(defaultVisaTour?.id);
-    setIsDialogOpen(false);
-  };
+    const currentYear = new Date().getFullYear()
+    const visaCode = `VISA${currentYear}001`
+    const defaultVisaTour = tours.find(t => t.code === visaCode)
+    resetForm(defaultVisaTour?.id)
+    setIsDialogOpen(false)
+  }
 
   // 批次送件
   const handleBatchSubmit = async () => {
-    if (!canManageVisas || selectedRows.length === 0) return;
-    const today = new Date().toISOString().split('T')[0];
+    if (!canManageVisas || selectedRows.length === 0) return
+    const today = new Date().toISOString().split('T')[0]
 
     for (const id of selectedRows) {
-      await updateVisa(id, { status: 'submitted', submission_date: today });
+      await updateVisa(id, { status: 'submitted', submission_date: today })
     }
 
-    setSelectedRows([]);
-  };
+    setSelectedRows([])
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -218,9 +213,9 @@ export default function VisasPage() {
         icon={FileText}
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '簽證管理', href: '/visas' }
+          { label: '簽證管理', href: '/visas' },
         ]}
-        actions={(
+        actions={
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
@@ -239,7 +234,7 @@ export default function VisasPage() {
               </Button>
             )}
           </div>
-        )}
+        }
         tabs={[
           { value: 'all', label: '全部', icon: FileText },
           { value: 'pending', label: '待送件', icon: Clock },
@@ -266,10 +261,7 @@ export default function VisasPage() {
               >
                 批次送件
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedRows([])}
-              >
+              <Button variant="outline" onClick={() => setSelectedRows([])}>
                 取消選擇
               </Button>
             </div>
@@ -287,10 +279,7 @@ export default function VisasPage() {
       </div>
 
       {/* 簽證資訊對話框 */}
-      <VisasInfoDialog
-        open={isInfoDialogOpen}
-        onClose={() => setIsInfoDialogOpen(false)}
-      />
+      <VisasInfoDialog open={isInfoDialogOpen} onClose={() => setIsInfoDialogOpen(false)} />
 
       {/* 新增簽證對話框 */}
       <AddVisaDialog
@@ -308,5 +297,5 @@ export default function VisasPage() {
         canSubmit={!!contact_info.applicant_name && applicants.some(a => a.name)}
       />
     </div>
-  );
+  )
 }

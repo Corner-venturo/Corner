@@ -8,74 +8,74 @@
  * - 支援手動回收
  */
 
-import { cacheStrategy } from '@/lib/cache/cache-strategy';
+import { cacheStrategy } from '@/lib/cache/cache-strategy'
 
 // Chrome 專屬 API 型別擴展
 interface PerformanceMemory {
-  usedJSHeapSize: number;
-  totalJSHeapSize: number;
-  jsHeapSizeLimit: number;
+  usedJSHeapSize: number
+  totalJSHeapSize: number
+  jsHeapSizeLimit: number
 }
 
 interface ChromePerformance extends Performance {
-  memory?: PerformanceMemory;
+  memory?: PerformanceMemory
 }
 
 interface ChromeWindow extends Window {
-  gc?: () => void;
+  gc?: () => void
 }
 
 interface MemoryStats {
   /** 使用的記憶體（MB） */
-  usedMemory: number;
+  usedMemory: number
   /** 總記憶體限制（MB） */
-  totalMemory: number;
+  totalMemory: number
   /** 使用率（%） */
-  usagePercent: number;
+  usagePercent: number
   /** 是否處於記憶體壓力狀態 */
-  isUnderPressure: boolean;
+  isUnderPressure: boolean
   /** 原始使用的 JS Heap 大小（MB） */
-  usedJSHeapSize?: number;
+  usedJSHeapSize?: number
   /** 原始 JS Heap 大小限制（MB） */
-  jsHeapSizeLimit?: number;
+  jsHeapSizeLimit?: number
 }
 
 interface CleanupOptions {
   /** 清理熱快取 */
-  clearHot?: boolean;
+  clearHot?: boolean
   /** 清理溫快取 */
-  clearWarm?: boolean;
+  clearWarm?: boolean
   /** 強制清理（即使沒有壓力） */
-  force?: boolean;
+  force?: boolean
 }
 
 class MemoryManager {
-  private static instance: MemoryManager;
-  private cleanupTimer: NodeJS.Timeout | null = null;
-  private pressureThreshold = 0.8; // 80% 記憶體使用率視為壓力
-  private autoCleanupInterval = 5 * 60 * 1000; // 5 分鐘自動清理一次
-  private visibilityChangeHandler: (() => void) | null = null;
+  private static instance: MemoryManager
+  private cleanupTimer: NodeJS.Timeout | null = null
+  private pressureThreshold = 0.8 // 80% 記憶體使用率視為壓力
+  private autoCleanupInterval = 5 * 60 * 1000 // 5 分鐘自動清理一次
+  private visibilityChangeHandler: (() => void) | null = null
 
   private constructor() {
     // 啟動自動清理
-    this.startAutoCleanup();
+    this.startAutoCleanup()
 
     // 監聽頁面隱藏事件（用戶切換分頁時清理）
     if (typeof window !== 'undefined') {
       this.visibilityChangeHandler = () => {
         if (document.hidden) {
-          this.cleanup({ clearHot: true });
+          this.cleanup({ clearHot: true })
         }
-      };
-      document.addEventListener('visibilitychange', this.visibilityChangeHandler);
+      }
+      document.addEventListener('visibilitychange', this.visibilityChangeHandler)
     }
   }
 
   static getInstance(): MemoryManager {
     if (!MemoryManager.instance) {
-      MemoryManager.instance = new MemoryManager();
+      MemoryManager.instance = new MemoryManager()
     }
-    return MemoryManager.instance;
+    return MemoryManager.instance
   }
 
   /**
@@ -83,13 +83,13 @@ class MemoryManager {
    */
   getMemoryStats(): MemoryStats | null {
     if (typeof window === 'undefined' || !(performance as ChromePerformance).memory) {
-      return null;
+      return null
     }
 
-    const memory = (performance as ChromePerformance).memory!;
-    const usedMemory = memory.usedJSHeapSize / 1024 / 1024; // 轉換為 MB
-    const totalMemory = memory.jsHeapSizeLimit / 1024 / 1024;
-    const usagePercent = (usedMemory / totalMemory) * 100;
+    const memory = (performance as ChromePerformance).memory!
+    const usedMemory = memory.usedJSHeapSize / 1024 / 1024 // 轉換為 MB
+    const totalMemory = memory.jsHeapSizeLimit / 1024 / 1024
+    const usagePercent = (usedMemory / totalMemory) * 100
 
     return {
       usedMemory: Math.round(usedMemory * 100) / 100,
@@ -98,44 +98,43 @@ class MemoryManager {
       isUnderPressure: usagePercent / 100 > this.pressureThreshold,
       usedJSHeapSize: usedMemory,
       jsHeapSizeLimit: totalMemory,
-    };
+    }
   }
 
   /**
    * 清理記憶體
    */
   async cleanup(options: CleanupOptions = {}): Promise<void> {
-    const { clearHot = false, clearWarm = false, force = false } = options;
+    const { clearHot = false, clearWarm = false, force = false } = options
 
     // 檢查是否需要清理
     if (!force) {
-      const stats = this.getMemoryStats();
+      const stats = this.getMemoryStats()
       if (!stats?.isUnderPressure) {
-        return; // 記憶體充足，不需清理
+        return // 記憶體充足，不需清理
       }
     }
 
-
     // 清理熱快取（記憶體）
     if (clearHot) {
-      await cacheStrategy.clear('hot');
+      await cacheStrategy.clear('hot')
     }
 
     // 清理溫快取（SessionStorage）
     if (clearWarm) {
-      await cacheStrategy.clear('warm');
+      await cacheStrategy.clear('warm')
     }
 
     // 觸發垃圾回收（如果瀏覽器支援）
     if (typeof window !== 'undefined' && (window as ChromeWindow).gc) {
       try {
-        (window as ChromeWindow).gc!();
+        ;(window as ChromeWindow).gc!()
       } catch {
         // 忽略錯誤
       }
     }
 
-    const afterStats = this.getMemoryStats();
+    const afterStats = this.getMemoryStats()
     if (afterStats) {
     }
   }
@@ -144,11 +143,11 @@ class MemoryManager {
    * 啟動自動清理
    */
   private startAutoCleanup(): void {
-    if (this.cleanupTimer) return;
+    if (this.cleanupTimer) return
 
     this.cleanupTimer = setInterval(() => {
-      this.cleanup({ clearHot: true });
-    }, this.autoCleanupInterval);
+      this.cleanup({ clearHot: true })
+    }, this.autoCleanupInterval)
   }
 
   /**
@@ -156,8 +155,8 @@ class MemoryManager {
    */
   stopAutoCleanup(): void {
     if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
-      this.cleanupTimer = null;
+      clearInterval(this.cleanupTimer)
+      this.cleanupTimer = null
     }
   }
 
@@ -165,11 +164,11 @@ class MemoryManager {
    * 清理所有資源（記憶體洩漏防護）
    */
   destroy(): void {
-    this.stopAutoCleanup();
+    this.stopAutoCleanup()
 
     if (this.visibilityChangeHandler && typeof window !== 'undefined') {
-      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
-      this.visibilityChangeHandler = null;
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler)
+      this.visibilityChangeHandler = null
     }
   }
 
@@ -177,32 +176,34 @@ class MemoryManager {
    * 監控記憶體（開發模式）
    */
   startMonitoring(interval: number = 10000): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return
 
     setInterval(() => {
-      const stats = this.getMemoryStats();
+      const stats = this.getMemoryStats()
       if (stats) {
-        const emoji = stats.isUnderPressure ? '⚠️' : '✅';
-        console.log(`${emoji} Memory: ${stats.usedMemory}MB / ${stats.totalMemory}MB (${stats.usagePercent}%)`);
+        const emoji = stats.isUnderPressure ? '⚠️' : '✅'
+        console.log(
+          `${emoji} Memory: ${stats.usedMemory}MB / ${stats.totalMemory}MB (${stats.usagePercent}%)`
+        )
 
         if (stats.isUnderPressure) {
-          console.warn('Memory pressure detected, cleaning up...');
-          this.cleanup({ clearHot: true, force: true });
+          console.warn('Memory pressure detected, cleaning up...')
+          this.cleanup({ clearHot: true, force: true })
         }
       }
-    }, interval);
+    }, interval)
   }
 
   /**
    * 獲取快取統計
    */
   getCacheStats() {
-    return cacheStrategy.getStats();
+    return cacheStrategy.getStats()
   }
 }
 
 // 匯出單例
-export const memoryManager = MemoryManager.getInstance();
+export const memoryManager = MemoryManager.getInstance()
 
 // 匯出類型
-export type { MemoryStats, CleanupOptions };
+export type { MemoryStats, CleanupOptions }

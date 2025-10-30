@@ -1,26 +1,26 @@
-'use client';
+'use client'
 
-import { Hash, Lock, Archive } from 'lucide-react';
+import { Hash, Lock, Archive } from 'lucide-react'
 
-import type { Channel } from '@/stores/workspace-store';
+import type { Channel } from '@/stores/workspace-store'
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
 
 interface ChannelListProps {
-  channels: Channel[];
-  activeChannelId: string | null;
-  onSelectChannel: (id: string) => void;
+  channels: Channel[]
+  activeChannelId: string | null
+  onSelectChannel: (id: string) => void
 }
 
 export function ChannelList({ channels, activeChannelId, onSelectChannel }: ChannelListProps) {
   // 分類頻道 - 使用實際的 type 值
-  const publicChannels = channels.filter(c => c.type === 'public');
-  const privateChannels = channels.filter(c => c.type === 'private');
-  const directChannels = channels.filter(c => c.type === 'direct');
+  const publicChannels = channels.filter(c => c.type === 'public')
+  const privateChannels = channels.filter(c => c.type === 'private')
+  const directChannels = channels.filter(c => c.type === 'direct')
 
   const renderChannel = (channel: Channel) => {
-    const is_active = channel.id === activeChannelId;
-    const isArchived = (channel as unknown).isArchived; // Add isArchived to Channel interface
+    const is_active = channel.id === activeChannelId
+    const isArchived = (channel as unknown).isArchived // Add isArchived to Channel interface
 
     return (
       <button
@@ -41,9 +41,9 @@ export function ChannelList({ channels, activeChannelId, onSelectChannel }: Chan
         <span className="flex-1 truncate">{channel.name}</span>
         {isArchived && <Archive size={12} className="flex-shrink-0" />}
       </button>
-    );
-  };
-  
+    )
+  }
+
   return (
     <div className="py-2 space-y-4">
       {/* 公開頻道 */}
@@ -81,7 +81,7 @@ export function ChannelList({ channels, activeChannelId, onSelectChannel }: Chan
           </div>
         </div>
       )}
-      
+
       {/* 空狀態 */}
       {channels.length === 0 && (
         <div className="px-3 py-8 text-center text-sm text-morandi-secondary">
@@ -90,5 +90,5 @@ export function ChannelList({ channels, activeChannelId, onSelectChannel }: Chan
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
 // 模板相關的輔助函數
 
-import { DataSource, DataSourceDefinition, SourceField } from '@/types/template';
+import { DataSource, DataSourceDefinition, SourceField } from '@/types/template'
 
 // 定義各個資料來源可用的欄位
 export const DATA_SOURCE_DEFINITIONS: DataSourceDefinition[] = [
@@ -57,52 +57,52 @@ export const DATA_SOURCE_DEFINITIONS: DataSourceDefinition[] = [
       { key: 'position', label: '職位', type: 'text' },
     ],
   },
-];
+]
 
 // 根據資料來源取得可用欄位
 export function getAvailableFields(source: DataSource): SourceField[] {
   if (source === 'manual') {
-    return [];
+    return []
   }
 
-  const definition = DATA_SOURCE_DEFINITIONS.find((d) => d.source === source);
-  return definition?.fields || [];
+  const definition = DATA_SOURCE_DEFINITIONS.find(d => d.source === source)
+  return definition?.fields || []
 }
 
 // 取得資料來源的顯示名稱
 export function getSourceLabel(source: DataSource): string {
   if (source === 'manual') {
-    return '手動輸入';
+    return '手動輸入'
   }
 
-  const definition = DATA_SOURCE_DEFINITIONS.find((d) => d.source === source);
-  return definition?.label || source;
+  const definition = DATA_SOURCE_DEFINITIONS.find(d => d.source === source)
+  return definition?.label || source
 }
 
 // 取得欄位的顯示名稱
 export function getFieldLabel(source: DataSource, fieldKey: string): string {
-  const fields = getAvailableFields(source);
-  const field = fields.find((f) => f.key === fieldKey);
-  return field?.label || fieldKey;
+  const fields = getAvailableFields(source)
+  const field = fields.find(f => f.key === fieldKey)
+  return field?.label || fieldKey
 }
 
 // 驗證欄位設定是否完整
 export function validateField(field: {
-  fieldKey: string;
-  displayName: string;
-  dataSource: DataSource;
-  sourceField?: string;
+  fieldKey: string
+  displayName: string
+  dataSource: DataSource
+  sourceField?: string
 }): { valid: boolean; error?: string } {
   if (!field.fieldKey || !field.fieldKey.trim()) {
-    return { valid: false, error: '變數名稱不可為空' };
+    return { valid: false, error: '變數名稱不可為空' }
   }
 
   if (!field.displayName || !field.displayName.trim()) {
-    return { valid: false, error: '顯示名稱不可為空' };
+    return { valid: false, error: '顯示名稱不可為空' }
   }
 
   if (field.dataSource !== 'manual' && !field.sourceField) {
-    return { valid: false, error: '請選擇對應欄位' };
+    return { valid: false, error: '請選擇對應欄位' }
   }
 
   // 檢查變數名稱格式（只允許字母、數字、底線）
@@ -110,8 +110,8 @@ export function validateField(field: {
     return {
       valid: false,
       error: '變數名稱只能包含字母、數字、底線，且不能以數字開頭',
-    };
+    }
   }
 
-  return { valid: true };
+  return { valid: true }
 }

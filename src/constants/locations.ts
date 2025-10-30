@@ -5,5 +5,5 @@ export const LOCATIONS = [
   { value: 'Osaka', label: 'Osaka 大阪' },
   { value: 'Kyoto', label: 'Kyoto 京都' },
   { value: 'Hokkaido', label: 'Hokkaido 北海道' },
-  { value: 'Fukuoka', label: 'Fukuoka 福岡' }
-] as const;
+  { value: 'Fukuoka', label: 'Fukuoka 福岡' },
+] as const

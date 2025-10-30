@@ -1,44 +1,44 @@
-import { BaseService, StoreOperations } from '@/core/services/base.service';
-import { PaymentRequest, PaymentRequestItem } from '@/stores/types';
-import { usePaymentRequestStore } from '@/stores';
-import { ValidationError } from '@/core/errors/app-errors';
-import { generateId } from '@/lib/data/create-data-store';
+import { BaseService, StoreOperations } from '@/core/services/base.service'
+import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
+import { usePaymentRequestStore } from '@/stores'
+import { ValidationError } from '@/core/errors/app-errors'
+import { generateId } from '@/lib/data/create-data-store'
 
 class PaymentRequestService extends BaseService<PaymentRequest> {
-  protected resourceName = 'payment_requests';
+  protected resourceName = 'payment_requests'
 
   protected getStore = (): StoreOperations<PaymentRequest> => {
-    const store = usePaymentRequestStore.getState();
+    const store = usePaymentRequestStore.getState()
     return {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
-        const result = await store.create(request as unknown);
-        return result || request;
+        const result = await store.create(request as unknown)
+        return result || request
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
-        await store.update(id, data);
+        await store.update(id, data)
       },
       delete: async (id: string) => {
-        await store.delete(id);
-      }
-    };
+        await store.delete(id)
+      },
+    }
   }
 
   protected validate(data: Partial<PaymentRequest>): void {
     if (data.tour_id && !data.tour_id.trim()) {
-      throw new ValidationError('tour_id', '必須關聯旅遊團');
+      throw new ValidationError('tour_id', '必須關聯旅遊團')
     }
 
     if (data.total_amount !== undefined && data.total_amount < 0) {
-      throw new ValidationError('total_amount', '總金額不能為負數');
+      throw new ValidationError('total_amount', '總金額不能為負數')
     }
 
     if (data.request_date) {
-      const requestDate = new Date(data.request_date);
-      const dayOfWeek = requestDate.getDay();
+      const requestDate = new Date(data.request_date)
+      const dayOfWeek = requestDate.getDay()
       if (dayOfWeek !== 4) {
-        throw new ValidationError('request_date', '請款日期必須為週四');
+        throw new ValidationError('request_date', '請款日期必須為週四')
       }
     }
   }
@@ -50,16 +50,19 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
    */
   async addItem(
     requestId: string,
-    itemData: Omit<PaymentRequestItem, 'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'>
+    itemData: Omit<
+      PaymentRequestItem,
+      'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
+    >
   ): Promise<PaymentRequestItem> {
-    const request = await this.getById(requestId);
+    const request = await this.getById(requestId)
     if (!request) {
-      throw new Error(`找不到請款單: ${requestId}`);
+      throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const id = generateId();
-    const now = this.now();
-    const itemNumber = `${request.request_number}-${String(request.items.length + 1).padStart(3, '0')}`;
+    const id = generateId()
+    const now = this.now()
+    const itemNumber = `${request.request_number}-${String(request.items.length + 1).padStart(3, '0')}`
 
     const item: PaymentRequestItem = {
       ...itemData,
@@ -69,19 +72,19 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       subtotal: itemData.unit_price * itemData.quantity,
       created_at: now,
       updated_at: now,
-    };
+    }
 
     // 更新 request 的 items 和 total_amount
-    const updatedItems = [...request.items, item];
-    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0);
+    const updatedItems = [...request.items, item]
+    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
 
     await this.update(requestId, {
       items: updatedItems,
       total_amount: totalAmount,
-      updated_at: now
-    });
+      updated_at: now,
+    })
 
-    return item;
+    return item
   }
 
   /**
@@ -92,48 +95,48 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     itemId: string,
     itemData: Partial<PaymentRequestItem>
   ): Promise<void> {
-    const request = await this.getById(requestId);
+    const request = await this.getById(requestId)
     if (!request) {
-      throw new Error(`找不到請款單: ${requestId}`);
+      throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const now = this.now();
+    const now = this.now()
     const updatedItems = request.items.map(item => {
       if (item.id === itemId) {
-        const updated = { ...item, ...itemData, updated_at: now };
-        updated.subtotal = updated.unit_price * updated.quantity;
-        return updated;
+        const updated = { ...item, ...itemData, updated_at: now }
+        updated.subtotal = updated.unit_price * updated.quantity
+        return updated
       }
-      return item;
-    });
+      return item
+    })
 
-    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0);
+    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
 
     await this.update(requestId, {
       items: updatedItems,
       total_amount: totalAmount,
-      updated_at: now
-    });
+      updated_at: now,
+    })
   }
 
   /**
    * 刪除請款項目
    */
   async deleteItem(requestId: string, itemId: string): Promise<void> {
-    const request = await this.getById(requestId);
+    const request = await this.getById(requestId)
     if (!request) {
-      throw new Error(`找不到請款單: ${requestId}`);
+      throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const now = this.now();
-    const updatedItems = request.items.filter(item => item.id !== itemId);
-    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0);
+    const now = this.now()
+    const updatedItems = request.items.filter(item => item.id !== itemId)
+    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
 
     await this.update(requestId, {
       items: updatedItems,
       total_amount: totalAmount,
-      updated_at: now
-    });
+      updated_at: now,
+    })
   }
 
   // ========== 業務邏輯方法 ==========
@@ -142,19 +145,19 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
    * 計算請款單總金額（手動觸發）
    */
   async calculateTotalAmount(requestId: string): Promise<number> {
-    const request = await this.getById(requestId);
+    const request = await this.getById(requestId)
     if (!request) {
-      throw new Error(`找不到請款單: ${requestId}`);
+      throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const totalAmount = request.items.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalAmount = request.items.reduce((sum, item) => sum + item.subtotal, 0)
 
     await this.update(requestId, {
       total_amount: totalAmount,
-      updated_at: this.now()
-    });
+      updated_at: this.now(),
+    })
 
-    return totalAmount;
+    return totalAmount
   }
 
   /**
@@ -164,9 +167,9 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     requestId: string,
     category: PaymentRequestItem['category']
   ): PaymentRequestItem[] {
-    const store = usePaymentRequestStore.getState();
-    const request = store.items.find((r: PaymentRequest) => r.id === requestId);
-    return request?.items.filter((item: PaymentRequestItem) => item.category === category) || [];
+    const store = usePaymentRequestStore.getState()
+    const request = store.items.find((r: PaymentRequest) => r.id === requestId)
+    return request?.items.filter((item: PaymentRequestItem) => item.category === category) || []
   }
 
   /**
@@ -191,9 +194,9 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       note: '從報價單自動生成',
       budget_warning: false,
       created_by: '1', // 使用實際用戶ID
-    };
+    }
 
-    return await this.create(requestData as unknown);
+    return await this.create(requestData as unknown)
   }
 
   // ========== Query 方法 ==========
@@ -202,33 +205,33 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
    * 取得待處理請款單
    */
   getPendingRequests(): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState();
-    return store.items.filter(r => r.status === 'pending');
+    const store = usePaymentRequestStore.getState()
+    return store.items.filter(r => r.status === 'pending')
   }
 
   /**
    * 取得處理中請款單
    */
   getProcessingRequests(): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState();
-    return store.items.filter(r => r.status === 'processing');
+    const store = usePaymentRequestStore.getState()
+    return store.items.filter(r => r.status === 'processing')
   }
 
   /**
    * 按旅遊團取得請款單
    */
   getRequestsByTour(tourId: string): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState();
-    return store.items.filter(r => r.tour_id === tourId);
+    const store = usePaymentRequestStore.getState()
+    return store.items.filter(r => r.tour_id === tourId)
   }
 
   /**
    * 按訂單取得請款單
    */
   getRequestsByOrder(orderId: string): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState();
-    return store.items.filter(r => r.order_id === orderId);
+    const store = usePaymentRequestStore.getState()
+    return store.items.filter(r => r.order_id === orderId)
   }
 }
 
-export const paymentRequestService = new PaymentRequestService();
+export const paymentRequestService = new PaymentRequestService()

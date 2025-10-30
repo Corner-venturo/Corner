@@ -3,18 +3,18 @@
  * 提供完整的 CRUD、驗證、業務邏輯
  */
 
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 
-import { useTourStore } from '@/stores';
-import { Tour, CreateTourData, UpdateTourData, TourStatus } from '@/types';
+import { useTourStore } from '@/stores'
+import { Tour, CreateTourData, UpdateTourData, TourStatus } from '@/types'
 
 /**
  * 旅遊團日期驗證錯誤
  */
 class TourDateValidationError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'TourDateValidationError';
+    super(message)
+    this.name = 'TourDateValidationError'
   }
 }
 
@@ -23,8 +23,8 @@ class TourDateValidationError extends Error {
  */
 class TourPermissionError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'TourPermissionError';
+    super(message)
+    this.name = 'TourPermissionError'
   }
 }
 
@@ -32,7 +32,7 @@ class TourPermissionError extends Error {
  * useTours Hook
  */
 export function useTours() {
-  const store = useTourStore();
+  const store = useTourStore()
 
   // ============================================
   // 資料驗證
@@ -42,30 +42,30 @@ export function useTours() {
    * 驗證旅遊團日期
    */
   const validateTourDates = (start_date: string, end_date: string): void => {
-    const start = new Date(start_date);
-    const end = new Date(end_date);
-    const now = new Date();
+    const start = new Date(start_date)
+    const end = new Date(end_date)
+    const now = new Date()
 
     // 檢查日期格式
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      throw new TourDateValidationError('日期格式錯誤');
+      throw new TourDateValidationError('日期格式錯誤')
     }
 
     // 結束日期必須大於開始日期
     if (end <= start) {
-      throw new TourDateValidationError('結束日期必須晚於開始日期');
+      throw new TourDateValidationError('結束日期必須晚於開始日期')
     }
 
     // 開始日期不能是過去（草稿狀態除外）
     if (start < now) {
-          }
+    }
 
     // 旅遊天數不能超過 365 天
-    const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
     if (diffDays > 365) {
-      throw new TourDateValidationError('旅遊天數不能超過 365 天');
+      throw new TourDateValidationError('旅遊天數不能超過 365 天')
     }
-  };
+  }
 
   /**
    * 驗證旅遊團資料
@@ -73,28 +73,28 @@ export function useTours() {
   const validateTourData = (data: Partial<Tour>): void => {
     // 檢查必填欄位
     if (data.name && data.name.trim().length === 0) {
-      throw new Error('團名不能為空');
+      throw new Error('團名不能為空')
     }
 
     if (data.location && data.location.trim().length === 0) {
-      throw new Error('目的地不能為空');
+      throw new Error('目的地不能為空')
     }
 
     // 檢查人數
     if (data.max_participants !== undefined && data.max_participants < 1) {
-      throw new Error('最高人數必須大於 0');
+      throw new Error('最高人數必須大於 0')
     }
 
     // 檢查價格
     if (data.price !== undefined && data.price < 0) {
-      throw new Error('價格不能為負數');
+      throw new Error('價格不能為負數')
     }
 
     // 檢查日期
     if (data.departure_date && data.return_date) {
-      validateTourDates(data.departure_date, data.return_date);
+      validateTourDates(data.departure_date, data.return_date)
     }
-  };
+  }
 
   // ============================================
   // 業務邏輯
@@ -104,41 +104,41 @@ export function useTours() {
    * 計算旅遊天數
    */
   const calculateDays = (start_date: string, end_date: string): number => {
-    const start = new Date(start_date);
-    const end = new Date(end_date);
-    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  };
+    const start = new Date(start_date)
+    const end = new Date(end_date)
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+  }
 
   /**
    * 計算夜數
    */
   const calculateNights = (days: number): number => {
-    return Math.max(0, days - 1);
-  };
+    return Math.max(0, days - 1)
+  }
 
   /**
    * 檢查是否可以編輯
    */
   const canEditTour = (tour: Tour): boolean => {
     // 只有提案和進行中的團可以編輯
-    return tour.status === 'draft' || tour.status === 'active';
-  };
+    return tour.status === 'draft' || tour.status === 'active'
+  }
 
   /**
    * 檢查是否可以刪除
    */
   const canDeleteTour = (tour: Tour): boolean => {
     // 只有提案狀態可以刪除
-    return tour.status === 'draft';
-  };
+    return tour.status === 'draft'
+  }
 
   /**
    * 檢查是否可以取消
    */
   const canCancelTour = (tour: Tour): boolean => {
     // 提案和進行中的團可以取消
-    return tour.status === 'draft' || tour.status === 'active';
-  };
+    return tour.status === 'draft' || tour.status === 'active'
+  }
 
   /**
    * 取得下一個狀態
@@ -151,34 +151,34 @@ export function useTours() {
       closed: null,
       cancelled: null,
       special: null,
-    };
-    return statusFlow[currentStatus];
-  };
+    }
+    return statusFlow[currentStatus]
+  }
 
   /**
    * 檢查是否已滿團
    */
   const isFullyBooked = (tour: Tour): boolean => {
-    if (!tour.max_participants || !tour.current_participants) return false;
-    return tour.current_participants >= tour.max_participants;
-  };
+    if (!tour.max_participants || !tour.current_participants) return false
+    return tour.current_participants >= tour.max_participants
+  }
 
   /**
    * 檢查是否成團（注意：Tour 類型沒有 min_people 欄位）
    */
   const hasMetMinimum = (tour: Tour): boolean => {
     // 如果需要最低成團人數，請在 Tour 類型中添加 min_participants 欄位
-    return false;
-  };
+    return false
+  }
 
   /**
    * 計算剩餘名額
    */
   const getRemainingSeats = (tour: Tour): number | null => {
-    if (!tour.max_participants) return null;
-    const current = tour.current_participants || 0;
-    return Math.max(0, tour.max_participants - current);
-  };
+    if (!tour.max_participants) return null
+    const current = tour.current_participants || 0
+    return Math.max(0, tour.max_participants - current)
+  }
 
   // ============================================
   // 權限檢查（簡化版，實際應從 auth 取得）
@@ -187,8 +187,8 @@ export function useTours() {
   const hasPermission = (_action: 'create' | 'update' | 'delete'): boolean => {
     // 從 auth store 取得實際權限
     // 目前簡化為都允許
-    return true;
-  };
+    return true
+  }
 
   // ============================================
   // 增強的 CRUD 操作
@@ -200,11 +200,11 @@ export function useTours() {
   const createTour = async (data: Omit<CreateTourData, 'id' | 'code'>): Promise<Tour> => {
     // 1. 權限檢查
     if (!hasPermission('create')) {
-      throw new TourPermissionError('沒有建立旅遊團的權限');
+      throw new TourPermissionError('沒有建立旅遊團的權限')
     }
 
     // 2. 資料驗證
-    validateTourData(data);
+    validateTourData(data)
 
     // 3. 計算天數和夜數（如果需要）
     // const days = calculateDays(data.departure_date, data.return_date);
@@ -214,11 +214,11 @@ export function useTours() {
     const tourData: Omit<CreateTourData, 'code'> = {
       ...data,
       status: data.status || 'draft',
-    };
+    }
 
     // 5. 呼叫 Store
-    return await store.create(tourData as Tour);
-  };
+    return await store.create(tourData as Tour)
+  }
 
   /**
    * 更新旅遊團
@@ -226,29 +226,29 @@ export function useTours() {
   const updateTour = async (id: string, data: UpdateTourData): Promise<Tour> => {
     // 1. 權限檢查
     if (!hasPermission('update')) {
-      throw new TourPermissionError('沒有更新旅遊團的權限');
+      throw new TourPermissionError('沒有更新旅遊團的權限')
     }
 
     // 2. 檢查旅遊團是否存在
-    const existingTour = await store.fetchById(id);
+    const existingTour = await store.fetchById(id)
     if (!existingTour) {
-      throw new Error('旅遊團不存在');
+      throw new Error('旅遊團不存在')
     }
 
     // 3. 檢查是否可以編輯
     if (!canEditTour(existingTour)) {
-      throw new Error(`${existingTour.status} 狀態的旅遊團無法編輯`);
+      throw new Error(`${existingTour.status} 狀態的旅遊團無法編輯`)
     }
 
     // 4. 資料驗證
-    validateTourData(data);
+    validateTourData(data)
 
     // 5. 直接使用資料（不需要計算天數）
-    const updatedData = { ...data };
+    const updatedData = { ...data }
 
     // 6. 呼叫 Store
-    return await store.update(id, updatedData);
-  };
+    return await store.update(id, updatedData)
+  }
 
   /**
    * 刪除旅遊團
@@ -256,55 +256,55 @@ export function useTours() {
   const deleteTour = async (id: string): Promise<void> => {
     // 1. 權限檢查
     if (!hasPermission('delete')) {
-      throw new TourPermissionError('沒有刪除旅遊團的權限');
+      throw new TourPermissionError('沒有刪除旅遊團的權限')
     }
 
     // 2. 檢查旅遊團是否存在
-    const tour = await store.fetchById(id);
+    const tour = await store.fetchById(id)
     if (!tour) {
-      throw new Error('旅遊團不存在');
+      throw new Error('旅遊團不存在')
     }
 
     // 3. 檢查是否可以刪除
     if (!canDeleteTour(tour)) {
-      throw new Error(`${tour.status} 狀態的旅遊團無法刪除`);
+      throw new Error(`${tour.status} 狀態的旅遊團無法刪除`)
     }
 
     // 4. 呼叫 Store
-    await store.delete(id);
-  };
+    await store.delete(id)
+  }
 
   /**
    * 取消旅遊團
    */
   const cancelTour = async (id: string): Promise<Tour> => {
-    const tour = await store.fetchById(id);
+    const tour = await store.fetchById(id)
     if (!tour) {
-      throw new Error('旅遊團不存在');
+      throw new Error('旅遊團不存在')
     }
 
     if (!canCancelTour(tour)) {
-      throw new Error(`${tour.status} 狀態的旅遊團無法取消`);
+      throw new Error(`${tour.status} 狀態的旅遊團無法取消`)
     }
 
-    return await store.update(id, { status: 'cancelled' });
-  };
+    return await store.update(id, { status: 'cancelled' })
+  }
 
   /**
    * 完成旅遊團
    */
   const completeTour = async (id: string): Promise<Tour> => {
-    const tour = await store.fetchById(id);
+    const tour = await store.fetchById(id)
     if (!tour) {
-      throw new Error('旅遊團不存在');
+      throw new Error('旅遊團不存在')
     }
 
     if (tour.status !== 'active') {
-      throw new Error('只有進行中的旅遊團可以完成');
+      throw new Error('只有進行中的旅遊團可以完成')
     }
 
-    return await store.update(id, { status: 'pending_close' });
-  };
+    return await store.update(id, { status: 'pending_close' })
+  }
 
   // ============================================
   // 查詢方法
@@ -314,42 +314,42 @@ export function useTours() {
    * 取得進行中的旅遊團
    */
   const getActiveTours = useMemo(() => {
-    return store.items.filter((tour) => tour.status === 'active');
-  }, [store.items]);
+    return store.items.filter(tour => tour.status === 'active')
+  }, [store.items])
 
   /**
    * 取得草稿旅遊團
    */
   const getDraftTours = useMemo(() => {
-    return store.items.filter((tour) => tour.status === 'draft');
-  }, [store.items]);
+    return store.items.filter(tour => tour.status === 'draft')
+  }, [store.items])
 
   /**
    * 根據日期範圍查詢
    */
   const getToursByDateRange = (start_date: string, end_date: string): Tour[] => {
-    const start = new Date(start_date);
-    const end = new Date(end_date);
+    const start = new Date(start_date)
+    const end = new Date(end_date)
 
-    return store.items.filter((tour) => {
-      const tourStart = new Date(tour.departure_date);
-      const tourEnd = new Date(tour.return_date);
-      return tourStart <= end && tourEnd >= start;
-    });
-  };
+    return store.items.filter(tour => {
+      const tourStart = new Date(tour.departure_date)
+      const tourEnd = new Date(tour.return_date)
+      return tourStart <= end && tourEnd >= start
+    })
+  }
 
   /**
    * 搜尋旅遊團
    */
   const searchTours = (keyword: string): Tour[] => {
-    const lowerKeyword = keyword.toLowerCase();
+    const lowerKeyword = keyword.toLowerCase()
     return store.items.filter(
-      (tour) =>
+      tour =>
         tour.code.toLowerCase().includes(lowerKeyword) ||
         tour.name.toLowerCase().includes(lowerKeyword) ||
         tour.location.toLowerCase().includes(lowerKeyword)
-    );
-  };
+    )
+  }
 
   // ============================================
   // 返回值
@@ -390,5 +390,5 @@ export function useTours() {
     // 驗證方法
     validateTourData,
     validateTourDates,
-  };
+  }
 }

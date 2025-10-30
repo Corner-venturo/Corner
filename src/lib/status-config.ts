@@ -13,31 +13,24 @@ import {
   DollarSign,
   Package,
   Truck,
-  type LucideIcon
-} from 'lucide-react';
+  type LucideIcon,
+} from 'lucide-react'
 
 /**
  * 狀態配置介面
  */
 export interface StatusConfig {
-  color: string;
-  label: string;
-  icon?: LucideIcon;
-  bgColor?: string;
-  borderColor?: string;
+  color: string
+  label: string
+  icon?: LucideIcon
+  bgColor?: string
+  borderColor?: string
 }
 
 /**
  * 狀態配置類型
  */
-type StatusType =
-  | 'payment'
-  | 'disbursement'
-  | 'todo'
-  | 'invoice'
-  | 'tour'
-  | 'order'
-  | 'visa';
+type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa'
 
 /**
  * 所有狀態配置的中央存儲
@@ -307,65 +300,65 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       icon: AlertCircle,
     },
   },
-};
+}
 
 /**
  * 獲取狀態配置
  */
 export function getStatusConfig(type: StatusType, status: string): StatusConfig {
-  const typeConfig = STATUS_CONFIGS[type];
+  const typeConfig = STATUS_CONFIGS[type]
   if (!typeConfig) {
-    return STATUS_CONFIGS.payment.default;
+    return STATUS_CONFIGS.payment.default
   }
-  return typeConfig[status] || typeConfig.default || STATUS_CONFIGS.payment.default;
+  return typeConfig[status] || typeConfig.default || STATUS_CONFIGS.payment.default
 }
 
 /**
  * 獲取狀態顏色
  */
 export function getStatusColor(type: StatusType, status: string): string {
-  return getStatusConfig(type, status).color;
+  return getStatusConfig(type, status).color
 }
 
 /**
  * 獲取狀態標籤
  */
 export function getStatusLabel(type: StatusType, status: string): string {
-  return getStatusConfig(type, status).label;
+  return getStatusConfig(type, status).label
 }
 
 /**
  * 獲取狀態圖示
  */
 export function getStatusIcon(type: StatusType, status: string): LucideIcon | undefined {
-  return getStatusConfig(type, status).icon;
+  return getStatusConfig(type, status).icon
 }
 
 /**
  * 獲取狀態背景色
  */
 export function getStatusBgColor(type: StatusType, status: string): string | undefined {
-  return getStatusConfig(type, status).bgColor;
+  return getStatusConfig(type, status).bgColor
 }
 
 /**
  * 獲取狀態邊框色
  */
 export function getStatusBorderColor(type: StatusType, status: string): string | undefined {
-  return getStatusConfig(type, status).borderColor;
+  return getStatusConfig(type, status).borderColor
 }
 
 /**
  * 獲取所有狀態選項（用於下拉選單）
  */
 export function getStatusOptions(type: StatusType): Array<{ value: string; label: string }> {
-  const typeConfig = STATUS_CONFIGS[type];
-  if (!typeConfig) return [];
+  const typeConfig = STATUS_CONFIGS[type]
+  if (!typeConfig) return []
 
   return Object.entries(typeConfig)
     .filter(([key]) => key !== 'default')
     .map(([value, config]) => ({
       value,
       label: config.label,
-    }));
+    }))
 }

@@ -3,13 +3,9 @@
  * 處理本地和遠端資料的合併邏輯
  */
 
-import type { BaseEntity, SyncableEntity } from '@/types';
-import { logger } from '@/lib/utils/logger';
-import {
-  isSyncableEntity,
-  needsSync,
-  isDeleted,
-} from '@/lib/sync/sync-types';
+import type { BaseEntity, SyncableEntity } from '@/types'
+import { logger } from '@/lib/utils/logger'
+import { isSyncableEntity, needsSync, isDeleted } from '@/lib/sync/sync-types'
 
 export class MergeStrategy<T extends BaseEntity> {
   /**
@@ -20,37 +16,33 @@ export class MergeStrategy<T extends BaseEntity> {
    * 2. 加入本地待同步的資料（_needs_sync: true）
    * 3. 過濾軟刪除的項目
    */
-  merge(
-    localItems: T[],
-    remoteItems: T[],
-    tableName: string
-  ): T[] {
+  merge(localItems: T[], remoteItems: T[], tableName: string): T[] {
     // 過濾軟刪除項目
-    const filteredLocal = this.filterDeleted(localItems);
-    const filteredRemote = this.filterDeleted(remoteItems);
+    const filteredLocal = this.filterDeleted(localItems)
+    const filteredRemote = this.filterDeleted(remoteItems)
 
     // 找出本地待同步的資料
-    const localPending = filteredLocal.filter((localItem) => {
+    const localPending = filteredLocal.filter(localItem => {
       // 使用型別守衛檢查是否為可同步實體
       if (isSyncableEntity(localItem)) {
         // 保留標記為待同步的資料
         if (needsSync(localItem)) {
-          return true;
+          return true
         }
       }
 
       // 保留遠端不存在的資料（可能是新增但尚未同步）
-      return !filteredRemote.find((remoteItem) => remoteItem.id === localItem.id);
-    });
+      return !filteredRemote.find(remoteItem => remoteItem.id === localItem.id)
+    })
 
     // 合併：遠端資料 + 本地待同步資料
-    const merged = [...filteredRemote, ...localPending];
+    const merged = [...filteredRemote, ...localPending]
 
     logger.log(
       `🔄 [${tableName}] 資料合併完成 (遠端: ${filteredRemote.length} + 本地: ${localPending.length} = ${merged.length})`
-    );
+    )
 
-    return merged;
+    return merged
   }
 
   /**
@@ -68,20 +60,20 @@ export class MergeStrategy<T extends BaseEntity> {
   resolveConflict(local: T, remote: T): T {
     // 檢查本地是否為可同步實體且有待同步標記
     if (isSyncableEntity(local) && needsSync(local)) {
-      logger.log(`⚠️ 衝突解決：使用本地版本 (待同步)`);
-      return local;
+      logger.log(`⚠️ 衝突解決：使用本地版本 (待同步)`)
+      return local
     }
 
     // 比較 updated_at 時間戳
-    const localTime = new Date(local.updated_at || 0).getTime();
-    const remoteTime = new Date(remote.updated_at || 0).getTime();
+    const localTime = new Date(local.updated_at || 0).getTime()
+    const remoteTime = new Date(remote.updated_at || 0).getTime()
 
     if (localTime > remoteTime) {
-      logger.log(`⚠️ 衝突解決：使用本地版本 (較新)`);
-      return local;
+      logger.log(`⚠️ 衝突解決：使用本地版本 (較新)`)
+      return local
     } else {
-      logger.log(`⚠️ 衝突解決：使用遠端版本 (較新或相同)`);
-      return remote;
+      logger.log(`⚠️ 衝突解決：使用遠端版本 (較新或相同)`)
+      return remote
     }
   }
 
@@ -89,21 +81,21 @@ export class MergeStrategy<T extends BaseEntity> {
    * 過濾軟刪除的項目
    */
   filterDeleted(items: T[]): T[] {
-    return items.filter((item) => !isDeleted(item));
+    return items.filter(item => !isDeleted(item))
   }
 
   /**
    * 檢查是否有待同步資料
    */
   hasPendingSync(items: T[]): boolean {
-    return items.some((item) => isSyncableEntity(item) && needsSync(item));
+    return items.some(item => isSyncableEntity(item) && needsSync(item))
   }
 
   /**
    * 取得待同步資料數量
    */
   getPendingCount(items: T[]): number {
-    return items.filter((item) => isSyncableEntity(item) && needsSync(item)).length;
+    return items.filter(item => isSyncableEntity(item) && needsSync(item)).length
   }
 
   /**
@@ -111,15 +103,15 @@ export class MergeStrategy<T extends BaseEntity> {
    */
   getPendingItems(items: T[]): Array<T & SyncableEntity> {
     return items.filter((item): item is T & SyncableEntity => {
-      return isSyncableEntity(item) && needsSync(item);
-    });
+      return isSyncableEntity(item) && needsSync(item)
+    })
   }
 
   /**
    * 檢查項目是否需要同步
    */
   itemNeedsSync(item: T): boolean {
-    return isSyncableEntity(item) && needsSync(item);
+    return isSyncableEntity(item) && needsSync(item)
   }
 
   /**
@@ -127,14 +119,14 @@ export class MergeStrategy<T extends BaseEntity> {
    */
   markAsSynced(item: T): T & SyncableEntity {
     if (!isSyncableEntity(item)) {
-      throw new Error('Item is not syncable - missing sync fields');
+      throw new Error('Item is not syncable - missing sync fields')
     }
 
     return {
       ...item,
       _needs_sync: false,
       _synced_at: new Date().toISOString(),
-    };
+    }
   }
 
   /**
@@ -147,7 +139,7 @@ export class MergeStrategy<T extends BaseEntity> {
         ...item,
         _needs_sync: true,
         _synced_at: null,
-      };
+      }
     }
 
     // 否則加上同步欄位
@@ -155,6 +147,6 @@ export class MergeStrategy<T extends BaseEntity> {
       ...item,
       _needs_sync: true,
       _synced_at: null,
-    };
+    }
   }
 }

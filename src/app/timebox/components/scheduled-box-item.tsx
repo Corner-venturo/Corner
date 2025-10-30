@@ -70,26 +70,23 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
       <div className="flex h-full flex-col justify-between gap-2">
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
-            <div className="font-medium text-sm truncate">
-              {box.name}
-            </div>
+            <div className="font-medium text-sm truncate">{box.name}</div>
             <div className="text-xs opacity-90">
               {scheduledBox.start_time} • {formatDuration(scheduledBox.duration)}
             </div>
           </div>
           <div className="flex flex-col items-center gap-1 text-white/90">
             <Icon className="h-4 w-4" />
-            {scheduledBox.completed && (
-              <Check className="h-3 w-3 text-morandi-green" />
-            )}
+            {scheduledBox.completed && <Check className="h-3 w-3 text-morandi-green" />}
           </div>
         </div>
 
         {scheduledBox.completed && scheduledBox.completedAt && (
           <div className="text-[11px] opacity-90">
-            ✓ {new Date(scheduledBox.completedAt).toLocaleTimeString('zh-TW', {
+            ✓{' '}
+            {new Date(scheduledBox.completedAt).toLocaleTimeString('zh-TW', {
               hour: '2-digit',
-              minute: '2-digit'
+              minute: '2-digit',
             })}
           </div>
         )}
@@ -98,22 +95,13 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
       {showDialog && (
         <>
           {box.type === 'workout' && (
-            <WorkoutDialog
-              scheduledBox={scheduledBox}
-              onClose={() => setShowDialog(false)}
-            />
+            <WorkoutDialog scheduledBox={scheduledBox} onClose={() => setShowDialog(false)} />
           )}
           {box.type === 'reminder' && (
-            <ReminderDialog
-              scheduledBox={scheduledBox}
-              onClose={() => setShowDialog(false)}
-            />
+            <ReminderDialog scheduledBox={scheduledBox} onClose={() => setShowDialog(false)} />
           )}
           {box.type === 'basic' && (
-            <BasicDialog
-              scheduledBox={scheduledBox}
-              onClose={() => setShowDialog(false)}
-            />
+            <BasicDialog scheduledBox={scheduledBox} onClose={() => setShowDialog(false)} />
           )}
         </>
       )}

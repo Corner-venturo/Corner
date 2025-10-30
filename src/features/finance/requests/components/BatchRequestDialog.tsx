@@ -1,21 +1,21 @@
-'use client';
+'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { BatchTourSelect } from './BatchTourSelect';
-import { RequestDateInput } from './RequestDateInput';
-import { RequestItemForm } from './RequestItemForm';
-import { RequestItemList } from './RequestItemList';
-import { useBatchRequestForm } from '../hooks/useBatchRequestForm';
-import { useRequestOperations } from '../hooks/useRequestOperations';
-import { RequestItem, NewItemFormData } from '../types';
-import { useState, useCallback, useMemo } from 'react';
-import { useSupplierStore, useEmployeeStore } from '@/stores';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { BatchTourSelect } from './BatchTourSelect'
+import { RequestDateInput } from './RequestDateInput'
+import { RequestItemForm } from './RequestItemForm'
+import { RequestItemList } from './RequestItemList'
+import { useBatchRequestForm } from '../hooks/useBatchRequestForm'
+import { useRequestOperations } from '../hooks/useRequestOperations'
+import { RequestItem, NewItemFormData } from '../types'
+import { useState, useCallback, useMemo } from 'react'
+import { useSupplierStore, useEmployeeStore } from '@/stores'
 
 interface BatchRequestDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogProps) {
@@ -31,26 +31,26 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
     toggleTourSelection,
     removeTourFromSelection,
     resetForm,
-    tours
-  } = useBatchRequestForm();
+    tours,
+  } = useBatchRequestForm()
 
-  const { items: suppliers } = useSupplierStore();
-  const { items: employees } = useEmployeeStore();
-  const { createBatchRequests } = useRequestOperations();
+  const { items: suppliers } = useSupplierStore()
+  const { items: employees } = useEmployeeStore()
+  const { createBatchRequests } = useRequestOperations()
 
   // Local state for items (shared between single and batch)
-  const [requestItems, setRequestItems] = useState<RequestItem[]>([]);
+  const [requestItems, setRequestItems] = useState<RequestItem[]>([])
   const [newItem, setNewItem] = useState<NewItemFormData>({
     category: '住宿',
     supplier_id: '',
     description: '',
     unit_price: 0,
-    quantity: 1
-  });
+    quantity: 1,
+  })
 
   // Supplier search states
-  const [supplierSearchValue, setSupplierSearchValue] = useState('');
-  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
+  const [supplierSearchValue, setSupplierSearchValue] = useState('')
+  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false)
 
   // Combine suppliers and employees
   const combinedSuppliers = useMemo(() => {
@@ -58,105 +58,104 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
       id: s.id,
       name: s.name,
       type: 'supplier' as const,
-      group: '供應商'
-    }));
+      group: '供應商',
+    }))
 
     const employeeList = employees.map(e => ({
       id: e.id,
       name: e.name,
       type: 'employee' as const,
-      group: '員工'
-    }));
+      group: '員工',
+    }))
 
-    return [...supplierList, ...employeeList];
-  }, [suppliers, employees]);
+    return [...supplierList, ...employeeList]
+  }, [suppliers, employees])
 
   // Filter suppliers by search
-  const filteredSuppliers = useMemo(() =>
-    combinedSuppliers.filter(supplier => {
-      const searchTerm = supplierSearchValue.toLowerCase();
-      if (!searchTerm) return true;
-      return supplier.name.toLowerCase().includes(searchTerm);
-    })
-  , [combinedSuppliers, supplierSearchValue]);
+  const filteredSuppliers = useMemo(
+    () =>
+      combinedSuppliers.filter(supplier => {
+        const searchTerm = supplierSearchValue.toLowerCase()
+        if (!searchTerm) return true
+        return supplier.name.toLowerCase().includes(searchTerm)
+      }),
+    [combinedSuppliers, supplierSearchValue]
+  )
 
   // Calculate total amount
-  const total_amount = useMemo(() =>
-    requestItems.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0)
-  , [requestItems]);
+  const total_amount = useMemo(
+    () => requestItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
+    [requestItems]
+  )
 
   // Add item to list
   const addItemToList = useCallback(() => {
-    if (!newItem.supplier_id || !newItem.description) return;
+    if (!newItem.supplier_id || !newItem.description) return
 
-    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id);
-    if (!selected) return;
+    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id)
+    if (!selected) return
 
-    const itemId = Math.random().toString(36).substr(2, 9);
-    setRequestItems(prev => [...prev, {
-      id: itemId,
-      ...newItem,
-      supplierName: selected.name,
-    }]);
+    const itemId = Math.random().toString(36).substr(2, 9)
+    setRequestItems(prev => [
+      ...prev,
+      {
+        id: itemId,
+        ...newItem,
+        supplierName: selected.name,
+      },
+    ])
 
     setNewItem({
       category: '住宿',
       supplier_id: '',
       description: '',
       unit_price: 0,
-      quantity: 1
-    });
-    setSupplierSearchValue('');
-  }, [newItem, combinedSuppliers]);
+      quantity: 1,
+    })
+    setSupplierSearchValue('')
+  }, [newItem, combinedSuppliers])
 
   // Remove item from list
   const removeItem = useCallback((itemId: string) => {
-    setRequestItems(prev => prev.filter(item => item.id !== itemId));
-  }, []);
+    setRequestItems(prev => prev.filter(item => item.id !== itemId))
+  }, [])
 
   const handleSubmit = async () => {
-    await createBatchRequests(
-      formData,
-      requestItems,
-      selectedTourIds,
-      tours
-    );
+    await createBatchRequests(formData, requestItems, selectedTourIds, tours)
 
-    resetForm();
-    setRequestItems([]);
+    resetForm()
+    setRequestItems([])
     setNewItem({
       category: '住宿',
       supplier_id: '',
       description: '',
       unit_price: 0,
-      quantity: 1
-    });
-    onOpenChange(false);
-  };
+      quantity: 1,
+    })
+    onOpenChange(false)
+  }
 
   const handleCancel = () => {
-    resetForm();
-    setRequestItems([]);
+    resetForm()
+    setRequestItems([])
     setNewItem({
       category: '住宿',
       supplier_id: '',
       description: '',
       unit_price: 0,
-      quantity: 1
-    });
-    setSupplierSearchValue('');
-    setShowSupplierDropdown(false);
-    onOpenChange(false);
-  };
+      quantity: 1,
+    })
+    setSupplierSearchValue('')
+    setShowSupplierDropdown(false)
+    onOpenChange(false)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>批次請款</DialogTitle>
-          <p className="text-sm text-morandi-secondary">
-            為多個旅遊團建立相同內容的請款單
-          </p>
+          <p className="text-sm text-morandi-secondary">為多個旅遊團建立相同內容的請款單</p>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -183,8 +182,8 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
                   setFormData(prev => ({
                     ...prev,
                     request_date: date,
-                    is_special_billing: isSpecialBilling
-                  }));
+                    is_special_billing: isSpecialBilling,
+                  }))
                 }}
               />
 
@@ -192,7 +191,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
                 <label className="text-sm font-medium text-morandi-primary">備註</label>
                 <Input
                   value={formData.note}
-                  onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
                   placeholder="輸入備註（可選）"
                   className="mt-1"
                 />
@@ -230,11 +229,12 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
               disabled={selectedTourIds.length === 0 || requestItems.length === 0}
               className="bg-morandi-primary hover:bg-morandi-primary/90 text-white rounded-md"
             >
-              建立批次請款 ({selectedTourIds.length} 個團，共 {requestItems.length} 項，總計 NT$ {(total_amount * selectedTourIds.length).toLocaleString()})
+              建立批次請款 ({selectedTourIds.length} 個團，共 {requestItems.length} 項，總計 NT${' '}
+              {(total_amount * selectedTourIds.length).toLocaleString()})
             </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

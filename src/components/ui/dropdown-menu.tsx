@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
 const DropdownMenu = React.forwardRef<
   HTMLDivElement,
@@ -25,23 +25,19 @@ const DropdownMenu = React.forwardRef<
   }
 
   return (
-    <div
-      ref={ref}
-      className={cn("relative", className)}
-      {...props}
-    >
+    <div ref={ref} className={cn('relative', className)} {...props}>
       {React.Children.map(children, child =>
         React.isValidElement(child)
           ? React.cloneElement(child, {
               isOpen,
-              onOpenChange: handleOpenChange
+              onOpenChange: handleOpenChange,
             })
           : child
       )}
     </div>
   )
 })
-DropdownMenu.displayName = "DropdownMenu"
+DropdownMenu.displayName = 'DropdownMenu'
 
 const DropdownMenuTrigger = React.forwardRef<
   HTMLButtonElement,
@@ -57,7 +53,7 @@ const DropdownMenuTrigger = React.forwardRef<
         onOpenChange?.(!isOpen)
         children.props.onClick?.(e)
       },
-      ...props
+      ...props,
     })
   }
 
@@ -65,9 +61,9 @@ const DropdownMenuTrigger = React.forwardRef<
     <button
       ref={ref}
       className={cn(
-        "flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        "disabled:pointer-events-none disabled:opacity-50",
+        'flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+        'disabled:pointer-events-none disabled:opacity-50',
         className
       )}
       onClick={() => onOpenChange?.(!isOpen)}
@@ -77,7 +73,7 @@ const DropdownMenuTrigger = React.forwardRef<
     </button>
   )
 })
-DropdownMenuTrigger.displayName = "DropdownMenuTrigger"
+DropdownMenuTrigger.displayName = 'DropdownMenuTrigger'
 
 const DropdownMenuContent = React.forwardRef<
   HTMLDivElement,
@@ -111,8 +107,8 @@ const DropdownMenuContent = React.forwardRef<
     <div
       ref={contentRef}
       className={cn(
-        "absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md",
-        "animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2",
+        'absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md',
+        'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
         align === 'start' && 'left-0',
         align === 'center' && 'left-1/2 -translate-x-1/2',
         align === 'end' && 'right-0',
@@ -124,37 +120,32 @@ const DropdownMenuContent = React.forwardRef<
     </div>
   )
 })
-DropdownMenuContent.displayName = "DropdownMenuContent"
+DropdownMenuContent.displayName = 'DropdownMenuContent'
 
-const DropdownMenuItem = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-      "hover:bg-morandi-container hover:text-morandi-primary",
-      "focus:bg-morandi-container focus:text-morandi-primary",
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
-    {...props}
-  />
-))
-DropdownMenuItem.displayName = "DropdownMenuItem"
+const DropdownMenuItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none',
+        'hover:bg-morandi-container hover:text-morandi-primary',
+        'focus:bg-morandi-container focus:text-morandi-primary',
+        'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        className
+      )}
+      {...props}
+    />
+  )
+)
+DropdownMenuItem.displayName = 'DropdownMenuItem'
 
 const DropdownMenuSeparator = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-muted", className)}
-    {...props}
-  />
+  <div ref={ref} className={cn('-mx-1 my-1 h-px bg-muted', className)} {...props} />
 ))
-DropdownMenuSeparator.displayName = "DropdownMenuSeparator"
+DropdownMenuSeparator.displayName = 'DropdownMenuSeparator'
 
 export {
   DropdownMenu,

@@ -1,18 +1,18 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { FormDialog } from '@/components/dialog';
-import { Input } from '@/components/ui/input';
-import type { City } from '@/stores';
+import { useState, useEffect } from 'react'
+import { FormDialog } from '@/components/dialog'
+import { Input } from '@/components/ui/input'
+import type { City } from '@/stores'
 
 // ============================================
 // 新增國家對話框
 // ============================================
 
 interface AddCountryDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onCreate: (data: any) => Promise<any>;
+  open: boolean
+  onClose: () => void
+  onCreate: (data: any) => Promise<any>
 }
 
 export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogProps) {
@@ -25,12 +25,12 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
     has_regions: false,
     display_order: 0,
     is_active: true,
-  });
+  })
 
   const handleSubmit = async () => {
-    const result = await onCreate(formData);
+    const result = await onCreate(formData)
     if (result) {
-      onClose();
+      onClose()
       setFormData({
         id: '',
         name: '',
@@ -40,14 +40,14 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         has_regions: false,
         display_order: 0,
         is_active: true,
-      });
+      })
     }
-  };
+  }
 
   return (
     <FormDialog
       open={open}
-      onOpenChange={(open) => !open && onClose()}
+      onOpenChange={open => !open && onClose()}
       title="新增國家"
       onSubmit={handleSubmit}
       submitLabel="新增"
@@ -58,7 +58,7 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         <label className="text-sm font-medium">ID（英文）*</label>
         <Input
           value={formData.id}
-          onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, id: e.target.value }))}
           placeholder="例如: japan"
           required
         />
@@ -67,7 +67,7 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         <label className="text-sm font-medium">中文名稱 *</label>
         <Input
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
           placeholder="例如: 日本"
           required
         />
@@ -76,7 +76,7 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         <label className="text-sm font-medium">英文名稱 *</label>
         <Input
           value={formData.name_en}
-          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
           placeholder="例如: Japan"
           required
         />
@@ -85,7 +85,7 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         <label className="text-sm font-medium">Emoji</label>
         <Input
           value={formData.emoji}
-          onChange={(e) => setFormData(prev => ({ ...prev, emoji: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, emoji: e.target.value }))}
           placeholder="例如: 🇯🇵"
         />
       </div>
@@ -93,7 +93,7 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         <label className="text-sm font-medium">國家代碼</label>
         <Input
           value={formData.code}
-          onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
           placeholder="例如: JP"
         />
       </div>
@@ -101,13 +101,13 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
         <input
           type="checkbox"
           checked={formData.has_regions}
-          onChange={(e) => setFormData(prev => ({ ...prev, has_regions: e.target.checked }))}
+          onChange={e => setFormData(prev => ({ ...prev, has_regions: e.target.checked }))}
           className="w-4 h-4"
         />
         <label className="text-sm">此國家有地區分類（如日本的九州、關東）</label>
       </div>
     </FormDialog>
-  );
+  )
 }
 
 // ============================================
@@ -115,10 +115,10 @@ export function AddCountryDialog({ open, onClose, onCreate }: AddCountryDialogPr
 // ============================================
 
 interface AddRegionDialogProps {
-  open: boolean;
-  onClose: () => void;
-  countryId: string;
-  onCreate: (data: any) => Promise<any>;
+  open: boolean
+  onClose: () => void
+  countryId: string
+  onCreate: (data: any) => Promise<any>
 }
 
 export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegionDialogProps) {
@@ -128,29 +128,29 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
     name_en: '',
     display_order: 0,
     is_active: true,
-  });
+  })
 
   const handleSubmit = async () => {
     const result = await onCreate({
       ...formData,
       country_id: countryId,
-    });
+    })
     if (result) {
-      onClose();
+      onClose()
       setFormData({
         id: '',
         name: '',
         name_en: '',
         display_order: 0,
         is_active: true,
-      });
+      })
     }
-  };
+  }
 
   return (
     <FormDialog
       open={open}
-      onOpenChange={(open) => !open && onClose()}
+      onOpenChange={open => !open && onClose()}
       title="新增地區"
       onSubmit={handleSubmit}
       submitLabel="新增"
@@ -161,7 +161,7 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
         <label className="text-sm font-medium">ID（英文）*</label>
         <Input
           value={formData.id}
-          onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, id: e.target.value }))}
           placeholder="例如: kyushu"
           required
         />
@@ -170,7 +170,7 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
         <label className="text-sm font-medium">中文名稱 *</label>
         <Input
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
           placeholder="例如: 九州"
           required
         />
@@ -179,12 +179,12 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
         <label className="text-sm font-medium">英文名稱</label>
         <Input
           value={formData.name_en}
-          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
           placeholder="例如: Kyushu"
         />
       </div>
     </FormDialog>
-  );
+  )
 }
 
 // ============================================
@@ -192,14 +192,20 @@ export function AddRegionDialog({ open, onClose, countryId, onCreate }: AddRegio
 // ============================================
 
 interface AddCityDialogProps {
-  open: boolean;
-  onClose: () => void;
-  countryId: string;
-  regionId?: string;
-  onCreate: (data: any) => Promise<any>;
+  open: boolean
+  onClose: () => void
+  countryId: string
+  regionId?: string
+  onCreate: (data: any) => Promise<any>
 }
 
-export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: AddCityDialogProps) {
+export function AddCityDialog({
+  open,
+  onClose,
+  countryId,
+  regionId,
+  onCreate,
+}: AddCityDialogProps) {
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -207,16 +213,16 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
     airport_code: '',
     display_order: 0,
     is_active: true,
-  });
+  })
 
   const handleSubmit = async () => {
     const result = await onCreate({
       ...formData,
       country_id: countryId,
       region_id: regionId || null,
-    });
+    })
     if (result) {
-      onClose();
+      onClose()
       setFormData({
         id: '',
         name: '',
@@ -224,14 +230,14 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
         airport_code: '',
         display_order: 0,
         is_active: true,
-      });
+      })
     }
-  };
+  }
 
   return (
     <FormDialog
       open={open}
-      onOpenChange={(open) => !open && onClose()}
+      onOpenChange={open => !open && onClose()}
       title="新增城市"
       onSubmit={handleSubmit}
       submitLabel="新增"
@@ -242,7 +248,7 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
         <label className="text-sm font-medium">ID（英文）*</label>
         <Input
           value={formData.id}
-          onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, id: e.target.value }))}
           placeholder="例如: fukuoka"
           required
         />
@@ -251,7 +257,7 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
         <label className="text-sm font-medium">中文名稱 *</label>
         <Input
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
           placeholder="例如: 福岡"
           required
         />
@@ -260,7 +266,7 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
         <label className="text-sm font-medium">英文名稱</label>
         <Input
           value={formData.name_en}
-          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
           placeholder="例如: Fukuoka"
         />
       </div>
@@ -268,19 +274,17 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
         <label className="text-sm font-medium">機場代碼（3 碼）</label>
         <Input
           value={formData.airport_code}
-          onChange={(e) => {
-            const value = e.target.value.toUpperCase().slice(0, 3);
-            setFormData(prev => ({ ...prev, airport_code: value }));
+          onChange={e => {
+            const value = e.target.value.toUpperCase().slice(0, 3)
+            setFormData(prev => ({ ...prev, airport_code: value }))
           }}
           placeholder="例如: FUK"
           maxLength={3}
         />
-        <p className="text-xs text-morandi-secondary mt-1">
-          用於生成團號，建議使用 IATA 機場代碼
-        </p>
+        <p className="text-xs text-morandi-secondary mt-1">用於生成團號，建議使用 IATA 機場代碼</p>
       </div>
     </FormDialog>
-  );
+  )
 }
 
 // ============================================
@@ -288,10 +292,10 @@ export function AddCityDialog({ open, onClose, countryId, regionId, onCreate }: 
 // ============================================
 
 interface EditCityDialogProps {
-  open: boolean;
-  onClose: () => void;
-  city: City | null;
-  onUpdate: (id: string, data: any) => Promise<any>;
+  open: boolean
+  onClose: () => void
+  city: City | null
+  onUpdate: (id: string, data: any) => Promise<any>
 }
 
 export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialogProps) {
@@ -300,7 +304,7 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
     name_en: '',
     airport_code: '',
     timezone: '',
-  });
+  })
 
   useEffect(() => {
     if (city) {
@@ -309,25 +313,25 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
         name_en: city.name_en || '',
         airport_code: city.airport_code || '',
         timezone: city.timezone || '',
-      });
+      })
     }
-  }, [city]);
+  }, [city])
 
   const handleSubmit = async () => {
-    if (!city) return;
+    if (!city) return
 
-    const result = await onUpdate(city.id, formData);
+    const result = await onUpdate(city.id, formData)
     if (result) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
-  if (!city) return null;
+  if (!city) return null
 
   return (
     <FormDialog
       open={open}
-      onOpenChange={(open) => !open && onClose()}
+      onOpenChange={open => !open && onClose()}
       title="編輯城市"
       onSubmit={handleSubmit}
       submitLabel="儲存"
@@ -338,7 +342,7 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
         <label className="text-sm font-medium">中文名稱 *</label>
         <Input
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
           placeholder="例如: 福岡"
           required
         />
@@ -347,7 +351,7 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
         <label className="text-sm font-medium">英文名稱</label>
         <Input
           value={formData.name_en}
-          onChange={(e) => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
           placeholder="例如: Fukuoka"
         />
       </div>
@@ -355,22 +359,20 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
         <label className="text-sm font-medium">機場代碼（3 碼）</label>
         <Input
           value={formData.airport_code}
-          onChange={(e) => {
-            const value = e.target.value.toUpperCase().slice(0, 3);
-            setFormData(prev => ({ ...prev, airport_code: value }));
+          onChange={e => {
+            const value = e.target.value.toUpperCase().slice(0, 3)
+            setFormData(prev => ({ ...prev, airport_code: value }))
           }}
           placeholder="例如: FUK"
           maxLength={3}
         />
-        <p className="text-xs text-morandi-secondary mt-1">
-          用於生成團號，建議使用 IATA 機場代碼
-        </p>
+        <p className="text-xs text-morandi-secondary mt-1">用於生成團號，建議使用 IATA 機場代碼</p>
       </div>
       <div>
         <label className="text-sm font-medium">時區（IANA 格式）</label>
         <Input
           value={formData.timezone}
-          onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
           placeholder="例如: Asia/Tokyo"
         />
         <p className="text-xs text-morandi-secondary mt-1">
@@ -378,5 +380,5 @@ export function EditCityDialog({ open, onClose, city, onUpdate }: EditCityDialog
         </p>
       </div>
     </FormDialog>
-  );
+  )
 }

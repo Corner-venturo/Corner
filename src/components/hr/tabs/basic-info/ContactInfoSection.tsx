@@ -1,20 +1,25 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Phone, Mail, MapPin, Plus, Trash2 } from 'lucide-react';
-import { Employee } from '@/stores/types';
-import { BasicInfoFormData } from './types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Phone, Mail, MapPin, Plus, Trash2 } from 'lucide-react'
+import { Employee } from '@/stores/types'
+import { BasicInfoFormData } from './types'
 
 interface ContactInfoSectionProps {
-  employee: Employee;
-  isEditing: boolean;
-  formData: BasicInfoFormData;
-  setFormData: (data: BasicInfoFormData) => void;
+  employee: Employee
+  isEditing: boolean
+  formData: BasicInfoFormData
+  setFormData: (data: BasicInfoFormData) => void
 }
 
-export function ContactInfoSection({ employee, isEditing, formData, setFormData }: ContactInfoSectionProps) {
+export function ContactInfoSection({
+  employee,
+  isEditing,
+  formData,
+  setFormData,
+}: ContactInfoSectionProps) {
   return (
     <div className="bg-morandi-container/10 rounded-lg p-4">
       <h4 className="font-medium text-morandi-primary mb-3">聯絡資訊</h4>
@@ -33,14 +38,14 @@ export function ContactInfoSection({ employee, isEditing, formData, setFormData 
                 onClick={() => {
                   const phones = Array.isArray(formData.personal_info.phone)
                     ? formData.personal_info.phone
-                    : [formData.personal_info.phone];
+                    : [formData.personal_info.phone]
                   setFormData({
                     ...formData,
                     personal_info: {
                       ...formData.personal_info,
-                      phone: [...phones, '']
-                    }
-                  });
+                      phone: [...phones, ''],
+                    },
+                  })
                 }}
                 className="h-6 text-xs"
               >
@@ -58,15 +63,15 @@ export function ContactInfoSection({ employee, isEditing, formData, setFormData 
                 <div key={index} className="flex gap-2">
                   <Input
                     value={phone}
-                    onChange={(e) => {
+                    onChange={e => {
                       const phones = Array.isArray(formData.personal_info.phone)
                         ? [...formData.personal_info.phone]
-                        : [formData.personal_info.phone];
-                      phones[index] = e.target.value;
+                        : [formData.personal_info.phone]
+                      phones[index] = e.target.value
                       setFormData({
                         ...formData,
-                        personal_info: { ...formData.personal_info, phone: phones }
-                      });
+                        personal_info: { ...formData.personal_info, phone: phones },
+                      })
                     }}
                     placeholder={`電話 ${index + 1}`}
                   />
@@ -79,11 +84,11 @@ export function ContactInfoSection({ employee, isEditing, formData, setFormData 
                       onClick={() => {
                         const phones = Array.isArray(formData.personal_info.phone)
                           ? formData.personal_info.phone.filter((_, i) => i !== index)
-                          : [];
+                          : []
                         setFormData({
                           ...formData,
-                          personal_info: { ...formData.personal_info, phone: phones }
-                        });
+                          personal_info: { ...formData.personal_info, phone: phones },
+                        })
                       }}
                       className="text-red-500 hover:text-red-700"
                     >
@@ -116,10 +121,12 @@ export function ContactInfoSection({ employee, isEditing, formData, setFormData 
             <Input
               type="email"
               value={formData.personal_info.email}
-              onChange={(e) => setFormData({
-                ...formData,
-                personal_info: { ...formData.personal_info, email: e.target.value }
-              })}
+              onChange={e =>
+                setFormData({
+                  ...formData,
+                  personal_info: { ...formData.personal_info, email: e.target.value },
+                })
+              }
             />
           ) : (
             <p className="text-morandi-primary py-2">{employee.personal_info.email}</p>
@@ -134,10 +141,12 @@ export function ContactInfoSection({ employee, isEditing, formData, setFormData 
           {isEditing ? (
             <Input
               value={formData.personal_info.address}
-              onChange={(e) => setFormData({
-                ...formData,
-                personal_info: { ...formData.personal_info, address: e.target.value }
-              })}
+              onChange={e =>
+                setFormData({
+                  ...formData,
+                  personal_info: { ...formData.personal_info, address: e.target.value },
+                })
+              }
             />
           ) : (
             <p className="text-morandi-primary py-2">{employee.personal_info.address}</p>
@@ -145,5 +154,5 @@ export function ContactInfoSection({ employee, isEditing, formData, setFormData 
         </div>
       </div>
     </div>
-  );
+  )
 }

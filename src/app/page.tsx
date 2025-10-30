@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth-store';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Card } from '@/components/ui/card';
-import { Settings } from 'lucide-react';
-import { useWidgets } from '@/features/dashboard/hooks';
-import { WidgetSettingsDialog, AVAILABLE_WIDGETS } from '@/features/dashboard/components';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/stores/auth-store'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Card } from '@/components/ui/card'
+import { Settings } from 'lucide-react'
+import { useWidgets } from '@/features/dashboard/hooks'
+import { WidgetSettingsDialog, AVAILABLE_WIDGETS } from '@/features/dashboard/components'
 import {
   DndContext,
   closestCenter,
@@ -15,33 +15,23 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  rectSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from '@dnd-kit/core'
+import { arrayMove, SortableContext, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // Sortable Widget Component
-function SortableWidget({ id, widget }: { id: string; widget: typeof AVAILABLE_WIDGETS[0] }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+function SortableWidget({ id, widget }: { id: string; widget: (typeof AVAILABLE_WIDGETS)[0] }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-  };
+  }
 
-  const Component = widget.component;
+  const Component = widget.component
 
   return (
     <div
@@ -53,14 +43,14 @@ function SortableWidget({ id, widget }: { id: string; widget: typeof AVAILABLE_W
     >
       <Component />
     </div>
-  );
+  )
 }
 
 export default function Home() {
-  const router = useRouter();
-  const { isAuthenticated, _hasHydrated } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets();
+  const router = useRouter()
+  const { isAuthenticated, _hasHydrated } = useAuthStore()
+  const [isLoading, setIsLoading] = useState(true)
+  const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets()
 
   // 設定拖拽感應器（長按 500ms 才觸發，避免影響正常互動）
   const sensors = useSensors(
@@ -70,32 +60,32 @@ export default function Home() {
         tolerance: 8,
       },
     })
-  );
+  )
 
   // 處理拖拽結束
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active, over } = event
 
     if (over && active.id !== over.id) {
-      const oldIndex = activeWidgets.indexOf(active.id as string);
-      const newIndex = activeWidgets.indexOf(over.id as string);
-      reorderWidgets(oldIndex, newIndex);
+      const oldIndex = activeWidgets.indexOf(active.id as string)
+      const newIndex = activeWidgets.indexOf(over.id as string)
+      reorderWidgets(oldIndex, newIndex)
     }
-  };
+  }
 
   useEffect(() => {
     // 等待 zustand persist hydration 完成
     if (!_hasHydrated) {
-      return;
+      return
     }
 
     // Hydration 完成後，檢查登入狀態
     if (!isAuthenticated) {
-      router.replace('/login');
+      router.replace('/login')
     } else {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [isAuthenticated, _hasHydrated, router]);
+  }, [isAuthenticated, _hasHydrated, router])
 
   if (isLoading) {
     return (
@@ -105,7 +95,7 @@ export default function Home() {
           <p className="mt-4 text-morandi-muted">載入中...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -114,10 +104,7 @@ export default function Home() {
         title="首頁"
         breadcrumb={[{ label: '首頁', href: '/' }]}
         actions={
-          <WidgetSettingsDialog
-            activeWidgets={activeWidgets}
-            onToggleWidget={toggleWidget}
-          />
+          <WidgetSettingsDialog activeWidgets={activeWidgets} onToggleWidget={toggleWidget} />
         }
       />
 
@@ -128,7 +115,9 @@ export default function Home() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <Settings className="h-8 w-8 text-morandi-gold" />
               </div>
-              <h3 className="text-lg font-semibold text-morandi-primary mb-2">尚未選擇任何小工具</h3>
+              <h3 className="text-lg font-semibold text-morandi-primary mb-2">
+                尚未選擇任何小工具
+              </h3>
               <p className="text-sm text-morandi-muted mb-6">
                 點擊右上角「小工具設定」來新增你需要的工具
               </p>
@@ -142,10 +131,10 @@ export default function Home() {
           >
             <SortableContext items={activeWidgets} strategy={rectSortingStrategy}>
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {activeWidgets.map((widgetId) => {
-                  const widget = AVAILABLE_WIDGETS.find((w) => w.id === widgetId);
-                  if (!widget) return null;
-                  return <SortableWidget key={widget.id} id={widget.id} widget={widget} />;
+                {activeWidgets.map(widgetId => {
+                  const widget = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
+                  if (!widget) return null
+                  return <SortableWidget key={widget.id} id={widget.id} widget={widget} />
                 })}
               </div>
             </SortableContext>
@@ -153,5 +142,5 @@ export default function Home() {
         )}
       </div>
     </div>
-  );
+  )
 }

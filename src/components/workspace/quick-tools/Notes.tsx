@@ -1,9 +1,9 @@
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { FileText, Save, X, Trash2 } from 'lucide-react';
-import { useNotes } from './useNotes';
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { FileText, Save, X, Trash2 } from 'lucide-react'
+import { useNotes } from './useNotes'
 
 export function Notes() {
   const {
@@ -15,8 +15,8 @@ export function Notes() {
     updateNote,
     deleteNote,
     startEditing,
-    cancelEditing
-  } = useNotes();
+    cancelEditing,
+  } = useNotes()
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -24,16 +24,14 @@ export function Notes() {
         {/* 新增/編輯筆記表單 */}
         <div className="w-1/2">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">
-              {editingNote ? '編輯筆記' : '新增筆記'}
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">{editingNote ? '編輯筆記' : '新增筆記'}</h3>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">標題</label>
                 <Input
                   value={newNote.title}
-                  onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+                  onChange={e => setNewNote({ ...newNote, title: e.target.value })}
                   placeholder="筆記標題"
                 />
               </div>
@@ -42,7 +40,7 @@ export function Notes() {
                 <label className="block text-sm font-medium mb-1">內容</label>
                 <Textarea
                   value={newNote.content}
-                  onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+                  onChange={e => setNewNote({ ...newNote, content: e.target.value })}
                   placeholder="筆記內容"
                   className="min-h-[200px]"
                 />
@@ -99,9 +97,7 @@ export function Notes() {
                       </Button>
                     </div>
                   </div>
-                  <p className="text-sm text-morandi-secondary line-clamp-3">
-                    {note.content}
-                  </p>
+                  <p className="text-sm text-morandi-secondary line-clamp-3">{note.content}</p>
                   <p className="text-xs text-morandi-secondary mt-2">
                     {new Date(note.created_at).toLocaleString()}
                   </p>
@@ -112,5 +108,5 @@ export function Notes() {
         </div>
       </div>
     </div>
-  );
+  )
 }

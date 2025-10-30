@@ -1,125 +1,128 @@
-'use client';
+'use client'
 
-import { useState, useMemo } from 'react';
-import { X, Search, Receipt } from 'lucide-react';
-import { useOrderStore } from '@/stores';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useAuthStore } from '@/stores/auth-store';
-import { _Order } from '@/stores/types';
+import { useState, useMemo } from 'react'
+import { X, Search, Receipt } from 'lucide-react'
+import { useOrderStore } from '@/stores'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
+import { _Order } from '@/stores/types'
 
 interface ShareOrdersDialogProps {
-  channelId: string;
-  onClose: () => void;
-  onSuccess: () => void;
+  channelId: string
+  onClose: () => void
+  onSuccess: () => void
 }
 
-export function ShareOrdersDialog({
-  channelId,
-  onClose,
-  onSuccess
-}: ShareOrdersDialogProps) {
-  const { items: orders } = useOrderStore();
-  const { shareOrderList } = useWorkspaceStore();
-  const { user } = useAuthStore();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrdersDialogProps) {
+  const { items: orders } = useOrderStore()
+  const { shareOrderList } = useWorkspaceStore()
+  const { user } = useAuthStore()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set())
 
   // 計算訂單的收款率和缺口
   const ordersWithGap = useMemo(() => {
     return orders
       .map(order => {
-        const totalCost = order.total_amount || 0;
-        const collected = order.paid_amount || 0;
-        const gap = totalCost - collected;
-        const collectionRate = totalCost > 0 ? (collected / totalCost) * 100 : 0;
+        const totalCost = order.total_amount || 0
+        const collected = order.paid_amount || 0
+        const gap = totalCost - collected
+        const collectionRate = totalCost > 0 ? (collected / totalCost) * 100 : 0
 
         return {
           ...order,
           gap,
-          collectionRate
-        };
+          collectionRate,
+        }
       })
       .filter(order => {
         // 過濾：有缺口的訂單（待收款）
-        return order.gap > 0;
+        return order.gap > 0
       })
       .sort((a, b) => {
         // 排序優先級：
         // 1. 成本 > 0 且收款 = 0（完全沒收）
         // 2. 收款率 < 30%
         // 3. 缺口金額大的優先
-        const aFullyUnpaid = a.total_amount > 0 && a.paid_amount === 0;
-        const bFullyUnpaid = b.total_amount > 0 && b.paid_amount === 0;
+        const aFullyUnpaid = a.total_amount > 0 && a.paid_amount === 0
+        const bFullyUnpaid = b.total_amount > 0 && b.paid_amount === 0
 
-        if (aFullyUnpaid && !bFullyUnpaid) return -1;
-        if (!aFullyUnpaid && bFullyUnpaid) return 1;
+        if (aFullyUnpaid && !bFullyUnpaid) return -1
+        if (!aFullyUnpaid && bFullyUnpaid) return 1
 
-        const aLowRate = a.collectionRate < 30;
-        const bLowRate = b.collectionRate < 30;
+        const aLowRate = a.collectionRate < 30
+        const bLowRate = b.collectionRate < 30
 
-        if (aLowRate && !bLowRate) return -1;
-        if (!aLowRate && bLowRate) return 1;
+        if (aLowRate && !bLowRate) return -1
+        if (!aLowRate && bLowRate) return 1
 
-        return b.gap - a.gap;
-      });
-  }, [orders]);
+        return b.gap - a.gap
+      })
+  }, [orders])
 
   // 搜尋過濾
   const filteredOrders = useMemo(() => {
-    if (!searchQuery.trim()) return ordersWithGap;
+    if (!searchQuery.trim()) return ordersWithGap
 
-    const query = searchQuery.toLowerCase();
-    return ordersWithGap.filter(order =>
-      order.order_number.toLowerCase().includes(query) ||
-      order.contact_person?.toLowerCase().includes(query) ||
-      order.tour_name?.toLowerCase().includes(query)
-    );
-  }, [ordersWithGap, searchQuery]);
+    const query = searchQuery.toLowerCase()
+    return ordersWithGap.filter(
+      order =>
+        order.order_number.toLowerCase().includes(query) ||
+        order.contact_person?.toLowerCase().includes(query) ||
+        order.tour_name?.toLowerCase().includes(query)
+    )
+  }, [ordersWithGap, searchQuery])
 
   // 切換訂單選擇
   const toggleOrderSelection = (orderId: string) => {
-    const newSelected = new Set(selectedOrders);
+    const newSelected = new Set(selectedOrders)
     if (newSelected.has(orderId)) {
-      newSelected.delete(orderId);
+      newSelected.delete(orderId)
     } else {
-      newSelected.add(orderId);
+      newSelected.add(orderId)
     }
-    setSelectedOrders(newSelected);
-  };
+    setSelectedOrders(newSelected)
+  }
 
   // 計算已選訂單的總缺口
   const selectedStats = useMemo(() => {
-    const selected = filteredOrders.filter(order => selectedOrders.has(order.id));
-    const totalGap = selected.reduce((sum, order) => sum + order.gap, 0);
+    const selected = filteredOrders.filter(order => selectedOrders.has(order.id))
+    const totalGap = selected.reduce((sum, order) => sum + order.gap, 0)
     return {
       count: selected.length,
-      totalGap
-    };
-  }, [filteredOrders, selectedOrders]);
+      totalGap,
+    }
+  }, [filteredOrders, selectedOrders])
 
   const handleShare = async () => {
     if (selectedOrders.size === 0) {
-      alert('請至少選擇一筆訂單');
-      return;
+      alert('請至少選擇一筆訂單')
+      return
     }
 
     if (!user) {
-      alert('請先登入');
-      return;
+      alert('請先登入')
+      return
     }
 
     try {
-      await shareOrderList(channelId, Array.from(selectedOrders), user.id);
-      onSuccess();
-      onClose();
+      await shareOrderList(channelId, Array.from(selectedOrders), user.id)
+      onSuccess()
+      onClose()
     } catch (error) {
-            alert('分享訂單失敗，請稍後再試');
+      alert('分享訂單失敗，請稍後再試')
     }
-  };
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="card-morandi-elevated w-[900px] max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="card-morandi-elevated w-[900px] max-h-[80vh] overflow-hidden flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
         {/* 標題列 */}
         <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
           <div className="flex items-center gap-2">
@@ -134,11 +137,14 @@ export function ShareOrdersDialog({
         {/* 搜尋列 */}
         <div className="my-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+              size={16}
+            />
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               placeholder="搜尋訂單號、客戶名稱..."
               className="input-morandi pl-10"
             />
@@ -156,19 +162,31 @@ export function ShareOrdersDialog({
               <thead className="sticky top-0 bg-morandi-container/5 border-b border-morandi-gold/20">
                 <tr>
                   <th className="w-10 py-2.5 px-4 text-xs"></th>
-                  <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">訂單號</th>
-                  <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">客戶</th>
-                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">總額</th>
-                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">已收</th>
-                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">缺口</th>
-                  <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">狀態</th>
+                  <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
+                    訂單號
+                  </th>
+                  <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
+                    客戶
+                  </th>
+                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
+                    總額
+                  </th>
+                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
+                    已收
+                  </th>
+                  <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
+                    缺口
+                  </th>
+                  <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
+                    狀態
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => {
-                  const isSelected = selectedOrders.has(order.id);
-                  const isFullyUnpaid = order.total_amount > 0 && order.paid_amount === 0;
-                  const isLowRate = order.collectionRate < 30;
+                {filteredOrders.map(order => {
+                  const isSelected = selectedOrders.has(order.id)
+                  const isFullyUnpaid = order.total_amount > 0 && order.paid_amount === 0
+                  const isLowRate = order.collectionRate < 30
 
                   return (
                     <tr
@@ -184,7 +202,7 @@ export function ShareOrdersDialog({
                           checked={isSelected}
                           onChange={() => toggleOrderSelection(order.id)}
                           className="w-4 h-4 rounded border-morandi-gold/20 text-morandi-gold focus:ring-morandi-gold/20"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={e => e.stopPropagation()}
                         />
                       </td>
                       <td className="py-2 px-2 text-sm text-morandi-primary font-medium">
@@ -218,7 +236,7 @@ export function ShareOrdersDialog({
                         )}
                       </td>
                     </tr>
-                  );
+                  )
                 })}
               </tbody>
             </table>
@@ -229,7 +247,9 @@ export function ShareOrdersDialog({
         <div className="pt-3 border-t border-morandi-gold/20">
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm text-morandi-secondary">
-              已選擇 <span className="font-semibold text-morandi-primary">{selectedStats.count}</span> 筆訂單
+              已選擇{' '}
+              <span className="font-semibold text-morandi-primary">{selectedStats.count}</span>{' '}
+              筆訂單
             </div>
             <div className="text-right">
               <div className="text-xs text-morandi-secondary">總缺口金額</div>
@@ -253,5 +273,5 @@ export function ShareOrdersDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

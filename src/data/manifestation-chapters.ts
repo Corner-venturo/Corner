@@ -1,4 +1,4 @@
-import { Chapter } from '@/types/manifestation';
+import { Chapter } from '@/types/manifestation'
 
 export const chapters: Chapter[] = [
   {
@@ -18,12 +18,12 @@ export const chapters: Chapter[] = [
         '在輸入「我想要……」之前，請先閉上眼睛，深呼吸三次',
         '將你的渴望浮現在心中，慢慢地感受：它在身體的哪個部位出現反應？',
         '試著用 3~5 個詞寫下你此刻的感覺',
-        '接著，再寫下你的願望句：「我想要……」'
+        '接著，再寫下你的願望句：「我想要……」',
       ],
-      fields: ['body_sensations', 'desire']
+      fields: ['body_sensations', 'desire'],
     },
     color: '#d4c5a9',
-    icon: 'Sparkles'
+    icon: 'Sparkles',
   },
   {
     id: 2,
@@ -41,11 +41,11 @@ export const chapters: Chapter[] = [
         '閉上眼睛，想像你的願望已經實現了',
         '感受你的身體：心跳、呼吸、溫度有什麼變化？',
         '記錄這些感覺，它們是你與願望連結的錨點',
-        '每天花 3 分鐘重溫這種感覺'
+        '每天花 3 分鐘重溫這種感覺',
       ],
-      fields: ['body_sensations', 'notes']
+      fields: ['body_sensations', 'notes'],
     },
-    color: '#c9b896'
+    color: '#c9b896',
   },
   {
     id: 3,
@@ -67,11 +67,11 @@ export const chapters: Chapter[] = [
         '寫下你對渴望想問的問題',
         '放鬆身心，讓答案自然浮現',
         '記錄下來，即使它看起來很模糊',
-        '這是你與內在智慧的第一次對話'
+        '這是你與內在智慧的第一次對話',
       ],
-      fields: ['dialogue', 'notes']
+      fields: ['dialogue', 'notes'],
     },
-    color: '#bfad87'
+    color: '#bfad87',
   },
   {
     id: 4,
@@ -90,11 +90,11 @@ export const chapters: Chapter[] = [
         '想一個與你的願望相關的「小到不可能失敗」的行動',
         '今天就去做（不需要完美，只需要開始）',
         '記錄下你的感受：做了之後，有什麼不一樣？',
-        '持續做 7 天，觀察變化'
+        '持續做 7 天，觀察變化',
       ],
-      fields: ['small_action', 'notes']
+      fields: ['small_action', 'notes'],
     },
-    color: '#a89968'
+    color: '#a89968',
   },
   {
     id: 5,
@@ -116,11 +116,11 @@ export const chapters: Chapter[] = [
         '每天睡前寫下 3 件感謝的事',
         '試著感受「感謝」的感覺在身體裡的變化',
         '持續 21 天，你會發現生活開始不一樣',
-        '可以搭配你的願望，感謝「它已經在路上」'
+        '可以搭配你的願望，感謝「它已經在路上」',
       ],
-      fields: ['gratitude']
+      fields: ['gratitude'],
     },
-    color: '#d4c5a9'
+    color: '#d4c5a9',
   },
   {
     id: 6,
@@ -140,11 +140,11 @@ export const chapters: Chapter[] = [
         '重新看看你的願望，問自己：「我真正想要的感覺是什麼？」',
         '寫下那個感覺（例如：自由、被愛、有價值）',
         '想像你已經擁有那個感覺，會做什麼不同的選擇？',
-        '記錄下來'
+        '記錄下來',
       ],
-      fields: ['desire', 'notes']
+      fields: ['desire', 'notes'],
     },
-    color: '#c9b896'
+    color: '#c9b896',
   },
   {
     id: 7,
@@ -165,11 +165,11 @@ export const chapters: Chapter[] = [
         '寫下 3~5 句專屬於你的魔法語',
         '用現在式、肯定句（例如：「我值得被愛」）',
         '每天早上唸 3 次，感受它的能量',
-        '可以錄音，開車、洗澡時播放'
+        '可以錄音，開車、洗澡時播放',
       ],
-      fields: ['magic_phrases']
+      fields: ['magic_phrases'],
     },
-    color: '#bfad87'
+    color: '#bfad87',
   },
   {
     id: 8,
@@ -188,11 +188,11 @@ export const chapters: Chapter[] = [
         '收集 5~10 張與你願望相關的圖片',
         '可以是網路圖片、雜誌剪貼、自己的照片',
         '排列在一個板子上（實體或數位都可以）',
-        '每天看 1 分鐘，想像那是你的生活'
+        '每天看 1 分鐘，想像那是你的生活',
       ],
-      fields: ['vision_board']
+      fields: ['vision_board'],
     },
-    color: '#a89968'
+    color: '#a89968',
   },
   {
     id: 9,
@@ -211,11 +211,11 @@ export const chapters: Chapter[] = [
         '寫下你對願望的「期待」（例如：要在 3 個月內發生）',
         '然後問自己：如果它晚一點來，或用不同的方式來，我願意接受嗎？',
         '練習說：「我允許它以最好的方式發生」',
-        '記錄你的感受'
+        '記錄你的感受',
       ],
-      fields: ['dialogue', 'notes']
+      fields: ['dialogue', 'notes'],
     },
-    color: '#d4c5a9'
+    color: '#d4c5a9',
   },
   {
     id: 10,
@@ -234,11 +234,11 @@ export const chapters: Chapter[] = [
         '寫下關於願望的所有「但是……」（例如：但是我不夠好）',
         '問自己：這是誰的聲音？（通常是父母、老師、或過去的自己）',
         '對它說：「謝謝你，但我選擇相信新的可能」',
-        '寫下你的新信念'
+        '寫下你的新信念',
       ],
-      fields: ['dialogue', 'notes']
+      fields: ['dialogue', 'notes'],
     },
-    color: '#c9b896'
+    color: '#c9b896',
   },
   {
     id: 11,
@@ -256,11 +256,11 @@ export const chapters: Chapter[] = [
         '想像你的願望已經實現，你會是什麼樣的人？',
         '列出 3 個「那個版本的你」會做的事',
         '今天就開始做其中一件',
-        '記錄你的感受'
+        '記錄你的感受',
       ],
-      fields: ['small_action', 'notes']
+      fields: ['small_action', 'notes'],
     },
-    color: '#bfad87'
+    color: '#bfad87',
   },
   {
     id: 12,
@@ -279,11 +279,11 @@ export const chapters: Chapter[] = [
         '寫下你正在「等待」的事',
         '然後感謝「它還沒來的原因」（即使你不知道是什麼）',
         '相信宇宙正在為你準備更好的',
-        '記錄你的感受'
+        '記錄你的感受',
       ],
-      fields: ['gratitude', 'notes']
+      fields: ['gratitude', 'notes'],
     },
-    color: '#a89968'
+    color: '#a89968',
   },
   {
     id: 13,
@@ -302,11 +302,11 @@ export const chapters: Chapter[] = [
         '寫下你想分享的願望（可以匿名）',
         '分享到「願望之牆」，讓它被看見',
         '也去看看別人的願望，為他們祝福',
-        '你會發現：你並不孤單'
+        '你會發現：你並不孤單',
       ],
-      fields: ['shared_wish']
+      fields: ['shared_wish'],
     },
-    color: '#d4c5a9'
+    color: '#d4c5a9',
   },
   {
     id: 14,
@@ -325,11 +325,11 @@ export const chapters: Chapter[] = [
         '回顧這週，寫下 3 件「小成功」',
         '可以是任何讓你開心的事',
         '慶祝它們（買個小禮物、跳個舞都可以）',
-        '感謝宇宙的回應'
+        '感謝宇宙的回應',
       ],
-      fields: ['gratitude', 'notes']
+      fields: ['gratitude', 'notes'],
     },
-    color: '#c9b896'
+    color: '#c9b896',
   },
   {
     id: 15,
@@ -354,13 +354,13 @@ export const chapters: Chapter[] = [
         '回顧這 15 章，寫下最觸動你的 3 句話',
         '寫一封信給「未來的自己」，告訴 TA 你的願望',
         '承諾你會持續練習，並信任這個過程',
-        '將這封信收好，3 個月後再打開'
+        '將這封信收好，3 個月後再打開',
       ],
-      fields: ['dialogue', 'notes']
+      fields: ['dialogue', 'notes'],
     },
-    color: '#bfad87'
-  }
-];
+    color: '#bfad87',
+  },
+]
 
 // 章節顏色對應（Morandi 色系）
 export const chapterColors = {
@@ -378,20 +378,20 @@ export const chapterColors = {
   12: '#a89968',
   13: '#d4c5a9',
   14: '#c9b896',
-  15: '#bfad87'
-};
+  15: '#bfad87',
+}
 
 // 獲取特定章節
 export function getChapter(id: number): Chapter | undefined {
-  return chapters.find(chapter => chapter.id === id);
+  return chapters.find(chapter => chapter.id === id)
 }
 
 // 獲取下一章
 export function getNextChapter(currentId: number): Chapter | undefined {
-  return chapters.find(chapter => chapter.id === currentId + 1);
+  return chapters.find(chapter => chapter.id === currentId + 1)
 }
 
 // 獲取上一章
 export function getPreviousChapter(currentId: number): Chapter | undefined {
-  return chapters.find(chapter => chapter.id === currentId - 1);
+  return chapters.find(chapter => chapter.id === currentId - 1)
 }

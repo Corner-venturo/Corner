@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Upload, Download, Plus, X } from 'lucide-react';
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Upload, Download, Plus, X } from 'lucide-react'
 
 interface TourPage {
-  id: string;
-  type: 'cover' | 'content';
-  title: string;
-  subtitle?: string;
-  description?: string;
-  image?: string;
-  location?: string;
+  id: string
+  type: 'cover' | 'content'
+  title: string
+  subtitle?: string
+  description?: string
+  image?: string
+  location?: string
 }
 
 /**
@@ -28,10 +28,10 @@ export default function EbookPage() {
       title: '旅遊電子書',
       subtitle: '探索世界上每個角落',
     },
-  ]);
+  ])
 
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const currentPage = pages[currentPageIndex];
+  const [currentPageIndex, setCurrentPageIndex] = useState(0)
+  const currentPage = pages[currentPageIndex]
 
   // 新增頁面
   const addPage = () => {
@@ -41,42 +41,42 @@ export default function EbookPage() {
       title: '新景點',
       description: '景點描述...',
       location: '地點',
-    };
-    setPages([...pages, newPage]);
-    setCurrentPageIndex(pages.length);
-  };
+    }
+    setPages([...pages, newPage])
+    setCurrentPageIndex(pages.length)
+  }
 
   // 刪除頁面
   const deletePage = (index: number) => {
-    if (pages.length <= 1) return; // 至少保留一頁
-    const newPages = pages.filter((_, i) => i !== index);
-    setPages(newPages);
+    if (pages.length <= 1) return // 至少保留一頁
+    const newPages = pages.filter((_, i) => i !== index)
+    setPages(newPages)
     if (currentPageIndex >= newPages.length) {
-      setCurrentPageIndex(newPages.length - 1);
+      setCurrentPageIndex(newPages.length - 1)
     }
-  };
+  }
 
   // 更新頁面資料
   const updatePage = (field: keyof TourPage, value: string) => {
-    const newPages = [...pages];
+    const newPages = [...pages]
     newPages[currentPageIndex] = {
       ...newPages[currentPageIndex],
       [field]: value,
-    };
-    setPages(newPages);
-  };
+    }
+    setPages(newPages)
+  }
 
   // 上傳圖片
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        updatePage('image', e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      const reader = new FileReader()
+      reader.onload = e => {
+        updatePage('image', e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -127,9 +127,9 @@ export default function EbookPage() {
                       size="sm"
                       variant="ghost"
                       className="h-6 w-6 p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deletePage(index);
+                      onClick={e => {
+                        e.stopPropagation()
+                        deletePage(index)
                       }}
                     >
                       <X className="h-3 w-3" />
@@ -147,7 +147,7 @@ export default function EbookPage() {
               <select
                 className="w-full px-3 py-2 border rounded-md"
                 value={currentPage.type}
-                onChange={(e) => updatePage('type', e.target.value)}
+                onChange={e => updatePage('type', e.target.value)}
               >
                 <option value="cover">封面</option>
                 <option value="content">內容頁</option>
@@ -158,7 +158,7 @@ export default function EbookPage() {
               <label className="text-sm font-medium mb-2 block">標題</label>
               <Input
                 value={currentPage.title}
-                onChange={(e) => updatePage('title', e.target.value)}
+                onChange={e => updatePage('title', e.target.value)}
                 placeholder="輸入標題"
               />
             </div>
@@ -168,7 +168,7 @@ export default function EbookPage() {
                 <label className="text-sm font-medium mb-2 block">副標題</label>
                 <Input
                   value={currentPage.subtitle || ''}
-                  onChange={(e) => updatePage('subtitle', e.target.value)}
+                  onChange={e => updatePage('subtitle', e.target.value)}
                   placeholder="輸入副標題"
                 />
               </div>
@@ -180,7 +180,7 @@ export default function EbookPage() {
                   <label className="text-sm font-medium mb-2 block">地點</label>
                   <Input
                     value={currentPage.location || ''}
-                    onChange={(e) => updatePage('location', e.target.value)}
+                    onChange={e => updatePage('location', e.target.value)}
                     placeholder="輸入地點"
                   />
                 </div>
@@ -189,7 +189,7 @@ export default function EbookPage() {
                   <label className="text-sm font-medium mb-2 block">描述</label>
                   <Textarea
                     value={currentPage.description || ''}
-                    onChange={(e) => updatePage('description', e.target.value)}
+                    onChange={e => updatePage('description', e.target.value)}
                     placeholder="輸入景點描述"
                     rows={4}
                   />
@@ -274,7 +274,8 @@ export default function EbookPage() {
                       <div
                         className="w-32 h-0.5 mb-6"
                         style={{
-                          background: 'linear-gradient(to right, transparent, #8CBCD0, transparent)',
+                          background:
+                            'linear-gradient(to right, transparent, #8CBCD0, transparent)',
                         }}
                       />
                       <p
@@ -353,5 +354,5 @@ export default function EbookPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

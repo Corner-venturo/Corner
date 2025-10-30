@@ -10,6 +10,7 @@
 **Venturo 是内部管理系统，所有已认证用户都应该能访问所有数据。**
 
 因此：
+
 - ✅ **禁用所有表的 RLS**
 - ❌ 不需要配置复杂的 RLS 策略
 - ✅ 使用 Supabase 的身份验证机制控制访问
@@ -97,6 +98,7 @@ COMMIT;
 **原因**: 表格启用了 RLS，但没有配置策略
 
 **解决方案**:
+
 ```sql
 ALTER TABLE public.table_name DISABLE ROW LEVEL SECURITY;
 ```
@@ -106,6 +108,7 @@ ALTER TABLE public.table_name DISABLE ROW LEVEL SECURITY;
 **原因**: 表格缺少字段
 
 **解决方案**:
+
 ```sql
 ALTER TABLE public.table_name
 ADD COLUMN IF NOT EXISTS column_name data_type;
@@ -116,6 +119,7 @@ ADD COLUMN IF NOT EXISTS column_name data_type;
 **原因**: RLS 阻止了写入操作
 
 **解决方案**:
+
 ```sql
 ALTER TABLE public.table_name DISABLE ROW LEVEL SECURITY;
 ```
@@ -186,7 +190,7 @@ WHERE schemaname = 'public'
 ```typescript
 // ✅ 好的做法：应用层权限控制
 if (user.role !== 'admin') {
-  throw new Error('Unauthorized');
+  throw new Error('Unauthorized')
 }
 
 // ❌ 避免：Supabase RLS
@@ -232,6 +236,7 @@ COMMIT;
 ---
 
 **记住**:
+
 - ❌ 不要启用 RLS
 - ❌ 不要创建 RLS 策略
 - ✅ 创建表格时立即禁用 RLS

@@ -3,29 +3,29 @@
  * 新增出納單對話框
  */
 
-'use client';
+'use client'
 
-import { FormDialog } from '@/components/dialog';
-import { Button } from '@/components/ui/button';
-import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
-import { FileText } from 'lucide-react';
-import { PaymentRequest } from '../types';
-import { useMemo } from 'react';
+import { FormDialog } from '@/components/dialog'
+import { Button } from '@/components/ui/button'
+import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { FileText } from 'lucide-react'
+import { PaymentRequest } from '../types'
+import { useMemo } from 'react'
 
 interface DisbursementDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  pendingRequests: PaymentRequest[];
-  selectedRequests: string[];
-  selectedAmount: number;
-  searchTerm: string;
-  orderNumber: string;
-  nextThursday: string | Date;
-  onSearchChange: (term: string) => void;
-  onSelectRequest: (requestId: string) => void;
-  onSelectAll: () => void;
-  onCreate: () => void;
-  onCancel: () => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  pendingRequests: PaymentRequest[]
+  selectedRequests: string[]
+  selectedAmount: number
+  searchTerm: string
+  orderNumber: string
+  nextThursday: string | Date
+  onSearchChange: (term: string) => void
+  onSelectRequest: (requestId: string) => void
+  onSelectAll: () => void
+  onCreate: () => void
+  onCancel: () => void
 }
 
 export function DisbursementDialog({
@@ -41,7 +41,7 @@ export function DisbursementDialog({
   onSelectRequest,
   onSelectAll,
   onCreate,
-  onCancel
+  onCancel,
 }: DisbursementDialogProps) {
   const columns = useMemo<TableColumn[]>(
     () => [
@@ -50,7 +50,9 @@ export function DisbursementDialog({
         label: (
           <input
             type="checkbox"
-            checked={selectedRequests.length === pendingRequests.length && pendingRequests.length > 0}
+            checked={
+              selectedRequests.length === pendingRequests.length && pendingRequests.length > 0
+            }
             onChange={onSelectAll}
             className="rounded border-morandi-secondary"
           />
@@ -63,41 +65,45 @@ export function DisbursementDialog({
             onChange={() => onSelectRequest(row.id)}
             className="rounded border-morandi-secondary"
           />
-        )
+        ),
       },
       {
         key: 'request_number',
         label: '請款單號',
         sortable: true,
-        render: (value) => <div className="font-medium text-morandi-primary">{value}</div>
+        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
       },
       {
         key: 'code',
         label: '團號',
         sortable: true,
-        render: (value) => <div className="font-medium">{value}</div>
+        render: value => <div className="font-medium">{value}</div>,
       },
       {
         key: 'tour_name',
         label: '團名',
         sortable: true,
-        render: (value) => <div className="text-morandi-secondary">{value}</div>
+        render: value => <div className="text-morandi-secondary">{value}</div>,
       },
       {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: (value) => <div className="text-sm text-morandi-secondary">{value}</div>
+        render: value => <div className="text-sm text-morandi-secondary">{value}</div>,
       },
       {
         key: 'total_amount',
         label: '金額',
         sortable: true,
-        render: (value) => <div className="font-bold text-morandi-primary text-right">NT$ {value.toLocaleString()}</div>
-      }
+        render: value => (
+          <div className="font-bold text-morandi-primary text-right">
+            NT$ {value.toLocaleString()}
+          </div>
+        ),
+      },
     ],
     [selectedRequests, pendingRequests.length, onSelectRequest, onSelectAll]
-  );
+  )
 
   return (
     <FormDialog
@@ -129,7 +135,9 @@ export function DisbursementDialog({
                 {selectedRequests.length > 0 && (
                   <span className="text-sm text-morandi-secondary">
                     • 已選 {selectedRequests.length} 筆 •
-                    <span className="font-bold text-morandi-primary ml-1">NT$ {selectedAmount.toLocaleString()}</span>
+                    <span className="font-bold text-morandi-primary ml-1">
+                      NT$ {selectedAmount.toLocaleString()}
+                    </span>
                   </span>
                 )}
               </div>
@@ -139,7 +147,7 @@ export function DisbursementDialog({
                   type="text"
                   placeholder="搜尋請款單號、團號或團名..."
                   value={searchTerm}
-                  onChange={(e) => onSearchChange(e.target.value)}
+                  onChange={e => onSearchChange(e.target.value)}
                   className="w-64 px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary"
                 />
               </div>
@@ -159,5 +167,5 @@ export function DisbursementDialog({
         )}
       </div>
     </FormDialog>
-  );
+  )
 }

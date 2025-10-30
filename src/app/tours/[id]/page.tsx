@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { ContentContainer } from '@/components/layout/content-container';
-import { useTourStore } from '@/stores';
-import { TourOverview } from '@/components/tours/tour-overview';
-import { TourOrders } from '@/components/tours/tour-orders';
-import { TourMembers } from '@/components/tours/tour-members';
-import { TourOperations } from '@/components/tours/tour-operations';
-import { TourPayments } from '@/components/tours/tour-payments';
-import { TourCosts } from '@/components/tours/tour-costs';
-import { TourDocuments } from '@/components/tours/tour-documents';
-import { TourAddOns } from '@/components/tours/tour-add-ons';
-import { TourRefunds } from '@/components/tours/tour-refunds';
+import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentContainer } from '@/components/layout/content-container'
+import { useTourStore } from '@/stores'
+import { TourOverview } from '@/components/tours/tour-overview'
+import { TourOrders } from '@/components/tours/tour-orders'
+import { TourMembers } from '@/components/tours/tour-members'
+import { TourOperations } from '@/components/tours/tour-operations'
+import { TourPayments } from '@/components/tours/tour-payments'
+import { TourCosts } from '@/components/tours/tour-costs'
+import { TourDocuments } from '@/components/tours/tour-documents'
+import { TourAddOns } from '@/components/tours/tour-add-ons'
+import { TourRefunds } from '@/components/tours/tour-refunds'
 
 const tabs = [
   { value: 'overview', label: '總覽' },
@@ -25,18 +25,18 @@ const tabs = [
   { value: 'payments', label: '收款紀錄' },
   { value: 'costs', label: '成本支出' },
   { value: 'documents', label: '文件確認' },
-];
+]
 
 export default function TourDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const { items: tours } = useTourStore();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false);
-  const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false);
-  const [triggerRefundAdd, setTriggerRefundAdd] = useState(false);
+  const params = useParams()
+  const router = useRouter()
+  const { items: tours } = useTourStore()
+  const [activeTab, setActiveTab] = useState('overview')
+  const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false)
+  const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
+  const [triggerRefundAdd, setTriggerRefundAdd] = useState(false)
 
-  const tour = tours.find((t) => t.id === params.id);
+  const tour = tours.find(t => t.id === params.id)
 
   if (!tour) {
     return (
@@ -47,7 +47,7 @@ export default function TourDetailPage() {
           </div>
         </ContentContainer>
       </div>
-    );
+    )
   }
 
   // 統一的按鈕配置
@@ -56,28 +56,28 @@ export default function TourDetailPage() {
     const getButtonLabel = () => {
       switch (activeTab) {
         case 'overview':
-          return '編輯';
+          return '編輯'
         case 'operations':
-          return '新增欄位';
+          return '新增欄位'
         case 'addons':
-          return '新增加購';
+          return '新增加購'
         case 'payments':
-          return '新增收款';
+          return '新增收款'
         case 'costs':
-          return '新增成本';
+          return '新增成本'
         case 'refunds':
-          return '新增退費';
+          return '新增退費'
         case 'orders':
-          return '新增訂單';
+          return '新增訂單'
         case 'members':
-          return '新增團員';
+          return '新增團員'
         default:
-          return null; // 不顯示按鈕
+          return null // 不顯示按鈕
       }
-    };
+    }
 
-    const buttonLabel = getButtonLabel();
-    if (!buttonLabel) return null;
+    const buttonLabel = getButtonLabel()
+    if (!buttonLabel) return null
 
     return {
       onAdd: () => {
@@ -85,60 +85,78 @@ export default function TourDetailPage() {
         switch (activeTab) {
           case 'overview':
             // 功能: 編輯旅遊團基本資料
-            break;
+            break
           case 'operations':
             // 功能: 新增團務欄位
-            break;
+            break
           case 'addons':
-            setTriggerAddOnAdd(true);
-            break;
+            setTriggerAddOnAdd(true)
+            break
           case 'payments':
-            setTriggerPaymentAdd(true);
-            break;
+            setTriggerPaymentAdd(true)
+            break
           case 'costs':
             // 功能: 新增成本支出
-            break;
+            break
           case 'refunds':
-            setTriggerRefundAdd(true);
-            break;
+            setTriggerRefundAdd(true)
+            break
           case 'orders':
             // 功能: 新增訂單
-            break;
+            break
           case 'members':
             // 功能: 新增團員
-            break;
+            break
         }
       },
-      addLabel: buttonLabel
-    };
-  };
+      addLabel: buttonLabel,
+    }
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <TourOverview tour={tour} />;
+        return <TourOverview tour={tour} />
       case 'orders':
-        return <TourOrders tour={tour} />;
+        return <TourOrders tour={tour} />
       case 'members':
-        return <TourMembers tour={tour} />;
+        return <TourMembers tour={tour} />
       case 'operations':
-        return <TourOperations tour={tour} />;
+        return <TourOperations tour={tour} />
       case 'addons':
-        return <TourAddOns tour={tour} triggerAdd={triggerAddOnAdd} onTriggerAddComplete={() => setTriggerAddOnAdd(false)} />;
+        return (
+          <TourAddOns
+            tour={tour}
+            triggerAdd={triggerAddOnAdd}
+            onTriggerAddComplete={() => setTriggerAddOnAdd(false)}
+          />
+        )
       case 'refunds':
-        return <TourRefunds tour={tour} triggerAdd={triggerRefundAdd} onTriggerAddComplete={() => setTriggerRefundAdd(false)} />;
+        return (
+          <TourRefunds
+            tour={tour}
+            triggerAdd={triggerRefundAdd}
+            onTriggerAddComplete={() => setTriggerRefundAdd(false)}
+          />
+        )
       case 'payments':
-        return <TourPayments tour={tour} triggerAdd={triggerPaymentAdd} onTriggerAddComplete={() => setTriggerPaymentAdd(false)} />;
+        return (
+          <TourPayments
+            tour={tour}
+            triggerAdd={triggerPaymentAdd}
+            onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
+          />
+        )
       case 'costs':
-        return <TourCosts tour={tour} />;
+        return <TourCosts tour={tour} />
       case 'documents':
-        return <TourDocuments tour={tour} />;
+        return <TourDocuments tour={tour} />
       default:
-        return <TourOverview tour={tour} />;
+        return <TourOverview tour={tour} />
     }
-  };
+  }
 
-  const buttonConfig = getButtonConfig();
+  const buttonConfig = getButtonConfig()
 
   return (
     <>
@@ -152,9 +170,7 @@ export default function TourDetailPage() {
         {...(buttonConfig ? { onAdd: buttonConfig.onAdd, addLabel: buttonConfig.addLabel } : {})}
       />
 
-      <ContentContainer>
-        {renderTabContent()}
-      </ContentContainer>
+      <ContentContainer>{renderTabContent()}</ContentContainer>
     </>
-  );
+  )
 }

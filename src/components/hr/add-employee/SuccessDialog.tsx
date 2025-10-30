@@ -1,18 +1,24 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Copy, Check } from 'lucide-react';
-import { CreatedEmployeeInfo } from './types';
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { Copy, Check } from 'lucide-react'
+import { CreatedEmployeeInfo } from './types'
 
 interface SuccessDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  createdEmployee: CreatedEmployeeInfo | null;
-  copiedField: string | null;
-  onCopy: (text: string, field: string) => void;
-  onClose: () => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  createdEmployee: CreatedEmployeeInfo | null
+  copiedField: string | null
+  onCopy: (text: string, field: string) => void
+  onClose: () => void
 }
 
 export function SuccessDialog({
@@ -21,7 +27,7 @@ export function SuccessDialog({
   createdEmployee,
   copiedField,
   onCopy,
-  onClose
+  onClose,
 }: SuccessDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -34,7 +40,9 @@ export function SuccessDialog({
         <div className="space-y-4">
           <div className="bg-green-50 border border-green-200 rounded-xl p-6">
             <p className="text-sm text-morandi-primary mb-4">
-              員工 <span className="font-bold text-morandi-gold">{createdEmployee?.display_name}</span> 已成功創建！
+              員工{' '}
+              <span className="font-bold text-morandi-gold">{createdEmployee?.display_name}</span>{' '}
+              已成功創建！
             </p>
 
             <div className="space-y-3">
@@ -91,11 +99,14 @@ export function SuccessDialog({
             </div>
           </div>
 
-          <Button onClick={onClose} className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white rounded-lg py-2.5">
+          <Button
+            onClick={onClose}
+            className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white rounded-lg py-2.5"
+          >
             完成
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

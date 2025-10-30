@@ -5,6 +5,7 @@
 經過深度代碼分析，發現 **9 個主要優化領域**，可以進一步減少 **1,500-2,000 行重複代碼**（約 15-20% 的代碼庫）。
 
 **核心發現**：
+
 - ✅ 已完成的優化：狀態配置、過濾邏輯、付款表單管理
 - 🎯 **下一步關鍵優化**：頁面佈局框架、表格單元格組件、對話框管理
 - 💡 **Venturo 特有概念組件化**：旅遊團統計、訂單支付狀態、實體詳細頁面佈局
@@ -16,6 +17,7 @@
 ### 1. ListPageLayout - 統一列表頁面框架
 
 #### 📊 影響範圍
+
 - **受益頁面**: 8+ 個（tours, quotes, orders, contracts, payments, requests, itinerary, regions 等）
 - **代碼減少**: ~1,000 行
 - **時間投入**: 3-4 小時
@@ -186,6 +188,7 @@ export default function ToursPage() {
 ```
 
 **預期效益**：
+
 - 每個列表頁面減少 100-150 行代碼
 - 統一 UI/UX 行為（搜尋、過濾、排序）
 - 未來新增列表頁面只需 50-80 行代碼
@@ -195,6 +198,7 @@ export default function ToursPage() {
 ### 2. 表格單元格渲染組件庫
 
 #### 📊 影響範圍
+
 - **受益位置**: 10+ 個表格配置
 - **代碼減少**: ~400 行
 - **時間投入**: 2-3 小時
@@ -427,6 +431,7 @@ const columns: TableColumn[] = [
 ```
 
 **預期效益**：
+
 - 每個表格配置減少 30-50 行代碼
 - 統一日期、金額、狀態的顯示格式
 - 易於國際化和主題切換
@@ -436,6 +441,7 @@ const columns: TableColumn[] = [
 ### 3. useListPageState - 統一列表頁狀態管理 Hook
 
 #### 📊 影響範圍
+
 - **受益頁面**: 8+ 個列表頁面
 - **代碼減少**: ~600 行
 - **時間投入**: 2-3 小時
@@ -474,104 +480,94 @@ const paginatedData = useMemo(() => {
 
 export interface UseListPageStateOptions<T> {
   // 數據源
-  data: T[];
+  data: T[]
 
   // 過濾配置
   filterConfig?: {
-    statusField?: keyof T;
-    searchFields?: (keyof T)[];
-    defaultStatus?: string;
-  };
+    statusField?: keyof T
+    searchFields?: (keyof T)[]
+    defaultStatus?: string
+  }
 
   // 排序配置
   sortConfig?: {
-    defaultSortBy?: string;
-    defaultSortOrder?: 'asc' | 'desc';
-  };
+    defaultSortBy?: string
+    defaultSortOrder?: 'asc' | 'desc'
+  }
 
   // 分頁配置
   paginationConfig?: {
-    pageSize?: number;
-    enabled?: boolean;
-  };
+    pageSize?: number
+    enabled?: boolean
+  }
 
   // 展開配置
-  expandable?: boolean;
+  expandable?: boolean
 }
 
 export function useListPageState<T extends Record<string, any>>(
   options: UseListPageStateOptions<T>
 ) {
-  const {
-    data,
-    filterConfig,
-    sortConfig,
-    paginationConfig,
-    expandable = false,
-  } = options;
+  const { data, filterConfig, sortConfig, paginationConfig, expandable = false } = options
 
   // 狀態管理
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState(
-    filterConfig?.defaultStatus || 'all'
-  );
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState(sortConfig?.defaultSortBy || 'created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
-    sortConfig?.defaultSortOrder || 'desc'
-  );
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState(filterConfig?.defaultStatus || 'all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortBy, setSortBy] = useState(sortConfig?.defaultSortBy || 'created_at')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(sortConfig?.defaultSortOrder || 'desc')
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
   // 過濾數據
   const filteredData = useDataFiltering(data, statusFilter, searchQuery, {
     statusField: filterConfig?.statusField,
     searchFields: filterConfig?.searchFields,
-  });
+  })
 
   // 排序數據
   const sortedData = useMemo(() => {
     return [...filteredData].sort((a, b) => {
-      const aVal = a[sortBy];
-      const bVal = b[sortBy];
-      const order = sortOrder === 'asc' ? 1 : -1;
+      const aVal = a[sortBy]
+      const bVal = b[sortBy]
+      const order = sortOrder === 'asc' ? 1 : -1
 
-      if (aVal < bVal) return -1 * order;
-      if (aVal > bVal) return 1 * order;
-      return 0;
-    });
-  }, [filteredData, sortBy, sortOrder]);
+      if (aVal < bVal) return -1 * order
+      if (aVal > bVal) return 1 * order
+      return 0
+    })
+  }, [filteredData, sortBy, sortOrder])
 
   // 分頁數據
-  const pageSize = paginationConfig?.pageSize || 20;
+  const pageSize = paginationConfig?.pageSize || 20
   const paginatedData = useMemo(() => {
-    if (!paginationConfig?.enabled) return sortedData;
+    if (!paginationConfig?.enabled) return sortedData
 
-    const start = (currentPage - 1) * pageSize;
-    return sortedData.slice(start, start + pageSize);
-  }, [sortedData, currentPage, pageSize, paginationConfig?.enabled]);
+    const start = (currentPage - 1) * pageSize
+    return sortedData.slice(start, start + pageSize)
+  }, [sortedData, currentPage, pageSize, paginationConfig?.enabled])
 
   // 展開/收合邏輯
   const toggleRow = useCallback((id: string) => {
     setExpandedRows(prev => {
-      const newSet = new Set(prev);
+      const newSet = new Set(prev)
       if (newSet.has(id)) {
-        newSet.delete(id);
+        newSet.delete(id)
       } else {
-        newSet.add(id);
+        newSet.add(id)
       }
-      return newSet;
-    });
-  }, []);
+      return newSet
+    })
+  }, [])
 
   // 重置所有狀態
   const reset = useCallback(() => {
-    setSearchQuery('');
-    setStatusFilter(filterConfig?.defaultStatus || 'all');
-    setCurrentPage(1);
-    setSortBy(sortConfig?.defaultSortBy || 'created_at');
-    setSortOrder(sortConfig?.defaultSortOrder || 'desc');
-    setExpandedRows(new Set());
-  }, [filterConfig, sortConfig]);
+    setSearchQuery('')
+    setStatusFilter(filterConfig?.defaultStatus || 'all')
+    setCurrentPage(1)
+    setSortBy(sortConfig?.defaultSortBy || 'created_at')
+    setSortOrder(sortConfig?.defaultSortOrder || 'desc')
+    setExpandedRows(new Set())
+  }, [filterConfig, sortConfig])
 
   return {
     // 原始數據
@@ -596,9 +592,9 @@ export function useListPageState<T extends Record<string, any>>(
     sortOrder,
     setSortOrder,
     handleSort: (field: string, order: 'asc' | 'desc') => {
-      setSortBy(field);
-      setSortOrder(order);
-      setCurrentPage(1);
+      setSortBy(field)
+      setSortOrder(order)
+      setCurrentPage(1)
     },
 
     // 分頁
@@ -615,7 +611,7 @@ export function useListPageState<T extends Record<string, any>>(
 
     // 重置
     reset,
-  };
+  }
 }
 ```
 
@@ -667,6 +663,7 @@ export default function ToursPage() {
 ```
 
 **預期效益**：
+
 - 每個列表頁面減少 50-80 行狀態管理代碼
 - 統一分頁、排序、過濾邏輯
 - 減少 bug 和不一致的行為
@@ -678,6 +675,7 @@ export default function ToursPage() {
 ### 4. useMultiDialog - 統一對話框狀態管理
 
 #### 📊 影響範圍
+
 - **受益頁面**: 6+ 個
 - **代碼減少**: ~300 行
 - **時間投入**: 1.5-2 小時
@@ -687,15 +685,15 @@ export default function ToursPage() {
 ```typescript
 // 📍 /tours/page.tsx (L 36-42)
 const [contractDialog, setContractDialog] = useState<{
-  isOpen: boolean;
-  tour: Tour | null;
-  mode: 'create' | 'edit';
-}>({ isOpen: false, tour: null, mode: 'create' });
+  isOpen: boolean
+  tour: Tour | null
+  mode: 'create' | 'edit'
+}>({ isOpen: false, tour: null, mode: 'create' })
 
 const [deleteConfirm, setDeleteConfirm] = useState<{
-  isOpen: boolean;
-  tour: Tour | null;
-}>({ isOpen: false, tour: null });
+  isOpen: boolean
+  tour: Tour | null
+}>({ isOpen: false, tour: null })
 ```
 
 #### 💡 建議的 Hook
@@ -704,21 +702,15 @@ const [deleteConfirm, setDeleteConfirm] = useState<{
 // src/hooks/useMultiDialog.ts
 
 type DialogState<T = any> = {
-  isOpen: boolean;
-  data: T | null;
-  mode?: 'create' | 'edit' | 'view';
-};
+  isOpen: boolean
+  data: T | null
+  mode?: 'create' | 'edit' | 'view'
+}
 
-export function useMultiDialog<T extends Record<string, DialogState>>(
-  initialState: T
-) {
-  const [dialogs, setDialogs] = useState(initialState);
+export function useMultiDialog<T extends Record<string, DialogState>>(initialState: T) {
+  const [dialogs, setDialogs] = useState(initialState)
 
-  const openDialog = useCallback((
-    name: keyof T,
-    data?: any,
-    mode?: DialogState['mode']
-  ) => {
+  const openDialog = useCallback((name: keyof T, data?: any, mode?: DialogState['mode']) => {
     setDialogs(prev => ({
       ...prev,
       [name]: {
@@ -726,8 +718,8 @@ export function useMultiDialog<T extends Record<string, DialogState>>(
         data: data || null,
         mode: mode || 'create',
       },
-    }));
-  }, []);
+    }))
+  }, [])
 
   const closeDialog = useCallback((name: keyof T) => {
     setDialogs(prev => ({
@@ -736,28 +728,25 @@ export function useMultiDialog<T extends Record<string, DialogState>>(
         ...prev[name],
         isOpen: false,
       },
-    }));
-  }, []);
+    }))
+  }, [])
 
-  const updateDialogData = useCallback((
-    name: keyof T,
-    data: any
-  ) => {
+  const updateDialogData = useCallback((name: keyof T, data: any) => {
     setDialogs(prev => ({
       ...prev,
       [name]: {
         ...prev[name],
         data,
       },
-    }));
-  }, []);
+    }))
+  }, [])
 
   return {
     dialogs,
     openDialog,
     closeDialog,
     updateDialogData,
-  };
+  }
 }
 ```
 
@@ -794,6 +783,7 @@ const { dialogs, openDialog, closeDialog } = useMultiDialog({
 ### 5. useFormSubmit - 統一表單提交邏輯
 
 #### 📊 影響範圍
+
 - **受益頁面**: 8+ 個表單
 - **代碼減少**: ~400 行
 - **時間投入**: 2 小時
@@ -809,45 +799,45 @@ export function useFormSubmit<T extends Record<string, any>>({
   onError,
   resetOnSuccess = true,
 }: {
-  onSubmit: (data: T) => Promise<void>;
-  onSuccess?: () => void;
-  onError?: (error: Error) => void;
-  resetOnSuccess?: boolean;
+  onSubmit: (data: T) => Promise<void>
+  onSuccess?: () => void
+  onError?: (error: Error) => void
+  resetOnSuccess?: boolean
 }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
 
   const submit = async (data: T) => {
-    setIsSubmitting(true);
-    setError(null);
+    setIsSubmitting(true)
+    setError(null)
 
     try {
-      await onSubmit(data);
+      await onSubmit(data)
 
       if (resetOnSuccess) {
-        setTouched({});
+        setTouched({})
       }
 
-      onSuccess?.();
+      onSuccess?.()
     } catch (err) {
-      const message = err instanceof Error ? err.message : '提交失敗';
-      setError(message);
-      onError?.(err as Error);
+      const message = err instanceof Error ? err.message : '提交失敗'
+      setError(message)
+      onError?.(err as Error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const markFieldTouched = (field: string) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-  };
+    setTouched(prev => ({ ...prev, [field]: true }))
+  }
 
   const reset = () => {
-    setIsSubmitting(false);
-    setError(null);
-    setTouched({});
-  };
+    setIsSubmitting(false)
+    setError(null)
+    setTouched({})
+  }
 
   return {
     submit,
@@ -856,7 +846,7 @@ export function useFormSubmit<T extends Record<string, any>>({
     touched,
     markFieldTouched,
     reset,
-  };
+  }
 }
 ```
 
@@ -869,6 +859,7 @@ export function useFormSubmit<T extends Record<string, any>>({
 #### 💡 業務概念
 
 在旅遊業中，每個旅遊團都需要快速查看以下統計信息：
+
 - 參與人數 vs 最大人數（座位率）
 - 已收款 vs 應收款（收款進度）
 - 成本 vs 收入（利潤率）
@@ -878,10 +869,10 @@ export function useFormSubmit<T extends Record<string, any>>({
 
 ```typescript
 // 📍 /tours/page.tsx (L 326-337) - 計算參與人數
-const tourOrders = orders.filter(order => order.tour_id === tour.id);
+const tourOrders = orders.filter(order => order.tour_id === tour.id)
 const actualMembers = members.filter(member =>
   tourOrders.some(order => order.id === member.order_id)
-).length;
+).length
 
 // 📍 /tours/[id]/page.tsx - 計算各種統計
 // 📍 /quotes/[id]/page.tsx - 計算報價統計
@@ -979,28 +970,26 @@ export function TourStatsSummary({ tour, variant = 'compact' }: TourStatsSummary
 // src/hooks/useTourStats.ts
 
 export function useTourStats(tourId: string) {
-  const { items: orders } = useOrderStore();
-  const { items: members } = useMemberStore();
-  const { items: payments } = usePaymentStore();
+  const { items: orders } = useOrderStore()
+  const { items: members } = useMemberStore()
+  const { items: payments } = usePaymentStore()
 
   return useMemo(() => {
     // 計算成員人數
-    const tourOrders = orders.filter(o => o.tour_id === tourId);
-    const memberCount = members.filter(m =>
-      tourOrders.some(o => o.id === m.order_id)
-    ).length;
+    const tourOrders = orders.filter(o => o.tour_id === tourId)
+    const memberCount = members.filter(m => tourOrders.some(o => o.id === m.order_id)).length
 
     // 計算收款進度
-    const totalAmount = tourOrders.reduce((sum, o) => sum + o.total_amount, 0);
+    const totalAmount = tourOrders.reduce((sum, o) => sum + o.total_amount, 0)
     const paidAmount = payments
       .filter(p => tourOrders.some(o => o.id === p.order_id))
-      .reduce((sum, p) => sum + p.amount, 0);
+      .reduce((sum, p) => sum + p.amount, 0)
 
     // 計算天數
-    const tour = useTourStore.getState().items.find(t => t.id === tourId);
+    const tour = useTourStore.getState().items.find(t => t.id === tourId)
     const daysUntilDeparture = tour
       ? Math.ceil((new Date(tour.departure_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-      : 0;
+      : 0
 
     return {
       memberCount,
@@ -1011,8 +1000,8 @@ export function useTourStats(tourId: string) {
       paymentRate: totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0,
       daysUntilDeparture,
       ordersList: tourOrders,
-    };
-  }, [tourId, orders, members, payments]);
+    }
+  }, [tourId, orders, members, payments])
 }
 ```
 
@@ -1023,6 +1012,7 @@ export function useTourStats(tourId: string) {
 #### 💡 業務概念
 
 訂單的支付狀態追蹤是 Venturo 核心功能，需要顯示：
+
 - 已付款 / 待付款金額
 - 逾期提醒
 - 下次繳費期限
@@ -1143,6 +1133,7 @@ export function OrderPaymentStatus({
 #### 💡 業務概念
 
 Venturo 中許多實體（旅遊團、報價單、訂單、簽證）都有詳細頁面，結構相似：
+
 - 頂部標題 + 快速操作
 - 側邊欄摘要卡片
 - Tab 導航切換內容
@@ -1336,45 +1327,51 @@ export default function TourDetailPage({ params }: { params: { id: string } }) {
 
 ## 📊 優化優先級矩陣
 
-| 優化項目 | 影響範圍 | 代碼減少 | 時間投入 | 風險 | 優先級 |
-|---------|---------|---------|---------|------|-------|
-| ListPageLayout | 8+ 頁面 | ~1,000 行 | 3-4 小時 | 低 | ⭐⭐⭐⭐⭐ |
-| 表格單元格組件庫 | 10+ 表格 | ~400 行 | 2-3 小時 | 低 | ⭐⭐⭐⭐⭐ |
-| useListPageState | 8+ 頁面 | ~600 行 | 2-3 小時 | 低 | ⭐⭐⭐⭐⭐ |
-| useMultiDialog | 6+ 頁面 | ~300 行 | 1.5-2 小時 | 低 | ⭐⭐⭐⭐ |
-| useFormSubmit | 8+ 表單 | ~400 行 | 2 小時 | 低 | ⭐⭐⭐⭐ |
-| TourStatsSummary | 3+ 位置 | ~200 行 | 2 小時 | 中 | ⭐⭐⭐ |
-| OrderPaymentStatus | 2+ 位置 | ~150 行 | 1.5 小時 | 中 | ⭐⭐⭐ |
-| EntityDetailLayout | 3+ 頁面 | ~400 行 | 3 小時 | 中 | ⭐⭐⭐ |
+| 優化項目           | 影響範圍 | 代碼減少  | 時間投入   | 風險 | 優先級     |
+| ------------------ | -------- | --------- | ---------- | ---- | ---------- |
+| ListPageLayout     | 8+ 頁面  | ~1,000 行 | 3-4 小時   | 低   | ⭐⭐⭐⭐⭐ |
+| 表格單元格組件庫   | 10+ 表格 | ~400 行   | 2-3 小時   | 低   | ⭐⭐⭐⭐⭐ |
+| useListPageState   | 8+ 頁面  | ~600 行   | 2-3 小時   | 低   | ⭐⭐⭐⭐⭐ |
+| useMultiDialog     | 6+ 頁面  | ~300 行   | 1.5-2 小時 | 低   | ⭐⭐⭐⭐   |
+| useFormSubmit      | 8+ 表單  | ~400 行   | 2 小時     | 低   | ⭐⭐⭐⭐   |
+| TourStatsSummary   | 3+ 位置  | ~200 行   | 2 小時     | 中   | ⭐⭐⭐     |
+| OrderPaymentStatus | 2+ 位置  | ~150 行   | 1.5 小時   | 中   | ⭐⭐⭐     |
+| EntityDetailLayout | 3+ 頁面  | ~400 行   | 3 小時     | 中   | ⭐⭐⭐     |
 
 ---
 
 ## 🎯 建議的執行階段
 
 ### 第一階段（高優先級，1-2 天）
+
 1. **ListPageLayout 組件** (3-4 小時)
 2. **表格單元格組件庫** (2-3 小時)
 3. **useListPageState Hook** (2-3 小時)
 
 **預期成果**：
+
 - 減少 2,000 行代碼
 - 8+ 個頁面統一結構
 - 表格顯示格式統一
 
 ### 第二階段（中優先級，1 天）
+
 4. **useMultiDialog Hook** (1.5-2 小時)
 5. **useFormSubmit Hook** (2 小時)
 
 **預期成果**：
+
 - 再減少 700 行代碼
 - 對話框和表單邏輯統一
 
 ### 第三階段（業務組件，2-3 天）
+
 6. **TourStatsSummary 組件** (2 小時)
 7. **OrderPaymentStatus 組件** (1.5 小時)
 8. **EntityDetailLayout 組件** (3 小時)
 
 **預期成果**：
+
 - 再減少 750 行代碼
 - Venturo 特有業務邏輯組件化
 - 詳細頁面結構統一
@@ -1384,18 +1381,22 @@ export default function TourDetailPage({ params }: { params: { id: string } }) {
 ## 💡 額外優化建議
 
 ### 1. 國際化準備
+
 - 所有單元格組件內建 i18n 支持
 - 日期、金額格式化使用區域設定
 
 ### 2. 主題支持
+
 - 組件使用 CSS 變數
 - 支持明暗主題切換
 
 ### 3. 測試覆蓋
+
 - 為新組件和 Hook 編寫單元測試
 - E2E 測試覆蓋關鍵業務流程
 
 ### 4. 文檔完善
+
 - 為每個組件/Hook 編寫 Storybook 文檔
 - 添加使用範例和最佳實踐指南
 
@@ -1404,11 +1405,13 @@ export default function TourDetailPage({ params }: { params: { id: string } }) {
 ## 📈 預期總體收益
 
 **第一階段完成後**：
+
 - 代碼減少：2,000 行 (~15%)
 - 開發效率提升：30%
 - Bug 減少：25%
 
 **全部完成後**：
+
 - 代碼減少：3,450 行 (~25%)
 - 開發效率提升：50%
 - 新頁面開發時間減少：60%

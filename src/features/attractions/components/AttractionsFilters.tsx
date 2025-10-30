@@ -1,25 +1,25 @@
-import { Button } from '@/components/ui/button';
-import { Combobox } from '@/components/ui/combobox';
+import { Button } from '@/components/ui/button'
+import { Combobox } from '@/components/ui/combobox'
 
 // ============================================
 // 景點篩選器組件
 // ============================================
 
 interface AttractionsFiltersProps {
-  selectedCountry: string;
-  setSelectedCountry: (value: string) => void;
-  selectedRegion: string;
-  setSelectedRegion: (value: string) => void;
-  selectedCity: string;
-  setSelectedCity: (value: string) => void;
-  selectedCategory: string;
-  setSelectedCategory: (value: string) => void;
-  hasActiveFilters: boolean;
-  clearFilters: () => void;
-  countries: any[];
-  availableRegions: any[];
-  availableCities: any[];
-  categories: string[];
+  selectedCountry: string
+  setSelectedCountry: (value: string) => void
+  selectedRegion: string
+  setSelectedRegion: (value: string) => void
+  selectedCity: string
+  setSelectedCity: (value: string) => void
+  selectedCategory: string
+  setSelectedCategory: (value: string) => void
+  hasActiveFilters: boolean
+  clearFilters: () => void
+  countries: any[]
+  availableRegions: any[]
+  availableCities: any[]
+  categories: string[]
 }
 
 export function AttractionsFilters({
@@ -44,17 +44,17 @@ export function AttractionsFilters({
       <div className="min-w-[200px]">
         <Combobox
           value={selectedCountry}
-          onChange={(value) => {
-            setSelectedCountry(value);
-            setSelectedRegion('');
-            setSelectedCity('');
+          onChange={value => {
+            setSelectedCountry(value)
+            setSelectedRegion('')
+            setSelectedCity('')
           }}
           options={[
             { value: '', label: '所有國家' },
             ...countries.map(country => ({
               value: country.id,
-              label: `${country.emoji} ${country.name}`
-            }))
+              label: `${country.emoji} ${country.name}`,
+            })),
           ]}
           placeholder="選擇國家..."
           emptyMessage="找不到符合的國家"
@@ -68,16 +68,16 @@ export function AttractionsFilters({
         <div className="min-w-[180px]">
           <Combobox
             value={selectedRegion}
-            onChange={(value) => {
-              setSelectedRegion(value);
-              setSelectedCity('');
+            onChange={value => {
+              setSelectedRegion(value)
+              setSelectedCity('')
             }}
             options={[
               { value: '', label: '所有地區' },
               ...availableRegions.map(region => ({
                 value: region.id,
-                label: region.name
-              }))
+                label: region.name,
+              })),
             ]}
             placeholder="選擇地區..."
             emptyMessage="找不到符合的地區"
@@ -97,8 +97,8 @@ export function AttractionsFilters({
               { value: '', label: '所有城市' },
               ...availableCities.map(city => ({
                 value: city.id,
-                label: city.name
-              }))
+                label: city.name,
+              })),
             ]}
             placeholder="選擇城市..."
             emptyMessage="找不到符合的城市"
@@ -115,7 +115,7 @@ export function AttractionsFilters({
           onChange={setSelectedCategory}
           options={categories.map(cat => ({
             value: cat,
-            label: cat === 'all' ? '所有類別' : cat
+            label: cat === 'all' ? '所有類別' : cat,
           }))}
           placeholder="選擇類別..."
           emptyMessage="找不到符合的類別"
@@ -126,14 +126,10 @@ export function AttractionsFilters({
 
       {/* 清除篩選 */}
       {hasActiveFilters && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={clearFilters}
-        >
+        <Button variant="outline" size="sm" onClick={clearFilters}>
           清除篩選
         </Button>
       )}
     </div>
-  );
+  )
 }

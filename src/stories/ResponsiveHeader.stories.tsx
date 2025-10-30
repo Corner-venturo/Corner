@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { Plus, Download } from 'lucide-react';
+import type { Meta, StoryObj } from '@storybook/react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { Plus, Download } from 'lucide-react'
 
 const meta = {
   title: 'Layout/ResponsiveHeader',
@@ -10,16 +10,16 @@ const meta = {
     layout: 'fullscreen',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof ResponsiveHeader>;
+} satisfies Meta<typeof ResponsiveHeader>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Simple: Story = {
   args: {
     title: 'Page Title',
   },
-};
+}
 
 export const WithBreadcrumb: Story = {
   args: {
@@ -29,7 +29,7 @@ export const WithBreadcrumb: Story = {
       { label: 'Tours', href: '/tours' },
     ],
   },
-};
+}
 
 export const WithActions: Story = {
   args: {
@@ -51,14 +51,12 @@ export const WithActions: Story = {
       </div>
     ),
   },
-};
+}
 
 export const WithDescription: Story = {
   args: {
     title: 'Dashboard',
     description: 'Overview of your business metrics and recent activities',
-    breadcrumb: [
-      { label: 'Home', href: '/' },
-    ],
+    breadcrumb: [{ label: 'Home', href: '/' }],
   },
-};
+}

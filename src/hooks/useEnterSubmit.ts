@@ -1,4 +1,4 @@
-import { KeyboardEvent, useState, useCallback } from 'react';
+import { KeyboardEvent, useState, useCallback } from 'react'
 
 /**
  * 統一的 Enter 鍵提交處理 Hook（支援中文輸入法）
@@ -8,22 +8,25 @@ import { KeyboardEvent, useState, useCallback } from 'react';
  * <Input onKeyDown={handleKeyDown} {...compositionProps} />
  */
 export function useEnterSubmit(onSubmit: () => void) {
-  const [isComposing, setIsComposing] = useState(false);
+  const [isComposing, setIsComposing] = useState(false)
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    // 如果正在使用輸入法（如注音、拼音），不要觸發提交
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-      e.preventDefault();
-      onSubmit();
-    }
-  }, [onSubmit, isComposing]);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      // 如果正在使用輸入法（如注音、拼音），不要觸發提交
+      if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+        e.preventDefault()
+        onSubmit()
+      }
+    },
+    [onSubmit, isComposing]
+  )
 
   const compositionProps = {
     onCompositionStart: () => setIsComposing(true),
     onCompositionEnd: () => setIsComposing(false),
-  };
+  }
 
-  return { handleKeyDown, compositionProps };
+  return { handleKeyDown, compositionProps }
 }
 
 /**
@@ -34,21 +37,24 @@ export function useEnterSubmit(onSubmit: () => void) {
  * <Textarea onKeyDown={handleKeyDown} {...compositionProps} />
  */
 export function useEnterSubmitWithShift(onSubmit: () => void) {
-  const [isComposing, setIsComposing] = useState(false);
+  const [isComposing, setIsComposing] = useState(false)
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Shift+Enter = 換行，Enter = 提交
-    // 如果正在使用輸入法（如注音、拼音），不要觸發提交
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-      e.preventDefault();
-      onSubmit();
-    }
-  }, [onSubmit, isComposing]);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      // Shift+Enter = 換行，Enter = 提交
+      // 如果正在使用輸入法（如注音、拼音），不要觸發提交
+      if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+        e.preventDefault()
+        onSubmit()
+      }
+    },
+    [onSubmit, isComposing]
+  )
 
   const compositionProps = {
     onCompositionStart: () => setIsComposing(true),
     onCompositionEnd: () => setIsComposing(false),
-  };
+  }
 
-  return { handleKeyDown, compositionProps };
+  return { handleKeyDown, compositionProps }
 }

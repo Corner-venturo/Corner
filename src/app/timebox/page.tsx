@@ -51,9 +51,9 @@ export default function TimeboxPage() {
         icon={Clock}
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '箱型時間', href: '/timebox' }
+          { label: '箱型時間', href: '/timebox' },
         ]}
-        actions={(
+        actions={
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -74,7 +74,7 @@ export default function TimeboxPage() {
               <span className="hidden sm:inline">覆盤本週</span>
             </Button>
           </div>
-        )}
+        }
       >
         <div className="flex items-center gap-6">
           {/* 週選擇器 */}
@@ -94,14 +94,16 @@ export default function TimeboxPage() {
             <span className="text-sm text-morandi-secondary min-w-[120px] text-center font-medium">
               {selectedWeek.toLocaleDateString('zh-TW', {
                 month: 'numeric',
-                day: 'numeric'
-              })} - {
-                new Date(selectedWeek.getTime() + 6 * 24 * 60 * 60 * 1000)
-                  .toLocaleDateString('zh-TW', {
-                    month: 'numeric',
-                    day: 'numeric'
-                  })
-              }
+                day: 'numeric',
+              })}{' '}
+              -{' '}
+              {new Date(selectedWeek.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString(
+                'zh-TW',
+                {
+                  month: 'numeric',
+                  day: 'numeric',
+                }
+              )}
             </span>
             <Button
               variant="outline"
@@ -120,23 +122,25 @@ export default function TimeboxPage() {
           {/* 時間間隔切換 */}
           <div className="flex items-center gap-1">
             <Button
-              variant={timeInterval === 30 ? "default" : "outline"}
+              variant={timeInterval === 30 ? 'default' : 'outline'}
               size="sm"
               onClick={() => setTimeInterval(30)}
-              className={timeInterval === 30
-                ? "bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold/20"
-                : "text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
+              className={
+                timeInterval === 30
+                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold/20'
+                  : 'text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20'
               }
             >
               30分鐘
             </Button>
             <Button
-              variant={timeInterval === 60 ? "default" : "outline"}
+              variant={timeInterval === 60 ? 'default' : 'outline'}
               size="sm"
               onClick={() => setTimeInterval(60)}
-              className={timeInterval === 60
-                ? "bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold/20"
-                : "text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20"
+              className={
+                timeInterval === 60
+                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white border-morandi-gold/20'
+                  : 'text-morandi-secondary hover:text-morandi-primary border-border hover:border-morandi-gold/20'
               }
             >
               1小時
@@ -152,10 +156,7 @@ export default function TimeboxPage() {
         {/* 時間箱視圖 - 填滿空間，內部可滾動 */}
         <div className="h-full">
           <div className="h-full border border-border rounded-lg bg-card shadow-sm overflow-hidden">
-            <WeekView
-              selectedWeek={selectedWeek}
-              timeInterval={timeInterval}
-            />
+            <WeekView selectedWeek={selectedWeek} timeInterval={timeInterval} />
           </div>
         </div>
       </div>

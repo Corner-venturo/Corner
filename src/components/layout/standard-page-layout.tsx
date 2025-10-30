@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import React, { ReactNode } from 'react';
-import { ResponsiveHeader } from './responsive-header';
-import type { LucideIcon } from 'lucide-react';
+import React, { ReactNode } from 'react'
+import { ResponsiveHeader } from './responsive-header'
+import type { LucideIcon } from 'lucide-react'
 
 /**
  * 麵包屑項目
  */
 export interface BreadcrumbItem {
-  label: string;
-  href?: string;
+  label: string
+  href?: string
 }
 
 /**
  * Tab 項目
  */
 export interface TabItem {
-  value: string;
-  label: string;
-  icon?: LucideIcon;
+  value: string
+  label: string
+  icon?: LucideIcon
 }
 
 /**
@@ -29,59 +29,59 @@ export interface TabItem {
 export interface StandardPageLayoutProps {
   // ========== 頁面配置 ==========
   /** 頁面標題 */
-  title: string;
+  title: string
   /** 頁面圖示 */
-  icon?: LucideIcon;
+  icon?: LucideIcon
   /** 麵包屑導航 */
-  breadcrumb?: BreadcrumbItem[];
+  breadcrumb?: BreadcrumbItem[]
 
   // ========== Header 配置 ==========
   /** 是否顯示搜尋框 */
-  showSearch?: boolean;
+  showSearch?: boolean
   /** 搜尋文字 */
-  searchTerm?: string;
+  searchTerm?: string
   /** 搜尋變更回調 */
-  onSearchChange?: (value: string) => void;
+  onSearchChange?: (value: string) => void
   /** 搜尋框佔位符 */
-  searchPlaceholder?: string;
+  searchPlaceholder?: string
 
   /** 狀態 Tab 配置 */
-  tabs?: TabItem[];
+  tabs?: TabItem[]
   /** 當前啟用的 Tab */
-  activeTab?: string;
+  activeTab?: string
   /** Tab 變更回調 */
-  onTabChange?: (tab: string) => void;
+  onTabChange?: (tab: string) => void
 
   /** Header 右側自訂操作按鈕 */
-  actions?: ReactNode;
+  actions?: ReactNode
   /** 新增按鈕點擊事件 */
-  onAdd?: () => void;
+  onAdd?: () => void
   /** 新增按鈕文字 */
-  addLabel?: string;
+  addLabel?: string
 
   /** Header 下方的自訂內容（週選擇器、過濾器等） */
-  headerChildren?: ReactNode;
+  headerChildren?: ReactNode
 
   // ========== 內容配置 ==========
   /** 主要內容 */
-  children: ReactNode;
+  children: ReactNode
 
   /**
    * 內容區域的 overflow 行為
    * - 'auto': 內容可滾動（適用於列表、表格等）
    * - 'hidden': 內容不滾動，由子組件自行處理（適用於工作空間、時間箱等）
    */
-  contentOverflow?: 'auto' | 'hidden';
+  contentOverflow?: 'auto' | 'hidden'
 
   /**
    * 內容區域是否需要 padding
    * - true: 有 padding（預設，適用於一般頁面）
    * - false: 無 padding（適用於需要完全填滿的頁面，如工作空間）
    */
-  contentPadding?: boolean;
+  contentPadding?: boolean
 
   /** 自訂外層 className */
-  className?: string;
+  className?: string
 }
 
 /**
@@ -163,5 +163,5 @@ export function StandardPageLayout({
         {children}
       </div>
     </div>
-  );
+  )
 }

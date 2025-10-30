@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { TourSearchSelect } from './TourSearchSelect';
-import { OrderSearchSelect } from './OrderSearchSelect';
-import { RequestDateInput } from './RequestDateInput';
-import { RequestItemForm } from './RequestItemForm';
-import { RequestItemList } from './RequestItemList';
-import { useRequestForm } from '../hooks/useRequestForm';
-import { useRequestOperations } from '../hooks/useRequestOperations';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { TourSearchSelect } from './TourSearchSelect'
+import { OrderSearchSelect } from './OrderSearchSelect'
+import { RequestDateInput } from './RequestDateInput'
+import { RequestItemForm } from './RequestItemForm'
+import { RequestItemList } from './RequestItemList'
+import { useRequestForm } from '../hooks/useRequestForm'
+import { useRequestOperations } from '../hooks/useRequestOperations'
 
 interface AddRequestDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) {
@@ -44,16 +44,16 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     resetForm,
     suppliers,
     tours,
-    orders
-  } = useRequestForm();
+    orders,
+  } = useRequestForm()
 
-  const { generateRequestNumber, createRequest } = useRequestOperations();
+  const { generateRequestNumber, createRequest } = useRequestOperations()
 
   const handleSubmit = async () => {
-    const selectedTour = tours.find(t => t.id === formData.tour_id);
-    const selectedOrder = orders.find(o => o.id === formData.order_id);
+    const selectedTour = tours.find(t => t.id === formData.tour_id)
+    const selectedOrder = orders.find(o => o.id === formData.order_id)
 
-    if (!selectedTour) return;
+    if (!selectedTour) return
 
     await createRequest(
       formData,
@@ -61,16 +61,16 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       selectedTour.name,
       selectedTour.code,
       selectedOrder?.order_number
-    );
+    )
 
-    resetForm();
-    onOpenChange(false);
-  };
+    resetForm()
+    onOpenChange(false)
+  }
 
   const handleCancel = () => {
-    resetForm();
-    onOpenChange(false);
-  };
+    resetForm()
+    onOpenChange(false)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -90,14 +90,14 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
               <TourSearchSelect
                 value={tourSearchValue}
                 onChange={setTourSearchValue}
-                onSelect={(tour) => {
+                onSelect={tour => {
                   setFormData(prev => ({
                     ...prev,
                     tour_id: tour.id,
-                    order_id: ''
-                  }));
-                  setTourSearchValue(`${tour.code} - ${tour.name}`);
-                  setOrderSearchValue('');
+                    order_id: '',
+                  }))
+                  setTourSearchValue(`${tour.code} - ${tour.name}`)
+                  setOrderSearchValue('')
                 }}
                 tours={filteredTours}
                 showDropdown={showTourDropdown}
@@ -108,12 +108,12 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
               <OrderSearchSelect
                 value={orderSearchValue}
                 onChange={setOrderSearchValue}
-                onSelect={(order) => {
+                onSelect={order => {
                   setFormData(prev => ({
                     ...prev,
-                    order_id: order.id
-                  }));
-                  setOrderSearchValue(`${order.order_number} - ${order.contact_person}`);
+                    order_id: order.id,
+                  }))
+                  setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
                 }}
                 orders={filteredOrders}
                 showDropdown={showOrderDropdown}
@@ -127,8 +127,8 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                   setFormData(prev => ({
                     ...prev,
                     request_date: date,
-                    is_special_billing: isSpecialBilling
-                  }));
+                    is_special_billing: isSpecialBilling,
+                  }))
                 }}
               />
 
@@ -136,7 +136,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                 <label className="text-sm font-medium text-morandi-primary">備註</label>
                 <Input
                   value={formData.note}
-                  onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
                   placeholder="輸入備註（可選）"
                   className="mt-1"
                 />
@@ -157,10 +157,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
           />
 
           {/* Item List */}
-          <RequestItemList
-            items={requestItems}
-            onRemoveItem={removeItem}
-          />
+          <RequestItemList items={requestItems} onRemoveItem={removeItem} />
 
           {/* Actions */}
           <div className="flex justify-end space-x-2 pt-4 border-t border-border">
@@ -178,5 +175,5 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

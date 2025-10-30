@@ -8,30 +8,33 @@
 ## ✅ 你的觀察完全正確
 
 ### 問題 1: "離線也能看訊息呢？"
+
 **答**: ✅ **可以！** 因為訊息存在 IndexedDB
 
 ```typescript
 // Chat 離線查看歷史訊息
-loadMessages: async (channelId) => {
+loadMessages: async channelId => {
   // 從 IndexedDB 立即載入 ← 離線可用！
-  const cached = await localDB.getAll('messages');
-  return cached; // 即使斷網也能看歷史
+  const cached = await localDB.getAll('messages')
+  return cached // 即使斷網也能看歷史
 }
 ```
 
 ---
 
 ### 問題 2: "只有工作空間的同步機制和大家不同對吧？"
+
 **答**: ✅ **目前還沒有不同，但規劃會不同**
 
-| 狀態 | Workspace | 其他功能 |
-|------|-----------|---------|
-| **目前** | Offline-First | Offline-First |
+| 狀態         | Workspace                    | 其他功能      |
+| ------------ | ---------------------------- | ------------- |
+| **目前**     | Offline-First                | Offline-First |
 | **未來規劃** | Offline-First **+ Realtime** | Offline-First |
 
 ---
 
 ### 問題 3: "這是不是也要寫在規範內？"
+
 **答**: ✅ **絕對要！** 已經更新到 `ARCHITECTURE.md`
 
 ---
@@ -39,6 +42,7 @@ loadMessages: async (channelId) => {
 ## 🎯 為什麼要記錄在規範內？
 
 ### 原因 1: 避免未來混淆
+
 ```
 如果沒記錄:
 ❌ 半年後看到 Chat 有 Realtime
@@ -54,6 +58,7 @@ loadMessages: async (channelId) => {
 ---
 
 ### 原因 2: 團隊協作
+
 ```
 新成員加入:
 ❌ 沒文件: "為什麼 Chat 和其他不一樣？是不是 bug？"
@@ -63,6 +68,7 @@ loadMessages: async (channelId) => {
 ---
 
 ### 原因 3: AI 檢測正確性
+
 ```
 Claude 檢查專案:
 ❌ 沒文件: "Chat 用 Realtime，其他沒用，不一致！"
@@ -74,17 +80,23 @@ Claude 檢查專案:
 ## 📊 目前已記錄的位置
 
 ### 1. ARCHITECTURE.md (主要架構文件)
+
 ```markdown
 ## 📊 資料流架構
 
 ### 同步機制總覽
+
 - Offline-First: Tours, Orders, Finance 等
 - Realtime (規劃): Workspace Chat
 
 ### 1. 離線優先架構
+
 ### 2. Workspace 同步機制（特殊）
+
 ### 3. 兩種機制的差異
+
 ### 4. 為什麼不全部用 Realtime？
+
 ### 5. 最佳實踐：混合架構
 ```
 
@@ -94,6 +106,7 @@ Claude 檢查專案:
 ---
 
 ### 2. REALTIME_VS_CURRENT_SYNC.md (詳細比較)
+
 ```markdown
 - Realtime 是什麼？
 - 目前機制是什麼？
@@ -107,6 +120,7 @@ Claude 檢查專案:
 ---
 
 ### 3. SYNC_MECHANISMS_EXPLAINED.md (本文件)
+
 ```markdown
 - 總結說明
 - 回答常見問題
@@ -122,6 +136,7 @@ Claude 檢查專案:
 ### Workspace Chat 同步機制
 
 #### 目前實作 (2025-10-26)
+
 ```typescript
 // ✅ Offline-First
 loadMessages(channelId)
@@ -132,6 +147,7 @@ loadMessages(channelId)
 ```
 
 #### 未來規劃
+
 ```typescript
 // ✅ Offline-First + Realtime
 loadMessages(channelId)
@@ -147,6 +163,7 @@ loadMessages(channelId)
 ### 其他功能同步機制
 
 #### 目前實作 = 未來維持
+
 ```typescript
 // ✅ Offline-First (永久)
 loadTours()
@@ -157,6 +174,7 @@ loadTours()
 ```
 
 **為什麼不加 Realtime？**
+
 - Tours 不需要即時看到其他人的更新
 - 離線可用更重要
 - 節省連線數
@@ -166,6 +184,7 @@ loadTours()
 ## 📋 設計決策記錄
 
 ### 決策 1: Workspace Chat 特殊處理
+
 ```
 日期: 2025-10-26
 決策: Workspace Chat 未來加入 Realtime
@@ -182,6 +201,7 @@ loadTours()
 ---
 
 ### 決策 2: 其他功能保持 Offline-First
+
 ```
 日期: 2025-10-26
 決策: Tours, Orders, Finance 等保持 Offline-First
@@ -198,6 +218,7 @@ loadTours()
 ---
 
 ### 決策 3: 混合架構
+
 ```
 日期: 2025-10-26
 決策: 採用混合架構
@@ -240,19 +261,20 @@ NO → Offline-First
 
 ## 📚 相關文件
 
-| 文件 | 用途 | 位置 |
-|------|------|------|
-| ARCHITECTURE.md | 主要架構文件 | `/ARCHITECTURE.md` |
-| REALTIME_VS_CURRENT_SYNC.md | 詳細比較 | `/REALTIME_VS_CURRENT_SYNC.md` |
-| SYNC_MECHANISMS_EXPLAINED.md | 本文件 | `/SYNC_MECHANISMS_EXPLAINED.md` |
-| chat-store.ts | Workspace 實作 | `/src/stores/workspace/chat-store.ts` |
-| sync-helper.ts | Offline-First 工具 | `/src/stores/utils/sync-helper.ts` |
+| 文件                         | 用途               | 位置                                  |
+| ---------------------------- | ------------------ | ------------------------------------- |
+| ARCHITECTURE.md              | 主要架構文件       | `/ARCHITECTURE.md`                    |
+| REALTIME_VS_CURRENT_SYNC.md  | 詳細比較           | `/REALTIME_VS_CURRENT_SYNC.md`        |
+| SYNC_MECHANISMS_EXPLAINED.md | 本文件             | `/SYNC_MECHANISMS_EXPLAINED.md`       |
+| chat-store.ts                | Workspace 實作     | `/src/stores/workspace/chat-store.ts` |
+| sync-helper.ts               | Offline-First 工具 | `/src/stores/utils/sync-helper.ts`    |
 
 ---
 
 ## 🔮 未來擴展
 
 ### 可能需要 Realtime 的功能
+
 ```
 ✅ Workspace Chat (規劃中)
   - 工時: 2-4 小時
@@ -268,6 +290,7 @@ NO → Offline-First
 ```
 
 ### 永遠使用 Offline-First 的功能
+
 ```
 ✅ Tours（旅遊團）
 ✅ Orders（訂單）
@@ -309,6 +332,7 @@ NO → Offline-First
 ## 📝 總結
 
 ### 核心概念
+
 ```
 Venturo = Offline-First 為主 + Realtime 為輔
 
@@ -322,6 +346,7 @@ Realtime:
 ```
 
 ### 為什麼這樣設計？
+
 ```
 1. 大部分功能不需要即時
 2. 離線可用是核心優勢
@@ -330,6 +355,7 @@ Realtime:
 ```
 
 ### 你的問題都對了
+
 ```
 ✅ 離線也能看訊息 → 對，IndexedDB
 ✅ Workspace 同步機制會不同 → 對，未來加 Realtime

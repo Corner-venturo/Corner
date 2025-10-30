@@ -34,27 +34,30 @@ export function useMoreEventsDialog() {
   )
 
   // 處理 "更多" 連結點擊
-  const handleMoreLinkClick = useCallback((info: any, filteredEvents: FullCalendarEvent[]) => {
-    info.jsEvent.preventDefault()
-    const clickedDate = info.dateStr
+  const handleMoreLinkClick = useCallback(
+    (info: any, filteredEvents: FullCalendarEvent[]) => {
+      info.jsEvent.preventDefault()
+      const clickedDate = info.dateStr
 
-    const dayEvents = (filteredEvents || []).filter((event: FullCalendarEvent) => {
-      if (!event?.start) return false
-      const eventStart = event.start.split('T')[0]
-      const eventEnd = event?.end ? event.end.split('T')[0] : eventStart
-      return clickedDate >= eventStart && clickedDate <= eventEnd
-    })
+      const dayEvents = (filteredEvents || []).filter((event: FullCalendarEvent) => {
+        if (!event?.start) return false
+        const eventStart = event.start.split('T')[0]
+        const eventEnd = event?.end ? event.end.split('T')[0] : eventStart
+        return clickedDate >= eventStart && clickedDate <= eventEnd
+      })
 
-    const sortedEvents = dayEvents.sort(compareEvents)
+      const sortedEvents = dayEvents.sort(compareEvents)
 
-    setMoreEventsDialog({
-      open: true,
-      date: clickedDate,
-      events: sortedEvents,
-    })
+      setMoreEventsDialog({
+        open: true,
+        date: clickedDate,
+        events: sortedEvents,
+      })
 
-    return 'popover' as const
-  }, [compareEvents])
+      return 'popover' as const
+    },
+    [compareEvents]
+  )
 
   const handleCloseDialog = () => {
     setMoreEventsDialog({

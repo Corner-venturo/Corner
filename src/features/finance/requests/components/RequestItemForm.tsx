@@ -1,28 +1,34 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
-import { NewItemFormData, categoryOptions } from '../types';
-import { SupplierSearchSelect } from './SupplierSearchSelect';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Plus } from 'lucide-react'
+import { NewItemFormData, categoryOptions } from '../types'
+import { SupplierSearchSelect } from './SupplierSearchSelect'
 
 interface SupplierOption {
-  id: string;
-  name: string;
-  type: 'supplier' | 'employee';
-  group: string;
+  id: string
+  name: string
+  type: 'supplier' | 'employee'
+  group: string
 }
 
 interface RequestItemFormProps {
-  newItem: NewItemFormData;
-  setNewItem: (item: NewItemFormData | ((prev: NewItemFormData) => NewItemFormData)) => void;
-  onAddItem: () => void;
-  suppliers: SupplierOption[];
-  supplierSearchValue: string;
-  setSupplierSearchValue: (value: string) => void;
-  showSupplierDropdown: boolean;
-  setShowSupplierDropdown: (show: boolean) => void;
+  newItem: NewItemFormData
+  setNewItem: (item: NewItemFormData | ((prev: NewItemFormData) => NewItemFormData)) => void
+  onAddItem: () => void
+  suppliers: SupplierOption[]
+  supplierSearchValue: string
+  setSupplierSearchValue: (value: string) => void
+  showSupplierDropdown: boolean
+  setShowSupplierDropdown: (show: boolean) => void
 }
 
 export function RequestItemForm({
@@ -33,9 +39,9 @@ export function RequestItemForm({
   supplierSearchValue,
   setSupplierSearchValue,
   showSupplierDropdown,
-  setShowSupplierDropdown
+  setShowSupplierDropdown,
 }: RequestItemFormProps) {
-  const subtotal = newItem.unit_price * newItem.quantity;
+  const subtotal = newItem.unit_price * newItem.quantity
 
   return (
     <div className="border border-border rounded-md p-6">
@@ -58,13 +64,13 @@ export function RequestItemForm({
           <label className="text-sm font-medium text-morandi-secondary">類別</label>
           <Select
             value={newItem.category}
-            onValueChange={(value) => setNewItem(prev => ({ ...prev, category: value as unknown }))}
+            onValueChange={value => setNewItem(prev => ({ ...prev, category: value as unknown }))}
           >
             <SelectTrigger className="mt-2 bg-background">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-background">
-              {categoryOptions.map((option) => (
+              {categoryOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -77,9 +83,9 @@ export function RequestItemForm({
           <SupplierSearchSelect
             value={supplierSearchValue}
             onChange={setSupplierSearchValue}
-            onSelect={(supplier) => {
-              setNewItem(prev => ({ ...prev, supplier_id: supplier.id }));
-              setSupplierSearchValue(supplier.name);
+            onSelect={supplier => {
+              setNewItem(prev => ({ ...prev, supplier_id: supplier.id }))
+              setSupplierSearchValue(supplier.name)
             }}
             suppliers={suppliers}
             showDropdown={showSupplierDropdown}
@@ -93,7 +99,7 @@ export function RequestItemForm({
           <label className="text-sm font-medium text-morandi-secondary">項目描述</label>
           <Input
             value={newItem.description}
-            onChange={(e) => setNewItem(prev => ({ ...prev, description: e.target.value }))}
+            onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
             placeholder="輸入項目描述"
             className="mt-2"
           />
@@ -104,7 +110,9 @@ export function RequestItemForm({
           <Input
             type="number"
             value={newItem.unit_price}
-            onChange={(e) => setNewItem(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))}
+            onChange={e =>
+              setNewItem(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))
+            }
             placeholder="0"
             className="mt-2"
           />
@@ -115,7 +123,9 @@ export function RequestItemForm({
           <Input
             type="number"
             value={newItem.quantity}
-            onChange={(e) => setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+            onChange={e =>
+              setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
+            }
             placeholder="1"
             className="mt-2"
           />
@@ -132,5 +142,5 @@ export function RequestItemForm({
         </div>
       </div>
     </div>
-  );
+  )
 }

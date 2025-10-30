@@ -1,23 +1,23 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
-import { Heart, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase/client'
+import { Heart, Sparkles } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Wish {
-  id: string;
-  shared_wish: string;
-  created_at: string;
+  id: string
+  shared_wish: string
+  created_at: string
 }
 
 export function WishWall() {
-  const [wishes, setWishes] = useState<Wish[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [wishes, setWishes] = useState<Wish[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetchWishes();
-  }, []);
+    fetchWishes()
+  }, [])
 
   const fetchWishes = async () => {
     try {
@@ -27,48 +27,40 @@ export function WishWall() {
         .not('shared_wish', 'is', null)
         .neq('shared_wish', '')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(50)
 
-      if (error) throw error;
+      if (error) throw error
 
-      setWishes(data || []);
+      setWishes(data || [])
     } catch (error) {
-          } finally {
-      setIsLoading(false);
+    } finally {
+      setIsLoading(false)
     }
-  };
+  }
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
         <div className="text-morandi-secondary">載入中...</div>
       </div>
-    );
+    )
   }
 
   if (wishes.length === 0) {
     return (
       <div className="text-center p-12">
         <Sparkles className="mx-auto mb-4 text-morandi-gold" size={48} />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">
-          願望之牆還很空
-        </h3>
-        <p className="text-sm text-morandi-secondary">
-          成為第一個分享願望的人吧
-        </p>
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">願望之牆還很空</h3>
+        <p className="text-sm text-morandi-secondary">成為第一個分享願望的人吧</p>
       </div>
-    );
+    )
   }
 
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-light text-morandi-primary mb-2">
-          願望之牆
-        </h2>
-        <p className="text-sm text-morandi-secondary">
-          每一個願望，都值得被看見和祝福
-        </p>
+        <h2 className="text-2xl font-light text-morandi-primary mb-2">願望之牆</h2>
+        <p className="text-sm text-morandi-secondary">每一個願望，都值得被看見和祝福</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -77,12 +69,12 @@ export function WishWall() {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 function WishCard({ wish, index }: { wish: Wish; index: number }) {
-  const colors = ['#d4c5a9', '#c9b896', '#bfad87', '#a89968'];
-  const color = colors[index % colors.length];
+  const colors = ['#d4c5a9', '#c9b896', '#bfad87', '#a89968']
+  const color = colors[index % colors.length]
 
   return (
     <div
@@ -92,7 +84,7 @@ function WishCard({ wish, index }: { wish: Wish; index: number }) {
       )}
       style={{
         backgroundColor: `${color}10`,
-        borderColor: `${color}40`
+        borderColor: `${color}40`,
       }}
     >
       <div className="flex items-start gap-3 mb-3">
@@ -102,9 +94,7 @@ function WishCard({ wish, index }: { wish: Wish; index: number }) {
         >
           <Sparkles size={16} style={{ color }} />
         </div>
-        <p className="text-sm text-morandi-primary flex-1 leading-relaxed">
-          {wish.shared_wish}
-        </p>
+        <p className="text-sm text-morandi-primary flex-1 leading-relaxed">{wish.shared_wish}</p>
       </div>
 
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
@@ -119,5 +109,5 @@ function WishCard({ wish, index }: { wish: Wish; index: number }) {
         </button>
       </div>
     </div>
-  );
+  )
 }

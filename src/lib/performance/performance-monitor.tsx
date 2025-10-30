@@ -4,30 +4,30 @@
  * 開發模式下顯示效能指標
  */
 
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { memoryManager, type MemoryStats } from './memory-manager';
-import { cacheStrategy } from '@/lib/cache/cache-strategy';
+import React, { useState, useEffect } from 'react'
+import { memoryManager, type MemoryStats } from './memory-manager'
+import { cacheStrategy } from '@/lib/cache/cache-strategy'
 
 export function PerformanceMonitor() {
-  const [stats, setStats] = useState<MemoryStats | null>(null);
-  const [cacheStats, setCacheStats] = useState<unknown>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [stats, setStats] = useState<MemoryStats | null>(null)
+  const [cacheStats, setCacheStats] = useState<unknown>(null)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     // 只在開發模式顯示
-    if (process.env.NODE_ENV !== 'development') return;
+    if (process.env.NODE_ENV !== 'development') return
 
     const interval = setInterval(() => {
-      setStats(memoryManager.getMemoryStats());
-      setCacheStats(cacheStrategy.getStats());
-    }, 2000);
+      setStats(memoryManager.getMemoryStats())
+      setCacheStats(cacheStrategy.getStats())
+    }, 2000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (process.env.NODE_ENV !== 'development') return null
 
   return (
     <div className="fixed bottom-4 right-4 z-[9999]">
@@ -62,9 +62,7 @@ export function PerformanceMonitor() {
                       style={{ width: `${stats.usagePercent}%` }}
                     />
                   </div>
-                  <div className="text-right mt-1 text-morandi-muted">
-                    {stats.usagePercent}%
-                  </div>
+                  <div className="text-right mt-1 text-morandi-muted">{stats.usagePercent}%</div>
                 </div>
               </>
             ) : (
@@ -97,8 +95,8 @@ export function PerformanceMonitor() {
           <div className="pt-2 border-t border-gray-700 space-y-2">
             <button
               onClick={() => {
-                memoryManager.cleanup({ clearHot: true, force: true });
-                alert('已清理熱快取');
+                memoryManager.cleanup({ clearHot: true, force: true })
+                alert('已清理熱快取')
               }}
               className="w-full px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 rounded text-white transition-colors"
             >
@@ -106,8 +104,8 @@ export function PerformanceMonitor() {
             </button>
             <button
               onClick={() => {
-                memoryManager.cleanup({ clearHot: true, clearWarm: true, force: true });
-                alert('已清理所有快取');
+                memoryManager.cleanup({ clearHot: true, clearWarm: true, force: true })
+                alert('已清理所有快取')
               }}
               className="w-full px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded text-white transition-colors"
             >
@@ -117,5 +115,5 @@ export function PerformanceMonitor() {
         </div>
       )}
     </div>
-  );
+  )
 }

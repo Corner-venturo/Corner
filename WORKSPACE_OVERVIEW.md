@@ -22,34 +22,38 @@
 
 ### 核心資訊
 
-| 項目 | 說明 |
-|------|------|
-| **專案名稱** | Venturo 旅遊團管理系統 |
-| **目標用戶** | 小型旅行社（10-50 人） |
-| **使用場景** | 辦公室為主，外勤為輔 |
-| **核心價值** | 簡單、實用、穩定、離線可用 |
+| 項目         | 說明                                       |
+| ------------ | ------------------------------------------ |
+| **專案名稱** | Venturo 旅遊團管理系統                     |
+| **目標用戶** | 小型旅行社（10-50 人）                     |
+| **使用場景** | 辦公室為主，外勤為輔                       |
+| **核心價值** | 簡單、實用、穩定、離線可用                 |
 | **工作目錄** | `/Users/williamchien/Projects/venturo-new` |
-| **開發端口** | `http://localhost:3000` |
+| **開發端口** | `http://localhost:3000`                    |
 
 ### 設計理念
 
 #### 1. **簡單優先（Simplicity First）**
+
 - 統一 > 分散：所有功能統一處理方式
 - 簡單 > 完美：可用性優先於完美設計
 - 實用 > 理論：解決實際問題，不過度設計
 
 #### 2. **離線優先（Offline-First）**
+
 - 所有功能都支援離線操作
 - 資料優先存本地，有網路時背景同步
 - 不區分功能的離線權限（統一處理，減少複雜度）
 
 #### 3. **FastIn 寫入策略**
+
 ```
 操作流程：
 UI 觸發 → IndexedDB 立即寫入 ⚡ → UI 立即更新 → 背景同步 Supabase ☁️
 ```
 
 **特點：**
+
 - ⚡ 本地先寫，零等待
 - ☁️ 背景同步，不阻塞
 - ✅ 最終一致，資料安全
@@ -185,21 +189,21 @@ UI 觸發 → IndexedDB 立即寫入 ⚡ → UI 立即更新 → 背景同步 Su
 
 ### 技術棧
 
-| 分類 | 技術 | 版本 | 用途 |
-|------|------|------|------|
-| **前端框架** | Next.js | 15.5.4 | App Router + Server Actions |
-| **UI 框架** | React | 19.1.0 | 組件化開發 |
-| **程式語言** | TypeScript | 5.x | 型別安全 |
-| **狀態管理** | Zustand | 5.0.8 | 輕量級狀態管理 + Persist |
-| **樣式系統** | TailwindCSS | 4.x | Utility-first CSS |
-| **UI 組件** | Radix UI | - | 無障礙 Headless 組件 |
-| **圖示** | Lucide React | 0.544.0 | 圖示庫 |
-| **資料庫** | Supabase | 2.75.0 | PostgreSQL + Realtime |
-| **本地快取** | IndexedDB | (idb 8.0.3) | 離線資料儲存 |
-| **日期處理** | date-fns | 4.1.0 | 日期格式化 |
-| **表單驗證** | - | - | 自訂驗證邏輯 |
-| **測試** | Playwright | 1.56.0 | E2E 測試 |
-| **部署** | Vercel | - | 自動化部署 |
+| 分類         | 技術         | 版本        | 用途                        |
+| ------------ | ------------ | ----------- | --------------------------- |
+| **前端框架** | Next.js      | 15.5.4      | App Router + Server Actions |
+| **UI 框架**  | React        | 19.1.0      | 組件化開發                  |
+| **程式語言** | TypeScript   | 5.x         | 型別安全                    |
+| **狀態管理** | Zustand      | 5.0.8       | 輕量級狀態管理 + Persist    |
+| **樣式系統** | TailwindCSS  | 4.x         | Utility-first CSS           |
+| **UI 組件**  | Radix UI     | -           | 無障礙 Headless 組件        |
+| **圖示**     | Lucide React | 0.544.0     | 圖示庫                      |
+| **資料庫**   | Supabase     | 2.75.0      | PostgreSQL + Realtime       |
+| **本地快取** | IndexedDB    | (idb 8.0.3) | 離線資料儲存                |
+| **日期處理** | date-fns     | 4.1.0       | 日期格式化                  |
+| **表單驗證** | -            | -           | 自訂驗證邏輯                |
+| **測試**     | Playwright   | 1.56.0      | E2E 測試                    |
+| **部署**     | Vercel       | -           | 自動化部署                  |
 
 ### 核心設計模式
 
@@ -209,8 +213,8 @@ UI 觸發 → IndexedDB 立即寫入 ⚡ → UI 立即更新 → 背景同步 Su
 // src/stores/index.ts
 
 // ✅ 使用統一工廠函數
-export const useTourStore = createStore<Tour>('tours', 'T');
-export const useOrderStore = createStore<Order>('orders', 'O');
+export const useTourStore = createStore<Tour>('tours', 'T')
+export const useOrderStore = createStore<Order>('orders', 'O')
 
 // createStore 自動提供：
 // - Supabase 雲端同步
@@ -220,6 +224,7 @@ export const useOrderStore = createStore<Order>('orders', 'O');
 ```
 
 **好處：**
+
 - 品質一致，所有 Store 功能相同
 - 自動離線支援
 - 減少重複程式碼
@@ -256,6 +261,7 @@ export const useOrderStore = createStore<Order>('orders', 'O');
 ```
 
 **讀取資料流程：**
+
 ```
 UI 請求 → Store → IndexedDB（快取優先）⚡
                     ↓
@@ -281,69 +287,74 @@ UI 請求 → Store → IndexedDB（快取優先）⚡
 ### 核心業務實體
 
 #### 1. **旅遊團（Tour）**
+
 ```typescript
 {
-  id: string;
-  tour_code: string;          // T20250001 或 TTBC（待確認）
-  tour_name: string;
-  departure_date: string;
-  return_date: string;
-  status: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+  id: string
+  tour_code: string // T20250001 或 TTBC（待確認）
+  tour_name: string
+  departure_date: string
+  return_date: string
+  status: 'draft' | 'confirmed' | 'completed' | 'cancelled'
   // ... 其他欄位
 }
 ```
 
 **編號規則：**
+
 - 線上：`T{year}{4位數}` (如：T20250001)
 - 離線：`TTBC` (Tour To Be Confirmed)
 
 #### 2. **訂單（Order）**
+
 ```typescript
 {
-  id: string;
-  order_number: string;       // O20250001 或 OTBC
-  tour_id: string;            // 關聯旅遊團
-  customer_id: string;        // 關聯客戶
-  total_amount: number;
-  status: 'pending' | 'confirmed' | 'paid' | 'cancelled';
+  id: string
+  order_number: string // O20250001 或 OTBC
+  tour_id: string // 關聯旅遊團
+  customer_id: string // 關聯客戶
+  total_amount: number
+  status: 'pending' | 'confirmed' | 'paid' | 'cancelled'
   // ... 其他欄位
 }
 ```
 
 **關聯關係：**
+
 ```
 Tour (1) ─── (N) Order ─── (N) Member
                       └─── (N) Payment
 ```
 
 #### 3. **客戶（Customer）**
+
 ```typescript
 {
-  id: string;
-  customer_code: string;      // C20250001 或 CTBC
-  name: string;
-  phone: string;
-  email: string;
+  id: string
+  customer_code: string // C20250001 或 CTBC
+  name: string
+  phone: string
+  email: string
   // ... 其他欄位
 }
 ```
 
 ### 業務模組
 
-| 模組 | 路徑 | 功能 | 狀態 |
-|------|------|------|------|
-| 🏠 **首頁** | `/` | 小工具集中地（計算機、代辦事項） | ✅ 完成 |
-| ✈️ **旅遊團** | `/tours` | 旅遊團 CRUD + 詳情頁（6 個分頁） | ✅ 完成 |
-| 📝 **訂單** | `/orders` | 訂單管理、付款追蹤 | ✅ 完成 |
-| 👥 **客戶** | `/customers` | 客戶資料庫 | ✅ 完成 |
-| 💰 **報價** | `/quotes` | 報價單建立、發送 | ✅ 完成 |
-| 💵 **財務** | `/finance` | 請款單、出納單、應收應付帳 | ✅ 完成 |
-| 🗄️ **資料庫** | `/database` | 地區、供應商、景點、活動 | ✅ 完成 |
-| 📅 **行事曆** | `/calendar` | 行程規劃視覺化 | ✅ 完成 |
-| 👔 **人事** | `/hr` | 員工管理、權限設定 | ✅ 完成 |
-| 📊 **會計** | `/accounting` | 會計分錄、報表 | ✅ 完成 |
-| 🛂 **簽證** | `/visas` | 簽證管理 | ✅ 完成 |
-| ⚙️ **設定** | `/settings` | 系統設定 | ✅ 完成 |
+| 模組          | 路徑          | 功能                             | 狀態    |
+| ------------- | ------------- | -------------------------------- | ------- |
+| 🏠 **首頁**   | `/`           | 小工具集中地（計算機、代辦事項） | ✅ 完成 |
+| ✈️ **旅遊團** | `/tours`      | 旅遊團 CRUD + 詳情頁（6 個分頁） | ✅ 完成 |
+| 📝 **訂單**   | `/orders`     | 訂單管理、付款追蹤               | ✅ 完成 |
+| 👥 **客戶**   | `/customers`  | 客戶資料庫                       | ✅ 完成 |
+| 💰 **報價**   | `/quotes`     | 報價單建立、發送                 | ✅ 完成 |
+| 💵 **財務**   | `/finance`    | 請款單、出納單、應收應付帳       | ✅ 完成 |
+| 🗄️ **資料庫** | `/database`   | 地區、供應商、景點、活動         | ✅ 完成 |
+| 📅 **行事曆** | `/calendar`   | 行程規劃視覺化                   | ✅ 完成 |
+| 👔 **人事**   | `/hr`         | 員工管理、權限設定               | ✅ 完成 |
+| 📊 **會計**   | `/accounting` | 會計分錄、報表                   | ✅ 完成 |
+| 🛂 **簽證**   | `/visas`      | 簽證管理                         | ✅ 完成 |
+| ⚙️ **設定**   | `/settings`   | 系統設定                         | ✅ 完成 |
 
 ---
 
@@ -411,9 +422,9 @@ Tour (1) ─── (N) Order ─── (N) Member
 ```typescript
 // 合併策略（雲端資料 + 本地待同步資料）
 const mergedData = [
-  ...cloudData,                    // 雲端已同步資料
-  ...localPendingData              // 本地待同步資料（_needs_sync: true）
-].filter(item => !item._deleted);  // 過濾軟刪除
+  ...cloudData, // 雲端已同步資料
+  ...localPendingData, // 本地待同步資料（_needs_sync: true）
+].filter(item => !item._deleted) // 過濾軟刪除
 ```
 
 ---
@@ -427,15 +438,15 @@ const mergedData = [
 ```typescript
 // ✅ 正確：統一使用 snake_case
 interface Tour {
-  tour_name: string;
-  start_date: string;
-  created_at: string;
+  tour_name: string
+  start_date: string
+  created_at: string
 }
 
 // ❌ 錯誤：不要用 camelCase
 interface BadTour {
-  tourName: string;   // ❌
-  startDate: string;  // ❌
+  tourName: string // ❌
+  startDate: string // ❌
 }
 ```
 
@@ -456,12 +467,8 @@ interface BadTour {
 ```tsx
 // ✅ 正確：h-full flex flex-col
 <div className="h-full flex flex-col">
-  <div className="flex-none">
-    {/* Header 固定高度 */}
-  </div>
-  <div className="flex-1 overflow-auto">
-    {/* 內容區自動填滿 */}
-  </div>
+  <div className="flex-none">{/* Header 固定高度 */}</div>
+  <div className="flex-1 overflow-auto">{/* 內容區自動填滿 */}</div>
 </div>
 ```
 
@@ -470,19 +477,16 @@ interface BadTour {
 #### 莫蘭迪色系
 
 ```css
---morandi-primary: #3A3633      /* 主要文字 */
---morandi-secondary: #8B8680    /* 次要文字 */
---morandi-gold: #C4A572         /* 強調色 */
---morandi-green: #9FA68F        /* 成功狀態 */
---morandi-red: #C08374          /* 警告狀態 */
---morandi-container: #E8E5E0    /* 容器背景 */
+--morandi-primary: #3a3633 /* 主要文字 */ --morandi-secondary: #8b8680 /* 次要文字 */
+  --morandi-gold: #c4a572 /* 強調色 */ --morandi-green: #9fa68f /* 成功狀態 */
+  --morandi-red: #c08374 /* 警告狀態 */ --morandi-container: #e8e5e0 /* 容器背景 */;
 ```
 
 ### Store 使用規範
 
 ```typescript
 // ✅ 正確：使用統一工廠
-export const useTourStore = createStore<Tour>('tours', 'T');
+export const useTourStore = createStore<Tour>('tours', 'T')
 
 // ❌ 錯誤：不要自己寫 Zustand create
 // 應該使用 createStore 工廠
@@ -493,23 +497,23 @@ export const useTourStore = createStore<Tour>('tours', 'T');
 ```typescript
 try {
   // 1. 優先嘗試 Supabase
-  const result = await supabase.from('tours').insert(data);
-  if (result.error) throw result.error;
+  const result = await supabase.from('tours').insert(data)
+  if (result.error) throw result.error
 
   // 2. 成功 → 快取到 IndexedDB
-  await indexedDB.put(result.data);
-
+  await indexedDB.put(result.data)
 } catch (error) {
   // 3. 失敗 → 靜默降級到 IndexedDB
-  console.log('⚠️ 切換到離線模式');
-  await indexedDB.put({ ...data, _needs_sync: true });
+  console.log('⚠️ 切換到離線模式')
+  await indexedDB.put({ ...data, _needs_sync: true })
 }
 
 // 4. 使用者只看到成功訊息
-toast.success('儲存成功');
+toast.success('儲存成功')
 ```
 
 **原則：**
+
 - ❌ 不要顯示「Supabase 連線失敗」（嚇到使用者）
 - ✅ 靜默切換到本地模式
 - ✅ 只顯示成功訊息
@@ -617,6 +621,7 @@ NEXT_PUBLIC_APP_URL=https://venturo.vercel.app
    - 參考 `README.md` 快速開始
 
 2. **環境設定**
+
    ```bash
    npm install
    npm run dev

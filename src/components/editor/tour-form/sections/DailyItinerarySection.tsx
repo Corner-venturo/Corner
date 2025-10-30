@@ -1,32 +1,32 @@
-import React, { useState } from "react";
-import { TourFormData, DailyItinerary, Activity } from "../types";
-import { AttractionSelector } from "../../AttractionSelector";
+import React, { useState } from 'react'
+import { TourFormData, DailyItinerary, Activity } from '../types'
+import { AttractionSelector } from '../../AttractionSelector'
 
 interface Attraction {
-  id: string;
-  name: string;
-  name_en: string | null;
-  category: string | null;
-  description: string | null;
-  thumbnail: string | null;
-  city_name?: string;
+  id: string
+  name: string
+  name_en: string | null
+  category: string | null
+  description: string | null
+  thumbnail: string | null
+  city_name?: string
 }
 
 interface DailyItinerarySectionProps {
-  data: TourFormData;
-  updateField: (field: string, value: unknown) => void;
-  addDailyItinerary: () => void;
-  updateDailyItinerary: (index: number, field: string, value: unknown) => void;
-  removeDailyItinerary: (index: number) => void;
-  addActivity: (dayIndex: number) => void;
-  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void;
-  removeActivity: (dayIndex: number, actIndex: number) => void;
-  addDayImage: (dayIndex: number) => void;
-  updateDayImage: (dayIndex: number, imageIndex: number, value: string) => void;
-  removeDayImage: (dayIndex: number, imageIndex: number) => void;
-  addRecommendation: (dayIndex: number) => void;
-  updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void;
-  removeRecommendation: (dayIndex: number, recIndex: number) => void;
+  data: TourFormData
+  updateField: (field: string, value: unknown) => void
+  addDailyItinerary: () => void
+  updateDailyItinerary: (index: number, field: string, value: unknown) => void
+  removeDailyItinerary: (index: number) => void
+  addActivity: (dayIndex: number) => void
+  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
+  removeActivity: (dayIndex: number, actIndex: number) => void
+  addDayImage: (dayIndex: number) => void
+  updateDayImage: (dayIndex: number, imageIndex: number, value: string) => void
+  removeDayImage: (dayIndex: number, imageIndex: number) => void
+  addRecommendation: (dayIndex: number) => void
+  updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void
+  removeRecommendation: (dayIndex: number, recIndex: number) => void
 }
 
 export function DailyItinerarySection({
@@ -45,36 +45,36 @@ export function DailyItinerarySection({
   updateRecommendation,
   removeRecommendation,
 }: DailyItinerarySectionProps) {
-  const [showAttractionSelector, setShowAttractionSelector] = useState(false);
-  const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1);
+  const [showAttractionSelector, setShowAttractionSelector] = useState(false)
+  const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1)
 
   // 開啟景點選擇器
   const handleOpenAttractionSelector = (dayIndex: number) => {
-    setCurrentDayIndex(dayIndex);
-    setShowAttractionSelector(true);
-  };
+    setCurrentDayIndex(dayIndex)
+    setShowAttractionSelector(true)
+  }
 
   // 處理景點選擇
   const handleSelectAttractions = (attractions: Attraction[]) => {
-    if (currentDayIndex === -1) return;
+    if (currentDayIndex === -1) return
 
     // 將選擇的景點轉換為活動
-    attractions.forEach((attraction) => {
-      addActivity(currentDayIndex);
-      const day = data.dailyItinerary[currentDayIndex];
-      const newActivityIndex = day.activities.length;
+    attractions.forEach(attraction => {
+      addActivity(currentDayIndex)
+      const day = data.dailyItinerary[currentDayIndex]
+      const newActivityIndex = day.activities.length
 
       // 設定活動資料
-      updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍');
-      updateActivity(currentDayIndex, newActivityIndex, 'title', attraction.name);
-      updateActivity(currentDayIndex, newActivityIndex, 'description', attraction.description || '');
+      updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍')
+      updateActivity(currentDayIndex, newActivityIndex, 'title', attraction.name)
+      updateActivity(currentDayIndex, newActivityIndex, 'description', attraction.description || '')
       if (attraction.thumbnail) {
-        updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail);
+        updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail)
       }
-    });
+    })
 
-    setCurrentDayIndex(-1);
-  };
+    setCurrentDayIndex(-1)
+  }
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-red-500 pb-2">
@@ -91,15 +91,18 @@ export function DailyItinerarySection({
         <label className="block text-sm font-medium text-morandi-primary mb-1">行程副標題</label>
         <input
           type="text"
-          value={data.itinerarySubtitle || ""}
-          onChange={(e) => updateField("itinerarySubtitle", e.target.value)}
+          value={data.itinerarySubtitle || ''}
+          onChange={e => updateField('itinerarySubtitle', e.target.value)}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
           placeholder="5天4夜精彩旅程規劃"
         />
       </div>
 
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
-        <div key={dayIndex} className="p-6 border border-red-100 rounded-2xl space-y-5 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 shadow-sm">
+        <div
+          key={dayIndex}
+          className="p-6 border border-red-100 rounded-2xl space-y-5 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 shadow-sm"
+        >
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
               <span className="bg-red-500 text-white px-3 py-1.5 rounded-full font-semibold text-sm tracking-wide">
@@ -117,11 +120,13 @@ export function DailyItinerarySection({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">Day 標籤</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">
+                Day 標籤
+              </label>
               <input
                 type="text"
                 value={day.dayLabel}
-                onChange={(e) => updateDailyItinerary(dayIndex, "dayLabel", e.target.value)}
+                onChange={e => updateDailyItinerary(dayIndex, 'dayLabel', e.target.value)}
                 className="w-full px-2 py-1 border rounded text-sm"
                 placeholder="Day 1"
               />
@@ -131,7 +136,7 @@ export function DailyItinerarySection({
               <input
                 type="text"
                 value={day.date}
-                onChange={(e) => updateDailyItinerary(dayIndex, "date", e.target.value)}
+                onChange={e => updateDailyItinerary(dayIndex, 'date', e.target.value)}
                 className="w-full px-2 py-1 border rounded text-sm"
                 placeholder="10/21 (二)"
               />
@@ -143,18 +148,20 @@ export function DailyItinerarySection({
             <input
               type="text"
               value={day.title}
-              onChange={(e) => updateDailyItinerary(dayIndex, "title", e.target.value)}
+              onChange={e => updateDailyItinerary(dayIndex, 'title', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
               placeholder="台北 ✈ 福岡空港 → 由布院 · 金麟湖 → 阿蘇溫泉"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">特別安排 (highlight)</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              特別安排 (highlight)
+            </label>
             <input
               type="text"
-              value={day.highlight || ""}
-              onChange={(e) => updateDailyItinerary(dayIndex, "highlight", e.target.value)}
+              value={day.highlight || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'highlight', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
               placeholder="✨ 特別安排：由布院 · 金麟湖 ～ 日本 OL 人氣 NO.1 散策地"
             />
@@ -163,8 +170,8 @@ export function DailyItinerarySection({
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
             <textarea
-              value={day.description || ""}
-              onChange={(e) => updateDailyItinerary(dayIndex, "description", e.target.value)}
+              value={day.description || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
               rows={3}
               placeholder="集合於台灣桃園國際機場..."
@@ -176,7 +183,9 @@ export function DailyItinerarySection({
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-sm font-medium text-morandi-primary">每日圖片</label>
-                <p className="text-xs text-morandi-secondary mt-1">建議尺寸 1600 × 900 以上，可依序新增多張照片</p>
+                <p className="text-xs text-morandi-secondary mt-1">
+                  建議尺寸 1600 × 900 以上，可依序新增多張照片
+                </p>
               </div>
               <button
                 onClick={() => addDayImage(dayIndex)}
@@ -191,7 +200,7 @@ export function DailyItinerarySection({
                   <input
                     type="text"
                     value={image}
-                    onChange={(e) => updateDayImage(dayIndex, imageIndex, e.target.value)}
+                    onChange={e => updateDayImage(dayIndex, imageIndex, e.target.value)}
                     className="flex-1 px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500"
                     placeholder="https://images.unsplash.com/..."
                   />
@@ -231,20 +240,23 @@ export function DailyItinerarySection({
               </div>
             </div>
             {day.activities?.map((activity: Activity, actIndex: number) => (
-              <div key={actIndex} className="space-y-2 bg-white/90 p-3 rounded-lg border border-blue-100">
+              <div
+                key={actIndex}
+                className="space-y-2 bg-white/90 p-3 rounded-lg border border-blue-100"
+              >
                 <div className="flex flex-wrap items-center gap-2">
                   <input
                     type="text"
                     value={activity.icon}
-                    onChange={(e) => updateActivity(dayIndex, actIndex, "icon", e.target.value)}
+                    onChange={e => updateActivity(dayIndex, actIndex, 'icon', e.target.value)}
                     className="px-2 py-1 border rounded text-sm"
-                  style={{ width: `${Math.max(3, activity.icon.length + 1)}ch` }}
-                  placeholder="🌋"
-                />
+                    style={{ width: `${Math.max(3, activity.icon.length + 1)}ch` }}
+                    placeholder="🌋"
+                  />
                   <input
                     type="text"
                     value={activity.title}
-                    onChange={(e) => updateActivity(dayIndex, actIndex, "title", e.target.value)}
+                    onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
                     className="px-2 py-1 border rounded text-sm"
                     style={{ width: `${Math.max(8, activity.title.length + 2)}ch` }}
                     placeholder="阿蘇火山"
@@ -254,14 +266,16 @@ export function DailyItinerarySection({
                   <input
                     type="text"
                     value={activity.description}
-                    onChange={(e) => updateActivity(dayIndex, actIndex, "description", e.target.value)}
+                    onChange={e =>
+                      updateActivity(dayIndex, actIndex, 'description', e.target.value)
+                    }
                     className="px-3 py-2 border rounded text-sm"
                     placeholder="描述"
                   />
                   <input
                     type="text"
-                    value={activity.image || ""}
-                    onChange={(e) => updateActivity(dayIndex, actIndex, "image", e.target.value)}
+                    value={activity.image || ''}
+                    onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
                     className="px-3 py-2 border rounded text-sm"
                     placeholder="圖片網址（選填）"
                   />
@@ -294,7 +308,7 @@ export function DailyItinerarySection({
                 <input
                   type="text"
                   value={rec}
-                  onChange={(e) => updateRecommendation(dayIndex, recIndex, e.target.value)}
+                  onChange={e => updateRecommendation(dayIndex, recIndex, e.target.value)}
                   className="flex-1 px-2 py-1 border rounded text-sm bg-white"
                   placeholder="天神商圈購物"
                 />
@@ -314,8 +328,13 @@ export function DailyItinerarySection({
               <label className="block text-xs font-medium text-morandi-secondary mb-1">早餐</label>
               <input
                 type="text"
-                value={day.meals?.breakfast || ""}
-                onChange={(e) => updateDailyItinerary(dayIndex, "meals", { ...day.meals, breakfast: e.target.value })}
+                value={day.meals?.breakfast || ''}
+                onChange={e =>
+                  updateDailyItinerary(dayIndex, 'meals', {
+                    ...day.meals,
+                    breakfast: e.target.value,
+                  })
+                }
                 className="w-full px-2 py-1 border rounded text-sm"
                 placeholder="飯店內早餐"
               />
@@ -324,8 +343,10 @@ export function DailyItinerarySection({
               <label className="block text-xs font-medium text-morandi-secondary mb-1">午餐</label>
               <input
                 type="text"
-                value={day.meals?.lunch || ""}
-                onChange={(e) => updateDailyItinerary(dayIndex, "meals", { ...day.meals, lunch: e.target.value })}
+                value={day.meals?.lunch || ''}
+                onChange={e =>
+                  updateDailyItinerary(dayIndex, 'meals', { ...day.meals, lunch: e.target.value })
+                }
                 className="w-full px-2 py-1 border rounded text-sm"
                 placeholder="博多拉麵 (¥1000)"
               />
@@ -334,8 +355,10 @@ export function DailyItinerarySection({
               <label className="block text-xs font-medium text-morandi-secondary mb-1">晚餐</label>
               <input
                 type="text"
-                value={day.meals?.dinner || ""}
-                onChange={(e) => updateDailyItinerary(dayIndex, "meals", { ...day.meals, dinner: e.target.value })}
+                value={day.meals?.dinner || ''}
+                onChange={e =>
+                  updateDailyItinerary(dayIndex, 'meals', { ...day.meals, dinner: e.target.value })
+                }
                 className="w-full px-2 py-1 border rounded text-sm"
                 placeholder="長腳蟹自助餐"
               />
@@ -347,8 +370,8 @@ export function DailyItinerarySection({
             <label className="block text-sm font-medium text-morandi-primary mb-1">住宿</label>
             <input
               type="text"
-              value={day.accommodation || ""}
-              onChange={(e) => updateDailyItinerary(dayIndex, "accommodation", e.target.value)}
+              value={day.accommodation || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
               placeholder="ASO RESORT GRANDVRIO HOTEL"
             />
@@ -360,12 +383,12 @@ export function DailyItinerarySection({
       <AttractionSelector
         isOpen={showAttractionSelector}
         onClose={() => {
-          setShowAttractionSelector(false);
-          setCurrentDayIndex(-1);
+          setShowAttractionSelector(false)
+          setCurrentDayIndex(-1)
         }}
         tourCountries={data.countries}
         onSelect={handleSelectAttractions}
       />
     </div>
-  );
+  )
 }

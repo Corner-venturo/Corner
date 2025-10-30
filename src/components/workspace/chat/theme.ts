@@ -1,9 +1,9 @@
 // Simple theme configuration for chat components
 export const theme = {
   colors: {
-    surface: 'rgb(var(--color-background) / 1)'
+    surface: 'rgb(var(--color-background) / 1)',
   },
   spacing: {
-    lg: '1rem'
-  }
-};
+    lg: '1rem',
+  },
+}

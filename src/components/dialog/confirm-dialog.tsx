@@ -3,27 +3,27 @@
  * 用於刪除、警告、確認等操作
  */
 
-'use client';
+'use client'
 
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, AlertTriangle, Info, Trash2 } from 'lucide-react';
+import React from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { AlertCircle, AlertTriangle, Info, Trash2 } from 'lucide-react'
 
-export type ConfirmDialogType = 'danger' | 'warning' | 'info';
+export type ConfirmDialogType = 'danger' | 'warning' | 'info'
 
 export interface ConfirmDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  type?: ConfirmDialogType;
-  title: string;
-  message: string;
-  details?: string[];
-  confirmLabel?: string;
-  cancelLabel?: string;
-  onConfirm: () => void | Promise<void>;
-  onCancel?: () => void;
-  loading?: boolean;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  type?: ConfirmDialogType
+  title: string
+  message: string
+  details?: string[]
+  confirmLabel?: string
+  cancelLabel?: string
+  onConfirm: () => void | Promise<void>
+  onCancel?: () => void
+  loading?: boolean
 }
 
 const TYPE_CONFIG = {
@@ -48,7 +48,7 @@ const TYPE_CONFIG = {
     buttonClass: 'bg-morandi-gold hover:bg-morandi-gold-hover text-white',
     detailsBg: 'bg-morandi-blue/5 border-morandi-blue/20',
   },
-};
+}
 
 export function ConfirmDialog({
   open,
@@ -63,19 +63,19 @@ export function ConfirmDialog({
   onCancel,
   loading = false,
 }: ConfirmDialogProps) {
-  const config = TYPE_CONFIG[type];
-  const Icon = config.icon;
+  const config = TYPE_CONFIG[type]
+  const Icon = config.icon
 
   const handleConfirm = async () => {
-    await onConfirm();
-  };
+    await onConfirm()
+  }
 
   const handleCancel = () => {
     if (onCancel) {
-      onCancel();
+      onCancel()
     }
-    onOpenChange(false);
-  };
+    onOpenChange(false)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,12 +105,7 @@ export function ConfirmDialog({
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            disabled={loading}
-          >
+          <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
             {cancelLabel}
           </Button>
           <Button
@@ -124,5 +119,5 @@ export function ConfirmDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

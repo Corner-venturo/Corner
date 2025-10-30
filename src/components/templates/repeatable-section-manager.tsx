@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { Plus, Trash2, Edit2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, Edit2, GripVertical } from 'lucide-react'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 
-import { RepeatableSection } from '@/types/template';
+import { RepeatableSection } from '@/types/template'
 
 interface RepeatableSectionManagerProps {
-  sections: RepeatableSection[];
-  onAdd: () => void;
-  onEdit: (section: RepeatableSection) => void;
-  onDelete: (sectionId: string) => void;
-  onHighlight: (section: RepeatableSection | null) => void;
+  sections: RepeatableSection[]
+  onAdd: () => void
+  onEdit: (section: RepeatableSection) => void
+  onDelete: (sectionId: string) => void
+  onHighlight: (section: RepeatableSection | null) => void
 }
 
 export function RepeatableSectionManager({
@@ -21,9 +21,9 @@ export function RepeatableSectionManager({
   onAdd,
   onEdit,
   onDelete,
-  onHighlight
+  onHighlight,
 }: RepeatableSectionManagerProps) {
-  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null)
 
   return (
     <div className="border-t border-morandi-container/20 bg-card">
@@ -32,16 +32,9 @@ export function RepeatableSectionManager({
           <div className="flex items-center gap-2">
             <GripVertical size={16} className="text-morandi-muted" />
             <h3 className="text-sm font-bold text-morandi-primary">可重複區塊</h3>
-            <span className="text-xs text-morandi-secondary">
-              ({sections.length} 個區塊)
-            </span>
+            <span className="text-xs text-morandi-secondary">({sections.length} 個區塊)</span>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onAdd}
-            className="text-xs"
-          >
+          <Button size="sm" variant="outline" onClick={onAdd} className="text-xs">
             <Plus size={14} className="mr-1" />
             新增區塊
           </Button>
@@ -56,36 +49,33 @@ export function RepeatableSectionManager({
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {sections.map((section) => (
+            {sections.map(section => (
               <div
                 key={section.id}
                 className={`
                   group relative flex items-center gap-2 px-3 py-2
                   bg-white border rounded-lg transition-all
-                  ${hoveredSection === section.id
-                    ? 'border-morandi-gold shadow-md'
-                    : 'border-morandi-container/30 hover:border-morandi-container/50'
+                  ${
+                    hoveredSection === section.id
+                      ? 'border-morandi-gold shadow-md'
+                      : 'border-morandi-container/30 hover:border-morandi-container/50'
                   }
                 `}
                 onMouseEnter={() => {
-                  setHoveredSection(section.id);
-                  onHighlight(section);
+                  setHoveredSection(section.id)
+                  onHighlight(section)
                 }}
                 onMouseLeave={() => {
-                  setHoveredSection(null);
-                  onHighlight(null);
+                  setHoveredSection(null)
+                  onHighlight(null)
                 }}
               >
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-morandi-primary">
-                    {section.name}
-                  </div>
+                  <div className="text-sm font-medium text-morandi-primary">{section.name}</div>
                   <div className="text-xs text-morandi-secondary">
                     列 {section.range.start_row + 1} - {section.range.end_row + 1}
                     {section.repeat_config?.max && (
-                      <span className="ml-2">
-                        (最多 {section.repeat_config.max} 個)
-                      </span>
+                      <span className="ml-2">(最多 {section.repeat_config.max} 個)</span>
                     )}
                   </div>
                 </div>
@@ -114,5 +104,5 @@ export function RepeatableSectionManager({
         )}
       </div>
     </div>
-  );
+  )
 }

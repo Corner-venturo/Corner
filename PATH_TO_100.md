@@ -9,14 +9,14 @@
 
 ## 📊 當前評分詳細分析
 
-| 類別 | 當前分數 | 滿分 | 差距 | 原因 |
-|------|----------|------|------|------|
-| **程式碼品質** | 90/100 | 100 | -10 | 缺少測試覆蓋率 |
-| **效能表現** | 95/100 | 100 | -5 | Bundle size 可再優化 |
-| **可維護性** | 92/100 | 100 | -8 | 缺少自動化文件 |
-| **文件完整度** | 98/100 | 100 | -2 | 缺少範例與教學 |
-| **開發體驗** | 93/100 | 100 | -7 | 缺少 CI/CD |
-| **型別安全** | 100/100 | 100 | ✅ | 已達標 |
+| 類別           | 當前分數 | 滿分 | 差距 | 原因                 |
+| -------------- | -------- | ---- | ---- | -------------------- |
+| **程式碼品質** | 90/100   | 100  | -10  | 缺少測試覆蓋率       |
+| **效能表現**   | 95/100   | 100  | -5   | Bundle size 可再優化 |
+| **可維護性**   | 92/100   | 100  | -8   | 缺少自動化文件       |
+| **文件完整度** | 98/100   | 100  | -2   | 缺少範例與教學       |
+| **開發體驗**   | 93/100   | 100  | -7   | 缺少 CI/CD           |
+| **型別安全**   | 100/100  | 100  | ✅   | 已達標               |
 
 **總分**: 94.7/100 → **目標 100/100**
 
@@ -27,6 +27,7 @@
 ### 1. 程式碼品質 (90 → 100) +10分
 
 #### 問題
+
 - ❌ **測試覆蓋率**: 0%
 - ❌ **單元測試**: 無
 - ❌ **整合測試**: 無
@@ -35,17 +36,19 @@
 #### 解決方案
 
 ##### A. 安裝測試框架
+
 ```bash
 npm install --save-dev vitest @testing-library/react @testing-library/jest-dom
 npm install --save-dev @playwright/test  # E2E
 ```
 
 ##### B. 建立測試配置
+
 ```typescript
 // vitest.config.ts
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -55,13 +58,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     coverage: {
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'tests/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/mockData',
-      ],
+      exclude: ['node_modules/', 'tests/', '**/*.d.ts', '**/*.config.*', '**/mockData'],
     },
   },
   resolve: {
@@ -69,10 +66,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-});
+})
 ```
 
 ##### C. 測試覆蓋率目標
+
 ```
 - 重要 Utilities: 100%
 - Store Selectors: 100%
@@ -84,12 +82,13 @@ export default defineConfig({
 ##### D. 範例測試
 
 **Selector 測試**:
+
 ```typescript
 // src/stores/selectors/__tests__/accounting-selectors.test.ts
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { useAccountingStats } from '../accounting-selectors';
-import { useAccountingStore } from '../../accounting-store';
+import { describe, it, expect, beforeEach } from 'vitest'
+import { renderHook } from '@testing-library/react'
+import { useAccountingStats } from '../accounting-selectors'
+import { useAccountingStore } from '../../accounting-store'
 
 describe('useAccountingStats', () => {
   beforeEach(() => {
@@ -98,29 +97,30 @@ describe('useAccountingStats', () => {
         { id: '1', amount: 1000, type: 'income', date: '2025-10-01' },
         { id: '2', amount: 500, type: 'expense', date: '2025-10-15' },
       ],
-    });
-  });
+    })
+  })
 
   it('should calculate stats correctly', () => {
-    const { result } = renderHook(() => useAccountingStats());
+    const { result } = renderHook(() => useAccountingStats())
 
-    expect(result.current.total_income).toBe(1000);
-    expect(result.current.total_expense).toBe(500);
-    expect(result.current.net_worth).toBe(500);
-  });
+    expect(result.current.total_income).toBe(1000)
+    expect(result.current.total_expense).toBe(500)
+    expect(result.current.net_worth).toBe(500)
+  })
 
   it('should memoize results', () => {
-    const { result, rerender } = renderHook(() => useAccountingStats());
-    const firstResult = result.current;
+    const { result, rerender } = renderHook(() => useAccountingStats())
+    const firstResult = result.current
 
-    rerender();
+    rerender()
 
-    expect(result.current).toBe(firstResult); // Same reference
-  });
-});
+    expect(result.current).toBe(firstResult) // Same reference
+  })
+})
 ```
 
 **Component 測試**:
+
 ```typescript
 // src/components/tours/__tests__/TourCard.test.tsx
 import { render, screen } from '@testing-library/react';
@@ -152,20 +152,21 @@ describe('TourCard', () => {
 ```
 
 **E2E 測試**:
+
 ```typescript
 // tests/e2e/tours.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
 test('should create a new tour', async ({ page }) => {
-  await page.goto('http://localhost:3000/tours');
+  await page.goto('http://localhost:3000/tours')
 
-  await page.click('text=新增旅遊');
-  await page.fill('input[name="name"]', 'Test Tour');
-  await page.fill('input[name="destination"]', 'Tokyo');
-  await page.click('text=確定');
+  await page.click('text=新增旅遊')
+  await page.fill('input[name="name"]', 'Test Tour')
+  await page.fill('input[name="destination"]', 'Tokyo')
+  await page.click('text=確定')
 
-  await expect(page.locator('text=Test Tour')).toBeVisible();
-});
+  await expect(page.locator('text=Test Tour')).toBeVisible()
+})
 ```
 
 **改善**: 90 → **100** (+10分)
@@ -175,6 +176,7 @@ test('should create a new tour', async ({ page }) => {
 ### 2. 效能表現 (95 → 100) +5分
 
 #### 問題
+
 - ❌ Bundle size 仍有優化空間
 - ❌ 未實作 Code Splitting
 - ❌ 未實作 Prefetching
@@ -184,6 +186,7 @@ test('should create a new tour', async ({ page }) => {
 ##### A. 實作 Code Splitting
 
 **templates/[id] 優化**:
+
 ```typescript
 // src/app/templates/[id]/page.tsx
 import dynamic from 'next/dynamic';
@@ -207,6 +210,7 @@ export default function TemplatePage({ params }: Props) {
 ```
 
 **workspace 優化**:
+
 ```typescript
 // src/app/workspace/page.tsx
 const ChannelChat = dynamic(() => import('@/components/workspace/ChannelChat'));
@@ -276,6 +280,7 @@ import Image from 'next/image';
 ```
 
 **預期改善**:
+
 - templates: 583 kB → 250 kB (-57%)
 - workspace: 512 kB → 350 kB (-32%)
 - 平均 First Load: ~350 kB → ~250 kB (-29%)
@@ -287,6 +292,7 @@ import Image from 'next/image';
 ### 3. 可維護性 (92 → 100) +8分
 
 #### 問題
+
 - ❌ 缺少自動生成文件
 - ❌ 缺少 Storybook
 - ❌ 缺少 API 文件
@@ -300,10 +306,11 @@ npx storybook@latest init
 ```
 
 **範例 Story**:
+
 ```typescript
 // src/components/ui/Button.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
+import type { Meta, StoryObj } from '@storybook/react'
+import { Button } from './button'
 
 const meta: Meta<typeof Button> = {
   title: 'UI/Button',
@@ -315,24 +322,24 @@ const meta: Meta<typeof Button> = {
       options: ['default', 'destructive', 'outline', 'ghost'],
     },
   },
-};
+}
 
-export default meta;
-type Story = StoryObj<typeof Button>;
+export default meta
+type Story = StoryObj<typeof Button>
 
 export const Default: Story = {
   args: {
     children: 'Click me',
     variant: 'default',
   },
-};
+}
 
 export const Destructive: Story = {
   args: {
     children: 'Delete',
     variant: 'destructive',
   },
-};
+}
 ```
 
 ##### B. TypeDoc API 文件
@@ -377,6 +384,7 @@ npm install --save-dev conventional-changelog-cli
 ### 4. 文件完整度 (98 → 100) +2分
 
 #### 問題
+
 - ❌ 缺少互動式範例
 - ❌ 缺少影片教學
 - ❌ 缺少 FAQ
@@ -391,15 +399,19 @@ npm install --save-dev conventional-changelog-cli
 ## 常見問題
 
 ### Q: 如何建立新的 Store?
+
 A: 參考 `DEVELOPMENT_STANDARDS.md` 的 Store 模板...
 
 ### Q: 為什麼 Build 失敗?
+
 A: 檢查以下項目：
+
 1. `npm run type-check`
 2. `npm run lint`
 3. 查看 build 錯誤訊息...
 
 ### Q: 如何優化頁面效能?
+
 A: 參考 `CODE_SPLITTING_STRATEGY.md`...
 ```
 
@@ -448,6 +460,7 @@ export function DashboardExample() {
 ### 5. 開發體驗 (93 → 100) +7分
 
 #### 問題
+
 - ❌ 缺少 CI/CD Pipeline
 - ❌ 缺少自動化部署
 - ❌ 缺少效能監控告警
@@ -553,21 +566,21 @@ jobs:
 export function setupPerformanceAlerts() {
   // Web Vitals 監控
   if (typeof window !== 'undefined') {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
-        const metric = entry as PerformanceEntry;
+        const metric = entry as PerformanceEntry
 
         // LCP > 2.5s 警告
         if (metric.entryType === 'largest-contentful-paint') {
           if (metric.startTime > 2500) {
-            console.warn('⚠️ LCP exceeded 2.5s:', metric.startTime);
+            console.warn('⚠️ LCP exceeded 2.5s:', metric.startTime)
             // 發送到監控服務 (Sentry, DataDog, etc.)
           }
         }
       }
-    });
+    })
 
-    observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] });
+    observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
   }
 }
 ```
@@ -692,6 +705,7 @@ npx typedoc
 ## ✅ 檢查清單
 
 ### 程式碼品質 (90 → 100)
+
 - [ ] 安裝 Vitest
 - [ ] 安裝 Playwright
 - [ ] 建立測試配置
@@ -701,6 +715,7 @@ npx typedoc
 - [ ] 整體覆蓋率 > 70%
 
 ### 效能表現 (95 → 100)
+
 - [ ] 實作 templates Dynamic Import
 - [ ] 實作 workspace Code Splitting
 - [ ] 實作 calendar Lazy Loading
@@ -709,6 +724,7 @@ npx typedoc
 - [ ] Bundle size < 250 kB
 
 ### 可維護性 (92 → 100)
+
 - [ ] 安裝 Storybook
 - [ ] 建立 UI Components Stories
 - [ ] TypeDoc API 文件
@@ -716,12 +732,14 @@ npx typedoc
 - [ ] Component 文件化
 
 ### 文件完整度 (98 → 100)
+
 - [ ] 建立 FAQ.md
 - [ ] 建立互動式範例
 - [ ] 建立快速開始指南
 - [ ] 錄製教學影片 (可選)
 
 ### 開發體驗 (93 → 100)
+
 - [ ] GitHub Actions CI/CD
 - [ ] 自動部署配置
 - [ ] 效能監控告警
@@ -734,14 +752,14 @@ npx typedoc
 
 ### 評分目標
 
-| 類別 | 當前 | 目標 | 行動 |
-|------|------|------|------|
-| 程式碼品質 | 90 | 100 | +測試 |
-| 效能表現 | 95 | 100 | +Code Splitting |
-| 可維護性 | 92 | 100 | +Storybook |
-| 文件完整度 | 98 | 100 | +FAQ & 範例 |
-| 開發體驗 | 93 | 100 | +CI/CD |
-| 型別安全 | 100 | 100 | ✅ 已達標 |
+| 類別       | 當前 | 目標 | 行動            |
+| ---------- | ---- | ---- | --------------- |
+| 程式碼品質 | 90   | 100  | +測試           |
+| 效能表現   | 95   | 100  | +Code Splitting |
+| 可維護性   | 92   | 100  | +Storybook      |
+| 文件完整度 | 98   | 100  | +FAQ & 範例     |
+| 開發體驗   | 93   | 100  | +CI/CD          |
+| 型別安全   | 100  | 100  | ✅ 已達標       |
 
 **總分目標**: **100/100** 🏆
 
@@ -781,12 +799,14 @@ npm run build
 
 ```markdown
 ## 2025-10-26
+
 - [x] 安裝 Vitest
 - [x] 建立測試配置
 - [ ] 第一個測試
 - [ ] ...
 
 ## 2025-10-27
+
 - [ ] Code Splitting 實作
 - [ ] CI/CD Pipeline
 - [ ] ...

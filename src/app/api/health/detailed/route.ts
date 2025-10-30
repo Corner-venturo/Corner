@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 /**
  * Detailed Health Check API
@@ -11,7 +11,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
  * GET /api/health/detailed
  */
 export async function GET() {
-  const startTime = Date.now();
+  const startTime = Date.now()
 
   const checks = {
     status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
@@ -22,19 +22,19 @@ export async function GET() {
         status: 'unknown' as 'ok' | 'error' | 'unknown' | 'degraded',
         responseTime: 0,
         message: '',
-        tables: {} as Record<string, { count: number | null; error?: string }>
+        tables: {} as Record<string, { count: number | null; error?: string }>,
       },
       cache: {
         status: 'ok' as 'ok' | 'error' | 'unknown',
-        message: 'IndexedDB (client-side)'
-      }
+        message: 'IndexedDB (client-side)',
+      },
     },
     version: {
       app: '5.8.0',
-      node: process.version
+      node: process.version,
     },
-    environment: process.env.NODE_ENV || 'development'
-  };
+    environment: process.env.NODE_ENV || 'development',
+  }
 
   // 核心表列表
   const coreTables = [
@@ -46,82 +46,84 @@ export async function GET() {
     'quotes',
     'quote_items',
     'payments',
-    'todos'
-  ];
+    'todos',
+  ]
 
   // 檢查 Supabase 連線和表資料
   try {
     if (!supabaseUrl || !supabaseKey) {
-      checks.services.database.status = 'error';
-      checks.services.database.message = 'Supabase credentials not configured';
-      checks.status = 'degraded';
+      checks.services.database.status = 'error'
+      checks.services.database.message = 'Supabase credentials not configured'
+      checks.status = 'degraded'
     } else {
-      const dbStartTime = Date.now();
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const dbStartTime = Date.now()
+      const supabase = createClient(supabaseUrl, supabaseKey)
 
       // 並行查詢所有表的數量
-      const tablePromises = coreTables.map(async (tableName) => {
+      const tablePromises = coreTables.map(async tableName => {
         try {
           const { count, error } = await supabase
             .from(tableName)
-            .select('*', { count: 'exact', head: true });
+            .select('*', { count: 'exact', head: true })
 
           if (error) {
             return {
               tableName,
-              result: { count: null, error: error.message }
-            };
+              result: { count: null, error: error.message },
+            }
           }
 
           return {
             tableName,
-            result: { count }
-          };
+            result: { count },
+          }
         } catch (err) {
           return {
             tableName,
             result: {
               count: null,
-              error: err instanceof Error ? err.message : 'Unknown error'
-            }
-          };
+              error: err instanceof Error ? err.message : 'Unknown error',
+            },
+          }
         }
-      });
+      })
 
-      const results = await Promise.all(tablePromises);
+      const results = await Promise.all(tablePromises)
 
       // 整理結果
       results.forEach(({ tableName, result }) => {
-        checks.services.database.tables[tableName] = result;
-      });
+        checks.services.database.tables[tableName] = result
+      })
 
-      checks.services.database.responseTime = Date.now() - dbStartTime;
+      checks.services.database.responseTime = Date.now() - dbStartTime
 
       // 檢查是否有錯誤
-      const hasErrors = results.some(r => r.result.error);
+      const hasErrors = results.some(r => r.result.error)
 
       if (hasErrors) {
-        checks.services.database.status = 'degraded';
-        checks.services.database.message = 'Some tables have errors';
-        checks.status = 'degraded';
+        checks.services.database.status = 'degraded'
+        checks.services.database.message = 'Some tables have errors'
+        checks.status = 'degraded'
       } else {
-        checks.services.database.status = 'ok';
-        checks.services.database.message = `Connected (${checks.services.database.responseTime}ms)`;
+        checks.services.database.status = 'ok'
+        checks.services.database.message = `Connected (${checks.services.database.responseTime}ms)`
       }
     }
   } catch (error) {
-    checks.services.database.status = 'error';
-    checks.services.database.message = error instanceof Error ? error.message : 'Unknown error';
-    checks.status = 'unhealthy';
+    checks.services.database.status = 'error'
+    checks.services.database.message = error instanceof Error ? error.message : 'Unknown error'
+    checks.status = 'unhealthy'
   }
 
-  const totalTime = Date.now() - startTime;
+  const totalTime = Date.now() - startTime
 
-  return NextResponse.json({
-    ...checks,
-    responseTime: totalTime
-  }, {
-    status: checks.status === 'healthy' ? 200 :
-           checks.status === 'degraded' ? 207 : 503
-  });
+  return NextResponse.json(
+    {
+      ...checks,
+      responseTime: totalTime,
+    },
+    {
+      status: checks.status === 'healthy' ? 200 : checks.status === 'degraded' ? 207 : 503,
+    }
+  )
 }

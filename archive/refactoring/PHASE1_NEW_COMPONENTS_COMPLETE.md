@@ -34,35 +34,35 @@
 ```typescript
 interface ListPageLayoutProps<T> {
   // 頁面配置
-  title: string;
-  icon?: LucideIcon;
-  breadcrumb?: BreadcrumbItem[];
+  title: string
+  icon?: LucideIcon
+  breadcrumb?: BreadcrumbItem[]
 
   // 數據管理
-  data: T[];
-  loading?: boolean;
+  data: T[]
+  loading?: boolean
 
   // 表格配置
-  columns: TableColumn[];
-  onRowClick?: (item: T) => void;
-  renderActions?: (item: T) => React.ReactNode;
-  renderExpanded?: (item: T) => React.ReactNode;
+  columns: TableColumn[]
+  onRowClick?: (item: T) => void
+  renderActions?: (item: T) => React.ReactNode
+  renderExpanded?: (item: T) => React.ReactNode
 
   // 搜尋與過濾
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  searchFields?: (keyof T)[];
-  statusTabs?: TabItem[];
-  statusField?: keyof T;
+  searchable?: boolean
+  searchPlaceholder?: string
+  searchFields?: (keyof T)[]
+  statusTabs?: TabItem[]
+  statusField?: keyof T
 
   // 新增操作
-  onAdd?: () => void;
-  addLabel?: string;
+  onAdd?: () => void
+  addLabel?: string
 
   // 自訂擴展
-  headerActions?: React.ReactNode;
-  beforeTable?: React.ReactNode;
-  afterTable?: React.ReactNode;
+  headerActions?: React.ReactNode
+  beforeTable?: React.ReactNode
+  afterTable?: React.ReactNode
 }
 ```
 
@@ -115,12 +115,14 @@ interface ListPageLayoutProps<T> {
 ##### 2.1 DateCell - 日期單元格
 
 **功能**：
+
 - 自動處理 null/undefined/無效日期
 - 支援 3 種格式：short, long, time
 - 可選顯示日曆圖示
 - 統一錯誤處理（顯示「未設定」或「無效日期」）
 
 **使用範例**：
+
 ```typescript
 <DateCell date={tour.departure_date} showIcon />
 <DateCell date={order.created_at} format="time" />
@@ -130,12 +132,14 @@ interface ListPageLayoutProps<T> {
 ##### 2.2 StatusCell - 狀態徽章單元格
 
 **功能**：
+
 - 整合 `status-config.ts` 配置
 - 支援 7 種實體類型（tour, order, payment, etc.）
 - 兩種顯示模式：badge（徽章）/ text（文字）
 - 自動獲取顏色、標籤、圖示
 
 **使用範例**：
+
 ```typescript
 <StatusCell type="tour" status={tour.status} />
 <StatusCell type="payment" status={payment.status} variant="text" showIcon />
@@ -144,12 +148,14 @@ interface ListPageLayoutProps<T> {
 ##### 2.3 CurrencyCell - 金額單元格
 
 **功能**：
+
 - 支援多幣別（TWD, USD, CNY）
 - 三種顯示變體：default, income, expense
 - 自動千分位格式化
 - 可選顯示正負號
 
 **使用範例**：
+
 ```typescript
 <CurrencyCell amount={tour.price} />
 <CurrencyCell amount={payment.amount} variant="income" />
@@ -159,11 +165,13 @@ interface ListPageLayoutProps<T> {
 ##### 2.4 DateRangeCell - 日期區間單元格
 
 **功能**：
+
 - 顯示開始和結束日期
 - 自動計算天數
 - 可選顯示天數統計
 
 **使用範例**：
+
 ```typescript
 <DateRangeCell
   start={tour.departure_date}
@@ -175,12 +183,14 @@ interface ListPageLayoutProps<T> {
 ##### 2.5 ActionCell - 操作按鈕單元格
 
 **功能**：
+
 - 統一操作按鈕佈局
 - 自動處理點擊事件傳播（stopPropagation）
 - 支援 disabled 狀態
 - 三種顏色變體：default, danger, success
 
 **使用範例**：
+
 ```typescript
 <ActionCell
   actions={[
@@ -202,10 +212,12 @@ interface ListPageLayoutProps<T> {
 ##### 2.6 TextCell - 文字單元格
 
 **功能**：
+
 - 文字截斷（可設定最大長度）
 - 滑鼠懸停顯示完整文字（title 屬性）
 
 **使用範例**：
+
 ```typescript
 <TextCell text={tour.description} maxLength={50} />
 ```
@@ -213,10 +225,12 @@ interface ListPageLayoutProps<T> {
 ##### 2.7 NumberCell - 數字單元格
 
 **功能**：
+
 - 千分位格式化
 - 可選前綴/後綴
 
 **使用範例**：
+
 ```typescript
 <NumberCell value={tour.max_participants} suffix="人" />
 <NumberCell value={distance} prefix="約 " suffix="公里" />
@@ -224,13 +238,13 @@ interface ListPageLayoutProps<T> {
 
 #### 重複模式消除統計
 
-| 組件 | 重複次數 | 影響檔案數 | 消除代碼行數 |
-|------|----------|-----------|-------------|
-| DateCell | 5+ | 5 | ~50 行 |
-| StatusCell | 6+ | 6 | ~80 行 |
-| CurrencyCell | 4+ | 4 | ~40 行 |
-| DateRangeCell | 3+ | 3 | ~30 行 |
-| ActionCell | 8+ | 8 | ~200 行 |
+| 組件          | 重複次數 | 影響檔案數 | 消除代碼行數 |
+| ------------- | -------- | ---------- | ------------ |
+| DateCell      | 5+       | 5          | ~50 行       |
+| StatusCell    | 6+       | 6          | ~80 行       |
+| CurrencyCell  | 4+       | 4          | ~40 行       |
+| DateRangeCell | 3+       | 3          | ~30 行       |
+| ActionCell    | 8+       | 8          | ~200 行      |
 
 **總計**: 消除 **~400 行重複代碼**
 
@@ -258,29 +272,29 @@ interface ListPageLayoutProps<T> {
 ```typescript
 interface UseListPageStateOptions<T> {
   // 數據源
-  data: T[];
+  data: T[]
 
   // 過濾配置
   filterConfig?: {
-    statusField?: keyof T;
-    searchFields?: (keyof T)[];
-    defaultStatus?: string;
-  };
+    statusField?: keyof T
+    searchFields?: (keyof T)[]
+    defaultStatus?: string
+  }
 
   // 排序配置
   sortConfig?: {
-    defaultSortBy?: string;
-    defaultSortOrder?: 'asc' | 'desc';
-  };
+    defaultSortBy?: string
+    defaultSortOrder?: 'asc' | 'desc'
+  }
 
   // 分頁配置
   paginationConfig?: {
-    pageSize?: number;
-    enabled?: boolean;
-  };
+    pageSize?: number
+    enabled?: boolean
+  }
 
   // 展開配置
-  expandable?: boolean;
+  expandable?: boolean
 }
 ```
 
@@ -289,42 +303,42 @@ interface UseListPageStateOptions<T> {
 ```typescript
 interface UseListPageStateReturn<T> {
   // 數據
-  data: T[];                    // 原始數據
-  filteredData: T[];            // 過濾後的數據
-  sortedData: T[];              // 排序後的數據
-  displayData: T[];             // 最終顯示的數據（含分頁）
+  data: T[] // 原始數據
+  filteredData: T[] // 過濾後的數據
+  sortedData: T[] // 排序後的數據
+  displayData: T[] // 最終顯示的數據（含分頁）
 
   // 搜尋
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  searchQuery: string
+  setSearchQuery: (query: string) => void
 
   // 狀態過濾
-  statusFilter: string;
-  setStatusFilter: (status: string) => void;
+  statusFilter: string
+  setStatusFilter: (status: string) => void
 
   // 排序
-  sortBy: string;
-  setSortBy: (field: string) => void;
-  sortOrder: 'asc' | 'desc';
-  setSortOrder: (order: 'asc' | 'desc') => void;
-  handleSort: (field: string, order: 'asc' | 'desc') => void;
+  sortBy: string
+  setSortBy: (field: string) => void
+  sortOrder: 'asc' | 'desc'
+  setSortOrder: (order: 'asc' | 'desc') => void
+  handleSort: (field: string, order: 'asc' | 'desc') => void
 
   // 分頁
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-  pageSize: number;
-  totalPages: number;
-  totalItems: number;
+  currentPage: number
+  setCurrentPage: (page: number) => void
+  pageSize: number
+  totalPages: number
+  totalItems: number
 
   // 展開
-  expandedRows: Set<string>;
-  toggleRow: (id: string) => void;
-  isExpanded: (id: string) => boolean;
-  expandAll: () => void;
-  collapseAll: () => void;
+  expandedRows: Set<string>
+  toggleRow: (id: string) => void
+  isExpanded: (id: string) => boolean
+  expandAll: () => void
+  collapseAll: () => void
 
   // 重置
-  reset: () => void;
+  reset: () => void
 }
 ```
 
@@ -372,6 +386,7 @@ return (
 #### 消除重複統計
 
 **每個列表頁面的重複代碼**：
+
 - 搜尋狀態：~10 行
 - 狀態過濾：~15 行
 - 排序邏輯：~30 行
@@ -388,14 +403,14 @@ return (
 
 ### 代碼度量
 
-| 項目 | 數值 |
-|------|------|
-| 新增組件數 | 3 個（ListPageLayout + 表格單元格庫 + useListPageState） |
-| 新增代碼行數 | ~900 行 |
-| 預期消除重複代碼 | **~2,120 行** |
-| 淨減少代碼量 | **~1,220 行** (-12%) |
-| 受益檔案數 | 10+ 個頁面 |
-| TypeScript 類型覆蓋 | 100% |
+| 項目                | 數值                                                     |
+| ------------------- | -------------------------------------------------------- |
+| 新增組件數          | 3 個（ListPageLayout + 表格單元格庫 + useListPageState） |
+| 新增代碼行數        | ~900 行                                                  |
+| 預期消除重複代碼    | **~2,120 行**                                            |
+| 淨減少代碼量        | **~1,220 行** (-12%)                                     |
+| 受益檔案數          | 10+ 個頁面                                               |
+| TypeScript 類型覆蓋 | 100%                                                     |
 
 ### 建置驗證
 
@@ -635,11 +650,13 @@ const listState = useListPageState({
 ### 預期收益
 
 **短期收益**（1 週內）：
+
 - 代碼減少：2,000+ 行
 - 開發效率提升：40%
 - Bug 減少：30%
 
 **長期收益**（3 個月）：
+
 - 新頁面開發時間減少：60%
 - 維護成本降低：35%
 - UI/UX 一致性提升：90%

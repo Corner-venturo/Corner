@@ -8,6 +8,7 @@
 ## 📊 現有文件清單
 
 ### 根目錄 (8 個文件)
+
 ```
 1. README.md                                    9.6K  ← 保留 (主入口)
 2. COMPLETE_REFACTORING_REPORT.md              11K   ← 刪除 (歷史記錄)
@@ -20,6 +21,7 @@
 ```
 
 ### docs/ 目錄 (8 個文件)
+
 ```
 1. PROJECT_PRINCIPLES.md                       3.1K  ← 保留 (核心)
 2. VENTURO_5.0_MANUAL.md                       160K  ← 需精簡！
@@ -40,9 +42,11 @@
 ### 保留的核心文件 (5 個)
 
 #### 1. README.md (入口)
+
 **位置**: 根目錄
 **大小**: 維持 ~10K
 **內容**:
+
 - 專案概述
 - 快速開始
 - 文件導航
@@ -53,15 +57,18 @@
 ---
 
 #### 2. DEVELOPMENT_GUIDE.md (開發指南) ⭐ 新建
+
 **位置**: 根目錄
 **大小**: 目標 ~15-20K
 **整合內容**:
+
 - NAMING_CONVENTION_STANDARD.md (命名規範)
 - 開發檢查清單
 - 最佳實踐
 - 常見問題
 
 **來源**:
+
 ```
 ← NAMING_CONVENTION_STANDARD.md (8.9K)
 ← VENTURO_5.0_MANUAL.md 的開發部分
@@ -71,9 +78,11 @@
 ---
 
 #### 3. ARCHITECTURE.md (架構文件) ⭐ 新建
+
 **位置**: 根目錄
 **大小**: 目標 ~20K
 **整合內容**:
+
 - 系統架構圖
 - 技術棧說明
 - 資料流
@@ -81,6 +90,7 @@
 - Component 系統
 
 **來源**:
+
 ```
 ← VENTURO_ARCHITECTURE_HEALTH_CHECK.md (13K)
 ← VENTURO_5.0_MANUAL.md 的架構部分
@@ -90,15 +100,18 @@
 ---
 
 #### 4. DATABASE.md (資料庫文件) ⭐ 新建
+
 **位置**: docs/
 **大小**: 目標 ~15K
 **整合內容**:
+
 - Supabase 設定
 - Schema 定義
 - Migration 指南
 - 資料同步策略
 
 **來源**:
+
 ```
 ← SUPABASE_SETUP.md (6.2K)
 ← SUPABASE_SCHEMA_CHECK.md (8.2K)
@@ -108,15 +121,18 @@
 ---
 
 #### 5. OPTIMIZATION.md (優化指南) ⭐ 新建
+
 **位置**: 根目錄
 **大小**: 目標 ~10K
 **整合內容**:
+
 - 當前優化狀態
 - 優化機會清單
 - 執行計劃
 - 最佳實踐
 
 **來源**:
+
 ```
 ← QUICK_OPTIMIZATION_GUIDE.md (7.5K)
 ← NEXT_OPTIMIZATION_OPPORTUNITIES.md 的有效部分
@@ -149,6 +165,7 @@ archive/
 ### 直接刪除
 
 以下文件已過時或重複：
+
 ```
 ✗ OPTIMIZATION_SESSION_1_REPORT.md (臨時報告)
 ✗ docs/OPTIMIZATION_V5_GUIDE.md (重複)
@@ -161,8 +178,10 @@ archive/
 ### Phase 1: 建立新文件 (60 分鐘)
 
 #### 1.1 建立 DEVELOPMENT_GUIDE.md
+
 ```markdown
 # 內容結構：
+
 - 開發環境設定
 - 命名規範
 - 程式碼風格
@@ -172,8 +191,10 @@ archive/
 ```
 
 #### 1.2 建立 ARCHITECTURE.md
+
 ```markdown
 # 內容結構：
+
 - 系統架構總覽
 - 目錄結構說明
 - 技術棧詳解
@@ -184,8 +205,10 @@ archive/
 ```
 
 #### 1.3 建立 DATABASE.md
+
 ```markdown
 # 內容結構：
+
 - Supabase 設定步驟
 - Schema 定義
 - Migration 管理
@@ -194,8 +217,10 @@ archive/
 ```
 
 #### 1.4 建立 OPTIMIZATION.md
+
 ```markdown
 # 內容結構：
+
 - 當前健康評分
 - 已完成優化
 - 待執行優化
@@ -241,10 +266,12 @@ rm docs/SUPABASE_SCHEMA_CHECK.md       # 已合併
 ### Phase 4: 更新 README.md (5 分鐘)
 
 更新文件導航區塊：
+
 ```markdown
 ## 📚 文件導航
 
 **核心文件**:
+
 1. 📖 [README.md](./README.md) - 專案總覽與快速開始
 2. 🔧 [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) - 開發指南
 3. 🏗️ [ARCHITECTURE.md](./ARCHITECTURE.md) - 系統架構
@@ -252,6 +279,7 @@ rm docs/SUPABASE_SCHEMA_CHECK.md       # 已合併
 5. ⚡ [OPTIMIZATION.md](./OPTIMIZATION.md) - 優化指南
 
 **輔助文件**:
+
 - 🎯 [PROJECT_PRINCIPLES.md](./docs/PROJECT_PRINCIPLES.md) - 設計原則
 - 🤖 [.claude/CLAUDE.md](./.claude/CLAUDE.md) - AI 助手規範
 
@@ -263,6 +291,7 @@ rm docs/SUPABASE_SCHEMA_CHECK.md       # 已合併
 ## 📊 整合前後對比
 
 ### 整合前 (16 個文件)
+
 ```
 根目錄:       8 個文件  ~110K
 docs/:        8 個文件  ~340K
@@ -270,6 +299,7 @@ docs/:        8 個文件  ~340K
 ```
 
 ### 整合後 (5+2 個核心文件)
+
 ```
 核心文件:     5 個      ~70-80K  ← 精簡有效
 輔助文件:     2 個      ~15K
@@ -278,6 +308,7 @@ docs/:        8 個文件  ~340K
 ```
 
 **效果**:
+
 - ✅ 活躍文件從 16 個減少到 7 個 (-56%)
 - ✅ 核心文件總大小從 450K 減少到 90K (-80%)
 - ✅ 文件結構清晰易懂

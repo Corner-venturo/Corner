@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   images: {
@@ -19,8 +19,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: '2mb'
-    }
+      bodySizeLimit: '2mb',
+    },
   },
   // 跳過預渲染錯誤頁面以避免 Html 組件錯誤
   skipMiddlewareUrlNormalize: true,
@@ -42,10 +42,10 @@ const nextConfig: NextConfig = {
         ignored: /node_modules/,
         poll: 1000,
         aggregateTimeout: 300,
-      };
+      }
     }
-    return config;
+    return config
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

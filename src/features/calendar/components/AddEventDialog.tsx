@@ -35,7 +35,7 @@ export function AddEventDialog({
   const timeOptions = generateTimeOptions()
 
   return (
-    <Dialog open={dialog.open} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>新增行事曆事項</DialogTitle>
@@ -87,7 +87,12 @@ export function AddEventDialog({
               <label className="text-sm font-medium text-morandi-primary">事件類型</label>
               <select
                 value={newEvent.visibility}
-                onChange={e => onNewEventChange({ ...newEvent, visibility: e.target.value as 'personal' | 'company' })}
+                onChange={e =>
+                  onNewEventChange({
+                    ...newEvent,
+                    visibility: e.target.value as 'personal' | 'company',
+                  })
+                }
                 className="mt-1"
               >
                 <option value="personal">個人行事曆</option>

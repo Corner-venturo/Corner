@@ -1,123 +1,127 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { ContentContainer } from '@/components/layout/content-container';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tour, Payment } from '@/stores/types';
-import { useOrderStore } from '@/stores';
-import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react';
+import React, { useState } from 'react'
+import { ContentContainer } from '@/components/layout/content-container'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Tour, Payment } from '@/stores/types'
+import { useOrderStore } from '@/stores'
+import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react'
 
 interface TourCostsProps {
-  tour: Tour;
-  orderFilter?: string; // 選填：只顯示特定訂單相關的成本
+  tour: Tour
+  orderFilter?: string // 選填：只顯示特定訂單相關的成本
 }
 
 // 擴展 Payment 型別以包含成本專用欄位
 interface CostPayment extends Payment {
-  category?: string;
-  vendor?: string;
-  receipt?: string;
+  category?: string
+  vendor?: string
+  receipt?: string
 }
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
-  const { items: orders } = useOrderStore();
-  const addPayment = async (_data: any) => { /* addPayment not implemented */ };
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { items: orders } = useOrderStore()
+  const addPayment = async (_data: any) => {
+    /* addPayment not implemented */
+  }
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [newCost, setNewCost] = useState({
     amount: 0,
     description: '',
     category: 'transport',
     status: '待確認' as const,
-    vendor: ''
-  });
+    vendor: '',
+  })
 
   // TODO: 實作 payment store
-  const payments: CostPayment[] = [];
+  const payments: CostPayment[] = []
 
   const _tourCosts = payments.filter(payment => {
-    if (payment.type !== 'request') return false;
+    if (payment.type !== 'request') return false
 
     if (orderFilter) {
-      return payment.order_id === orderFilter;
+      return payment.order_id === orderFilter
     }
 
-    return payment.tour_id === tour.id;
-  });
+    return payment.tour_id === tour.id
+  })
 
   const handleAddCost = () => {
-    if (!newCost.amount || !newCost.description) return;
+    if (!newCost.amount || !newCost.description) return
 
     addPayment({
       type: 'request',
       tour_id: tour.id,
-      ...newCost
-    });
+      ...newCost,
+    })
 
     setNewCost({
       amount: 0,
       description: '',
       category: 'transport',
       status: '待確認',
-      vendor: ''
-    });
-    setIsAddDialogOpen(false);
-  };
+      vendor: '',
+    })
+    setIsAddDialogOpen(false)
+  }
 
   // 獲取屬於這個旅遊團的所有訂單
-  const tourOrders = orders.filter(order => order.tour_id === tour.id);
+  const tourOrders = orders.filter(order => order.tour_id === tour.id)
 
   // 獲取所有相關的成本支出記錄
-  const costPayments = payments.filter(payment =>
-    payment.type === 'request' &&
-    (payment.tour_id === tour.id ||
-     tourOrders.some(order => order.id === payment.order_id))
-  );
+  const costPayments = payments.filter(
+    payment =>
+      payment.type === 'request' &&
+      (payment.tour_id === tour.id || tourOrders.some(order => order.id === payment.order_id))
+  )
 
   const getCategoryIcon = (category: string) => {
     const icons: Record<string, any> = {
-      'transport': Truck,
-      'accommodation': Hotel,
-      'food': Utensils,
-      'attraction': MapPin,
-      '交通': Truck,
-      '住宿': Hotel,
-      '餐食': Utensils,
-      '景點': MapPin
-    };
-    return icons[category] || Receipt;
-  };
+      transport: Truck,
+      accommodation: Hotel,
+      food: Utensils,
+      attraction: MapPin,
+      交通: Truck,
+      住宿: Hotel,
+      餐食: Utensils,
+      景點: MapPin,
+    }
+    return icons[category] || Receipt
+  }
 
   const getCategoryDisplayName = (category: string) => {
     const names: Record<string, string> = {
-      'transport': '交通',
-      'accommodation': '住宿',
-      'food': '餐食',
-      'attraction': '景點',
-      'other': '其他'
-    };
-    return names[category] || category;
-  };
+      transport: '交通',
+      accommodation: '住宿',
+      food: '餐食',
+      attraction: '景點',
+      other: '其他',
+    }
+    return names[category] || category
+  }
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
-      '已確認': 'bg-morandi-green text-white',
-      '待確認': 'bg-morandi-gold text-white',
-      '已付款': 'bg-morandi-container text-morandi-secondary'
-    };
-    return badges[status] || 'bg-morandi-container text-morandi-secondary';
-  };
+      已確認: 'bg-morandi-green text-white',
+      待確認: 'bg-morandi-gold text-white',
+      已付款: 'bg-morandi-container text-morandi-secondary',
+    }
+    return badges[status] || 'bg-morandi-container text-morandi-secondary'
+  }
 
   const getReceiptBadge = (receipt: string) => {
-    return receipt === '已上傳'
-      ? 'bg-morandi-green text-white'
-      : 'bg-morandi-red text-white';
-  };
+    return receipt === '已上傳' ? 'bg-morandi-green text-white' : 'bg-morandi-red text-white'
+  }
 
-  const totalCosts = costPayments.reduce((sum, cost) => sum + cost.amount, 0);
-  const confirmedCosts = costPayments.filter(cost => cost.status === 'confirmed').reduce((sum, cost) => sum + cost.amount, 0);
-  const pendingCosts = costPayments.filter(cost => cost.status === 'pending').reduce((sum, cost) => sum + cost.amount, 0);
+  const totalCosts = costPayments.reduce((sum, cost) => sum + cost.amount, 0)
+  const confirmedCosts = costPayments
+    .filter(cost => cost.status === 'confirmed')
+    .reduce((sum, cost) => sum + cost.amount, 0)
+  const pendingCosts = costPayments
+    .filter(cost => cost.status === 'pending')
+    .reduce((sum, cost) => sum + cost.amount, 0)
 
   return (
     <div className="space-y-6">
@@ -156,12 +160,12 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">成本分類</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-          {['transport', 'accommodation', 'food', 'attraction', 'other'].map((category) => {
+          {['transport', 'accommodation', 'food', 'attraction', 'other'].map(category => {
             const categoryTotal = costPayments
               .filter(cost => cost.category === category)
-              .reduce((sum, cost) => sum + cost.amount, 0);
-            const Icon = getCategoryIcon(category);
-            const displayName = getCategoryDisplayName(category);
+              .reduce((sum, cost) => sum + cost.amount, 0)
+            const Icon = getCategoryIcon(category)
+            const displayName = getCategoryDisplayName(category)
 
             return (
               <div key={category} className="bg-card border border-border p-4 rounded-lg">
@@ -173,7 +177,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
                 </div>
                 <div className="text-sm text-morandi-secondary">{displayName}</div>
               </div>
-            );
+            )
           })}
         </div>
       </ContentContainer>
@@ -205,13 +209,16 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
           {/* 成本項目 */}
           <div className="space-y-2">
-            {costPayments.map((cost) => {
-              const Icon = getCategoryIcon(cost.category || '');
-              const displayCategory = getCategoryDisplayName(cost.category || '');
-              const relatedOrder = tourOrders.find(order => order.id === cost.order_id);
+            {costPayments.map(cost => {
+              const Icon = getCategoryIcon(cost.category || '')
+              const displayCategory = getCategoryDisplayName(cost.category || '')
+              const relatedOrder = tourOrders.find(order => order.id === cost.order_id)
 
               return (
-                <div key={cost.id} className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg">
+                <div
+                  key={cost.id}
+                  className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg"
+                >
                   <div className="col-span-2">
                     <div className="flex items-center text-sm text-morandi-primary">
                       <Calendar size={14} className="mr-1" />
@@ -233,9 +240,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
                   </div>
 
                   <div className="col-span-2">
-                    <div className="text-sm text-morandi-primary">
-                      {cost.description}
-                    </div>
+                    <div className="text-sm text-morandi-primary">{cost.description}</div>
                   </div>
 
                   <div className="col-span-2">
@@ -245,18 +250,22 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getReceiptBadge('待上傳')}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getReceiptBadge('待上傳')}`}
+                    >
                       待上傳
                     </span>
                   </div>
 
                   <div className="col-span-1">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(cost.status)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(cost.status)}`}
+                    >
                       {cost.status}
                     </span>
                   </div>
                 </div>
-              );
+              )
             })}
 
             {costPayments.length === 0 && (
@@ -282,7 +291,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
               <Input
                 type="number"
                 value={newCost.amount}
-                onChange={(e) => setNewCost(prev => ({ ...prev, amount: Number(e.target.value) }))}
+                onChange={e => setNewCost(prev => ({ ...prev, amount: Number(e.target.value) }))}
                 placeholder="0"
                 className="mt-1"
               />
@@ -292,7 +301,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
               <label className="text-sm font-medium text-morandi-primary">支出說明</label>
               <Input
                 value={newCost.description}
-                onChange={(e) => setNewCost(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e => setNewCost(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="例：機票費用"
                 className="mt-1"
               />
@@ -302,7 +311,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
               <label className="text-sm font-medium text-morandi-primary">類別</label>
               <select
                 value={newCost.category}
-                onChange={(e) => setNewCost(prev => ({ ...prev, category: e.target.value }))}
+                onChange={e => setNewCost(prev => ({ ...prev, category: e.target.value }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="transport">交通</option>
@@ -317,17 +326,14 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
               <label className="text-sm font-medium text-morandi-primary">供應商</label>
               <Input
                 value={newCost.vendor}
-                onChange={(e) => setNewCost(prev => ({ ...prev, vendor: e.target.value }))}
+                onChange={e => setNewCost(prev => ({ ...prev, vendor: e.target.value }))}
                 placeholder="供應商名稱"
                 className="mt-1"
               />
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsAddDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 取消
               </Button>
               <Button
@@ -341,5 +347,5 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         </DialogContent>
       </Dialog>
     </div>
-  );
-});
+  )
+})

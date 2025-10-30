@@ -3,6 +3,7 @@
 ## 📊 總體成果
 
 ### 程式碼優化統計
+
 - **重構頁面數量**: 4 個主要頁面
 - **程式碼行數變化**: 2,249 行 → 2,092 行
 - **減少行數**: 157 行 (-7%)
@@ -14,7 +15,9 @@
 ## 📝 Phase 1: 快速優化（已完成）
 
 ### 1. 檔案系統清理
+
 ✅ **完成項目**:
+
 - 移動 10+ 個 .md 文件到 `docs/` 目錄結構
 - 清理 `supabase/migrations/` - 封存診斷檔案到 `_archive/debugging-2025-01/`
 - 移動 HTML 診斷工具到 `tools/debug-html/`
@@ -23,7 +26,9 @@
 ### 2. 核心可重用模組創建
 
 #### `/src/lib/status-config.ts` (350 行)
+
 **功能**: 集中管理 7 種實體類型的狀態配置
+
 - 支援的類型: payment, disbursement, todo, invoice, tour, order, visa
 - 提供函數:
   - `getStatusConfig(type, status)` - 獲取完整狀態配置
@@ -36,7 +41,9 @@
 **影響**: 消除 60+ 行跨 4+ 個檔案的重複代碼
 
 #### `/src/hooks/usePaymentItemsForm.ts` (235 行)
+
 **功能**: 管理付款項目陣列狀態
+
 - 提供方法:
   - `addPaymentItem()` - 新增付款項目
   - `removePaymentItem(id)` - 移除付款項目（至少保留一個）
@@ -50,7 +57,9 @@
 **影響**: 消除 120+ 行在付款頁面之間的重複代碼
 
 #### `/src/hooks/useDataFiltering.ts` (260 行)
+
 **功能**: 通用資料過濾 Hook
+
 - 三種變體:
   1. `useDataFiltering` - 基礎過濾（狀態 + 搜尋 + 自訂）
   2. `useMultiStatusFiltering` - 多狀態過濾
@@ -69,6 +78,7 @@
 ## 🔧 Phase 2: Tours Page 重構
 
 ### 重構前
+
 - **行數**: 600 行
 - **問題**:
   - 手動過濾邏輯 (144-155 行)
@@ -76,6 +86,7 @@
   - 表格列定義冗長
 
 ### 重構後
+
 - **行數**: 593 行
 - **減少**: 7 行 (-1.2%)
 - **改善項目**:
@@ -84,23 +95,25 @@
   ✅ 移除 `getStatusColor` 從 state 解構
 
 ### 程式碼範例
+
 ```typescript
 // Before:
 const filteredTours = (tours || []).filter(tour => {
-  const statusMatch = activeStatusTab === 'all' || tour.status === activeStatusTab;
-  const searchLower = searchQuery.toLowerCase();
-  const searchMatch = !searchQuery ||
+  const statusMatch = activeStatusTab === 'all' || tour.status === activeStatusTab
+  const searchLower = searchQuery.toLowerCase()
+  const searchMatch =
+    !searchQuery ||
     tour.name.toLowerCase().includes(searchLower) ||
     tour.code.toLowerCase().includes(searchLower) ||
-    tour.location.toLowerCase().includes(searchLower);
-  return statusMatch && searchMatch;
-});
+    tour.location.toLowerCase().includes(searchLower)
+  return statusMatch && searchMatch
+})
 
 // After:
 const filteredTours = useDataFiltering(tours || [], activeStatusTab, searchQuery, {
   statusField: 'status',
   searchFields: ['name', 'code', 'location', 'status', 'description'],
-});
+})
 ```
 
 ---
@@ -108,12 +121,14 @@ const filteredTours = useDataFiltering(tours || [], activeStatusTab, searchQuery
 ## 💰 Phase 3A: Finance/Treasury/Disbursement Page 重構
 
 ### 重構前
+
 - **行數**: 630 行
 - **問題**:
   - 重複的狀態配置物件 (18-42 行)
   - 每個表格都有獨立的狀態渲染邏輯
 
 ### 重構後
+
 - **行數**: 605 行
 - **減少**: 25 行 (-4%)
 - **改善項目**:
@@ -122,6 +137,7 @@ const filteredTours = useDataFiltering(tours || [], activeStatusTab, searchQuery
   ✅ 使用 `getStatusLabel('disbursement', status)` 統一出納單狀態
 
 ### 程式碼範例
+
 ```typescript
 // Before:
 const statusLabels = {
@@ -150,6 +166,7 @@ import { getStatusLabel, getStatusBgColor } from '@/lib/status-config';
 ## 💳 Phase 3B: Finance/Payments Page 重構
 
 ### 重構前
+
 - **行數**: 522 行
 - **問題**:
   - 手動管理 Payment Items 狀態 (56-105 行)
@@ -157,6 +174,7 @@ import { getStatusLabel, getStatusBgColor } from '@/lib/status-config';
   - 冗長的表單欄位處理
 
 ### 重構後
+
 - **行數**: 425 行
 - **減少**: 97 行 (-18.6%) 🎉
 - **改善項目**:
@@ -166,6 +184,7 @@ import { getStatusLabel, getStatusBgColor } from '@/lib/status-config';
   ✅ 簡化欄位類型映射（payment_method, bank_account_id 等）
 
 ### 程式碼範例
+
 ```typescript
 // Before:
 const [paymentItems, setPaymentItems] = useState<PaymentItem[]>([...]);
@@ -190,6 +209,7 @@ const {
 ## ✅ Phase 4: Todos Page 重構
 
 ### 重構前
+
 - **行數**: 497 行
 - **問題**:
   - 手動過濾邏輯 (58-83 行)
@@ -197,6 +217,7 @@ const {
   - 混合可見性過濾和狀態過濾
 
 ### 重構後
+
 - **行數**: 469 行
 - **減少**: 28 行 (-5.6%)
 - **改善項目**:
@@ -206,6 +227,7 @@ const {
   ✅ 移除 34 行重複的狀態配置函數
 
 ### 程式碼範例
+
 ```typescript
 // Before:
 const getStatusLabel = useCallback((status: Todo['status']) => {
@@ -231,12 +253,13 @@ import { getStatusLabel } from '@/lib/status-config';
 ## 📈 Bundle Size 分析
 
 ### 重構前後對比
-| 頁面 | 重構前 | 重構後 | 變化 |
-|------|--------|--------|------|
-| /tours | 40.4 kB | 39.2 kB | **-1.2 kB** ✅ |
-| /finance/treasury/disbursement | 6.11 kB | 7.39 kB | +1.28 kB |
-| /finance/payments | 6.06 kB | 6.58 kB | +0.52 kB |
-| /todos | 11.7 kB | 8.96 kB | **-2.74 kB** ✅ |
+
+| 頁面                           | 重構前  | 重構後  | 變化            |
+| ------------------------------ | ------- | ------- | --------------- |
+| /tours                         | 40.4 kB | 39.2 kB | **-1.2 kB** ✅  |
+| /finance/treasury/disbursement | 6.11 kB | 7.39 kB | +1.28 kB        |
+| /finance/payments              | 6.06 kB | 6.58 kB | +0.52 kB        |
+| /todos                         | 11.7 kB | 8.96 kB | **-2.74 kB** ✅ |
 
 **總體**: -2.14 kB (-1.4%)
 
@@ -247,21 +270,25 @@ import { getStatusLabel } from '@/lib/status-config';
 ## ✨ 代碼品質提升
 
 ### 1. 一致性 (Consistency)
+
 - ✅ 所有頁面使用統一的狀態配置系統
 - ✅ 所有過濾邏輯使用相同的 Hook 模式
 - ✅ 付款項目管理邏輯統一
 
 ### 2. 可維護性 (Maintainability)
+
 - ✅ 新增狀態只需在 `status-config.ts` 一處修改
 - ✅ 過濾邏輯集中管理，易於優化
 - ✅ 付款表單邏輯可在多處重用
 
 ### 3. 類型安全 (Type Safety)
+
 - ✅ 所有 Hook 都有完整的 TypeScript 類型定義
 - ✅ 狀態配置使用 TypeScript 確保正確性
 - ✅ 減少手動類型轉換
 
 ### 4. 性能優化 (Performance)
+
 - ✅ 所有過濾和計算使用 `useMemo` 優化
 - ✅ 回調函數使用 `useCallback` 避免重複渲染
 - ✅ 減少重複代碼降低 bundle size
@@ -271,12 +298,14 @@ import { getStatusLabel } from '@/lib/status-config';
 ## 🎯 受益檔案清單
 
 ### 直接使用新 Hooks 的頁面
+
 1. `/app/tours/page.tsx` - 使用 useDataFiltering + status-config
 2. `/app/finance/treasury/disbursement/page.tsx` - 使用 status-config
 3. `/app/finance/payments/page.tsx` - 使用 usePaymentItemsForm + status-config
 4. `/app/todos/page.tsx` - 使用 useDataFiltering + status-config
 
 ### 未來可受益的頁面
+
 - `/app/orders/page.tsx` - 可使用 useDataFiltering
 - `/app/visas/page.tsx` - 已重構，可進一步使用 status-config
 - `/app/finance/payments/new/page.tsx` - 可使用 usePaymentItemsForm
@@ -289,10 +318,12 @@ import { getStatusLabel } from '@/lib/status-config';
 ### ✅ 已完成項目
 
 #### Phase 0: 準備階段
+
 - [x] 讀取 VENTURO_SYSTEM_INDEX.md 了解系統架構
 - [x] 分析需要重構的頁面和模式
 
 #### Phase 1: 基礎建設（70 分鐘）
+
 - [x] 清理根目錄 .md 文件到 docs/
 - [x] 清理 supabase/migrations/ 診斷檔案
 - [x] 移除 public/ 診斷工具
@@ -303,24 +334,28 @@ import { getStatusLabel } from '@/lib/status-config';
 - [x] 驗證建置成功
 
 #### Phase 2: Tours Page 重構（1.5 天）
+
 - [x] 分析當前結構
 - [x] 應用 useDataFiltering Hook
 - [x] 應用 status-config
 - [x] 測試功能正常
 
 #### Phase 3: Finance Pages 重構（2 天）
+
 - [x] Disbursement Page - 應用 status-config
 - [x] Payments Page - 應用 usePaymentItemsForm + status-config
 - [x] 簡化表單欄位處理
 - [x] 測試功能正常
 
 #### Phase 4: Todos Page 重構（0.5 天）
+
 - [x] 應用 useDataFiltering Hook
 - [x] 應用 status-config
 - [x] 優化過濾邏輯
 - [x] 測試功能正常
 
 #### Phase 5: 驗證與報告
+
 - [x] 執行完整建置測試
 - [x] 確認所有頁面正常運作
 - [x] 生成優化報告
@@ -331,6 +366,7 @@ import { getStatusLabel } from '@/lib/status-config';
 ## 🚀 下一步建議
 
 ### 立即可做
+
 1. **應用到其他頁面**:
    - Orders Page 可使用 useDataFiltering
    - 其他 Finance 頁面可使用相同模式
@@ -344,6 +380,7 @@ import { getStatusLabel } from '@/lib/status-config';
    - 建立 Storybook 展示可重用組件
 
 ### 長期優化
+
 1. **建立組件庫**: 將常用 UI 模式抽取為獨立組件
 2. **性能監控**: 使用 React DevTools Profiler 持續監控
 3. **自動化測試**: 為新 Hooks 增加單元測試
@@ -353,12 +390,14 @@ import { getStatusLabel } from '@/lib/status-config';
 ## 💡 最佳實踐總結
 
 ### 成功模式
+
 ✅ **單一數據源** - 狀態配置集中在一處
 ✅ **可組合 Hooks** - 小而專注的 Hooks 易於組合
 ✅ **類型驅動** - TypeScript 確保正確使用
 ✅ **漸進式重構** - 一次改善一個頁面，降低風險
 
 ### 避免事項
+
 ❌ 不要在多處定義相同的狀態映射
 ❌ 不要在組件內部重複實作過濾邏輯
 ❌ 不要忽略 TypeScript 類型定義
@@ -369,6 +408,7 @@ import { getStatusLabel } from '@/lib/status-config';
 ## 📊 最終統計
 
 ### 代碼健康度
+
 - **重複代碼減少**: ~220 行
 - **可重用模組**: 4 個
 - **類型覆蓋率**: 100%
@@ -376,6 +416,7 @@ import { getStatusLabel } from '@/lib/status-config';
 - **整體代碼品質**: 🚀 大幅提升
 
 ### 時間投資
+
 - **Phase 1**: 約 70 分鐘
 - **Phase 2-4**: 約 4 天
 - **總計**: ~5 天

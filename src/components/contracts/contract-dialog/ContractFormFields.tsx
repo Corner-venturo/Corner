@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { ContractData } from './types';
+import React from 'react'
+import { Input } from '@/components/ui/input'
+import { ContractData } from './types'
 
 interface ContractFormFieldsProps {
-  contractData: Partial<ContractData>;
-  onFieldChange: (field: keyof ContractData, value: string) => void;
+  contractData: Partial<ContractData>
+  onFieldChange: (field: keyof ContractData, value: string) => void
 }
 
 export function ContractFormFields({ contractData, onFieldChange }: ContractFormFieldsProps) {
@@ -21,7 +21,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.travelerName || ''}
-              onChange={(e) => onFieldChange('travelerName', e.target.value)}
+              onChange={e => onFieldChange('travelerName', e.target.value)}
               className="w-full p-2 border rounded text-sm"
             />
           </div>
@@ -30,7 +30,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.travelerIdNumber || ''}
-              onChange={(e) => onFieldChange('travelerIdNumber', e.target.value)}
+              onChange={e => onFieldChange('travelerIdNumber', e.target.value)}
               className="w-full p-2 border rounded text-sm"
             />
           </div>
@@ -39,7 +39,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.travelerAddress || ''}
-              onChange={(e) => onFieldChange('travelerAddress', e.target.value)}
+              onChange={e => onFieldChange('travelerAddress', e.target.value)}
               className="w-full p-2 border rounded text-sm"
             />
           </div>
@@ -48,7 +48,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.travelerPhone || ''}
-              onChange={(e) => onFieldChange('travelerPhone', e.target.value)}
+              onChange={e => onFieldChange('travelerPhone', e.target.value)}
               className="w-full p-2 border rounded text-sm"
             />
           </div>
@@ -65,37 +65,38 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
               type="datetime-local"
               value={(() => {
                 // 將分開的年月日時分組合成 datetime-local 格式
-                const { gatherYear, gatherMonth, gatherDay, gatherHour, gatherMinute } = contractData;
+                const { gatherYear, gatherMonth, gatherDay, gatherHour, gatherMinute } =
+                  contractData
                 if (gatherYear && gatherMonth && gatherDay && gatherHour && gatherMinute) {
-                  const year = gatherYear.padStart(4, '0');
-                  const month = gatherMonth.padStart(2, '0');
-                  const day = gatherDay.padStart(2, '0');
-                  const hour = gatherHour.padStart(2, '0');
-                  const minute = gatherMinute.padStart(2, '0');
-                  return `${year}-${month}-${day}T${hour}:${minute}`;
+                  const year = gatherYear.padStart(4, '0')
+                  const month = gatherMonth.padStart(2, '0')
+                  const day = gatherDay.padStart(2, '0')
+                  const hour = gatherHour.padStart(2, '0')
+                  const minute = gatherMinute.padStart(2, '0')
+                  return `${year}-${month}-${day}T${hour}:${minute}`
                 }
-                return '';
+                return ''
               })()}
-              onChange={(e) => {
+              onChange={e => {
                 // 將 datetime-local 格式分解成5個欄位
-                const value = e.target.value; // 格式: "2024-01-15T08:30"
+                const value = e.target.value // 格式: "2024-01-15T08:30"
                 if (value) {
-                  const [datePart, timePart] = value.split('T');
-                  const [year, month, day] = datePart.split('-');
-                  const [hour, minute] = timePart.split(':');
+                  const [datePart, timePart] = value.split('T')
+                  const [year, month, day] = datePart.split('-')
+                  const [hour, minute] = timePart.split(':')
 
-                  onFieldChange('gatherYear', year);
-                  onFieldChange('gatherMonth', month);
-                  onFieldChange('gatherDay', day);
-                  onFieldChange('gatherHour', hour);
-                  onFieldChange('gatherMinute', minute);
+                  onFieldChange('gatherYear', year)
+                  onFieldChange('gatherMonth', month)
+                  onFieldChange('gatherDay', day)
+                  onFieldChange('gatherHour', hour)
+                  onFieldChange('gatherMinute', minute)
                 } else {
                   // 清空所有欄位
-                  onFieldChange('gatherYear', '');
-                  onFieldChange('gatherMonth', '');
-                  onFieldChange('gatherDay', '');
-                  onFieldChange('gatherHour', '');
-                  onFieldChange('gatherMinute', '');
+                  onFieldChange('gatherYear', '')
+                  onFieldChange('gatherMonth', '')
+                  onFieldChange('gatherDay', '')
+                  onFieldChange('gatherHour', '')
+                  onFieldChange('gatherMinute', '')
                 }
               }}
               className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
@@ -106,7 +107,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.gatherLocation || ''}
-              onChange={(e) => onFieldChange('gatherLocation', e.target.value)}
+              onChange={e => onFieldChange('gatherLocation', e.target.value)}
               placeholder="集合地點（例如：桃園國際機場第一航廈）"
               className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
             />
@@ -123,7 +124,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.totalAmount || ''}
-              onChange={(e) => onFieldChange('totalAmount', e.target.value)}
+              onChange={e => onFieldChange('totalAmount', e.target.value)}
               className="w-full p-2 border rounded text-sm"
             />
           </div>
@@ -132,7 +133,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             <input
               type="text"
               value={contractData.depositAmount || ''}
-              onChange={(e) => onFieldChange('depositAmount', e.target.value)}
+              onChange={e => onFieldChange('depositAmount', e.target.value)}
               className="w-full p-2 border rounded text-sm"
             />
           </div>
@@ -149,12 +150,12 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
           <input
             type="text"
             value={contractData.companyExtension || ''}
-            onChange={(e) => onFieldChange('companyExtension', e.target.value)}
+            onChange={e => onFieldChange('companyExtension', e.target.value)}
             placeholder="分機號碼"
             className="w-full p-2 border rounded text-sm"
           />
         </div>
       </div>
     </>
-  );
+  )
 }

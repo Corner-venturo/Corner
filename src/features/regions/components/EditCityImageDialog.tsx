@@ -1,146 +1,142 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import { Image as ImageIcon, Upload, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { FormDialog } from '@/components/dialog';
-import type { City } from '@/stores';
+import { useState, useEffect, useRef } from 'react'
+import { Image as ImageIcon, Upload, Star } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { FormDialog } from '@/components/dialog'
+import type { City } from '@/stores'
 
 interface EditCityImageDialogProps {
-  open: boolean;
-  onClose: () => void;
-  city: City | null;
-  onUpdate: (id: string, data: any) => Promise<any>;
+  open: boolean
+  onClose: () => void
+  city: City | null
+  onUpdate: (id: string, data: any) => Promise<any>
 }
 
 export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityImageDialogProps) {
-  const [uploading, setUploading] = useState(false);
-  const [previewUrl1, setPreviewUrl1] = useState<string | null>(null);
-  const [previewUrl2, setPreviewUrl2] = useState<string | null>(null);
-  const [selectedFile1, setSelectedFile1] = useState<File | null>(null);
-  const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
-  const [primaryImage, setPrimaryImage] = useState<1 | 2>(1);
-  const fileInput1Ref = useRef<HTMLInputElement>(null);
-  const fileInput2Ref = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false)
+  const [previewUrl1, setPreviewUrl1] = useState<string | null>(null)
+  const [previewUrl2, setPreviewUrl2] = useState<string | null>(null)
+  const [selectedFile1, setSelectedFile1] = useState<File | null>(null)
+  const [selectedFile2, setSelectedFile2] = useState<File | null>(null)
+  const [primaryImage, setPrimaryImage] = useState<1 | 2>(1)
+  const fileInput1Ref = useRef<HTMLInputElement>(null)
+  const fileInput2Ref = useRef<HTMLInputElement>(null)
 
   // 當 city 改變時更新預覽
   useEffect(() => {
     if (city) {
-      setPreviewUrl1(city.background_image_url || null);
-      setPreviewUrl2(city.background_image_url_2 || null);
-      setPrimaryImage(city.primary_image || 1);
+      setPreviewUrl1(city.background_image_url || null)
+      setPreviewUrl2(city.background_image_url_2 || null)
+      setPrimaryImage(city.primary_image || 1)
     } else {
-      setPreviewUrl1(null);
-      setPreviewUrl2(null);
-      setPrimaryImage(1);
+      setPreviewUrl1(null)
+      setPreviewUrl2(null)
+      setPrimaryImage(1)
     }
-    setSelectedFile1(null);
-    setSelectedFile2(null);
-  }, [city]);
+    setSelectedFile1(null)
+    setSelectedFile2(null)
+  }, [city])
 
   const handleFileChange = (imageSlot: 1 | 2) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       // 驗證檔案類型
       if (!file.type.startsWith('image/')) {
-        alert('請選擇圖片檔案');
-        return;
+        alert('請選擇圖片檔案')
+        return
       }
 
       // 驗證檔案大小（5MB）
       if (file.size > 5 * 1024 * 1024) {
-        alert('圖片大小不可超過 5MB');
-        return;
+        alert('圖片大小不可超過 5MB')
+        return
       }
 
       if (imageSlot === 1) {
-        setSelectedFile1(file);
+        setSelectedFile1(file)
       } else {
-        setSelectedFile2(file);
+        setSelectedFile2(file)
       }
 
       // 建立預覽
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
         if (imageSlot === 1) {
-          setPreviewUrl1(reader.result as string);
+          setPreviewUrl1(reader.result as string)
         } else {
-          setPreviewUrl2(reader.result as string);
+          setPreviewUrl2(reader.result as string)
         }
-      };
-      reader.readAsDataURL(file);
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleUpload = async () => {
-    if (!city || (!selectedFile1 && !selectedFile2 && city.primary_image === primaryImage)) return;
+    if (!city || (!selectedFile1 && !selectedFile2 && city.primary_image === primaryImage)) return
 
-    setUploading(true);
+    setUploading(true)
     try {
-      const { supabase } = await import('@/lib/supabase/client');
-      const updateData: any = {};
+      const { supabase } = await import('@/lib/supabase/client')
+      const updateData: any = {}
 
       // 上傳圖片 1
       if (selectedFile1) {
-        const filename = `${city.id}-1.jpg`;
+        const filename = `${city.id}-1.jpg`
         const { error } = await supabase.storage
           .from('city-backgrounds')
           .upload(filename, selectedFile1, {
             contentType: selectedFile1.type,
-            upsert: true
-          });
+            upsert: true,
+          })
 
-        if (error) throw error;
+        if (error) throw error
 
-        const { data: urlData } = supabase.storage
-          .from('city-backgrounds')
-          .getPublicUrl(filename);
+        const { data: urlData } = supabase.storage.from('city-backgrounds').getPublicUrl(filename)
 
-        updateData.background_image_url = urlData.publicUrl;
+        updateData.background_image_url = urlData.publicUrl
       }
 
       // 上傳圖片 2
       if (selectedFile2) {
-        const filename = `${city.id}-2.jpg`;
+        const filename = `${city.id}-2.jpg`
         const { error } = await supabase.storage
           .from('city-backgrounds')
           .upload(filename, selectedFile2, {
             contentType: selectedFile2.type,
-            upsert: true
-          });
+            upsert: true,
+          })
 
-        if (error) throw error;
+        if (error) throw error
 
-        const { data: urlData } = supabase.storage
-          .from('city-backgrounds')
-          .getPublicUrl(filename);
+        const { data: urlData } = supabase.storage.from('city-backgrounds').getPublicUrl(filename)
 
-        updateData.background_image_url_2 = urlData.publicUrl;
+        updateData.background_image_url_2 = urlData.publicUrl
       }
 
       // 更新主要圖片設定
-      updateData.primary_image = primaryImage;
+      updateData.primary_image = primaryImage
 
       // 更新資料庫
-      await onUpdate(city.id, updateData);
+      await onUpdate(city.id, updateData)
 
-      alert('圖片上傳成功！');
-      onClose();
+      alert('圖片上傳成功！')
+      onClose()
     } catch (error) {
-            alert('圖片上傳失敗，請稍後再試');
+      alert('圖片上傳失敗，請稍後再試')
     } finally {
-      setUploading(false);
+      setUploading(false)
     }
-  };
+  }
 
-  if (!city) return null;
+  if (!city) return null
 
-  const hasChanges = selectedFile1 || selectedFile2 || city.primary_image !== primaryImage;
+  const hasChanges = selectedFile1 || selectedFile2 || city.primary_image !== primaryImage
 
   return (
     <FormDialog
       open={open}
-      onOpenChange={(open) => !open && onClose()}
+      onOpenChange={open => !open && onClose()}
       title={`編輯城市圖片 - ${city.name}`}
       onSubmit={handleUpload}
       onCancel={onClose}
@@ -178,25 +174,23 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
             <span className="text-sm text-morandi-primary">圖片 2</span>
           </label>
         </div>
-        <p className="text-xs text-morandi-secondary mt-2">
-          主要圖片會在行程封面和城市列表中顯示
-        </p>
+        <p className="text-xs text-morandi-secondary mt-2">主要圖片會在行程封面和城市列表中顯示</p>
       </div>
 
       {/* 兩個圖片區域 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 圖片 1 */}
-        <div className={`space-y-3 p-4 rounded-lg border-2 transition-all ${
-          primaryImage === 1
-            ? 'border-amber-400 bg-amber-50/50 shadow-md'
-            : 'border-gray-200 bg-white'
-        }`}>
+        <div
+          className={`space-y-3 p-4 rounded-lg border-2 transition-all ${
+            primaryImage === 1
+              ? 'border-amber-400 bg-amber-50/50 shadow-md'
+              : 'border-gray-200 bg-white'
+          }`}
+        >
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-morandi-primary flex items-center gap-2">
               圖片 1
-              {primaryImage === 1 && (
-                <Star size={16} className="text-amber-500 fill-amber-500" />
-              )}
+              {primaryImage === 1 && <Star size={16} className="text-amber-500 fill-amber-500" />}
             </h3>
           </div>
 
@@ -245,17 +239,17 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
         </div>
 
         {/* 圖片 2 */}
-        <div className={`space-y-3 p-4 rounded-lg border-2 transition-all ${
-          primaryImage === 2
-            ? 'border-amber-400 bg-amber-50/50 shadow-md'
-            : 'border-gray-200 bg-white'
-        }`}>
+        <div
+          className={`space-y-3 p-4 rounded-lg border-2 transition-all ${
+            primaryImage === 2
+              ? 'border-amber-400 bg-amber-50/50 shadow-md'
+              : 'border-gray-200 bg-white'
+          }`}
+        >
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-morandi-primary flex items-center gap-2">
               圖片 2
-              {primaryImage === 2 && (
-                <Star size={16} className="text-amber-500 fill-amber-500" />
-              )}
+              {primaryImage === 2 && <Star size={16} className="text-amber-500 fill-amber-500" />}
             </h3>
           </div>
 
@@ -304,5 +298,5 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
         </div>
       </div>
     </FormDialog>
-  );
+  )
 }

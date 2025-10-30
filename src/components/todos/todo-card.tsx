@@ -3,22 +3,22 @@
  * 支援共享待辦的顏色區分
  */
 
-'use client';
+'use client'
 
-import React from 'react';
-import { Star, Calendar, Users, CheckCircle, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Todo } from '@/stores/types';
-import { format } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
+import React from 'react'
+import { Star, Calendar, Users, CheckCircle, Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Todo } from '@/stores/types'
+import { format } from 'date-fns'
+import { zhTW } from 'date-fns/locale'
 
 interface TodoCardProps {
-  todo: Todo;
-  currentUserId?: string;
-  onClick?: () => void;
-  onToggleComplete?: (e: React.MouseEvent) => void;
-  onDelete?: (e: React.MouseEvent) => void;
-  onEdit?: (e: React.MouseEvent) => void;
+  todo: Todo
+  currentUserId?: string
+  onClick?: () => void
+  onToggleComplete?: (e: React.MouseEvent) => void
+  onDelete?: (e: React.MouseEvent) => void
+  onEdit?: (e: React.MouseEvent) => void
 }
 
 export function TodoCard({
@@ -27,31 +27,32 @@ export function TodoCard({
   onClick,
   onToggleComplete,
   onDelete,
-  onEdit
+  onEdit,
 }: TodoCardProps) {
   // 判斷是否為共享待辦（有指派給別人或有多個可見人員）
-  const isShared = (todo.assignee && todo.assignee !== currentUserId) ||
-    (todo.visibility && todo.visibility.length > 1);
+  const isShared =
+    (todo.assignee && todo.assignee !== currentUserId) ||
+    (todo.visibility && todo.visibility.length > 1)
 
   // 判斷是否完成
-  const isCompleted = todo.status === 'completed';
+  const isCompleted = todo.status === 'completed'
 
   // 優先級顏色
   const getPriorityColor = (priority: number) => {
-    if (priority >= 4) return 'text-red-500';
-    if (priority === 3) return 'text-orange-500';
-    return 'text-gray-400';
-  };
+    if (priority >= 4) return 'text-red-500'
+    if (priority === 3) return 'text-orange-500'
+    return 'text-gray-400'
+  }
 
   // 狀態標籤
   const statusConfig = {
     pending: { label: '待辦', color: 'bg-gray-100 text-gray-600' },
     in_progress: { label: '進行中', color: 'bg-blue-100 text-blue-600' },
     completed: { label: '完成', color: 'bg-green-100 text-green-600' },
-    cancelled: { label: '取消', color: 'bg-red-100 text-red-600' }
-  };
+    cancelled: { label: '取消', color: 'bg-red-100 text-red-600' },
+  }
 
-  const status = statusConfig[todo.status];
+  const status = statusConfig[todo.status]
 
   return (
     <div
@@ -74,14 +75,10 @@ export function TodoCard({
           onClick={onToggleComplete}
           className={cn(
             'mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all',
-            isCompleted
-              ? 'bg-green-500 border-green-500'
-              : 'border-gray-300 hover:border-green-400'
+            isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-400'
           )}
         >
-          {isCompleted && (
-            <CheckCircle className="w-full h-full text-white" strokeWidth={3} />
-          )}
+          {isCompleted && <CheckCircle className="w-full h-full text-white" strokeWidth={3} />}
         </button>
 
         {/* 標題 */}
@@ -96,7 +93,7 @@ export function TodoCard({
 
         {/* 優先級星星 */}
         <div className="flex gap-0.5 flex-shrink-0">
-          {[1, 2, 3, 4, 5].map((star) => (
+          {[1, 2, 3, 4, 5].map(star => (
             <Star
               key={star}
               size={14}
@@ -113,12 +110,7 @@ export function TodoCard({
       {/* 中間：狀態 + 標籤 */}
       <div className="flex items-center gap-2 mb-3">
         {/* 狀態標籤 */}
-        <span
-          className={cn(
-            'px-2 py-0.5 rounded text-xs font-medium',
-            status.color
-          )}
-        >
+        <span className={cn('px-2 py-0.5 rounded text-xs font-medium', status.color)}>
           {status.label}
         </span>
 
@@ -135,14 +127,12 @@ export function TodoCard({
       {todo.deadline && (
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
           <Calendar size={14} />
-          <span>
-            {format(new Date(todo.deadline), 'yyyy/MM/dd', { locale: zhTW })}
-          </span>
+          <span>{format(new Date(todo.deadline), 'yyyy/MM/dd', { locale: zhTW })}</span>
         </div>
       )}
 
       {/* 懸浮顯示的操作按鈕（可選） */}
       {/* 如果需要快捷操作，可以在這裡添加 */}
     </div>
-  );
+  )
 }

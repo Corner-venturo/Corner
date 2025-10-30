@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState, useRef, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Bold,
   Italic,
@@ -17,16 +17,16 @@ import {
   Type,
   Palette,
   Save,
-  X
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  X,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface RichTextEditorProps {
-  initialTitle?: string;
-  initialContent?: string;
-  onSave?: (title: string, content: string, formatData: Record<string, unknown>) => void;
-  onCancel?: () => void;
-  className?: string;
+  initialTitle?: string
+  initialContent?: string
+  onSave?: (title: string, content: string, formatData: Record<string, unknown>) => void
+  onCancel?: () => void
+  className?: string
 }
 
 export function RichTextEditor({
@@ -34,115 +34,131 @@ export function RichTextEditor({
   initialContent = '',
   onSave,
   onCancel,
-  className
+  className,
 }: RichTextEditorProps) {
-  const [title, setTitle] = useState(initialTitle);
-  const [isSaving, setIsSaving] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [selectedColor, setSelectedColor] = useState('#000000');
-  const [fontSize, setFontSize] = useState('14');
+  const [title, setTitle] = useState(initialTitle)
+  const [isSaving, setIsSaving] = useState(false)
+  const editorRef = useRef<HTMLDivElement>(null)
+  const [selectedColor, setSelectedColor] = useState('#000000')
+  const [fontSize, setFontSize] = useState('14')
 
   useEffect(() => {
     if (editorRef.current && initialContent) {
-      editorRef.current.innerHTML = initialContent;
+      editorRef.current.innerHTML = initialContent
     }
-  }, [initialContent]);
+  }, [initialContent])
 
   const execCommand = (command: string, value: string | boolean = false) => {
-    document.execCommand(command, false, value as string);
-    editorRef.current?.focus();
-  };
+    document.execCommand(command, false, value as string)
+    editorRef.current?.focus()
+  }
 
   const setTextAlign = (align: string) => {
-    execCommand('justify' + align.charAt(0).toUpperCase() + align.slice(1));
-  };
+    execCommand('justify' + align.charAt(0).toUpperCase() + align.slice(1))
+  }
 
   const setTextColor = (color: string) => {
-    setSelectedColor(color);
-    execCommand('foreColor', color);
-  };
+    setSelectedColor(color)
+    execCommand('foreColor', color)
+  }
 
   const setTextSize = (size: string) => {
-    setFontSize(size);
-    const selection = window.getSelection();
+    setFontSize(size)
+    const selection = window.getSelection()
     if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
+      const range = selection.getRangeAt(0)
       if (!range.collapsed) {
-        const span = document.createElement('span');
-        span.style.fontSize = size + 'px';
+        const span = document.createElement('span')
+        span.style.fontSize = size + 'px'
         try {
-          range.surroundContents(span);
+          range.surroundContents(span)
         } catch {
           // If selection spans multiple elements, wrap content differently
-          const contents = range.extractContents();
-          span.appendChild(contents);
-          range.insertNode(span);
+          const contents = range.extractContents()
+          span.appendChild(contents)
+          range.insertNode(span)
         }
-        selection.removeAllRanges();
+        selection.removeAllRanges()
       }
     }
-  };
+  }
 
   const insertLink = () => {
-    const url = prompt('請輸入網址：');
+    const url = prompt('請輸入網址：')
     if (url) {
-      execCommand('createLink', url);
+      execCommand('createLink', url)
     }
-  };
+  }
 
   const insertList = (ordered: boolean = false) => {
-    execCommand(ordered ? 'insertOrderedList' : 'insertUnorderedList');
-  };
+    execCommand(ordered ? 'insertOrderedList' : 'insertUnorderedList')
+  }
 
   const formatBlock = (tag: string) => {
-    execCommand('formatBlock', tag);
-  };
+    execCommand('formatBlock', tag)
+  }
 
   const handleSave = async () => {
     if (!title.trim()) {
-      alert('請輸入文件標題');
-      return;
+      alert('請輸入文件標題')
+      return
     }
 
-    const content = editorRef.current?.innerHTML || '';
+    const content = editorRef.current?.innerHTML || ''
     if (!content.trim() || content === '<br>') {
-      alert('請輸入文件內容');
-      return;
+      alert('請輸入文件內容')
+      return
     }
 
-    setIsSaving(true);
+    setIsSaving(true)
     try {
       // Extract format data from the content
       const formatData = {
         wordCount: editorRef.current?.textContent?.length || 0,
         hasFormatting: content.includes('<') && content.includes('>'),
-        lastModified: new Date().toISOString()
-      };
+        lastModified: new Date().toISOString(),
+      }
 
-      await onSave?.(title, content, formatData);
+      await onSave?.(title, content, formatData)
     } catch (error) {
-            alert('儲存失敗，請稍後再試');
+      alert('儲存失敗，請稍後再試')
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const colors = [
-    '#000000', '#333333', '#666666', '#999999', '#CCCCCC',
-    '#FF0000', '#FF6600', '#FFCC00', '#CCFF00', '#66FF00',
-    '#00FF00', '#00FF66', '#00FFCC', '#00CCFF', '#0066FF',
-    '#0000FF', '#6600FF', '#CC00FF', '#FF00CC', '#FF0066'
-  ];
+    '#000000',
+    '#333333',
+    '#666666',
+    '#999999',
+    '#CCCCCC',
+    '#FF0000',
+    '#FF6600',
+    '#FFCC00',
+    '#CCFF00',
+    '#66FF00',
+    '#00FF00',
+    '#00FF66',
+    '#00FFCC',
+    '#00CCFF',
+    '#0066FF',
+    '#0000FF',
+    '#6600FF',
+    '#CC00FF',
+    '#FF00CC',
+    '#FF0066',
+  ]
 
-  const fontSizes = ['10', '12', '14', '16', '18', '20', '24', '28', '32', '36'];
+  const fontSizes = ['10', '12', '14', '16', '18', '20', '24', '28', '32', '36']
 
   return (
-    <div className={cn("bg-white border border-border rounded-lg shadow-sm", className)}>
+    <div className={cn('bg-white border border-border rounded-lg shadow-sm', className)}>
       {/* 標題輸入 */}
       <div className="p-4 border-b border-border">
         <Input
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={e => setTitle(e.target.value)}
           placeholder="文件標題"
           className="text-lg font-medium"
         />
@@ -262,11 +278,13 @@ export function RichTextEditor({
             <Type size={14} />
             <select
               value={fontSize}
-              onChange={(e) => setTextSize(e.target.value)}
+              onChange={e => setTextSize(e.target.value)}
               className="px-2 py-1 border border-border rounded text-xs"
             >
               {fontSizes.map(size => (
-                <option key={size} value={size}>{size}px</option>
+                <option key={size} value={size}>
+                  {size}px
+                </option>
               ))}
             </select>
           </div>
@@ -280,8 +298,8 @@ export function RichTextEditor({
                   key={color}
                   onClick={() => setTextColor(color)}
                   className={cn(
-                    "w-5 h-5 rounded border border-gray-300",
-                    selectedColor === color && "ring-2 ring-morandi-gold"
+                    'w-5 h-5 rounded border border-gray-300',
+                    selectedColor === color && 'ring-2 ring-morandi-gold'
                   )}
                   style={{ backgroundColor: color }}
                   title={color}
@@ -298,8 +316,8 @@ export function RichTextEditor({
               key={color}
               onClick={() => setTextColor(color)}
               className={cn(
-                "w-5 h-5 rounded border border-gray-300",
-                selectedColor === color && "ring-2 ring-morandi-gold"
+                'w-5 h-5 rounded border border-gray-300',
+                selectedColor === color && 'ring-2 ring-morandi-gold'
               )}
               style={{ backgroundColor: color }}
               title={color}
@@ -317,13 +335,13 @@ export function RichTextEditor({
         style={{
           lineHeight: '1.6',
           fontSize: `${fontSize}px`,
-          color: selectedColor
+          color: selectedColor,
         }}
-        onPaste={(e) => {
+        onPaste={e => {
           // Handle paste events to clean up formatting if needed
-          e.preventDefault();
-          const text = e.clipboardData.getData('text/plain');
-          document.execCommand('insertText', false, text);
+          e.preventDefault()
+          const text = e.clipboardData.getData('text/plain')
+          document.execCommand('insertText', false, text)
         }}
       />
 
@@ -350,21 +368,21 @@ export function RichTextEditor({
         字數：{editorRef.current?.textContent?.length || 0}
       </div>
     </div>
-  );
+  )
 }
 
 // 簡化版的富文本顯示器
 export function RichTextViewer({
   title,
   content,
-  className
+  className,
 }: {
-  title: string;
-  content: string;
-  className?: string;
+  title: string
+  content: string
+  className?: string
 }) {
   return (
-    <div className={cn("bg-white border border-border rounded-lg", className)}>
+    <div className={cn('bg-white border border-border rounded-lg', className)}>
       <div className="p-4 border-b border-border">
         <h3 className="text-lg font-semibold text-morandi-primary">{title}</h3>
       </div>
@@ -374,5 +392,5 @@ export function RichTextViewer({
         style={{ lineHeight: '1.6' }}
       />
     </div>
-  );
+  )
 }

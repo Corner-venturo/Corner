@@ -25,7 +25,7 @@ export const UI_DELAYS = {
   TOOLTIP_DELAY: 500,
   /** 長時間延遲 */
   LONG_DELAY: 60000,
-} as const;
+} as const
 
 /**
  * 資料同步延遲（毫秒）
@@ -41,7 +41,7 @@ export const SYNC_DELAYS = {
   AUTO_SYNC_INTERVAL: 30000, // 30 秒
   /** 重試延遲 */
   RETRY_DELAY: 2000,
-} as const;
+} as const
 
 /**
  * 網路請求超時（毫秒）
@@ -53,7 +53,7 @@ export const REQUEST_TIMEOUTS = {
   FILE_UPLOAD: 60000,
   /** 長時間查詢 */
   LONG_QUERY: 30000,
-} as const;
+} as const
 
 /**
  * 動畫時間（毫秒）
@@ -65,7 +65,7 @@ export const ANIMATION_DURATIONS = {
   NORMAL: 300,
   /** 慢速動畫 */
   SLOW: 500,
-} as const;
+} as const
 
 /**
  * 輪詢間隔（毫秒）
@@ -79,7 +79,7 @@ export const POLLING_INTERVALS = {
   REGULAR: 30000,
   /** 偶爾更新 */
   OCCASIONAL: 60000,
-} as const;
+} as const
 
 /**
  * 特殊延遲（毫秒）
@@ -87,4 +87,4 @@ export const POLLING_INTERVALS = {
 export const SPECIAL_DELAYS = {
   /** 立即執行（nextTick） */
   NEXT_TICK: 0,
-} as const;
+} as const

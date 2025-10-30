@@ -2,21 +2,21 @@
  * 直接透過 Supabase service_role key 更新 visas 表
  */
 
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config({ path: '.env.local' });
+const { createClient } = require('@supabase/supabase-js')
+require('dotenv').config({ path: '.env.local' })
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ 缺少 Supabase 環境變數');
-  process.exit(1);
+  console.error('❌ 缺少 Supabase 環境變數')
+  process.exit(1)
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function updateVisasTable() {
-  console.log('🔧 開始更新 Supabase visas 表結構...\n');
+  console.log('🔧 開始更新 Supabase visas 表結構...\n')
 
   const sql = `
 -- 先刪除舊的 visas 表
@@ -70,40 +70,39 @@ CREATE TRIGGER update_visas_updated_at
   BEFORE UPDATE ON visas
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
-`;
+`
 
   try {
-    console.log('📝 執行 SQL...');
+    console.log('📝 執行 SQL...')
 
     // 方法1: 嘗試直接執行
-    const { data, error } = await supabase.rpc('exec', { sql });
+    const { data, error } = await supabase.rpc('exec', { sql })
 
     if (error) {
-      console.log('⚠️  方法1失敗，嘗試方法2...');
+      console.log('⚠️  方法1失敗，嘗試方法2...')
 
       // 方法2: 分段執行
-      const statements = sql.split(';').filter(s => s.trim());
+      const statements = sql.split(';').filter(s => s.trim())
 
       for (const stmt of statements) {
-        if (!stmt.trim()) continue;
-        console.log(`\n執行: ${stmt.substring(0, 50)}...`);
+        if (!stmt.trim()) continue
+        console.log(`\n執行: ${stmt.substring(0, 50)}...`)
 
-        const { error: err } = await supabase.rpc('query', { sql: stmt });
+        const { error: err } = await supabase.rpc('query', { sql: stmt })
         if (err) {
-          console.error('❌ 執行失敗:', err.message);
+          console.error('❌ 執行失敗:', err.message)
         } else {
-          console.log('✅ 成功');
+          console.log('✅ 成功')
         }
       }
     } else {
-      console.log('✅ 全部執行成功！', data);
+      console.log('✅ 全部執行成功！', data)
     }
-
   } catch (err) {
-    console.error('❌ 錯誤:', err.message);
-    console.log('\n💡 看起來需要 service_role key 才能執行 DDL');
-    console.log('📝 請到 Supabase Dashboard 手動執行上面的 SQL\n');
+    console.error('❌ 錯誤:', err.message)
+    console.log('\n💡 看起來需要 service_role key 才能執行 DDL')
+    console.log('📝 請到 Supabase Dashboard 手動執行上面的 SQL\n')
   }
 }
 
-updateVisasTable();
+updateVisasTable()

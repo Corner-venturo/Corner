@@ -2,18 +2,18 @@
  * LoadingState - 統一的載入狀態組件
  */
 
-'use client';
+'use client'
 
-import React, { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import React, { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 
 export interface LoadingStateProps {
-  icon?: ReactNode;
-  message?: string;
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-  spinner?: boolean;
+  icon?: ReactNode
+  message?: string
+  className?: string
+  size?: 'sm' | 'md' | 'lg'
+  spinner?: boolean
 }
 
 const SIZE_STYLES = {
@@ -32,7 +32,7 @@ const SIZE_STYLES = {
     icon: 64,
     text: 'text-lg',
   },
-};
+}
 
 export function LoadingState({
   icon,
@@ -41,42 +41,24 @@ export function LoadingState({
   size = 'md',
   spinner = true,
 }: LoadingStateProps) {
-  const sizeConfig = SIZE_STYLES[size];
+  const sizeConfig = SIZE_STYLES[size]
 
   return (
-    <div
-      className={cn(
-        'text-center text-morandi-secondary',
-        sizeConfig.container,
-        className
-      )}
-    >
+    <div className={cn('text-center text-morandi-secondary', sizeConfig.container, className)}>
       <div className="flex justify-center mb-4">
         {icon || (
-          <Loader2
-            size={sizeConfig.icon}
-            className={cn('opacity-50', spinner && 'animate-spin')}
-          />
+          <Loader2 size={sizeConfig.icon} className={cn('opacity-50', spinner && 'animate-spin')} />
         )}
       </div>
 
-      {message && (
-        <p className={cn('text-morandi-secondary', sizeConfig.text)}>
-          {message}
-        </p>
-      )}
+      {message && <p className={cn('text-morandi-secondary', sizeConfig.text)}>{message}</p>}
     </div>
-  );
+  )
 }
 
 // 簡化版 - 用於小區塊
 export function LoadingSpinner({ size = 16, className }: { size?: number; className?: string }) {
-  return (
-    <Loader2
-      size={size}
-      className={cn('animate-spin text-morandi-secondary', className)}
-    />
-  );
+  return <Loader2 size={size} className={cn('animate-spin text-morandi-secondary', className)} />
 }
 
 // 全屏載入
@@ -87,5 +69,5 @@ export function LoadingOverlay({ message = '載入中...' }: { message?: string 
         <LoadingState message={message} size="lg" />
       </div>
     </div>
-  );
+  )
 }

@@ -5,7 +5,13 @@ import { useTimeboxStore, morandiColors } from '@/stores/timebox-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import ColorPicker from '@/components/ui/color-picker'
 
 interface CreateBoxDialogProps {
@@ -49,7 +55,7 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>新增箱子</DialogTitle>
@@ -62,16 +68,14 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
             </label>
             <Input
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
               placeholder="請輸入箱子名稱"
             />
           </div>
 
           {/* 箱子類型 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">
-              箱子類型
-            </label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">箱子類型</label>
             <Select
               value={formData.type}
               onValueChange={(value: 'workout' | 'reminder') =>
@@ -90,12 +94,10 @@ export default function CreateBoxDialog({ isOpen, onClose }: CreateBoxDialogProp
 
           {/* 顏色選擇 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">
-              顏色選擇
-            </label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">顏色選擇</label>
             <ColorPicker
               value={formData.color}
-              onChange={(color) => setFormData({ ...formData, color })}
+              onChange={color => setFormData({ ...formData, color })}
             />
           </div>
 

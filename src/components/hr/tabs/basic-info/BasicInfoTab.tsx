@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import React, { forwardRef, useImperativeHandle } from 'react';
-import { useBasicInfoForm } from './useBasicInfoForm';
-import { PersonalInfoSection } from './PersonalInfoSection';
-import { ContactInfoSection } from './ContactInfoSection';
-import { EmploymentInfoSection } from './EmploymentInfoSection';
-import { EmergencyContactSection } from './EmergencyContactSection';
-import { PasswordManagementSection } from './PasswordManagementSection';
-import { BasicInfoTabProps } from './types';
+import React, { forwardRef, useImperativeHandle } from 'react'
+import { useBasicInfoForm } from './useBasicInfoForm'
+import { PersonalInfoSection } from './PersonalInfoSection'
+import { ContactInfoSection } from './ContactInfoSection'
+import { EmploymentInfoSection } from './EmploymentInfoSection'
+import { EmergencyContactSection } from './EmergencyContactSection'
+import { PasswordManagementSection } from './PasswordManagementSection'
+import { BasicInfoTabProps } from './types'
 
 export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabProps>(
   ({ employee, isEditing, setIsEditing }, ref) => {
@@ -22,12 +22,12 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
       setShowPassword,
       passwordUpdateLoading,
       handleSave,
-      handlePasswordUpdate
-    } = useBasicInfoForm(employee, setIsEditing);
+      handlePasswordUpdate,
+    } = useBasicInfoForm(employee, setIsEditing)
 
     useImperativeHandle(ref, () => ({
-      handleSave
-    }));
+      handleSave,
+    }))
 
     return (
       <div className="space-y-6">
@@ -79,8 +79,8 @@ export const BasicInfoTab = forwardRef<{ handleSave: () => void }, BasicInfoTabP
           </div>
         </div>
       </div>
-    );
+    )
   }
-);
+)
 
-BasicInfoTab.displayName = 'BasicInfoTab';
+BasicInfoTab.displayName = 'BasicInfoTab'

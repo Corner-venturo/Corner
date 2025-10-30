@@ -1,6 +1,6 @@
 'use client'
 
-import { useState} from 'react'
+import { useState } from 'react'
 
 import { Check, Dumbbell, Plus, X, Edit2, Trash2 } from 'lucide-react'
 
@@ -25,7 +25,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
     removeWorkoutExercise,
     updateWorkoutExercise,
     toggleSetCompletion,
-    scheduledBoxes
+    scheduledBoxes,
   } = useTimeboxStore()
 
   const [showAddExercise, setShowAddExercise] = useState(false)
@@ -65,7 +65,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
     addWorkoutExercise(scheduledBox.id, {
       ...exerciseForm,
       setsCompleted: Array(exerciseForm.sets).fill(false),
-      completedSetsTime: Array(exerciseForm.sets).fill(null)
+      completedSetsTime: Array(exerciseForm.sets).fill(null),
     })
 
     // 延遲關閉表單，讓用戶看到確認動畫
@@ -109,7 +109,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
       message: '確定要刪除此動作嗎？',
       details: ['此操作無法復原'],
       confirmLabel: '確認刪除',
-      cancelLabel: '取消'
+      cancelLabel: '取消',
     })
     if (!confirmed) return
     removeWorkoutExercise(scheduledBox.id, exerciseId)
@@ -147,7 +147,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
       message: `確定要移除此訓練排程嗎？`,
       details: [`箱子：${box?.name}`],
       confirmLabel: '確認移除',
-      cancelLabel: '取消'
+      cancelLabel: '取消',
     })
     if (!confirmed) return
     removeScheduledBox(scheduledBox.id)
@@ -159,7 +159,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
     if (!workoutData.exercises) return 0
     return workoutData.exercises.reduce((total, exercise) => {
       const completedSets = exercise.setsCompleted.filter(Boolean).length
-      return total + (completedSets * exercise.weight * exercise.reps)
+      return total + completedSets * exercise.weight * exercise.reps
     }, 0)
   }
 
@@ -192,7 +192,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
   const isBoxCompleted = currentScheduledBox.completed
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
@@ -229,12 +229,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                   <h4 className="text-sm font-medium text-morandi-gold">
                     {editingExerciseId ? '編輯動作' : '新增動作'}
                   </h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={resetForm}
-                    className="h-6 w-6 p-0"
-                  >
+                  <Button variant="ghost" size="sm" onClick={resetForm} className="h-6 w-6 p-0">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -244,7 +239,9 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                     <label className="text-xs text-morandi-secondary">動作名稱 *</label>
                     <Input
                       value={exerciseForm.equipment}
-                      onChange={(e) => setExerciseForm(prev => ({ ...prev, equipment: e.target.value }))}
+                      onChange={e =>
+                        setExerciseForm(prev => ({ ...prev, equipment: e.target.value }))
+                      }
                       placeholder="例: 槓鈴臥推"
                       className="mt-1"
                     />
@@ -255,10 +252,12 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                     <Input
                       type="number"
                       value={exerciseForm.weight}
-                      onChange={(e) => setExerciseForm(prev => ({
-                        ...prev,
-                        weight: e.target.value === '' ? 0 : Number(e.target.value)
-                      }))}
+                      onChange={e =>
+                        setExerciseForm(prev => ({
+                          ...prev,
+                          weight: e.target.value === '' ? 0 : Number(e.target.value),
+                        }))
+                      }
                       className="mt-1"
                       min={0}
                       step={0.5}
@@ -271,10 +270,12 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                       <Input
                         type="number"
                         value={exerciseForm.reps}
-                        onChange={(e) => setExerciseForm(prev => ({
-                          ...prev,
-                          reps: e.target.value === '' ? 0 : Number(e.target.value)
-                        }))}
+                        onChange={e =>
+                          setExerciseForm(prev => ({
+                            ...prev,
+                            reps: e.target.value === '' ? 0 : Number(e.target.value),
+                          }))
+                        }
                         className="mt-1"
                         min={0}
                       />
@@ -284,10 +285,12 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                       <Input
                         type="number"
                         value={exerciseForm.sets}
-                        onChange={(e) => setExerciseForm(prev => ({
-                          ...prev,
-                          sets: e.target.value === '' ? 1 : Number(e.target.value)
-                        }))}
+                        onChange={e =>
+                          setExerciseForm(prev => ({
+                            ...prev,
+                            sets: e.target.value === '' ? 1 : Number(e.target.value),
+                          }))
+                        }
                         min={1}
                         max={10}
                         className="mt-1"
@@ -311,8 +314,10 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                       <Check className="h-4 w-4 animate-in zoom-in" />
                       已新增！
                     </span>
+                  ) : editingExerciseId ? (
+                    '儲存修改'
                   ) : (
-                    editingExerciseId ? '儲存修改' : '新增'
+                    '新增'
                   )}
                 </Button>
               </div>
@@ -374,7 +379,8 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                             完成進度: {completedSets}/{exercise.sets} 組
                           </span>
                           <span className="text-xs text-morandi-secondary">
-                            訓練量: {(completedSets * exercise.weight * exercise.reps).toLocaleString()} kg
+                            訓練量:{' '}
+                            {(completedSets * exercise.weight * exercise.reps).toLocaleString()} kg
                           </span>
                         </div>
 
@@ -387,14 +393,16 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                                 relative w-12 h-12 rounded-lg border-2 transition-all duration-200
                                 flex flex-col items-center justify-center
                                 active:scale-95
-                                ${completed
-                                  ? 'bg-morandi-green border-morandi-green text-white shadow-lg scale-105 animate-pulse'
-                                  : 'border-morandi-container hover:border-morandi-gold/20 hover:bg-morandi-gold/5 bg-white hover:scale-105'
+                                ${
+                                  completed
+                                    ? 'bg-morandi-green border-morandi-green text-white shadow-lg scale-105 animate-pulse'
+                                    : 'border-morandi-container hover:border-morandi-gold/20 hover:bg-morandi-gold/5 bg-white hover:scale-105'
                                 }
                               `}
-                              title={exercise.completedSetsTime[setIndex]
-                                ? `完成於 ${new Date(exercise.completedSetsTime[setIndex]!).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
-                                : `點擊完成第 ${setIndex + 1} 組`
+                              title={
+                                exercise.completedSetsTime[setIndex]
+                                  ? `完成於 ${new Date(exercise.completedSetsTime[setIndex]!).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
+                                  : `點擊完成第 ${setIndex + 1} 組`
                               }
                             >
                               {completed ? (
@@ -426,7 +434,9 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
                 </div>
                 <div>
                   <span className="text-morandi-secondary">完成組數:</span>
-                  <p className="font-medium text-lg">{totalCompletedSets}/{totalSets}</p>
+                  <p className="font-medium text-lg">
+                    {totalCompletedSets}/{totalSets}
+                  </p>
                 </div>
                 <div>
                   <span className="text-morandi-secondary">總訓練量:</span>
@@ -442,9 +452,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
             {isBoxCompleted && (
               <div className="bg-morandi-green/10 border border-morandi-green/30 rounded-lg p-3 flex items-center justify-center gap-2">
                 <Check className="h-5 w-5 text-morandi-green" />
-                <span className="text-morandi-green font-medium">
-                  此訓練已完成 ✓
-                </span>
+                <span className="text-morandi-green font-medium">此訓練已完成 ✓</span>
               </div>
             )}
 

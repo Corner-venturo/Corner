@@ -8,14 +8,14 @@
 
 ## 📊 問題統計總覽
 
-| 問題類型 | 數量 | 嚴重程度 | 影響範圍 |
-|---------|------|----------|----------|
-| 🏗️ 大型檔案 (>500行) | 26 個 | 🔴 高 | 可維護性 |
-| 🔓 型別逃逸 (`as unknown`) | 78 個文件 | 🔴 高 | 型別安全 |
-| ⏰ setTimeout Hack | 30+ 處 | 🟡 中 | 效能/穩定性 |
-| 🔄 同步欄位使用 | 321 次 (35 文件) | 🟡 中 | 資料一致性 |
-| 🧹 TODO/FIXME 標記 | 54 個文件 | 🟡 中 | 技術債 |
-| 💾 記憶體洩漏風險 | ~10 處 | 🟠 中高 | 效能 |
+| 問題類型                   | 數量             | 嚴重程度 | 影響範圍    |
+| -------------------------- | ---------------- | -------- | ----------- |
+| 🏗️ 大型檔案 (>500行)       | 26 個            | 🔴 高    | 可維護性    |
+| 🔓 型別逃逸 (`as unknown`) | 78 個文件        | 🔴 高    | 型別安全    |
+| ⏰ setTimeout Hack         | 30+ 處           | 🟡 中    | 效能/穩定性 |
+| 🔄 同步欄位使用            | 321 次 (35 文件) | 🟡 中    | 資料一致性  |
+| 🧹 TODO/FIXME 標記         | 54 個文件        | 🟡 中    | 技術債      |
+| 💾 記憶體洩漏風險          | ~10 處           | 🟠 中高  | 效能        |
 
 ---
 
@@ -26,6 +26,7 @@
 **問題描述**: 多個檔案超過 1000 行，違反單一職責原則
 
 **最嚴重的檔案**:
+
 ```
 1944 行 - src/app/quotes/[id]/page.tsx          (報價詳情頁)
 1650 行 - src/app/tours/page.tsx                (旅遊團列表頁)
@@ -37,6 +38,7 @@
 ```
 
 **影響**:
+
 - ❌ 難以理解和維護
 - ❌ 測試覆蓋困難
 - ❌ Git 衝突機率高
@@ -51,25 +53,27 @@
 **問題描述**: 78 個檔案使用 `as unknown` 繞過 TypeScript 檢查
 
 **典型案例**:
+
 ```typescript
 // ❌ 錯誤範例 - src/app/database/regions/page.tsx:48
 await create({
   type: 'country',
   name: destination.name,
   code: countryCode,
-  status: 'active'
-} as unknown);  // 直接繞過型別檢查
+  status: 'active',
+} as unknown) // 直接繞過型別檢查
 
 // ✅ 正確做法
 await create({
   type: 'country' as const,
   name: destination.name,
   code: countryCode,
-  status: 'active'
-} satisfies Omit<Region, 'id' | 'created_at' | 'updated_at'>);
+  status: 'active',
+} satisfies Omit<Region, 'id' | 'created_at' | 'updated_at'>)
 ```
 
 **影響**:
+
 - ❌ 執行期型別錯誤
 - ❌ IDE 無法提供自動完成
 - ❌ 重構時容易遺漏
@@ -86,32 +90,35 @@ await create({
 **問題描述**: 使用 setTimeout 等待非同步初始化，無法保證完成
 
 **最嚴重案例**:
+
 ```typescript
 // ❌ src/app/database/regions/page.tsx:72
-const timer = setTimeout(initializeRegions, 100);  // 為什麼是 100ms？
+const timer = setTimeout(initializeRegions, 100) // 為什麼是 100ms？
 
 // ❌ src/lib/db/version-manager.ts:95
-setTimeout(() => resolve(), 1000);  // 為什麼是 1000ms？
+setTimeout(() => resolve(), 1000) // 為什麼是 1000ms？
 
 // ❌ src/stores/create-store.ts:254
 setTimeout(async () => {
   // 背景同步 Supabase...
-}, 0);  // 為什麼用 setTimeout(0) 而不是 queueMicrotask？
+}, 0) // 為什麼用 setTimeout(0) 而不是 queueMicrotask？
 ```
 
 **問題**:
+
 - ⏰ 100ms 可能不夠（慢設備）
 - ⏰ 1000ms 太長（快設備浪費時間）
 - ⏰ setTimeout(0) 不保證執行順序
 
 **正確做法**:
+
 ```typescript
 // ✅ 使用 Promise + 狀態檢查
-await waitForStoreReady();
+await waitForStoreReady()
 
 // ✅ 使用 AbortController + timeout
-const controller = new AbortController();
-const timeout = setTimeout(() => controller.abort(), 3000);
+const controller = new AbortController()
+const timeout = setTimeout(() => controller.abort(), 3000)
 ```
 
 **建議修復優先級**: 🔴 P0 (立即處理)
@@ -125,20 +132,22 @@ const timeout = setTimeout(() => controller.abort(), 3000);
 **問題位置**: `src/stores/create-store.ts`
 
 **已知問題**:
+
 ```typescript
 // Line 279: 軟刪除機制被註解掉
 // TODO: 軟刪除機制需要重新設計（目前暫時移除 _deleted 過濾）
 // items = items.filter((item) => !item._deleted);
 
 // Line 285-299: 合併策略過於簡單
-const localOnlyItems = currentItems.filter((localItem) => {
+const localOnlyItems = currentItems.filter(localItem => {
   // 🚨 問題：如果同一筆資料本地和雲端都修改了？
-  if ('_needs_sync' in localItem && localItem._needs_sync === true) return true;
-  return !items.find((serverItem) => serverItem.id === localItem.id);
-});
+  if ('_needs_sync' in localItem && localItem._needs_sync === true) return true
+  return !items.find(serverItem => serverItem.id === localItem.id)
+})
 ```
 
 **缺乏處理的情況**:
+
 1. ❌ 本地修改 vs 雲端修改（Last Write Wins？還是 Merge？）
 2. ❌ 刪除衝突（本地刪除 vs 雲端修改）
 3. ❌ 網路中斷期間的多次修改
@@ -155,15 +164,16 @@ const localOnlyItems = currentItems.filter((localItem) => {
 **問題案例**:
 
 #### ❌ 案例 1: Store 全域監聽器
+
 ```typescript
 // src/stores/create-store.ts:668-678
 if (typeof window !== 'undefined') {
   const handleSyncCompleted = () => {
-    logger.log(`📥 [${tableName}] 收到同步完成通知，重新載入資料...`);
-    store.getState().fetchAll();
-  };
+    logger.log(`📥 [${tableName}] 收到同步完成通知，重新載入資料...`)
+    store.getState().fetchAll()
+  }
 
-  window.addEventListener('venturo:sync-completed', handleSyncCompleted);
+  window.addEventListener('venturo:sync-completed', handleSyncCompleted)
 
   // ⚠️ 注意：在實際應用中，應該在適當的時機移除監聽器
   // 但由於 Store 是全域單例，通常不需要清理
@@ -171,31 +181,34 @@ if (typeof window !== 'undefined') {
 ```
 
 **問題**: 註解說「通常不需要清理」，但在某些情況下：
+
 - 🔄 熱重載 (HMR) 時會重複註冊
 - 🧪 測試環境會累積監聽器
 - 📱 SPA 頁面切換可能洩漏
 
 #### ❌ 案例 2: AbortController 未清理
+
 ```typescript
 // src/stores/create-store.ts:171
-const controller = new AbortController();
-set({ loading: true, error: null, _abortController: controller });
+const controller = new AbortController()
+set({ loading: true, error: null, _abortController: controller })
 
 // 🚨 問題：如果 fetchAll 多次調用，舊的 controller 會被覆蓋但不會清理
 ```
 
 #### ✅ 有正確清理的案例
+
 ```typescript
 // src/components/ErrorLogger.tsx
 useEffect(() => {
-  window.addEventListener('error', handleError);
-  window.addEventListener('unhandledrejection', handleRejection);
+  window.addEventListener('error', handleError)
+  window.addEventListener('unhandledrejection', handleRejection)
 
   return () => {
-    window.removeEventListener('error', handleError);
-    window.removeEventListener('unhandledrejection', handleRejection);
-  };
-}, []);
+    window.removeEventListener('error', handleError)
+    window.removeEventListener('unhandledrejection', handleRejection)
+  }
+}, [])
 ```
 
 **建議修復優先級**: 🟠 P1 (高優先)
@@ -209,6 +222,7 @@ useEffect(() => {
 54 個文件包含 TODO/FIXME 標記，表示未完成的功能或已知問題。
 
 **高風險 TODO** (需要優先處理):
+
 - `src/stores/create-store.ts`: 3 處（軟刪除機制、同步策略）
 - `src/components/workspace/ChannelChat.tsx`: 8 處
 - `src/app/tours/page.tsx`: 4 處
@@ -218,22 +232,24 @@ useEffect(() => {
 ### 7. 🚀 效能問題
 
 #### 大量資料載入無分頁
+
 ```typescript
 // src/stores/create-store.ts:208
 const { data, error: supabaseError } = await supabase
   .from(tableName)
-  .select('*')  // 🚨 一次載入全部資料
-  .order('created_at', { ascending: true });
+  .select('*') // 🚨 一次載入全部資料
+  .order('created_at', { ascending: true })
 ```
 
 #### 同步資料時阻塞 UI
+
 ```typescript
 // src/stores/create-store.ts:308
-const batchSize = 10;
+const batchSize = 10
 const syncBatch = async (startIndex: number) => {
   // 🚨 雖然有分批，但是在主執行緒執行
-  await Promise.all(batch.map(item => localDB.put(tableName, item)));
-};
+  await Promise.all(batch.map(item => localDB.put(tableName, item)))
+}
 ```
 
 ---
@@ -241,6 +257,7 @@ const syncBatch = async (startIndex: number) => {
 ## 🎯 修復建議與行動方案
 
 ### 優先級定義
+
 - 🔴 **P0 (立即)**: 影響系統穩定性、資料完整性
 - 🟠 **P1 (本週)**: 影響開發效率、程式碼品質
 - 🟡 **P2 (本月)**: 技術債、最佳化
@@ -249,6 +266,7 @@ const syncBatch = async (startIndex: number) => {
 ### 修復時程規劃
 
 #### Week 1: 基礎架構修復 (P0)
+
 1. **重構 create-store.ts** (2 天)
    - 拆分成 7 個獨立模組
    - 建立清晰的介面
@@ -258,6 +276,7 @@ const syncBatch = async (startIndex: number) => {
    - 建立正確的型別定義
 
 #### Week 2: 同步機制完善 (P0-P1)
+
 3. **實作衝突解決策略** (3 天)
    - Last Write Wins + 時間戳比較
    - 軟刪除機制重新啟用
@@ -267,6 +286,7 @@ const syncBatch = async (startIndex: number) => {
    - AbortController 管理
 
 #### Week 3-4: 大型檔案重構 (P1-P2)
+
 5. **拆分超大型頁面** (每個 1-2 天)
    - quotes/[id]/page.tsx → 模組化
    - tours/page.tsx → 模組化

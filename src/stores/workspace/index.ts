@@ -1,31 +1,31 @@
 // Unified workspace store - combines all workspace stores with backward compatibility
 
-import { useChannelsStore } from './channels-store';
-import { useChatStore } from './chat-store';
-import { useMembersStore } from './members-store';
-import { useWidgetsStore } from './widgets-store';
-import { useCanvasStore } from './canvas-store';
+import { useChannelsStore } from './channels-store'
+import { useChatStore } from './chat-store'
+import { useMembersStore } from './members-store'
+import { useWidgetsStore } from './widgets-store'
+import { useCanvasStore } from './canvas-store'
 
 // Re-export all types
-export * from './types';
+export * from './types'
 
 // Re-export individual stores
-export { useChannelsStore } from './channels-store';
-export { useChatStore } from './chat-store';
-export { useMembersStore } from './members-store';
-export { useWidgetsStore } from './widgets-store';
-export { useCanvasStore } from './canvas-store';
+export { useChannelsStore } from './channels-store'
+export { useChatStore } from './chat-store'
+export { useMembersStore } from './members-store'
+export { useWidgetsStore } from './widgets-store'
+export { useCanvasStore } from './canvas-store'
 
 /**
  * Unified workspace store hook - maintains backward compatibility
  * This combines all workspace stores into a single interface
  */
 export const useWorkspaceStore = () => {
-  const channelsStore = useChannelsStore();
-  const chatStore = useChatStore();
-  const membersStore = useMembersStore();
-  const widgetsStore = useWidgetsStore();
-  const canvasStore = useCanvasStore();
+  const channelsStore = useChannelsStore()
+  const chatStore = useChatStore()
+  const membersStore = useMembersStore()
+  const widgetsStore = useWidgetsStore()
+  const canvasStore = useCanvasStore()
 
   return {
     // Workspaces & Channels
@@ -60,21 +60,21 @@ export const useWorkspaceStore = () => {
 
     // Channel selection with coordinated state
     selectChannel: async (channel: typeof channelsStore.selectedChannel) => {
-      await channelsStore.selectChannel(channel);
+      await channelsStore.selectChannel(channel)
 
       if (channel) {
         // Load data for the selected channel
-        await chatStore.loadMessages(channel.id);
-        await widgetsStore.loadAdvanceLists(channel.id);
-        await widgetsStore.loadSharedOrderLists(channel.id);
+        await chatStore.loadMessages(channel.id)
+        await widgetsStore.loadAdvanceLists(channel.id)
+        await widgetsStore.loadSharedOrderLists(channel.id)
 
         // Update chat store's current messages
-        const messages = chatStore.channelMessages[channel.id] || [];
-        chatStore.setCurrentChannelMessages(channel.id, messages);
+        const messages = chatStore.channelMessages[channel.id] || []
+        chatStore.setCurrentChannelMessages(channel.id, messages)
       } else {
         // Clear messages when no channel selected
-        chatStore.clearMessages();
-        widgetsStore.clearWidgets();
+        chatStore.clearMessages()
+        widgetsStore.clearWidgets()
       }
     },
 
@@ -128,8 +128,8 @@ export const useWorkspaceStore = () => {
     loading: channelsStore.loading || widgetsStore.loading,
     error: channelsStore.error || membersStore.error,
     clearError: () => {
-      channelsStore.clearError();
-      membersStore.clearError();
+      channelsStore.clearError()
+      membersStore.clearError()
     },
-  };
-};
+  }
+}

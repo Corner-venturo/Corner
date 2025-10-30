@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { ChevronDown, X, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import * as React from 'react'
+import { ChevronDown, X, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 /**
  * 通用的 Combobox 選項類型
@@ -12,13 +12,13 @@ import { Button } from "@/components/ui/button";
  */
 export interface ComboboxOption<T = unknown> {
   /** 選項的唯一識別值 */
-  value: string;
+  value: string
   /** 顯示的標籤文字 */
-  label: string;
+  label: string
   /** 可選的額外資料，用於傳遞更多資訊 */
-  data?: T;
+  data?: T
   /** 是否禁用此選項 */
-  disabled?: boolean;
+  disabled?: boolean
 }
 
 /**
@@ -27,29 +27,29 @@ export interface ComboboxOption<T = unknown> {
  */
 export interface ComboboxProps<T = unknown> {
   /** 當前選中的值 */
-  value: string;
+  value: string
   /** 值改變時的回調函數 */
-  onChange: (value: string) => void;
+  onChange: (value: string) => void
   /** 選項被選中時的回調函數，可獲取完整的選項物件 */
-  onSelect?: (option: ComboboxOption<T>) => void;
+  onSelect?: (option: ComboboxOption<T>) => void
   /** 可選項列表 */
-  options: ComboboxOption<T>[];
+  options: ComboboxOption<T>[]
   /** 輸入框佔位符 */
-  placeholder?: string;
+  placeholder?: string
   /** 自定義樣式類名 */
-  className?: string;
+  className?: string
   /** 無搜尋結果時顯示的訊息 */
-  emptyMessage?: string;
+  emptyMessage?: string
   /** 是否顯示搜尋圖示 */
-  showSearchIcon?: boolean;
+  showSearchIcon?: boolean
   /** 是否顯示清除按鈕 */
-  showClearButton?: boolean;
+  showClearButton?: boolean
   /** 是否禁用整個組件 */
-  disabled?: boolean;
+  disabled?: boolean
   /** 自定義選項渲染函數 */
-  renderOption?: (option: ComboboxOption<T>) => React.ReactNode;
+  renderOption?: (option: ComboboxOption<T>) => React.ReactNode
   /** 下拉選單最大高度 */
-  maxHeight?: string;
+  maxHeight?: string
 }
 
 /**
@@ -85,140 +85,136 @@ export function Combobox<T = unknown>({
   onChange,
   onSelect,
   options,
-  placeholder = "輸入或選擇項目",
+  placeholder = '輸入或選擇項目',
   className,
-  emptyMessage = "無符合的選項",
+  emptyMessage = '無符合的選項',
   showSearchIcon = true,
   showClearButton = true,
   disabled = false,
   renderOption,
-  maxHeight = "16rem"
+  maxHeight = '16rem',
 }: ComboboxProps<T>) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [searchValue, setSearchValue] = React.useState("");
-  const [highlightedIndex, setHighlightedIndex] = React.useState(-1);
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
-  const optionRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [searchValue, setSearchValue] = React.useState('')
+  const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const dropdownRef = React.useRef<HTMLDivElement>(null)
+  const optionRefs = React.useRef<(HTMLButtonElement | null)[]>([])
 
   // 當 value 改變時，更新搜尋值為對應的 label
   React.useEffect(() => {
-    const selectedOption = options.find(opt => opt.value === value);
-    setSearchValue(selectedOption?.label || "");
-  }, [value, options]);
+    const selectedOption = options.find(opt => opt.value === value)
+    setSearchValue(selectedOption?.label || '')
+  }, [value, options])
 
   // 篩選選項
   const filteredOptions = React.useMemo(() => {
-    return options.filter(option =>
-      option.label?.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }, [options, searchValue]);
+    return options.filter(option => option.label?.toLowerCase().includes(searchValue.toLowerCase()))
+  }, [options, searchValue])
 
   // 處理輸入變化
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setSearchValue(newValue);
+    const newValue = e.target.value
+    setSearchValue(newValue)
 
     // 只有在真正輸入內容時才打開下拉選單
     if (!isOpen) {
-      setIsOpen(true);
+      setIsOpen(true)
     }
 
-    setHighlightedIndex(-1);
+    setHighlightedIndex(-1)
 
     // 如果輸入為空，清除選擇
     if (!newValue) {
-      onChange("");
+      onChange('')
     }
-  };
+  }
 
   // 處理輸入框點擊（打開下拉選單）
   const handleInputClick = () => {
     if (!disabled && !isOpen) {
-      setIsOpen(true);
+      setIsOpen(true)
     }
-  };
+  }
 
   // 處理選項選擇
   const handleOptionSelect = (option: ComboboxOption<T>) => {
-    if (option.disabled) return;
+    if (option.disabled) return
 
-    setSearchValue(option.label);
-    onChange(option.value);
-    onSelect?.(option);
-    setIsOpen(false);
-    setHighlightedIndex(-1);
-  };
+    setSearchValue(option.label)
+    onChange(option.value)
+    onSelect?.(option)
+    setIsOpen(false)
+    setHighlightedIndex(-1)
+  }
 
   // 清除選擇
   const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSearchValue("");
-    onChange("");
-    setIsOpen(false);
-    inputRef.current?.focus();
-  };
+    e.stopPropagation()
+    setSearchValue('')
+    onChange('')
+    setIsOpen(false)
+    inputRef.current?.focus()
+  }
 
   // 切換下拉選單
   const handleToggleDropdown = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation()
     if (!disabled) {
-      setIsOpen(!isOpen);
+      setIsOpen(!isOpen)
       if (!isOpen) {
-        inputRef.current?.focus();
+        inputRef.current?.focus()
       }
     }
-  };
+  }
 
   // 鍵盤導航
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen) {
       if (e.key === 'ArrowDown' || e.key === 'Enter') {
-        setIsOpen(true);
-        setHighlightedIndex(0);
-        e.preventDefault();
+        setIsOpen(true)
+        setHighlightedIndex(0)
+        e.preventDefault()
       }
-      return;
+      return
     }
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault();
-        setHighlightedIndex(prev =>
-          prev < filteredOptions.length - 1 ? prev + 1 : prev
-        );
-        break;
+        e.preventDefault()
+        setHighlightedIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : prev))
+        break
       case 'ArrowUp':
-        e.preventDefault();
-        setHighlightedIndex(prev => prev > 0 ? prev - 1 : 0);
-        break;
+        e.preventDefault()
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0))
+        break
       case 'Enter':
-        e.preventDefault();
+        e.preventDefault()
         if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
-          handleOptionSelect(filteredOptions[highlightedIndex]);
+          handleOptionSelect(filteredOptions[highlightedIndex])
         }
-        break;
+        break
       case 'Escape':
-        e.preventDefault();
-        setIsOpen(false);
-        setHighlightedIndex(-1);
-        inputRef.current?.blur();
-        break;
+        e.preventDefault()
+        setIsOpen(false)
+        setHighlightedIndex(-1)
+        inputRef.current?.blur()
+        break
       case 'Tab':
-        setIsOpen(false);
-        break;
+        setIsOpen(false)
+        break
     }
-  };
+  }
 
   // 滾動到高亮的選項
   React.useEffect(() => {
     if (highlightedIndex >= 0 && optionRefs.current[highlightedIndex]) {
       optionRefs.current[highlightedIndex]?.scrollIntoView({
         block: 'nearest',
-        behavior: 'smooth'
-      });
+        behavior: 'smooth',
+      })
     }
-  }, [highlightedIndex]);
+  }, [highlightedIndex])
 
   // 點擊外部關閉下拉選單
   React.useEffect(() => {
@@ -229,21 +225,21 @@ export function Combobox<T = unknown>({
         inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // 預設選項渲染
   const defaultRenderOption = (option: ComboboxOption<T>) => (
     <span className="text-morandi-primary">{option.label}</span>
-  );
+  )
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       {/* 輸入框 */}
       <div className="relative">
         {showSearchIcon && (
@@ -261,10 +257,7 @@ export function Combobox<T = unknown>({
           onClick={handleInputClick}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn(
-            "pr-8",
-            showSearchIcon && "pl-9"
-          )}
+          className={cn('pr-8', showSearchIcon && 'pl-9')}
         />
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
           {showClearButton && searchValue && !disabled && (
@@ -287,8 +280,8 @@ export function Combobox<T = unknown>({
             <ChevronDown
               size={16}
               className={cn(
-                "text-morandi-secondary transition-transform",
-                isOpen && "transform rotate-180"
+                'text-morandi-secondary transition-transform',
+                isOpen && 'transform rotate-180'
               )}
             />
           </button>
@@ -307,15 +300,17 @@ export function Combobox<T = unknown>({
               filteredOptions.map((option, index) => (
                 <button
                   key={option.value}
-                  ref={el => { optionRefs.current[index] = el; }}
+                  ref={el => {
+                    optionRefs.current[index] = el
+                  }}
                   onClick={() => handleOptionSelect(option)}
                   disabled={option.disabled}
                   className={cn(
-                    "w-full px-3 py-2 text-left text-sm transition-colors",
-                    "hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none",
-                    highlightedIndex === index && "bg-morandi-container/50",
-                    option.value === value && "bg-morandi-gold/10 font-medium",
-                    option.disabled && "opacity-50 cursor-not-allowed"
+                    'w-full px-3 py-2 text-left text-sm transition-colors',
+                    'hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none',
+                    highlightedIndex === index && 'bg-morandi-container/50',
+                    option.value === value && 'bg-morandi-gold/10 font-medium',
+                    option.disabled && 'opacity-50 cursor-not-allowed'
                   )}
                 >
                   {renderOption ? renderOption(option) : defaultRenderOption(option)}
@@ -330,25 +325,25 @@ export function Combobox<T = unknown>({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 // 保留舊版相容性的類型定義
 export interface LegacyComboboxOption {
-  id: string;
-  name: string;
-  price_per_person?: number;
-  pricePerGroup?: number;
-  isGroupCost?: boolean;
+  id: string
+  name: string
+  price_per_person?: number
+  pricePerGroup?: number
+  isGroupCost?: boolean
 }
 
 export interface LegacyComboboxProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSelect?: (option: LegacyComboboxOption) => void;
-  options: LegacyComboboxOption[];
-  placeholder?: string;
-  className?: string;
+  value: string
+  onChange: (value: string) => void
+  onSelect?: (option: LegacyComboboxOption) => void
+  options: LegacyComboboxOption[]
+  placeholder?: string
+  className?: string
 }
 
 /**
@@ -360,39 +355,47 @@ export function LegacyCombobox({
   onChange,
   onSelect,
   options,
-  placeholder = "輸入或選擇項目",
-  className
+  placeholder = '輸入或選擇項目',
+  className,
 }: LegacyComboboxProps) {
   const transformedOptions: ComboboxOption<LegacyComboboxOption>[] = options.map(opt => ({
     value: opt.id,
     label: opt.name,
-    data: opt
-  }));
+    data: opt,
+  }))
 
   return (
     <Combobox
       value={value}
       onChange={onChange}
-      onSelect={(option) => onSelect?.(option.data!)}
+      onSelect={option => onSelect?.(option.data!)}
       options={transformedOptions}
       placeholder={placeholder}
       className={className}
-      renderOption={(option) => (
+      renderOption={option => (
         <div className="flex justify-between items-center">
           <span className="text-morandi-primary">{option.label}</span>
           {option.data && (
             <span className="text-xs text-morandi-secondary">
-              {option.data && typeof option.data === 'object' && 'pricePerGroup' in option.data && option.data.pricePerGroup ? (
-                'isGroupCost' in option.data && option.data.isGroupCost
+              {option.data &&
+              typeof option.data === 'object' &&
+              'pricePerGroup' in option.data &&
+              option.data.pricePerGroup
+                ? 'isGroupCost' in option.data && option.data.isGroupCost
                   ? `團體 NT$${option.data.pricePerGroup}`
-                  : 'price_per_person' in option.data ? `個人 NT$${option.data.price_per_person}` : ''
-              ) : option.data && typeof option.data === 'object' && 'price_per_person' in option.data && option.data.price_per_person ? (
-                `NT$${option.data.price_per_person}`
-              ) : ''}
+                  : 'price_per_person' in option.data
+                    ? `個人 NT$${option.data.price_per_person}`
+                    : ''
+                : option.data &&
+                    typeof option.data === 'object' &&
+                    'price_per_person' in option.data &&
+                    option.data.price_per_person
+                  ? `NT$${option.data.price_per_person}`
+                  : ''}
             </span>
           )}
         </div>
       )}
     />
-  );
+  )
 }

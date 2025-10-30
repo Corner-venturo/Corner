@@ -1,18 +1,18 @@
-import React from "react";
-import { TourFormData, FocusCard } from "../types";
+import React from 'react'
+import { TourFormData, FocusCard } from '../types'
 
 interface FocusCardsSectionProps {
-  data: TourFormData;
-  addFocusCard: () => void;
-  updateFocusCard: (index: number, field: string, value: string) => void;
-  removeFocusCard: (index: number) => void;
+  data: TourFormData
+  addFocusCard: () => void
+  updateFocusCard: (index: number, field: string, value: string) => void
+  removeFocusCard: (index: number) => void
 }
 
 export function FocusCardsSection({
   data,
   addFocusCard,
   updateFocusCard,
-  removeFocusCard
+  removeFocusCard,
 }: FocusCardsSectionProps) {
   return (
     <div className="space-y-4">
@@ -42,7 +42,7 @@ export function FocusCardsSection({
             <input
               type="text"
               value={card.title}
-              onChange={(e) => updateFocusCard(index, "title", e.target.value)}
+              onChange={e => updateFocusCard(index, 'title', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="由布院溫泉街"
             />
@@ -52,14 +52,16 @@ export function FocusCardsSection({
             <input
               type="text"
               value={card.src}
-              onChange={(e) => updateFocusCard(index, "src", e.target.value)}
+              onChange={e => updateFocusCard(index, 'src', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="https://images.unsplash.com/..."
             />
-            <p className="mt-1 text-xs text-morandi-secondary">建議使用 16:9 高解析度圖片，營造一致的 Morandi 色調。</p>
+            <p className="mt-1 text-xs text-morandi-secondary">
+              建議使用 16:9 高解析度圖片，營造一致的 Morandi 色調。
+            </p>
           </div>
         </div>
       ))}
     </div>
-  );
+  )
 }

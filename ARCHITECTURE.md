@@ -106,10 +106,10 @@ venturo-new/
 
 Venturo 採用**兩種不同的同步機制**，針對不同功能需求：
 
-| 功能類型 | 同步機制 | 適用功能 | 特點 |
-|---------|---------|---------|------|
-| **主要功能** | Offline-First | Tours, Orders, Finance 等 | 離線可用、快速載入 |
-| **即時協作** | Realtime (規劃中) | Workspace Chat | 即時推送、多人協作 |
+| 功能類型     | 同步機制          | 適用功能                  | 特點               |
+| ------------ | ----------------- | ------------------------- | ------------------ |
+| **主要功能** | Offline-First     | Tours, Orders, Finance 等 | 離線可用、快速載入 |
+| **即時協作** | Realtime (規劃中) | Workspace Chat            | 即時推送、多人協作 |
 
 ---
 
@@ -158,15 +158,15 @@ graph TD
 // src/stores/utils/sync-helper.ts
 export async function loadWithSync<T>(options: SyncOptions<T>) {
   // 1️⃣ 從 IndexedDB 快速載入 (0.1 秒)
-  const cached = await localDB.getAll(tableName);
+  const cached = await localDB.getAll(tableName)
 
   // 2️⃣ 背景從 Supabase 同步
   setTimeout(async () => {
-    const { data } = await supabase.from(tableName).select('*');
+    const { data } = await supabase.from(tableName).select('*')
     // 更新 IndexedDB 和 Store
-  }, 0);
+  }, 0)
 
-  return { cached, fresh: null };
+  return { cached, fresh: null }
 }
 ```
 
@@ -180,19 +180,20 @@ export async function loadWithSync<T>(options: SyncOptions<T>) {
 
 ```typescript
 // src/stores/workspace/chat-store.ts (目前實作)
-loadMessages: async (channelId) => {
+loadMessages: async channelId => {
   // ✅ 步驟 1: IndexedDB 快速載入
-  const cached = await localDB.getAll('messages');
+  const cached = await localDB.getAll('messages')
 
   // ✅ 步驟 2: 背景同步
   setTimeout(async () => {
-    const { data } = await supabase.from('messages').select('*');
+    const { data } = await supabase.from('messages').select('*')
     // 更新本地
-  }, 0);
+  }, 0)
 }
 ```
 
 **特點**:
+
 - ✅ 離線可看歷史訊息
 - ✅ 快速載入
 - ❌ 不即時（需手動刷新才能看到其他人的新訊息）
@@ -207,23 +208,28 @@ subscribeToChannel: (channelId: string) => {
   // ⚡ 訂閱 Realtime 推送
   const channel = supabase
     .channel(`chat:${channelId}`)
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'messages',
-      filter: `channel_id=eq.${channelId}`
-    }, (payload) => {
-      // 🎯 其他人發訊息時，立即推送到本機
-      addMessage(payload.new);
-      localDB.put('messages', payload.new); // 同時存入 IndexedDB
-    })
-    .subscribe();
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `channel_id=eq.${channelId}`,
+      },
+      payload => {
+        // 🎯 其他人發訊息時，立即推送到本機
+        addMessage(payload.new)
+        localDB.put('messages', payload.new) // 同時存入 IndexedDB
+      }
+    )
+    .subscribe()
 
-  return () => channel.unsubscribe();
+  return () => channel.unsubscribe()
 }
 ```
 
 **加入 Realtime 後的特點**:
+
 - ✅ 離線可看歷史訊息（IndexedDB）
 - ✅ 快速載入（IndexedDB）
 - ✅ 即時接收新訊息（Realtime Push）
@@ -247,11 +253,13 @@ subscribeToChannel: (channelId: string) => {
 ```
 
 **優點**:
+
 - ✅ 離線完全可用
 - ✅ 超快載入速度
 - ✅ 節省連線數
 
 **缺點**:
+
 - ❌ 不即時
 - ❌ 需手動刷新
 
@@ -274,11 +282,13 @@ subscribeToChannel: (channelId: string) => {
 ```
 
 **優點**:
+
 - ✅ 即時協作
 - ✅ 自動推送
 - ✅ 仍保有 IndexedDB 離線查看歷史
 
 **缺點**:
+
 - ⚠️ 需保持連線（離開頁面自動斷線）
 - ⚠️ 佔用連線數（Free tier: 200 連線）
 
@@ -336,15 +346,15 @@ Offline-First:
 
 ### 5. 最佳實踐：混合架構
 
-| 功能 | 同步機制 | 原因 |
-|------|---------|------|
-| Tours | Offline-First | 離線可用、快速載入 |
-| Orders | Offline-First | 不需即時、穩定優先 |
-| Employees | Offline-First | 更新頻率低 |
-| Finance | Offline-First | 穩定性優先 |
-| Accounting | Offline-First | 資料準確性優先 |
+| 功能               | 同步機制                     | 原因                    |
+| ------------------ | ---------------------------- | ----------------------- |
+| Tours              | Offline-First                | 離線可用、快速載入      |
+| Orders             | Offline-First                | 不需即時、穩定優先      |
+| Employees          | Offline-First                | 更新頻率低              |
+| Finance            | Offline-First                | 穩定性優先              |
+| Accounting         | Offline-First                | 資料準確性優先          |
 | **Workspace Chat** | **Offline-First + Realtime** | 離線看歷史 + 即時新訊息 |
-| Notifications | Realtime (未來) | 需即時推送 |
+| Notifications      | Realtime (未來)              | 需即時推送              |
 
 ---
 
@@ -460,6 +470,7 @@ features/
 ```
 
 **未來擴展**:
+
 - `features/tours/` - 旅遊團功能模組
 - `features/orders/` - 訂單功能模組
 - `features/workspace/` - 工作區功能模組
@@ -478,6 +489,7 @@ hooks/
 ```
 
 **Hook 分類**:
+
 - **資料管理**: useTours, useOrders, useCustomers
 - **UI 狀態**: useListPageState, useDialogState
 - **業務邏輯**: useDataFiltering, usePaymentTracking
@@ -498,6 +510,7 @@ services/
 **問題**: Service Layer 太薄弱，只有 5 個服務
 
 **建議擴展**:
+
 - TourService
 - OrderService
 - PaymentService
@@ -639,21 +652,21 @@ Phase 1 建立的可重用表格單元格組件：
 
 ```typescript
 // 主要業務實體
-Tour          // 旅遊團
-Order         // 訂單
-Member        // 團員（旅客）
-Customer      // 客戶
-Payment       // 付款記錄
-Quote         // 報價單
-Contract      // 合約
-Visa          // 簽證
-Employee      // 員工
-Todo          // 待辦事項
+Tour // 旅遊團
+Order // 訂單
+Member // 團員（旅客）
+Customer // 客戶
+Payment // 付款記錄
+Quote // 報價單
+Contract // 合約
+Visa // 簽證
+Employee // 員工
+Todo // 待辦事項
 
 // 工作區實體
-Workspace     // 工作區
-Channel       // 頻道
-Message       // 訊息
+Workspace // 工作區
+Channel // 頻道
+Message // 訊息
 ChannelMember // 頻道成員
 ```
 
@@ -681,10 +694,10 @@ Order (訂單)
 
 ```typescript
 interface BaseEntity {
-  id: string;              // UUID
-  created_at: string;      // ISO 8601
-  updated_at: string;      // ISO 8601
-  is_deleted?: boolean;    // 軟刪除標記
+  id: string // UUID
+  created_at: string // ISO 8601
+  updated_at: string // ISO 8601
+  is_deleted?: boolean // 軟刪除標記
 }
 ```
 
@@ -704,7 +717,7 @@ export const PERMISSIONS = {
   ORDERS_VIEW: 'orders:view',
   FINANCE_VIEW: 'finance:view',
   HR_VIEW: 'hr:view',
-};
+}
 
 // 角色定義
 export const ROLES = {
@@ -714,20 +727,13 @@ export const ROLES = {
   },
   TOUR_MANAGER: {
     label: '團控',
-    permissions: [
-      PERMISSIONS.TOURS_VIEW,
-      PERMISSIONS.TOURS_EDIT,
-      PERMISSIONS.ORDERS_VIEW,
-    ],
+    permissions: [PERMISSIONS.TOURS_VIEW, PERMISSIONS.TOURS_EDIT, PERMISSIONS.ORDERS_VIEW],
   },
   ACCOUNTANT: {
     label: '會計',
-    permissions: [
-      PERMISSIONS.FINANCE_VIEW,
-      PERMISSIONS.ORDERS_VIEW,
-    ],
+    permissions: [PERMISSIONS.FINANCE_VIEW, PERMISSIONS.ORDERS_VIEW],
   },
-};
+}
 ```
 
 ---
@@ -757,16 +763,18 @@ export const ROLES = {
 ### 優化機會
 
 1. **Component Memoization** (30-50 個組件需要)
+
    ```typescript
    export const TourCard = React.memo(({ tour }: Props) => {
      // ...
-   });
+   })
    ```
 
 2. **Store Selectors** (避免不必要的重新渲染)
+
    ```typescript
-   const tours = useTourStore(state => state.items);
-   const loading = useTourStore(state => state.loading);
+   const tours = useTourStore(state => state.items)
+   const loading = useTourStore(state => state.loading)
    ```
 
 3. **List Virtualization** (長列表效能)
@@ -860,6 +868,7 @@ export const ROLES = {
 **決策**: 採用 Zustand
 
 **理由**:
+
 - 更簡單的 API，學習曲線低
 - 不需要 Provider 包裝
 - TypeScript 支援良好
@@ -876,6 +885,7 @@ export const ROLES = {
 **決策**: 全面採用 snake_case
 
 **理由**:
+
 - 資料庫（Supabase/IndexedDB）使用 snake_case
 - 避免前後端轉換
 - 減少錯誤機會
@@ -891,6 +901,7 @@ export const ROLES = {
 **決策**: 採用離線優先（Offline-First）架構
 
 **理由**:
+
 - 提升使用體驗
 - 資料優先存本地（IndexedDB）
 - 網路恢復時自動同步
@@ -901,18 +912,21 @@ export const ROLES = {
 ## 🚀 未來規劃
 
 ### Phase 1: 架構優化 (第 1-4 週)
+
 - [ ] 拆分超大檔案（< 400 行）
 - [ ] 建立 Service Layer（12-15 services）
 - [ ] 擴展 API Layer（15-20 routes）
 - [ ] 解耦 Workspace Store Facade
 
 ### Phase 2: 測試與品質 (第 5-8 週)
+
 - [ ] Stores 單元測試（60% 覆蓋率）
 - [ ] Services 單元測試（80% 覆蓋率）
 - [ ] API 整合測試
 - [ ] 消除型別繞過（< 50 個）
 
 ### Phase 3: 效能優化 (第 9-12 週)
+
 - [ ] Component Memoization（30-50 組件）
 - [ ] Store Selectors 優化
 - [ ] List Virtualization
@@ -920,6 +934,7 @@ export const ROLES = {
 - [ ] Bundle Size 優化
 
 ### Phase 4: 文檔與規範 (持續)
+
 - [ ] API 文檔（OpenAPI）
 - [ ] Component Storybook
 - [ ] 架構決策記錄（ADR）

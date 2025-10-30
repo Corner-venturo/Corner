@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react'
 
 interface DialogState<T = unknown> {
-  isOpen: boolean;
-  type: string | null;
-  data: T | null;
-  meta?: unknown;
+  isOpen: boolean
+  type: string | null
+  data: T | null
+  meta?: unknown
 }
 
 export function useDialog<T = unknown>() {
@@ -12,33 +12,33 @@ export function useDialog<T = unknown>() {
     isOpen: false,
     type: null,
     data: null,
-    meta: undefined
-  });
+    meta: undefined,
+  })
 
   const openDialog = useCallback((type: string, data?: T, meta?: unknown) => {
     setDialog({
       isOpen: true,
       type,
       data: data || null,
-      meta
-    });
-  }, []);
+      meta,
+    })
+  }, [])
 
   const closeDialog = useCallback(() => {
     setDialog({
       isOpen: false,
       type: null,
       data: null,
-      meta: undefined
-    });
-  }, []);
+      meta: undefined,
+    })
+  }, [])
 
   const updateDialogData = useCallback((data: Partial<T>) => {
     setDialog(prev => ({
       ...prev,
-      data: prev.data ? { ...prev.data, ...data } : data as T
-    }));
-  }, []);
+      data: prev.data ? { ...prev.data, ...data } : (data as T),
+    }))
+  }, [])
 
   return {
     dialog,
@@ -48,8 +48,8 @@ export function useDialog<T = unknown>() {
     isOpen: dialog.isOpen,
     dialogType: dialog.type,
     dialogData: dialog.data,
-    dialogMeta: dialog.meta
-  };
+    dialogMeta: dialog.meta,
+  }
 }
 
 // 使用範例：

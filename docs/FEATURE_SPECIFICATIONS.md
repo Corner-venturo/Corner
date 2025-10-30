@@ -10,29 +10,30 @@
 
 VENTURO 系統共有 **19 個核心功能模組**：
 
-| # | 功能模組 | 路徑 | 狀態 | 優先級 |
-|---|---------|------|------|--------|
-| 1 | 🏠 工作區 (Workspace) | `/workspace` | ✅ 已實作 | P0 |
-| 2 | ✅ 待辦事項 (Todos) | `/todos` | ✅ 已實作 | P0 |
-| 3 | 🗓️ 行事曆 (Calendar) | `/calendar` | ✅ 已實作 | P0 |
-| 4 | ⏰ 時間盒 (Timebox) | `/timebox` | ✅ 已實作 | P1 |
-| 5 | 🏨 旅遊團 (Tours) | `/tours` | ⚠️ 需修正 | P0 |
-| 6 | 📝 行程表 (Itinerary) | `/itinerary` | ✅ 已實作 | P0 |
-| 7 | 📋 訂單 (Orders) | `/orders` | ⚠️ 需修正 | P0 |
-| 8 | 💰 報價單 (Quotes) | `/quotes` | ⚠️ 需修正 | P0 |
-| 9 | 👥 客戶管理 (Customers) | `/customers` | ⚠️ 需修正 | P1 |
-| 10 | 💳 財務管理 (Finance) | `/finance` | ⚠️ 需修正 | P0 |
-| 11 | 📊 會計系統 (Accounting) | `/accounting` | ⚠️ 需修正 | P0 |
-| 12 | 👔 人事管理 (HR) | `/hr` | ⚠️ 需修正 | P1 |
-| 13 | 🌍 簽證管理 (Visas) | `/visas` | ⚠️ 需修正 | P2 |
-| 14 | 🗂️ 基礎資料 (Database) | `/database` | ⚠️ 需修正 | P1 |
-| 15 | 📄 模板系統 (Templates) | `/templates` | ✅ 已實作 | P1 |
-| 16 | 👤 檔案管理 (Profile) | `/profile-manager` | ⚠️ 需修正 | P2 |
-| 17 | 📚 導覽 (Guide) | `/guide` | ✅ 已實作 | P2 |
-| 18 | ⚙️ 系統設定 (Settings) | `/settings` | ✅ 已實作 | P1 |
-| 19 | 🔐 登入系統 (Auth) | `/login` | ✅ 已實作 | P0 |
+| #   | 功能模組                 | 路徑               | 狀態      | 優先級 |
+| --- | ------------------------ | ------------------ | --------- | ------ |
+| 1   | 🏠 工作區 (Workspace)    | `/workspace`       | ✅ 已實作 | P0     |
+| 2   | ✅ 待辦事項 (Todos)      | `/todos`           | ✅ 已實作 | P0     |
+| 3   | 🗓️ 行事曆 (Calendar)     | `/calendar`        | ✅ 已實作 | P0     |
+| 4   | ⏰ 時間盒 (Timebox)      | `/timebox`         | ✅ 已實作 | P1     |
+| 5   | 🏨 旅遊團 (Tours)        | `/tours`           | ⚠️ 需修正 | P0     |
+| 6   | 📝 行程表 (Itinerary)    | `/itinerary`       | ✅ 已實作 | P0     |
+| 7   | 📋 訂單 (Orders)         | `/orders`          | ⚠️ 需修正 | P0     |
+| 8   | 💰 報價單 (Quotes)       | `/quotes`          | ⚠️ 需修正 | P0     |
+| 9   | 👥 客戶管理 (Customers)  | `/customers`       | ⚠️ 需修正 | P1     |
+| 10  | 💳 財務管理 (Finance)    | `/finance`         | ⚠️ 需修正 | P0     |
+| 11  | 📊 會計系統 (Accounting) | `/accounting`      | ⚠️ 需修正 | P0     |
+| 12  | 👔 人事管理 (HR)         | `/hr`              | ⚠️ 需修正 | P1     |
+| 13  | 🌍 簽證管理 (Visas)      | `/visas`           | ⚠️ 需修正 | P2     |
+| 14  | 🗂️ 基礎資料 (Database)   | `/database`        | ⚠️ 需修正 | P1     |
+| 15  | 📄 模板系統 (Templates)  | `/templates`       | ✅ 已實作 | P1     |
+| 16  | 👤 檔案管理 (Profile)    | `/profile-manager` | ⚠️ 需修正 | P2     |
+| 17  | 📚 導覽 (Guide)          | `/guide`           | ✅ 已實作 | P2     |
+| 18  | ⚙️ 系統設定 (Settings)   | `/settings`        | ✅ 已實作 | P1     |
+| 19  | 🔐 登入系統 (Auth)       | `/login`           | ✅ 已實作 | P0     |
 
 **優先級說明**：
+
 - P0：核心功能，必須優先修復
 - P1：重要功能，次要優先
 - P2：輔助功能，最後處理
@@ -44,6 +45,7 @@ VENTURO 系統共有 **19 個核心功能模組**：
 每個功能的規格表格包含以下章節：
 
 ### 1. 基本資訊
+
 - 功能名稱
 - 路徑
 - 狀態
@@ -51,36 +53,43 @@ VENTURO 系統共有 **19 個核心功能模組**：
 - 更新日期
 
 ### 2. 功能說明
+
 - 用途描述
 - 主要使用者
 - 業務流程
 
 ### 3. 資料模型
+
 - 資料表名稱
 - 欄位定義（欄位名、型別、必填、說明）
 - 關聯關係
 
 ### 4. UI 組件
+
 - 頁面組件清單
 - 組件檔案路徑
 - 使用的 UI 元件
 
 ### 5. 資料層架構
+
 - Hook（業務邏輯層）
 - Service（API 層）
 - Store（狀態管理層）
 - Database（資料持久層）
 
 ### 6. API 端點（Phase 3）
+
 - API 路徑
 - HTTP 方法
 - 請求/回應格式
 
 ### 7. 權限控制
+
 - 可操作角色
 - 特殊限制
 
 ### 8. 已知問題
+
 - 欄位命名不一致
 - 資料結構衝突
 - 功能缺失
@@ -91,25 +100,28 @@ VENTURO 系統共有 **19 個核心功能模組**：
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
+| 項目         | 內容               |
+| ------------ | ------------------ |
 | **功能名稱** | 工作區 (Workspace) |
-| **路徑** | `/workspace` |
-| **狀態** | ✅ 已完成實作 |
-| **更新日期** | 2025-01-07 |
+| **路徑**     | `/workspace`       |
+| **狀態**     | ✅ 已完成實作      |
+| **更新日期** | 2025-01-07         |
 
 ### 2. 功能說明
 
 **用途描述**：
+
 - 團隊協作中心
 - 頻道式訊息系統
 - 個人 Canvas 筆記
 - 任務看板整合
 
 **主要使用者**：
+
 - 全體員工
 
 **業務流程**：
+
 1. 使用者進入工作區
 2. 查看/切換頻道
 3. 發送訊息、附件
@@ -120,43 +132,44 @@ VENTURO 系統共有 **19 個核心功能模組**：
 
 #### 3.1 頻道 (Channel)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 頻道唯一識別碼 |
-| `name` | string | ✅ | 頻道名稱 |
-| `description` | string | ❌ | 頻道說明 |
-| `type` | 'public' \| 'private' | ✅ | 頻道類型 |
-| `creatorId` | string (UUID) | ✅ | 建立者 ID（關聯 User） |
-| `memberIds` | string[] | ✅ | 成員 ID 列表 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名        | 型別                  | 必填 | 說明                   |
+| ------------- | --------------------- | ---- | ---------------------- |
+| `id`          | string (UUID)         | ✅   | 頻道唯一識別碼         |
+| `name`        | string                | ✅   | 頻道名稱               |
+| `description` | string                | ❌   | 頻道說明               |
+| `type`        | 'public' \| 'private' | ✅   | 頻道類型               |
+| `creatorId`   | string (UUID)         | ✅   | 建立者 ID（關聯 User） |
+| `memberIds`   | string[]              | ✅   | 成員 ID 列表           |
+| `createdAt`   | string (ISO 8601)     | ✅   | 建立時間               |
+| `updatedAt`   | string (ISO 8601)     | ✅   | 更新時間               |
 
 #### 3.2 訊息 (Message)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 訊息唯一識別碼 |
-| `channelId` | string (UUID) | ✅ | 所屬頻道 ID |
-| `senderId` | string (UUID) | ✅ | 發送者 ID（關聯 User） |
-| `content` | string | ✅ | 訊息內容 |
-| `attachments` | Attachment[] | ❌ | 附件列表 |
-| `createdAt` | string (ISO 8601) | ✅ | 發送時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
-| `isEdited` | boolean | ✅ | 是否已編輯 |
+| 欄位名        | 型別              | 必填 | 說明                   |
+| ------------- | ----------------- | ---- | ---------------------- |
+| `id`          | string (UUID)     | ✅   | 訊息唯一識別碼         |
+| `channelId`   | string (UUID)     | ✅   | 所屬頻道 ID            |
+| `senderId`    | string (UUID)     | ✅   | 發送者 ID（關聯 User） |
+| `content`     | string            | ✅   | 訊息內容               |
+| `attachments` | Attachment[]      | ❌   | 附件列表               |
+| `createdAt`   | string (ISO 8601) | ✅   | 發送時間               |
+| `updatedAt`   | string (ISO 8601) | ✅   | 更新時間               |
+| `isEdited`    | boolean           | ✅   | 是否已編輯             |
 
 #### 3.3 Canvas 筆記 (CanvasNote)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 筆記唯一識別碼 |
-| `userId` | string (UUID) | ✅ | 擁有者 ID |
-| `title` | string | ✅ | 筆記標題 |
-| `content` | string | ✅ | 筆記內容（HTML） |
-| `position` | { x: number, y: number } | ❌ | Canvas 位置 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名      | 型別                     | 必填 | 說明             |
+| ----------- | ------------------------ | ---- | ---------------- |
+| `id`        | string (UUID)            | ✅   | 筆記唯一識別碼   |
+| `userId`    | string (UUID)            | ✅   | 擁有者 ID        |
+| `title`     | string                   | ✅   | 筆記標題         |
+| `content`   | string                   | ✅   | 筆記內容（HTML） |
+| `position`  | { x: number, y: number } | ❌   | Canvas 位置      |
+| `createdAt` | string (ISO 8601)        | ✅   | 建立時間         |
+| `updatedAt` | string (ISO 8601)        | ✅   | 更新時間         |
 
 **關聯關係**：
+
 ```
 User (1) ----< (N) Channel (建立)
 User (N) ----< (N) Channel (成員)
@@ -167,18 +180,19 @@ User (1) ----< (N) CanvasNote
 
 ### 4. UI 組件
 
-| 組件名稱 | 檔案路徑 | 說明 |
-|----------|---------|------|
-| WorkspacePage | `src/app/workspace/page.tsx` | 工作區主頁 |
-| ChannelList | `src/components/workspace/channel-list.tsx` | 頻道列表 |
-| ChannelView | `src/components/workspace/channel-view.tsx` | 頻道訊息視圖 |
-| CanvasView | `src/components/workspace/canvas-view.tsx` | Canvas 筆記視圖 |
-| WorkspaceTaskList | `src/components/workspace/workspace-task-list.tsx` | 任務列表 |
-| CreateChannelDialog | `src/components/workspace/create-channel-dialog.tsx` | 建立頻道對話框 |
+| 組件名稱            | 檔案路徑                                             | 說明            |
+| ------------------- | ---------------------------------------------------- | --------------- |
+| WorkspacePage       | `src/app/workspace/page.tsx`                         | 工作區主頁      |
+| ChannelList         | `src/components/workspace/channel-list.tsx`          | 頻道列表        |
+| ChannelView         | `src/components/workspace/channel-view.tsx`          | 頻道訊息視圖    |
+| CanvasView          | `src/components/workspace/canvas-view.tsx`           | Canvas 筆記視圖 |
+| WorkspaceTaskList   | `src/components/workspace/workspace-task-list.tsx`   | 任務列表        |
+| CreateChannelDialog | `src/components/workspace/create-channel-dialog.tsx` | 建立頻道對話框  |
 
 ### 5. 資料層架構
 
 **目前實作**：
+
 ```typescript
 // Store 層（Zustand）
 src/stores/workspace-store.ts
@@ -197,6 +211,7 @@ src/stores/workspace-store.ts
 ```
 
 **未來 Phase 3 架構**：
+
 ```
 UI (WorkspacePage)
   ↓
@@ -211,30 +226,30 @@ Supabase (channels, messages, canvas_notes)
 
 ### 6. API 端點（Phase 3）
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/api/channels` | GET | 取得所有頻道 |
-| `/api/channels` | POST | 建立新頻道 |
-| `/api/channels/:id` | GET | 取得頻道詳情 |
-| `/api/channels/:id` | PATCH | 更新頻道 |
-| `/api/channels/:id` | DELETE | 刪除頻道 |
-| `/api/channels/:id/messages` | GET | 取得頻道訊息 |
-| `/api/messages` | POST | 發送訊息 |
-| `/api/canvas-notes` | GET | 取得個人 Canvas |
-| `/api/canvas-notes` | POST | 建立筆記 |
-| `/api/canvas-notes/:id` | PATCH | 更新筆記 |
+| 端點                         | 方法   | 說明            |
+| ---------------------------- | ------ | --------------- |
+| `/api/channels`              | GET    | 取得所有頻道    |
+| `/api/channels`              | POST   | 建立新頻道      |
+| `/api/channels/:id`          | GET    | 取得頻道詳情    |
+| `/api/channels/:id`          | PATCH  | 更新頻道        |
+| `/api/channels/:id`          | DELETE | 刪除頻道        |
+| `/api/channels/:id/messages` | GET    | 取得頻道訊息    |
+| `/api/messages`              | POST   | 發送訊息        |
+| `/api/canvas-notes`          | GET    | 取得個人 Canvas |
+| `/api/canvas-notes`          | POST   | 建立筆記        |
+| `/api/canvas-notes/:id`      | PATCH  | 更新筆記        |
 
 ### 7. 權限控制
 
-| 操作 | 允許角色 | 說明 |
-|------|---------|------|
-| 查看公開頻道 | 所有人 | - |
-| 查看私人頻道 | 頻道成員 | - |
-| 建立頻道 | 所有人 | - |
-| 發送訊息 | 頻道成員 | - |
-| 編輯頻道 | 頻道建立者、管理員 | - |
-| 刪除頻道 | 頻道建立者、管理員 | - |
-| Canvas 筆記 | 本人 | 完全私人 |
+| 操作         | 允許角色           | 說明     |
+| ------------ | ------------------ | -------- |
+| 查看公開頻道 | 所有人             | -        |
+| 查看私人頻道 | 頻道成員           | -        |
+| 建立頻道     | 所有人             | -        |
+| 發送訊息     | 頻道成員           | -        |
+| 編輯頻道     | 頻道建立者、管理員 | -        |
+| 刪除頻道     | 頻道建立者、管理員 | -        |
+| Canvas 筆記  | 本人               | 完全私人 |
 
 ### 8. 已知問題
 
@@ -248,16 +263,17 @@ Supabase (channels, messages, canvas_notes)
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
+| 項目         | 內容             |
+| ------------ | ---------------- |
 | **功能名稱** | 待辦事項 (Todos) |
-| **路徑** | `/todos` |
-| **狀態** | ✅ 已完成實作 |
-| **更新日期** | 2025-01-07 |
+| **路徑**     | `/todos`         |
+| **狀態**     | ✅ 已完成實作    |
+| **更新日期** | 2025-01-07       |
 
 ### 2. 功能說明
 
 **用途描述**：
+
 - 任務管理中心
 - 支援個人待辦與專案待辦
 - 子任務分解
@@ -266,9 +282,11 @@ Supabase (channels, messages, canvas_notes)
 - 協作與通知機制
 
 **主要使用者**：
+
 - 全體員工
 
 **業務流程**：
+
 1. 使用者建立待辦事項
 2. 設定優先級（1-5星）、截止日期
 3. 可指派給其他人或分享協作
@@ -281,65 +299,66 @@ Supabase (channels, messages, canvas_notes)
 
 #### 3.1 待辦事項 (Todo)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 待辦唯一識別碼 |
-| `title` | string | ✅ | 任務標題 |
-| `description` | string | ❌ | 任務描述 |
-| `priority` | 1 \| 2 \| 3 \| 4 \| 5 | ✅ | 星級緊急度 |
-| `deadline` | string (ISO 8601) | ❌ | 截止日期 |
-| `status` | 'pending' \| 'in_progress' \| 'completed' \| 'cancelled' | ✅ | 任務狀態 |
-| `completed` | boolean | ❌ | 完成標記（對齊資料庫） |
-| `completedAt` | string (ISO 8601) | ❌ | 完成時間（用於離線衝突解決） |
-| `type` | 'personal' \| 'project' | ❌ | 待辦類型（預設 personal） |
-| `parentId` | string (UUID) | ❌ | 父任務 ID（子任務用） |
-| `projectId` | string (UUID) | ❌ | 關聯專案 ID（旅遊團/報價單） |
-| `projectType` | 'tour' \| 'quote' | ❌ | 專案類型 |
-| `creator` | string (UUID) | ✅ | 建立者 ID（關聯 User） |
-| `assignee` | string (UUID) | ❌ | 被指派者 ID（關聯 User） |
-| `sharedWith` | string[] | ✅ | 協作者 ID 列表 |
-| `visibility` | string[] | ✅ | 可見人員 ID 列表 |
-| `lastModifiedBy` | string (UUID) | ❌ | 最後修改者 ID |
-| `relatedItems` | RelatedItem[] | ✅ | 關聯業務項目列表 |
-| `subTasks` | SubTask[] | ✅ | 子任務列表 |
-| `notes` | Note[] | ✅ | 備註列表 |
-| `enabledQuickActions` | QuickAction[] | ✅ | 啟用的快速操作 |
-| `needsCreatorNotification` | boolean | ❌ | 需通知建立者 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名                     | 型別                                                     | 必填 | 說明                         |
+| -------------------------- | -------------------------------------------------------- | ---- | ---------------------------- |
+| `id`                       | string (UUID)                                            | ✅   | 待辦唯一識別碼               |
+| `title`                    | string                                                   | ✅   | 任務標題                     |
+| `description`              | string                                                   | ❌   | 任務描述                     |
+| `priority`                 | 1 \| 2 \| 3 \| 4 \| 5                                    | ✅   | 星級緊急度                   |
+| `deadline`                 | string (ISO 8601)                                        | ❌   | 截止日期                     |
+| `status`                   | 'pending' \| 'in_progress' \| 'completed' \| 'cancelled' | ✅   | 任務狀態                     |
+| `completed`                | boolean                                                  | ❌   | 完成標記（對齊資料庫）       |
+| `completedAt`              | string (ISO 8601)                                        | ❌   | 完成時間（用於離線衝突解決） |
+| `type`                     | 'personal' \| 'project'                                  | ❌   | 待辦類型（預設 personal）    |
+| `parentId`                 | string (UUID)                                            | ❌   | 父任務 ID（子任務用）        |
+| `projectId`                | string (UUID)                                            | ❌   | 關聯專案 ID（旅遊團/報價單） |
+| `projectType`              | 'tour' \| 'quote'                                        | ❌   | 專案類型                     |
+| `creator`                  | string (UUID)                                            | ✅   | 建立者 ID（關聯 User）       |
+| `assignee`                 | string (UUID)                                            | ❌   | 被指派者 ID（關聯 User）     |
+| `sharedWith`               | string[]                                                 | ✅   | 協作者 ID 列表               |
+| `visibility`               | string[]                                                 | ✅   | 可見人員 ID 列表             |
+| `lastModifiedBy`           | string (UUID)                                            | ❌   | 最後修改者 ID                |
+| `relatedItems`             | RelatedItem[]                                            | ✅   | 關聯業務項目列表             |
+| `subTasks`                 | SubTask[]                                                | ✅   | 子任務列表                   |
+| `notes`                    | Note[]                                                   | ✅   | 備註列表                     |
+| `enabledQuickActions`      | QuickAction[]                                            | ✅   | 啟用的快速操作               |
+| `needsCreatorNotification` | boolean                                                  | ❌   | 需通知建立者                 |
+| `createdAt`                | string (ISO 8601)                                        | ✅   | 建立時間                     |
+| `updatedAt`                | string (ISO 8601)                                        | ✅   | 更新時間                     |
 
 #### 3.2 關聯項目 (RelatedItem)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `type` | 'group' \| 'quote' \| 'order' \| 'invoice' \| 'receipt' \| 'tour' \| 'payment' \| 'visa' | ✅ | 關聯類型 |
-| `id` | string (UUID) | ✅ | 關聯項目 ID |
-| `title` | string | ✅ | 關聯項目標題 |
+| 欄位名  | 型別                                                                                     | 必填 | 說明         |
+| ------- | ---------------------------------------------------------------------------------------- | ---- | ------------ |
+| `type`  | 'group' \| 'quote' \| 'order' \| 'invoice' \| 'receipt' \| 'tour' \| 'payment' \| 'visa' | ✅   | 關聯類型     |
+| `id`    | string (UUID)                                                                            | ✅   | 關聯項目 ID  |
+| `title` | string                                                                                   | ✅   | 關聯項目標題 |
 
 #### 3.3 子任務 (SubTask)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 子任務 ID |
-| `title` | string | ✅ | 子任務標題 |
-| `done` | boolean | ✅ | 完成狀態 |
-| `completedAt` | string (ISO 8601) | ❌ | 完成時間 |
+| 欄位名        | 型別              | 必填 | 說明       |
+| ------------- | ----------------- | ---- | ---------- |
+| `id`          | string (UUID)     | ✅   | 子任務 ID  |
+| `title`       | string            | ✅   | 子任務標題 |
+| `done`        | boolean           | ✅   | 完成狀態   |
+| `completedAt` | string (ISO 8601) | ❌   | 完成時間   |
 
 #### 3.4 備註 (Note)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `timestamp` | string (ISO 8601) | ✅ | 時間戳記 |
-| `content` | string | ✅ | 備註內容 |
-| `userId` | string (UUID) | ✅ | 留言者 ID |
+| 欄位名      | 型別              | 必填 | 說明      |
+| ----------- | ----------------- | ---- | --------- |
+| `timestamp` | string (ISO 8601) | ✅   | 時間戳記  |
+| `content`   | string            | ✅   | 備註內容  |
+| `userId`    | string (UUID)     | ✅   | 留言者 ID |
 
 #### 3.5 快速操作類型 (QuickAction)
 
 ```typescript
-type QuickAction = 'receipt' | 'invoice' | 'group' | 'quote' | 'assign';
+type QuickAction = 'receipt' | 'invoice' | 'group' | 'quote' | 'assign'
 ```
 
 **關聯關係**：
+
 ```
 User (1) ----< (N) Todo (建立者)
 User (1) ----< (N) Todo (指派者)
@@ -351,20 +370,21 @@ Todo (1) ----< (N) Todo (父子任務)
 
 ### 4. UI 組件
 
-| 組件名稱 | 檔案路徑 | 說明 |
-|----------|---------|------|
-| TodosPage | `src/app/todos/page.tsx` | 待辦事項主頁 |
-| TodoCardGroups | `src/components/todos/todo-card-groups.tsx` | 卡片分組視圖 |
-| TodoExpandedView | `src/components/todos/todo-expanded-view.tsx` | 待辦詳細視圖 |
-| QuickReceipt | `src/components/todos/quick-actions/quick-receipt.tsx` | 快速建立收款 |
-| QuickDisbursement | `src/components/todos/quick-actions/quick-disbursement.tsx` | 快速建立撥款 |
-| QuickGroup | `src/components/todos/quick-actions/quick-group.tsx` | 快速建立分組 |
-| EnhancedTable | `src/components/ui/enhanced-table.tsx` | 列表視圖表格 |
-| StarRating | `src/components/ui/star-rating.tsx` | 優先級星級組件 |
+| 組件名稱          | 檔案路徑                                                    | 說明           |
+| ----------------- | ----------------------------------------------------------- | -------------- |
+| TodosPage         | `src/app/todos/page.tsx`                                    | 待辦事項主頁   |
+| TodoCardGroups    | `src/components/todos/todo-card-groups.tsx`                 | 卡片分組視圖   |
+| TodoExpandedView  | `src/components/todos/todo-expanded-view.tsx`               | 待辦詳細視圖   |
+| QuickReceipt      | `src/components/todos/quick-actions/quick-receipt.tsx`      | 快速建立收款   |
+| QuickDisbursement | `src/components/todos/quick-actions/quick-disbursement.tsx` | 快速建立撥款   |
+| QuickGroup        | `src/components/todos/quick-actions/quick-group.tsx`        | 快速建立分組   |
+| EnhancedTable     | `src/components/ui/enhanced-table.tsx`                      | 列表視圖表格   |
+| StarRating        | `src/components/ui/star-rating.tsx`                         | 優先級星級組件 |
 
 ### 5. 資料層架構
 
 **目前實作（Phase 1）**：
+
 ```typescript
 // Store 層（Zustand）
 src/stores/create-store.ts (工廠函數)
@@ -393,6 +413,7 @@ src/features/todos/services/todo.service.ts
 ```
 
 **未來 Phase 3 架構**：
+
 ```
 UI (TodosPage)
   ↓
@@ -407,40 +428,43 @@ Supabase (todos 表)
 
 ### 6. API 端點（Phase 3）
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/api/todos` | GET | 取得待辦列表（可篩選 userId, status） |
-| `/api/todos` | POST | 建立新待辦 |
-| `/api/todos/:id` | GET | 取得待辦詳情 |
-| `/api/todos/:id` | PATCH | 更新待辦 |
-| `/api/todos/:id` | DELETE | 刪除待辦 |
-| `/api/todos/:id/toggle` | POST | 切換完成狀態 |
-| `/api/todos/:id/subtasks` | POST | 新增子任務 |
-| `/api/todos/:id/notes` | POST | 新增備註 |
+| 端點                      | 方法   | 說明                                  |
+| ------------------------- | ------ | ------------------------------------- |
+| `/api/todos`              | GET    | 取得待辦列表（可篩選 userId, status） |
+| `/api/todos`              | POST   | 建立新待辦                            |
+| `/api/todos/:id`          | GET    | 取得待辦詳情                          |
+| `/api/todos/:id`          | PATCH  | 更新待辦                              |
+| `/api/todos/:id`          | DELETE | 刪除待辦                              |
+| `/api/todos/:id/toggle`   | POST   | 切換完成狀態                          |
+| `/api/todos/:id/subtasks` | POST   | 新增子任務                            |
+| `/api/todos/:id/notes`    | POST   | 新增備註                              |
 
 ### 7. 權限控制
 
-| 操作 | 允許角色 | 說明 |
-|------|---------|------|
-| 查看待辦 | 建立者、指派者、分享者 | 根據 visibility 欄位 |
-| 建立待辦 | 所有人 | - |
-| 編輯待辦 | 建立者、指派者 | - |
-| 刪除待辦 | 建立者 | 僅建立者可刪除 |
-| 標記完成 | 建立者、指派者 | - |
-| 新增備註 | 建立者、指派者、分享者 | 可見即可留言 |
-| 新增子任務 | 建立者、指派者 | - |
+| 操作       | 允許角色               | 說明                 |
+| ---------- | ---------------------- | -------------------- |
+| 查看待辦   | 建立者、指派者、分享者 | 根據 visibility 欄位 |
+| 建立待辦   | 所有人                 | -                    |
+| 編輯待辦   | 建立者、指派者         | -                    |
+| 刪除待辦   | 建立者                 | 僅建立者可刪除       |
+| 標記完成   | 建立者、指派者         | -                    |
+| 新增備註   | 建立者、指派者、分享者 | 可見即可留言         |
+| 新增子任務 | 建立者、指派者         | -                    |
 
 ### 8. 已知問題
 
 #### 8.1 欄位命名問題
+
 - ✅ 已統一使用 camelCase
 - ✅ 無 snake_case 混用
 
 #### 8.2 資料結構問題
+
 - ⚠️ `completed` 和 `status` 雙重狀態可能造成不一致
   - 建議：統一用 `status`，移除 `completed`（但需保留以相容資料庫）
 
 #### 8.3 功能缺失
+
 - ⚠️ 快速操作功能尚未完整實作
   - `QuickReceipt` 已實作
   - `QuickDisbursement` 已實作
@@ -448,26 +472,24 @@ Supabase (todos 表)
   - `QuickQuote`、`QuickAssign` 待實作
 
 #### 8.4 離線衝突處理
+
 - ⚠️ `completedAt` 欄位設計用於衝突解決，但尚未實作完整邏輯
 - ⚠️ 多人同時編輯同一待辦的衝突處理策略未定義
 
 #### 8.5 通知機制
+
 - ⚠️ `needsCreatorNotification` 欄位已準備，但通知系統尚未實作
 
 ### 9. 修復建議
 
 **優先修復（P0）**：
+
 1. 釐清 `completed` vs `status` 的使用邏輯
 2. 統一「結案」的英文名稱（目前混用 'completed'）
 
-**次要修復（P1）**：
-3. 完成快速操作功能（QuickQuote、QuickAssign）
-4. 實作通知機制
+**次要修復（P1）**：3. 完成快速操作功能（QuickQuote、QuickAssign）4. 實作通知機制
 
-**未來優化（P2）**：
-5. 實作離線衝突解決策略
-6. 支援拖拉排序
-7. 支援批次操作
+**未來優化（P2）**：5. 實作離線衝突解決策略 6. 支援拖拉排序 7. 支援批次操作
 
 ---
 
@@ -477,16 +499,17 @@ Supabase (todos 表)
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
-| **功能名稱** | 旅遊團管理 (Tours) |
-| **路徑** | `/tours` |
-| **狀態** | ⚠️ 需修正（欄位不一致、狀態命名問題） |
-| **更新日期** | 2025-01-07 |
+| 項目         | 內容                                  |
+| ------------ | ------------------------------------- |
+| **功能名稱** | 旅遊團管理 (Tours)                    |
+| **路徑**     | `/tours`                              |
+| **狀態**     | ⚠️ 需修正（欄位不一致、狀態命名問題） |
+| **更新日期** | 2025-01-07                            |
 
 ### 2. 功能說明
 
 **用途描述**：
+
 - 旅行社核心業務管理系統
 - 團體資訊建立與管理
 - 訂單、團員、收款、成本整合
@@ -495,12 +518,14 @@ Supabase (todos 表)
 - 財務試算與報表
 
 **主要使用者**：
+
 - 業務人員（建立與管理旅遊團）
 - 助理（團員名單、文件確認）
 - 會計（收款、成本）
 - 管理層（財務報表）
 
 **業務流程**：
+
 1. 從報價單轉換或直接建立旅遊團
 2. 自動生成團號（地區碼+日期+序號）
 3. 建立訂單，分配給業務與助理
@@ -515,62 +540,63 @@ Supabase (todos 表)
 
 #### 3.1 旅遊團 (Tour)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 旅遊團唯一識別碼 |
-| `code` | string | ✅ | 團號（如 TYO250107001） |
-| `name` | string | ✅ | 旅遊團名稱 |
-| `departureDate` | string (ISO 8601) | ✅ | 出發日期 |
-| `returnDate` | string (ISO 8601) | ✅ | 返回日期 |
-| `status` | '提案' \| '進行中' \| '待結案' \| '結案' \| '特殊團' | ✅ | 旅遊團狀態 |
-| `location` | string | ✅ | 目的地 |
-| `price` | number | ✅ | 每人價格 |
-| `maxParticipants` | number | ✅ | 最大參與人數 |
-| `currentParticipants` | number | ❌ | 當前參與人數 |
-| `contractStatus` | '未簽署' \| '已簽署' | ✅ | 合約狀態 |
-| `totalRevenue` | number | ✅ | 總收入 |
-| `totalCost` | number | ✅ | 總成本 |
-| `profit` | number | ✅ | 利潤 |
-| `quoteId` | string (UUID) | ❌ | 關聯的報價單 ID |
-| `quoteCostStructure` | QuoteCategory[] | ❌ | 報價成本結構快照 |
-| `isSpecial` | boolean | ❌ | 是否為特殊團 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名                | 型別                                                 | 必填 | 說明                    |
+| --------------------- | ---------------------------------------------------- | ---- | ----------------------- |
+| `id`                  | string (UUID)                                        | ✅   | 旅遊團唯一識別碼        |
+| `code`                | string                                               | ✅   | 團號（如 TYO250107001） |
+| `name`                | string                                               | ✅   | 旅遊團名稱              |
+| `departureDate`       | string (ISO 8601)                                    | ✅   | 出發日期                |
+| `returnDate`          | string (ISO 8601)                                    | ✅   | 返回日期                |
+| `status`              | '提案' \| '進行中' \| '待結案' \| '結案' \| '特殊團' | ✅   | 旅遊團狀態              |
+| `location`            | string                                               | ✅   | 目的地                  |
+| `price`               | number                                               | ✅   | 每人價格                |
+| `maxParticipants`     | number                                               | ✅   | 最大參與人數            |
+| `currentParticipants` | number                                               | ❌   | 當前參與人數            |
+| `contractStatus`      | '未簽署' \| '已簽署'                                 | ✅   | 合約狀態                |
+| `totalRevenue`        | number                                               | ✅   | 總收入                  |
+| `totalCost`           | number                                               | ✅   | 總成本                  |
+| `profit`              | number                                               | ✅   | 利潤                    |
+| `quoteId`             | string (UUID)                                        | ❌   | 關聯的報價單 ID         |
+| `quoteCostStructure`  | QuoteCategory[]                                      | ❌   | 報價成本結構快照        |
+| `isSpecial`           | boolean                                              | ❌   | 是否為特殊團            |
+| `createdAt`           | string (ISO 8601)                                    | ✅   | 建立時間                |
+| `updatedAt`           | string (ISO 8601)                                    | ✅   | 更新時間                |
 
 #### 3.2 加購項目 (TourAddOn)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 加購項目 ID |
-| `tourId` | string (UUID) | ✅ | 所屬旅遊團 ID |
-| `name` | string | ✅ | 加購項目名稱 |
-| `price` | number | ✅ | 價格 |
-| `description` | string | ❌ | 說明 |
-| `isActive` | boolean | ✅ | 是否啟用 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名        | 型別              | 必填 | 說明          |
+| ------------- | ----------------- | ---- | ------------- |
+| `id`          | string (UUID)     | ✅   | 加購項目 ID   |
+| `tourId`      | string (UUID)     | ✅   | 所屬旅遊團 ID |
+| `name`        | string            | ✅   | 加購項目名稱  |
+| `price`       | number            | ✅   | 價格          |
+| `description` | string            | ❌   | 說明          |
+| `isActive`    | boolean           | ✅   | 是否啟用      |
+| `createdAt`   | string (ISO 8601) | ✅   | 建立時間      |
+| `updatedAt`   | string (ISO 8601) | ✅   | 更新時間      |
 
 #### 3.3 退費項目 (TourRefund)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 退費項目 ID |
-| `tourId` | string (UUID) | ✅ | 所屬旅遊團 ID |
-| `orderId` | string (UUID) | ✅ | 訂單 ID |
-| `orderNumber` | string | ✅ | 訂單號碼 |
-| `memberName` | string | ✅ | 團員姓名 |
-| `reason` | string | ✅ | 退費原因 |
-| `amount` | number | ✅ | 退費金額 |
-| `status` | '申請中' \| '已核准' \| '已退款' \| '已拒絕' | ✅ | 退費狀態 |
-| `appliedDate` | string (ISO 8601) | ✅ | 申請日期 |
-| `processedDate` | string (ISO 8601) | ❌ | 處理日期 |
-| `notes` | string | ❌ | 備註 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名          | 型別                                         | 必填 | 說明          |
+| --------------- | -------------------------------------------- | ---- | ------------- |
+| `id`            | string (UUID)                                | ✅   | 退費項目 ID   |
+| `tourId`        | string (UUID)                                | ✅   | 所屬旅遊團 ID |
+| `orderId`       | string (UUID)                                | ✅   | 訂單 ID       |
+| `orderNumber`   | string                                       | ✅   | 訂單號碼      |
+| `memberName`    | string                                       | ✅   | 團員姓名      |
+| `reason`        | string                                       | ✅   | 退費原因      |
+| `amount`        | number                                       | ✅   | 退費金額      |
+| `status`        | '申請中' \| '已核准' \| '已退款' \| '已拒絕' | ✅   | 退費狀態      |
+| `appliedDate`   | string (ISO 8601)                            | ✅   | 申請日期      |
+| `processedDate` | string (ISO 8601)                            | ❌   | 處理日期      |
+| `notes`         | string                                       | ❌   | 備註          |
+| `createdAt`     | string (ISO 8601)                            | ✅   | 建立時間      |
+| `updatedAt`     | string (ISO 8601)                            | ✅   | 更新時間      |
 
 #### 3.4 團號生成規則
 
 **格式**：
+
 - 一般團：`{地區碼}{YYMMDD}{序號}`
   - 範例：`TYO250107001`（東京、2025/01/07、第1團）
 - 特殊團：`SPC{YYMMDD}{序號}`
@@ -588,6 +614,7 @@ Supabase (todos 表)
 | 其他 | UNK |
 
 **關聯關係**：
+
 ```
 Quote (1) ----< (1) Tour (轉換)
 Tour (1) ----< (N) Order (訂單)
@@ -602,25 +629,26 @@ Tour (1) ----< (N) Task (任務)
 
 ### 4. UI 組件
 
-| 組件名稱 | 檔案路徑 | 說明 |
-|----------|---------|------|
-| ToursPage | `src/app/tours/page.tsx` | 旅遊團主頁 |
-| TourCard | `src/components/tours/tour-card.tsx` | 旅遊團卡片 |
-| TourOverview | `src/components/tours/tour-overview.tsx` | 總覽視圖 |
-| TourMembers | `src/components/tours/tour-members.tsx` | 團員名單 |
-| TourOperations | `src/components/tours/tour-operations.tsx` | 團務管理 |
-| TourAddOns | `src/components/tours/tour-add-ons.tsx` | 加購管理 |
-| TourRefunds | `src/components/tours/tour-refunds.tsx` | 退費管理 |
-| TourPayments | `src/components/tours/tour-payments.tsx` | 收款記錄 |
-| TourCosts | `src/components/tours/tour-costs.tsx` | 成本支出 |
-| TourDocuments | `src/components/tours/tour-documents.tsx` | 文件確認 |
-| TourTaskAssignment | `src/components/tours/tour-task-assignment.tsx` | 任務指派 |
-| RoomAllocation | `src/components/tours/room-allocation.tsx` | 房間分配 |
+| 組件名稱             | 檔案路徑                                           | 說明           |
+| -------------------- | -------------------------------------------------- | -------------- |
+| ToursPage            | `src/app/tours/page.tsx`                           | 旅遊團主頁     |
+| TourCard             | `src/components/tours/tour-card.tsx`               | 旅遊團卡片     |
+| TourOverview         | `src/components/tours/tour-overview.tsx`           | 總覽視圖       |
+| TourMembers          | `src/components/tours/tour-members.tsx`            | 團員名單       |
+| TourOperations       | `src/components/tours/tour-operations.tsx`         | 團務管理       |
+| TourAddOns           | `src/components/tours/tour-add-ons.tsx`            | 加購管理       |
+| TourRefunds          | `src/components/tours/tour-refunds.tsx`            | 退費管理       |
+| TourPayments         | `src/components/tours/tour-payments.tsx`           | 收款記錄       |
+| TourCosts            | `src/components/tours/tour-costs.tsx`              | 成本支出       |
+| TourDocuments        | `src/components/tours/tour-documents.tsx`          | 文件確認       |
+| TourTaskAssignment   | `src/components/tours/tour-task-assignment.tsx`    | 任務指派       |
+| RoomAllocation       | `src/components/tours/room-allocation.tsx`         | 房間分配       |
 | ExpandableOrderTable | `src/components/orders/expandable-order-table.tsx` | 訂單可展開表格 |
 
 ### 5. 資料層架構
 
 **目前實作（Phase 1）**：
+
 ```typescript
 // Store 層（Zustand）
 src/stores/create-store.ts (工廠函數)
@@ -653,6 +681,7 @@ src/features/tours/services/tour.service.ts
 ```
 
 **未來 Phase 3 架構**：
+
 ```
 UI (ToursPage)
   ↓
@@ -667,38 +696,40 @@ Supabase (tours, tour_addons, tour_refunds 表)
 
 ### 6. API 端點（Phase 3）
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/api/tours` | GET | 取得旅遊團列表（分頁、篩選） |
-| `/api/tours` | POST | 建立新旅遊團 |
-| `/api/tours/:id` | GET | 取得旅遊團詳情 |
-| `/api/tours/:id` | PATCH | 更新旅遊團 |
-| `/api/tours/:id` | DELETE | 刪除旅遊團 |
-| `/api/tours/:id/status` | PATCH | 更新旅遊團狀態 |
-| `/api/tours/:id/financials` | GET | 取得財務摘要 |
-| `/api/tours/:id/addons` | GET/POST | 加購項目 |
-| `/api/tours/:id/refunds` | GET/POST | 退費項目 |
-| `/api/tours/generate-code` | POST | 生成團號 |
+| 端點                        | 方法     | 說明                         |
+| --------------------------- | -------- | ---------------------------- |
+| `/api/tours`                | GET      | 取得旅遊團列表（分頁、篩選） |
+| `/api/tours`                | POST     | 建立新旅遊團                 |
+| `/api/tours/:id`            | GET      | 取得旅遊團詳情               |
+| `/api/tours/:id`            | PATCH    | 更新旅遊團                   |
+| `/api/tours/:id`            | DELETE   | 刪除旅遊團                   |
+| `/api/tours/:id/status`     | PATCH    | 更新旅遊團狀態               |
+| `/api/tours/:id/financials` | GET      | 取得財務摘要                 |
+| `/api/tours/:id/addons`     | GET/POST | 加購項目                     |
+| `/api/tours/:id/refunds`    | GET/POST | 退費項目                     |
+| `/api/tours/generate-code`  | POST     | 生成團號                     |
 
 ### 7. 權限控制
 
-| 操作 | 允許角色 | 說明 |
-|------|---------|------|
-| 查看旅遊團 | 所有人 | - |
-| 建立旅遊團 | 業務、管理員 | - |
-| 編輯旅遊團 | 業務、管理員 | - |
-| 刪除旅遊團 | 管理員 | 需檢查無訂單 |
-| 查看財務 | 業務（自己的）、管理層、會計 | - |
-| 管理加購/退費 | 業務、助理、管理員 | - |
-| 結案 | 管理員、會計 | - |
+| 操作          | 允許角色                     | 說明         |
+| ------------- | ---------------------------- | ------------ |
+| 查看旅遊團    | 所有人                       | -            |
+| 建立旅遊團    | 業務、管理員                 | -            |
+| 編輯旅遊團    | 業務、管理員                 | -            |
+| 刪除旅遊團    | 管理員                       | 需檢查無訂單 |
+| 查看財務      | 業務（自己的）、管理層、會計 | -            |
+| 管理加購/退費 | 業務、助理、管理員           | -            |
+| 結案          | 管理員、會計                 | -            |
 
 ### 8. 已知問題
 
 #### 8.1 欄位命名問題
+
 - ✅ 大部分欄位已統一使用 camelCase
 - ⚠️ 無 snake_case 問題
 
 #### 8.2 狀態命名混亂（嚴重）
+
 - ❌ **狀態值使用中文**：`'提案' | '進行中' | '待結案' | '結案' | '特殊團'`
 - **問題**：
   1. 中文不利於國際化
@@ -712,24 +743,30 @@ Supabase (tours, tour_addons, tour_refunds 表)
   ```
 
 #### 8.3 狀態邏輯重複
+
 - ⚠️ `isSpecial` 欄位與 `status === '特殊團'` 重複
 - **建議**：移除 `isSpecial`，用 `status === 'special'` 判斷
 
 #### 8.4 資料計算問題
+
 - ⚠️ `currentParticipants` 應該自動計算（從 Orders 和 Members 統計）
 - ⚠️ `totalRevenue`, `totalCost`, `profit` 應該動態計算，而非儲存
 
 #### 8.5 合約狀態不足
+
 - ⚠️ `contractStatus` 只有「未簽署/已簽署」，缺少「待簽署」、「部分簽署」狀態
 
 #### 8.6 財務計算邏輯問題
-- ⚠️ `calculateFinancialSummary` 使用假資料（成本 = 收入 * 0.7）
+
+- ⚠️ `calculateFinancialSummary` 使用假資料（成本 = 收入 \* 0.7）
 - 需整合真實的訂單、收款、成本資料
 
 #### 8.7 團號生成重複檢查
+
 - ✅ 已實作 `isTourCodeExists` 和時間戳備案機制
 
 #### 8.8 缺少必要欄位
+
 - ⚠️ 缺少 `description`（行程描述）
 - ⚠️ 缺少 `leadGuide`（領隊）
 - ⚠️ 缺少 `notes`（內部備註）
@@ -739,6 +776,7 @@ Supabase (tours, tour_addons, tour_refunds 表)
 ### 9. 修復建議
 
 **優先修復（P0）**：
+
 1. **統一狀態命名為英文**：
    ```typescript
    status: 'draft' | 'active' | 'pending_close' | 'closed' | 'cancelled' | 'special'
@@ -746,16 +784,9 @@ Supabase (tours, tour_addons, tour_refunds 表)
 2. **移除 `isSpecial` 欄位**，改用 `status === 'special'`
 3. **財務欄位改為動態計算**，不儲存於 Tour 表
 
-**次要修復（P1）**：
-4. 新增必要欄位（description, leadGuide, notes, cancellationReason, closedAt）
-5. 擴充 `contractStatus` 狀態
-6. 實作真實的財務計算邏輯
+**次要修復（P1）**：4. 新增必要欄位（description, leadGuide, notes, cancellationReason, closedAt）5. 擴充 `contractStatus` 狀態 6. 實作真實的財務計算邏輯
 
-**未來優化（P2）**：
-7. 支援多幣別
-8. 團體複製功能
-9. 批次操作（批次結案、批次匯出）
-10. 團體範本
+**未來優化（P2）**：7. 支援多幣別 8. 團體複製功能 9. 批次操作（批次結案、批次匯出）10. 團體範本
 
 ### 10. 資料表建議（Phase 3）
 
@@ -804,16 +835,17 @@ GROUP BY t.id;
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
+| 項目         | 內容                   |
+| ------------ | ---------------------- |
 | **功能名稱** | 行程表管理 (Itinerary) |
-| **路徑** | `/itinerary` |
-| **狀態** | ✅ 已完成實作 |
-| **更新日期** | 2025-01-07 |
+| **路徑**     | `/itinerary`           |
+| **狀態**     | ✅ 已完成實作          |
+| **更新日期** | 2025-01-07             |
 
 ### 2. 功能說明
 
 **用途描述**：
+
 - 旅遊行程的視覺化展示系統
 - 支援電腦版和手機版即時預覽
 - 可產生外部分享連結
@@ -821,11 +853,13 @@ GROUP BY t.id;
 - 自動帶入天數、航班、飯店資訊
 
 **主要使用者**：
+
 - 業務人員（建立與編輯行程）
 - 客戶（瀏覽外部分享頁面）
 - 管理層（審核行程內容）
 
 **業務流程**：
+
 1. 從報價單轉換或直接建立行程
 2. 輸入封面資訊（標題、圖片、地點、日期）
 3. 設定航班資訊（去回程）
@@ -841,52 +875,53 @@ GROUP BY t.id;
 
 **核心說明**：行程表實際上是 **Tour 資料的擴充版本**，在 Tour Store 中储存，但包含了大量展示用欄位。
 
-| 欄位名 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|--------|------|------|------|--------|
-| `id` | string (UUID) | ✅ | 行程唯一識別碼 | |
-| `tourCode` | string | ✅ | 行程編號（25JFO21CIG） | |
-| `title` | string | ✅ | 主標題（漫遊福岡） | |
-| `subtitle` | string | ❓ | 副標題（半自由行） | |
-| `tagline` | string | ❓ | 標籤文字（Venturo 2025） | |
-| `description` | string | ✅ | 行程描述 | |
-| `country` | string | ✅ | 國家 | |
-| `city` | string | ✅ | 城市 | |
-| `departureDate` | string (YYYY/MM/DD) | ✅ | 出發日期 | |
-| `coverImage` | string (URL) | ✅ | 封面圖片 | |
-| `status` | '草稿' \| '已發佈' | ✅ | 行程狀態 | ⚠️ **中文值** |
-| `outboundFlight` | FlightInfo | ✅ | 去程航班 | |
-| `returnFlight` | FlightInfo | ✅ | 回程航班 | |
-| `features` | Feature[] | ✅ | 行程特色列表 | |
-| `focusCards` | FocusCard[] | ✅ | 精選景點卡片 | |
-| `leader` | LeaderInfo | ✅ | 領隊資訊 | |
-| `meetingInfo` | MeetingInfo | ✅ | 集合資訊 | |
-| `itinerarySubtitle` | string | ❓ | 行程副標題 | |
-| `dailyItinerary` | DailyItinerary[] | ✅ | 逐日行程列表 | |
-| `created_at` | string (ISO 8601) | ✅ | 建立時間 | |
-| `updated_at` | string (ISO 8601) | ✅ | 更新時間 | |
+| 欄位名              | 型別                | 必填 | 說明                     | ⚠️ 問題       |
+| ------------------- | ------------------- | ---- | ------------------------ | ------------- |
+| `id`                | string (UUID)       | ✅   | 行程唯一識別碼           |               |
+| `tourCode`          | string              | ✅   | 行程編號（25JFO21CIG）   |               |
+| `title`             | string              | ✅   | 主標題（漫遊福岡）       |               |
+| `subtitle`          | string              | ❓   | 副標題（半自由行）       |               |
+| `tagline`           | string              | ❓   | 標籤文字（Venturo 2025） |               |
+| `description`       | string              | ✅   | 行程描述                 |               |
+| `country`           | string              | ✅   | 國家                     |               |
+| `city`              | string              | ✅   | 城市                     |               |
+| `departureDate`     | string (YYYY/MM/DD) | ✅   | 出發日期                 |               |
+| `coverImage`        | string (URL)        | ✅   | 封面圖片                 |               |
+| `status`            | '草稿' \| '已發佈'  | ✅   | 行程狀態                 | ⚠️ **中文值** |
+| `outboundFlight`    | FlightInfo          | ✅   | 去程航班                 |               |
+| `returnFlight`      | FlightInfo          | ✅   | 回程航班                 |               |
+| `features`          | Feature[]           | ✅   | 行程特色列表             |               |
+| `focusCards`        | FocusCard[]         | ✅   | 精選景點卡片             |               |
+| `leader`            | LeaderInfo          | ✅   | 領隊資訊                 |               |
+| `meetingInfo`       | MeetingInfo         | ✅   | 集合資訊                 |               |
+| `itinerarySubtitle` | string              | ❓   | 行程副標題               |               |
+| `dailyItinerary`    | DailyItinerary[]    | ✅   | 逐日行程列表             |               |
+| `created_at`        | string (ISO 8601)   | ✅   | 建立時間                 |               |
+| `updated_at`        | string (ISO 8601)   | ✅   | 更新時間                 |               |
 
 #### 3.2 航班資訊 (FlightInfo)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `airline` | string | ✅ | 航空公司（中華航空） |
-| `flightNumber` | string | ✅ | 航班號碼（CI110） |
-| `departureAirport` | string | ✅ | 出發機場（TPE） |
-| `departureTime` | string | ✅ | 出發時間（06:50） |
-| `departureDate` | string | ✅ | 出發日期（10/21） |
-| `arrivalAirport` | string | ✅ | 抵達機場（FUK） |
-| `arrivalTime` | string | ✅ | 抵達時間（09:55） |
-| `duration` | string | ✅ | 飛行時間（自動計算） |
+| 欄位名             | 型別   | 必填 | 說明                 |
+| ------------------ | ------ | ---- | -------------------- |
+| `airline`          | string | ✅   | 航空公司（中華航空） |
+| `flightNumber`     | string | ✅   | 航班號碼（CI110）    |
+| `departureAirport` | string | ✅   | 出發機場（TPE）      |
+| `departureTime`    | string | ✅   | 出發時間（06:50）    |
+| `departureDate`    | string | ✅   | 出發日期（10/21）    |
+| `arrivalAirport`   | string | ✅   | 抵達機場（FUK）      |
+| `arrivalTime`      | string | ✅   | 抵達時間（09:55）    |
+| `duration`         | string | ✅   | 飛行時間（自動計算） |
 
 #### 3.3 行程特色 (Feature)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `icon` | string | ✅ | 圖示名稱（IconBuilding） |
-| `title` | string | ✅ | 特色標題 |
-| `description` | string | ✅ | 特色描述 |
+| 欄位名        | 型別   | 必填 | 說明                     |
+| ------------- | ------ | ---- | ------------------------ |
+| `icon`        | string | ✅   | 圖示名稱（IconBuilding） |
+| `title`       | string | ✅   | 特色標題                 |
+| `description` | string | ✅   | 特色描述                 |
 
 **可用圖示**：
+
 - `IconBuilding`: 🏨 建築/飯店
 - `IconToolsKitchen2`: 🍽️ 餐食
 - `IconSparkles`: ✨ 特色
@@ -896,55 +931,55 @@ GROUP BY t.id;
 
 #### 3.4 精選景點 (FocusCard)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `title` | string | ✅ | 景點名稱 |
-| `src` | string (URL) | ✅ | 景點圖片 |
+| 欄位名  | 型別         | 必填 | 說明     |
+| ------- | ------------ | ---- | -------- |
+| `title` | string       | ✅   | 景點名稱 |
+| `src`   | string (URL) | ✅   | 景點圖片 |
 
 #### 3.5 領隊資訊 (LeaderInfo)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `name` | string | ✅ | 領隊姓名 |
-| `domesticPhone` | string | ✅ | 國內電話 |
-| `overseasPhone` | string | ✅ | 國外電話 |
+| 欄位名          | 型別   | 必填 | 說明     |
+| --------------- | ------ | ---- | -------- |
+| `name`          | string | ✅   | 領隊姓名 |
+| `domesticPhone` | string | ✅   | 國內電話 |
+| `overseasPhone` | string | ✅   | 國外電話 |
 
 #### 3.6 集合資訊 (MeetingInfo)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `time` | string | ✅ | 集合時間 |
-| `location` | string | ✅ | 集合地點 |
+| 欄位名     | 型別   | 必填 | 說明     |
+| ---------- | ------ | ---- | -------- |
+| `time`     | string | ✅   | 集合時間 |
+| `location` | string | ✅   | 集合地點 |
 
 #### 3.7 逐日行程 (DailyItinerary)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `dayLabel` | string | ✅ | 日期標籤（Day 1） |
-| `date` | string | ✅ | 日期（10/21 (二)） |
-| `title` | string | ✅ | 當日主題 |
-| `highlight` | string | ❓ | 特別安排 |
-| `description` | string | ❓ | 當日描述 |
-| `activities` | Activity[] | ❓ | 景點活動列表 |
-| `recommendations` | string[] | ❓ | 推薦行程列表 |
-| `meals` | Meals | ✅ | 餐食安排 |
-| `accommodation` | string | ❓ | 住宿飯店 |
+| 欄位名            | 型別       | 必填 | 說明               |
+| ----------------- | ---------- | ---- | ------------------ |
+| `dayLabel`        | string     | ✅   | 日期標籤（Day 1）  |
+| `date`            | string     | ✅   | 日期（10/21 (二)） |
+| `title`           | string     | ✅   | 當日主題           |
+| `highlight`       | string     | ❓   | 特別安排           |
+| `description`     | string     | ❓   | 當日描述           |
+| `activities`      | Activity[] | ❓   | 景點活動列表       |
+| `recommendations` | string[]   | ❓   | 推薦行程列表       |
+| `meals`           | Meals      | ✅   | 餐食安排           |
+| `accommodation`   | string     | ❓   | 住宿飯店           |
 
 #### 3.8 景點活動 (Activity)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `icon` | string | ✅ | emoji 圖示（🌋） |
-| `title` | string | ✅ | 活動名稱 |
-| `description` | string | ❓ | 活動說明 |
+| 欄位名        | 型別   | 必填 | 說明             |
+| ------------- | ------ | ---- | ---------------- |
+| `icon`        | string | ✅   | emoji 圖示（🌋） |
+| `title`       | string | ✅   | 活動名稱         |
+| `description` | string | ❓   | 活動說明         |
 
 #### 3.9 餐食 (Meals)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `breakfast` | string | ✅ | 早餐安排 |
-| `lunch` | string | ✅ | 午餐安排 |
-| `dinner` | string | ✅ | 晚餐安排 |
+| 欄位名      | 型別   | 必填 | 說明     |
+| ----------- | ------ | ---- | -------- |
+| `breakfast` | string | ✅   | 早餐安排 |
+| `lunch`     | string | ✅   | 午餐安排 |
+| `dinner`    | string | ✅   | 晚餐安排 |
 
 #### 3.10 與其他模組的關聯
 
@@ -960,18 +995,19 @@ DailyItinerary (1) ----< (N) Activity
 
 ### 4. UI 組件
 
-| 組件名稱 | 檔案路徑 | 說明 |
-|----------|---------|------|
-| ItineraryPage | `src/app/itinerary/page.tsx` | 行程表主頁 |
-| NewItineraryPage | `src/app/itinerary/new/page.tsx` | 新增行程頁（左右分屏） |
-| EditItineraryPage | `src/app/itinerary/[slug]/page.tsx` | 編輯行程頁 |
-| TourForm | `src/components/editor/TourForm.tsx` | 行程表單編輯器 |
-| TourPreview | `src/components/editor/TourPreview.tsx` | 行程即時預覽 |
-| PublishButton | `src/components/editor/PublishButton.tsx` | 發佈按鈕 |
+| 組件名稱          | 檔案路徑                                  | 說明                   |
+| ----------------- | ----------------------------------------- | ---------------------- |
+| ItineraryPage     | `src/app/itinerary/page.tsx`              | 行程表主頁             |
+| NewItineraryPage  | `src/app/itinerary/new/page.tsx`          | 新增行程頁（左右分屏） |
+| EditItineraryPage | `src/app/itinerary/[slug]/page.tsx`       | 編輯行程頁             |
+| TourForm          | `src/components/editor/TourForm.tsx`      | 行程表單編輯器         |
+| TourPreview       | `src/components/editor/TourPreview.tsx`   | 行程即時預覽           |
+| PublishButton     | `src/components/editor/PublishButton.tsx` | 發佈按鈕               |
 
 ### 5. 資料層架構
 
 **目前實作（Phase 1）**：
+
 ```typescript
 // Store 層（重用 Tour Store）
 src/stores/create-store.ts
@@ -986,6 +1022,7 @@ src/features/tours/services/tour.service.ts
 ```
 
 **未來 Phase 3 架構**：
+
 ```
 UI (ItineraryPage)
   ↓
@@ -1000,26 +1037,26 @@ Supabase (tours 表 + itinerary_details 表)
 
 ### 6. API 端點（Phase 3 規劃）
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/api/itineraries` | GET | 取得行程表列表 |
-| `/api/itineraries` | POST | 建立新行程 |
-| `/api/itineraries/:id` | GET | 取得行程詳情 |
-| `/api/itineraries/:id` | PATCH | 更新行程 |
-| `/api/itineraries/:id` | DELETE | 刪除行程 |
-| `/api/itineraries/:id/publish` | POST | 發佈行程 |
-| `/api/itineraries/:id/duplicate` | POST | 複製行程 |
-| `/api/itineraries/from-quote/:quoteId` | POST | 從報價單建立行程 |
+| 端點                                   | 方法   | 說明             |
+| -------------------------------------- | ------ | ---------------- |
+| `/api/itineraries`                     | GET    | 取得行程表列表   |
+| `/api/itineraries`                     | POST   | 建立新行程       |
+| `/api/itineraries/:id`                 | GET    | 取得行程詳情     |
+| `/api/itineraries/:id`                 | PATCH  | 更新行程         |
+| `/api/itineraries/:id`                 | DELETE | 刪除行程         |
+| `/api/itineraries/:id/publish`         | POST   | 發佈行程         |
+| `/api/itineraries/:id/duplicate`       | POST   | 複製行程         |
+| `/api/itineraries/from-quote/:quoteId` | POST   | 從報價單建立行程 |
 
 ### 7. 權限控制
 
-| 操作 | 允許角色 | 說明 |
-|------|---------|------|
-| 查看行程 | 所有人 | - |
-| 建立行程 | 業務、管理員 | - |
-| 編輯行程 | 業務、管理員 | - |
-| 刪除行程 | 管理員 | - |
-| 發佈行程 | 業務、管理員 | - |
+| 操作         | 允許角色           | 說明     |
+| ------------ | ------------------ | -------- |
+| 查看行程     | 所有人             | -        |
+| 建立行程     | 業務、管理員       | -        |
+| 編輯行程     | 業務、管理員       | -        |
+| 刪除行程     | 管理員             | -        |
+| 發佈行程     | 業務、管理員       | -        |
 | 查看分享連結 | 所有人（包含外部） | 公開分享 |
 
 ### 8. 已知問題
@@ -1029,6 +1066,7 @@ Supabase (tours 表 + itinerary_details 表)
 ✅ **大部分欄位已使用 camelCase**
 
 ⚠️ **status 使用中文**
+
 ```typescript
 // 現狀
 status: '草稿' | '已發佈'
@@ -1040,6 +1078,7 @@ status: 'draft' | 'published'
 #### 8.2 資料重複問題
 
 ⚠️ **行程表和 Tour 資料混在一起**
+
 - Tour Store 包含了旅遊團的財務欄位（price, total_revenue）
 - 也包含了行程展示用欄位（dailyItinerary, features）
 - **建議**：分離為兩個表：
@@ -1049,36 +1088,43 @@ status: 'draft' | 'published'
 #### 8.3 航班時間計算
 
 ✅ **duration 已自動計算**
+
 - 根據 departureTime 和 arrivalTime
 - 考慮時差（timezoneOffset）
 
 #### 8.4 圖片資源管理
 
 ⚠️ **城市圖片硬編碼在程式中**
+
 ```typescript
 // src/components/editor/TourForm.tsx
 const cityImages: Record<string, string> = {
-  "東京": "https://images.unsplash.com/...",
-  "京都": "https://images.unsplash.com/...",
+  東京: 'https://images.unsplash.com/...',
+  京都: 'https://images.unsplash.com/...',
   // ...
-};
+}
 ```
+
 - **建議**：移到資料庫的 `city_images` 表
 
 #### 8.5 分享連結問題
 
 ⚠️ **ngrok 網址硬編碼**
+
 ```typescript
 // src/app/itinerary/page.tsx
-const baseUrl = 'https://frisky-masonic-mellissa.ngrok-free.dev';
-const shareUrl = `${baseUrl}/view/${itinerary.id}`;
+const baseUrl = 'https://frisky-masonic-mellissa.ngrok-free.dev'
+const shareUrl = `${baseUrl}/view/${itinerary.id}`
 ```
+
 - **建議**：移到環境變數 `NEXT_PUBLIC_BASE_URL`
 
 ### 9. 修復建議
 
 **優先修復（P0）**：
+
 1. **統一 status 命名為英文**：
+
    ```typescript
    status: 'draft' | 'published'
    ```
@@ -1087,17 +1133,9 @@ const shareUrl = `${baseUrl}/view/${itinerary.id}`;
    - Tour: 業務資料（code, name, departure_date, price, max_participants）
    - Itinerary: 展示資料（title, subtitle, coverImage, dailyItinerary）
 
-**次要修復（P1）**：
-3. 城市圖片移到資料庫
-4. 分享連結使用環境變數
-5. 新增 `author` 欄位（目前從 useAuthStore 取得）
+**次要修復（P1）**：3. 城市圖片移到資料庫 4. 分享連結使用環境變數 5. 新增 `author` 欄位（目前從 useAuthStore 取得）
 
-**未來優化（P2）**：
-6. 支援行程範本
-7. 多語言版本
-8. PDF 匯出功能
-9. 行程比較功能
-10. SEO 優化（外部分享頁）
+**未來優化（P2）**：6. 支援行程範本 7. 多語言版本 8. PDF 匯出功能 9. 行程比較功能 10. SEO 優化（外部分享頁）
 
 ### 10. 資料表建議（Phase 3）
 
@@ -1117,21 +1155,21 @@ CREATE TABLE itineraries (
   cover_image TEXT,
   status VARCHAR(20) NOT NULL CHECK (status IN ('draft', 'published')),
   author_id UUID REFERENCES users(id),
-  
+
   -- 航班資訊（JSONB）
   outbound_flight JSONB NOT NULL,
   return_flight JSONB NOT NULL,
-  
+
   -- 特色、景點、領隊、集合（JSONB）
   features JSONB,
   focus_cards JSONB,
   leader_info JSONB,
   meeting_info JSONB,
-  
+
   -- 逐日行程（JSONB）
   itinerary_subtitle VARCHAR(255),
   daily_itinerary JSONB NOT NULL,
-  
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -1169,16 +1207,17 @@ CREATE INDEX idx_itinerary_shares_token ON itinerary_shares(share_token);
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
-| **功能名稱** | 訂單管理 (Orders) |
-| **路徑** | `/orders` |
-| **狀態** | ⚠️ 需修正（狀態混亂、欄位不一致） |
-| **更新日期** | 2025-01-07 |
+| 項目         | 內容                              |
+| ------------ | --------------------------------- |
+| **功能名稱** | 訂單管理 (Orders)                 |
+| **路徑**     | `/orders`                         |
+| **狀態**     | ⚠️ 需修正（狀態混亂、欄位不一致） |
+| **更新日期** | 2025-01-07                        |
 
 ### 2. 功能說明
 
 **用途描述**：
+
 - 旅遊團訂單管理
 - 客戶資料登記
 - 團員名單管理
@@ -1187,11 +1226,13 @@ CREATE INDEX idx_itinerary_shares_token ON itinerary_shares(share_token);
 - 與旅遊團關聯
 
 **主要使用者**：
+
 - 業務人員（建立訂單、追蹤收款）
 - 助理（團員資料、文件處理）
 - 會計（收款確認）
 
 **業務流程**：
+
 1. 客戶確認參加旅遊團
 2. 業務建立訂單，指派業務與助理
 3. 登記訂單人數，生成訂單號碼
@@ -1204,59 +1245,60 @@ CREATE INDEX idx_itinerary_shares_token ON itinerary_shares(share_token);
 
 #### 3.1 訂單 (Order)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 訂單唯一識別碼 |
-| `orderNumber` | string | ✅ | 訂單號碼 |
-| `tourId` | string (UUID) | ✅ | 關聯旅遊團 ID |
-| `code` | string | ✅ | 團號（冗餘，來自 Tour） |
-| `tourName` | string | ✅ | 旅遊團名稱（冗餘） |
-| `contactPerson` | string | ✅ | 聯絡人 |
-| `salesPerson` | string | ✅ | 業務負責人 |
-| `assistant` | string | ✅ | 助理 |
-| `memberCount` | number | ✅ | 訂單人數 |
-| `status` | '進行中' \| '已完成' \| '已取消' | ❌ | 訂單狀態（可選） |
-| `paymentStatus` | PaymentStatus | ✅ | 付款狀態 |
-| `totalAmount` | number | ✅ | 訂單總額 |
-| `paidAmount` | number | ✅ | 已付金額 |
-| `remainingAmount` | number | ✅ | 未付金額 |
-| `customerId` | string (UUID) | ❌ | 客戶 ID（目前缺失） |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名            | 型別                             | 必填 | 說明                    |
+| ----------------- | -------------------------------- | ---- | ----------------------- |
+| `id`              | string (UUID)                    | ✅   | 訂單唯一識別碼          |
+| `orderNumber`     | string                           | ✅   | 訂單號碼                |
+| `tourId`          | string (UUID)                    | ✅   | 關聯旅遊團 ID           |
+| `code`            | string                           | ✅   | 團號（冗餘，來自 Tour） |
+| `tourName`        | string                           | ✅   | 旅遊團名稱（冗餘）      |
+| `contactPerson`   | string                           | ✅   | 聯絡人                  |
+| `salesPerson`     | string                           | ✅   | 業務負責人              |
+| `assistant`       | string                           | ✅   | 助理                    |
+| `memberCount`     | number                           | ✅   | 訂單人數                |
+| `status`          | '進行中' \| '已完成' \| '已取消' | ❌   | 訂單狀態（可選）        |
+| `paymentStatus`   | PaymentStatus                    | ✅   | 付款狀態                |
+| `totalAmount`     | number                           | ✅   | 訂單總額                |
+| `paidAmount`      | number                           | ✅   | 已付金額                |
+| `remainingAmount` | number                           | ✅   | 未付金額                |
+| `customerId`      | string (UUID)                    | ❌   | 客戶 ID（目前缺失）     |
+| `createdAt`       | string (ISO 8601)                | ✅   | 建立時間                |
+| `updatedAt`       | string (ISO 8601)                | ✅   | 更新時間                |
 
 #### 3.2 付款狀態 (PaymentStatus)
 
 ```typescript
-type PaymentStatus = '未收款' | '部分收款' | '已收款' | '已收款' | '已完成';
+type PaymentStatus = '未收款' | '部分收款' | '已收款' | '已收款' | '已完成'
 ```
 
 **問題**：`'已收款'` 重複定義
 
 #### 3.3 團員 (Member)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 團員唯一識別碼 |
-| `orderId` | string (UUID) | ✅ | 所屬訂單 ID |
-| `name` | string | ✅ | 中文姓名 |
-| `nameEn` | string | ✅ | 英文拼音 |
-| `birthday` | string (YYYY-MM-DD) | ✅ | 生日 |
-| `passportNumber` | string | ✅ | 護照號碼 |
-| `passportExpiry` | string (YYYY-MM-DD) | ✅ | 護照到期日 |
-| `idNumber` | string | ✅ | 身分證字號 |
-| `gender` | 'M' \| 'F' \| '' | ✅ | 性別（自動判斷） |
-| `age` | number | ✅ | 年齡（自動計算） |
-| `assignedRoom` | string | ❌ | 分配的房間 |
-| `isChildNoBed` | boolean | ❌ | 小孩不佔床 |
-| `reservationCode` | string | ❌ | 訂位代號 |
-| `addOns` | string[] | ❌ | 加購項目 IDs |
-| `refunds` | string[] | ❌ | 退費項目 IDs |
-| `customFields` | Record<string, any> | ❌ | 自定義欄位 |
-| `isNew` | boolean | ❌ | 新增標記 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名            | 型別                | 必填 | 說明             |
+| ----------------- | ------------------- | ---- | ---------------- |
+| `id`              | string (UUID)       | ✅   | 團員唯一識別碼   |
+| `orderId`         | string (UUID)       | ✅   | 所屬訂單 ID      |
+| `name`            | string              | ✅   | 中文姓名         |
+| `nameEn`          | string              | ✅   | 英文拼音         |
+| `birthday`        | string (YYYY-MM-DD) | ✅   | 生日             |
+| `passportNumber`  | string              | ✅   | 護照號碼         |
+| `passportExpiry`  | string (YYYY-MM-DD) | ✅   | 護照到期日       |
+| `idNumber`        | string              | ✅   | 身分證字號       |
+| `gender`          | 'M' \| 'F' \| ''    | ✅   | 性別（自動判斷） |
+| `age`             | number              | ✅   | 年齡（自動計算） |
+| `assignedRoom`    | string              | ❌   | 分配的房間       |
+| `isChildNoBed`    | boolean             | ❌   | 小孩不佔床       |
+| `reservationCode` | string              | ❌   | 訂位代號         |
+| `addOns`          | string[]            | ❌   | 加購項目 IDs     |
+| `refunds`         | string[]            | ❌   | 退費項目 IDs     |
+| `customFields`    | Record<string, any> | ❌   | 自定義欄位       |
+| `isNew`           | boolean             | ❌   | 新增標記         |
+| `createdAt`       | string (ISO 8601)   | ✅   | 建立時間         |
+| `updatedAt`       | string (ISO 8601)   | ✅   | 更新時間         |
 
 **關聯關係**：
+
 ```
 Tour (1) ----< (N) Order
 Customer (1) ----< (N) Order
@@ -1266,16 +1308,17 @@ Order (1) ----< (N) Payment
 
 ### 4. UI 組件
 
-| 組件名稱 | 檔案路徑 | 說明 |
-|----------|---------|------|
-| OrdersPage | `src/app/orders/page.tsx` | 訂單主頁 |
+| 組件名稱             | 檔案路徑                                           | 說明           |
+| -------------------- | -------------------------------------------------- | -------------- |
+| OrdersPage           | `src/app/orders/page.tsx`                          | 訂單主頁       |
 | ExpandableOrderTable | `src/components/orders/expandable-order-table.tsx` | 可展開訂單表格 |
-| OrderKanban | `src/components/orders/order-kanban.tsx` | 看板視圖 |
-| OrderList | `src/components/orders/order-list.tsx` | 列表視圖 |
+| OrderKanban          | `src/components/orders/order-kanban.tsx`           | 看板視圖       |
+| OrderList            | `src/components/orders/order-list.tsx`             | 列表視圖       |
 
 ### 5. 資料層架構
 
 **目前實作（Phase 1）**：
+
 ```typescript
 // Store 層（Zustand）
 src/stores/create-store.ts (工廠函數)
@@ -1302,6 +1345,7 @@ src/features/orders/services/order.service.ts
 ```
 
 **未來 Phase 3 架構**：
+
 ```
 UI (OrdersPage)
   ↓
@@ -1316,41 +1360,44 @@ Supabase (orders, members 表)
 
 ### 6. API 端點（Phase 3）
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/api/orders` | GET | 取得訂單列表（可篩選） |
-| `/api/orders` | POST | 建立新訂單 |
-| `/api/orders/:id` | GET | 取得訂單詳情 |
-| `/api/orders/:id` | PATCH | 更新訂單 |
-| `/api/orders/:id` | DELETE | 刪除訂單 |
-| `/api/orders/:id/members` | GET/POST | 團員管理 |
-| `/api/orders/:id/payments` | GET/POST | 收款記錄 |
-| `/api/orders/tour/:tourId` | GET | 取得旅遊團的所有訂單 |
+| 端點                       | 方法     | 說明                   |
+| -------------------------- | -------- | ---------------------- |
+| `/api/orders`              | GET      | 取得訂單列表（可篩選） |
+| `/api/orders`              | POST     | 建立新訂單             |
+| `/api/orders/:id`          | GET      | 取得訂單詳情           |
+| `/api/orders/:id`          | PATCH    | 更新訂單               |
+| `/api/orders/:id`          | DELETE   | 刪除訂單               |
+| `/api/orders/:id/members`  | GET/POST | 團員管理               |
+| `/api/orders/:id/payments` | GET/POST | 收款記錄               |
+| `/api/orders/tour/:tourId` | GET      | 取得旅遊團的所有訂單   |
 
 ### 7. 權限控制
 
-| 操作 | 允許角色 | 說明 |
-|------|---------|------|
-| 查看訂單 | 所有人 | - |
-| 建立訂單 | 業務、管理員 | - |
-| 編輯訂單 | 業務（負責人）、助理、管理員 | - |
-| 刪除訂單 | 管理員 | 需檢查無團員 |
-| 團員資料 | 業務、助理、管理員 | - |
-| 收款確認 | 會計、管理員 | - |
+| 操作     | 允許角色                     | 說明         |
+| -------- | ---------------------------- | ------------ |
+| 查看訂單 | 所有人                       | -            |
+| 建立訂單 | 業務、管理員                 | -            |
+| 編輯訂單 | 業務（負責人）、助理、管理員 | -            |
+| 刪除訂單 | 管理員                       | 需檢查無團員 |
+| 團員資料 | 業務、助理、管理員           | -            |
+| 收款確認 | 會計、管理員                 | -            |
 
 ### 8. 已知問題
 
 #### 8.1 欄位命名問題
+
 - ✅ 大部分欄位已使用 camelCase
 - ⚠️ 無 snake_case 問題
 
 #### 8.2 狀態混亂（嚴重）
+
 - ❌ **Order.status 使用中文**：`'進行中' | '已完成' | '已取消'`
 - ❌ **PaymentStatus 使用中文**：`'未收款' | '部分收款' | '已收款' | '已完成'`
 - ❌ **PaymentStatus 重複定義**：`'已收款'` 出現兩次
 - ❌ **Order.status 與 PaymentStatus 語意重疊**
 
 **建議改為**：
+
 ```typescript
 // Order 狀態
 status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
@@ -1360,11 +1407,13 @@ paymentStatus: 'unpaid' | 'partial' | 'paid' | 'refunded'
 ```
 
 #### 8.3 冗餘欄位問題
+
 - ⚠️ `code` 和 `tourName` 是冗餘欄位（來自 Tour）
 - **風險**：Tour 更新時，Order 的冗餘資料不會同步
 - **建議**：移除冗餘，或改為動態 JOIN
 
 #### 8.4 缺少關鍵欄位
+
 - ❌ 缺少 `customerId`（客戶 ID）
 - ❌ 缺少 `notes`（訂單備註）
 - ❌ 缺少 `cancelledAt`（取消時間）
@@ -1373,19 +1422,23 @@ paymentStatus: 'unpaid' | 'partial' | 'paid' | 'refunded'
 - ❌ 缺少 `depositPaidAt`（訂金付款時間）
 
 #### 8.5 團員資料問題
+
 - ⚠️ `gender` 和 `age` 應該動態計算，不應儲存
 - ⚠️ `isNew` 標記用途不明，應移除
 
 #### 8.6 付款金額計算
+
 - ⚠️ `remainingAmount` 應該動態計算（totalAmount - paidAmount）
 
 #### 8.7 Service 層邏輯問題
+
 - ⚠️ `getOrdersByStatus` 使用硬編碼中文狀態（'已確認'、'已完成'）
 - ⚠️ `getPendingOrders` 使用 `status === '未收款'`，但 status 不是付款狀態
 
 ### 9. 修復建議
 
 **優先修復（P0）**：
+
 1. **統一狀態命名為英文**：
    ```typescript
    status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
@@ -1394,17 +1447,9 @@ paymentStatus: 'unpaid' | 'partial' | 'paid' | 'refunded'
 2. **修正 PaymentStatus 重複定義**
 3. **移除或修正 Service 層硬編碼的中文狀態**
 
-**次要修復（P1）**：
-4. 新增必要欄位（customerId, notes, depositAmount 等）
-5. 移除冗餘欄位（code, tourName）或改為 computed
-6. `remainingAmount`, `gender`, `age` 改為動態計算
-7. 移除 `isNew` 標記
+**次要修復（P1）**：4. 新增必要欄位（customerId, notes, depositAmount 等）5. 移除冗餘欄位（code, tourName）或改為 computed 6. `remainingAmount`, `gender`, `age` 改為動態計算 7. 移除 `isNew` 標記
 
-**未來優化（P2）**：
-8. 支援訂單範本
-9. 批次匯入團員
-10. 訂單複製功能
-11. 文件自動提醒
+**未來優化（P2）**：8. 支援訂單範本 9. 批次匯入團員 10. 訂單複製功能 11. 文件自動提醒
 
 ### 10. 資料表建議（Phase 3）
 
@@ -1484,16 +1529,17 @@ LEFT JOIN tours t ON t.id = o.tour_id;
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
-| **功能名稱** | 報價單管理 (Quotes) |
-| **路徑** | `/quotes` |
-| **狀態** | ⚠️ 需修正（狀態使用中文、欄位混亂） |
-| **更新日期** | 2025-01-07 |
+| 項目         | 內容                                |
+| ------------ | ----------------------------------- |
+| **功能名稱** | 報價單管理 (Quotes)                 |
+| **路徑**     | `/quotes`                           |
+| **狀態**     | ⚠️ 需修正（狀態使用中文、欄位混亂） |
+| **更新日期** | 2025-01-07                          |
 
 ### 2. 功能說明
 
 **用途描述**：
+
 - 旅遊團報價單建立與管理
 - 多項費用分類（住宿、交通、餐食、門票等）
 - 版本控制（提案 → 最終版本）
@@ -1501,10 +1547,12 @@ LEFT JOIN tours t ON t.id = o.tour_id;
 - 轉換為旅遊團
 
 **主要使用者**：
+
 - 業務人員（建立報價單、回覆客戶）
 - 會計（成本核算）
 
 **業務流程**：
+
 1. 客戶詢價，業務建立報價單
 2. 輸入團體資訊（人數、天數、需求）
 3. 逐項填寫費用明細（住宿、交通、餐食等）
@@ -1516,65 +1564,66 @@ LEFT JOIN tours t ON t.id = o.tour_id;
 
 #### 3.1 報價單 (Quote)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 報價單唯一識別碼 |
-| `quoteNumber` | string | ❌ | 報價單號碼（QUOTE-2025-0001） |
-| `name` | string | ✅ | 團體名稱 |
-| `status` | '提案' \| '最終版本' | ✅ | 報價單狀態 |
-| `tourId` | string (UUID) | ❌ | 關聯的旅遊團 ID（轉換後） |
-| `customerName` | string | ❌ | 客戶名稱 |
-| `contactPerson` | string | ❌ | 聯絡人 |
-| `contactPhone` | string | ❌ | 聯絡電話 |
-| `contactEmail` | string | ❌ | Email |
-| `groupSize` | number | ✅ | 團體人數 |
-| `accommodationDays` | number | ✅ | 住宿天數 |
-| `requirements` | string | ❌ | 需求說明 |
-| `budgetRange` | string | ❌ | 預算範圍 |
-| `validUntil` | string (ISO 8601) | ❌ | 報價有效期 |
-| `paymentTerms` | string | ❌ | 付款條件 |
-| `categories` | QuoteCategory[] | ✅ | 費用分類 |
-| `totalCost` | number | ✅ | 總成本 |
-| `version` | number | ❌ | 版本號 |
-| `versions` | QuoteVersion[] | ❌ | 版本歷史 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
-| `updatedAt` | string (ISO 8601) | ✅ | 更新時間 |
+| 欄位名              | 型別                 | 必填 | 說明                          |
+| ------------------- | -------------------- | ---- | ----------------------------- |
+| `id`                | string (UUID)        | ✅   | 報價單唯一識別碼              |
+| `quoteNumber`       | string               | ❌   | 報價單號碼（QUOTE-2025-0001） |
+| `name`              | string               | ✅   | 團體名稱                      |
+| `status`            | '提案' \| '最終版本' | ✅   | 報價單狀態                    |
+| `tourId`            | string (UUID)        | ❌   | 關聯的旅遊團 ID（轉換後）     |
+| `customerName`      | string               | ❌   | 客戶名稱                      |
+| `contactPerson`     | string               | ❌   | 聯絡人                        |
+| `contactPhone`      | string               | ❌   | 聯絡電話                      |
+| `contactEmail`      | string               | ❌   | Email                         |
+| `groupSize`         | number               | ✅   | 團體人數                      |
+| `accommodationDays` | number               | ✅   | 住宿天數                      |
+| `requirements`      | string               | ❌   | 需求說明                      |
+| `budgetRange`       | string               | ❌   | 預算範圍                      |
+| `validUntil`        | string (ISO 8601)    | ❌   | 報價有效期                    |
+| `paymentTerms`      | string               | ❌   | 付款條件                      |
+| `categories`        | QuoteCategory[]      | ✅   | 費用分類                      |
+| `totalCost`         | number               | ✅   | 總成本                        |
+| `version`           | number               | ❌   | 版本號                        |
+| `versions`          | QuoteVersion[]       | ❌   | 版本歷史                      |
+| `createdAt`         | string (ISO 8601)    | ✅   | 建立時間                      |
+| `updatedAt`         | string (ISO 8601)    | ✅   | 更新時間                      |
 
 #### 3.2 費用分類 (QuoteCategory)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 分類唯一識別碼 |
-| `name` | string | ✅ | 分類名稱（住宿、交通、餐食等） |
-| `items` | QuoteItem[] | ✅ | 費用項目列表 |
-| `total` | number | ✅ | 分類小計 |
+| 欄位名  | 型別          | 必填 | 說明                           |
+| ------- | ------------- | ---- | ------------------------------ |
+| `id`    | string (UUID) | ✅   | 分類唯一識別碼                 |
+| `name`  | string        | ✅   | 分類名稱（住宿、交通、餐食等） |
+| `items` | QuoteItem[]   | ✅   | 費用項目列表                   |
+| `total` | number        | ✅   | 分類小計                       |
 
 #### 3.3 費用項目 (QuoteItem)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 項目唯一識別碼 |
-| `name` | string | ✅ | 項目名稱 |
-| `quantity` | number | ✅ | 數量 |
-| `unitPrice` | number | ✅ | 單價 |
-| `total` | number | ✅ | 小計（quantity × unitPrice） |
-| `note` | string | ❌ | 備註 |
-| `day` | number | ❌ | 第幾天（住宿專用） |
-| `roomType` | string | ❌ | 房型名稱（住宿專用） |
-| `isGroupCost` | boolean | ❌ | 團體分攤（交通、導遊專用） |
+| 欄位名        | 型別          | 必填 | 說明                         |
+| ------------- | ------------- | ---- | ---------------------------- |
+| `id`          | string (UUID) | ✅   | 項目唯一識別碼               |
+| `name`        | string        | ✅   | 項目名稱                     |
+| `quantity`    | number        | ✅   | 數量                         |
+| `unitPrice`   | number        | ✅   | 單價                         |
+| `total`       | number        | ✅   | 小計（quantity × unitPrice） |
+| `note`        | string        | ❌   | 備註                         |
+| `day`         | number        | ❌   | 第幾天（住宿專用）           |
+| `roomType`    | string        | ❌   | 房型名稱（住宿專用）         |
+| `isGroupCost` | boolean       | ❌   | 團體分攤（交通、導遊專用）   |
 
 #### 3.4 版本歷史 (QuoteVersion)
 
-| 欄位名 | 型別 | 必填 | 說明 |
-|--------|------|------|------|
-| `id` | string (UUID) | ✅ | 版本唯一識別碼 |
-| `version` | number | ✅ | 版本號 |
-| `categories` | QuoteCategory[] | ✅ | 費用分類快照 |
-| `totalCost` | number | ✅ | 總成本快照 |
-| `note` | string | ❌ | 修改說明 |
-| `createdAt` | string (ISO 8601) | ✅ | 建立時間 |
+| 欄位名       | 型別              | 必填 | 說明           |
+| ------------ | ----------------- | ---- | -------------- |
+| `id`         | string (UUID)     | ✅   | 版本唯一識別碼 |
+| `version`    | number            | ✅   | 版本號         |
+| `categories` | QuoteCategory[]   | ✅   | 費用分類快照   |
+| `totalCost`  | number            | ✅   | 總成本快照     |
+| `note`       | string            | ❌   | 修改說明       |
+| `createdAt`  | string (ISO 8601) | ✅   | 建立時間       |
 
 **關聯關係**：
+
 ```
 Quote (1) ----< (1) Tour (轉換)
 Quote (1) ----< (N) QuoteCategory
@@ -1584,15 +1633,16 @@ Quote (1) ----< (N) QuoteVersion
 
 ### 4. UI 組件
 
-| 組件名稱 | 檔案路徑 | 說明 |
-|----------|---------|------|
-| QuotesPage | `src/app/quotes/page.tsx` | 報價單主頁 |
-| QuoteDetailPage | `src/app/quotes/[id]/page.tsx` | 報價單詳情頁 |
-| EnhancedTable | `src/components/ui/enhanced-table.tsx` | 報價單列表 |
+| 組件名稱        | 檔案路徑                               | 說明         |
+| --------------- | -------------------------------------- | ------------ |
+| QuotesPage      | `src/app/quotes/page.tsx`              | 報價單主頁   |
+| QuoteDetailPage | `src/app/quotes/[id]/page.tsx`         | 報價單詳情頁 |
+| EnhancedTable   | `src/components/ui/enhanced-table.tsx` | 報價單列表   |
 
 ### 5. 資料層架構
 
 **目前實作（Phase 1）**：
+
 ```typescript
 // Store 層（Zustand）
 src/stores/create-store.ts (工廠函數)
@@ -1619,6 +1669,7 @@ src/features/quotes/services/quote.service.ts
 ```
 
 **未來 Phase 3 架構**：
+
 ```
 UI (QuotesPage)
   ↓
@@ -1633,41 +1684,44 @@ Supabase (quotes, quote_versions 表)
 
 ### 6. API 端點（Phase 3）
 
-| 端點 | 方法 | 說明 |
-|------|------|------|
-| `/api/quotes` | GET | 取得報價單列表 |
-| `/api/quotes` | POST | 建立新報價單 |
-| `/api/quotes/:id` | GET | 取得報價單詳情 |
-| `/api/quotes/:id` | PATCH | 更新報價單 |
-| `/api/quotes/:id` | DELETE | 刪除報價單 |
-| `/api/quotes/:id/duplicate` | POST | 複製報價單 |
-| `/api/quotes/:id/version` | POST | 建立新版本 |
-| `/api/quotes/:id/convert-tour` | POST | 轉換為旅遊團 |
+| 端點                           | 方法   | 說明           |
+| ------------------------------ | ------ | -------------- |
+| `/api/quotes`                  | GET    | 取得報價單列表 |
+| `/api/quotes`                  | POST   | 建立新報價單   |
+| `/api/quotes/:id`              | GET    | 取得報價單詳情 |
+| `/api/quotes/:id`              | PATCH  | 更新報價單     |
+| `/api/quotes/:id`              | DELETE | 刪除報價單     |
+| `/api/quotes/:id/duplicate`    | POST   | 複製報價單     |
+| `/api/quotes/:id/version`      | POST   | 建立新版本     |
+| `/api/quotes/:id/convert-tour` | POST   | 轉換為旅遊團   |
 
 ### 7. 權限控制
 
-| 操作 | 允許角色 | 說明 |
-|------|---------|------|
-| 查看報價單 | 所有人 | - |
-| 建立報價單 | 業務、管理員 | - |
-| 編輯報價單 | 業務、管理員 | - |
-| 刪除報價單 | 管理員 | 需檢查未轉換為旅遊團 |
-| 複製報價單 | 業務、管理員 | - |
-| 轉換為旅遊團 | 業務、管理員 | - |
+| 操作         | 允許角色     | 說明                 |
+| ------------ | ------------ | -------------------- |
+| 查看報價單   | 所有人       | -                    |
+| 建立報價單   | 業務、管理員 | -                    |
+| 編輯報價單   | 業務、管理員 | -                    |
+| 刪除報價單   | 管理員       | 需檢查未轉換為旅遊團 |
+| 複製報價單   | 業務、管理員 | -                    |
+| 轉換為旅遊團 | 業務、管理員 | -                    |
 
 ### 8. 已知問題
 
 #### 8.1 欄位命名問題
+
 - ✅ 大部分欄位已使用 camelCase
 - ⚠️ 無 snake_case 問題
 
 #### 8.2 狀態命名問題（嚴重）
+
 - ❌ **狀態使用中文**：`'提案' | '最終版本'`
 - **問題**：
   1. 不利於國際化
   2. 語意不清（缺少「已確認」、「已取消」等狀態）
 
 **建議改為**：
+
 ```typescript
 status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
 // draft: 草稿
@@ -1679,18 +1733,22 @@ status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
 ```
 
 #### 8.3 totalCost 計算問題
+
 - ⚠️ `totalCost` 應該動態計算，不應儲存
 - **風險**：categories 更新時，totalCost 可能不同步
 
 #### 8.4 版本控制邏輯不完整
+
 - ⚠️ `version` 欄位與 `status` 關係不明確
 - ⚠️ `versions` 陣列儲存方式冗餘（完整快照）
 - **建議**：版本應獨立表格，使用差異儲存
 
 #### 8.5 QuoteItem 計算問題
+
 - ⚠️ `total` 應該動態計算（quantity × unitPrice）
 
 #### 8.6 缺少關鍵欄位
+
 - ❌ 缺少 `customerId`（客戶 ID）
 - ❌ 缺少 `pricePerPerson`（每人價格）
 - ❌ 缺少 `profitMargin`（利潤率）
@@ -1698,11 +1756,13 @@ status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
 - ❌ 缺少 `rejectedReason`（拒絕原因）
 
 #### 8.7 Service 層 validate 問題
+
 - ⚠️ validate 檢查 `title` 欄位，但 Quote 沒有 `title` 欄位（應該是 `name`）
 
 ### 9. 修復建議
 
 **優先修復（P0）**：
+
 1. **統一狀態命名為英文**：
    ```typescript
    status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
@@ -1710,16 +1770,9 @@ status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
 2. **修正 Service validate 欄位名稱**（title → name）
 3. **totalCost 改為動態計算**
 
-**次要修復（P1）**：
-4. 新增必要欄位（customerId, pricePerPerson, profitMargin 等）
-5. 優化版本控制邏輯
-6. QuoteItem.total 改為動態計算
+**次要修復（P1）**：4. 新增必要欄位（customerId, pricePerPerson, profitMargin 等）5. 優化版本控制邏輯 6. QuoteItem.total 改為動態計算
 
-**未來優化（P2）**：
-7. 支援報價單範本
-8. PDF 匯出功能
-9. Email 寄送功能
-10. 報價比較功能
+**未來優化（P2）**：7. 支援報價單範本 8. PDF 匯出功能 9. Email 寄送功能 10. 報價比較功能
 
 ### 10. 資料表建議（Phase 3）
 
@@ -1788,6 +1841,7 @@ CREATE TABLE quote_versions (
 接下來將依照優先級逐一建立以下功能的完整規格：
 
 ### P0 核心功能（優先處理）
+
 1. ✅ **工作區 (Workspace)** - 已完成
 2. ✅ **待辦事項 (Todos)** - 已完成
 3. ✅ **旅遊團 (Tours)** - 已完成
@@ -1797,6 +1851,7 @@ CREATE TABLE quote_versions (
 7. ⏳ **會計系統 (Accounting)** - 核心業務
 
 ### P1 重要功能
+
 8. ⏳ **行事曆 (Calendar)**
 9. ⏳ **時間盒 (Timebox)**
 10. ⏳ **客戶管理 (Customers)**
@@ -1805,6 +1860,7 @@ CREATE TABLE quote_versions (
 13. ⏳ **模板系統 (Templates)**
 
 ### P2 輔助功能
+
 14. ⏳ **簽證管理 (Visas)**
 15. ⏳ **檔案管理 (Profile)**
 16. ⏳ **導覽 (Guide)**
@@ -1816,6 +1872,7 @@ CREATE TABLE quote_versions (
 ### 給 Claude AI 的指示
 
 **開始處理某個功能時**：
+
 1. 讀取該功能的規格表格
 2. 檢查「已知問題」章節
 3. 依照資料模型統一欄位命名
@@ -1823,6 +1880,7 @@ CREATE TABLE quote_versions (
 5. 更新「已知問題」狀態
 
 **建立新功能規格時**：
+
 1. 複製「工作區」範本
 2. 填寫 8 個章節內容
 3. 確保欄位 100% 使用 camelCase
@@ -1831,6 +1889,7 @@ CREATE TABLE quote_versions (
 ### 給開發者的指示
 
 **查詢功能架構**：
+
 ```bash
 # 1. 讀取功能總覽，找到目標功能
 # 2. 查看該功能的完整規格
@@ -1838,6 +1897,7 @@ CREATE TABLE quote_versions (
 ```
 
 **提交新功能**：
+
 ```bash
 # 1. 先建立功能規格文件
 # 2. 經過 Review 後再開始實作
@@ -1850,19 +1910,21 @@ CREATE TABLE quote_versions (
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
-| **路徑** | `/finance/*` (含 5 個子模組) |
-| **狀態** | ✅ 已實作 - 完整多子系統 |
-| **開發階段** | Phase 1 (IndexedDB) |
-| **最後更新** | 2025-01-06 |
+| 項目         | 內容                         |
+| ------------ | ---------------------------- |
+| **路徑**     | `/finance/*` (含 5 個子模組) |
+| **狀態**     | ✅ 已實作 - 完整多子系統     |
+| **開發階段** | Phase 1 (IndexedDB)          |
+| **最後更新** | 2025-01-06                   |
 
 ### 2. 功能說明
 
 #### 2.1 用途
+
 **旅行社財務核心系統** - 管理收款、請款、出納支出、金流對帳，確保財務資料準確性。
 
 #### 2.2 使用者
+
 - **財務人員** - 日常收款、請款、對帳
 - **會計人員** - 月結、報表生成
 - **管理層** - 財務概覽、利潤分析
@@ -1870,6 +1932,7 @@ CREATE TABLE quote_versions (
 #### 2.3 業務流程
 
 **主要流程：**
+
 ```
 1. 收款管理 (Payments) ─┐
 2. 請款管理 (Requests) ─┼─> 出納管理 (Treasury) ─> 對帳 (Reconciliation)
@@ -1879,6 +1942,7 @@ CREATE TABLE quote_versions (
 ```
 
 **子模組說明：**
+
 - **`/finance/payments`** - 收款單：單訂單多付款/批量分配收款
 - **`/finance/requests`** - 請款單：按旅遊團請款，週四固定出帳
 - **`/finance/treasury/disbursement`** - 出納支出：週期批次支付
@@ -1891,76 +1955,76 @@ CREATE TABLE quote_versions (
 
 #### 3.1 Payment (收款記錄)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `orderId` | string | ✅ | 訂單ID | |
-| `amount` | number | ✅ | 金額 | |
-| `type` | `'收款' \| '請款' \| '出納'` | ✅ | 支付類型 | ⚠️ **中文值** |
-| `status` | `'未收款' \| '已確認' \| '已完成'` | ✅ | 狀態 | ⚠️ **中文值** |
-| `description` | string | ❌ | 說明 | |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱      | 型別                               | 必填 | 說明     | ⚠️ 問題       |
+| ------------- | ---------------------------------- | ---- | -------- | ------------- |
+| `id`          | string                             | ✅   | UUID     |               |
+| `orderId`     | string                             | ✅   | 訂單ID   |               |
+| `amount`      | number                             | ✅   | 金額     |               |
+| `type`        | `'收款' \| '請款' \| '出納'`       | ✅   | 支付類型 | ⚠️ **中文值** |
+| `status`      | `'未收款' \| '已確認' \| '已完成'` | ✅   | 狀態     | ⚠️ **中文值** |
+| `description` | string                             | ❌   | 說明     |               |
+| `createdAt`   | string                             | ✅   | 建立時間 |               |
+| `updatedAt`   | string                             | ✅   | 更新時間 |               |
 
 #### 3.2 PaymentRequest (請款單)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `requestNumber` | string | ✅ | 請款單號 (REQ-2025001) | |
-| `tourId` | string | ✅ | 旅遊團ID | |
-| `tourName` | string | ✅ | 團名 | ⚠️ 冗餘欄位 |
-| `code` | string | ✅ | 團號 | ⚠️ 冗餘欄位 |
-| `orderId` | string | ❌ | 訂單ID（可選） | |
-| `orderNumber` | string | ❌ | 訂單編號 | ⚠️ 冗餘欄位 |
-| `requestDate` | string | ❌ | 請款日期（固定週四） | |
-| `items` | PaymentRequestItem[] | ✅ | 請款項目 | |
-| `totalAmount` | number | ✅ | 總金額 | ⚠️ 應計算而非儲存 |
-| `status` | `'pending' \| 'processing' \| 'confirmed' \| 'paid'` | ✅ | 狀態 | ✅ 使用英文 |
-| `note` | string | ❌ | 備註 | |
-| `isSpecialBilling` | boolean | ✅ | 是否特殊請款 | |
-| `disbursementOrderId` | string | ❌ | 出納單ID | |
-| `createdBy` | string | ✅ | 建立人 | |
-| `confirmedBy` | string | ❌ | 確認人 | |
-| `confirmedAt` | string | ❌ | 確認時間 | |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱              | 型別                                                 | 必填 | 說明                   | ⚠️ 問題           |
+| --------------------- | ---------------------------------------------------- | ---- | ---------------------- | ----------------- |
+| `id`                  | string                                               | ✅   | UUID                   |                   |
+| `requestNumber`       | string                                               | ✅   | 請款單號 (REQ-2025001) |                   |
+| `tourId`              | string                                               | ✅   | 旅遊團ID               |                   |
+| `tourName`            | string                                               | ✅   | 團名                   | ⚠️ 冗餘欄位       |
+| `code`                | string                                               | ✅   | 團號                   | ⚠️ 冗餘欄位       |
+| `orderId`             | string                                               | ❌   | 訂單ID（可選）         |                   |
+| `orderNumber`         | string                                               | ❌   | 訂單編號               | ⚠️ 冗餘欄位       |
+| `requestDate`         | string                                               | ❌   | 請款日期（固定週四）   |                   |
+| `items`               | PaymentRequestItem[]                                 | ✅   | 請款項目               |                   |
+| `totalAmount`         | number                                               | ✅   | 總金額                 | ⚠️ 應計算而非儲存 |
+| `status`              | `'pending' \| 'processing' \| 'confirmed' \| 'paid'` | ✅   | 狀態                   | ✅ 使用英文       |
+| `note`                | string                                               | ❌   | 備註                   |                   |
+| `isSpecialBilling`    | boolean                                              | ✅   | 是否特殊請款           |                   |
+| `disbursementOrderId` | string                                               | ❌   | 出納單ID               |                   |
+| `createdBy`           | string                                               | ✅   | 建立人                 |                   |
+| `confirmedBy`         | string                                               | ❌   | 確認人                 |                   |
+| `confirmedAt`         | string                                               | ❌   | 確認時間               |                   |
+| `createdAt`           | string                                               | ✅   | 建立時間               |                   |
+| `updatedAt`           | string                                               | ✅   | 更新時間               |                   |
 
 #### 3.3 PaymentRequestItem (請款項目)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `requestId` | string | ✅ | 請款單ID | |
-| `category` | `'住宿' \| '交通' \| '餐食' \| '門票' \| '導遊' \| '其他'` | ✅ | 費用類別 | ⚠️ **中文值** |
-| `supplierId` | string | ✅ | 供應商ID | |
-| `supplierName` | string | ✅ | 供應商名稱 | ⚠️ 冗餘欄位 |
-| `description` | string | ❌ | 項目描述 | |
-| `unitPrice` | number | ✅ | 單價 | |
-| `quantity` | number | ✅ | 數量 | |
-| `subtotal` | number | ✅ | 小計 | ⚠️ 應計算而非儲存 |
-| `note` | string | ❌ | 備註 | |
-| `sortOrder` | number | ✅ | 排序 | |
+| 欄位名稱       | 型別                                                       | 必填 | 說明       | ⚠️ 問題           |
+| -------------- | ---------------------------------------------------------- | ---- | ---------- | ----------------- |
+| `id`           | string                                                     | ✅   | UUID       |                   |
+| `requestId`    | string                                                     | ✅   | 請款單ID   |                   |
+| `category`     | `'住宿' \| '交通' \| '餐食' \| '門票' \| '導遊' \| '其他'` | ✅   | 費用類別   | ⚠️ **中文值**     |
+| `supplierId`   | string                                                     | ✅   | 供應商ID   |                   |
+| `supplierName` | string                                                     | ✅   | 供應商名稱 | ⚠️ 冗餘欄位       |
+| `description`  | string                                                     | ❌   | 項目描述   |                   |
+| `unitPrice`    | number                                                     | ✅   | 單價       |                   |
+| `quantity`     | number                                                     | ✅   | 數量       |                   |
+| `subtotal`     | number                                                     | ✅   | 小計       | ⚠️ 應計算而非儲存 |
+| `note`         | string                                                     | ❌   | 備註       |                   |
+| `sortOrder`    | number                                                     | ✅   | 排序       |                   |
 
 #### 3.4 DisbursementOrder (出納單)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `weekNumber` | string | ✅ | 週次 (2025-W02) | |
-| `weekStartDate` | string | ✅ | 週起始日 | |
-| `weekEndDate` | string | ✅ | 週結束日 | |
-| `thursdayDate` | string | ✅ | 週四出帳日 | |
-| `requestIds` | string[] | ✅ | 包含的請款單ID | |
-| `totalAmount` | number | ✅ | 總金額 | ⚠️ 應計算而非儲存 |
-| `status` | `'draft' \| 'confirmed' \| 'paid'` | ✅ | 狀態 | ✅ 使用英文 |
-| `note` | string | ❌ | 備註 | |
-| `createdBy` | string | ✅ | 建立人 | |
-| `confirmedBy` | string | ❌ | 確認人 | |
-| `confirmedAt` | string | ❌ | 確認時間 | |
-| `paidAt` | string | ❌ | 支付時間 | |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱        | 型別                               | 必填 | 說明            | ⚠️ 問題           |
+| --------------- | ---------------------------------- | ---- | --------------- | ----------------- |
+| `id`            | string                             | ✅   | UUID            |                   |
+| `weekNumber`    | string                             | ✅   | 週次 (2025-W02) |                   |
+| `weekStartDate` | string                             | ✅   | 週起始日        |                   |
+| `weekEndDate`   | string                             | ✅   | 週結束日        |                   |
+| `thursdayDate`  | string                             | ✅   | 週四出帳日      |                   |
+| `requestIds`    | string[]                           | ✅   | 包含的請款單ID  |                   |
+| `totalAmount`   | number                             | ✅   | 總金額          | ⚠️ 應計算而非儲存 |
+| `status`        | `'draft' \| 'confirmed' \| 'paid'` | ✅   | 狀態            | ✅ 使用英文       |
+| `note`          | string                             | ❌   | 備註            |                   |
+| `createdBy`     | string                             | ✅   | 建立人          |                   |
+| `confirmedBy`   | string                             | ❌   | 確認人          |                   |
+| `confirmedAt`   | string                             | ❌   | 確認時間        |                   |
+| `paidAt`        | string                             | ❌   | 支付時間        |                   |
+| `createdAt`     | string                             | ✅   | 建立時間        |                   |
+| `updatedAt`     | string                             | ✅   | 更新時間        |                   |
 
 #### 3.5 資料關聯圖
 
@@ -1997,38 +2061,40 @@ CREATE TABLE quote_versions (
 
 #### 4.1 主要頁面
 
-| 路徑 | 檔案 | 功能 |
-|------|------|------|
-| `/finance` | `src/app/finance/page.tsx` | 財務儀表板 |
-| `/finance/payments` | `src/app/finance/payments/page.tsx` | 收款管理 |
-| `/finance/requests` | `src/app/finance/requests/page.tsx` | 請款管理 |
-| `/finance/treasury/disbursement` | `src/app/finance/treasury/disbursement/page.tsx` | 出納支出 |
-| `/finance/reports` | `src/app/finance/reports/page.tsx` | 財務報表 |
+| 路徑                             | 檔案                                             | 功能       |
+| -------------------------------- | ------------------------------------------------ | ---------- |
+| `/finance`                       | `src/app/finance/page.tsx`                       | 財務儀表板 |
+| `/finance/payments`              | `src/app/finance/payments/page.tsx`              | 收款管理   |
+| `/finance/requests`              | `src/app/finance/requests/page.tsx`              | 請款管理   |
+| `/finance/treasury/disbursement` | `src/app/finance/treasury/disbursement/page.tsx` | 出納支出   |
+| `/finance/reports`               | `src/app/finance/reports/page.tsx`               | 財務報表   |
 
 #### 4.2 關鍵組件邏輯
 
 **收款模式（Payments）：**
+
 ```typescript
 // 模式 1: 單一訂單多付款
 interface PaymentItem {
-  paymentMethod: '現金' | '匯款' | '刷卡' | '支票';  // ⚠️ 中文
-  amount: number;
-  transactionDate: string;
+  paymentMethod: '現金' | '匯款' | '刷卡' | '支票' // ⚠️ 中文
+  amount: number
+  transactionDate: string
   // 根據付款方式動態欄位
-  handlerName?: string;      // 現金
-  accountInfo?: string;       // 匯款
-  cardLastFour?: string;      // 刷卡
-  checkNumber?: string;       // 支票
+  handlerName?: string // 現金
+  accountInfo?: string // 匯款
+  cardLastFour?: string // 刷卡
+  checkNumber?: string // 支票
 }
 
 // 模式 2: 批量分配多訂單
 interface OrderAllocation {
-  orderId: string;
-  allocatedAmount: number;
+  orderId: string
+  allocatedAmount: number
 }
 ```
 
 **請款週四邏輯（Requests）：**
+
 ```typescript
 // 生成接下來 8 週的週四日期
 const upcomingThursdays = useMemo(() => {
@@ -2047,7 +2113,7 @@ const upcomingThursdays = useMemo(() => {
     thursdayDate.setDate(today.getDate() + daysUntilThursday + i * 7)
     thursdays.push({
       value: thursdayDate.toISOString().split('T')[0],
-      label: `${thursdayDate.toLocaleDateString('zh-TW')} (${thursdayDate.toLocaleDateString('zh-TW', { weekday: 'short' })})`
+      label: `${thursdayDate.toLocaleDateString('zh-TW')} (${thursdayDate.toLocaleDateString('zh-TW', { weekday: 'short' })})`,
     })
   }
 
@@ -2067,51 +2133,55 @@ const upcomingThursdays = useMemo(() => {
 export const usePayments = () => {
   // === PaymentRequest 相關 ===
   const createPaymentRequest = async (data: Partial<PaymentRequest>) => {
-    const requestNumber = generateRequestNumber();
+    const requestNumber = generateRequestNumber()
     // ...
-  };
+  }
 
   const updatePaymentRequest = async (id: string, updates: Partial<PaymentRequest>) => {
     // ...
-  };
+  }
 
   const deletePaymentRequest = async (id: string) => {
     // ...
-  };
+  }
 
   // 從報價單建立請款單
   const createFromQuote = async (tourId: string, quoteId: string, requestDate?: string) => {
     // 讀取 Quote 資料
     // 轉換為 PaymentRequest
-  };
+  }
 
   // === PaymentRequestItem 相關 ===
   const addPaymentItem = async (requestId: string, item: Partial<PaymentRequestItem>) => {
     // ...
-  };
+  }
 
-  const updatePaymentItem = async (requestId: string, itemId: string, updates: Partial<PaymentRequestItem>) => {
+  const updatePaymentItem = async (
+    requestId: string,
+    itemId: string,
+    updates: Partial<PaymentRequestItem>
+  ) => {
     // ...
-  };
+  }
 
   const deletePaymentItem = async (requestId: string, itemId: string) => {
     // ...
-  };
+  }
 
   // === DisbursementOrder 相關 ===
   const createDisbursementOrder = async (weekNumber: string, requestIds: string[]) => {
     // ...
-  };
+  }
 
   const confirmDisbursementOrder = async (id: string, confirmedBy: string) => {
     // ...
-  };
+  }
 
   const getCurrentWeekDisbursementOrder = () => {
     // 取得本週出納單
-    const weekNumber = format(new Date(), 'yyyy-\'W\'II');
-    return disbursementOrders.find(order => order.weekNumber === weekNumber);
-  };
+    const weekNumber = format(new Date(), "yyyy-'W'II")
+    return disbursementOrders.find(order => order.weekNumber === weekNumber)
+  }
 
   return {
     // PaymentRequest
@@ -2131,8 +2201,8 @@ export const usePayments = () => {
     createDisbursementOrder,
     confirmDisbursementOrder,
     getCurrentWeekDisbursementOrder,
-  };
-};
+  }
+}
 ```
 
 #### 5.2 Service Layer
@@ -2143,33 +2213,33 @@ export const usePayments = () => {
 class PaymentService {
   // 生成請款單號 (REQ-2025001)
   generateRequestNumber(): string {
-    const year = new Date().getFullYear();
-    const count = this.paymentRequests.length + 1;
-    return `REQ-${year}${count.toString().padStart(3, '0')}`;
+    const year = new Date().getFullYear()
+    const count = this.paymentRequests.length + 1
+    return `REQ-${year}${count.toString().padStart(3, '0')}`
   }
 
   // 取得下一個週四
   getNextThursday(): string {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    let daysUntilThursday = (4 - dayOfWeek + 7) % 7;
+    const today = new Date()
+    const dayOfWeek = today.getDay()
+    let daysUntilThursday = (4 - dayOfWeek + 7) % 7
 
     if (daysUntilThursday === 0 && today.getHours() >= 12) {
-      daysUntilThursday = 7; // 今天週四過中午，取下週四
+      daysUntilThursday = 7 // 今天週四過中午，取下週四
     }
 
-    const nextThursday = new Date(today);
-    nextThursday.setDate(today.getDate() + daysUntilThursday);
-    return nextThursday.toISOString().split('T')[0];
+    const nextThursday = new Date(today)
+    nextThursday.setDate(today.getDate() + daysUntilThursday)
+    return nextThursday.toISOString().split('T')[0]
   }
 
   // 從報價單創建請款單
   async createFromQuote(tourId: string, quoteId: string, requestDate?: string) {
-    const quote = await quoteService.getById(quoteId);
-    if (!quote) throw new Error('報價單不存在');
+    const quote = await quoteService.getById(quoteId)
+    if (!quote) throw new Error('報價單不存在')
 
     // 轉換 Quote 的 categories 為 PaymentRequestItems
-    const items: PaymentRequestItem[] = [];
+    const items: PaymentRequestItem[] = []
     quote.categories.forEach(category => {
       category.items.forEach(quoteItem => {
         items.push({
@@ -2184,9 +2254,9 @@ class PaymentService {
           subtotal: quoteItem.total,
           note: '',
           sortOrder: items.length + 1,
-        });
-      });
-    });
+        })
+      })
+    })
 
     // 創建 PaymentRequest
     const request: PaymentRequest = {
@@ -2203,20 +2273,20 @@ class PaymentService {
       createdBy: '1', // 模擬
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    };
+    }
 
-    return this.paymentRequestStore.add(request);
+    return this.paymentRequestStore.add(request)
   }
 
   // 驗證請款單
   validate(data: Partial<PaymentRequest>): string[] {
-    const errors: string[] = [];
+    const errors: string[] = []
 
-    if (!data.tourId) errors.push('必須選擇旅遊團');
-    if (!data.items || data.items.length === 0) errors.push('必須至少有一個請款項目');
-    if (data.totalAmount && data.totalAmount <= 0) errors.push('總金額必須大於 0');
+    if (!data.tourId) errors.push('必須選擇旅遊團')
+    if (!data.items || data.items.length === 0) errors.push('必須至少有一個請款項目')
+    if (data.totalAmount && data.totalAmount <= 0) errors.push('總金額必須大於 0')
 
-    return errors;
+    return errors
   }
 }
 ```
@@ -2228,17 +2298,17 @@ class PaymentService {
 ```typescript
 // Store 結構（由 createStore 生成）
 interface PaymentStore {
-  items: Payment[];
-  add: (item: Payment) => Promise<Payment>;
-  update: (id: string, updates: Partial<Payment>) => Promise<void>;
-  remove: (id: string) => Promise<void>;
-  getById: (id: string) => Payment | undefined;
+  items: Payment[]
+  add: (item: Payment) => Promise<Payment>
+  update: (id: string, updates: Partial<Payment>) => Promise<void>
+  remove: (id: string) => Promise<void>
+  getById: (id: string) => Payment | undefined
 }
 
 // 儲存到 IndexedDB
-const usePaymentStore = createStore<Payment>('payments', 'payment_');
-const usePaymentRequestStore = createStore<PaymentRequest>('paymentRequests', 'req_');
-const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursementOrders', 'disb_');
+const usePaymentStore = createStore<Payment>('payments', 'payment_')
+const usePaymentRequestStore = createStore<PaymentRequest>('paymentRequests', 'req_')
+const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursementOrders', 'disb_')
 ```
 
 ---
@@ -2247,43 +2317,43 @@ const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursementOr
 
 #### 6.1 收款 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/payments` | 取得收款列表 | Query: `?orderId=xxx&status=xxx` | `{ data: Payment[] }` |
-| `POST` | `/api/payments` | 新增收款記錄 | `Payment` | `{ data: Payment }` |
-| `PUT` | `/api/payments/:id` | 更新收款記錄 | `Partial<Payment>` | `{ data: Payment }` |
-| `DELETE` | `/api/payments/:id` | 刪除收款記錄 | - | `{ success: true }` |
+| 方法     | 端點                | 說明         | Request Body                     | Response              |
+| -------- | ------------------- | ------------ | -------------------------------- | --------------------- |
+| `GET`    | `/api/payments`     | 取得收款列表 | Query: `?orderId=xxx&status=xxx` | `{ data: Payment[] }` |
+| `POST`   | `/api/payments`     | 新增收款記錄 | `Payment`                        | `{ data: Payment }`   |
+| `PUT`    | `/api/payments/:id` | 更新收款記錄 | `Partial<Payment>`               | `{ data: Payment }`   |
+| `DELETE` | `/api/payments/:id` | 刪除收款記錄 | -                                | `{ success: true }`   |
 
 #### 6.2 請款 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/payment-requests` | 取得請款單列表 | Query: `?tourId=xxx&status=xxx` | `{ data: PaymentRequest[] }` |
-| `GET` | `/api/payment-requests/:id` | 取得請款單詳情 | - | `{ data: PaymentRequest }` |
-| `POST` | `/api/payment-requests` | 新增請款單 | `PaymentRequest` | `{ data: PaymentRequest }` |
-| `POST` | `/api/payment-requests/from-quote` | 從報價單建立請款單 | `{ tourId, quoteId, requestDate? }` | `{ data: PaymentRequest }` |
-| `PUT` | `/api/payment-requests/:id` | 更新請款單 | `Partial<PaymentRequest>` | `{ data: PaymentRequest }` |
-| `DELETE` | `/api/payment-requests/:id` | 刪除請款單 | - | `{ success: true }` |
+| 方法     | 端點                               | 說明               | Request Body                        | Response                     |
+| -------- | ---------------------------------- | ------------------ | ----------------------------------- | ---------------------------- |
+| `GET`    | `/api/payment-requests`            | 取得請款單列表     | Query: `?tourId=xxx&status=xxx`     | `{ data: PaymentRequest[] }` |
+| `GET`    | `/api/payment-requests/:id`        | 取得請款單詳情     | -                                   | `{ data: PaymentRequest }`   |
+| `POST`   | `/api/payment-requests`            | 新增請款單         | `PaymentRequest`                    | `{ data: PaymentRequest }`   |
+| `POST`   | `/api/payment-requests/from-quote` | 從報價單建立請款單 | `{ tourId, quoteId, requestDate? }` | `{ data: PaymentRequest }`   |
+| `PUT`    | `/api/payment-requests/:id`        | 更新請款單         | `Partial<PaymentRequest>`           | `{ data: PaymentRequest }`   |
+| `DELETE` | `/api/payment-requests/:id`        | 刪除請款單         | -                                   | `{ success: true }`          |
 
 #### 6.3 出納 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/disbursement-orders` | 取得出納單列表 | Query: `?weekNumber=xxx&status=xxx` | `{ data: DisbursementOrder[] }` |
-| `GET` | `/api/disbursement-orders/current-week` | 取得本週出納單 | - | `{ data: DisbursementOrder }` |
-| `POST` | `/api/disbursement-orders` | 新增出納單 | `{ weekNumber, requestIds[] }` | `{ data: DisbursementOrder }` |
-| `POST` | `/api/disbursement-orders/:id/confirm` | 確認出納單 | `{ confirmedBy }` | `{ data: DisbursementOrder }` |
+| 方法   | 端點                                    | 說明           | Request Body                        | Response                        |
+| ------ | --------------------------------------- | -------------- | ----------------------------------- | ------------------------------- |
+| `GET`  | `/api/disbursement-orders`              | 取得出納單列表 | Query: `?weekNumber=xxx&status=xxx` | `{ data: DisbursementOrder[] }` |
+| `GET`  | `/api/disbursement-orders/current-week` | 取得本週出納單 | -                                   | `{ data: DisbursementOrder }`   |
+| `POST` | `/api/disbursement-orders`              | 新增出納單     | `{ weekNumber, requestIds[] }`      | `{ data: DisbursementOrder }`   |
+| `POST` | `/api/disbursement-orders/:id/confirm`  | 確認出納單     | `{ confirmedBy }`                   | `{ data: DisbursementOrder }`   |
 
 ---
 
 ### 7. 權限控制
 
-| 角色 | 收款管理 | 請款管理 | 出納管理 | 財務報表 |
-|------|---------|---------|---------|---------|
-| **管理員** | ✅ 完整權限 | ✅ 完整權限 | ✅ 完整權限 | ✅ 完整權限 |
-| **財務人員** | ✅ 新增/查看/修改 | ✅ 新增/查看/修改 | ✅ 新增/查看 | ✅ 查看 |
-| **會計人員** | ✅ 查看 | ✅ 查看 | ✅ 確認/支付 | ✅ 完整權限 |
-| **業務人員** | ❌ 無 | ✅ 查看自己的 | ❌ 無 | ❌ 無 |
+| 角色         | 收款管理          | 請款管理          | 出納管理     | 財務報表    |
+| ------------ | ----------------- | ----------------- | ------------ | ----------- |
+| **管理員**   | ✅ 完整權限       | ✅ 完整權限       | ✅ 完整權限  | ✅ 完整權限 |
+| **財務人員** | ✅ 新增/查看/修改 | ✅ 新增/查看/修改 | ✅ 新增/查看 | ✅ 查看     |
+| **會計人員** | ✅ 查看           | ✅ 查看           | ✅ 確認/支付 | ✅ 完整權限 |
+| **業務人員** | ❌ 無             | ✅ 查看自己的     | ❌ 無        | ❌ 無       |
 
 ---
 
@@ -2292,6 +2362,7 @@ const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursementOr
 #### 8.1 欄位命名問題
 
 ❌ **Payment 使用中文值**
+
 ```typescript
 // 現狀
 type: '收款' | '請款' | '出納'
@@ -2303,6 +2374,7 @@ status: 'pending' | 'confirmed' | 'completed'
 ```
 
 ❌ **PaymentRequestItem category 使用中文**
+
 ```typescript
 // 現狀
 category: '住宿' | '交通' | '餐食' | '門票' | '導遊' | '其他'
@@ -2312,6 +2384,7 @@ category: 'accommodation' | 'transport' | 'meals' | 'tickets' | 'guide' | 'other
 ```
 
 ❌ **Payment Method 使用中文**
+
 ```typescript
 // 現狀 (UI 層面)
 paymentMethod: '現金' | '匯款' | '刷卡' | '支票'
@@ -2323,45 +2396,49 @@ paymentMethod: 'cash' | 'transfer' | 'card' | 'check'
 #### 8.2 冗餘欄位問題
 
 ⚠️ **PaymentRequest 儲存 Tour 和 Order 的名稱**
+
 ```typescript
 interface PaymentRequest {
-  tourId: string;
-  tourName: string;  // ❌ 應從 Tour 查詢
-  code: string;      // ❌ 應從 Tour 查詢
-  orderId?: string;
-  orderNumber?: string;  // ❌ 應從 Order 查詢
+  tourId: string
+  tourName: string // ❌ 應從 Tour 查詢
+  code: string // ❌ 應從 Tour 查詢
+  orderId?: string
+  orderNumber?: string // ❌ 應從 Order 查詢
 }
 ```
 
 ⚠️ **PaymentRequestItem 儲存 supplierName**
+
 ```typescript
 interface PaymentRequestItem {
-  supplierId: string;
-  supplierName: string;  // ❌ 應從 Supplier 查詢
+  supplierId: string
+  supplierName: string // ❌ 應從 Supplier 查詢
 }
 ```
 
 #### 8.3 資料計算問題
 
 ⚠️ **儲存計算結果而非動態計算**
+
 ```typescript
 // 現狀
 interface PaymentRequest {
-  totalAmount: number;  // ❌ 應由 items.reduce((sum, item) => sum + item.subtotal, 0) 計算
+  totalAmount: number // ❌ 應由 items.reduce((sum, item) => sum + item.subtotal, 0) 計算
 }
 
 interface PaymentRequestItem {
-  subtotal: number;  // ❌ 應由 unitPrice * quantity 計算
+  subtotal: number // ❌ 應由 unitPrice * quantity 計算
 }
 
 interface DisbursementOrder {
-  totalAmount: number;  // ❌ 應由關聯的 PaymentRequest 加總
+  totalAmount: number // ❌ 應由關聯的 PaymentRequest 加總
 }
 ```
 
 #### 8.4 Service 層邏輯問題
 
 ❌ **createFromQuote 需要映射中文類別**
+
 ```typescript
 // src/features/payments/services/payment.service.ts
 mapCategoryToChinese(name: string): PaymentRequestItem['category'] {
@@ -2379,10 +2456,11 @@ mapCategoryToChinese(name: string): PaymentRequestItem['category'] {
 #### 8.5 缺少關鍵欄位
 
 ❌ **Payment 缺少 paymentMethod**
+
 ```typescript
 // 現狀
 interface Payment {
-  type: '收款' | '請款' | '出納';
+  type: '收款' | '請款' | '出納'
   // ❌ 缺少 paymentMethod: 'cash' | 'transfer' | 'card' | 'check'
 }
 
@@ -2412,30 +2490,30 @@ interface Payment {
 #### 9.2 P1 - 應該修正（影響可維護性）
 
 4. **移除冗餘欄位**
+
    ```typescript
    // 修改 PaymentRequest interface
    interface PaymentRequest {
-     tourId: string;
+     tourId: string
      // ❌ 移除 tourName, code
-     orderId?: string;
+     orderId?: string
      // ❌ 移除 orderNumber
    }
 
    // 修改 PaymentRequestItem interface
    interface PaymentRequestItem {
-     supplierId: string;
+     supplierId: string
      // ❌ 移除 supplierName
    }
    ```
 
 5. **改為動態計算欄位**
+
    ```typescript
    // 修改 Service 層
    class PaymentService {
      getTotalAmount(request: PaymentRequest): number {
-       return request.items.reduce((sum, item) =>
-         sum + (item.unitPrice * item.quantity), 0
-       );
+       return request.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
      }
    }
    ```
@@ -2443,15 +2521,15 @@ interface Payment {
 6. **Payment interface 補充 paymentMethod**
    ```typescript
    interface Payment {
-     id: string;
-     orderId: string;
-     amount: number;
-     type: 'receipt' | 'request' | 'disbursement';
-     status: 'pending' | 'confirmed' | 'completed';
-     paymentMethod?: 'cash' | 'transfer' | 'card' | 'check';  // ✅ 新增
-     description?: string;
-     createdAt: string;
-     updatedAt: string;
+     id: string
+     orderId: string
+     amount: number
+     type: 'receipt' | 'request' | 'disbursement'
+     status: 'pending' | 'confirmed' | 'completed'
+     paymentMethod?: 'cash' | 'transfer' | 'card' | 'check' // ✅ 新增
+     description?: string
+     createdAt: string
+     updatedAt: string
    }
    ```
 
@@ -2462,11 +2540,12 @@ interface Payment {
    - `Payment` 保持簡潔，只存核心資料
 
 8. **建立 Enum 統一管理**
+
    ```typescript
    export enum PaymentType {
      RECEIPT = 'receipt',
      REQUEST = 'request',
-     DISBURSEMENT = 'disbursement'
+     DISBURSEMENT = 'disbursement',
    }
 
    export enum PaymentCategory {
@@ -2475,7 +2554,7 @@ interface Payment {
      MEALS = 'meals',
      TICKETS = 'tickets',
      GUIDE = 'guide',
-     OTHER = 'other'
+     OTHER = 'other',
    }
    ```
 
@@ -2591,19 +2670,21 @@ CREATE INDEX idx_disbursement_orders_week_number ON disbursement_orders(week_num
 
 ### 1. 基本資訊
 
-| 項目 | 內容 |
-|------|------|
-| **路徑** | `/accounting` |
-| **狀態** | ✅ 已實作 - 個人記帳系統 |
-| **開發階段** | Phase 1 (IndexedDB) |
-| **最後更新** | 2025-01-06 |
+| 項目         | 內容                     |
+| ------------ | ------------------------ |
+| **路徑**     | `/accounting`            |
+| **狀態**     | ✅ 已實作 - 個人記帳系統 |
+| **開發階段** | Phase 1 (IndexedDB)      |
+| **最後更新** | 2025-01-06               |
 
 ### 2. 功能說明
 
 #### 2.1 用途
+
 **個人記帳系統** - 管理個人帳戶、交易記錄、預算設定，提供快速記帳與財務統計功能。
 
 #### 2.2 使用者
+
 - **個人用戶** - 日常記帳、追蹤支出
 - **財務人員** - 個人財務管理、預算控制
 - **所有員工** - 個人費用追蹤
@@ -2611,6 +2692,7 @@ CREATE INDEX idx_disbursement_orders_week_number ON disbursement_orders(week_num
 #### 2.3 業務流程
 
 **核心流程：**
+
 ```
 帳戶管理 (Accounts) ─┐
                     ├──> 交易記錄 (Transactions) ──> 統計分析 (Stats)
@@ -2619,6 +2701,7 @@ CREATE INDEX idx_disbursement_orders_week_number ON disbursement_orders(week_num
 ```
 
 **功能模組：**
+
 - **帳戶管理** - 現金、銀行、信用卡帳戶
 - **交易記錄** - 收入、支出、轉帳
 - **分類管理** - 自訂收支分類
@@ -2631,75 +2714,76 @@ CREATE INDEX idx_disbursement_orders_week_number ON disbursement_orders(week_num
 
 #### 3.1 Account (帳戶)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `name` | string | ✅ | 帳戶名稱 | |
-| `type` | `'cash' \| 'credit' \| 'bank'` | ✅ | 帳戶類型 | ✅ 使用英文 |
-| `balance` | number | ✅ | 餘額 | |
-| `currency` | string | ✅ | 幣別 (TWD, USD) | |
-| `description` | string | ❌ | 描述 | |
-| `creditLimit` | number | ❌ | 信用額度（信用卡用） | |
-| `availableCredit` | number | ❌ | 可用額度 | ⚠️ 應計算而非儲存 |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱          | 型別                           | 必填 | 說明                 | ⚠️ 問題           |
+| ----------------- | ------------------------------ | ---- | -------------------- | ----------------- |
+| `id`              | string                         | ✅   | UUID                 |                   |
+| `name`            | string                         | ✅   | 帳戶名稱             |                   |
+| `type`            | `'cash' \| 'credit' \| 'bank'` | ✅   | 帳戶類型             | ✅ 使用英文       |
+| `balance`         | number                         | ✅   | 餘額                 |                   |
+| `currency`        | string                         | ✅   | 幣別 (TWD, USD)      |                   |
+| `description`     | string                         | ❌   | 描述                 |                   |
+| `creditLimit`     | number                         | ❌   | 信用額度（信用卡用） |                   |
+| `availableCredit` | number                         | ❌   | 可用額度             | ⚠️ 應計算而非儲存 |
+| `createdAt`       | string                         | ✅   | 建立時間             |                   |
+| `updatedAt`       | string                         | ✅   | 更新時間             |                   |
 
 #### 3.2 Transaction (交易記錄)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `accountId` | string | ✅ | 來源帳戶ID | |
-| `toAccountId` | string | ❌ | 目標帳戶ID（轉帳用） | |
-| `type` | `'income' \| 'expense' \| 'transfer'` | ✅ | 交易類型 | ✅ 使用英文 |
-| `categoryId` | string | ✅ | 分類ID | |
-| `amount` | number | ✅ | 金額 | |
-| `description` | string | ✅ | 描述 | |
-| `date` | string | ✅ | 交易日期 (YYYY-MM-DD) | |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱      | 型別                                  | 必填 | 說明                  | ⚠️ 問題     |
+| ------------- | ------------------------------------- | ---- | --------------------- | ----------- |
+| `id`          | string                                | ✅   | UUID                  |             |
+| `accountId`   | string                                | ✅   | 來源帳戶ID            |             |
+| `toAccountId` | string                                | ❌   | 目標帳戶ID（轉帳用）  |             |
+| `type`        | `'income' \| 'expense' \| 'transfer'` | ✅   | 交易類型              | ✅ 使用英文 |
+| `categoryId`  | string                                | ✅   | 分類ID                |             |
+| `amount`      | number                                | ✅   | 金額                  |             |
+| `description` | string                                | ✅   | 描述                  |             |
+| `date`        | string                                | ✅   | 交易日期 (YYYY-MM-DD) |             |
+| `createdAt`   | string                                | ✅   | 建立時間              |             |
+| `updatedAt`   | string                                | ✅   | 更新時間              |             |
 
 **缺少欄位：**
+
 - ❌ 缺少 `currency`: 交易幣別
 - ❌ 缺少 `accountName`, `categoryName`: 冗餘欄位（用於顯示）
 
 #### 3.3 Category (分類)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `name` | string | ✅ | 分類名稱 | |
-| `type` | `'income' \| 'expense'` | ✅ | 分類類型 | ✅ 使用英文 |
-| `parent` | string | ❌ | 父分類ID | |
-| `color` | string | ❌ | 顏色 (#HEX) | |
-| `icon` | string | ❌ | 圖示名稱 | |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱    | 型別                    | 必填 | 說明        | ⚠️ 問題     |
+| ----------- | ----------------------- | ---- | ----------- | ----------- |
+| `id`        | string                  | ✅   | UUID        |             |
+| `name`      | string                  | ✅   | 分類名稱    |             |
+| `type`      | `'income' \| 'expense'` | ✅   | 分類類型    | ✅ 使用英文 |
+| `parent`    | string                  | ❌   | 父分類ID    |             |
+| `color`     | string                  | ❌   | 顏色 (#HEX) |             |
+| `icon`      | string                  | ❌   | 圖示名稱    |             |
+| `createdAt` | string                  | ✅   | 建立時間    |             |
+| `updatedAt` | string                  | ✅   | 更新時間    |             |
 
 #### 3.4 Budget (預算)
 
-| 欄位名稱 | 型別 | 必填 | 說明 | ⚠️ 問題 |
-|---------|------|------|------|---------|
-| `id` | string | ✅ | UUID | |
-| `categoryId` | string | ✅ | 分類ID | |
-| `amount` | number | ✅ | 預算金額 | |
-| `period` | `'monthly' \| 'yearly'` | ✅ | 週期 | ✅ 使用英文 |
-| `startDate` | string | ✅ | 開始日期 | |
-| `endDate` | string | ❌ | 結束日期 | |
-| `createdAt` | string | ✅ | 建立時間 | |
-| `updatedAt` | string | ✅ | 更新時間 | |
+| 欄位名稱     | 型別                    | 必填 | 說明     | ⚠️ 問題     |
+| ------------ | ----------------------- | ---- | -------- | ----------- |
+| `id`         | string                  | ✅   | UUID     |             |
+| `categoryId` | string                  | ✅   | 分類ID   |             |
+| `amount`     | number                  | ✅   | 預算金額 |             |
+| `period`     | `'monthly' \| 'yearly'` | ✅   | 週期     | ✅ 使用英文 |
+| `startDate`  | string                  | ✅   | 開始日期 |             |
+| `endDate`    | string                  | ❌   | 結束日期 |             |
+| `createdAt`  | string                  | ✅   | 建立時間 |             |
+| `updatedAt`  | string                  | ✅   | 更新時間 |             |
 
 #### 3.5 AccountingStats (統計資料)
 
-| 欄位名稱 | 型別 | 說明 |
-|---------|------|------|
-| `totalAssets` | number | 總資產 |
-| `totalIncome` | number | 總收入 |
-| `totalExpense` | number | 總支出 |
-| `monthlyIncome` | number | 本月收入 |
-| `monthlyExpense` | number | 本月支出 |
-| `netWorth` | number | 淨值 |
-| `categoryBreakdown` | Array | 分類統計 |
+| 欄位名稱            | 型別   | 說明     |
+| ------------------- | ------ | -------- |
+| `totalAssets`       | number | 總資產   |
+| `totalIncome`       | number | 總收入   |
+| `totalExpense`      | number | 總支出   |
+| `monthlyIncome`     | number | 本月收入 |
+| `monthlyExpense`    | number | 本月支出 |
+| `netWorth`          | number | 淨值     |
+| `categoryBreakdown` | Array  | 分類統計 |
 
 **⚠️ 全部為動態計算欄位，不應儲存於資料庫**
 
@@ -2732,79 +2816,81 @@ CREATE INDEX idx_disbursement_orders_week_number ON disbursement_orders(week_num
 
 #### 4.1 主要頁面
 
-| 路徑 | 檔案 | 功能 |
-|------|------|------|
+| 路徑          | 檔案                          | 功能                            |
+| ------------- | ----------------------------- | ------------------------------- |
 | `/accounting` | `src/app/accounting/page.tsx` | 記帳主頁（總覽/交易/帳戶/設定） |
 
 #### 4.2 組件清單
 
-| 組件 | 檔案 | 功能 |
-|------|------|------|
-| AccountsOverview | `src/components/accounting/accounts-overview.tsx` | 帳戶總覽卡片 |
-| AccountsManagement | `src/components/accounting/accounts-management.tsx` | 帳戶管理列表 |
-| TransactionList | `src/components/accounting/transaction-list.tsx` | 交易記錄列表 |
-| AddAccountDialog | `src/components/accounting/add-account-dialog.tsx` | 新增帳戶對話框 |
+| 組件                 | 檔案                                                   | 功能           |
+| -------------------- | ------------------------------------------------------ | -------------- |
+| AccountsOverview     | `src/components/accounting/accounts-overview.tsx`      | 帳戶總覽卡片   |
+| AccountsManagement   | `src/components/accounting/accounts-management.tsx`    | 帳戶管理列表   |
+| TransactionList      | `src/components/accounting/transaction-list.tsx`       | 交易記錄列表   |
+| AddAccountDialog     | `src/components/accounting/add-account-dialog.tsx`     | 新增帳戶對話框 |
 | AddTransactionDialog | `src/components/accounting/add-transaction-dialog.tsx` | 新增交易對話框 |
 
 #### 4.3 關鍵功能邏輯
 
 **快速記帳：**
+
 ```typescript
 const handleQuickTransaction = useCallback(async () => {
-  if (!quickAmount || !quickCategory || !quickAccount) return;
+  if (!quickAmount || !quickCategory || !quickAccount) return
 
-  const categoryData = categories.find(c => c.id === quickCategory);
-  const accountData = accounts.find(a => a.id === quickAccount);
+  const categoryData = categories.find(c => c.id === quickCategory)
+  const accountData = accounts.find(a => a.id === quickAccount)
 
-  if (!categoryData || !accountData) return;
+  if (!categoryData || !accountData) return
 
   const transactionData = {
     accountId: quickAccount,
-    accountName: accountData.name,  // ⚠️ 冗餘欄位
+    accountName: accountData.name, // ⚠️ 冗餘欄位
     categoryId: quickCategory,
-    categoryName: categoryData.name,  // ⚠️ 冗餘欄位
+    categoryName: categoryData.name, // ⚠️ 冗餘欄位
     type: 'expense' as const,
     amount: parseFloat(quickAmount),
     currency: 'TWD',
     description: '',
     date: today,
-  };
+  }
 
-  addTransaction(transactionData);
+  addTransaction(transactionData)
   // 清空表單並顯示成功動畫
-}, [quickAmount, quickCategory, quickAccount, categories, accounts, today, addTransaction]);
+}, [quickAmount, quickCategory, quickAccount, categories, accounts, today, addTransaction])
 ```
 
 **餘額自動更新：**
+
 ```typescript
 // src/stores/accounting-store.ts
 updateAccountBalances: (transaction: Transaction) => {
-  const { accountId, toAccountId, type, amount } = transaction;
+  const { accountId, toAccountId, type, amount } = transaction
 
   if (type === 'expense') {
     // 支出：扣款
-    const account = get().accounts.find(a => a.id === accountId);
+    const account = get().accounts.find(a => a.id === accountId)
     if (account) {
-      get().updateAccount(accountId, { balance: account.balance - amount });
+      get().updateAccount(accountId, { balance: account.balance - amount })
     }
   } else if (type === 'income') {
     // 收入：入帳
-    const account = get().accounts.find(a => a.id === accountId);
+    const account = get().accounts.find(a => a.id === accountId)
     if (account) {
-      get().updateAccount(accountId, { balance: account.balance + amount });
+      get().updateAccount(accountId, { balance: account.balance + amount })
     }
   } else if (type === 'transfer') {
     // 轉帳：from 扣款，to 入帳
-    const fromAccount = get().accounts.find(a => a.id === accountId);
-    const toAccount = get().accounts.find(a => a.id === toAccountId);
+    const fromAccount = get().accounts.find(a => a.id === accountId)
+    const toAccount = get().accounts.find(a => a.id === toAccountId)
     if (fromAccount) {
-      get().updateAccount(accountId, { balance: fromAccount.balance - amount });
+      get().updateAccount(accountId, { balance: fromAccount.balance - amount })
     }
     if (toAccount) {
-      get().updateAccount(toAccountId, { balance: toAccount.balance + amount });
+      get().updateAccount(toAccountId, { balance: toAccount.balance + amount })
     }
   }
-};
+}
 ```
 
 ---
@@ -2843,15 +2929,15 @@ export const useAccountingStore = createComplexStore<AccountingEntities>({
     } as AccountingStats,
 
     // 新增交易（覆寫預設的 createTransaction）
-    createTransaction: async (transactionData) => {
+    createTransaction: async transactionData => {
       // 儲存交易
       // 更新帳戶餘額
-      get().updateAccountBalances(transaction);
+      get().updateAccountBalances(transaction)
       // 重新計算統計
-      get().calculateStats();
+      get().calculateStats()
       // 清除快取
-      helpers.clearCache('transactions');
-      helpers.clearCache('accounts');
+      helpers.clearCache('transactions')
+      helpers.clearCache('accounts')
     },
 
     // 更新帳戶餘額
@@ -2861,31 +2947,31 @@ export const useAccountingStore = createComplexStore<AccountingEntities>({
 
     // 計算統計資料
     calculateStats: () => {
-      const { accounts, transactions, categories } = get();
+      const { accounts, transactions, categories } = get()
 
       // 總資產
-      const totalAssets = accounts.reduce((sum, a) => sum + a.balance, 0);
+      const totalAssets = accounts.reduce((sum, a) => sum + a.balance, 0)
 
       // 本月收支
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-      const monthTransactions = transactions.filter(t => t.date >= monthStart);
+      const now = new Date()
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+      const monthTransactions = transactions.filter(t => t.date >= monthStart)
 
       const monthlyIncome = monthTransactions
         .filter(t => t.type === 'income')
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((sum, t) => sum + t.amount, 0)
 
       const monthlyExpense = monthTransactions
         .filter(t => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((sum, t) => sum + t.amount, 0)
 
       // 分類統計
       const categoryBreakdown = categories.map(category => {
         const total = transactions
           .filter(t => t.categoryId === category.id)
-          .reduce((sum, t) => sum + t.amount, 0);
-        return { categoryId: category.id, categoryName: category.name, total };
-      });
+          .reduce((sum, t) => sum + t.amount, 0)
+        return { categoryId: category.id, categoryName: category.name, total }
+      })
 
       set({
         stats: {
@@ -2895,28 +2981,27 @@ export const useAccountingStore = createComplexStore<AccountingEntities>({
           netWorth: totalAssets,
           categoryBreakdown,
           // ...
-        }
-      });
+        },
+      })
     },
 
     // 取得帳戶餘額
     getAccountBalance: (accountId: string) => {
-      const account = get().accounts.find(a => a.id === accountId);
-      return account?.balance || 0;
+      const account = get().accounts.find(a => a.id === accountId)
+      return account?.balance || 0
     },
 
     // 取得分類總額
     getCategoryTotal: (categoryId: string, startDate?: string, endDate?: string) => {
       const transactions = get().transactions.filter(t => {
-        const matchCategory = t.categoryId === categoryId;
-        const matchDate = (!startDate || t.date >= startDate) &&
-                         (!endDate || t.date <= endDate);
-        return matchCategory && matchDate;
-      });
-      return transactions.reduce((sum, t) => sum + t.amount, 0);
+        const matchCategory = t.categoryId === categoryId
+        const matchDate = (!startDate || t.date >= startDate) && (!endDate || t.date <= endDate)
+        return matchCategory && matchDate
+      })
+      return transactions.reduce((sum, t) => sum + t.amount, 0)
     },
   }),
-});
+})
 ```
 
 #### 5.2 Hook Layer
@@ -2925,7 +3010,7 @@ export const useAccountingStore = createComplexStore<AccountingEntities>({
 
 ```typescript
 export const useAccounting = () => {
-  const store = useAccountingStore();
+  const store = useAccountingStore()
 
   return {
     // 資料
@@ -2937,58 +3022,58 @@ export const useAccounting = () => {
 
     // Account 操作
     createAccount: async (data: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return await store.addAccount(data);
+      return await store.addAccount(data)
     },
     updateAccount: async (id: string, data: Partial<Account>) => {
-      return await store.updateAccount(id, data);
+      return await store.updateAccount(id, data)
     },
     deleteAccount: async (id: string) => {
-      return await store.deleteAccount(id);
+      return await store.deleteAccount(id)
     },
     getAccountsByType: (type: Account['type']) => {
-      return accountingService.getAccountsByType(type);
+      return accountingService.getAccountsByType(type)
     },
     getAccountBalance: (accountId: string) => {
-      return accountingService.getAccountBalance(accountId);
+      return accountingService.getAccountBalance(accountId)
     },
 
     // Category 操作
     createCategory: async (data: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return await store.addCategory(data);
+      return await store.addCategory(data)
     },
     getCategoriesByType: (type: Category['type']) => {
-      return categoryService.getCategoriesByType(type);
+      return categoryService.getCategoriesByType(type)
     },
     getCategoryTotal: (categoryId: string, startDate?: string, endDate?: string) => {
-      return accountingService.getCategoryTotal(categoryId, startDate, endDate);
+      return accountingService.getCategoryTotal(categoryId, startDate, endDate)
     },
 
     // Transaction 操作
     createTransaction: (data: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return accountingService.addTransaction(data);
+      return accountingService.addTransaction(data)
     },
     getTransactionsByAccount: (accountId: string) => {
-      return accountingService.getTransactionsByAccount(accountId);
+      return accountingService.getTransactionsByAccount(accountId)
     },
     getTransactionsByDateRange: (startDate: string, endDate: string) => {
-      return accountingService.getTransactionsByDateRange(startDate, endDate);
+      return accountingService.getTransactionsByDateRange(startDate, endDate)
     },
 
     // 統計方法
     calculateStats: () => {
-      accountingService.calculateStats();
+      accountingService.calculateStats()
     },
     getTotalAssets: () => {
-      return accountingService.getTotalAssets();
+      return accountingService.getTotalAssets()
     },
     getMonthlyIncome: () => {
-      return accountingService.getMonthlyIncome();
+      return accountingService.getMonthlyIncome()
     },
     getMonthlyExpense: () => {
-      return accountingService.getMonthlyExpense();
+      return accountingService.getMonthlyExpense()
     },
-  };
-};
+  }
+}
 ```
 
 #### 5.3 Service Layer
@@ -2997,76 +3082,72 @@ export const useAccounting = () => {
 
 ```typescript
 class AccountingService extends BaseService<Account> {
-  protected resourceName = 'accounts';
+  protected resourceName = 'accounts'
 
   protected validate(data: Partial<Account>): void {
     if (data.name && data.name.trim().length === 0) {
-      throw new ValidationError('name', '帳戶名稱不能為空');
+      throw new ValidationError('name', '帳戶名稱不能為空')
     }
     if (data.balance !== undefined && isNaN(data.balance)) {
-      throw new ValidationError('balance', '餘額格式錯誤');
+      throw new ValidationError('balance', '餘額格式錯誤')
     }
   }
 
   // 業務邏輯方法
   getAccountBalance(accountId: string): number {
-    const store = useAccountingStore.getState();
-    return store.getAccountBalance(accountId);
+    const store = useAccountingStore.getState()
+    return store.getAccountBalance(accountId)
   }
 
   getCategoryTotal(categoryId: string, startDate?: string, endDate?: string): number {
-    const store = useAccountingStore.getState();
-    return store.getCategoryTotal(categoryId, startDate, endDate);
+    const store = useAccountingStore.getState()
+    return store.getCategoryTotal(categoryId, startDate, endDate)
   }
 
   calculateStats(): void {
-    const store = useAccountingStore.getState();
-    store.calculateStats();
+    const store = useAccountingStore.getState()
+    store.calculateStats()
   }
 
   getAccountsByType(type: Account['type']): Account[] {
-    const store = useAccountingStore.getState();
-    return store.accounts.filter(a => a.type === type);
+    const store = useAccountingStore.getState()
+    return store.accounts.filter(a => a.type === type)
   }
 
   // Transaction 相關
   addTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>): string {
-    const store = useAccountingStore.getState();
-    return store.addTransaction(transaction);
+    const store = useAccountingStore.getState()
+    return store.addTransaction(transaction)
   }
 
   getTransactionsByAccount(accountId: string): Transaction[] {
-    const store = useAccountingStore.getState();
-    return store.transactions.filter(t =>
-      t.accountId === accountId || t.toAccountId === accountId
-    );
+    const store = useAccountingStore.getState()
+    return store.transactions.filter(t => t.accountId === accountId || t.toAccountId === accountId)
   }
 
   getTransactionsByDateRange(startDate: string, endDate: string): Transaction[] {
-    const store = useAccountingStore.getState();
-    return store.transactions.filter(t =>
-      t.date >= startDate && t.date <= endDate
-    );
+    const store = useAccountingStore.getState()
+    return store.transactions.filter(t => t.date >= startDate && t.date <= endDate)
   }
 }
 
 class CategoryService extends BaseService<Category> {
-  protected resourceName = 'categories';
+  protected resourceName = 'categories'
 
   protected validate(data: Partial<Category>): void {
     if (data.name && data.name.trim().length === 0) {
-      throw new ValidationError('name', '分類名稱不能為空');
+      throw new ValidationError('name', '分類名稱不能為空')
     }
   }
 
   getCategoriesByType(type: Category['type']): Category[] {
-    const store = useAccountingStore.getState();
-    return store.categories.filter(c => c.type === type);
+    const store = useAccountingStore.getState()
+    return store.categories.filter(c => c.type === type)
   }
 }
 
-export const accountingService = new AccountingService();
-export const categoryService = new CategoryService();
+export const accountingService = new AccountingService()
+export const categoryService = new CategoryService()
 ```
 
 ---
@@ -3075,49 +3156,49 @@ export const categoryService = new CategoryService();
 
 #### 6.1 帳戶 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/accounts` | 取得帳戶列表 | Query: `?type=xxx` | `{ data: Account[] }` |
-| `GET` | `/api/accounts/:id` | 取得帳戶詳情 | - | `{ data: Account }` |
-| `POST` | `/api/accounts` | 新增帳戶 | `Account` | `{ data: Account }` |
-| `PUT` | `/api/accounts/:id` | 更新帳戶 | `Partial<Account>` | `{ data: Account }` |
-| `DELETE` | `/api/accounts/:id` | 刪除帳戶 | - | `{ success: true }` |
-| `GET` | `/api/accounts/:id/balance` | 取得帳戶餘額 | - | `{ balance: number }` |
+| 方法     | 端點                        | 說明         | Request Body       | Response              |
+| -------- | --------------------------- | ------------ | ------------------ | --------------------- |
+| `GET`    | `/api/accounts`             | 取得帳戶列表 | Query: `?type=xxx` | `{ data: Account[] }` |
+| `GET`    | `/api/accounts/:id`         | 取得帳戶詳情 | -                  | `{ data: Account }`   |
+| `POST`   | `/api/accounts`             | 新增帳戶     | `Account`          | `{ data: Account }`   |
+| `PUT`    | `/api/accounts/:id`         | 更新帳戶     | `Partial<Account>` | `{ data: Account }`   |
+| `DELETE` | `/api/accounts/:id`         | 刪除帳戶     | -                  | `{ success: true }`   |
+| `GET`    | `/api/accounts/:id/balance` | 取得帳戶餘額 | -                  | `{ balance: number }` |
 
 #### 6.2 交易 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/transactions` | 取得交易列表 | Query: `?accountId=xxx&startDate=xxx&endDate=xxx` | `{ data: Transaction[] }` |
-| `GET` | `/api/transactions/:id` | 取得交易詳情 | - | `{ data: Transaction }` |
-| `POST` | `/api/transactions` | 新增交易 | `Transaction` | `{ data: Transaction }` |
-| `PUT` | `/api/transactions/:id` | 更新交易 | `Partial<Transaction>` | `{ data: Transaction }` |
-| `DELETE` | `/api/transactions/:id` | 刪除交易 | - | `{ success: true }` |
+| 方法     | 端點                    | 說明         | Request Body                                      | Response                  |
+| -------- | ----------------------- | ------------ | ------------------------------------------------- | ------------------------- |
+| `GET`    | `/api/transactions`     | 取得交易列表 | Query: `?accountId=xxx&startDate=xxx&endDate=xxx` | `{ data: Transaction[] }` |
+| `GET`    | `/api/transactions/:id` | 取得交易詳情 | -                                                 | `{ data: Transaction }`   |
+| `POST`   | `/api/transactions`     | 新增交易     | `Transaction`                                     | `{ data: Transaction }`   |
+| `PUT`    | `/api/transactions/:id` | 更新交易     | `Partial<Transaction>`                            | `{ data: Transaction }`   |
+| `DELETE` | `/api/transactions/:id` | 刪除交易     | -                                                 | `{ success: true }`       |
 
 #### 6.3 分類 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/categories` | 取得分類列表 | Query: `?type=income/expense` | `{ data: Category[] }` |
-| `POST` | `/api/categories` | 新增分類 | `Category` | `{ data: Category }` |
-| `PUT` | `/api/categories/:id` | 更新分類 | `Partial<Category>` | `{ data: Category }` |
-| `DELETE` | `/api/categories/:id` | 刪除分類 | - | `{ success: true }` |
-| `GET` | `/api/categories/:id/total` | 取得分類總額 | Query: `?startDate=xxx&endDate=xxx` | `{ total: number }` |
+| 方法     | 端點                        | 說明         | Request Body                        | Response               |
+| -------- | --------------------------- | ------------ | ----------------------------------- | ---------------------- |
+| `GET`    | `/api/categories`           | 取得分類列表 | Query: `?type=income/expense`       | `{ data: Category[] }` |
+| `POST`   | `/api/categories`           | 新增分類     | `Category`                          | `{ data: Category }`   |
+| `PUT`    | `/api/categories/:id`       | 更新分類     | `Partial<Category>`                 | `{ data: Category }`   |
+| `DELETE` | `/api/categories/:id`       | 刪除分類     | -                                   | `{ success: true }`    |
+| `GET`    | `/api/categories/:id/total` | 取得分類總額 | Query: `?startDate=xxx&endDate=xxx` | `{ total: number }`    |
 
 #### 6.4 統計 API
 
-| 方法 | 端點 | 說明 | Request Body | Response |
-|------|------|------|-------------|----------|
-| `GET` | `/api/stats` | 取得統計資料 | - | `{ data: AccountingStats }` |
+| 方法  | 端點                 | 說明         | Request Body                | Response                              |
+| ----- | -------------------- | ------------ | --------------------------- | ------------------------------------- |
+| `GET` | `/api/stats`         | 取得統計資料 | -                           | `{ data: AccountingStats }`           |
 | `GET` | `/api/stats/monthly` | 取得月度統計 | Query: `?year=2025&month=1` | `{ income: number, expense: number }` |
 
 ---
 
 ### 7. 權限控制
 
-| 角色 | 帳戶管理 | 交易管理 | 分類管理 | 統計查看 |
-|------|---------|---------|---------|---------|
-| **個人** | ✅ 完整權限 | ✅ 完整權限 | ✅ 完整權限 | ✅ 完整權限 |
+| 角色       | 帳戶管理      | 交易管理      | 分類管理        | 統計查看      |
+| ---------- | ------------- | ------------- | --------------- | ------------- |
+| **個人**   | ✅ 完整權限   | ✅ 完整權限   | ✅ 完整權限     | ✅ 完整權限   |
 | **管理員** | ✅ 查看所有人 | ✅ 查看所有人 | ✅ 系統預設分類 | ✅ 查看所有人 |
 
 **注意**：Phase 1 為單用戶系統，Phase 3 可擴充多用戶支援。
@@ -3133,19 +3214,20 @@ export const categoryService = new CategoryService();
 #### 8.2 冗餘欄位問題
 
 ❌ **Transaction 儲存 accountName 和 categoryName**
+
 ```typescript
 // 現狀 (UI 層面)
 const transactionData = {
   accountId: quickAccount,
-  accountName: accountData.name,    // ❌ 應從 Account 查詢
+  accountName: accountData.name, // ❌ 應從 Account 查詢
   categoryId: quickCategory,
-  categoryName: categoryData.name,  // ❌ 應從 Category 查詢
+  categoryName: categoryData.name, // ❌ 應從 Category 查詢
   type: 'expense' as const,
   amount: parseFloat(quickAmount),
   currency: 'TWD',
   description: '',
   date: today,
-};
+}
 
 // 建議：移除 accountName 和 categoryName
 ```
@@ -3153,6 +3235,7 @@ const transactionData = {
 #### 8.3 資料計算問題
 
 ⚠️ **Account.availableCredit 應為計算欄位**
+
 ```typescript
 // 現狀
 interface Account {
@@ -3175,6 +3258,7 @@ getAvailableCredit(accountId: string): number {
 ```
 
 ⚠️ **Stats 全部為動態計算，不應儲存**
+
 ```typescript
 // 現狀：存在 Store 的 state 中
 stats: {
@@ -3193,33 +3277,35 @@ stats: {
 #### 8.4 缺少關鍵欄位
 
 ❌ **Transaction 缺少 currency**
+
 ```typescript
 // 現狀
 interface Transaction {
-  accountId: string;
-  type: 'income' | 'expense' | 'transfer';
-  categoryId: string;
-  amount: number;
+  accountId: string
+  type: 'income' | 'expense' | 'transfer'
+  categoryId: string
+  amount: number
   // ❌ 缺少 currency: string
 }
 
 // 建議：新增 currency 欄位
 interface Transaction {
-  accountId: string;
-  type: 'income' | 'expense' | 'transfer';
-  categoryId: string;
-  amount: number;
-  currency: string;  // ✅ 新增
-  description: string;
-  date: string;
-  createdAt: string;
-  updatedAt: string;
+  accountId: string
+  type: 'income' | 'expense' | 'transfer'
+  categoryId: string
+  amount: number
+  currency: string // ✅ 新增
+  description: string
+  date: string
+  createdAt: string
+  updatedAt: string
 }
 ```
 
 #### 8.5 資料類型定義重複
 
 ⚠️ **accounting-types 檔案未被使用**
+
 ```typescript
 // src/stores/types.ts 定義了 Account, Transaction, Category
 // src/stores/accounting-types.ts 也定義了相同型別
@@ -3238,42 +3324,44 @@ interface Transaction {
 #### 9.2 P1 - 應該修正（影響可維護性）
 
 1. **移除冗餘欄位**
+
    ```typescript
    // 修改 Transaction interface
    interface Transaction {
-     accountId: string;
+     accountId: string
      // ❌ 移除 accountName
-     categoryId: string;
+     categoryId: string
      // ❌ 移除 categoryName
-     type: 'income' | 'expense' | 'transfer';
-     amount: number;
-     currency: string;  // ✅ 新增
-     description: string;
-     date: string;
+     type: 'income' | 'expense' | 'transfer'
+     amount: number
+     currency: string // ✅ 新增
+     description: string
+     date: string
    }
    ```
 
 2. **改為動態計算 availableCredit**
+
    ```typescript
    // 修改 Account interface
    interface Account {
-     id: string;
-     name: string;
-     type: 'cash' | 'credit' | 'bank';
-     balance: number;
-     currency: string;
-     creditLimit?: number;
+     id: string
+     name: string
+     type: 'cash' | 'credit' | 'bank'
+     balance: number
+     currency: string
+     creditLimit?: number
      // ❌ 移除 availableCredit
    }
 
    // Service 層提供計算方法
    class AccountingService {
      getAvailableCredit(accountId: string): number {
-       const account = this.getById(accountId);
+       const account = this.getById(accountId)
        if (!account || account.type !== 'credit' || !account.creditLimit) {
-         return 0;
+         return 0
        }
-       return account.creditLimit - account.balance;
+       return account.creditLimit - account.balance
      }
    }
    ```
@@ -3287,6 +3375,7 @@ interface Transaction {
 #### 9.3 P2 - 可以優化（增強功能）
 
 4. **Stats 改為 Computed Property**
+
    ```typescript
    // 不儲存在 state，改為 getter
    get stats(): AccountingStats {

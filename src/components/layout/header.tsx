@@ -1,21 +1,21 @@
-'use client';
+'use client'
 
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { _TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
+import { Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { _TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 interface HeaderProps {
-  title: string;
+  title: string
   tabs?: {
-    value: string;
-    label: string;
-  }[];
-  activeTab?: string;
-  onTabChange?: (value: string) => void;
-  onAdd?: () => void;
-  addLabel?: string;
-  children?: React.ReactNode;
+    value: string
+    label: string
+  }[]
+  activeTab?: string
+  onTabChange?: (value: string) => void
+  onAdd?: () => void
+  addLabel?: string
+  children?: React.ReactNode
 }
 
 export function Header({
@@ -25,16 +25,12 @@ export function Header({
   onTabChange,
   onAdd,
   addLabel = '新增',
-  children
+  children,
 }: HeaderProps) {
   return (
     <div className="fixed top-0 right-0 left-64 h-[72px] bg-background border-b border-border z-40 flex items-center px-6 transition-all duration-300">
       {/* 最左側 - 返回按鈕 */}
-      {children && (
-        <div className="flex items-center mr-4">
-          {children}
-        </div>
-      )}
+      {children && <div className="flex items-center mr-4">{children}</div>}
 
       {/* 左側 - 主標題 */}
       <h1 className="text-lg font-bold text-morandi-primary">{title}</h1>
@@ -47,7 +43,7 @@ export function Header({
         <div className="flex items-center">
           <div className="h-6 w-px bg-border mx-4"></div>
           <div className="flex items-center space-x-1">
-            {tabs.map((tab) => (
+            {tabs.map(tab => (
               <button
                 key={tab.value}
                 onClick={() => onTabChange?.(tab.value)}
@@ -82,5 +78,5 @@ export function Header({
         )}
       </div>
     </div>
-  );
+  )
 }

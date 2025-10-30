@@ -1,20 +1,16 @@
-import { useCallback } from 'react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useAuthStore } from '@/stores/auth-store';
-import type { MessageAttachment } from '@/stores/workspace-store';
+import { useCallback } from 'react'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
+import type { MessageAttachment } from '@/stores/workspace-store'
 
 export function useMessageOperations() {
-  const { sendMessage, updateMessageReactions, deleteMessage } = useWorkspaceStore();
-  const { user, currentProfile } = useAuthStore();
+  const { sendMessage, updateMessageReactions, deleteMessage } = useWorkspaceStore()
+  const { user, currentProfile } = useAuthStore()
 
   const handleSendMessage = useCallback(
-    async (
-      channelId: string,
-      content: string,
-      attachments?: MessageAttachment[]
-    ) => {
+    async (channelId: string, content: string, attachments?: MessageAttachment[]) => {
       if (!user) {
-        throw new Error('用戶未登入');
+        throw new Error('用戶未登入')
       }
 
       await sendMessage({
@@ -24,53 +20,53 @@ export function useMessageOperations() {
         author: {
           id: user.id,
           display_name: currentProfile?.display_name || user.display_name || '未知用戶',
-          avatar: undefined
+          avatar: undefined,
         },
-        attachments
-      });
+        attachments,
+      })
     },
     [user, currentProfile, sendMessage]
-  );
+  )
 
   const handleReaction = useCallback(
     async (messageId: string, emoji: string, messages: any[]) => {
-      if (!user) return;
+      if (!user) return
 
-      const message = messages.find(m => m.id === messageId);
-      if (!message) return;
+      const message = messages.find(m => m.id === messageId)
+      if (!message) return
 
-      const currentReactions = { ...message.reactions };
+      const currentReactions = { ...message.reactions }
       if (!currentReactions[emoji]) {
-        currentReactions[emoji] = [];
+        currentReactions[emoji] = []
       }
 
-      const userIndex = currentReactions[emoji].indexOf(user.id);
+      const userIndex = currentReactions[emoji].indexOf(user.id)
       if (userIndex > -1) {
-        currentReactions[emoji].splice(userIndex, 1);
+        currentReactions[emoji].splice(userIndex, 1)
         if (currentReactions[emoji].length === 0) {
-          delete currentReactions[emoji];
+          delete currentReactions[emoji]
         }
       } else {
-        currentReactions[emoji].push(user.id);
+        currentReactions[emoji].push(user.id)
       }
 
-      await updateMessageReactions(messageId, currentReactions);
+      await updateMessageReactions(messageId, currentReactions)
     },
     [user, updateMessageReactions]
-  );
+  )
 
   const handleDeleteMessage = useCallback(
     async (messageId: string) => {
-      await deleteMessage(messageId);
+      await deleteMessage(messageId)
     },
     [deleteMessage]
-  );
+  )
 
   return {
     handleSendMessage,
     handleReaction,
     handleDeleteMessage,
     user,
-    currentProfile
-  };
+    currentProfile,
+  }
 }

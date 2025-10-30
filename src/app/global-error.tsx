@@ -39,9 +39,7 @@ export default function GlobalError({
             }}
           >
             {/* 錯誤圖示 */}
-            <div style={{ marginBottom: '1.5rem', fontSize: '4rem' }}>
-              ⚠️
-            </div>
+            <div style={{ marginBottom: '1.5rem', fontSize: '4rem' }}>⚠️</div>
 
             {/* 標題 */}
             <h1

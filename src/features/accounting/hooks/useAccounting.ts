@@ -1,9 +1,9 @@
-import { useAccountingStore } from '@/stores/accounting-store';
-import { accountingService, categoryService } from '../services/accounting.service';
-import { Account, Category, Transaction } from '@/stores/accounting-types';
+import { useAccountingStore } from '@/stores/accounting-store'
+import { accountingService, categoryService } from '../services/accounting.service'
+import { Account, Category, Transaction } from '@/stores/accounting-types'
 
 export const useAccounting = () => {
-  const store = useAccountingStore();
+  const store = useAccountingStore()
 
   return {
     // ========== 資料 ==========
@@ -15,94 +15,94 @@ export const useAccounting = () => {
 
     // ========== Account 操作 ==========
     createAccount: async (data: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => {
-      return await store.addAccount(data);
+      return await store.addAccount(data)
     },
 
     updateAccount: async (id: string, data: Partial<Account>) => {
-      return await store.updateAccount(id, data);
+      return await store.updateAccount(id, data)
     },
 
     deleteAccount: async (id: string) => {
-      return await store.deleteAccount(id);
+      return await store.deleteAccount(id)
     },
 
     loadAccounts: async () => {
-      return await store.loadAccounts();
+      return await store.loadAccounts()
     },
 
     getAccountsByType: (type: Account['type']) => {
-      return accountingService.getAccountsByType(type);
+      return accountingService.getAccountsByType(type)
     },
 
     getAccountBalance: (account_id: string) => {
-      return accountingService.getAccountBalance(account_id);
+      return accountingService.getAccountBalance(account_id)
     },
 
     // ========== Category 操作 ==========
     createCategory: async (data: Omit<Category, 'id' | 'created_at' | 'updated_at'>) => {
-      return await store.addCategory(data);
+      return await store.addCategory(data)
     },
 
     updateCategory: async (id: string, data: Partial<Category>) => {
-      return await store.updateCategory(id, data);
+      return await store.updateCategory(id, data)
     },
 
     deleteCategory: async (id: string) => {
-      return await store.deleteCategory(id);
+      return await store.deleteCategory(id)
     },
 
     loadCategories: async () => {
-      return await store.loadCategories();
+      return await store.loadCategories()
     },
 
     getCategoriesByType: (type: Category['type']) => {
-      return categoryService.getCategoriesByType(type);
+      return categoryService.getCategoriesByType(type)
     },
 
     getCategoryTotal: (category_id: string, start_date?: string, end_date?: string) => {
-      return accountingService.getCategoryTotal(category_id, start_date, end_date);
+      return accountingService.getCategoryTotal(category_id, start_date, end_date)
     },
 
     // ========== Transaction 操作 ==========
     createTransaction: (data: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => {
-      return accountingService.addTransaction(data);
+      return accountingService.addTransaction(data)
     },
 
     updateTransaction: (id: string, data: Partial<Transaction>) => {
-      accountingService.updateTransaction(id, data);
+      accountingService.updateTransaction(id, data)
     },
 
     deleteTransaction: (id: string) => {
-      accountingService.deleteTransaction(id);
+      accountingService.deleteTransaction(id)
     },
 
     getTransactionsByAccount: (account_id: string) => {
-      return accountingService.getTransactionsByAccount(account_id);
+      return accountingService.getTransactionsByAccount(account_id)
     },
 
     getTransactionsByDateRange: (start_date: string, end_date: string) => {
-      return accountingService.getTransactionsByDateRange(start_date, end_date);
+      return accountingService.getTransactionsByDateRange(start_date, end_date)
     },
 
     // ========== 統計方法 ==========
     calculateStats: () => {
-      accountingService.calculateStats();
+      accountingService.calculateStats()
     },
 
     getTotalAssets: () => {
-      return accountingService.getTotalAssets();
+      return accountingService.getTotalAssets()
     },
 
     getMonthlyIncome: () => {
-      return accountingService.getMonthlyIncome();
+      return accountingService.getMonthlyIncome()
     },
 
     getMonthlyExpense: () => {
-      return accountingService.getMonthlyExpense();
+      return accountingService.getMonthlyExpense()
     },
 
     getNetWorth: () => {
-      return accountingService.getNetWorth();
+      return accountingService.getNetWorth()
     },
-  };
-};
+  }
+}

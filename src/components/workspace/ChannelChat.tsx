@@ -1,14 +1,14 @@
-'use client';
+'use client'
 
-import { Hash } from 'lucide-react';
-import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
-import { useCleanupOrphanChannels } from '@/hooks/use-cleanup-orphan-channels';
-import { ChannelSidebar } from './ChannelSidebar';
-import { ChannelTabs } from './ChannelTabs';
-import { useChannelChat } from './channel-chat/useChannelChat';
-import { ChatHeader } from './channel-chat/ChatHeader';
-import { ChatMessages } from './channel-chat/ChatMessages';
-import { DialogsContainer } from './channel-chat/DialogsContainer';
+import { Hash } from 'lucide-react'
+import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels'
+import { useCleanupOrphanChannels } from '@/hooks/use-cleanup-orphan-channels'
+import { ChannelSidebar } from './ChannelSidebar'
+import { ChannelTabs } from './ChannelTabs'
+import { useChannelChat } from './channel-chat/useChannelChat'
+import { ChatHeader } from './channel-chat/ChatHeader'
+import { ChatMessages } from './channel-chat/ChatMessages'
+import { DialogsContainer } from './channel-chat/DialogsContainer'
 
 export function ChannelChat() {
   const {
@@ -83,17 +83,17 @@ export function ChannelChat() {
     handleChannelSwitch,
     handleDeleteChannel,
     handleUpdateChannel,
-  } = useChannelChat();
+  } = useChannelChat()
 
-  useAutoCreateTourChannels();
-  useCleanupOrphanChannels();
+  useAutoCreateTourChannels()
+  useCleanupOrphanChannels()
 
   if (loading && channels.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -130,16 +130,16 @@ export function ChannelChat() {
               onReaction={handleReactionClick}
               onDeleteMessage={handleDeleteMessageClick}
               onCreatePayment={(itemId, item) => {
-                setSelectedAdvanceItem(item);
-                setSelectedAdvanceListId(advanceLists.find(al =>
-                  al.items?.some((i: any) => i.id === itemId)
-                )?.id || '');
-                setShowCreatePaymentDialog(true);
+                setSelectedAdvanceItem(item)
+                setSelectedAdvanceListId(
+                  advanceLists.find(al => al.items?.some((i: any) => i.id === itemId))?.id || ''
+                )
+                setShowCreatePaymentDialog(true)
               }}
               onDeleteAdvanceList={deleteAdvanceList}
               onCreateReceipt={(orderId, order) => {
-                setSelectedOrder(order);
-                setShowCreateReceiptDialog(true);
+                setSelectedOrder(order)
+                setShowCreateReceiptDialog(true)
               }}
               onMessageChange={setMessageText}
               onSubmit={handleSubmitMessage}
@@ -170,9 +170,9 @@ export function ChannelChat() {
         showShareOrdersDialog={showShareOrdersDialog}
         setShowShareOrdersDialog={setShowShareOrdersDialog}
         onShareOrdersSuccess={() => {
-          setShowShareOrdersDialog(false);
+          setShowShareOrdersDialog(false)
           if (selectedChannel?.id) {
-            loadSharedOrderLists(selectedChannel.id);
+            loadSharedOrderLists(selectedChannel.id)
           }
         }}
         showCreateReceiptDialog={showCreateReceiptDialog}
@@ -186,11 +186,11 @@ export function ChannelChat() {
         selectedAdvanceListId={selectedAdvanceListId}
         setSelectedAdvanceListId={setSelectedAdvanceListId}
         onCreatePaymentSuccess={() => {
-          setShowCreatePaymentDialog(false);
-          setSelectedAdvanceItem(null);
-          setSelectedAdvanceListId('');
+          setShowCreatePaymentDialog(false)
+          setSelectedAdvanceItem(null)
+          setSelectedAdvanceListId('')
           if (selectedChannel?.id) {
-            advanceLists;
+            advanceLists
           }
         }}
         showSettingsDialog={showSettingsDialog}
@@ -213,5 +213,5 @@ export function ChannelChat() {
         setShowNewTaskDialog={setShowNewTaskDialog}
       />
     </div>
-  );
+  )
 }

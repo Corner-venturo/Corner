@@ -2,14 +2,14 @@
  * Hook for filtering suppliers
  */
 
-'use client';
+'use client'
 
-import { useMemo } from 'react';
-import { Supplier } from '../types';
+import { useMemo } from 'react'
+import { Supplier } from '../types'
 
 interface UseSuppliersFiltersProps {
-  suppliers: Record<string, Supplier> | Supplier[];
-  searchQuery: string;
+  suppliers: Record<string, Supplier> | Supplier[]
+  searchQuery: string
 }
 
 export function useSuppliersFilters({ suppliers, searchQuery }: UseSuppliersFiltersProps) {
@@ -19,12 +19,12 @@ export function useSuppliersFilters({ suppliers, searchQuery }: UseSuppliersFilt
       ? suppliers
       : suppliers
         ? Object.values(suppliers)
-        : [];
+        : []
 
     // Filter by search query
-    if (!searchQuery) return suppliersArray;
+    if (!searchQuery) return suppliersArray
 
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase()
     return suppliersArray.filter(supplier => {
       return (
         supplier.name.toLowerCase().includes(query) ||
@@ -32,9 +32,9 @@ export function useSuppliersFilters({ suppliers, searchQuery }: UseSuppliersFilt
         (supplier.country && supplier.country.toLowerCase().includes(query)) ||
         (supplier.location && supplier.location.toLowerCase().includes(query)) ||
         supplier.contact.contact_person.toLowerCase().includes(query)
-      );
-    });
-  }, [suppliers, searchQuery]);
+      )
+    })
+  }, [suppliers, searchQuery])
 
-  return { filteredSuppliers };
+  return { filteredSuppliers }
 }

@@ -2,75 +2,75 @@
  * 合約資料處理工具函數
  */
 
-import { Tour } from '@/types/tour.types';
-import { Order, Member } from '@/types/order.types';
-import { Itinerary } from '@/stores/types';
+import { Tour } from '@/types/tour.types'
+import { Order, Member } from '@/types/order.types'
+import { Itinerary } from '@/stores/types'
 
 export interface ContractData {
   // 審閱日期
-  reviewYear: string;
-  reviewMonth: string;
-  reviewDay: string;
+  reviewYear: string
+  reviewMonth: string
+  reviewDay: string
 
   // 旅客資訊
-  travelerName: string;
-  travelerAddress: string;
-  travelerIdNumber: string;
-  travelerPhone: string;
+  travelerName: string
+  travelerAddress: string
+  travelerIdNumber: string
+  travelerPhone: string
 
   // 緊急聯絡人資訊
-  emergencyContactName: string;
-  emergencyContactRelation: string;
-  emergencyContactPhone: string;
+  emergencyContactName: string
+  emergencyContactRelation: string
+  emergencyContactPhone: string
 
   // 旅遊團資訊
-  tourName: string;
-  tourDestination: string;
-  tourCode: string;
+  tourName: string
+  tourDestination: string
+  tourCode: string
 
   // 集合資訊
-  gatherYear: string;
-  gatherMonth: string;
-  gatherDay: string;
-  gatherHour: string;
-  gatherMinute: string;
-  gatherLocation: string;
+  gatherYear: string
+  gatherMonth: string
+  gatherDay: string
+  gatherHour: string
+  gatherMinute: string
+  gatherLocation: string
 
   // 費用資訊
-  totalAmount: string;
-  depositAmount: string;
-  paymentMethod: string;
-  finalPaymentMethod: string;
+  totalAmount: string
+  depositAmount: string
+  paymentMethod: string
+  finalPaymentMethod: string
 
   // 保險金額
-  deathInsurance: string;
-  medicalInsurance: string;
+  deathInsurance: string
+  medicalInsurance: string
 
   // 旅遊團資訊
-  minParticipants: string;
+  minParticipants: string
 
   // 乙方資訊
-  companyExtension: string;
+  companyExtension: string
 }
 
 /**
  * 計算集合時間（起飛時間 - 3小時）
  */
 function calculateGatherTime(departureTime: string): { hour: string; minute: string } {
-  const [hourStr, minuteStr] = departureTime.split(':');
-  let hour = parseInt(hourStr);
-  const minute = parseInt(minuteStr);
+  const [hourStr, minuteStr] = departureTime.split(':')
+  let hour = parseInt(hourStr)
+  const minute = parseInt(minuteStr)
 
   // 減3小時
-  hour = hour - 3;
+  hour = hour - 3
   if (hour < 0) {
-    hour = hour + 24;
+    hour = hour + 24
   }
 
   return {
     hour: hour.toString().padStart(2, '0'),
-    minute: minute.toString().padStart(2, '0')
-  };
+    minute: minute.toString().padStart(2, '0'),
+  }
 }
 
 /**
@@ -88,32 +88,32 @@ export function prepareContractData(
   itinerary?: Itinerary,
   depositAmount?: number
 ): Partial<ContractData> {
-  const today = new Date();
+  const today = new Date()
 
   // 預設集合時間（如果沒有行程表）
-  let gatherHour = '06';
-  let gatherMinute = '00';
-  let gatherYear = '';
-  let gatherMonth = '';
-  let gatherDay = '';
+  let gatherHour = '06'
+  let gatherMinute = '00'
+  let gatherYear = ''
+  let gatherMonth = ''
+  let gatherDay = ''
 
   // 如果有行程表且有航班資訊
   if (itinerary?.outboundFlight?.departureTime) {
-    const gatherTime = calculateGatherTime(itinerary.outboundFlight.departureTime);
-    gatherHour = gatherTime.hour;
-    gatherMinute = gatherTime.minute;
+    const gatherTime = calculateGatherTime(itinerary.outboundFlight.departureTime)
+    gatherHour = gatherTime.hour
+    gatherMinute = gatherTime.minute
 
     // 從航班日期或旅遊團出發日期取得
-    const departureDate = new Date(tour.departure_date);
-    gatherYear = departureDate.getFullYear().toString();
-    gatherMonth = (departureDate.getMonth() + 1).toString();
-    gatherDay = departureDate.getDate().toString();
+    const departureDate = new Date(tour.departure_date)
+    gatherYear = departureDate.getFullYear().toString()
+    gatherMonth = (departureDate.getMonth() + 1).toString()
+    gatherDay = departureDate.getDate().toString()
   } else if (tour.departure_date) {
     // 沒有行程表，使用旅遊團出發日期
-    const departureDate = new Date(tour.departure_date);
-    gatherYear = departureDate.getFullYear().toString();
-    gatherMonth = (departureDate.getMonth() + 1).toString();
-    gatherDay = departureDate.getDate().toString();
+    const departureDate = new Date(tour.departure_date)
+    gatherYear = departureDate.getFullYear().toString()
+    gatherMonth = (departureDate.getMonth() + 1).toString()
+    gatherDay = departureDate.getDate().toString()
   }
 
   return {
@@ -150,7 +150,9 @@ export function prepareContractData(
 
     // 費用資訊
     totalAmount: order.total_amount?.toString() || '',
-    depositAmount: depositAmount?.toString() || (order.total_amount ? (order.total_amount * 0.3).toFixed(0) : ''),
+    depositAmount:
+      depositAmount?.toString() ||
+      (order.total_amount ? (order.total_amount * 0.3).toFixed(0) : ''),
     paymentMethod: '現金',
     finalPaymentMethod: '現金',
 
@@ -163,20 +165,20 @@ export function prepareContractData(
 
     // 乙方資訊
     companyExtension: '', // 需手動填寫
-  };
+  }
 }
 
 /**
  * 替換合約範本中的變數
  */
 export function replaceContractVariables(template: string, data: Partial<ContractData>): string {
-  let result = template;
+  let result = template
 
   // 替換所有 {{變數名}} 格式的變數
   Object.entries(data).forEach(([key, value]) => {
-    const regex = new RegExp(`{{${key}}}`, 'g');
-    result = result.replace(regex, value || '');
-  });
+    const regex = new RegExp(`{{${key}}}`, 'g')
+    result = result.replace(regex, value || '')
+  })
 
-  return result;
+  return result
 }

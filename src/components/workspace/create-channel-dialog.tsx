@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { FormDialog } from '@/components/dialog';
-import { Input } from '@/components/ui/input';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { FormDialog } from '@/components/dialog'
+import { Input } from '@/components/ui/input'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
 interface CreateChannelDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogProps) {
-  const { createChannel } = useWorkspaceStore();
-  const [channelName, setChannelName] = useState('');
+  const { createChannel } = useWorkspaceStore()
+  const [channelName, setChannelName] = useState('')
 
   const handleCreate = () => {
-    if (!channelName.trim()) return;
+    if (!channelName.trim()) return
 
-    const currentUserId = '1'; // 從 auth store 獲取
+    const currentUserId = '1' // 從 auth store 獲取
 
     createChannel({
       name: channelName.trim(),
@@ -27,11 +27,11 @@ export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogP
       // members: [currentUserId], // Channel 類型不包含此屬性
       workspace_id: '', // 從 workspace store 獲取當前 workspace_id
       created_by: currentUserId,
-    });
+    })
 
-    setChannelName('');
-    onOpenChange(false);
-  };
+    setChannelName('')
+    onOpenChange(false)
+  }
 
   return (
     <FormDialog
@@ -44,12 +44,10 @@ export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogP
       maxWidth="md"
     >
       <div>
-        <label className="text-sm font-medium text-morandi-primary mb-2 block">
-          頻道名稱
-        </label>
+        <label className="text-sm font-medium text-morandi-primary mb-2 block">頻道名稱</label>
         <Input
           value={channelName}
-          onChange={(e) => setChannelName(e.target.value)}
+          onChange={e => setChannelName(e.target.value)}
           placeholder="輸入頻道名稱..."
           autoFocus
         />
@@ -64,5 +62,5 @@ export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogP
         </ul>
       </div>
     </FormDialog>
-  );
+  )
 }

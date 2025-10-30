@@ -2,15 +2,15 @@
  * Canvas Editor - main rich text editor component
  */
 
-'use client';
+'use client'
 
-import { useCanvasEditor } from './useCanvasEditor';
-import { EditorToolbar } from './EditorToolbar';
-import { EditorContent } from './EditorContent';
-import { CanvasEditorProps } from '../shared/types';
+import { useCanvasEditor } from './useCanvasEditor'
+import { EditorToolbar } from './EditorToolbar'
+import { EditorContent } from './EditorContent'
+import { CanvasEditorProps } from '../shared/types'
 
 export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
-  const storageKey = canvasId || `canvas-${channelId}`;
+  const storageKey = canvasId || `canvas-${channelId}`
 
   const {
     editor,
@@ -23,10 +23,10 @@ export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
     handleDrop,
     setLink,
     addImage,
-  } = useCanvasEditor(storageKey);
+  } = useCanvasEditor(storageKey)
 
   if (!editor) {
-    return null;
+    return null
   }
 
   return (
@@ -58,5 +58,5 @@ export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
         onDrop={handleDrop}
       />
     </div>
-  );
+  )
 }

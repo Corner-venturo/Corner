@@ -1,21 +1,17 @@
-import React from 'react';
-import { morandiColors } from '@/lib/constants/morandi-colors';
+import React from 'react'
+import { morandiColors } from '@/lib/constants/morandi-colors'
 
 export interface DateSubtitleProps {
-  date: string;
-  variant?: 'default' | 'elegant';
-  className?: string;
+  date: string
+  variant?: 'default' | 'elegant'
+  className?: string
 }
 
 /**
  * 日期副標題組件
  * 顯示優雅的日期格式
  */
-export function DateSubtitle({
-  date,
-  variant = 'default',
-  className = ''
-}: DateSubtitleProps) {
+export function DateSubtitle({ date, variant = 'default', className = '' }: DateSubtitleProps) {
   if (variant === 'elegant') {
     return (
       <div
@@ -24,15 +20,12 @@ export function DateSubtitle({
       >
         {date}
       </div>
-    );
+    )
   }
 
   return (
-    <div
-      className={`text-sm ${className}`}
-      style={{ color: morandiColors.text.light }}
-    >
+    <div className={`text-sm ${className}`} style={{ color: morandiColors.text.light }}>
       {date}
     </div>
-  );
+  )
 }

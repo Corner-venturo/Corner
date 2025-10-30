@@ -7,14 +7,14 @@
  * - 為未來 Sentry 整合預留接口
  */
 
-type _LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type _LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 interface LogMeta {
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 class AppLogger {
-  private isDev = process.env.NODE_ENV === 'development';
+  private isDev = process.env.NODE_ENV === 'development'
 
   /**
    * 除錯訊息（僅開發環境）
@@ -35,14 +35,13 @@ class AppLogger {
   /**
    * 警告訊息
    */
-  warn(message: string, meta?: LogMeta) {
-      }
+  warn(message: string, meta?: LogMeta) {}
 
   /**
    * 錯誤訊息
    */
   error(message: string, meta?: LogMeta) {
-        // 生產環境可整合 Sentry
+    // 生產環境可整合 Sentry
     if (!this.isDev && typeof window !== 'undefined') {
       // 整合 Sentry
       // Sentry.captureException(new Error(message), { extra: meta });
@@ -50,4 +49,4 @@ class AppLogger {
   }
 }
 
-export const logger = new AppLogger();
+export const logger = new AppLogger()

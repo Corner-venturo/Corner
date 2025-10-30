@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { _useRef } from 'react';
-import { _Calculator } from 'lucide-react';
+import { _useRef } from 'react'
+import { _Calculator } from 'lucide-react'
 // import { use_Calculator } from './calculator/useCalculator';
 // import { useCalculatorKeyboard } from './calculator/useCalculatorKeyboard';
 // import { CalculatorDisplay } from './calculator/CalculatorDisplay';
@@ -17,5 +17,5 @@ import { _Calculator } from 'lucide-react';
 export function CalculatorWidget() {
   // 待實作: 計算機功能
   // 需要實作 calculator 子模組才能啟用此功能
-  return <div className="p-4 text-morandi-secondary">計算機功能開發中...</div>;
+  return <div className="p-4 text-morandi-secondary">計算機功能開發中...</div>
 }

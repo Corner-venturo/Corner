@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { networkMonitor } from '@/lib/sync/network-monitor';
+import { useEffect } from 'react'
+import { networkMonitor } from '@/lib/sync/network-monitor'
 
 /**
  * 網路監聽器初始化器
@@ -14,10 +14,10 @@ export function NetworkMonitorInitializer() {
 
     return () => {
       // 清理（雖然通常不會執行到這裡）
-      networkMonitor?.destroy();
-    };
-  }, []);
+      networkMonitor?.destroy()
+    }
+  }, [])
 
   // 不渲染任何 UI
-  return null;
+  return null
 }

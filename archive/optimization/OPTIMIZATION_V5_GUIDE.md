@@ -52,6 +52,7 @@ L3 (冷快取) - IndexedDB
 ### 1. 使用新版 Store（按需載入）
 
 **舊版寫法：**
+
 ```typescript
 // ❌ 一次載入全部資料
 const { tours } = useTourStore();
@@ -64,6 +65,7 @@ return tours.map(tour => <TourCard tour={tour} />);
 ```
 
 **新版寫法：**
+
 ```typescript
 // ✅ 只載入需要的資料
 import { useTourStoreV2 } from '@/stores/tour-store-v2';
@@ -87,6 +89,7 @@ return (
 ### 2. 使用虛擬列表（減少 DOM）
 
 **舊版寫法：**
+
 ```typescript
 // ❌ 渲染所有 DOM 節點
 {tours.map(tour => <TourCard tour={tour} />)}
@@ -94,6 +97,7 @@ return (
 ```
 
 **新版寫法：**
+
 ```typescript
 // ✅ 只渲染可見區域
 import { VirtualList } from '@/components/common/virtual-list';
@@ -132,38 +136,38 @@ export default function RootLayout({ children }) {
 ### CacheStrategy（快取策略）
 
 ```typescript
-import { cacheStrategy } from '@/lib/cache/cache-strategy';
+import { cacheStrategy } from '@/lib/cache/cache-strategy'
 
 // 設定快取
 await cacheStrategy.set('my-key', data, {
   level: 'hot', // 'hot' | 'warm' | 'cold'
-  ttl: 60000,   // 過期時間（毫秒）
-});
+  ttl: 60000, // 過期時間（毫秒）
+})
 
 // 讀取快取
-const data = await cacheStrategy.get('my-key');
+const data = await cacheStrategy.get('my-key')
 
 // 刪除快取
-await cacheStrategy.delete('my-key');
+await cacheStrategy.delete('my-key')
 
 // 清除所有
-await cacheStrategy.clear('hot');
+await cacheStrategy.clear('hot')
 ```
 
 ### LazyStore（按需載入）
 
 ```typescript
-import { LazyStore } from '@/lib/store/lazy-store';
+import { LazyStore } from '@/lib/store/lazy-store'
 
 const store = new LazyStore({
   table: 'tours',
   cachePrefix: 'tour',
   pageSize: 10,
-  enableCache: true
-});
+  enableCache: true,
+})
 
 // 分頁載入
-const page = await store.fetchPage(1, 10);
+const page = await store.fetchPage(1, 10)
 // {
 //   data: [...],
 //   total: 100,
@@ -173,7 +177,7 @@ const page = await store.fetchPage(1, 10);
 // }
 
 // 載入單筆
-const item = await store.fetchById('id');
+const item = await store.fetchById('id')
 ```
 
 ### VirtualList（虛擬列表）
@@ -195,10 +199,10 @@ import { VirtualList } from '@/components/common/virtual-list';
 ### MemoryManager（記憶體管理）
 
 ```typescript
-import { memoryManager } from '@/lib/performance/memory-manager';
+import { memoryManager } from '@/lib/performance/memory-manager'
 
 // 獲取記憶體統計
-const stats = memoryManager.getMemoryStats();
+const stats = memoryManager.getMemoryStats()
 // {
 //   usedMemory: 50.5,
 //   totalMemory: 100,
@@ -210,11 +214,11 @@ const stats = memoryManager.getMemoryStats();
 await memoryManager.cleanup({
   clearHot: true,
   clearWarm: false,
-  force: false
-});
+  force: false,
+})
 
 // 開始監控（開發模式）
-memoryManager.startMonitoring(10000); // 每 10 秒
+memoryManager.startMonitoring(10000) // 每 10 秒
 ```
 
 ---
@@ -228,23 +232,24 @@ memoryManager.startMonitoring(10000); // 每 10 秒
 3. 保留舊版 Store（暫時並存）
 
 **範例：**
+
 ```typescript
 // stores/tour-store-v2.ts
-import { LazyStore } from '@/lib/store/lazy-store';
+import { LazyStore } from '@/lib/store/lazy-store'
 
 const tourLazyStore = new LazyStore({
   table: 'tours',
   cachePrefix: 'tour',
-  pageSize: 10
-});
+  pageSize: 10,
+})
 
-export const useTourStoreV2 = create((set) => ({
+export const useTourStoreV2 = create(set => ({
   currentPage: null,
-  fetchPage: async (page) => {
-    const data = await tourLazyStore.fetchPage(page);
-    set({ currentPage: data });
-  }
-}));
+  fetchPage: async page => {
+    const data = await tourLazyStore.fetchPage(page)
+    set({ currentPage: data })
+  },
+}))
 ```
 
 ### Phase 2: 逐頁遷移
@@ -255,6 +260,7 @@ export const useTourStoreV2 = create((set) => ({
 4. 測試效能
 
 **範例：**
+
 ```typescript
 // app/tours/page.tsx
 // import { useTourStore } from '@/stores/tour-store'; // ❌ 舊版
@@ -299,13 +305,13 @@ function ToursPage() {
 ```typescript
 // ✅ 好的做法
 useEffect(() => {
-  fetchPage(1, 10); // 只載入第一頁
-}, []);
+  fetchPage(1, 10) // 只載入第一頁
+}, [])
 
 // ❌ 不好的做法
 useEffect(() => {
-  fetchAll(); // 載入全部資料
-}, []);
+  fetchAll() // 載入全部資料
+}, [])
 ```
 
 ### 2. 快取使用
@@ -314,11 +320,11 @@ useEffect(() => {
 // ✅ 好的做法
 await cacheStrategy.set('tours-page-1', data, {
   level: 'warm', // 跨頁面快取
-  ttl: 5 * 60 * 1000 // 5 分鐘
-});
+  ttl: 5 * 60 * 1000, // 5 分鐘
+})
 
 // ❌ 不好的做法
-localStorage.setItem('tours', JSON.stringify(allData)); // 太大
+localStorage.setItem('tours', JSON.stringify(allData)) // 太大
 ```
 
 ### 3. 列表渲染
@@ -342,9 +348,9 @@ localStorage.setItem('tours', JSON.stringify(allData)); // 太大
 useEffect(() => {
   return () => {
     // 離開頁面時清理
-    memoryManager.cleanup({ clearHot: true });
-  };
-}, []);
+    memoryManager.cleanup({ clearHot: true })
+  }
+}, [])
 
 // ❌ 不好的做法
 // 不清理，讓記憶體持續增長
@@ -356,18 +362,19 @@ useEffect(() => {
 
 ### 目標指標
 
-| 指標 | 舊版 | 新版 | 改善 |
-|------|------|------|------|
-| 首次載入 | 3-5s | 0.5-1s | 80%+ |
+| 指標       | 舊版   | 新版    | 改善 |
+| ---------- | ------ | ------- | ---- |
+| 首次載入   | 3-5s   | 0.5-1s  | 80%+ |
 | 記憶體使用 | 200MB+ | 50-60MB | 70%+ |
-| 頁面切換 | 1-2s | <0.1s | 95%+ |
-| DOM 節點 | 1000+ | 10-20 | 98%+ |
+| 頁面切換   | 1-2s   | <0.1s   | 95%+ |
+| DOM 節點   | 1000+  | 10-20   | 98%+ |
 
 ### 監控方式
 
 1. **記憶體監控**
+
    ```typescript
-   memoryManager.startMonitoring(10000);
+   memoryManager.startMonitoring(10000)
    ```
 
 2. **Chrome DevTools**
@@ -399,12 +406,13 @@ A: 目前支援固定高度。如需動態高度，可以使用 `react-window` �
 ### Q: 如何清除所有快取？
 
 A:
+
 ```typescript
 await memoryManager.cleanup({
   clearHot: true,
   clearWarm: true,
-  force: true
-});
+  force: true,
+})
 ```
 
 ---

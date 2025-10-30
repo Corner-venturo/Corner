@@ -1,26 +1,26 @@
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 interface DailyImageCarouselProps {
-  images: string[];
-  title: string;
+  images: string[]
+  title: string
 }
 
 export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(0)
 
   if (!images || images.length === 0) {
-    return null;
+    return null
   }
 
-  const showControls = images.length > 1;
+  const showControls = images.length > 1
 
   const goToSlide = (index: number) => {
-    if (!showControls) return;
-    const total = images.length;
-    const next = (index + total) % total;
-    setCurrent(next);
-  };
+    if (!showControls) return
+    const total = images.length
+    const next = (index + total) % total
+    setCurrent(next)
+  }
 
   return (
     <div className="relative mb-8 mt-6">
@@ -32,8 +32,8 @@ export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
               src={image}
               alt={`${title} 圖片 ${index + 1}`}
               className={cn(
-                "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
-                index === current ? "opacity-100" : "opacity-0"
+                'absolute inset-0 h-full w-full object-cover transition-opacity duration-700',
+                index === current ? 'opacity-100' : 'opacity-0'
               )}
             />
           ))}
@@ -65,8 +65,8 @@ export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
                 type="button"
                 onClick={() => goToSlide(index)}
                 className={cn(
-                  "h-2.5 w-2.5 rounded-full border border-morandi-primary/30 transition-all duration-300",
-                  current === index ? "w-6 bg-morandi-primary/90" : "bg-white/60"
+                  'h-2.5 w-2.5 rounded-full border border-morandi-primary/30 transition-all duration-300',
+                  current === index ? 'w-6 bg-morandi-primary/90' : 'bg-white/60'
                 )}
                 aria-label={`切換至第 ${index + 1} 張圖片`}
               />
@@ -75,5 +75,5 @@ export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
         </>
       )}
     </div>
-  );
+  )
 }

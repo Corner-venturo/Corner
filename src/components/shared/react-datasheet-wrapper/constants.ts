@@ -1,5 +1,5 @@
 // Core field keys that cannot be deleted
-export const CORE_FIELD_KEYS = ['index', 'name', 'idNumber'];
+export const CORE_FIELD_KEYS = ['index', 'name', 'idNumber']
 
 // Default field keys that cannot be hidden (except core fields)
 export const PROTECTED_FIELD_KEYS = [
@@ -13,20 +13,20 @@ export const PROTECTED_FIELD_KEYS = [
   'passport_number',
   'passportExpiry',
   'reservationCode',
-  'assignedRoom'
-];
+  'assignedRoom',
+]
 
 // Default column width in pixels
-export const DEFAULT_COLUMN_WIDTH = 100;
+export const DEFAULT_COLUMN_WIDTH = 100
 
 // Minimum column width to prevent squishing
-export const MIN_COLUMN_WIDTH = 50;
+export const MIN_COLUMN_WIDTH = 50
 
 // Default room options for room assignments
-export const DEFAULT_ROOM_OPTIONS = [];
+export const DEFAULT_ROOM_OPTIONS = []
 
 // LocalStorage key prefix for column widths
-export const COLUMN_WIDTHS_STORAGE_KEY = 'columnWidths_';
+export const COLUMN_WIDTHS_STORAGE_KEY = 'columnWidths_'
 
 // CSS class names
 export const CSS_CLASSES = {
@@ -42,8 +42,8 @@ export const CSS_CLASSES = {
   editing: 'editing',
   copying: 'copying',
   resizeHandle: 'resize-handle',
-  draggable: 'draggable'
-};
+  draggable: 'draggable',
+}
 
 // Keyboard keycodes
 export const KEYCODES = {
@@ -56,16 +56,11 @@ export const KEYCODES = {
   ARROW_UP: 'ArrowUp',
   ARROW_DOWN: 'ArrowDown',
   ARROW_LEFT: 'ArrowLeft',
-  ARROW_RIGHT: 'ArrowRight'
-};
+  ARROW_RIGHT: 'ArrowRight',
+}
 
 // Arrow keys for navigation
-export const ARROW_KEYS = [
-  'ArrowDown',
-  'ArrowUp',
-  'ArrowLeft',
-  'ArrowRight'
-];
+export const ARROW_KEYS = ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight']
 
 // Colors
 export const COLORS = {
@@ -82,17 +77,17 @@ export const COLORS = {
   gray: '#6b7280',
   grayBg: '#fafafa',
   hoverBg: '#f9fafb',
-  readonly: '#fafafa'
-};
+  readonly: '#fafafa',
+}
 
 // Special cell types
 export const SPECIAL_CELLS = {
   ASSIGNED_ROOM: 'assignedRoom',
-  NO_BED: 'no-bed'
-};
+  NO_BED: 'no-bed',
+}
 
 // Error messages
 export const ERROR_MESSAGES = {
   FORMULA_ERROR: '#ERROR',
-  FORMULA_ERROR_DISPLAY: '錯誤'
-};
+  FORMULA_ERROR_DISPLAY: '錯誤',
+}

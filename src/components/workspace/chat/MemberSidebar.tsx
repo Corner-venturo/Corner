@@ -1,98 +1,94 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
-import { useUserStore, useAuthStore } from '@/stores';
-import { User, UserPlus, X } from 'lucide-react';
-import { addChannelMembers } from '@/services/workspace-members';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useUserStore, useAuthStore } from '@/stores'
+import { User, UserPlus, X } from 'lucide-react'
+import { addChannelMembers } from '@/services/workspace-members'
+import { Button } from '@/components/ui/button'
 
 interface MemberSidebarProps {
-  isOpen: boolean;
+  isOpen: boolean
 }
 
 export function MemberSidebar({ isOpen }: MemberSidebarProps) {
-  const { selectedChannel, currentWorkspace, channelMembers, loadChannelMembers } = useWorkspaceStore();
-  const { items: employees } = useUserStore();
-  const { user } = useAuthStore();
-  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isAdding, setIsAdding] = useState(false);
+  const { selectedChannel, currentWorkspace, channelMembers, loadChannelMembers } =
+    useWorkspaceStore()
+  const { items: employees } = useUserStore()
+  const { user } = useAuthStore()
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false)
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isAdding, setIsAdding] = useState(false)
 
   useEffect(() => {
     if (selectedChannel?.id && currentWorkspace?.id) {
-      loadChannelMembers(currentWorkspace.id, selectedChannel.id);
+      loadChannelMembers(currentWorkspace.id, selectedChannel.id)
     }
-  }, [selectedChannel?.id, currentWorkspace?.id, loadChannelMembers]);
+  }, [selectedChannel?.id, currentWorkspace?.id, loadChannelMembers])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const members = selectedChannel?.id ? channelMembers[selectedChannel.id] || [] : [];
-  const memberEmployeeIds = new Set(members.map(m => m.employeeId));
+  const members = selectedChannel?.id ? channelMembers[selectedChannel.id] || [] : []
+  const memberEmployeeIds = new Set(members.map(m => m.employeeId))
 
   // 🔐 權限驗證：檢查當前用戶在此頻道的角色
-  const currentUserMember = members.find(m => m.employeeId === user?.id);
-  const currentUserRole = currentUserMember?.role;
-  const canManageMembers = currentUserRole === 'owner' || currentUserRole === 'admin';
+  const currentUserMember = members.find(m => m.employeeId === user?.id)
+  const currentUserRole = currentUserMember?.role
+  const canManageMembers = currentUserRole === 'owner' || currentUserRole === 'admin'
 
   // 過濾出還不是成員的員工
   const availableEmployees = employees.filter(emp => {
     // 1. 排除已經是成員的
-    if (memberEmployeeIds.has(emp.id)) return false;
+    if (memberEmployeeIds.has(emp.id)) return false
 
     // 2. 只顯示活躍狀態
-    if (emp.status !== 'active') return false;
+    if (emp.status !== 'active') return false
 
     // 3. 🔥 只顯示真正的「員工」（有 employee 角色標籤）
     // 未來可能會有客戶、訪客等非員工帳號，這裡需要過濾
-    const isEmployee = emp.roles?.includes('employee') || emp.roles?.includes('admin');
-    if (!isEmployee) return false;
+    const isEmployee = emp.roles?.includes('employee') || emp.roles?.includes('admin')
+    if (!isEmployee) return false
 
     // 4. 搜尋過濾
     if (searchQuery !== '') {
-      const query = searchQuery.toLowerCase();
-      return emp.display_name.toLowerCase().includes(query) ||
-             emp.english_name.toLowerCase().includes(query) ||
-             emp.employee_number.toLowerCase().includes(query);
+      const query = searchQuery.toLowerCase()
+      return (
+        emp.display_name.toLowerCase().includes(query) ||
+        emp.english_name.toLowerCase().includes(query) ||
+        emp.employee_number.toLowerCase().includes(query)
+      )
     }
 
-    return true;
-  });
+    return true
+  })
 
   const handleAddMembers = async () => {
-    if (!selectedChannel || !currentWorkspace || selectedEmployees.length === 0) return;
+    if (!selectedChannel || !currentWorkspace || selectedEmployees.length === 0) return
 
-    setIsAdding(true);
+    setIsAdding(true)
     try {
-      await addChannelMembers(
-        currentWorkspace.id,
-        selectedChannel.id,
-        selectedEmployees,
-        'member'
-      );
+      await addChannelMembers(currentWorkspace.id, selectedChannel.id, selectedEmployees, 'member')
 
       // 重新載入成員列表
-      await loadChannelMembers(currentWorkspace.id, selectedChannel.id);
+      await loadChannelMembers(currentWorkspace.id, selectedChannel.id)
 
       // 重置狀態
-      setSelectedEmployees([]);
-      setSearchQuery('');
-      setShowAddMemberDialog(false);
+      setSelectedEmployees([])
+      setSearchQuery('')
+      setShowAddMemberDialog(false)
     } catch (error) {
-            alert('新增成員失敗，請稍後再試');
+      alert('新增成員失敗，請稍後再試')
     } finally {
-      setIsAdding(false);
+      setIsAdding(false)
     }
-  };
+  }
 
   const toggleEmployeeSelection = (employeeId: string) => {
     setSelectedEmployees(prev =>
-      prev.includes(employeeId)
-        ? prev.filter(id => id !== employeeId)
-        : [...prev, employeeId]
-    );
-  };
+      prev.includes(employeeId) ? prev.filter(id => id !== employeeId) : [...prev, employeeId]
+    )
+  }
 
   return (
     <div className="w-64 border-l border-border bg-white flex flex-col shrink-0">
@@ -113,10 +109,16 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
           {members.length} 位成員
           {currentUserRole && (
             <span className="ml-2 text-morandi-gold">
-              · 你的角色：{currentUserRole === 'owner' ? '擁有者' :
-                         currentUserRole === 'admin' ? '管理員' :
-                         currentUserRole === 'manager' ? '經理' :
-                         currentUserRole === 'member' ? '成員' : '訪客'}
+              · 你的角色：
+              {currentUserRole === 'owner'
+                ? '擁有者'
+                : currentUserRole === 'admin'
+                  ? '管理員'
+                  : currentUserRole === 'manager'
+                    ? '經理'
+                    : currentUserRole === 'member'
+                      ? '成員'
+                      : '訪客'}
             </span>
           )}
         </p>
@@ -129,7 +131,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
           </div>
         ) : (
           <div className="space-y-1">
-            {members.map((member) => (
+            {members.map(member => (
               <div
                 key={member.id}
                 className="flex items-center gap-2 p-2 rounded hover:bg-morandi-container/10 transition-colors"
@@ -141,9 +143,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                   <p className="text-sm font-medium text-morandi-primary truncate">
                     {member.profile?.displayName || member.profile?.englishName || '未知成員'}
                   </p>
-                  <p className="text-xs text-morandi-secondary truncate">
-                    {member.role || '成員'}
-                  </p>
+                  <p className="text-xs text-morandi-secondary truncate">{member.role || '成員'}</p>
                 </div>
               </div>
             ))}
@@ -153,8 +153,14 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
 
       {/* 新增成員對話框 */}
       {showAddMemberDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowAddMemberDialog(false)}>
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowAddMemberDialog(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4"
+            onClick={e => e.stopPropagation()}
+          >
             {/* 標題列 */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="font-semibold text-morandi-primary">新增成員到頻道</h3>
@@ -172,7 +178,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 type="text"
                 placeholder="搜尋員工姓名或編號..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-morandi-gold/20 text-sm"
               />
             </div>
@@ -186,7 +192,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 </div>
               ) : (
                 <div className="space-y-1">
-                  {availableEmployees.map((employee) => (
+                  {availableEmployees.map(employee => (
                     <div
                       key={employee.id}
                       onClick={() => toggleEmployeeSelection(employee.id)}
@@ -209,8 +215,18 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                       </div>
                       {selectedEmployees.includes(employee.id) && (
                         <div className="w-5 h-5 rounded-full bg-morandi-gold flex items-center justify-center">
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                         </div>
                       )}
@@ -246,5 +262,5 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

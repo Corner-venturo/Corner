@@ -1,42 +1,52 @@
-import React from 'react';
-import { ArrowLeft, Save, CheckCircle, Plane, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from 'react'
+import { ArrowLeft, Save, CheckCircle, Plane, FileText } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import { ParticipantCounts, VersionRecord } from '../types';
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { cn } from '@/lib/utils'
+import { ParticipantCounts, VersionRecord } from '../types'
 
 interface QuoteHeaderProps {
-  isSpecialTour: boolean;
-  isReadOnly: boolean;
-  relatedTour: any;
-  quote: any;
-  quoteName: string;
-  setQuoteName: (name: string) => void;
-  participantCounts: ParticipantCounts;
-  setParticipantCounts: React.Dispatch<React.SetStateAction<ParticipantCounts>>;
-  saveSuccess: boolean;
-  setIsSaveDialogOpen: (open: boolean) => void;
-  formatDateTime: (dateString: string) => string;
-  handleLoadVersion: (versionData: any) => void;
-  handleFinalize: () => void;
-  handleCreateTour: () => void;
-  handleGenerateQuotation: () => void;
-  router: any;
+  isSpecialTour: boolean
+  isReadOnly: boolean
+  relatedTour: any
+  quote: any
+  quoteName: string
+  setQuoteName: (name: string) => void
+  participantCounts: ParticipantCounts
+  setParticipantCounts: React.Dispatch<React.SetStateAction<ParticipantCounts>>
+  saveSuccess: boolean
+  setIsSaveDialogOpen: (open: boolean) => void
+  formatDateTime: (dateString: string) => string
+  handleLoadVersion: (versionData: any) => void
+  handleFinalize: () => void
+  handleCreateTour: () => void
+  handleGenerateQuotation: () => void
+  router: any
 }
 
 function History({ size, className }: { size: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
       <path d="M3 3v5h5"></path>
       <path d="M12 7v5l4 2"></path>
     </svg>
-  );
+  )
 }
 
 export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
@@ -55,7 +65,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleFinalize,
   handleCreateTour,
   handleGenerateQuotation,
-  router
+  router,
 }) => {
   return (
     <>
@@ -64,7 +74,11 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         <div className="fixed top-18 right-0 left-16 bg-orange-50 border-b border-orange-200 z-30 px-6 py-2">
           <div className="flex items-center space-x-2 text-orange-800">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                clipRule="evenodd"
+              />
             </svg>
             <span className="text-sm font-medium">此為特殊團報價單，所有欄位已鎖定無法編輯</span>
           </div>
@@ -72,10 +86,12 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
       )}
 
       {/* 標題區域 */}
-      <div className={cn(
-        "fixed top-0 right-0 left-16 h-18 bg-background border-b border-border z-40 flex items-center justify-between px-6",
-        isSpecialTour && "border-b-0"
-      )}>
+      <div
+        className={cn(
+          'fixed top-0 right-0 left-16 h-18 bg-background border-b border-border z-40 flex items-center justify-between px-6',
+          isSpecialTour && 'border-b-0'
+        )}
+      >
         {/* 左區：內容標題區域 - 緊湊排列 */}
         <div className="flex items-center space-x-3 flex-shrink-0">
           <button
@@ -93,20 +109,18 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 {relatedTour.code || '-'}
               </span>
             ) : (
-              <span>
-                {quote?.code || '-'}
-              </span>
+              <span>{quote?.code || '-'}</span>
             )}
           </div>
 
           <input
             type="text"
             value={quoteName}
-            onChange={(e) => setQuoteName(e.target.value)}
+            onChange={e => setQuoteName(e.target.value)}
             disabled={isReadOnly}
             className={cn(
-              "text-lg font-bold text-morandi-primary bg-transparent border-0 focus:outline-none focus:bg-white px-2 py-1 rounded w-[180px]",
-              isReadOnly && "cursor-not-allowed opacity-60"
+              'text-lg font-bold text-morandi-primary bg-transparent border-0 focus:outline-none focus:bg-white px-2 py-1 rounded w-[180px]',
+              isReadOnly && 'cursor-not-allowed opacity-60'
             )}
             placeholder="輸入團體名稱"
           />
@@ -114,28 +128,33 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
         {/* 右區：功能區域 (原中+右合併) */}
         <div className="flex items-center space-x-2">
-
           {/* 總人數 */}
           <div className="flex items-center space-x-1 whitespace-nowrap text-xs">
             <span className="text-morandi-secondary">總人數:</span>
             <input
               type="number"
-              value={participantCounts.adult + participantCounts.child_with_bed + participantCounts.child_no_bed + participantCounts.single_room + participantCounts.infant}
-              onChange={(e) => {
-                const total = Number(e.target.value) || 0;
+              value={
+                participantCounts.adult +
+                participantCounts.child_with_bed +
+                participantCounts.child_no_bed +
+                participantCounts.single_room +
+                participantCounts.infant
+              }
+              onChange={e => {
+                const total = Number(e.target.value) || 0
                 // 簡化：所有人數設定為成人
                 setParticipantCounts({
                   adult: total,
                   child_with_bed: 0,
                   child_no_bed: 0,
                   single_room: 0,
-                  infant: 0
-                });
+                  infant: 0,
+                })
               }}
               disabled={isReadOnly}
               className={cn(
-                "w-16 px-2 py-1 text-xs text-center bg-morandi-container rounded border-0 focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                isReadOnly && "cursor-not-allowed opacity-60"
+                'w-16 px-2 py-1 text-xs text-center bg-morandi-container rounded border-0 focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                isReadOnly && 'cursor-not-allowed opacity-60'
               )}
             />
             <span className="text-morandi-secondary">人</span>
@@ -143,13 +162,19 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
           <div className="flex items-center space-x-1 whitespace-nowrap">
             <span className="text-sm text-morandi-secondary">狀態:</span>
-            <span className={cn(
-              'inline-flex items-center px-2 py-1 rounded text-sm font-medium',
-              quote && quote.status === 'proposed'
-                ? 'bg-morandi-gold text-white'
-                : 'bg-morandi-green text-white'
-            )}>
-              {quote?.status === 'proposed' ? '提案' : quote?.status === 'approved' ? '已核准' : quote?.status || '提案'}
+            <span
+              className={cn(
+                'inline-flex items-center px-2 py-1 rounded text-sm font-medium',
+                quote && quote.status === 'proposed'
+                  ? 'bg-morandi-gold text-white'
+                  : 'bg-morandi-green text-white'
+              )}
+            >
+              {quote?.status === 'proposed'
+                ? '提案'
+                : quote?.status === 'approved'
+                  ? '已核准'
+                  : quote?.status || '提案'}
             </span>
           </div>
 
@@ -157,11 +182,11 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             onClick={() => setIsSaveDialogOpen(true)}
             disabled={isReadOnly}
             className={cn(
-              "h-8 px-3 text-sm transition-all duration-200",
+              'h-8 px-3 text-sm transition-all duration-200',
               saveSuccess
-                ? "bg-morandi-green hover:bg-morandi-green text-white"
-                : "bg-morandi-green hover:bg-morandi-green-hover text-white",
-              isReadOnly && "cursor-not-allowed opacity-60"
+                ? 'bg-morandi-green hover:bg-morandi-green text-white'
+                : 'bg-morandi-green hover:bg-morandi-green-hover text-white',
+              isReadOnly && 'cursor-not-allowed opacity-60'
             )}
           >
             <Save size={14} className="mr-1.5" />
@@ -172,8 +197,8 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             <DropdownMenuTrigger
               disabled={isReadOnly}
               className={cn(
-                "h-8 px-3 text-sm border-morandi-container text-morandi-secondary hover:bg-morandi-container",
-                isReadOnly && "cursor-not-allowed opacity-60"
+                'h-8 px-3 text-sm border-morandi-container text-morandi-secondary hover:bg-morandi-container',
+                isReadOnly && 'cursor-not-allowed opacity-60'
               )}
             >
               <History size={14} className="mr-1.5" />
@@ -193,9 +218,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                       {quote?.updated_at ? formatDateTime(quote.updated_at) : ''}
                     </span>
                   </div>
-                  <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">
-                    當前
-                  </div>
+                  <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>
                 </DropdownMenuItem>
               )}
 
@@ -211,7 +234,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                         onClick={() => handleLoadVersion(version)}
                       >
                         <div className="flex flex-col">
-                          <span className="font-medium">{version.note || `版本 ${version.version}`}</span>
+                          <span className="font-medium">
+                            {version.note || `版本 ${version.version}`}
+                          </span>
                           <span className="text-xs text-morandi-secondary">
                             {formatDateTime(version.created_at)}
                           </span>
@@ -220,8 +245,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                           NT$ {version.total_cost.toLocaleString()}
                         </div>
                       </DropdownMenuItem>
-                    ))
-                  }
+                    ))}
                 </>
               )}
 
@@ -238,8 +262,8 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               onClick={handleFinalize}
               disabled={isReadOnly}
               className={cn(
-                "h-8 px-3 text-sm bg-morandi-primary hover:bg-morandi-primary/90 text-white",
-                isReadOnly && "cursor-not-allowed opacity-60"
+                'h-8 px-3 text-sm bg-morandi-primary hover:bg-morandi-primary/90 text-white',
+                isReadOnly && 'cursor-not-allowed opacity-60'
               )}
             >
               <CheckCircle size={14} className="mr-1.5" />
@@ -247,8 +271,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             </Button>
           )}
 
-          {quote && quote.status === 'approved' && (
-            relatedTour ? (
+          {quote &&
+            quote.status === 'approved' &&
+            (relatedTour ? (
               // 已有關聯旅遊團：前往該旅遊團
               <Button
                 onClick={() => router.push(`/tours?highlight=${relatedTour.id}`)}
@@ -263,17 +288,16 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 onClick={handleCreateTour}
                 disabled={isReadOnly}
                 className={cn(
-                  "h-8 px-3 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'h-8 px-3 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plane size={14} className="mr-1.5" />
                 開旅遊團
               </Button>
-            )
-          )}
+            ))}
         </div>
       </div>
     </>
-  );
-};
+  )
+}

@@ -2,25 +2,25 @@
  * QuotesPage - Main quotes list page component
  */
 
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Calculator } from 'lucide-react';
-import { QuotesList } from './QuotesList';
-import { QuoteDialog } from './QuoteDialog';
-import { useQuotesData } from '../hooks/useQuotesData';
-import { useQuotesFilters } from '../hooks/useQuotesFilters';
-import { useQuoteForm } from '../hooks/useQuoteForm';
-import { useQuoteTourSync } from '../hooks/useQuoteTourSync';
-import { STATUS_FILTERS } from '../constants';
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Calculator } from 'lucide-react'
+import { QuotesList } from './QuotesList'
+import { QuoteDialog } from './QuoteDialog'
+import { useQuotesData } from '../hooks/useQuotesData'
+import { useQuotesFilters } from '../hooks/useQuotesFilters'
+import { useQuoteForm } from '../hooks/useQuoteForm'
+import { useQuoteTourSync } from '../hooks/useQuoteTourSync'
+import { STATUS_FILTERS } from '../constants'
 
 export const QuotesPage: React.FC = () => {
-  const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter()
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Data and actions
   const {
@@ -34,7 +34,7 @@ export const QuotesPage: React.FC = () => {
     handleTogglePin,
     handleDeleteQuote,
     handleQuoteClick,
-  } = useQuotesData();
+  } = useQuotesData()
 
   // Form management
   const {
@@ -46,10 +46,10 @@ export const QuotesPage: React.FC = () => {
     resetForm,
     initFormWithTour,
     handleSubmit,
-  } = useQuoteForm({ addQuote, getCitiesByCountry });
+  } = useQuoteForm({ addQuote, getCitiesByCountry })
 
   // Filtering
-  const { filteredQuotes } = useQuotesFilters({ quotes, statusFilter, searchTerm });
+  const { filteredQuotes } = useQuotesFilters({ quotes, statusFilter, searchTerm })
 
   // Tour sync - auto-open dialog when coming from tours page
   const { clearTourParam } = useQuoteTourSync({
@@ -57,22 +57,22 @@ export const QuotesPage: React.FC = () => {
     tours,
     isAddDialogOpen,
     onOpenDialog: (tourId: string) => {
-      const tour = tours.find(t => t.id === tourId);
+      const tour = tours.find(t => t.id === tourId)
       if (tour) {
-        initFormWithTour(tour);
-        setIsAddDialogOpen(true);
+        initFormWithTour(tour)
+        setIsAddDialogOpen(true)
       }
     },
     onNavigateToQuote: (quoteId: string) => {
-      router.replace(`/quotes/${quoteId}`);
+      router.replace(`/quotes/${quoteId}`)
     },
-  });
+  })
 
   const handleDialogClose = () => {
-    setIsAddDialogOpen(false);
-    resetForm();
-    clearTourParam();
-  };
+    setIsAddDialogOpen(false)
+    resetForm()
+    clearTourParam()
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -81,7 +81,7 @@ export const QuotesPage: React.FC = () => {
         icon={Calculator}
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '報價單管理', href: '/quotes' }
+          { label: '報價單管理', href: '/quotes' },
         ]}
         tabs={STATUS_FILTERS.map(f => ({
           value: f.value,
@@ -112,9 +112,9 @@ export const QuotesPage: React.FC = () => {
 
       <QuoteDialog
         open={isAddDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) handleDialogClose();
-          setIsAddDialogOpen(open);
+        onOpenChange={open => {
+          if (!open) handleDialogClose()
+          setIsAddDialogOpen(open)
         }}
         formData={formData}
         setFormField={setFormField}
@@ -127,5 +127,5 @@ export const QuotesPage: React.FC = () => {
         onClose={handleDialogClose}
       />
     </div>
-  );
-};
+  )
+}

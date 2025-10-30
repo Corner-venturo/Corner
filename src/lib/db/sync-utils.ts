@@ -8,7 +8,7 @@
  * - _deleted: 軟刪除標記
  */
 
-import type { SyncableEntity } from '@/types';
+import type { SyncableEntity } from '@/types'
 
 /**
  * 為新建立的實體加入同步欄位
@@ -25,7 +25,7 @@ export function withSyncFields<T extends Record<string, unknown>>(
     _needs_sync: !isSynced,
     _synced_at: isSynced ? new Date().toISOString() : null,
     _deleted: false,
-  };
+  }
 }
 
 /**
@@ -40,7 +40,7 @@ export function markAsSynced<T extends Record<string, unknown>>(
     ...data,
     _needs_sync: false,
     _synced_at: new Date().toISOString(),
-  };
+  }
 }
 
 /**
@@ -55,7 +55,7 @@ export function markAsPending<T extends Record<string, unknown>>(
     ...data,
     _needs_sync: true,
     _synced_at: null,
-  };
+  }
 }
 
 /**
@@ -71,27 +71,26 @@ export function markAsDeleted<T extends Record<string, unknown>>(
     _deleted: true,
     _needs_sync: true,
     _synced_at: null,
-  };
+  }
 }
 
 /**
  * 檢查實體是否已同步
  */
 export function isSynced(entity: Partial<SyncableEntity>): boolean {
-  return entity._needs_sync === false && entity._synced_at !== null;
+  return entity._needs_sync === false && entity._synced_at !== null
 }
 
 /**
  * 檢查實體是否待同步
  */
 export function isPending(entity: Partial<SyncableEntity>): boolean {
-  return entity._needs_sync === true;
+  return entity._needs_sync === true
 }
 
 /**
  * 檢查實體是否已軟刪除
  */
 export function isDeleted(entity: Partial<SyncableEntity>): boolean {
-  return entity._deleted === true;
+  return entity._deleted === true
 }
-

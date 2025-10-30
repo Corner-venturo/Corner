@@ -1,30 +1,34 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-import { Template, GeneratedDocument, PaperSettings } from '@/types/template';
-import { logger } from '@/lib/utils/logger';
+import { Template, GeneratedDocument, PaperSettings } from '@/types/template'
+import { logger } from '@/lib/utils/logger'
 
 interface TemplateStore {
   // 狀態
-  templates: Template[];
-  documents: GeneratedDocument[];
+  templates: Template[]
+  documents: GeneratedDocument[]
 
   // 模板操作（統一使用 Promise）
-  addTemplate: (template: Omit<Template, 'id' | 'version' | 'usage_count' | 'metadata' | 'is_deleted'>) => Promise<Template>;
-  updateTemplate: (id: string, updates: Partial<Template>) => Promise<void>;
-  deleteTemplate: (id: string, user_id: string) => Promise<void>;
-  getTemplate: (id: string) => Template | undefined;
-  duplicateTemplate: (id: string, newName: string) => Promise<Template>;
+  addTemplate: (
+    template: Omit<Template, 'id' | 'version' | 'usage_count' | 'metadata' | 'is_deleted'>
+  ) => Promise<Template>
+  updateTemplate: (id: string, updates: Partial<Template>) => Promise<void>
+  deleteTemplate: (id: string, user_id: string) => Promise<void>
+  getTemplate: (id: string) => Template | undefined
+  duplicateTemplate: (id: string, newName: string) => Promise<Template>
 
   // 文件操作
-  addDocument: (document: Omit<GeneratedDocument, 'id' | 'created_at'>) => Promise<GeneratedDocument>;
-  getDocumentsByTemplate: (template_id: string) => GeneratedDocument[];
+  addDocument: (
+    document: Omit<GeneratedDocument, 'id' | 'created_at'>
+  ) => Promise<GeneratedDocument>
+  getDocumentsByTemplate: (template_id: string) => GeneratedDocument[]
 
   // 工具函數
-  incrementUsageCount: (templateId: string) => void;
+  incrementUsageCount: (templateId: string) => void
 
   // 初始化預設模板
-  initializeDefaultTemplates: () => void;
+  initializeDefaultTemplates: () => void
 }
 
 // 預設紙張設定
@@ -39,7 +43,7 @@ const _DEFAULT_PAPER_SETTINGS: PaperSettings = {
   },
   show_grid: true,
   show_ruler: true,
-};
+}
 
 export const useTemplateStore = create<TemplateStore>()(
   persist(
@@ -47,7 +51,7 @@ export const useTemplateStore = create<TemplateStore>()(
       templates: [],
       documents: [],
 
-      addTemplate: async (templateData) => {
+      addTemplate: async templateData => {
         const newTemplate: Template = {
           ...templateData,
           id: crypto.randomUUID(),
@@ -59,18 +63,18 @@ export const useTemplateStore = create<TemplateStore>()(
           metadata: {
             created_by: templateData.paper_settings ? 'user' : 'system',
           },
-        };
+        }
 
-        set((state) => ({
+        set(state => ({
           templates: [...state.templates, newTemplate],
-        }));
+        }))
 
-        return newTemplate;
+        return newTemplate
       },
 
       updateTemplate: async (id, updates) => {
-        set((state) => ({
-          templates: state.templates.map((template) =>
+        set(state => ({
+          templates: state.templates.map(template =>
             template.id === id
               ? {
                   ...template,
@@ -82,12 +86,12 @@ export const useTemplateStore = create<TemplateStore>()(
                 }
               : template
           ),
-        }));
+        }))
       },
 
       deleteTemplate: async (id, user_id) => {
-        set((state) => ({
-          templates: state.templates.map((template) =>
+        set(state => ({
+          templates: state.templates.map(template =>
             template.id === id
               ? {
                   ...template,
@@ -97,17 +101,17 @@ export const useTemplateStore = create<TemplateStore>()(
                 }
               : template
           ),
-        }));
+        }))
       },
 
-      getTemplate: (id) => {
-        return get().templates.find((t) => t.id === id && !t.is_deleted);
+      getTemplate: id => {
+        return get().templates.find(t => t.id === id && !t.is_deleted)
       },
 
       duplicateTemplate: async (id, newName) => {
-        const original = get().getTemplate(id);
+        const original = get().getTemplate(id)
         if (!original) {
-          throw new Error('Template not found');
+          throw new Error('Template not found')
         }
 
         const duplicated: Template = {
@@ -121,52 +125,52 @@ export const useTemplateStore = create<TemplateStore>()(
           metadata: {
             created_by: original.metadata.created_by,
           },
-        };
+        }
 
-        set((state) => ({
+        set(state => ({
           templates: [...state.templates, duplicated],
-        }));
+        }))
 
-        return duplicated;
+        return duplicated
       },
 
-      addDocument: async (documentData) => {
+      addDocument: async documentData => {
         const newDocument: GeneratedDocument = {
           ...documentData,
           id: crypto.randomUUID(),
           created_at: new Date().toISOString(),
-        };
+        }
 
-        set((state) => ({
+        set(state => ({
           documents: [...state.documents, newDocument],
-        }));
+        }))
 
         // 增加模板使用次數
-        get().incrementUsageCount(documentData.template_id);
+        get().incrementUsageCount(documentData.template_id)
 
-        return newDocument;
+        return newDocument
       },
 
-      getDocumentsByTemplate: (templateId) => {
-        return get().documents.filter((doc) => doc.template_id === templateId);
+      getDocumentsByTemplate: templateId => {
+        return get().documents.filter(doc => doc.template_id === templateId)
       },
 
-      incrementUsageCount: (templateId) => {
-        set((state) => ({
-          templates: state.templates.map((template) =>
+      incrementUsageCount: templateId => {
+        set(state => ({
+          templates: state.templates.map(template =>
             template.id === templateId
               ? { ...template, usage_count: template.usage_count + 1 }
               : template
           ),
-        }));
+        }))
       },
 
       initializeDefaultTemplates: () => {
-        const { templates } = get();
+        const { templates } = get()
         if (templates.length === 0) {
           // 目前不自動建立預設模板
           // 等待使用者從設計器建立
-          logger.log('模板列表為空，等待使用者建立第一個模板');
+          logger.log('模板列表為空，等待使用者建立第一個模板')
         }
       },
     }),
@@ -174,4 +178,4 @@ export const useTemplateStore = create<TemplateStore>()(
       name: 'template-storage',
     }
   )
-);
+)

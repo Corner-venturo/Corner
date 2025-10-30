@@ -3,22 +3,22 @@
  * 出納單列表組件
  */
 
-'use client';
+'use client'
 
-import { EnhancedTable } from '@/components/ui/enhanced-table';
-import { Button } from '@/components/ui/button';
-import { Calendar } from 'lucide-react';
-import { PaymentRequest, DisbursementOrder } from '../types';
-import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns';
+import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { Button } from '@/components/ui/button'
+import { Calendar } from 'lucide-react'
+import { PaymentRequest, DisbursementOrder } from '../types'
+import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
 
 interface PendingListProps {
-  data: PaymentRequest[];
-  selectedRequests: string[];
-  selectedAmount: number;
-  searchTerm: string;
-  nextThursday: string | Date;
-  onSelectRequest: (requestId: string) => void;
-  onAddToDisbursement: () => void;
+  data: PaymentRequest[]
+  selectedRequests: string[]
+  selectedAmount: number
+  searchTerm: string
+  nextThursday: string | Date
+  onSelectRequest: (requestId: string) => void
+  onAddToDisbursement: () => void
 }
 
 export function PendingList({
@@ -28,9 +28,9 @@ export function PendingList({
   searchTerm,
   nextThursday,
   onSelectRequest,
-  onAddToDisbursement
+  onAddToDisbursement,
 }: PendingListProps) {
-  const columns = usePendingColumns({ selectedRequests, onSelectRequest });
+  const columns = usePendingColumns({ selectedRequests, onSelectRequest })
 
   return (
     <>
@@ -41,7 +41,10 @@ export function PendingList({
             <span className="text-sm text-morandi-secondary">
               已選 {selectedRequests.length} 筆，總金額 NT$ {selectedAmount.toLocaleString()}
             </span>
-            <Button onClick={onAddToDisbursement} className="bg-morandi-gold hover:bg-morandi-gold/90">
+            <Button
+              onClick={onAddToDisbursement}
+              className="bg-morandi-gold hover:bg-morandi-gold/90"
+            >
               加入本週出帳
             </Button>
           </div>
@@ -52,7 +55,10 @@ export function PendingList({
       {data.length > 0 && (
         <div className="mb-4 flex items-center justify-end">
           <div className="text-sm text-morandi-secondary">
-            {data.length} 筆 • 下次出帳日：{typeof nextThursday === 'string' ? nextThursday : nextThursday.toLocaleDateString('zh-TW')}
+            {data.length} 筆 • 下次出帳日：
+            {typeof nextThursday === 'string'
+              ? nextThursday
+              : nextThursday.toLocaleDateString('zh-TW')}
           </div>
         </div>
       )}
@@ -67,15 +73,15 @@ export function PendingList({
         searchTerm={searchTerm}
       />
     </>
-  );
+  )
 }
 
 interface CurrentOrderListProps {
-  currentOrder: DisbursementOrder;
-  requests: PaymentRequest[];
-  searchTerm: string;
-  onRemove: (requestId: string) => void;
-  onConfirm: () => void;
+  currentOrder: DisbursementOrder
+  requests: PaymentRequest[]
+  searchTerm: string
+  onRemove: (requestId: string) => void
+  onConfirm: () => void
 }
 
 export function CurrentOrderList({
@@ -83,22 +89,27 @@ export function CurrentOrderList({
   requests,
   searchTerm,
   onRemove,
-  onConfirm
+  onConfirm,
 }: CurrentOrderListProps) {
-  const columns = useCurrentOrderColumns({ currentOrder, onRemove });
+  const columns = useCurrentOrderColumns({ currentOrder, onRemove })
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-morandi-primary">{currentOrder.order_number}</h3>
+          <h3 className="text-lg font-semibold text-morandi-primary">
+            {currentOrder.order_number}
+          </h3>
           <p className="text-sm text-morandi-secondary">
-            出帳日期：{currentOrder.disbursement_date} • {currentOrder.payment_request_ids.length} 筆請款單
+            出帳日期：{currentOrder.disbursement_date} • {currentOrder.payment_request_ids.length}{' '}
+            筆請款單
           </p>
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-right">
-            <p className="text-2xl font-bold text-morandi-primary">NT$ {currentOrder.total_amount.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-morandi-primary">
+              NT$ {currentOrder.total_amount.toLocaleString()}
+            </p>
           </div>
           {currentOrder.status === 'pending' && (
             <Button onClick={onConfirm} className="bg-morandi-green hover:bg-morandi-green/90">
@@ -117,11 +128,11 @@ export function CurrentOrderList({
         searchTerm={searchTerm}
       />
     </div>
-  );
+  )
 }
 
 interface EmptyCurrentOrderProps {
-  onNavigate: () => void;
+  onNavigate: () => void
 }
 
 export function EmptyCurrentOrder({ onNavigate }: EmptyCurrentOrderProps) {
@@ -134,16 +145,16 @@ export function EmptyCurrentOrder({ onNavigate }: EmptyCurrentOrderProps) {
         前往選擇請款單
       </Button>
     </div>
-  );
+  )
 }
 
 interface HistoryListProps {
-  data: DisbursementOrder[];
-  searchTerm: string;
+  data: DisbursementOrder[]
+  searchTerm: string
 }
 
 export function HistoryList({ data, searchTerm }: HistoryListProps) {
-  const columns = useHistoryColumns();
+  const columns = useHistoryColumns()
 
   return (
     <EnhancedTable
@@ -154,5 +165,5 @@ export function HistoryList({ data, searchTerm }: HistoryListProps) {
       initialPageSize={20}
       searchTerm={searchTerm}
     />
-  );
+  )
 }

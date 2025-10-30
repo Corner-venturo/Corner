@@ -65,14 +65,14 @@ npm run type-check   # TypeScript 類型檢查
 ```typescript
 // ✅ 正確：全部 snake_case
 export interface Employee extends BaseEntity {
-  id: string;
-  employee_number: string;
-  first_name: string;
-  last_name: string;
-  is_active: boolean;
-  hire_date?: string;
-  created_at: string;
-  updated_at: string;
+  id: string
+  employee_number: string
+  first_name: string
+  last_name: string
+  is_active: boolean
+  hire_date?: string
+  created_at: string
+  updated_at: string
 }
 ```
 
@@ -95,22 +95,22 @@ export interface Employee extends BaseEntity {
 
 ```typescript
 // ✅ 正確
-const employee = await localDB.read<Employee>('employees', id);
-console.log(employee.employee_number);
-console.log(employee.is_active);
-console.log(employee.created_at);
+const employee = await localDB.read<Employee>('employees', id)
+console.log(employee.employee_number)
+console.log(employee.is_active)
+console.log(employee.created_at)
 ```
 
 ### 常用欄位對照表
 
-| 欄位說明 | ✅ 正確命名 | ❌ 錯誤命名 |
-|---------|------------|-----------|
+| 欄位說明 | ✅ 正確命名       | ❌ 錯誤命名      |
+| -------- | ----------------- | ---------------- |
 | 員工編號 | `employee_number` | `employeeNumber` |
-| 名字 | `first_name` | `firstName` |
-| 姓氏 | `last_name` | `lastName` |
-| 是否啟用 | `is_active` | `isActive` |
-| 建立時間 | `created_at` | `createdAt` |
-| 更新時間 | `updated_at` | `updatedAt` |
+| 名字     | `first_name`      | `firstName`      |
+| 姓氏     | `last_name`       | `lastName`       |
+| 是否啟用 | `is_active`       | `isActive`       |
+| 建立時間 | `created_at`      | `createdAt`      |
+| 更新時間 | `updated_at`      | `updatedAt`      |
 
 ### 禁止事項
 
@@ -119,10 +119,10 @@ console.log(employee.created_at);
 ```typescript
 // ❌ 錯誤：一個物件裡混用
 interface BadExample {
-  employeeNumber: string;  // camelCase
-  first_name: string;      // snake_case
-  isActive: boolean;       // camelCase
-  created_at: string;      // snake_case
+  employeeNumber: string // camelCase
+  first_name: string // snake_case
+  isActive: boolean // camelCase
+  created_at: string // snake_case
 }
 ```
 
@@ -130,9 +130,9 @@ interface BadExample {
 
 ```typescript
 // ❌ 錯誤：不需要這些
-function toSnakeCase(obj: any) { }
-function toCamelCase(obj: any) { }
-function convertKeys(obj: any) { }
+function toSnakeCase(obj: any) {}
+function toCamelCase(obj: any) {}
+function convertKeys(obj: any) {}
 ```
 
 ---
@@ -201,40 +201,40 @@ Database Layer (Supabase/IndexedDB)
 ```typescript
 // ✅ 正確
 interface TourFormData {
-  name: string;
-  start_date: string;
-  end_date: string;
-  max_people: number;
+  name: string
+  start_date: string
+  end_date: string
+  max_people: number
 }
 
 // ❌ 錯誤：使用 any
-function handleSubmit(data: any) { }
+function handleSubmit(data: any) {}
 ```
 
 #### 2. 避免型別斷言
 
 ```typescript
 // ✅ 正確：使用適當型別
-const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
 // ❌ 錯誤：使用 unknown 或 any
-const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
-const data = response as any;
+const [selectedOrder, setSelectedOrder] = useState<unknown>(null)
+const data = response as any
 ```
 
 #### 3. 使用 Logger 而非 console
 
 ```typescript
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/utils/logger'
 
 // ✅ 正確
-logger.info('訂單已建立:', order.code);
-logger.error('建立失敗:', error);
-logger.debug('除錯資訊:', data);
+logger.info('訂單已建立:', order.code)
+logger.error('建立失敗:', error)
+logger.debug('除錯資訊:', data)
 
 // ❌ 錯誤
-console.log('訂單已建立:', order.code);
-console.error('建立失敗:', error);
+console.log('訂單已建立:', order.code)
+console.error('建立失敗:', error)
 ```
 
 ### React 組件規範
@@ -274,20 +274,20 @@ export function TourList() {
 ```typescript
 // ✅ 正確：合併相關狀態
 interface DialogState {
-  memberSidebar: boolean;
-  shareQuote: boolean;
-  shareTour: boolean;
+  memberSidebar: boolean
+  shareQuote: boolean
+  shareTour: boolean
 }
 const [dialogState, setDialogState] = useState<DialogState>({
   memberSidebar: false,
   shareQuote: false,
   shareTour: false,
-});
+})
 
 // ❌ 錯誤：過多獨立狀態
-const [isMemberSidebarOpen, setIsMemberSidebarOpen] = useState(false);
-const [isShareQuoteOpen, setIsShareQuoteOpen] = useState(false);
-const [isShareTourOpen, setIsShareTourOpen] = useState(false);
+const [isMemberSidebarOpen, setIsMemberSidebarOpen] = useState(false)
+const [isShareQuoteOpen, setIsShareQuoteOpen] = useState(false)
+const [isShareTourOpen, setIsShareTourOpen] = useState(false)
 // ... 8 more states
 ```
 
@@ -409,12 +409,9 @@ git commit -m "feat: add new feature"
 ### 莫蘭迪色系
 
 ```css
---morandi-primary: #3A3633      /* 主要文字 */
---morandi-secondary: #8B8680    /* 次要文字 */
---morandi-gold: #C4A572         /* 強調色（按鈕） */
---morandi-green: #9FA68F        /* 成功狀態 */
---morandi-red: #C08374          /* 警告狀態 */
---morandi-container: #E8E5E0    /* 容器背景 */
+--morandi-primary: #3a3633 /* 主要文字 */ --morandi-secondary: #8b8680 /* 次要文字 */
+  --morandi-gold: #c4a572 /* 強調色（按鈕） */ --morandi-green: #9fa68f /* 成功狀態 */
+  --morandi-red: #c08374 /* 警告狀態 */ --morandi-container: #e8e5e0 /* 容器背景 */;
 ```
 
 ### 設計原則
@@ -431,6 +428,7 @@ git commit -m "feat: add new feature"
 ### Q1: 為什麼不用 TypeScript 慣例的 camelCase？
 
 **A**: 因為我們的資料直接來自資料庫（IndexedDB/Supabase），使用 snake_case 可以：
+
 - 避免前後端轉換
 - 減少錯誤機會
 - 簡化維護
@@ -439,32 +437,35 @@ git commit -m "feat: add new feature"
 ### Q2: 如何處理 console.log？
 
 **A**: 全部替換為 logger：
-```typescript
-import { logger } from '@/lib/utils/logger';
 
-logger.info()   // 一般資訊
-logger.error()  // 錯誤訊息
-logger.warn()   // 警告訊息
-logger.debug()  // 除錯訊息
+```typescript
+import { logger } from '@/lib/utils/logger'
+
+logger.info() // 一般資訊
+logger.error() // 錯誤訊息
+logger.warn() // 警告訊息
+logger.debug() // 除錯訊息
 ```
 
 ### Q3: 組件狀態太多怎麼辦？
 
 **A**: 合併相關狀態到單一物件，或建立自訂 Hook：
+
 ```typescript
 // 方案 1：合併狀態
 const [dialogState, setDialogState] = useState({
   memberSidebar: false,
   shareQuote: false,
-});
+})
 
 // 方案 2：自訂 Hook
-const { isOpen, open, close } = useDialogState(['memberSidebar', 'shareQuote']);
+const { isOpen, open, close } = useDialogState(['memberSidebar', 'shareQuote'])
 ```
 
 ### Q4: 如何正確使用型別？
 
 **A**:
+
 - 避免 `as any` / `as unknown`
 - 使用適當的泛型
 - 定義明確的 interface

@@ -12,38 +12,38 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
-    detectSessionInUrl: false
+    detectSessionInUrl: false,
   },
   global: {
     fetch: (url, options = {}) => {
       // 60 秒超時，給本地網路更多時間
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), POLLING_INTERVALS.OCCASIONAL);
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), POLLING_INTERVALS.OCCASIONAL)
 
       return fetch(url, {
         ...options,
         signal: controller.signal,
-      }).finally(() => clearTimeout(timeoutId));
+      }).finally(() => clearTimeout(timeoutId))
     },
   },
 })
 
 // 獲取 Supabase client 實例的函數
 export function getSupabaseClient() {
-  return supabase;
+  return supabase
 }
 
 // 測試 Supabase 連接
 export async function testSupabaseConnection() {
   try {
-    const { data, error } = await supabase.from('employees').select('count').limit(1);
+    const { data, error } = await supabase.from('employees').select('count').limit(1)
 
     if (error) {
-            return { success: false, error: error.message };
+      return { success: false, error: error.message }
     }
 
-    return { success: true, data };
+    return { success: true, data }
   } catch (err) {
-        return { success: false, error: String(err) };
+    return { success: false, error: String(err) }
   }
 }

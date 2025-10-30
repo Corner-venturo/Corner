@@ -45,17 +45,13 @@ export function CalendarSettingsDialog() {
             <Checkbox
               id="show-personal"
               checked={settings.showPersonal}
-              onCheckedChange={(checked) =>
-                updateSettings({ showPersonal: checked as boolean })
-              }
+              onCheckedChange={checked => updateSettings({ showPersonal: checked as boolean })}
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-personal" className="text-base cursor-pointer">
                 個人行事曆
               </Label>
-              <p className="text-sm text-muted-foreground">
-                只有您能看到的個人事項
-              </p>
+              <p className="text-sm text-muted-foreground">只有您能看到的個人事項</p>
             </div>
           </div>
 
@@ -64,17 +60,13 @@ export function CalendarSettingsDialog() {
             <Checkbox
               id="show-company"
               checked={settings.showCompany}
-              onCheckedChange={(checked) =>
-                updateSettings({ showCompany: checked as boolean })
-              }
+              onCheckedChange={checked => updateSettings({ showCompany: checked as boolean })}
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-company" className="text-base cursor-pointer">
                 公司行事曆
               </Label>
-              <p className="text-sm text-muted-foreground">
-                全公司共享的會議與活動
-              </p>
+              <p className="text-sm text-muted-foreground">全公司共享的會議與活動</p>
             </div>
           </div>
 
@@ -83,17 +75,13 @@ export function CalendarSettingsDialog() {
             <Checkbox
               id="show-tours"
               checked={settings.showTours}
-              onCheckedChange={(checked) =>
-                updateSettings({ showTours: checked as boolean })
-              }
+              onCheckedChange={checked => updateSettings({ showTours: checked as boolean })}
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-tours" className="text-base cursor-pointer">
                 旅遊團
               </Label>
-              <p className="text-sm text-muted-foreground">
-                自動顯示旅遊團出發與返回日期
-              </p>
+              <p className="text-sm text-muted-foreground">自動顯示旅遊團出發與返回日期</p>
             </div>
           </div>
 
@@ -102,17 +90,13 @@ export function CalendarSettingsDialog() {
             <Checkbox
               id="show-birthdays"
               checked={settings.showBirthdays}
-              onCheckedChange={(checked) =>
-                updateSettings({ showBirthdays: checked as boolean })
-              }
+              onCheckedChange={checked => updateSettings({ showBirthdays: checked as boolean })}
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-birthdays" className="text-base cursor-pointer">
                 生日提醒
               </Label>
-              <p className="text-sm text-muted-foreground">
-                自動顯示團員生日
-              </p>
+              <p className="text-sm text-muted-foreground">自動顯示團員生日</p>
             </div>
           </div>
         </div>

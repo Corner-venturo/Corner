@@ -1,5 +1,5 @@
 // Main component
-export { ReactDatasheetWrapper } from './ReactDatasheetWrapper';
+export { ReactDatasheetWrapper } from './ReactDatasheetWrapper'
 
 // Types
 export type {
@@ -8,16 +8,16 @@ export type {
   DataSheetProps,
   SelectionRange,
   RoomUsage,
-  CellChange
-} from './types';
+  CellChange,
+} from './types'
 
 // Hooks (for advanced usage)
-export { useDatasheetState } from './useDatasheetState';
-export { useDatasheetHandlers } from './useDatasheetHandlers';
+export { useDatasheetState } from './useDatasheetState'
+export { useDatasheetHandlers } from './useDatasheetHandlers'
 
 // Components (for advanced usage)
-export { DatasheetCell } from './DatasheetCell';
-export { DatasheetStyles } from './DatasheetStyles';
+export { DatasheetCell } from './DatasheetCell'
+export { DatasheetStyles } from './DatasheetStyles'
 
 // Constants (for advanced usage)
 export {
@@ -31,9 +31,9 @@ export {
   ARROW_KEYS,
   COLORS,
   SPECIAL_CELLS,
-  ERROR_MESSAGES
-} from './constants';
+  ERROR_MESSAGES,
+} from './constants'
 
 // Default export for backwards compatibility
-import { ReactDatasheetWrapper as RDW } from './ReactDatasheetWrapper';
-export default RDW;
+import { ReactDatasheetWrapper as RDW } from './ReactDatasheetWrapper'
+export default RDW

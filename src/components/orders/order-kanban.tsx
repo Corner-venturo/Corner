@@ -1,85 +1,92 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Order, Tour } from '@/stores/types';
-import { useOrderStore } from '@/stores';
-import { Users, DollarSign, Calendar, User, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { _Button } from '@/components/ui/button';
+import React, { useState } from 'react'
+import { Order, Tour } from '@/stores/types'
+import { useOrderStore } from '@/stores'
+import { Users, DollarSign, Calendar, User, AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { _Button } from '@/components/ui/button'
 
 interface OrderKanbanProps {
-  orders: Order[];
-  tours: Tour[];
-  onOrderClick?: (order: Order) => void;
+  orders: Order[]
+  tours: Tour[]
+  onOrderClick?: (order: Order) => void
 }
 
-type PaymentStatus = 'unpaid' | 'partial' | 'paid';
+type PaymentStatus = 'unpaid' | 'partial' | 'paid'
 
 const columns: Array<{
-  id: PaymentStatus;
-  label: string;
-  color: string;
-  icon: React.ElementType;
+  id: PaymentStatus
+  label: string
+  color: string
+  icon: React.ElementType
 }> = [
   { id: 'unpaid', label: '未收款', color: 'bg-morandi-gold/10 border-morandi-gold', icon: Clock },
-  { id: 'partial', label: '部分收款', color: 'bg-morandi-blue/10 border-morandi-blue', icon: CheckCircle2 },
-  { id: 'paid', label: '已收款', color: 'bg-morandi-green/10 border-morandi-green', icon: DollarSign },
-];
+  {
+    id: 'partial',
+    label: '部分收款',
+    color: 'bg-morandi-blue/10 border-morandi-blue',
+    icon: CheckCircle2,
+  },
+  {
+    id: 'paid',
+    label: '已收款',
+    color: 'bg-morandi-green/10 border-morandi-green',
+    icon: DollarSign,
+  },
+]
 
 export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
-  const orderStore = useOrderStore();
-  const updateOrder = orderStore.update;
-  const [draggedOrder, setDraggedOrder] = useState<Order | null>(null);
+  const orderStore = useOrderStore()
+  const updateOrder = orderStore.update
+  const [draggedOrder, setDraggedOrder] = useState<Order | null>(null)
 
   const getOrdersByStatus = (status: PaymentStatus) => {
-    return orders.filter(order => order.payment_status === status);
-  };
+    return orders.filter(order => order.payment_status === status)
+  }
 
   const handleDragStart = (order: Order) => {
-    setDraggedOrder(order);
-  };
+    setDraggedOrder(order)
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+    e.preventDefault()
+  }
 
   const handleDrop = (status: PaymentStatus) => {
     if (draggedOrder) {
-      updateOrder(draggedOrder.id, { payment_status: status as unknown });
-      setDraggedOrder(null);
+      updateOrder(draggedOrder.id, { payment_status: status as unknown })
+      setDraggedOrder(null)
     }
-  };
+  }
 
   const getTourInfo = (order: Order) => {
-    return tours.find(t => t.id === order.tour_id);
-  };
+    return tours.find(t => t.id === order.tour_id)
+  }
 
   const getPaymentProgress = (order: Order) => {
-    if (order.total_amount === 0) return 0;
-    return (order.paid_amount / order.total_amount) * 100;
-  };
+    if (order.total_amount === 0) return 0
+    return (order.paid_amount / order.total_amount) * 100
+  }
 
   const getDaysUntilDeparture = (tour: Tour | undefined) => {
-    if (!tour) return null;
-    const today = new Date();
-    const departure = new Date(tour.departure_date);
-    const days = Math.ceil((departure.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return days;
-  };
+    if (!tour) return null
+    const today = new Date()
+    const departure = new Date(tour.departure_date)
+    const days = Math.ceil((departure.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    return days
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {columns.map((column) => {
-        const columnOrders = getOrdersByStatus(column.id);
-        const Icon = column.icon;
+      {columns.map(column => {
+        const columnOrders = getOrdersByStatus(column.id)
+        const Icon = column.icon
 
         return (
           <div
             key={column.id}
-            className={cn(
-              'flex flex-col rounded-xl border-2 p-4 min-h-[600px]',
-              column.color
-            )}
+            className={cn('flex flex-col rounded-xl border-2 p-4 min-h-[600px]', column.color)}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(column.id)}
           >
@@ -96,11 +103,15 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
 
             {/* 訂單卡片列表 */}
             <div className="space-y-3 flex-1 overflow-y-auto">
-              {columnOrders.map((order) => {
-                const tour = getTourInfo(order);
-                const progress = getPaymentProgress(order);
-                const daysUntil = getDaysUntilDeparture(tour);
-                const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0 && order.payment_status !== 'paid';
+              {columnOrders.map(order => {
+                const tour = getTourInfo(order)
+                const progress = getPaymentProgress(order)
+                const daysUntil = getDaysUntilDeparture(tour)
+                const isUrgent =
+                  daysUntil !== null &&
+                  daysUntil <= 7 &&
+                  daysUntil >= 0 &&
+                  order.payment_status !== 'paid'
 
                 return (
                   <div
@@ -180,8 +191,11 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                           <div
                             className={cn(
                               'h-full transition-all',
-                              progress === 100 ? 'bg-morandi-green' :
-                              progress >= 50 ? 'bg-morandi-gold' : 'bg-morandi-red'
+                              progress === 100
+                                ? 'bg-morandi-green'
+                                : progress >= 50
+                                  ? 'bg-morandi-gold'
+                                  : 'bg-morandi-red'
                             )}
                             style={{ width: `${progress}%` }}
                           />
@@ -200,7 +214,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
 
               {/* 空狀態 */}
@@ -212,8 +226,8 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
               )}
             </div>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

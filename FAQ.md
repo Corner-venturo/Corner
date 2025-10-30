@@ -60,7 +60,7 @@ netstat -ano | findstr :3000   # Windows
 
 ### Q: 如何啟動開發服務器？
 
-**A**: 
+**A**:
 
 ```bash
 # 標準啟動
@@ -73,20 +73,23 @@ start http://localhost:3000 # Windows
 
 ### Q: 首次啟動需要做什麼設定？
 
-**A**: 
+**A**:
 
 1. **設定環境變數** (.env.local)
+
 ```bash
 cp .env.example .env.local
 # 編輯 .env.local 填入你的 Supabase 資訊
 ```
 
 2. **初始化資料庫**
+
 ```bash
 npm run db:init
 ```
 
 3. **啟動專案**
+
 ```bash
 npm run dev
 ```
@@ -123,9 +126,10 @@ npm run test:ui
 
 ### Q: 測試失敗怎麼辦？
 
-**A**: 
+**A**:
 
 1. **檢查錯誤訊息**
+
 ```bash
 npm test -- --reporter=verbose
 ```
@@ -136,6 +140,7 @@ npm test -- --reporter=verbose
    - 依賴版本不匹配
 
 3. **清除快取重試**:
+
 ```bash
 npm test -- --clearCache
 ```
@@ -146,13 +151,13 @@ npm test -- --clearCache
 
 ```typescript
 // src/stores/selectors/__tests__/example.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest'
 
 describe('Example Test', () => {
   it('should pass', () => {
-    expect(1 + 1).toBe(2);
-  });
-});
+    expect(1 + 1).toBe(2)
+  })
+})
 ```
 
 ---
@@ -176,12 +181,14 @@ npm run start
 **A**:
 
 1. **環境變數** (在 Vercel Dashboard 設定)
+
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```
 
 2. **Build 設定**
+
 ```
 Build Command: npm run build
 Output Directory: .next
@@ -220,6 +227,7 @@ npm run dev -- --port 3001
 **A**:
 
 1. **檢查環境變數**
+
 ```bash
 # .env.local
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -232,10 +240,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    - 檢查 API keys 是否正確
 
 3. **測試連接**
+
 ```typescript
-import { supabase } from '@/lib/supabase/client';
-const { data, error } = await supabase.from('employees').select('*');
-console.log(data, error);
+import { supabase } from '@/lib/supabase/client'
+const { data, error } = await supabase.from('employees').select('*')
+console.log(data, error)
 ```
 
 ### Q: TypeScript 錯誤太多怎麼辦？
@@ -286,6 +295,7 @@ ANALYZE=true npm run build
 **A**:
 
 1. **使用 Dynamic Import**
+
 ```typescript
 const HeavyComponent = dynamic(
   () => import('./HeavyComponent'),
@@ -355,10 +365,11 @@ npx supabase migration list
    - 選擇 `VenturoOfflineDB`
 
 2. **程式碼查詢**
+
 ```typescript
-import { localDB } from '@/services/storage';
-const employees = await localDB.getAll('employees');
-console.log(employees);
+import { localDB } from '@/services/storage'
+const employees = await localDB.getAll('employees')
+console.log(employees)
 ```
 
 ### Q: Offline-First 如何運作？
@@ -371,12 +382,12 @@ console.log(employees);
 
 ```typescript
 // 使用 sync helper
-import { loadWithSync } from '@/stores/utils/sync-helper';
+import { loadWithSync } from '@/stores/utils/sync-helper'
 
 const { cached, fresh } = await loadWithSync({
   tableName: 'employees',
   filter: { field: 'is_active', value: true },
-});
+})
 
 // cached 立即可用，fresh 背景同步
 ```
@@ -400,6 +411,7 @@ const { cached, fresh } = await loadWithSync({
 **A**:
 
 在 GitHub Issues 創建新 issue，包含：
+
 - Bug 描述
 - 重現步驟
 - 預期行為

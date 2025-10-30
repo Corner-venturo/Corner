@@ -9,20 +9,20 @@
 
 ### 功能區塊分佈 (696 行)
 
-| 區塊 | 行數 | 職責 | 複雜度 |
-|------|------|------|--------|
-| **型別定義** | ~80 行 | StoreState, CodeConfig, StoreConfig | 🟢 低 |
-| **編號生成** | ~25 行 | _generateCode 函數 | 🟢 低 |
-| **fetchAll** | ~210 行 | IndexedDB + Supabase 同步邏輯 | 🔴 高 |
-| **fetchById** | ~35 行 | 單筆查詢 | 🟢 低 |
-| **create** | ~60 行 | FastIn 新增邏輯 | 🟡 中 |
-| **update** | ~60 行 | FastIn 更新邏輯 | 🟡 中 |
-| **delete** | ~55 行 | FastIn 刪除邏輯 | 🟡 中 |
-| **批次操作** | ~25 行 | createMany, deleteMany | 🟢 低 |
-| **查詢操作** | ~20 行 | findByField, filter, count | 🟢 低 |
-| **同步操作** | ~25 行 | syncPending, cancelRequests | 🟢 低 |
-| **事件監聽器** | ~25 行 | 全域事件註冊 | 🟢 低 |
-| **配置解析** | ~20 行 | 向後相容處理 | 🟢 低 |
+| 區塊           | 行數    | 職責                                | 複雜度 |
+| -------------- | ------- | ----------------------------------- | ------ |
+| **型別定義**   | ~80 行  | StoreState, CodeConfig, StoreConfig | 🟢 低  |
+| **編號生成**   | ~25 行  | \_generateCode 函數                 | 🟢 低  |
+| **fetchAll**   | ~210 行 | IndexedDB + Supabase 同步邏輯       | 🔴 高  |
+| **fetchById**  | ~35 行  | 單筆查詢                            | 🟢 低  |
+| **create**     | ~60 行  | FastIn 新增邏輯                     | 🟡 中  |
+| **update**     | ~60 行  | FastIn 更新邏輯                     | 🟡 中  |
+| **delete**     | ~55 行  | FastIn 刪除邏輯                     | 🟡 中  |
+| **批次操作**   | ~25 行  | createMany, deleteMany              | 🟢 低  |
+| **查詢操作**   | ~20 行  | findByField, filter, count          | 🟢 低  |
+| **同步操作**   | ~25 行  | syncPending, cancelRequests         | 🟢 低  |
+| **事件監聽器** | ~25 行  | 全域事件註冊                        | 🟢 低  |
+| **配置解析**   | ~20 行  | 向後相容處理                        | 🟢 低  |
 
 ### 核心問題
 
@@ -80,6 +80,7 @@ src/stores/
 ### Phase 2.1: 建立基礎架構 (1-2 小時)
 
 #### Step 1: 型別定義 ✅
+
 ```typescript
 // src/stores/core/types.ts
 export interface StoreState<T> { ... }
@@ -89,6 +90,7 @@ export interface SyncState { ... }
 ```
 
 #### Step 2: 工具模組 ✅
+
 ```typescript
 // src/stores/utils/code-generator.ts
 export function generateCode(config, items) { ... }
@@ -98,6 +100,7 @@ export class AbortManager { ... }
 ```
 
 #### Step 3: 適配器層 ✅
+
 ```typescript
 // src/stores/adapters/indexeddb.ts
 export class IndexedDBAdapter<T> {
@@ -117,6 +120,7 @@ export class SupabaseAdapter<T> {
 ### Phase 2.2: 同步邏輯拆分 (2-3 小時)
 
 #### Step 4: 同步協調器 ✅
+
 ```typescript
 // src/stores/sync/coordinator.ts
 export class SyncCoordinator<T> {
@@ -127,6 +131,7 @@ export class SyncCoordinator<T> {
 ```
 
 #### Step 5: 合併策略 ✅
+
 ```typescript
 // src/stores/sync/merge-strategy.ts
 export class MergeStrategy<T> {
@@ -138,6 +143,7 @@ export class MergeStrategy<T> {
 ### Phase 2.3: 操作層重構 (3-4 小時)
 
 #### Step 6: Fetch 操作 ✅
+
 ```typescript
 // src/stores/operations/fetch.ts
 export async function fetchAll<T>(config, adapters) { ... }
@@ -145,6 +151,7 @@ export async function fetchById<T>(id, adapters) { ... }
 ```
 
 #### Step 7: CRUD 操作 ✅
+
 ```typescript
 // src/stores/operations/create.ts
 export async function create<T>(data, config, adapters) { ... }
@@ -159,25 +166,26 @@ export async function deleteItem<T>(id, config, adapters) { ... }
 ### Phase 2.4: 主入口重構 (1-2 小時)
 
 #### Step 8: 組合所有模組 ✅
+
 ```typescript
 // src/stores/core/create-store.ts
-import { fetchAll, fetchById } from '../operations/fetch';
-import { create } from '../operations/create';
+import { fetchAll, fetchById } from '../operations/fetch'
+import { create } from '../operations/create'
 // ...
 
 export function createStore<T>(config) {
   const adapters = {
     indexedDB: new IndexedDBAdapter(config.tableName),
     supabase: new SupabaseAdapter(config.tableName),
-  };
+  }
 
-  const sync = new SyncCoordinator(adapters);
+  const sync = new SyncCoordinator(adapters)
 
   return createZustandStore({
     fetchAll: () => fetchAll(config, adapters, sync),
-    create: (data) => create(data, config, adapters, sync),
+    create: data => create(data, config, adapters, sync),
     // ...
-  });
+  })
 }
 ```
 
@@ -189,17 +197,17 @@ export function createStore<T>(config) {
 
 ```typescript
 // ✅ 所有現有程式碼無需修改
-import { createStore } from './create-store';
+import { createStore } from './create-store'
 
 // 舊的調用方式仍然有效
-export const useTourStore = createStore<Tour>('tours', 'T');
+export const useTourStore = createStore<Tour>('tours', 'T')
 
 // 新的調用方式也支援
 export const useOrderStore = createStore<Order>({
   tableName: 'orders',
   codePrefix: 'O',
-  fastInsert: true
-});
+  fastInsert: true,
+})
 ```
 
 ---
@@ -207,55 +215,57 @@ export const useOrderStore = createStore<Order>({
 ## 🧪 測試策略
 
 ### 單元測試
+
 每個模組都應該有獨立的單元測試：
 
 ```typescript
 // __tests__/utils/code-generator.test.ts
 describe('generateCode', () => {
   it('should generate correct tour code', () => {
-    const code = generateCode({ prefix: 'T', year: 2025 }, []);
-    expect(code).toBe('T20250001');
-  });
-});
+    const code = generateCode({ prefix: 'T', year: 2025 }, [])
+    expect(code).toBe('T20250001')
+  })
+})
 ```
 
 ### 整合測試
+
 確保重構後功能正常：
 
 ```typescript
 // __tests__/create-store.integration.test.ts
 describe('createStore', () => {
   it('should create tour store with all operations', async () => {
-    const store = createStore<Tour>('tours', 'T');
-    const tour = await store.getState().create({ tour_name: 'Test' });
-    expect(tour.code).toMatch(/^T\d{8}$/);
-  });
-});
+    const store = createStore<Tour>('tours', 'T')
+    const tour = await store.getState().create({ tour_name: 'Test' })
+    expect(tour.code).toMatch(/^T\d{8}$/)
+  })
+})
 ```
 
 ---
 
 ## 📊 預期改善
 
-| 指標 | 重構前 | 重構後 | 改善 |
-|------|--------|--------|------|
-| **檔案大小** | 696 行 | 最大 150 行 | ✅ -78% |
-| **可測試性** | 困難 | 容易 | ✅ +200% |
-| **複雜度** | 高 | 低-中 | ✅ -60% |
-| **擴充性** | 困難 | 容易 | ✅ +150% |
-| **維護性** | 困難 | 容易 | ✅ +200% |
+| 指標         | 重構前 | 重構後      | 改善     |
+| ------------ | ------ | ----------- | -------- |
+| **檔案大小** | 696 行 | 最大 150 行 | ✅ -78%  |
+| **可測試性** | 困難   | 容易        | ✅ +200% |
+| **複雜度**   | 高     | 低-中       | ✅ -60%  |
+| **擴充性**   | 困難   | 容易        | ✅ +150% |
+| **維護性**   | 困難   | 容易        | ✅ +200% |
 
 ---
 
 ## 🎯 執行時程
 
-| 階段 | 任務 | 預估時間 | 狀態 |
-|------|------|----------|------|
-| **2.1** | 建立基礎架構 | 1-2h | ⏳ 準備開始 |
-| **2.2** | 同步邏輯拆分 | 2-3h | ⏳ 待執行 |
-| **2.3** | 操作層重構 | 3-4h | ⏳ 待執行 |
-| **2.4** | 主入口重構 | 1-2h | ⏳ 待執行 |
-| **測試** | 整合測試 | 1-2h | ⏳ 待執行 |
+| 階段     | 任務         | 預估時間 | 狀態        |
+| -------- | ------------ | -------- | ----------- |
+| **2.1**  | 建立基礎架構 | 1-2h     | ⏳ 準備開始 |
+| **2.2**  | 同步邏輯拆分 | 2-3h     | ⏳ 待執行   |
+| **2.3**  | 操作層重構   | 3-4h     | ⏳ 待執行   |
+| **2.4**  | 主入口重構   | 1-2h     | ⏳ 待執行   |
+| **測試** | 整合測試     | 1-2h     | ⏳ 待執行   |
 
 **總預估**: 8-13 小時
 
@@ -264,6 +274,7 @@ describe('createStore', () => {
 ## 🚀 開始執行
 
 執行順序：
+
 1. ✅ 建立目錄結構
 2. ✅ 拆分型別定義 → `core/types.ts`
 3. ✅ 拆分工具函數 → `utils/`

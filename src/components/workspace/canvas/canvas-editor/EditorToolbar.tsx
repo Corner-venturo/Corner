@@ -2,15 +2,15 @@
  * Editor Toolbar - formatting controls for rich text editor
  */
 
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 import {
   Bold,
   Italic,
@@ -25,19 +25,24 @@ import {
   Undo,
   Redo,
   Strikethrough,
-  Minus
-} from 'lucide-react';
-import { Editor } from '@tiptap/react';
-import { cn } from '@/lib/utils';
+  Minus,
+} from 'lucide-react'
+import { Editor } from '@tiptap/react'
+import { cn } from '@/lib/utils'
 
 interface EditorToolbarProps {
-  editor: Editor;
-  onSetLink: () => void;
-  onAddImage: () => void;
-  onUploadImage: () => void;
+  editor: Editor
+  onSetLink: () => void
+  onAddImage: () => void
+  onUploadImage: () => void
 }
 
-export function EditorToolbar({ editor, onSetLink, onAddImage, onUploadImage }: EditorToolbarProps) {
+export function EditorToolbar({
+  editor,
+  onSetLink,
+  onAddImage,
+  onUploadImage,
+}: EditorToolbarProps) {
   return (
     <div className="border-b border-border bg-morandi-container/5 px-4 py-2 flex items-center gap-1 flex-wrap">
       {/* Undo/Redo */}
@@ -189,22 +194,14 @@ export function EditorToolbar({ editor, onSetLink, onAddImage, onUploadImage }: 
       {/* Image */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2 gap-1"
-          >
+          <Button variant="ghost" size="sm" className="h-8 px-2 gap-1">
             <ImageIcon size={16} />
             <span className="text-xs">圖片</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={onUploadImage}>
-            上傳圖片
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onAddImage}>
-            圖片網址
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onUploadImage}>上傳圖片</DropdownMenuItem>
+          <DropdownMenuItem onClick={onAddImage}>圖片網址</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -220,5 +217,5 @@ export function EditorToolbar({ editor, onSetLink, onAddImage, onUploadImage }: 
         <Minus size={16} />
       </Button>
     </div>
-  );
+  )
 }

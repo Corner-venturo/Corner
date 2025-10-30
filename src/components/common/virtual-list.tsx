@@ -10,30 +10,30 @@
  * - 提升滾動流暢度
  */
 
-'use client';
+'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { cn } from '@/lib/utils'
 
 interface VirtualListProps<T> {
   /** 資料陣列 */
-  items: T[];
+  items: T[]
   /** 每個項目的高度（px） */
-  itemHeight: number;
+  itemHeight: number
   /** 可視區域高度（px） */
-  height: number;
+  height: number
   /** 渲染項目的函數 */
-  renderItem: (item: T, index: number) => React.ReactNode;
+  renderItem: (item: T, index: number) => React.ReactNode
   /** 額外渲染的緩衝項目數量（上下各加幾個） */
-  overscan?: number;
+  overscan?: number
   /** 自訂 className */
-  className?: string;
+  className?: string
   /** 載入更多的回調（無限滾動） */
-  onLoadMore?: () => void;
+  onLoadMore?: () => void
   /** 是否正在載入 */
-  isLoading?: boolean;
+  isLoading?: boolean
   /** 載入指示器 */
-  loadingIndicator?: React.ReactNode;
+  loadingIndicator?: React.ReactNode
 }
 
 export function VirtualList<T>({
@@ -45,47 +45,44 @@ export function VirtualList<T>({
   className,
   onLoadMore,
   isLoading = false,
-  loadingIndicator
+  loadingIndicator,
 }: VirtualListProps<T>) {
-  const [scrollTop, setScrollTop] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // 計算可視範圍
-  const totalHeight = items.length * itemHeight;
-  const visibleCount = Math.ceil(height / itemHeight);
-  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
-  const endIndex = Math.min(
-    items.length - 1,
-    startIndex + visibleCount + overscan * 2
-  );
+  const totalHeight = items.length * itemHeight
+  const visibleCount = Math.ceil(height / itemHeight)
+  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
+  const endIndex = Math.min(items.length - 1, startIndex + visibleCount + overscan * 2)
 
   // 可見項目
-  const visibleItems = items.slice(startIndex, endIndex + 1);
+  const visibleItems = items.slice(startIndex, endIndex + 1)
 
   // 處理滾動
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
-      const target = e.currentTarget;
-      setScrollTop(target.scrollTop);
+      const target = e.currentTarget
+      setScrollTop(target.scrollTop)
 
       // 檢查是否接近底部（觸發載入更多）
       if (onLoadMore && !isLoading) {
-        const bottomDistance = target.scrollHeight - target.scrollTop - target.clientHeight;
+        const bottomDistance = target.scrollHeight - target.scrollTop - target.clientHeight
         if (bottomDistance < itemHeight * 5) {
-          onLoadMore();
+          onLoadMore()
         }
       }
     },
     [onLoadMore, isLoading, itemHeight]
-  );
+  )
 
   // 自動滾動到頂部（當資料變化時）
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-      setScrollTop(0);
+      containerRef.current.scrollTop = 0
+      setScrollTop(0)
     }
-  }, [items.length]);
+  }, [items.length])
 
   return (
     <div
@@ -98,7 +95,7 @@ export function VirtualList<T>({
       <div style={{ height: totalHeight, position: 'relative' }}>
         {/* 渲染可見項目 */}
         {visibleItems.map((item, i) => {
-          const index = startIndex + i;
+          const index = startIndex + i
           return (
             <div
               key={index}
@@ -107,12 +104,12 @@ export function VirtualList<T>({
                 top: index * itemHeight,
                 left: 0,
                 right: 0,
-                height: itemHeight
+                height: itemHeight,
               }}
             >
               {renderItem(item, index)}
             </div>
-          );
+          )
         })}
 
         {/* 載入指示器 */}
@@ -123,7 +120,7 @@ export function VirtualList<T>({
               top: items.length * itemHeight,
               left: 0,
               right: 0,
-              height: itemHeight
+              height: itemHeight,
             }}
             className="flex items-center justify-center"
           >
@@ -137,7 +134,7 @@ export function VirtualList<T>({
         )}
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -145,11 +142,11 @@ export function VirtualList<T>({
  */
 interface VirtualGridProps<T> extends Omit<VirtualListProps<T>, 'itemHeight'> {
   /** 每個項目的寬度（px） */
-  itemWidth: number;
+  itemWidth: number
   /** 每個項目的高度（px） */
-  itemHeight: number;
+  itemHeight: number
   /** 每列顯示幾個 */
-  columns: number;
+  columns: number
 }
 
 export function VirtualGrid<T>({
@@ -163,12 +160,12 @@ export function VirtualGrid<T>({
   className,
   onLoadMore,
   isLoading = false,
-  loadingIndicator
+  loadingIndicator,
 }: VirtualGridProps<T>) {
   // 將一維陣列轉換為二維陣列（每列 columns 個）
-  const rows: T[][] = [];
+  const rows: T[][] = []
   for (let i = 0; i < items.length; i += columns) {
-    rows.push(items.slice(i, i + columns));
+    rows.push(items.slice(i, i + columns))
   }
 
   return (
@@ -184,15 +181,15 @@ export function VirtualGrid<T>({
       renderItem={(row, rowIndex) => (
         <div className="flex gap-4">
           {row.map((item, colIndex) => {
-            const index = rowIndex * columns + colIndex;
+            const index = rowIndex * columns + colIndex
             return (
               <div key={index} style={{ width: itemWidth }}>
                 {renderItem(item, index)}
               </div>
-            );
+            )
           })}
         </div>
       )}
     />
-  );
+  )
 }

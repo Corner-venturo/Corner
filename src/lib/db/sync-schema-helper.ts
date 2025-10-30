@@ -3,7 +3,7 @@
  * 為所有業務表自動加入同步相關索引
  */
 
-import type { IndexSchema } from './schemas';
+import type { IndexSchema } from './schemas'
 
 /**
  * 同步相關的索引定義
@@ -13,7 +13,7 @@ export const SYNC_INDEXES: IndexSchema[] = [
   { name: 'sync_status', keyPath: 'sync_status', unique: false },
   { name: 'temp_code', keyPath: 'temp_code', unique: false },
   { name: 'synced_at', keyPath: 'synced_at', unique: false },
-];
+]
 
 /**
  * 需要加入同步索引的業務表清單
@@ -50,13 +50,13 @@ export const SYNCABLE_TABLES = [
   'templates',
   'workspace_items',
   'timebox_sessions',
-] as const;
+] as const
 
 /**
  * 檢查表是否需要同步索引
  */
 export function isSyncableTable(tableName: string): boolean {
-  return SYNCABLE_TABLES.includes(tableName as unknown);
+  return SYNCABLE_TABLES.includes(tableName as unknown)
 }
 
 /**
@@ -64,14 +64,14 @@ export function isSyncableTable(tableName: string): boolean {
  * 如果索引已存在則跳過
  */
 export function addSyncIndexes(existingIndexes: IndexSchema[]): IndexSchema[] {
-  const indexNames = new Set(existingIndexes.map(idx => idx.name));
-  const newIndexes = [...existingIndexes];
+  const indexNames = new Set(existingIndexes.map(idx => idx.name))
+  const newIndexes = [...existingIndexes]
 
   for (const syncIndex of SYNC_INDEXES) {
     if (!indexNames.has(syncIndex.name)) {
-      newIndexes.push(syncIndex);
+      newIndexes.push(syncIndex)
     }
   }
 
-  return newIndexes;
+  return newIndexes
 }

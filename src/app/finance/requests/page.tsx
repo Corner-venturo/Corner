@@ -1,25 +1,21 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { EnhancedTable } from '@/components/ui/enhanced-table';
-import { usePayments } from '@/features/payments/hooks/usePayments';
-import { Plus, FileText } from 'lucide-react';
-import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog';
-import { BatchRequestDialog } from '@/features/finance/requests/components/BatchRequestDialog';
-import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable';
+import { useState } from 'react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { usePayments } from '@/features/payments/hooks/usePayments'
+import { Plus, FileText } from 'lucide-react'
+import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
+import { BatchRequestDialog } from '@/features/finance/requests/components/BatchRequestDialog'
+import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 
 export default function RequestsPage() {
-  const { payment_requests } = usePayments();
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false);
+  const { payment_requests } = usePayments()
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
 
-  const {
-    tableColumns,
-    filteredAndSortedRequests,
-    handleSort,
-    handleFilter
-  } = useRequestTable(payment_requests);
+  const { tableColumns, filteredAndSortedRequests, handleSort, handleFilter } =
+    useRequestTable(payment_requests)
 
   return (
     <div className="h-full flex flex-col">
@@ -56,15 +52,9 @@ export default function RequestsPage() {
         />
       </div>
 
-      <AddRequestDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-      />
+      <AddRequestDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
 
-      <BatchRequestDialog
-        open={isBatchDialogOpen}
-        onOpenChange={setIsBatchDialogOpen}
-      />
+      <BatchRequestDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
     </div>
-  );
+  )
 }

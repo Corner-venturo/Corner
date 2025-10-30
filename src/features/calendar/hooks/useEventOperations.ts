@@ -5,10 +5,7 @@ import { useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { FullCalendarEvent } from '@/features/calendar/types'
-import {
-  AddEventDialogState,
-  NewEventForm,
-} from '../types'
+import { AddEventDialogState, NewEventForm } from '../types'
 
 const initialNewEventState: NewEventForm = {
   title: '',

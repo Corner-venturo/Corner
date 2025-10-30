@@ -1,51 +1,51 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import { Calendar, Clock, FileText, X, UserCheck } from 'lucide-react';
-import { AssignmentSectionProps } from './types';
-import { useUserStore } from '@/stores/user-store';
-import { useAuthStore } from '@/stores/auth-store';
+import React, { useEffect, useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
+import { Calendar, Clock, FileText, X, UserCheck } from 'lucide-react'
+import { AssignmentSectionProps } from './types'
+import { useUserStore } from '@/stores/user-store'
+import { useAuthStore } from '@/stores/auth-store'
 
 export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
-  const { items: employees, loadItems } = useUserStore();
-  const { user } = useAuthStore();
-  const [assigneeName, setAssigneeName] = useState<string>('');
+  const { items: employees, loadItems } = useUserStore()
+  const { user } = useAuthStore()
+  const [assigneeName, setAssigneeName] = useState<string>('')
 
   // 載入員工資料
   useEffect(() => {
     if (employees.length === 0) {
-      void loadItems();
+      void loadItems()
     }
-  }, [employees.length, loadItems]);
+  }, [employees.length, loadItems])
 
   // 更新指派者名稱
   useEffect(() => {
     if (todo.assignee) {
       // 優先檢查當前登入用戶，再檢查員工列表
       if (user?.id === todo.assignee) {
-        setAssigneeName(user.display_name || user.name || user.email || '未知員工');
+        setAssigneeName(user.display_name || user.name || user.email || '未知員工')
       } else {
-        const assignee = employees.find(e => e.id === todo.assignee);
-        setAssigneeName(assignee?.display_name || assignee?.name || '未知員工');
+        const assignee = employees.find(e => e.id === todo.assignee)
+        setAssigneeName(assignee?.display_name || assignee?.name || '未知員工')
       }
     } else {
-      setAssigneeName('');
+      setAssigneeName('')
     }
-  }, [todo.assignee, employees, user]);
+  }, [todo.assignee, employees, user])
   const getDeadlineColor = () => {
-    if (!todo.deadline) return 'text-morandi-secondary';
+    if (!todo.deadline) return 'text-morandi-secondary'
 
-    const deadline = new Date(todo.deadline);
-    const today = new Date();
-    const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const deadline = new Date(todo.deadline)
+    const today = new Date()
+    const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
-    if (diffDays < 0) return 'text-morandi-red'; // 逾期
-    if (diffDays === 0) return 'text-morandi-gold'; // 今天
-    if (diffDays <= 3) return 'text-morandi-gold'; // 3天內
-    return 'text-morandi-secondary'; // 充裕
-  };
+    if (diffDays < 0) return 'text-morandi-red' // 逾期
+    if (diffDays === 0) return 'text-morandi-gold' // 今天
+    if (diffDays <= 3) return 'text-morandi-gold' // 3天內
+    return 'text-morandi-secondary' // 充裕
+  }
 
   return (
     <div className="bg-card border border-border rounded-xl p-4 mb-4 shadow-sm">
@@ -74,7 +74,7 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
           <Input
             type="date"
             value={todo.deadline || ''}
-            onChange={(e) => onUpdate({ deadline: e.target.value })}
+            onChange={e => onUpdate({ deadline: e.target.value })}
             className={cn('text-sm font-medium h-8 w-auto', getDeadlineColor())}
           />
           {todo.deadline && (
@@ -151,14 +151,14 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
                 key={index}
                 onClick={() => {
                   const basePath = {
-                    'group': '/tours',
-                    'quote': '/quotes',
-                    'order': '/orders',
-                    'invoice': '/finance/treasury/disbursement',
-                    'receipt': '/finance/payments'
-                  }[item.type];
+                    group: '/tours',
+                    quote: '/quotes',
+                    order: '/orders',
+                    invoice: '/finance/treasury/disbursement',
+                    receipt: '/finance/payments',
+                  }[item.type]
                   if (basePath) {
-                    window.location.href = `${basePath}?highlight=${item.id}`;
+                    window.location.href = `${basePath}?highlight=${item.id}`
                   }
                 }}
                 className="bg-white/60 border border-morandi-gold/20 text-morandi-primary text-xs px-2 py-1 rounded-lg hover:bg-morandi-gold/10 hover:border-morandi-gold/20 transition-all font-medium"
@@ -170,5 +170,5 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

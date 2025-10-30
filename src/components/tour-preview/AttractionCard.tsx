@@ -1,13 +1,13 @@
-import React from 'react';
-import Image from 'next/image';
-import { morandiColors } from '@/lib/constants/morandi-colors';
+import React from 'react'
+import Image from 'next/image'
+import { morandiColors } from '@/lib/constants/morandi-colors'
 
 export interface AttractionCardProps {
-  title: string;
-  description: string;
-  image?: string;
-  layout?: 'horizontal' | 'vertical' | 'fullwidth' | 'hero';
-  className?: string;
+  title: string
+  description: string
+  image?: string
+  layout?: 'horizontal' | 'vertical' | 'fullwidth' | 'hero'
+  className?: string
 }
 
 /**
@@ -19,9 +19,9 @@ export function AttractionCard({
   description,
   image,
   layout = 'horizontal',
-  className = ''
+  className = '',
 }: AttractionCardProps) {
-  const hasImage = image && image.length > 0;
+  const hasImage = image && image.length > 0
 
   // Hero layout - 大圖 + 文字覆蓋
   if (layout === 'hero') {
@@ -30,7 +30,7 @@ export function AttractionCard({
         className={`relative h-[400px] rounded-[24px] overflow-hidden ${className}`}
         style={{
           backgroundColor: morandiColors.background.cream,
-          boxShadow: `0 4px 20px ${morandiColors.shadow.medium}`
+          boxShadow: `0 4px 20px ${morandiColors.shadow.medium}`,
         }}
       >
         {hasImage && (
@@ -45,15 +45,18 @@ export function AttractionCard({
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(to top, ${morandiColors.text.primary}E6 0%, transparent 60%)`
+            background: `linear-gradient(to top, ${morandiColors.text.primary}E6 0%, transparent 60%)`,
           }}
         />
-        <div className="absolute bottom-0 left-0 right-0 p-8" style={{ color: morandiColors.background.white }}>
+        <div
+          className="absolute bottom-0 left-0 right-0 p-8"
+          style={{ color: morandiColors.background.white }}
+        >
           <h3 className="text-3xl font-bold mb-3">{title}</h3>
           <p className="text-lg opacity-95 line-clamp-3">{description}</p>
         </div>
       </div>
-    );
+    )
   }
 
   // Fullwidth layout - 全寬圖片 + 下方文字
@@ -64,7 +67,7 @@ export function AttractionCard({
         style={{
           backgroundColor: morandiColors.background.white,
           border: `1px solid ${morandiColors.border.light}`,
-          boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`
+          boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`,
         }}
       >
         {hasImage && (
@@ -79,21 +82,15 @@ export function AttractionCard({
           </div>
         )}
         <div className="p-7">
-          <h3
-            className="text-2xl font-bold mb-3"
-            style={{ color: morandiColors.text.primary }}
-          >
+          <h3 className="text-2xl font-bold mb-3" style={{ color: morandiColors.text.primary }}>
             {title}
           </h3>
-          <p
-            className="text-base leading-relaxed"
-            style={{ color: morandiColors.text.secondary }}
-          >
+          <p className="text-base leading-relaxed" style={{ color: morandiColors.text.secondary }}>
             {description}
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   // Vertical layout - 縱向卡片
@@ -104,7 +101,7 @@ export function AttractionCard({
         style={{
           backgroundColor: morandiColors.background.white,
           border: `1px solid ${morandiColors.border.light}`,
-          boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`
+          boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`,
         }}
       >
         {hasImage && (
@@ -119,10 +116,7 @@ export function AttractionCard({
           </div>
         )}
         <div className="p-6">
-          <h4
-            className="text-xl font-bold mb-3"
-            style={{ color: morandiColors.text.primary }}
-          >
+          <h4 className="text-xl font-bold mb-3" style={{ color: morandiColors.text.primary }}>
             {title}
           </h4>
           <p
@@ -133,7 +127,7 @@ export function AttractionCard({
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   // Horizontal layout - 預設佈局
@@ -143,34 +137,22 @@ export function AttractionCard({
       style={{
         backgroundColor: morandiColors.background.white,
         border: `1px solid ${morandiColors.border.light}`,
-        boxShadow: `0 1px 8px ${morandiColors.shadow.soft}`
+        boxShadow: `0 1px 8px ${morandiColors.shadow.soft}`,
       }}
     >
       {hasImage && (
         <div className="relative w-36 h-36 flex-shrink-0 rounded-[16px] overflow-hidden">
-          <Image
-            src={image}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="144px"
-          />
+          <Image src={image} alt={title} fill className="object-cover" sizes="144px" />
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <h4
-          className="text-lg font-bold mb-2"
-          style={{ color: morandiColors.text.primary }}
-        >
+        <h4 className="text-lg font-bold mb-2" style={{ color: morandiColors.text.primary }}>
           {title}
         </h4>
-        <p
-          className="text-sm leading-relaxed"
-          style={{ color: morandiColors.text.secondary }}
-        >
+        <p className="text-sm leading-relaxed" style={{ color: morandiColors.text.secondary }}>
           {description}
         </p>
       </div>
     </div>
-  );
+  )
 }

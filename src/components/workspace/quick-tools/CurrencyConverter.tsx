@@ -1,8 +1,8 @@
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useCurrency } from './useCurrency';
-import { CURRENCY_OPTIONS } from './constants';
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useCurrency } from './useCurrency'
+import { CURRENCY_OPTIONS } from './constants'
 
 export function CurrencyConverter() {
   const {
@@ -13,8 +13,8 @@ export function CurrencyConverter() {
     toCurrency,
     setToCurrency,
     convertedAmount,
-    convert
-  } = useCurrency();
+    convert,
+  } = useCurrency()
 
   return (
     <div className="max-w-md mx-auto">
@@ -27,7 +27,7 @@ export function CurrencyConverter() {
             <Input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={e => setAmount(e.target.value)}
               placeholder="輸入金額"
             />
           </div>
@@ -37,7 +37,7 @@ export function CurrencyConverter() {
               <label className="block text-sm font-medium mb-1">從</label>
               <select
                 value={fromCurrency}
-                onChange={(e) => setFromCurrency(e.target.value)}
+                onChange={e => setFromCurrency(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-md"
               >
                 {CURRENCY_OPTIONS.map(option => (
@@ -52,7 +52,7 @@ export function CurrencyConverter() {
               <label className="block text-sm font-medium mb-1">到</label>
               <select
                 value={toCurrency}
-                onChange={(e) => setToCurrency(e.target.value)}
+                onChange={e => setToCurrency(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-md"
               >
                 {CURRENCY_OPTIONS.map(option => (
@@ -78,5 +78,5 @@ export function CurrencyConverter() {
         </div>
       </Card>
     </div>
-  );
+  )
 }

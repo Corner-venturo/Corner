@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { Input } from '@/components/ui/input';
-import { UI_DELAYS } from '@/lib/constants/timeouts';
+import { Input } from '@/components/ui/input'
+import { UI_DELAYS } from '@/lib/constants/timeouts'
 
 interface SupplierOption {
-  id: string;
-  name: string;
-  type: 'supplier' | 'employee';
-  group: string;
+  id: string
+  name: string
+  type: 'supplier' | 'employee'
+  group: string
 }
 
 interface SupplierSearchSelectProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSelect: (supplier: SupplierOption) => void;
-  suppliers: SupplierOption[];
-  showDropdown: boolean;
-  onShowDropdown: (show: boolean) => void;
-  placeholder?: string;
-  label?: string;
+  value: string
+  onChange: (value: string) => void
+  onSelect: (supplier: SupplierOption) => void
+  suppliers: SupplierOption[]
+  showDropdown: boolean
+  onShowDropdown: (show: boolean) => void
+  placeholder?: string
+  label?: string
 }
 
 export function SupplierSearchSelect({
@@ -28,29 +28,30 @@ export function SupplierSearchSelect({
   suppliers,
   showDropdown,
   onShowDropdown,
-  placeholder = "搜尋供應商或員工...",
-  label = "供應商"
+  placeholder = '搜尋供應商或員工...',
+  label = '供應商',
 }: SupplierSearchSelectProps) {
   // Group suppliers by type
-  const groupedSuppliers = suppliers.reduce((acc, supplier) => {
-    const group = supplier.group;
-    if (!acc[group]) {
-      acc[group] = [];
-    }
-    acc[group].push(supplier);
-    return acc;
-  }, {} as Record<string, SupplierOption[]>);
+  const groupedSuppliers = suppliers.reduce(
+    (acc, supplier) => {
+      const group = supplier.group
+      if (!acc[group]) {
+        acc[group] = []
+      }
+      acc[group].push(supplier)
+      return acc
+    },
+    {} as Record<string, SupplierOption[]>
+  )
 
   return (
     <div>
-      {label && (
-        <label className="text-sm font-medium text-morandi-secondary">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium text-morandi-secondary">{label}</label>}
       <div className="relative">
         <Input
           placeholder={placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           onClick={() => onShowDropdown(true)}
           onBlur={() => setTimeout(() => onShowDropdown(false), UI_DELAYS.SHORT_DELAY)}
           className="mt-2 bg-background"
@@ -64,12 +65,12 @@ export function SupplierSearchSelect({
                     <div className="px-3 py-2 text-xs font-semibold text-morandi-secondary bg-morandi-container/10 sticky top-0">
                       {groupName}
                     </div>
-                    {items.map((supplier) => (
+                    {items.map(supplier => (
                       <div
                         key={supplier.id}
                         onClick={() => {
-                          onSelect(supplier);
-                          onShowDropdown(false);
+                          onSelect(supplier)
+                          onShowDropdown(false)
                         }}
                         className="px-3 py-2 hover:bg-morandi-container/20 cursor-pointer border-b border-border last:border-b-0"
                       >
@@ -86,5 +87,5 @@ export function SupplierSearchSelect({
         )}
       </div>
     </div>
-  );
+  )
 }

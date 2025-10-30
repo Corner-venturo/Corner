@@ -1,16 +1,16 @@
-'use client';
+'use client'
 
-import { useEffect, useState, useMemo } from 'react';
-import { MapPin } from 'lucide-react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import type { City } from '@/stores';
-import { useRegionsData } from '../hooks/useRegionsData';
-import { useRegionsHierarchy } from '../hooks/useRegionsHierarchy';
-import { RegionsList } from './RegionsList';
-import { AddCountryDialog, AddRegionDialog, AddCityDialog, EditCityDialog } from './RegionsDialogs';
-import { EditCityImageDialog } from './EditCityImageDialog';
-import { ConfirmDialog } from '@/components/dialog/confirm-dialog';
-import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { useEffect, useState, useMemo } from 'react'
+import { MapPin } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import type { City } from '@/stores'
+import { useRegionsData } from '../hooks/useRegionsData'
+import { useRegionsHierarchy } from '../hooks/useRegionsHierarchy'
+import { RegionsList } from './RegionsList'
+import { AddCountryDialog, AddRegionDialog, AddCityDialog, EditCityDialog } from './RegionsDialogs'
+import { EditCityImageDialog } from './EditCityImageDialog'
+import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 // ============================================
 // 地區管理主頁面
@@ -33,7 +33,7 @@ export default function RegionsPage() {
     getRegionsByCountry,
     getCitiesByCountry,
     getCitiesByRegion,
-  } = useRegionsData();
+  } = useRegionsData()
 
   // UI 狀態管理
   const {
@@ -47,32 +47,32 @@ export default function RegionsPage() {
     sortCities,
     searchTerm,
     setSearchTerm,
-  } = useRegionsHierarchy();
+  } = useRegionsHierarchy()
 
   // 對話框狀態
-  const [isAddCountryOpen, setIsAddCountryOpen] = useState(false);
-  const [isAddRegionOpen, setIsAddRegionOpen] = useState(false);
-  const [isAddCityOpen, setIsAddCityOpen] = useState(false);
-  const [isEditCityOpen, setIsEditCityOpen] = useState(false);
-  const [isEditImageOpen, setIsEditImageOpen] = useState(false);
-  const [selectedCountryId, setSelectedCountryId] = useState<string>('');
-  const [selectedRegionId, setSelectedRegionId] = useState<string>('');
-  const [selectedCity, setSelectedCity] = useState<City | null>(null);
-  const { confirm, confirmDialogProps } = useConfirmDialog();
+  const [isAddCountryOpen, setIsAddCountryOpen] = useState(false)
+  const [isAddRegionOpen, setIsAddRegionOpen] = useState(false)
+  const [isAddCityOpen, setIsAddCityOpen] = useState(false)
+  const [isEditCityOpen, setIsEditCityOpen] = useState(false)
+  const [isEditImageOpen, setIsEditImageOpen] = useState(false)
+  const [selectedCountryId, setSelectedCountryId] = useState<string>('')
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('')
+  const [selectedCity, setSelectedCity] = useState<City | null>(null)
+  const { confirm, confirmDialogProps } = useConfirmDialog()
 
   // 載入資料
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    fetchAll()
+  }, [fetchAll])
 
   // 狀態切換處理
   const toggleCountryStatus = async (country: any) => {
-    await updateCountry(country.id, { is_active: !country.is_active });
-  };
+    await updateCountry(country.id, { is_active: !country.is_active })
+  }
 
   const toggleCityStatus = async (city: City) => {
-    await updateCity(city.id, { is_active: !city.is_active });
-  };
+    await updateCity(city.id, { is_active: !city.is_active })
+  }
 
   // 刪除處理
   const handleDeleteCountry = async (id: string) => {
@@ -80,34 +80,28 @@ export default function RegionsPage() {
       type: 'danger',
       title: '刪除國家',
       message: '確定要刪除此國家嗎？',
-      details: [
-        '⚠️ 這將同時刪除所有關聯的地區和城市',
-        '⚠️ 此操作無法復原'
-      ],
+      details: ['⚠️ 這將同時刪除所有關聯的地區和城市', '⚠️ 此操作無法復原'],
       confirmLabel: '確認刪除',
-      cancelLabel: '取消'
-    });
+      cancelLabel: '取消',
+    })
     if (confirmed) {
-      await deleteCountry(id);
+      await deleteCountry(id)
     }
-  };
+  }
 
   const handleDeleteRegion = async (id: string) => {
     const confirmed = await confirm({
       type: 'danger',
       title: '刪除地區',
       message: '確定要刪除此地區嗎？',
-      details: [
-        '⚠️ 這將同時刪除所有關聯的城市',
-        '⚠️ 此操作無法復原'
-      ],
+      details: ['⚠️ 這將同時刪除所有關聯的城市', '⚠️ 此操作無法復原'],
       confirmLabel: '確認刪除',
-      cancelLabel: '取消'
-    });
+      cancelLabel: '取消',
+    })
     if (confirmed) {
-      await deleteRegion(id);
+      await deleteRegion(id)
     }
-  };
+  }
 
   const handleDeleteCity = async (id: string) => {
     const confirmed = await confirm({
@@ -116,21 +110,22 @@ export default function RegionsPage() {
       message: '確定要刪除此城市嗎？',
       details: ['此操作無法復原'],
       confirmLabel: '確認刪除',
-      cancelLabel: '取消'
-    });
+      cancelLabel: '取消',
+    })
     if (confirmed) {
-      await deleteCity(id);
+      await deleteCity(id)
     }
-  };
+  }
 
   // 過濾資料
   const filteredCountries = useMemo(() => {
-    return countries.filter(country =>
-      !searchTerm ||
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      country.name_en.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [countries, searchTerm]);
+    return countries.filter(
+      country =>
+        !searchTerm ||
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        country.name_en.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [countries, searchTerm])
 
   return (
     <div className="h-full flex flex-col">
@@ -140,7 +135,7 @@ export default function RegionsPage() {
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
-          { label: '地區管理', href: '/database/regions' }
+          { label: '地區管理', href: '/database/regions' },
         ]}
         showSearch={true}
         searchTerm={searchTerm}
@@ -167,22 +162,22 @@ export default function RegionsPage() {
           handleDeleteRegion={handleDeleteRegion}
           handleDeleteCity={handleDeleteCity}
           onAddCountry={() => setIsAddCountryOpen(true)}
-          onAddRegion={(countryId) => {
-            setSelectedCountryId(countryId);
-            setIsAddRegionOpen(true);
+          onAddRegion={countryId => {
+            setSelectedCountryId(countryId)
+            setIsAddRegionOpen(true)
           }}
           onAddCity={(countryId, regionId) => {
-            setSelectedCountryId(countryId);
-            setSelectedRegionId(regionId || '');
-            setIsAddCityOpen(true);
+            setSelectedCountryId(countryId)
+            setSelectedRegionId(regionId || '')
+            setIsAddCityOpen(true)
           }}
-          onEditCity={(city) => {
-            setSelectedCity(city);
-            setIsEditCityOpen(true);
+          onEditCity={city => {
+            setSelectedCity(city)
+            setIsEditCityOpen(true)
           }}
-          onEditImage={(city) => {
-            setSelectedCity(city);
-            setIsEditImageOpen(true);
+          onEditImage={city => {
+            setSelectedCity(city)
+            setIsEditImageOpen(true)
           }}
           getRegionsByCountry={getRegionsByCountry}
           getCitiesByCountry={getCitiesByCountry}
@@ -213,8 +208,8 @@ export default function RegionsPage() {
       <EditCityDialog
         open={isEditCityOpen}
         onClose={() => {
-          setIsEditCityOpen(false);
-          setSelectedCity(null);
+          setIsEditCityOpen(false)
+          setSelectedCity(null)
         }}
         city={selectedCity}
         onUpdate={updateCity}
@@ -222,13 +217,13 @@ export default function RegionsPage() {
       <EditCityImageDialog
         open={isEditImageOpen}
         onClose={() => {
-          setIsEditImageOpen(false);
-          setSelectedCity(null);
+          setIsEditImageOpen(false)
+          setSelectedCity(null)
         }}
         city={selectedCity}
         onUpdate={updateCity}
       />
       <ConfirmDialog {...confirmDialogProps} />
     </div>
-  );
+  )
 }

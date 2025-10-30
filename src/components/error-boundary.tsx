@@ -1,42 +1,42 @@
-'use client';
+'use client'
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { AlertCircle, RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: ReactNode
+  fallback?: ReactNode
 }
 
 interface State {
-  hasError: boolean;
-  error?: Error;
-  errorInfo?: ErrorInfo;
+  hasError: boolean
+  error?: Error
+  errorInfo?: ErrorInfo
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
+    super(props)
+    this.state = { hasError: false }
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        this.setState({ error, errorInfo });
+    this.setState({ error, errorInfo })
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
-  };
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined })
+  }
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        return this.props.fallback
       }
 
       return (
@@ -49,9 +49,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-xl font-semibold text-morandi-primary">
-                發生錯誤
-              </h1>
+              <h1 className="text-xl font-semibold text-morandi-primary">發生錯誤</h1>
               <p className="text-morandi-secondary">
                 應用程式遇到未預期的錯誤，請嘗試重新載入頁面。
               </p>
@@ -90,10 +88,10 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
           </div>
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
@@ -107,26 +105,18 @@ export function withErrorBoundary<T extends object>(
       <ErrorBoundary fallback={fallback}>
         <Component {...props} />
       </ErrorBoundary>
-    );
-  };
+    )
+  }
 }
 
 // 輕量級錯誤邊界（用於小組件）
-export function ErrorFallback({
-  error,
-  resetError
-}: {
-  error?: Error;
-  resetError?: () => void;
-}) {
+export function ErrorFallback({ error, resetError }: { error?: Error; resetError?: () => void }) {
   return (
     <div className="morandi-card p-4 text-center space-y-3">
       <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
       <div>
         <h3 className="font-medium text-morandi-primary">載入失敗</h3>
-        <p className="text-sm text-morandi-secondary mt-1">
-          {error?.message || '發生未知錯誤'}
-        </p>
+        <p className="text-sm text-morandi-secondary mt-1">{error?.message || '發生未知錯誤'}</p>
       </div>
       {resetError && (
         <Button
@@ -140,5 +130,5 @@ export function ErrorFallback({
         </Button>
       )}
     </div>
-  );
+  )
 }

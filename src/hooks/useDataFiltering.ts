@@ -1,19 +1,19 @@
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 
 /**
  * 過濾配置介面
  */
 export interface FilterConfig<T> {
   /** 狀態欄位名稱 */
-  statusField?: keyof T;
+  statusField?: keyof T
   /** 用於搜尋的欄位列表 */
-  searchFields?: (keyof T)[];
+  searchFields?: (keyof T)[]
   /** 自訂過濾函數 */
-  customFilters?: Array<(item: T) => boolean>;
+  customFilters?: Array<(item: T) => boolean>
   /** 是否啟用模糊搜尋（預設 true） */
-  fuzzySearch?: boolean;
+  fuzzySearch?: boolean
   /** 搜尋時是否忽略大小寫（預設 true） */
-  caseInsensitive?: boolean;
+  caseInsensitive?: boolean
 }
 
 /**
@@ -58,15 +58,15 @@ export function useDataFiltering<T extends Record<string, unknown>>(
     customFilters = [],
     fuzzySearch = true,
     caseInsensitive = true,
-  } = config;
+  } = config
 
   return useMemo(() => {
     return data.filter(item => {
       // 1. 狀態過濾
       if (statusField && statusFilter && statusFilter !== 'all') {
-        const itemStatus = item[statusField];
+        const itemStatus = item[statusField]
         if (itemStatus !== statusFilter) {
-          return false;
+          return false
         }
       }
 
@@ -74,31 +74,29 @@ export function useDataFiltering<T extends Record<string, unknown>>(
       if (searchTerm && searchTerm.trim() !== '' && searchFields.length > 0) {
         const normalizedSearch = caseInsensitive
           ? searchTerm.trim().toLowerCase()
-          : searchTerm.trim();
+          : searchTerm.trim()
 
         const matchesSearch = searchFields.some(field => {
-          const value = item[field];
+          const value = item[field]
 
           // 跳過 null 或 undefined
-          if (value == null) return false;
+          if (value == null) return false
 
           // 轉換為字串並比對
-          const stringValue = String(value);
-          const normalizedValue = caseInsensitive
-            ? stringValue.toLowerCase()
-            : stringValue;
+          const stringValue = String(value)
+          const normalizedValue = caseInsensitive ? stringValue.toLowerCase() : stringValue
 
           if (fuzzySearch) {
             // 模糊搜尋 - 包含關鍵字即可
-            return normalizedValue.includes(normalizedSearch);
+            return normalizedValue.includes(normalizedSearch)
           } else {
             // 精確搜尋 - 必須完全匹配
-            return normalizedValue === normalizedSearch;
+            return normalizedValue === normalizedSearch
           }
-        });
+        })
 
         if (!matchesSearch) {
-          return false;
+          return false
         }
       }
 
@@ -106,19 +104,19 @@ export function useDataFiltering<T extends Record<string, unknown>>(
       if (customFilters.length > 0) {
         const passesAllFilters = customFilters.every(filter => {
           try {
-            return filter(item);
+            return filter(item)
           } catch (error) {
-                        return true; // 過濾器錯誤時，不排除該項目
+            return true // 過濾器錯誤時，不排除該項目
           }
-        });
+        })
 
         if (!passesAllFilters) {
-          return false;
+          return false
         }
       }
 
-      return true;
-    });
+      return true
+    })
   }, [
     data,
     statusFilter,
@@ -128,7 +126,7 @@ export function useDataFiltering<T extends Record<string, unknown>>(
     customFilters,
     fuzzySearch,
     caseInsensitive,
-  ]);
+  ])
 }
 
 /**
@@ -162,49 +160,47 @@ export function useMultiStatusFiltering<T extends Record<string, unknown>>(
   searchTerm: string,
   config: Omit<FilterConfig<T>, 'statusField'> & { statusField: keyof T }
 ): T[] {
-  const { statusField, ...restConfig } = config;
+  const { statusField, ...restConfig } = config
 
   return useMemo(() => {
     return data.filter(item => {
       // 1. 多狀態過濾
       if (statusFilters.length > 0 && !statusFilters.includes('all')) {
-        const itemStatus = item[statusField];
+        const itemStatus = item[statusField]
         if (!statusFilters.includes(String(itemStatus))) {
-          return false;
+          return false
         }
       }
 
       // 2. 關鍵字搜尋
       if (searchTerm && searchTerm.trim() !== '' && restConfig.searchFields) {
-        const normalizedSearch = restConfig.caseInsensitive !== false
-          ? searchTerm.trim().toLowerCase()
-          : searchTerm.trim();
+        const normalizedSearch =
+          restConfig.caseInsensitive !== false ? searchTerm.trim().toLowerCase() : searchTerm.trim()
 
         const matchesSearch = restConfig.searchFields.some(field => {
-          const value = item[field];
-          if (value == null) return false;
+          const value = item[field]
+          if (value == null) return false
 
-          const stringValue = String(value);
-          const normalizedValue = restConfig.caseInsensitive !== false
-            ? stringValue.toLowerCase()
-            : stringValue;
+          const stringValue = String(value)
+          const normalizedValue =
+            restConfig.caseInsensitive !== false ? stringValue.toLowerCase() : stringValue
 
-          return normalizedValue.includes(normalizedSearch);
-        });
+          return normalizedValue.includes(normalizedSearch)
+        })
 
         if (!matchesSearch) {
-          return false;
+          return false
         }
       }
 
       // 3. 自訂過濾器
       if (restConfig.customFilters && restConfig.customFilters.length > 0) {
-        return restConfig.customFilters.every(filter => filter(item));
+        return restConfig.customFilters.every(filter => filter(item))
       }
 
-      return true;
-    });
-  }, [data, statusFilters, searchTerm, statusField, restConfig]);
+      return true
+    })
+  }, [data, statusFilters, searchTerm, statusField, restConfig])
 }
 
 /**
@@ -233,26 +229,26 @@ export function useDateRangeFiltering<T extends Record<string, unknown>>(
   endDate?: string
 ): T[] {
   return useMemo(() => {
-    if (!startDate && !endDate) return data;
+    if (!startDate && !endDate) return data
 
     return data.filter(item => {
-      const itemDate = item[dateField];
-      if (!itemDate) return false;
+      const itemDate = item[dateField]
+      if (!itemDate) return false
 
-      const dateStr = String(itemDate);
-      const itemTimestamp = new Date(dateStr).getTime();
+      const dateStr = String(itemDate)
+      const itemTimestamp = new Date(dateStr).getTime()
 
       if (startDate) {
-        const startTimestamp = new Date(startDate).getTime();
-        if (itemTimestamp < startTimestamp) return false;
+        const startTimestamp = new Date(startDate).getTime()
+        if (itemTimestamp < startTimestamp) return false
       }
 
       if (endDate) {
-        const endTimestamp = new Date(endDate).getTime();
-        if (itemTimestamp > endTimestamp) return false;
+        const endTimestamp = new Date(endDate).getTime()
+        if (itemTimestamp > endTimestamp) return false
       }
 
-      return true;
-    });
-  }, [data, dateField, startDate, endDate]);
+      return true
+    })
+  }, [data, dateField, startDate, endDate])
 }

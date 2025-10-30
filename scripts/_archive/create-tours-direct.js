@@ -1,16 +1,17 @@
-const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js')
+const fs = require('fs')
 
-const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE';
+const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey, {
   db: { schema: 'public' },
-  auth: { persistSession: false }
-});
+  auth: { persistSession: false },
+})
 
 async function createToursTable() {
-  console.log('🔄 建立 tours 表格...');
+  console.log('🔄 建立 tours 表格...')
 
   // 直接使用 rpc 呼叫，如果有設定好的話
   const { data, error } = await supabase.rpc('exec_sql', {
@@ -48,19 +49,21 @@ async function createToursTable() {
         _synced_at TIMESTAMPTZ,
         _deleted BOOLEAN DEFAULT FALSE
       );
-    `
-  });
+    `,
+  })
 
   if (error) {
-    console.error('❌ 執行失敗:', error.message);
-    console.log('\n📋 請手動在 Supabase Dashboard 執行 SQL:');
-    console.log('👉 https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn/sql/new');
-    console.log('\nSQL 檔案位置:');
-    console.log('/Users/william/Projects/venturo-new/supabase/migrations/20251025_create_tours_table.sql');
-    return;
+    console.error('❌ 執行失敗:', error.message)
+    console.log('\n📋 請手動在 Supabase Dashboard 執行 SQL:')
+    console.log('👉 https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn/sql/new')
+    console.log('\nSQL 檔案位置:')
+    console.log(
+      '/Users/william/Projects/venturo-new/supabase/migrations/20251025_create_tours_table.sql'
+    )
+    return
   }
 
-  console.log('✅ tours 表格建立成功！');
+  console.log('✅ tours 表格建立成功！')
 }
 
-createToursTable();
+createToursTable()

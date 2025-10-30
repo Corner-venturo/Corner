@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { Sparkles, Moon, BellRing, Feather, Heart } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
+import { Sparkles, Moon, BellRing, Feather, Heart } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
   MANIFESTATION_EVENT,
   ManifestationReminderSnapshot,
@@ -13,18 +13,18 @@ import {
   MANIFESTATION_LAST_DATE_KEY,
   MANIFESTATION_STREAK_KEY,
   MANIFESTATION_HISTORY_KEY,
-} from '@/lib/manifestation/reminder';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/auth-store';
+} from '@/lib/manifestation/reminder'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface ReminderView {
-  title: string;
-  message: string;
-  accent: string;
-  gradient: string;
-  icon: ReactNode;
-  showAction: boolean;
+  title: string
+  message: string
+  accent: string
+  gradient: string
+  icon: ReactNode
+  showAction: boolean
 }
 
 const icons = {
@@ -32,11 +32,11 @@ const icons = {
   day1: <Feather className="w-5 h-5" />,
   day2: <Moon className="w-5 h-5" />,
   recall: <BellRing className="w-5 h-5" />,
-  empty: <Heart className="w-5 h-5" />
-};
+  empty: <Heart className="w-5 h-5" />,
+}
 
 const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView => {
-  const diff = getDayDifferenceFromToday(snapshot.lastDate);
+  const diff = getDayDifferenceFromToday(snapshot.lastDate)
 
   if (snapshot.lastDate === null) {
     return {
@@ -45,8 +45,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       accent: 'from-rose-200/70 to-amber-100/60',
       gradient: 'bg-gradient-to-br from-rose-100/80 via-white to-amber-50/70',
       icon: icons.empty,
-      showAction: true
-    };
+      showAction: true,
+    }
   }
 
   if (diff === null || diff <= 0) {
@@ -56,8 +56,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       accent: 'from-pink-200/60 to-amber-100/60',
       gradient: 'bg-gradient-to-br from-pink-50 via-white to-amber-50',
       icon: icons.complete,
-      showAction: false
-    };
+      showAction: false,
+    }
   }
 
   if (diff === 1) {
@@ -67,8 +67,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       accent: 'from-emerald-200/60 to-sky-100/60',
       gradient: 'bg-gradient-to-br from-emerald-50 via-white to-sky-50',
       icon: icons.day1,
-      showAction: true
-    };
+      showAction: true,
+    }
   }
 
   if (diff === 2) {
@@ -78,8 +78,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       accent: 'from-indigo-200/60 to-purple-100/60',
       gradient: 'bg-gradient-to-br from-indigo-50 via-white to-purple-50',
       icon: icons.day2,
-      showAction: true
-    };
+      showAction: true,
+    }
   }
 
   return {
@@ -88,100 +88,100 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
     accent: 'from-violet-200/60 to-blue-100/60',
     gradient: 'bg-gradient-to-br from-violet-100 via-white to-blue-50',
     icon: icons.recall,
-    showAction: true
-  };
-};
+    showAction: true,
+  }
+}
 
 const getWeeklyMessage = (history: string[]): string => {
-  const week = getWeekRange();
-  const completions = week.filter(day => history.includes(day)).length;
+  const week = getWeekRange()
+  const completions = week.filter(day => history.includes(day)).length
 
   if (completions >= 5) {
-    return '這週你的顯化節奏：穩定而柔軟，請繼續信任流動。';
+    return '這週你的顯化節奏：穩定而柔軟，請繼續信任流動。'
   }
   if (completions >= 3) {
-    return '這週你的顯化節奏：有起伏也有溫度，允許自己慢慢調頻。';
+    return '這週你的顯化節奏：有起伏也有溫度，允許自己慢慢調頻。'
   }
   if (completions >= 1) {
-    return '這週你的顯化節奏：願望聽見你了，再靠近一點點。';
+    return '這週你的顯化節奏：願望聽見你了，再靠近一點點。'
   }
-  return '這週你的顯化節奏：靜靜等待，你隨時都可以重新開始。';
-};
+  return '這週你的顯化節奏：靜靜等待，你隨時都可以重新開始。'
+}
 
-const dayLabels = ['一', '二', '三', '四', '五', '六', '日'];
+const dayLabels = ['一', '二', '三', '四', '五', '六', '日']
 
 export function ManifestationWidget() {
   const [snapshot, setSnapshot] = useState<ManifestationReminderSnapshot>({
     lastDate: null,
     streak: 0,
-    history: []
-  });
-  const router = useRouter();
-  const { user } = useAuthStore();
+    history: [],
+  })
+  const router = useRouter()
+  const { user } = useAuthStore()
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return
 
     const syncFromStorage = async () => {
       // 如果有用戶，先從 Supabase 載入
       if (user?.id) {
-        const supabaseData = await loadManifestationFromSupabase(user.id);
+        const supabaseData = await loadManifestationFromSupabase(user.id)
         if (supabaseData) {
-          setSnapshot(supabaseData);
+          setSnapshot(supabaseData)
           // 同步到 localStorage 作為備份
           if (supabaseData.lastDate) {
-            localStorage.setItem(MANIFESTATION_LAST_DATE_KEY, supabaseData.lastDate);
+            localStorage.setItem(MANIFESTATION_LAST_DATE_KEY, supabaseData.lastDate)
           }
-          localStorage.setItem(MANIFESTATION_STREAK_KEY, String(supabaseData.streak));
-          localStorage.setItem(MANIFESTATION_HISTORY_KEY, JSON.stringify(supabaseData.history));
-          return;
+          localStorage.setItem(MANIFESTATION_STREAK_KEY, String(supabaseData.streak))
+          localStorage.setItem(MANIFESTATION_HISTORY_KEY, JSON.stringify(supabaseData.history))
+          return
         }
       }
 
       // 降級到 localStorage
-      setSnapshot(getManifestationReminderSnapshot());
-    };
+      setSnapshot(getManifestationReminderSnapshot())
+    }
 
     const handleUpdate = (event: Event) => {
-      const custom = event as CustomEvent<ManifestationReminderSnapshot>;
+      const custom = event as CustomEvent<ManifestationReminderSnapshot>
       if (custom.detail) {
-        setSnapshot(custom.detail);
+        setSnapshot(custom.detail)
       } else {
-        syncFromStorage();
+        syncFromStorage()
       }
-    };
+    }
 
-    syncFromStorage();
+    syncFromStorage()
 
-    window.addEventListener(MANIFESTATION_EVENT, handleUpdate);
-    window.addEventListener('focus', syncFromStorage);
+    window.addEventListener(MANIFESTATION_EVENT, handleUpdate)
+    window.addEventListener('focus', syncFromStorage)
 
     return () => {
-      window.removeEventListener(MANIFESTATION_EVENT, handleUpdate);
-      window.removeEventListener('focus', syncFromStorage);
-    };
-  }, [user?.id]);
+      window.removeEventListener(MANIFESTATION_EVENT, handleUpdate)
+      window.removeEventListener('focus', syncFromStorage)
+    }
+  }, [user?.id])
 
-  const view = useMemo(() => getReminderView(snapshot), [snapshot]);
+  const view = useMemo(() => getReminderView(snapshot), [snapshot])
 
   const week = useMemo(() => {
-    const range = getWeekRange();
+    const range = getWeekRange()
     return range.map((day, index) => ({
       day,
       label: dayLabels[index],
-      completed: snapshot.history.includes(day)
-    }));
-  }, [snapshot.history]);
+      completed: snapshot.history.includes(day),
+    }))
+  }, [snapshot.history])
 
-  const diff = getDayDifferenceFromToday(snapshot.lastDate);
+  const diff = getDayDifferenceFromToday(snapshot.lastDate)
   const lastDateDisplay = useMemo(() => {
-    if (!snapshot.lastDate) return '尚未開始練習';
-    return `上次練習：${snapshot.lastDate}（${diff === 0 ? '今天' : diff === 1 ? '昨天' : `${diff} 天前`}）`;
-  }, [snapshot.lastDate, diff]);
+    if (!snapshot.lastDate) return '尚未開始練習'
+    return `上次練習：${snapshot.lastDate}（${diff === 0 ? '今天' : diff === 1 ? '昨天' : `${diff} 天前`}）`
+  }, [snapshot.lastDate, diff])
 
   const handleAction = () => {
-    router.push('/manifestation');
-  };
+    router.push('/manifestation')
+  }
 
   return (
     <div className="h-full">
@@ -204,8 +204,12 @@ export function ManifestationWidget() {
               {view.icon}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">{view.title}</p>
-              <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">{view.message}</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
+                {view.title}
+              </p>
+              <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
+                {view.message}
+              </p>
             </div>
           </div>
 
@@ -232,10 +236,14 @@ export function ManifestationWidget() {
                           : 'bg-white/90 border-morandi-secondary/20 hover:border-morandi-secondary/30'
                       )}
                     />
-                    <span className={cn(
-                      "text-[10px] font-medium transition-colors",
-                      completed ? "text-morandi-gold" : "text-morandi-secondary/70"
-                    )}>{label}</span>
+                    <span
+                      className={cn(
+                        'text-[10px] font-medium transition-colors',
+                        completed ? 'text-morandi-gold' : 'text-morandi-secondary/70'
+                      )}
+                    >
+                      {label}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -262,5 +270,5 @@ export function ManifestationWidget() {
         </div>
       </div>
     </div>
-  );
+  )
 }

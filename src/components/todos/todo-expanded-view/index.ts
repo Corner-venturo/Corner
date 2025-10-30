@@ -1,7 +1,7 @@
-export { TodoExpandedView } from './TodoExpandedView';
-export { SubTasksSection } from './SubTasksSection';
-export { NotesSection } from './NotesSection';
-export { AssignmentSection } from './AssignmentSection';
-export { QuickActionsSection, QuickActionContent } from './QuickActionsSection';
-export { useTodoExpandedView } from './useTodoExpandedView';
-export * from './types';
+export { TodoExpandedView } from './TodoExpandedView'
+export { SubTasksSection } from './SubTasksSection'
+export { NotesSection } from './NotesSection'
+export { AssignmentSection } from './AssignmentSection'
+export { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
+export { useTodoExpandedView } from './useTodoExpandedView'
+export * from './types'

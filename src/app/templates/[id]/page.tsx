@@ -1,10 +1,10 @@
 'use client'
 
-import { use, useState} from 'react'
+import { use, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Save, Eye, Download} from 'lucide-react'
+import { Save, Eye, Download } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TemplateExcelEditor } from '@/components/templates/template-excel-editor'
@@ -46,7 +46,7 @@ export default function TemplateEditorPage({ params }: PageProps) {
       })
       alert('儲存成功！')
     } catch (error) {
-            alert('儲存失敗，請稍後再試')
+      alert('儲存失敗，請稍後再試')
     } finally {
       setIsSaving(false)
     }

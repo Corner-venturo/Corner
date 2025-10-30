@@ -3,10 +3,10 @@
  * 建立所有必要的預設資料
  */
 
-import _bcrypt from 'bcryptjs';
-import { localDB } from '@/lib/db';
-import { DB_NAME } from '@/lib/db/schemas';
-import { _generateUUID } from '@/lib/utils/uuid';
+import _bcrypt from 'bcryptjs'
+import { localDB } from '@/lib/db'
+import { DB_NAME } from '@/lib/db/schemas'
+import { _generateUUID } from '@/lib/utils/uuid'
 
 /**
  * 產生 UUID（已移除，改用系統統一的 UUID 生成器）
@@ -17,27 +17,25 @@ import { _generateUUID } from '@/lib/utils/uuid';
  * 產生編號
  */
 function _generateCode(prefix: string, index: number): string {
-  const year = new Date().getFullYear();
-  const number = (index + 1).toString().padStart(4, '0');
-  return `${prefix}${year}${number}`;
+  const year = new Date().getFullYear()
+  const number = (index + 1).toString().padStart(4, '0')
+  return `${prefix}${year}${number}`
 }
 
 /**
  * 初始化本地資料庫
  */
 export async function initLocalDatabase(): Promise<void> {
-
   try {
     // 初始化 IndexedDB
-    await localDB.init();
+    await localDB.init()
 
     // 檢查是否已有資料
-    const employeeCount = await localDB.count('employees');
+    const employeeCount = await localDB.count('employees')
 
     if (employeeCount === 0) {
-
       // 🔄 優先從 Supabase 同步資料（如果有網路）
-      const syncedFromSupabase = await syncFromSupabase();
+      const syncedFromSupabase = await syncFromSupabase()
 
       if (!syncedFromSupabase) {
         // Supabase 也沒資料或無網路 → 不自動建立管理員
@@ -46,7 +44,7 @@ export async function initLocalDatabase(): Promise<void> {
     } else {
     }
   } catch (error) {
-        throw error;
+    throw error
   }
 }
 
@@ -58,35 +56,33 @@ async function syncFromSupabase(): Promise<boolean> {
   try {
     // 檢查是否有網路
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      return false;
+      return false
     }
 
-    const { supabase } = await import('@/lib/supabase/client');
+    const { supabase } = await import('@/lib/supabase/client')
 
     // 下載 employees 資料
     const { data: employees, error } = await (supabase as unknown)
       .from('employees')
       .select('*')
-      .eq('status', 'active');
+      .eq('status', 'active')
 
     if (error) {
-            return false;
+      return false
     }
 
     if (!employees || employees.length === 0) {
-      return false;
+      return false
     }
-
 
     // 寫入到 IndexedDB（使用 put 允許更新現有資料）
     for (const employee of employees) {
-      await localDB.put('employees', employee);
+      await localDB.put('employees', employee)
     }
 
-    return true;
-
+    return true
   } catch (error) {
-        return false;
+    return false
   }
 }
 
@@ -106,7 +102,6 @@ async function syncFromSupabase(): Promise<boolean> {
 //   ... 已移除
 // }
 
-
 // ========================================
 // 測試資料函數已移除
 // 根據 STORE_UNIFICATION_FINAL.md 定案：
@@ -119,17 +114,26 @@ async function syncFromSupabase(): Promise<boolean> {
  */
 export async function clearAllData(): Promise<void> {
   const tables = [
-    'employees', 'tours', 'orders', 'customers',
-    'members', 'payments', 'todos', 'visas',
-    'suppliers', 'quotes', 'quote_items',
-    'payment_requests', 'disbursement_orders', 'receipt_orders'
-  ];
-  
+    'employees',
+    'tours',
+    'orders',
+    'customers',
+    'members',
+    'payments',
+    'todos',
+    'visas',
+    'suppliers',
+    'quotes',
+    'quote_items',
+    'payment_requests',
+    'disbursement_orders',
+    'receipt_orders',
+  ]
+
   for (const table of tables) {
     try {
-      await localDB.clear(table as unknown);
-    } catch (error) {
-          }
+      await localDB.clear(table as unknown)
+    } catch (error) {}
   }
 }
 
@@ -137,26 +141,27 @@ export async function clearAllData(): Promise<void> {
  * 匯出所有資料
  */
 export async function exportAllData(): Promise<Record<string, unknown[]>> {
-  return await localDB.export();
+  return await localDB.export()
 }
 
 /**
  * 匯入資料
  */
 export async function importData(data: Record<string, unknown[]>): Promise<void> {
-  await localDB.import(data);
+  await localDB.import(data)
 }
 
 // 自動初始化（在瀏覽器環境）
 if (typeof window !== 'undefined') {
   // 檢查是否需要初始化
-  const initKey = `${DB_NAME}-initialized`;
-  const needsInit = localStorage.getItem(initKey) !== 'true';
+  const initKey = `${DB_NAME}-initialized`
+  const needsInit = localStorage.getItem(initKey) !== 'true'
 
   if (needsInit) {
-    initLocalDatabase().then(() => {
-      localStorage.setItem(initKey, 'true');
-    }).catch(error => {
-          });
+    initLocalDatabase()
+      .then(() => {
+        localStorage.setItem(initKey, 'true')
+      })
+      .catch(error => {})
   }
 }

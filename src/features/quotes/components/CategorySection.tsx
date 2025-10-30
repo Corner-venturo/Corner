@@ -1,10 +1,10 @@
-import React from 'react';
-import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { CostCategory, CostItem } from '../types';
-import { CostItemRow } from './CostItemRow';
-import { AccommodationItemRow } from './AccommodationItemRow';
+import React from 'react'
+import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { CostCategory, CostItem } from '../types'
+import { CostItemRow } from './CostItemRow'
+import { AccommodationItemRow } from './AccommodationItemRow'
 
 const categoryIcons: Record<string, React.ElementType> = {
   transport: Car,
@@ -13,22 +13,27 @@ const categoryIcons: Record<string, React.ElementType> = {
   meals: UtensilsCrossed,
   activities: MapPin,
   others: MoreHorizontal,
-  guide: Users
-};
+  guide: Users,
+}
 
 interface CategorySectionProps {
-  category: CostCategory;
-  accommodationTotal: number;
-  accommodationDays: number;
-  isReadOnly: boolean;
-  handleAddAccommodationDay: () => void;
-  handleAddRow: (categoryId: string) => void;
-  handleAddGuideRow: (categoryId: string) => void;
-  handleAddAdultTicket: (categoryId: string) => void;
-  handleAddChildTicket: (categoryId: string) => void;
-  handleAddInfantTicket: (categoryId: string) => void;
-  handleUpdateItem: (categoryId: string, itemId: string, field: keyof CostItem, value: unknown) => void;
-  handleRemoveItem: (categoryId: string, itemId: string) => void;
+  category: CostCategory
+  accommodationTotal: number
+  accommodationDays: number
+  isReadOnly: boolean
+  handleAddAccommodationDay: () => void
+  handleAddRow: (categoryId: string) => void
+  handleAddGuideRow: (categoryId: string) => void
+  handleAddAdultTicket: (categoryId: string) => void
+  handleAddChildTicket: (categoryId: string) => void
+  handleAddInfantTicket: (categoryId: string) => void
+  handleUpdateItem: (
+    categoryId: string,
+    itemId: string,
+    field: keyof CostItem,
+    value: unknown
+  ) => void
+  handleRemoveItem: (categoryId: string, itemId: string) => void
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -43,9 +48,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleAddChildTicket,
   handleAddInfantTicket,
   handleUpdateItem,
-  handleRemoveItem
+  handleRemoveItem,
 }) => {
-  const Icon = categoryIcons[category.id];
+  const Icon = categoryIcons[category.id]
 
   return (
     <React.Fragment>
@@ -69,8 +74,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={handleAddAccommodationDay}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-gold hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -83,8 +88,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                   onClick={() => handleAddRow(category.id)}
                   disabled={isReadOnly}
                   className={cn(
-                    "text-morandi-secondary hover:bg-morandi-gold/10",
-                    isReadOnly && "cursor-not-allowed opacity-60"
+                    'text-morandi-secondary hover:bg-morandi-gold/10',
+                    isReadOnly && 'cursor-not-allowed opacity-60'
                   )}
                 >
                   <Plus size={12} className="mr-1" />
@@ -100,8 +105,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddRow(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-gold hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -113,8 +118,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddGuideRow(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-secondary hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Users size={12} className="mr-1" />
@@ -129,8 +134,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddAdultTicket(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-gold hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -142,8 +147,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddChildTicket(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-secondary hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -155,8 +160,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddInfantTicket(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-secondary hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -168,8 +173,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddRow(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-secondary hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -184,8 +189,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={() => handleAddRow(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  "text-morandi-gold hover:bg-morandi-gold/10",
-                  isReadOnly && "cursor-not-allowed opacity-60"
+                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
                 <Plus size={12} className="mr-1" />
@@ -197,69 +202,72 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       </tr>
 
       {/* 項目明細行 */}
-      {category.id === 'accommodation' ? (
-        // 住宿特殊渲染：按天分組，每天內顯示各房型
-        (() => {
-          const accommodationItems = category.items.filter(item => item.day !== undefined);
-          const groupedByDay: Record<number, CostItem[]> = {};
+      {category.id === 'accommodation'
+        ? // 住宿特殊渲染：按天分組，每天內顯示各房型
+          (() => {
+            const accommodationItems = category.items.filter(item => item.day !== undefined)
+            const groupedByDay: Record<number, CostItem[]> = {}
 
-          // 按天分組
-          accommodationItems.forEach(item => {
-            const day = item.day!;
-            if (!groupedByDay[day]) groupedByDay[day] = [];
-            groupedByDay[day].push(item);
-          });
+            // 按天分組
+            accommodationItems.forEach(item => {
+              const day = item.day!
+              if (!groupedByDay[day]) groupedByDay[day] = []
+              groupedByDay[day].push(item)
+            })
 
-          return Object.keys(groupedByDay)
-            .sort((a, b) => Number(a) - Number(b))
-            .map(dayStr => {
-              const day = Number(dayStr);
-              const dayItems = groupedByDay[day];
+            return Object.keys(groupedByDay)
+              .sort((a, b) => Number(a) - Number(b))
+              .map(dayStr => {
+                const day = Number(dayStr)
+                const dayItems = groupedByDay[day]
 
-              return dayItems.map((item, roomIndex) => (
-                <AccommodationItemRow
-                  key={item.id}
-                  item={item}
-                  categoryId={category.id}
-                  day={day}
-                  roomIndex={roomIndex}
-                  handleUpdateItem={handleUpdateItem}
-                  handleRemoveItem={handleRemoveItem}
-                />
-              ));
-            });
-        })()
-      ) : (
-        // 一般分類的渲染
-        category.items.map((item) => (
-          <CostItemRow
-            key={item.id}
-            item={item}
-            categoryId={category.id}
-            handleUpdateItem={handleUpdateItem}
-            handleRemoveItem={handleRemoveItem}
-          />
-        ))
-      )}
+                return dayItems.map((item, roomIndex) => (
+                  <AccommodationItemRow
+                    key={item.id}
+                    item={item}
+                    categoryId={category.id}
+                    day={day}
+                    roomIndex={roomIndex}
+                    handleUpdateItem={handleUpdateItem}
+                    handleRemoveItem={handleRemoveItem}
+                  />
+                ))
+              })
+          })()
+        : // 一般分類的渲染
+          category.items.map(item => (
+            <CostItemRow
+              key={item.id}
+              item={item}
+              categoryId={category.id}
+              handleUpdateItem={handleUpdateItem}
+              handleRemoveItem={handleRemoveItem}
+            />
+          ))}
 
       {/* 小計行 - 只有當該分類有項目時才顯示 */}
       {category.items.length > 0 && (
         <tr className="bg-morandi-container/10 border-b border-border">
-          <td colSpan={4} className="py-2 px-4 text-right text-sm font-medium text-morandi-secondary">
+          <td
+            colSpan={4}
+            className="py-2 px-4 text-right text-sm font-medium text-morandi-secondary"
+          >
             小計
           </td>
           <td className="py-2 px-4 text-center text-sm font-bold text-morandi-primary">
             {(() => {
               if (category.id === 'accommodation') {
-                return accommodationTotal.toLocaleString();
+                return accommodationTotal.toLocaleString()
               } else if (category.id === 'transport') {
                 // 機票小計：只計算成人機票
                 const adultTicketTotal = category.items
                   .filter(item => item.name === '成人機票')
-                  .reduce((sum, item) => sum + (item.total || 0), 0);
-                return adultTicketTotal.toLocaleString();
+                  .reduce((sum, item) => sum + (item.total || 0), 0)
+                return adultTicketTotal.toLocaleString()
               } else {
-                return category.items.reduce((sum, item) => sum + (item.total || 0), 0).toLocaleString();
+                return category.items
+                  .reduce((sum, item) => sum + (item.total || 0), 0)
+                  .toLocaleString()
               }
             })()}
           </td>
@@ -267,5 +275,5 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         </tr>
       )}
     </React.Fragment>
-  );
-};
+  )
+}

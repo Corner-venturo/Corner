@@ -3,7 +3,7 @@
  * 用於統一前端顯示與資料庫欄位
  */
 
-import { Quote } from '@/stores/types';
+import { Quote } from '@/stores/types'
 
 // 報價單狀態對照
 export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> = {
@@ -12,8 +12,8 @@ export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> =
   revised: '修改中',
   approved: '已核准',
   converted: '已轉單',
-  rejected: '已拒絕'
-};
+  rejected: '已拒絕',
+}
 
 // 報價單狀態顏色
 export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> = {
@@ -22,8 +22,8 @@ export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> =
   revised: 'bg-blue-500 text-white',
   approved: 'bg-morandi-green text-white',
   converted: 'bg-morandi-primary text-white',
-  rejected: 'bg-morandi-red text-white'
-};
+  rejected: 'bg-morandi-red text-white',
+}
 
 // 狀態篩選選項
 export const QUOTE_STATUS_FILTERS = [
@@ -33,5 +33,5 @@ export const QUOTE_STATUS_FILTERS = [
   { value: 'revised', label: '修改中' },
   { value: 'approved', label: '已核准' },
   { value: 'converted', label: '已轉單' },
-  { value: 'rejected', label: '已拒絕' }
-];
+  { value: 'rejected', label: '已拒絕' },
+]

@@ -1,1 +1,1 @@
-export { QuickTools } from './quick-tools';
+export { QuickTools } from './quick-tools'

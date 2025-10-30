@@ -400,6 +400,7 @@ supabase/migrations/
 格式：`YYYYMMDDHHMMSS_description.sql`
 
 範例：
+
 ```
 20251025150000_add_tour_archived_field.sql
 20251025151000_create_tour_addons_table.sql
@@ -533,7 +534,7 @@ export const SCHEMAS = [
     ],
   },
   // ... 其他表
-];
+]
 ```
 
 ### 初始化
@@ -541,22 +542,17 @@ export const SCHEMAS = [
 ```typescript
 // src/lib/db/database-initializer.ts
 
-import { LocalDatabase } from './local-db';
-import { SCHEMAS } from './schemas';
+import { LocalDatabase } from './local-db'
+import { SCHEMAS } from './schemas'
 
 export async function initializeDatabase() {
-  const db = LocalDatabase.getInstance();
+  const db = LocalDatabase.getInstance()
 
   for (const schema of SCHEMAS) {
-    await db.createStore(
-      schema.name,
-      schema.keyPath,
-      schema.autoIncrement,
-      schema.indexes
-    );
+    await db.createStore(schema.name, schema.keyPath, schema.autoIncrement, schema.indexes)
   }
 
-  console.log('✅ IndexedDB 初始化完成');
+  console.log('✅ IndexedDB 初始化完成')
 }
 ```
 
@@ -570,7 +566,7 @@ export async function initializeDatabase() {
 // 1. 離線時：寫入本地 + 加入同步佇列
 async function createTour(tour: Tour) {
   // 寫入 IndexedDB
-  await localDB.create('tours', tour);
+  await localDB.create('tours', tour)
 
   if (!navigator.onLine) {
     // 加入同步佇列
@@ -579,27 +575,27 @@ async function createTour(tour: Tour) {
       action: 'create',
       data: tour,
       timestamp: Date.now(),
-    });
+    })
   } else {
     // 直接同步到 Supabase
-    await supabase.from('tours').insert(tour);
+    await supabase.from('tours').insert(tour)
   }
 }
 
 // 2. 恢復在線時：執行同步佇列
 window.addEventListener('online', async () => {
-  const queue = await syncQueue.getAll();
+  const queue = await syncQueue.getAll()
 
   for (const item of queue) {
     try {
-      await executeSync(item);
-      await syncQueue.remove(item.id);
+      await executeSync(item)
+      await syncQueue.remove(item.id)
     } catch (error) {
-      console.error('同步失敗:', error);
+      console.error('同步失敗:', error)
       // 保留在佇列中，稍後重試
     }
   }
-});
+})
 ```
 
 ### 衝突解決
@@ -608,15 +604,15 @@ window.addEventListener('online', async () => {
 
 ```typescript
 async function resolveConflict(local: Tour, remote: Tour) {
-  const localTimestamp = new Date(local.updated_at).getTime();
-  const remoteTimestamp = new Date(remote.updated_at).getTime();
+  const localTimestamp = new Date(local.updated_at).getTime()
+  const remoteTimestamp = new Date(remote.updated_at).getTime()
 
   if (localTimestamp > remoteTimestamp) {
     // 本地較新，上傳到 Supabase
-    await supabase.from('tours').upsert(local);
+    await supabase.from('tours').upsert(local)
   } else {
     // 遠端較新，更新本地
-    await localDB.update('tours', local.id, remote);
+    await localDB.update('tours', local.id, remote)
   }
 }
 ```

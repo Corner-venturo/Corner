@@ -44,6 +44,7 @@ services/      40K  (  5 files)   1% - 業務服務 ⚠️
 **狀態**: 已完成 6 個核心檔案，剩餘 ~535 個
 
 **已完成**:
+
 ```
 ✅ src/stores/user-store.ts
    - Line 62: console.log → logger.debug
@@ -59,6 +60,7 @@ services/      40K  (  5 files)   1% - 業務服務 ⚠️
 **待完成**: 批量處理剩餘 535 個 console 使用
 
 **建議腳本**:
+
 ```bash
 # 自動替換 console.log → logger.info
 find src/ -name "*.ts" -o -name "*.tsx" | \
@@ -82,17 +84,19 @@ find src/ -name "*.ts" -o -name "*.tsx" | \
 **優先修復檔案**:
 
 1. **src/components/workspace/ChannelChat.tsx** (Lines 48-49)
+
    ```typescript
    // ❌ 錯誤
-   const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
-   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null);
+   const [selectedOrder, setSelectedOrder] = useState<unknown>(null)
+   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<unknown>(null)
 
    // ✅ 修正
-   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<AdvanceItem | null>(null);
+   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+   const [selectedAdvanceItem, setSelectedAdvanceItem] = useState<AdvanceItem | null>(null)
    ```
 
 2. **src/components/workspace/AdvanceListCard.tsx** (Line 11)
+
    ```typescript
    // ❌ 錯誤
    item: unknown
@@ -102,6 +106,7 @@ find src/ -name "*.ts" -o -name "*.tsx" | \
    ```
 
 3. **src/app/customers/page.tsx**
+
    ```typescript
    // ❌ 錯誤
    (o: any) => o.customer_id === customer.id
@@ -111,6 +116,7 @@ find src/ -name "*.ts" -o -name "*.tsx" | \
    ```
 
 4. **src/stores/index.ts** (Line 116)
+
    ```typescript
    // ❌ 錯誤
    'tour_addons' as unknown
@@ -129,6 +135,7 @@ find src/ -name "*.ts" -o -name "*.tsx" | \
 **預估時間**: 45 分鐘
 
 **重構方案**:
+
 ```typescript
 // ❌ 之前：11 個獨立 states
 const [showMemberSidebar, setShowMemberSidebar] = useState(false);
@@ -175,6 +182,7 @@ const toggleDialog = useCallback((key: keyof DialogState) => {
 ```
 
 **相同模式的檔案**:
+
 - `src/app/finance/payments/page.tsx`
 - `src/app/visas/page.tsx`
 
@@ -187,6 +195,7 @@ const toggleDialog = useCallback((key: keyof DialogState) => {
 **優先處理檔案**:
 
 1. **src/components/layout/sidebar.tsx** (Lines 41-128)
+
    ```typescript
    // ❌ 錯誤：組件內定義
    export function Sidebar() {
@@ -194,7 +203,7 @@ const toggleDialog = useCallback((key: keyof DialogState) => {
        { label: '首頁', href: '/', icon: Home },
        { label: '旅遊團', href: '/tours', icon: Plane },
        // ... 20+ items
-     ];
+     ]
    }
 
    // ✅ 正確：提取到組件外
@@ -202,7 +211,7 @@ const toggleDialog = useCallback((key: keyof DialogState) => {
      { label: '首頁', href: '/', icon: Home },
      { label: '旅遊團', href: '/tours', icon: Plane },
      // ... 20+ items
-   ] as const;
+   ] as const
 
    export function Sidebar() {
      // 直接使用 SIDEBAR_MENU_ITEMS
@@ -210,18 +219,19 @@ const toggleDialog = useCallback((key: keyof DialogState) => {
    ```
 
 2. **src/components/workspace/ChannelSidebar.tsx** (Lines 58-79)
+
    ```typescript
    // 提取 ROLE_LABELS, STATUS_LABELS 到組件外
    const ROLE_LABELS = {
      admin: '管理員',
      member: '成員',
      guest: '訪客',
-   } as const;
+   } as const
 
    const STATUS_LABELS = {
      active: '活躍',
      inactive: '停用',
-   } as const;
+   } as const
    ```
 
 #### 5. 建立 useDialogState Hook 🔄 規劃中
@@ -230,6 +240,7 @@ const toggleDialog = useCallback((key: keyof DialogState) => {
 **預估時間**: 30 分鐘
 
 **實作**:
+
 ```typescript
 // src/hooks/useDialogState.ts
 
@@ -298,6 +309,7 @@ function MyComponent() {
 **問題**: 23 個檔案超過 500 行
 
 **優先拆分**:
+
 ```
 🔴 TourPage.tsx                  897 lines → 拆成 3-4 個組件
 🔴 ChannelSidebar.tsx            833 lines → 拆成 2-3 個組件
@@ -307,6 +319,7 @@ function MyComponent() {
 ```
 
 **拆分策略**:
+
 - TourPage.tsx → TourHeader + TourTabs + TourOverview + TourMembers + TourPayments
 - ChannelSidebar.tsx → ChannelHeader + MemberList + AdvanceList
 - todo-expanded-view.tsx → TodoHeader + TodoContent + TodoFooter
@@ -317,6 +330,7 @@ function MyComponent() {
 **目標**: 建立 12-15 個專用 services
 
 **待建立 Services**:
+
 ```typescript
 // src/services/tour.service.ts
 export class TourService {
@@ -356,6 +370,7 @@ export class PaymentService {
 **目標**: 建立 15-20 個 API routes
 
 **待建立 API Routes**:
+
 ```
 /api/tours
 ├── GET /api/tours
@@ -393,6 +408,7 @@ export class PaymentService {
 **目標**: 從 ~0% 提升到 60-80%
 
 **優先測試**:
+
 ```typescript
 // 1. Stores (狀態管理邏輯)
 describe('TourStore', () => {
@@ -426,26 +442,34 @@ describe('useTours', () => {
 #### 2. 效能優化
 
 **React.memo 優化** (30-50 個組件)
+
 ```typescript
-export const TourCard = React.memo(function TourCard({ tour }: Props) {
-  // ...
-}, (prevProps, nextProps) => {
-  return prevProps.tour.id === nextProps.tour.id &&
-         prevProps.tour.updated_at === nextProps.tour.updated_at;
-});
+export const TourCard = React.memo(
+  function TourCard({ tour }: Props) {
+    // ...
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.tour.id === nextProps.tour.id &&
+      prevProps.tour.updated_at === nextProps.tour.updated_at
+    )
+  }
+)
 ```
 
 **Store Selectors** (避免不必要重新渲染)
+
 ```typescript
 // ❌ 錯誤：整個 state 改變時都重新渲染
-const store = useTourStore();
+const store = useTourStore()
 
 // ✅ 正確：只在特定值改變時重新渲染
-const tours = useTourStore(state => state.items);
-const loading = useTourStore(state => state.loading);
+const tours = useTourStore(state => state.items)
+const loading = useTourStore(state => state.loading)
 ```
 
 **List Virtualization** (大列表)
+
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual';
 
@@ -495,12 +519,14 @@ export function TourList({ tours }: Props) {
 ### 待執行 ⏳
 
 #### 本週 (高優先級)
+
 - [ ] 型別斷言修復 - 前 5 個檔案 (40min)
 - [ ] ChannelChat.tsx State 重構 (45min)
 - [ ] 提取 inline 常數 (20min)
 - [ ] 建立 useDialogState hook (30min)
 
 #### 下週 (中優先級)
+
 - [ ] Console.log 批量清理 (剩餘 535 個)
 - [ ] 拆分 TourPage.tsx (897 lines)
 - [ ] 拆分 ChannelSidebar.tsx (833 lines)
@@ -508,6 +534,7 @@ export function TourList({ tours }: Props) {
 - [ ] 建立 OrderService
 
 #### 本月 (長期目標)
+
 - [ ] 建立完整 Service Layer (12-15 services)
 - [ ] 擴展 API Layer (15-20 routes)
 - [ ] 測試覆蓋率提升 (60-80%)
@@ -550,16 +577,16 @@ Status: HEALTHY ✅
 
 ### 優化前後對比
 
-| 指標 | 優化前 | 優化後 | 改善 |
-|------|--------|--------|------|
-| 健康評分 | 6.75/10 | 8.5/10 | +26% |
-| Console.log | 541 個 | < 10 個 | -98% |
-| 型別繞過 | 188 個 | < 50 個 | -73% |
-| 超大檔案 | 23 個 | < 5 個 | -78% |
-| Service Layer | 5 個 | 15 個 | +200% |
-| API Routes | 4 個 | 20 個 | +400% |
-| 測試覆蓋率 | ~0% | 60-80% | +60-80% |
-| 檔案組織 | 良好 | 優秀 | +30% |
+| 指標          | 優化前  | 優化後  | 改善    |
+| ------------- | ------- | ------- | ------- |
+| 健康評分      | 6.75/10 | 8.5/10  | +26%    |
+| Console.log   | 541 個  | < 10 個 | -98%    |
+| 型別繞過      | 188 個  | < 50 個 | -73%    |
+| 超大檔案      | 23 個   | < 5 個  | -78%    |
+| Service Layer | 5 個    | 15 個   | +200%   |
+| API Routes    | 4 個    | 20 個   | +400%   |
+| 測試覆蓋率    | ~0%     | 60-80%  | +60-80% |
+| 檔案組織      | 良好    | 優秀    | +30%    |
 
 ### 投資報酬率
 
