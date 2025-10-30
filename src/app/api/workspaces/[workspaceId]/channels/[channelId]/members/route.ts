@@ -103,12 +103,26 @@ export async function POST(request: Request, { params }: RouteParams) {
       status: 'active',
     }))
 
+    // 🔥 先檢查是否已存在，避免 upsert 衝突
+    const { data: existingMembers } = await supabase
+      .from('channel_members')
+      .select('employee_id')
+      .eq('workspace_id', workspaceId)
+      .eq('channel_id', channelId)
+      .in('employee_id', employeeIds)
+
+    const existingEmployeeIds = new Set((existingMembers || []).map(m => m.employee_id))
+    const newMembers = membersToInsert.filter(m => !existingEmployeeIds.has(m.employee_id))
+
+    if (newMembers.length === 0) {
+      // 全部都已存在
+      return NextResponse.json({ members: [], count: 0, message: 'All members already exist' })
+    }
+
+    // 只插入新成員
     const { data, error } = await supabase
       .from('channel_members')
-      .upsert(membersToInsert, {
-        onConflict: 'workspace_id,channel_id,employee_id',
-        ignoreDuplicates: false, // 返回所有成員（包括已存在的）
-      })
+      .insert(newMembers)
       .select()
 
     if (error) {

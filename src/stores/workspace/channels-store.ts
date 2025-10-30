@@ -228,17 +228,26 @@ export const useChannelsStore = create<ChannelsState>((set, get) => ({
 
   // ✅ 訂閱 Realtime 變更
   subscribeToChannels: (workspaceId) => {
+    // 🔥 先取消舊的訂閱（防止重複）
+    const oldSubscriptionId = `channels-${workspaceId}`;
+    realtimeManager.unsubscribe(oldSubscriptionId);
+
+    // 創建新的訂閱
     realtimeManager.subscribe<Channel>({
       table: 'channels',
       filter: `workspace_id=eq.${workspaceId}`,
-      subscriptionId: `channels-${workspaceId}`,
+      subscriptionId: oldSubscriptionId,
       handlers: {
         onInsert: (channel) => {
           set(state => {
             // 防止重複
             const exists = state.channels.some(ch => ch.id === channel.id);
-            if (exists) return state;
+            if (exists) {
+              console.log(`[channels-store] ⚠️ Channel ${channel.id} already exists, skipping insert`);
+              return state;
+            }
 
+            console.log(`[channels-store] ✅ Inserting channel:`, channel.id, channel.name);
             return {
               channels: [...state.channels, channel]
             };
