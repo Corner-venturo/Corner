@@ -69,25 +69,39 @@ export async function fetchAll<T extends BaseEntity>(
           .order('created_at', { ascending: false })
           .limit(100);
 
-        if (fetchError) throw fetchError;
+        if (fetchError) {
+          logger.error(`❌ [${tableName}] Supabase 查詢失敗:`, fetchError);
+          throw fetchError;
+        }
 
         const typedInitialItems = (initialItems || []) as T[];
 
         if (typedInitialItems.length > 0) {
           // 存入快取
-          await indexedDB.batchPut(typedInitialItems, 1000);
-          logger.log(`✅ [${tableName}] 快速載入完成:`, typedInitialItems.length, '筆');
+          try {
+            await indexedDB.batchPut(typedInitialItems, 1000);
+            logger.log(`✅ [${tableName}] 快速載入完成:`, typedInitialItems.length, '筆');
+          } catch (putError) {
+            // 🔥 IndexedDB 寫入失敗 - 這是嚴重問題，需要記錄
+            logger.error(`❌ [${tableName}] IndexedDB 寫入失敗:`, putError);
+            // 即使寫入失敗，仍然返回資料（記憶體模式）
+          }
 
           // 🎯 背景下載剩餘資料（不阻擋 UI）
           Promise.resolve().then(async () => {
             try {
+              logger.log(`🔄 [${tableName}] 開始背景下載剩餘資料...`);
               const allItems = await supabase.fetchAll();
               if (allItems.length > typedInitialItems.length) {
-                await indexedDB.batchPut(allItems, 1000);
-                logger.log(`✅ [${tableName}] 背景下載完成:`, allItems.length, '筆（含前面的 ${typedInitialItems.length} 筆）');
+                try {
+                  await indexedDB.batchPut(allItems, 1000);
+                  logger.log(`✅ [${tableName}] 背景下載完成:`, allItems.length, '筆');
+                } catch (putError) {
+                  logger.error(`❌ [${tableName}] 背景下載寫入 IndexedDB 失敗:`, putError);
+                }
               }
             } catch (err) {
-              logger.warn(`⚠️ [${tableName}] 背景下載失敗:`, err);
+              logger.error(`❌ [${tableName}] 背景下載失敗:`, err);
             }
           });
 
@@ -95,9 +109,24 @@ export async function fetchAll<T extends BaseEntity>(
         }
 
         // 沒有資料，返回空陣列
+        logger.log(`ℹ️ [${tableName}] Supabase 無資料`);
         return [];
       } catch (err) {
-        logger.warn(`⚠️ [${tableName}] 快速載入失敗:`, err);
+        logger.error(`❌ [${tableName}] 快速載入失敗:`, err);
+
+        // 嘗試從 IndexedDB 讀取（可能有舊資料）
+        try {
+          const fallbackItems = await indexedDB.getAll();
+          if (fallbackItems.length > 0) {
+            logger.log(`💾 [${tableName}] 降級到 IndexedDB:`, fallbackItems.length, '筆（舊資料）');
+            return fallbackItems;
+          }
+        } catch (idbError) {
+          logger.error(`❌ [${tableName}] IndexedDB 讀取也失敗:`, idbError);
+        }
+
+        // 完全失敗，返回空陣列（記憶體模式）
+        logger.warn(`⚠️ [${tableName}] 所有資料源都失敗，返回空陣列`);
         return [];
       }
     } else {
