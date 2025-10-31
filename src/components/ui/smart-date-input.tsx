@@ -128,7 +128,7 @@ export function SmartDateInput({
 
   return (
     <div className={cn('flex items-center gap-1', className)}>
-      <div className="flex items-center gap-1 px-3 h-10 border rounded-md bg-background flex-1">
+      <div className="flex items-center gap-1 px-3 h-10 border border-input rounded-md bg-background flex-1 focus-within:border-morandi-gold transition-colors">
         <input
           ref={yearRef}
           type="text"
@@ -136,8 +136,8 @@ export function SmartDateInput({
           value={year}
           onChange={handleYearChange}
           onKeyDown={e => handleKeyDown(e, 'year')}
-          _placeholder="YYYY"
-          className="w-14 bg-transparent outline-none text-center"
+          placeholder="YYYY"
+          className="w-14 bg-transparent outline-none text-center placeholder:text-muted-foreground text-base md:text-sm"
           maxLength={4}
           required={required}
         />
@@ -149,8 +149,8 @@ export function SmartDateInput({
           value={month}
           onChange={handleMonthChange}
           onKeyDown={e => handleKeyDown(e, 'month')}
-          _placeholder="MM"
-          className="w-10 bg-transparent outline-none text-center"
+          placeholder="MM"
+          className="w-10 bg-transparent outline-none text-center placeholder:text-muted-foreground text-base md:text-sm"
           maxLength={2}
           required={required}
         />
@@ -162,8 +162,8 @@ export function SmartDateInput({
           value={day}
           onChange={handleDayChange}
           onKeyDown={e => handleKeyDown(e, 'day')}
-          _placeholder="DD"
-          className="w-10 bg-transparent outline-none text-center"
+          placeholder="DD"
+          className="w-10 bg-transparent outline-none text-center placeholder:text-muted-foreground text-base md:text-sm"
           maxLength={2}
           required={required}
         />
@@ -173,10 +173,10 @@ export function SmartDateInput({
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="h-10 w-10 flex items-center justify-center border rounded-md bg-background hover:bg-morandi-bg-subtle transition-colors"
+            className="h-10 w-10 flex items-center justify-center border border-input rounded-md bg-background hover:bg-morandi-bg-subtle transition-colors"
             title="選擇日期"
           >
-            <CalendarIcon className="h-4 w-4 text-morandi-primary" />
+            <CalendarIcon className="h-4 w-4 text-morandi-secondary" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">

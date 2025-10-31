@@ -94,10 +94,9 @@ export function TourForm({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-morandi-primary">國家/地區</label>
-                    <select
+                    <Combobox
                       value={newTour.countryCode}
-                      onChange={e => {
-                        const countryCode = e.target.value
+                      onChange={countryCode => {
                         const selectedCountry = activeCountries.find(c => c.code === countryCode)
                         const cities =
                           countryCode === '__custom__'
@@ -109,20 +108,22 @@ export function TourForm({
                         setNewTour(prev => ({
                           ...prev,
                           countryCode,
-                          cityCode:
-                            countryCode === '__custom__' ? '__custom__' : cities[0]?.code || '',
+                          cityCode: countryCode === '__custom__' ? '__custom__' : '', // 不要自動帶入第一個城市
                         }))
                       }}
-                      className="mt-1 w-full p-2 border border-border rounded-md bg-background"
-                    >
-                      <option value="">請選擇國家...</option>
-                      {activeCountries.map(country => (
-                        <option key={country.id} value={country.code}>
-                          {country.name}
-                        </option>
-                      ))}
-                      <option value="__custom__">+ 新增其他目的地</option>
-                    </select>
+                      options={[
+                        ...activeCountries.map(country => ({
+                          value: country.code,
+                          label: country.name,
+                        })),
+                        { value: '__custom__', label: '+ 新增其他目的地' },
+                      ]}
+                      placeholder="搜尋或選擇國家..."
+                      emptyMessage="找不到符合的國家"
+                      showSearchIcon={true}
+                      showClearButton={true}
+                      className="mt-1"
+                    />
                   </div>
 
                   <div>
