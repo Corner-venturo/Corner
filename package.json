@@ -1,6 +1,9 @@
 {
   "name": "venturo",
   "version": "1.0.0",
+  "description": "專業的旅遊團營運管理平台",
+  "author": "William Chien",
+  "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
