@@ -81,7 +81,7 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
   /**
    * 批次寫入（帶超時保護和錯誤重試）
    */
-  async batchPut(items: T[], timeout = 5000): Promise<void> {
+  async batchPut(items: T[], timeout = 10000): Promise<void> {
     if (items.length === 0) {
       logger.log(`💾 [${this.tableName}] 無資料需要寫入`)
       return
@@ -90,53 +90,38 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
     const batchSize = 10
     let successCount = 0
     let failCount = 0
-    const failedItems: T[] = []
 
     logger.log(`💾 [${this.tableName}] 開始批次寫入 ${items.length} 筆資料...`)
 
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize)
 
-      try {
-        await Promise.all(
-          batch.map(async item => {
-            try {
-              await Promise.race([
-                this.put(item),
-                new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error('INDEXEDDB_WRITE_TIMEOUT')), timeout)
-                ),
-              ])
-              successCount++
-            } catch (err) {
-              failCount++
-              failedItems.push(item)
-              logger.error(`❌ [${this.tableName}] 寫入失敗 (${item.id}):`, err)
-              throw err
-            }
-          })
-        )
-      } catch (batchError) {
-        // 批次中有錯誤，記錄但繼續處理下一批
-        logger.error(
-          `❌ [${this.tableName}] 批次 ${i / batchSize + 1} 寫入失敗 (${batch.length} 筆中有錯誤)`
-        )
-      }
+      await Promise.all(
+        batch.map(async item => {
+          try {
+            await Promise.race([
+              this.put(item),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('INDEXEDDB_WRITE_TIMEOUT')), timeout)
+              ),
+            ])
+            successCount++
+          } catch (err) {
+            failCount++
+            // 🔥 不要拋出錯誤，只記錄 - 讓其他項目繼續寫入
+            logger.warn(`⚠️ [${this.tableName}] 單筆寫入失敗 (${item.id}):`, err)
+          }
+        })
+      )
     }
 
-    // 最終報告
+    // 最終報告（只記錄，不拋出錯誤）
     if (failCount > 0) {
-      const errorMsg = `IndexedDB 批次寫入部分失敗: 成功 ${successCount} 筆，失敗 ${failCount} 筆`
-      logger.error(`❌ [${this.tableName}] ${errorMsg}`)
-
-      // 拋出錯誤，讓外層知道寫入失敗
-      const error = new Error(errorMsg)
-      ;(error as any).failedItems = failedItems
-      ;(error as any).successCount = successCount
-      ;(error as any).failCount = failCount
-      throw error
+      logger.warn(
+        `⚠️ [${this.tableName}] IndexedDB 批次寫入部分失敗: 成功 ${successCount} 筆，失敗 ${failCount} 筆`
+      )
+    } else {
+      logger.log(`✅ [${this.tableName}] IndexedDB 批次寫入完成 (${successCount} 筆)`)
     }
-
-    logger.log(`✅ [${this.tableName}] IndexedDB 批次寫入完成 (${successCount} 筆)`)
   }
 }

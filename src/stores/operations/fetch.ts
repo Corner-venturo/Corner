@@ -77,15 +77,9 @@ export async function fetchAll<T extends BaseEntity>(
         const typedInitialItems = (initialItems || []) as T[];
 
         if (typedInitialItems.length > 0) {
-          // 存入快取
-          try {
-            await indexedDB.batchPut(typedInitialItems, 1000);
-            logger.log(`✅ [${tableName}] 快速載入完成:`, typedInitialItems.length, '筆');
-          } catch (putError) {
-            // 🔥 IndexedDB 寫入失敗 - 這是嚴重問題，需要記錄
-            logger.error(`❌ [${tableName}] IndexedDB 寫入失敗:`, putError);
-            // 即使寫入失敗，仍然返回資料（記憶體模式）
-          }
+          // 存入快取（不阻擋返回）
+          await indexedDB.batchPut(typedInitialItems);
+          logger.log(`✅ [${tableName}] 快速載入完成:`, typedInitialItems.length, '筆');
 
           // 🎯 背景下載剩餘資料（不阻擋 UI）
           Promise.resolve().then(async () => {
@@ -93,12 +87,8 @@ export async function fetchAll<T extends BaseEntity>(
               logger.log(`🔄 [${tableName}] 開始背景下載剩餘資料...`);
               const allItems = await supabase.fetchAll();
               if (allItems.length > typedInitialItems.length) {
-                try {
-                  await indexedDB.batchPut(allItems, 1000);
-                  logger.log(`✅ [${tableName}] 背景下載完成:`, allItems.length, '筆');
-                } catch (putError) {
-                  logger.error(`❌ [${tableName}] 背景下載寫入 IndexedDB 失敗:`, putError);
-                }
+                await indexedDB.batchPut(allItems);
+                logger.log(`✅ [${tableName}] 背景下載完成:`, allItems.length, '筆');
               }
             } catch (err) {
               logger.error(`❌ [${tableName}] 背景下載失敗:`, err);
