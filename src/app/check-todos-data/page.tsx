@@ -13,9 +13,40 @@ export default function CheckTodosDataPage() {
   const [error, setError] = useState<string | null>(null)
   const [logs, setLogs] = useState<string[]>([])
   const [syncing, setSyncing] = useState(false)
+  const [storageInfo, setStorageInfo] = useState<{
+    usage: number
+    quota: number
+    percentage: number
+  } | null>(null)
 
   const addLog = (message: string) => {
     setLogs(prev => [...prev, `${new Date().toISOString().split('T')[1].split('.')[0]} - ${message}`])
+  }
+
+  // 檢查儲存空間
+  async function checkStorage() {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      try {
+        const estimate = await navigator.storage.estimate()
+        const usage = estimate.usage || 0
+        const quota = estimate.quota || 0
+        const percentage = quota > 0 ? (usage / quota) * 100 : 0
+
+        setStorageInfo({
+          usage,
+          quota,
+          percentage,
+        })
+
+        addLog(
+          `💾 儲存空間: ${(usage / 1024 / 1024).toFixed(2)} MB / ${(quota / 1024 / 1024).toFixed(2)} MB (${percentage.toFixed(1)}%)`
+        )
+      } catch (err) {
+        addLog(`⚠️ 無法檢查儲存空間: ${err}`)
+      }
+    } else {
+      addLog('⚠️ 瀏覽器不支援 Storage API')
+    }
   }
 
   useEffect(() => {
@@ -29,6 +60,9 @@ export default function CheckTodosDataPage() {
       setError(null)
 
       addLog('🔍 開始檢查資料...')
+
+      // 0. 檢查儲存空間
+      await checkStorage()
 
       // 1. 檢查 IndexedDB
       addLog('📦 檢查 IndexedDB...')
@@ -185,10 +219,30 @@ export default function CheckTodosDataPage() {
               <strong>可能原因：</strong>
               <br />
               1. 瀏覽器儲存空間已滿
+              {storageInfo && storageInfo.percentage > 90 && (
+                <span className="text-red-600 font-semibold">
+                  {' '}
+                  ⚠️ 儲存空間使用率 {storageInfo.percentage.toFixed(1)}%，接近上限！
+                </span>
+              )}
               <br />
-              2. IndexedDB 寫入權限被阻擋
+              2. IndexedDB 寫入權限被阻擋（私密瀏覽模式、瀏覽器設定）
               <br />
-              3. fetchAll() 執行失敗（查看控制台錯誤）
+              3. fetchAll() 執行失敗（查看控制台錯誤和上方執行記錄）
+              <br />
+              4. batchPut() 錯誤被靜默吞掉（已修復）
+              <br />
+              <br />
+              <strong>儲存空間資訊：</strong>
+              <br />
+              {storageInfo ? (
+                <>
+                  已使用: {(storageInfo.usage / 1024 / 1024).toFixed(2)} MB / 配額:{' '}
+                  {(storageInfo.quota / 1024 / 1024).toFixed(2)} MB ({storageInfo.percentage.toFixed(1)}%)
+                </>
+              ) : (
+                '無法取得儲存空間資訊'
+              )}
               <br />
               <br />
               <strong>建議：</strong>點擊上方「從 Supabase 同步到 IndexedDB」按鈕手動同步。
