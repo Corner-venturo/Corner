@@ -35,26 +35,18 @@ export async function create<T extends BaseEntity>(
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
         const code = generateCode({ prefix: codePrefix }, existingItems);
         recordData = { ...recordData, code } as T;
-        logger.log(`✨ [${tableName}] 生成編號: ${code}`);
-      } else {
-        logger.log(`✨ [${tableName}] 使用自訂編號: ${existingCode}`);
       }
     }
 
     // ✅ 步驟 1：先新增到 Supabase（確保雲端同步）
     if (enableSupabase && typeof window !== 'undefined') {
-      logger.log(`☁️ [${tableName}] 新增到 Supabase...`);
       const supabaseData = await supabase.create(recordData);
-      // 使用 Supabase 回傳的資料（可能包含自動生成的欄位）
       recordData = supabaseData;
-      logger.log(`✅ [${tableName}] Supabase 新增成功`);
     }
 
     // ✅ 步驟 2：寫入 IndexedDB（本地快取）
     await indexedDB.put(recordData);
-    logger.log(`💾 [${tableName}] IndexedDB 寫入成功`);
 
-    logger.log(`✅ [${tableName}] 新增完成: ${id}`);
     return recordData;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '建立失敗';

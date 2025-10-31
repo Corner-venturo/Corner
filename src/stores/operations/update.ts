@@ -25,14 +25,11 @@ export async function update<T extends BaseEntity>(
   try {
     // ✅ 步驟 1：先更新 Supabase（確保雲端同步）
     if (enableSupabase && typeof window !== 'undefined') {
-      logger.log(`☁️ [${tableName}] 更新 Supabase...`);
       await supabase.update(id, data);
-      logger.log(`✅ [${tableName}] Supabase 更新成功`);
     }
 
     // ✅ 步驟 2：更新 IndexedDB（本地快取）
     await indexedDB.update(id, data);
-    logger.log(`💾 [${tableName}] IndexedDB 更新成功`);
 
     // 取得更新後的完整資料
     const updatedItem = await indexedDB.getById(id);
@@ -40,7 +37,6 @@ export async function update<T extends BaseEntity>(
       throw new Error('找不到要更新的項目');
     }
 
-    logger.log(`✅ [${tableName}] 更新完成: ${id}`);
     return updatedItem;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '更新失敗';

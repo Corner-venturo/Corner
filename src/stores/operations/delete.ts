@@ -27,16 +27,11 @@ export async function deleteItem<T extends BaseEntity>(
   try {
     // ✅ 步驟 1：先刪除 Supabase（確保雲端同步）
     if (enableSupabase && typeof window !== 'undefined') {
-      logger.log(`☁️ [${tableName}] 刪除 Supabase...`);
       await supabase.delete(id);
-      logger.log(`✅ [${tableName}] Supabase 刪除成功`);
     }
 
     // ✅ 步驟 2：刪除 IndexedDB（本地快取）
     await indexedDB.delete(id);
-    logger.log(`💾 [${tableName}] IndexedDB 刪除成功`);
-
-    logger.log(`✅ [${tableName}] 刪除完成: ${id}`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '刪除失敗';
     logger.error(`❌ [${tableName}] 刪除失敗:`, error);
