@@ -63,7 +63,8 @@ export default function RegionsPage() {
   // 載入資料
   useEffect(() => {
     fetchAll()
-  }, [fetchAll])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 狀態切換處理
   const toggleCountryStatus = async (country: any) => {
