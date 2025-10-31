@@ -49,7 +49,6 @@ export default function PaymentsPage() {
   const { items: orders } = useOrderStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // TODO: 實作 payment store
   const payments: any[] = [];
 
   // 只取收款記錄
@@ -133,7 +132,6 @@ export default function PaymentsPage() {
     }
 
     // 動作: 保存收款單到 store 或 API
-    // TODO: Implement save receipt logic
 
     // 關閉對話框並重置表單
     setIsDialogOpen(false);

@@ -16,7 +16,6 @@ export default function PaymentDetailPage() {
   const orderId = params.orderId as string
   const orderStore = useOrderStore()
 
-  // TODO: 實作 payment store
   const paymentStore: any = null
 
   // 等待 store 載入

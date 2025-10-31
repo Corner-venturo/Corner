@@ -18,7 +18,6 @@ import { realtimeManager } from '@/lib/realtime/realtime-manager';
 import { logger } from '@/lib/utils/logger';
 import { useToast } from '@/components/ui/use-toast';
 
-// TODO: 定義 UserRole 型別
 interface UserRole {
   id: string;
   user_id: string;
@@ -27,7 +26,6 @@ interface UserRole {
   updated_at: string;
 }
 
-// TODO: 定義 Workspace 型別
 interface Workspace {
   id: string;
   name: string;

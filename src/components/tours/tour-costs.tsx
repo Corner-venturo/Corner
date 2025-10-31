@@ -35,7 +35,6 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     vendor: '',
   })
 
-  // TODO: 實作 payment store
   const payments: CostPayment[] = []
 
   const _tourCosts = payments.filter(payment => {

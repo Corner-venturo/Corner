@@ -98,7 +98,6 @@ export default function QuoteDetailPage() {
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionData: any) => {
-      console.log('🔄 載入版本資料:', versionData)
       setCategories(versionData.categories)
       setAccommodationDays(versionData.accommodation_days || 0)
       if (versionData.participant_counts) {
@@ -107,7 +106,6 @@ export default function QuoteDetailPage() {
       if (versionData.selling_prices) {
         setSellingPrices(versionData.selling_prices)
       }
-      console.log('✅ 版本載入完成')
     },
     [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]
   )
@@ -116,7 +114,6 @@ export default function QuoteDetailPage() {
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
 
   const handleGenerateQuotation = useCallback(() => {
-    console.log('顯示報價單預覽...')
     setShowQuotationPreview(true)
   }, [])
 

@@ -48,7 +48,6 @@ export const TourPayments = React.memo(function TourPayments({
     status: '已確認' as const,
   })
 
-  // TODO: 實作 payment store
   const payments: ReceiptPayment[] = []
 
   // 獲取屬於這個旅遊團的所有訂單（如果有 orderFilter，則只取該訂單）

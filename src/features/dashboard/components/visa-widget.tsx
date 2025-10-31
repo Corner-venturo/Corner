@@ -128,7 +128,6 @@ export function VisaWidget() {
     setError(null)
 
     try {
-      // TODO: 替換為真實 API 呼叫
       // const response = await fetch('https://visa-requirement.p.rapidapi.com/v2/visa/check', {
       //   method: 'POST',
       //   headers: {

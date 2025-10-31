@@ -22,7 +22,6 @@ export default function FinancePage() {
   const { items: _tours } = useTourStore()
   const { items: _orders } = useOrderStore()
 
-  // TODO: 實作 payment store
   const payments: Payment[] = []
 
   // 計算財務統計

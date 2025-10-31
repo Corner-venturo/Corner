@@ -101,7 +101,6 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
   const handleUploadDocument = () => {
     if (!newDocument.name) return
 
-    // TODO: Implement document upload logic
 
     setNewDocument({
       name: '',

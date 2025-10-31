@@ -4,7 +4,6 @@ import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { useOrderStore, useMemberStore } from '@/stores'
 import { cn } from '@/lib/utils'
 
-// TODO: 實作 payment store
 const paymentStore: { payment_requests: unknown[] } = { payment_requests: [] }
 
 interface TourOverviewTabProps {

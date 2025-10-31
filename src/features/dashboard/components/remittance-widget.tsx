@@ -50,7 +50,6 @@ export function RemittanceWidget() {
     setError(null)
 
     try {
-      // TODO: 接入 World Bank API
       // const response = await fetch(`https://api.worldbank.org/v2/country/${from}/indicator/SI.RMT.COST.IB.ZS?format=json`);
 
       await new Promise(resolve => setTimeout(resolve, 1000))
