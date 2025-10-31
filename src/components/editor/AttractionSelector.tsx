@@ -202,7 +202,7 @@ export function AttractionSelector({
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="搜尋景點名稱、城市..."
-                className="pl-9"
+                className="pl-10"
               />
             </div>
           </div>

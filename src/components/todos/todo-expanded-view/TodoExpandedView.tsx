@@ -15,6 +15,10 @@ import { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
 export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewProps) {
   const { activeTab, setActiveTab } = useTodoExpandedView()
 
+  if (!todo) {
+    return null
+  }
+
   return (
     <div
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4"

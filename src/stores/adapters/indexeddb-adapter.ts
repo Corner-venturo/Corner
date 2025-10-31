@@ -67,11 +67,7 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
    * 清空所有資料
    */
   async clear(): Promise<void> {
-    // IndexedDB 沒有提供 clear 方法，需要逐一刪除
-    const items = await this.getAll()
-    for (const item of items) {
-      await this.delete(item.id)
-    }
+    await localDB.clear(this.tableName)
   }
 
   /**

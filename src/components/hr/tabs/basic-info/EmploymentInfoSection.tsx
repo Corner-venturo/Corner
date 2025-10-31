@@ -20,9 +20,27 @@ export function EmploymentInfoSection({
 }: EmploymentInfoSectionProps) {
   return (
     <div className="bg-morandi-container/10 rounded-lg p-4">
-      <h4 className="font-medium text-morandi-primary mb-3">職務資料</h4>
+      <h4 className="font-medium text-morandi-primary mb-4 pt-1">職務資料</h4>
 
       <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">職位</label>
+          {isEditing ? (
+            <Input
+              value={formData.job_info.position || ''}
+              onChange={e =>
+                setFormData({
+                  ...formData,
+                  job_info: { ...formData.job_info, position: e.target.value },
+                })
+              }
+              placeholder="輸入職位..."
+            />
+          ) : (
+            <p className="text-morandi-primary py-2">{employee.job_info?.position || '未設定'}</p>
+          )}
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">入職日期</label>
           {isEditing ? (

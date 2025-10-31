@@ -114,7 +114,15 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       const { supabase } = await import('@/lib/supabase/client')
       const { error } = await supabase.from(this.tableName).upsert(item)
 
-      if (error) throw error
+      if (error) {
+        logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        })
+        throw error
+      }
 
       logger.log(`☁️ [${this.tableName}] Supabase upsert:`, item.id)
     } catch (error) {

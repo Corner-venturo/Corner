@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, lazy, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -15,9 +15,10 @@ import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Users, DollarSign, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
-import { QuickReceipt } from '../quick-actions/quick-receipt'
-import { QuickDisbursement } from '../quick-actions/quick-disbursement'
-import { QuickGroup } from '../quick-actions/quick-group'
+// 使用懶加載避免打包問題
+const QuickReceipt = lazy(() => import('../quick-actions/quick-receipt').then(m => ({ default: m.QuickReceipt })))
+const QuickDisbursement = lazy(() => import('../quick-actions/quick-disbursement').then(m => ({ default: m.QuickDisbursement })))
+const QuickGroup = lazy(() => import('../quick-actions/quick-group').then(m => ({ default: m.QuickGroup })))
 
 const quickActionTabs: QuickActionTabConfig[] = [
   { key: 'receipt' as const, label: '收款', icon: Receipt },
@@ -65,7 +66,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
   const [isSharing, setIsSharing] = React.useState(false)
 
   // 共享待辦的處理函數
-  const handleShareTodo = async () => {
+  const handleShareTodo = React.useCallback(async () => {
     if (!shareData.targetUserId) {
       alert('請選擇要共享的成員')
       return
@@ -79,10 +80,12 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
         ? currentVisibility
         : [...currentVisibility, shareData.targetUserId]
 
-      await onUpdate?.({
-        assignee: shareData.permission === 'edit' ? shareData.targetUserId : todo.assignee,
-        visibility: newVisibility,
-      })
+      if (onUpdate) {
+        await onUpdate({
+          assignee: shareData.permission === 'edit' ? shareData.targetUserId : todo.assignee,
+          visibility: newVisibility,
+        })
+      }
 
       // 重置表單
       setShareData({ targetUserId: '', permission: 'view', message: '' })
@@ -92,7 +95,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
     } finally {
       setIsSharing(false)
     }
-  }
+  }, [shareData, todo, onUpdate])
 
   // 使用 ref 建立穩定的函數參考
   const fetchAllRef = useRef(fetchAll)
@@ -112,15 +115,34 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
   // 過濾掉自己
   const otherEmployees = employees.filter(emp => emp.id !== currentUser?.id)
 
+  // 加載中的元件
+  const LoadingFallback = (
+    <div className="flex items-center justify-center h-full">
+      <div className="text-sm text-morandi-secondary">載入中...</div>
+    </div>
+  )
+
   switch (activeTab) {
     case 'receipt':
-      return <QuickReceipt />
+      return (
+        <Suspense fallback={LoadingFallback}>
+          <QuickReceipt />
+        </Suspense>
+      )
 
     case 'invoice':
-      return <QuickDisbursement />
+      return (
+        <Suspense fallback={LoadingFallback}>
+          <QuickDisbursement />
+        </Suspense>
+      )
 
     case 'group':
-      return <QuickGroup />
+      return (
+        <Suspense fallback={LoadingFallback}>
+          <QuickGroup />
+        </Suspense>
+      )
 
     case 'quote':
       return (

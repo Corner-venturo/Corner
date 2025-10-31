@@ -9,16 +9,17 @@ import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
 
 export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
-  const { items: employees, loadItems } = useUserStore()
+  const { items: employees, fetchAll } = useUserStore()
   const { user } = useAuthStore()
   const [assigneeName, setAssigneeName] = useState<string>('')
 
   // 載入員工資料
   useEffect(() => {
     if (employees.length === 0) {
-      void loadItems()
+      void fetchAll()
     }
-  }, [employees.length, loadItems])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employees.length])
 
   // 更新指派者名稱
   useEffect(() => {

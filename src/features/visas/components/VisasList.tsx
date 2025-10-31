@@ -14,6 +14,7 @@ interface VisasListProps {
   selectedRows: string[]
   onSelectionChange: (rows: string[]) => void
   onDelete: (id: string) => void
+  onUpdateStatus: (id: string, status: Visa['status']) => void
 }
 
 export function VisasList({
@@ -22,6 +23,7 @@ export function VisasList({
   selectedRows,
   onSelectionChange,
   onDelete,
+  onUpdateStatus,
 }: VisasListProps) {
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
@@ -98,16 +100,6 @@ export function VisasList({
 
     return (
       <div className="flex items-center gap-1">
-        <button
-          onClick={e => {
-            e.stopPropagation()
-            // 編輯功能
-          }}
-          className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-          title="編輯"
-        >
-          <Edit2 size={14} />
-        </button>
         <button
           onClick={async e => {
             e.stopPropagation()

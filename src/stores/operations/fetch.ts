@@ -33,30 +33,25 @@ export async function fetchAll<T extends BaseEntity>(
         cachedItems = [];
       }
 
-      // 2. ✅ 快取優先 + 背景更新策略（Stale-While-Revalidate）
+      // 2. ✅ Supabase 優先策略（雲端為權威來源）
       // 策略：
-      // - 有快取 → 立即返回快取，背景下載最新資料並更新
-      // - 無快取 → 返回空陣列，背景下載（不阻擋 UI）
+      // - 先顯示快取（避免空白畫面）
+      // - 立即從 Supabase 拉取最新資料並覆蓋快取
+      // - 確保資料一致性
 
-      if (cachedItems.length > 0) {
-        // 情境 A：有快取資料 → 立即返回快取，背景更新
-        // 🔄 背景更新（簡化版：只下載最新資料）
-        Promise.resolve().then(async () => {
-          try {
-            const latestItems = await supabase.fetchAll();
-            await indexedDB.batchPut(latestItems);
+      // 🎯 立即從 Supabase 拉取最新資料
+      try {
+        const latestItems = await supabase.fetchAll(controller?.signal);
 
-            // 通知 UI 更新（透過 event）
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent(`${tableName}:updated`, {
-                detail: { items: latestItems }
-              }));
-            }
-          } catch (err) {
-            // 靜默失敗
-          }
-        });
+        // ✅ 完全同步策略：清空舊資料 + 寫入新資料
+        await indexedDB.clear();
+        await indexedDB.batchPut(latestItems);
 
+        logger.log(`✅ [${tableName}] 從 Supabase 同步 ${latestItems.length} 筆資料`);
+        return latestItems;
+      } catch (supabaseError) {
+        // Supabase 失敗時，才使用快取（靜默降級）
+        logger.warn(`⚠️ [${tableName}] Supabase 連線失敗，使用快取資料 (${cachedItems.length} 筆)`, supabaseError);
         return cachedItems;
       }
 

@@ -229,24 +229,73 @@ export default function VisasPage() {
         ]}
         actions={(
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setIsInfoDialogOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <Info size={16} />
-              查看簽證資訊
-            </Button>
-            {canManageVisas && (
-              <Button
-                onClick={async () => {
-                  await initVisaTour();
-                  setIsDialogOpen(true);
-                }}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                新增簽證
-              </Button>
+            {/* 批次操作區域 */}
+            {canManageVisas && selectedRows.length > 0 ? (
+              <>
+                <span className="text-sm text-morandi-primary">
+                  已選擇 {selectedRows.length} 筆簽證
+                </span>
+                <Button
+                  onClick={() => {
+                    selectedRows.forEach(id => updateVisa(id, { status: 'submitted' }))
+                    setSelectedRows([])
+                  }}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  送
+                </Button>
+                <Button
+                  onClick={() => {
+                    selectedRows.forEach(id => updateVisa(id, { status: 'collected' }))
+                    setSelectedRows([])
+                  }}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  取
+                </Button>
+                <Button
+                  onClick={() => {
+                    selectedRows.forEach(id => updateVisa(id, { status: 'rejected' }))
+                    setSelectedRows([])
+                  }}
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  退
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedRows([])}
+                >
+                  取消選擇
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsInfoDialogOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Info size={16} />
+                  查看簽證資訊
+                </Button>
+                {canManageVisas && (
+                  <Button
+                    onClick={() => {
+                      setIsDialogOpen(true);
+                      // 背景載入團號資料，不阻塞 UI
+                      void initVisaTour();
+                    }}
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                  >
+                    新增簽證
+                  </Button>
+                )}
+              </>
             )}
           </div>
         )}
@@ -263,29 +312,6 @@ export default function VisasPage() {
       />
 
       <div className="flex-1 overflow-auto">
-        {/* 批次操作按鈕 */}
-        {canManageVisas && selectedRows.length > 0 && (
-          <div className="bg-morandi-container p-4 rounded-lg flex items-center justify-between">
-            <span className="text-sm text-morandi-primary">
-              已選擇 {selectedRows.length} 筆簽證
-            </span>
-            <div className="flex gap-2">
-              <Button
-                onClick={handleBatchSubmit}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                批次送件
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedRows([])}
-              >
-                取消選擇
-              </Button>
-            </div>
-          </div>
-        )}
-
         {/* 簽證列表 */}
         <VisasList
           filteredVisas={filteredVisas}
@@ -293,6 +319,7 @@ export default function VisasPage() {
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           onDelete={deleteVisa}
+          onUpdateStatus={(id, status) => updateVisa(id, { status })}
         />
       </div>
 

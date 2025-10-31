@@ -222,6 +222,9 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
+  /* 表單元素顏色映射 */
+  --color-input: var(--input-border);
+
   /* 莫蘭迪色系 */
   --color-morandi-primary: var(--morandi-primary);
   --color-morandi-secondary: var(--morandi-secondary);

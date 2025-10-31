@@ -117,10 +117,10 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-6xl h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border border-border">
         {/* 標題列 */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-morandi-container/30 flex items-center justify-center">
               {employee.avatar ? (
@@ -146,7 +146,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
         </div>
 
         {/* 分頁導航 */}
-        <div className="flex items-center justify-between border-b border-border px-6">
+        <div className="flex items-center justify-between border-b border-border px-6 flex-shrink-0">
           <div className="flex">
             {tabs.map(tab => {
               const Icon = tab.icon
@@ -196,7 +196,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
         </div>
 
         {/* 分頁內容 */}
-        <div className="flex-1 overflow-y-auto p-6">{renderTabContent()}</div>
+        <div className="flex-1 overflow-y-auto">{renderTabContent()}</div>
       </div>
     </div>
   )

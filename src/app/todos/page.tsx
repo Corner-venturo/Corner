@@ -244,7 +244,7 @@ export default function TodosPage() {
       const newTodoData = {
         title: formData.title,
         priority: formData.priority,
-        deadline: formData.deadline,
+        deadline: formData.deadline || null, // ✅ 空字串轉 null
         status: 'pending' as const,
         completed: false,
         creator: user.id, // ✅ 使用當前登入用戶
@@ -295,7 +295,7 @@ export default function TodosPage() {
                 const newTodoData = {
                   title,
                   priority: 3 as 1 | 2 | 3 | 4 | 5,
-                  deadline: '',
+                  deadline: null, // ✅ 使用 null 而非空字串
                   status: 'pending' as const,
                   completed: false,
                   creator: user.id,
@@ -421,13 +421,17 @@ export default function TodosPage() {
       </div>
 
       {/* 展開的待辦事項視圖 */}
-      {expandedTodo && (
-        <TodoExpandedView
-          todo={todos.find(t => t.id === expandedTodo)!}
-          onUpdate={(updates) => updateTodo(expandedTodo, updates)}
-          onClose={() => setExpandedTodo(null)}
-        />
-      )}
+      {expandedTodo && (() => {
+        const todo = todos.find(t => t.id === expandedTodo)
+        if (!todo) return null
+        return (
+          <TodoExpandedView
+            todo={todo}
+            onUpdate={(updates) => updateTodo(expandedTodo, updates)}
+            onClose={() => setExpandedTodo(null)}
+          />
+        )
+      })()}
 
       {/* 新增待辦事項對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

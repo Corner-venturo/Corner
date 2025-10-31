@@ -31,6 +31,7 @@ export interface User {
     }
   }
   job_info: {
+    position?: string
     supervisor?: string
     hire_date: string
     probation_end_date?: string

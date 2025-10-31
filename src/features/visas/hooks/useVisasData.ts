@@ -12,11 +12,10 @@ export function useVisasData() {
   const { items: orders, create: addOrder } = useOrderStore()
   const { user } = useAuthStore()
 
-  // 權限檢查
+  // 權限檢查（暫時開放給所有人）
   const canManageVisas = useMemo(() => {
-    const permissions = user?.permissions || []
-    return permissions.includes('admin') || permissions.includes('super_admin')
-  }, [user])
+    return true // 所有登入使用者都可以管理簽證
+  }, [])
 
   return {
     // 資料

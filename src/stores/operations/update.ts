@@ -23,13 +23,28 @@ export async function update<T extends BaseEntity>(
   const { tableName, enableSupabase } = config;
 
   try {
-    // ✅ 步驟 1：先更新 Supabase（確保雲端同步）
-    if (enableSupabase && typeof window !== 'undefined') {
-      await supabase.update(id, data);
-    }
+    // 清理資料：將空字串的時間欄位轉為 null（PostgreSQL 不接受空字串）
+    const cleanedData = { ...data } as Record<string, unknown>;
+    Object.keys(cleanedData).forEach(key => {
+      const value = cleanedData[key];
+      // 時間相關欄位：空字串轉 null
+      if (
+        (key.endsWith('_at') || key.endsWith('_date') || key === 'deadline') &&
+        value === ''
+      ) {
+        cleanedData[key] = null;
+      }
+    });
 
-    // ✅ 步驟 2：更新 IndexedDB（本地快取）
-    await indexedDB.update(id, data);
+    // ✅ 步驟 1：更新 IndexedDB（本地快取）⚡ 立即反映
+    await indexedDB.update(id, cleanedData as UpdateInput<T>);
+
+    // ✅ 步驟 2：背景同步到 Supabase（不阻塞 UI）
+    if (enableSupabase && typeof window !== 'undefined') {
+      supabase.update(id, cleanedData as UpdateInput<T>).catch(error => {
+        logger.warn(`⚠️ [${tableName}] Supabase 背景同步失敗（已保存到本地）:`, error);
+      });
+    }
 
     // 取得更新後的完整資料
     const updatedItem = await indexedDB.getById(id);

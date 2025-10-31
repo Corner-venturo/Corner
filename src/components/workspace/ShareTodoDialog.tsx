@@ -121,7 +121,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
               placeholder="搜尋代辦事項..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-10"
             />
           </div>
 

@@ -257,7 +257,7 @@ export function Combobox<T = unknown>({
           onClick={handleInputClick}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn('pr-8', showSearchIcon && 'pl-9')}
+          className={cn('pr-8', showSearchIcon && 'pl-10')}
         />
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
           {showClearButton && searchValue && !disabled && (

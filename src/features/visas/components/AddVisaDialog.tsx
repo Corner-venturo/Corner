@@ -166,13 +166,13 @@ export function AddVisaDialog({
               value={applicant.name}
               onChange={e => updateApplicant(applicant.id, 'name', e.target.value)}
               placeholder={index === 0 ? '辦理人（自動帶入）' : '辦理人'}
-              className="flex-[1.5]"
+              className="w-40"
             />
 
             <select
               value={applicant.country}
               onChange={e => updateApplicant(applicant.id, 'country', e.target.value)}
-              className="flex-[2] p-2 border border-border rounded-md bg-background h-10"
+              className="w-56 p-2 border border-border rounded-md bg-background h-10 text-sm"
             >
               <option value="護照 成人">護照 成人</option>
               <option value="護照 兒童">護照 兒童</option>
@@ -187,21 +187,21 @@ export function AddVisaDialog({
               type="date"
               value={applicant.submission_date}
               onChange={e => updateApplicant(applicant.id, 'submission_date', e.target.value)}
-              className="flex-1"
+              className="w-32"
             />
 
             <Input
               type="date"
               value={applicant.received_date}
               readOnly
-              className="flex-1 bg-muted"
+              className="w-32 bg-muted"
             />
 
             <Input
               type="number"
               value={calculateFee(applicant.country)}
               readOnly
-              className="w-20 bg-muted"
+              className="w-12 bg-muted text-xs"
             />
 
             <Input
@@ -209,17 +209,17 @@ export function AddVisaDialog({
               value={applicant.cost}
               onChange={e => updateApplicant(applicant.id, 'cost', Number(e.target.value))}
               placeholder="成本"
-              className="w-20"
+              className="w-12 text-xs"
             />
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 w-14 flex-shrink-0">
               <input
                 type="checkbox"
                 checked={applicant.is_urgent}
                 onChange={e => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
-                className="w-4 h-4"
+                className="w-4 h-4 flex-shrink-0"
               />
-              <span className="text-sm whitespace-nowrap">急件</span>
+              <span className="text-xs whitespace-nowrap">急件</span>
             </div>
 
             <Button

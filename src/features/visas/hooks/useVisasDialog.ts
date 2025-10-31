@@ -127,12 +127,12 @@ export function useVisasDialog(tours: any[]) {
             }
           }
 
-          // 如果勾選/取消急件，自動調整成本 ±900
+          // 如果勾選/取消急件，自動調整成本 ±1000
           if (field === 'is_urgent') {
             if (value === true) {
-              updated.cost = a.cost + 900
+              updated.cost = a.cost + 1000
             } else {
-              updated.cost = Math.max(0, a.cost - 900)
+              updated.cost = Math.max(0, a.cost - 1000)
             }
           }
 

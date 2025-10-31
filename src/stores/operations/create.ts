@@ -25,11 +25,18 @@ export async function create<T extends BaseEntity>(
   const { tableName, codePrefix, enableSupabase } = config;
 
   try {
-    // 生成 ID
+    // 生成 ID 和時間戳記
     const id = generateUUID();
+    const now = new Date().toISOString();
 
     // 如果有 codePrefix，生成編號
-    let recordData = { ...data, id } as T;
+    let recordData = {
+      ...data,
+      id,
+      created_at: now,
+      updated_at: now
+    } as T;
+
     if (codePrefix) {
       const existingCode = (data as Record<string, unknown>).code;
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
@@ -38,14 +45,29 @@ export async function create<T extends BaseEntity>(
       }
     }
 
-    // ✅ 步驟 1：先新增到 Supabase（確保雲端同步）
-    if (enableSupabase && typeof window !== 'undefined') {
-      const supabaseData = await supabase.create(recordData);
-      recordData = supabaseData;
-    }
-
-    // ✅ 步驟 2：寫入 IndexedDB（本地快取）
+    // ✅ 步驟 1：寫入 IndexedDB（本地快取）⚡ FastIn
     await indexedDB.put(recordData);
+
+    // ✅ 步驟 2：背景同步到 Supabase（不阻塞 UI）
+    if (enableSupabase && typeof window !== 'undefined') {
+      // 清理資料：將空字串的時間欄位轉為 null（PostgreSQL 不接受空字串）
+      const cleanedData = { ...recordData } as Record<string, unknown>;
+      Object.keys(cleanedData).forEach(key => {
+        const value = cleanedData[key];
+        // 時間相關欄位：空字串轉 null
+        if (
+          (key.endsWith('_at') || key.endsWith('_date') || key === 'deadline') &&
+          value === ''
+        ) {
+          cleanedData[key] = null;
+        }
+      });
+
+      // 使用 put (upsert) 而非 insert，避免主鍵衝突
+      supabase.put(cleanedData as T).catch(error => {
+        logger.warn(`⚠️ [${tableName}] Supabase 背景同步失敗（已保存到本地）:`, error);
+      });
+    }
 
     return recordData;
   } catch (error) {

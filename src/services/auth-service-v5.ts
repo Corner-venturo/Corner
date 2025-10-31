@@ -109,7 +109,6 @@ export class AuthServiceV5 {
     const permissions = user.permissions || []
     return (
       permissions.includes(permission) ||
-      permissions.includes('super_admin') ||
       permissions.includes('admin')
     )
   }

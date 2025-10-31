@@ -22,9 +22,8 @@ const paymentMethods = [
 
 // 帳戶選項
 const bankAccounts = [
-  { value: 'bank1', label: '台灣銀行 - 001234567' },
-  { value: 'bank2', label: '國泰世華 - 987654321' },
-  { value: 'bank3', label: '玉山銀行 - 555666777' }
+  { value: 'bank1', label: '國泰' },
+  { value: 'bank2', label: '合庫' }
 ];
 
 interface PaymentItem {
@@ -224,7 +223,7 @@ export default function PaymentsPage() {
 
       {/* 新增收款對話框 */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">新增收款單</DialogTitle>
           </DialogHeader>
@@ -313,8 +312,10 @@ export default function PaymentsPage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
+                    {/* 所有欄位在同一排 */}
+                    <div className="grid grid-cols-12 gap-3">
+                      {/* 收款方式 */}
+                      <div className="col-span-2">
                         <label className="text-sm font-medium text-morandi-primary mb-2 block">收款方式</label>
                         <Select
                           value={item.paymentMethod}
@@ -333,17 +334,19 @@ export default function PaymentsPage() {
                         </Select>
                       </div>
 
-                      <div>
+                      {/* 金額 */}
+                      <div className="col-span-2">
                         <label className="text-sm font-medium text-morandi-primary mb-2 block">金額</label>
                         <Input
                           type="number"
                           value={item.amount || ''}
                           onChange={(e) => updatePaymentItem(item.id, { amount: Number(e.target.value) })}
-                          placeholder="請輸入收款金額"
+                          placeholder="請輸入金額"
                         />
                       </div>
 
-                      <div>
+                      {/* 交易日期 */}
+                      <div className="col-span-2">
                         <label className="text-sm font-medium text-morandi-primary mb-2 block">交易日期</label>
                         <Input
                           type="date"
@@ -352,21 +355,31 @@ export default function PaymentsPage() {
                         />
                       </div>
 
-                      {/* 根據收款方式顯示額外欄位 */}
+                      {/* 根據收款方式顯示不同欄位 - 每種都平均分配剩餘 6 欄 */}
                       {item.paymentMethod === '現金' && (
-                        <div>
-                          <label className="text-sm font-medium text-morandi-primary mb-2 block">經手人</label>
-                          <Input
-                            value={item.handlerName || ''}
-                            onChange={(e) => updatePaymentItem(item.id, { handlerName: e.target.value })}
-                            placeholder="請輸入經手人姓名"
-                          />
-                        </div>
+                        <>
+                          <div className="col-span-3">
+                            <label className="text-sm font-medium text-morandi-primary mb-2 block">經手人</label>
+                            <Input
+                              value={item.handlerName || ''}
+                              onChange={(e) => updatePaymentItem(item.id, { handlerName: e.target.value })}
+                              placeholder="請輸入經手人姓名"
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+                            <Input
+                              value={item.note || ''}
+                              onChange={(e) => updatePaymentItem(item.id, { note: e.target.value })}
+                              placeholder="收款備註（選填）"
+                            />
+                          </div>
+                        </>
                       )}
 
                       {item.paymentMethod === '匯款' && (
                         <>
-                          <div>
+                          <div className="col-span-2">
                             <label className="text-sm font-medium text-morandi-primary mb-2 block">匯入帳戶</label>
                             <Select
                               value={item.accountInfo || ''}
@@ -384,13 +397,21 @@ export default function PaymentsPage() {
                               </SelectContent>
                             </Select>
                           </div>
-                          <div>
+                          <div className="col-span-2">
                             <label className="text-sm font-medium text-morandi-primary mb-2 block">手續費</label>
                             <Input
                               type="number"
                               value={item.fees || ''}
                               onChange={(e) => updatePaymentItem(item.id, { fees: Number(e.target.value) })}
-                              placeholder="手續費金額"
+                              placeholder="手續費"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+                            <Input
+                              value={item.note || ''}
+                              onChange={(e) => updatePaymentItem(item.id, { note: e.target.value })}
+                              placeholder="收款備註（選填）"
                             />
                           </div>
                         </>
@@ -398,7 +419,7 @@ export default function PaymentsPage() {
 
                       {item.paymentMethod === '刷卡' && (
                         <>
-                          <div>
+                          <div className="col-span-2">
                             <label className="text-sm font-medium text-morandi-primary mb-2 block">卡號後四碼</label>
                             <Input
                               value={item.cardLastFour || ''}
@@ -407,7 +428,7 @@ export default function PaymentsPage() {
                               maxLength={4}
                             />
                           </div>
-                          <div>
+                          <div className="col-span-2">
                             <label className="text-sm font-medium text-morandi-primary mb-2 block">授權碼</label>
                             <Input
                               value={item.authCode || ''}
@@ -415,12 +436,20 @@ export default function PaymentsPage() {
                               placeholder="授權碼"
                             />
                           </div>
+                          <div className="col-span-2">
+                            <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+                            <Input
+                              value={item.note || ''}
+                              onChange={(e) => updatePaymentItem(item.id, { note: e.target.value })}
+                              placeholder="收款備註（選填）"
+                            />
+                          </div>
                         </>
                       )}
 
                       {item.paymentMethod === '支票' && (
                         <>
-                          <div>
+                          <div className="col-span-2">
                             <label className="text-sm font-medium text-morandi-primary mb-2 block">支票號碼</label>
                             <Input
                               value={item.checkNumber || ''}
@@ -428,7 +457,7 @@ export default function PaymentsPage() {
                               placeholder="支票號碼"
                             />
                           </div>
-                          <div>
+                          <div className="col-span-2">
                             <label className="text-sm font-medium text-morandi-primary mb-2 block">開票銀行</label>
                             <Input
                               value={item.checkBank || ''}
@@ -436,17 +465,16 @@ export default function PaymentsPage() {
                               placeholder="開票銀行"
                             />
                           </div>
+                          <div className="col-span-2">
+                            <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+                            <Input
+                              value={item.note || ''}
+                              onChange={(e) => updatePaymentItem(item.id, { note: e.target.value })}
+                              placeholder="收款備註（選填）"
+                            />
+                          </div>
                         </>
                       )}
-
-                      <div className="md:col-span-3">
-                        <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
-                        <Input
-                          value={item.note || ''}
-                          onChange={(e) => updatePaymentItem(item.id, { note: e.target.value })}
-                          placeholder="收款備註（選填）"
-                        />
-                      </div>
                     </div>
                   </div>
                 ))}
