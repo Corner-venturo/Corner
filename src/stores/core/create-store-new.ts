@@ -311,6 +311,13 @@ export function createStore<T extends BaseEntity>(
     // ⚠️ Realtime 訂閱已改為「按需訂閱」
     // 不再自動訂閱，需在各頁面使用 useRealtimeFor[Table]() Hook
     // 範例：useRealtimeForTours()
+
+    // 監聽背景更新完成事件（Stale-While-Revalidate 策略）
+    window.addEventListener(`${tableName}:updated`, ((event: CustomEvent) => {
+      const { items } = event.detail;
+      logger.log(`📥 [${tableName}] 背景更新完成，更新 UI:`, items.length, '筆');
+      store.setState({ items });
+    }) as EventListener);
   }
 
   return store;

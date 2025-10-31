@@ -35,27 +35,42 @@ export async function fetchAll<T extends BaseEntity>(
         cachedItems = [];
       }
 
-      // 2. ✅ 離線優先策略（無論首次或後續）
+      // 2. ✅ 快取優先 + 背景更新策略（Stale-While-Revalidate）
       // 策略：
-      // - 有快取 → 立即返回，背景同步
+      // - 有快取 → 立即返回快取，背景下載最新資料並更新
       // - 無快取 → 返回空陣列，背景下載（不阻擋 UI）
 
       if (cachedItems.length > 0) {
-        // 情境 A：有快取資料 → 離線優先：立即返回快取
+        // 情境 A：有快取資料 → 立即返回快取，背景更新
         logger.log(`💾 [${tableName}] 立即返回快取:`, cachedItems.length, '筆');
 
-        // 🔄 背景靜默同步（不阻擋 UI，不影響返回值）
-        // 策略：上傳本地修改，Realtime 會自動推送其他人的新增/更新
+        // 🔄 背景更新（Stale-While-Revalidate）
         Promise.resolve().then(async () => {
           try {
+            // 1. 上傳本地修改
             await sync.uploadLocalChanges();
             logger.log(`✅ [${tableName}] 本地修改已上傳`);
+
+            // 2. 下載 Supabase 最新資料
+            logger.log(`🔄 [${tableName}] 背景下載最新資料...`);
+            const latestItems = await supabase.fetchAll();
+
+            // 3. 更新 IndexedDB
+            await indexedDB.batchPut(latestItems);
+            logger.log(`✅ [${tableName}] 背景更新完成:`, latestItems.length, '筆');
+
+            // 4. 通知 UI 更新（透過 event）
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent(`${tableName}:updated`, {
+                detail: { items: latestItems }
+              }));
+            }
           } catch (err) {
-            // 靜默失敗
+            logger.warn(`⚠️ [${tableName}] 背景更新失敗:`, err);
           }
         });
 
-        return cachedItems; // ← 立即返回，依賴 Realtime 推送新資料
+        return cachedItems; // ← 立即返回快取，背景更新會透過 event 通知 UI
       }
 
       // 情境 B：無快取資料 → 顯示 loading，快速下載前 100 筆
