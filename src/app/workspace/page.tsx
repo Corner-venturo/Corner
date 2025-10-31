@@ -25,17 +25,21 @@ export default function WorkspacePage() {
   // 自動將訂單的業務和助理加入旅遊團頻道
   useAutoAddOrderMembers();
 
-  // 載入工作空間
+  // 載入工作空間（只執行一次）
   useEffect(() => {
     loadWorkspaces();
-  }, [loadWorkspaces]);
+    // ✅ 只在 mount 時執行一次，不依賴 loadWorkspaces（它每次都是新的函數）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // 載入頻道群組
+  // 載入頻道群組（只在 workspace 改變時執行）
   useEffect(() => {
     if (currentWorkspace) {
       loadChannelGroups(currentWorkspace.id);
     }
-  }, [currentWorkspace?.id, loadChannelGroups]);
+    // ✅ 只依賴 currentWorkspace.id，不依賴 loadChannelGroups（它每次都是新的函數）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWorkspace?.id]);
 
   // 監聽旅遊團資料變化（使用快取資料，不重新載入）
   useEffect(() => {
