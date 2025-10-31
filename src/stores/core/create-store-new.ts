@@ -1,10 +1,10 @@
 /**
- * Zustand Store 工廠函數（重構版）
+ * Zustand Store 工廠函數
  * 支援 Supabase 雲端同步 + IndexedDB 本地快取
  *
  * 架構：
  * - Supabase: 雲端資料庫（Single Source of Truth）
- * - IndexedDB: 本地快取（離線支援）
+ * - IndexedDB: 本地快取（效能優化）
  * - Zustand: UI 狀態管理
  */
 
@@ -44,9 +44,6 @@ import { logger } from '@/lib/utils/logger';
  * // 基本使用
  * const useTourStore = createStore({ tableName: 'tours', codePrefix: 'T' });
  *
- * // FastIn 模式（預設）
- * const useQuoteStore = createStore({ tableName: 'quotes', fastInsert: true });
- *
  * // 舊版向後相容
  * const useOrderStore = createStore('orders', 'O');
  */
@@ -63,7 +60,7 @@ export function createStore<T extends BaseEntity>(
       tableName: tableNameOrConfig,
       codePrefix: codePrefixParam,
       enableSupabase: enableSupabaseParam,
-      fastInsert: true, // 預設啟用 FastIn
+      fastInsert: true,
     };
   } else {
     // 新版配置物件
@@ -149,7 +146,7 @@ export function createStore<T extends BaseEntity>(
           }
         },
 
-        // 建立資料（FastIn 模式）
+        // 建立資料
         create: async (data) => {
           try {
             set({ loading: true, error: null });
@@ -173,7 +170,7 @@ export function createStore<T extends BaseEntity>(
           }
         },
 
-        // 更新資料（FastIn 模式）
+        // 更新資料
         update: async (id: string, data: Partial<T>) => {
           try {
             set({ loading: true, error: null });
@@ -197,7 +194,7 @@ export function createStore<T extends BaseEntity>(
           }
         },
 
-        // 刪除資料（FastIn 模式）
+        // 刪除資料
         delete: async (id: string) => {
           try {
             set({ loading: true, error: null });

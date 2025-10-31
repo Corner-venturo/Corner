@@ -80,7 +80,7 @@ export interface StoreConfig {
   codePrefix?: string
   /** 是否啟用 Supabase 同步（預設讀取環境變數） */
   enableSupabase?: boolean
-  /** FastIn 模式：本地先寫入 IndexedDB → 背景同步 Supabase（預設 true） */
+  /** 直接寫入模式（預設 true） */
   fastInsert?: boolean
 }
 

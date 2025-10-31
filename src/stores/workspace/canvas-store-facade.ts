@@ -67,7 +67,7 @@ export const useCanvasStore = () => {
     },
 
     loadPersonalCanvases: async (userId?: string, workspaceId?: string) => {
-      // 使用 createStore 的 fetchAll（自動處理離線優先）
+      // 使用 createStore 的 fetchAll
       await canvasStore.fetchAll()
 
       // 過濾邏輯在 UI 層面處理（如果需要）
@@ -80,7 +80,7 @@ export const useCanvasStore = () => {
     // Document 操作 (使用 createStore 的 CRUD)
     // ============================================
     loadRichDocuments: async (canvasId?: string) => {
-      // 使用 createStore 的 fetchAll（自動處理離線優先）
+      // 使用 createStore 的 fetchAll
       await documentStore.fetchAll()
 
       // 過濾邏輯在 UI 層面處理（如果需要）

@@ -1,7 +1,7 @@
 /**
  * Channel Group Store (使用 createStore)
  * 管理 channel_groups 表格資料
- * 自動繼承離線優先、Realtime 同步等功能
+ * 自動繼承 Realtime 即時同步等功能
  */
 
 import { createStore } from '../core/create-store-new'
