@@ -74,7 +74,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
           {/* 右半部：快速功能 */}
           <div className="w-1/2 px-6 py-4 flex flex-col">
             {/* 快速功能分頁 */}
-            <QuickActionsSection activeTab={activeTab} todo={todo} onTabChange={setActiveTab} />
+            <QuickActionsSection activeTab={activeTab} onTabChange={setActiveTab} />
 
             {/* 分頁內容 */}
             <div className="flex-1 bg-card border border-border rounded-xl p-4 overflow-y-auto shadow-sm">

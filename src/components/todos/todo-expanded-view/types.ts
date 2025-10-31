@@ -31,7 +31,6 @@ export interface AssignmentSectionProps {
 
 export interface QuickActionsSectionProps {
   activeTab: QuickActionTab
-  todo: Todo
   onTabChange: (tab: QuickActionTab) => void
 }
 
