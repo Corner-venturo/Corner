@@ -25,7 +25,7 @@ export const DB_VERSION = 2
 
 /**
  * 資料庫名稱
- * 離線優先架構專用資料庫
+ * 快取優先架構專用資料庫
  */
 export const DB_NAME = 'VenturoOfflineDB'
 

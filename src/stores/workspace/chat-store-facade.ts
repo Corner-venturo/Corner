@@ -94,7 +94,7 @@ export const useChatStore = () => {
       uiStore.setMessagesLoading(channelId, true)
 
       try {
-        // 使用 createStore 的 fetchAll（自動處理離線優先）
+        // 使用 createStore 的 fetchAll（自動處理快取優先）
         await messageStore.fetchAll()
 
         // 過濾出該 channel 的訊息

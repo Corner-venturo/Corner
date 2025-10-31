@@ -198,12 +198,6 @@ const personalToolItems: MenuItem[] = [
     icon: Sparkles,
     requiredPermission: 'manifestation',
   },
-  {
-    href: '/heroic-summon',
-    label: '英靈招喚',
-    icon: CircleDot,
-    requiredPermission: 'heroic-summon',
-  },
 ]
 
 export function Sidebar() {

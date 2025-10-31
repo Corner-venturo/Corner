@@ -1,6 +1,11 @@
 /**
  * Fetch 操作
- * 負責從 IndexedDB 和 Supabase 讀取資料
+ * 負責從 Supabase 讀取資料，並使用 IndexedDB 作為快取層加速載入
+ *
+ * 架構原則：
+ * - Supabase = 唯一的 Source of Truth（資料權威來源）
+ * - IndexedDB = 快取層（Cache，可隨時清空）
+ * - 無離線編輯功能（斷網時無法新增/修改資料）
  */
 
 import type { BaseEntity } from '@/types';
@@ -12,7 +17,13 @@ import { MergeStrategy } from '../sync/merge-strategy';
 import { logger } from '@/lib/utils/logger';
 
 /**
- * 取得所有資料（IndexedDB 優先，背景同步 Supabase）
+ * 取得所有資料（快取優先顯示，Supabase 為權威來源）
+ *
+ * 流程：
+ * 1. 先從 IndexedDB 讀取快取 → 快速顯示（避免空白畫面）
+ * 2. 從 Supabase 拉取最新資料 → 確保資料正確性
+ * 3. 清空 IndexedDB 舊快取 → 寫入最新資料
+ * 4. 如果 Supabase 失敗 → 顯示快取（唯讀模式）
  */
 export async function fetchAll<T extends BaseEntity>(
   config: StoreConfig,
@@ -25,7 +36,7 @@ export async function fetchAll<T extends BaseEntity>(
 
   try {
     if (enableSupabase && typeof window !== 'undefined') {
-      // 1. 先從 IndexedDB 讀取（快速顯示）
+      // Step 1: 先從 IndexedDB 讀取快取（快速顯示 UI）
       let cachedItems: T[] = [];
       try {
         cachedItems = await indexedDB.getAll(3000); // 3 秒超時
@@ -33,24 +44,21 @@ export async function fetchAll<T extends BaseEntity>(
         cachedItems = [];
       }
 
-      // 2. ✅ Supabase 優先策略（雲端為權威來源）
-      // 策略：
-      // - 先顯示快取（避免空白畫面）
-      // - 立即從 Supabase 拉取最新資料並覆蓋快取
-      // - 確保資料一致性
-
-      // 🎯 立即從 Supabase 拉取最新資料
+      // Step 2: 從 Supabase 拉取最新資料（權威來源）
       try {
         const latestItems = await supabase.fetchAll(controller?.signal);
 
-        // ✅ 完全同步策略：清空舊資料 + 寫入新資料
+        // Step 3: 更新快取（清空舊資料 + 寫入新資料）
+        // 說明：因為 Supabase 是唯一的 Source of Truth，
+        //      我們直接清空並重寫快取，確保資料完全一致
+        //      沒有離線編輯功能，所以不會丟失本地變更
         await indexedDB.clear();
         await indexedDB.batchPut(latestItems);
 
         logger.log(`✅ [${tableName}] 從 Supabase 同步 ${latestItems.length} 筆資料`);
         return latestItems;
       } catch (supabaseError) {
-        // Supabase 失敗時，才使用快取（靜默降級）
+        // Step 4: Supabase 失敗時，使用快取（唯讀降級模式）
         logger.warn(`⚠️ [${tableName}] Supabase 連線失敗，使用快取資料 (${cachedItems.length} 筆)`, supabaseError);
         return cachedItems;
       }

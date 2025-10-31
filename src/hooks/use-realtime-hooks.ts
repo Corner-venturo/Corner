@@ -35,6 +35,8 @@ import {
   useQuoteItemStore,
   useTourAddOnStore,
   useEmployeeStore,
+  useReceiptStore,
+  useLinkPayLogStore,
 } from '@/stores';
 
 // IndexedDB adapters
@@ -60,6 +62,7 @@ import type {
 } from '@/stores/types';
 import type { TourAddOn } from '@/stores/types';
 import type { CalendarEvent } from '@/types/calendar.types';
+import type { Receipt, LinkPayLog } from '@/types/receipt.types';
 
 // ============================================
 // 業務實體（13 個）
@@ -251,8 +254,8 @@ export { useChatRealtime } from './useChatRealtime';
 
 /**
  * 員工 Realtime Hook
- * 使用時機：進入 /employees 頁面 或需要永久訂閱
- * ⚠️ 建議永久訂閱（在 layout 中）
+ * 使用時機：進入 /employees 頁面（按需訂閱）
+ * ✅ 按需訂閱（進入頁面才訂閱，離開自動取消）
  */
 export const useRealtimeForEmployees = createRealtimeHook<Employee>({
   tableName: 'employees',
@@ -278,7 +281,26 @@ export const useRealtimeForEmployees = createRealtimeHook<Employee>({
 
 // 3. 財務即時
 // export const useRealtimeForPayments = ...
-// export const useRealtimeForReceipts = ...
+
+/**
+ * 收款單 Realtime Hook
+ * 使用時機：進入 /finance/payments 或 /receipts 頁面
+ */
+export const useRealtimeForReceipts = createRealtimeHook<Receipt>({
+  tableName: 'receipts',
+  indexedDB: new IndexedDBAdapter<Receipt>('receipts'),
+  store: useReceiptStore,
+});
+
+/**
+ * LinkPay 記錄 Realtime Hook
+ * 使用時機：進入收款單詳情頁面（如果有 LinkPay）
+ */
+export const useRealtimeForLinkPayLogs = createRealtimeHook<LinkPayLog>({
+  tableName: 'linkpay_logs',
+  indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs'),
+  store: useLinkPayLogStore,
+});
 
 // 4. 協作功能
 // export const useRealtimeForAdvanceLists = ...

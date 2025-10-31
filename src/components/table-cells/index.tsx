@@ -52,12 +52,32 @@ export interface ActionButton {
   icon: LucideIcon
   label: string
   onClick: () => void
-  variant?: 'default' | 'danger' | 'success'
+  variant?: 'default' | 'danger' | 'success' | 'warning'
   disabled?: boolean
 }
 
 export interface ActionCellProps {
   actions: ActionButton[]
+  className?: string
+}
+
+export interface AvatarCellProps {
+  name: string
+  imageUrl?: string | null
+  subtitle?: string
+  className?: string
+}
+
+export interface LinkCellProps {
+  href: string
+  text: string
+  external?: boolean
+  className?: string
+}
+
+export interface BadgeCellProps {
+  text: string
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
   className?: string
 }
 
@@ -290,6 +310,7 @@ export function ActionCell({ actions, className }: ActionCellProps) {
         const buttonClass = cn(
           'p-1 rounded transition-colors',
           action.variant === 'danger' && 'text-morandi-red hover:bg-morandi-red/10',
+          action.variant === 'warning' && 'text-orange-600 hover:bg-orange-50',
           action.variant === 'success' && 'text-morandi-green hover:bg-morandi-green/10',
           (!action.variant || action.variant === 'default') &&
             'text-morandi-gold hover:bg-morandi-gold/10',
@@ -377,4 +398,93 @@ export function NumberCell({
       {suffix}
     </span>
   )
+}
+
+/**
+ * AvatarCell - 頭像+名稱單元格
+ *
+ * 顯示用戶頭像和名稱，支援副標題
+ *
+ * @example
+ * ```tsx
+ * <AvatarCell name="張三" subtitle="業務部" />
+ * <AvatarCell name="李四" imageUrl="/avatars/li.jpg" />
+ * ```
+ */
+export function AvatarCell({ name, imageUrl, subtitle, className }: AvatarCellProps) {
+  // 取名字第一個字作為頭像文字
+  const initial = name?.charAt(0) || '?'
+
+  return (
+    <div className={cn('flex items-center gap-2', className)}>
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-morandi-gold/20 flex items-center justify-center">
+        {imageUrl ? (
+          <img src={imageUrl} alt={name} className="w-full h-full rounded-full object-cover" />
+        ) : (
+          <span className="text-sm font-medium text-morandi-gold">{initial}</span>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-medium text-morandi-primary truncate">{name}</div>
+        {subtitle && <div className="text-xs text-morandi-secondary truncate">{subtitle}</div>}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * LinkCell - 連結單元格
+ *
+ * 可點擊的連結，支援內部和外部連結
+ *
+ * @example
+ * ```tsx
+ * <LinkCell href="/tours/123" text="查看詳情" />
+ * <LinkCell href="https://example.com" text="外部連結" external />
+ * ```
+ */
+export function LinkCell({ href, text, external = false, className }: LinkCellProps) {
+  const linkClass = cn(
+    'text-sm text-morandi-gold hover:text-morandi-gold-dark hover:underline transition-colors',
+    className
+  )
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+        {text} ↗
+      </a>
+    )
+  }
+
+  return (
+    <a href={href} className={linkClass}>
+      {text}
+    </a>
+  )
+}
+
+/**
+ * BadgeCell - 徽章單元格
+ *
+ * 簡單的徽章顯示，與 StatusCell 不同，不依賴 status-config
+ *
+ * @example
+ * ```tsx
+ * <BadgeCell text="熱門" variant="warning" />
+ * <BadgeCell text="新品" variant="success" />
+ * ```
+ */
+export function BadgeCell({ text, variant = 'default', className }: BadgeCellProps) {
+  const variantClass = cn(
+    'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+    variant === 'default' && 'bg-morandi-container text-morandi-primary',
+    variant === 'success' && 'bg-morandi-green/10 text-morandi-green',
+    variant === 'warning' && 'bg-morandi-gold/10 text-morandi-gold',
+    variant === 'danger' && 'bg-morandi-red/10 text-morandi-red',
+    variant === 'info' && 'bg-blue-50 text-blue-600',
+    className
+  )
+
+  return <span className={variantClass}>{text}</span>
 }

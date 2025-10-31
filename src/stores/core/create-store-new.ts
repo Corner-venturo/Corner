@@ -1,11 +1,16 @@
 /**
  * Zustand Store 工廠函數
- * 支援 Supabase 雲端同步 + IndexedDB 本地快取
+ * 支援 Supabase 雲端同步 + IndexedDB 快取層
  *
  * 架構：
- * - Supabase: 雲端資料庫（Single Source of Truth）
- * - IndexedDB: 本地快取（效能優化）
+ * - Supabase: 雲端資料庫（唯一的 Source of Truth）
+ * - IndexedDB: 快取層（Cache，加速載入，可隨時清空）
  * - Zustand: UI 狀態管理
+ *
+ * 重要：
+ * - 無離線編輯功能（所有變更都直接寫入 Supabase）
+ * - IndexedDB 純粹作為快取，不儲存未同步的變更
+ * - 斷網時只能查看快取資料（唯讀模式）
  */
 
 import { create } from 'zustand';

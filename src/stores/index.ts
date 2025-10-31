@@ -126,13 +126,23 @@ export const useRegionStore = createStore<Region>('regions')
 
 // 地區 Store（新版，三層架構 - 已重構使用 createStore）
 // 支援 Countries > Regions > Cities 三層架構
-// 內部使用 createStore 工廠，提供統一的離線優先架構
+// 內部使用 createStore 工廠，提供統一的快取優先架構
 export { useRegionStoreNew } from './region-store-new'
 export type { Country, Region as RegionNew, City, RegionStats } from './region-store-new'
 
 // 行事曆事件 Store
 export const useCalendarEventStore =
   createStore<import('@/types/calendar.types').CalendarEvent>('calendar_events')
+
+// ============================================
+// 財務收款系統 Stores
+// ============================================
+
+// 收款單 Store（新版，支援 LinkPay）
+export { useReceiptStore } from './receipt-store'
+
+// LinkPay 付款記錄 Store
+export { useLinkPayLogStore } from './linkpay-log-store'
 
 // WorkspaceItem, Template, TimeboxSession 型別需要定義後再啟用
 // export const useTemplateStore = createStore<Template>('templates');
@@ -218,3 +228,20 @@ export type {
   Supplier,
   Region,
 }
+
+// 財務收款系統型別
+export type {
+  Receipt,
+  LinkPayLog,
+  ReceiptType,
+  ReceiptStatus,
+  LinkPayStatus,
+  CreateReceiptData,
+  UpdateReceiptData,
+  ReceiptItem,
+  RECEIPT_TYPE_LABELS,
+  RECEIPT_STATUS_LABELS,
+  RECEIPT_STATUS_COLORS,
+  LINKPAY_STATUS_LABELS,
+  LINKPAY_STATUS_COLORS,
+} from '@/types/receipt.types'

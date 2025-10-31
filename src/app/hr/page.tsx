@@ -74,7 +74,7 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      console.error('辦理離職失敗:', err)
+      // 靜默失敗，UI 層面已透過 store 狀態處理
     }
   }
 
@@ -108,8 +108,7 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '未知錯誤'
-      console.error('刪除員工失敗:', errorMessage)
+      // 靜默失敗，UI 層面已透過 store 狀態處理
     }
   }
 

@@ -1,21 +1,19 @@
 /**
  * Hooks 統一匯出
- * 業務邏輯層的統一入口
+ * 通用 Hooks 的統一入口
+ *
+ * 注意：業務邏輯 Hooks 已遷移至 features/ 目錄
+ * - useTours → @/features/tours/hooks/useTours
+ * - useOrders → @/features/orders/hooks/useOrders
+ * - useCustomers → @/features/customers/hooks/useCustomers
+ * - usePayments → @/features/payments/hooks/usePayments (deprecated)
  */
 
-// 業務 Hooks
-export { useTours } from './useTours'
-export { useOrders } from './useOrders'
-export { useCustomers } from './useCustomers'
-// usePayments deprecated (moved to features/payments/hooks/usePayments.ts)
-// export { usePayments } from './usePayments';
-
-// 現有通用 Hooks
+// 通用 Hooks
 export { usePermissions } from './usePermissions'
 export { useDialog } from './useDialog'
 export { useEnterSubmit } from './useEnterSubmit'
 export { useCrudOperations } from './useCrudOperations'
-export { useStatusBadge } from './useStatusBadge'
 export { useDataFiltering } from './useDataFiltering'
 export { useDialogState } from './useDialogState'
 export { useListPageState } from './useListPageState'

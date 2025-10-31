@@ -29,7 +29,7 @@ export interface SyncResult<T> {
 
 /**
  * 載入資料並同步
- * 1. 先從 IndexedDB 快速載入 (離線優先)
+ * 1. 先從 IndexedDB 快速載入（快取優先）
  * 2. 背景從 Supabase 同步最新資料
  */
 export async function loadWithSync<T extends { id: string }>(

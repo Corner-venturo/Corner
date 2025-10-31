@@ -1,7 +1,7 @@
 /**
  * Channel Member Store (使用 createStore)
  * 管理 channel_members 表格資料
- * 自動繼承離線優先、Realtime 同步等功能
+ * 自動繼承快取優先、Realtime 同步等功能
  *
  * 注意：
  * - 實際使用時通常透過 API endpoint 查詢（包含 profile 資訊）

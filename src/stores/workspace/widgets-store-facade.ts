@@ -148,7 +148,7 @@ export const useWidgetsStore = () => {
       uiStore.setLoading(true)
 
       try {
-        // 使用 createStore 的 fetchAll（自動處理離線優先）
+        // 使用 createStore 的 fetchAll（自動處理快取優先）
         await advanceListStore.fetchAll()
 
         // 過濾出該 channel 的清單 (createStore 已經載入所有資料)
@@ -222,7 +222,7 @@ export const useWidgetsStore = () => {
       uiStore.setLoading(true)
 
       try {
-        // 使用 createStore 的 fetchAll（自動處理離線優先）
+        // 使用 createStore 的 fetchAll（自動處理快取優先）
         await sharedOrderListStore.fetchAll()
 
         // 過濾出該 channel 的清單 (createStore 已經載入所有資料)

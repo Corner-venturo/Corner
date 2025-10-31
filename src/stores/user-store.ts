@@ -1,6 +1,6 @@
 /**
  * 員工管理 Store
- * 離線優先架構：Supabase（雲端）+ IndexedDB（快取）
+ * 快取優先架構：Supabase（雲端）+ IndexedDB（快取）
  */
 
 import { User } from './types'

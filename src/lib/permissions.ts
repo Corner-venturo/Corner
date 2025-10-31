@@ -156,13 +156,6 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/manifestation'],
     description: '顯化魔法功能',
   },
-  {
-    id: 'heroic_summon',
-    label: '英靈招喚',
-    category: '全部',
-    routes: ['/heroic-summon'],
-    description: '英靈招喚系統',
-  },
 ]
 
 /**

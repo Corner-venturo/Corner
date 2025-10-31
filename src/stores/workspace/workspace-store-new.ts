@@ -1,7 +1,7 @@
 /**
  * Workspace Store (使用 createStore)
  * 管理 workspaces 表格資料
- * 自動繼承離線優先、Realtime 同步等功能
+ * 自動繼承快取優先、Realtime 同步等功能
  */
 
 import { createStore } from '../core/create-store-new'

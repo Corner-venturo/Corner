@@ -1,5 +1,10 @@
 /**
- * Create 操作（簡化版：直接新增到 Supabase + IndexedDB）
+ * Create 操作（FastInsert 策略：立即更新 UI，背景同步 Supabase）
+ *
+ * 流程：
+ * 1. 立即寫入 IndexedDB（快取）→ 樂觀更新
+ * 2. 立即更新 UI（不等待 Supabase）
+ * 3. 背景寫入 Supabase → 如果失敗則回滾
  */
 
 import type { BaseEntity } from '@/types';
