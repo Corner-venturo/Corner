@@ -47,7 +47,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
    */
   async put(item: T): Promise<void> {
     await localDB.put(this.tableName, item)
-    logger.log(`💾 [${this.tableName}] IndexedDB put:`, item.id)
   }
 
   /**
@@ -55,7 +54,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
    */
   async update(id: string, data: Partial<T>): Promise<void> {
     await localDB.update(this.tableName, id, data)
-    logger.log(`💾 [${this.tableName}] IndexedDB update:`, id)
   }
 
   /**
@@ -63,7 +61,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
    */
   async delete(id: string): Promise<void> {
     await localDB.delete(this.tableName, id)
-    logger.log(`💾 [${this.tableName}] IndexedDB delete:`, id)
   }
 
   /**
@@ -75,7 +72,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
     for (const item of items) {
       await this.delete(item.id)
     }
-    logger.log(`💾 [${this.tableName}] IndexedDB cleared`)
   }
 
   /**
@@ -83,7 +79,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
    */
   async batchPut(items: T[], timeout = 10000): Promise<void> {
     if (items.length === 0) {
-      logger.log(`💾 [${this.tableName}] 無資料需要寫入`)
       return
     }
 
@@ -91,7 +86,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
     let successCount = 0
     let failCount = 0
 
-    logger.log(`💾 [${this.tableName}] 開始批次寫入 ${items.length} 筆資料...`)
 
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize)
@@ -121,7 +115,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
         `⚠️ [${this.tableName}] IndexedDB 批次寫入部分失敗: 成功 ${successCount} 筆，失敗 ${failCount} 筆`
       )
     } else {
-      logger.log(`✅ [${this.tableName}] IndexedDB 批次寫入完成 (${successCount} 筆)`)
     }
   }
 }

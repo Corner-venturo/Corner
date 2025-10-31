@@ -115,7 +115,6 @@ export function createStore<T extends BaseEntity>(
             const items = await fetchAll(config, indexedDB, supabase, sync, controller);
 
             set({ items, loading: false });
-            logger.log(`✅ [${tableName}] fetchAll 完成:`, items.length, '筆');
           } catch (error) {
             // 忽略 AbortError
             if (error instanceof Error && error.name === 'AbortError') {
@@ -166,8 +165,6 @@ export function createStore<T extends BaseEntity>(
             // 通知 NetworkMonitor 資料已變更
             networkMonitor?.markDataChanged();
 
-            logger.log(`✅ [${tableName}] 已建立:`, newItem.id);
-
             return newItem;
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : '建立失敗';
@@ -192,8 +189,6 @@ export function createStore<T extends BaseEntity>(
             // 通知 NetworkMonitor 資料已變更
             networkMonitor?.markDataChanged();
 
-            logger.log(`✅ [${tableName}] 已更新:`, id);
-
             return updatedItem;
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : '更新失敗';
@@ -217,8 +212,6 @@ export function createStore<T extends BaseEntity>(
 
             // 通知 NetworkMonitor 資料已變更
             networkMonitor?.markDataChanged();
-
-            logger.log(`✅ [${tableName}] 已刪除:`, id);
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : '更新失敗';
             set({ error: errorMessage, loading: false });
@@ -304,7 +297,6 @@ export function createStore<T extends BaseEntity>(
   // 註冊同步完成監聽器
   if (typeof window !== 'undefined') {
     storeEventBus.onSyncCompleted(tableName, () => {
-      logger.log(`📥 [${tableName}] 收到同步完成通知，重新載入資料...`);
       store.getState().fetchAll();
     });
 
@@ -315,7 +307,6 @@ export function createStore<T extends BaseEntity>(
     // 監聽背景更新完成事件（Stale-While-Revalidate 策略）
     window.addEventListener(`${tableName}:updated`, ((event: CustomEvent) => {
       const { items } = event.detail;
-      logger.log(`📥 [${tableName}] 背景更新完成，更新 UI:`, items.length, '筆');
       store.setState({ items });
     }) as EventListener);
   }
