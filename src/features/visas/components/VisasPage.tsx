@@ -67,23 +67,23 @@ export default function VisasPage() {
 
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
 
-  // 當頁面載入時，自動取得或建立當年度簽證專用團
-  useEffect(() => {
-    const initVisaTour = async () => {
-      try {
-        const visaTour = await tourService.getOrCreateVisaTour();
+  // ✅ 延遲初始化：只在打開對話框時才載入 tours
+  // getOrCreateVisaTour 已經直接查詢 Supabase，不需要先 fetchTours()
+  const initVisaTour = React.useCallback(async () => {
+    try {
+      const visaTour = await tourService.getOrCreateVisaTour();
+      // 只在需要時載入所有 tours（用於下拉選單）
+      if (tours.length === 0) {
         await fetchTours();
-
-        if (visaTour && !contact_info.tour_id) {
-          setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
-        }
-      } catch (error) {
-                logger.error('Failed to get or create visa tour', error);
       }
-    };
 
-    initVisaTour();
-  }, [contact_info.tour_id, fetchTours, setContactInfo]);
+      if (visaTour && !contact_info.tour_id) {
+        setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
+      }
+    } catch (error) {
+      logger.error('Failed to get or create visa tour', error);
+    }
+  }, [contact_info.tour_id, fetchTours, setContactInfo, tours.length]);
 
   // 權限檢查：清除選擇
   useEffect(() => {
@@ -239,7 +239,10 @@ export default function VisasPage() {
             </Button>
             {canManageVisas && (
               <Button
-                onClick={() => setIsDialogOpen(true)}
+                onClick={async () => {
+                  await initVisaTour();
+                  setIsDialogOpen(true);
+                }}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 新增簽證

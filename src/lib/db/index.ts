@@ -153,10 +153,9 @@ export class LocalDatabase {
 
     // 開始初始化
     this.initPromise = new Promise((resolve, reject) => {
-      // 🔥 關鍵修正：延遲執行確保環境就緒
-      setTimeout(() => {
-        try {
-          const request = indexedDB.open(DB_NAME, DB_VERSION)
+      // ✅ 直接執行，不延遲（延遲可能導致競態條件）
+      try {
+        const request = indexedDB.open(DB_NAME, DB_VERSION)
 
           request.onerror = event => {
             const error = new Error(`無法開啟資料庫: ${request.error?.message || '未知錯誤'}`)
@@ -194,7 +193,11 @@ export class LocalDatabase {
           this.initPromise = null
           reject(error)
         }
-      }, 100) // 延遲 100ms 確保環境就緒
+      } catch (error) {
+        console.error('[LocalDB] Promise 內部錯誤:', error)
+        this.initPromise = null
+        reject(error)
+      }
     })
 
     return this.initPromise

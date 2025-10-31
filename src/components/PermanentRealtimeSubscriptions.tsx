@@ -176,7 +176,9 @@ export function PermanentRealtimeSubscriptions() {
       realtimeManager.unsubscribe(workspaceSubscriptionId);
       realtimeManager.unsubscribe(employeeSubscriptionId);
     };
-  }, [user, employeeStore]);
+    // ✅ 只依賴 user，不要依賴 employeeStore（它每次都會改變）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // 這是一個純邏輯組件，不渲染任何 UI
   return null;

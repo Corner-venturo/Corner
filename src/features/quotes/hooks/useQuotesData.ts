@@ -20,7 +20,8 @@ export const useQuotesData = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       loadQuotes()
-      fetchRegions()
+      // ✅ 移除自動載入 regions（改為在打開對話框時才載入）
+      // fetchRegions()
     }, 100)
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps

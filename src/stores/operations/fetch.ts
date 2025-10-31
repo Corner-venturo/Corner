@@ -63,7 +63,8 @@ export async function fetchAll<T extends BaseEntity>(
 
       try {
         // ✅ 策略：先快速下載前 100 筆顯示（1 秒內）
-        const { data: initialItems, error: fetchError } = await supabase.supabase
+        const { supabase: supabaseClient } = await import('@/lib/supabase/client');
+        const { data: initialItems, error: fetchError } = await supabaseClient
           .from(tableName)
           .select('*')
           .order('created_at', { ascending: false })

@@ -40,9 +40,12 @@ export function DestinationSelector({
     Array<{ id: string; code: string; name: string }>
   >([])
 
-  // 載入地區資料
+  // 載入地區資料（只在需要時載入）
   useEffect(() => {
-    regionStore.fetchAll()
+    // ✅ 只在 countries 為空時才載入，避免重複請求
+    if (regionStore.countries.length === 0) {
+      regionStore.fetchAll()
+    }
   }, [])
 
   // 取得啟用的國家列表

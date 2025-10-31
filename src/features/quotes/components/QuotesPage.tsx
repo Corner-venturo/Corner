@@ -16,6 +16,7 @@ import { useQuoteForm } from '../hooks/useQuoteForm';
 import { useQuoteTourSync } from '../hooks/useQuoteTourSync';
 import { STATUS_FILTERS } from '../constants';
 import { useRealtimeForQuotes, useRealtimeForTours, useRealtimeForQuoteItems } from '@/hooks/use-realtime-hooks';
+import { useRegionStoreNew } from '@/stores';
 
 export const QuotesPage: React.FC = () => {
   // ✅ Realtime 訂閱
@@ -40,6 +41,16 @@ export const QuotesPage: React.FC = () => {
     handleDeleteQuote,
     handleQuoteClick,
   } = useQuotesData();
+
+  // ✅ 延遲載入 regions（只在打開對話框時載入）
+  const { fetchAll: fetchRegions } = useRegionStoreNew();
+  const handleOpenDialog = React.useCallback(async () => {
+    setIsAddDialogOpen(true);
+    // 只在需要時載入 regions
+    if (countries.length === 0) {
+      await fetchRegions();
+    }
+  }, [countries.length, fetchRegions]);
 
   // Form management
   const {
@@ -99,7 +110,7 @@ export const QuotesPage: React.FC = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋報價單名稱..."
-        onAdd={() => setIsAddDialogOpen(true)}
+        onAdd={handleOpenDialog}
         addLabel="新增報價單"
       />
 

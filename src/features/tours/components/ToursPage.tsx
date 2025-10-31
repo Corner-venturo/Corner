@@ -108,13 +108,13 @@ export const ToursPage: React.FC = () => {
   // Use tours hook
   const { data: tours, loading, actions } = useTours(pageRequest);
 
-  // Load regions on mount
-  React.useEffect(() => {
-    if (countries.length === 0) {
-      fetchRegions();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countries.length]);  // 只監聽 countries.length，避免無限迴圈
+  // ✅ 移除自動載入 regions（改為在打開對話框時才載入）
+  // 原因：大部分用戶只是瀏覽列表，不需要載入 187 筆 cities
+  // React.useEffect(() => {
+  //   if (countries.length === 0) {
+  //     fetchRegions();
+  //   }
+  // }, [countries.length]);
 
   // Get active countries from new region store
   const activeCountries = useMemo(() => {
