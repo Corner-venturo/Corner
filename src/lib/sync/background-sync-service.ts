@@ -204,6 +204,26 @@ export class BackgroundSyncService {
             }
           }
 
+          // 🔥 先檢查 syncQueue 是否有此項目的刪除記錄
+          const allQueueItems = await localDB.getAll('syncQueue')
+          const hasDeleteRecord = allQueueItems.some(queueItem => {
+            if (!isSyncQueueItem(queueItem)) return false
+            return (
+              queueItem.table_name === tableName &&
+              queueItem.record_id === item.id &&
+              queueItem.operation === 'delete'
+            )
+          })
+
+          // 如果有刪除記錄，不要上傳，直接清理本地資料
+          if (hasDeleteRecord) {
+            logger.log(
+              `⚠️ [${tableName}] 發現刪除記錄，跳過同步並清理本地資料: ${item.id}`
+            )
+            await localDB.delete(tableName, item.id)
+            continue
+          }
+
           // 檢查是否已存在（update）或新建（insert）
           const { data: existing } = await supabase
             .from(tableName)
@@ -219,7 +239,22 @@ export class BackgroundSyncService {
             if (error) throw error
             logger.log(`✅ [${tableName}] 更新成功: ${item.id}`)
           } else {
-            // 新增
+            // 新增（確保不是已被其他裝置刪除的資料）
+            // 如果 Supabase 中找不到，有兩種可能：
+            // 1. 真的是新資料
+            // 2. 已被其他裝置刪除
+            //
+            // 保守做法：如果資料已經有 _synced_at（曾經同步過），則跳過
+            if (item._synced_at) {
+              logger.warn(
+                `⚠️ [${tableName}] 資料在 Supabase 中不存在但曾同步過，可能已被其他裝置刪除，跳過插入: ${item.id}`
+              )
+              // 清理本地資料
+              await localDB.delete(tableName, item.id)
+              continue
+            }
+
+            // 真的是新資料，執行插入
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error } = await supabase.from(tableName).insert([syncData])
 

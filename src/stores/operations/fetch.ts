@@ -41,15 +41,21 @@ export async function fetchAll<T extends BaseEntity>(
       // - 無快取 → 返回空陣列，背景下載（不阻擋 UI）
 
       if (cachedItems.length > 0) {
-        // 情境 A：有快取資料 → 立即返回
+        // 情境 A：有快取資料 → 離線優先：立即返回快取
         logger.log(`💾 [${tableName}] 立即返回快取:`, cachedItems.length, '筆');
 
-        // 背景同步（不阻擋 UI）
-        sync.uploadLocalChanges()
-          .then(() => logger.log(`📤 [${tableName}] 背景上傳完成`))
-          .catch((err) => logger.warn(`⚠️ [${tableName}] 背景上傳失敗:`, err));
+        // 🔄 背景靜默同步（不阻擋 UI，不影響返回值）
+        // 策略：上傳本地修改，Realtime 會自動推送其他人的新增/更新
+        Promise.resolve().then(async () => {
+          try {
+            await sync.uploadLocalChanges();
+            logger.log(`✅ [${tableName}] 本地修改已上傳`);
+          } catch (err) {
+            // 靜默失敗
+          }
+        });
 
-        return cachedItems;
+        return cachedItems; // ← 立即返回，依賴 Realtime 推送新資料
       }
 
       // 情境 B：無快取資料 → 顯示 loading，快速下載前 100 筆

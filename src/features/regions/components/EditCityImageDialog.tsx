@@ -5,6 +5,7 @@ import { Image as ImageIcon, Upload, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
 import type { City } from '@/stores'
+import { getOptimizedImageUrl, lazyLoadProps } from '@/lib/utils/image-optimization'
 
 interface EditCityImageDialogProps {
   open: boolean
@@ -198,9 +199,10 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
           <div className="aspect-video w-full border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-gray-50">
             {previewUrl1 ? (
               <img
-                src={previewUrl1}
+                src={getOptimizedImageUrl(previewUrl1, { width: 600, quality: 85 })}
                 alt={`${city.name} 圖片 1`}
                 className="w-full h-full object-cover"
+                {...lazyLoadProps}
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
@@ -257,9 +259,10 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
           <div className="aspect-video w-full border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-gray-50">
             {previewUrl2 ? (
               <img
-                src={previewUrl2}
+                src={getOptimizedImageUrl(previewUrl2, { width: 600, quality: 85 })}
                 alt={`${city.name} 圖片 2`}
                 className="w-full h-full object-cover"
+                {...lazyLoadProps}
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">

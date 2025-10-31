@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { Country, City } from '@/stores'
+import { getCityBackgroundThumbnails, lazyLoadProps } from '@/lib/utils/image-optimization'
 
 type SortField = 'name' | 'airport_code' | 'display_order'
 type SortDirection = 'asc' | 'desc'
@@ -128,55 +129,64 @@ export function RegionsList({
 
         {/* 城市圖片 */}
         <div className="w-32 flex items-center justify-center gap-1">
-          {/* 第一張圖片 */}
-          {city.background_image_url ? (
-            <div className="relative group">
-              <img
-                src={city.background_image_url}
-                alt={`${city.name} 1`}
-                className="w-12 h-8 object-cover rounded border border-border"
-              />
-              <button
-                onClick={() => onEditImage(city)}
-                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded"
-              >
-                <ImageIcon size={12} className="text-white" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => onEditImage(city)}
-              className="w-12 h-8 border-2 border-dashed border-morandi-secondary/30 rounded flex items-center justify-center hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
-              title="上傳圖片 1"
-            >
-              <Upload size={12} className="text-morandi-muted" />
-            </button>
-          )}
+          {(() => {
+            const thumbnails = getCityBackgroundThumbnails(city)
+            return (
+              <>
+                {/* 第一張圖片 */}
+                {city.background_image_url ? (
+                  <div className="relative group">
+                    <img
+                      src={thumbnails.url1}
+                      alt={`${city.name} 1`}
+                      className="w-12 h-8 object-cover rounded border border-border"
+                      {...lazyLoadProps}
+                    />
+                    <button
+                      onClick={() => onEditImage(city)}
+                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded"
+                    >
+                      <ImageIcon size={12} className="text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => onEditImage(city)}
+                    className="w-12 h-8 border-2 border-dashed border-morandi-secondary/30 rounded flex items-center justify-center hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                    title="上傳圖片 1"
+                  >
+                    <Upload size={12} className="text-morandi-muted" />
+                  </button>
+                )}
 
-          {/* 第二張圖片 */}
-          {city.background_image_url_2 ? (
-            <div className="relative group">
-              <img
-                src={city.background_image_url_2}
-                alt={`${city.name} 2`}
-                className="w-12 h-8 object-cover rounded border border-border"
-              />
-              <button
-                onClick={() => onEditImage(city)}
-                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded"
-              >
-                <ImageIcon size={12} className="text-white" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => onEditImage(city)}
-              className="w-12 h-8 border-2 border-dashed border-morandi-secondary/30 rounded flex items-center justify-center hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
-              title="上傳圖片 2"
-            >
-              <Upload size={12} className="text-morandi-muted" />
-            </button>
-          )}
+                {/* 第二張圖片 */}
+                {city.background_image_url_2 ? (
+                  <div className="relative group">
+                    <img
+                      src={thumbnails.url2}
+                      alt={`${city.name} 2`}
+                      className="w-12 h-8 object-cover rounded border border-border"
+                      {...lazyLoadProps}
+                    />
+                    <button
+                      onClick={() => onEditImage(city)}
+                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded"
+                    >
+                      <ImageIcon size={12} className="text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => onEditImage(city)}
+                    className="w-12 h-8 border-2 border-dashed border-morandi-secondary/30 rounded flex items-center justify-center hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                    title="上傳圖片 2"
+                  >
+                    <Upload size={12} className="text-morandi-muted" />
+                  </button>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         {/* 空白填充 */}

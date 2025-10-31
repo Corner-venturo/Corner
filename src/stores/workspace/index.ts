@@ -1,20 +1,21 @@
 // Unified workspace store - combines all workspace stores with backward compatibility
 
-import { useChannelsStore } from './channels-store'
-import { useChatStore } from './chat-store'
-import { useMembersStore } from './members-store'
-import { useWidgetsStore } from './widgets-store'
-import { useCanvasStore } from './canvas-store'
+// 🔥 使用新的 Facade (基於 createStore)
+import { useChannelsStore } from './channels-store-facade'
+import { useChatStore } from './chat-store-facade'
+import { useMembersStore } from './members-store-facade'
+import { useWidgetsStore } from './widgets-store-facade'
+import { useCanvasStore } from './canvas-store-facade'
 
 // Re-export all types
 export * from './types'
 
 // Re-export individual stores
-export { useChannelsStore } from './channels-store'
-export { useChatStore } from './chat-store'
-export { useMembersStore } from './members-store'
-export { useWidgetsStore } from './widgets-store'
-export { useCanvasStore } from './canvas-store'
+export { useChannelsStore } from './channels-store-facade'
+export { useChatStore } from './chat-store-facade'
+export { useMembersStore } from './members-store-facade'
+export { useWidgetsStore } from './widgets-store-facade'
+export { useCanvasStore } from './canvas-store-facade'
 
 /**
  * Unified workspace store hook - maintains backward compatibility
