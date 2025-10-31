@@ -157,41 +157,36 @@ export class LocalDatabase {
       try {
         const request = indexedDB.open(DB_NAME, DB_VERSION)
 
-          request.onerror = event => {
-            const error = new Error(`無法開啟資料庫: ${request.error?.message || '未知錯誤'}`)
-            console.error('[LocalDB] request.onerror 觸發:', error, event)
-            this.initPromise = null // 清除失敗的 Promise
-            reject(error)
-          }
-
-          request.onsuccess = () => {
-            this.db = request.result
-            resolve(this.db)
-          }
-
-          request.onupgradeneeded = event => {
-            const db = (event.target as IDBOpenDBRequest).result
-            const oldVersion = event.oldVersion
-            const newVersion = event.newVersion
-
-            try {
-              handleUpgrade(db, oldVersion, newVersion)
-            } catch (error) {
-              console.error('[LocalDB] 升級失敗:', error)
-              this.initPromise = null // 清除失敗的 Promise
-              // 注意: 在 onupgradeneeded 中 reject 可能無效
-              // 因為還會觸發 onsuccess 或 onerror
-              throw error
-            }
-          }
-
-          request.onblocked = event => {
-            console.warn('資料庫被其他連線阻擋', event)
-          }
-        } catch (error) {
-          console.error('[LocalDB] Promise 內部錯誤:', error)
-          this.initPromise = null
+        request.onerror = event => {
+          const error = new Error(`無法開啟資料庫: ${request.error?.message || '未知錯誤'}`)
+          console.error('[LocalDB] request.onerror 觸發:', error, event)
+          this.initPromise = null // 清除失敗的 Promise
           reject(error)
+        }
+
+        request.onsuccess = () => {
+          this.db = request.result
+          resolve(this.db)
+        }
+
+        request.onupgradeneeded = event => {
+          const db = (event.target as IDBOpenDBRequest).result
+          const oldVersion = event.oldVersion
+          const newVersion = event.newVersion
+
+          try {
+            handleUpgrade(db, oldVersion, newVersion)
+          } catch (error) {
+            console.error('[LocalDB] 升級失敗:', error)
+            this.initPromise = null // 清除失敗的 Promise
+            // 注意: 在 onupgradeneeded 中 reject 可能無效
+            // 因為還會觸發 onsuccess 或 onerror
+            throw error
+          }
+        }
+
+        request.onblocked = event => {
+          console.warn('資料庫被其他連線阻擋', event)
         }
       } catch (error) {
         console.error('[LocalDB] Promise 內部錯誤:', error)
