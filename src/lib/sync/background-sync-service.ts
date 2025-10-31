@@ -229,7 +229,7 @@ export class BackgroundSyncService {
             .from(tableName)
             .select('id')
             .eq('id', item.id)
-            .single()
+            .maybeSingle() // ✅ 使用 maybeSingle() 避免 406 錯誤
 
           if (existing) {
             // 更新
