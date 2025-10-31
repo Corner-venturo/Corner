@@ -44,22 +44,18 @@ export async function fetchAll<T extends BaseEntity>(
         // 情境 A：有快取資料 → 立即返回快取，背景更新
         logger.log(`💾 [${tableName}] 立即返回快取:`, cachedItems.length, '筆');
 
-        // 🔄 背景更新（Stale-While-Revalidate）
+        // 🔄 背景更新（簡化版：只下載最新資料）
         Promise.resolve().then(async () => {
           try {
-            // 1. 上傳本地修改
-            await sync.uploadLocalChanges();
-            logger.log(`✅ [${tableName}] 本地修改已上傳`);
-
-            // 2. 下載 Supabase 最新資料
+            // 下載 Supabase 最新資料
             logger.log(`🔄 [${tableName}] 背景下載最新資料...`);
             const latestItems = await supabase.fetchAll();
 
-            // 3. 更新 IndexedDB
+            // 更新 IndexedDB
             await indexedDB.batchPut(latestItems);
             logger.log(`✅ [${tableName}] 背景更新完成:`, latestItems.length, '筆');
 
-            // 4. 通知 UI 更新（透過 event）
+            // 通知 UI 更新（透過 event）
             if (typeof window !== 'undefined') {
               window.dispatchEvent(new CustomEvent(`${tableName}:updated`, {
                 detail: { items: latestItems }

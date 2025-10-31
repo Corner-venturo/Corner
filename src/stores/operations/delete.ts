@@ -13,7 +13,7 @@ import { localDB } from '@/lib/db';
 import { logger } from '@/lib/utils/logger';
 
 /**
- * 刪除資料（FastIn 模式）
+ * 刪除資料（簡化版：直接刪除 Supabase + IndexedDB）
  */
 export async function deleteItem<T extends BaseEntity>(
   id: string,
@@ -25,43 +25,21 @@ export async function deleteItem<T extends BaseEntity>(
   const { tableName, enableSupabase } = config;
 
   try {
-    // FastIn Step 1: 加入刪除隊列（用於背景同步）
-    const item = await indexedDB.getById(id);
-
-    if (item) {
-      // 加入刪除隊列
-      try {
-        await localDB.put('syncQueue', {
-          id: generateUUID(),
-          table_name: tableName,
-          record_id: id,
-          operation: 'delete',
-          data: item,
-          created_at: new Date().toISOString(),
-        });
-        logger.log(`📝 [${tableName}] FastIn: 已加入刪除隊列`);
-      } catch (queueError) {
-        logger.warn(`⚠️ [${tableName}] FastIn: 無法加入刪除隊列:`, queueError);
-      }
-    }
-
-    // 立即從 IndexedDB 刪除
-    await indexedDB.delete(id);
-    logger.log(`💾 [${tableName}] 已從本地刪除`);
-
-    // 即時同步到 Supabase
+    // ✅ 步驟 1：先刪除 Supabase（確保雲端同步）
     if (enableSupabase && typeof window !== 'undefined') {
-      try {
-        logger.log(`☁️ [${tableName}] 即時同步刪除到 Supabase...`);
-        await sync.uploadLocalChanges();
-        logger.log(`✅ [${tableName}] 同步刪除完成`);
-      } catch (syncError) {
-        logger.warn(`⚠️ [${tableName}] 同步刪除失敗（本地已刪除）`, syncError);
-      }
+      logger.log(`☁️ [${tableName}] 刪除 Supabase...`);
+      await supabase.delete(id);
+      logger.log(`✅ [${tableName}] Supabase 刪除成功`);
     }
+
+    // ✅ 步驟 2：刪除 IndexedDB（本地快取）
+    await indexedDB.delete(id);
+    logger.log(`💾 [${tableName}] IndexedDB 刪除成功`);
+
+    logger.log(`✅ [${tableName}] 刪除完成: ${id}`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '刪除失敗';
-    logger.error(`❌ [${tableName}] delete 失敗:`, error);
+    logger.error(`❌ [${tableName}] 刪除失敗:`, error);
     throw new Error(errorMessage);
   }
 }
