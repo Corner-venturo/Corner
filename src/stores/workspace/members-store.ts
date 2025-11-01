@@ -1,4 +1,13 @@
-// Channel members management store
+/**
+ * Members Store Facade
+ * 整合 ChannelMember Store (createStore)，提供統一接口
+ * 保持與舊版 members-store 相同的 API
+ *
+ * 注意：
+ * - 主要使用 API endpoint（包含 profile 資訊）
+ * - createStore 作為快取層和離線支援
+ */
+
 import { create } from 'zustand'
 import {
   fetchChannelMembers,
@@ -13,60 +22,94 @@ function isValidUUID(id: string): boolean {
   return UUID_REGEX.test(id)
 }
 
-interface MembersState {
+/**
+ * Members UI 狀態 (不需要同步到 Supabase 的狀態)
+ */
+interface MembersUIState {
   channelMembers: Record<string, ChannelMember[]>
   error: string | null
 
-  // Member operations
-  loadChannelMembers: (workspaceId: string, channelId: string) => Promise<void>
-  removeChannelMember: (workspaceId: string, channelId: string, memberId: string) => Promise<void>
+  // Internal state management
+  setChannelMembers: (channelId: string, members: ChannelMember[]) => void
+  setError: (error: string | null) => void
   clearError: () => void
 }
 
-export const useMembersStore = create<MembersState>(set => ({
+/**
+ * UI 狀態 Store (純前端狀態)
+ */
+const useMembersUIStore = create<MembersUIState>(set => ({
   channelMembers: {},
   error: null,
 
-  loadChannelMembers: async (workspaceId, channelId) => {
-    // 跳過假資料（不是有效的 UUID）
-    if (!isValidUUID(workspaceId) || !isValidUUID(channelId)) {
-      set(state => ({
-        channelMembers: {
-          ...state.channelMembers,
-          [channelId]: [],
-        },
-      }))
-      return
-    }
-
-    try {
-      const members = await fetchChannelMembers(workspaceId, channelId)
-      set(state => ({
-        channelMembers: {
-          ...state.channelMembers,
-          [channelId]: members,
-        },
-      }))
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : '無法載入頻道成員' })
-    }
+  setChannelMembers: (channelId, members) => {
+    set(state => ({
+      channelMembers: {
+        ...state.channelMembers,
+        [channelId]: members,
+      },
+    }))
   },
 
-  removeChannelMember: async (workspaceId, channelId, memberId) => {
-    try {
-      await removeChannelMemberService(workspaceId, channelId, memberId)
-      set(state => ({
-        channelMembers: {
-          ...state.channelMembers,
-          [channelId]: (state.channelMembers[channelId] || []).filter(
-            member => member.id !== memberId
-          ),
-        },
-      }))
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : '移除頻道成員失敗' })
-    }
-  },
-
+  setError: error => set({ error }),
   clearError: () => set({ error: null }),
 }))
+
+/**
+ * Members Store Facade
+ * 使用 API endpoint（包含 profile 資訊）
+ * 保持與舊版相同的 API
+ *
+ * 未來可以整合 ChannelMemberStore (createStore) 作為快取層
+ */
+export const useMembersStore = () => {
+  const uiStore = useMembersUIStore()
+
+  return {
+    // ============================================
+    // 資料
+    // ============================================
+    channelMembers: uiStore.channelMembers,
+    error: uiStore.error,
+
+    // ============================================
+    // Member 操作
+    // ============================================
+    loadChannelMembers: async (workspaceId: string, channelId: string) => {
+      // 跳過假資料（不是有效的 UUID）
+      if (!isValidUUID(workspaceId) || !isValidUUID(channelId)) {
+        uiStore.setChannelMembers(channelId, [])
+        return
+      }
+
+      try {
+        const members = await fetchChannelMembers(workspaceId, channelId)
+        uiStore.setChannelMembers(channelId, members)
+      } catch (error) {
+        uiStore.setError(error instanceof Error ? error.message : '無法載入頻道成員')
+      }
+    },
+
+    removeChannelMember: async (workspaceId: string, channelId: string, memberId: string) => {
+      try {
+        await removeChannelMemberService(workspaceId, channelId, memberId)
+
+        // 更新 UI 狀態
+        const currentMembers = uiStore.channelMembers[channelId] || []
+        uiStore.setChannelMembers(
+          channelId,
+          currentMembers.filter(member => member.id !== memberId)
+        )
+      } catch (error) {
+        uiStore.setError(error instanceof Error ? error.message : '移除頻道成員失敗')
+      }
+    },
+
+    clearError: uiStore.clearError,
+  }
+}
+
+/**
+ * Hook 型別（方便使用）
+ */
+export type MembersStoreType = ReturnType<typeof useMembersStore>

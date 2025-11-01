@@ -1,426 +1,250 @@
-// Chat and messaging store
-import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
-import { supabase } from '@/lib/supabase/client';
-import { localDB } from '@/lib/db';
-import { realtimeManager } from '@/lib/realtime';
-import type { Message, RawMessage } from './types';
-import { ensureMessageAttachments, normalizeMessage } from './utils';
+/**
+ * Chat Store Facade
+ * 整合 Message Store (createStore)，提供統一接口
+ * 保持與舊版 chat-store 相同的 API
+ */
 
-interface ChatState {
-  messages: Message[];
-  channelMessages: Record<string, Message[]>;
-  messagesLoading: Record<string, boolean>;
-  currentChannelId: string | null;
+import { create } from 'zustand'
+import { v4 as uuidv4 } from 'uuid'
+import { supabase } from '@/lib/supabase/client'
+import { useMessageStore } from './message-store-new'
+import type { Message } from './types'
+import { ensureMessageAttachments, normalizeMessage } from './utils'
 
-  // Message operations
-  loadMessages: (channelId: string) => Promise<void>;
-  sendMessage: (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => Promise<void>;
-  addMessage: (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => Promise<void>;
-  updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
-  deleteMessage: (messageId: string) => Promise<void>;
-  softDeleteMessage: (messageId: string) => Promise<void>;
-
-  // Message interactions
-  togglePinMessage: (messageId: string) => void;
-  addReaction: (messageId: string, emoji: string, userId: string) => void;
-  updateMessageReactions: (messageId: string, reactions: Record<string, string[]>) => Promise<void>;
+/**
+ * Chat UI 狀態 (不需要同步到 Supabase 的狀態)
+ */
+interface ChatUIState {
+  // 按 channel 分組的訊息 (從 MessageStore 過濾而來)
+  channelMessages: Record<string, Message[]>
+  messagesLoading: Record<string, boolean>
+  currentChannelId: string | null
 
   // Internal state management
-  setCurrentChannelMessages: (channelId: string, messages: Message[]) => void;
-  clearMessages: () => void;
-
-  // Realtime subscriptions
-  subscribeToMessages: (channelId: string) => void;
-  unsubscribeFromMessages: () => void;
+  setCurrentChannelMessages: (channelId: string, messages: Message[]) => void
+  setMessagesLoading: (channelId: string, loading: boolean) => void
+  setCurrentChannelId: (channelId: string | null) => void
+  clearMessages: () => void
 }
 
-export const useChatStore = create<ChatState>((set, get) => ({
-  messages: [],
+/**
+ * UI 狀態 Store (純前端狀態)
+ */
+const useChatUIStore = create<ChatUIState>(set => ({
   channelMessages: {},
   messagesLoading: {},
   currentChannelId: null,
 
-  loadMessages: async (channelId) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-
-    set((state) => ({
-      messagesLoading: { ...state.messagesLoading, [channelId]: true },
-      currentChannelId: channelId
-    }));
-
-    try {
-      // 優先從 Supabase 載入（即時資料）
-      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-        const { data, error } = await supabase
-          .from('messages')
-          .select(`
-            *,
-            author:employees!author_id(id, display_name, avatar)
-          `)
-          .eq('channel_id', channelId)
-          .order('created_at', { ascending: true });
-
-        if (!error && data) {
-          const freshMessages = (data || []).map(normalizeMessage);
-
-          // 更新 IndexedDB 快取
-          for (const message of freshMessages) {
-            await localDB.put('messages', message);
-          }
-
-          set((state) => ({
-            channelMessages: {
-              ...state.channelMessages,
-              [channelId]: freshMessages
-            },
-            messagesLoading: {
-              ...state.messagesLoading,
-              [channelId]: false
-            }
-          }));
-          return;
-        }
-      }
-
-      // 離線時從 IndexedDB 載入
-      const cachedMessages = (await localDB.getAll('messages') as RawMessage[])
-        .filter(m => m.channel_id === channelId)
-        .map(normalizeMessage);
-
-      set((state) => ({
-        channelMessages: {
-          ...state.channelMessages,
-          [channelId]: cachedMessages
-        },
-        messagesLoading: {
-          ...state.messagesLoading,
-          [channelId]: false
-        }
-      }));
-    } catch (error) {
-      set((state) => ({
-        messagesLoading: { ...state.messagesLoading, [channelId]: false }
-      }));
-    }
-  },
-
-  sendMessage: async (message) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-    const attachments = ensureMessageAttachments(message.attachments);
-
-    const newMessage: Message = {
-      ...message,
-      id: uuidv4(),
-      reactions: {},
-      created_at: new Date().toISOString(),
-      author: message.author,
-      attachments: attachments.length > 0 ? attachments : [],
-    };
-
-    try {
-      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await supabase
-          .from('messages')
-          .insert({
-            id: newMessage.id,
-            channel_id: newMessage.channel_id,
-            author_id: newMessage.author_id,
-            content: newMessage.content,
-            reactions: newMessage.reactions,
-            attachments: newMessage.attachments || [],
-            created_at: newMessage.created_at
-          });
-
-        if (error) throw error;
-      } else {
-      }
-    } catch (error) {
-    }
-
-    await localDB.put('messages', newMessage);
-    set(state => {
-      const existingMessages = state.channelMessages[newMessage.channel_id] || [];
-      return {
-        channelMessages: {
-          ...state.channelMessages,
-          [newMessage.channel_id]: [...existingMessages, newMessage]
-        }
-      };
-    });
-  },
-
-  addMessage: async (message) => {
-    return get().sendMessage(message);
-  },
-
-  updateMessage: async (messageId, updates) => {
-    set(state => {
-      const nextChannelMessages = { ...state.channelMessages };
-
-      for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
-        const index = channelMessages.findIndex(m => m.id === messageId);
-        if (index !== -1) {
-          const updatedMessages = [...channelMessages];
-          updatedMessages[index] = { ...channelMessages[index], ...updates };
-          nextChannelMessages[channelId] = updatedMessages;
-          break;
-        }
-      }
-
-      return { channelMessages: nextChannelMessages };
-    });
-  },
-
-  togglePinMessage: (messageId) => {
-    set(state => {
-      const nextChannelMessages = { ...state.channelMessages };
-
-      for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
-        const index = channelMessages.findIndex(m => m.id === messageId);
-        if (index !== -1) {
-          const updatedMessages = [...channelMessages];
-          const currentMessage = channelMessages[index];
-          updatedMessages[index] = { ...currentMessage, is_pinned: !currentMessage.is_pinned };
-          nextChannelMessages[channelId] = updatedMessages;
-          break;
-        }
-      }
-
-      return { channelMessages: nextChannelMessages };
-    });
-  },
-
-  addReaction: (messageId, emoji, userId) => {
-    set(state => {
-      const nextChannelMessages = { ...state.channelMessages };
-
-      for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
-        const index = channelMessages.findIndex(m => m.id === messageId);
-        if (index !== -1) {
-          const updatedMessages = [...channelMessages];
-          const currentMessage = channelMessages[index];
-          const reactions = { ...currentMessage.reactions };
-          if (!reactions[emoji]) {
-            reactions[emoji] = [];
-          }
-          if (!reactions[emoji].includes(userId)) {
-            reactions[emoji] = [...reactions[emoji], userId];
-          }
-          updatedMessages[index] = { ...currentMessage, reactions };
-          nextChannelMessages[channelId] = updatedMessages;
-          break;
-        }
-      }
-
-      return { channelMessages: nextChannelMessages };
-    });
-  },
-
-  updateMessageReactions: async (messageId, reactions) => {
-    set(state => {
-      const nextChannelMessages = { ...state.channelMessages };
-
-      for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
-        const index = channelMessages.findIndex(m => m.id === messageId);
-        if (index !== -1) {
-          const updatedMessages = [...channelMessages];
-          updatedMessages[index] = { ...channelMessages[index], reactions };
-          nextChannelMessages[channelId] = updatedMessages;
-          break;
-        }
-      }
-
-      return { channelMessages: nextChannelMessages };
-    });
-  },
-
-  deleteMessage: async (messageId) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-
-    try {
-      // 🔥 從 Supabase 刪除
-      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await supabase
-          .from('messages')
-          .delete()
-          .eq('id', messageId);
-
-        if (error) throw error;
-      } else {
-      }
-    } catch (error) {
-    }
-
-    // 🔥 從 IndexedDB 刪除
-    try {
-      await localDB.delete('messages', messageId);
-    } catch (error) {
-          }
-
-    // 🔥 從 Zustand 狀態刪除
-    set((state) => {
-      const nextChannelMessages = { ...state.channelMessages };
-
-      for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
-        if (channelMessages.some(m => m.id === messageId)) {
-          nextChannelMessages[channelId] = channelMessages.filter(m => m.id !== messageId);
-          break;
-        }
-      }
-
-      return { channelMessages: nextChannelMessages };
-    });
-  },
-
-  softDeleteMessage: async (messageId) => {
-    const isOnline = typeof navigator !== 'undefined' && navigator.onLine;
-
-    try {
-      if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await supabase
-          .from('messages')
-          .update({ content: '此訊息已被刪除' })
-          .eq('id', messageId);
-
-        if (error) throw error;
-      }
-    } catch (error) {
-    }
-
-    set((state) => {
-      const nextChannelMessages = { ...state.channelMessages };
-
-      for (const [channelId, channelMessages] of Object.entries(state.channelMessages)) {
-        const index = channelMessages.findIndex(m => m.id === messageId);
-        if (index !== -1) {
-          const updatedMessages = [...channelMessages];
-          updatedMessages[index] = {
-            ...channelMessages[index],
-            content: '此訊息已被刪除'
-          };
-          nextChannelMessages[channelId] = updatedMessages;
-          break;
-        }
-      }
-
-      return { channelMessages: nextChannelMessages };
-    });
-  },
-
   setCurrentChannelMessages: (channelId, messages) => {
-    set((state) => ({
-      messages,
+    set(state => ({
       channelMessages: {
         ...state.channelMessages,
-        [channelId]: messages
-      }
-    }));
+        [channelId]: messages,
+      },
+    }))
+  },
+
+  setMessagesLoading: (channelId, loading) => {
+    set(state => ({
+      messagesLoading: {
+        ...state.messagesLoading,
+        [channelId]: loading,
+      },
+    }))
+  },
+
+  setCurrentChannelId: channelId => {
+    set({ currentChannelId: channelId })
   },
 
   clearMessages: () => {
-    set({ messages: [] });
+    set({ channelMessages: {}, currentChannelId: null })
   },
+}))
 
-  // ==================== Realtime 訂閱 ====================
+/**
+ * Chat Store Facade
+ * 整合 Message Store (createStore)
+ * 保持與舊版相同的 API
+ */
+export const useChatStore = () => {
+  const messageStore = useMessageStore()
+  const uiStore = useChatUIStore()
 
-  subscribeToMessages: (channelId) => {
-    const subscriptionId = `messages-${channelId}`;
+  return {
+    // ============================================
+    // 資料 (來自 MessageStore)
+    // ============================================
+    messages: messageStore.items,
+    channelMessages: uiStore.channelMessages,
+    messagesLoading: uiStore.messagesLoading,
+    currentChannelId: uiStore.currentChannelId,
 
-    realtimeManager.subscribe<RawMessage>({
-      table: 'messages',
-      filter: `channel_id=eq.${channelId}`,
-      subscriptionId,
-      handlers: {
-        // 新訊息插入
-        onInsert: async (rawMessage) => {
-          const newMessage = normalizeMessage(rawMessage);
+    // ============================================
+    // Loading 和 Error
+    // ============================================
+    loading: messageStore.loading,
+    error: messageStore.error,
 
-          // 更新 IndexedDB
-          await localDB.put('messages', newMessage);
+    // ============================================
+    // 訊息載入 (使用 createStore 的 fetchAll)
+    // ============================================
+    loadMessages: async (channelId: string) => {
+      uiStore.setCurrentChannelId(channelId)
+      uiStore.setMessagesLoading(channelId, true)
 
-          // 更新 Zustand 狀態
-          set((state) => {
-            const existingMessages = state.channelMessages[channelId] || [];
+      try {
+        // 使用 createStore 的 fetchAll（自動處理快取優先）
+        await messageStore.fetchAll()
 
-            // 避免重複（如果訊息已存在）
-            if (existingMessages.some(m => m.id === newMessage.id)) {
-              return state;
-            }
+        // 過濾出該 channel 的訊息
+        const channelMessages = messageStore.items
+          .filter(m => m.channel_id === channelId)
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
-            return {
-              channelMessages: {
-                ...state.channelMessages,
-                [channelId]: [...existingMessages, newMessage]
-              }
-            };
-          });
-        },
-
-        // 訊息更新（編輯/反應/置頂）
-        onUpdate: async (rawMessage) => {
-          const updatedMessage = normalizeMessage(rawMessage);
-
-          // 更新 IndexedDB
-          await localDB.put('messages', updatedMessage);
-
-          // 更新 Zustand 狀態
-          set((state) => {
-            const existingMessages = state.channelMessages[channelId] || [];
-            const index = existingMessages.findIndex(m => m.id === updatedMessage.id);
-
-            if (index === -1) {
-              return state;
-            }
-
-            const newMessages = [...existingMessages];
-            newMessages[index] = updatedMessage;
-
-            return {
-              channelMessages: {
-                ...state.channelMessages,
-                [channelId]: newMessages
-              }
-            };
-          });
-        },
-
-        // 訊息刪除
-        onDelete: async (rawMessage) => {
-          const messageId = rawMessage.id;
-
-          // 從 IndexedDB 刪除
-          await localDB.delete('messages', messageId);
-
-          // 從 Zustand 狀態刪除
-          set((state) => {
-            const existingMessages = state.channelMessages[channelId] || [];
-
-            return {
-              channelMessages: {
-                ...state.channelMessages,
-                [channelId]: existingMessages.filter(m => m.id !== messageId)
-              }
-            };
-          });
-        }
+        uiStore.setCurrentChannelMessages(channelId, channelMessages)
+        uiStore.setMessagesLoading(channelId, false)
+      } catch (error) {
+        console.error('[Chat] Failed to load messages:', error)
+        uiStore.setMessagesLoading(channelId, false)
       }
-    });
+    },
 
-    set({ currentChannelId: channelId });
-  },
+    // ============================================
+    // 訊息操作 (使用 createStore 的 CRUD)
+    // ============================================
+    sendMessage: async (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => {
+      const attachments = ensureMessageAttachments(message.attachments)
 
-  unsubscribeFromMessages: () => {
-    const { currentChannelId } = get();
+      const newMessage: Message = {
+        ...message,
+        id: uuidv4(),
+        reactions: {},
+        created_at: new Date().toISOString(),
+        attachments: attachments.length > 0 ? attachments : [],
+      }
 
-    if (currentChannelId) {
-      const subscriptionId = `messages-${currentChannelId}`;
-      realtimeManager.unsubscribe(subscriptionId);
-    }
+      // 使用 createStore 的 create 方法（自動處理離線/線上）
+      await messageStore.create(newMessage)
 
-    set({ currentChannelId: null });
+      // 更新 UI 狀態
+      const channelMessages = messageStore.items
+        .filter(m => m.channel_id === newMessage.channel_id)
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+      uiStore.setCurrentChannelMessages(newMessage.channel_id, channelMessages)
+    },
+
+    addMessage: async (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => {
+      // addMessage 與 sendMessage 相同
+      const attachments = ensureMessageAttachments(message.attachments)
+
+      const newMessage: Message = {
+        ...message,
+        id: uuidv4(),
+        reactions: {},
+        created_at: new Date().toISOString(),
+        attachments: attachments.length > 0 ? attachments : [],
+      }
+
+      await messageStore.create(newMessage)
+
+      const channelMessages = messageStore.items
+        .filter(m => m.channel_id === newMessage.channel_id)
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+      uiStore.setCurrentChannelMessages(newMessage.channel_id, channelMessages)
+    },
+
+    updateMessage: async (messageId: string, updates: Partial<Message>) => {
+      await messageStore.update(messageId, updates)
+
+      // 更新 UI 狀態
+      if (uiStore.currentChannelId) {
+        const channelMessages = messageStore.items
+          .filter(m => m.channel_id === uiStore.currentChannelId)
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+        uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
+      }
+    },
+
+    deleteMessage: async (messageId: string) => {
+      await messageStore.delete(messageId)
+
+      // 更新 UI 狀態
+      if (uiStore.currentChannelId) {
+        const channelMessages = messageStore.items
+          .filter(m => m.channel_id === uiStore.currentChannelId)
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+        uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
+      }
+    },
+
+    softDeleteMessage: async (messageId: string) => {
+      // 軟刪除：標記為已刪除而不實際刪除
+      await messageStore.update(messageId, { _deleted: true })
+
+      // 更新 UI 狀態（過濾掉已刪除的訊息）
+      if (uiStore.currentChannelId) {
+        const channelMessages = messageStore.items
+          .filter(m => m.channel_id === uiStore.currentChannelId && !m._deleted)
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+        uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
+      }
+    },
+
+    // ============================================
+    // 訊息互動
+    // ============================================
+    togglePinMessage: async (messageId: string) => {
+      const message = messageStore.items.find(m => m.id === messageId)
+      if (!message) return
+
+      await messageStore.update(messageId, { is_pinned: !message.is_pinned })
+    },
+
+    addReaction: async (messageId: string, emoji: string, userId: string) => {
+      const message = messageStore.items.find(m => m.id === messageId)
+      if (!message) return
+
+      const reactions = { ...message.reactions }
+      if (!reactions[emoji]) {
+        reactions[emoji] = []
+      }
+      if (!reactions[emoji].includes(userId)) {
+        reactions[emoji].push(userId)
+      }
+
+      await messageStore.update(messageId, { reactions })
+    },
+
+    updateMessageReactions: async (messageId: string, reactions: Record<string, string[]>) => {
+      await messageStore.update(messageId, { reactions })
+    },
+
+    // ============================================
+    // Internal state management
+    // ============================================
+    setCurrentChannelMessages: uiStore.setCurrentChannelMessages,
+    clearMessages: uiStore.clearMessages,
+
+    // ============================================
+    // Realtime 訂閱 (createStore 自動處理)
+    // ============================================
+    subscribeToMessages: (channelId: string) => {
+      console.log('[Chat Facade] subscribeToMessages called, but createStore handles it automatically')
+    },
+
+    unsubscribeFromMessages: () => {
+      console.log('[Chat Facade] unsubscribeFromMessages called, but createStore handles it automatically')
+    },
   }
-}));
+}
+
+/**
+ * Hook 型別（方便使用）
+ */
+export type ChatStoreType = ReturnType<typeof useChatStore>
