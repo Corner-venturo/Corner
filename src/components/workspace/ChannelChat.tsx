@@ -1,8 +1,9 @@
 'use client'
 
 import { Hash } from 'lucide-react'
-import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels'
-import { useCleanupOrphanChannels } from '@/hooks/use-cleanup-orphan-channels'
+// 🔥 所有自動化 Hooks 已停用（效能優化）
+// import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels'
+// import { useCleanupOrphanChannels } from '@/hooks/use-cleanup-orphan-channels'
 import { ChannelSidebar } from './ChannelSidebar'
 import { ChannelTabs } from './ChannelTabs'
 import { useChannelChat } from './channel-chat/useChannelChat'
@@ -85,8 +86,9 @@ export function ChannelChat() {
     handleUpdateChannel,
   } = useChannelChat()
 
-  useAutoCreateTourChannels()
-  useCleanupOrphanChannels()
+  // 🔥 所有自動化功能已停用（效能優化 - 改用手動按鈕）
+  // useCleanupOrphanChannels()
+  // useAutoCreateTourChannels()
 
   if (loading && channels.length === 0) {
     return (

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { logger } from '@/lib/utils/logger';
 import { tourService } from '@/features/tours/services/tour.service';
+import { toast } from 'sonner';
 import { useVisasData } from '../hooks/useVisasData';
 import { useVisasFilters } from '../hooks/useVisasFilters';
 import { useVisasDialog } from '../hooks/useVisasDialog';
@@ -109,7 +110,7 @@ export default function VisasPage() {
 
     let selectedTour;
 
-    // 如果沒選團號，自動建立或使用預設的「簽證代辦團」
+    // 如果沒選團號，使用預設簽證團（不自動建立）
     if (!contact_info.tour_id) {
       const currentYear = new Date().getFullYear();
       const defaultTourCode = `VISA-${currentYear}`;
@@ -118,20 +119,9 @@ export default function VisasPage() {
       if (existingDefaultTour) {
         selectedTour = existingDefaultTour;
       } else {
-        const endOfYear = `${currentYear}-12-31`;
-        selectedTour = await addTour({
-          name: `${currentYear}年度簽證代辦`,
-          departure_date: endOfYear,
-          return_date: endOfYear,
-          status: 'special' as const,
-          location: 'VISA',
-          price: 0,
-          max_participants: 9999,
-          contract_status: 'pending' as const,
-          total_revenue: 0,
-          total_cost: 0,
-          profit: 0,
-        } as unknown);
+        // 提示管理員需要先建立簽證團
+        toast.error(`請先在簽證頁面設定 ${currentYear} 年預設簽證團，或在表單中選擇團號`);
+        return;
       }
     } else {
       selectedTour = tours.find(t => t.id === contact_info.tour_id);
@@ -218,6 +208,46 @@ export default function VisasPage() {
     setSelectedRows([]);
   };
 
+  // 建立預設簽證團
+  const [isCreatingDefaultTour, setIsCreatingDefaultTour] = useState(false);
+  const currentYear = new Date().getFullYear();
+  const defaultVisaTourCode = `VISA-${currentYear}`;
+  const defaultVisaTour = tours.find(t => t.code === defaultVisaTourCode);
+
+  const handleCreateDefaultVisaTour = async () => {
+    if (!canManageVisas) return;
+
+    if (defaultVisaTour) {
+      toast.info(`${defaultVisaTourCode} 簽證團已存在！`);
+      return;
+    }
+
+    setIsCreatingDefaultTour(true);
+    try {
+      const endOfYear = `${currentYear}-12-31`;
+      await addTour({
+        code: defaultVisaTourCode,
+        name: `${currentYear}年度簽證代辦`,
+        departure_date: endOfYear,
+        return_date: endOfYear,
+        status: 'special' as const,
+        location: 'VISA',
+        price: 0,
+        max_participants: 9999,
+        contract_status: 'pending' as const,
+        total_revenue: 0,
+        total_cost: 0,
+        profit: 0,
+      } as any);
+
+      toast.success(`已建立 ${defaultVisaTourCode} 簽證團！`);
+    } catch (error) {
+      toast.error('建立簽證團失敗');
+    } finally {
+      setIsCreatingDefaultTour(false);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
@@ -275,6 +305,23 @@ export default function VisasPage() {
               </>
             ) : (
               <>
+                {/* 設定預設簽證團按鈕 */}
+                {canManageVisas && !defaultVisaTour && (
+                  <Button
+                    variant="outline"
+                    onClick={handleCreateDefaultVisaTour}
+                    disabled={isCreatingDefaultTour}
+                    className="flex items-center gap-2 border-morandi-gold text-morandi-gold hover:bg-morandi-gold/10"
+                  >
+                    <Settings size={16} />
+                    {isCreatingDefaultTour ? '建立中...' : `建立 ${defaultVisaTourCode} 簽證團`}
+                  </Button>
+                )}
+                {canManageVisas && defaultVisaTour && (
+                  <span className="text-sm text-morandi-secondary px-3 py-1.5 bg-green-50 rounded-md border border-green-200">
+                    預設團號：{defaultVisaTourCode} ✓
+                  </span>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => setIsInfoDialogOpen(true)}

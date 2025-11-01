@@ -5,6 +5,9 @@ import { useParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { useTourStore } from '@/stores'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
+import { addChannelMembers } from '@/services/workspace-members'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { TourMembers } from '@/components/tours/tour-members'
@@ -13,7 +16,8 @@ import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
 import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourAddOns } from '@/components/tours/tour-add-ons'
-import { TourRefunds } from '@/components/tours/tour-refunds'
+import { MessageSquare } from 'lucide-react'
+import { toast } from 'sonner'
 
 const tabs = [
   { value: 'overview', label: '總覽' },
@@ -21,7 +25,6 @@ const tabs = [
   { value: 'members', label: '團員名單' },
   { value: 'operations', label: '團務' },
   { value: 'addons', label: '加購' },
-  { value: 'refunds', label: '退費' },
   { value: 'payments', label: '收款紀錄' },
   { value: 'costs', label: '成本支出' },
   { value: 'documents', label: '文件確認' },
@@ -31,12 +34,46 @@ export default function TourDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { items: tours } = useTourStore()
+  const { channels, createChannel, currentWorkspace } = useWorkspaceStore()
+  const { user } = useAuthStore()
   const [activeTab, setActiveTab] = useState('overview')
   const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false)
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
-  const [triggerRefundAdd, setTriggerRefundAdd] = useState(false)
+  const [isCreatingChannel, setIsCreatingChannel] = useState(false)
 
   const tour = tours.find(t => t.id === params.id)
+
+  // 檢查是否已有工作頻道
+  const existingChannel = channels.find(ch => ch.tour_id === tour?.id)
+
+  // 建立工作頻道
+  const handleCreateWorkChannel = async () => {
+    if (!tour || !currentWorkspace || !user) return
+
+    setIsCreatingChannel(true)
+    try {
+      const newChannel = await createChannel({
+        workspace_id: currentWorkspace.id,
+        name: `${tour.code} ${tour.name}`,
+        description: `${tour.name} 的工作頻道`,
+        type: 'public',
+        tour_id: tour.id,
+      })
+
+      if (newChannel && user.id) {
+        // 將當前用戶加入頻道作為 owner
+        await addChannelMembers(currentWorkspace.id, newChannel.id, [user.id], 'owner')
+      }
+
+      toast.success('工作頻道已建立！')
+      // 跳轉到 workspace 並選擇該頻道
+      router.push(`/workspace?channel=${newChannel.id}`)
+    } catch (error) {
+      toast.error('建立頻道失敗')
+    } finally {
+      setIsCreatingChannel(false)
+    }
+  }
 
   if (!tour) {
     return (
@@ -65,8 +102,6 @@ export default function TourDetailPage() {
           return '新增收款'
         case 'costs':
           return '新增成本'
-        case 'refunds':
-          return '新增退費'
         case 'orders':
           return '新增訂單'
         case 'members':
@@ -98,9 +133,6 @@ export default function TourDetailPage() {
           case 'costs':
             // 功能: 新增成本支出
             break
-          case 'refunds':
-            setTriggerRefundAdd(true)
-            break
           case 'orders':
             // 功能: 新增訂單
             break
@@ -129,14 +161,6 @@ export default function TourDetailPage() {
             tour={tour}
             triggerAdd={triggerAddOnAdd}
             onTriggerAddComplete={() => setTriggerAddOnAdd(false)}
-          />
-        )
-      case 'refunds':
-        return (
-          <TourRefunds
-            tour={tour}
-            triggerAdd={triggerRefundAdd}
-            onTriggerAddComplete={() => setTriggerRefundAdd(false)}
           />
         )
       case 'payments':
@@ -168,6 +192,26 @@ export default function TourDetailPage() {
         showBackButton={true}
         onBack={() => router.push('/tours')}
         {...(buttonConfig ? { onAdd: buttonConfig.onAdd, addLabel: buttonConfig.addLabel } : {})}
+        actions={
+          existingChannel ? (
+            <button
+              onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-morandi-primary border border-morandi-gold/30 rounded-lg hover:bg-morandi-gold/10 transition-colors"
+            >
+              <MessageSquare size={16} />
+              前往工作頻道
+            </button>
+          ) : (
+            <button
+              onClick={handleCreateWorkChannel}
+              disabled={isCreatingChannel}
+              className="flex items-center gap-2 px-4 py-2 text-sm bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <MessageSquare size={16} />
+              {isCreatingChannel ? '建立中...' : '建立工作頻道'}
+            </button>
+          )
+        }
       />
 
       <ContentContainer>{renderTabContent()}</ContentContainer>
