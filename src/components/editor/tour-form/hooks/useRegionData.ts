@@ -1,16 +1,19 @@
 import React from 'react'
-import { useRegionStoreNew } from '@/stores'
+import { useRegionsStore } from '@/stores'
 import { CityOption } from '../types'
 
 export function useRegionData(data: { country?: string }) {
   const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || '')
   const [selectedCountryCode, setSelectedCountryCode] = React.useState<string>('')
   const [initialized, setInitialized] = React.useState<boolean>(false)
-  const { countries, cities, fetchAll } = useRegionStoreNew()
+  const { countries, cities, fetchAll } = useRegionsStore()
 
-  // 懶載入：進入表單時載入 regions
+  // 懶載入：進入表單時載入 regions（只執行一次）
+  const hasFetchedRef = React.useRef(false)
+
   React.useEffect(() => {
-    if (countries.length === 0) {
+    if (countries.length === 0 && !hasFetchedRef.current) {
+      hasFetchedRef.current = true
       fetchAll()
     }
   }, [countries.length, fetchAll])
@@ -66,11 +69,9 @@ export function useRegionData(data: { country?: string }) {
     }
   }, [
     data.country,
-    countryNameToCode,
-    selectedCountry,
-    selectedCountryCode,
+    // 移除 countryNameToCode（已在 useMemo 中穩定）
+    // 移除 selectedCountry 和 selectedCountryCode（避免循環）
     countries.length,
-    initialized,
   ])
 
   return {

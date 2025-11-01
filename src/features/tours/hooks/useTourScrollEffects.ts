@@ -53,11 +53,20 @@ export function useTourScrollEffects({ viewMode, isPreview }: ScrollEffectsOptio
 
   // 監聽精選景點區塊的滾動進度（手機版）
   useEffect(() => {
-    if (viewMode !== 'mobile') return
+    if (viewMode !== 'mobile') {
+      setAttractionsProgress(0) // 重置進度
+      return
+    }
 
     if (isPreview) {
       let progress = 0
+      let isCancelled = false
+
       const interval = setInterval(() => {
+        if (isCancelled) {
+          clearInterval(interval)
+          return
+        }
         progress += 0.02
         if (progress >= 1) {
           progress = 1
@@ -65,7 +74,11 @@ export function useTourScrollEffects({ viewMode, isPreview }: ScrollEffectsOptio
         }
         setAttractionsProgress(progress)
       }, 50)
-      return () => clearInterval(interval)
+
+      return () => {
+        isCancelled = true
+        clearInterval(interval)
+      }
     }
 
     let scrollContainer: HTMLElement | null = null

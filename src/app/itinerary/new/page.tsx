@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
+import React, { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TourForm } from '@/components/editor/TourForm'
 import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
-import { useTourStore, useRegionStoreNew } from '@/stores'
+import { useTourStore, useRegionsStore } from '@/stores'
 import {
   IconBuilding,
   IconToolsKitchen2,
@@ -256,7 +256,7 @@ function NewItineraryPageContent() {
   const searchParams = useSearchParams()
   const tourId = searchParams.get('tour_id')
   const { items: tours } = useTourStore()
-  const { countries, cities } = useRegionStoreNew()
+  const { countries, cities } = useRegionsStore()
 
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
   const [scale, setScale] = useState(1)
@@ -265,9 +265,19 @@ function NewItineraryPageContent() {
   const [tourData, setTourData] = useState(getDefaultTourData())
   const [loading, setLoading] = useState(true)
 
+  // 使用 ref 追蹤是否已初始化，避免使用者編輯被覆蓋
+  const hasInitializedRef = useRef(false)
+  const lastTourIdRef = useRef<string | null>(null)
+
   // 從旅遊團載入資料（如果有 tour_id）
+  // 只在首次載入或 tourId 改變時執行，避免覆蓋使用者編輯
   useEffect(() => {
     const initializeTourData = () => {
+      // 如果 tourId 沒變，且已經初始化過，就不要重新載入
+      if (hasInitializedRef.current && lastTourIdRef.current === tourId) {
+        return
+      }
+
       if (!tourId) {
         // 沒有 tour_id，使用空白資料
         setTourData({
@@ -316,6 +326,8 @@ function NewItineraryPageContent() {
           dailyItinerary: [],
         })
         setLoading(false)
+        hasInitializedRef.current = true
+        lastTourIdRef.current = tourId
         return
       }
 
@@ -392,6 +404,8 @@ function NewItineraryPageContent() {
       })
 
       setLoading(false)
+      hasInitializedRef.current = true
+      lastTourIdRef.current = tourId
     }
 
     initializeTourData()
@@ -439,13 +453,14 @@ function NewItineraryPageContent() {
   }, [viewMode])
 
   // Convert icon strings to components for preview
-  const processedData = {
+  // 使用 useMemo 穩定 processedData 引用，避免無限循環
+  const processedData = React.useMemo(() => ({
     ...tourData,
     features: tourData.features.map((f: any) => ({
       ...f,
       iconComponent: iconMap[f.icon] || IconSparkles,
     })),
-  }
+  }), [tourData])
 
   if (loading) {
     return (

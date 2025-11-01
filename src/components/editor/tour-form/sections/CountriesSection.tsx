@@ -18,15 +18,26 @@ export function CountriesSection({
   getCitiesByCountryId,
   onChange,
 }: CountriesSectionProps) {
+  // 穩定國家選項（避免無限循環）
+  const countryOptions = React.useMemo(
+    () => allCountries.map(c => ({ value: c.id, label: c.name })),
+    [allCountries]
+  )
+
   // 初始化 countries 陣列（如果沒有的話，從現有的 country/city 建立）
+  const hasInitializedRef = React.useRef(false)
+
   React.useEffect(() => {
+    // 只初始化一次，避免觸發無限循環
+    if (hasInitializedRef.current) return
     if (!data.countries || data.countries.length === 0) {
-      if (data.country) {
+      if (data.country && allCountries.length > 0) {
         const country = allCountries.find(c => c.name === data.country)
         if (country) {
           const cities = getCitiesByCountryId(country.id)
           const city = cities.find(c => c.name === data.city)
 
+          hasInitializedRef.current = true
           onChange({
             ...data,
             countries: [
@@ -42,11 +53,36 @@ export function CountriesSection({
           })
         }
       }
+    } else {
+      hasInitializedRef.current = true
     }
-  }, [])
+  }, [allCountries.length])
 
   const countries = data.countries || []
   const primaryCountry = countries.find(c => c.is_primary)
+
+  // 穩定主要城市選項（避免無限循環）
+  const primaryCityOptions = React.useMemo(() => {
+    if (!primaryCountry?.country_id) return []
+    return getCitiesByCountryId(primaryCountry.country_id).map(c => ({
+      value: c.id,
+      label: `${c.name} (${c.code})`,
+    }))
+  }, [primaryCountry?.country_id, getCitiesByCountryId])
+
+  // 為每個國家建立穩定的城市選項映射
+  const cityOptionsMap = React.useMemo(() => {
+    const map: Record<string, Array<{ value: string; label: string }>> = {}
+    countries.forEach(country => {
+      if (country.country_id) {
+        map[country.country_id] = getCitiesByCountryId(country.country_id).map(c => ({
+          value: c.id,
+          label: `${c.name} (${c.code})`,
+        }))
+      }
+    })
+    return map
+  }, [countries, getCitiesByCountryId])
 
   const addCountry = () => {
     const newCountry: TourCountry = {
@@ -114,7 +150,7 @@ export function CountriesSection({
 
   return (
     <div className="space-y-4">
-      <div className="border-b-2 border-red-500 pb-2">
+      <div className="border-b-2 border-[#C9A961] pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">🌍 旅遊國家/地區</h2>
         <p className="text-xs text-morandi-secondary mt-1">
           設定此行程會前往的國家，方便後續選擇景點
@@ -123,10 +159,10 @@ export function CountriesSection({
 
       {/* 主要國家 */}
       {primaryCountry && (
-        <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <div className="p-4 bg-[#F9F5ED] border-2 border-[#E5D4A6] rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-blue-900">主要國家</label>
-            <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">主要</span>
+            <label className="text-sm font-semibold text-[#3D2914]">主要國家</label>
+            <span className="text-xs bg-[#C9A961] text-white px-2 py-0.5 rounded">主要</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -140,7 +176,7 @@ export function CountriesSection({
                     updateCountry(index, 'country_id', value)
                   }
                 }}
-                options={allCountries.map(c => ({ value: c.id, label: c.name }))}
+                options={countryOptions}
                 placeholder="搜尋或選擇國家..."
                 showSearchIcon
                 showClearButton
@@ -159,14 +195,7 @@ export function CountriesSection({
                     updateCountry(index, 'main_city_id', value)
                   }
                 }}
-                options={
-                  primaryCountry.country_id
-                    ? getCitiesByCountryId(primaryCountry.country_id).map(c => ({
-                        value: c.id,
-                        label: c.name,
-                      }))
-                    : []
-                }
+                options={primaryCityOptions}
                 placeholder="搜尋或選擇城市..."
                 showSearchIcon
                 showClearButton
@@ -192,7 +221,7 @@ export function CountriesSection({
                 </label>
                 <button
                   onClick={() => removeCountry(actualIndex)}
-                  className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
+                  className="text-[#9E8F81] hover:text-[#6B5D52] text-sm flex items-center gap-1"
                 >
                   <X size={14} />
                   刪除
@@ -207,7 +236,7 @@ export function CountriesSection({
                   <Combobox
                     value={country.country_id}
                     onChange={value => updateCountry(actualIndex, 'country_id', value)}
-                    options={allCountries.map(c => ({ value: c.id, label: c.name }))}
+                    options={countryOptions}
                     placeholder="搜尋或選擇國家..."
                     showSearchIcon
                     showClearButton
@@ -221,14 +250,7 @@ export function CountriesSection({
                   <Combobox
                     value={country.main_city_id || ''}
                     onChange={value => updateCountry(actualIndex, 'main_city_id', value)}
-                    options={
-                      country.country_id
-                        ? getCitiesByCountryId(country.country_id).map(c => ({
-                            value: c.id,
-                            label: c.name,
-                          }))
-                        : []
-                    }
+                    options={cityOptionsMap[country.country_id] || []}
                     placeholder="搜尋或選擇城市..."
                     showSearchIcon
                     showClearButton
@@ -243,7 +265,7 @@ export function CountriesSection({
       {/* 新增按鈕 */}
       <button
         onClick={addCountry}
-        className="w-full px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-morandi-secondary hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+        className="w-full px-4 py-2.5 border-2 border-dashed border-[#E0D8CC] rounded-lg text-sm text-morandi-secondary hover:border-[#C9A961] hover:text-[#3D2914] hover:bg-[#FAF8F5] transition-colors"
       >
         + 新增其他國家
       </button>
