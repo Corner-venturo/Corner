@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
 import { useUserStore, useAuthStore } from '@/stores'
 import { User, UserPlus, X } from 'lucide-react'
 import { addChannelMembers } from '@/services/workspace-members'
@@ -12,8 +12,8 @@ interface MemberSidebarProps {
 }
 
 export function MemberSidebar({ isOpen }: MemberSidebarProps) {
-  const { selectedChannel, currentWorkspace, channelMembers, loadChannelMembers } =
-    useWorkspaceStore()
+  const { selectedChannel, currentWorkspace } = useWorkspaceChannels()
+  const { channelMembers, loadChannelMembers } = useWorkspaceMembers()
   const { items: employees } = useUserStore()
   const { user } = useAuthStore()
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false)

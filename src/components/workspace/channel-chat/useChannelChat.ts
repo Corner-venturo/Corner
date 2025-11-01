@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useWorkspaceStore } from '@/stores/workspace-store';
+import { useWorkspaceChannels, useWorkspaceChat, useWorkspaceWidgets } from '@/stores/workspace-store';
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat';
 import { useChatRealtime } from '@/hooks/useChatRealtime';
 import { DEFAULT_CHANNEL_NAME, CHANNEL_SWITCH_DELAY, ALERT_MESSAGES } from './constants';
@@ -26,8 +26,7 @@ export function useChannelChat() {
   const [editChannelName, setEditChannelName] = useState('');
   const [editChannelDescription, setEditChannelDescription] = useState('');
 
-  // Store
-  const store = useWorkspaceStore();
+  // Use selective hooks for better performance
   const {
     channels,
     currentWorkspace,
@@ -37,15 +36,21 @@ export function useChannelChat() {
     loadChannels,
     updateChannel,
     deleteChannel,
+  } = useWorkspaceChannels();
+
+  const {
+    channelMessages,
+    messagesLoading,
     loadMessages,
+  } = useWorkspaceChat();
+
+  const {
     advanceLists,
     sharedOrderLists,
     loadAdvanceLists,
     loadSharedOrderLists,
     deleteAdvanceList,
-    channelMessages,
-    messagesLoading
-  } = store;
+  } = useWorkspaceWidgets();
 
   // Derived state
   const currentMessages = selectedChannel?.id && channelMessages?.[selectedChannel.id]
@@ -68,14 +73,16 @@ export function useChannelChat() {
     if (currentWorkspace?.id) {
       loadChannels(currentWorkspace.id);
     }
-  }, [currentWorkspace?.id, loadChannels]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWorkspace?.id]);
 
   useEffect(() => {
     if (channels.length > 0 && !selectedChannel) {
       const defaultChannel = channels.find(c => c.name === DEFAULT_CHANNEL_NAME) || channels[0];
       selectChannel(defaultChannel);
     }
-  }, [channels, selectedChannel, selectChannel]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channels.length, selectedChannel?.id]);
 
   useEffect(() => {
     if (showSettingsDialog && selectedChannel) {
@@ -96,7 +103,8 @@ export function useChannelChat() {
     ]).catch((error) => {
       // Silent error handling
     });
-  }, [selectedChannel?.id, loadMessages, loadAdvanceLists, loadSharedOrderLists]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChannel?.id]);
 
   // Handlers
   const handleSubmitMessage = async (e: React.FormEvent) => {

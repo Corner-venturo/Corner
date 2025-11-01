@@ -7,7 +7,7 @@
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
-import { useMessageStore } from './message-store-new'
+import { useMessageStore } from './message-store'
 import type { Message } from './types'
 import { ensureMessageAttachments, normalizeMessage } from './utils'
 
@@ -62,6 +62,45 @@ const useChatUIStore = create<ChatUIState>(set => ({
   },
 }))
 
+// ============================================
+// 訊息過濾+排序緩存（效能優化）
+// ============================================
+let cachedChannelId: string | null = null
+let cachedMessages: Message[] = []
+let cachedAllMessagesLength = 0
+
+/**
+ * 獲取指定頻道的訊息（帶緩存）
+ * 只在 channelId 或訊息數量變化時重新計算
+ */
+function getChannelMessages(
+  allMessages: Message[],
+  channelId: string,
+  includeDeleted: boolean = false
+): Message[] {
+  // 緩存檢查：channelId 和訊息數量都沒變 → 返回緩存
+  if (
+    cachedChannelId === channelId &&
+    cachedAllMessagesLength === allMessages.length &&
+    cachedMessages.length > 0
+  ) {
+    return cachedMessages
+  }
+
+  // 過濾 + 排序（只在必要時執行）
+  cachedMessages = allMessages
+    .filter(m =>
+      m.channel_id === channelId &&
+      (includeDeleted || !m._deleted)
+    )
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+  cachedChannelId = channelId
+  cachedAllMessagesLength = allMessages.length
+
+  return cachedMessages
+}
+
 /**
  * Chat Store Facade
  * 整合 Message Store (createStore)
@@ -97,15 +136,12 @@ export const useChatStore = () => {
         // 使用 createStore 的 fetchAll（自動處理快取優先）
         await messageStore.fetchAll()
 
-        // 過濾出該 channel 的訊息
-        const channelMessages = messageStore.items
-          .filter(m => m.channel_id === channelId)
-          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        // 🔥 使用緩存函數（避免重複計算）
+        const channelMessages = getChannelMessages(messageStore.items, channelId)
 
         uiStore.setCurrentChannelMessages(channelId, channelMessages)
         uiStore.setMessagesLoading(channelId, false)
       } catch (error) {
-        console.error('[Chat] Failed to load messages:', error)
         uiStore.setMessagesLoading(channelId, false)
       }
     },
@@ -127,10 +163,8 @@ export const useChatStore = () => {
       // 使用 createStore 的 create 方法（自動處理離線/線上）
       await messageStore.create(newMessage)
 
-      // 更新 UI 狀態
-      const channelMessages = messageStore.items
-        .filter(m => m.channel_id === newMessage.channel_id)
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      // 🔥 使用緩存函數（避免重複計算）
+      const channelMessages = getChannelMessages(messageStore.items, newMessage.channel_id)
 
       uiStore.setCurrentChannelMessages(newMessage.channel_id, channelMessages)
     },
@@ -149,9 +183,8 @@ export const useChatStore = () => {
 
       await messageStore.create(newMessage)
 
-      const channelMessages = messageStore.items
-        .filter(m => m.channel_id === newMessage.channel_id)
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      // 🔥 使用緩存函數（避免重複計算）
+      const channelMessages = getChannelMessages(messageStore.items, newMessage.channel_id)
 
       uiStore.setCurrentChannelMessages(newMessage.channel_id, channelMessages)
     },
@@ -161,9 +194,8 @@ export const useChatStore = () => {
 
       // 更新 UI 狀態
       if (uiStore.currentChannelId) {
-        const channelMessages = messageStore.items
-          .filter(m => m.channel_id === uiStore.currentChannelId)
-          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        // 🔥 使用緩存函數（避免重複計算）
+        const channelMessages = getChannelMessages(messageStore.items, uiStore.currentChannelId)
 
         uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
       }
@@ -174,9 +206,8 @@ export const useChatStore = () => {
 
       // 更新 UI 狀態
       if (uiStore.currentChannelId) {
-        const channelMessages = messageStore.items
-          .filter(m => m.channel_id === uiStore.currentChannelId)
-          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        // 🔥 使用緩存函數（避免重複計算）
+        const channelMessages = getChannelMessages(messageStore.items, uiStore.currentChannelId)
 
         uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
       }
@@ -188,9 +219,8 @@ export const useChatStore = () => {
 
       // 更新 UI 狀態（過濾掉已刪除的訊息）
       if (uiStore.currentChannelId) {
-        const channelMessages = messageStore.items
-          .filter(m => m.channel_id === uiStore.currentChannelId && !m._deleted)
-          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        // 🔥 使用緩存函數（避免重複計算）
+        const channelMessages = getChannelMessages(messageStore.items, uiStore.currentChannelId)
 
         uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
       }
@@ -235,11 +265,11 @@ export const useChatStore = () => {
     // Realtime 訂閱 (createStore 自動處理)
     // ============================================
     subscribeToMessages: (channelId: string) => {
-      console.log('[Chat Facade] subscribeToMessages called, but createStore handles it automatically')
+      // createStore handles subscriptions automatically
     },
 
     unsubscribeFromMessages: () => {
-      console.log('[Chat Facade] unsubscribeFromMessages called, but createStore handles it automatically')
+      // createStore handles unsubscriptions automatically
     },
   }
 }

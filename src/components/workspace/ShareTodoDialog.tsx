@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { useTodoStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Send, CheckCircle2, AlertCircle, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -28,7 +28,7 @@ interface ShareTodoDialogProps {
 export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDialogProps) {
   const { items: todos, updateItem } = useTodoStore()
   const { items: employees, loadItems } = useUserStore()
-  const { sendMessage } = useWorkspaceStore()
+  const { sendMessage } = useWorkspaceChat()
   const { user } = useAuthStore()
 
   const [selectedTodoId, setSelectedTodoId] = useState<string | null>(null)

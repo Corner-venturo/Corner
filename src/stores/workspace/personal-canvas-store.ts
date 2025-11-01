@@ -4,7 +4,7 @@
  * 自動繼承快取優先、Realtime 同步等功能
  */
 
-import { createStore } from '../core/create-store-new'
+import { createStore } from '../core/create-store'
 import type { PersonalCanvas } from './types'
 import type { BaseEntity } from '@/types'
 

@@ -5,7 +5,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { useAuthStore } from '@/stores/auth-store'
 import { removeChannelMember } from '@/services/workspace-members'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
 import type { Channel } from '@/stores/workspace-store'
 import type { ChannelSidebarProps } from './types'
 import { useChannelSidebar } from './useChannelSidebar'
@@ -18,6 +18,7 @@ import { EditChannelDialog } from './EditChannelDialog'
 import { ChannelList } from './ChannelList'
 
 export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSidebarProps) {
+  // Use selective hooks for better performance
   const {
     channels,
     channelGroups,
@@ -28,14 +29,18 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     setChannelFilter,
     createChannelGroup,
     toggleGroupCollapse,
-    channelMembers,
-    loadChannelMembers,
     updateChannelOrder,
     updateChannel,
     deleteChannel,
     deleteChannelGroup,
     createChannel,
-  } = useWorkspaceStore()
+  } = useWorkspaceChannels()
+
+  const {
+    channelMembers,
+    loadChannelMembers,
+  } = useWorkspaceMembers()
+
   const { user } = useAuthStore()
 
   // Use the new state hook

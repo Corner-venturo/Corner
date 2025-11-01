@@ -7,8 +7,8 @@
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
-import { useAdvanceListStore } from './advance-list-store-new'
-import { useSharedOrderListStore } from './shared-order-list-store-new'
+import { useAdvanceListStore } from './advance-list-store'
+import { useSharedOrderListStore } from './shared-order-list-store'
 import type { AdvanceItem, AdvanceList, SharedOrderList } from './types'
 
 /**
@@ -77,8 +77,7 @@ export const useWidgetsStore = () => {
 
       try {
         if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: listError } = await (supabase as any).from('advance_lists').insert({
+          const { error: listError } = await supabase.from('advance_lists').insert({
             id: listId,
             channel_id: channelId,
             created_by: currentUserId,
@@ -87,8 +86,7 @@ export const useWidgetsStore = () => {
 
           if (listError) throw listError
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: itemsError } = await (supabase as any).from('advance_items').insert(
+          const { error: itemsError } = await supabase.from('advance_items').insert(
             advanceItems.map(item => ({
               id: item.id,
               advance_list_id: listId,
@@ -104,7 +102,7 @@ export const useWidgetsStore = () => {
           if (itemsError) throw itemsError
         }
       } catch (error) {
-        console.warn('[Widgets] Failed to share advance list:', error)
+        // Silently fail
       }
 
       // 使用 createStore 的 create 方法
@@ -155,7 +153,6 @@ export const useWidgetsStore = () => {
         // Note: 過濾邏輯在 UI 層面處理
         uiStore.setLoading(false)
       } catch (error) {
-        console.error('[Widgets] Failed to load advance lists:', error)
         uiStore.setLoading(false)
       }
     },
@@ -229,7 +226,6 @@ export const useWidgetsStore = () => {
         // Note: 過濾邏輯在 UI 層面處理
         uiStore.setLoading(false)
       } catch (error) {
-        console.error('[Widgets] Failed to load shared order lists:', error)
         uiStore.setLoading(false)
       }
     },
@@ -240,7 +236,6 @@ export const useWidgetsStore = () => {
     clearWidgets: () => {
       // createStore 自動管理資料，這裡不需要清空
       // 如果需要，可以重新 fetchAll
-      console.log('[Widgets Facade] clearWidgets called, but data is managed by createStore')
     },
   }
 }

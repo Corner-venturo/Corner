@@ -15,6 +15,7 @@ export interface SortableChannelItemProps {
   isAdmin?: boolean
   isMember?: boolean
   onJoinChannel?: (channelId: string) => void
+  onLeaveChannel?: (channelId: string) => void
 }
 
 export interface DroppableGroupHeaderProps {

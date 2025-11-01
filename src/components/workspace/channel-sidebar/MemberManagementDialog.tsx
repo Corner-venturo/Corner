@@ -127,11 +127,10 @@ export function GroupDeleteDialog({
   onDelete,
 }: GroupDeleteDialogProps) {
   const handleDelete = async () => {
-    console.log('[GroupDeleteDialog] Delete button clicked')
     try {
       await onDelete()
     } catch (error) {
-      console.error('[GroupDeleteDialog] Delete failed:', error)
+      // Error handled by parent
     }
   }
 

@@ -7,18 +7,15 @@
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
-import { useChannelStore } from './channel-store-new'
-import { useChannelGroupStore } from './channel-group-store-new'
-import { useWorkspaceStoreData } from './workspace-store-new'
-import type { Workspace, Bulletin, Channel, ChannelGroup } from './types'
+import { useChannelStore } from './channel-store'
+import { useChannelGroupStore } from './channel-group-store'
+import { useWorkspaceStoreData } from './workspace-store'
+import type { Workspace, Channel, ChannelGroup } from './types'
 
 /**
  * 額外狀態 (不需要同步到 Supabase 的 UI 狀態)
  */
 interface ChannelsUIState {
-  // Bulletins (簡單的前端狀態，不需要createStore)
-  bulletins: Bulletin[]
-
   // UI 選擇狀態
   selectedChannel: Channel | null
   currentChannel: Channel | null
@@ -36,11 +33,6 @@ interface ChannelsUIState {
  * UI 狀態 Store (純前端狀態)
  */
 const useChannelsUIStore = create<ChannelsUIState & {
-  // Bulletin 操作
-  createBulletin: (bulletin: Omit<Bulletin, 'id' | 'created_at' | 'updated_at'>) => void
-  updateBulletin: (id: string, updates: Partial<Bulletin>) => void
-  deleteBulletin: (id: string) => void
-
   // UI 狀態操作
   setSelectedChannel: (channel: Channel | null) => void
   setCurrentChannel: (channel: Channel | null) => void
@@ -50,35 +42,12 @@ const useChannelsUIStore = create<ChannelsUIState & {
   setError: (error: string | null) => void
   clearError: () => void
 }>(set => ({
-  bulletins: [],
   selectedChannel: null,
   currentChannel: null,
   currentWorkspace: null,
   searchQuery: '',
   channelFilter: 'all',
   error: null,
-
-  createBulletin: bulletin => {
-    const newBulletin: Bulletin = {
-      ...bulletin,
-      id: uuidv4(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-    set(state => ({ bulletins: [...state.bulletins, newBulletin] }))
-  },
-
-  updateBulletin: (id, updates) => {
-    set(state => ({
-      bulletins: state.bulletins.map(b =>
-        b.id === id ? { ...b, ...updates, updated_at: new Date().toISOString() } : b
-      ),
-    }))
-  },
-
-  deleteBulletin: id => {
-    set(state => ({ bulletins: state.bulletins.filter(b => b.id !== id) }))
-  },
 
   setSelectedChannel: channel => set({ selectedChannel: channel }),
   setCurrentChannel: channel => set({ currentChannel: channel }),
@@ -114,7 +83,6 @@ export const useChannelsStore = () => {
     // ============================================
     // UI 狀態
     // ============================================
-    bulletins: uiStore.bulletins,
     selectedChannel: uiStore.selectedChannel,
     currentChannel: uiStore.currentChannel,
     currentWorkspace: uiStore.currentWorkspace,
@@ -131,29 +99,15 @@ export const useChannelsStore = () => {
     // Workspace 操作
     // ============================================
     loadWorkspaces: async () => {
-      await workspaceStore.fetchAll()
-      // 自動選擇第一個 workspace
-      if (workspaceStore.items.length > 0 && !uiStore.currentWorkspace) {
-        uiStore.setCurrentWorkspace(workspaceStore.items[0])
+      const workspaces = await workspaceStore.fetchAll()
+
+      // 🔥 使用 fetchAll 的返回值，而不是 items (避免競爭條件)
+      if (workspaces && workspaces.length > 0 && !uiStore.currentWorkspace) {
+        uiStore.setCurrentWorkspace(workspaces[0])
       }
     },
 
     setCurrentWorkspace: uiStore.setCurrentWorkspace,
-
-    // ============================================
-    // Bulletin 操作
-    // ============================================
-    loadBulletins: async (workspaceId?: string) => {
-      const currentWorkspaceId = workspaceId || uiStore.currentWorkspace?.id
-      if (!currentWorkspaceId) return
-
-      const filtered = uiStore.bulletins.filter(b => b.workspace_id === currentWorkspaceId)
-      // Bulletins 已經在 uiStore 中，這裡只是過濾
-    },
-
-    createBulletin: uiStore.createBulletin,
-    updateBulletin: uiStore.updateBulletin,
-    deleteBulletin: uiStore.deleteBulletin,
 
     // ============================================
     // Channel 操作 (使用 createStore 的方法)
@@ -181,8 +135,7 @@ export const useChannelsStore = () => {
             status: 'active',
           })
         } catch (error) {
-          // 靜默失敗
-          console.warn('[Channels] Failed to add channel member:', error)
+          // Silently fail
         }
       }
     },
@@ -275,13 +228,11 @@ export const useChannelsStore = () => {
     // Realtime 訂閱 (createStore 自動處理，但保留接口以防舊代碼呼叫)
     // ============================================
     subscribeToChannels: (workspaceId: string) => {
-      // createStore 已經自動訂閱，這裡不需要做任何事
-      console.log('[Channels Facade] subscribeToChannels called, but createStore handles it automatically')
+      // createStore handles subscriptions automatically
     },
 
     unsubscribeFromChannels: () => {
-      // createStore 已經自動處理，這裡不需要做任何事
-      console.log('[Channels Facade] unsubscribeFromChannels called, but createStore handles it automatically')
+      // createStore handles unsubscriptions automatically
     },
 
     // ============================================

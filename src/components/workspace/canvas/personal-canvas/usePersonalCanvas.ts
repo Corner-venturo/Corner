@@ -4,7 +4,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import {
-  useWorkspaceStore,
+  useWorkspaceChannels,
+  useWorkspaceCanvas,
   PersonalCanvas as PersonalCanvasType,
   RichDocument,
 } from '@/stores/workspace-store'
@@ -15,17 +16,17 @@ export function usePersonalCanvas(initialCanvasId?: string) {
   const [activeCanvasId, setActiveCanvasId] = useState<string | null>(initialCanvasId || null)
   const [selectedDocument, setSelectedDocument] = useState<RichDocument | null>(null)
 
+  const { currentWorkspace } = useWorkspaceChannels()
   const {
     richDocuments,
     personalCanvases,
-    currentWorkspace,
     loadRichDocuments,
     createRichDocument,
     updateRichDocument,
     deleteRichDocument,
     loadPersonalCanvases,
     createPersonalCanvas,
-  } = useWorkspaceStore()
+  } = useWorkspaceCanvas()
 
   const { user } = useAuthStore()
 

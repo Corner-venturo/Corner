@@ -5,8 +5,8 @@
  */
 
 import { create } from 'zustand'
-import { usePersonalCanvasStore } from './personal-canvas-store-new'
-import { useRichDocumentStore } from './rich-document-store-new'
+import { usePersonalCanvasStore } from './personal-canvas-store'
+import { useRichDocumentStore } from './rich-document-store'
 import type { PersonalCanvas, RichDocument } from './types'
 
 /**

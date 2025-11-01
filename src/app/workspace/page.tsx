@@ -3,48 +3,33 @@
 import { useEffect } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ChannelChat } from '@/components/workspace/ChannelChat';
-import { useTourStore, useWorkspaceStore } from '@/stores';
-import { useAutoCreateTourChannels } from '@/hooks/use-auto-create-tour-channels';
-import { useAutoAddVisaMembers } from '@/hooks/use-auto-add-visa-members';
-import { useAutoAddOrderMembers } from '@/hooks/use-auto-add-order-members';
-import { useChannelsRealtime } from '@/hooks/useChannelsRealtime';
+import { useWorkspaceChannels } from '@/stores/workspace-store';
 
 export default function WorkspacePage() {
-  const { items: tours } = useTourStore();
-  const { loadWorkspaces, loadChannelGroups, currentWorkspace } = useWorkspaceStore();
+  const { loadWorkspaces, loadChannelGroups, loadChannels, currentWorkspace } = useWorkspaceChannels();
 
-  // ✅ 訂閱 Channels Realtime（即時同步）
-  useChannelsRealtime();
-
-  // 自動建立旅遊團頻道
-  useAutoCreateTourChannels();
-
-  // 自動將所有員工加入簽證頻道
-  useAutoAddVisaMembers();
-
-  // 自動將訂單的業務和助理加入旅遊團頻道
-  useAutoAddOrderMembers();
-
-  // 載入工作空間（只執行一次）
+  // 🔥 簡化版：只載入資料，不要自動建立、不要 Realtime（先讓頁面能跑）
   useEffect(() => {
-    loadWorkspaces();
-    // ✅ 只在 mount 時執行一次，不依賴 loadWorkspaces（它每次都是新的函數）
+    const init = async () => {
+      // Step 1: 載入 workspaces
+      await loadWorkspaces();
+    };
+
+    init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 載入頻道群組（只在 workspace 改變時執行）
+  // Step 2: 當 workspace 載入後，載入 channels 和 groups
   useEffect(() => {
     if (currentWorkspace) {
-      loadChannelGroups(currentWorkspace.id);
+      const loadData = async () => {
+        await loadChannelGroups(currentWorkspace.id);
+        await loadChannels(currentWorkspace.id);
+      };
+      loadData();
     }
-    // ✅ 只依賴 currentWorkspace.id，不依賴 loadChannelGroups（它每次都是新的函數）
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspace?.id]);
-
-  // 監聽旅遊團資料變化（使用快取資料，不重新載入）
-  useEffect(() => {
-    // Tour data loaded
-  }, [tours]);
 
   return (
     <div className="h-full flex flex-col">

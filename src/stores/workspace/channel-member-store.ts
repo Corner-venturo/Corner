@@ -8,7 +8,7 @@
  * - 這個 Store 主要用於快取和離線支援
  */
 
-import { createStore } from '../core/create-store-new'
+import { createStore } from '../core/create-store'
 import type { BaseEntity } from '@/types'
 
 /**

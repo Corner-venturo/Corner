@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { Plus, Trash2, X } from 'lucide-react'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useUserStore } from '@/stores/user-store'
 import { Combobox } from '@/components/ui/combobox'
 
@@ -26,7 +26,7 @@ export function ShareAdvanceDialog({
   onClose,
   onSuccess,
 }: ShareAdvanceDialogProps) {
-  const { shareAdvanceList } = useWorkspaceStore()
+  const { shareAdvanceList } = useWorkspaceWidgets()
   const { items: employees, fetchAll: fetchEmployees } = useUserStore()
 
   const [rows, setRows] = useState<AdvanceRow[]>([

@@ -9,11 +9,11 @@
 
 import { useEffect } from 'react'
 import { useTourStore } from '@/stores'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
 
 export function useCleanupOrphanChannels() {
   const { items: tours } = useTourStore()
-  const { channels, channelGroups, deleteChannel, updateChannel } = useWorkspaceStore()
+  const { channels, channelGroups, deleteChannel, updateChannel } = useWorkspaceChannels()
 
   useEffect(() => {
     // 資料未就緒時靜默返回

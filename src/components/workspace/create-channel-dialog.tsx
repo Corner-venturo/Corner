@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
 
 interface CreateChannelDialogProps {
   open: boolean
@@ -12,7 +12,7 @@ interface CreateChannelDialogProps {
 }
 
 export function CreateChannelDialog({ open, onOpenChange }: CreateChannelDialogProps) {
-  const { createChannel } = useWorkspaceStore()
+  const { createChannel } = useWorkspaceChannels()
   const [channelName, setChannelName] = useState('')
 
   const handleCreate = () => {

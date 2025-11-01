@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { useTourStore } from '@/stores'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { addChannelMembers } from '@/services/workspace-members'
 import { TourOverview } from '@/components/tours/tour-overview'
@@ -34,7 +34,7 @@ export default function TourDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { items: tours } = useTourStore()
-  const { channels, createChannel, currentWorkspace } = useWorkspaceStore()
+  const { channels, createChannel, currentWorkspace } = useWorkspaceChannels()
   const { user } = useAuthStore()
   const [activeTab, setActiveTab] = useState('overview')
   const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false)

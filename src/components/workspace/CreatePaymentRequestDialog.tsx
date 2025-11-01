@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { X, Calendar } from 'lucide-react'
 import { useTourStore, usePaymentRequestStore } from '@/stores'
-import { useWorkspaceStore, AdvanceItem } from '@/stores/workspace-store'
+import { useWorkspaceWidgets, AdvanceItem } from '@/stores/workspace-store'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -20,7 +20,7 @@ export function CreatePaymentRequestDialog({
 }: CreatePaymentRequestDialogProps) {
   const { items: tours } = useTourStore()
   const { create: createPaymentRequest } = usePaymentRequestStore()
-  const { processAdvanceItem } = useWorkspaceStore()
+  const { processAdvanceItem } = useWorkspaceWidgets()
 
   const itemsArray = useMemo(() => (Array.isArray(items) ? items : [items]), [items])
   const isBatch = Array.isArray(items)

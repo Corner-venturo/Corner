@@ -4,7 +4,7 @@
  * 自動繼承 Realtime 即時同步等功能
  */
 
-import { createStore } from '../core/create-store-new'
+import { createStore } from '../core/create-store'
 import type { ChannelGroup } from './types'
 import type { BaseEntity } from '@/types'
 

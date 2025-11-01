@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { X, Search, Receipt } from 'lucide-react'
 import { useOrderStore } from '@/stores'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { _Order } from '@/stores/types'
 
@@ -15,7 +15,7 @@ interface ShareOrdersDialogProps {
 
 export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrdersDialogProps) {
   const { items: orders } = useOrderStore()
-  const { shareOrderList } = useWorkspaceStore()
+  const { shareOrderList } = useWorkspaceWidgets()
   const { user } = useAuthStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set())

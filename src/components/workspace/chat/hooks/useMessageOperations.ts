@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type { MessageAttachment } from '@/stores/workspace-store'
 
 export function useMessageOperations() {
-  const { sendMessage, updateMessageReactions, deleteMessage } = useWorkspaceStore()
+  const { sendMessage, updateMessageReactions, deleteMessage } = useWorkspaceChat()
   const { user, currentProfile } = useAuthStore()
 
   const handleSendMessage = useCallback(
