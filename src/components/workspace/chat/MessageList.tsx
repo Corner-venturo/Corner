@@ -1,11 +1,17 @@
 'use client'
 
-import { forwardRef } from 'react'
+import { forwardRef, useMemo } from 'react'
+import { Virtuoso } from 'react-virtuoso'
 import type { Message, AdvanceList, SharedOrderList } from '@/stores/workspace-store'
 import { MessageItem } from './MessageItem'
 import { EmptyState } from './EmptyState'
 import { AdvanceListCard } from '../AdvanceListCard'
 import { OrderListCard } from '../OrderListCard'
+
+type ListItem =
+  | { type: 'message'; data: Message }
+  | { type: 'advanceList'; data: AdvanceList }
+  | { type: 'orderList'; data: SharedOrderList }
 
 interface MessageListProps {
   messages: Message[]
@@ -67,47 +73,68 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
     )
   }
 
+  // 合併所有項目為單一列表
+  const allItems = useMemo<ListItem[]>(() => {
+    const items: ListItem[] = [
+      ...messages.map(msg => ({ type: 'message' as const, data: msg })),
+      ...advanceLists.map(list => ({ type: 'advanceList' as const, data: list })),
+      ...sharedOrderLists.map(list => ({ type: 'orderList' as const, data: list })),
+    ]
+    return items
+  }, [messages, advanceLists, sharedOrderLists])
+
   return (
-    <div
-      ref={ref}
-      className="flex-1 overflow-y-auto space-y-4 min-h-0 transition-opacity duration-150 bg-white p-6"
-    >
-      {messages.map(message => (
-        <MessageItem
-          key={message.id}
-          message={message}
-          currentUserId={currentUserId}
-          onReaction={onReaction}
-          onDelete={onDeleteMessage}
-        />
-      ))}
+    <div ref={ref} className="flex-1 bg-white" style={{ height: '100%' }}>
+      <Virtuoso
+        data={allItems}
+        followOutput="smooth"
+        className="p-6"
+        itemContent={(index, item) => {
+          // 為每個項目添加間距
+          const itemElement = (() => {
+            switch (item.type) {
+              case 'message':
+                return (
+                  <MessageItem
+                    key={item.data.id}
+                    message={item.data}
+                    currentUserId={currentUserId}
+                    onReaction={onReaction}
+                    onDelete={onDeleteMessage}
+                  />
+                )
+              case 'advanceList':
+                return (
+                  <AdvanceListCard
+                    key={item.data.id}
+                    advanceList={item.data}
+                    userName={item.data.author?.display_name}
+                    currentUserId={currentUserId || ''}
+                    userRole="admin"
+                    onCreatePayment={onCreatePayment || (() => {})}
+                    onDelete={onDeleteAdvanceList || (() => {})}
+                  />
+                )
+              case 'orderList':
+                return (
+                  <OrderListCard
+                    key={item.data.id}
+                    orderList={item.data}
+                    userName={item.data.author?.display_name}
+                    currentUserId={currentUserId || ''}
+                    userRole="admin"
+                    onCreateReceipt={onCreateReceipt || (() => {})}
+                  />
+                )
+            }
+          })()
 
-      {/* 代墊清單卡片 */}
-      {advanceLists.map(advanceList => (
-        <AdvanceListCard
-          key={advanceList.id}
-          advanceList={advanceList}
-          userName={advanceList.author?.display_name}
-          currentUserId={currentUserId || ''}
-          userRole="admin"
-          onCreatePayment={onCreatePayment || (() => {})}
-          onDelete={onDeleteAdvanceList || (() => {})}
-        />
-      ))}
-
-      {/* 訂單列表卡片 */}
-      {sharedOrderLists.map(orderList => (
-        <OrderListCard
-          key={orderList.id}
-          orderList={orderList}
-          userName={orderList.author?.display_name}
-          currentUserId={currentUserId || ''}
-          userRole="admin"
-          onCreateReceipt={onCreateReceipt || (() => {})}
-        />
-      ))}
-
-      <div ref={messagesEndRef} />
+          return <div className="mb-4">{itemElement}</div>
+        }}
+        components={{
+          Footer: () => <div ref={messagesEndRef} />,
+        }}
+      />
     </div>
   )
 })
