@@ -21,8 +21,6 @@ export interface AttractionsTabProps {
   selectedCategory: string
   setSelectedCategory: (category: string) => void
   selectedCountry: string
-  selectedRegion: string
-  selectedCity: string
   openAdd: () => void
 }
 
@@ -32,19 +30,8 @@ export default function AttractionsTab({
   selectedCategory,
   setSelectedCategory,
   selectedCountry,
-  selectedRegion,
-  selectedCity,
   openAdd,
-  countries: filterCountries,
-  regions: filterRegions,
-  cities: filterCities,
-}: AttractionsTabProps & {
-  countries: any[]
-  regions: any[]
-  cities: any[]
-}) {
-  const { getRegionsByCountry, getCitiesByCountry, getCitiesByRegion } =
-    useRegionsStore()
+}: AttractionsTabProps) {
 
   // 用於顯示的國家和城市資料（從景點載入後，按需從資料庫查詢）
   const [displayCountries, setDisplayCountries] = useState<Country[]>([])
@@ -89,8 +76,8 @@ export default function AttractionsTab({
     searchTerm,
     selectedCategory,
     selectedCountry,
-    selectedRegion,
-    selectedCity,
+    selectedRegion: '', // 不再使用地區篩選
+    selectedCity: '', // 不再使用城市篩選
   })
 
   const {
@@ -119,34 +106,7 @@ export default function AttractionsTab({
         />
       </div>
 
-      {/* 新增對話框 */}
-      <AttractionsDialog
-        open={isAddOpen}
-        onClose={closeAdd}
-        onSubmit={addAttraction}
-        countries={filterCountries}
-        regions={filterRegions}
-        cities={filterCities}
-        getRegionsByCountry={getRegionsByCountry}
-        getCitiesByCountry={getCitiesByCountry}
-        getCitiesByRegion={getCitiesByRegion}
-        initialFormData={initialFormData}
-      />
-
-      {/* 編輯對話框 */}
-      <AttractionsDialog
-        open={isEditOpen}
-        onClose={closeEdit}
-        onSubmit={formData => updateAttraction(editingAttraction!.id, formData)}
-        attraction={editingAttraction}
-        countries={filterCountries}
-        regions={filterRegions}
-        cities={filterCities}
-        getRegionsByCountry={getRegionsByCountry}
-        getCitiesByCountry={getCitiesByCountry}
-        getCitiesByRegion={getCitiesByRegion}
-        initialFormData={initialFormData}
-      />
+      {/* TODO: 新增和編輯對話框需要重新實作 */}
     </div>
   )
 }

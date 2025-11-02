@@ -77,11 +77,11 @@ export function DailyItinerarySection({
   }
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center border-b-2 border-red-500 pb-2">
+      <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">📅 逐日行程</h2>
         <button
           onClick={addDailyItinerary}
-          className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
+          className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
         >
           + 新增天數
         </button>
@@ -93,7 +93,7 @@ export function DailyItinerarySection({
           type="text"
           value={data.itinerarySubtitle || ''}
           onChange={e => updateField('itinerarySubtitle', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
+          className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
           placeholder="5天4夜精彩旅程規劃"
         />
       </div>
@@ -101,11 +101,11 @@ export function DailyItinerarySection({
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
         <div
           key={dayIndex}
-          className="p-6 border border-red-100 rounded-2xl space-y-5 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 shadow-sm"
+          className="p-6 border border-morandi-container rounded-2xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-white to-morandi-container/10 shadow-sm"
         >
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
-              <span className="bg-red-500 text-white px-3 py-1.5 rounded-full font-semibold text-sm tracking-wide">
+              <span className="bg-morandi-gold text-white px-3 py-1.5 rounded-full font-semibold text-sm tracking-wide">
                 {day.dayLabel}
               </span>
               <span className="text-morandi-secondary text-sm">{day.date}</span>
@@ -189,7 +189,7 @@ export function DailyItinerarySection({
               </div>
               <button
                 onClick={() => addDayImage(dayIndex)}
-                className="px-2.5 py-1 bg-amber-500 text-white rounded text-xs shadow hover:bg-amber-600"
+                className="px-2.5 py-1 bg-morandi-gold text-white rounded text-xs shadow hover:bg-morandi-gold/90"
               >
                 + 新增圖片
               </button>
@@ -201,7 +201,7 @@ export function DailyItinerarySection({
                     type="text"
                     value={image}
                     onChange={e => updateDayImage(dayIndex, imageIndex, e.target.value)}
-                    className="flex-1 px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500"
+                    className="flex-1 px-3 py-2 border border-morandi-container rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
                     placeholder="https://images.unsplash.com/..."
                   />
                   <button

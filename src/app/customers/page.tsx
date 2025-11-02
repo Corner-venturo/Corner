@@ -364,11 +364,11 @@ export default function CustomersPage() {
         </div>
       )}
 
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          className="min-h-full"
-          columns={tableColumns}
-          data={filteredCustomers}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">
+          <EnhancedTable
+            columns={tableColumns}
+            data={filteredCustomers}
           actions={() => (
             <Button
               variant="outline"
@@ -379,7 +379,8 @@ export default function CustomersPage() {
               <Edit size={14} className="text-morandi-gold" />
             </Button>
           )}
-        />
+          />
+        </div>
       </div>
 
       {/* 進階搜尋對話框 */}

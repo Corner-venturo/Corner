@@ -20,6 +20,7 @@ import { useTourPageState } from '../hooks/useTourPageState';
 import { useTourOperations } from '../hooks/useTourOperations';
 import { TourForm } from './TourForm';
 import { TourExpandedView } from './TourExpandedView';
+import { TourMobileCard } from './TourMobileCard';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers, useRealtimeForQuotes } from '@/hooks/use-realtime-hooks';
 
@@ -348,14 +349,15 @@ export const ToursPage: React.FC = () => {
 
     try {
       const { supabase } = await import('@/lib/supabase/client');
+      const { useAuthStore } = await import('@/stores/auth-store');
 
       console.log('🔵 [建立頻道] 開始處理:', tour.code, tour.name);
 
-      // 獲取當前登入使用者
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      // 從 Zustand store 獲取當前登入使用者（支援本地認證）
+      const { user } = useAuthStore.getState();
 
-      if (userError || !user) {
-        console.error('❌ [建立頻道] 使用者未登入:', userError);
+      if (!user) {
+        console.error('❌ [建立頻道] 使用者未登入');
         toast.dismiss(loadingToast);
         toast.error('請先登入');
         return;
@@ -420,6 +422,28 @@ export const ToursPage: React.FC = () => {
       }
 
       console.log('✅ [建立頻道] 建立成功:', newChannel);
+
+      // 自動將創建者加入為頻道擁有者
+      try {
+        const { error: memberError } = await supabase
+          .from('channel_members')
+          .insert({
+            workspace_id: workspaces.id,
+            channel_id: newChannel.id,
+            employee_id: user.id,
+            role: 'owner',
+            status: 'active',
+          });
+
+        if (memberError) {
+          console.warn('⚠️ [建立頻道] 加入成員失敗（可能已存在）:', memberError);
+        } else {
+          console.log('✅ [建立頻道] 創建者已加入為擁有者');
+        }
+      } catch (memberErr) {
+        console.warn('⚠️ [建立頻道] 加入成員異常:', memberErr);
+      }
+
       toast.dismiss(loadingToast);
       toast.success(`已建立頻道：${channelName}`);
     } catch (error: any) {
@@ -594,22 +618,48 @@ export const ToursPage: React.FC = () => {
       />
 
       {/* Tour list */}
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          className="min-h-full"
-          columns={columns}
-          data={filteredTours}
-          loading={loading}
-          onSort={handleSortChange}
-          expandable={{
-            expanded: expandedRows,
-            onExpand: toggleRowExpand,
-            renderExpanded,
-          }}
-          actions={renderActions}
-          onRowClick={handleRowClick}
-          bordered={true}
-        />
+      <div className="flex-1 overflow-hidden">
+        {/* 桌面模式：表格 */}
+        <div className="hidden md:block h-full">
+          <EnhancedTable
+            columns={columns}
+            data={filteredTours}
+            loading={loading}
+            onSort={handleSortChange}
+            expandable={{
+              expanded: expandedRows,
+              onExpand: toggleRowExpand,
+              renderExpanded,
+            }}
+            actions={renderActions}
+            onRowClick={handleRowClick}
+            bordered={true}
+          />
+        </div>
+
+        {/* 手機模式：卡片列表 */}
+        <div className="md:hidden space-y-3 pb-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold"></div>
+            </div>
+          ) : filteredTours.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <MapPin size={48} className="text-morandi-secondary/30 mb-4" />
+              <p className="text-morandi-secondary">沒有找到旅遊團</p>
+              <p className="text-sm text-morandi-secondary/70 mt-1">請調整篩選條件或新增旅遊團</p>
+            </div>
+          ) : (
+            filteredTours.map((tour) => (
+              <TourMobileCard
+                key={tour.id}
+                tour={tour}
+                onClick={() => handleRowClick(tour)}
+                getStatusColor={getStatusColor}
+              />
+            ))
+          )}
+        </div>
       </div>
 
       {/* Tour form dialog */}

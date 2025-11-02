@@ -1,7 +1,6 @@
 'use client'
 
 import { useTourScrollEffects } from '@/features/tours/hooks/useTourScrollEffects'
-import { useTourGallery } from '@/features/tours/hooks/useTourGallery'
 import { useTourItineraryNav } from '@/features/tours/hooks/useTourItineraryNav'
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
@@ -12,7 +11,6 @@ import { TourLeaderSection } from '@/features/tours/components/sections/TourLead
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
 import { TourContactSection } from '@/features/tours/components/sections/TourContactSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
-import { TourGalleryOverlay } from '@/features/tours/components/sections/TourGalleryOverlay'
 
 interface TourPageProps {
   data: any
@@ -22,12 +20,9 @@ interface TourPageProps {
 
 export default function TourPage({ data, isPreview = false, viewMode = 'desktop' }: TourPageProps) {
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
-  const focusCards = data.focusCards || []
 
   // Custom hooks
   const { scrollOpacity, attractionsProgress } = useTourScrollEffects({ viewMode, isPreview })
-  const { showGallery, currentImageIndex, setCurrentImageIndex, galleryRef, closeGallery } =
-    useTourGallery({ viewMode })
   const { activeDayIndex, dayRefs, handleDayNavigate } = useTourItineraryNav(dailyItinerary)
 
   return (
@@ -63,7 +58,6 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         data={data}
         viewMode={viewMode}
         attractionsProgress={attractionsProgress}
-        galleryRef={galleryRef}
       />
 
       {/* Divider */}
@@ -102,23 +96,29 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       <footer className="bg-slate-900 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-white mb-2">Corner Travel</h3>
-            <p className="text-slate-300 mb-8">探索世界，創造回憶</p>
-            <p className="text-slate-400 text-sm">© 2025 Corner Travel. All rights reserved.</p>
+            {/* Logo SVG */}
+            <div className="flex justify-center mb-4">
+              <svg
+                className="h-12 w-auto text-morandi-gold"
+                viewBox="0 0 200 200"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="4" />
+                <path
+                  d="M100 40 L120 80 L165 85 L130 115 L140 160 L100 135 L60 160 L70 115 L35 85 L80 80 Z"
+                  fill="currentColor"
+                  opacity="0.9"
+                />
+                <circle cx="100" cy="100" r="25" fill="currentColor" opacity="0.8" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Corner Travel</h3>
+            <p className="text-slate-300 mb-6 text-sm">讓我們一起探索世界上每個角落</p>
+            <p className="text-slate-500 text-xs">© 2025 Corner Travel. All rights reserved.</p>
           </div>
         </div>
       </footer>
-
-      {/* Gallery Overlay - Mobile only */}
-      {viewMode === 'mobile' && (
-        <TourGalleryOverlay
-          showGallery={showGallery}
-          focusCards={focusCards}
-          currentImageIndex={currentImageIndex}
-          setCurrentImageIndex={setCurrentImageIndex}
-          onClose={closeGallery}
-        />
-      )}
     </div>
   )
 }

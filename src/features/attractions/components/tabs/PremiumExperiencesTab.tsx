@@ -32,7 +32,11 @@ interface PremiumExperience {
   is_active: boolean
 }
 
-export default function PremiumExperiencesTab() {
+interface PremiumExperiencesTabProps {
+  selectedCountry: string
+}
+
+export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperiencesTabProps) {
   const [experiences, setExperiences] = useState<PremiumExperience[]>([])
   const [loading, setLoading] = useState(true)
   const [countries, setCountries] = useState<any[]>([])
@@ -171,6 +175,12 @@ export default function PremiumExperiencesTab() {
     }
     return labels[category] || category
   }
+
+  // 根據國家篩選體驗
+  const filteredExperiences = useMemo(() => {
+    if (!selectedCountry) return experiences
+    return experiences.filter(e => e.country_id === selectedCountry)
+  }, [experiences, selectedCountry])
 
   // 定義表格欄位
   const columns = useMemo(
@@ -328,7 +338,7 @@ export default function PremiumExperiencesTab() {
       <div className="flex-1 overflow-auto">
         <EnhancedTable
           columns={columns}
-          data={experiences}
+          data={filteredExperiences}
           loading={loading}
           initialPageSize={20}
           onRowClick={experience => {

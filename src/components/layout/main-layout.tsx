@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useLocalAuthStore } from '@/lib/auth/local-auth-manager';
 import { Sidebar } from './sidebar';
+import { MobileBottomNav } from './mobile-bottom-nav';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
+import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import {
   STORAGE_KEY_LAST_VISITED,
   NO_SIDEBAR_PAGES,
@@ -27,6 +29,9 @@ export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+
+  // 啟用滑動導航（手機模式）
+  useSwipeNavigation();
 
   useEffect(() => {
     setIsClient(true);
@@ -115,19 +120,26 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* ✅ 永久 Realtime 訂閱（user_roles, workspaces, employees） */}
       <PermanentRealtimeSubscriptions />
 
-      {/* 左下象限 - 側邊欄 */}
+      {/* 左下象限 - 側邊欄（桌面模式 >= lg） */}
       <Sidebar />
+
+      {/* 底部導航欄（手機模式 < lg） */}
+      <MobileBottomNav />
 
       {/* 右下象限 - 主內容區域 */}
       <main className={cn(
-        'fixed bottom-0 right-0 transition-all overflow-hidden',
-        !isClient ? 'left-16' : (sidebarCollapsed ? 'left-16' : 'left-[190px]')
+        'fixed right-0 transition-all overflow-hidden',
+        // 手機模式 (< lg)：全寬，從頂部開始，底部扣除導航欄
+        'top-0 bottom-16 left-0',
+        // 桌面模式 (>= lg)：扣除 sidebar 寬度，有 top header
+        'lg:top-[72px] lg:bottom-0',
+        !isClient ? 'lg:left-16' : (sidebarCollapsed ? 'lg:left-16' : 'lg:left-[190px]')
       )}
       style={{
-        top: HEADER_HEIGHT_PX,
         transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
-      }}>
-        <div className="h-full overflow-auto p-6">
+      }}
+      >
+        <div className="h-full overflow-auto p-4 lg:p-6">
           {children}
         </div>
       </main>

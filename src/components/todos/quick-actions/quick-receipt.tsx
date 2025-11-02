@@ -1,11 +1,10 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-
-import { Receipt, Search } from 'lucide-react'
-
+import { Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -14,268 +13,261 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useTourStore, useOrderStore } from '@/stores'
-import type { Tour, Order } from '@/stores/types'
-
-import { cn } from '@/lib/utils'
+import { useOrderStore, useReceiptOrderStore, useTourStore } from '@/stores'
+import { OrderAllocation, ReceiptPaymentItem } from '@/stores/types'
+import { Combobox } from '@/components/ui/combobox'
 
 interface QuickReceiptProps {
-  onSubmit?: (data: ReceiptData) => void
+  onSubmit?: () => void
 }
 
-interface ReceiptData {
-  tour_id: string
-  order_id: string
-  amount: number
-  paymentMethod: string
-  payment_date: string
-  note?: string
-}
+// 收款方式選項
+const paymentMethods = [
+  { value: 'cash', label: '現金' },
+  { value: 'transfer', label: '匯款' },
+  { value: 'card', label: '刷卡' },
+  { value: 'check', label: '支票' },
+]
 
 export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
-  const { items: tours } = useTourStore()
   const { items: orders } = useOrderStore()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedTourId, setSelectedTourId] = useState('')
-  const [formData, setFormData] = useState<Partial<ReceiptData>>({
-    paymentMethod: 'transfer',
-    payment_date: new Date().toISOString().split('T')[0],
-  })
+  const { items: tours } = useTourStore()
+  const { create: createReceiptOrder } = useReceiptOrderStore()
 
-  // 模糊搜尋團體（團號/團名/代碼）
-  const filteredTours = useMemo(() => {
-    if (!searchTerm.trim()) return tours || []
+  const [selectedTourId, setSelectedTourId] = useState<string>('')
+  const [receiptDate, setReceiptDate] = useState(new Date().toISOString().split('T')[0])
+  const [note, setNote] = useState('')
 
-    const term = searchTerm.toLowerCase()
-    return (tours || []).filter((tour: Tour) => {
-      const code = tour.code?.toLowerCase() || ''
-      const name = tour.name?.toLowerCase() || ''
-      const location = tour.location?.toLowerCase() || ''
+  // 訂單分配列表
+  const [orderAllocations, setOrderAllocations] = useState<OrderAllocation[]>([])
 
-      return code.includes(term) || name.includes(term) || location.includes(term)
-    })
-  }, [tours, searchTerm])
+  // 收款項目
+  const [paymentItems, setPaymentItems] = useState<Partial<ReceiptPaymentItem>[]>([
+    {
+      payment_method: 'cash',
+      amount: 0,
+      transaction_date: new Date().toISOString().split('T')[0],
+    },
+  ])
 
-  // 該團體的訂單列表（訂單編號-聯絡人-業務）
-  const tourOrders = useMemo(() => {
+  // 選中的團體
+  const selectedTour = useMemo(() => {
+    return tours.find(tour => tour.id === selectedTourId)
+  }, [tours, selectedTourId])
+
+  // 可用訂單（根據選中的團體過濾，且未收款或部分收款）
+  const availableOrders = useMemo(() => {
     if (!selectedTourId) return []
 
-    return orders
-      .filter((order: Order) => order.tour_id === selectedTourId)
-      .map((order: Order) => ({
-        id: order.id,
-        label: `${order.order_number || 'N/A'} - ${order.contact_person} - ${order.sales_person || '未指派'}`,
-      }))
-  }, [selectedTourId, orders])
+    return orders.filter(
+      order =>
+        order.tour_id === selectedTourId &&
+        (order.payment_status === 'unpaid' || order.payment_status === 'partial')
+    )
+  }, [orders, selectedTourId])
 
-  const selectedTour = (tours || []).find((t: Tour) => t.id === selectedTourId)
 
-  const handleSubmit = () => {
-    if (!formData.order_id || !formData.amount) {
-      alert('請填寫必填欄位（團體、訂單、金額）')
+  // 更新訂單分配
+  const updateOrderAllocation = (index: number, updates: Partial<OrderAllocation>) => {
+    setOrderAllocations(prev =>
+      prev.map((allocation, i) => (i === index ? { ...allocation, ...updates } : allocation))
+    )
+  }
+
+  // 更新收款項目（現在只有一個項目）
+  const updatePaymentItem = (updates: Partial<ReceiptPaymentItem>) => {
+    setPaymentItems([{ ...paymentItems[0], ...updates }])
+  }
+
+  // 重置表單
+  const resetForm = () => {
+    setSelectedTourId('')
+    setReceiptDate(new Date().toISOString().split('T')[0])
+    setNote('')
+    setOrderAllocations([])
+    setPaymentItems([
+      {
+        payment_method: 'cash',
+        amount: 0,
+        transaction_date: new Date().toISOString().split('T')[0],
+      },
+    ])
+  }
+
+  // 儲存
+  const handleSave = async () => {
+    if (!selectedTourId) {
+      alert('請選擇團體')
       return
     }
 
-    onSubmit?.({
-      tour_id: selectedTourId,
-      order_id: formData.order_id!,
-      amount: formData.amount!,
-      paymentMethod: formData.paymentMethod!,
-      payment_date: formData.payment_date!,
-      note: formData.note,
-    })
+    if (orderAllocations.length === 0) {
+      alert('請選擇訂單')
+      return
+    }
 
-    // 重置表單
-    setSearchTerm('')
-    setSelectedTourId('')
-    setFormData({
-      paymentMethod: 'transfer',
-      payment_date: new Date().toISOString().split('T')[0],
-    })
+    const amount = paymentItems[0]?.amount || 0
+    if (amount === 0) {
+      alert('收款金額不能為 0')
+      return
+    }
+
+    try {
+      // 自動將收款金額同步到訂單分配
+      const updatedAllocation = {
+        ...orderAllocations[0],
+        allocated_amount: amount,
+      }
+
+      await createReceiptOrder({
+        allocation_mode: 'single',
+        order_allocations: [updatedAllocation],
+        receipt_date: receiptDate,
+        payment_items: paymentItems as ReceiptPaymentItem[],
+        total_amount: amount,
+        status: '已收款',
+        note,
+        created_by: '1', // TODO: 從 auth store 取得當前用戶
+      } as unknown)
+
+      alert('✅ 收款單建立成功')
+      onSubmit?.()
+      resetForm()
+    } catch (error) {
+      alert('❌ 建立失敗，請稍後再試')
+    }
   }
 
   return (
     <div className="space-y-4">
-      {/* 團體搜尋選擇器 */}
+      {/* 選擇團體 */}
       <div>
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-          選擇團體 <span className="text-morandi-red">*</span>
-        </label>
-
-        {/* 搜尋輸入框 */}
-        <div className="relative mb-2">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
-          />
-          <Input
-            placeholder="搜尋團號、團名或地點（如：0801、東京、TYO）"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="pl-10 border-morandi-container/30"
-          />
-        </div>
-
-        {/* 搜尋結果列表 */}
-        {searchTerm && (
-          <div className="border border-morandi-container/30 rounded-lg max-h-48 overflow-y-auto">
-            {filteredTours.length > 0 ? (
-              filteredTours.map((tour: Tour) => (
-                <button
-                  key={tour.id}
-                  onClick={() => {
-                    setSelectedTourId(tour.id)
-                    setSearchTerm('')
-                    setFormData(prev => ({ ...prev, order_id: undefined })) // 重置訂單
-                  }}
-                  className={cn(
-                    'w-full text-left px-4 py-3 hover:bg-morandi-container/10 transition-colors border-b border-morandi-container/20 last:border-0',
-                    selectedTourId === tour.id && 'bg-morandi-gold/10'
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium text-morandi-primary">
-                        {tour.code || 'N/A'} - {tour.name}
-                      </div>
-                      <div className="text-xs text-morandi-secondary mt-1">
-                        {tour.location} • {tour.departure_date}
-                      </div>
-                    </div>
-                    {selectedTourId === tour.id && (
-                      <div className="text-morandi-gold text-xs font-medium">已選</div>
-                    )}
-                  </div>
-                </button>
-              ))
-            ) : (
-              <div className="px-4 py-6 text-center text-sm text-morandi-secondary">
-                找不到相關團體
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 已選團體顯示 */}
-        {selectedTour && !searchTerm && (
-          <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-morandi-primary">
-                  {selectedTour.code || 'N/A'} - {selectedTour.name}
-                </div>
-                <div className="text-xs text-morandi-secondary mt-1">
-                  {selectedTour.location} • {selectedTour.departure_date}
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setSelectedTourId('')
-                  setFormData(prev => ({ ...prev, order_id: undefined }))
-                }}
-                className="text-xs text-morandi-red hover:underline"
-              >
-                清除
-              </button>
-            </div>
-          </div>
+        <Label className="text-sm font-medium text-morandi-secondary">選擇團體</Label>
+        <Combobox
+          options={tours.map(tour => ({
+            value: tour.id,
+            label: `${tour.tour_code || tour.code || ''} - ${tour.tour_name || tour.name || ''}`,
+          }))}
+          value={selectedTourId}
+          onChange={setSelectedTourId}
+          placeholder="請選擇團體..."
+          className="mt-1"
+        />
+        {selectedTour && (
+          <p className="text-xs text-morandi-secondary mt-1">
+            已選擇：{selectedTour.tour_code || selectedTour.code} - {selectedTour.tour_name || selectedTour.name}
+          </p>
         )}
       </div>
 
-      {/* 訂單選擇（必須先選團體） */}
+      {/* 收款日期 */}
       <div>
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-          選擇訂單 <span className="text-morandi-red">*</span>
-        </label>
+        <Label className="text-sm font-medium text-morandi-secondary">收款日期</Label>
+        <Input
+          type="date"
+          value={receiptDate}
+          onChange={e => setReceiptDate(e.target.value)}
+          className="mt-1 border-morandi-container/30"
+        />
+      </div>
+
+      {/* 收款方式 */}
+      <div>
+        <Label className="text-sm font-medium text-morandi-secondary">收款方式</Label>
         <Select
-          value={formData.order_id}
-          onValueChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
-          disabled={!selectedTourId}
+          value={paymentItems[0]?.payment_method}
+          onValueChange={value => updatePaymentItem({ payment_method: value as unknown })}
         >
-          <SelectTrigger className="border-morandi-container/30">
-            <SelectValue placeholder={selectedTourId ? '請選擇訂單' : '請先選擇團體'} />
+          <SelectTrigger className="mt-1 border-morandi-container/30">
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {tourOrders.length > 0 ? (
-              tourOrders.map((order: { id: string; label: string }) => (
-                <SelectItem key={order.id} value={order.id}>
-                  {order.label}
-                </SelectItem>
-              ))
-            ) : (
-              <div className="px-2 py-4 text-center text-sm text-morandi-secondary">
-                此團體尚無訂單
-              </div>
-            )}
+            {paymentMethods.map(method => (
+              <SelectItem key={method.value} value={method.value}>
+                {method.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
 
       {/* 收款金額 */}
       <div>
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-          收款金額 <span className="text-morandi-red">*</span>
-        </label>
+        <Label className="text-sm font-medium text-morandi-secondary">收款金額</Label>
         <Input
           type="number"
-          placeholder="請輸入金額"
-          value={formData.amount || ''}
-          onChange={e => setFormData(prev => ({ ...prev, amount: Number(e.target.value) }))}
-          className="border-morandi-container/30"
+          placeholder="輸入收款金額..."
+          value={paymentItems[0]?.amount || ''}
+          onChange={e => updatePaymentItem({ amount: parseFloat(e.target.value) || 0 })}
+          className="mt-1 border-morandi-container/30"
         />
       </div>
 
-      {/* 付款方式 */}
-      <div>
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-          付款方式 <span className="text-morandi-red">*</span>
-        </label>
-        <Select
-          value={formData.paymentMethod}
-          onValueChange={value => setFormData(prev => ({ ...prev, paymentMethod: value }))}
-        >
-          <SelectTrigger className="border-morandi-container/30">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="cash">現金</SelectItem>
-            <SelectItem value="transfer">轉帳</SelectItem>
-            <SelectItem value="card">信用卡</SelectItem>
-            <SelectItem value="check">支票</SelectItem>
-            <SelectItem value="other">其他</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* 選擇訂單 */}
+      {selectedTourId && (
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-morandi-secondary">選擇訂單</Label>
+          {availableOrders.length === 0 ? (
+            <div className="text-center py-4 text-xs text-morandi-secondary border rounded-lg border-dashed border-morandi-container/30">
+              此團體沒有可用的訂單（未收款或部分收款）
+            </div>
+          ) : (
+            <Select
+              value={orderAllocations[0]?.order_id || ''}
+              onValueChange={value => {
+                const order = orders.find(o => o.id === value)
+                if (!order) return
 
-      {/* 收款日期 */}
-      <div>
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-          收款日期 <span className="text-morandi-red">*</span>
-        </label>
-        <Input
-          type="date"
-          value={formData.payment_date}
-          onChange={e => setFormData(prev => ({ ...prev, payment_date: e.target.value }))}
-          className="border-morandi-container/30"
-        />
-      </div>
+                setOrderAllocations([
+                  {
+                    order_id: order.id,
+                    order_number: order.code,
+                    tour_id: order.tour_id,
+                    code: order.code || '',
+                    tour_name: order.tour_name || '',
+                    contact_person: order.contact_person,
+                    allocated_amount: 0,
+                  },
+                ])
+              }}
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="請選擇訂單..." />
+              </SelectTrigger>
+              <SelectContent>
+                {availableOrders.map(order => (
+                  <SelectItem key={order.id} value={order.id}>
+                    {order.code} - {order.contact_person}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {orderAllocations[0] && (
+            <p className="text-xs text-morandi-secondary">
+              已選擇：{orderAllocations[0].code} - {orderAllocations[0].contact_person}
+            </p>
+          )}
+        </div>
+      )}
+
 
       {/* 備註 */}
       <div>
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">備註</label>
+        <Label className="text-sm font-medium text-morandi-secondary">備註</Label>
         <Textarea
           placeholder="收款相關說明..."
           rows={2}
-          value={formData.note || ''}
-          onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
-          className="border-morandi-container/30"
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          className="mt-1 border-morandi-container/30 text-xs"
         />
       </div>
 
       {/* 提交按鈕 */}
       <Button
-        onClick={handleSubmit}
-        disabled={!selectedTourId || !formData.order_id || !formData.amount}
+        onClick={handleSave}
+        disabled={!selectedTourId || orderAllocations.length === 0 || (paymentItems[0]?.amount || 0) === 0}
         className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
       >
         <Receipt size={16} className="mr-2" />

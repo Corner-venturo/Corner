@@ -160,9 +160,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             /* 使用 table 的 thead/tfoot 來實作固定頁首頁尾 */
             table.print-wrapper {
               width: 100%;
-              min-height: 297mm; /* A4 高度 */
+              height: 100vh; /* 佔滿整個視窗高度 */
               border-collapse: collapse;
-              display: table;
             }
 
             table.print-wrapper thead {
@@ -178,11 +177,11 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             }
 
             table.print-wrapper tbody > tr {
-              height: 100%;
+              height: 100%; /* tbody 的內容區佔滿剩餘空間 */
             }
 
             table.print-wrapper tbody > tr > td {
-              vertical-align: top;
+              vertical-align: top; /* 內容靠上對齊 */
             }
 
             /* 防止表格內容被切斷 */
@@ -230,28 +229,28 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             <thead>
               <tr>
                 <td>
-                  <div className="relative mb-1 pb-2">
-                    {/* Logo */}
-                    <div className="absolute left-0 top-0 w-[45.6rem] h-[7.6rem]">
-                      {logoUrl ? (
+                  <div className="relative mb-1 pb-4" style={{ borderBottom: '1px solid #D4AF37', marginTop: '6px' }}>
+                    {/* Logo - 左上角 */}
+                    {logoUrl ? (
+                      <div className="absolute left-0 top-0" style={{ width: '120px', height: '40px' }}>
                         <img
                           src={logoUrl}
                           alt="角落旅行社 Logo"
-                          className="h-full w-auto"
                           style={{
+                            width: '100%',
+                            height: '100%',
                             objectFit: 'contain',
-                            objectPosition: '0% 0%',
-                            transform: 'scale(0.2025)',
-                            transformOrigin: 'left top'
+                            objectPosition: 'left top'
                           }}
                         />
-                      ) : (
-                        <div className="text-xs text-gray-400">角落旅行社</div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>角落旅行社</div>
+                    )}
                     {/* 標題 */}
                     <div className="relative z-10 text-center py-2">
-                      <h1 className="text-xl font-bold text-gray-800">旅遊報價單</h1>
+                      <div className="text-sm tracking-widest mb-1" style={{ color: '#D4AF37', fontWeight: 500 }}>QUOTATION</div>
+                      <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>旅遊報價單</h1>
                     </div>
                   </div>
                 </td>
@@ -310,51 +309,51 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
 
           {/* 團費報價表 */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">團費報價 ▽</h3>
-            <table className="w-full border-collapse border border-gray-400 text-sm">
+            <h3 className="text-lg font-semibold mb-3" style={{ color: '#6B5B4F' }}>團費報價 ▽</h3>
+            <table className="w-full text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0, borderRadius: '8px', overflow: 'hidden', border: '1px solid #E5E7EB' }}>
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-400 px-4 py-3 text-left">身份</th>
-                  <th className="border border-gray-400 px-4 py-3 text-right">單價</th>
+                <tr style={{ backgroundColor: '#FAF7F2' }}>
+                  <th className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>身份</th>
+                  <th className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>單價</th>
                 </tr>
               </thead>
               <tbody>
                 {sellingPrices.adult > 0 && (
                   <tr>
-                    <td className="border border-gray-400 px-4 py-3">成人</td>
-                    <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                    <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>成人</td>
+                    <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                       NT$ {sellingPrices.adult.toLocaleString()}
                     </td>
                   </tr>
                 )}
                 {sellingPrices.child_with_bed > 0 && (
                   <tr>
-                    <td className="border border-gray-400 px-4 py-3">小孩佔床</td>
-                    <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                    <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>小孩佔床</td>
+                    <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                       NT$ {sellingPrices.child_with_bed.toLocaleString()}
                     </td>
                   </tr>
                 )}
                 {sellingPrices.child_no_bed > 0 && (
                   <tr>
-                    <td className="border border-gray-400 px-4 py-3">小孩不佔床</td>
-                    <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                    <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>小孩不佔床</td>
+                    <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                       NT$ {sellingPrices.child_no_bed.toLocaleString()}
                     </td>
                   </tr>
                 )}
                 {sellingPrices.single_room > 0 && (
                   <tr>
-                    <td className="border border-gray-400 px-4 py-3">單人房差價</td>
-                    <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                    <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>單人房差價</td>
+                    <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                       NT$ {sellingPrices.single_room.toLocaleString()}
                     </td>
                   </tr>
                 )}
                 {sellingPrices.infant > 0 && (
                   <tr>
-                    <td className="border border-gray-400 px-4 py-3">嬰兒</td>
-                    <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                    <td className="px-4 py-3 text-center" style={{ color: '#4B5563' }}>嬰兒</td>
+                    <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                       NT$ {sellingPrices.infant.toLocaleString()}
                     </td>
                   </tr>
@@ -366,8 +365,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           {/* 費用說明 */}
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
-              <h4 className="font-semibold text-gray-700 mb-2">費用包含</h4>
-              <ul className="space-y-1 text-sm text-gray-600">
+              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>費用包含</h4>
+              <ul className="space-y-1 text-sm" style={{ color: '#4B5563' }}>
                 <li>• 行程表所列之交通費用</li>
                 <li>• 行程表所列之住宿費用</li>
                 <li>• 行程表所列之餐食費用</li>
@@ -377,8 +376,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-700 mb-2">費用不含</h4>
-              <ul className="space-y-1 text-sm text-gray-600">
+              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>費用不含</h4>
+              <ul className="space-y-1 text-sm" style={{ color: '#4B5563' }}>
                 <li>• 個人護照及簽證費用</li>
                 <li>• 行程外之自費行程</li>
                 <li>• 個人消費及小費</li>
@@ -389,8 +388,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           </div>
 
           {/* 注意事項 */}
-          <div className="border-t border-gray-300 pt-4 text-sm text-gray-600">
-            <h4 className="font-semibold text-gray-700 mb-2">注意事項</h4>
+          <div className="pt-4 text-sm" style={{ borderTop: '1px solid #E5E7EB', color: '#4B5563' }}>
+            <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>注意事項</h4>
             <ul className="space-y-1">
               <li>• 本報價單有效期限至 {quote?.valid_until
                 ? new Date(quote.valid_until).toLocaleDateString('zh-TW')
@@ -411,24 +410,25 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           {/* 螢幕顯示版本（不使用 table 結構） */}
           <div className="print:hidden">
             {/* Logo 和標題 */}
-            <div className="relative mb-6">
-              <div className="absolute left-0 top-0 w-[45.6rem] h-[7.6rem]">
-                {logoUrl && (
+            <div className="relative mb-6 pb-4" style={{ borderBottom: '2px solid #D4AF37' }}>
+              {/* Logo - 左上角 */}
+              {logoUrl && (
+                <div className="absolute left-0 top-0" style={{ width: '120px', height: '40px' }}>
                   <img
                     src={logoUrl}
                     alt="角落旅行社 Logo"
-                    className="h-full w-auto"
                     style={{
+                      width: '100%',
+                      height: '100%',
                       objectFit: 'contain',
-                      objectPosition: '0% 0%',
-                      transform: 'scale(0.2025)',
-                      transformOrigin: 'left top'
+                      objectPosition: 'left top'
                     }}
                   />
-                )}
-              </div>
+                </div>
+              )}
               <div className="relative z-10 text-center py-4">
-                <h1 className="text-xl font-bold text-gray-800">旅遊報價單</h1>
+                <div className="text-sm tracking-widest mb-1" style={{ color: '#D4AF37', fontWeight: 500 }}>QUOTATION</div>
+                <h1 className="text-xl font-bold" style={{ color: '#2D3436' }}>旅遊報價單</h1>
               </div>
             </div>
 
@@ -460,51 +460,51 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
 
             {/* 團費報價表 */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">團費報價 ▽</h3>
-              <table className="w-full border-collapse border border-gray-400 text-sm">
+              <h3 className="text-lg font-semibold mb-3" style={{ color: '#6B5B4F' }}>團費報價 ▽</h3>
+              <table className="w-full text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0, borderRadius: '8px', overflow: 'hidden', border: '1px solid #E5E7EB' }}>
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-400 px-4 py-3 text-left">身份</th>
-                    <th className="border border-gray-400 px-4 py-3 text-right">單價</th>
+                  <tr style={{ backgroundColor: '#FAF7F2' }}>
+                    <th className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>身份</th>
+                    <th className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>單價</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sellingPrices.adult > 0 && (
                     <tr>
-                      <td className="border border-gray-400 px-4 py-3">成人</td>
-                      <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                      <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>成人</td>
+                      <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                         NT$ {sellingPrices.adult.toLocaleString()}
                       </td>
                     </tr>
                   )}
                   {sellingPrices.child_with_bed > 0 && (
                     <tr>
-                      <td className="border border-gray-400 px-4 py-3">小孩佔床</td>
-                      <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                      <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>小孩佔床</td>
+                      <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                         NT$ {sellingPrices.child_with_bed.toLocaleString()}
                       </td>
                     </tr>
                   )}
                   {sellingPrices.child_no_bed > 0 && (
                     <tr>
-                      <td className="border border-gray-400 px-4 py-3">小孩不佔床</td>
-                      <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                      <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>小孩不佔床</td>
+                      <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                         NT$ {sellingPrices.child_no_bed.toLocaleString()}
                       </td>
                     </tr>
                   )}
                   {sellingPrices.single_room > 0 && (
                     <tr>
-                      <td className="border border-gray-400 px-4 py-3">單人房差價</td>
-                      <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                      <td className="px-4 py-3 text-center" style={{ borderBottom: '1px solid #E5E7EB', color: '#4B5563' }}>單人房差價</td>
+                      <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                         NT$ {sellingPrices.single_room.toLocaleString()}
                       </td>
                     </tr>
                   )}
                   {sellingPrices.infant > 0 && (
                     <tr>
-                      <td className="border border-gray-400 px-4 py-3">嬰兒</td>
-                      <td className="border border-gray-400 px-4 py-3 text-right text-lg font-semibold">
+                      <td className="px-4 py-3 text-center" style={{ color: '#4B5563' }}>嬰兒</td>
+                      <td className="px-4 py-3 text-center text-lg font-semibold" style={{ borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}>
                         NT$ {sellingPrices.infant.toLocaleString()}
                       </td>
                     </tr>
@@ -516,8 +516,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             {/* 費用說明 */}
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">費用包含</h4>
-                <ul className="space-y-1 text-sm text-gray-600">
+                <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>費用包含</h4>
+                <ul className="space-y-1 text-sm" style={{ color: '#4B5563' }}>
                   <li>• 行程表所列之交通費用</li>
                   <li>• 行程表所列之住宿費用</li>
                   <li>• 行程表所列之餐食費用</li>
@@ -527,8 +527,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">費用不含</h4>
-                <ul className="space-y-1 text-sm text-gray-600">
+                <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>費用不含</h4>
+                <ul className="space-y-1 text-sm" style={{ color: '#4B5563' }}>
                   <li>• 個人護照及簽證費用</li>
                   <li>• 行程外之自費行程</li>
                   <li>• 個人消費及小費</li>
@@ -539,8 +539,8 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             </div>
 
             {/* 注意事項 */}
-            <div className="border-t border-gray-300 pt-4 mb-6 text-sm text-gray-600">
-              <h4 className="font-semibold text-gray-700 mb-2">注意事項</h4>
+            <div className="pt-4 mb-6 text-sm" style={{ borderTop: '1px solid #E5E7EB', color: '#4B5563' }}>
+              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>注意事項</h4>
               <ul className="space-y-1">
                 <li>• 本報價單有效期限至 {quote?.valid_until
                   ? new Date(quote.valid_until).toLocaleDateString('zh-TW')

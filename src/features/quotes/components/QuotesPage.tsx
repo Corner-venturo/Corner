@@ -188,16 +188,18 @@ export const QuotesPage: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="flex-1 overflow-auto">
-        <QuotesList
-          quotes={filteredQuotes}
-          tours={tours}
-          searchTerm={searchTerm}
-          onQuoteClick={handleQuoteClick}
-          onDuplicate={handleDuplicateQuote}
-          onTogglePin={handleTogglePin}
-          onDelete={handleDeleteQuote}
-        />
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">
+          <QuotesList
+            quotes={filteredQuotes}
+            tours={tours}
+            searchTerm={searchTerm}
+            onQuoteClick={handleQuoteClick}
+            onDuplicate={handleDuplicateQuote}
+            onTogglePin={handleTogglePin}
+            onDelete={handleDeleteQuote}
+          />
+        </div>
       </div>
 
       <QuoteDialog

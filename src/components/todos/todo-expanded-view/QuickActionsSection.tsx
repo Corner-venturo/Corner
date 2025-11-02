@@ -65,6 +65,9 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
   })
   const [isSharing, setIsSharing] = React.useState(false)
 
+  // 收款功能的資料載入狀態
+  const [isLoadingReceipt, setIsLoadingReceipt] = React.useState(false)
+
   // 共享待辦的處理函數
   const handleShareTodo = React.useCallback(async () => {
     if (!shareData.targetUserId) {
@@ -112,6 +115,34 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
     }
   }, [activeTab, employees.length])
 
+  // 只在收款分頁時載入團體和訂單資料
+  useEffect(() => {
+    const loadReceiptData = async () => {
+      if (activeTab === 'receipt') {
+        setIsLoadingReceipt(true)
+        try {
+          const { useTourStore, useOrderStore } = await import('@/stores')
+          const tourStore = useTourStore.getState()
+          const orderStore = useOrderStore.getState()
+
+          // 只在資料為空時才載入
+          if (tourStore.items.length === 0) {
+            await tourStore.fetchAll()
+          }
+          if (orderStore.items.length === 0) {
+            await orderStore.fetchAll()
+          }
+        } catch (error) {
+          console.error('載入收款資料失敗:', error)
+        } finally {
+          setIsLoadingReceipt(false)
+        }
+      }
+    }
+
+    loadReceiptData()
+  }, [activeTab])
+
   // 過濾掉自己
   const otherEmployees = employees.filter(emp => emp.id !== currentUser?.id)
 
@@ -124,6 +155,13 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
 
   switch (activeTab) {
     case 'receipt':
+      if (isLoadingReceipt) {
+        return (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-sm text-morandi-secondary">載入團體和訂單資料中...</div>
+          </div>
+        )
+      }
       return (
         <Suspense fallback={LoadingFallback}>
           <QuickReceipt />

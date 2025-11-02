@@ -452,6 +452,7 @@ export function Sidebar() {
         }}
         className={cn(
           'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-30 group transition-[width] duration-300 flex flex-col',
+          'hidden lg:flex',
           sidebarCollapsed
             ? isSidebarHovered || isDropdownHovered
               ? 'w-[190px]'

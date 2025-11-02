@@ -173,7 +173,6 @@ export const QuotesList: React.FC<QuotesListProps> = ({
 
   return (
     <EnhancedTable
-      className="min-h-full"
       columns={tableColumns}
       data={quotes}
       searchableFields={['name']}

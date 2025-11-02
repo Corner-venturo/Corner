@@ -49,7 +49,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
     <div
       className={cn(
         'fixed top-0 right-0 h-[72px] bg-background z-[200] flex items-center justify-between px-6',
-        'left-16'
+        'left-0 md:left-16'
       )}
     >
       {/* 分割線 */}
@@ -91,8 +91,8 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
       </div>
 
       {/* 右側區域 - 功能、標籤頁和操作按鈕 - 統一無空白設計 */}
-      <div className="flex items-center flex-shrink-0 pointer-events-auto">
-        {/* 搜尋功能 - 最左邊 */}
+      <div className="flex items-center flex-shrink-0 pointer-events-auto gap-2">
+        {/* 搜尋功能 - 最左邊 - 手機模式隱藏 */}
         {props.showSearch && (
           <div className="flex items-center mr-4">
             {!isSearchOpen ? (
@@ -181,9 +181,9 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
         {/* 功能區域 */}
         {props.children && <div className="flex items-center mr-6">{props.children}</div>}
 
-        {/* 標籤頁 */}
+        {/* 標籤頁 - 手機模式隱藏 */}
         {props.tabs && props.tabs.length > 0 && (
-          <div className="flex items-center space-x-1 pointer-events-auto mr-4">
+          <div className="hidden md:flex items-center space-x-1 pointer-events-auto mr-4">
             {props.tabs.map(tab => (
               <button
                 key={tab.value}

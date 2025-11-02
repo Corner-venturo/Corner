@@ -37,7 +37,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-green-500 pb-2 flex-1">
+        <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2 flex-1">
           🏨 飯店資訊
         </h2>
         <label className="flex items-center gap-2 text-sm">
@@ -45,19 +45,19 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
             type="checkbox"
             checked={data.showHotels !== false}
             onChange={e => updateField('showHotels', e.target.checked)}
-            className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+            className="w-4 h-4 text-morandi-gold rounded focus:ring-morandi-gold/50"
           />
           <span className="text-morandi-primary">顯示此區塊</span>
         </label>
       </div>
 
-      <div className="bg-green-50 p-4 rounded-lg space-y-3">
+      <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-green-800">新增入住的飯店資訊，可以加入多間飯店</p>
+          <p className="text-sm text-morandi-secondary">新增入住的飯店資訊，可以加入多間飯店</p>
           <button
             type="button"
             onClick={addHotel}
-            className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+            className="flex items-center gap-1 px-3 py-1.5 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors text-sm"
           >
             <Plus size={16} />
             新增飯店
@@ -65,7 +65,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         </div>
 
         {hotels.length === 0 && (
-          <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-green-300">
+          <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-morandi-container">
             <p className="text-sm text-morandi-secondary mb-2">尚未新增飯店資訊</p>
             <p className="text-xs text-gray-400">點擊「新增飯店」按鈕開始</p>
           </div>
@@ -74,7 +74,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         {hotels.map((hotel, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-green-200 space-y-3 relative"
+            className="bg-white p-4 rounded-lg border border-morandi-container space-y-3 relative"
           >
             <button
               type="button"
@@ -86,7 +86,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
             </button>
 
             <div className="pr-8">
-              <h4 className="font-bold text-green-900 mb-3">飯店 {index + 1}</h4>
+              <h4 className="font-bold text-morandi-secondary mb-3">飯店 {index + 1}</h4>
 
               <div className="space-y-3">
                 <div>
@@ -97,7 +97,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                     type="text"
                     value={hotel.name}
                     onChange={e => updateHotel(index, 'name', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
                     placeholder="例如: 福岡海鷹希爾頓酒店"
                   />
                 </div>
@@ -109,7 +109,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                   <textarea
                     value={hotel.description}
                     onChange={e => updateHotel(index, 'description', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 min-h-[80px]"
+                    className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold min-h-[80px]"
                     placeholder="介紹飯店特色、位置、設施等..."
                   />
                 </div>
@@ -122,7 +122,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                     type="url"
                     value={hotel.image || ''}
                     onChange={e => updateHotel(index, 'image', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
                     placeholder="https://example.com/hotel.jpg"
                   />
                   {hotel.image && (

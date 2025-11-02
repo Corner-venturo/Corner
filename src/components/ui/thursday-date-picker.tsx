@@ -1,10 +1,9 @@
 'use client'
 
-import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
+import { UI_DELAYS } from '@/lib/constants/timeouts'
 
 import * as React from 'react'
 import { format } from 'date-fns'
-import { zhTW } from 'date-fns/locale'
 import { Calendar as CalendarIcon, AlertCircle } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -41,8 +40,9 @@ export function ThursdayDatePicker({
     }
   }, [value])
 
-  const handleSelect = (selectedDate: Date | undefined) => {
-    if (!selectedDate) {
+  const handleSelect = (selectedDate: Date | { from: Date; to?: Date } | undefined) => {
+    // 只處理單一日期選擇
+    if (!selectedDate || !(selectedDate instanceof Date)) {
       setDate(undefined)
       onChange('')
       setShowWarning(false)
@@ -84,13 +84,7 @@ export function ThursdayDatePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleSelect}
-            locale={zhTW}
-            initialFocus
-          />
+          <Calendar mode="single" selected={date} onSelect={handleSelect} />
         </PopoverContent>
       </Popover>
       {showWarning && (

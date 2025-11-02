@@ -489,11 +489,11 @@ function NewItineraryPageContent() {
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
           {/* 左側：輸入表單 */}
-          <div className="w-1/2 bg-white border-r border-border flex flex-col">
-            <div className="h-14 bg-morandi-gold text-white px-6 flex items-center border-b border-border">
+          <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col">
+            <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center border-b border-morandi-container">
               <h2 className="text-lg font-semibold">編輯表單</h2>
             </div>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto bg-white">
               <TourForm data={tourData} onChange={setTourData} />
             </div>
           </div>
@@ -551,15 +551,12 @@ function NewItineraryPageContent() {
 
                         {/* 螢幕 */}
                         <div
-                          className="bg-black rounded-[37px] overflow-hidden relative"
+                          className="bg-white rounded-[37px] overflow-hidden relative"
                           style={{
                             width: '390px',
                             height: '844px',
                           }}
                         >
-                          {/* 狀態列安全區 */}
-                          <div className="absolute top-0 left-0 right-0 h-[50px] bg-transparent z-10"></div>
-
                           {/* 內容區域 */}
                           <div
                             className="w-full h-full overflow-y-auto"
@@ -573,7 +570,7 @@ function NewItineraryPageContent() {
 
                           {/* 底部指示條 */}
                           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
-                            <div className="w-32 h-1 bg-black/30 rounded-full"></div>
+                            <div className="w-32 h-1 bg-gray-300 rounded-full"></div>
                           </div>
                         </div>
                       </div>

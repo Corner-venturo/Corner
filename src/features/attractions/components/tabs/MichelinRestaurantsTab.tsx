@@ -25,7 +25,11 @@ interface MichelinRestaurant {
   is_active: boolean
 }
 
-export default function MichelinRestaurantsTab() {
+interface MichelinRestaurantsTabProps {
+  selectedCountry: string
+}
+
+export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRestaurantsTabProps) {
   const [restaurants, setRestaurants] = useState<MichelinRestaurant[]>([])
   const [loading, setLoading] = useState(true)
   const [countries, setCountries] = useState<any[]>([])
@@ -129,6 +133,12 @@ export default function MichelinRestaurantsTab() {
       </div>
     )
   }
+
+  // 根據國家篩選餐廳
+  const filteredRestaurants = useMemo(() => {
+    if (!selectedCountry) return restaurants
+    return restaurants.filter(r => r.country_id === selectedCountry)
+  }, [restaurants, selectedCountry])
 
   // 定義表格欄位
   const columns = useMemo(
@@ -242,7 +252,7 @@ export default function MichelinRestaurantsTab() {
       <div className="flex-1 overflow-auto">
         <EnhancedTable
           columns={columns}
-          data={restaurants}
+          data={filteredRestaurants}
           loading={loading}
           initialPageSize={20}
           onRowClick={restaurant => {

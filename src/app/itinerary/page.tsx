@@ -213,12 +213,14 @@ export default function ItineraryPage() {
         </div>
       </ResponsiveHeader>
 
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={tableColumns}
-          data={filteredItineraries}
-          onRowClick={(itinerary: Itinerary) => router.push(`/itinerary/${itinerary.id}`)}
-        />
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">
+          <EnhancedTable
+            columns={tableColumns}
+            data={filteredItineraries}
+            onRowClick={(itinerary: Itinerary) => router.push(`/itinerary/${itinerary.id}`)}
+          />
+        </div>
       </div>
     </div>
   );

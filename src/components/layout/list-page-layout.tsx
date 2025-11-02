@@ -191,26 +191,27 @@ export function ListPageLayout<T extends Record<string, any>>({
       {beforeTable}
 
       {/* 表格區域 */}
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          className="min-h-full"
-          columns={columns}
-          data={filteredData}
-          loading={loading}
-          onRowClick={onRowClick}
-          actions={renderActions}
-          expandable={
-            renderExpanded
-              ? {
-                  expanded: expandedRows,
-                  onExpand: onToggleExpand,
-                  renderExpanded,
-                }
-              : undefined
-          }
-          onSort={onSort}
-          bordered={bordered}
-        />
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">
+          <EnhancedTable
+            columns={columns}
+            data={filteredData}
+            loading={loading}
+            onRowClick={onRowClick}
+            actions={renderActions}
+            expandable={
+              renderExpanded
+                ? {
+                    expanded: expandedRows,
+                    onExpand: onToggleExpand,
+                    renderExpanded,
+                  }
+                : undefined
+            }
+            onSort={onSort}
+            bordered={bordered}
+          />
+        </div>
       </div>
 
       {/* 表格後自訂內容 */}

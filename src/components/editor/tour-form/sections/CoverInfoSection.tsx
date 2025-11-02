@@ -35,7 +35,7 @@ export function CoverInfoSection({
 }: CoverInfoSectionProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-amber-500 pb-2">
+      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2">
         📸 封面設定
       </h2>
 
@@ -45,7 +45,7 @@ export function CoverInfoSection({
           type="text"
           value={data.tagline || ''}
           onChange={e => updateField('tagline', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+          className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold transition-colors"
           placeholder="Venturo Travel 2025 秋季精選"
         />
       </div>
@@ -57,7 +57,7 @@ export function CoverInfoSection({
             type="text"
             value={data.title || ''}
             onChange={e => updateField('title', e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold transition-colors"
             placeholder="漫遊福岡"
           />
         </div>
@@ -67,7 +67,7 @@ export function CoverInfoSection({
             type="text"
             value={data.subtitle || ''}
             onChange={e => updateField('subtitle', e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold transition-colors"
             placeholder="半自由行"
           />
         </div>
@@ -79,7 +79,7 @@ export function CoverInfoSection({
           type="text"
           value={data.description || ''}
           onChange={e => updateField('description', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+          className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold transition-colors"
           placeholder="2日市區自由活動 · 保證入住溫泉飯店 · 柳川遊船 · 阿蘇火山"
         />
       </div>
@@ -128,7 +128,7 @@ export function CoverInfoSection({
             type="text"
             value={data.departureDate || ''}
             onChange={e => updateField('departureDate', e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold transition-colors"
             placeholder="2025/10/21"
           />
         </div>
@@ -138,7 +138,7 @@ export function CoverInfoSection({
             type="text"
             value={data.tourCode || ''}
             onChange={e => updateField('tourCode', e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold transition-colors"
             placeholder="25JFO21CIG"
           />
         </div>

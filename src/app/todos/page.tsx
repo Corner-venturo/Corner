@@ -342,11 +342,12 @@ export default function TodosPage() {
       </ResponsiveHeader>
 
       {/* 待辦事項列表 */}
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={columns}
-          data={filteredTodos}
-          onRowClick={handleRowClick}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">
+          <EnhancedTable
+            columns={columns}
+            data={filteredTodos}
+            onRowClick={handleRowClick}
           rowClassName={(todo: Todo) => {
             // 判斷是否為共享待辦
             const isShared = (todo.assignee && todo.assignee !== user?.id) ||
@@ -417,7 +418,8 @@ export default function TodosPage() {
           searchTerm={searchTerm}
           showFilters={false}
           initialPageSize={15}
-        />
+          />
+        </div>
       </div>
 
       {/* 展開的待辦事項視圖 */}

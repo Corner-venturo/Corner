@@ -5,7 +5,6 @@ import { Plus } from 'lucide-react'
 import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import {
   CalendarGrid,
   CalendarStyles,
@@ -24,11 +23,12 @@ import { useRealtimeForCalendarEvents, useRealtimeForTours, useRealtimeForOrders
 
 export default function CalendarPage() {
   // ✅ Realtime 訂閱
-  useRealtimeForCalendarEvents();
-  useRealtimeForTours();
-  useRealtimeForOrders();
-  useRealtimeForMembers();
-  useRealtimeForCustomers(); // 新增客戶訂閱（顯示客戶生日）
+  useRealtimeForCalendarEvents()
+  useRealtimeForTours()
+  useRealtimeForOrders()
+  useRealtimeForMembers()
+  useRealtimeForCustomers() // 新增客戶訂閱（顯示客戶生日）
+
   // Stores
   const { fetchAll: fetchTours } = useTourStore()
   const { fetchAll: fetchOrders } = useOrderStore()
@@ -101,7 +101,7 @@ export default function CalendarPage() {
                   variant="ghost"
                   size="sm"
                   onClick={handlePrevMonth}
-                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all"
+                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-l-lg"
                 >
                   ←
                 </Button>
@@ -112,7 +112,7 @@ export default function CalendarPage() {
                   variant="ghost"
                   size="sm"
                   onClick={handleNextMonth}
-                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all"
+                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-r-lg"
                 >
                   →
                 </Button>
@@ -122,7 +122,7 @@ export default function CalendarPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleToday}
-                className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium"
+                className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium rounded-lg"
               >
                 今天
               </Button>
@@ -135,7 +135,7 @@ export default function CalendarPage() {
                   const today = new Date().toISOString().split('T')[0]
                   setAddEventDialog({ open: true, selectedDate: today })
                 }}
-                className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium"
+                className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium rounded-lg"
               >
                 <Plus size={16} className="mr-1.5" />
                 新增事項

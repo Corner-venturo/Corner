@@ -4,11 +4,10 @@ import React, { useRef, useState } from 'react'
 import { _Input } from './input'
 import { cn } from '@/lib/utils'
 import { Calendar as CalendarIcon } from 'lucide-react'
-import { DayPicker } from 'react-day-picker'
 import { format, parse, isValid } from 'date-fns'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
 import { SPECIAL_DELAYS } from '@/lib/constants/timeouts'
-import 'react-day-picker/style.css'
 
 interface SmartDateInputProps {
   value: string
@@ -46,8 +45,8 @@ export function SmartDateInput({
   const initialMonthDate = initialMonth ? parse(initialMonth, 'yyyy-MM-dd', new Date()) : undefined
 
   // 從日曆選擇日期
-  const handleCalendarSelect = (date: Date | undefined) => {
-    if (date) {
+  const handleCalendarSelect = (date: Date | { from: Date; to?: Date } | undefined) => {
+    if (date && date instanceof Date) {
       const formatted = format(date, 'yyyy-MM-dd')
       onChange(formatted)
       setIsCalendarOpen(false)
@@ -180,7 +179,7 @@ export function SmartDateInput({
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <DayPicker
+          <Calendar
             mode="single"
             selected={dateValue && isValid(dateValue) ? dateValue : undefined}
             onSelect={handleCalendarSelect}
@@ -188,31 +187,6 @@ export function SmartDateInput({
             defaultMonth={
               initialMonthDate && isValid(initialMonthDate) ? initialMonthDate : undefined
             }
-            className="p-3"
-            classNames={{
-              months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-              month: 'space-y-4',
-              caption: 'flex justify-center pt-1 relative items-center',
-              caption_label: 'text-sm font-medium',
-              nav: 'space-x-1 flex items-center',
-              nav_button: 'h-10 w-10 bg-transparent p-0 opacity-50 hover:opacity-100',
-              nav_button_previous: 'absolute left-1',
-              nav_button_next: 'absolute right-1',
-              table: 'w-full border-collapse space-y-1',
-              head_row: 'flex',
-              head_cell: 'text-morandi-secondary rounded-md w-9 font-normal text-[0.8rem]',
-              row: 'flex w-full mt-2',
-              cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-morandi-bg-subtle first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-              day: 'h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-morandi-bg-subtle rounded-md transition-colors',
-              day_selected:
-                'bg-morandi-primary text-white hover:bg-morandi-primary hover:text-white focus:bg-morandi-primary focus:text-white',
-              day_today: 'bg-morandi-bg-subtle text-morandi-primary',
-              day_outside: 'text-morandi-secondary opacity-50',
-              day_disabled: 'text-morandi-secondary opacity-50',
-              day_range_middle:
-                'aria-selected:bg-morandi-bg-subtle aria-selected:text-morandi-primary',
-              day_hidden: 'invisible',
-            }}
           />
         </PopoverContent>
       </Popover>

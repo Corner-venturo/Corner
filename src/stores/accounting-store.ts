@@ -1,375 +1,469 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { Account, TransactionCategory, Transaction, AccountingStats } from '@/types'
-import { generateUUID } from '@/lib/utils/uuid'
+import { createClient } from '@/lib/supabase/client'
+import { useAuthStore } from './auth-store'
 
 /**
- * 會計系統 Store (純 localStorage 版本)
+ * 會計系統 Store (Supabase 版本)
  *
- * 說明：會計系統使用 localStorage 持久化，原因：
- * 1. 資料量小 (帳戶、交易記錄)
- * 2. 需要即時計算統計 (不適合 IndexedDB)
- * 3. 暫不同步到 Supabase（待未來擴充）
+ * 說明：
+ * 1. 每個員工有自己的帳戶和交易記錄
+ * 2. 使用 Supabase 儲存，支援多裝置同步
+ * 3. 分類為全局共享（系統預設 + 自定義）
  */
+
+export interface Account {
+  id: string
+  user_id: string
+  name: string
+  type: 'cash' | 'bank' | 'credit' | 'investment' | 'other'
+  balance: number
+  currency: string
+  icon?: string
+  color?: string
+  is_active: boolean
+  description?: string
+  credit_limit?: number
+  available_credit?: number
+  created_at: string
+  updated_at: string
+}
+
+export interface TransactionCategory {
+  id: string
+  name: string
+  type: 'income' | 'expense' | 'transfer'
+  icon?: string
+  color?: string
+  is_system: boolean
+  created_at: string
+}
+
+export interface Transaction {
+  id: string
+  user_id: string
+  account_id: string
+  account_name?: string
+  category_id?: string
+  category_name?: string
+  type: 'income' | 'expense' | 'transfer'
+  amount: number
+  currency: string
+  description?: string
+  date: string
+  to_account_id?: string
+  to_account_name?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface AccountingStats {
+  total_assets: number
+  total_income: number
+  total_expense: number
+  monthly_income: number
+  monthly_expense: number
+  net_worth: number
+  category_breakdown: Array<{
+    category_id: string
+    category_name: string
+    amount: number
+    percentage: number
+  }>
+}
 
 interface AccountingStore {
   // 資料狀態
   accounts: Account[]
   categories: TransactionCategory[]
   transactions: Transaction[]
-
-  // 統計資料
   stats: AccountingStats
+  isLoading: boolean
 
   // 帳戶管理
-  addAccount: (account: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => Account
-  updateAccount: (id: string, account: Partial<Account>) => Account | undefined
-  deleteAccount: (id: string) => boolean
-  loadAccounts: () => Account[]
+  fetchAccounts: () => Promise<void>
+  addAccount: (account: Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Account | null>
+  updateAccount: (id: string, account: Partial<Account>) => Promise<Account | null>
+  deleteAccount: (id: string) => Promise<boolean>
 
   // 分類管理
-  addCategory: (
-    category: Omit<TransactionCategory, 'id' | 'created_at' | 'updated_at'>
-  ) => TransactionCategory
-  updateCategory: (
-    id: string,
-    category: Partial<TransactionCategory>
-  ) => TransactionCategory | undefined
-  deleteCategory: (id: string) => boolean
-  loadCategories: () => TransactionCategory[]
+  fetchCategories: () => Promise<void>
+  addCategory: (category: Omit<TransactionCategory, 'id' | 'created_at'>) => Promise<TransactionCategory | null>
 
   // 交易記錄
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => string
-  updateTransaction: (id: string, transaction: Partial<Transaction>) => void
-  deleteTransaction: (id: string) => void
+  fetchTransactions: () => Promise<void>
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<string | null>
+  updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>
+  deleteTransaction: (id: string) => Promise<void>
 
   // 統計計算
   calculateStats: () => void
-  getAccountBalance: (account_id: string) => number
-  getCategoryTotal: (category_id: string, start_date?: string, end_date?: string) => number
 
-  // 輔助方法
-  updateAccountBalances: (transaction: Transaction) => void
-  reverseAccountBalances: (transaction: Transaction) => void
+  // 初始化
+  initialize: () => Promise<void>
 }
 
-const generateId = () => generateUUID()
+export const useAccountingStore = create<AccountingStore>((set, get) => ({
+  // 初始資料
+  accounts: [],
+  categories: [],
+  transactions: [],
+  isLoading: false,
 
-export const useAccountingStore = create<AccountingStore>()(
-  persist(
-    (set, get) => ({
-      // 初始資料
-      accounts: [],
-      categories: [],
-      transactions: [],
+  stats: {
+    total_assets: 0,
+    total_income: 0,
+    total_expense: 0,
+    monthly_income: 0,
+    monthly_expense: 0,
+    net_worth: 0,
+    category_breakdown: [],
+  },
 
-      stats: {
-        total_assets: 0,
-        total_income: 0,
-        total_expense: 0,
-        monthly_income: 0,
-        monthly_expense: 0,
-        net_worth: 0,
-        category_breakdown: [],
-      },
+  // ===== 帳戶管理 =====
+  fetchAccounts: async () => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return
 
-      // ===== 帳戶管理 =====
-      addAccount: accountData => {
-        const id = generateId()
-        const now = new Date().toISOString()
-        const account: Account = {
-          ...accountData,
-          id,
-          created_at: now,
-          updated_at: now,
-        }
-        set(state => ({ accounts: [...state.accounts, account] }))
-        get().calculateStats()
-        return account
-      },
+    const { data, error } = await supabase
+      .from('accounting_accounts')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
 
-      updateAccount: (id, accountData) => {
-        let updated: Account | undefined
-        set(state => {
-          const account = state.accounts.find(a => a.id === id)
-          if (!account) return state
-
-          updated = { ...account, ...accountData, updated_at: new Date().toISOString() }
-          return {
-            accounts: state.accounts.map(a => (a.id === id ? updated! : a)),
-          }
-        })
-        get().calculateStats()
-        return updated
-      },
-
-      deleteAccount: id => {
-        // 先刪除相關交易
-        set(state => ({
-          transactions: state.transactions.filter(
-            transaction => transaction.account_id !== id && transaction.to_account_id !== id
-          ),
-        }))
-
-        set(state => ({
-          accounts: state.accounts.filter(a => a.id !== id),
-        }))
-        get().calculateStats()
-        return true
-      },
-
-      loadAccounts: () => {
-        return get().accounts
-      },
-
-      // ===== 分類管理 =====
-      addCategory: categoryData => {
-        const id = generateId()
-        const now = new Date().toISOString()
-        const category: TransactionCategory = {
-          ...categoryData,
-          id,
-          created_at: now,
-          updated_at: now,
-        }
-        set(state => ({ categories: [...state.categories, category] }))
-        return category
-      },
-
-      updateCategory: (id, categoryData) => {
-        let updated: TransactionCategory | undefined
-        set(state => {
-          const category = state.categories.find(c => c.id === id)
-          if (!category) return state
-
-          updated = { ...category, ...categoryData, updated_at: new Date().toISOString() }
-          return {
-            categories: state.categories.map(c => (c.id === id ? updated! : c)),
-          }
-        })
-        return updated
-      },
-
-      deleteCategory: id => {
-        // 先刪除該分類的交易
-        set(state => ({
-          transactions: state.transactions.filter(transaction => transaction.category_id !== id),
-        }))
-
-        set(state => ({
-          categories: state.categories.filter(c => c.id !== id),
-        }))
-        return true
-      },
-
-      loadCategories: () => {
-        return get().categories
-      },
-
-      // ===== 交易記錄 =====
-      addTransaction: transactionData => {
-        const id = generateId()
-        const now = new Date().toISOString()
-
-        const transaction: Transaction = {
-          ...transactionData,
-          id,
-          created_at: now,
-          updated_at: now,
-        }
-
-        set(state => ({ transactions: [...state.transactions, transaction] }))
-        get().updateAccountBalances(transaction)
-        get().calculateStats()
-        return id
-      },
-
-      updateTransaction: (id, transactionData) => {
-        const now = new Date().toISOString()
-        const oldTransaction = get().transactions.find(t => t.id === id)
-
-        set(state => ({
-          transactions: state.transactions.map(transaction =>
-            transaction.id === id
-              ? { ...transaction, ...transactionData, updated_at: now }
-              : transaction
-          ),
-        }))
-
-        if (oldTransaction) {
-          get().reverseAccountBalances(oldTransaction)
-        }
-        const newTransaction = get().transactions.find(t => t.id === id)
-        if (newTransaction) {
-          get().updateAccountBalances(newTransaction)
-        }
-        get().calculateStats()
-      },
-
-      deleteTransaction: id => {
-        const transaction = get().transactions.find(t => t.id === id)
-        if (transaction) {
-          get().reverseAccountBalances(transaction)
-        }
-
-        set(state => ({
-          transactions: state.transactions.filter(transaction => transaction.id !== id),
-        }))
-        get().calculateStats()
-      },
-
-      // ===== 輔助方法 =====
-      updateAccountBalances: (transaction: Transaction) => {
-        set(state => ({
-          accounts: state.accounts.map(account => {
-            if (account.id === transaction.account_id) {
-              const balanceChange =
-                transaction.type === 'income' ? transaction.amount : -transaction.amount
-              const newBalance = account.balance + balanceChange
-              const availableCredit =
-                account.type === 'credit' && account.credit_limit
-                  ? (account.credit_limit ?? 0) + newBalance
-                  : account.available_credit
-              return { ...account, balance: newBalance, available_credit: availableCredit }
-            }
-            if (transaction.to_account_id && account.id === transaction.to_account_id) {
-              const newBalance = account.balance + transaction.amount
-              const availableCredit =
-                account.type === 'credit' && account.credit_limit
-                  ? (account.credit_limit ?? 0) + newBalance
-                  : account.available_credit
-              return { ...account, balance: newBalance, available_credit: availableCredit }
-            }
-            return account
-          }),
-        }))
-      },
-
-      reverseAccountBalances: (transaction: Transaction) => {
-        set(state => ({
-          accounts: state.accounts.map(account => {
-            if (account.id === transaction.account_id) {
-              const balanceChange =
-                transaction.type === 'income' ? -transaction.amount : transaction.amount
-              return { ...account, balance: account.balance + balanceChange }
-            }
-            if (transaction.to_account_id && account.id === transaction.to_account_id) {
-              return { ...account, balance: account.balance - transaction.amount }
-            }
-            return account
-          }),
-        }))
-      },
-
-      // ===== 統計計算 =====
-      calculateStats: () => {
-        const { accounts, transactions, categories } = get()
-        const now = new Date()
-        const currentMonth = now.getMonth()
-        const currentYear = now.getFullYear()
-
-        const totalAssets = accounts
-          .filter(account => account.balance > 0)
-          .reduce((sum, account) => sum + account.balance, 0)
-
-        const totalDebt = accounts
-          .filter(account => account.balance < 0)
-          .reduce((sum, account) => sum + Math.abs(account.balance), 0)
-
-        const netWorth = totalAssets - totalDebt
-
-        const totalIncome = transactions
-          .filter(t => t.type === 'income')
-          .reduce((sum, t) => sum + t.amount, 0)
-
-        const totalExpense = transactions
-          .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + t.amount, 0)
-
-        const monthlyIncome = transactions
-          .filter(t => {
-            const transactionDate = new Date(t.date)
-            return (
-              t.type === 'income' &&
-              transactionDate.getMonth() === currentMonth &&
-              transactionDate.getFullYear() === currentYear
-            )
-          })
-          .reduce((sum, t) => sum + t.amount, 0)
-
-        const monthlyExpense = transactions
-          .filter(t => {
-            const transactionDate = new Date(t.date)
-            return (
-              t.type === 'expense' &&
-              transactionDate.getMonth() === currentMonth &&
-              transactionDate.getFullYear() === currentYear
-            )
-          })
-          .reduce((sum, t) => sum + t.amount, 0)
-
-        const categoryTotals = new Map<string, number>()
-
-        transactions
-          .filter(t => t.type === 'expense')
-          .forEach(t => {
-            const current = categoryTotals.get(t.category_id) || 0
-            categoryTotals.set(t.category_id, current + t.amount)
-          })
-
-        const categoryBreakdown = Array.from(categoryTotals.entries())
-          .map(([categoryId, amount]) => {
-            const category = categories.find(c => c.id === categoryId)
-            return {
-              category_id: categoryId,
-              category_name: category?.name || '未知分類',
-              amount,
-              percentage: totalExpense > 0 ? (amount / totalExpense) * 100 : 0,
-            }
-          })
-          .sort((a, b) => b.amount - a.amount)
-
-        set({
-          stats: {
-            total_assets: totalAssets,
-            total_income: totalIncome,
-            total_expense: totalExpense,
-            monthly_income: monthlyIncome,
-            monthly_expense: monthlyExpense,
-            net_worth: netWorth,
-            category_breakdown: categoryBreakdown,
-          },
-        })
-      },
-
-      // 工具方法
-      getAccountBalance: (accountId: string) => {
-        const account = get().accounts.find(a => a.id === accountId)
-        return account?.balance || 0
-      },
-
-      getCategoryTotal: (categoryId: string, start_date?: string, end_date?: string) => {
-        const { transactions } = get()
-        return transactions
-          .filter(t => {
-            if (t.category_id !== categoryId) return false
-            if (start_date && t.date < start_date) return false
-            if (end_date && t.date > end_date) return false
-            return true
-          })
-          .reduce((sum, t) => sum + t.amount, 0)
-      },
-    }),
-    {
-      name: 'venturo-accounting-store',
-      version: 2, // 版本升級
+    if (!error && data) {
+      set({ accounts: data })
+      get().calculateStats()
     }
-  )
-)
+  },
 
-// 初始化統計資料
-if (typeof window !== 'undefined') {
-  setTimeout(() => {
-    useAccountingStore.getState().calculateStats()
-  }, 0)
-}
+  addAccount: async (accountData) => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return null
+
+    const { data, error } = await supabase
+      .from('accounting_accounts')
+      .insert({
+        ...accountData,
+        user_id: user.id,
+      })
+      .select()
+      .single()
+
+    if (!error && data) {
+      set(state => ({ accounts: [...state.accounts, data] }))
+      get().calculateStats()
+      return data
+    }
+    return null
+  },
+
+  updateAccount: async (id, accountData) => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return null
+
+    const { data, error } = await supabase
+      .from('accounting_accounts')
+      .update(accountData)
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    if (!error && data) {
+      set(state => ({
+        accounts: state.accounts.map(a => (a.id === id ? data : a)),
+      }))
+      get().calculateStats()
+      return data
+    }
+    return null
+  },
+
+  deleteAccount: async (id) => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return false
+
+    // 軟刪除：設為不活躍
+    const { error } = await supabase
+      .from('accounting_accounts')
+      .update({ is_active: false })
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (!error) {
+      set(state => ({
+        accounts: state.accounts.filter(a => a.id !== id),
+      }))
+      get().calculateStats()
+      return true
+    }
+    return false
+  },
+
+  // ===== 分類管理 =====
+  fetchCategories: async () => {
+    const supabase = createClient()
+
+    const { data, error } = await supabase
+      .from('accounting_categories')
+      .select('*')
+      .order('type', { ascending: true })
+      .order('name', { ascending: true })
+
+    if (!error && data) {
+      set({ categories: data })
+    }
+  },
+
+  addCategory: async (categoryData) => {
+    const supabase = createClient()
+
+    const { data, error } = await supabase
+      .from('accounting_categories')
+      .insert({
+        ...categoryData,
+        is_system: false,
+      })
+      .select()
+      .single()
+
+    if (!error && data) {
+      set(state => ({ categories: [...state.categories, data] }))
+      return data
+    }
+    return null
+  },
+
+  // ===== 交易記錄 =====
+  fetchTransactions: async () => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return
+
+    const { data, error } = await supabase
+      .from('accounting_transactions')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    if (!error && data) {
+      set({ transactions: data })
+      get().calculateStats()
+    }
+  },
+
+  addTransaction: async (transactionData) => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return null
+
+    const { data, error } = await supabase
+      .from('accounting_transactions')
+      .insert({
+        ...transactionData,
+        user_id: user.id,
+      })
+      .select()
+      .single()
+
+    if (!error && data) {
+      set(state => ({ transactions: [data, ...state.transactions] }))
+
+      // 更新帳戶餘額
+      await get().updateAccountBalance(data)
+
+      // 重新載入帳戶資料
+      await get().fetchAccounts()
+
+      return data.id
+    }
+    return null
+  },
+
+  updateTransaction: async (id, transactionData) => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return
+
+    const { data, error } = await supabase
+      .from('accounting_transactions')
+      .update(transactionData)
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    if (!error && data) {
+      set(state => ({
+        transactions: state.transactions.map(t => (t.id === id ? data : t)),
+      }))
+
+      // 重新載入帳戶資料
+      await get().fetchAccounts()
+    }
+  },
+
+  deleteTransaction: async (id) => {
+    const supabase = createClient()
+    const user = useAuthStore.getState().user
+    if (!user) return
+
+    const { error } = await supabase
+      .from('accounting_transactions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (!error) {
+      set(state => ({
+        transactions: state.transactions.filter(t => t.id !== id),
+      }))
+
+      // 重新載入帳戶資料
+      await get().fetchAccounts()
+    }
+  },
+
+  // ===== 輔助方法：更新帳戶餘額 =====
+  updateAccountBalance: async (transaction: Transaction) => {
+    const supabase = createClient()
+    const { accounts } = get()
+
+    // 更新來源帳戶
+    const account = accounts.find(a => a.id === transaction.account_id)
+    if (account) {
+      const balanceChange = transaction.type === 'income'
+        ? transaction.amount
+        : -transaction.amount
+
+      const newBalance = account.balance + balanceChange
+      const updates: any = { balance: newBalance }
+
+      // 信用卡額度計算
+      if (account.type === 'credit' && account.credit_limit) {
+        updates.available_credit = account.credit_limit + newBalance
+      }
+
+      await supabase
+        .from('accounting_accounts')
+        .update(updates)
+        .eq('id', account.id)
+    }
+
+    // 更新目標帳戶（轉帳）
+    if (transaction.to_account_id) {
+      const toAccount = accounts.find(a => a.id === transaction.to_account_id)
+      if (toAccount) {
+        const newBalance = toAccount.balance + transaction.amount
+        const updates: any = { balance: newBalance }
+
+        if (toAccount.type === 'credit' && toAccount.credit_limit) {
+          updates.available_credit = toAccount.credit_limit + newBalance
+        }
+
+        await supabase
+          .from('accounting_accounts')
+          .update(updates)
+          .eq('id', toAccount.id)
+      }
+    }
+  },
+
+  // ===== 統計計算 =====
+  calculateStats: () => {
+    const { accounts, transactions, categories } = get()
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+
+    const totalAssets = accounts
+      .filter(account => account.balance > 0)
+      .reduce((sum, account) => sum + account.balance, 0)
+
+    const totalDebt = accounts
+      .filter(account => account.balance < 0)
+      .reduce((sum, account) => sum + Math.abs(account.balance), 0)
+
+    const netWorth = totalAssets - totalDebt
+
+    const totalIncome = transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0)
+
+    const totalExpense = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0)
+
+    const monthlyIncome = transactions
+      .filter(t => {
+        const transactionDate = new Date(t.date)
+        return (
+          t.type === 'income' &&
+          transactionDate.getMonth() === currentMonth &&
+          transactionDate.getFullYear() === currentYear
+        )
+      })
+      .reduce((sum, t) => sum + t.amount, 0)
+
+    const monthlyExpense = transactions
+      .filter(t => {
+        const transactionDate = new Date(t.date)
+        return (
+          t.type === 'expense' &&
+          transactionDate.getMonth() === currentMonth &&
+          transactionDate.getFullYear() === currentYear
+        )
+      })
+      .reduce((sum, t) => sum + t.amount, 0)
+
+    const categoryTotals = new Map<string, number>()
+
+    transactions
+      .filter(t => t.type === 'expense' && t.category_id)
+      .forEach(t => {
+        const current = categoryTotals.get(t.category_id!) || 0
+        categoryTotals.set(t.category_id!, current + t.amount)
+      })
+
+    const categoryBreakdown = Array.from(categoryTotals.entries())
+      .map(([categoryId, amount]) => {
+        const category = categories.find(c => c.id === categoryId)
+        return {
+          category_id: categoryId,
+          category_name: category?.name || '未知分類',
+          amount,
+          percentage: totalExpense > 0 ? (amount / totalExpense) * 100 : 0,
+        }
+      })
+      .sort((a, b) => b.amount - a.amount)
+
+    set({
+      stats: {
+        total_assets: totalAssets,
+        total_income: totalIncome,
+        total_expense: totalExpense,
+        monthly_income: monthlyIncome,
+        monthly_expense: monthlyExpense,
+        net_worth: netWorth,
+        category_breakdown: categoryBreakdown,
+      },
+    })
+  },
+
+  // ===== 初始化 =====
+  initialize: async () => {
+    set({ isLoading: true })
+    await Promise.all([
+      get().fetchCategories(),
+      get().fetchAccounts(),
+      get().fetchTransactions(),
+    ])
+    set({ isLoading: false })
+  },
+}))

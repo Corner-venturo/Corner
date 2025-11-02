@@ -5,6 +5,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import type { SortableChannelItemProps } from './types'
+import { DELETE_TOUR_CHANNEL_PASSWORD } from '@/lib/constants/workspace-settings'
 
 export function SortableChannelItem({
   channel,
@@ -113,15 +114,36 @@ export function SortableChannelItem({
             >
               <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
             </button>
-            {/* 刪除按鈕（非旅遊團頻道） */}
-            {!isTourChannel && onDelete && (
+            {/* 刪除按鈕（所有頻道都可刪除，旅遊團頻道需要密碼） */}
+            {onDelete && (
               <button
-                onClick={e => {
+                onClick={async e => {
                   e.stopPropagation()
+
+                  // 如果是旅遊團頻道，需要輸入密碼
+                  if (isTourChannel) {
+                    const password = prompt(
+                      '⚠️ 刪除旅遊團頻道需要密碼確認\n\n' +
+                      `即將刪除：${channel.name}\n` +
+                      '此操作無法復原，請輸入密碼：'
+                    )
+
+                    // 使用者取消
+                    if (password === null) {
+                      return
+                    }
+
+                    // 驗證密碼
+                    if (password !== DELETE_TOUR_CHANNEL_PASSWORD) {
+                      alert('❌ 密碼錯誤')
+                      return
+                    }
+                  }
+
                   onDelete(channel.id)
                 }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-100 text-red-600 hover:text-red-700 transition-opacity"
-                title="刪除頻道"
+                title={isTourChannel ? '刪除頻道（需要密碼）' : '刪除頻道'}
               >
                 <Trash2 size={12} />
               </button>

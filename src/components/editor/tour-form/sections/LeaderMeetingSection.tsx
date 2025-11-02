@@ -36,7 +36,7 @@ export function LeaderMeetingSection({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-purple-500 pb-2 flex-1">
+        <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2 flex-1">
           👤 領隊與集合資訊
         </h2>
         <label className="flex items-center gap-2 text-sm">
@@ -44,21 +44,21 @@ export function LeaderMeetingSection({
             type="checkbox"
             checked={data.showLeaderMeeting !== false}
             onChange={e => updateField('showLeaderMeeting', e.target.checked)}
-            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+            className="w-4 h-4 text-morandi-gold rounded focus:ring-morandi-gold/50"
           />
           <span className="text-morandi-primary">顯示此區塊</span>
         </label>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg space-y-3">
-        <h3 className="font-bold text-purple-900">領隊資訊</h3>
+      <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
+        <h3 className="font-bold text-morandi-secondary">領隊資訊</h3>
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">領隊姓名</label>
           <input
             type="text"
             value={data.leader?.name || ''}
             onChange={e => updateNestedField('leader', 'name', e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
             placeholder="鍾惠如 小姐"
           />
         </div>
@@ -69,7 +69,7 @@ export function LeaderMeetingSection({
               type="text"
               value={data.leader?.domesticPhone || ''}
               onChange={e => updateNestedField('leader', 'domesticPhone', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
               placeholder="+886 0928402897"
             />
           </div>
@@ -79,20 +79,20 @@ export function LeaderMeetingSection({
               type="text"
               value={data.leader?.overseasPhone || ''}
               onChange={e => updateNestedField('leader', 'overseasPhone', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
               placeholder="+81 08074371189"
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+      <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-blue-900">集合資訊</h3>
+          <h3 className="font-bold text-morandi-secondary">集合資訊</h3>
           <button
             type="button"
             onClick={addMeetingPoint}
-            className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            className="flex items-center gap-1 px-3 py-1.5 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors text-sm"
           >
             <Plus size={16} />
             新增集合地點
@@ -108,7 +108,7 @@ export function LeaderMeetingSection({
         {meetingPoints.map((point, index) => (
           <div
             key={index}
-            className="bg-white p-3 rounded-lg border border-blue-200 space-y-3 relative"
+            className="bg-white p-3 rounded-lg border border-morandi-container space-y-3 relative"
           >
             <button
               type="button"
@@ -128,7 +128,7 @@ export function LeaderMeetingSection({
                   type="text"
                   value={point.time}
                   onChange={e => updateMeetingPoint(index, 'time', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
                   placeholder="2025/10/21 04:50"
                 />
               </div>
@@ -140,7 +140,7 @@ export function LeaderMeetingSection({
                   type="text"
                   value={point.location}
                   onChange={e => updateMeetingPoint(index, 'location', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
                   placeholder="桃園機場華航第二航廈 7號櫃台"
                 />
               </div>

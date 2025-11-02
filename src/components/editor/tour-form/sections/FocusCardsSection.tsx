@@ -16,20 +16,20 @@ export function FocusCardsSection({
 }: FocusCardsSectionProps) {
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center border-b-2 border-green-500 pb-2">
+      <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">📍 精選景點</h2>
         <button
           onClick={addFocusCard}
-          className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600"
+          className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
         >
           + 新增景點
         </button>
       </div>
 
       {data.focusCards?.map((card: FocusCard, index: number) => (
-        <div key={index} className="p-4 border-2 border-green-200 rounded-lg space-y-3 bg-green-50">
+        <div key={index} className="p-4 border-2 border-morandi-container rounded-lg space-y-3 bg-morandi-container/20">
           <div className="flex justify-between items-start">
-            <span className="text-sm font-medium text-green-700">景點 {index + 1}</span>
+            <span className="text-sm font-medium text-morandi-secondary">景點 {index + 1}</span>
             <button
               onClick={() => removeFocusCard(index)}
               className="text-red-500 hover:text-red-700 text-sm"
@@ -43,7 +43,7 @@ export function FocusCardsSection({
               type="text"
               value={card.title}
               onChange={e => updateFocusCard(index, 'title', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
               placeholder="由布院溫泉街"
             />
           </div>
@@ -53,7 +53,7 @@ export function FocusCardsSection({
               type="text"
               value={card.src}
               onChange={e => updateFocusCard(index, 'src', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
               placeholder="https://images.unsplash.com/..."
             />
             <p className="mt-1 text-xs text-morandi-secondary">
