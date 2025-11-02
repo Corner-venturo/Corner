@@ -12,14 +12,11 @@ interface AttractionsFiltersProps {
   setSelectedRegion: (value: string) => void
   selectedCity: string
   setSelectedCity: (value: string) => void
-  selectedCategory: string
-  setSelectedCategory: (value: string) => void
   hasActiveFilters: boolean
   clearFilters: () => void
   countries: any[]
   availableRegions: any[]
   availableCities: any[]
-  categories: string[]
 }
 
 export function AttractionsFilters({
@@ -29,14 +26,11 @@ export function AttractionsFilters({
   setSelectedRegion,
   selectedCity,
   setSelectedCity,
-  selectedCategory,
-  setSelectedCategory,
   hasActiveFilters,
   clearFilters,
   countries,
   availableRegions,
   availableCities,
-  categories,
 }: AttractionsFiltersProps) {
   return (
     <div className="mb-4 p-4 bg-card border border-border rounded-lg flex flex-wrap gap-3 items-end">
@@ -107,22 +101,6 @@ export function AttractionsFilters({
           />
         </div>
       )}
-
-      {/* 類別選擇 */}
-      <div className="min-w-[150px]">
-        <Combobox
-          value={selectedCategory}
-          onChange={setSelectedCategory}
-          options={categories.map(cat => ({
-            value: cat,
-            label: cat === 'all' ? '所有類別' : cat,
-          }))}
-          placeholder="選擇類別..."
-          emptyMessage="找不到符合的類別"
-          showSearchIcon={false}
-          showClearButton={false}
-        />
-      </div>
 
       {/* 清除篩選 */}
       {hasActiveFilters && (

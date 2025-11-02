@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useRegionStoreNew } from '@/stores'
+import { useRegionsStore } from '@/stores'
 import { TourFormData } from './tour-form/types'
 import { useRegionData } from './tour-form/hooks/useRegionData'
 import { useTourFormHandlers } from './tour-form/hooks/useTourFormHandlers'
@@ -22,7 +22,7 @@ interface TourFormProps {
 
 export function TourForm({ data, onChange }: TourFormProps) {
   const { user } = useAuthStore()
-  const { countries, cities } = useRegionStoreNew()
+  const { countries, cities } = useRegionsStore()
 
   const {
     selectedCountry,
@@ -36,17 +36,24 @@ export function TourForm({ data, onChange }: TourFormProps) {
 
   const handlers = useTourFormHandlers(data, onChange, selectedCountry)
 
-  // 根據 country_id 取得城市列表的輔助函數
-  const getCitiesByCountryId = (countryId: string) => {
-    return cities
-      .filter(c => c.country_id === countryId && c.is_active)
-      .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name }))
-  }
+  // 根據 country_id 取得城市列表的輔助函數（穩定引用）
+  const getCitiesByCountryId = React.useCallback(
+    (countryId: string) => {
+      return cities
+        .filter(c => c.country_id === countryId && c.is_active)
+        .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name }))
+    },
+    [cities]
+  )
 
-  // 取得所有國家列表
-  const allCountries = countries
-    .filter(c => c.is_active)
-    .map(c => ({ id: c.id, code: c.code || '', name: c.name }))
+  // 取得所有國家列表（穩定引用，避免無限循環）
+  const allCountries = React.useMemo(
+    () =>
+      countries
+        .filter(c => c.is_active)
+        .map(c => ({ id: c.id, code: c.code || '', name: c.name })),
+    [countries]
+  )
 
   return (
     <div className="p-6 space-y-8">

@@ -40,15 +40,10 @@ export function GlobalDialogOverride() {
     // 因為原生 confirm 是同步的，無法完美替換為異步對話框
     // 需要手動替換 confirm() 呼叫為 await confirm() from alert-dialog
 
-    // 但我們可以在控制台警告開發者
+    // 提示開發者使用自訂 confirm
     const originalConfirmFunc = window.confirm.bind(window)
     window.confirm = (message?: any): boolean => {
-      console.warn(
-        '⚠️ 偵測到使用原生 confirm()，建議改用 async confirm() 以獲得更好的 UI。\n' +
-          '使用方式：\n' +
-          '  import { confirm } from "@/lib/ui/alert-dialog";\n' +
-          '  const result = await confirm("確定要刪除嗎？");'
-      )
+      // For better UI, use: import { confirm } from "@/lib/ui/alert-dialog"
       return originalConfirmFunc(message)
     }
 

@@ -13,9 +13,20 @@ import {
   SellingPriceSection,
   SaveVersionDialog,
   PrintableQuotation,
+  QuickQuoteDetail,
 } from '@/features/quotes/components'
+import { useRealtimeForQuotes, useRealtimeForTours, useRealtimeForQuoteItems } from '@/hooks/use-realtime-hooks'
 
 export default function QuoteDetailPage() {
+  // ✅ Realtime 訂閱（必須！否則重新整理時無法載入資料）
+  useRealtimeForQuotes()
+  useRealtimeForTours()
+  useRealtimeForQuoteItems()
+
+  // Scroll handling refs (必須在任何條件判斷之前宣告)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+
   // State management hook
   const quoteState = useQuoteState()
   const {
@@ -125,10 +136,7 @@ export default function QuoteDetailPage() {
     setShowQuotationPreview(false)
   }, [])
 
-  // Scroll handling
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
-
+  // Scroll handling effect (必須在任何條件判斷之前)
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
@@ -152,6 +160,23 @@ export default function QuoteDetailPage() {
       return () => element.removeEventListener('scroll', handleScroll)
     }
   }, [])
+
+  // 如果還在載入或報價單不存在，顯示載入中
+  if (!quote) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto mb-4"></div>
+          <p className="text-morandi-secondary">載入中...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ✅ 如果是快速報價單，顯示快速報價單介面
+  if (quote.quote_type === 'quick') {
+    return <QuickQuoteDetail quote={quote} onUpdate={(data) => updateQuote(quote.id, data)} />
+  }
 
   return (
     <div className="w-full max-w-full space-y-6 pb-6">

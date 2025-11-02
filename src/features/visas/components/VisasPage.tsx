@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info, Settings } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { logger } from '@/lib/utils/logger';
@@ -68,23 +68,6 @@ export default function VisasPage() {
 
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
 
-  // ✅ 延遲初始化：只在打開對話框時才載入 tours
-  // getOrCreateVisaTour 已經直接查詢 Supabase，不需要先 fetchTours()
-  const initVisaTour = React.useCallback(async () => {
-    try {
-      const visaTour = await tourService.getOrCreateVisaTour();
-      // 只在需要時載入所有 tours（用於下拉選單）
-      if (tours.length === 0) {
-        await fetchTours();
-      }
-
-      if (visaTour && !contact_info.tour_id) {
-        setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }));
-      }
-    } catch (error) {
-      logger.error('Failed to get or create visa tour', error);
-    }
-  }, [contact_info.tour_id, fetchTours, setContactInfo, tours.length]);
 
   // 權限檢查：清除選擇
   useEffect(() => {
@@ -132,12 +115,19 @@ export default function VisasPage() {
     const totalFee = applicants.reduce((sum, a) => sum + calculateFee(a.country), 0);
     let targetOrder;
 
-    if (contact_info.order_id) {
+    // 如果選擇「+ 新增訂單」或沒有選訂單，則自動建立
+    if (contact_info.order_id && contact_info.order_id !== '__create_new__') {
       targetOrder = orders.find(o => o.id === contact_info.order_id);
       if (!targetOrder) return;
     } else {
-      const tourOrders = orders.filter(o => o.tour_id === selectedTour.id);
-      const nextNumber = (tourOrders.length + 1).toString().padStart(3, '0');
+      // 重新查詢該團的訂單數量（確保最新）
+      const { supabase } = await import('@/lib/supabase/client');
+      const { count } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('tour_id', selectedTour.id);
+
+      const nextNumber = ((count || 0) + 1).toString().padStart(3, '0');
       const order_number = `${selectedTour.code}-${nextNumber}`;
 
       targetOrder = await addOrder({
@@ -154,6 +144,10 @@ export default function VisasPage() {
         remaining_amount: totalFee,
         payment_status: 'unpaid' as const,
       });
+
+      if (contact_info.order_id === '__create_new__') {
+        toast.success(`已建立訂單：${order_number}`);
+      }
     }
 
     if (!targetOrder) {
@@ -208,45 +202,6 @@ export default function VisasPage() {
     setSelectedRows([]);
   };
 
-  // 建立預設簽證團
-  const [isCreatingDefaultTour, setIsCreatingDefaultTour] = useState(false);
-  const currentYear = new Date().getFullYear();
-  const defaultVisaTourCode = `VISA-${currentYear}`;
-  const defaultVisaTour = tours.find(t => t.code === defaultVisaTourCode);
-
-  const handleCreateDefaultVisaTour = async () => {
-    if (!canManageVisas) return;
-
-    if (defaultVisaTour) {
-      toast.info(`${defaultVisaTourCode} 簽證團已存在！`);
-      return;
-    }
-
-    setIsCreatingDefaultTour(true);
-    try {
-      const endOfYear = `${currentYear}-12-31`;
-      await addTour({
-        code: defaultVisaTourCode,
-        name: `${currentYear}年度簽證代辦`,
-        departure_date: endOfYear,
-        return_date: endOfYear,
-        status: 'special' as const,
-        location: 'VISA',
-        price: 0,
-        max_participants: 9999,
-        contract_status: 'pending' as const,
-        total_revenue: 0,
-        total_cost: 0,
-        profit: 0,
-      } as any);
-
-      toast.success(`已建立 ${defaultVisaTourCode} 簽證團！`);
-    } catch (error) {
-      toast.error('建立簽證團失敗');
-    } finally {
-      setIsCreatingDefaultTour(false);
-    }
-  };
 
   return (
     <div className="h-full flex flex-col">
@@ -305,23 +260,6 @@ export default function VisasPage() {
               </>
             ) : (
               <>
-                {/* 設定預設簽證團按鈕 */}
-                {canManageVisas && !defaultVisaTour && (
-                  <Button
-                    variant="outline"
-                    onClick={handleCreateDefaultVisaTour}
-                    disabled={isCreatingDefaultTour}
-                    className="flex items-center gap-2 border-morandi-gold text-morandi-gold hover:bg-morandi-gold/10"
-                  >
-                    <Settings size={16} />
-                    {isCreatingDefaultTour ? '建立中...' : `建立 ${defaultVisaTourCode} 簽證團`}
-                  </Button>
-                )}
-                {canManageVisas && defaultVisaTour && (
-                  <span className="text-sm text-morandi-secondary px-3 py-1.5 bg-green-50 rounded-md border border-green-200">
-                    預設團號：{defaultVisaTourCode} ✓
-                  </span>
-                )}
                 <Button
                   variant="outline"
                   onClick={() => setIsInfoDialogOpen(true)}
@@ -332,11 +270,7 @@ export default function VisasPage() {
                 </Button>
                 {canManageVisas && (
                   <Button
-                    onClick={() => {
-                      setIsDialogOpen(true);
-                      // 背景載入團號資料，不阻塞 UI
-                      void initVisaTour();
-                    }}
+                    onClick={() => setIsDialogOpen(true)}
                     className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                   >
                     新增簽證

@@ -30,7 +30,7 @@ export interface StatusConfig {
 /**
  * 狀態配置類型
  */
-type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa'
+type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa' | 'esim'
 
 /**
  * 所有狀態配置的中央存儲
@@ -300,6 +300,33 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       icon: AlertCircle,
     },
   },
+
+  // eSIM 網卡狀態（參考 CornerERP）
+  esim: {
+    0: {
+      color: 'text-morandi-gold',
+      label: '待確認',
+      icon: Clock,
+      bgColor: 'bg-morandi-gold/10',
+    },
+    1: {
+      color: 'text-morandi-green',
+      label: '已確認',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+    },
+    2: {
+      color: 'text-morandi-red',
+      label: '錯誤',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
+    },
+    default: {
+      color: 'text-morandi-secondary',
+      label: '未知',
+      icon: AlertCircle,
+    },
+  },
 }
 
 /**
@@ -362,3 +389,8 @@ export function getStatusOptions(type: StatusType): Array<{ value: string; label
       label: config.label,
     }))
 }
+
+/**
+ * 直接導出 STATUS_CONFIG 供組件使用
+ */
+export const STATUS_CONFIG = STATUS_CONFIGS

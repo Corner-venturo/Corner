@@ -13,6 +13,7 @@ export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> =
   approved: '已核准',
   converted: '已轉單',
   rejected: '已拒絕',
+  billed: '已請款',
 }
 
 // 報價單狀態顏色
@@ -23,6 +24,7 @@ export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> =
   approved: 'bg-morandi-green text-white',
   converted: 'bg-morandi-primary text-white',
   rejected: 'bg-morandi-red text-white',
+  billed: 'bg-purple-500 text-white',
 }
 
 // 狀態篩選選項
@@ -34,4 +36,5 @@ export const QUOTE_STATUS_FILTERS = [
   { value: 'approved', label: '已核准' },
   { value: 'converted', label: '已轉單' },
   { value: 'rejected', label: '已拒絕' },
+  { value: 'billed', label: '已請款' },
 ]

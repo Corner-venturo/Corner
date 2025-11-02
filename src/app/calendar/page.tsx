@@ -19,8 +19,8 @@ import {
   useEventOperations,
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
-import { useTourStore, useOrderStore, useMemberStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
-import { useRealtimeForCalendarEvents, useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers } from '@/hooks/use-realtime-hooks'
+import { useTourStore, useOrderStore, useMemberStore, useCustomerStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
+import { useRealtimeForCalendarEvents, useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers, useRealtimeForCustomers } from '@/hooks/use-realtime-hooks'
 
 export default function CalendarPage() {
   // ✅ Realtime 訂閱
@@ -28,10 +28,12 @@ export default function CalendarPage() {
   useRealtimeForTours();
   useRealtimeForOrders();
   useRealtimeForMembers();
+  useRealtimeForCustomers(); // 新增客戶訂閱（顯示客戶生日）
   // Stores
   const { fetchAll: fetchTours } = useTourStore()
   const { fetchAll: fetchOrders } = useOrderStore()
   const { fetchAll: fetchMembers } = useMemberStore()
+  const { fetchAll: fetchCustomers } = useCustomerStore()
   const { fetchAll: fetchCalendarEvents } = useCalendarEventStore()
   const { fetchAll: fetchEmployees } = useEmployeeStore()
 
@@ -42,12 +44,13 @@ export default function CalendarPage() {
         fetchTours(),
         fetchOrders(),
         fetchMembers(),
+        fetchCustomers(),
         fetchCalendarEvents(),
         fetchEmployees(),
       ])
     }
     loadData()
-  }, [fetchTours, fetchOrders, fetchMembers, fetchCalendarEvents, fetchEmployees])
+  }, [fetchTours, fetchOrders, fetchMembers, fetchCustomers, fetchCalendarEvents, fetchEmployees])
 
   // Custom hooks for calendar logic
   const { filteredEvents } = useCalendarEvents()

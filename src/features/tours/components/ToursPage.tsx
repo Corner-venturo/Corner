@@ -9,9 +9,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { useTours } from '../hooks/useTours-advanced';
 import { PageRequest } from '@/core/types/common';
-import { Calendar, FileText, MapPin, Calculator, BarChart3, FileCheck, AlertCircle, Edit2, Trash2, Archive, ArchiveRestore, FileSignature, Flag } from 'lucide-react';
+import { Calendar, FileText, MapPin, Calculator, BarChart3, FileCheck, AlertCircle, Edit2, Trash2, Archive, ArchiveRestore, FileSignature, Flag, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionStoreNew } from '@/stores';
+import { useTourStore, useOrderStore, useMemberStore, useEmployeeStore, useRegionsStore } from '@/stores';
 import { useQuotes } from '@/features/quotes/hooks/useQuotes';
 import { Tour } from '@/stores/types';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
@@ -38,7 +38,7 @@ export const ToursPage: React.FC = () => {
   const { items: members } = useMemberStore();
   const employeeStore = useEmployeeStore();
   const { items: employees } = employeeStore;
-  const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionStoreNew();
+  const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore();
   const { quotes, updateQuote } = useQuotes();
   const { dialog, openDialog, closeDialog } = useDialog();
 
@@ -340,6 +340,95 @@ export const ToursPage: React.FC = () => {
     },
   ], [orders, members, getStatusColor]);
 
+  const handleCreateChannel = useCallback(async (tour: Tour) => {
+    const { toast } = await import('sonner');
+
+    // 立即顯示載入提示
+    const loadingToast = toast.loading('正在建立頻道...');
+
+    try {
+      const { supabase } = await import('@/lib/supabase/client');
+
+      console.log('🔵 [建立頻道] 開始處理:', tour.code, tour.name);
+
+      // 獲取當前登入使用者
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.error('❌ [建立頻道] 使用者未登入:', userError);
+        toast.dismiss(loadingToast);
+        toast.error('請先登入');
+        return;
+      }
+
+      console.log('✅ [建立頻道] 使用者已登入:', user.id);
+
+      // 獲取預設工作空間 ID
+      const { data: workspaces, error: wsError } = await supabase
+        .from('workspaces')
+        .select('id')
+        .limit(1)
+        .single();
+
+      if (wsError || !workspaces) {
+        console.error('❌ [建立頻道] 找不到工作空間:', wsError);
+        toast.dismiss(loadingToast);
+        toast.error('找不到工作空間');
+        return;
+      }
+
+      console.log('✅ [建立頻道] 工作空間:', workspaces.id);
+
+      // 檢查是否已有頻道
+      const { data: existingChannel, error: checkError } = await supabase
+        .from('channels')
+        .select('id, name')
+        .eq('tour_id', tour.id)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('❌ [建立頻道] 檢查失敗:', checkError);
+      }
+
+      if (existingChannel) {
+        console.log('ℹ️ [建立頻道] 頻道已存在:', existingChannel.name);
+        toast.dismiss(loadingToast);
+        toast.info(`頻道已存在：${existingChannel.name}`);
+        return;
+      }
+
+      // 建立頻道
+      const channelName = `${tour.code} ${tour.name}`;
+      console.log('🔵 [建立頻道] 準備建立:', channelName);
+
+      const { error: insertError, data: newChannel } = await supabase
+        .from('channels')
+        .insert({
+          workspace_id: workspaces.id,
+          name: channelName,
+          description: `${tour.name} - ${tour.departure_date || ''} 出發`,
+          type: 'public',
+          tour_id: tour.id,
+          created_by: user.id,
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('❌ [建立頻道] 建立失敗:', insertError);
+        throw insertError;
+      }
+
+      console.log('✅ [建立頻道] 建立成功:', newChannel);
+      toast.dismiss(loadingToast);
+      toast.success(`已建立頻道：${channelName}`);
+    } catch (error: any) {
+      console.error('❌ [建立頻道] 發生錯誤:', error);
+      toast.dismiss(loadingToast);
+      toast.error(`建立頻道失敗：${error.message || '未知錯誤'}`);
+    }
+  }, []);
+
   const renderActions = useCallback((tour: Tour) => {
     const tourQuote = quotes.find(q => q.tour_id === tour.id);
     const hasQuote = !!tourQuote;
@@ -355,6 +444,16 @@ export const ToursPage: React.FC = () => {
           title="編輯"
         >
           <Edit2 size={14} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCreateChannel(tour);
+          }}
+          className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+          title="建立工作空間頻道"
+        >
+          <MessageSquare size={14} />
         </button>
         <button
           onClick={(e) => {
@@ -418,7 +517,7 @@ export const ToursPage: React.FC = () => {
         </button>
       </div>
     );
-  }, [quotes, openDialog, router, operations, setSelectedTour, setDeleteConfirm]);
+  }, [quotes, openDialog, router, operations, setSelectedTour, setDeleteConfirm, handleCreateChannel]);
 
   const renderExpanded = useCallback((tour: Tour) => (
     <TourExpandedView

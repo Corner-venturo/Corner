@@ -7,14 +7,14 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useTourStore, useRegionStoreNew } from '@/stores'
+import { useTourStore, useRegionsStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 
 export const useQuotesData = () => {
   const router = useRouter()
   const { quotes, addQuote, updateQuote, deleteQuote, duplicateQuote, loadQuotes } = useQuotes()
   const { items: tours } = useTourStore()
-  const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionStoreNew()
+  const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
 
   // 載入報價單資料 - 只在首次載入時執行
   useEffect(() => {

@@ -86,7 +86,6 @@ export function getOptimizedImageUrl(url: string | null | undefined, options: Im
     return `${urlObj.origin}${renderPath}?${params.toString()}`
   } catch (error) {
     // URL 解析失敗，返回原始 URL
-    console.warn('[Image Optimization] Failed to parse URL:', url, error)
     return url
   }
 }

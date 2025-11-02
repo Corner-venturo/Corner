@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MapPin, MapIcon, Calculator, Building2 } from 'lucide-react'
+import { MapPin, MapIcon, Calculator, Building2, ImageIcon } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,15 @@ const databaseModules = [
     href: '/database/suppliers',
     color: 'bg-indigo-500',
     count: 12,
+  },
+  {
+    id: 'company-assets',
+    title: '公司資源管理',
+    description: '管理公司 Logo、大小章、插圖等資源',
+    icon: ImageIcon,
+    href: '/database/company-assets',
+    color: 'bg-amber-500',
+    count: 0,
   },
 ]
 

@@ -7,8 +7,6 @@ import {
   Cloud,
   Plane,
   CloudSun,
-  Shield,
-  Banknote,
 } from 'lucide-react'
 import type { WidgetConfig } from '../types'
 import { CalculatorWidget } from './calculator-widget'
@@ -19,8 +17,6 @@ import { ManifestationWidget } from './manifestation-widget'
 import { WeatherWidget } from './weather-widget'
 import { WeatherWidgetWeekly } from './weather-widget-weekly'
 import { FlightWidget } from './flight-widget'
-import { VisaWidget } from './visa-widget'
-import { RemittanceWidget } from './remittance-widget'
 
 // 小工具配置
 export const AVAILABLE_WIDGETS: WidgetConfig[] = [
@@ -32,8 +28,6 @@ export const AVAILABLE_WIDGETS: WidgetConfig[] = [
     span: 1,
   },
   { id: 'flight', name: '航班查詢', icon: Plane, component: FlightWidget, span: 1 },
-  { id: 'visa', name: '簽證查詢', icon: Shield, component: VisaWidget, span: 1 },
-  { id: 'remittance', name: '匯款比較', icon: Banknote, component: RemittanceWidget, span: 1 },
   { id: 'weather', name: '天氣查詢', icon: Cloud, component: WeatherWidget, span: 1 },
   {
     id: 'weather-weekly',

@@ -29,7 +29,7 @@ export interface Attraction {
   updated_at: string
 }
 
-export type SortField = 'name' | 'city' | 'category' | 'duration'
+export type SortField = 'name' | 'city' | 'category' | 'duration' | 'status'
 export type SortDirection = 'asc' | 'desc' | null
 
 export interface AttractionFormData {

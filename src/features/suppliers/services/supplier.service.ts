@@ -14,8 +14,10 @@ class SupplierService extends BaseService<Supplier> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find((s: Supplier) => s.id === id),
       add: async (supplier: Supplier) => {
-        await store.create(supplier as unknown)
-        return supplier
+        // 移除系統自動生成的欄位
+        const { id, created_at, updated_at, ...createData } = supplier
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<Supplier>) => {
         await store.update(id, data)

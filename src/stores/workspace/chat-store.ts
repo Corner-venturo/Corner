@@ -126,22 +126,28 @@ export const useChatStore = () => {
     error: messageStore.error,
 
     // ============================================
-    // 訊息載入 (使用 createStore 的 fetchAll)
+    // 訊息載入 (只載入當前頻道的訊息，不載入所有訊息)
     // ============================================
     loadMessages: async (channelId: string) => {
       uiStore.setCurrentChannelId(channelId)
       uiStore.setMessagesLoading(channelId, true)
 
       try {
-        // 使用 createStore 的 fetchAll（自動處理快取優先）
-        await messageStore.fetchAll()
+        // 🔥 效能優化：使用 Supabase 查詢只載入當前頻道的訊息
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('channel_id', channelId)
+          .order('created_at', { ascending: true })
 
-        // 🔥 使用緩存函數（避免重複計算）
-        const channelMessages = getChannelMessages(messageStore.items, channelId)
+        if (error) throw error
 
+        // 更新 store 中該頻道的訊息（不影響其他頻道）
+        const channelMessages = data || []
         uiStore.setCurrentChannelMessages(channelId, channelMessages)
         uiStore.setMessagesLoading(channelId, false)
       } catch (error) {
+        console.error('Failed to load messages:', error)
         uiStore.setMessagesLoading(channelId, false)
       }
     },

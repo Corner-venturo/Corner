@@ -11,7 +11,7 @@ export const useOrders = () => {
 
     // ========== CRUD 操作 ==========
     createOrder: async (data: Omit<Order, 'id' | 'created_at' | 'updated_at'>) => {
-      return await store.create(data as unknown)
+      return await store.create(data)
     },
 
     updateOrder: async (id: string, data: Partial<Order>) => {
@@ -31,9 +31,8 @@ export const useOrders = () => {
       return orderService.getOrdersByTour(tour_id)
     },
 
-    getOrdersByStatus: (status: string) => {
-      // Order 介面沒有 status 欄位
-      return orderService.getOrdersByStatus(status as unknown)
+    getOrdersByStatus: (status: 'unpaid' | 'partial' | 'paid') => {
+      return orderService.getOrdersByStatus(status)
     },
 
     getOrdersByCustomer: (customer_id: string) => {

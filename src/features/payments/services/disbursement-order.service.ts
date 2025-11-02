@@ -12,8 +12,10 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(o => o.id === id),
       add: async (order: DisbursementOrder) => {
-        const result = await store.create(order as unknown)
-        return result || order
+        // 移除系統自動生成的欄位
+        const { id, created_at, updated_at, ...createData } = order
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<DisbursementOrder>) => {
         await store.update(id, data)
@@ -99,7 +101,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       created_by: '1', // 使用實際用戶ID
     }
 
-    const order = await this.create(orderData as unknown)
+    const order = await this.create(orderData)
 
     // 更新請款單狀態為 processing
     for (const requestId of paymentRequestIds) {

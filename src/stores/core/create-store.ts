@@ -117,20 +117,25 @@ export function createStore<T extends BaseEntity>(
             const items = await fetchAll(config, indexedDB, supabase, sync, controller);
 
             set({ items, loading: false });
+
+            // 🔥 返回資料，讓呼叫者可以立即使用
+            return items;
           } catch (error) {
             // 忽略 AbortError
             if (error instanceof Error && error.name === 'AbortError') {
               set({ loading: false });
-              return;
+              return [];
             }
 
             // 其他錯誤：靜默切換到本地模式
             try {
               const items = await indexedDB.getAll();
               set({ items, loading: false, error: null });
+              return items;
             } catch (localError) {
               const errorMessage = localError instanceof Error ? localError.message : '無法載入資料';
               set({ error: errorMessage, loading: false });
+              return [];
             }
           } finally {
             abortManager.abort(); // 清理

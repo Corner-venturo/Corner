@@ -13,6 +13,7 @@ import { BaseEntity } from './base.types'
  */
 export interface Quote extends BaseEntity {
   code: string // 報價單編號
+  quote_type: QuoteType // 報價單類型
   customer_id?: string // 客戶 ID
   customer_name: string // 客戶姓名（必填）
   customer_email?: string // 客戶電郵
@@ -42,11 +43,33 @@ export interface Quote extends BaseEntity {
   tour_id?: string // 轉換後的旅遊團 ID
   is_pinned?: boolean // 是否置頂（範本報價單）
 
+  // 快速報價單專用欄位
+  contact_phone?: string // 聯絡電話（快速報價單用）
+  contact_address?: string // 通訊地址（快速報價單用）
+  tour_code?: string // 團體編號（快速報價單用）
+  handler_name?: string // 承辦業務（快速報價單用）
+  issue_date?: string // 開單日期（快速報價單用）
+  received_amount?: number // 已收金額
+  balance_amount?: number // 應收餘額（自動計算）
+  quick_quote_items?: QuickQuoteItem[] // 快速報價單的收費明細項目
+
   // 擴展欄位（用於詳細頁）- 使用 any 暫時相容舊結構
   categories?: any[] // 報價分類（複雜的前端結構，使用 CostCategory[] 或 any[]）
   versions?: any[] // 歷史版本（使用 VersionRecord[] 或 QuoteVersion[]）
   participant_counts?: any // 參與人數統計
   selling_prices?: any // 銷售價格
+}
+
+/**
+ * QuickQuoteItem - 快速報價單項目
+ */
+export interface QuickQuoteItem {
+  id: string
+  description: string // 摘要
+  quantity: number // 數量
+  unit_price: number // 單價
+  amount: number // 金額（quantity * unit_price）
+  notes: string // 備註
 }
 
 /**
@@ -97,6 +120,13 @@ export interface QuoteItem extends BaseEntity {
 // ============================================
 
 /**
+ * QuoteType - 報價單類型
+ */
+export type QuoteType =
+  | 'standard' // 團體報價單（複雜的旅遊行程）
+  | 'quick' // 快速報價單（簡單收款用）
+
+/**
  * QuoteStatus - 報價狀態
  */
 export type QuoteStatus =
@@ -106,6 +136,10 @@ export type QuoteStatus =
   | 'rejected' // 已拒絕
   | 'expired' // 已過期
   | 'converted' // 已轉單
+  | 'proposed' // 提案
+  | 'revised' // 修改中
+  | 'approved' // 已核准
+  | 'billed' // 已請款
 
 /**
  * QuoteItemType - 報價項目類型
@@ -131,25 +165,34 @@ export type QuoteItemType =
  */
 export interface CreateQuoteData {
   code: string
+  quote_type: QuoteType
   customer_id?: string
   customer_name?: string
-  destination: string
-  start_date: string
-  end_date: string
-  days: number
-  nights: number
-  number_of_people: number
+  destination?: string
+  start_date?: string
+  end_date?: string
+  days?: number
+  nights?: number
+  number_of_people?: number
   status: QuoteStatus
-  total_amount: number
+  total_amount?: number
   valid_until?: string
   notes?: string
   is_active: boolean
+  // 快速報價單專用
+  contact_phone?: string
+  contact_address?: string
+  tour_code?: string
+  handler_name?: string
+  issue_date?: string
+  received_amount?: number
 }
 
 /**
  * UpdateQuoteData - 更新報價單
  */
 export interface UpdateQuoteData {
+  quote_type?: QuoteType
   customer_id?: string
   customer_name?: string
   destination?: string
@@ -165,6 +208,13 @@ export interface UpdateQuoteData {
   is_active?: boolean
   converted_to_tour?: boolean
   tour_id?: string
+  // 快速報價單專用
+  contact_phone?: string
+  contact_address?: string
+  tour_code?: string
+  handler_name?: string
+  issue_date?: string
+  received_amount?: number
 }
 
 /**

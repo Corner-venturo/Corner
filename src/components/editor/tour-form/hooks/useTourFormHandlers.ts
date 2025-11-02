@@ -1,14 +1,14 @@
 import { TourFormData, Activity } from '../types'
 import { cityImages, timezoneOffset } from '../constants'
 import { calculateFlightDuration } from '../utils'
-import { useRegionStoreNew } from '@/stores'
+import { useRegionsStore } from '@/stores'
 
 export function useTourFormHandlers(
   data: TourFormData,
   onChange: (data: TourFormData) => void,
   selectedCountry: string
 ) {
-  const { cities } = useRegionStoreNew()
+  const { cities } = useRegionsStore()
 
   const updateField = (field: string, value: unknown) => {
     onChange({ ...data, [field]: value })

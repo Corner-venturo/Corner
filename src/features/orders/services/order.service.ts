@@ -12,8 +12,10 @@ class OrderService extends BaseService<Order> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(o => o.id === id),
       add: async (order: Order) => {
-        const result = await store.create(order as unknown)
-        return result || order
+        // 移除系統自動生成的欄位
+        const { id, created_at, updated_at, ...createData } = order
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<Order>) => {
         await store.update(id, data)

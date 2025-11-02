@@ -1,0 +1,306 @@
+'use client'
+
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { MapPin, Star, Sparkles } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
+import { Combobox } from '@/components/ui/combobox'
+import { supabase } from '@/lib/supabase/client'
+import type { Country, Region, City } from '@/stores/region-store'
+
+// Lazy load tabs - 只有切換到該 tab 才載入組件
+const AttractionsTab = lazy(() => import('./tabs/AttractionsTab'))
+const MichelinRestaurantsTab = lazy(() => import('./tabs/MichelinRestaurantsTab'))
+const PremiumExperiencesTab = lazy(() => import('./tabs/PremiumExperiencesTab'))
+
+// ============================================
+// 資料庫管理主頁面（含景點、米其林、體驗）
+// ============================================
+
+export default function DatabaseManagementPage() {
+  const [activeTab, setActiveTab] = useState('attractions')
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['attractions']))
+
+  // 景點分頁的狀態
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedCountry, setSelectedCountry] = useState('')
+  const [selectedRegion, setSelectedRegion] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
+  const { openAdd } = useAttractionsDialog()
+
+  // 地區資料 - 直接從 Supabase 載入，避免透過 store 導致崩潰
+  const [countries, setCountries] = useState<Country[]>([])
+  const [regions, setRegions] = useState<Region[]>([])
+  const [cities, setCities] = useState<City[]>([])
+
+  // 只載入國家列表
+  useEffect(() => {
+    const loadCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('countries')
+          .select('*')
+          .order('display_order')
+
+        if (error) {
+          console.error('Error loading countries:', error)
+          return
+        }
+
+        if (data) {
+          console.log('Loaded countries:', data.length)
+          setCountries(data)
+        }
+      } catch (err) {
+        console.error('Exception loading countries:', err)
+      }
+    }
+    loadCountries()
+  }, [])
+
+  // 當選擇國家時，載入該國家的地區
+  useEffect(() => {
+    if (selectedCountry) {
+      const loadRegions = async () => {
+        const { data, error } = await supabase
+          .from('regions')
+          .select('*')
+          .eq('country_id', selectedCountry)
+          .eq('is_active', true)
+          .order('display_order')
+
+        if (!error && data) {
+          setRegions(data)
+        }
+      }
+      loadRegions()
+    } else {
+      setRegions([])
+    }
+  }, [selectedCountry])
+
+  // 當選擇地區或國家時，載入城市
+  useEffect(() => {
+    const loadCities = async () => {
+      if (selectedRegion) {
+        const { data, error } = await supabase
+          .from('cities')
+          .select('*')
+          .eq('region_id', selectedRegion)
+          .eq('is_active', true)
+          .order('display_order')
+
+        if (!error && data) {
+          setCities(data)
+        }
+      } else if (selectedCountry) {
+        const { data, error } = await supabase
+          .from('cities')
+          .select('*')
+          .eq('country_id', selectedCountry)
+          .eq('is_active', true)
+          .order('display_order')
+
+        if (!error && data) {
+          setCities(data)
+        }
+      } else {
+        setCities([])
+      }
+    }
+
+    loadCities()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCountry, selectedRegion])
+
+  // Helper functions for region/city lookups
+  const getRegionsByCountry = (countryId: string) => regions.filter(r => r.country_id === countryId)
+  const getCitiesByCountry = (countryId: string) => cities.filter(c => c.country_id === countryId)
+  const getCitiesByRegion = (regionId: string) => cities.filter(c => c.region_id === regionId)
+
+  // 當切換 tab 時，標記該 tab 已載入
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab)
+    setLoadedTabs(prev => new Set(prev).add(tab))
+  }
+
+  // 清除篩選
+  const clearFilters = () => {
+    setSelectedCountry('')
+    setSelectedRegion('')
+    setSelectedCity('')
+    setSelectedCategory('all')
+  }
+
+  const hasActiveFilters =
+    selectedCountry || selectedRegion || selectedCity || selectedCategory !== 'all'
+
+  // 分類選項
+  const categoryOptions = [
+    { value: '景點', label: '景點' },
+    { value: '餐廳', label: '餐廳' },
+    { value: '住宿', label: '住宿' },
+    { value: '購物', label: '購物' },
+    { value: '交通', label: '交通' },
+  ]
+
+  const availableRegions = selectedCountry ? getRegionsByCountry(selectedCountry) : []
+  const availableCities = selectedRegion
+    ? getCitiesByRegion(selectedRegion)
+    : selectedCountry
+      ? getCitiesByCountry(selectedCountry)
+      : []
+
+  return (
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="旅遊資料庫"
+        icon={MapPin}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '資料庫管理', href: '/database' },
+          { label: '旅遊資料庫', href: '/database/attractions' },
+        ]}
+        tabs={[
+          { value: 'attractions', label: '景點活動', icon: MapPin },
+          { value: 'michelin', label: '米其林餐廳', icon: Star },
+          { value: 'experiences', label: '頂級體驗', icon: Sparkles },
+        ]}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        showSearch={activeTab === 'attractions'}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="搜尋景點名稱..."
+        filters={
+          activeTab === 'attractions' ? (
+            <>
+              {/* 國家篩選 */}
+              <Combobox
+                value={selectedCountry}
+                onChange={value => {
+                  setSelectedCountry(value)
+                  setSelectedRegion('')
+                  setSelectedCity('')
+                }}
+                options={[
+                  { value: '', label: '所有國家' },
+                  ...countries.map(country => ({
+                    value: country.id,
+                    label: `${country.emoji} ${country.name}`,
+                  })),
+                ]}
+                placeholder="選擇國家..."
+                emptyMessage="找不到符合的國家"
+                showSearchIcon={true}
+                showClearButton={true}
+              />
+              {/* 地區篩選 */}
+              {availableRegions.length > 0 && (
+                <Combobox
+                  value={selectedRegion}
+                  onChange={value => {
+                    setSelectedRegion(value)
+                    setSelectedCity('')
+                  }}
+                  options={[
+                    { value: '', label: '所有地區' },
+                    ...availableRegions.map(region => ({
+                      value: region.id,
+                      label: region.name,
+                    })),
+                  ]}
+                  placeholder="選擇地區..."
+                  emptyMessage="找不到符合的地區"
+                  showSearchIcon={true}
+                  showClearButton={true}
+                />
+              )}
+              {/* 城市篩選 */}
+              {availableCities.length > 0 && (
+                <Combobox
+                  value={selectedCity}
+                  onChange={setSelectedCity}
+                  options={[
+                    { value: '', label: '所有城市' },
+                    ...availableCities.map(city => ({
+                      value: city.id,
+                      label: city.name,
+                    })),
+                  ]}
+                  placeholder="選擇城市..."
+                  emptyMessage="找不到符合的城市"
+                  showSearchIcon={true}
+                  showClearButton={true}
+                />
+              )}
+              {/* 分類篩選 */}
+              <select
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+                className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-background text-morandi-primary min-w-[120px]"
+              >
+                <option value="all">全部分類</option>
+                {categoryOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </>
+          ) : undefined
+        }
+        showClearFilters={activeTab === 'attractions' && hasActiveFilters}
+        onClearFilters={clearFilters}
+        onAdd={activeTab === 'attractions' ? openAdd : undefined}
+        addLabel="新增景點"
+      />
+
+      <div className="flex-1 overflow-auto">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
+
+          {/* 分頁內容 - 只載入已訪問過的 tab */}
+          <div className="flex-1 overflow-hidden">
+            <TabsContent value="attractions" className="h-full mt-0 data-[state=inactive]:hidden">
+              {loadedTabs.has('attractions') && (
+                <Suspense fallback={<div className="flex items-center justify-center h-full">載入中...</div>}>
+                  <AttractionsTab
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                    selectedCountry={selectedCountry}
+                    selectedRegion={selectedRegion}
+                    selectedCity={selectedCity}
+                    openAdd={openAdd}
+                    countries={countries}
+                    regions={regions}
+                    cities={cities}
+                  />
+                </Suspense>
+              )}
+            </TabsContent>
+
+            <TabsContent value="michelin" className="h-full mt-0 data-[state=inactive]:hidden">
+              {loadedTabs.has('michelin') && (
+                <Suspense fallback={<div className="flex items-center justify-center h-full">載入中...</div>}>
+                  <MichelinRestaurantsTab />
+                </Suspense>
+              )}
+            </TabsContent>
+
+            <TabsContent value="experiences" className="h-full mt-0 data-[state=inactive]:hidden">
+              {loadedTabs.has('experiences') && (
+                <Suspense fallback={<div className="flex items-center justify-center h-full">載入中...</div>}>
+                  <PremiumExperiencesTab />
+                </Suspense>
+              )}
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  )
+}

@@ -156,6 +156,27 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/manifestation'],
     description: '顯化魔法功能',
   },
+  {
+    id: 'confirmations',
+    label: '確認單管理',
+    category: '全部',
+    routes: ['/confirmations'],
+    description: '確認單建立和管理',
+  },
+  {
+    id: 'esims',
+    label: 'eSIM 管理',
+    category: '全部',
+    routes: ['/esims'],
+    description: 'eSIM 申請和管理',
+  },
+  {
+    id: 'company_assets',
+    label: '公司資產管理',
+    category: '全部',
+    routes: ['/database/company-assets'],
+    description: '公司 Logo、印章等資產管理',
+  },
 ]
 
 /**

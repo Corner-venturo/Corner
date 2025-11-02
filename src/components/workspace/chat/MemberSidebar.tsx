@@ -25,7 +25,8 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
     if (selectedChannel?.id && currentWorkspace?.id) {
       loadChannelMembers(currentWorkspace.id, selectedChannel.id)
     }
-  }, [selectedChannel?.id, currentWorkspace?.id, loadChannelMembers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChannel?.id, currentWorkspace?.id])
 
   if (!isOpen) return null
 

@@ -61,6 +61,10 @@ Thumbs.db
 *.log
 *.tmp
 *.temp
+*.bak
+*.backup
+*.old
+*.deprecated
 .cache
 
 # Development temporary files

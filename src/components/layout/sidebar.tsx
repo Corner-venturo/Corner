@@ -27,6 +27,8 @@ import {
   FileSignature,
   FileText,
   CircleDot,
+  Wifi,
+  ImageIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -138,6 +140,12 @@ const menuItems: MenuItem[] = [
     requiredPermission: 'contracts',
   },
   {
+    href: '/confirmations',
+    label: '確認單管理',
+    icon: CircleDot,
+    requiredPermission: 'confirmations',
+  },
+  {
     href: '/database',
     label: '資料管理',
     icon: Database,
@@ -168,12 +176,24 @@ const menuItems: MenuItem[] = [
         icon: Building2,
         requiredPermission: 'database',
       },
+      {
+        href: '/database/company-assets',
+        label: '公司資源管理',
+        icon: ImageIcon,
+        requiredPermission: 'database',
+      },
     ],
   },
   {
     href: '/hr',
     label: '人資管理',
     icon: UserCog,
+    requiredPermission: 'hr',
+  },
+  {
+    href: '/esims',
+    label: '網卡管理',
+    icon: Wifi,
     requiredPermission: 'hr',
   },
 ]
@@ -204,8 +224,10 @@ export function Sidebar() {
   const pathname = usePathname()
   const { sidebarCollapsed, user } = useAuthStore()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [clickedItem, setClickedItem] = useState<string | null>(null)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const sidebarRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [mounted, setMounted] = useState(false)
   const [isDropdownHovered, setIsDropdownHovered] = useState(false)
@@ -225,28 +247,78 @@ export function Sidebar() {
     }
   }, [])
 
+  // 點擊外部關閉下拉選單
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node
+      if (
+        clickedItem &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target) &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(target)
+      ) {
+        setClickedItem(null)
+        setHoveredItem(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [clickedItem])
+
   const handleMouseEnter = (item: MenuItem, element: HTMLElement) => {
+    // 如果已經有點擊固定的項目，不要用 hover 覆蓋它
+    if (clickedItem) return
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
 
-    // 方案 B：側邊欄收起時不顯示子選單，必須先展開側邊欄
+    // Hover 預覽：側邊欄展開或 hover 時才顯示
     if (item.children && (isSidebarHovered || !sidebarCollapsed)) {
       const rect = element.getBoundingClientRect()
       setDropdownPosition({
         top: rect.top,
-        left: rect.right + 10, // 直接使用元素的右邊界 + 10px 間距
+        left: rect.right + 10,
       })
       setHoveredItem(item.href)
     }
   }
 
   const handleMouseLeave = () => {
+    // 如果已經有點擊固定的項目，不要關閉下拉選單
+    if (clickedItem) return
+
     timeoutRef.current = setTimeout(() => {
       if (!isDropdownHovered) {
         setHoveredItem(null)
       }
-    }, 100) // 縮短延遲時間
+    }, 100)
+  }
+
+  const handleClick = (item: MenuItem, element: HTMLElement) => {
+    if (!item.children) return
+
+    // 如果點擊的是同一個項目，關閉下拉選單
+    if (clickedItem === item.href) {
+      setClickedItem(null)
+      setHoveredItem(null)
+      return
+    }
+
+    // 計算下拉選單位置
+    const rect = element.getBoundingClientRect()
+    setDropdownPosition({
+      top: rect.top,
+      left: rect.right + 10,
+    })
+
+    // 固定展開
+    setClickedItem(item.href)
+    setHoveredItem(item.href)
   }
 
   const handleDropdownMouseEnter = () => {
@@ -258,6 +330,10 @@ export function Sidebar() {
 
   const handleDropdownMouseLeave = () => {
     setIsDropdownHovered(false)
+
+    // 如果是點擊固定的項目，不要關閉
+    if (clickedItem) return
+
     setHoveredItem(null)
     // 同時收起側邊欄（如果是摺疊模式）
     if (sidebarCollapsed) {
@@ -271,9 +347,15 @@ export function Sidebar() {
     return pathname.startsWith(href)
   }
 
-  const getHoveredItemChildren = () => {
-    if (!hoveredItem) return []
-    const item = menuItems.find(item => item.href === hoveredItem)
+  const getActiveDropdownItem = () => {
+    // 優先顯示點擊固定的項目，其次是 hover 的項目
+    const activeHref = clickedItem || hoveredItem
+    if (!activeHref) return null
+    return menuItems.find(item => item.href === activeHref) || null
+  }
+
+  const getActiveDropdownChildren = () => {
+    const item = getActiveDropdownItem()
     return item?.children || []
   }
 
@@ -369,7 +451,7 @@ export function Sidebar() {
           }
         }}
         className={cn(
-          'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-40 group transition-[width] duration-300 flex flex-col',
+          'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-30 group transition-[width] duration-300 flex flex-col',
           sidebarCollapsed
             ? isSidebarHovered || isDropdownHovered
               ? 'w-[190px]'
@@ -418,11 +500,12 @@ export function Sidebar() {
                     className={cn(
                       'w-full relative h-10 text-sm text-morandi-secondary transition-all duration-200 cursor-pointer',
                       'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
-                      is_active(item.href) &&
+                      (is_active(item.href) || clickedItem === item.href) &&
                         'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
                     )}
                     onMouseEnter={e => handleMouseEnter(item, e.currentTarget)}
                     onMouseLeave={handleMouseLeave}
+                    onClick={e => handleClick(item, e.currentTarget)}
                   >
                     <item.icon
                       size={20}
@@ -443,7 +526,10 @@ export function Sidebar() {
                     {!sidebarCollapsed && (
                       <ChevronRight
                         size={16}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 transition-transform duration-300"
+                        className={cn(
+                          'absolute right-4 top-1/2 -translate-y-1/2 transition-transform duration-300',
+                          clickedItem === item.href && 'rotate-90'
+                        )}
                       />
                     )}
                   </div>
@@ -590,9 +676,10 @@ export function Sidebar() {
       </div>
 
       {/* 懸浮下拉選單 */}
-      {hoveredItem && getHoveredItemChildren().length > 0 && (
+      {(hoveredItem || clickedItem) && getActiveDropdownChildren().length > 0 && (
         <div
-          className="fixed bg-card border border-border rounded-lg shadow-lg py-2 min-w-48 z-[60]"
+          ref={dropdownRef}
+          className="fixed bg-card border border-border rounded-lg shadow-lg py-2 min-w-48 z-40"
           style={{
             top: dropdownPosition.top,
             left: dropdownPosition.left,
@@ -600,7 +687,7 @@ export function Sidebar() {
           onMouseEnter={handleDropdownMouseEnter}
           onMouseLeave={handleDropdownMouseLeave}
         >
-          {getHoveredItemChildren().map(child => (
+          {getActiveDropdownChildren().map(child => (
             <Link
               key={child.href}
               href={child.href}
@@ -611,6 +698,11 @@ export function Sidebar() {
                 is_active(child.href) &&
                   'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
               )}
+              onClick={() => {
+                // 點擊子項目後關閉下拉選單
+                setClickedItem(null)
+                setHoveredItem(null)
+              }}
             >
               <child.icon size={16} className="mr-3" />
               <span>{child.label}</span>

@@ -12,8 +12,10 @@ class TodoService extends BaseService<Todo> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(t => t.id === id),
       add: async (todo: Todo) => {
-        await store.create(todo as unknown)
-        return todo
+        // 移除系統自動生成的欄位
+        const { id, created_at, updated_at, ...createData } = todo
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<Todo>) => {
         await store.update(id, data)
@@ -45,7 +47,7 @@ class TodoService extends BaseService<Todo> {
     if (todo) {
       await store.update(id, {
         status: todo.status === 'completed' ? 'pending' : 'completed',
-      } as unknown)
+      })
     }
   }
 

@@ -4,7 +4,7 @@
  */
 
 import { User } from './types'
-import { createStore } from './core/create-store-new'
+import { createStore } from './core/create-store'
 import { TABLES } from '@/lib/db/schemas'
 import { generateUUID } from '@/lib/utils/uuid'
 

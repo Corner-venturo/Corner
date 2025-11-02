@@ -77,8 +77,42 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'name',
         label: '團體名稱',
         sortable: true,
+        render: (value, quote) => {
+          // 快速報價單顯示 customer_name，團體報價單顯示 name
+          const displayName = quote.quote_type === 'quick' ? quote.customer_name : quote.name
+          return (
+            <span className="text-sm font-medium text-morandi-primary">{displayName || '-'}</span>
+          )
+        },
+      },
+      {
+        key: 'quote_type',
+        label: '類型',
+        sortable: true,
+        render: (value, quote) => {
+          const isQuick = quote.quote_type === 'quick'
+          return (
+            <span
+              className={cn(
+                'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
+                isQuick
+                  ? 'bg-morandi-green/10 text-morandi-green'
+                  : 'bg-morandi-blue/10 text-morandi-blue'
+              )}
+            >
+              {isQuick ? '快速報價單' : '團體報價單'}
+            </span>
+          )
+        },
+      },
+      {
+        key: 'created_by_name',
+        label: '作者',
+        sortable: true,
         render: (value, quote) => (
-          <span className="text-sm font-medium text-morandi-primary">{quote.name}</span>
+          <span className="text-sm text-morandi-secondary">
+            {quote.created_by_name || quote.handler_name || '-'}
+          </span>
         ),
       },
       {
@@ -100,12 +134,18 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'group_size',
         label: '人數',
         sortable: true,
-        render: (value, quote) => (
-          <div className="flex items-center text-sm text-morandi-secondary">
-            <Users size={14} className="mr-1" />
-            {quote.group_size}人
-          </div>
-        ),
+        render: (value, quote) => {
+          // 快速報價單不顯示人數，顯示 -
+          if (quote.quote_type === 'quick') {
+            return <span className="text-sm text-morandi-secondary">-</span>
+          }
+          return (
+            <div className="flex items-center text-sm text-morandi-secondary">
+              <Users size={14} className="mr-1" />
+              {quote.group_size}人
+            </div>
+          )
+        },
       },
       {
         key: 'total_cost',

@@ -13,8 +13,10 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
-        const result = await store.create(request as unknown)
-        return result || request
+        // 移除系統自動生成的欄位
+        const { id, created_at, updated_at, ...createData } = request
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
         await store.update(id, data)
@@ -183,6 +185,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     code: string
   ): Promise<PaymentRequest> {
     const requestData = {
+      allocation_mode: 'single' as const,
       tour_id: tourId,
       code,
       tour_name: tourName,
@@ -196,7 +199,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       created_by: '1', // 使用實際用戶ID
     }
 
-    return await this.create(requestData as unknown)
+    return await this.create(requestData)
   }
 
   // ========== Query 方法 ==========

@@ -4,7 +4,7 @@
  * 支援 Supabase 雲端同步 + IndexedDB 本地快取
  */
 
-import { createStore } from './core/create-store-new'
+import { createStore } from './core/create-store'
 
 // 從 @/types 匯入（使用 types/ 目錄下的標準定義）
 import type { Tour, Order, Member, Customer, ReceiptOrder, Employee, Region } from '@/types'
@@ -96,7 +96,7 @@ export const useQuoteItemStore = createStore<QuoteItem>('quote_items')
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as unknown)
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons')
 
 // ============================================
 // 系統管理 Stores（無編號）
@@ -124,15 +124,18 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 // 地區 Store（舊版，保留向後相容）
 export const useRegionStore = createStore<Region>('regions')
 
-// 地區 Store（新版，三層架構 - 已重構使用 createStore）
+// 地區 Store（新版，三層架構）
 // 支援 Countries > Regions > Cities 三層架構
-// 內部使用 createStore 工廠，提供統一的快取優先架構
-export { useRegionStoreNew } from './region-store-new'
-export type { Country, Region as RegionNew, City, RegionStats } from './region-store-new'
+// 使用 createStore 工廠，提供統一的快取優先架構
+export { useRegionsStore } from './region-store'
+export type { Country, Region as RegionNew, City, RegionStats } from './region-store'
 
 // 行事曆事件 Store
 export const useCalendarEventStore =
   createStore<import('@/types/calendar.types').CalendarEvent>('calendar_events')
+
+// 確認單 Store（航班/住宿）
+export { useConfirmationStore } from './confirmation-store'
 
 // ============================================
 // 財務收款系統 Stores
@@ -144,8 +147,7 @@ export { useReceiptStore } from './receipt-store'
 // LinkPay 付款記錄 Store
 export { useLinkPayLogStore } from './linkpay-log-store'
 
-// WorkspaceItem, Template, TimeboxSession 型別需要定義後再啟用
-// export const useTemplateStore = createStore<Template>('templates');
+// WorkspaceItem, TimeboxSession 型別需要定義後再啟用
 // export const useTimeboxSessionStore = createStore<TimeboxSession>('timebox_sessions');
 // export const useWorkspaceItemStore = createStore<WorkspaceItem>('workspace_items');
 
@@ -177,9 +179,6 @@ export { useCalendarStore } from './calendar-store'
 
 // 移到 hooks/use-timebox.ts
 export { useTimeboxStore } from './timebox-store'
-
-// 已有 useTemplateStore，檢查是否重複
-// export { useTemplateStore } from './template-store';
 
 // 已有 useWorkspaceItemStore，檢查是否重複
 export { useWorkspaceStore } from './workspace-store'

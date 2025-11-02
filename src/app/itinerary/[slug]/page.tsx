@@ -60,8 +60,8 @@ export default function EditItineraryPage() {
 
         if (tour) {
           // 從旅遊團建立行程資料
-          const { useRegionStoreNew } = await import('@/stores')
-          const { countries, cities } = useRegionStoreNew.getState()
+          const { useRegionsStore } = await import('@/stores')
+          const { countries, cities } = useRegionsStore.getState()
 
           // 找到國家和城市名稱
           const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null

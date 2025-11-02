@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tour, Payment } from '@/stores/types'
-import { useOrderStore } from '@/stores'
+import { useOrderStore, usePaymentRequestStore, useSupplierStore } from '@/stores'
+import type { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
+import { generateUUID } from '@/lib/utils/uuid'
 
 interface TourCostsProps {
   tour: Tour
@@ -23,9 +26,84 @@ interface CostPayment extends Payment {
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
   const { items: orders } = useOrderStore()
-  const addPayment = async (_data: any) => {
-    /* addPayment not implemented */
+  const { items: paymentRequests, create: createPaymentRequest, fetchAll: fetchPaymentRequests } = usePaymentRequestStore()
+  const { items: suppliers } = useSupplierStore()
+  const { toast } = useToast()
+
+  const addPayment = async (data: {
+    tour_id: string
+    amount: number
+    description: string
+    category: string
+    vendor: string
+    status: string
+  }) => {
+    try {
+      // 找到供應商
+      const supplier = suppliers.find(s => s.name === data.vendor || s.id === data.vendor)
+
+      // 類別映射：英文 -> 中文
+      const categoryMap: Record<string, '住宿' | '交通' | '餐食' | '門票' | '導遊' | '其他'> = {
+        'transport': '交通',
+        'accommodation': '住宿',
+        'food': '餐食',
+        'attraction': '門票',
+        'guide': '導遊',
+        'other': '其他',
+      }
+
+      // 建立請款單項目
+      const itemId = generateUUID()
+      const requestItem: PaymentRequestItem = {
+        id: itemId,
+        request_id: '', // 會在 create 時自動設定
+        item_number: `ITEM-${Date.now()}`,
+        category: categoryMap[data.category] || '其他',
+        supplier_id: supplier?.id || '',
+        supplier_name: supplier?.name || data.vendor,
+        description: data.description,
+        unit_price: data.amount,
+        quantity: 1,
+        subtotal: data.amount,
+        sort_order: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      // 建立請款單
+      const paymentRequestData: Partial<PaymentRequest> = {
+        allocation_mode: 'single',
+        tour_id: data.tour_id,
+        code: tour.code,
+        tour_name: tour.name,
+        request_date: new Date().toISOString(),
+        items: [requestItem],
+        total_amount: data.amount,
+        status: data.status === '已確認' ? 'confirmed' : 'pending',
+        note: data.description,
+        created_by: '', // 會由 store 自動填入
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      await createPaymentRequest(paymentRequestData as PaymentRequest)
+      await fetchPaymentRequests()
+
+      toast({
+        title: '成功',
+        description: '請款單建立成功',
+      })
+    } catch (error) {
+      console.error('建立請款單失敗:', error)
+      toast({
+        title: '錯誤',
+        description: '建立請款單失敗',
+        variant: 'destructive',
+      })
+      throw error
+    }
   }
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [newCost, setNewCost] = useState({
     amount: 0,
@@ -35,23 +113,10 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     vendor: '',
   })
 
-  const payments: CostPayment[] = []
-
-  const _tourCosts = payments.filter(payment => {
-    if (payment.type !== 'request') return false
-
-    if (orderFilter) {
-      return payment.order_id === orderFilter
-    }
-
-    return payment.tour_id === tour.id
-  })
-
   const handleAddCost = () => {
     if (!newCost.amount || !newCost.description) return
 
     addPayment({
-      type: 'request',
       tour_id: tour.id,
       ...newCost,
     })
@@ -69,12 +134,36 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   // 獲取屬於這個旅遊團的所有訂單
   const tourOrders = orders.filter(order => order.tour_id === tour.id)
 
-  // 獲取所有相關的成本支出記錄
-  const costPayments = payments.filter(
-    payment =>
-      payment.type === 'request' &&
-      (payment.tour_id === tour.id || tourOrders.some(order => order.id === payment.order_id))
-  )
+  // 從 payment_requests store 獲取這個團的請款記錄
+  const costPayments = React.useMemo(() => {
+    const tourOrderIds = new Set(tourOrders.map(o => o.id))
+
+    return paymentRequests
+      .filter(request => {
+        // 如果有 orderFilter，只顯示該訂單的請款
+        if (orderFilter) {
+          return request.order_id === orderFilter
+        }
+
+        // 顯示所有屬於這個團的請款
+        return request.tour_id === tour.id || (request.order_id && tourOrderIds.has(request.order_id))
+      })
+      .flatMap(request =>
+        // 將每個請款單的項目展開成 CostPayment 格式
+        request.items.map(item => ({
+          id: item.id,
+          type: 'request' as const,
+          tour_id: request.tour_id || tour.id,
+          order_id: request.order_id,
+          amount: item.subtotal,
+          description: item.description,
+          status: request.status,
+          category: item.category,
+          vendor: item.supplier_name,
+          created_at: request.created_at,
+        }))
+      ) as CostPayment[]
+  }, [paymentRequests, tourOrders, tour.id, orderFilter])
 
   const getCategoryIcon = (category: string) => {
     const icons: Record<string, any> = {
@@ -323,12 +412,18 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
             <div>
               <label className="text-sm font-medium text-morandi-primary">供應商</label>
-              <Input
+              <select
                 value={newCost.vendor}
                 onChange={e => setNewCost(prev => ({ ...prev, vendor: e.target.value }))}
-                placeholder="供應商名稱"
-                className="mt-1"
-              />
+                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+              >
+                <option value="">請選擇供應商</option>
+                {suppliers.map(supplier => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex justify-end space-x-2">

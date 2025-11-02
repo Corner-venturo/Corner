@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react'
 import { Tour, Payment } from '@/stores/types'
-import { useOrderStore } from '@/stores'
+import { useOrderStore, useReceiptStore } from '@/stores'
+import type { Receipt, ReceiptType } from '@/types/receipt.types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DollarSign, TrendingUp, TrendingDown, CreditCard } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/components/ui/use-toast'
 
 interface TourPaymentsProps {
   tour: Tour
@@ -28,9 +30,60 @@ export const TourPayments = React.memo(function TourPayments({
   onTriggerAddComplete,
 }: TourPaymentsProps) {
   const { items: orders } = useOrderStore()
-  const addPayment = async (_data: any) => {
-    /* addPayment not implemented */
+  const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore()
+  const { toast } = useToast()
+
+  const addPayment = async (data: {
+    tour_id: string
+    order_id?: string
+    amount: number
+    description: string
+    method: string
+    status: string
+  }) => {
+    try {
+      // 找到對應的訂單
+      const order = data.order_id ? orders.find(o => o.id === data.order_id) : undefined
+
+      // 轉換付款方式為 ReceiptType
+      const receiptTypeMap: Record<string, ReceiptType> = {
+        'bank_transfer': 0, // 匯款
+        'cash': 1,          // 現金
+        'credit_card': 2,   // 刷卡
+        'check': 3,         // 支票
+      }
+
+      const receiptData: Partial<Receipt> = {
+        order_id: data.order_id || null,
+        order_number: order?.order_number || null,
+        tour_name: tour.name || null,
+        receipt_date: new Date().toISOString(),
+        receipt_type: receiptTypeMap[data.method] || 0,
+        receipt_amount: data.amount,
+        actual_amount: data.amount,
+        status: data.status === '已確認' ? 1 : 0, // 1:已確認 0:待確認
+        note: data.description,
+        receipt_account: order?.contact_person || null,
+      }
+
+      await createReceipt(receiptData as Receipt)
+      await fetchReceipts()
+
+      toast({
+        title: '成功',
+        description: '收款單建立成功',
+      })
+    } catch (error) {
+      console.error('建立收款單失敗:', error)
+      toast({
+        title: '錯誤',
+        description: '建立收款單失敗',
+        variant: 'destructive',
+      })
+      throw error
+    }
   }
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
   // 監聽外部觸發新增
@@ -48,8 +101,6 @@ export const TourPayments = React.memo(function TourPayments({
     status: '已確認' as const,
   })
 
-  const payments: ReceiptPayment[] = []
-
   // 獲取屬於這個旅遊團的所有訂單（如果有 orderFilter，則只取該訂單）
   const tourOrders = orders.filter(order => {
     if (orderFilter) {
@@ -58,16 +109,32 @@ export const TourPayments = React.memo(function TourPayments({
     return order.tour_id === tour.id
   })
 
-  // 獲取所有相關的收款記錄（根據 orderFilter 過濾）
-  const tourPayments = payments.filter(payment => {
-    if (payment.type !== 'receipt') return false
+  // 從 receipts store 獲取這個團的收款記錄
+  const tourPayments = React.useMemo(() => {
+    const tourOrderIds = new Set(tourOrders.map(o => o.id))
 
-    if (orderFilter) {
-      return payment.order_id === orderFilter
-    }
+    return receipts
+      .filter(receipt => {
+        // 如果有 orderFilter，只顯示該訂單的收款
+        if (orderFilter) {
+          return receipt.order_id === orderFilter
+        }
 
-    return payment.tour_id === tour.id || tourOrders.some(order => order.id === payment.order_id)
-  })
+        // 否則顯示所有屬於這個團的收款
+        return receipt.order_id && tourOrderIds.has(receipt.order_id)
+      })
+      .map(receipt => ({
+        id: receipt.id,
+        type: 'receipt' as const,
+        tour_id: tour.id,
+        order_id: receipt.order_id || undefined,
+        amount: receipt.actual_amount,
+        description: receipt.note || '',
+        status: receipt.status === 1 ? 'confirmed' : 'pending',
+        method: ['bank_transfer', 'cash', 'credit_card', 'check', 'linkpay'][receipt.receipt_type] || 'bank_transfer',
+        created_at: receipt.created_at,
+      })) as ReceiptPayment[]
+  }, [receipts, tourOrders, tour.id, orderFilter])
 
   const handleAddPayment = () => {
     if (!newPayment.amount || !newPayment.description) return

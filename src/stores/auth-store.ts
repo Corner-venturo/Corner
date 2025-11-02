@@ -168,7 +168,7 @@ export const useAuthStore = create<AuthState>(
               // 🔍 檢查資料格式（統一使用 snake_case）
               if (!employee.password_hash || !employee.employee_number || !employee.display_name) {
                 logger.error('❌ IndexedDB 資料格式錯誤（應為 snake_case）')
-                logger.error('   請開啟 http://localhost:3000/check-db.html 清空資料庫')
+                logger.error('   請訪問 /check-db.html 清空資料庫')
                 localAuthStore.removeProfile(existingProfile.id)
                 return {
                   success: false,

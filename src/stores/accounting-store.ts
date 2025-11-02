@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Account, TransactionCategory, Transaction, Budget, AccountingStats } from '@/types'
+import { Account, TransactionCategory, Transaction, AccountingStats } from '@/types'
 import { generateUUID } from '@/lib/utils/uuid'
 
 /**
@@ -17,7 +17,6 @@ interface AccountingStore {
   accounts: Account[]
   categories: TransactionCategory[]
   transactions: Transaction[]
-  budgets: Budget[]
 
   // 統計資料
   stats: AccountingStats
@@ -44,11 +43,6 @@ interface AccountingStore {
   updateTransaction: (id: string, transaction: Partial<Transaction>) => void
   deleteTransaction: (id: string) => void
 
-  // 預算管理
-  addBudget: (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at'>) => Budget
-  updateBudget: (id: string, budget: Partial<Budget>) => Budget | undefined
-  deleteBudget: (id: string) => boolean
-
   // 統計計算
   calculateStats: () => void
   getAccountBalance: (account_id: string) => number
@@ -68,7 +62,6 @@ export const useAccountingStore = create<AccountingStore>()(
       accounts: [],
       categories: [],
       transactions: [],
-      budgets: [],
 
       stats: {
         total_assets: 0,
@@ -223,41 +216,6 @@ export const useAccountingStore = create<AccountingStore>()(
           transactions: state.transactions.filter(transaction => transaction.id !== id),
         }))
         get().calculateStats()
-      },
-
-      // ===== 預算管理 =====
-      addBudget: budgetData => {
-        const id = generateId()
-        const now = new Date().toISOString()
-        const budget: Budget = {
-          ...budgetData,
-          id,
-          created_at: now,
-          updated_at: now,
-        }
-        set(state => ({ budgets: [...state.budgets, budget] }))
-        return budget
-      },
-
-      updateBudget: (id, budgetData) => {
-        let updated: Budget | undefined
-        set(state => {
-          const budget = state.budgets.find(b => b.id === id)
-          if (!budget) return state
-
-          updated = { ...budget, ...budgetData, updated_at: new Date().toISOString() }
-          return {
-            budgets: state.budgets.map(b => (b.id === id ? updated! : b)),
-          }
-        })
-        return updated
-      },
-
-      deleteBudget: id => {
-        set(state => ({
-          budgets: state.budgets.filter(b => b.id !== id),
-        }))
-        return true
       },
 
       // ===== 輔助方法 =====

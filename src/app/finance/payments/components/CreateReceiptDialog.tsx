@@ -1,0 +1,204 @@
+/**
+ * 新增收款單 Dialog
+ */
+
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus } from 'lucide-react';
+import { PaymentItemForm } from './PaymentItemForm';
+import type { ReceiptItem } from '@/stores';
+import type { Order } from '@/stores/order-store';
+
+const RECEIPT_TYPES = {
+  BANK_TRANSFER: 0,
+  CASH: 1,
+  CREDIT_CARD: 2,
+  CHECK: 3,
+  LINK_PAY: 4,
+} as const;
+
+interface CreateReceiptDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  availableOrders: Order[];
+  onSubmit: (data: {
+    selectedOrderId: string;
+    paymentItems: ReceiptItem[];
+  }) => Promise<void>;
+}
+
+export function CreateReceiptDialog({
+  isOpen,
+  onClose,
+  availableOrders,
+  onSubmit
+}: CreateReceiptDialogProps) {
+  const [selectedOrderId, setSelectedOrderId] = useState('');
+  const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([
+    {
+      id: '1',
+      receipt_type: RECEIPT_TYPES.CASH,
+      amount: 0,
+      transaction_date: new Date().toISOString().split('T')[0]
+    }
+  ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const selectedOrder = availableOrders.find(order => order.id === selectedOrderId);
+
+  const totalAmount = paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+
+  const addPaymentItem = () => {
+    const newItem: ReceiptItem = {
+      id: Date.now().toString(),
+      receipt_type: RECEIPT_TYPES.CASH,
+      amount: 0,
+      transaction_date: new Date().toISOString().split('T')[0]
+    };
+    setPaymentItems(prev => [...prev, newItem]);
+  };
+
+  const removePaymentItem = (id: string) => {
+    if (paymentItems.length > 1) {
+      setPaymentItems(prev => prev.filter(item => item.id !== id));
+    }
+  };
+
+  const updatePaymentItem = (id: string, updates: Partial<ReceiptItem>) => {
+    setPaymentItems(prev => prev.map(item =>
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  };
+
+  const resetForm = () => {
+    setSelectedOrderId('');
+    setPaymentItems([
+      {
+        id: '1',
+        receipt_type: RECEIPT_TYPES.CASH,
+        amount: 0,
+        transaction_date: new Date().toISOString().split('T')[0]
+      }
+    ]);
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit({ selectedOrderId, paymentItems });
+      resetForm();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+    resetForm();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">新增收款單</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* 基本資訊 */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">基本資訊</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">選擇訂單 *</label>
+                <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="請選擇待收款的訂單..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableOrders.map(order => (
+                      <SelectItem key={order.id} value={order.id}>
+                        <div>
+                          <div className="font-medium">{order.order_number} - {order.tour_name}</div>
+                          <div className="text-sm text-morandi-secondary">
+                            {order.contact_person} | 待收: NT$ {order.remaining_amount?.toLocaleString() || 0}
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedOrder && (
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary mb-2 block">待收金額</label>
+                  <Input
+                    value={`NT$ ${selectedOrder.remaining_amount?.toLocaleString() || 0}`}
+                    disabled
+                    className="bg-morandi-container/30"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 收款項目 */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">收款項目</h3>
+              <Button onClick={addPaymentItem} variant="outline" size="sm">
+                <Plus size={16} className="mr-2" />
+                新增項目
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {paymentItems.map((item, index) => (
+                <PaymentItemForm
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onUpdate={updatePaymentItem}
+                  onRemove={removePaymentItem}
+                  canRemove={paymentItems.length > 1}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* 摘要 */}
+          <div className="bg-morandi-container/20 p-4 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold">總收款金額</span>
+              <span className="text-2xl font-bold text-morandi-gold">
+                NT$ {totalAmount.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          {/* 操作按鈕 */}
+          <div className="flex justify-end gap-4">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              取消
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!selectedOrderId || totalAmount <= 0 || isSubmitting}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              {isSubmitting ? '處理中...' : '儲存收款單'}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -34,6 +34,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     deleteChannel,
     deleteChannelGroup,
     createChannel,
+    loadChannels,
+    loading,
   } = useWorkspaceChannels()
 
   const {
@@ -99,7 +101,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
 
     void loadChannelMembers(currentWorkspace.id, selectedChannelId)
-  }, [selectedChannelId, currentWorkspace?.id, loadChannelMembers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChannelId, currentWorkspace?.id])
 
   const handleRemoveMember = async () => {
     if (!memberToRemove || !selectedChannelId || !currentWorkspace) {
@@ -382,6 +385,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         onFilterChange={setChannelFilter}
         onCreateChannel={() => setShowCreateChannelDialog(true)}
         onCreateGroup={() => setShowNewGroupDialog(true)}
+        onRefresh={() => currentWorkspace?.id && loadChannels(currentWorkspace.id)}
+        isRefreshing={loading}
       />
 
       {/* Search input */}

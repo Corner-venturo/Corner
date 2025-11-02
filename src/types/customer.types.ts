@@ -21,8 +21,10 @@ export interface Customer extends BaseEntity {
   address?: string // 地址
   city?: string // 城市
   country?: string // 國家
-  id_number?: string // 身分證字號
+  national_id?: string // 身分證字號
   passport_number?: string // 護照號碼
+  passport_romanization?: string // 護照拼音（格式：姓氏/名字，例如：WANG/XIAOMING）
+  passport_expiry_date?: string // 護照效期 (ISO 8601)
   date_of_birth?: string // 出生日期 (ISO 8601)
   gender?: string // 性別
   company?: string // 公司名稱
@@ -82,8 +84,10 @@ export interface CreateCustomerData {
   address?: string
   city?: string
   country?: string
-  id_number?: string
+  national_id?: string
   passport_number?: string
+  passport_romanization?: string
+  passport_expiry_date?: string
   date_of_birth?: string
   gender?: string
   company?: string
@@ -108,8 +112,10 @@ export interface UpdateCustomerData {
   address?: string
   city?: string
   country?: string
-  id_number?: string
+  national_id?: string
   passport_number?: string
+  passport_romanization?: string
+  passport_expiry_date?: string
   date_of_birth?: string
   gender?: string
   company?: string

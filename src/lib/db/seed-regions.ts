@@ -5,7 +5,7 @@
 
 import { COUNTRIES } from '@/data/region-hierarchy'
 import { localDB } from '@/lib/db'
-import type { Country, Region, City } from '@/stores/region-store-new'
+import type { Country, Region, City } from '@/stores/region-store'
 
 // 全域 flag 防止重複初始化
 let isSeeding = false
@@ -141,7 +141,7 @@ export async function seedRegions(): Promise<void> {
  * 清空並重新初始化地區資料（危險操作！）
  */
 export async function reseedRegions(): Promise<void> {
-  console.warn('⚠️ [Seed] 清空現有地區資料...')
+  // WARNING: This will clear all existing region data
 
   await localDB.init()
   await localDB.clear('countries')

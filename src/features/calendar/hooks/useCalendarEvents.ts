@@ -3,6 +3,7 @@ import {
   useTourStore,
   useOrderStore,
   useMemberStore,
+  useCustomerStore,
   useCalendarStore,
   useCalendarEventStore,
   useAuthStore,
@@ -15,6 +16,7 @@ export function useCalendarEvents() {
   const { items: tours } = useTourStore()
   const { items: orders } = useOrderStore()
   const { items: members } = useMemberStore()
+  const { items: customers } = useCustomerStore()
   const { settings } = useCalendarStore()
   const { items: calendarEvents } = useCalendarEventStore()
   const { user } = useAuthStore()
@@ -160,7 +162,7 @@ export function useCalendarEvents() {
   }, [calendarEvents, getEventColor, employees])
 
   // 轉換會員生日為日曆事件
-  const birthdayEvents: FullCalendarEvent[] = useMemo(() => {
+  const memberBirthdayEvents: FullCalendarEvent[] = useMemo(() => {
     const currentYear = new Date().getFullYear()
 
     return (members || [])
@@ -171,8 +173,8 @@ export function useCalendarEvents() {
         const birthdayThisYear = `${currentYear}-${member.birthday.slice(5)}`
 
         return {
-          id: `birthday-${member.id}`,
-          title: `${member.name} 生日`,
+          id: `member-birthday-${member.id}`,
+          title: `🎂 ${member.name} 生日`,
           start: birthdayThisYear,
           backgroundColor: getEventColor('birthday').bg,
           borderColor: getEventColor('birthday').border,
@@ -181,11 +183,45 @@ export function useCalendarEvents() {
             member_id: member.id,
             member_name: member.name,
             order_id: member.order_id,
+            source: 'member' as const,
           },
         }
       })
       .filter(Boolean) as FullCalendarEvent[]
   }, [members, getEventColor])
+
+  // 轉換客戶生日為日曆事件
+  const customerBirthdayEvents: FullCalendarEvent[] = useMemo(() => {
+    const currentYear = new Date().getFullYear()
+
+    return (customers || [])
+      .map(customer => {
+        if (!customer?.date_of_birth) return null
+
+        // 計算今年的生日日期
+        const birthdayThisYear = `${currentYear}-${customer.date_of_birth.slice(5)}`
+
+        return {
+          id: `customer-birthday-${customer.id}`,
+          title: `🎂 ${customer.name} 生日`,
+          start: birthdayThisYear,
+          backgroundColor: getEventColor('birthday').bg,
+          borderColor: getEventColor('birthday').border,
+          extendedProps: {
+            type: 'birthday' as const,
+            customer_id: customer.id,
+            customer_name: customer.name,
+            source: 'customer' as const,
+          },
+        }
+      })
+      .filter(Boolean) as FullCalendarEvent[]
+  }, [customers, getEventColor])
+
+  // 合併所有生日事件
+  const birthdayEvents = useMemo(() => {
+    return [...memberBirthdayEvents, ...customerBirthdayEvents]
+  }, [memberBirthdayEvents, customerBirthdayEvents])
 
   // 合併所有事件
   const allEvents = useMemo(() => {

@@ -1,17 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { ChannelChat } from '@/components/workspace/ChannelChat';
 import { useWorkspaceChannels } from '@/stores/workspace-store';
 
 export default function WorkspacePage() {
   const { loadWorkspaces, loadChannelGroups, loadChannels, currentWorkspace } = useWorkspaceChannels();
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  // 🔥 簡化版：只載入資料，不要自動建立、不要 Realtime（先讓頁面能跑）
+  // 🔥 Step 1: 載入 workspaces（只執行一次）
   useEffect(() => {
+    if (hasLoaded) return;
+
     const init = async () => {
-      // Step 1: 載入 workspaces
+      console.log('🔵 [WorkspacePage] 載入工作空間');
       await loadWorkspaces();
     };
 
@@ -19,15 +22,21 @@ export default function WorkspacePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Step 2: 當 workspace 載入後，載入 channels 和 groups
+  // 🔥 Step 2: 當 workspace 載入後，載入 channels 和 groups（只執行一次）
   useEffect(() => {
-    if (currentWorkspace) {
-      const loadData = async () => {
-        await loadChannelGroups(currentWorkspace.id);
-        await loadChannels(currentWorkspace.id);
-      };
-      loadData();
-    }
+    if (hasLoaded || !currentWorkspace) return;
+
+    const loadData = async () => {
+      console.log('🔵 [WorkspacePage] 載入頻道和群組');
+      await Promise.all([
+        loadChannelGroups(currentWorkspace.id),
+        loadChannels(currentWorkspace.id)
+      ]);
+      setHasLoaded(true);
+      console.log('✅ [WorkspacePage] 初始化完成');
+    };
+
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspace?.id]);
 

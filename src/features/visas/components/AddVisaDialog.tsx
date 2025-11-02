@@ -52,17 +52,85 @@ export function AddVisaDialog({
   updateApplicant,
   canSubmit,
 }: AddVisaDialogProps) {
-  // 訂單選項（根據選擇的團號過濾）
-  const orderOptions = React.useMemo(() => {
-    if (!contact_info.tour_id) return []
-    const { items: orders } = useOrderStore.getState()
-    return orders
-      .filter(order => order.tour_id === contact_info.tour_id)
-      .map(order => ({
-        value: order.id,
-        label: `${order.order_number} - ${order.contact_person}`,
-      }))
+  const [tourOrders, setTourOrders] = React.useState<any[]>([])
+  const [hasInitialized, setHasInitialized] = React.useState(false)
+
+  // ✅ 當對話框打開時，載入團號資料並自動選擇簽證專用團
+  React.useEffect(() => {
+    if (open && !hasInitialized) {
+      const init = async () => {
+        try {
+          const { tourService } = await import('@/features/tours/services/tour.service')
+          const { useTourStore } = await import('@/stores')
+
+          // 1. 先載入團號資料
+          const tourStore = useTourStore.getState()
+          if (tourStore.items.length === 0) {
+            await tourStore.fetchAll()
+          }
+
+          // 2. 取得或建立簽證專用團
+          const visaTour = await tourService.getOrCreateVisaTour()
+          if (visaTour && !contact_info.tour_id) {
+            setContactInfo((prev: any) => ({ ...prev, tour_id: visaTour.id }))
+            setHasInitialized(true)
+          }
+        } catch (error) {
+          console.error('Failed to initialize visa dialog:', error)
+        }
+      }
+      void init()
+    }
+
+    // 對話框關閉時重置初始化狀態
+    if (!open) {
+      setHasInitialized(false)
+    }
+  }, [open, hasInitialized, contact_info.tour_id, setContactInfo])
+
+  // ✅ 當團號改變時，載入該團的訂單
+  React.useEffect(() => {
+    if (contact_info.tour_id) {
+      const fetchTourOrders = async () => {
+        try {
+          const { supabase } = await import('@/lib/supabase/client')
+          const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('tour_id', contact_info.tour_id)
+            .order('created_at', { ascending: false })
+
+          if (!error && data) {
+            setTourOrders(data)
+          } else {
+            setTourOrders([])
+          }
+        } catch (error) {
+          console.error('Failed to fetch tour orders:', error)
+          setTourOrders([])
+        }
+      }
+      fetchTourOrders()
+    } else {
+      setTourOrders([])
+    }
   }, [contact_info.tour_id])
+
+  // 訂單選項（使用當前團號的訂單 + 新增選項）
+  const orderOptions = React.useMemo(() => {
+    const options = tourOrders.map(order => ({
+      value: order.id,
+      label: `${order.order_number} - ${order.contact_person}`,
+    }))
+    // 加入「新增訂單」選項
+    if (contact_info.tour_id) {
+      options.push({
+        value: '__create_new__',
+        label: '+ 新增訂單',
+      })
+    }
+    return options
+  }, [tourOrders, contact_info.tour_id])
 
   // 第一個辦理人自動帶入申請人姓名
   useEffect(() => {

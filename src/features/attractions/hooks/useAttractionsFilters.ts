@@ -8,14 +8,22 @@ import { Attraction, SortField, SortDirection } from '../types'
 interface UseAttractionsFiltersProps {
   attractions: Attraction[]
   cities: any[]
+  searchTerm: string
+  selectedCategory: string
+  selectedCountry: string
+  selectedRegion: string
+  selectedCity: string
 }
 
-export function useAttractionsFilters({ attractions, cities }: UseAttractionsFiltersProps) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCountry, setSelectedCountry] = useState<string>('')
-  const [selectedRegion, setSelectedRegion] = useState<string>('')
-  const [selectedCity, setSelectedCity] = useState<string>('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+export function useAttractionsFilters({
+  attractions,
+  cities,
+  searchTerm,
+  selectedCategory,
+  selectedCountry,
+  selectedRegion,
+  selectedCity
+}: UseAttractionsFiltersProps) {
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
 
@@ -32,14 +40,6 @@ export function useAttractionsFilters({ attractions, cities }: UseAttractionsFil
       setSortField(field)
       setSortDirection('asc')
     }
-  }
-
-  // 清除篩選
-  const clearFilters = () => {
-    setSelectedCountry('')
-    setSelectedRegion('')
-    setSelectedCity('')
-    setSelectedCategory('all')
   }
 
   // 過濾資料（包含搜尋、國家、地區、城市、類別）
@@ -98,6 +98,11 @@ export function useAttractionsFilters({ attractions, cities }: UseAttractionsFil
           compareA = a.duration_minutes || 0
           compareB = b.duration_minutes || 0
           break
+        case 'status':
+          // 啟用 = 1, 停用 = 0，這樣升序時啟用會排在前面
+          compareA = a.is_active ? 1 : 0
+          compareB = b.is_active ? 1 : 0
+          break
         default:
           return 0
       }
@@ -108,25 +113,7 @@ export function useAttractionsFilters({ attractions, cities }: UseAttractionsFil
     })
   }, [filteredAttractions, sortField, sortDirection, cities])
 
-  // 是否有套用篩選
-  const hasActiveFilters =
-    selectedCountry || selectedRegion || selectedCity || selectedCategory !== 'all'
-
   return {
-    // 搜尋
-    searchTerm,
-    setSearchTerm,
-    // 篩選
-    selectedCountry,
-    setSelectedCountry,
-    selectedRegion,
-    setSelectedRegion,
-    selectedCity,
-    setSelectedCity,
-    selectedCategory,
-    setSelectedCategory,
-    clearFilters,
-    hasActiveFilters,
     // 排序
     sortField,
     sortDirection,

@@ -11,7 +11,8 @@ import { localDB } from '@/lib/db'
 import { logger } from '@/lib/utils/logger'
 
 type CacheKey = string
-type CacheValue = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CacheValue = any // Cache values can be of any type, intentionally flexible
 
 interface CacheOptions {
   /** 快取層級 */
@@ -230,13 +231,16 @@ class CacheStrategy {
 
   /**
    * IndexedDB 操作
+   * Note: 'cache' is not in TableName union, but IndexedDB may have a cache objectStore
+   * We use type assertion here as a workaround for dynamic table names
    */
   private async getFromIndexedDB(key: CacheKey): Promise<CacheValue | null> {
     if (typeof window === 'undefined') return null
 
     try {
-      // 使用特殊的 cache 表
-      const value = await localDB.read('cache' as unknown, key)
+      // Using cache table for storing cache entries
+      // Type cast needed as 'cache' may not be in TableName union
+      const value = await localDB.read('cache' as 'syncQueue', key)
       return value || null
     } catch {
       return null
@@ -247,7 +251,7 @@ class CacheStrategy {
     if (typeof window === 'undefined') return
 
     try {
-      await localDB.create('cache' as unknown, { id: key, data: value })
+      await localDB.create('cache' as 'syncQueue', { id: key, data: value } as { id: string })
     } catch (error) {
       logger.warn('IndexedDB 寫入失敗', error)
     }
@@ -257,7 +261,7 @@ class CacheStrategy {
     if (typeof window === 'undefined') return
 
     try {
-      await localDB.delete('cache' as unknown, key)
+      await localDB.delete('cache' as 'syncQueue', key)
     } catch {
       // 忽略錯誤
     }

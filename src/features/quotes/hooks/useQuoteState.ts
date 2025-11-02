@@ -7,7 +7,7 @@ import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '
 export const useQuoteState = () => {
   const params = useParams()
   const router = useRouter()
-  const { quotes, updateQuote } = useQuotes()
+  const { quotes, updateQuote, loadQuotes } = useQuotes()
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
   const regionStore = useRegionStore()
@@ -15,6 +15,14 @@ export const useQuoteState = () => {
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
+
+  // 自動載入 quotes（如果還沒載入）
+  useEffect(() => {
+    if (quotes.length === 0) {
+      loadQuotes()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
@@ -33,7 +41,8 @@ export const useQuoteState = () => {
     if (regions.length === 0) {
       regionStore.fetchAll()
     }
-  }, [regions.length, regionStore])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regions.length])
 
   // 從 regions 取得啟用的國家清單
   const activeCountries = useMemo(() => {

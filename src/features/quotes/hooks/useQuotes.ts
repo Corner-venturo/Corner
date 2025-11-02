@@ -13,7 +13,7 @@ export const useQuotes = () => {
     addQuote: async (
       data: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>
     ) => {
-      return await store.create(data as unknown)
+      return await store.create(data)
     },
 
     updateQuote: async (id: string, data: Partial<Quote>) => {

@@ -15,13 +15,13 @@ import {
   Package,
   RefreshCw,
   Edit2,
+  MessageSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ExpandableOrderTable } from '@/components/orders/expandable-order-table'
 import { TourMembers } from '@/components/tours/tour-members'
 import { TourOperations } from '@/components/tours/tour-operations'
 import { TourAddOns } from '@/components/tours/tour-add-ons'
-import { TourRefunds } from '@/components/tours/tour-refunds'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
 import { TourTaskAssignment } from '@/components/tours/tour-task-assignment'
@@ -34,7 +34,6 @@ const tourTabs = [
   { id: 'members', label: '團員名單', icon: Users },
   { id: 'operations', label: '團務', icon: Clipboard },
   { id: 'addons', label: '加購', icon: Package },
-  { id: 'refunds', label: '退費', icon: RefreshCw },
   { id: 'payments', label: '收款紀錄', icon: Calculator },
   { id: 'costs', label: '成本支出', icon: AlertCircle },
   { id: 'documents', label: '文件確認', icon: FileCheck },
@@ -76,6 +75,50 @@ export function TourExpandedView({
   triggerCostAdd,
   setTriggerCostAdd,
 }: TourExpandedViewProps) {
+  const handleCreateChannel = async () => {
+    try {
+      const { useWorkspaceChannels } = await import('@/stores/workspace/channels-store')
+      const { useAuthStore } = await import('@/stores/auth-store')
+      const { toast } = await import('sonner')
+
+      const { createChannel } = useWorkspaceChannels.getState()
+      const { user } = useAuthStore.getState()
+
+      if (!user) {
+        toast.error('請先登入')
+        return
+      }
+
+      // 獲取預設工作空間 ID
+      const { supabase } = await import('@/lib/supabase/client')
+      const { data: workspaces } = await supabase
+        .from('workspaces')
+        .select('id')
+        .limit(1)
+        .single()
+
+      if (!workspaces) {
+        toast.error('找不到工作空間')
+        return
+      }
+
+      await createChannel({
+        workspace_id: workspaces.id,
+        name: tour.name || tour.code,
+        description: `${tour.code} - ${tour.departure_date || ''} 出發`,
+        type: 'tour' as const,
+        tour_id: tour.id,
+        created_by: user.id,
+      })
+
+      toast.success(`已建立頻道：${tour.name || tour.code}`)
+    } catch (error) {
+      const { toast } = await import('sonner')
+      console.error('Failed to create channel:', error)
+      toast.error('建立頻道失敗')
+    }
+  }
+
   return (
     <div>
       {/* Tab navigation */}
@@ -105,13 +148,22 @@ export function TourExpandedView({
         {/* Right: Tab-specific buttons */}
         <div className="flex items-center gap-2 px-4">
           {activeTabs[tour.id] === 'overview' && (
-            <button
-              onClick={() => openDialog('edit', tour)}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
-            >
-              <Edit2 size={14} className="mr-1" />
-              編輯
-            </button>
+            <>
+              <button
+                onClick={handleCreateChannel}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
+              >
+                <MessageSquare size={14} className="mr-1" />
+                建立頻道
+              </button>
+              <button
+                onClick={() => openDialog('edit', tour)}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
+              >
+                <Edit2 size={14} className="mr-1" />
+                編輯
+              </button>
+            </>
           )}
           {activeTabs[tour.id] === 'orders' && (
             <button
@@ -187,15 +239,6 @@ export function TourExpandedView({
             tour={tour}
             triggerAdd={triggerAddOnAdd[tour.id] || false}
             onTriggerAddComplete={() => setTriggerAddOnAdd(prev => ({ ...prev, [tour.id]: false }))}
-          />
-        )}
-        {activeTabs[tour.id] === 'refunds' && (
-          <TourRefunds
-            tour={tour}
-            triggerAdd={triggerRefundAdd[tour.id] || false}
-            onTriggerAddComplete={() =>
-              setTriggerRefundAdd(prev => ({ ...prev, [tour.id]: false }))
-            }
           />
         )}
         {activeTabs[tour.id] === 'payments' && (

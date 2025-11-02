@@ -1,0 +1,389 @@
+/**
+ * QuickQuoteDialog - 快速報價單表單（簡單收款用）
+ */
+
+'use client'
+
+import React from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+
+interface QuickQuoteItem {
+  id: string
+  description: string // 摘要
+  quantity: number // 數量
+  unit_price: number // 單價
+  amount: number // 金額
+  notes: string // 備註
+}
+
+interface QuickQuoteFormData {
+  customer_name: string // 客戶名稱
+  contact_phone: string // 聯絡電話
+  contact_address: string // 通訊地址
+  tour_code: string // 團體編號
+  handler_name: string // 承辦業務
+  issue_date: string // 開單日期
+  items: QuickQuoteItem[] // 收費明細
+  received_amount: number | '' // 已收金額
+}
+
+interface QuickQuoteDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  formData: QuickQuoteFormData
+  setFormField: (field: string, value: any) => void
+  onSubmit: () => Promise<boolean>
+  onClose: () => void
+}
+
+export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
+  open,
+  onOpenChange,
+  formData,
+  setFormField,
+  onSubmit,
+  onClose,
+}) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (formData.customer_name.trim()) {
+      const success = await onSubmit()
+      if (success) {
+        onClose()
+      }
+    }
+  }
+
+  // 計算應收金額（所有項目的金額總和）
+  const totalAmount = formData.items.reduce((sum, item) => sum + item.amount, 0)
+
+  // 計算應收餘額
+  const balanceAmount = totalAmount - (Number(formData.received_amount) || 0)
+
+  // 新增項目
+  const addItem = () => {
+    const newItem: QuickQuoteItem = {
+      id: `item-${Date.now()}`,
+      description: '',
+      quantity: 1,
+      unit_price: 0,
+      amount: 0,
+      notes: '',
+    }
+    setFormField('items', [...formData.items, newItem])
+  }
+
+  // 刪除項目
+  const removeItem = (id: string) => {
+    setFormField(
+      'items',
+      formData.items.filter(item => item.id !== id)
+    )
+  }
+
+  // 更新項目
+  const updateItem = (id: string, field: keyof QuickQuoteItem, value: any) => {
+    setFormField(
+      'items',
+      formData.items.map(item => {
+        if (item.id === id) {
+          const updated = { ...item, [field]: value }
+          // 自動計算金額
+          if (field === 'quantity' || field === 'unit_price') {
+            updated.amount = updated.quantity * updated.unit_price
+          }
+          return updated
+        }
+        return item
+      })
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>新增快速報價單</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 客戶資訊 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">客戶名稱 *</label>
+              <Input
+                value={formData.customer_name}
+                onChange={e => setFormField('customer_name', e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="輸入客戶姓名"
+                className="mt-1"
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
+              <Input
+                value={formData.contact_phone}
+                onChange={e => setFormField('contact_phone', e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="輸入聯絡電話"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">通訊地址</label>
+              <Input
+                value={formData.contact_address}
+                onChange={e => setFormField('contact_address', e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="輸入通訊地址"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">團體編號</label>
+              <Input
+                value={formData.tour_code}
+                onChange={e => setFormField('tour_code', e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="輸入團體編號"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">承辦業務</label>
+              <Input
+                value={formData.handler_name}
+                onChange={e => setFormField('handler_name', e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="輸入承辦業務"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">開單日期</label>
+              <Input
+                type="date"
+                value={formData.issue_date}
+                onChange={e => setFormField('issue_date', e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          {/* 收費明細表 */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-morandi-primary">收費明細表</label>
+              <Button type="button" size="sm" onClick={addItem} variant="outline">
+                + 新增項目
+              </Button>
+            </div>
+            <div className="border border-border rounded-md overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-morandi-container/20">
+                  <tr>
+                    <th className="px-3 py-2 text-left">摘要</th>
+                    <th className="px-3 py-2 text-center w-20">數量</th>
+                    <th className="px-3 py-2 text-center w-28">單價</th>
+                    <th className="px-3 py-2 text-center w-28">金額</th>
+                    <th className="px-3 py-2 text-left w-32">備註</th>
+                    <th className="px-3 py-2 text-center w-16"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.items.map((item, index) => (
+                    <tr key={item.id} className="border-t border-border">
+                      <td className="px-3 py-2">
+                        <Input
+                          value={item.description}
+                          onChange={e => updateItem(item.id, 'description', e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              e.currentTarget.blur()
+                            }
+                          }}
+                          placeholder="項目說明"
+                          className="h-8"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Input
+                          type="number"
+                          value={item.quantity === 0 ? '' : item.quantity}
+                          onChange={e => {
+                            const val = e.target.value
+                            // 允許空值
+                            if (val === '' || val === '-') {
+                              updateItem(item.id, 'quantity', 0)
+                            } else {
+                              const num = parseFloat(val)
+                              if (!isNaN(num)) {
+                                updateItem(item.id, 'quantity', num)
+                              }
+                            }
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              e.currentTarget.blur() // 失去焦點
+                            }
+                          }}
+                          className="h-8 text-center"
+                          step="0.01"
+                          placeholder=""
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Input
+                          type="number"
+                          value={item.unit_price === 0 ? '' : item.unit_price}
+                          onChange={e => {
+                            const val = e.target.value
+                            // 允許空值
+                            if (val === '' || val === '-') {
+                              updateItem(item.id, 'unit_price', 0)
+                            } else {
+                              const num = parseFloat(val)
+                              if (!isNaN(num)) {
+                                updateItem(item.id, 'unit_price', num)
+                              }
+                            }
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              e.currentTarget.blur() // 失去焦點
+                            }
+                          }}
+                          className="h-8 text-right"
+                          step="0.01"
+                          placeholder=""
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right font-medium">
+                        {item.amount.toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2">
+                        <Input
+                          value={item.notes}
+                          onChange={e => updateItem(item.id, 'notes', e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              e.currentTarget.blur()
+                            }
+                          }}
+                          placeholder="備註"
+                          className="h-8"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.id)}
+                          className="text-morandi-red hover:text-red-700 text-lg"
+                        >
+                          ×
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {formData.items.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-3 py-8 text-center text-morandi-secondary">
+                        尚無項目，點擊「新增項目」開始
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 金額統計 */}
+          <div className="grid grid-cols-3 gap-4 bg-morandi-container/10 p-4 rounded-md">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">應收金額</label>
+              <div className="mt-1 text-lg font-bold text-morandi-primary">
+                NT$ {totalAmount.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">已收金額</label>
+              <Input
+                type="number"
+                value={formData.received_amount}
+                onChange={e => {
+                  const value = e.target.value
+                  setFormField('received_amount', value === '' ? '' : Number(value))
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="0"
+                className="mt-1"
+                min="0"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">應收餘額</label>
+              <div
+                className={`mt-1 text-lg font-bold ${
+                  balanceAmount > 0 ? 'text-morandi-red' : 'text-morandi-green'
+                }`}
+              >
+                NT$ {balanceAmount.toLocaleString()}
+              </div>
+            </div>
+          </div>
+
+          {/* 動作按鈕 */}
+          <div className="flex justify-end space-x-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              取消
+            </Button>
+            <Button
+              type="submit"
+              disabled={!formData.customer_name.trim()}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              建立快速報價單
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}

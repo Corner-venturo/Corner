@@ -461,19 +461,6 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     ],
   },
 
-  // 記帳 - 預算
-  {
-    name: 'budgets',
-    keyPath: 'id',
-    autoIncrement: false,
-    indexes: [
-      { name: 'category_id', keyPath: 'category_id', unique: false },
-      { name: 'period', keyPath: 'period', unique: false },
-      { name: 'is_active', keyPath: 'is_active', unique: false },
-      { name: 'created_at', keyPath: 'created_at', unique: false },
-      { name: 'updated_at', keyPath: 'updated_at', unique: false },
-    ],
-  },
 
   // 工作空間表
   {
@@ -532,22 +519,6 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'week_id', keyPath: 'week_id', unique: false },
       { name: 'day_of_week', keyPath: 'day_of_week', unique: false },
       { name: 'completed', keyPath: 'completed', unique: false },
-      { name: 'created_at', keyPath: 'created_at', unique: false },
-      { name: 'updated_at', keyPath: 'updated_at', unique: false },
-      // Offline-First 同步欄位
-      { name: 'sync_status', keyPath: 'sync_status', unique: false },
-    ],
-  },
-
-  // 模板表
-  {
-    name: 'templates',
-    keyPath: 'id',
-    autoIncrement: false,
-    indexes: [
-      { name: 'type', keyPath: 'type', unique: false },
-      { name: 'category', keyPath: 'category', unique: false },
-      { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
       // Offline-First 同步欄位
@@ -656,6 +627,39 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'created_at', keyPath: 'created_at', unique: false },
     ],
   },
+
+  // eSIM 網卡管理
+  {
+    name: 'esims',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'iccid', keyPath: 'iccid', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 確認單系統（住宿、機票）
+  {
+    name: 'confirmations',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'type', keyPath: 'type', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'booking_number', keyPath: 'booking_number', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
 ]
 
 /**
@@ -692,12 +696,10 @@ export const TABLES = {
   ACCOUNTS: 'accounts',
   CATEGORIES: 'categories',
   TRANSACTIONS: 'transactions',
-  BUDGETS: 'budgets',
   WORKSPACE_ITEMS: 'workspace_items',
   TIMEBOX_BOXES: 'timebox_boxes',
   TIMEBOX_WEEKS: 'timebox_weeks',
   TIMEBOX_SCHEDULED_BOXES: 'timebox_scheduled_boxes',
-  TEMPLATES: 'templates',
   // Workspace 相關（v2 新增）
   WORKSPACES: 'workspaces',
   CHANNELS: 'channels',
@@ -706,6 +708,8 @@ export const TABLES = {
   BULLETINS: 'bulletins',
   ADVANCE_LISTS: 'advance_lists',
   SHARED_ORDER_LISTS: 'shared_order_lists',
+  ESIMS: 'esims',
+  CONFIRMATIONS: 'confirmations',
 } as const
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES]

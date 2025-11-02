@@ -102,10 +102,13 @@ export function Combobox<T = unknown>({
   const optionRefs = React.useRef<(HTMLButtonElement | null)[]>([])
 
   // 當 value 改變時，更新搜尋值為對應的 label
+  // 只依賴 value，避免 options 引用變化導致無限循環
   React.useEffect(() => {
     const selectedOption = options.find(opt => opt.value === value)
-    setSearchValue(selectedOption?.label || '')
-  }, [value, options])
+    const newLabel = selectedOption?.label || ''
+    // 只在 label 真的改變時才更新，避免不必要的 re-render
+    setSearchValue(prev => (prev !== newLabel ? newLabel : prev))
+  }, [value]) // 移除 options 依賴
 
   // 篩選選項
   const filteredOptions = React.useMemo(() => {

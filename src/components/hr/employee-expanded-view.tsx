@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { useUserStore } from '@/stores/user-store'
 import { cn } from '@/lib/utils'
@@ -116,8 +117,8 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
     }
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[500] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border border-border">
         {/* 標題列 */}
         <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
@@ -200,4 +201,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
       </div>
     </div>
   )
+
+  // 使用 Portal 渲染到 body，確保能覆蓋 Sidebar
+  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null
 }

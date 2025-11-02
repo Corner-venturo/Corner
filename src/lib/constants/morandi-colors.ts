@@ -60,7 +60,7 @@ export function getMonandiColor(path: string): string {
   for (const key of keys) {
     value = value[key]
     if (value === undefined) {
-      console.warn(`Morandi color path "${path}" not found`)
+      // Fallback to primary color if path not found
       return morandiColors.primary
     }
   }

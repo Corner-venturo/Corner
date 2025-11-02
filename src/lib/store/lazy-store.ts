@@ -9,12 +9,12 @@
  */
 
 import { cacheStrategy, type CacheKey } from '@/lib/cache/cache-strategy'
-import { localDB } from '@/lib/db'
+import { localDB, type TableName } from '@/lib/db'
 import { supabase } from '@/lib/supabase/client'
 
 interface LazyLoadOptions {
   /** 資料表名稱 */
-  table: string
+  table: TableName
   /** 快取 key 前綴 */
   cachePrefix: string
   /** 預設每頁筆數 */
@@ -139,13 +139,13 @@ export class LazyStore<T extends { id: string }> {
 
     // 2. 從 IndexedDB 讀取
     try {
-      const localItem = await localDB.read(this.options.table as unknown, id)
+      const localItem = await localDB.read<T>(this.options.table, id)
       if (localItem) {
         // 快取到熱快取
         if (this.options.enableCache) {
           await cacheStrategy.set(cacheKey, localItem, { level: 'hot' })
         }
-        return localItem as T
+        return localItem
       }
     } catch (error) {}
 
@@ -214,7 +214,7 @@ export class LazyStore<T extends { id: string }> {
 
   private async fetchFromIndexedDB(page: number, pageSize: number): Promise<PaginatedData<T>> {
     try {
-      const allData = (await localDB.getAll(this.options.table as unknown)) as T[]
+      const allData = await localDB.getAll<T>(this.options.table)
       const start = (page - 1) * pageSize
       const end = start + pageSize
       const pageData = allData.slice(start, end)
@@ -269,7 +269,7 @@ export class LazyStore<T extends { id: string }> {
 
       // 同步到 IndexedDB
       for (const item of supabaseData.data) {
-        await localDB.create(this.options.table as unknown, item)
+        await localDB.create(this.options.table, item)
       }
     } catch (error) {}
   }

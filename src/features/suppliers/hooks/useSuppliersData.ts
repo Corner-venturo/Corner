@@ -5,7 +5,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useSupplierStore, useRegionStoreNew } from '@/stores'
+import { useSupplierStore, useRegionsStore } from '@/stores'
 import { supplierService } from '../services/supplier.service'
 import { Supplier, SupplierPaymentAccount } from '../types'
 
@@ -19,7 +19,7 @@ export function useSuppliersData() {
     getRegionsByCountry,
     getCitiesByCountry,
     getCitiesByRegion,
-  } = useRegionStoreNew()
+  } = useRegionsStore()
 
   // Get active countries
   const activeCountries = useMemo(() => {

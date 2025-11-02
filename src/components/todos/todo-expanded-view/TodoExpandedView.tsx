@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StarRating } from '@/components/ui/star-rating'
@@ -19,9 +20,9 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
     return null
   }
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[500] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
@@ -115,4 +116,6 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
       </div>
     </div>
   )
+
+  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null
 }

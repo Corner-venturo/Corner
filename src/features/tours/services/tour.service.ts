@@ -282,6 +282,82 @@ class TourService extends BaseService<Tour> {
     return await this.create(visaTour as Tour)
   }
 
+  async getOrCreateEsimTour(year?: number): Promise<Tour> {
+    const targetYear = year || new Date().getFullYear()
+    const esimCode = `ESIM${targetYear}001`
+
+    // 🔧 直接查詢 Supabase（包含已刪除的資料）
+    try {
+      if (typeof window !== 'undefined') {
+        const { supabase } = await import('@/lib/supabase/client')
+        const { data, error } = await supabase
+          .from('tours')
+          .select('*')
+          .eq('code', esimCode)
+          .maybeSingle()
+
+        if (!error && data) {
+          // 如果找到已刪除的網卡團，復原它
+          const typedData = data as Tour & { _deleted?: boolean }
+          if (typedData._deleted) {
+            const { data: updated, error: updateError } = await supabase
+              .from('tours')
+              .update({
+                _deleted: false,
+                _synced_at: null,
+                updated_at: this.now(),
+              })
+              .eq('id', typedData.id)
+              .select()
+              .single()
+
+            if (!updateError && updated) {
+              // 重新載入 tours
+              const _store = this.getStore()
+              const tourStore = useTourStore.getState()
+              await tourStore.fetchAll()
+              return updated as Tour
+            }
+          } else {
+            // 找到且未被刪除，直接返回
+            return data as Tour
+          }
+        }
+      }
+    } catch (error) {}
+
+    // 檢查本地 Store 是否有（未刪除的）
+    const allTours = await this.list()
+    const existingEsimTour = allTours.data.find(t => t.code === esimCode)
+    if (existingEsimTour) {
+      return existingEsimTour
+    }
+
+    // 不存在則建立新的網卡專用團
+    const today = new Date()
+    const yearStart = new Date(targetYear, 0, 1)
+    const departureDate = today > yearStart ? today : yearStart
+
+    const esimTour: Partial<Tour> = {
+      code: esimCode,
+      name: `${targetYear}年度網卡專用團`,
+      departure_date: departureDate.toISOString().split('T')[0],
+      return_date: `${targetYear}-12-31`,
+      status: 'special',
+      location: '網卡專用',
+      price: 0,
+      max_participants: 9999,
+      contract_status: 'pending',
+      total_revenue: 0,
+      total_cost: 0,
+      profit: 0,
+      created_at: this.now(),
+      updated_at: this.now(),
+    }
+
+    return await this.create(esimTour as Tour)
+  }
+
   /**
    * 取得所有非特殊團的旅遊團（用於行事曆顯示）
    * @returns 一般旅遊團列表

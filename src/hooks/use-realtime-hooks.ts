@@ -37,6 +37,7 @@ import {
   useEmployeeStore,
   useReceiptStore,
   useLinkPayLogStore,
+  useConfirmationStore,
 } from '@/stores';
 
 // IndexedDB adapters
@@ -233,20 +234,32 @@ export const useRealtimeForTourAddons = createRealtimeHook<TourAddOn>({
 });
 
 // ============================================
-// Workspace 系統（2 個）- 已有專用 Hooks
+// Workspace 系統（5 個）- 已有專用 Hooks
 // ============================================
 
 /**
- * Channels Realtime Hook (Phase 2 實作)
- * 使用時機：進入工作空間頁面
+ * Workspaces Realtime Hook
+ * 使用時機：進入工作空間頁面（永久訂閱）
  */
 export { useChannelsRealtime } from './useChannelsRealtime';
 
 /**
- * Messages Realtime Hook (Phase 3 實作)
+ * Channels Realtime Hook
+ * 使用時機：進入工作空間頁面
+ */
+export { useChannelsRealtime as useRealtimeForChannels } from './useChannelsRealtime';
+
+/**
+ * Messages Realtime Hook
  * 使用時機：進入頻道聊天頁面
  */
 export { useChatRealtime } from './useChatRealtime';
+
+/**
+ * Messages Realtime Hook (別名)
+ * 使用時機：進入頻道聊天頁面
+ */
+export { useChatRealtime as useRealtimeForMessages } from './useChatRealtime';
 
 // ============================================
 // 其他（2 個）
@@ -300,6 +313,16 @@ export const useRealtimeForLinkPayLogs = createRealtimeHook<LinkPayLog>({
   tableName: 'linkpay_logs',
   indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs'),
   store: useLinkPayLogStore,
+});
+
+/**
+ * 確認單（航班/住宿）Realtime Hook
+ * 使用時機：進入確認單列表頁面
+ */
+export const useRealtimeForConfirmations = createRealtimeHook<import('@/types/confirmation.types').Confirmation>({
+  tableName: 'confirmations',
+  indexedDB: new IndexedDBAdapter<import('@/types/confirmation.types').Confirmation>('confirmations'),
+  store: useConfirmationStore,
 });
 
 // 4. 協作功能

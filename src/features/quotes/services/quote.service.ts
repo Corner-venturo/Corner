@@ -13,8 +13,10 @@ class QuoteService extends BaseService<Quote> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(q => q.id === id),
       add: async (quote: Quote) => {
-        const result = await store.create(quote as unknown)
-        return result || quote
+        // 移除系統自動生成的欄位
+        const { id, created_at, updated_at, ...createData } = quote
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<Quote>) => {
         await store.update(id, data)
@@ -54,7 +56,7 @@ class QuoteService extends BaseService<Quote> {
       name: `${original.name} (副本)`,
       status: 'proposed',
       is_pinned: false, // 複製的報價單不自動置頂
-    } as unknown)
+    })
 
     // 確保返回完整的資料（包含 id）
     if (duplicated) {

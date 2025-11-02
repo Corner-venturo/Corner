@@ -13,12 +13,12 @@ interface FlightInfoSectionProps {
 export function FlightInfoSection({ data, updateFlightField }: FlightInfoSectionProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-blue-500 pb-2">
+      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-[#C9A961] pb-2">
         ✈️ 航班資訊
       </h2>
 
-      <div className="bg-blue-50 p-4 rounded-lg space-y-3">
-        <h3 className="font-bold text-blue-900">去程航班</h3>
+      <div className="bg-[#F9F5ED] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">
+        <h3 className="font-bold text-[#3D2914]">去程航班</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-morandi-secondary mb-1">
@@ -110,15 +110,19 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             <label className="block text-xs font-medium text-morandi-secondary mb-1">
               飛行時間（自動計算）
             </label>
-            <div className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-morandi-primary">
-              {data.outboundFlight?.duration || '請輸入出發/抵達時間'}
-            </div>
+            <input
+              type="text"
+              value={data.outboundFlight?.duration || ''}
+              readOnly
+              className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-morandi-secondary cursor-not-allowed"
+              placeholder="請輸入出發/抵達時間"
+            />
           </div>
         </div>
       </div>
 
-      <div className="bg-indigo-50 p-4 rounded-lg space-y-3">
-        <h3 className="font-bold text-indigo-900">回程航班</h3>
+      <div className="bg-[#F5F0EB] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">
+        <h3 className="font-bold text-[#3D2914]">回程航班</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-morandi-secondary mb-1">
@@ -208,9 +212,13 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
             <label className="block text-xs font-medium text-morandi-secondary mb-1">
               飛行時間（自動計算）
             </label>
-            <div className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-morandi-primary">
-              {data.returnFlight?.duration || '請輸入出發/抵達時間'}
-            </div>
+            <input
+              type="text"
+              value={data.returnFlight?.duration || ''}
+              readOnly
+              className="w-full px-2 py-1 border rounded text-sm bg-gray-100 text-morandi-secondary cursor-not-allowed"
+              placeholder="請輸入出發/抵達時間"
+            />
           </div>
         </div>
       </div>

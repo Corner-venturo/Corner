@@ -19,7 +19,14 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6 ">
-      <ResponsiveHeader title="財務報表" />
+      <ResponsiveHeader
+        title="財務報表"
+        badge={
+          <span className="ml-2 px-2 py-1 text-xs font-medium bg-morandi-gold/20 text-morandi-gold rounded-md border border-morandi-gold/30">
+            🚧 待開發
+          </span>
+        }
+      />
 
       {/* 財務概覽 */}
       <ContentContainer>

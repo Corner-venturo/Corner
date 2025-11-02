@@ -1,284 +1,536 @@
+/**
+ * 顧客管理頁面（完整重構版）
+ *
+ * 整合功能：
+ * 1. cornerERP 的護照資訊管理（拼音、效期）
+ * 2. Venturo 的 VIP 系統和客戶來源
+ * 3. 進階搜尋對話框
+ * 4. 搜尋條件持久化
+ */
+
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Mail, Phone, MapPin, Calendar, Edit } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit } from 'lucide-react';
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
 import { Input } from '@/components/ui/input';
-import { useTourStore, useOrderStore, useCustomerStore } from '@/stores';
-import { useRealtimeForCustomers, useRealtimeForOrders, useRealtimeForTours } from '@/hooks/use-realtime-hooks';
+import { CustomerSearchDialog, CustomerSearchParams } from '@/components/customers/customer-search-dialog';
+import { useCustomerStore } from '@/stores';
+import { useRealtimeForCustomers } from '@/hooks/use-realtime-hooks';
+import type { Customer } from '@/types/customer.types';
+
+const STORAGE_KEY = 'customerSearchParams';
 
 export default function CustomersPage() {
   // ✅ Realtime 訂閱
   useRealtimeForCustomers();
-  useRealtimeForOrders();
-  useRealtimeForTours();
+
   const { items: customers, create: addCustomer } = useCustomerStore();
-  const { items: orders } = useOrderStore();
-  const { items: tours } = useTourStore();
+
+  // 搜尋狀態
+  const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
+  const [searchParams, setSearchParams] = useState<CustomerSearchParams>(() => {
+    // 從 localStorage 讀取儲存的搜尋參數
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
+  // 新增顧客對話框
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    passport_number: '',
+    passport_romanization: '',
+    passport_expiry_date: '',
+    national_id: '',
+    date_of_birth: '',
   });
 
+  // 當搜尋參數改變時，保存到 localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(searchParams));
+    }
+  }, [searchParams]);
+
+  // 進階搜尋篩選
   const filteredCustomers = useMemo(() => {
-    if (!searchTerm) return customers;
-    return customers.filter(c =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.phone?.includes(searchTerm)
-    );
-  }, [customers, searchTerm]);
+    let result = customers;
+
+    // 基本搜尋（姓名、身份證號、護照號碼）
+    if (searchParams.query) {
+      const query = searchParams.query.toLowerCase();
+      result = result.filter(
+        (c) =>
+          c.name.toLowerCase().includes(query) ||
+          c.national_id?.toLowerCase().includes(query) ||
+          c.passport_number?.toLowerCase().includes(query)
+      );
+    }
+
+    // 電話
+    if (searchParams.phone) {
+      result = result.filter((c) => c.phone?.includes(searchParams.phone!));
+    }
+
+    // Email
+    if (searchParams.email) {
+      result = result.filter((c) =>
+        c.email?.toLowerCase().includes(searchParams.email!.toLowerCase())
+      );
+    }
+
+    // 護照拼音
+    if (searchParams.passport_romanization) {
+      result = result.filter((c) =>
+        c.passport_romanization
+          ?.toLowerCase()
+          .includes(searchParams.passport_romanization!.toLowerCase())
+      );
+    }
+
+    // 城市
+    if (searchParams.city) {
+      result = result.filter((c) =>
+        c.city?.toLowerCase().includes(searchParams.city!.toLowerCase())
+      );
+    }
+
+    // VIP 狀態
+    if (searchParams.is_vip !== undefined) {
+      result = result.filter((c) => c.is_vip === searchParams.is_vip);
+    }
+
+    // VIP 等級
+    if (searchParams.vip_level) {
+      result = result.filter((c) => c.vip_level === searchParams.vip_level);
+    }
+
+    // 客戶來源
+    if (searchParams.source) {
+      result = result.filter((c) => c.source === searchParams.source);
+    }
+
+    // 護照效期範圍
+    if (searchParams.passport_expiry_start) {
+      result = result.filter(
+        (c) =>
+          c.passport_expiry_date &&
+          c.passport_expiry_date >= searchParams.passport_expiry_start!
+      );
+    }
+    if (searchParams.passport_expiry_end) {
+      result = result.filter(
+        (c) =>
+          c.passport_expiry_date &&
+          c.passport_expiry_date <= searchParams.passport_expiry_end!
+      );
+    }
+
+    return result;
+  }, [customers, searchParams]);
 
   const handleAddCustomer = async () => {
-    if (!newCustomer.name.trim()) return;
+    if (!newCustomer.name.trim() || !newCustomer.phone.trim()) return;
 
     await addCustomer({
       ...newCustomer,
       code: '', // 由 Store 自動生成
       is_vip: false,
       is_active: true,
-      total_spent: 0
-    });
+      total_spent: 0,
+    } as any);
 
     setNewCustomer({
       name: '',
       email: '',
       phone: '',
-      address: ''
+      address: '',
+      passport_number: '',
+      passport_romanization: '',
+      passport_expiry_date: '',
+      national_id: '',
+      date_of_birth: '',
     });
     setIsAddDialogOpen(false);
   };
 
-  const getCustomerOrders = (_customer_id: string) => {
-    // ✅ 透過 Order.customer_id 反查（目前 Order 類型還沒有 customer_id，暫時返回空陣列）
-    // 注意: 等 Order 類型加入 customer_id 後，改為: orders.filter(order => order.customer_id === _customer_id)
-    return [];
+  const handleSearch = (params: CustomerSearchParams) => {
+    setSearchParams(params);
   };
 
-  const getCustomerTours = (_customer_id: string) => {
-    // ✅ 透過反查訂單的 tour_id
-    const customerOrders = getCustomerOrders(_customer_id);
-    const tourIds = new Set(customerOrders.map((o) => o.tour_id));
-    return tours.filter(tour => tourIds.has(tour.id));
+  const handleClearSearch = () => {
+    setSearchParams({});
   };
 
-  // 模擬更豐富的顧客資料
-  const enrichedCustomers = filteredCustomers.map(customer => {
-    const customerOrders = getCustomerOrders(customer.id);
-    const customerTours = getCustomerTours(customer.id);
-    const lastOrderDate = customerOrders.length > 0
-      ? new Date(Math.max(...customerOrders.map((o) => new Date(o.created_at).getTime())))
-      : null;
+  const hasActiveFilters = Object.keys(searchParams).length > 0;
 
-    return {
-      ...customer,
-      orderCount: customerOrders.length,
-      tourCount: customerTours.length,
-      lastOrderDate: lastOrderDate?.toLocaleDateString(),
-      avgOrderValue: customerOrders.length > 0
-        ? customerOrders.reduce((sum: number, o: any) => sum + o.total_amount, 0) / customerOrders.length
-        : 0
-    };
-  });
-
-  // 表格配置
-  const tableColumns: TableColumn[] = useMemo(() => [
-    {
-      key: 'name',
-      label: '姓名',
-      sortable: true,
-      render: (value, customer) => (
-        <div>
-          <div className="text-sm font-medium text-morandi-primary">{customer.name}</div>
-          <div className="text-xs text-morandi-secondary">ID: {customer.id}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'contact',
-      label: '聯絡方式',
-      sortable: false,
-      render: (value, customer) => (
-        <div>
-          {customer.email && (
-            <div className="flex items-center text-sm text-morandi-primary mb-1">
-              <Mail size={12} className="mr-1" />
-              {customer.email}
-            </div>
-          )}
-          {customer.phone && (
-            <div className="flex items-center text-sm text-morandi-secondary">
-              <Phone size={12} className="mr-1" />
-              {customer.phone}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'address',
-      label: '地址',
-      sortable: true,
-      render: (value, customer) => (
-        <div>
-          {customer.address && (
-            <div className="flex items-center text-sm text-morandi-primary">
-              <MapPin size={12} className="mr-1" />
-              {customer.address}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'orders',
-      label: '訂單/旅遊團',
-      sortable: true,
-      render: (value, customer) => (
-        <div className="text-sm">
-          <div className="text-morandi-primary">訂單: {customer.orderCount} 筆</div>
-          <div className="text-morandi-secondary">旅遊團: {customer.tourCount} 個</div>
-        </div>
-      ),
-    },
-    {
-      key: 'totalSpent',
-      label: '消費紀錄',
-      sortable: true,
-      render: (value, customer) => (
-        <div className="text-sm">
-          <div className="font-medium text-morandi-primary">
-            總計: NT$ {customer.total_spent.toLocaleString()}
+  // 表格欄位定義
+  const tableColumns: TableColumn[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        label: '基本資訊',
+        sortable: true,
+        render: (_value, customer: Customer) => (
+          <div>
+            <div className="text-sm font-medium text-morandi-primary">{customer.name}</div>
+            {customer.english_name && (
+              <div className="text-xs text-morandi-secondary">{customer.english_name}</div>
+            )}
+            <div className="text-xs text-morandi-secondary">ID: {customer.code}</div>
           </div>
-          {customer.avgOrderValue > 0 && (
-            <div className="text-morandi-secondary">
-              平均: NT$ {customer.avgOrderValue.toLocaleString()}
+        ),
+      },
+      {
+        key: 'contact',
+        label: '聯絡方式',
+        sortable: false,
+        render: (_value, customer: Customer) => (
+          <div className="space-y-1">
+            {customer.phone && (
+              <div className="flex items-center text-xs text-morandi-primary">
+                <Phone size={12} className="mr-1" />
+                {customer.phone}
+              </div>
+            )}
+            {customer.email && (
+              <div className="flex items-center text-xs text-morandi-secondary">
+                <Mail size={12} className="mr-1" />
+                {customer.email}
+              </div>
+            )}
+            {customer.city && (
+              <div className="flex items-center text-xs text-morandi-secondary">
+                <MapPin size={12} className="mr-1" />
+                {customer.city}
+              </div>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'passport',
+        label: '護照資訊',
+        sortable: false,
+        render: (_value, customer: Customer) => (
+          <div className="space-y-1">
+            {customer.passport_romanization && (
+              <div className="text-xs text-morandi-primary font-mono">
+                {customer.passport_romanization}
+              </div>
+            )}
+            {customer.passport_number && (
+              <div className="text-xs text-morandi-secondary">
+                號碼: {customer.passport_number}
+              </div>
+            )}
+            {customer.passport_expiry_date && (
+              <div className="text-xs text-morandi-secondary">
+                效期: {new Date(customer.passport_expiry_date).toLocaleDateString('zh-TW')}
+              </div>
+            )}
+            {!customer.passport_romanization &&
+              !customer.passport_number &&
+              !customer.passport_expiry_date && (
+                <div className="text-xs text-morandi-secondary italic">未填寫</div>
+              )}
+          </div>
+        ),
+      },
+      {
+        key: 'identity',
+        label: '身份證號 / 生日',
+        sortable: false,
+        render: (_value, customer: Customer) => (
+          <div className="space-y-1">
+            {customer.national_id && (
+              <div className="text-xs text-morandi-primary font-mono">
+                {customer.national_id}
+              </div>
+            )}
+            {customer.date_of_birth && (
+              <div className="text-xs text-morandi-secondary">
+                🎂 {new Date(customer.date_of_birth).toLocaleDateString('zh-TW')}
+              </div>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'vip',
+        label: 'VIP 狀態',
+        sortable: true,
+        render: (_value, customer: Customer) => (
+          <div className="space-y-1">
+            {customer.is_vip ? (
+              <>
+                <div className="flex items-center text-xs text-morandi-gold font-medium">
+                  <CreditCard size={12} className="mr-1" />
+                  VIP
+                </div>
+                {customer.vip_level && (
+                  <div className="text-xs text-morandi-secondary capitalize">
+                    {customer.vip_level === 'bronze' && '銅卡'}
+                    {customer.vip_level === 'silver' && '銀卡'}
+                    {customer.vip_level === 'gold' && '金卡'}
+                    {customer.vip_level === 'platinum' && '白金卡'}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-xs text-morandi-secondary">一般顧客</div>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'stats',
+        label: '消費統計',
+        sortable: true,
+        render: (_value, customer: Customer) => (
+          <div className="space-y-1">
+            <div className="text-xs text-morandi-primary font-medium">
+              NT$ {(customer.total_spent || 0).toLocaleString()}
             </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'lastOrderDate',
-      label: '最後消費',
-      sortable: true,
-      render: (value, customer) => (
-        <div>
-          {customer.lastOrderDate && (
-            <div className="flex items-center text-xs text-morandi-secondary">
-              <Calendar size={12} className="mr-1" />
-              {customer.lastOrderDate}
-            </div>
-          )}
-        </div>
-      ),
-    },
-  ], []);
-
-  const totalCustomers = customers.length;
-  const _activeCustomers = customers.filter(c => (c.total_orders ?? 0) > 0).length;
-  const totalSpent = customers.reduce((sum, c) => sum + (c.total_spent ?? 0), 0);
-  const _avgSpentPerCustomer = totalCustomers > 0 ? totalSpent / totalCustomers : 0;
+            {customer.total_orders && customer.total_orders > 0 && (
+              <div className="text-xs text-morandi-secondary">
+                {customer.total_orders} 筆訂單
+              </div>
+            )}
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title="顧客管理"
-        showSearch={true}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋顧客姓名、電話、Email..."
-        onAdd={() => setIsAddDialogOpen(true)}
-        addLabel="新增顧客"
-      >
-        <div className="text-sm text-morandi-secondary">
-          {filteredCustomers.length} 位顧客
-        </div>
-      </ResponsiveHeader>
-
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-        className="min-h-full"
-        columns={tableColumns}
-        data={enrichedCustomers}
-        actions={() => (
+      <ResponsiveHeader title="顧客管理">
+        <div className="flex items-center gap-2">
+          {/* 搜尋按鈕區域 */}
           <Button
             variant="outline"
             size="sm"
-            className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-            title="編輯顧客"
+            onClick={() => setIsAdvancedSearchOpen(true)}
+            className="gap-2"
           >
-            <Edit size={14} className="text-morandi-gold" />
+            <Search size={16} />
+            <span className="hidden sm:inline">進階搜尋</span>
           </Button>
-        )}
-      />
+
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearSearch}
+              className="gap-2 text-morandi-red"
+            >
+              <X size={16} />
+              <span className="hidden sm:inline">清除條件</span>
+            </Button>
+          )}
+
+          {/* 新增顧客按鈕 */}
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+            size="sm"
+          >
+            <Plus size={16} />
+            <span className="hidden sm:inline">新增顧客</span>
+          </Button>
+        </div>
+      </ResponsiveHeader>
+
+      {/* 搜尋條件提示 */}
+      {hasActiveFilters && (
+        <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
+          <div className="text-xs text-morandi-secondary">
+            已套用 {Object.keys(searchParams).length} 個篩選條件 |{' '}
+            顯示 {filteredCustomers.length} / {customers.length} 位顧客
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+          className="min-h-full"
+          columns={tableColumns}
+          data={filteredCustomers}
+          actions={() => (
+            <Button
+              variant="outline"
+              size="sm"
+              className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+              title="編輯顧客"
+            >
+              <Edit size={14} className="text-morandi-gold" />
+            </Button>
+          )}
+        />
       </div>
+
+      {/* 進階搜尋對話框 */}
+      <CustomerSearchDialog
+        open={isAdvancedSearchOpen}
+        onClose={() => setIsAdvancedSearchOpen(false)}
+        onSearch={handleSearch}
+        initialValues={searchParams}
+      />
 
       {/* 新增顧客對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>新增顧客</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-6 py-4">
+            {/* 基本資訊 */}
             <div>
-              <label className="text-sm font-medium text-morandi-primary">姓名</label>
-              <Input
-                value={newCustomer.name}
-                onChange={(e) => setNewCustomer(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="輸入顧客姓名"
-                className="mt-1"
-              />
+              <h3 className="text-sm font-semibold text-morandi-primary mb-3">基本資訊</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">姓名 *</label>
+                  <Input
+                    value={newCustomer.name}
+                    onChange={(e) => setNewCustomer((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="輸入顧客姓名"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">電話 *</label>
+                  <Input
+                    value={newCustomer.phone}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({ ...prev, phone: e.target.value }))
+                    }
+                    placeholder="輸入聯絡電話"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">Email</label>
+                  <Input
+                    type="email"
+                    value={newCustomer.email}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    placeholder="輸入 Email 地址"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">地址</label>
+                  <Input
+                    value={newCustomer.address}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({ ...prev, address: e.target.value }))
+                    }
+                    placeholder="輸入地址"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
             </div>
 
+            {/* 護照資訊 */}
             <div>
-              <label className="text-sm font-medium text-morandi-primary">Email</label>
-              <Input
-                type="email"
-                value={newCustomer.email}
-                onChange={(e) => setNewCustomer(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="輸入 Email 地址"
-                className="mt-1"
-              />
+              <h3 className="text-sm font-semibold text-morandi-primary mb-3">護照資訊</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">
+                    護照拼音（姓氏/名字）
+                  </label>
+                  <Input
+                    value={newCustomer.passport_romanization}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({
+                        ...prev,
+                        passport_romanization: e.target.value.toUpperCase(),
+                      }))
+                    }
+                    placeholder="例如：WANG/XIAOMING"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">護照號碼</label>
+                  <Input
+                    value={newCustomer.passport_number}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({ ...prev, passport_number: e.target.value }))
+                    }
+                    placeholder="輸入護照號碼"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">護照效期</label>
+                  <Input
+                    type="date"
+                    value={newCustomer.passport_expiry_date}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({
+                        ...prev,
+                        passport_expiry_date: e.target.value,
+                      }))
+                    }
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">身份證字號</label>
+                  <Input
+                    value={newCustomer.national_id}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({ ...prev, national_id: e.target.value }))
+                    }
+                    placeholder="輸入身份證字號"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">出生日期</label>
+                  <Input
+                    type="date"
+                    value={newCustomer.date_of_birth}
+                    onChange={(e) =>
+                      setNewCustomer((prev) => ({ ...prev, date_of_birth: e.target.value }))
+                    }
+                    className="mt-1"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">電話</label>
-              <Input
-                value={newCustomer.phone}
-                onChange={(e) => setNewCustomer(prev => ({ ...prev, phone: e.target.value }))}
-                placeholder="輸入聯絡電話"
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">地址</label>
-              <Input
-                value={newCustomer.address}
-                onChange={(e) => setNewCustomer(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="輸入地址"
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsAddDialogOpen(false)}
-              >
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 取消
               </Button>
               <Button
                 onClick={handleAddCustomer}
+                disabled={!newCustomer.name.trim() || !newCustomer.phone.trim()}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 新增

@@ -1,4 +1,4 @@
-import { useRegionStoreNew } from '@/stores'
+import { useRegionsStore } from '@/stores'
 
 /**
  * 地區資料管理 Hook
@@ -23,7 +23,7 @@ export function useRegionsData() {
     getRegionsByCountry,
     getCitiesByCountry,
     getCitiesByRegion,
-  } = useRegionStoreNew()
+  } = useRegionsStore()
 
   return {
     // 資料

@@ -12,7 +12,9 @@ class CustomerService extends BaseService<Customer> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(c => c.id === id),
       add: async (customer: Customer) => {
-        await store.create(customer as unknown)
+        // Type assertion needed: store.create expects Database type, but we work with domain Customer type
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await store.create(customer as any)
         return customer
       },
       update: async (id: string, data: Partial<Customer>) => {

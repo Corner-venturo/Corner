@@ -2,7 +2,7 @@
  * 工作空間標題列
  */
 
-import { Filter, Settings, Plus } from 'lucide-react';
+import { Filter, Settings, Plus, RefreshCw } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,8 @@ interface WorkspaceHeaderProps {
   onFilterChange: (filter: 'all' | 'starred' | 'unread' | 'muted') => void;
   onCreateChannel: () => void;
   onCreateGroup: () => void;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 export function WorkspaceHeader({
@@ -26,6 +28,8 @@ export function WorkspaceHeader({
   onFilterChange,
   onCreateChannel,
   onCreateGroup,
+  onRefresh,
+  isRefreshing = false,
 }: WorkspaceHeaderProps) {
   return (
     <div className="h-[52px] px-6 border-b border-morandi-gold/20 bg-gradient-to-r from-morandi-gold/5 to-transparent flex items-center">
@@ -34,6 +38,16 @@ export function WorkspaceHeader({
           {workspaceIcon} {workspaceName || '工作空間'}
         </h2>
         <div className="flex items-center gap-1">
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="btn-icon-morandi !w-7 !h-7"
+              title="重新整理頻道列表"
+            >
+              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            </button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger className="btn-icon-morandi !w-7 !h-7">
               <Filter size={14} />

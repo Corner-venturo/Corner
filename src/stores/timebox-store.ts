@@ -6,7 +6,7 @@
 import { create } from 'zustand'
 import { BaseEntity } from '@/types'
 import { TABLES } from '@/lib/db/schemas'
-import { createStore } from './core/create-store-new'
+import { createStore } from './core/create-store'
 import { generateUUID } from '@/lib/utils/uuid'
 
 const generateId = () => generateUUID()

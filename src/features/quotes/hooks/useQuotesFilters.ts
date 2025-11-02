@@ -11,9 +11,10 @@ interface UseQuotesFiltersParams {
   quotes: Quote[]
   statusFilter: string
   searchTerm: string
+  authorFilter?: string
 }
 
-export const useQuotesFilters = ({ quotes, statusFilter, searchTerm }: UseQuotesFiltersParams) => {
+export const useQuotesFilters = ({ quotes, statusFilter, searchTerm, authorFilter }: UseQuotesFiltersParams) => {
   const filteredQuotes = useMemo(() => {
     return (
       quotes
@@ -28,7 +29,14 @@ export const useQuotesFilters = ({ quotes, statusFilter, searchTerm }: UseQuotes
             quote.quote_number?.toLowerCase().includes(searchLower) ||
             quote.status?.toLowerCase().includes(searchLower)
 
-          return matchesStatus && matchesSearch
+          // 作者篩選
+          const matchesAuthor =
+            !authorFilter ||
+            authorFilter === 'all' ||
+            quote.created_by_name === authorFilter ||
+            quote.handler_name === authorFilter
+
+          return matchesStatus && matchesSearch && matchesAuthor
         })
         // 排序：置頂的報價單排在最前面
         .sort((a, b) => {
@@ -38,7 +46,7 @@ export const useQuotesFilters = ({ quotes, statusFilter, searchTerm }: UseQuotes
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         })
     )
-  }, [quotes, statusFilter, searchTerm])
+  }, [quotes, statusFilter, searchTerm, authorFilter])
 
   return { filteredQuotes }
 }
