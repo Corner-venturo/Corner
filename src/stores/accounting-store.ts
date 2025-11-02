@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from './auth-store'
 
 /**
@@ -121,7 +121,6 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 帳戶管理 =====
   fetchAccounts: async () => {
-    const supabase = createClient()
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -139,9 +138,14 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   addAccount: async (accountData) => {
-    const supabase = createClient()
+
     const user = useAuthStore.getState().user
-    if (!user) return null
+    if (!user) {
+      console.error('[addAccount] 用戶未登入')
+      return null
+    }
+
+    console.log('[addAccount] 準備插入資料:', { ...accountData, user_id: user.id })
 
     const { data, error } = await supabase
       .from('accounting_accounts')
@@ -152,16 +156,23 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .select()
       .single()
 
-    if (!error && data) {
+    if (error) {
+      console.error('[addAccount] Supabase 錯誤:', error)
+      return null
+    }
+
+    if (data) {
+      console.log('[addAccount] 成功建立帳戶:', data)
       set(state => ({ accounts: [...state.accounts, data] }))
       get().calculateStats()
       return data
     }
+
     return null
   },
 
   updateAccount: async (id, accountData) => {
-    const supabase = createClient()
+    
     const user = useAuthStore.getState().user
     if (!user) return null
 
@@ -184,7 +195,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   deleteAccount: async (id) => {
-    const supabase = createClient()
+    
     const user = useAuthStore.getState().user
     if (!user) return false
 
@@ -207,7 +218,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 分類管理 =====
   fetchCategories: async () => {
-    const supabase = createClient()
+    
 
     const { data, error } = await supabase
       .from('accounting_categories')
@@ -221,7 +232,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   addCategory: async (categoryData) => {
-    const supabase = createClient()
+    
 
     const { data, error } = await supabase
       .from('accounting_categories')
@@ -241,7 +252,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 交易記錄 =====
   fetchTransactions: async () => {
-    const supabase = createClient()
+    
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -259,7 +270,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   addTransaction: async (transactionData) => {
-    const supabase = createClient()
+    
     const user = useAuthStore.getState().user
     if (!user) return null
 
@@ -287,7 +298,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   updateTransaction: async (id, transactionData) => {
-    const supabase = createClient()
+    
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -310,7 +321,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   deleteTransaction: async (id) => {
-    const supabase = createClient()
+    
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -332,7 +343,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 輔助方法：更新帳戶餘額 =====
   updateAccountBalance: async (transaction: Transaction) => {
-    const supabase = createClient()
+    
     const { accounts } = get()
 
     // 更新來源帳戶

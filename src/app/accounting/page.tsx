@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { AddAccountDialog } from '@/components/accounting/add-account-dialog'
 import { AddTransactionDialog } from '@/components/accounting/add-transaction-dialog'
+import { AccountsManagementDialog } from '@/components/accounting/accounts-management-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils'
 export default function AccountingPage() {
   const router = useRouter()
   const { accounts, stats, categories, transactions, addTransaction, initialize } = useAccountingStore()
+  const [isAccountsManagementOpen, setIsAccountsManagementOpen] = useState(false)
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false)
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false)
 
@@ -147,7 +149,7 @@ export default function AccountingPage() {
         {/* 自定義按鈕群組 */}
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => setIsAddAccountOpen(true)}
+            onClick={() => setIsAccountsManagementOpen(true)}
             variant="outline"
             size="sm"
             className="border-[#E0D8CC] text-[#6B5D52] hover:bg-[#FAF8F5]"
@@ -479,6 +481,13 @@ export default function AccountingPage() {
           </div>
         </div>
       )}
+
+      {/* 帳戶管理對話框 */}
+      <AccountsManagementDialog
+        isOpen={isAccountsManagementOpen}
+        onClose={() => setIsAccountsManagementOpen(false)}
+        onAddAccount={() => setIsAddAccountOpen(true)}
+      />
 
       {/* 新增帳戶對話框 */}
       <AddAccountDialog isOpen={isAddAccountOpen} onClose={() => setIsAddAccountOpen(false)} />

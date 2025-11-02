@@ -83,17 +83,25 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
     description: '',
   })
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name.trim()) return
 
     const selectedType = accountTypes.find(t => t.id === formData.type)
+
+    const iconMap: Record<AccountType, string> = {
+      cash: 'Wallet',
+      bank: 'Building2',
+      credit: 'CreditCard',
+      investment: 'TrendingUp',
+      other: 'PiggyBank',
+    }
 
     const accountData = {
       name: formData.name.trim(),
       type: formData.type,
       balance: parseFloat(formData.balance) || 0,
       currency: 'TWD',
-      icon: selectedType?.icon.name || 'Wallet',
+      icon: iconMap[formData.type],
       color: formData.color,
       is_active: true,
       description: formData.description.trim(),
@@ -105,7 +113,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       }),
     }
 
-    addAccount(accountData)
+    await addAccount(accountData)
     resetForm()
     onClose()
   }

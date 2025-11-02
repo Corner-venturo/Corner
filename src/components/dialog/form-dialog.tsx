@@ -41,8 +41,8 @@ export interface FormDialogProps {
   subtitle?: string
   /** 表單內容 */
   children: ReactNode
-  /** 提交處理函數 */
-  onSubmit: () => void | Promise<void>
+  /** 提交處理函數（可選，如果不提供則不顯示 footer） */
+  onSubmit?: () => void | Promise<void>
   /** 取消處理函數（可選，預設為關閉對話框） */
   onCancel?: () => void
   /** 提交按鈕文字（預設：確定） */
@@ -103,8 +103,13 @@ export function FormDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSubmit()
+    if (onSubmit) {
+      await onSubmit()
+    }
   }
+
+  // 如果沒有 onSubmit，就不需要 form 包裝
+  const shouldShowFooter = showFooter && onSubmit
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,30 +119,35 @@ export function FormDialog({
           {subtitle && <p className="text-sm text-morandi-secondary mt-1">{subtitle}</p>}
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 表單內容區域 */}
-          <div className="space-y-4">{children}</div>
+        {onSubmit ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* 表單內容區域 */}
+            <div className="space-y-4">{children}</div>
 
-          {/* Footer 按鈕組 */}
-          {showFooter && (
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              {footer || (
-                <>
-                  <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
-                    {cancelLabel}
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={loading || submitDisabled}
-                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                  >
-                    {loading ? '處理中...' : submitLabel}
-                  </Button>
-                </>
-              )}
-            </div>
-          )}
-        </form>
+            {/* Footer 按鈕組 */}
+            {shouldShowFooter && (
+              <div className="flex justify-end gap-2 pt-4 border-t border-border">
+                {footer || (
+                  <>
+                    <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
+                      {cancelLabel}
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={loading || submitDisabled}
+                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                    >
+                      {loading ? '處理中...' : submitLabel}
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </form>
+        ) : (
+          // 沒有 onSubmit 就不用 form 包裝
+          <div className="space-y-4">{children}</div>
+        )}
       </DialogContent>
     </Dialog>
   )

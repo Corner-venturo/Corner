@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { useAccountingStore } from '@/stores/accounting-store'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Plus, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
+import { Button } from '@/components/ui/button'
 
 interface AddTransactionDialogProps {
   isOpen: boolean
@@ -14,13 +15,18 @@ interface AddTransactionDialogProps {
 }
 
 type TransactionType = 'income' | 'expense'
+type Step = 'selectType' | 'selectCategory' | 'enterDetails'
 
 export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogProps) {
-  const { accounts, categories, addTransaction } = useAccountingStore()
+  const { accounts, categories, addTransaction, addCategory } = useAccountingStore()
+  const [step, setStep] = useState<Step>('selectType')
   const [transactionType, setTransactionType] = useState<TransactionType>('expense')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [isAddingCategory, setIsAddingCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+
   const [formData, setFormData] = useState({
     account_id: '',
-    category_id: '',
     amount: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
@@ -33,18 +39,29 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
     }
   }, [accounts, formData.account_id])
 
+  // 當對話框打開時重置狀態
+  useEffect(() => {
+    if (isOpen) {
+      setStep('selectType')
+      setTransactionType('expense')
+      setSelectedCategory('')
+      setIsAddingCategory(false)
+      setNewCategoryName('')
+    }
+  }, [isOpen])
+
   const handleSubmit = async () => {
-    if (!formData.account_id || !formData.amount || !formData.category_id) {
+    if (!formData.account_id || !formData.amount || !selectedCategory) {
       return
     }
 
     const account = accounts.find(acc => acc.id === formData.account_id)
-    const category = categories.find(cat => cat.id === formData.category_id)
+    const category = categories.find(cat => cat.id === selectedCategory)
 
     const transactionData = {
       account_id: formData.account_id,
       account_name: account?.name || '',
-      category_id: formData.category_id,
+      category_id: selectedCategory,
       category_name: category?.name || '',
       type: transactionType,
       amount: parseFloat(formData.amount),
@@ -61,17 +78,45 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
   const resetForm = () => {
     setFormData({
       account_id: accounts.length > 0 ? accounts[0].id : '',
-      category_id: '',
       amount: '',
       description: '',
       date: new Date().toISOString().split('T')[0],
     })
+    setStep('selectType')
     setTransactionType('expense')
+    setSelectedCategory('')
   }
 
   const handleClose = () => {
     resetForm()
     onClose()
+  }
+
+  const handleTypeSelect = (type: TransactionType) => {
+    setTransactionType(type)
+    setStep('selectCategory')
+  }
+
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId)
+    setStep('enterDetails')
+  }
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return
+
+    const newCategory = await addCategory({
+      name: newCategoryName.trim(),
+      type: transactionType,
+      color: transactionType === 'expense' ? '#C89B9B' : '#7B9B7E',
+    })
+
+    if (newCategory) {
+      setSelectedCategory(newCategory.id)
+      setIsAddingCategory(false)
+      setNewCategoryName('')
+      setStep('enterDetails')
+    }
   }
 
   const filteredCategories = categories.filter(category => category.type === transactionType)
@@ -101,8 +146,140 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
   const { handleKeyDown, compositionProps } = useEnterSubmit(handleSubmit)
 
-  const isFormValid = formData.account_id && formData.amount && formData.category_id
+  const isFormValid = formData.account_id && formData.amount && selectedCategory
 
+  // 步驟 1：選擇交易類型
+  if (step === 'selectType') {
+    return (
+      <FormDialog
+        open={isOpen}
+        onOpenChange={open => !open && handleClose()}
+        title="選擇交易類型"
+        onCancel={handleClose}
+        maxWidth="sm"
+        hideActions
+      >
+        <div className="grid grid-cols-2 gap-3">
+          {transactionTypes.map(type => {
+            const Icon = type.icon
+            return (
+              <button
+                key={type.id}
+                type="button"
+                onClick={() => handleTypeSelect(type.id)}
+                className="p-6 rounded-xl transition-all flex flex-col items-center space-y-3 hover:shadow-md"
+                style={{ backgroundColor: type.bgColor, color: type.color }}
+              >
+                <Icon size={32} strokeWidth={2} />
+                <span className="font-semibold text-lg">{type.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </FormDialog>
+    )
+  }
+
+  // 步驟 2：選擇分類
+  if (step === 'selectCategory') {
+    return (
+      <FormDialog
+        open={isOpen}
+        onOpenChange={open => !open && handleClose()}
+        title={`選擇${transactionType === 'expense' ? '支出' : '收入'}分類`}
+        onCancel={handleClose}
+        maxWidth="md"
+        hideActions
+      >
+        {/* 返回按鈕 */}
+        <button
+          onClick={() => setStep('selectType')}
+          className="flex items-center text-[#9E8F81] hover:text-[#6B5D52] mb-4 -mt-2"
+        >
+          <ChevronLeft size={20} />
+          <span className="text-sm">返回</span>
+        </button>
+
+        {/* 分類列表或空狀態 */}
+        {filteredCategories.length === 0 && !isAddingCategory ? (
+          <div className="text-center py-12">
+            <div className="text-[#9E8F81] mb-4">還沒有分類</div>
+            <Button
+              onClick={() => setIsAddingCategory(true)}
+              className="bg-[#C9A961] hover:bg-[#B8985A] text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              新增第一個分類
+            </Button>
+          </div>
+        ) : isAddingCategory ? (
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">分類名稱</label>
+              <Input
+                value={newCategoryName}
+                onChange={e => setNewCategoryName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleAddCategory()
+                  }
+                }}
+                placeholder="例如：餐費、交通、娛樂"
+                className="border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  setIsAddingCategory(false)
+                  setNewCategoryName('')
+                }}
+                variant="outline"
+                className="flex-1 border-[#E0D8CC]"
+              >
+                取消
+              </Button>
+              <Button
+                onClick={handleAddCategory}
+                disabled={!newCategoryName.trim()}
+                className="flex-1 bg-[#C9A961] hover:bg-[#B8985A] text-white"
+              >
+                新增
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* 分類卡片 */}
+            <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+              {filteredCategories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => handleCategorySelect(category.id)}
+                  className="p-4 rounded-xl bg-white/60 hover:bg-white border-2 border-[#E0D8CC] hover:border-[#C9A961] transition-all text-left"
+                >
+                  <div className="font-medium text-[#3D2914]">{category.name}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* 新增分類按鈕 */}
+            <button
+              onClick={() => setIsAddingCategory(true)}
+              className="w-full p-3 rounded-xl border-2 border-dashed border-[#E0D8CC] hover:border-[#C9A961] text-[#9E8F81] hover:text-[#6B5D52] transition-all flex items-center justify-center space-x-2"
+            >
+              <Plus size={18} />
+              <span className="text-sm font-medium">新增分類</span>
+            </button>
+          </div>
+        )}
+      </FormDialog>
+    )
+  }
+
+  // 步驟 3：輸入詳細資訊
   return (
     <FormDialog
       open={isOpen}
@@ -114,31 +291,22 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       submitDisabled={!isFormValid}
       maxWidth="md"
     >
-      {/* 交易類型選擇 */}
-      <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-2 block">交易類型</label>
-        <div className="grid grid-cols-2 gap-2">
-          {transactionTypes.map(type => {
-            const Icon = type.icon
-            const isSelected = transactionType === type.id
-            return (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => setTransactionType(type.id)}
-                className={cn(
-                  'p-4 rounded-xl transition-all flex items-center justify-center space-x-2',
-                  isSelected
-                    ? 'shadow-sm'
-                    : 'bg-white/40 hover:bg-white/60'
-                )}
-                style={isSelected ? { backgroundColor: type.bgColor, color: type.color } : {}}
-              >
-                <Icon size={20} />
-                <span className="font-medium">{type.label}</span>
-              </button>
-            )
-          })}
+      {/* 返回按鈕 */}
+      <button
+        onClick={() => setStep('selectCategory')}
+        className="flex items-center text-[#9E8F81] hover:text-[#6B5D52] mb-4 -mt-2"
+      >
+        <ChevronLeft size={20} />
+        <span className="text-sm">更改分類</span>
+      </button>
+
+      {/* 已選分類顯示 */}
+      <div className="mb-4 p-3 rounded-lg bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EB]">
+        <div className="text-xs text-[#9E8F81] mb-1">
+          {transactionType === 'expense' ? '支出' : '收入'}分類
+        </div>
+        <div className="font-medium text-[#3D2914]">
+          {categories.find(c => c.id === selectedCategory)?.name}
         </div>
       </div>
 
@@ -154,23 +322,6 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
           {accounts.map(account => (
             <option key={account.id} value={account.id}>
               {account.name} (NT$ {account.balance.toLocaleString()})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 分類選擇 */}
-      <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">選擇分類</label>
-        <select
-          value={formData.category_id}
-          onChange={e => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
-          className="w-full p-3 border border-[#E0D8CC] rounded-lg bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20 transition-colors"
-        >
-          <option value="">請選擇分類</option>
-          {filteredCategories.map(category => (
-            <option key={category.id} value={category.id}>
-              {category.name}
             </option>
           ))}
         </select>
@@ -193,6 +344,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             className="pl-12 text-lg font-semibold border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
             min="0"
             step="1"
+            autoFocus
           />
         </div>
       </div>
