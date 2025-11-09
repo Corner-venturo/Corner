@@ -47,7 +47,7 @@ export default function PermissionsManagementPage() {
   } = useWorkspacePermissionStore()
 
   const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
-  const { workspaces, fetchAll: fetchWorkspaces } = useWorkspaceStore()
+  const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   const [showGrantDialog, setShowGrantDialog] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string>('')
@@ -64,7 +64,7 @@ export default function PermissionsManagementPage() {
   useEffect(() => {
     fetchAllPermissions()
     fetchEmployees()
-    fetchWorkspaces()
+    loadWorkspaces()
   }, [])
 
   const handleGrantAccess = async () => {
