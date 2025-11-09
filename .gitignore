@@ -80,3 +80,8 @@ fix-types-to-snake.js
 .env
 .env.local
 .env*.local
+
+# Claude Code sensitive files
+.claude/SUPABASE_CREDENTIALS.md
+.claude/*_CREDENTIALS.md
+.claude/*_PASSWORD*.md
