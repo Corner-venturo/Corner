@@ -12,6 +12,7 @@ import type { Tour, Order, Member, Customer, ReceiptOrder, Employee, Region } fr
 // 從本地 types 匯入（包含 PaymentRequest, DisbursementOrder 等）
 import type {
   PaymentRequest,
+  PaymentRequestItem,
   DisbursementOrder,
   Todo,
   Visa,
@@ -63,6 +64,12 @@ export const useQuoteStore = createStore<Quote>('quotes', 'Q')
  * 編號格式：PR{year}{4位數} (如: PR20240001)
  */
 export const usePaymentRequestStore = createStore<PaymentRequest>('payment_requests', 'PR')
+
+/**
+ * 請款項目 Store
+ * 無獨立編號，依附於請款單
+ */
+export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items')
 
 /**
  * 出納單 Store
@@ -120,6 +127,9 @@ export const useVisaStore = createStore<Visa>('visas', 'V')
 
 // 供應商 Store
 export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
+
+// 供應商類別 Store
+export { useSupplierCategoryStore } from './supplier-category-store'
 
 // 地區 Store（舊版，保留向後相容）
 export const useRegionStore = createStore<Region>('regions')

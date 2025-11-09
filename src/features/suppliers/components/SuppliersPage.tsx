@@ -1,82 +1,88 @@
 /**
- * SuppliersPage - Main suppliers management page
+ * SuppliersPage - 簡化版供應商管理頁面
  */
 
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
-import { useSuppliersData } from '../hooks/useSuppliersData'
-import { useSuppliersFilters } from '../hooks/useSuppliersFilters'
-import { useSupplierForm } from '../hooks/useSupplierForm'
+import { useSupplierStore, useSupplierCategoryStore } from '@/stores'
 import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks'
 
 export const SuppliersPage: React.FC = () => {
   // ✅ Realtime 訂閱
   useRealtimeForSuppliers()
+
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  // Data hooks
-  const {
-    suppliers,
-    countries,
-    activeCountries,
-    fetchRegions,
-    getRegionsByCountry,
-    getCitiesByCountry,
-    getCitiesByRegion,
-    handleCreateSupplier,
-  } = useSuppliersData()
+  const { items: suppliers, create } = useSupplierStore()
+  const { fetchAll: fetchCategories } = useSupplierCategoryStore()
 
-  // Filter hooks
-  const { filteredSuppliers } = useSuppliersFilters({ suppliers, searchQuery })
+  // 載入類別資料
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
 
-  // Form hooks
-  const {
-    formData,
-    paymentAccounts,
-    availableRegions,
-    availableCities,
-    setFormField,
-    setContactField,
-    setPaymentAccounts,
-    handleCountryChange,
-    handleRegionChange,
-    toggleCitySelection,
-    resetForm,
-    handleSubmit: submitForm,
-  } = useSupplierForm({
-    onSubmit: handleCreateSupplier,
-    getRegionsByCountry,
-    getCitiesByCountry,
-    getCitiesByRegion,
+  // 簡化的表單狀態
+  const [formData, setFormData] = useState({
+    name: '',
+    category_id: '',
+    bank_name: '',
+    bank_account: '',
+    note: '',
   })
 
-  // Lazy load: only load regions when opening dialog
+  // 過濾供應商
+  const filteredSuppliers = suppliers.filter(supplier =>
+    searchQuery
+      ? supplier.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        supplier.bank_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        supplier.bank_account?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  )
+
   const handleOpenAddDialog = useCallback(() => {
-    if (countries.length === 0) {
-      fetchRegions()
-    }
     setIsAddDialogOpen(true)
-  }, [countries.length, fetchRegions])
+  }, [])
 
   const handleCloseDialog = useCallback(() => {
     setIsAddDialogOpen(false)
-    resetForm()
-  }, [resetForm])
+    setFormData({
+      name: '',
+      category_id: '',
+      bank_name: '',
+      bank_account: '',
+      note: '',
+    })
+  }, [])
+
+  const handleFormFieldChange = useCallback(
+    <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
+      setFormData(prev => ({ ...prev, [field]: value }))
+    },
+    []
+  )
 
   const handleSubmit = useCallback(async () => {
     try {
-      await submitForm()
+      await create({
+        name: formData.name,
+        category_id: formData.category_id,
+        bank_name: formData.bank_name,
+        bank_account: formData.bank_account,
+        notes: formData.note,
+      })
       handleCloseDialog()
+      alert('✅ 供應商建立成功')
     } catch (error) {
-      alert(error instanceof Error ? error.message : '新增供應商失敗，請稍後再試')
+      console.error('❌ Create Supplier Error:', error)
+      alert('❌ 建立失敗，請稍後再試')
     }
-  }, [submitForm, handleCloseDialog])
+  }, [formData, create, handleCloseDialog])
 
   return (
     <div className="h-full flex flex-col">
@@ -91,7 +97,7 @@ export const SuppliersPage: React.FC = () => {
         showSearch={true}
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋供應商名稱、聯絡人或服務項目..."
+        searchPlaceholder="搜尋供應商名稱或銀行資訊..."
         onAdd={handleOpenAddDialog}
         addLabel="新增供應商"
       />
@@ -106,16 +112,7 @@ export const SuppliersPage: React.FC = () => {
         isOpen={isAddDialogOpen}
         onClose={handleCloseDialog}
         formData={formData}
-        paymentAccounts={paymentAccounts}
-        activeCountries={activeCountries}
-        availableRegions={availableRegions}
-        availableCities={availableCities}
-        onFormFieldChange={setFormField}
-        onContactFieldChange={setContactField}
-        onPaymentAccountsChange={setPaymentAccounts}
-        onCountryChange={handleCountryChange}
-        onRegionChange={handleRegionChange}
-        onCityToggle={toggleCitySelection}
+        onFormFieldChange={handleFormFieldChange}
         onSubmit={handleSubmit}
       />
     </div>

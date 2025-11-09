@@ -1,14 +1,14 @@
 /**
- * SuppliersList - List view for suppliers
+ * SuppliersList - 供應商列表（含類別顯示）
  */
 
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
 import { Supplier } from '../types'
-import { SUPPLIER_TYPE_LABELS } from '../constants'
+import { useSupplierCategoryStore } from '@/stores'
 
 interface SuppliersListProps {
   suppliers: Supplier[]
@@ -16,6 +16,15 @@ interface SuppliersListProps {
 }
 
 export const SuppliersList: React.FC<SuppliersListProps> = ({ suppliers, loading = false }) => {
+  const { items: categories } = useSupplierCategoryStore()
+
+  // 建立類別 lookup
+  const categoryMap = useMemo(() => {
+    const map = new Map()
+    categories.forEach(cat => map.set(cat.id, cat))
+    return map
+  }, [categories])
+
   const columns: TableColumn[] = [
     {
       key: 'name',
@@ -24,32 +33,37 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({ suppliers, loading
       render: value => <span className="font-medium text-morandi-primary">{value}</span>,
     },
     {
-      key: 'supplier_code',
-      label: '供應商編號',
+      key: 'category_id',
+      label: '類別',
+      sortable: true,
+      render: (value: string) => {
+        const category = categoryMap.get(value)
+        if (!category) return <span className="text-morandi-muted">-</span>
+        return (
+          <Badge variant="secondary" className="text-xs">
+            {category.icon && <span className="mr-1">{category.icon}</span>}
+            {category.name}
+          </Badge>
+        )
+      },
+    },
+    {
+      key: 'bank_name',
+      label: '銀行名稱',
       sortable: true,
       render: value => <span className="text-morandi-primary">{value || '-'}</span>,
     },
     {
-      key: 'country',
-      label: '國家',
+      key: 'bank_account',
+      label: '銀行帳號',
       sortable: true,
-      render: value => <span className="text-morandi-primary">{value || '-'}</span>,
+      render: value => <span className="text-morandi-secondary">{value || '-'}</span>,
     },
     {
-      key: 'location',
-      label: '地點',
-      sortable: true,
-      render: value => <span className="text-morandi-primary">{value || '-'}</span>,
-    },
-    {
-      key: 'type',
-      label: '服務項目',
-      sortable: true,
-      render: value => (
-        <Badge variant="secondary" className="text-xs">
-          {SUPPLIER_TYPE_LABELS[value as Supplier['type']]}
-        </Badge>
-      ),
+      key: 'notes',
+      label: '備註',
+      sortable: false,
+      render: value => <span className="text-sm text-morandi-muted">{value || '-'}</span>,
     },
   ]
 
