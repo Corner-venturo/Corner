@@ -46,10 +46,10 @@ import { useRealtimeForTodos } from '@/hooks/use-realtime-hooks'
 export const dynamic = 'force-dynamic'
 
 const statusFilters = [
-  { value: 'all', label: '全部' },
+  { value: 'active', label: '未完成' },
   { value: 'pending', label: '待辦' },
   { value: 'in_progress', label: '進行中' },
-  { value: 'completed', label: '完成' },
+  { value: 'completed', label: '已完成' },
 ]
 
 export default function TodosPage() {
@@ -61,7 +61,7 @@ export default function TodosPage() {
   const { create: addTodo, update: updateTodo, delete: deleteTodo, fetchAll } = todoStore
   const { user } = useAuthStore() // 取得當前登入用戶
   const searchParams = useSearchParams()
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('active')
   const [expandedTodo, setExpandedTodo] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -102,7 +102,13 @@ export default function TodosPage() {
       }
 
       // 狀態篩選
-      if (statusFilter !== 'all' && todo.status !== statusFilter) return false
+      if (statusFilter === 'active') {
+        // 「未完成」= 待辦 + 進行中
+        if (todo.status !== 'pending' && todo.status !== 'in_progress') return false
+      } else if (statusFilter !== 'all') {
+        // 其他狀態直接比對
+        if (todo.status !== statusFilter) return false
+      }
 
       // 搜尋篩選
       if (searchTerm && !todo.title.toLowerCase().includes(searchTerm.toLowerCase())) return false
@@ -126,8 +132,8 @@ export default function TodosPage() {
   const getStatusColor = useCallback((status: Todo['status']) => {
     const colorMap = {
       pending: 'text-morandi-muted',
-      in_progress: 'text-blue-600',
-      completed: 'text-green-600',
+      in_progress: 'text-morandi-gold',
+      completed: 'text-morandi-green',
       cancelled: 'text-morandi-red',
     }
     return colorMap[status]
@@ -142,8 +148,8 @@ export default function TodosPage() {
     const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
     if (diffDays < 0) return 'text-morandi-red' // 逾期
-    if (diffDays === 0) return 'text-orange-500' // 今天
-    if (diffDays <= 3) return 'text-yellow-600' // 3天內
+    if (diffDays === 0) return 'text-morandi-gold' // 今天
+    if (diffDays <= 3) return 'text-morandi-gold/70' // 3天內
     return 'text-morandi-secondary' // 充裕
   }, [])
 
@@ -188,7 +194,13 @@ export default function TodosPage() {
       label: '優先級',
       sortable: true,
       render: (value: number, todo: Todo) => (
-        <StarRating value={todo.priority} readonly size="sm" />
+        <div onClick={e => e.stopPropagation()}>
+          <StarRating
+            value={todo.priority}
+            onChange={newPriority => updateTodo(todo.id, { priority: newPriority as 1 | 2 | 3 | 4 | 5 })}
+            size="sm"
+          />
+        </div>
       ),
     },
     {
@@ -215,6 +227,43 @@ export default function TodosPage() {
       ),
     },
   ]
+
+  // 根據優先級取得列樣式
+  const getPriorityRowClass = useCallback((todo: Todo) => {
+    // 如果已完成，降低所有特效
+    const opacity = todo.status === 'completed' ? 'opacity-60' : ''
+
+    switch (todo.priority) {
+      case 5:
+        return cn(
+          'bg-gradient-to-r from-red-50/80 via-rose-50/60 to-red-50/80',
+          'hover:from-red-100/90 hover:via-rose-100/70 hover:to-red-100/90',
+          'shadow-sm shadow-red-100/50',
+          opacity
+        )
+      case 4:
+        return cn(
+          'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70',
+          'hover:from-orange-100/80 hover:via-amber-100/60 hover:to-orange-100/80',
+          opacity
+        )
+      case 3:
+        return cn(
+          'bg-gradient-to-r from-yellow-50/60 via-amber-50/40 to-yellow-50/60',
+          'hover:from-yellow-100/70 hover:via-amber-100/50 hover:to-yellow-100/70',
+          opacity
+        )
+      case 2:
+        return cn(
+          'bg-gradient-to-r from-blue-50/50 via-sky-50/30 to-blue-50/50',
+          'hover:from-blue-100/60 hover:via-sky-100/40 hover:to-blue-100/60',
+          opacity
+        )
+      case 1:
+      default:
+        return cn(opacity)
+    }
+  }, [])
 
   const handleRowClick = useCallback((todo: Todo) => {
     setExpandedTodo(todo.id)
@@ -325,7 +374,7 @@ export default function TodosPage() {
 
                 const newTodoData = {
                   title,
-                  priority: 3 as 1 | 2 | 3 | 4 | 5,
+                  priority: 1 as 1 | 2 | 3 | 4 | 5,
                   deadline: null, // ✅ 使用 null 而非空字串
                   status: 'pending' as const,
                   completed: false,
@@ -379,33 +428,8 @@ export default function TodosPage() {
             columns={columns}
             data={filteredTodos}
             onRowClick={handleRowClick}
-            rowClassName={(todo: Todo) => {
-              // 判斷是否為共享待辦
-              const isShared =
-                (todo.assignee && todo.assignee !== user?.id) ||
-                (todo.visibility && todo.visibility.length > 1)
-
-              return cn(
-                // 移除所有預設邊框
-                '!border-0',
-                // 強制設置 margin bottom 為 2rem (32px)
-                '!mb-8',
-                // 卡片樣式：圓角、陰影、完整邊框
-                '!rounded-lg !shadow-md !outline !outline-1 outline-gray-200/60 transition-all hover:!shadow-lg hover:!-translate-y-0.5',
-                // 卡片內部上下 padding 加大
-                '[&>td]:!py-5',
-                // 確保每個 td 都有圓角（第一個左側圓角，最後一個右側圓角）
-                '[&>td:first-child]:!rounded-l-lg [&>td:last-child]:!rounded-r-lg',
-                // 移除 td 之間的邊框
-                '[&>td]:!border-0',
-                // 共享待辦使用藍色背景和輪廓
-                isShared
-                  ? '!bg-blue-50 !outline-blue-200 hover:!bg-blue-100 hover:!outline-blue-300'
-                  : '!bg-white hover:!outline-morandi-gold/40',
-                // 完成的待辦降低透明度
-                todo.status === 'completed' && 'opacity-60'
-              )
-            }}
+            striped
+            rowClassName={getPriorityRowClass}
             actions={(todo: Todo) => (
               <div className="flex items-center gap-1">
                 <button

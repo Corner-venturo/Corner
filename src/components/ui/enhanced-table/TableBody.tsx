@@ -93,7 +93,7 @@ export function TableBody({
                 isSelected && 'bg-morandi-gold/10',
                 (onRowClick || onRowDoubleClick) && !selection && !expandable && 'cursor-pointer',
                 hoverable && 'hover:bg-morandi-container/20 transition-all duration-150',
-                striped && index % 2 === 0 && 'bg-morandi-container/10',
+                striped && index % 2 === 0 && 'bg-morandi-container/20',
                 rowClassName?.(row)
               )}
               onClick={() => {
