@@ -5,8 +5,9 @@
 
 import { useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { TableColumn } from '@/components/ui/enhanced-table'
-import { X } from 'lucide-react'
+import { X, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   STATUS_LABELS,
@@ -143,7 +144,11 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
   )
 }
 
-export function useHistoryColumns() {
+interface UseHistoryColumnsProps {
+  onPrintPDF: (order: DisbursementOrder) => void
+}
+
+export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
   return useMemo<TableColumn[]>(
     () => [
       {
@@ -153,7 +158,7 @@ export function useHistoryColumns() {
         render: value => <div className="font-medium text-morandi-primary">{value}</div>,
       },
       {
-        key: 'disbursementDate',
+        key: 'disbursement_date',
         label: '出帳日期',
         sortable: true,
         render: value => <div className="text-sm text-morandi-secondary">{value}</div>,
@@ -165,7 +170,7 @@ export function useHistoryColumns() {
         render: value => <div className="font-medium text-right">NT$ {value.toLocaleString()}</div>,
       },
       {
-        key: 'paymentRequestIds',
+        key: 'payment_request_ids',
         label: '請款單數',
         render: value => <div className="text-center">{value.length} 筆</div>,
       },
@@ -193,7 +198,23 @@ export function useHistoryColumns() {
           </div>
         ),
       },
+      {
+        key: 'actions',
+        label: '操作',
+        width: '100px',
+        render: (_value, row) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPrintPDF(row as DisbursementOrder)}
+            className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+          >
+            <FileText size={14} className="mr-1" />
+            PDF
+          </Button>
+        ),
+      },
     ],
-    []
+    [onPrintPDF]
   )
 }

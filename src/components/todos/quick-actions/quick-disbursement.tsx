@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { FileText, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -12,12 +13,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Combobox } from '@/components/ui/combobox'
 import { useRequestForm } from '@/features/finance/requests/hooks/useRequestForm'
 import { useBatchRequestForm } from '@/features/finance/requests/hooks/useBatchRequestForm'
 import { useRequestOperations } from '@/features/finance/requests/hooks/useRequestOperations'
 import { categoryOptions } from '@/features/finance/requests/types'
-import { TourSearchSelect } from '@/features/finance/requests/components/TourSearchSelect'
-import { OrderSearchSelect } from '@/features/finance/requests/components/OrderSearchSelect'
 import { BatchTourSelect } from '@/features/finance/requests/components/BatchTourSelect'
 import { cn } from '@/lib/utils'
 
@@ -58,7 +58,25 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     suppliers,
     tours,
     orders,
+    loadTours,
   } = useRequestForm()
+
+  // ✅ 載入團體和訂單資料（進入請款頁面時）
+  React.useEffect(() => {
+    const loadData = async () => {
+      const { useTourStore, useOrderStore } = await import('@/stores')
+      const tourStore = useTourStore.getState()
+      const orderStore = useOrderStore.getState()
+
+      if (tourStore.items.length === 0) {
+        await tourStore.fetchAll()
+      }
+      if (orderStore.items.length === 0) {
+        await orderStore.fetchAll()
+      }
+    }
+    loadData()
+  }, [])
 
   // Batch request hook
   const {
@@ -78,18 +96,16 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
   const { createRequest, createBatchRequests } = useRequestOperations()
 
-  // Generate upcoming Thursdays for request date
+  // Generate upcoming Thursdays for request date (20 weeks = ~5 months)
   const upcomingThursdays = useMemo(() => {
     const thursdays = []
     const today = new Date()
     const currentDay = today.getDay()
 
+    // 如果今天是週四，從今天開始；否則從下一個週四開始
     let daysUntilThursday = (4 - currentDay + 7) % 7
-    if (daysUntilThursday === 0 && today.getHours() >= 12) {
-      daysUntilThursday = 7
-    }
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 20; i++) {
       const thursdayDate = new Date(today)
       thursdayDate.setDate(today.getDate() + daysUntilThursday + i * 7)
 
@@ -160,15 +176,15 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
   }
 
   return (
-    <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
+    <div className="space-y-4">
       {/* Mode Toggle */}
-      <div className="flex gap-2 p-1 bg-morandi-container/20 rounded-lg">
+      <div className="flex gap-2 p-1 bg-morandi-container/20 rounded-lg shadow-sm">
         <button
           onClick={() => setMode('single')}
           className={cn(
-            'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors',
+            'flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all',
             mode === 'single'
-              ? 'bg-morandi-gold text-white'
+              ? 'bg-morandi-gold text-white shadow-sm'
               : 'text-morandi-secondary hover:bg-morandi-container/30'
           )}
         >
@@ -177,9 +193,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         <button
           onClick={() => setMode('batch')}
           className={cn(
-            'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors',
+            'flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all',
             mode === 'batch'
-              ? 'bg-morandi-primary text-white'
+              ? 'bg-morandi-primary text-white shadow-sm'
               : 'text-morandi-secondary hover:bg-morandi-container/30'
           )}
         >
@@ -189,43 +205,58 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
       {mode === 'single' ? (
         <>
-          {/* Single Request: Tour Search */}
-          <TourSearchSelect
-            value={tourSearchValue}
-            onChange={setTourSearchValue}
-            onSelect={tour => {
-              setFormData(prev => ({
-                ...prev,
-                tour_id: tour.id,
-                order_id: '',
-              }))
-              setTourSearchValue(`${tour.code} - ${tour.name}`)
-              setOrderSearchValue('')
-            }}
-            tours={filteredTours}
-            showDropdown={showTourDropdown}
-            onShowDropdown={setShowTourDropdown}
-            label="選擇團體 *"
-            placeholder="搜尋團號、團名或日期（如：0801、東京）"
-          />
+          {/* 團體和訂單選擇（並排） */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* 選擇團體 */}
+            <div>
+              <Label className="text-sm font-medium text-morandi-secondary">團體 *</Label>
+              <Combobox
+                options={tours.map(tour => ({
+                  value: tour.id,
+                  label: `${tour.code || ''} - ${tour.name || ''}`,
+                }))}
+                value={formData.tour_id}
+                onChange={value => {
+                  setFormData(prev => ({
+                    ...prev,
+                    tour_id: value,
+                    order_id: '',
+                  }))
+                }}
+                placeholder="請選擇團體..."
+                className="mt-1"
+              />
+            </div>
 
-          {/* Single Request: Order Search */}
-          <OrderSearchSelect
-            value={orderSearchValue}
-            onChange={setOrderSearchValue}
-            onSelect={order => {
-              setFormData(prev => ({
-                ...prev,
-                order_id: order.id,
-              }))
-              setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
-            }}
-            orders={filteredOrders}
-            showDropdown={showOrderDropdown}
-            onShowDropdown={setShowOrderDropdown}
-            disabled={!formData.tour_id}
-            label="選擇訂單（選填）"
-          />
+            {/* 選擇訂單 */}
+            <div>
+              <Label className="text-sm font-medium text-morandi-secondary">訂單（選填）</Label>
+              <Select
+                disabled={!formData.tour_id || filteredOrders.length === 0}
+                value={formData.order_id}
+                onValueChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
+              >
+                <SelectTrigger className="mt-1 h-9 border-morandi-container/30">
+                  <SelectValue
+                    placeholder={
+                      !formData.tour_id
+                        ? '請先選擇團體'
+                        : filteredOrders.length === 0
+                          ? '此團體沒有訂單'
+                          : '請選擇訂單...'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredOrders.map(order => (
+                    <SelectItem key={order.id} value={order.id}>
+                      {order.order_number} - {order.contact_person || '無聯絡人'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </>
       ) : (
         <>
@@ -245,12 +276,12 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       )}
 
       {/* Request Date */}
-      <div>
+      <div className="pt-3 border-t border-morandi-container/20">
         <label className="text-sm font-medium text-morandi-secondary mb-2 block">
           請款日期 <span className="text-morandi-red">*</span>
         </label>
 
-        <div className="mb-2 flex items-center space-x-2">
+        <div className="mb-3 flex items-center space-x-2">
           <input
             type="checkbox"
             id="isSpecialBilling"
@@ -291,9 +322,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                   setBatchFormData(prev => ({ ...prev, request_date: e.target.value }))
                 }
               }}
-              className="bg-morandi-gold/10 border-morandi-gold/20"
+              className="bg-morandi-gold/10 border-morandi-container/30"
             />
-            <p className="text-xs text-morandi-gold mt-1">⚠️ 特殊出帳：可選擇任何日期</p>
+            <p className="text-xs text-morandi-gold mt-1.5">⚠️ 特殊出帳：可選擇任何日期</p>
           </div>
         ) : (
           <div>
@@ -307,7 +338,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="border-morandi-container/30">
                 <SelectValue placeholder="選擇請款日期 (週四)" />
               </SelectTrigger>
               <SelectContent>
@@ -318,19 +349,19 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-morandi-secondary mt-1">💼 一般請款固定每週四</p>
+            <p className="text-xs text-morandi-secondary mt-1.5">💼 一般請款固定每週四</p>
           </div>
         )}
       </div>
 
       {/* Add Item Form */}
-      <div className="border border-morandi-container/30 rounded-lg p-4 bg-morandi-container/5">
-        <h6 className="font-medium text-morandi-primary mb-3">新增請款項目</h6>
+      <div className="pt-3 border-t border-morandi-container/20">
+        <label className="text-sm font-medium text-morandi-primary mb-3 block">新增請款項目</label>
 
-        <div className="space-y-3">
+        <div className="space-y-3 p-4 bg-morandi-container/5 rounded-lg border border-morandi-container/30">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">類別</label>
+              <label className="text-sm font-medium text-morandi-secondary mb-1 block">類別</label>
               <Select
                 value={newItem.category}
                 onValueChange={value =>
@@ -351,7 +382,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
             </div>
 
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+              <label className="text-sm font-medium text-morandi-secondary mb-1 block">
                 供應商
               </label>
               <Select
@@ -373,7 +404,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           </div>
 
           <div>
-            <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+            <label className="text-sm font-medium text-morandi-secondary mb-1 block">
               項目描述
             </label>
             <Input
@@ -386,7 +417,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">單價</label>
+              <label className="text-sm font-medium text-morandi-secondary mb-1 block">單價</label>
               <Input
                 type="number"
                 value={newItem.unit_price || ''}
@@ -399,7 +430,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
             </div>
 
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">數量</label>
+              <label className="text-sm font-medium text-morandi-secondary mb-1 block">數量</label>
               <Input
                 type="number"
                 value={newItem.quantity || ''}
@@ -410,7 +441,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
             </div>
 
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">小計</label>
+              <label className="text-sm font-medium text-morandi-secondary mb-1 block">小計</label>
               <Input
                 value={`NT$ ${(newItem.unit_price * newItem.quantity).toLocaleString()}`}
                 disabled
@@ -422,7 +453,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           <Button
             onClick={addItemToList}
             disabled={!newItem.supplier_id || !newItem.description}
-            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm"
             size="sm"
           >
             <Plus size={16} className="mr-2" />
@@ -433,54 +464,56 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
       {/* Item List */}
       {requestItems.length > 0 && (
-        <div className="border border-morandi-container/30 rounded-lg p-4">
-          <h6 className="font-medium text-morandi-primary mb-3">
+        <div className="pt-3 border-t border-morandi-container/20">
+          <label className="text-sm font-medium text-morandi-primary mb-3 block">
             請款項目列表 ({requestItems.length})
-          </h6>
-          <div className="space-y-2">
-            {requestItems.map(item => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between p-3 bg-morandi-container/10 rounded"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-0.5 rounded">
-                      {categoryOptions.find(c => c.value === item.category)?.label}
-                    </span>
-                    <span className="text-sm font-medium text-morandi-primary">
-                      {item.supplierName}
-                    </span>
-                  </div>
-                  <div className="text-xs text-morandi-secondary">{item.description}</div>
-                  <div className="text-xs text-morandi-secondary mt-1">
-                    NT$ {item.unit_price.toLocaleString()} × {item.quantity} =
-                    <span className="font-semibold text-morandi-gold ml-1">
-                      NT$ {(item.unit_price * item.quantity).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="ml-4 text-morandi-red hover:bg-morandi-red/10 p-2 rounded"
+          </label>
+          <div className="space-y-2 p-4 bg-morandi-container/5 rounded-lg border border-morandi-container/30">
+            <div className="space-y-2">
+              {requestItems.map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-morandi-container/20"
                 >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-0.5 rounded">
+                        {categoryOptions.find(c => c.value === item.category)?.label}
+                      </span>
+                      <span className="text-sm font-medium text-morandi-primary">
+                        {item.supplierName}
+                      </span>
+                    </div>
+                    <div className="text-xs text-morandi-secondary">{item.description}</div>
+                    <div className="text-xs text-morandi-secondary mt-1">
+                      NT$ {item.unit_price.toLocaleString()} × {item.quantity} =
+                      <span className="font-semibold text-morandi-gold ml-1">
+                        NT$ {(item.unit_price * item.quantity).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="ml-4 text-morandi-red hover:bg-morandi-red/10 p-2 rounded transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
 
-          <div className="mt-3 pt-3 border-t border-morandi-container/30 flex justify-between items-center">
-            <span className="text-sm font-semibold text-morandi-primary">總金額:</span>
-            <span className="text-lg font-bold text-morandi-gold">
-              NT$ {total_amount.toLocaleString()}
-            </span>
+            <div className="mt-3 pt-3 border-t border-morandi-container/30 flex justify-between items-center">
+              <span className="text-sm font-semibold text-morandi-primary">總金額:</span>
+              <span className="text-lg font-bold text-morandi-gold">
+                NT$ {total_amount.toLocaleString()}
+              </span>
+            </div>
           </div>
         </div>
       )}
 
       {/* Note */}
-      <div>
+      <div className="pt-3 border-t border-morandi-container/20">
         <label className="text-sm font-medium text-morandi-secondary mb-2 block">備註</label>
         <Textarea
           placeholder="請款相關說明..."
@@ -498,27 +531,29 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       </div>
 
       {/* Submit Button */}
-      <Button
-        onClick={handleSubmit}
-        disabled={
-          mode === 'single'
-            ? !formData.tour_id || requestItems.length === 0 || !formData.request_date
-            : selectedTourIds.length === 0 ||
-              requestItems.length === 0 ||
-              !batchFormData.request_date
-        }
-        className={cn(
-          'w-full text-white',
-          mode === 'single'
-            ? 'bg-morandi-gold hover:bg-morandi-gold-hover'
-            : 'bg-morandi-primary hover:bg-morandi-primary/90'
-        )}
-      >
-        <FileText size={16} className="mr-2" />
-        {mode === 'single'
-          ? `建立請款單 (${requestItems.length} 項，NT$ ${total_amount.toLocaleString()})`
-          : `建立批次請款 (${selectedTourIds.length} 個團，${requestItems.length} 項，總計 NT$ ${(total_amount * selectedTourIds.length).toLocaleString()})`}
-      </Button>
+      <div className="pt-4">
+        <Button
+          onClick={handleSubmit}
+          disabled={
+            mode === 'single'
+              ? !formData.tour_id || requestItems.length === 0 || !formData.request_date
+              : selectedTourIds.length === 0 ||
+                requestItems.length === 0 ||
+                !batchFormData.request_date
+          }
+          className={cn(
+            'w-full text-white shadow-sm',
+            mode === 'single'
+              ? 'bg-morandi-gold hover:bg-morandi-gold-hover'
+              : 'bg-morandi-primary hover:bg-morandi-primary/90'
+          )}
+        >
+          <FileText size={16} className="mr-2" />
+          {mode === 'single'
+            ? `建立請款單 (${requestItems.length} 項，NT$ ${total_amount.toLocaleString()})`
+            : `建立批次請款 (${selectedTourIds.length} 個團，${requestItems.length} 項，總計 NT$ ${(total_amount * selectedTourIds.length).toLocaleString()})`}
+        </Button>
+      </div>
     </div>
   )
 }

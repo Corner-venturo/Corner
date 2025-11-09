@@ -6,9 +6,12 @@ import { Users } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { SmartDateInput } from '@/components/ui/smart-date-input'
+import { SimpleDateInput } from '@/components/ui/simple-date-input'
+import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
 import { useTourStore, useOrderStore } from '@/stores'
+import { useUserStore } from '@/stores/user-store'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface QuickGroupProps {
   onSubmit?: () => void
@@ -17,6 +20,8 @@ interface QuickGroupProps {
 export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const tourStore = useTourStore()
   const orderStore = useOrderStore()
+  const { items: employees } = useUserStore()
+  const { currentProfile } = useAuthStore()
   const [submitting, setSubmitting] = useState(false)
 
   const [newTour, setNewTour] = useState({
@@ -27,18 +32,24 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
     departure_date: '',
     return_date: '',
     price: 0,
-    max_participants: 20,
+    max_participants: undefined as number | undefined,
     description: '',
     isSpecial: false,
   })
 
+  const currentUserName = currentProfile?.display_name || currentProfile?.english_name || ''
+
   const [newOrder, setNewOrder] = useState({
     contact_person: '',
-    sales_person: '',
+    sales_person: currentUserName,
     assistant: '',
-    member_count: 1,
+    member_count: undefined as number | undefined,
     total_amount: 0,
   })
+
+  // 篩選業務人員和助理
+  const salesPersons = employees.filter(emp => emp.status === 'active')
+  const assistants = employees.filter(emp => emp.status === 'active')
 
   const handleSubmit = async () => {
     if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
@@ -71,7 +82,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         departure_date: newTour.departure_date,
         return_date: newTour.return_date,
         price: newTour.price,
-        max_participants: newTour.max_participants,
+        max_participants: newTour.max_participants || 20,
         description: newTour.description,
         status: 'draft' as const,
         contract_status: 'pending' as const,
@@ -91,7 +102,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           contact_person: newOrder.contact_person,
           sales_person: newOrder.sales_person || '未指派',
           assistant: newOrder.assistant || '未指派',
-          member_count: newOrder.member_count,
+          member_count: newOrder.member_count || 1,
           total_amount: newOrder.total_amount,
           paid_amount: 0,
           remaining_amount: newOrder.total_amount,
@@ -171,7 +182,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             <label className="text-sm font-medium text-morandi-secondary mb-2 block">
               出發日期 <span className="text-morandi-red">*</span>
             </label>
-            <SmartDateInput
+            <SimpleDateInput
               value={newTour.departure_date}
               onChange={departure_date => {
                 setNewTour(prev => {
@@ -191,7 +202,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             <label className="text-sm font-medium text-morandi-secondary mb-2 block">
               返回日期 <span className="text-morandi-red">*</span>
             </label>
-            <SmartDateInput
+            <SimpleDateInput
               value={newTour.return_date}
               onChange={return_date => {
                 setNewTour(prev => ({ ...prev, return_date }))
@@ -199,31 +210,6 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
               min={newTour.departure_date || new Date().toISOString().split('T')[0]}
               className="border-morandi-container/30"
               required
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">價格</label>
-            <Input
-              type="number"
-              value={newTour.price}
-              onChange={e => setNewTour(prev => ({ ...prev, price: Number(e.target.value) }))}
-              className="border-morandi-container/30"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-              最大人數
-            </label>
-            <Input
-              type="number"
-              value={newTour.max_participants}
-              onChange={e =>
-                setNewTour(prev => ({ ...prev, max_participants: Number(e.target.value) }))
-              }
-              className="border-morandi-container/30"
             />
           </div>
         </div>
@@ -262,18 +248,34 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
               <label className="text-sm font-medium text-morandi-secondary mb-2 block">
                 業務人員
               </label>
-              <Input
+              <Combobox
                 value={newOrder.sales_person}
-                onChange={e => setNewOrder(prev => ({ ...prev, sales_person: e.target.value }))}
+                onChange={sales_person => setNewOrder(prev => ({ ...prev, sales_person }))}
+                options={salesPersons.map(emp => ({
+                  value: emp.display_name || emp.english_name || '',
+                  label: emp.display_name || emp.english_name || '',
+                }))}
+                placeholder="選擇業務人員..."
+                emptyMessage="找不到員工"
+                showSearchIcon={true}
+                showClearButton={true}
                 className="border-morandi-container/30"
               />
             </div>
 
             <div>
               <label className="text-sm font-medium text-morandi-secondary mb-2 block">助理</label>
-              <Input
+              <Combobox
                 value={newOrder.assistant}
-                onChange={e => setNewOrder(prev => ({ ...prev, assistant: e.target.value }))}
+                onChange={assistant => setNewOrder(prev => ({ ...prev, assistant }))}
+                options={assistants.map(emp => ({
+                  value: emp.display_name || emp.english_name || '',
+                  label: emp.display_name || emp.english_name || '',
+                }))}
+                placeholder="選擇助理..."
+                emptyMessage="找不到員工"
+                showSearchIcon={true}
+                showClearButton={true}
                 className="border-morandi-container/30"
               />
             </div>
@@ -285,11 +287,16 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                 </label>
                 <Input
                   type="number"
-                  value={newOrder.member_count}
-                  onChange={e =>
-                    setNewOrder(prev => ({ ...prev, member_count: Number(e.target.value) }))
-                  }
-                  min="1"
+                  value={newOrder.member_count || ''}
+                  onChange={e => {
+                    const value = e.target.value
+                    setNewOrder(prev => ({
+                      ...prev,
+                      member_count: value === '' ? undefined : Number(value),
+                    }))
+                  }}
+                  placeholder="1"
+                  min="0"
                   className="border-morandi-container/30"
                 />
               </div>

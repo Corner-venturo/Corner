@@ -11,6 +11,7 @@ import { FileText, Calendar, Wallet } from 'lucide-react'
 import { useDisbursementData } from '../hooks/useDisbursementData'
 import { useDisbursementFilters } from '../hooks/useDisbursementFilters'
 import { useDisbursementForm } from '../hooks/useDisbursementForm'
+import { useDisbursementPDF } from '../hooks/useDisbursementPDF'
 import { PendingList, CurrentOrderList, EmptyCurrentOrder, HistoryList } from './DisbursementList'
 import { DisbursementDialog } from './DisbursementDialog'
 
@@ -53,6 +54,9 @@ export function DisbursementPage() {
     resetForm,
     clearSelections,
   } = useDisbursementForm(pendingRequests)
+
+  // PDF 生成
+  const { handlePrintPDF } = useDisbursementPDF()
 
   // 加入出納單
   const handleAddToDisbursement = useCallback(() => {
@@ -141,6 +145,7 @@ export function DisbursementPage() {
                 searchTerm={searchTerm}
                 onRemove={handleRemoveFromDisbursement}
                 onConfirm={handleConfirmDisbursement}
+                onPrintPDF={handlePrintPDF}
               />
             ) : (
               <EmptyCurrentOrder onNavigate={() => setActiveTab('pending')} />
@@ -149,7 +154,13 @@ export function DisbursementPage() {
         )}
 
         {/* 出納單列表頁面 */}
-        {activeTab === 'all' && <HistoryList data={disbursement_orders} searchTerm={searchTerm} />}
+        {activeTab === 'all' && (
+          <HistoryList
+            data={disbursement_orders}
+            searchTerm={searchTerm}
+            onPrintPDF={handlePrintPDF}
+          />
+        )}
       </div>
 
       {/* 新增出納單對話框 */}
