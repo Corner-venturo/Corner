@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart3 } from 'lucide-react'
+import { BarChart3, TrendingUp, Trophy } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
 
 export default function FitnessStatsPage() {
@@ -26,9 +26,18 @@ export default function FitnessStatsPage() {
             累積更多訓練記錄後，這裡會顯示你的進步曲線
           </p>
           <div className="text-xs text-[#AFA598] space-y-1">
-            <div>📊 訓練容量趨勢</div>
-            <div>📈 訓練頻率分析</div>
-            <div>🏆 個人紀錄 (PR)</div>
+            <div className="flex items-center gap-2 justify-center">
+              <BarChart3 className="w-3.5 h-3.5" />
+              訓練容量趨勢
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <TrendingUp className="w-3.5 h-3.5" />
+              訓練頻率分析
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <Trophy className="w-3.5 h-3.5" />
+              個人紀錄 (PR)
+            </div>
           </div>
         </div>
       </div>
