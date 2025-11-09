@@ -1,0 +1,129 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { LogOut, Trash2, Info, User } from 'lucide-react'
+import { FitnessLayout } from '../components/FitnessLayout'
+import { useAuthStore } from '@/stores/auth-store'
+
+export default function FitnessSettingsPage() {
+  const router = useRouter()
+  const { user, signOut } = useAuthStore()
+
+  const handleLogout = async () => {
+    if (confirm('確定要登出嗎？')) {
+      await signOut()
+      router.push('/login')
+    }
+  }
+
+  const handleClearData = () => {
+    if (
+      confirm(
+        '⚠️ 警告：這將清除所有本地健身資料（訓練記錄、身體數據、目標等）。\n\n此操作無法復原，確定要繼續嗎？'
+      )
+    ) {
+      // TODO: 清除 IndexedDB 中的健身資料
+      alert('本地資料已清除')
+      router.push('/fitness')
+    }
+  }
+
+  return (
+    <FitnessLayout activeTab="settings">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-[#FEFEFE] border-b border-[#EDE8E0] px-4 py-4">
+        <h1 className="text-xl font-bold text-[#3D2914]">設定</h1>
+      </div>
+
+      <div className="px-4 pt-6 space-y-6">
+        {/* 使用者資訊 */}
+        <div className="bg-[#FEFEFE] border border-[#EDE8E0] rounded-2xl p-4 shadow-[0_2px_8px_rgba(61,41,20,0.08)]">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-[#C9A961] rounded-full flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="font-medium text-[#3D2914]">
+                {user?.user_metadata?.full_name || '使用者'}
+              </div>
+              <div className="text-sm text-[#9E8F81]">{user?.email}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 設定選項 */}
+        <div className="bg-[#FEFEFE] border border-[#EDE8E0] rounded-2xl overflow-hidden">
+          {/* 清除本地資料 */}
+          <button
+            onClick={handleClearData}
+            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-[#FAF8F5] transition-colors border-b border-[#EDE8E0]"
+          >
+            <div className="w-10 h-10 bg-[#FFF3E0] rounded-full flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-[#C9A961]" />
+            </div>
+            <div className="flex-1 text-left">
+              <div className="font-medium text-[#3D2914]">清除本地資料</div>
+              <div className="text-xs text-[#9E8F81]">
+                清除所有健身記錄和設定
+              </div>
+            </div>
+          </button>
+
+          {/* 登出 */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-[#FAF8F5] transition-colors"
+          >
+            <div className="w-10 h-10 bg-[#FFE5E5] rounded-full flex items-center justify-center">
+              <LogOut className="w-5 h-5 text-[#C94961]" />
+            </div>
+            <div className="flex-1 text-left">
+              <div className="font-medium text-[#3D2914]">登出</div>
+              <div className="text-xs text-[#9E8F81]">
+                登出 Corner Fitness
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* 關於 */}
+        <div className="bg-[#FEFEFE] border border-[#EDE8E0] rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-[#E8F4F8] rounded-full flex items-center justify-center flex-shrink-0">
+              <Info className="w-5 h-5 text-[#61A9C9]" />
+            </div>
+            <div className="flex-1">
+              <div className="font-medium text-[#3D2914] mb-2">
+                關於 Corner Fitness
+              </div>
+              <div className="text-sm text-[#9E8F81] space-y-1">
+                <p>版本：1.0.0</p>
+                <p>
+                  簡潔優雅的健身記錄工具，專為 Corner
+                  團隊設計。
+                </p>
+                <p className="mt-3 pt-3 border-t border-[#EDE8E0]">
+                  💪 支援 134+ 訓練動作
+                  <br />
+                  📊 訓練容量自動計算
+                  <br />
+                  📱 PWA 離線使用
+                  <br />
+                  🔄 多裝置同步（開發中）
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 返回主系統 */}
+        <button
+          onClick={() => router.push('/')}
+          className="w-full py-3 text-sm text-[#6B5D52] border border-[#E0D8CC] rounded-xl hover:bg-[#FAF8F5] transition-colors"
+        >
+          ← 返回 Corner 主系統
+        </button>
+      </div>
+    </FitnessLayout>
+  )
+}
