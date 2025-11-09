@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useWorkspacePermissionStore } from '@/stores/workspace-permission-store'
-import { useEmployeeStore } from '@/stores/employee-store'
-import { useWorkspaceStore } from '@/stores'
+import { useEmployeeStore, useWorkspaceStore } from '@/stores'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
