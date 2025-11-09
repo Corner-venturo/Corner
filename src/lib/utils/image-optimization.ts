@@ -121,7 +121,11 @@ export function getPlaceholderImage(width: number = 400, height: number = 300): 
  */
 export function preloadImage(url: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const img = new Image()
+    if (typeof window === 'undefined') {
+      resolve()
+      return
+    }
+    const img = new window.Image()
     img.onload = () => resolve()
     img.onerror = reject
     img.src = url

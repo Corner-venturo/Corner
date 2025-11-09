@@ -148,8 +148,7 @@ export default function AttractionsPage() {
 
       <div className="flex-1 overflow-auto">
         {/* 篩選區 - 暫時隱藏避免崩潰 */}
-        {false && (
-          <AttractionsFilters
+        {/* <AttractionsFilters
             selectedCountry={selectedCountry}
             setSelectedCountry={setSelectedCountry}
             selectedRegion={selectedRegion}
@@ -164,8 +163,7 @@ export default function AttractionsPage() {
             availableRegions={availableRegions}
             availableCities={availableCities}
             categories={categories}
-          />
-        )}
+          /> */}
 
         {/* 景點列表（超級簡化版本） */}
         <div className="p-4">
@@ -194,8 +192,7 @@ export default function AttractionsPage() {
       </div>
 
       {/* 新增對話框 - 暫時禁用 */}
-      {false && (
-        <AttractionsDialog
+      {/* <AttractionsDialog
           open={isAddOpen}
           onClose={closeAdd}
           onSubmit={addAttraction}
@@ -206,12 +203,10 @@ export default function AttractionsPage() {
           getCitiesByCountry={getCitiesByCountry}
           getCitiesByRegion={getCitiesByRegion}
           initialFormData={initialFormData}
-        />
-      )}
+        /> */}
 
       {/* 編輯對話框 - 暫時禁用 */}
-      {false && (
-        <AttractionsDialog
+      {/* <AttractionsDialog
           open={isEditOpen}
           onClose={closeEdit}
           onSubmit={formData => updateAttraction(editingAttraction!.id, formData)}
@@ -223,8 +218,7 @@ export default function AttractionsPage() {
           getCitiesByCountry={getCitiesByCountry}
           getCitiesByRegion={getCitiesByRegion}
           initialFormData={initialFormData}
-        />
-      )}
+        /> */}
     </div>
   )
 }

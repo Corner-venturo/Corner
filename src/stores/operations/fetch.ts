@@ -62,60 +62,6 @@ export async function fetchAll<T extends BaseEntity>(
         logger.warn(`⚠️ [${tableName}] Supabase 連線失敗，使用快取資料 (${cachedItems.length} 筆)`, supabaseError);
         return cachedItems;
       }
-
-      // 情境 B：無快取資料 → 快速下載前 100 筆
-
-      try {
-        // ✅ 策略：先快速下載前 100 筆顯示（1 秒內）
-        const { supabase: supabaseClient } = await import('@/lib/supabase/client');
-        const { data: initialItems, error: fetchError } = await supabaseClient
-          .from(tableName)
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(100);
-
-        if (fetchError) {
-          logger.error(`❌ [${tableName}] Supabase 查詢失敗:`, fetchError);
-          throw fetchError;
-        }
-
-        const typedInitialItems = (initialItems || []) as T[];
-
-        if (typedInitialItems.length > 0) {
-          // 存入快取（不阻擋返回）
-          await indexedDB.batchPut(typedInitialItems);
-
-          // 🎯 背景下載剩餘資料（不阻擋 UI）
-          Promise.resolve().then(async () => {
-            try {
-              const allItems = await supabase.fetchAll();
-              if (allItems.length > typedInitialItems.length) {
-                await indexedDB.batchPut(allItems);
-              }
-            } catch (err) {
-              // 靜默失敗
-            }
-          });
-
-          return typedInitialItems;
-        }
-
-        return [];
-      } catch (err) {
-        logger.error(`❌ [${tableName}] 快速載入失敗:`, err);
-
-        // 嘗試從 IndexedDB 讀取（可能有舊資料）
-        try {
-          const fallbackItems = await indexedDB.getAll();
-          if (fallbackItems.length > 0) {
-            return fallbackItems;
-          }
-        } catch (idbError) {
-          // 靜默失敗
-        }
-
-        return [];
-      }
     } else {
       // 從 IndexedDB 讀取（離線模式或未啟用 Supabase）
       const items = await indexedDB.getAll();

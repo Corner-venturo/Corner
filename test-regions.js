@@ -1,3 +1,4 @@
+/* eslint-disable */
 // 快速測試 regions 資料讀取
 const { createClient } = require('@supabase/supabase-js');
 
