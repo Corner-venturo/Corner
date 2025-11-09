@@ -23,5 +23,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-env.d.ts", "out/types/**/*.ts"],
-  "exclude": ["node_modules", "**/*.deprecated.ts"]
+  "exclude": ["node_modules", "**/*.deprecated.ts", "Corner"]
 }
