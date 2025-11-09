@@ -9,11 +9,13 @@
 ## 🎯 任務目標
 
 **解決問題**:
+
 - 公司刪除的資料，回到家還是顯示（多裝置同步失敗）
 - setTimeout 背景同步被忽略
 - 自動訂閱所有表格導致連線數超標
 
 **解決方案**:
+
 - ✅ 改為「按需訂閱」模式（進入頁面才訂閱，離開時取消）
 - ✅ 移除所有 setTimeout，改為即時同步
 - ✅ 永久訂閱系統表格（user_roles, workspaces, employees）
@@ -28,6 +30,7 @@
 建立了 **20 個按需訂閱 Hooks**：
 
 #### 業務實體（13 個）
+
 1. `useRealtimeForTours()` - 旅遊團
 2. `useRealtimeForOrders()` - 訂單
 3. `useRealtimeForQuotes()` - 報價單
@@ -43,15 +46,18 @@
 13. `useRealtimeForTodos()` - 待辦事項
 
 #### 子實體（3 個）
+
 14. `useRealtimeForMembers()` - 團員
 15. `useRealtimeForQuoteItems()` - 報價項目
 16. `useRealtimeForTourAddons()` - 加購項目
 
 #### Workspace 系統（2 個）
+
 17. `useChannelsRealtime()` - 頻道（Phase 2）
 18. `useChatRealtime()` - 訊息（Phase 3）
 
 #### 其他（2 個）
+
 19. `useRealtimeForEmployees()` - 員工
 20. 永久訂閱：`PermanentRealtimeSubscriptions` 組件
 
@@ -111,6 +117,7 @@
    - 即時更新 IndexedDB + Zustand
 
 **檔案位置**:
+
 - `src/components/PermanentRealtimeSubscriptions.tsx`
 - `src/components/layout/main-layout.tsx` (整合)
 
@@ -200,45 +207,43 @@ export default function CalendarPage() {
 export function createRealtimeHook<T extends { id: string }>(
   options: CreateRealtimeHookOptions<T>
 ) {
-  const { tableName, indexedDB, store } = options;
+  const { tableName, indexedDB, store } = options
 
   return function useRealtimeForTable() {
     useEffect(() => {
-      const subscriptionId = `${tableName}-realtime`;
+      const subscriptionId = `${tableName}-realtime`
 
       realtimeManager.subscribe<T>({
         table: tableName,
         subscriptionId,
         handlers: {
-          onInsert: async (record) => {
-            await indexedDB.put(record);
-            store.setState((state) => ({
+          onInsert: async record => {
+            await indexedDB.put(record)
+            store.setState(state => ({
               items: [...state.items, record],
-            }));
+            }))
           },
-          onUpdate: async (record) => {
-            await indexedDB.put(record);
-            store.setState((state) => ({
-              items: state.items.map((item) =>
-                item.id === record.id ? record : item
-              ),
-            }));
+          onUpdate: async record => {
+            await indexedDB.put(record)
+            store.setState(state => ({
+              items: state.items.map(item => (item.id === record.id ? record : item)),
+            }))
           },
-          onDelete: async (oldRecord) => {
-            await indexedDB.delete(oldRecord.id);
-            store.setState((state) => ({
-              items: state.items.filter((item) => item.id !== oldRecord.id),
-            }));
+          onDelete: async oldRecord => {
+            await indexedDB.delete(oldRecord.id)
+            store.setState(state => ({
+              items: state.items.filter(item => item.id !== oldRecord.id),
+            }))
           },
         },
-      });
+      })
 
       // 清理：離開頁面時取消訂閱
       return () => {
-        realtimeManager.unsubscribe(subscriptionId);
-      };
-    }, []);
-  };
+        realtimeManager.unsubscribe(subscriptionId)
+      }
+    }, [])
+  }
 }
 ```
 
@@ -247,11 +252,11 @@ export function createRealtimeHook<T extends { id: string }>(
 ```typescript
 // src/components/PermanentRealtimeSubscriptions.tsx
 export function PermanentRealtimeSubscriptions() {
-  const user = useAuthStore((state) => state.user);
-  const { toast } = useToast();
+  const user = useAuthStore(state => state.user)
+  const { toast } = useToast()
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) return
 
     // 訂閱 user_roles
     realtimeManager.subscribe<UserRole>({
@@ -259,23 +264,23 @@ export function PermanentRealtimeSubscriptions() {
       filter: `user_id=eq.${user.id}`,
       subscriptionId: `user-role-${user.id}`,
       handlers: {
-        onUpdate: (newRole) => {
+        onUpdate: newRole => {
           toast({
             title: '你的權限已更新！',
             description: '請重新整理頁面以套用新權限。',
-          });
-          setTimeout(() => window.location.reload(), 2000);
+          })
+          setTimeout(() => window.location.reload(), 2000)
         },
       },
-    });
+    })
 
     // 清理
     return () => {
-      realtimeManager.unsubscribeAll();
-    };
-  }, [user]);
+      realtimeManager.unsubscribeAll()
+    }
+  }, [user])
 
-  return null;
+  return null
 }
 ```
 
@@ -286,63 +291,68 @@ export function PermanentRealtimeSubscriptions() {
 ### 1. 多裝置同步
 
 **修正前**：
+
 ```typescript
 // ❌ setTimeout 背景同步被忽略
 setTimeout(async () => {
-  const remoteItems = await supabase.fetchAll();
+  const remoteItems = await supabase.fetchAll()
   // 無法更新 UI（已經 return 了）
-}, 0);
+}, 0)
 ```
 
 **修正後**：
+
 ```typescript
 // ✅ 即時同步 + Realtime 推送
 try {
-  await sync.uploadLocalChanges();
-  const remoteItems = await supabase.fetchAll();
-  await indexedDB.batchPut(remoteItems);
-  return remoteItems; // ✅ 立即返回給 UI
+  await sync.uploadLocalChanges()
+  const remoteItems = await supabase.fetchAll()
+  await indexedDB.batchPut(remoteItems)
+  return remoteItems // ✅ 立即返回給 UI
 } catch (syncError) {
-  return cachedItems; // ✅ 離線模式降級
+  return cachedItems // ✅ 離線模式降級
 }
 ```
 
 ### 2. 連線數控制
 
 **修正前**：
+
 ```typescript
 // ❌ 自動訂閱所有表格
 if (enableSupabase) {
-  realtimeManager.subscribe({ table: tableName });
+  realtimeManager.subscribe({ table: tableName })
 }
 // 結果: 50 表格 × 40 使用者 = 2000 連線 ❌
 ```
 
 **修正後**：
+
 ```typescript
 // ✅ 按需訂閱（只訂閱當前頁面）
 useEffect(() => {
-  realtimeManager.subscribe({ table: tableName });
-  return () => realtimeManager.unsubscribe(subscriptionId);
-}, []);
+  realtimeManager.subscribe({ table: tableName })
+  return () => realtimeManager.unsubscribe(subscriptionId)
+}, [])
 // 結果: 平均 2-4 表格 × 10 在線使用者 = 100 連線 ✅
 ```
 
 ### 3. 權限即時更新
 
 **新增功能**：
+
 ```typescript
 // ✅ 管理員變更權限 → 使用者立即收到通知
 realtimeManager.subscribe({
   table: 'user_roles',
   filter: `user_id=eq.${user.id}`,
   handlers: {
-    onUpdate: (newRole) => {
-      toast({ title: '你的權限已更新！' });
-      setTimeout(() => window.location.reload(), 2000);
+    onUpdate: newRole => {
+      toast({ title: '你的權限已更新！' })
+      setTimeout(() => window.location.reload(), 2000)
     },
   },
-});
+})
 ```
 
 ---
@@ -352,21 +362,25 @@ realtimeManager.subscribe({
 ### 1. 多裝置同步測試
 
 #### Test Case 1: 新增資料
+
 - [ ] 公司電腦：新增旅遊團「北海道賞雪」
 - [ ] 家裡電腦：打開旅遊團頁面
 - [ ] 預期結果：立即看到「北海道賞雪」✅
 
 #### Test Case 2: 刪除資料
+
 - [ ] 公司電腦：刪除旅遊團「北海道賞雪」
 - [ ] 家裡電腦：旅遊團頁面已開啟
 - [ ] 預期結果：旅遊團立即消失 ✅
 
 #### Test Case 3: 更新資料
+
 - [ ] 公司電腦：修改旅遊團「北海道賞雪」→「北海道滑雪」
 - [ ] 家裡電腦：旅遊團頁面已開啟
 - [ ] 預期結果：名稱立即更新為「北海道滑雪」✅
 
 #### Test Case 4: 離線新增
+
 - [ ] 家裡電腦：斷網
 - [ ] 家裡電腦：新增旅遊團「沖繩陽光」
 - [ ] 家裡電腦：恢復網路
@@ -376,11 +390,13 @@ realtimeManager.subscribe({
 ### 2. 權限即時更新測試
 
 #### Test Case 5: 新增權限
+
 - [ ] 威廉（管理員）：新增雅萍的「財務管理」權限
 - [ ] 雅萍：正在線上
 - [ ] 預期結果：雅萍立即收到通知，2 秒後頁面重新整理 ✅
 
 #### Test Case 6: 離線權限更新
+
 - [ ] 威廉（管理員）：新增雅萍的「財務管理」權限
 - [ ] 雅萍：離線
 - [ ] 雅萍：下次登入
@@ -389,11 +405,13 @@ realtimeManager.subscribe({
 ### 3. 連線數測試
 
 #### Test Case 7: 單一使用者
+
 - [ ] 登入系統
 - [ ] 打開開發者工具 → Network → WS
 - [ ] 預期結果：3-4 個 WebSocket 連線（user_roles, workspaces, employees + 當前頁面）✅
 
 #### Test Case 8: 切換頁面
+
 - [ ] 從旅遊團頁面 → 切換到行事曆頁面
 - [ ] 觀察 Network → WS
 - [ ] 預期結果：旅遊團訂閱關閉，行事曆訂閱開啟 ✅
@@ -428,7 +446,7 @@ export const useRealtimeForXXX = createRealtimeHook<XXX>({
   tableName: 'xxx',
   indexedDB: new IndexedDBAdapter<XXX>('xxx'),
   store: useXXXStore,
-});
+})
 ```
 
 ---

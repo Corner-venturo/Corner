@@ -162,7 +162,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
       </style>
       <div
         className="bg-white rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto print:max-w-full print:rounded-none print:max-h-none print:overflow-visible"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* 控制按鈕（列印時隱藏） */}
         <div className="flex justify-end gap-2 p-4 print:hidden">
@@ -183,10 +183,16 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <thead>
               <tr>
                 <td>
-                  <div className="relative mb-1 pb-4" style={{ borderBottom: '1px solid #D4AF37', marginTop: '6px' }}>
+                  <div
+                    className="relative mb-1 pb-4"
+                    style={{ borderBottom: '1px solid #D4AF37', marginTop: '6px' }}
+                  >
                     {/* Logo - 左上角 */}
                     {logoUrl ? (
-                      <div className="absolute left-0 top-0" style={{ width: '120px', height: '40px' }}>
+                      <div
+                        className="absolute left-0 top-0"
+                        style={{ width: '120px', height: '40px' }}
+                      >
                         <img
                           src={logoUrl}
                           alt="角落旅行社 Logo"
@@ -194,17 +200,26 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                             width: '100%',
                             height: '100%',
                             objectFit: 'contain',
-                            objectPosition: 'left top'
+                            objectPosition: 'left top',
                           }}
                         />
                       </div>
                     ) : (
-                      <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>角落旅行社</div>
+                      <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>
+                        角落旅行社
+                      </div>
                     )}
                     {/* 標題 */}
                     <div className="relative z-10 text-center py-2">
-                      <div className="text-sm tracking-widest mb-1" style={{ color: '#D4AF37', fontWeight: 500 }}>QUOTATION</div>
-                      <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>報價請款單</h1>
+                      <div
+                        className="text-sm tracking-widest mb-1"
+                        style={{ color: '#D4AF37', fontWeight: 500 }}
+                      >
+                        QUOTATION
+                      </div>
+                      <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                        報價請款單
+                      </h1>
                     </div>
                   </div>
                 </td>
@@ -223,7 +238,9 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                     </div>
                     <div className="flex justify-between items-center text-xs text-gray-500 px-4">
                       <span>角落旅行社股份有限公司 © {new Date().getFullYear()}</span>
-                      <span>第 <span className="page-number"></span> 頁</span>
+                      <span>
+                        第 <span className="page-number"></span> 頁
+                      </span>
                     </div>
                   </div>
                 </td>
@@ -234,156 +251,309 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <tbody>
               <tr>
                 <td>
+                  {/* 客戶資訊區 */}
+                  <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+                    <div className="flex">
+                      <span className="font-semibold w-24">團體名稱：</span>
+                      <span className="flex-1 border-b border-gray-300">{quote.customer_name}</span>
+                    </div>
+                    <div className="flex">
+                      <span className="font-semibold w-24">團體編號：</span>
+                      <span className="flex-1 border-b border-gray-300">
+                        {quote.tour_code || ''}
+                      </span>
+                    </div>
+                    <div className="flex">
+                      <span className="font-semibold w-24">聯絡電話：</span>
+                      <span className="flex-1 border-b border-gray-300">
+                        {quote.contact_phone || ''}
+                      </span>
+                    </div>
+                    <div className="flex">
+                      <span className="font-semibold w-24">承辦業務：</span>
+                      <span className="flex-1 border-b border-gray-300">
+                        {quote.handler_name || 'William'}
+                      </span>
+                    </div>
+                    <div className="flex col-span-2">
+                      <span className="font-semibold w-24">通訊地址：</span>
+                      <span className="flex-1 border-b border-gray-300">
+                        {quote.contact_address || ''}
+                      </span>
+                    </div>
+                    <div className="flex">
+                      <span className="font-semibold w-24">開單日期：</span>
+                      <span className="flex-1 border-b border-gray-300">
+                        {quote.issue_date || new Date().toISOString().split('T')[0]}
+                      </span>
+                    </div>
+                  </div>
 
-          {/* 客戶資訊區 */}
-          <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-            <div className="flex">
-              <span className="font-semibold w-24">團體名稱：</span>
-              <span className="flex-1 border-b border-gray-300">{quote.customer_name}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-24">團體編號：</span>
-              <span className="flex-1 border-b border-gray-300">{quote.tour_code || ''}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-24">聯絡電話：</span>
-              <span className="flex-1 border-b border-gray-300">{quote.contact_phone || ''}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-24">承辦業務：</span>
-              <span className="flex-1 border-b border-gray-300">{quote.handler_name || 'William'}</span>
-            </div>
-            <div className="flex col-span-2">
-              <span className="font-semibold w-24">通訊地址：</span>
-              <span className="flex-1 border-b border-gray-300">{quote.contact_address || ''}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-24">開單日期：</span>
-              <span className="flex-1 border-b border-gray-300">
-                {quote.issue_date || new Date().toISOString().split('T')[0]}
-              </span>
-            </div>
-          </div>
+                  {/* 收費明細表標題 */}
+                  <div className="mb-2">
+                    <h3 className="text-lg font-semibold" style={{ color: '#6B5B4F' }}>
+                      收費明細表 ▽
+                    </h3>
+                  </div>
 
-          {/* 收費明細表標題 */}
-          <div className="mb-2">
-            <h3 className="text-lg font-semibold" style={{ color: '#6B5B4F' }}>收費明細表 ▽</h3>
-          </div>
+                  {/* 收費明細表 */}
+                  <table
+                    className="w-full mb-6 text-sm"
+                    style={{
+                      borderCollapse: 'separate',
+                      borderSpacing: 0,
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: '1px solid #E5E7EB',
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ backgroundColor: '#FAF7F2' }}>
+                        <th
+                          className="px-3 py-2 text-left"
+                          style={{
+                            width: '35%',
+                            borderBottom: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                            fontWeight: 600,
+                          }}
+                        >
+                          摘要
+                        </th>
+                        <th
+                          className="px-3 py-2 text-center"
+                          style={{
+                            width: '10%',
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                            fontWeight: 600,
+                          }}
+                        >
+                          數量
+                        </th>
+                        <th
+                          className="px-3 py-2 text-center"
+                          style={{
+                            width: '15%',
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                            fontWeight: 600,
+                          }}
+                        >
+                          單價
+                        </th>
+                        <th
+                          className="px-3 py-2 text-center"
+                          style={{
+                            width: '15%',
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                            fontWeight: 600,
+                          }}
+                        >
+                          金額
+                        </th>
+                        <th
+                          className="px-3 py-2 text-left"
+                          style={{
+                            width: '25%',
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                            fontWeight: 600,
+                          }}
+                        >
+                          備註
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* 只顯示有資料的項目 */}
+                      {items.map((item, index) => (
+                        <tr key={item.id} className="h-8">
+                          <td
+                            className="px-2 py-1"
+                            style={{
+                              borderBottom:
+                                index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                              color: '#4B5563',
+                            }}
+                          >
+                            {item.description || '\u00A0'}
+                          </td>
+                          <td
+                            className="px-2 py-1 text-center"
+                            style={{
+                              borderBottom:
+                                index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                              borderLeft: '1px solid #E5E7EB',
+                              color: '#4B5563',
+                            }}
+                          >
+                            {item.quantity !== 0 ? item.quantity : '\u00A0'}
+                          </td>
+                          <td
+                            className="px-2 py-1 text-right"
+                            style={{
+                              borderBottom:
+                                index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                              borderLeft: '1px solid #E5E7EB',
+                              color: '#4B5563',
+                            }}
+                          >
+                            {item.unit_price !== 0 ? item.unit_price.toLocaleString() : '\u00A0'}
+                          </td>
+                          <td
+                            className="px-2 py-1 text-right"
+                            style={{
+                              borderBottom:
+                                index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                              borderLeft: '1px solid #E5E7EB',
+                              color: '#6B5B4F',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {item.amount !== 0 ? item.amount.toLocaleString() : '\u00A0'}
+                          </td>
+                          <td
+                            className="px-2 py-1"
+                            style={{
+                              borderBottom:
+                                index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                              borderLeft: '1px solid #E5E7EB',
+                              color: '#4B5563',
+                            }}
+                          >
+                            {item.notes || '\u00A0'}
+                          </td>
+                        </tr>
+                      ))}
+                      {/* 如果沒有項目，顯示提示訊息 */}
+                      {items.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="px-3 py-8 text-center"
+                            style={{ color: '#9CA3AF' }}
+                          >
+                            尚無收費項目
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
 
-          {/* 收費明細表 */}
-          <table className="w-full mb-6 text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0, borderRadius: '8px', overflow: 'hidden', border: '1px solid #E5E7EB' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#FAF7F2' }}>
-                <th className="px-3 py-2 text-left" style={{ width: '35%', borderBottom: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
-                  摘要
-                </th>
-                <th className="px-3 py-2 text-center" style={{ width: '10%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
-                  數量
-                </th>
-                <th className="px-3 py-2 text-center" style={{ width: '15%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
-                  單價
-                </th>
-                <th className="px-3 py-2 text-center" style={{ width: '15%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
-                  金額
-                </th>
-                <th className="px-3 py-2 text-left" style={{ width: '25%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
-                  備註
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* 只顯示有資料的項目 */}
-              {items.map((item, index) => (
-                <tr key={item.id} className="h-8">
-                  <td className="px-2 py-1" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', color: '#4B5563' }}>
-                    {item.description || '\u00A0'}
-                  </td>
-                  <td className="px-2 py-1 text-center" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#4B5563' }}>
-                    {item.quantity !== 0 ? item.quantity : '\u00A0'}
-                  </td>
-                  <td className="px-2 py-1 text-right" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#4B5563' }}>
-                    {item.unit_price !== 0 ? item.unit_price.toLocaleString() : '\u00A0'}
-                  </td>
-                  <td className="px-2 py-1 text-right" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
-                    {item.amount !== 0 ? item.amount.toLocaleString() : '\u00A0'}
-                  </td>
-                  <td className="px-2 py-1" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#4B5563' }}>
-                    {item.notes || '\u00A0'}
-                  </td>
-                </tr>
-              ))}
-              {/* 如果沒有項目，顯示提示訊息 */}
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-3 py-8 text-center" style={{ color: '#9CA3AF' }}>
-                    尚無收費項目
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  {/* 金額統計區 */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div
+                      className="p-3"
+                      style={{
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        backgroundColor: '#FAF7F2',
+                      }}
+                    >
+                      <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
+                        應收金額
+                      </div>
+                      <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                        NT$ {totalAmount.toLocaleString()}
+                      </div>
+                    </div>
+                    <div
+                      className="p-3"
+                      style={{
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        backgroundColor: '#FAF7F2',
+                      }}
+                    >
+                      <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
+                        已收金額
+                      </div>
+                      <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                        NT$ {(quote.received_amount || 0).toLocaleString()}
+                      </div>
+                    </div>
+                    <div
+                      className="p-3"
+                      style={{
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        backgroundColor: '#FAF7F2',
+                      }}
+                    >
+                      <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
+                        應收餘額
+                      </div>
+                      <div
+                        className="text-xl font-bold"
+                        style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
+                      >
+                        NT$ {balanceAmount.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
 
-          {/* 金額統計區 */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="p-3" style={{ border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: '#FAF7F2' }}>
-              <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>應收金額</div>
-              <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
-                NT$ {totalAmount.toLocaleString()}
-              </div>
-            </div>
-            <div className="p-3" style={{ border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: '#FAF7F2' }}>
-              <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>已收金額</div>
-              <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
-                NT$ {(quote.received_amount || 0).toLocaleString()}
-              </div>
-            </div>
-            <div className="p-3" style={{ border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: '#FAF7F2' }}>
-              <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>應收餘額</div>
-              <div
-                className="text-xl font-bold"
-                style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
-              >
-                NT$ {balanceAmount.toLocaleString()}
-              </div>
-            </div>
-          </div>
+                  {/* 付款資訊區 */}
+                  <div
+                    className="grid grid-cols-2 gap-6 pt-4 text-sm"
+                    style={{ borderTop: '1px solid #E5E7EB' }}
+                  >
+                    <div>
+                      <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
+                        匯款資訊
+                      </h4>
+                      <div className="space-y-1" style={{ color: '#4B5563' }}>
+                        <div>戶名：角落旅行社股份有限公司</div>
+                        <div>銀行：國泰世華銀行 (013)</div>
+                        <div>分行：大同分行 (0626)</div>
+                        <div>帳號：062-03-500821-2</div>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
+                        支票資訊
+                      </h4>
+                      <div className="space-y-1" style={{ color: '#4B5563' }}>
+                        <div>抬頭：角落旅行社股份有限公司</div>
+                        <div className="font-semibold" style={{ color: '#DC2626' }}>
+                          禁止背書轉讓
+                        </div>
+                        <div className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
+                          （請於出發日前付清餘額）
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-          {/* 付款資訊區 */}
-          <div className="grid grid-cols-2 gap-6 pt-4 text-sm" style={{ borderTop: '1px solid #E5E7EB' }}>
-            <div>
-              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>匯款資訊</h4>
-              <div className="space-y-1" style={{ color: '#4B5563' }}>
-                <div>戶名：角落旅行社股份有限公司</div>
-                <div>銀行：國泰世華銀行 (013)</div>
-                <div>分行：大同分行 (0626)</div>
-                <div>帳號：062-03-500821-2</div>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>支票資訊</h4>
-              <div className="space-y-1" style={{ color: '#4B5563' }}>
-                <div>抬頭：角落旅行社股份有限公司</div>
-                <div className="font-semibold" style={{ color: '#DC2626' }}>禁止背書轉讓</div>
-                <div className="text-xs mt-2" style={{ color: '#9CA3AF' }}>（請於出發日前付清餘額）</div>
-              </div>
-            </div>
-          </div>
-
-          {/* 收據資訊 */}
-          <div className="mt-4 pt-4 text-sm" style={{ borderTop: '1px solid #E5E7EB' }}>
-            <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>收據資訊</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex">
-                <span className="font-semibold w-32" style={{ color: '#4B5563' }}>開立代收轉付抬頭：</span>
-                <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>{'\u00A0'}</span>
-              </div>
-              <div className="flex">
-                <span className="font-semibold w-32" style={{ color: '#4B5563' }}>開立代收轉付統編：</span>
-                <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>{'\u00A0'}</span>
-              </div>
-            </div>
-          </div>
-
+                  {/* 收據資訊 */}
+                  <div className="mt-4 pt-4 text-sm" style={{ borderTop: '1px solid #E5E7EB' }}>
+                    <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
+                      收據資訊
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex">
+                        <span className="font-semibold w-32" style={{ color: '#4B5563' }}>
+                          開立代收轉付抬頭：
+                        </span>
+                        <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>
+                          {'\u00A0'}
+                        </span>
+                      </div>
+                      <div className="flex">
+                        <span className="font-semibold w-32" style={{ color: '#4B5563' }}>
+                          開立代收轉付統編：
+                        </span>
+                        <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>
+                          {'\u00A0'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -402,16 +572,25 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                       width: '100%',
                       height: '100%',
                       objectFit: 'contain',
-                      objectPosition: 'left top'
+                      objectPosition: 'left top',
                     }}
                   />
                 </div>
               ) : (
-                <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>角落旅行社</div>
+                <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>
+                  角落旅行社
+                </div>
               )}
               <div className="relative z-10 text-center py-2">
-                <div className="text-sm tracking-widest mb-1" style={{ color: '#D4AF37', fontWeight: 500 }}>QUOTATION</div>
-                <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>報價請款單</h1>
+                <div
+                  className="text-sm tracking-widest mb-1"
+                  style={{ color: '#D4AF37', fontWeight: 500 }}
+                >
+                  QUOTATION
+                </div>
+                <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                  報價請款單
+                </h1>
               </div>
             </div>
 
@@ -431,11 +610,15 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               </div>
               <div className="flex">
                 <span className="font-semibold w-24">承辦業務：</span>
-                <span className="flex-1 border-b border-gray-300">{quote.handler_name || 'William'}</span>
+                <span className="flex-1 border-b border-gray-300">
+                  {quote.handler_name || 'William'}
+                </span>
               </div>
               <div className="flex col-span-2">
                 <span className="font-semibold w-24">通訊地址：</span>
-                <span className="flex-1 border-b border-gray-300">{quote.contact_address || ''}</span>
+                <span className="flex-1 border-b border-gray-300">
+                  {quote.contact_address || ''}
+                </span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-24">開單日期：</span>
@@ -447,32 +630,136 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
 
             {/* 收費明細表 */}
             <div className="mb-2">
-              <h3 className="text-lg font-semibold" style={{ color: '#6B5B4F' }}>收費明細表 ▽</h3>
+              <h3 className="text-lg font-semibold" style={{ color: '#6B5B4F' }}>
+                收費明細表 ▽
+              </h3>
             </div>
-            <table className="w-full mb-6 text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0, borderRadius: '8px', overflow: 'hidden', border: '1px solid #E5E7EB' }}>
+            <table
+              className="w-full mb-6 text-sm"
+              style={{
+                borderCollapse: 'separate',
+                borderSpacing: 0,
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '1px solid #E5E7EB',
+              }}
+            >
               <thead>
                 <tr style={{ backgroundColor: '#FAF7F2' }}>
-                  <th className="px-3 py-2 text-left" style={{ width: '35%', borderBottom: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>摘要</th>
-                  <th className="px-3 py-2 text-center" style={{ width: '10%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>數量</th>
-                  <th className="px-3 py-2 text-center" style={{ width: '15%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>單價</th>
-                  <th className="px-3 py-2 text-center" style={{ width: '15%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>金額</th>
-                  <th className="px-3 py-2 text-left" style={{ width: '25%', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>備註</th>
+                  <th
+                    className="px-3 py-2 text-left"
+                    style={{
+                      width: '35%',
+                      borderBottom: '1px solid #E5E7EB',
+                      color: '#6B5B4F',
+                      fontWeight: 600,
+                    }}
+                  >
+                    摘要
+                  </th>
+                  <th
+                    className="px-3 py-2 text-center"
+                    style={{
+                      width: '10%',
+                      borderBottom: '1px solid #E5E7EB',
+                      borderLeft: '1px solid #E5E7EB',
+                      color: '#6B5B4F',
+                      fontWeight: 600,
+                    }}
+                  >
+                    數量
+                  </th>
+                  <th
+                    className="px-3 py-2 text-center"
+                    style={{
+                      width: '15%',
+                      borderBottom: '1px solid #E5E7EB',
+                      borderLeft: '1px solid #E5E7EB',
+                      color: '#6B5B4F',
+                      fontWeight: 600,
+                    }}
+                  >
+                    單價
+                  </th>
+                  <th
+                    className="px-3 py-2 text-center"
+                    style={{
+                      width: '15%',
+                      borderBottom: '1px solid #E5E7EB',
+                      borderLeft: '1px solid #E5E7EB',
+                      color: '#6B5B4F',
+                      fontWeight: 600,
+                    }}
+                  >
+                    金額
+                  </th>
+                  <th
+                    className="px-3 py-2 text-left"
+                    style={{
+                      width: '25%',
+                      borderBottom: '1px solid #E5E7EB',
+                      borderLeft: '1px solid #E5E7EB',
+                      color: '#6B5B4F',
+                      fontWeight: 600,
+                    }}
+                  >
+                    備註
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, index) => (
                   <tr key={item.id} className="h-8">
-                    <td className="px-2 py-1" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', color: '#4B5563' }}>{item.description || '\u00A0'}</td>
-                    <td className="px-2 py-1 text-center" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#4B5563' }}>
+                    <td
+                      className="px-2 py-1"
+                      style={{
+                        borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        color: '#4B5563',
+                      }}
+                    >
+                      {item.description || '\u00A0'}
+                    </td>
+                    <td
+                      className="px-2 py-1 text-center"
+                      style={{
+                        borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderLeft: '1px solid #E5E7EB',
+                        color: '#4B5563',
+                      }}
+                    >
                       {item.quantity !== 0 ? item.quantity : '\u00A0'}
                     </td>
-                    <td className="px-2 py-1 text-right" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#4B5563' }}>
+                    <td
+                      className="px-2 py-1 text-right"
+                      style={{
+                        borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderLeft: '1px solid #E5E7EB',
+                        color: '#4B5563',
+                      }}
+                    >
                       {item.unit_price !== 0 ? item.unit_price.toLocaleString() : '\u00A0'}
                     </td>
-                    <td className="px-2 py-1 text-right" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#6B5B4F', fontWeight: 600 }}>
+                    <td
+                      className="px-2 py-1 text-right"
+                      style={{
+                        borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderLeft: '1px solid #E5E7EB',
+                        color: '#6B5B4F',
+                        fontWeight: 600,
+                      }}
+                    >
                       {item.amount !== 0 ? item.amount.toLocaleString() : '\u00A0'}
                     </td>
-                    <td className="px-2 py-1" style={{ borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', color: '#4B5563' }}>{item.notes || '\u00A0'}</td>
+                    <td
+                      className="px-2 py-1"
+                      style={{
+                        borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderLeft: '1px solid #E5E7EB',
+                        color: '#4B5563',
+                      }}
+                    >
+                      {item.notes || '\u00A0'}
+                    </td>
                   </tr>
                 ))}
                 {items.length === 0 && (
@@ -487,28 +774,65 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
 
             {/* 金額統計 */}
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="p-3" style={{ border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: '#FAF7F2' }}>
-                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>應收金額</div>
-                <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>NT$ {totalAmount.toLocaleString()}</div>
+              <div
+                className="p-3"
+                style={{
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  backgroundColor: '#FAF7F2',
+                }}
+              >
+                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
+                  應收金額
+                </div>
+                <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                  NT$ {totalAmount.toLocaleString()}
+                </div>
               </div>
-              <div className="p-3" style={{ border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: '#FAF7F2' }}>
-                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>已收金額</div>
+              <div
+                className="p-3"
+                style={{
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  backgroundColor: '#FAF7F2',
+                }}
+              >
+                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
+                  已收金額
+                </div>
                 <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
                   NT$ {(quote.received_amount || 0).toLocaleString()}
                 </div>
               </div>
-              <div className="p-3" style={{ border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: '#FAF7F2' }}>
-                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>應收餘額</div>
-                <div className="text-xl font-bold" style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}>
+              <div
+                className="p-3"
+                style={{
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  backgroundColor: '#FAF7F2',
+                }}
+              >
+                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
+                  應收餘額
+                </div>
+                <div
+                  className="text-xl font-bold"
+                  style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
+                >
                   NT$ {balanceAmount.toLocaleString()}
                 </div>
               </div>
             </div>
 
             {/* 付款資訊 */}
-            <div className="grid grid-cols-2 gap-6 pt-4 text-sm mb-6" style={{ borderTop: '1px solid #E5E7EB' }}>
+            <div
+              className="grid grid-cols-2 gap-6 pt-4 text-sm mb-6"
+              style={{ borderTop: '1px solid #E5E7EB' }}
+            >
               <div>
-                <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>匯款資訊</h4>
+                <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
+                  匯款資訊
+                </h4>
                 <div className="space-y-1" style={{ color: '#4B5563' }}>
                   <div>戶名：角落旅行社股份有限公司</div>
                   <div>銀行：國泰世華銀行 (013)</div>
@@ -517,26 +841,42 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>支票資訊</h4>
+                <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
+                  支票資訊
+                </h4>
                 <div className="space-y-1" style={{ color: '#4B5563' }}>
                   <div>抬頭：角落旅行社股份有限公司</div>
-                  <div className="font-semibold" style={{ color: '#DC2626' }}>禁止背書轉讓</div>
-                  <div className="text-xs mt-2" style={{ color: '#9CA3AF' }}>（請於出發日前付清餘額）</div>
+                  <div className="font-semibold" style={{ color: '#DC2626' }}>
+                    禁止背書轉讓
+                  </div>
+                  <div className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
+                    （請於出發日前付清餘額）
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* 收據資訊 */}
             <div className="pt-4 text-sm mb-6" style={{ borderTop: '1px solid #E5E7EB' }}>
-              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>收據資訊</h4>
+              <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
+                收據資訊
+              </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex">
-                  <span className="font-semibold w-32" style={{ color: '#4B5563' }}>開立代收轉付抬頭：</span>
-                  <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>{'\u00A0'}</span>
+                  <span className="font-semibold w-32" style={{ color: '#4B5563' }}>
+                    開立代收轉付抬頭：
+                  </span>
+                  <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>
+                    {'\u00A0'}
+                  </span>
                 </div>
                 <div className="flex">
-                  <span className="font-semibold w-32" style={{ color: '#4B5563' }}>開立代收轉付統編：</span>
-                  <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>{'\u00A0'}</span>
+                  <span className="font-semibold w-32" style={{ color: '#4B5563' }}>
+                    開立代收轉付統編：
+                  </span>
+                  <span className="flex-1" style={{ borderBottom: '1px solid #E5E7EB' }}>
+                    {'\u00A0'}
+                  </span>
                 </div>
               </div>
             </div>

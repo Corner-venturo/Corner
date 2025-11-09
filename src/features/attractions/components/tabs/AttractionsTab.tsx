@@ -32,7 +32,6 @@ export default function AttractionsTab({
   selectedCountry,
   openAdd,
 }: AttractionsTabProps) {
-
   // 用於顯示的國家和城市資料（從景點載入後，按需從資料庫查詢）
   const [displayCountries, setDisplayCountries] = useState<Country[]>([])
   const [displayCities, setDisplayCities] = useState<City[]>([])

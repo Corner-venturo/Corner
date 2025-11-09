@@ -171,10 +171,7 @@ export function AccountSettings({
               <h3 className="font-medium mb-1">修改密碼</h3>
               <p className="text-sm text-morandi-secondary">定期更換密碼以保護您的帳號安全</p>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowPasswordSection(!showPasswordSection)}
-            >
+            <Button variant="outline" onClick={() => setShowPasswordSection(!showPasswordSection)}>
               {showPasswordSection ? '取消' : '修改密碼'}
             </Button>
           </div>

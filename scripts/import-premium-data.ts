@@ -8,7 +8,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -27,7 +28,9 @@ async function main() {
     // 需要手動處理或使用 Postgres 連線
     console.log('⚠️  請使用以下指令執行 SQL：')
     console.log('')
-    console.log('psql "postgresql://postgres.pfqvdacxowpgfamuvnsn:Corner@8520@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres" < scripts/seed-premium-database.sql')
+    console.log(
+      'psql "postgresql://postgres.pfqvdacxowpgfamuvnsn:Corner@8520@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres" < scripts/seed-premium-database.sql'
+    )
     console.log('')
 
     console.log('✅ 完成！')

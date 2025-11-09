@@ -18,12 +18,7 @@ const addHeaders = (doc: jsPDF, logoUrl: string) => {
     // 標題
     doc.setFontSize(16)
     doc.setFont('ChironHeiHK', 'bold')
-    doc.text(
-      '報價請款單',
-      doc.internal.pageSize.getWidth() / 2,
-      15,
-      { align: 'center' }
-    )
+    doc.text('報價請款單', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' })
   }
 }
 
@@ -41,28 +36,16 @@ const addFooters = (doc: jsPDF) => {
 
     // 副標題（斜體效果用較小字型模擬）
     doc.setFontSize(10)
-    doc.text(
-      '─ 如果可以，讓我們一起探索世界上每個角落 ─',
-      pageWidth / 2,
-      pageHeight - 20,
-      { align: 'center' }
-    )
+    doc.text('─ 如果可以，讓我們一起探索世界上每個角落 ─', pageWidth / 2, pageHeight - 20, {
+      align: 'center',
+    })
 
     // 版權
     doc.setFontSize(8)
-    doc.text(
-      `角落旅行社股份有限公司 © ${new Date().getFullYear()}`,
-      15,
-      pageHeight - 10
-    )
+    doc.text(`角落旅行社股份有限公司 © ${new Date().getFullYear()}`, 15, pageHeight - 10)
 
     // 頁碼
-    doc.text(
-      `第 ${i} / ${pageCount} 頁`,
-      pageWidth - 15,
-      pageHeight - 10,
-      { align: 'right' }
-    )
+    doc.text(`第 ${i} / ${pageCount} 頁`, pageWidth - 15, pageHeight - 10, { align: 'right' })
   }
 }
 
@@ -91,10 +74,7 @@ export const generateQuickQuotePDF = async (
     ['聯絡電話：', quote.contact_phone || ''],
     ['承辦業務：', quote.handler_name || 'William'],
     ['通訊地址：', quote.contact_address || ''],
-    [
-      '開單日期：',
-      quote.issue_date || new Date().toISOString().split('T')[0],
-    ],
+    ['開單日期：', quote.issue_date || new Date().toISOString().split('T')[0]],
   ]
 
   autoTable(pdf, {
@@ -119,7 +99,7 @@ export const generateQuickQuotePDF = async (
   pdf.text('收費明細表 ▽', 15, yPos)
 
   // 收費明細表
-  const tableData = items.map((item) => [
+  const tableData = items.map(item => [
     item.description || '',
     item.quantity !== 0 ? item.quantity.toString() : '',
     item.unit_price !== 0 ? item.unit_price.toLocaleString() : '',
@@ -274,8 +254,6 @@ export const generateQuickQuotePDF = async (
   addFooters(pdf)
 
   // 保存 PDF
-  const fileName = `報價請款單_${quote.customer_name}_${
-    new Date().toISOString().split('T')[0]
-  }.pdf`
+  const fileName = `報價請款單_${quote.customer_name}_${new Date().toISOString().split('T')[0]}.pdf`
   pdf.save(fileName)
 }

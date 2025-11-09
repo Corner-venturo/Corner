@@ -430,7 +430,7 @@ const additionalMichelinRestaurants = [
     currency: 'JPY',
     description: '藝術與科學的料理實驗室',
     commission_rate: 10,
-    awards: ['米其林三星', 'The World\'s 50 Best'],
+    awards: ['米其林三星', "The World's 50 Best"],
     is_active: true,
   },
 
@@ -822,19 +822,13 @@ async function seedData() {
   )
 
   // 總結
-  console.log('=' .repeat(60))
+  console.log('='.repeat(60))
   console.log('🎉 資料匯入總結：')
   console.log(`  📍 景點：${attractionsSuccess}/${additionalAttractions.length}`)
-  console.log(
-    `  ⭐ 米其林餐廳：${restaurantsSuccess}/${additionalMichelinRestaurants.length}`
-  )
-  console.log(
-    `  ✨ 頂級體驗：${experiencesSuccess}/${additionalPremiumExperiences.length}`
-  )
-  console.log(
-    `  📊 總計成功：${attractionsSuccess + restaurantsSuccess + experiencesSuccess} 筆`
-  )
-  console.log('=' .repeat(60))
+  console.log(`  ⭐ 米其林餐廳：${restaurantsSuccess}/${additionalMichelinRestaurants.length}`)
+  console.log(`  ✨ 頂級體驗：${experiencesSuccess}/${additionalPremiumExperiences.length}`)
+  console.log(`  📊 總計成功：${attractionsSuccess + restaurantsSuccess + experiencesSuccess} 筆`)
+  console.log('='.repeat(60))
 }
 
 seedData()

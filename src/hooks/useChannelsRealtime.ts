@@ -4,12 +4,12 @@
  * 使用 createRealtimeHook 工廠函數創建
  */
 
-'use client';
+'use client'
 
-import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook';
-import { useChannelStore } from '@/stores/workspace/channel-store';
-import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter';
-import type { Channel } from '@/stores/workspace/types';
+import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook'
+import { useChannelStore } from '@/stores/workspace/channel-store'
+import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter'
+import type { Channel } from '@/stores/workspace/types'
 
 /**
  * Channels Realtime Hook
@@ -34,4 +34,4 @@ export const useChannelsRealtime = createRealtimeHook<Channel>({
   tableName: 'channels',
   indexedDB: new IndexedDBAdapter<Channel>('channels'),
   store: useChannelStore,
-});
+})

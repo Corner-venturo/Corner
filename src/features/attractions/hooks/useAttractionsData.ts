@@ -16,7 +16,9 @@ export function useAttractionsData() {
     try {
       const { data, error } = await supabase
         .from('attractions')
-        .select('id, name, name_en, country_id, city_id, region_id, category, description, duration_minutes, tags, thumbnail, images, is_active, created_at, updated_at')
+        .select(
+          'id, name, name_en, country_id, city_id, region_id, category, description, duration_minutes, tags, thumbnail, images, is_active, created_at, updated_at'
+        )
         .order('created_at', { ascending: false }) // 最新的在前面
 
       if (error) throw error
@@ -96,34 +98,31 @@ export function useAttractionsData() {
   )
 
   // 切換啟用狀態（樂觀更新，避免畫面閃爍）
-  const toggleStatus = useCallback(
-    async (attraction: Attraction) => {
-      // 樂觀更新：立即更新本地狀態
-      const newStatus = !attraction.is_active
+  const toggleStatus = useCallback(async (attraction: Attraction) => {
+    // 樂觀更新：立即更新本地狀態
+    const newStatus = !attraction.is_active
+    setAttractions(prev =>
+      prev.map(item => (item.id === attraction.id ? { ...item, is_active: newStatus } : item))
+    )
+
+    try {
+      const { error } = await supabase
+        .from('attractions')
+        .update({ is_active: newStatus })
+        .eq('id', attraction.id)
+
+      if (error) throw error
+      return { success: true }
+    } catch (error) {
+      // 如果更新失敗，還原本地狀態
       setAttractions(prev =>
-        prev.map(item => (item.id === attraction.id ? { ...item, is_active: newStatus } : item))
-      )
-
-      try {
-        const { error } = await supabase
-          .from('attractions')
-          .update({ is_active: newStatus })
-          .eq('id', attraction.id)
-
-        if (error) throw error
-        return { success: true }
-      } catch (error) {
-        // 如果更新失敗，還原本地狀態
-        setAttractions(prev =>
-          prev.map(item =>
-            item.id === attraction.id ? { ...item, is_active: attraction.is_active } : item
-          )
+        prev.map(item =>
+          item.id === attraction.id ? { ...item, is_active: attraction.is_active } : item
         )
-        return { success: false, error }
-      }
-    },
-    []
-  )
+      )
+      return { success: false, error }
+    }
+  }, [])
 
   // 初始載入（只執行一次，避免無限迴圈）
   useEffect(() => {

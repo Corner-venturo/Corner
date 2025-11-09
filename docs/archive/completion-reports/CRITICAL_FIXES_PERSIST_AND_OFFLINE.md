@@ -11,6 +11,7 @@
 ### 問題 1: Zustand Persist 導致跨裝置同步失敗
 
 **問題描述**:
+
 ```typescript
 // ❌ 錯誤：使用 persist middleware
 const store = create<StoreState<T>>()(
@@ -25,12 +26,14 @@ const store = create<StoreState<T>>()(
 ```
 
 **為什麼會失敗**:
+
 1. **公司電腦**: localStorage 儲存了舊資料
 2. **家裡電腦**: localStorage 也儲存了舊資料
 3. **問題**: 兩邊的 localStorage 不會同步
 4. **結果**: 即使 IndexedDB 和 Supabase 都更新了，UI 還是顯示 localStorage 的舊資料
 
 **實際案例**:
+
 ```
 公司電腦：
 1. 刪除旅遊團「北海道」
@@ -50,26 +53,29 @@ const store = create<StoreState<T>>()(
 ### 問題 2: fetchAll 不是真正的「離線優先」
 
 **問題描述**:
+
 ```typescript
 // ❌ 錯誤：每次都等待 Supabase
 async function fetchAll() {
   // Step 1: 讀取 IndexedDB
-  const cachedItems = await indexedDB.getAll();
+  const cachedItems = await indexedDB.getAll()
 
   // Step 2: 等待 Supabase（阻擋 UI）
-  const remoteItems = await supabase.fetchAll(); // ← 等待 1-2 秒
+  const remoteItems = await supabase.fetchAll() // ← 等待 1-2 秒
 
   // Step 3: 返回 Supabase 資料
-  return remoteItems; // ← UI 必須等待
+  return remoteItems // ← UI 必須等待
 }
 ```
 
 **為什麼不好**:
+
 1. **延遲高**: UI 必須等待 Supabase 回應（1-2 秒）
 2. **違反離線優先**: 即使有快取，還是要等雲端
 3. **網路問題**: 如果 Supabase 慢或失敗，整個頁面卡住
 
 **實際體驗**:
+
 ```
 使用者打開頁面：
 1. 空白畫面（等待 Supabase）⏳
@@ -87,6 +93,7 @@ async function fetchAll() {
 ### 修正 1: 移除 Persist Middleware
 
 **修正前**:
+
 ```typescript
 // ❌ 使用 persist，導致跨裝置同步問題
 const store = create<StoreState<T>>()(
@@ -101,6 +108,7 @@ const store = create<StoreState<T>>()(
 ```
 
 **修正後**:
+
 ```typescript
 // ✅ 不使用 persist，完全依賴 IndexedDB
 const store = create<StoreState<T>>()((set, get) => ({
@@ -109,16 +117,18 @@ const store = create<StoreState<T>>()((set, get) => ({
   loading: false,
   error: null,
   // ...
-}));
+}))
 ```
 
 **好處**:
+
 1. ✅ 資料持久化完全由 IndexedDB 負責
 2. ✅ IndexedDB 可以跨裝置同步（透過 Supabase）
 3. ✅ 避免 localStorage 的過時資料問題
 4. ✅ Zustand 只負責 UI 狀態，不負責資料持久化
 
 **檔案位置**:
+
 - `src/stores/core/create-store-new.ts` (Line 90-93)
 
 ---
@@ -126,50 +136,55 @@ const store = create<StoreState<T>>()((set, get) => ({
 ### 修正 2: 真正的離線優先策略
 
 **修正前**:
+
 ```typescript
 // ❌ 等待 Supabase（阻擋 UI）
 async function fetchAll() {
-  const cachedItems = await indexedDB.getAll();
+  const cachedItems = await indexedDB.getAll()
 
   // 等待 Supabase（1-2 秒）
-  const remoteItems = await supabase.fetchAll();
+  const remoteItems = await supabase.fetchAll()
 
-  return remoteItems; // UI 必須等待
+  return remoteItems // UI 必須等待
 }
 ```
 
 **修正後**:
+
 ```typescript
 // ✅ 立即返回快取，背景同步
 async function fetchAll() {
-  const cachedItems = await indexedDB.getAll();
+  const cachedItems = await indexedDB.getAll()
 
   // 🎯 如果有快取，立即返回
   if (cachedItems.length > 0) {
-    logger.log('💾 立即返回快取');
+    logger.log('💾 立即返回快取')
 
     // 背景同步（不阻擋 UI）
-    sync.uploadLocalChanges()
+    sync
+      .uploadLocalChanges()
       .then(() => logger.log('📤 背景上傳完成'))
-      .catch((err) => logger.warn('⚠️ 背景上傳失敗', err));
+      .catch(err => logger.warn('⚠️ 背景上傳失敗', err))
 
-    return cachedItems; // ✅ 立即返回（0.1 秒）
+    return cachedItems // ✅ 立即返回（0.1 秒）
   }
 
   // 沒有快取，等待 Supabase
-  const remoteItems = await supabase.fetchAll();
-  await indexedDB.batchPut(remoteItems);
-  return remoteItems;
+  const remoteItems = await supabase.fetchAll()
+  await indexedDB.batchPut(remoteItems)
+  return remoteItems
 }
 ```
 
 **好處**:
+
 1. ✅ UI 立即顯示（0.1 秒 vs 1-2 秒）
 2. ✅ 背景同步不阻擋使用者
 3. ✅ 依賴 Realtime 更新 UI（即時資料）
 4. ✅ 網路問題時仍可使用
 
 **檔案位置**:
+
 - `src/stores/operations/fetch.ts` (Line 67-106)
 
 ---
@@ -252,23 +267,24 @@ async function fetchAll() {
 
 ### Before（修正前）
 
-| 操作 | 延遲 | 體驗 |
-|------|------|------|
-| 首次載入 | 1-2 秒 | ⚠️ 需要等待 |
-| 後續載入 | 1-2 秒 | ❌ 每次都要等 Supabase |
-| 多裝置同步 | ∞ | ❌ localStorage 不同步 |
-| 離線操作 | ❌ 失敗 | ❌ 需要網路 |
+| 操作       | 延遲    | 體驗                   |
+| ---------- | ------- | ---------------------- |
+| 首次載入   | 1-2 秒  | ⚠️ 需要等待            |
+| 後續載入   | 1-2 秒  | ❌ 每次都要等 Supabase |
+| 多裝置同步 | ∞       | ❌ localStorage 不同步 |
+| 離線操作   | ❌ 失敗 | ❌ 需要網路            |
 
 ### After（修正後）
 
-| 操作 | 延遲 | 體驗 |
-|------|------|------|
-| 首次載入 | 1-2 秒 | ⚠️ 需要等待（無法避免）|
-| 後續載入 | 0.1 秒 | ✅ 立即顯示 |
-| 多裝置同步 | < 100ms | ✅ 即時同步 |
-| 離線操作 | 0.1 秒 | ✅ 完全支援 |
+| 操作       | 延遲    | 體驗                    |
+| ---------- | ------- | ----------------------- |
+| 首次載入   | 1-2 秒  | ⚠️ 需要等待（無法避免） |
+| 後續載入   | 0.1 秒  | ✅ 立即顯示             |
+| 多裝置同步 | < 100ms | ✅ 即時同步             |
+| 離線操作   | 0.1 秒  | ✅ 完全支援             |
 
 **改善**:
+
 - 後續載入速度：**10-20x 提升**
 - 多裝置同步：**從失敗到成功**
 - 離線支援：**從無到有**
@@ -322,6 +338,7 @@ async function fetchAll() {
 ## 🧪 測試驗證
 
 ### Test Case 1: 首次載入
+
 ```
 步驟：
 1. 清空 IndexedDB
@@ -336,6 +353,7 @@ async function fetchAll() {
 ```
 
 ### Test Case 2: 後續載入（離線優先）
+
 ```
 步驟：
 1. 已有 IndexedDB 快取
@@ -350,6 +368,7 @@ async function fetchAll() {
 ```
 
 ### Test Case 3: 多裝置同步
+
 ```
 步驟：
 1. 公司電腦刪除資料
@@ -363,6 +382,7 @@ async function fetchAll() {
 ```
 
 ### Test Case 4: 離線操作
+
 ```
 步驟：
 1. 斷開網路
@@ -412,6 +432,7 @@ async function fetchAll() {
 **這兩個修正非常關鍵！** 🚀
 
 沒有這些修正，即使有 Realtime，多裝置同步還是會失敗。現在的架構才是真正的：
+
 - ✅ 離線優先
 - ✅ 即時同步
 - ✅ 跨裝置支援

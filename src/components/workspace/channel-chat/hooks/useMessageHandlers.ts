@@ -1,5 +1,5 @@
-import type { Message } from '@/stores/workspace-store';
-import { ALERT_MESSAGES } from '../constants';
+import type { Message } from '@/stores/workspace-store'
+import { ALERT_MESSAGES } from '../constants'
 
 /**
  * 管理訊息相關的處理函數
@@ -19,46 +19,45 @@ export function useMessageHandlers(
   handleDeleteMessage: (messageId: string) => Promise<void>
 ) {
   const handleSubmitMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!messageText.trim() && attachedFiles.length === 0) {
-      return;
+      return
     }
 
     if (!selectedChannel) {
-      return;
+      return
     }
 
     if (!user) {
-      alert(ALERT_MESSAGES.LOGIN_REQUIRED);
-      return;
+      alert(ALERT_MESSAGES.LOGIN_REQUIRED)
+      return
     }
 
     try {
-      const uploadedAttachments = attachedFiles.length > 0
-        ? await uploadFiles(selectedChannel.id)
-        : undefined;
+      const uploadedAttachments =
+        attachedFiles.length > 0 ? await uploadFiles(selectedChannel.id) : undefined
 
-      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments);
+      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments)
 
-      setMessageText('');
-      clearFiles();
+      setMessageText('')
+      clearFiles()
     } catch (error) {
-      alert(ALERT_MESSAGES.SEND_FAILED);
+      alert(ALERT_MESSAGES.SEND_FAILED)
     }
-  };
+  }
 
   const handleReactionClick = (messageId: string, emoji: string) => {
-    handleReaction(messageId, emoji, currentMessages);
-  };
+    handleReaction(messageId, emoji, currentMessages)
+  }
 
   const handleDeleteMessageClick = async (messageId: string) => {
-    await handleDeleteMessage(messageId);
-  };
+    await handleDeleteMessage(messageId)
+  }
 
   return {
     handleSubmitMessage,
     handleReactionClick,
     handleDeleteMessageClick,
-  };
+  }
 }

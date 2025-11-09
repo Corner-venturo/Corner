@@ -178,12 +178,7 @@ export async function updateMany<T extends { id: string }>(
   db: IDBDatabase,
   tableName: TableName,
   updates: Array<{ id: string; data: Partial<T> }>,
-  updateFn: (
-    db: IDBDatabase,
-    tableName: TableName,
-    id: string,
-    data: Partial<T>
-  ) => Promise<T>
+  updateFn: (db: IDBDatabase, tableName: TableName, id: string, data: Partial<T>) => Promise<T>
 ): Promise<T[]> {
   const results: T[] = []
 

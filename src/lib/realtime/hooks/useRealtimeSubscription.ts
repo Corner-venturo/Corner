@@ -3,26 +3,26 @@
  * 自動管理訂閱的生命週期
  */
 
-'use client';
+'use client'
 
-import { useEffect, useRef, useState } from 'react';
-import { realtimeManager } from '../realtime-manager';
-import type { RealtimeSubscriptionConfig, RealtimeStatus } from '../types';
+import { useEffect, useRef, useState } from 'react'
+import { realtimeManager } from '../realtime-manager'
+import type { RealtimeSubscriptionConfig, RealtimeStatus } from '../types'
 
 interface UseRealtimeSubscriptionOptions<T> extends RealtimeSubscriptionConfig<T> {
   /** 是否啟用訂閱 (預設: true) */
-  enabled?: boolean;
+  enabled?: boolean
 }
 
 interface UseRealtimeSubscriptionReturn {
   /** 訂閱狀態 */
-  status: RealtimeStatus;
+  status: RealtimeStatus
   /** 錯誤訊息 */
-  error: Error | null;
+  error: Error | null
   /** 是否已連線 */
-  isConnected: boolean;
+  isConnected: boolean
   /** 重試次數 */
-  retryCount: number;
+  retryCount: number
 }
 
 /**
@@ -50,46 +50,44 @@ interface UseRealtimeSubscriptionReturn {
 export function useRealtimeSubscription<T = unknown>(
   options: UseRealtimeSubscriptionOptions<T>
 ): UseRealtimeSubscriptionReturn {
-  const { enabled = true, ...config } = options;
-  const subscriptionIdRef = useRef<string | null>(null);
-  const [status, setStatus] = useState<RealtimeStatus>('disconnected');
-  const [error, setError] = useState<Error | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const { enabled = true, ...config } = options
+  const subscriptionIdRef = useRef<string | null>(null)
+  const [status, setStatus] = useState<RealtimeStatus>('disconnected')
+  const [error, setError] = useState<Error | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     // 如果未啟用，不訂閱
     if (!enabled) {
-      return;
+      return
     }
 
     // 創建訂閱
-    const subscriptionId = realtimeManager.subscribe<T>(config);
-    subscriptionIdRef.current = subscriptionId;
+    const subscriptionId = realtimeManager.subscribe<T>(config)
+    subscriptionIdRef.current = subscriptionId
 
     // 定期檢查訂閱狀態
     const statusInterval = setInterval(() => {
-      if (!subscriptionIdRef.current) return;
+      if (!subscriptionIdRef.current) return
 
-      const state = realtimeManager.getSubscriptionState(
-        subscriptionIdRef.current
-      );
+      const state = realtimeManager.getSubscriptionState(subscriptionIdRef.current)
 
       if (state) {
-        setStatus(state.status);
-        setError(state.error);
-        setRetryCount(state.retryCount);
+        setStatus(state.status)
+        setError(state.error)
+        setRetryCount(state.retryCount)
       }
-    }, 1000);
+    }, 1000)
 
     // 清理函數
     return () => {
-      clearInterval(statusInterval);
+      clearInterval(statusInterval)
 
       if (subscriptionIdRef.current) {
-        realtimeManager.unsubscribe(subscriptionIdRef.current);
-        subscriptionIdRef.current = null;
+        realtimeManager.unsubscribe(subscriptionIdRef.current)
+        subscriptionIdRef.current = null
       }
-    };
+    }
   }, [
     enabled,
     config.table,
@@ -98,14 +96,14 @@ export function useRealtimeSubscription<T = unknown>(
     config.filter,
     // 注意：handlers 不應該作為依賴，因為它們是物件引用
     // 如果 handlers 變更，需要重新訂閱
-  ]);
+  ])
 
   return {
     status,
     error,
     isConnected: status === 'connected',
     retryCount,
-  };
+  }
 }
 
 /**
@@ -130,33 +128,28 @@ export function useRealtimeSubscription<T = unknown>(
 export function useMultipleRealtimeSubscriptions<T = unknown>(
   subscriptions: UseRealtimeSubscriptionOptions<T>[]
 ): UseRealtimeSubscriptionReturn[] {
-  const results = subscriptions.map((config) =>
-    useRealtimeSubscription(config)
-  );
+  const results = subscriptions.map(config => useRealtimeSubscription(config))
 
-  return results;
+  return results
 }
 
 /**
  * 取得所有訂閱狀態（不創建新訂閱）
  */
 export function useRealtimeStatus() {
-  const [subscriptions, setSubscriptions] = useState(
-    realtimeManager.getAllSubscriptions()
-  );
+  const [subscriptions, setSubscriptions] = useState(realtimeManager.getAllSubscriptions())
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSubscriptions(realtimeManager.getAllSubscriptions());
-    }, 1000);
+      setSubscriptions(realtimeManager.getAllSubscriptions())
+    }, 1000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   return {
     subscriptions,
     totalCount: subscriptions.length,
-    connectedCount: subscriptions.filter((s) => s.status === 'connected')
-      .length,
-  };
+    connectedCount: subscriptions.filter(s => s.status === 'connected').length,
+  }
 }

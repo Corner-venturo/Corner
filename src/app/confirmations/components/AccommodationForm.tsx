@@ -68,7 +68,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="booking_number"
             value={formData.booking_number}
-            onChange={(e) => onChange({ ...formData, booking_number: e.target.value })}
+            onChange={e => onChange({ ...formData, booking_number: e.target.value })}
             placeholder="1658108098074416"
           />
         </div>
@@ -77,7 +77,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="confirmation_number"
             value={formData.confirmation_number || ''}
-            onChange={(e) => onChange({ ...formData, confirmation_number: e.target.value })}
+            onChange={e => onChange({ ...formData, confirmation_number: e.target.value })}
             placeholder="15382152"
           />
         </div>
@@ -92,7 +92,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="hotelName"
             value={data.hotelName || ''}
-            onChange={(e) => updateField('hotelName', e.target.value)}
+            onChange={e => updateField('hotelName', e.target.value)}
             placeholder="凡裡FUN LIST飯店（上海顓橋萬達店）"
           />
         </div>
@@ -102,7 +102,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="hotelAddress"
             value={data.hotelAddress || ''}
-            onChange={(e) => updateField('hotelAddress', e.target.value)}
+            onChange={e => updateField('hotelAddress', e.target.value)}
             placeholder="上海, 閔行區, 顓興東路1398號"
           />
         </div>
@@ -113,15 +113,10 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             <div key={index} className="flex gap-2">
               <Input
                 value={phone}
-                onChange={(e) => updatePhone(index, e.target.value)}
+                onChange={e => updatePhone(index, e.target.value)}
                 placeholder="+86-21-62218638"
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => removePhone(index)}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => removePhone(index)}>
                 刪除
               </Button>
             </div>
@@ -143,7 +138,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               id="checkInDate"
               type="date"
               value={data.checkInDate || ''}
-              onChange={(e) => updateField('checkInDate', e.target.value)}
+              onChange={e => updateField('checkInDate', e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -151,7 +146,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             <Input
               id="checkInTime"
               value={data.checkInTime || ''}
-              onChange={(e) => updateField('checkInTime', e.target.value)}
+              onChange={e => updateField('checkInTime', e.target.value)}
               placeholder="14:00後"
             />
           </div>
@@ -164,7 +159,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               id="checkOutDate"
               type="date"
               value={data.checkOutDate || ''}
-              onChange={(e) => updateField('checkOutDate', e.target.value)}
+              onChange={e => updateField('checkOutDate', e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -172,7 +167,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             <Input
               id="checkOutTime"
               value={data.checkOutTime || ''}
-              onChange={(e) => updateField('checkOutTime', e.target.value)}
+              onChange={e => updateField('checkOutTime', e.target.value)}
               placeholder="12:00前"
             />
           </div>
@@ -185,7 +180,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               id="roomCount"
               type="number"
               value={data.roomCount || ''}
-              onChange={(e) => updateField('roomCount', parseInt(e.target.value) || 0)}
+              onChange={e => updateField('roomCount', parseInt(e.target.value) || 0)}
             />
           </div>
           <div className="space-y-2">
@@ -194,7 +189,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               id="nightCount"
               type="number"
               value={data.nightCount || ''}
-              onChange={(e) => updateField('nightCount', parseInt(e.target.value) || 0)}
+              onChange={e => updateField('nightCount', parseInt(e.target.value) || 0)}
             />
           </div>
         </div>
@@ -209,7 +204,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="roomType"
             value={data.roomType || ''}
-            onChange={(e) => updateField('roomType', e.target.value)}
+            onChange={e => updateField('roomType', e.target.value)}
             placeholder="凡趣大床房（全屋智能+手機投屏+零壓床品+65吋電視）"
           />
         </div>
@@ -219,7 +214,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="guestName"
             value={data.guestName || ''}
-            onChange={(e) => updateField('guestName', e.target.value)}
+            onChange={e => updateField('guestName', e.target.value)}
             placeholder="SUNG SHAOCHING"
           />
         </div>
@@ -229,7 +224,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           <Input
             id="guestCapacity"
             value={data.guestCapacity || ''}
-            onChange={(e) => updateField('guestCapacity', e.target.value)}
+            onChange={e => updateField('guestCapacity', e.target.value)}
             placeholder="此房型可容納最多 2 位旅客，其中最多 2 位成人"
           />
         </div>
@@ -244,21 +239,16 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             <Input
               type="date"
               value={meal.date}
-              onChange={(e) => updateMeal(index, 'date', e.target.value)}
+              onChange={e => updateMeal(index, 'date', e.target.value)}
               className="w-40"
             />
             <Input
               value={meal.description}
-              onChange={(e) => updateMeal(index, 'description', e.target.value)}
+              onChange={e => updateMeal(index, 'description', e.target.value)}
               placeholder="每房 1 客早餐"
               className="flex-1"
             />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => removeMeal(index)}
-            >
+            <Button type="button" variant="outline" size="sm" onClick={() => removeMeal(index)}>
               刪除
             </Button>
           </div>
@@ -274,7 +264,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         <Textarea
           id="importantNotes"
           value={data.importantNotes || ''}
-          onChange={(e) => updateField('importantNotes', e.target.value)}
+          onChange={e => updateField('importantNotes', e.target.value)}
           placeholder="特殊規定、注意事項..."
           rows={4}
         />

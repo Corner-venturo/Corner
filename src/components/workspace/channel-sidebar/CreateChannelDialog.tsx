@@ -2,19 +2,19 @@
  * 新增頻道 Dialog
  */
 
-import { Hash, Lock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Hash, Lock } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface CreateChannelDialogProps {
-  isOpen: boolean;
-  channelName: string;
-  channelDescription: string;
-  channelType: 'public' | 'private';
-  onChannelNameChange: (name: string) => void;
-  onChannelDescriptionChange: (desc: string) => void;
-  onChannelTypeChange: (type: 'public' | 'private') => void;
-  onClose: () => void;
-  onCreate: () => void;
+  isOpen: boolean
+  channelName: string
+  channelDescription: string
+  channelType: 'public' | 'private'
+  onChannelNameChange: (name: string) => void
+  onChannelDescriptionChange: (desc: string) => void
+  onChannelTypeChange: (type: 'public' | 'private') => void
+  onClose: () => void
+  onCreate: () => void
 }
 
 export function CreateChannelDialog({
@@ -28,7 +28,7 @@ export function CreateChannelDialog({
   onClose,
   onCreate,
 }: CreateChannelDialogProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-50">
@@ -37,9 +37,7 @@ export function CreateChannelDialog({
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">
-              頻道名稱
-            </label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">頻道名稱</label>
             <input
               type="text"
               placeholder="例如：專案討論"
@@ -64,9 +62,7 @@ export function CreateChannelDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">
-              頻道類型
-            </label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">頻道類型</label>
             <div className="flex gap-2">
               <button
                 onClick={() => onChannelTypeChange('public')}
@@ -97,10 +93,7 @@ export function CreateChannelDialog({
         </div>
 
         <div className="flex gap-2 mt-4 justify-end">
-          <button
-            className="btn-morandi-secondary !py-1.5 !px-3 text-sm"
-            onClick={onClose}
-          >
+          <button className="btn-morandi-secondary !py-1.5 !px-3 text-sm" onClick={onClose}>
             取消
           </button>
           <button
@@ -113,5 +106,5 @@ export function CreateChannelDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

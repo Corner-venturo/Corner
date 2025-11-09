@@ -32,16 +32,18 @@ interface ChannelsUIState {
 /**
  * UI 狀態 Store (純前端狀態)
  */
-const useChannelsUIStore = create<ChannelsUIState & {
-  // UI 狀態操作
-  setSelectedChannel: (channel: Channel | null) => void
-  setCurrentChannel: (channel: Channel | null) => void
-  setCurrentWorkspace: (workspace: Workspace | null) => void
-  setSearchQuery: (query: string) => void
-  setChannelFilter: (filter: 'all' | 'starred' | 'unread' | 'muted') => void
-  setError: (error: string | null) => void
-  clearError: () => void
-}>(set => ({
+const useChannelsUIStore = create<
+  ChannelsUIState & {
+    // UI 狀態操作
+    setSelectedChannel: (channel: Channel | null) => void
+    setCurrentChannel: (channel: Channel | null) => void
+    setCurrentWorkspace: (workspace: Workspace | null) => void
+    setSearchQuery: (query: string) => void
+    setChannelFilter: (filter: 'all' | 'starred' | 'unread' | 'muted') => void
+    setError: (error: string | null) => void
+    clearError: () => void
+  }
+>(set => ({
   selectedChannel: null,
   currentChannel: null,
   currentWorkspace: null,
@@ -202,9 +204,7 @@ export const useChannelsStore = () => {
 
       // 批量更新頻道
       await Promise.all(
-        channelsInGroup.map(channel =>
-          channelStore.update(channel.id, { group_id: null })
-        )
+        channelsInGroup.map(channel => channelStore.update(channel.id, { group_id: null }))
       )
 
       // 刪除群組

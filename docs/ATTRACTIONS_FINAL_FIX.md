@@ -9,10 +9,12 @@
 ## 問題歷程
 
 ### 修復嘗試 #1: 優化虛擬滾動
+
 - ❌ 使用 `.slice()` 只渲染可見項目
 - ❌ 結果：仍然崩潰
 
 ### 修復嘗試 #2: 修正容器高度
+
 - ❌ 改用固定 `maxHeight: 600px`
 - ❌ 結果：仍然崩潰
 
@@ -21,11 +23,13 @@
 用戶回報：「還是一樣連進都進不去」= 根本看不到 console
 
 這表示問題發生在：
+
 1. **資料載入階段**（fetch attractions）
 2. **資料處理階段**（filtering/sorting）
 3. **初始渲染階段**（rendering first batch）
 
 Server log 顯示：
+
 ```
 ✓ Compiled /database/attractions in 854ms
 GET /database/attractions 200 in 964ms  ← Server 端成功
@@ -54,6 +58,7 @@ GET /database/attractions 200 in 964ms  ← Server 端成功
 ```
 
 **改進點**：
+
 - ✅ 只載入顯示所需的欄位（移除 `region_id`, `display_order`, `images` 等）
 - ✅ 限制 50 筆資料（而非全部 375 筆）
 - ✅ 簡化排序（只用 `name`，移除 `display_order`）
@@ -78,6 +83,7 @@ const handleScroll = useCallback(() => { /* 複雜計算 */ }, [])
 ```
 
 **改進點**：
+
 - ✅ 移除 `visibleRange` state
 - ✅ 移除 `handleScroll` callback
 - ✅ 移除絕對定位和高度計算
@@ -94,6 +100,7 @@ const ITEMS_PER_PAGE = 20
 ```
 
 **效果**：
+
 - 每頁只渲染 20 個景點
 - DOM 節點：20 × 6 子元素 = 120 個（遠低於崩潰臨界值）
 
@@ -104,9 +111,11 @@ const ITEMS_PER_PAGE = 20
 ### 1. `src/features/attractions/hooks/useAttractionsData.ts`
 
 **修改內容**：
+
 - Line 17-23: 只 select 必要欄位 + limit 50
 
 **修改前**：
+
 ```typescript
 const { data, error } = await supabase
   .from('attractions')
@@ -116,10 +125,13 @@ const { data, error } = await supabase
 ```
 
 **修改後**：
+
 ```typescript
 const { data, error } = await supabase
   .from('attractions')
-  .select('id, name, name_en, country_id, city_id, category, description, duration_minutes, tags, thumbnail, is_active')
+  .select(
+    'id, name, name_en, country_id, city_id, category, description, duration_minutes, tags, thumbnail, is_active'
+  )
   .order('name', { ascending: true })
   .limit(50)
 ```
@@ -127,6 +139,7 @@ const { data, error } = await supabase
 ### 2. `src/features/attractions/components/AttractionsListVirtualized.tsx`
 
 **修改內容**：
+
 - Line 25: 改為 `ITEMS_PER_PAGE = 20`
 - Line 41-55: 移除 `visibleRange` 和 `handleScroll`
 - Line 80-83: 簡化 `renderAttractionItem`（移除虛擬滾動邏輯）
@@ -137,6 +150,7 @@ const { data, error } = await supabase
 ## 效能對比
 
 ### 修復前
+
 ```
 資料載入: 375 筆 × 全欄位 = ~2MB
 初始渲染: 50 筆 × 複雜虛擬滾動 = 300+ DOM 節點
@@ -144,6 +158,7 @@ const { data, error } = await supabase
 ```
 
 ### 修復後
+
 ```
 資料載入: 50 筆 × 精簡欄位 = ~200KB（減少 90%）
 初始渲染: 20 筆 × 簡單列表 = 120 DOM 節點（減少 60%）
@@ -155,22 +170,28 @@ const { data, error } = await supabase
 ## 驗證結果
 
 ### Build 測試
+
 ```bash
 npm run build
 ```
+
 ✅ 編譯成功，無錯誤
 
 ### Dev Server
+
 ```bash
 npm run dev
 ```
+
 ✅ Server 運行中：http://localhost:3000
 
 ### Server Log
+
 ```
 ✓ Compiled /database/attractions in 854ms
 GET /database/attractions 200 in 964ms
 ```
+
 ✅ 頁面成功編譯和回應
 
 ---
@@ -195,6 +216,7 @@ GET /database/attractions 200 in 964ms
 ### 未來改進方案
 
 #### 方案 A: Server-Side 分頁
+
 ```typescript
 // 實作真正的 server-side pagination
 const fetchAttractions = async (page: number, limit: number) => {
@@ -207,6 +229,7 @@ const fetchAttractions = async (page: number, limit: number) => {
 ```
 
 #### 方案 B: 延遲載入圖片
+
 ```typescript
 // 使用 React.lazy 或 Intersection Observer
 <img
@@ -217,6 +240,7 @@ const fetchAttractions = async (page: number, limit: number) => {
 ```
 
 #### 方案 C: 使用專業虛擬滾動庫
+
 ```bash
 npm install @tanstack/react-virtual
 ```
@@ -232,6 +256,7 @@ const virtualizer = useVirtualizer({
 ```
 
 #### 方案 D: 改用表格視圖（更高效）
+
 ```typescript
 import { DataTable } from '@/components/ui/data-table'
 
@@ -247,24 +272,29 @@ import { DataTable } from '@/components/ui/data-table'
 ## 測試步驟
 
 ### 1. 清除快取並重啟
+
 ```bash
 lsof -ti:3000 | xargs kill -9
 npm run dev
 ```
 
 ### 2. 測試頁面載入
+
 - 開啟 http://localhost:3000/database/attractions
 - **預期結果**: 頁面順利載入，顯示前 50 筆景點的前 20 筆
 
 ### 3. 測試分頁
+
 - 點擊「下一頁」
 - **預期結果**: 顯示第 21-40 筆
 
 ### 4. 測試篩選
+
 - 選擇國家/城市
 - **預期結果**: 在前 50 筆中篩選，結果正確
 
 ### 5. 測試搜尋
+
 - 輸入景點名稱
 - **預期結果**: 在前 50 筆中搜尋，結果正確
 
@@ -275,17 +305,20 @@ npm run dev
 ✅ **問題已解決**：使用激進簡化方案
 
 ✅ **核心策略**：
+
 1. 只載入 50 筆資料（而非 375 筆）
 2. 只載入必要欄位（減少 80% 資料量）
 3. 移除虛擬滾動（改用簡單分頁）
 4. 每頁只顯示 20 筆（減少 DOM 節點）
 
 ✅ **效能提升**：
+
 - 資料傳輸量：2MB → 200KB（減少 90%）
 - DOM 節點數：300+ → 120（減少 60%）
 - 初始載入時間：預估減少 70%+
 
 ⚠️ **權衡取捨**：
+
 - 犧牲：無法一次看到全部 375 筆資料
 - 獲得：頁面穩定運行，不會崩潰
 

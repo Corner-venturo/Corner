@@ -8,42 +8,45 @@
  * 4. 搜尋條件持久化
  */
 
-'use client';
+'use client'
 
-import { useState, useMemo, useEffect } from 'react';
-import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react'
+import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit } from 'lucide-react'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table';
-import { Input } from '@/components/ui/input';
-import { CustomerSearchDialog, CustomerSearchParams } from '@/components/customers/customer-search-dialog';
-import { useCustomerStore } from '@/stores';
-import { useRealtimeForCustomers } from '@/hooks/use-realtime-hooks';
-import type { Customer } from '@/types/customer.types';
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { Input } from '@/components/ui/input'
+import {
+  CustomerSearchDialog,
+  CustomerSearchParams,
+} from '@/components/customers/customer-search-dialog'
+import { useCustomerStore } from '@/stores'
+import { useRealtimeForCustomers } from '@/hooks/use-realtime-hooks'
+import type { Customer } from '@/types/customer.types'
 
-const STORAGE_KEY = 'customerSearchParams';
+const STORAGE_KEY = 'customerSearchParams'
 
 export default function CustomersPage() {
   // ✅ Realtime 訂閱
-  useRealtimeForCustomers();
+  useRealtimeForCustomers()
 
-  const { items: customers, create: addCustomer } = useCustomerStore();
+  const { items: customers, create: addCustomer } = useCustomerStore()
 
   // 搜尋狀態
-  const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
+  const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false)
   const [searchParams, setSearchParams] = useState<CustomerSearchParams>(() => {
     // 從 localStorage 讀取儲存的搜尋參數
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : {};
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? JSON.parse(saved) : {}
     }
-    return {};
-  });
+    return {}
+  })
 
   // 新增顧客對話框
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
@@ -54,94 +57,88 @@ export default function CustomersPage() {
     passport_expiry_date: '',
     national_id: '',
     date_of_birth: '',
-  });
+  })
 
   // 當搜尋參數改變時，保存到 localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(searchParams));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(searchParams))
     }
-  }, [searchParams]);
+  }, [searchParams])
 
   // 進階搜尋篩選
   const filteredCustomers = useMemo(() => {
-    let result = customers;
+    let result = customers
 
     // 基本搜尋（姓名、身份證號、護照號碼）
     if (searchParams.query) {
-      const query = searchParams.query.toLowerCase();
+      const query = searchParams.query.toLowerCase()
       result = result.filter(
-        (c) =>
+        c =>
           c.name.toLowerCase().includes(query) ||
           c.national_id?.toLowerCase().includes(query) ||
           c.passport_number?.toLowerCase().includes(query)
-      );
+      )
     }
 
     // 電話
     if (searchParams.phone) {
-      result = result.filter((c) => c.phone?.includes(searchParams.phone!));
+      result = result.filter(c => c.phone?.includes(searchParams.phone!))
     }
 
     // Email
     if (searchParams.email) {
-      result = result.filter((c) =>
+      result = result.filter(c =>
         c.email?.toLowerCase().includes(searchParams.email!.toLowerCase())
-      );
+      )
     }
 
     // 護照拼音
     if (searchParams.passport_romanization) {
-      result = result.filter((c) =>
+      result = result.filter(c =>
         c.passport_romanization
           ?.toLowerCase()
           .includes(searchParams.passport_romanization!.toLowerCase())
-      );
+      )
     }
 
     // 城市
     if (searchParams.city) {
-      result = result.filter((c) =>
-        c.city?.toLowerCase().includes(searchParams.city!.toLowerCase())
-      );
+      result = result.filter(c => c.city?.toLowerCase().includes(searchParams.city!.toLowerCase()))
     }
 
     // VIP 狀態
     if (searchParams.is_vip !== undefined) {
-      result = result.filter((c) => c.is_vip === searchParams.is_vip);
+      result = result.filter(c => c.is_vip === searchParams.is_vip)
     }
 
     // VIP 等級
     if (searchParams.vip_level) {
-      result = result.filter((c) => c.vip_level === searchParams.vip_level);
+      result = result.filter(c => c.vip_level === searchParams.vip_level)
     }
 
     // 客戶來源
     if (searchParams.source) {
-      result = result.filter((c) => c.source === searchParams.source);
+      result = result.filter(c => c.source === searchParams.source)
     }
 
     // 護照效期範圍
     if (searchParams.passport_expiry_start) {
       result = result.filter(
-        (c) =>
-          c.passport_expiry_date &&
-          c.passport_expiry_date >= searchParams.passport_expiry_start!
-      );
+        c => c.passport_expiry_date && c.passport_expiry_date >= searchParams.passport_expiry_start!
+      )
     }
     if (searchParams.passport_expiry_end) {
       result = result.filter(
-        (c) =>
-          c.passport_expiry_date &&
-          c.passport_expiry_date <= searchParams.passport_expiry_end!
-      );
+        c => c.passport_expiry_date && c.passport_expiry_date <= searchParams.passport_expiry_end!
+      )
     }
 
-    return result;
-  }, [customers, searchParams]);
+    return result
+  }, [customers, searchParams])
 
   const handleAddCustomer = async () => {
-    if (!newCustomer.name.trim() || !newCustomer.phone.trim()) return;
+    if (!newCustomer.name.trim() || !newCustomer.phone.trim()) return
 
     await addCustomer({
       ...newCustomer,
@@ -149,7 +146,7 @@ export default function CustomersPage() {
       is_vip: false,
       is_active: true,
       total_spent: 0,
-    } as any);
+    } as any)
 
     setNewCustomer({
       name: '',
@@ -161,19 +158,19 @@ export default function CustomersPage() {
       passport_expiry_date: '',
       national_id: '',
       date_of_birth: '',
-    });
-    setIsAddDialogOpen(false);
-  };
+    })
+    setIsAddDialogOpen(false)
+  }
 
   const handleSearch = (params: CustomerSearchParams) => {
-    setSearchParams(params);
-  };
+    setSearchParams(params)
+  }
 
   const handleClearSearch = () => {
-    setSearchParams({});
-  };
+    setSearchParams({})
+  }
 
-  const hasActiveFilters = Object.keys(searchParams).length > 0;
+  const hasActiveFilters = Object.keys(searchParams).length > 0
 
   // 表格欄位定義
   const tableColumns: TableColumn[] = useMemo(
@@ -231,9 +228,7 @@ export default function CustomersPage() {
               </div>
             )}
             {customer.passport_number && (
-              <div className="text-xs text-morandi-secondary">
-                號碼: {customer.passport_number}
-              </div>
+              <div className="text-xs text-morandi-secondary">號碼: {customer.passport_number}</div>
             )}
             {customer.passport_expiry_date && (
               <div className="text-xs text-morandi-secondary">
@@ -255,9 +250,7 @@ export default function CustomersPage() {
         render: (_value, customer: Customer) => (
           <div className="space-y-1">
             {customer.national_id && (
-              <div className="text-xs text-morandi-primary font-mono">
-                {customer.national_id}
-              </div>
+              <div className="text-xs text-morandi-primary font-mono">{customer.national_id}</div>
             )}
             {customer.date_of_birth && (
               <div className="text-xs text-morandi-secondary">
@@ -304,16 +297,14 @@ export default function CustomersPage() {
               NT$ {(customer.total_spent || 0).toLocaleString()}
             </div>
             {customer.total_orders && customer.total_orders > 0 && (
-              <div className="text-xs text-morandi-secondary">
-                {customer.total_orders} 筆訂單
-              </div>
+              <div className="text-xs text-morandi-secondary">{customer.total_orders} 筆訂單</div>
             )}
           </div>
         ),
       },
     ],
     []
-  );
+  )
 
   return (
     <div className="h-full flex flex-col">
@@ -358,8 +349,8 @@ export default function CustomersPage() {
       {hasActiveFilters && (
         <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
           <div className="text-xs text-morandi-secondary">
-            已套用 {Object.keys(searchParams).length} 個篩選條件 |{' '}
-            顯示 {filteredCustomers.length} / {customers.length} 位顧客
+            已套用 {Object.keys(searchParams).length} 個篩選條件 | 顯示 {filteredCustomers.length} /{' '}
+            {customers.length} 位顧客
           </div>
         </div>
       )}
@@ -369,16 +360,16 @@ export default function CustomersPage() {
           <EnhancedTable
             columns={tableColumns}
             data={filteredCustomers}
-          actions={() => (
-            <Button
-              variant="outline"
-              size="sm"
-              className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-              title="編輯顧客"
-            >
-              <Edit size={14} className="text-morandi-gold" />
-            </Button>
-          )}
+            actions={() => (
+              <Button
+                variant="outline"
+                size="sm"
+                className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+                title="編輯顧客"
+              >
+                <Edit size={14} className="text-morandi-gold" />
+              </Button>
+            )}
           />
         </div>
       </div>
@@ -406,7 +397,7 @@ export default function CustomersPage() {
                   <label className="text-sm font-medium text-morandi-primary">姓名 *</label>
                   <Input
                     value={newCustomer.name}
-                    onChange={(e) => setNewCustomer((prev) => ({ ...prev, name: e.target.value }))}
+                    onChange={e => setNewCustomer(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="輸入顧客姓名"
                     className="mt-1"
                   />
@@ -416,9 +407,7 @@ export default function CustomersPage() {
                   <label className="text-sm font-medium text-morandi-primary">電話 *</label>
                   <Input
                     value={newCustomer.phone}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({ ...prev, phone: e.target.value }))
-                    }
+                    onChange={e => setNewCustomer(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="輸入聯絡電話"
                     className="mt-1"
                   />
@@ -429,9 +418,7 @@ export default function CustomersPage() {
                   <Input
                     type="email"
                     value={newCustomer.email}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({ ...prev, email: e.target.value }))
-                    }
+                    onChange={e => setNewCustomer(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="輸入 Email 地址"
                     className="mt-1"
                   />
@@ -441,9 +428,7 @@ export default function CustomersPage() {
                   <label className="text-sm font-medium text-morandi-primary">地址</label>
                   <Input
                     value={newCustomer.address}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({ ...prev, address: e.target.value }))
-                    }
+                    onChange={e => setNewCustomer(prev => ({ ...prev, address: e.target.value }))}
                     placeholder="輸入地址"
                     className="mt-1"
                   />
@@ -461,8 +446,8 @@ export default function CustomersPage() {
                   </label>
                   <Input
                     value={newCustomer.passport_romanization}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({
+                    onChange={e =>
+                      setNewCustomer(prev => ({
                         ...prev,
                         passport_romanization: e.target.value.toUpperCase(),
                       }))
@@ -476,8 +461,8 @@ export default function CustomersPage() {
                   <label className="text-sm font-medium text-morandi-primary">護照號碼</label>
                   <Input
                     value={newCustomer.passport_number}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({ ...prev, passport_number: e.target.value }))
+                    onChange={e =>
+                      setNewCustomer(prev => ({ ...prev, passport_number: e.target.value }))
                     }
                     placeholder="輸入護照號碼"
                     className="mt-1"
@@ -489,8 +474,8 @@ export default function CustomersPage() {
                   <Input
                     type="date"
                     value={newCustomer.passport_expiry_date}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({
+                    onChange={e =>
+                      setNewCustomer(prev => ({
                         ...prev,
                         passport_expiry_date: e.target.value,
                       }))
@@ -503,8 +488,8 @@ export default function CustomersPage() {
                   <label className="text-sm font-medium text-morandi-primary">身份證字號</label>
                   <Input
                     value={newCustomer.national_id}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({ ...prev, national_id: e.target.value }))
+                    onChange={e =>
+                      setNewCustomer(prev => ({ ...prev, national_id: e.target.value }))
                     }
                     placeholder="輸入身份證字號"
                     className="mt-1"
@@ -516,8 +501,8 @@ export default function CustomersPage() {
                   <Input
                     type="date"
                     value={newCustomer.date_of_birth}
-                    onChange={(e) =>
-                      setNewCustomer((prev) => ({ ...prev, date_of_birth: e.target.value }))
+                    onChange={e =>
+                      setNewCustomer(prev => ({ ...prev, date_of_birth: e.target.value }))
                     }
                     className="mt-1"
                   />
@@ -541,5 +526,5 @@ export default function CustomersPage() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

@@ -89,10 +89,7 @@ function getChannelMessages(
 
   // 過濾 + 排序（只在必要時執行）
   cachedMessages = allMessages
-    .filter(m =>
-      m.channel_id === channelId &&
-      (includeDeleted || !m._deleted)
-    )
+    .filter(m => m.channel_id === channelId && (includeDeleted || !m._deleted))
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
   cachedChannelId = channelId

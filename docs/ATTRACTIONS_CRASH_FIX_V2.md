@@ -13,6 +13,7 @@
 **檔案**: `src/features/attractions/components/AttractionsListVirtualized.tsx`
 
 **修改內容**:
+
 - 使用 `.slice()` 只渲染可見範圍的項目
 - 減少初始渲染數量（50 → 20）
 - 改進滾動計算邏輯
@@ -24,18 +25,22 @@
 經過進一步分析，發現問題不只是虛擬滾動的實作，還包括：
 
 1. **容器高度計算錯誤**（Line 317）
+
    ```typescript
    // ❌ 錯誤：使用 calc(100% - 120px) 但父容器沒有明確高度
    style={{ height: 'calc(100% - 120px)' }}
    ```
+
    - 父容器使用 `flex-1`，但沒有明確的 `height`
    - 導致瀏覽器無法正確計算虛擬滾動容器的高度
    - `handleScroll` 中的 `containerHeight` 可能返回不正確的值
 
 2. **初始可見範圍過大**
+
    ```typescript
    const [visibleRange, setVisibleRange] = useState({ start: 0, end: 20 })
    ```
+
    - 雖然已經從 50 減少到 20
    - 但在容器高度不明確的情況下，可能還是太多
 
@@ -46,6 +51,7 @@
 ### 修改 1: 使用固定高度（Line 317）
 
 **修改前**:
+
 ```typescript
 <div
   ref={containerRef}
@@ -56,6 +62,7 @@
 ```
 
 **修改後**:
+
 ```typescript
 <div
   ref={containerRef}
@@ -66,6 +73,7 @@
 ```
 
 **改進點**:
+
 - ✅ 使用固定的 `maxHeight: 600px`
 - ✅ 移除 `flex-1`（不再依賴父容器高度）
 - ✅ 移除 `calc()`（避免計算錯誤）
@@ -79,17 +87,21 @@
 
 ```html
 <!-- 父容器層級結構 -->
-<div class="h-full flex flex-col">           <!-- 100vh -->
-  <ResponsiveHeader />                        <!-- ~80px -->
-  <div class="flex-1 overflow-auto">          <!-- flex-1 = 剩餘高度，但沒有明確值 -->
-    <AttractionsFilters />                    <!-- ~60px -->
+<div class="h-full flex flex-col">
+  <!-- 100vh -->
+  <ResponsiveHeader />
+  <!-- ~80px -->
+  <div class="flex-1 overflow-auto">
+    <!-- flex-1 = 剩餘高度，但沒有明確值 -->
+    <AttractionsFilters />
+    <!-- ~60px -->
     <AttractionsListVirtualized />
-      <!-- 問題在這裡！ -->
-      <div style="height: calc(100% - 120px)">
-        <!-- 父元素是 flex-1，沒有明確高度 -->
-        <!-- 瀏覽器無法計算 100% 是多少 -->
-        <!-- 導致 containerRef.current.clientHeight 返回錯誤值 -->
-      </div>
+    <!-- 問題在這裡！ -->
+    <div style="height: calc(100% - 120px)">
+      <!-- 父元素是 flex-1，沒有明確高度 -->
+      <!-- 瀏覽器無法計算 100% 是多少 -->
+      <!-- 導致 containerRef.current.clientHeight 返回錯誤值 -->
+    </div>
   </div>
 </div>
 ```
@@ -97,11 +109,13 @@
 ### 虛擬滾動失敗的連鎖反應
 
 1. **容器高度計算錯誤**
+
    ```typescript
    const containerHeight = containerRef.current.clientHeight // 可能返回 0 或錯誤值
    ```
 
 2. **可見項目數量計算錯誤**
+
    ```typescript
    const visibleCount = Math.ceil(containerHeight / ITEM_HEIGHT)
    // 如果 containerHeight = 0，visibleCount = 0
@@ -110,10 +124,7 @@
 
 3. **渲染過多或過少項目**
    ```typescript
-   const end = Math.min(
-     currentPageData.length,
-     start + visibleCount + BUFFER_SIZE * 2
-   )
+   const end = Math.min(currentPageData.length, start + visibleCount + BUFFER_SIZE * 2)
    // 如果 visibleCount 錯誤，end 也會錯誤
    // 可能渲染 0 個項目（空白畫面）
    // 或渲染 100+ 個項目（瀏覽器當機）
@@ -148,15 +159,19 @@ style={{ maxHeight: '600px' }}
 ## 驗證結果
 
 ### 建置測試
+
 ```bash
 npm run build
 ```
+
 ✅ 編譯成功，無 TypeScript 錯誤
 
 ### 開發伺服器
+
 ```bash
 npm run dev
 ```
+
 ✅ 伺服器啟動成功 (port 3000)
 
 ### 預期行為
@@ -171,9 +186,11 @@ npm run dev
 ## 相關檔案
 
 **修改檔案**:
+
 - `src/features/attractions/components/AttractionsListVirtualized.tsx` (Line 317)
 
 **相關檔案**:
+
 - `src/features/attractions/components/AttractionsPage.tsx`
 - `src/features/attractions/hooks/useAttractionsData.ts`
 - `src/features/attractions/hooks/useAttractionsFilters.ts`
@@ -233,6 +250,7 @@ import { FixedSizeList } from 'react-window'
 ### 3. 分頁策略
 
 當前 50 items/page 可能過多，可改為：
+
 - 30 items/page（減少記憶體佔用）
 - 或使用無限滾動取代分頁
 
@@ -247,6 +265,7 @@ import { FixedSizeList } from 'react-window'
 ✅ **修復方式**：改用固定 `maxHeight`，確保容器高度可預測
 
 ✅ **效能提升**：
+
 - 固定渲染 20-26 個項目（取決於緩衝區）
 - DOM 節點數量穩定在 120-156 個
 - 不會因為計算錯誤而崩潰

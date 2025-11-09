@@ -4,17 +4,17 @@
  * 密碼: 83212711
  */
 
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs')
 
 async function generatePasswordHash() {
-  const password = '83212711';
-  const salt = await bcrypt.genSalt(10);
-  const hash = await bcrypt.hash(password, salt);
+  const password = '83212711'
+  const salt = await bcrypt.genSalt(10)
+  const hash = await bcrypt.hash(password, salt)
 
-  console.log('\n✅ 密碼 Hash 生成成功');
-  console.log('密碼:', password);
-  console.log('Hash:', hash);
-  console.log('\n請將以下 SQL 貼到 Supabase SQL Editor 執行：\n');
+  console.log('\n✅ 密碼 Hash 生成成功')
+  console.log('密碼:', password)
+  console.log('Hash:', hash)
+  console.log('\n請將以下 SQL 貼到 Supabase SQL Editor 執行：\n')
 
   const sql = `
 -- 新增工程師使用者 LIAO00
@@ -48,9 +48,9 @@ ON CONFLICT (employee_number) DO UPDATE SET
   permissions = EXCLUDED.permissions,
   is_active = EXCLUDED.is_active,
   updated_at = now();
-`;
+`
 
-  console.log(sql);
+  console.log(sql)
 }
 
-generatePasswordHash().catch(console.error);
+generatePasswordHash().catch(console.error)

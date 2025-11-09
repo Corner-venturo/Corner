@@ -151,41 +151,44 @@ export const useRegionsStore = () => {
   // ============================================
   // 根據國家載入城市（按需載入）
   // ============================================
-  const fetchCitiesByCountry = useCallback(async (countryId: string) => {
-    // 只載入特定國家的城市（如果已經有全部資料就不重新載入）
-    if (cityStore.items.length === 0) {
-      await cityStore.fetchAll()
-    }
-  }, [cityStore])
+  const fetchCitiesByCountry = useCallback(
+    async (countryId: string) => {
+      // 只載入特定國家的城市（如果已經有全部資料就不重新載入）
+      if (cityStore.items.length === 0) {
+        await cityStore.fetchAll()
+      }
+    },
+    [cityStore]
+  )
 
   // ============================================
   // 載入所有資料（保留向後相容）
   // ============================================
   const fetchAll = useCallback(async () => {
-      // 先載入現有資料
-      await Promise.all([countryStore.fetchAll(), regionStore.fetchAll(), cityStore.fetchAll()])
+    // 先載入現有資料
+    await Promise.all([countryStore.fetchAll(), regionStore.fetchAll(), cityStore.fetchAll()])
 
-      // 如果 countries 是空的，自動初始化預設資料
-      if (countryStore.items.length === 0) {
-        logger.info('📦 [RegionStore] 偵測到空資料，開始初始化預設地區資料...')
-        try {
-          await seedRegions()
+    // 如果 countries 是空的，自動初始化預設資料
+    if (countryStore.items.length === 0) {
+      logger.info('📦 [RegionStore] 偵測到空資料，開始初始化預設地區資料...')
+      try {
+        await seedRegions()
 
-          // 重新載入資料
-          await Promise.all([countryStore.fetchAll(), regionStore.fetchAll(), cityStore.fetchAll()])
+        // 重新載入資料
+        await Promise.all([countryStore.fetchAll(), regionStore.fetchAll(), cityStore.fetchAll()])
 
-          logger.info('✅ [RegionStore] 預設地區資料初始化完成')
-        } catch (error) {
-          logger.error('❌ [RegionStore] 初始化失敗:', error)
-        }
+        logger.info('✅ [RegionStore] 預設地區資料初始化完成')
+      } catch (error) {
+        logger.error('❌ [RegionStore] 初始化失敗:', error)
       }
+    }
 
-      logger.info('✅ 地區資料載入完成', {
-        countries: countryStore.items.length,
-        regions: regionStore.items.length,
-        cities: cityStore.items.length,
-      })
-    }, [countryStore, regionStore, cityStore])
+    logger.info('✅ 地區資料載入完成', {
+      countries: countryStore.items.length,
+      regions: regionStore.items.length,
+      cities: cityStore.items.length,
+    })
+  }, [countryStore, regionStore, cityStore])
 
   // ============================================
   // 載入統計資訊
@@ -198,110 +201,138 @@ export const useRegionsStore = () => {
   // Countries CRUD
   // ============================================
   const createCountry = useCallback((data: any) => countryStore.create(data), [countryStore.create])
-  const updateCountry = useCallback((id: string, data: any) => countryStore.update(id, data), [countryStore.update])
+  const updateCountry = useCallback(
+    (id: string, data: any) => countryStore.update(id, data),
+    [countryStore.update]
+  )
   const deleteCountry = useCallback((id: string) => countryStore.delete(id), [countryStore.delete])
 
   // ============================================
   // Regions CRUD
   // ============================================
   const createRegion = useCallback((data: any) => regionStore.create(data), [regionStore.create])
-  const updateRegion = useCallback((id: string, data: any) => regionStore.update(id, data), [regionStore.update])
+  const updateRegion = useCallback(
+    (id: string, data: any) => regionStore.update(id, data),
+    [regionStore.update]
+  )
   const deleteRegion = useCallback((id: string) => regionStore.delete(id), [regionStore.delete])
 
   // ============================================
   // Cities CRUD
   // ============================================
   const createCity = useCallback((data: any) => cityStore.create(data), [cityStore.create])
-  const updateCity = useCallback((id: string, data: any) => cityStore.update(id, data), [cityStore.update])
+  const updateCity = useCallback(
+    (id: string, data: any) => cityStore.update(id, data),
+    [cityStore.update]
+  )
   const deleteCity = useCallback((id: string) => cityStore.delete(id), [cityStore.delete])
 
   // ============================================
   // 查詢方法（使用 useCallback 穩定引用）
   // ============================================
-  const getCountry = useCallback((id: string) => {
-    return countryStore.items.find(c => c.id === id)
-  }, [countryStore.items])
+  const getCountry = useCallback(
+    (id: string) => {
+      return countryStore.items.find(c => c.id === id)
+    },
+    [countryStore.items]
+  )
 
-  const getRegionsByCountry = useCallback((countryId: string) => {
-    return regionStore.items.filter(r => r.country_id === countryId)
-  }, [regionStore.items])
+  const getRegionsByCountry = useCallback(
+    (countryId: string) => {
+      return regionStore.items.filter(r => r.country_id === countryId)
+    },
+    [regionStore.items]
+  )
 
-  const getCitiesByCountry = useCallback((countryId: string) => {
-    return cityStore.items.filter(c => c.country_id === countryId)
-  }, [cityStore.items])
+  const getCitiesByCountry = useCallback(
+    (countryId: string) => {
+      return cityStore.items.filter(c => c.country_id === countryId)
+    },
+    [cityStore.items]
+  )
 
-  const getCitiesByRegion = useCallback((regionId: string) => {
-    return cityStore.items.filter(c => c.region_id === regionId)
-  }, [cityStore.items])
+  const getCitiesByRegion = useCallback(
+    (regionId: string) => {
+      return cityStore.items.filter(c => c.region_id === regionId)
+    },
+    [cityStore.items]
+  )
 
-  const getCityStats = useCallback((cityId: string) => {
-    return statsStore.stats[cityId]
-  }, [statsStore.stats])
+  const getCityStats = useCallback(
+    (cityId: string) => {
+      return statsStore.stats[cityId]
+    },
+    [statsStore.stats]
+  )
 
   // 使用 useMemo 確保回傳的物件引用穩定
-  return useMemo(() => ({
-    // 資料
-    countries: countryStore.items,
-    regions: regionStore.items,
-    cities: cityStore.items,
-    stats: statsStore.stats,
+  return useMemo(
+    () => ({
+      // 資料
+      countries: countryStore.items,
+      regions: regionStore.items,
+      cities: cityStore.items,
+      stats: statsStore.stats,
 
-    // 狀態
-    loading: countryStore.loading || regionStore.loading || cityStore.loading || statsStore.loading,
-    error: countryStore.error || regionStore.error || cityStore.error || statsStore.error,
+      // 狀態
+      loading:
+        countryStore.loading || regionStore.loading || cityStore.loading || statsStore.loading,
+      error: countryStore.error || regionStore.error || cityStore.error || statsStore.error,
 
-    // 方法（已穩定）
-    fetchAll,
-    fetchCountries,
-    fetchCitiesByCountry,
-    fetchStats,
-    createCountry,
-    updateCountry,
-    deleteCountry,
-    createRegion,
-    updateRegion,
-    deleteRegion,
-    createCity,
-    updateCity,
-    deleteCity,
-    getCountry,
-    getRegionsByCountry,
-    getCitiesByCountry,
-    getCitiesByRegion,
-    getCityStats,
-  }), [
-    // 資料依賴
-    countryStore.items,
-    regionStore.items,
-    cityStore.items,
-    statsStore.stats,
-    // 狀態依賴
-    countryStore.loading,
-    regionStore.loading,
-    cityStore.loading,
-    statsStore.loading,
-    countryStore.error,
-    regionStore.error,
-    cityStore.error,
-    statsStore.error,
-    // 方法依賴
-    fetchAll,
-    fetchCountries,
-    fetchCitiesByCountry,
-    fetchStats,
-    createCountry,
-    updateCountry,
-    deleteCountry,
-    createRegion,
-    updateRegion,
-    deleteRegion,
-    createCity,
-    updateCity,
-    deleteCity,
-    getCountry,
-    getRegionsByCountry,
-    getCitiesByCountry,
-    getCitiesByRegion,
-    getCityStats,
-  ])
+      // 方法（已穩定）
+      fetchAll,
+      fetchCountries,
+      fetchCitiesByCountry,
+      fetchStats,
+      createCountry,
+      updateCountry,
+      deleteCountry,
+      createRegion,
+      updateRegion,
+      deleteRegion,
+      createCity,
+      updateCity,
+      deleteCity,
+      getCountry,
+      getRegionsByCountry,
+      getCitiesByCountry,
+      getCitiesByRegion,
+      getCityStats,
+    }),
+    [
+      // 資料依賴
+      countryStore.items,
+      regionStore.items,
+      cityStore.items,
+      statsStore.stats,
+      // 狀態依賴
+      countryStore.loading,
+      regionStore.loading,
+      cityStore.loading,
+      statsStore.loading,
+      countryStore.error,
+      regionStore.error,
+      cityStore.error,
+      statsStore.error,
+      // 方法依賴
+      fetchAll,
+      fetchCountries,
+      fetchCitiesByCountry,
+      fetchStats,
+      createCountry,
+      updateCountry,
+      deleteCountry,
+      createRegion,
+      updateRegion,
+      deleteRegion,
+      createCity,
+      updateCity,
+      deleteCity,
+      getCountry,
+      getRegionsByCountry,
+      getCitiesByCountry,
+      getCitiesByRegion,
+      getCityStats,
+    ]
+  )
 }

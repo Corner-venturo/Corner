@@ -120,10 +120,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     // 只插入新成員
-    const { data, error } = await supabase
-      .from('channel_members')
-      .insert(newMembers)
-      .select()
+    const { data, error } = await supabase.from('channel_members').insert(newMembers).select()
 
     if (error) {
       console.error('Failed to add channel members:', error)

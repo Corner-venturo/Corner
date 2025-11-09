@@ -9,7 +9,12 @@ interface FlightFormProps {
 }
 
 export function FlightForm({ formData, onChange }: FlightFormProps) {
-  const data = (formData.data || { passengers: [], segments: [], baggage: [], importantNotes: [] }) as Partial<FlightData>
+  const data = (formData.data || {
+    passengers: [],
+    segments: [],
+    baggage: [],
+    importantNotes: [],
+  }) as Partial<FlightData>
 
   const updateData = (updates: Partial<FlightData>) => {
     onChange({
@@ -86,7 +91,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
         <Input
           id="booking_number"
           value={formData.booking_number}
-          onChange={(e) => onChange({ ...formData, booking_number: e.target.value })}
+          onChange={e => onChange({ ...formData, booking_number: e.target.value })}
           placeholder="1658108098074416"
         />
       </div>
@@ -101,7 +106,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>英文姓名</Label>
                 <Input
                   value={passenger.nameEn}
-                  onChange={(e) => {
+                  onChange={e => {
                     const passengers = [...(data.passengers || [])]
                     passengers[index] = { ...passengers[index], nameEn: e.target.value }
                     updateData({ passengers })
@@ -113,7 +118,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>中文姓名</Label>
                 <Input
                   value={passenger.nameZh || ''}
-                  onChange={(e) => {
+                  onChange={e => {
                     const passengers = [...(data.passengers || [])]
                     passengers[index] = { ...passengers[index], nameZh: e.target.value }
                     updateData({ passengers })
@@ -127,7 +132,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>艙等</Label>
                 <Input
                   value={passenger.cabin}
-                  onChange={(e) => {
+                  onChange={e => {
                     const passengers = [...(data.passengers || [])]
                     passengers[index] = { ...passengers[index], cabin: e.target.value }
                     updateData({ passengers })
@@ -139,7 +144,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>票號</Label>
                 <Input
                   value={passenger.ticketNumber}
-                  onChange={(e) => {
+                  onChange={e => {
                     const passengers = [...(data.passengers || [])]
                     passengers[index] = { ...passengers[index], ticketNumber: e.target.value }
                     updateData({ passengers })
@@ -151,7 +156,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>訂位代號</Label>
                 <Input
                   value={passenger.bookingCode}
-                  onChange={(e) => {
+                  onChange={e => {
                     const passengers = [...(data.passengers || [])]
                     passengers[index] = { ...passengers[index], bookingCode: e.target.value }
                     updateData({ passengers })
@@ -176,7 +181,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
               <Label>航段</Label>
               <Input
                 value={segment.route}
-                onChange={(e) => {
+                onChange={e => {
                   const segments = [...(data.segments || [])]
                   segments[index] = { ...segments[index], route: e.target.value }
                   updateData({ segments })
@@ -190,7 +195,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Input
                   type="date"
                   value={segment.departureDate}
-                  onChange={(e) => {
+                  onChange={e => {
                     const segments = [...(data.segments || [])]
                     segments[index] = { ...segments[index], departureDate: e.target.value }
                     updateData({ segments })
@@ -202,7 +207,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Input
                   type="time"
                   value={segment.departureTime}
-                  onChange={(e) => {
+                  onChange={e => {
                     const segments = [...(data.segments || [])]
                     segments[index] = { ...segments[index], departureTime: e.target.value }
                     updateData({ segments })
@@ -215,7 +220,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>出發機場</Label>
                 <Input
                   value={segment.departureAirport}
-                  onChange={(e) => {
+                  onChange={e => {
                     const segments = [...(data.segments || [])]
                     segments[index] = { ...segments[index], departureAirport: e.target.value }
                     updateData({ segments })
@@ -227,7 +232,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>抵達機場</Label>
                 <Input
                   value={segment.arrivalAirport}
-                  onChange={(e) => {
+                  onChange={e => {
                     const segments = [...(data.segments || [])]
                     segments[index] = { ...segments[index], arrivalAirport: e.target.value }
                     updateData({ segments })
@@ -241,7 +246,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>航空公司</Label>
                 <Input
                   value={segment.airline}
-                  onChange={(e) => {
+                  onChange={e => {
                     const segments = [...(data.segments || [])]
                     segments[index] = { ...segments[index], airline: e.target.value }
                     updateData({ segments })
@@ -253,7 +258,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>航班號</Label>
                 <Input
                   value={segment.flightNumber}
-                  onChange={(e) => {
+                  onChange={e => {
                     const segments = [...(data.segments || [])]
                     segments[index] = { ...segments[index], flightNumber: e.target.value }
                     updateData({ segments })
@@ -278,7 +283,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
               <Label>旅客姓名</Label>
               <Input
                 value={bag.passengerName}
-                onChange={(e) => {
+                onChange={e => {
                   const baggage = [...(data.baggage || [])]
                   baggage[index] = { ...baggage[index], passengerName: e.target.value }
                   updateData({ baggage })
@@ -291,7 +296,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>個人物品</Label>
                 <Input
                   value={bag.personalItem}
-                  onChange={(e) => {
+                  onChange={e => {
                     const baggage = [...(data.baggage || [])]
                     baggage[index] = { ...baggage[index], personalItem: e.target.value }
                     updateData({ baggage })
@@ -303,7 +308,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>手提行李</Label>
                 <Input
                   value={bag.carryOn}
-                  onChange={(e) => {
+                  onChange={e => {
                     const baggage = [...(data.baggage || [])]
                     baggage[index] = { ...baggage[index], carryOn: e.target.value }
                     updateData({ baggage })
@@ -315,7 +320,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>託運行李</Label>
                 <Input
                   value={bag.checked}
-                  onChange={(e) => {
+                  onChange={e => {
                     const baggage = [...(data.baggage || [])]
                     baggage[index] = { ...baggage[index], checked: e.target.value }
                     updateData({ baggage })
@@ -339,7 +344,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
             <Label>注意事項 #{index + 1}</Label>
             <Input
               value={note}
-              onChange={(e) => {
+              onChange={e => {
                 const importantNotes = [...(data.importantNotes || [])]
                 importantNotes[index] = e.target.value
                 updateData({ importantNotes })
@@ -362,7 +367,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
               <Label>航段</Label>
               <Input
                 value={detail.route}
-                onChange={(e) => {
+                onChange={e => {
                   const baggageDetails = [...(data.baggageDetails || [])]
                   baggageDetails[index] = { ...baggageDetails[index], route: e.target.value }
                   updateData({ baggageDetails })
@@ -375,9 +380,12 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>手提行李詳情</Label>
                 <Input
                   value={detail.carryOnDetail}
-                  onChange={(e) => {
+                  onChange={e => {
                     const baggageDetails = [...(data.baggageDetails || [])]
-                    baggageDetails[index] = { ...baggageDetails[index], carryOnDetail: e.target.value }
+                    baggageDetails[index] = {
+                      ...baggageDetails[index],
+                      carryOnDetail: e.target.value,
+                    }
                     updateData({ baggageDetails })
                   }}
                   placeholder="每人 1 件，每件 8 公斤 每件尺寸上限 55x40x20 公分"
@@ -387,9 +395,12 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>託運行李詳情</Label>
                 <Input
                   value={detail.checkedDetail}
-                  onChange={(e) => {
+                  onChange={e => {
                     const baggageDetails = [...(data.baggageDetails || [])]
-                    baggageDetails[index] = { ...baggageDetails[index], checkedDetail: e.target.value }
+                    baggageDetails[index] = {
+                      ...baggageDetails[index],
+                      checkedDetail: e.target.value,
+                    }
                     updateData({ baggageDetails })
                   }}
                   placeholder="每人 1 件，每件 23 公斤 每件尺寸 (長+寬+高) 上限 158 公分"
@@ -399,9 +410,12 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 <Label>個人物品詳情</Label>
                 <Input
                   value={detail.personalItemDetail}
-                  onChange={(e) => {
+                  onChange={e => {
                     const baggageDetails = [...(data.baggageDetails || [])]
-                    baggageDetails[index] = { ...baggageDetails[index], personalItemDetail: e.target.value }
+                    baggageDetails[index] = {
+                      ...baggageDetails[index],
+                      personalItemDetail: e.target.value,
+                    }
                     updateData({ baggageDetails })
                   }}
                   placeholder="每人 1 件 請聯繫航空公司以進一步了解行李政策 必須置於您前面座位的下方。"

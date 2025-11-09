@@ -81,17 +81,23 @@ interface AccountingStore {
 
   // 帳戶管理
   fetchAccounts: () => Promise<void>
-  addAccount: (account: Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Account | null>
+  addAccount: (
+    account: Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+  ) => Promise<Account | null>
   updateAccount: (id: string, account: Partial<Account>) => Promise<Account | null>
   deleteAccount: (id: string) => Promise<boolean>
 
   // 分類管理
   fetchCategories: () => Promise<void>
-  addCategory: (category: Omit<TransactionCategory, 'id' | 'created_at'>) => Promise<TransactionCategory | null>
+  addCategory: (
+    category: Omit<TransactionCategory, 'id' | 'created_at'>
+  ) => Promise<TransactionCategory | null>
 
   // 交易記錄
   fetchTransactions: () => Promise<void>
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<string | null>
+  addTransaction: (
+    transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+  ) => Promise<string | null>
   updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>
   deleteTransaction: (id: string) => Promise<void>
 
@@ -137,8 +143,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  addAccount: async (accountData) => {
-
+  addAccount: async accountData => {
     const user = useAuthStore.getState().user
     if (!user) {
       console.error('[addAccount] 用戶未登入')
@@ -172,7 +177,6 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   updateAccount: async (id, accountData) => {
-    
     const user = useAuthStore.getState().user
     if (!user) return null
 
@@ -194,8 +198,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     return null
   },
 
-  deleteAccount: async (id) => {
-    
+  deleteAccount: async id => {
     const user = useAuthStore.getState().user
     if (!user) return false
 
@@ -218,8 +221,6 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 分類管理 =====
   fetchCategories: async () => {
-    
-
     const { data, error } = await supabase
       .from('accounting_categories')
       .select('*')
@@ -231,9 +232,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  addCategory: async (categoryData) => {
-    
-
+  addCategory: async categoryData => {
     const { data, error } = await supabase
       .from('accounting_categories')
       .insert({
@@ -252,7 +251,6 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 交易記錄 =====
   fetchTransactions: async () => {
-    
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -269,8 +267,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  addTransaction: async (transactionData) => {
-    
+  addTransaction: async transactionData => {
     const user = useAuthStore.getState().user
     if (!user) return null
 
@@ -298,7 +295,6 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   },
 
   updateTransaction: async (id, transactionData) => {
-    
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -320,8 +316,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  deleteTransaction: async (id) => {
-    
+  deleteTransaction: async id => {
     const user = useAuthStore.getState().user
     if (!user) return
 
@@ -343,15 +338,12 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
   // ===== 輔助方法：更新帳戶餘額 =====
   updateAccountBalance: async (transaction: Transaction) => {
-    
     const { accounts } = get()
 
     // 更新來源帳戶
     const account = accounts.find(a => a.id === transaction.account_id)
     if (account) {
-      const balanceChange = transaction.type === 'income'
-        ? transaction.amount
-        : -transaction.amount
+      const balanceChange = transaction.type === 'income' ? transaction.amount : -transaction.amount
 
       const newBalance = account.balance + balanceChange
       const updates: any = { balance: newBalance }
@@ -361,10 +353,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
         updates.available_credit = account.credit_limit + newBalance
       }
 
-      await supabase
-        .from('accounting_accounts')
-        .update(updates)
-        .eq('id', account.id)
+      await supabase.from('accounting_accounts').update(updates).eq('id', account.id)
     }
 
     // 更新目標帳戶（轉帳）
@@ -378,10 +367,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
           updates.available_credit = toAccount.credit_limit + newBalance
         }
 
-        await supabase
-          .from('accounting_accounts')
-          .update(updates)
-          .eq('id', toAccount.id)
+        await supabase.from('accounting_accounts').update(updates).eq('id', toAccount.id)
       }
     }
   },
@@ -470,11 +456,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   // ===== 初始化 =====
   initialize: async () => {
     set({ isLoading: true })
-    await Promise.all([
-      get().fetchCategories(),
-      get().fetchAccounts(),
-      get().fetchTransactions(),
-    ])
+    await Promise.all([get().fetchCategories(), get().fetchAccounts(), get().fetchTransactions()])
     set({ isLoading: false })
   },
 }))

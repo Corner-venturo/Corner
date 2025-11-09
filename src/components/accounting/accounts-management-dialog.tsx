@@ -4,7 +4,16 @@ import React, { useState } from 'react'
 import { useAccountingStore } from '@/stores/accounting-store'
 import { FormDialog } from '@/components/dialog'
 import { Button } from '@/components/ui/button'
-import { Wallet, CreditCard, Building2, TrendingUp, PiggyBank, Plus, Edit, Trash2 } from 'lucide-react'
+import {
+  Wallet,
+  CreditCard,
+  Building2,
+  TrendingUp,
+  PiggyBank,
+  Plus,
+  Edit,
+  Trash2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface AccountsManagementDialogProps {
@@ -21,7 +30,11 @@ const accountTypeIcons = {
   other: PiggyBank,
 }
 
-export function AccountsManagementDialog({ isOpen, onClose, onAddAccount }: AccountsManagementDialogProps) {
+export function AccountsManagementDialog({
+  isOpen,
+  onClose,
+  onAddAccount,
+}: AccountsManagementDialogProps) {
   const { accounts, deleteAccount } = useAccountingStore()
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
@@ -46,12 +59,8 @@ export function AccountsManagementDialog({ isOpen, onClose, onAddAccount }: Acco
       {/* 總資產卡片 */}
       <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#F9F5ED] to-[#F5EDDC]">
         <div className="text-sm text-[#9E8F81] mb-1">總資產</div>
-        <div className="text-3xl font-bold text-[#3D2914]">
-          NT$ {totalBalance.toLocaleString()}
-        </div>
-        <div className="text-xs text-[#AFA598] mt-2">
-          {accounts.length} 個帳戶
-        </div>
+        <div className="text-3xl font-bold text-[#3D2914]">NT$ {totalBalance.toLocaleString()}</div>
+        <div className="text-xs text-[#AFA598] mt-2">{accounts.length} 個帳戶</div>
       </div>
 
       {/* 帳戶列表 */}
@@ -94,9 +103,7 @@ export function AccountsManagementDialog({ isOpen, onClose, onAddAccount }: Acco
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-[#3D2914] truncate">
-                          {account.name}
-                        </div>
+                        <div className="font-semibold text-[#3D2914] truncate">{account.name}</div>
                         <div className="text-xs text-[#9E8F81] mt-0.5">
                           {account.type === 'cash' && '現金'}
                           {account.type === 'bank' && '銀行帳戶'}
@@ -105,9 +112,7 @@ export function AccountsManagementDialog({ isOpen, onClose, onAddAccount }: Acco
                           {account.type === 'other' && '其他帳戶'}
                         </div>
                         {account.description && (
-                          <div className="text-xs text-[#AFA598] mt-1">
-                            {account.description}
-                          </div>
+                          <div className="text-xs text-[#AFA598] mt-1">{account.description}</div>
                         )}
                       </div>
 

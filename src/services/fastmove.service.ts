@@ -15,7 +15,7 @@ class FastMoveService {
     try {
       const response = await fetch(`${FASTMOVE_API_BASE}/products`, {
         headers: {
-          'Authorization': `Bearer ${FASTMOVE_API_KEY}`,
+          Authorization: `Bearer ${FASTMOVE_API_KEY}`,
           'Content-Type': 'application/json',
         },
       })
@@ -40,7 +40,7 @@ class FastMoveService {
       const response = await fetch(`${FASTMOVE_API_BASE}/orders`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${FASTMOVE_API_KEY}`,
+          Authorization: `Bearer ${FASTMOVE_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(orderData),
@@ -65,7 +65,7 @@ class FastMoveService {
     try {
       const response = await fetch(`${FASTMOVE_API_BASE}/orders/${orderId}`, {
         headers: {
-          'Authorization': `Bearer ${FASTMOVE_API_KEY}`,
+          Authorization: `Bearer ${FASTMOVE_API_KEY}`,
           'Content-Type': 'application/json',
         },
       })

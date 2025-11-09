@@ -100,9 +100,7 @@ export async function findByIndex<T>(
     }
 
     request.onerror = () => {
-      const error = new Error(
-        `索引查詢失敗 (${tableName}.${indexName}): ${request.error?.message}`
-      )
+      const error = new Error(`索引查詢失敗 (${tableName}.${indexName}): ${request.error?.message}`)
       console.error('[LocalDB]', error)
       reject(error)
     }

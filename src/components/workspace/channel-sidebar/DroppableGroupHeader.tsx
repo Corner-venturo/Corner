@@ -31,7 +31,7 @@ export function DroppableGroupHeader({
       </button>
       {onDelete && (
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             onDelete(groupId)
           }}

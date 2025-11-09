@@ -372,9 +372,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
               >
                 <Power
                   size={14}
-                  className={
-                    experience.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
-                  }
+                  className={experience.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
                 />
               </Button>
               <Button

@@ -195,7 +195,7 @@ export function Calendar({
 
   // 月份導航
   const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentMonth((prev) => {
+    setCurrentMonth(prev => {
       const newMonth = new Date(prev)
       if (direction === 'prev') {
         newMonth.setMonth(newMonth.getMonth() - 1)
@@ -244,7 +244,7 @@ export function Calendar({
 
       {/* 星期標題 */}
       <div className="mt-6 grid grid-cols-7 text-xs leading-6 text-gray-500 dark:text-gray-400">
-        {WEEKDAYS.map((day) => (
+        {WEEKDAYS.map(day => (
           <div key={day} className="text-center">
             {day}
           </div>

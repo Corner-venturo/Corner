@@ -7,13 +7,13 @@
 
 ## 📊 分類總覽
 
-| 類別 | 數量 | 處理方式 |
-|------|------|---------|
-| ✅ 已使用 createStore | 16 個 | 不需改動 |
-| 🔴 需要遷移 | 5 個 | **必須遷移** |
-| 🟡 待確認 | 2 個 | 評估後決定 |
-| 🟢 純前端狀態 | 4 個 | 不需遷移 |
-| 🔵 特殊處理 | 2 個 | 個別評估 |
+| 類別                  | 數量  | 處理方式     |
+| --------------------- | ----- | ------------ |
+| ✅ 已使用 createStore | 16 個 | 不需改動     |
+| 🔴 需要遷移           | 5 個  | **必須遷移** |
+| 🟡 待確認             | 2 個  | 評估後決定   |
+| 🟢 純前端狀態         | 4 個  | 不需遷移     |
+| 🔵 特殊處理           | 2 個  | 個別評估     |
 
 ---
 
@@ -21,25 +21,25 @@
 
 **狀態**: 不需改動，已自動繼承所有修復
 
-| Store | 表格 | 快取策略 |
-|-------|------|---------|
-| useTourStore | tours | 全量 |
-| useItineraryStore | itineraries | 全量 |
-| useOrderStore | orders | 全量 |
-| useCustomerStore | customers | 全量 |
-| useQuoteStore | quotes | 全量 |
-| usePaymentRequestStore | payment_requests | 時間範圍 |
+| Store                     | 表格                | 快取策略 |
+| ------------------------- | ------------------- | -------- |
+| useTourStore              | tours               | 全量     |
+| useItineraryStore         | itineraries         | 全量     |
+| useOrderStore             | orders              | 全量     |
+| useCustomerStore          | customers           | 全量     |
+| useQuoteStore             | quotes              | 全量     |
+| usePaymentRequestStore    | payment_requests    | 時間範圍 |
 | useDisbursementOrderStore | disbursement_orders | 時間範圍 |
-| useReceiptOrderStore | receipt_orders | 時間範圍 |
-| useMemberStore | members | 全量 |
-| useQuoteItemStore | quote_items | 全量 |
-| useTourAddOnStore | tour_addons | 全量 |
-| useEmployeeStore | employees | 全量 |
-| useTodoStore | todos | 時間範圍 |
-| useVisaStore | visas | 全量 |
-| useSupplierStore | suppliers | 全量 |
-| useRegionStore | regions | 分頁 |
-| **useCalendarEventStore** | calendar_events | 全量 |
+| useReceiptOrderStore      | receipt_orders      | 時間範圍 |
+| useMemberStore            | members             | 全量     |
+| useQuoteItemStore         | quote_items         | 全量     |
+| useTourAddOnStore         | tour_addons         | 全量     |
+| useEmployeeStore          | employees           | 全量     |
+| useTodoStore              | todos               | 時間範圍 |
+| useVisaStore              | visas               | 全量     |
+| useSupplierStore          | suppliers           | 全量     |
+| useRegionStore            | regions             | 分頁     |
+| **useCalendarEventStore** | calendar_events     | 全量     |
 
 ---
 
@@ -48,11 +48,13 @@
 ### 1. workspace/channels-store.ts
 
 **目前狀態**:
+
 - 使用 `zustand create`
 - 有 `loadChannels()` 違反離線優先
 - 每次線上時都查詢 Supabase
 
 **資料表格**:
+
 - `channels` (主表)
 - `workspaces` (關聯)
 - `channel_groups` (關聯)
@@ -65,17 +67,17 @@
 
 // 1. channels 表
 export const useChannelStore = createStore<Channel>('channels', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 // 2. channel_groups 表
 export const useChannelGroupStore = createStore<ChannelGroup>('channel_groups', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 // 3. channel_members 表
 export const useChannelMemberStore = createStore<ChannelMember>('channel_members', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 // 4. 保留 useChannelsStore 作為 Facade
@@ -103,11 +105,13 @@ export const useChannelsStore = () => {
 ### 2. workspace/chat-store.ts
 
 **目前狀態**:
+
 - 使用 `zustand create`
 - 有 `loadMessages()` 違反離線優先
 - 需要時間範圍快取（最近 1000 則）
 
 **資料表格**:
+
 - `messages`
 
 **遷移方式**: 改用 createStore
@@ -118,8 +122,8 @@ export const useMessageStore = createStore<Message>('messages', {
   cacheConfig: {
     limit: 1000,
     sortBy: 'created_at',
-    order: 'desc'
-  }
+    order: 'desc',
+  },
 })
 
 // 保留 useChatStore 作為 Facade
@@ -145,18 +149,20 @@ export const useChatStore = () => {
 ### 3. workspace/members-store.ts
 
 **目前狀態**:
+
 - 使用 `zustand create`
 - 有 `loadChannelMembers()`
 - 資料量小，適合全量快取
 
 **資料表格**:
+
 - `channel_members`
 
 **遷移方式**: 改用 createStore
 
 ```typescript
 export const useChannelMemberStore = createStore<ChannelMember>('channel_members', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 // 保留 useMembersStore 作為 Facade
@@ -179,11 +185,13 @@ export const useMembersStore = () => {
 ### 4. workspace/widgets-store.ts
 
 **目前狀態**:
+
 - 使用 `zustand create`
 - 有 `loadAdvanceLists()`, `loadSharedOrderLists()`
 - 資料量中等
 
 **資料表格**:
+
 - `advance_lists`
 - `shared_order_lists`
 
@@ -192,12 +200,12 @@ export const useMembersStore = () => {
 ```typescript
 export const useAdvanceListStore = createStore<AdvanceList>('advance_lists', {
   cacheStrategy: 'time_range',
-  cacheConfig: { months: 3 }
+  cacheConfig: { months: 3 },
 })
 
 export const useSharedOrderListStore = createStore<SharedOrderList>('shared_order_lists', {
   cacheStrategy: 'time_range',
-  cacheConfig: { months: 3 }
+  cacheConfig: { months: 3 },
 })
 
 // 保留 useWidgetsStore 作為 Facade
@@ -222,11 +230,13 @@ export const useWidgetsStore = () => {
 ### 5. workspace/canvas-store.ts
 
 **目前狀態**:
+
 - 使用 `zustand create`
 - 有 `loadPersonalCanvases()`, `loadRichDocuments()`
 - 資料量小
 
 **資料表格**:
+
 - `personal_canvases`
 - `rich_documents`
 
@@ -234,11 +244,11 @@ export const useWidgetsStore = () => {
 
 ```typescript
 export const usePersonalCanvasStore = createStore<PersonalCanvas>('personal_canvases', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 export const useRichDocumentStore = createStore<RichDocument>('rich_documents', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 // 保留 useCanvasStore 作為 Facade
@@ -265,6 +275,7 @@ export const useCanvasStore = () => {
 ### 6. accounting-store.ts
 
 **需要確認**:
+
 - [ ] 是否有 Supabase 表格？
 - [ ] 是否需要離線查看？
 - [ ] 資料量多大？
@@ -276,6 +287,7 @@ export const useCanvasStore = () => {
 ### 7. timebox-store.ts
 
 **需要確認**:
+
 - [ ] 是否有 Supabase 表格？
 - [ ] 是否需要離線使用？
 
@@ -301,6 +313,7 @@ export const useCanvasStore = () => {
 **狀態**: 已使用 createStore ✅
 
 **特殊之處**:
+
 - 基於 `employees` 表
 - 有額外的使用者邏輯
 - 有 `loadUsersFromDatabase` 別名
@@ -372,6 +385,7 @@ export const useWorkspaceStore = () => {
 **影響**: 聊天、頻道管理可能暫時無法使用
 
 **緩解**:
+
 - 分階段遷移（一次一個 Store）
 - 保留舊代碼作為備份
 - 充分測試再部署
@@ -381,6 +395,7 @@ export const useWorkspaceStore = () => {
 **影響**: 舊快取與新快取格式不同
 
 **緩解**:
+
 - 清除舊的 IndexedDB 快取
 - 或提供遷移腳本
 
@@ -389,6 +404,7 @@ export const useWorkspaceStore = () => {
 **影響**: createStore 可能有不同的載入策略
 
 **緩解**:
+
 - 效能測試
 - 調整快取策略
 

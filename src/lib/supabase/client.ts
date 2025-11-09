@@ -10,10 +10,10 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholde
 // 🔧 新增：fetch timeout 防止請求卡住
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,      // ✅ 啟用自動刷新 token
-    persistSession: true,         // ✅ 啟用 session 持久化
-    detectSessionInUrl: false,    // ❌ 不從 URL 檢測（避免安全問題）
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined,  // ✅ 使用 localStorage 保存 session
+    autoRefreshToken: true, // ✅ 啟用自動刷新 token
+    persistSession: true, // ✅ 啟用 session 持久化
+    detectSessionInUrl: false, // ❌ 不從 URL 檢測（避免安全問題）
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined, // ✅ 使用 localStorage 保存 session
   },
   global: {
     fetch: (url, options = {}) => {

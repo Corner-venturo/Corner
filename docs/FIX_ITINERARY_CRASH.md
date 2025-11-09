@@ -39,6 +39,7 @@
 **檔案**：`src/app/itinerary/new/page.tsx`
 
 **問題**：
+
 ```typescript
 // ❌ 每次 tourData 改變，processedData 都是新物件
 const processedData = {
@@ -48,15 +49,19 @@ const processedData = {
 ```
 
 **修復**：
+
 ```typescript
 // ✅ 使用 useMemo 穩定引用
-const processedData = React.useMemo(() => ({
-  ...tourData,
-  features: tourData.features.map((f: any) => ({
-    ...f,
-    iconComponent: iconMap[f.icon] || IconSparkles,
-  })),
-}), [tourData])
+const processedData = React.useMemo(
+  () => ({
+    ...tourData,
+    features: tourData.features.map((f: any) => ({
+      ...f,
+      iconComponent: iconMap[f.icon] || IconSparkles,
+    })),
+  }),
+  [tourData]
+)
 ```
 
 **影響**：防止 TourPreview 每次都重新渲染
@@ -68,30 +73,30 @@ const processedData = React.useMemo(() => ({
 **檔案**：`src/components/editor/tour-form/hooks/useRegionData.ts`
 
 **問題 1**：依賴項包含不穩定的物件
+
 ```typescript
 // ❌ countryNameToCode 每次都是新物件
 useEffect(() => {
   // ...
 }, [
   data.country,
-  countryNameToCode,  // ❌ 不穩定
-  selectedCountry,    // ❌ 造成循環
-  selectedCountryCode // ❌ 造成循環
+  countryNameToCode, // ❌ 不穩定
+  selectedCountry, // ❌ 造成循環
+  selectedCountryCode, // ❌ 造成循環
 ])
 ```
 
 **修復**：
+
 ```typescript
 // ✅ 只保留必要的依賴項
 useEffect(() => {
   // ...
-}, [
-  data.country,
-  countries.length,
-])
+}, [data.country, countries.length])
 ```
 
 **問題 2**：fetchAll 被重複呼叫
+
 ```typescript
 // ❌ 沒有防止重複執行
 useEffect(() => {
@@ -102,6 +107,7 @@ useEffect(() => {
 ```
 
 **修復**：
+
 ```typescript
 // ✅ 使用 ref 防止重複
 const hasFetchedRef = React.useRef(false)
@@ -123,6 +129,7 @@ useEffect(() => {
 **檔案**：`src/components/editor/tour-form/sections/CountriesSection.tsx`
 
 **問題**：
+
 ```typescript
 // ❌ 空依賴但會呼叫 onChange，可能觸發循環
 useEffect(() => {
@@ -133,6 +140,7 @@ useEffect(() => {
 ```
 
 **修復**：
+
 ```typescript
 // ✅ 使用 ref 確保只初始化一次
 const hasInitializedRef = React.useRef(false)
@@ -155,6 +163,7 @@ useEffect(() => {
 **檔案**：`src/features/tours/hooks/useTourScrollEffects.ts`
 
 **問題**：
+
 ```typescript
 // ⚠️ 雖然有清理，但缺少取消標記
 if (isPreview) {
@@ -168,6 +177,7 @@ if (isPreview) {
 ```
 
 **修復**：
+
 ```typescript
 // ✅ 加入取消標記，確保正確清理
 if (isPreview) {
@@ -201,12 +211,15 @@ if (isPreview) {
 ## 📊 修復驗證
 
 ### 建構測試
+
 ```bash
 npm run build
 ```
+
 **結果**：✅ 成功，無錯誤
 
 ### 修復的檔案清單
+
 1. ✅ `src/app/itinerary/new/page.tsx`
 2. ✅ `src/components/editor/tour-form/hooks/useRegionData.ts`
 3. ✅ `src/components/editor/tour-form/sections/CountriesSection.tsx`
@@ -217,25 +230,30 @@ npm run build
 ## 🎓 學到的教訓
 
 ### 1. **useMemo 的重要性**
+
 當物件作為 props 傳遞時，如果每次都是新物件，會導致子組件不必要的重新渲染。
 
 ### 2. **useEffect 依賴項陷阱**
+
 - ❌ 不要把會變化的物件放入依賴項（如 `countryNameToCode`）
 - ❌ 不要把 state 本身放入依賴項（如 `selectedCountry`）
 - ✅ 只放入真正需要監聽的原始值（如 `data.country`）
 
 ### 3. **使用 ref 防止重複執行**
+
 對於只應該執行一次的邏輯（如初始化），使用 `useRef` 標記：
+
 ```typescript
 const hasInitializedRef = React.useRef(false)
 if (hasInitializedRef.current) return
 ```
 
 ### 4. **setInterval 清理最佳實踐**
+
 ```typescript
 let isCancelled = false
 const interval = setInterval(() => {
-  if (isCancelled) return  // 提前退出
+  if (isCancelled) return // 提前退出
   // ...
 }, delay)
 return () => {
@@ -248,13 +266,13 @@ return () => {
 
 ## 🔍 Corner 工程師的分析對比
 
-| 問題點 | Corner 工程師 | 實際情況 |
-|--------|--------------|---------|
-| TourPage useEffect | ✅ 有提到 | ⚠️ 不是主因 |
-| processedData 不穩定 | ❌ 沒提到 | ✅ **主要原因** |
-| useRegionData 循環 | ❌ 沒提到 | ✅ **根本原因** |
-| 建議方案 | 禁用預覽 | 修復依賴項 |
-| 結果 | 功能受損 | ✅ **功能保留** |
+| 問題點               | Corner 工程師 | 實際情況        |
+| -------------------- | ------------- | --------------- |
+| TourPage useEffect   | ✅ 有提到     | ⚠️ 不是主因     |
+| processedData 不穩定 | ❌ 沒提到     | ✅ **主要原因** |
+| useRegionData 循環   | ❌ 沒提到     | ✅ **根本原因** |
+| 建議方案             | 禁用預覽      | 修復依賴項      |
+| 結果                 | 功能受損      | ✅ **功能保留** |
 
 **結論**：Corner 工程師抓到了部分問題，但沒有找到根本原因。我們的修復方案更徹底，且保留了預覽功能。
 

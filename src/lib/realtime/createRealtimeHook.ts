@@ -3,21 +3,21 @@
  * 為任何資料表建立按需訂閱的 Hook
  */
 
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { realtimeManager } from './realtime-manager';
-import { logger } from '@/lib/utils/logger';
+import { useEffect } from 'react'
+import { realtimeManager } from './realtime-manager'
+import { logger } from '@/lib/utils/logger'
 
 interface CreateRealtimeHookOptions<T> {
-  tableName: string;
+  tableName: string
   indexedDB: {
-    put: (record: T) => Promise<void>;
-    delete: (id: string) => Promise<void>;
-  };
+    put: (record: T) => Promise<void>
+    delete: (id: string) => Promise<void>
+  }
   store: {
-    setState: (updater: (state: { items: T[] }) => { items: T[] }) => void;
-  };
+    setState: (updater: (state: { items: T[] }) => { items: T[] }) => void
+  }
 }
 
 /**
@@ -42,55 +42,53 @@ interface CreateRealtimeHookOptions<T> {
 export function createRealtimeHook<T extends { id: string }>(
   options: CreateRealtimeHookOptions<T>
 ) {
-  const { tableName, indexedDB, store } = options;
+  const { tableName, indexedDB, store } = options
 
   return function useRealtimeForTable() {
     useEffect(() => {
-      const subscriptionId = `${tableName}-realtime`;
+      const subscriptionId = `${tableName}-realtime`
 
       realtimeManager.subscribe<T>({
         table: tableName,
         subscriptionId,
         handlers: {
           // 新增資料
-          onInsert: async (record) => {
-            await indexedDB.put(record);
+          onInsert: async record => {
+            await indexedDB.put(record)
 
-            store.setState((state) => {
-              const exists = state.items.some((item) => item.id === record.id);
-              if (exists) return state;
+            store.setState(state => {
+              const exists = state.items.some(item => item.id === record.id)
+              if (exists) return state
               return {
                 items: [...state.items, record],
-              };
-            });
+              }
+            })
           },
 
           // 更新資料
-          onUpdate: async (record) => {
-            await indexedDB.put(record);
+          onUpdate: async record => {
+            await indexedDB.put(record)
 
-            store.setState((state) => ({
-              items: state.items.map((item) =>
-                item.id === record.id ? record : item
-              ),
-            }));
+            store.setState(state => ({
+              items: state.items.map(item => (item.id === record.id ? record : item)),
+            }))
           },
 
           // 刪除資料
-          onDelete: async (oldRecord) => {
-            await indexedDB.delete(oldRecord.id);
+          onDelete: async oldRecord => {
+            await indexedDB.delete(oldRecord.id)
 
-            store.setState((state) => ({
-              items: state.items.filter((item) => item.id !== oldRecord.id),
-            }));
+            store.setState(state => ({
+              items: state.items.filter(item => item.id !== oldRecord.id),
+            }))
           },
         },
-      });
+      })
 
       // 清理：離開頁面時取消訂閱
       return () => {
-        realtimeManager.unsubscribe(subscriptionId);
-      };
-    }, []); // 只在組件掛載時訂閱一次
-  };
+        realtimeManager.unsubscribe(subscriptionId)
+      }
+    }, []) // 只在組件掛載時訂閱一次
+  }
 }

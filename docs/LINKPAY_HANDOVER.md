@@ -38,22 +38,26 @@
 ## 🗂️ 檔案位置
 
 ### 資料庫
+
 ```
 supabase/migrations/20251031120100_alter_receipts_add_linkpay_support.sql
 ```
 
 ### 型別定義
+
 ```
 src/types/receipt.types.ts
 ```
 
 ### Zustand Stores
+
 ```
 src/stores/receipt-store.ts
 src/stores/linkpay-log-store.ts
 ```
 
 ### Realtime Hooks
+
 ```
 src/hooks/use-realtime-hooks.ts
   - useRealtimeForReceipts()
@@ -61,16 +65,19 @@ src/hooks/use-realtime-hooks.ts
 ```
 
 ### API Route（您需要修改）
+
 ```
 src/app/api/linkpay/route.ts  ← 主要工作在這裡
 ```
 
 ### 前端頁面
+
 ```
 src/app/finance/payments/page.tsx
 ```
 
 ### 工具函式
+
 ```
 src/lib/utils/receipt-number-generator.ts
 ```
@@ -94,7 +101,7 @@ return NextResponse.json({
   success: true,
   message: '✅ 測試模式：付款連結生成成功（這是假資料）',
   paymentLink: mockPaymentLink,
-  linkpayOrderNumber: mockLinkpayOrderNumber
+  linkpayOrderNumber: mockLinkpayOrderNumber,
 })
 ```
 
@@ -106,6 +113,7 @@ return NextResponse.json({
    - 複製認證機制
 
 2. **整合到新架構**
+
    ```typescript
    // 🔧 您需要填入的部分（標記 TODO）
    const response = await fetch('https://api.cornertravel.com.tw/AuthBySupabase', {
@@ -122,7 +130,7 @@ return NextResponse.json({
        amount,
        endDate,
        // ...其他必要欄位
-     })
+     }),
    })
 
    const data = await response.json()
@@ -136,14 +144,14 @@ return NextResponse.json({
      end_date: endDate,
      link: data.paymentLink,
      status: 0, // 待付款
-     payment_name: paymentName
+     payment_name: paymentName,
    })
 
    return NextResponse.json({
      success: true,
      message: '付款連結生成成功',
      paymentLink: data.paymentLink,
-     linkpayOrderNumber: data.orderNumber
+     linkpayOrderNumber: data.orderNumber,
    })
    ```
 
@@ -184,7 +192,7 @@ export async function POST(req: NextRequest) {
       .from('linkpay_logs')
       .update({
         status: 1, // 已付款
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', log.id)
 
@@ -194,12 +202,11 @@ export async function POST(req: NextRequest) {
       .update({
         actual_amount: log.price,
         status: 1, // 已確認
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('receipt_number', log.receipt_number)
 
     return NextResponse.json({ success: true })
-
   } catch (error) {
     console.error('Webhook 錯誤:', error)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
@@ -254,12 +261,15 @@ async function checkLinkPayStatus(orderNumber: string) {
 ```
 
 **設定 Vercel Cron Job**: `vercel.json`
+
 ```json
 {
-  "crons": [{
-    "path": "/api/linkpay/check-status",
-    "schedule": "0 */6 * * *"
-  }]
+  "crons": [
+    {
+      "path": "/api/linkpay/check-status",
+      "schedule": "0 */6 * * *"
+    }
+  ]
 }
 ```
 
@@ -269,47 +279,47 @@ async function checkLinkPayStatus(orderNumber: string) {
 
 ### `receipts` 表格（已建立）
 
-| 欄位 | 型別 | 說明 |
-|------|------|------|
-| `id` | UUID | 主鍵 |
-| `receipt_number` | VARCHAR(20) | 收款單號（R2501280001） |
-| `workspace_id` | UUID | 工作空間 ID |
-| `order_id` | UUID | 訂單 ID |
-| `order_number` | VARCHAR(50) | 訂單編號 |
-| `tour_name` | VARCHAR(255) | 團名 |
-| `receipt_date` | DATE | 收款日期 |
-| `receipt_type` | INTEGER | 收款方式（0~4） |
-| `receipt_amount` | DECIMAL | 應收金額 |
-| `actual_amount` | DECIMAL | 實收金額 |
-| `status` | INTEGER | 狀態（0:待確認 1:已確認） |
-| **LinkPay 欄位** | | |
-| `email` | VARCHAR(255) | 客戶 Email |
-| `payment_name` | VARCHAR(255) | 付款名稱（客戶看到的） |
-| `pay_dateline` | DATE | 付款截止日 |
-| **其他方式欄位** | | |
-| `receipt_account` | VARCHAR(255) | 付款人姓名 |
-| `handler_name` | VARCHAR(100) | 經手人（現金） |
-| `account_info` | VARCHAR(100) | 匯入帳戶（匯款） |
-| `fees` | DECIMAL | 手續費（匯款/刷卡） |
-| `card_last_four` | VARCHAR(4) | 卡號後四碼（刷卡） |
-| `auth_code` | VARCHAR(50) | 授權碼（刷卡） |
-| `check_number` | VARCHAR(50) | 支票號碼 |
-| `check_bank` | VARCHAR(100) | 開票銀行 |
-| `note` | TEXT | 備註 |
+| 欄位              | 型別         | 說明                      |
+| ----------------- | ------------ | ------------------------- |
+| `id`              | UUID         | 主鍵                      |
+| `receipt_number`  | VARCHAR(20)  | 收款單號（R2501280001）   |
+| `workspace_id`    | UUID         | 工作空間 ID               |
+| `order_id`        | UUID         | 訂單 ID                   |
+| `order_number`    | VARCHAR(50)  | 訂單編號                  |
+| `tour_name`       | VARCHAR(255) | 團名                      |
+| `receipt_date`    | DATE         | 收款日期                  |
+| `receipt_type`    | INTEGER      | 收款方式（0~4）           |
+| `receipt_amount`  | DECIMAL      | 應收金額                  |
+| `actual_amount`   | DECIMAL      | 實收金額                  |
+| `status`          | INTEGER      | 狀態（0:待確認 1:已確認） |
+| **LinkPay 欄位**  |              |                           |
+| `email`           | VARCHAR(255) | 客戶 Email                |
+| `payment_name`    | VARCHAR(255) | 付款名稱（客戶看到的）    |
+| `pay_dateline`    | DATE         | 付款截止日                |
+| **其他方式欄位**  |              |                           |
+| `receipt_account` | VARCHAR(255) | 付款人姓名                |
+| `handler_name`    | VARCHAR(100) | 經手人（現金）            |
+| `account_info`    | VARCHAR(100) | 匯入帳戶（匯款）          |
+| `fees`            | DECIMAL      | 手續費（匯款/刷卡）       |
+| `card_last_four`  | VARCHAR(4)   | 卡號後四碼（刷卡）        |
+| `auth_code`       | VARCHAR(50)  | 授權碼（刷卡）            |
+| `check_number`    | VARCHAR(50)  | 支票號碼                  |
+| `check_bank`      | VARCHAR(100) | 開票銀行                  |
+| `note`            | TEXT         | 備註                      |
 
 ### `linkpay_logs` 表格（已建立）
 
-| 欄位 | 型別 | 說明 |
-|------|------|------|
-| `id` | UUID | 主鍵 |
-| `receipt_number` | VARCHAR(20) | 對應的收款單號 |
-| `workspace_id` | UUID | 工作空間 ID |
-| `linkpay_order_number` | VARCHAR(50) | LinkPay 訂單號（API 回傳） |
-| `price` | DECIMAL | 金額 |
-| `end_date` | DATE | 付款截止日 |
-| `link` | TEXT | 付款連結 |
-| `status` | INTEGER | 狀態（0:待付款 1:已付款 2:失敗 3:過期） |
-| `payment_name` | VARCHAR(255) | 付款名稱 |
+| 欄位                   | 型別         | 說明                                    |
+| ---------------------- | ------------ | --------------------------------------- |
+| `id`                   | UUID         | 主鍵                                    |
+| `receipt_number`       | VARCHAR(20)  | 對應的收款單號                          |
+| `workspace_id`         | UUID         | 工作空間 ID                             |
+| `linkpay_order_number` | VARCHAR(50)  | LinkPay 訂單號（API 回傳）              |
+| `price`                | DECIMAL      | 金額                                    |
+| `end_date`             | DATE         | 付款截止日                              |
+| `link`                 | TEXT         | 付款連結                                |
+| `status`               | INTEGER      | 狀態（0:待付款 1:已付款 2:失敗 3:過期） |
+| `payment_name`         | VARCHAR(255) | 付款名稱                                |
 
 ---
 
@@ -376,6 +386,7 @@ async function checkLinkPayStatus(orderNumber: string) {
 ## 🧪 測試建議
 
 ### 1. 單元測試
+
 ```typescript
 // 測試收款單號生成
 describe('generateReceiptNumber', () => {
@@ -393,6 +404,7 @@ describe('generateReceiptNumber', () => {
 ```
 
 ### 2. API 測試
+
 ```bash
 # 測試 LinkPay API（目前是測試模式）
 curl -X POST http://localhost:3000/api/linkpay \
@@ -417,6 +429,7 @@ curl -X POST http://localhost:3000/api/linkpay \
 ```
 
 ### 3. Webhook 測試
+
 ```bash
 # 模擬 LinkPay Webhook 呼叫
 curl -X POST http://localhost:3000/api/linkpay/webhook \
@@ -467,6 +480,7 @@ curl -X POST http://localhost:3000/api/linkpay/webhook \
 ## 📞 聯絡方式
 
 如有任何問題，請聯絡：
+
 - **AI 助手**: 透過 Claude Code 繼續對話
 - **專案負責人**: William
 

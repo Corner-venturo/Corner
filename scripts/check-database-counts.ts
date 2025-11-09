@@ -23,7 +23,9 @@ async function checkCounts() {
   console.log(`  📍 景點：${attractionsCount} 筆`)
   console.log(`  ⭐ 米其林餐廳：${michelinCount} 筆`)
   console.log(`  ✨ 頂級體驗：${experiencesCount} 筆`)
-  console.log(`  📊 總計：${(attractionsCount || 0) + (michelinCount || 0) + (experiencesCount || 0)} 筆`)
+  console.log(
+    `  📊 總計：${(attractionsCount || 0) + (michelinCount || 0) + (experiencesCount || 0)} 筆`
+  )
 }
 
 checkCounts()

@@ -567,16 +567,14 @@ async function seedData() {
   console.log(`越南體驗：${experiencesSuccess}/${vietnamPremiumExperiences.length}\n`)
 
   // 總結
-  console.log('=' .repeat(70))
+  console.log('='.repeat(70))
   console.log('🎉 越南資料匯入總結：')
   console.log(`  📍 景點：${attractionsSuccess}/${vietnamAttractions.length}`)
-  console.log(
-    `  ⭐ 米其林餐廳：${restaurantsSuccess}/${vietnamMichelinRestaurants.length}`
-  )
+  console.log(`  ⭐ 米其林餐廳：${restaurantsSuccess}/${vietnamMichelinRestaurants.length}`)
   console.log(`  ✨ 頂級體驗：${experiencesSuccess}/${vietnamPremiumExperiences.length}`)
   console.log(`  📊 總計成功：${totalSuccess} 筆`)
   console.log(`  ❌ 失敗：${totalFailed} 筆`)
-  console.log('=' .repeat(70))
+  console.log('='.repeat(70))
 
   console.log('\n🌏 越南城市覆蓋：')
   console.log('  🏙️ 胡志明市（Ho Chi Minh）：5 景點 + 1 米其林 + 1 體驗')

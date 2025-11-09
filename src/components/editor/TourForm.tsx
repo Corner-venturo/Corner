@@ -49,9 +49,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
   // 取得所有國家列表（穩定引用，避免無限循環）
   const allCountries = React.useMemo(
     () =>
-      countries
-        .filter(c => c.is_active)
-        .map(c => ({ id: c.id, code: c.code || '', name: c.name })),
+      countries.filter(c => c.is_active).map(c => ({ id: c.id, code: c.code || '', name: c.name })),
     [countries]
   )
 

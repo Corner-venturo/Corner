@@ -123,8 +123,8 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
                 <div className="grid grid-cols-[80px_1fr] gap-3 text-sm">
                   <div className="font-semibold text-morandi-secondary">抵達</div>
                   <div className="text-morandi-primary">
-                    {formatDate(segment.arrivalDate)} {segment.arrivalTime}, {segment.arrivalAirport}{' '}
-                    {segment.arrivalTerminal}
+                    {formatDate(segment.arrivalDate)} {segment.arrivalTime},{' '}
+                    {segment.arrivalAirport} {segment.arrivalTerminal}
                   </div>
                 </div>
                 <div className="grid grid-cols-[80px_1fr] gap-3 text-sm">
@@ -149,8 +149,13 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
             請查看底端的行李資訊，以進一步了解詳情。
           </p>
           {data.baggage.map((bag, i) => (
-            <div key={i} className="bg-morandi-cream-light border border-morandi-cream-dark rounded-md p-4 mb-3">
-              <div className="text-sm font-semibold text-morandi-primary mb-3">{bag.passengerName}</div>
+            <div
+              key={i}
+              className="bg-morandi-cream-light border border-morandi-cream-dark rounded-md p-4 mb-3"
+            >
+              <div className="text-sm font-semibold text-morandi-primary mb-3">
+                {bag.passengerName}
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <div className="text-xs font-semibold text-morandi-secondary mb-1">個人物品</div>

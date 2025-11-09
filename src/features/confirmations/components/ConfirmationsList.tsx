@@ -41,9 +41,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
           return (
             <div className="flex items-center gap-2">
               <span className="text-base">{config.icon}</span>
-              <span className={cn('text-sm font-medium', config.colorClass)}>
-                {config.label}
-              </span>
+              <span className={cn('text-sm font-medium', config.colorClass)}>{config.label}</span>
             </div>
           )
         },
@@ -114,7 +112,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
       data={confirmations}
       searchableFields={['booking_number', 'confirmation_number']}
       searchTerm={searchTerm}
-      onRowClick={(conf) => onConfirmationClick(conf.id)}
+      onRowClick={conf => onConfirmationClick(conf.id)}
       bordered={true}
       actions={(conf: Confirmation) => (
         <div className="flex items-center gap-1">
@@ -122,7 +120,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
             type="button"
             variant="ghost"
             size="iconSm"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               onEdit(conf.id)
             }}
@@ -135,7 +133,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
             type="button"
             variant="ghost"
             size="iconSm"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               onDelete(conf.id)
             }}

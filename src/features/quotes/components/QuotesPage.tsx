@@ -2,38 +2,42 @@
  * QuotesPage - Main quotes list page component
  */
 
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Calculator } from 'lucide-react';
-import { QuotesList } from './QuotesList';
-import { QuoteDialog } from './QuoteDialog';
-import { QuickQuoteDialog } from './QuickQuoteDialog';
-import { useQuotesData } from '../hooks/useQuotesData';
-import { useQuotesFilters } from '../hooks/useQuotesFilters';
-import { useQuoteForm } from '../hooks/useQuoteForm';
-import { useQuickQuoteForm } from '../hooks/useQuickQuoteForm';
-import { useQuoteTourSync } from '../hooks/useQuoteTourSync';
-import { STATUS_FILTERS } from '../constants';
-import { useRealtimeForQuotes, useRealtimeForTours, useRealtimeForQuoteItems } from '@/hooks/use-realtime-hooks';
-import { useRegionsStore } from '@/stores';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Calculator } from 'lucide-react'
+import { QuotesList } from './QuotesList'
+import { QuoteDialog } from './QuoteDialog'
+import { QuickQuoteDialog } from './QuickQuoteDialog'
+import { useQuotesData } from '../hooks/useQuotesData'
+import { useQuotesFilters } from '../hooks/useQuotesFilters'
+import { useQuoteForm } from '../hooks/useQuoteForm'
+import { useQuickQuoteForm } from '../hooks/useQuickQuoteForm'
+import { useQuoteTourSync } from '../hooks/useQuoteTourSync'
+import { STATUS_FILTERS } from '../constants'
+import {
+  useRealtimeForQuotes,
+  useRealtimeForTours,
+  useRealtimeForQuoteItems,
+} from '@/hooks/use-realtime-hooks'
+import { useRegionsStore } from '@/stores'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 export const QuotesPage: React.FC = () => {
   // ✅ Realtime 訂閱
-  useRealtimeForQuotes();
-  useRealtimeForTours();
-  useRealtimeForQuoteItems();
-  const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [authorFilter, setAuthorFilter] = useState<string>('all');
-  const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isQuickDialogOpen, setIsQuickDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  useRealtimeForQuotes()
+  useRealtimeForTours()
+  useRealtimeForQuoteItems()
+  const router = useRouter()
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [authorFilter, setAuthorFilter] = useState<string>('all')
+  const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isQuickDialogOpen, setIsQuickDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Data and actions
   const {
@@ -47,31 +51,31 @@ export const QuotesPage: React.FC = () => {
     handleTogglePin,
     handleDeleteQuote,
     handleQuoteClick,
-  } = useQuotesData();
+  } = useQuotesData()
 
   // ✅ 延遲載入 regions（只在打開對話框時載入）
-  const { fetchAll: fetchRegions } = useRegionsStore();
+  const { fetchAll: fetchRegions } = useRegionsStore()
 
   // 打開類型選擇對話框
   const handleOpenTypeSelect = React.useCallback(async () => {
-    setIsTypeSelectOpen(true);
+    setIsTypeSelectOpen(true)
     // 預先載入 regions（為標準報價單準備）
     if (countries.length === 0) {
-      await fetchRegions();
+      await fetchRegions()
     }
-  }, [countries.length, fetchRegions]);
+  }, [countries.length, fetchRegions])
 
   // 選擇標準報價單
   const handleSelectStandard = () => {
-    setIsTypeSelectOpen(false);
-    setIsAddDialogOpen(true);
-  };
+    setIsTypeSelectOpen(false)
+    setIsAddDialogOpen(true)
+  }
 
   // 選擇快速報價單
   const handleSelectQuick = () => {
-    setIsTypeSelectOpen(false);
-    setIsQuickDialogOpen(true);
-  };
+    setIsTypeSelectOpen(false)
+    setIsQuickDialogOpen(true)
+  }
 
   // Standard quote form management
   const {
@@ -83,7 +87,7 @@ export const QuotesPage: React.FC = () => {
     resetForm,
     initFormWithTour,
     handleSubmit,
-  } = useQuoteForm({ addQuote, getCitiesByCountry });
+  } = useQuoteForm({ addQuote, getCitiesByCountry })
 
   // Quick quote form management
   const {
@@ -91,20 +95,20 @@ export const QuotesPage: React.FC = () => {
     setFormField: setQuickFormField,
     resetForm: resetQuickForm,
     handleSubmit: handleQuickSubmit,
-  } = useQuickQuoteForm({ addQuote });
+  } = useQuickQuoteForm({ addQuote })
 
   // 取得所有作者列表
   const authors = React.useMemo(() => {
-    const authorSet = new Set<string>();
+    const authorSet = new Set<string>()
     quotes.forEach(quote => {
-      const author = quote.created_by_name || quote.handler_name;
-      if (author) authorSet.add(author);
-    });
-    return Array.from(authorSet).sort();
-  }, [quotes]);
+      const author = quote.created_by_name || quote.handler_name
+      if (author) authorSet.add(author)
+    })
+    return Array.from(authorSet).sort()
+  }, [quotes])
 
   // Filtering
-  const { filteredQuotes } = useQuotesFilters({ quotes, statusFilter, searchTerm, authorFilter });
+  const { filteredQuotes } = useQuotesFilters({ quotes, statusFilter, searchTerm, authorFilter })
 
   // Tour sync - auto-open dialog when coming from tours page
   const { clearTourParam } = useQuoteTourSync({
@@ -112,27 +116,27 @@ export const QuotesPage: React.FC = () => {
     tours,
     isAddDialogOpen,
     onOpenDialog: (tourId: string) => {
-      const tour = tours.find(t => t.id === tourId);
+      const tour = tours.find(t => t.id === tourId)
       if (tour) {
-        initFormWithTour(tour);
-        setIsAddDialogOpen(true);
+        initFormWithTour(tour)
+        setIsAddDialogOpen(true)
       }
     },
     onNavigateToQuote: (quoteId: string) => {
-      router.replace(`/quotes/${quoteId}`);
+      router.replace(`/quotes/${quoteId}`)
     },
-  });
+  })
 
   const handleDialogClose = () => {
-    setIsAddDialogOpen(false);
-    resetForm();
-    clearTourParam();
-  };
+    setIsAddDialogOpen(false)
+    resetForm()
+    clearTourParam()
+  }
 
   const handleQuickDialogClose = () => {
-    setIsQuickDialogOpen(false);
-    resetQuickForm();
-  };
+    setIsQuickDialogOpen(false)
+    resetQuickForm()
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -141,7 +145,7 @@ export const QuotesPage: React.FC = () => {
         icon={Calculator}
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '報價單管理', href: '/quotes' }
+          { label: '報價單管理', href: '/quotes' },
         ]}
         tabs={STATUS_FILTERS.map(f => ({
           value: f.value,
@@ -204,9 +208,9 @@ export const QuotesPage: React.FC = () => {
 
       <QuoteDialog
         open={isAddDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) handleDialogClose();
-          setIsAddDialogOpen(open);
+        onOpenChange={open => {
+          if (!open) handleDialogClose()
+          setIsAddDialogOpen(open)
         }}
         formData={formData}
         setFormField={setFormField}
@@ -221,9 +225,9 @@ export const QuotesPage: React.FC = () => {
 
       <QuickQuoteDialog
         open={isQuickDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) handleQuickDialogClose();
-          setIsQuickDialogOpen(open);
+        onOpenChange={open => {
+          if (!open) handleQuickDialogClose()
+          setIsQuickDialogOpen(open)
         }}
         formData={quickFormData}
         setFormField={setQuickFormField}
@@ -231,5 +235,5 @@ export const QuotesPage: React.FC = () => {
         onClose={handleQuickDialogClose}
       />
     </div>
-  );
-};
+  )
+}

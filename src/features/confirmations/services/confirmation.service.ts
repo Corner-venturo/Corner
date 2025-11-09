@@ -25,11 +25,7 @@ export const confirmationService = {
    * 取得單一確認單
    */
   async fetchById(id: string): Promise<Confirmation | null> {
-    const { data, error } = await supabase
-      .from('confirmations')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const { data, error } = await supabase.from('confirmations').select('*').eq('id', id).single()
 
     if (error) throw error
     return data
@@ -38,7 +34,9 @@ export const confirmationService = {
   /**
    * 新增確認單
    */
-  async create(confirmation: Omit<Confirmation, 'id' | 'created_at' | 'updated_at'>): Promise<Confirmation> {
+  async create(
+    confirmation: Omit<Confirmation, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<Confirmation> {
     const { data, error } = await supabase
       .from('confirmations')
       .insert(confirmation)
@@ -68,10 +66,7 @@ export const confirmationService = {
    * 刪除確認單
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('confirmations')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('confirmations').delete().eq('id', id)
 
     if (error) throw error
   },
@@ -79,7 +74,10 @@ export const confirmationService = {
   /**
    * 依照類型搜尋
    */
-  async fetchByType(workspaceId: string, type: 'accommodation' | 'flight'): Promise<Confirmation[]> {
+  async fetchByType(
+    workspaceId: string,
+    type: 'accommodation' | 'flight'
+  ): Promise<Confirmation[]> {
     const { data, error } = await supabase
       .from('confirmations')
       .select('*')

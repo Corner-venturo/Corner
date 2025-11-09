@@ -73,7 +73,9 @@ export function TourContactSection({ data, viewMode }: TourContactSectionProps) 
           >
             聯絡我們
           </h2>
-          <p className={viewMode === 'mobile' ? 'text-base text-white/90' : 'text-xl text-white/90'}>
+          <p
+            className={viewMode === 'mobile' ? 'text-base text-white/90' : 'text-xl text-white/90'}
+          >
             有任何問題歡迎隨時聯繫
           </p>
         </motion.div>
@@ -104,13 +106,13 @@ export function TourContactSection({ data, viewMode }: TourContactSectionProps) 
             {salesEmployees.length > 0 ? (
               <select
                 value={selectedEmployee?.id || ''}
-                onChange={(e) => {
-                  const employee = salesEmployees.find((emp) => emp.id === e.target.value)
+                onChange={e => {
+                  const employee = salesEmployees.find(emp => emp.id === e.target.value)
                   if (employee) setSelectedEmployee(employee)
                 }}
                 className="w-full px-3 py-2 text-center border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold text-morandi-secondary font-medium bg-white"
               >
-                {salesEmployees.map((emp) => (
+                {salesEmployees.map(emp => (
                   <option key={emp.id} value={emp.id}>
                     {emp.name}
                   </option>

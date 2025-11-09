@@ -10,7 +10,11 @@ import type { Channel } from '@/stores/workspace-store'
 import type { ChannelSidebarProps } from './types'
 import { useChannelSidebar } from './useChannelSidebar'
 import { useChannelState } from './hooks/useChannelState'
-import { MemberManagementDialog, ChannelDeleteDialog, GroupDeleteDialog } from './MemberManagementDialog'
+import {
+  MemberManagementDialog,
+  ChannelDeleteDialog,
+  GroupDeleteDialog,
+} from './MemberManagementDialog'
 import { WorkspaceHeader } from './WorkspaceHeader'
 import { CreateGroupDialog } from './CreateGroupDialog'
 import { CreateChannelDialog } from './CreateChannelDialog'
@@ -38,10 +42,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     loading,
   } = useWorkspaceChannels()
 
-  const {
-    channelMembers,
-    loadChannelMembers,
-  } = useWorkspaceMembers()
+  const { channelMembers, loadChannelMembers } = useWorkspaceMembers()
 
   const { user } = useAuthStore()
 
@@ -314,16 +315,26 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   }
 
   // 1. Company announcements (system group, fixed at top)
-  const announcementGroup = channelGroups.find(g => g.is_system && g.system_type === 'company_announcements')
+  const announcementGroup = channelGroups.find(
+    g => g.is_system && g.system_type === 'company_announcements'
+  )
   const announcementChannels = announcementGroup
-    ? sortChannels(filteredChannels.filter(ch => ch.group_id === announcementGroup.id && !ch.is_archived))
+    ? sortChannels(
+        filteredChannels.filter(ch => ch.group_id === announcementGroup.id && !ch.is_archived)
+      )
     : []
 
   // 2. User-defined groups (exclude archived)
-  const userGroups = channelGroups.filter(g => !g.is_system).sort((a, b) => (a.order || 0) - (b.order || 0))
+  const userGroups = channelGroups
+    .filter(g => !g.is_system)
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
   const userGroupedChannels = userGroups.map(group => ({
     group,
-    channels: sortChannels(filteredChannels.filter(ch => ch.group_id === group.id && !ch.is_archived && checkIsMember(ch.id))),
+    channels: sortChannels(
+      filteredChannels.filter(
+        ch => ch.group_id === group.id && !ch.is_archived && checkIsMember(ch.id)
+      )
+    ),
   }))
 
   // 3. Ungrouped channels (joined but not grouped, exclude archived)
@@ -339,7 +350,9 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   // 5. Archived (system group, fixed at bottom)
   const archivedGroup = channelGroups.find(g => g.is_system && g.system_type === 'archived')
   const archivedChannels = archivedGroup
-    ? sortChannels(filteredChannels.filter(ch => ch.is_archived || ch.group_id === archivedGroup.id))
+    ? sortChannels(
+        filteredChannels.filter(ch => ch.is_archived || ch.group_id === archivedGroup.id)
+      )
     : []
 
   const handleCreateGroup = () => {

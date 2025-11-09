@@ -48,7 +48,9 @@ export default function DayView({ selectedDay, timeInterval }: DayViewProps) {
             isToday ? 'bg-morandi-gold/10' : ''
           }`}
         >
-          <div className={`text-sm font-medium ${isToday ? 'text-morandi-gold' : 'text-morandi-secondary'}`}>
+          <div
+            className={`text-sm font-medium ${isToday ? 'text-morandi-gold' : 'text-morandi-secondary'}`}
+          >
             {dayLabels[selectedDay.getDay()]} {selectedDay.getDate()}日
           </div>
         </div>

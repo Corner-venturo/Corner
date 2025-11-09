@@ -20,7 +20,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['mountain_climbing', 'luxury_adventure', 'sunrise_viewing'],
     exclusivity_level: 'ultra_exclusive',
-    description: '在日本最神聖的富士山，由專業登山嚮導一對一帶領，體驗從夜間登山到山頂日出的難忘旅程。不同於一般大眾登山團，這是完全客製化的私人行程：專屬嚮導會根據你的體能調整步伐，在八合目山屋預訂最佳房間（非大通鋪），提供專業登山裝備，並在山頂預留最佳觀日出位置。登頂後享用熱騰騰的日式早餐便當，俯瞰雲海與日出的震撼美景。下山後前往河口湖溫泉旅館，享受私人風呂療癒疲憊的身體。',
+    description:
+      '在日本最神聖的富士山，由專業登山嚮導一對一帶領，體驗從夜間登山到山頂日出的難忘旅程。不同於一般大眾登山團，這是完全客製化的私人行程：專屬嚮導會根據你的體能調整步伐，在八合目山屋預訂最佳房間（非大通鋪），提供專業登山裝備，並在山頂預留最佳觀日出位置。登頂後享用熱騰騰的日式早餐便當，俯瞰雲海與日出的震撼美景。下山後前往河口湖溫泉旅館，享受私人風呂療癒疲憊的身體。',
     highlights: [
       '專業登山嚮導一對一全程陪同',
       '八合目山屋最佳房間（非大通鋪）',
@@ -28,7 +29,7 @@ const specialExperiences = [
       '山頂預留最佳日出觀景位置',
       '山頂熱食早餐便當',
       '下山後河口湖溫泉旅館私人風呂',
-      '專車接送（東京往返）'
+      '專車接送（東京往返）',
     ],
     duration_hours: 16,
     group_size_min: 1,
@@ -43,16 +44,24 @@ const specialExperiences = [
     physical_requirement: '需良好體能，能連續行走6-8小時',
     best_time_of_day: '夜間出發（22:00）',
     available_seasons: ['7月', '8月', '9月上旬'],
-    price_includes: ['專業嚮導', '登山裝備租借', '山屋住宿', '早餐便當', '溫泉旅館', '專車接送', '保險'],
+    price_includes: [
+      '專業嚮導',
+      '登山裝備租借',
+      '山屋住宿',
+      '早餐便當',
+      '溫泉旅館',
+      '專車接送',
+      '保險',
+    ],
     what_to_bring: ['防風外套', '手套', '頭燈', '個人藥品', '水壺'],
     advance_booking_days: 60,
     cancellation_policy: '30天前免費取消，之後不退款（天氣因素例外）',
     thumbnail: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=800',
     images: [
       'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=800',
-      'https://images.unsplash.com/photo-1576674421245-f2fd2c0f8257?w=800'
+      'https://images.unsplash.com/photo-1576674421245-f2fd2c0f8257?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '北海道冬季私人雪地探險',
@@ -62,7 +71,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['snow_adventure', 'wildlife_tracking', 'luxury_lodge'],
     exclusivity_level: 'ultra_exclusive',
-    description: '探索北海道冬季仙境的終極奢華體驗。搭乘私人直升機降落在人跡罕至的雪地，跟隨野生動物追蹤專家尋找蝦夷鹿、北狐、丹頂鶴的足跡。在零下20度的雪原上體驗雪地健行、雪鞋漫步，午餐享用熱騰騰的石狩鍋（北海道鄉土料理）。下午前往知床半島觀賞流冰與海豹，傍晚入住頂級溫泉旅館，享受露天風呂與懷石料理。這是結合極地探險與日式奢華的獨特體驗。',
+    description:
+      '探索北海道冬季仙境的終極奢華體驗。搭乘私人直升機降落在人跡罕至的雪地，跟隨野生動物追蹤專家尋找蝦夷鹿、北狐、丹頂鶴的足跡。在零下20度的雪原上體驗雪地健行、雪鞋漫步，午餐享用熱騰騰的石狩鍋（北海道鄉土料理）。下午前往知床半島觀賞流冰與海豹，傍晚入住頂級溫泉旅館，享受露天風呂與懷石料理。這是結合極地探險與日式奢華的獨特體驗。',
     highlights: [
       '私人直升機雪地降落',
       '野生動物追蹤專家帶領',
@@ -70,7 +80,7 @@ const specialExperiences = [
       '雪地野餐（石狩鍋）',
       '知床半島流冰巡航',
       '頂級溫泉旅館住宿',
-      '私人露天風呂與懷石料理'
+      '私人露天風呂與懷石料理',
     ],
     duration_hours: 10,
     group_size_min: 2,
@@ -92,9 +102,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
     images: [
       'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
-      'https://images.unsplash.com/photo-1548523803-52340ae8b333?w=800'
+      'https://images.unsplash.com/photo-1548523803-52340ae8b333?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '喀比攀岩與私人遊艇探索',
@@ -104,7 +114,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['rock_climbing', 'yacht_charter', 'island_hopping'],
     exclusivity_level: 'highly_exclusive',
-    description: '在泰國喀比的石灰岩峭壁上，體驗世界級攀岩與海上奢華的完美結合。由專業攀岩教練帶領，挑戰萊莉海灘（Railay Beach）的標誌性攀岩路線，從初級到進階路線應有盡有。攀岩後登上私人豪華遊艇，巡航翡翠綠的安達曼海，探索秘境海灣、浮潛珊瑚礁、在隱密沙灘享用由船上主廚準備的海鮮BBQ。傍晚在遊艇甲板觀賞日落，品嚐香檳與泰式小點。這是冒險與奢華的極致融合。',
+    description:
+      '在泰國喀比的石灰岩峭壁上，體驗世界級攀岩與海上奢華的完美結合。由專業攀岩教練帶領，挑戰萊莉海灘（Railay Beach）的標誌性攀岩路線，從初級到進階路線應有盡有。攀岩後登上私人豪華遊艇，巡航翡翠綠的安達曼海，探索秘境海灣、浮潛珊瑚礁、在隱密沙灘享用由船上主廚準備的海鮮BBQ。傍晚在遊艇甲板觀賞日落，品嚐香檳與泰式小點。這是冒險與奢華的極致融合。',
     highlights: [
       '專業攀岩教練一對一指導',
       '挑戰世界級攀岩路線（萊莉海灘）',
@@ -112,7 +123,7 @@ const specialExperiences = [
       '私人豪華遊艇巡航（6小時）',
       '秘境海灣浮潛',
       '海鮮BBQ午餐（船上主廚現做）',
-      '日落香檳與泰式小點'
+      '日落香檳與泰式小點',
     ],
     duration_hours: 10,
     group_size_min: 2,
@@ -133,9 +144,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800',
     images: [
       'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800',
-      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800'
+      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '清邁叢林豪華露營與大象保護',
@@ -145,7 +156,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['jungle_camping', 'elephant_conservation', 'glamping'],
     exclusivity_level: 'highly_exclusive',
-    description: '在清邁叢林深處，體驗結合野外冒險與奢華住宿的獨特旅程。白天前往獲得國際認證的大象保護營，近距離觀察、餵食、為大象洗澡，了解大象保育工作。下午徒步熱帶雨林，由植物學家講解藥用植物，在瀑布游泳。傍晚入住豪華樹屋帳篷（Glamping），配備舒適大床、私人浴室、戶外浴缸。晚餐由米其林主廚準備的野外Fine Dining，在星空下品嚐fusion泰式料理。夜間聆聽叢林交響曲入眠。',
+    description:
+      '在清邁叢林深處，體驗結合野外冒險與奢華住宿的獨特旅程。白天前往獲得國際認證的大象保護營，近距離觀察、餵食、為大象洗澡，了解大象保育工作。下午徒步熱帶雨林，由植物學家講解藥用植物，在瀑布游泳。傍晚入住豪華樹屋帳篷（Glamping），配備舒適大床、私人浴室、戶外浴缸。晚餐由米其林主廚準備的野外Fine Dining，在星空下品嚐fusion泰式料理。夜間聆聽叢林交響曲入眠。',
     highlights: [
       '國際認證大象保護營體驗',
       '餵食、洗澡、與大象互動',
@@ -153,7 +165,7 @@ const specialExperiences = [
       '豪華樹屋帳篷住宿（Glamping）',
       '私人浴室與戶外浴缸',
       '米其林主廚野外Fine Dining',
-      '星空下品嚐fusion泰式料理'
+      '星空下品嚐fusion泰式料理',
     ],
     duration_hours: 24,
     group_size_min: 2,
@@ -175,9 +187,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800',
     images: [
       'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800',
-      'https://images.unsplash.com/photo-1534188753412-5df1d5612ab1?w=800'
+      'https://images.unsplash.com/photo-1534188753412-5df1d5612ab1?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '濟州島海岸徒步與海女文化',
@@ -187,7 +199,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['coastal_hiking', 'cultural_heritage', 'unesco_experience'],
     exclusivity_level: 'exclusive',
-    description: '探索濟州島令人屏息的海岸線，結合UNESCO認證的海女（Haenyeo）文化體驗。徒步濟州偶來小路（Olle Trail）最美的海岸段，欣賞玄武岩海岸、柱狀節理、藍色海蝕洞。午餐與真正的海女阿嬤共餐，品嚐她們親自潛水採集的海鮮：鮑魚、海膽、海參、海藻。聆聽海女的生命故事與傳統技藝。下午參觀城山日出峰，體驗簡單的自由潛水訓練。傍晚入住濟州頂級度假村，享受火山石桑拿與海景溫泉。',
+    description:
+      '探索濟州島令人屏息的海岸線，結合UNESCO認證的海女（Haenyeo）文化體驗。徒步濟州偶來小路（Olle Trail）最美的海岸段，欣賞玄武岩海岸、柱狀節理、藍色海蝕洞。午餐與真正的海女阿嬤共餐，品嚐她們親自潛水採集的海鮮：鮑魚、海膽、海參、海藻。聆聽海女的生命故事與傳統技藝。下午參觀城山日出峰，體驗簡單的自由潛水訓練。傍晚入住濟州頂級度假村，享受火山石桑拿與海景溫泉。',
     highlights: [
       '徒步濟州偶來小路最美海岸段',
       '欣賞玄武岩海岸與柱狀節理',
@@ -195,7 +208,7 @@ const specialExperiences = [
       '與海女阿嬤共餐（親採海鮮）',
       '聆聽海女生命故事',
       '城山日出峰與自由潛水體驗',
-      '頂級度假村與火山石桑拿'
+      '頂級度假村與火山石桑拿',
     ],
     duration_hours: 10,
     group_size_min: 2,
@@ -216,9 +229,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
     images: [
       'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800'
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '下龍灣皮划艇探洞秘境之旅',
@@ -228,7 +241,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['kayaking', 'cave_exploration', 'yacht_charter'],
     exclusivity_level: 'highly_exclusive',
-    description: '在越南世界遺產下龍灣，體驗不為遊客所知的秘境探險。搭乘私人豪華遊艇（非大型遊輪）出海，抵達人跡罕至的海域。換乘雙人皮划艇，由專業嚮導帶領穿越石灰岩洞穴、探索隱藏的潟湖與漂浮村落。在秘密沙灘野餐，游泳、浮潛。下午繼續皮划艇冒險，進入只有退潮時才能通過的洞穴，發現鐘乳石與地下湖。傍晚返回遊艇，在甲板享用海鮮BBQ晚餐，觀賞日落。夜宿遊艇上的豪華客房。',
+    description:
+      '在越南世界遺產下龍灣，體驗不為遊客所知的秘境探險。搭乘私人豪華遊艇（非大型遊輪）出海，抵達人跡罕至的海域。換乘雙人皮划艇，由專業嚮導帶領穿越石灰岩洞穴、探索隱藏的潟湖與漂浮村落。在秘密沙灘野餐，游泳、浮潛。下午繼續皮划艇冒險，進入只有退潮時才能通過的洞穴，發現鐘乳石與地下湖。傍晚返回遊艇，在甲板享用海鮮BBQ晚餐，觀賞日落。夜宿遊艇上的豪華客房。',
     highlights: [
       '私人豪華遊艇（非大眾遊輪）',
       '皮划艇探索秘境洞穴與潟湖',
@@ -236,7 +250,7 @@ const specialExperiences = [
       '秘境沙灘野餐與浮潛',
       '探訪漂浮村落',
       '甲板海鮮BBQ與日落',
-      '遊艇豪華客房住宿'
+      '遊艇豪華客房住宿',
     ],
     duration_hours: 24,
     group_size_min: 2,
@@ -257,9 +271,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800',
     images: [
       'https://images.unsplash.com/photo-1528127269322-539801943592?w=800',
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800'
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '張家界阿凡達秘境探險',
@@ -269,7 +283,8 @@ const specialExperiences = [
     category: 'adventure_luxury',
     sub_category: ['mountain_hiking', 'glass_bridge', 'avatar_filming_site'],
     exclusivity_level: 'highly_exclusive',
-    description: '探索電影《阿凡達》取景地張家界的震撼美景，專屬VIP通道避開人潮。清晨搭乘VIP包廂纜車直達天子山，由專業攝影師帶領尋找最佳拍攝角度。徒步金鞭溪峽谷，欣賞3000多座石英砂岩峰林。午餐享用土家族特色料理。下午挑戰天門山玻璃棧道與玻璃橋（世界最高最長），體驗懸崖邊的心跳感。乘坐天門洞纜車（全球最長高山客運索道），穿越999級天梯。晚上入住張家界最奢華度假村，享受山景溫泉與湘菜盛宴。',
+    description:
+      '探索電影《阿凡達》取景地張家界的震撼美景，專屬VIP通道避開人潮。清晨搭乘VIP包廂纜車直達天子山，由專業攝影師帶領尋找最佳拍攝角度。徒步金鞭溪峽谷，欣賞3000多座石英砂岩峰林。午餐享用土家族特色料理。下午挑戰天門山玻璃棧道與玻璃橋（世界最高最長），體驗懸崖邊的心跳感。乘坐天門洞纜車（全球最長高山客運索道），穿越999級天梯。晚上入住張家界最奢華度假村，享受山景溫泉與湘菜盛宴。',
     highlights: [
       'VIP包廂纜車（避開人潮）',
       '專業攝影師帶領拍攝',
@@ -277,7 +292,7 @@ const specialExperiences = [
       '天門山玻璃棧道與玻璃橋',
       '天門洞纜車（世界最長索道）',
       '999級天梯挑戰',
-      '奢華度假村與山景溫泉'
+      '奢華度假村與山景溫泉',
     ],
     duration_hours: 12,
     group_size_min: 2,
@@ -298,9 +313,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=800',
     images: [
       'https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=800',
-      'https://images.unsplash.com/photo-1548013146-72479768bada?w=800'
+      'https://images.unsplash.com/photo-1548013146-72479768bada?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
 
   // ==================== 在地達人體驗（7個）====================
@@ -312,7 +327,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['market_life', 'sushi_learning', 'local_culture'],
     exclusivity_level: 'highly_exclusive',
-    description: '跟隨經營三代的築地魚販家族，體驗凌晨市場的真實生活。凌晨4點抵達豐洲市場（築地新址），觀看鮪魚拍賣現場。跟著魚販大哥學習魚類鑑定：如何看鮪魚的油花、鮭魚的新鮮度、挑選當季魚類。親自推著手推車採購，與批發商議價。採購完成後回到魚販的小店舖，由合作的壽司師傅教你製作握壽司，使用剛採購的新鮮魚貨。享用自己做的壽司早餐，聆聽魚販家族的故事與築地百年歷史。這是只有內行人才能參加的體驗。',
+    description:
+      '跟隨經營三代的築地魚販家族，體驗凌晨市場的真實生活。凌晨4點抵達豐洲市場（築地新址），觀看鮪魚拍賣現場。跟著魚販大哥學習魚類鑑定：如何看鮪魚的油花、鮭魚的新鮮度、挑選當季魚類。親自推著手推車採購，與批發商議價。採購完成後回到魚販的小店舖，由合作的壽司師傅教你製作握壽司，使用剛採購的新鮮魚貨。享用自己做的壽司早餐，聆聽魚販家族的故事與築地百年歷史。這是只有內行人才能參加的體驗。',
     highlights: [
       '凌晨4點進入豐洲市場',
       '觀看鮪魚拍賣現場',
@@ -320,7 +336,7 @@ const specialExperiences = [
       '跟著魚販採購與議價',
       '壽司師傅教學握壽司',
       '享用自製壽司早餐',
-      '聆聽魚販家族三代故事'
+      '聆聽魚販家族三代故事',
     ],
     duration_hours: 5,
     group_size_min: 2,
@@ -342,9 +358,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1540648639573-3c1b4593ee5e?w=800',
     images: [
       'https://images.unsplash.com/photo-1540648639573-3c1b4593ee5e?w=800',
-      'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800'
+      'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '京都舞妓見習體驗',
@@ -354,7 +370,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['geisha_culture', 'traditional_training', 'behind_the_scenes'],
     exclusivity_level: 'ultra_exclusive',
-    description: '這是極為罕見的舞妓見習（Maiko）體驗，由真正的置屋媽媽桑親自指導。不是一般的變裝體驗，而是學習成為舞妓的基礎訓練。從清晨開始，學習如何盤髮髻、塗白粉（白塗り）、畫眉毛、點唇紅。穿著正統的舞妓和服（非觀光用簡化版），學習走路方式（內八字、小碎步）、座姿、鞠躬禮儀。學習三味線基礎與簡單舞蹈動作。午餐體驗舞妓的便當文化。下午參觀茶屋，了解舞妓的一日作息。這是深入花街文化的獨特機會，讓你理解舞妓不是藝妓，而是學徒的嚴格訓練。',
+    description:
+      '這是極為罕見的舞妓見習（Maiko）體驗，由真正的置屋媽媽桑親自指導。不是一般的變裝體驗，而是學習成為舞妓的基礎訓練。從清晨開始，學習如何盤髮髻、塗白粉（白塗り）、畫眉毛、點唇紅。穿著正統的舞妓和服（非觀光用簡化版），學習走路方式（內八字、小碎步）、座姿、鞠躬禮儀。學習三味線基礎與簡單舞蹈動作。午餐體驗舞妓的便當文化。下午參觀茶屋，了解舞妓的一日作息。這是深入花街文化的獨特機會，讓你理解舞妓不是藝妓，而是學徒的嚴格訓練。',
     highlights: [
       '真正置屋媽媽桑親自指導',
       '學習白塗り化妝技巧',
@@ -362,7 +379,7 @@ const specialExperiences = [
       '學習走路、座姿、鞠躬禮儀',
       '三味線與舞蹈基礎訓練',
       '參觀真正的茶屋',
-      '了解舞妓嚴格的生活規範'
+      '了解舞妓嚴格的生活規範',
     ],
     duration_hours: 7,
     group_size_min: 1,
@@ -385,9 +402,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
     images: [
       'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
-      'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'
+      'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '曼谷嘟嘟車司機一日體驗',
@@ -397,7 +414,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['local_transport', 'street_culture', 'unique_experience'],
     exclusivity_level: 'exclusive',
-    description: '化身曼谷嘟嘟車司機，體驗這座城市最道地的生活方式。由資深嘟嘟車司機教你駕駛技巧（需國際駕照），學習如何在混亂的曼谷交通中穿梭。上午跟著師傅跑幾趟載客（真實客人），體驗與乘客議價、推薦景點、分享路線。午餐在司機們的秘密食堂，品嚐最道地的街頭小吃。下午探訪司機才知道的私房景點：隱藏的寺廟、在地市場、塗鴉巷弄。傍晚學習如何裝飾嘟嘟車（泰國特色彩燈與裝飾）。這是了解曼谷基層生活與街頭文化的獨特視角。',
+    description:
+      '化身曼谷嘟嘟車司機，體驗這座城市最道地的生活方式。由資深嘟嘟車司機教你駕駛技巧（需國際駕照），學習如何在混亂的曼谷交通中穿梭。上午跟著師傅跑幾趟載客（真實客人），體驗與乘客議價、推薦景點、分享路線。午餐在司機們的秘密食堂，品嚐最道地的街頭小吃。下午探訪司機才知道的私房景點：隱藏的寺廟、在地市場、塗鴉巷弄。傍晚學習如何裝飾嘟嘟車（泰國特色彩燈與裝飾）。這是了解曼谷基層生活與街頭文化的獨特視角。',
     highlights: [
       '學習駕駛嘟嘟車（需國際駕照）',
       '跟著資深司機載客體驗',
@@ -405,7 +423,7 @@ const specialExperiences = [
       '司機秘密食堂午餐',
       '探訪司機私房景點',
       '學習裝飾嘟嘟車',
-      '獲得嘟嘟車司機證書'
+      '獲得嘟嘟車司機證書',
     ],
     duration_hours: 8,
     group_size_min: 1,
@@ -427,9 +445,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800',
     images: [
       'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800',
-      'https://images.unsplash.com/photo-1528181304800-259b08848526?w=800'
+      'https://images.unsplash.com/photo-1528181304800-259b08848526?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '清邁僧侶托缽與寺廟生活',
@@ -439,7 +457,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['buddhist_culture', 'temple_life', 'meditation'],
     exclusivity_level: 'exclusive',
-    description: '體驗泰北僧侶的一日生活，深入了解上座部佛教文化。清晨5點跟隨僧侶進行托缽（Alms Round），赤腳行走於清邁古城，接受信眾供養的食物。返回寺廟後參與早課誦經，學習巴利文經文的基本唸法。早餐享用信眾供養的素食（過午不食，僧侶只吃早餐）。上午學習坐禪與行禪，由資深僧侶指導正念呼吸法。午餐後參與寺廟日常工作：打掃、整理經書。下午茶時間與僧侶對話（Monk Chat），詢問佛法與人生問題。這是深度理解泰國佛教文化的難得機會。',
+    description:
+      '體驗泰北僧侶的一日生活，深入了解上座部佛教文化。清晨5點跟隨僧侶進行托缽（Alms Round），赤腳行走於清邁古城，接受信眾供養的食物。返回寺廟後參與早課誦經，學習巴利文經文的基本唸法。早餐享用信眾供養的素食（過午不食，僧侶只吃早餐）。上午學習坐禪與行禪，由資深僧侶指導正念呼吸法。午餐後參與寺廟日常工作：打掃、整理經書。下午茶時間與僧侶對話（Monk Chat），詢問佛法與人生問題。這是深度理解泰國佛教文化的難得機會。',
     highlights: [
       '清晨5點跟隨僧侶托缽',
       '參與早課誦經',
@@ -447,7 +466,7 @@ const specialExperiences = [
       '享用供養素食',
       '學習坐禪與行禪',
       '參與寺廟日常工作',
-      '與僧侶對話（Monk Chat）'
+      '與僧侶對話（Monk Chat）',
     ],
     duration_hours: 8,
     group_size_min: 1,
@@ -470,9 +489,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800',
     images: [
       'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800',
-      'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800'
+      'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '首爾傳統市場商人體驗',
@@ -482,7 +501,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['market_life', 'korean_food', 'local_culture'],
     exclusivity_level: 'exclusive',
-    description: '在首爾最熱鬧的廣藏市場，跟隨經營三代的攤販家族體驗一日商人生活。清晨6點抵達市場，幫忙攤位準備工作：擺放商品、調配醬料、蒸煮年糕。學習韓國小吃製作：綠豆煎餅（빈대떡）、辣炒年糕（떡볶이）、血腸（순대）。最重要的是學習叫賣技巧：如何用韓語招攬客人、議價、介紹商品。親自站在攤位前販售，體驗與客人互動的樂趣。午餐品嚐市場各攤位的美食，每個攤主都會招待一點自家特色。下午學習韓國傳統醃製泡菜，並打包一罐回家。這是最道地的首爾基層生活體驗。',
+    description:
+      '在首爾最熱鬧的廣藏市場，跟隨經營三代的攤販家族體驗一日商人生活。清晨6點抵達市場，幫忙攤位準備工作：擺放商品、調配醬料、蒸煮年糕。學習韓國小吃製作：綠豆煎餅（빈대떡）、辣炒年糕（떡볶이）、血腸（순대）。最重要的是學習叫賣技巧：如何用韓語招攬客人、議價、介紹商品。親自站在攤位前販售，體驗與客人互動的樂趣。午餐品嚐市場各攤位的美食，每個攤主都會招待一點自家特色。下午學習韓國傳統醃製泡菜，並打包一罐回家。這是最道地的首爾基層生活體驗。',
     highlights: [
       '清晨6點進入廣藏市場',
       '幫忙攤位準備工作',
@@ -490,7 +510,7 @@ const specialExperiences = [
       '學習韓語叫賣技巧',
       '親自站攤販售',
       '品嚐市場各攤美食',
-      '學習醃製泡菜帶回家'
+      '學習醃製泡菜帶回家',
     ],
     duration_hours: 8,
     group_size_min: 2,
@@ -512,9 +532,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800',
     images: [
       'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800',
-      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800'
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '河內摩托車維修師傅體驗',
@@ -524,7 +544,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['motorbike_culture', 'street_life', 'local_skills'],
     exclusivity_level: 'exclusive',
-    description: '河內有800萬輛摩托車，摩托車維修師傅是這座城市的重要角色。跟隨路邊維修攤的老師傅，學習基本的摩托車維修技巧：換輪胎、調整煞車、更換機油、修補爆胎。了解越南獨特的摩托車文化：為何一家四口能騎一台車、如何在摩托車上載冰箱、雨季的騎車技巧。午餐與師傅在路邊攤吃河粉，聊天喝越南咖啡。下午騎著修好的摩托車環城（師傅陪同），探訪維修師傅的私房景點：老城區的窄巷、還劍湖的日落、隱藏的咖啡館。體驗河內最真實的街頭生活。',
+    description:
+      '河內有800萬輛摩托車，摩托車維修師傅是這座城市的重要角色。跟隨路邊維修攤的老師傅，學習基本的摩托車維修技巧：換輪胎、調整煞車、更換機油、修補爆胎。了解越南獨特的摩托車文化：為何一家四口能騎一台車、如何在摩托車上載冰箱、雨季的騎車技巧。午餐與師傅在路邊攤吃河粉，聊天喝越南咖啡。下午騎著修好的摩托車環城（師傅陪同），探訪維修師傅的私房景點：老城區的窄巷、還劍湖的日落、隱藏的咖啡館。體驗河內最真實的街頭生活。',
     highlights: [
       '學習摩托車基本維修技巧',
       '換輪胎、調整煞車、更換機油',
@@ -532,7 +553,7 @@ const specialExperiences = [
       '與師傅路邊攤午餐（河粉）',
       '喝越南傳統滴漏咖啡',
       '騎摩托車環城探索',
-      '探訪師傅私房景點'
+      '探訪師傅私房景點',
     ],
     duration_hours: 6,
     group_size_min: 1,
@@ -555,9 +576,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1582655299221-2e0fd73faa37?w=800',
     images: [
       'https://images.unsplash.com/photo-1582655299221-2e0fd73faa37?w=800',
-      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800'
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '上海弄堂阿姨帶路深度遊',
@@ -567,7 +588,8 @@ const specialExperiences = [
     category: 'local_insider',
     sub_category: ['local_life', 'market_culture', 'shanghai_cuisine'],
     exclusivity_level: 'exclusive',
-    description: '跟著道地上海弄堂（Longtang，石庫門里弄）的退休阿姨，體驗老上海人的日常生活。清晨6點從菜市場開始，學習如何挑選新鮮蔬菜、砍價、與攤販打交道。買好菜回到阿姨家的石庫門老房子，學做上海家常菜：紅燒肉、糖醋小排、蔥油拌麵。一邊做菜一邊聽阿姨講上海話與弄堂文化。午餐品嚐自己做的上海菜。下午跟著阿姨參加弄堂活動：打麻將（學習基本規則）、跳廣場舞、與鄰居聊天。探訪附近的老建築、理髮店、修傘攤。傍晚坐在弄堂口，喝茶看人來人往，體驗最市井的上海生活。',
+    description:
+      '跟著道地上海弄堂（Longtang，石庫門里弄）的退休阿姨，體驗老上海人的日常生活。清晨6點從菜市場開始，學習如何挑選新鮮蔬菜、砍價、與攤販打交道。買好菜回到阿姨家的石庫門老房子，學做上海家常菜：紅燒肉、糖醋小排、蔥油拌麵。一邊做菜一邊聽阿姨講上海話與弄堂文化。午餐品嚐自己做的上海菜。下午跟著阿姨參加弄堂活動：打麻將（學習基本規則）、跳廣場舞、與鄰居聊天。探訪附近的老建築、理髮店、修傘攤。傍晚坐在弄堂口，喝茶看人來人往，體驗最市井的上海生活。',
     highlights: [
       '清晨6點菜市場採買',
       '學習挑菜與砍價技巧',
@@ -575,7 +597,7 @@ const specialExperiences = [
       '學做上海家常菜',
       '學習上海話與弄堂文化',
       '跟著打麻將、跳廣場舞',
-      '探訪弄堂老店鋪'
+      '探訪弄堂老店鋪',
     ],
     duration_hours: 8,
     group_size_min: 2,
@@ -597,9 +619,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=800',
     images: [
       'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=800',
-      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800'
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
 
   // ==================== 養生靜修體驗（7個）====================
@@ -611,7 +633,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['buddhist_meditation', 'temple_stay', 'spiritual_healing'],
     exclusivity_level: 'highly_exclusive',
-    description: '在日本真言宗總本山高野山，體驗三日兩夜的深度佛教靜修。高野山是空海大師（弘法大師）於1200年前開創的聖地，至今有117座寺廟。入住傳統寺院宿坊（Shukubo），與僧侶共同生活。清晨5:30參加朝勤（早課），聆聽僧侶誦經與梵唄。早餐享用精進料理（佛教素食），學習正念飲食。上午學習阿字觀冥想（真言宗獨特禪法）與抄經（寫經）。午後參訪奧之院、金剛峯寺、壇上伽藍等聖地。晚上參加夜間參拜與火供儀式。這是深度的心靈淨化與靈性成長之旅。',
+    description:
+      '在日本真言宗總本山高野山，體驗三日兩夜的深度佛教靜修。高野山是空海大師（弘法大師）於1200年前開創的聖地，至今有117座寺廟。入住傳統寺院宿坊（Shukubo），與僧侶共同生活。清晨5:30參加朝勤（早課），聆聽僧侶誦經與梵唄。早餐享用精進料理（佛教素食），學習正念飲食。上午學習阿字觀冥想（真言宗獨特禪法）與抄經（寫經）。午後參訪奧之院、金剛峯寺、壇上伽藍等聖地。晚上參加夜間參拜與火供儀式。這是深度的心靈淨化與靈性成長之旅。',
     highlights: [
       '入住高野山傳統寺院宿坊',
       '參加清晨5:30朝勤（早課）',
@@ -619,7 +642,7 @@ const specialExperiences = [
       '品嚐精進料理（佛教素食）',
       '參訪奧之院等聖地',
       '參加夜間參拜與火供儀式',
-      '與僧侶一對一對話指導'
+      '與僧侶一對一對話指導',
     ],
     duration_hours: 48,
     group_size_min: 1,
@@ -642,9 +665,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800',
     images: [
       'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800',
-      'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800'
+      'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '熊野古道靈性徒步五日',
@@ -654,7 +677,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['pilgrimage_walking', 'unesco_heritage', 'nature_healing'],
     exclusivity_level: 'highly_exclusive',
-    description: '走訪UNESCO世界遺產熊野古道，進行五日四夜的靈性朝聖之旅。熊野古道是日本古代朝聖之路，連接熊野三山（熊野本宮大社、熊野速玉大社、熊野那智大社）。每日徒步10-15公里，穿越千年杉木林、越過山嶺、渡過溪流。沿途參拜王子社（休息點神社），淨化身心。夜宿古道旁的溫泉旅館，享受療癒的溫泉浴。早晚進行森林冥想與瑜伽，聆聽自然的聲音。由熊野修驗道的山伏（修行者）帶領，講解神道與自然崇拜。這是結合自然、靈性、身體鍛鍊的療癒之旅。',
+    description:
+      '走訪UNESCO世界遺產熊野古道，進行五日四夜的靈性朝聖之旅。熊野古道是日本古代朝聖之路，連接熊野三山（熊野本宮大社、熊野速玉大社、熊野那智大社）。每日徒步10-15公里，穿越千年杉木林、越過山嶺、渡過溪流。沿途參拜王子社（休息點神社），淨化身心。夜宿古道旁的溫泉旅館，享受療癒的溫泉浴。早晚進行森林冥想與瑜伽，聆聽自然的聲音。由熊野修驗道的山伏（修行者）帶領，講解神道與自然崇拜。這是結合自然、靈性、身體鍛鍊的療癒之旅。',
     highlights: [
       'UNESCO世界遺產朝聖之路',
       '五日徒步穿越千年杉木林',
@@ -662,7 +686,7 @@ const specialExperiences = [
       '夜宿古道溫泉旅館',
       '每日森林冥想與瑜伽',
       '山伏（修行者）帶領講解',
-      '淨化儀式與護身符'
+      '淨化儀式與護身符',
     ],
     duration_hours: 96,
     group_size_min: 4,
@@ -684,9 +708,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
     images: [
       'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
-      'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'
+      'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '清邁禪修寺廟七日靜修',
@@ -696,7 +720,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['vipassana_meditation', 'silent_retreat', 'buddhist_teaching'],
     exclusivity_level: 'exclusive',
-    description: '在清邁山區的寧靜寺廟，進行七日內觀禪修（Vipassana）靜修。這是上座部佛教最核心的禪修方法，通過觀察呼吸與身體感受，達到內心的平靜與洞察。七天中保持聖默（Noble Silence），不說話、不眼神交流，專注於內在修行。每日清晨4:30起床，進行坐禪、行禪、聆聽佛法開示。享用兩餐簡單素食（過午不食）。由資深禪修導師每日一對一指導，調整姿勢與心態。這是深度的心靈排毒與自我覺察之旅，適合想暫時離開喧囂、尋找內在平靜的人。',
+    description:
+      '在清邁山區的寧靜寺廟，進行七日內觀禪修（Vipassana）靜修。這是上座部佛教最核心的禪修方法，通過觀察呼吸與身體感受，達到內心的平靜與洞察。七天中保持聖默（Noble Silence），不說話、不眼神交流，專注於內在修行。每日清晨4:30起床，進行坐禪、行禪、聆聽佛法開示。享用兩餐簡單素食（過午不食）。由資深禪修導師每日一對一指導，調整姿勢與心態。這是深度的心靈排毒與自我覺察之旅，適合想暫時離開喧囂、尋找內在平靜的人。',
     highlights: [
       '七日內觀禪修（Vipassana）',
       '保持聖默（Noble Silence）',
@@ -704,7 +729,7 @@ const specialExperiences = [
       '坐禪、行禪、佛法開示',
       '資深禪修導師一對一指導',
       '簡單素食（過午不食）',
-      '山區寧靜寺廟環境'
+      '山區寧靜寺廟環境',
     ],
     duration_hours: 168,
     group_size_min: 1,
@@ -728,9 +753,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
     images: [
       'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-      'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800'
+      'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '華欣皇家養生Spa療程',
@@ -740,7 +765,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['luxury_spa', 'thai_healing', 'ayurveda'],
     exclusivity_level: 'ultra_exclusive',
-    description: '在華欣（泰國皇室度假勝地）的頂級養生度假村，體驗三日兩夜的全方位身心療癒。結合泰式傳統醫學、阿育吠陀（Ayurveda）與現代Spa技術。第一天進行完整的健康評估（泰醫與阿育吠陀體質診斷），制定個人化療程。每日包含：泰式草藥蒸浴、泰式按摩（2小時）、油壓按摩、頌缽療癒、冥想瑜伽。享用根據體質設計的養生餐食（排毒或滋補）。學習泰式按摩基礎技法與藥草知識。第三天贈送藥草包與精油帶回家。這是泰國傳統養生智慧與奢華享受的完美結合。',
+    description:
+      '在華欣（泰國皇室度假勝地）的頂級養生度假村，體驗三日兩夜的全方位身心療癒。結合泰式傳統醫學、阿育吠陀（Ayurveda）與現代Spa技術。第一天進行完整的健康評估（泰醫與阿育吠陀體質診斷），制定個人化療程。每日包含：泰式草藥蒸浴、泰式按摩（2小時）、油壓按摩、頌缽療癒、冥想瑜伽。享用根據體質設計的養生餐食（排毒或滋補）。學習泰式按摩基礎技法與藥草知識。第三天贈送藥草包與精油帶回家。這是泰國傳統養生智慧與奢華享受的完美結合。',
     highlights: [
       '泰醫與阿育吠陀體質診斷',
       '個人化養生療程設計',
@@ -748,7 +774,7 @@ const specialExperiences = [
       '頌缽療癒與冥想瑜伽',
       '根據體質設計的養生餐食',
       '學習泰式按摩技法',
-      '贈送藥草包與精油'
+      '贈送藥草包與精油',
     ],
     duration_hours: 48,
     group_size_min: 1,
@@ -763,15 +789,22 @@ const specialExperiences = [
     physical_requirement: '無特殊要求',
     best_time_of_day: '下午入住',
     available_seasons: ['全年'],
-    price_includes: ['度假村住宿2晚', '所有療程', '養生餐食', '瑜伽課程', '藥草包與精油', '專車接送'],
+    price_includes: [
+      '度假村住宿2晚',
+      '所有療程',
+      '養生餐食',
+      '瑜伽課程',
+      '藥草包與精油',
+      '專車接送',
+    ],
     advance_booking_days: 21,
     cancellation_policy: '14天前免費取消，之後扣50%',
     thumbnail: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
     images: [
       'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
-      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800'
+      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '韓國寺廟寄宿Templestay三日',
@@ -781,7 +814,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['temple_stay', 'zen_meditation', 'korean_buddhism'],
     exclusivity_level: 'exclusive',
-    description: '在首爾近郊的千年古剎，體驗三日兩夜的韓國寺廟寄宿（Templestay）。這是韓國政府推廣的文化體驗項目，讓現代人暫離塵囂，體驗僧侶生活。清晨3:30起床參加晨鐘儀式與早課，聆聽108響鐘聲淨化心靈。學習108拜（禮佛）、抄經（寫佛經）、茶道（禪茶一味）。參與寺廟工作：打掃、種菜、準備齋飯。與住持進行一對一對話，討論人生煩惱與佛法智慧。晚上山中夜行禪，觀星冥想。享用寺廟素食（精緻的韓式寺剎料理）。這是身心靈全面放鬆與充電的旅程。',
+    description:
+      '在首爾近郊的千年古剎，體驗三日兩夜的韓國寺廟寄宿（Templestay）。這是韓國政府推廣的文化體驗項目，讓現代人暫離塵囂，體驗僧侶生活。清晨3:30起床參加晨鐘儀式與早課，聆聽108響鐘聲淨化心靈。學習108拜（禮佛）、抄經（寫佛經）、茶道（禪茶一味）。參與寺廟工作：打掃、種菜、準備齋飯。與住持進行一對一對話，討論人生煩惱與佛法智慧。晚上山中夜行禪，觀星冥想。享用寺廟素食（精緻的韓式寺剎料理）。這是身心靈全面放鬆與充電的旅程。',
     highlights: [
       '清晨3:30參加晨鐘與早課',
       '學習108拜、抄經、茶道',
@@ -789,7 +823,7 @@ const specialExperiences = [
       '與住持一對一對話',
       '山中夜行禪與觀星',
       '享用韓式寺剎料理',
-      '體驗僧侶作息與生活'
+      '體驗僧侶作息與生活',
     ],
     duration_hours: 48,
     group_size_min: 1,
@@ -812,9 +846,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800',
     images: [
       'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800',
-      'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'
+      'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '全州韓醫養生療程三日',
@@ -824,7 +858,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['korean_medicine', 'herbal_therapy', 'acupuncture'],
     exclusivity_level: 'highly_exclusive',
-    description: '在韓國傳統韓醫學（韓方）的故鄉全州，體驗三日兩夜的深度養生療程。由資深韓醫師進行完整的四診（望、聞、問、切）體質診斷，判定你的體質類型（太陽人、太陰人、少陽人、少陰人）。根據體質設計個人化療程：針灸、拔罐、艾灸、推拿。每日服用客製化藥膳湯劑（韓方茶）。學習五行養生功法（氣功與伸展）。享用根據體質設計的藥膳料理。參觀韓藥材市場，學習辨識常用藥材。體驗藥草足浴與藥草蒸氣浴。這是結合傳統韓醫智慧與現代養生的獨特體驗。',
+    description:
+      '在韓國傳統韓醫學（韓方）的故鄉全州，體驗三日兩夜的深度養生療程。由資深韓醫師進行完整的四診（望、聞、問、切）體質診斷，判定你的體質類型（太陽人、太陰人、少陽人、少陰人）。根據體質設計個人化療程：針灸、拔罐、艾灸、推拿。每日服用客製化藥膳湯劑（韓方茶）。學習五行養生功法（氣功與伸展）。享用根據體質設計的藥膳料理。參觀韓藥材市場，學習辨識常用藥材。體驗藥草足浴與藥草蒸氣浴。這是結合傳統韓醫智慧與現代養生的獨特體驗。',
     highlights: [
       '資深韓醫師四診體質診斷',
       '個人化針灸、拔罐、艾灸療程',
@@ -832,7 +867,7 @@ const specialExperiences = [
       '學習五行養生功法',
       '根據體質設計的藥膳料理',
       '參觀韓藥材市場',
-      '藥草足浴與蒸氣浴'
+      '藥草足浴與蒸氣浴',
     ],
     duration_hours: 48,
     group_size_min: 1,
@@ -853,9 +888,9 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1519824145371-296894a0daa9?w=800',
     images: [
       'https://images.unsplash.com/photo-1519824145371-296894a0daa9?w=800',
-      'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800'
+      'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
     ],
-    is_active: true
+    is_active: true,
   },
   {
     name: '武當山道教養生七日',
@@ -865,7 +900,8 @@ const specialExperiences = [
     category: 'wellness_retreat',
     sub_category: ['taoist_practice', 'tai_chi', 'qigong'],
     exclusivity_level: 'highly_exclusive',
-    description: '在道教聖地武當山，體驗七日六夜的道家養生修煉。武當山是道教全真派的發源地，也是武當太極拳的誕生地。入住道觀客房，與道士共同生活。清晨5點起床練習太極拳與八段錦（養生氣功），由武當派傳人親自教授。學習道家內丹術（呼吸與冥想）、五禽戲（模仿動物的養生功法）。享用道家素齋（清淡養生食物）。參與道觀日常：晨鐘暮鼓、誦經、打坐。學習中醫經絡與養生理論。參訪金頂、紫霄宮等聖地。這是結合武術、養生、靈性的全方位修煉。',
+    description:
+      '在道教聖地武當山，體驗七日六夜的道家養生修煉。武當山是道教全真派的發源地，也是武當太極拳的誕生地。入住道觀客房，與道士共同生活。清晨5點起床練習太極拳與八段錦（養生氣功），由武當派傳人親自教授。學習道家內丹術（呼吸與冥想）、五禽戲（模仿動物的養生功法）。享用道家素齋（清淡養生食物）。參與道觀日常：晨鐘暮鼓、誦經、打坐。學習中醫經絡與養生理論。參訪金頂、紫霄宮等聖地。這是結合武術、養生、靈性的全方位修煉。',
     highlights: [
       '武當派傳人教授太極拳',
       '學習八段錦與五禽戲',
@@ -873,7 +909,7 @@ const specialExperiences = [
       '享用道家素齋',
       '參與道觀晨鐘暮鼓',
       '學習中醫經絡理論',
-      '參訪武當山聖地'
+      '參訪武當山聖地',
     ],
     duration_hours: 144,
     group_size_min: 4,
@@ -895,10 +931,10 @@ const specialExperiences = [
     thumbnail: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800',
     images: [
       'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
     ],
-    is_active: true
-  }
+    is_active: true,
+  },
 ]
 
 async function seedSpecialExperiences() {
@@ -909,7 +945,7 @@ async function seedSpecialExperiences() {
   const results = {
     adventure: { success: 0, fail: 0 },
     insider: { success: 0, fail: 0 },
-    wellness: { success: 0, fail: 0 }
+    wellness: { success: 0, fail: 0 },
   }
 
   console.log('🏔️ 匯入豪華冒險體驗...')

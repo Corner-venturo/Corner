@@ -16,9 +16,15 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Users, DollarSign, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
 // 使用懶加載避免打包問題
-const QuickReceipt = lazy(() => import('../quick-actions/quick-receipt').then(m => ({ default: m.QuickReceipt })))
-const QuickDisbursement = lazy(() => import('../quick-actions/quick-disbursement').then(m => ({ default: m.QuickDisbursement })))
-const QuickGroup = lazy(() => import('../quick-actions/quick-group').then(m => ({ default: m.QuickGroup })))
+const QuickReceipt = lazy(() =>
+  import('../quick-actions/quick-receipt').then(m => ({ default: m.QuickReceipt }))
+)
+const QuickDisbursement = lazy(() =>
+  import('../quick-actions/quick-disbursement').then(m => ({ default: m.QuickDisbursement }))
+)
+const QuickGroup = lazy(() =>
+  import('../quick-actions/quick-group').then(m => ({ default: m.QuickGroup }))
+)
 
 const quickActionTabs: QuickActionTabConfig[] = [
   { key: 'receipt' as const, label: '收款', icon: Receipt },

@@ -18,6 +18,7 @@
 ### ✅ 自動支援 Realtime 的資料表（16 個）
 
 #### 業務實體（13 個）
+
 1. **tours** - 旅遊團
 2. **orders** - 訂單
 3. **quotes** - 報價單
@@ -33,11 +34,13 @@
 13. **todos** - 待辦事項
 
 #### 子實體（3 個）
+
 14. **members** - 團員
 15. **quote_items** - 報價項目
 16. **tour_addons** - 加購項目
 
 ### ✅ 已在 Phase 2/3 完成
+
 - **channels** - 頻道（Phase 2）
 - **messages** - 訊息（Phase 3）
 
@@ -50,25 +53,27 @@
 ### 1. `src/stores/operations/fetch.ts`
 
 #### ❌ 移除延遲同步
+
 ```typescript
 // ❌ 舊版：setTimeout 背景同步
 setTimeout(async () => {
-  const remoteItems = await supabase.fetchAll();
+  const remoteItems = await supabase.fetchAll()
   // 更新資料（但無法更新 UI）
-}, 0);
-return cachedResult; // 回傳過時的快取
+}, 0)
+return cachedResult // 回傳過時的快取
 ```
 
 #### ✅ 改為即時載入
+
 ```typescript
 // ✅ 新版：優先從 Supabase 即時載入
 try {
-  await sync.uploadLocalChanges();
-  const remoteItems = await supabase.fetchAll();
-  await indexedDB.batchPut(remoteItems, 1000);
-  return remoteItems; // 回傳最新資料
+  await sync.uploadLocalChanges()
+  const remoteItems = await supabase.fetchAll()
+  await indexedDB.batchPut(remoteItems, 1000)
+  return remoteItems // 回傳最新資料
 } catch (syncError) {
-  return cachedItems; // 失敗時回傳快取
+  return cachedItems // 失敗時回傳快取
 }
 ```
 
@@ -77,26 +82,28 @@ try {
 ### 2. `src/stores/operations/create.ts`
 
 #### ❌ 移除延遲同步
+
 ```typescript
 // ❌ 舊版：Fast...In + setTimeout 背景同步
-await indexedDB.put(recordData);
+await indexedDB.put(recordData)
 setTimeout(async () => {
-  await sync.uploadLocalChanges();
-}, 0);
-return recordData;
+  await sync.uploadLocalChanges()
+}, 0)
+return recordData
 ```
 
 #### ✅ 改為即時同步
+
 ```typescript
 // ✅ 新版：即時同步
-await indexedDB.put(recordData);
+await indexedDB.put(recordData)
 try {
-  await sync.uploadLocalChanges();
-  logger.log(`✅ 同步完成`);
+  await sync.uploadLocalChanges()
+  logger.log(`✅ 同步完成`)
 } catch (syncError) {
-  logger.warn(`⚠️ 同步失敗（本地資料已保存）`);
+  logger.warn(`⚠️ 同步失敗（本地資料已保存）`)
 }
-return recordData;
+return recordData
 ```
 
 ---
@@ -104,25 +111,27 @@ return recordData;
 ### 3. `src/stores/operations/update.ts`
 
 #### ❌ 移除延遲同步
+
 ```typescript
 // ❌ 舊版：FastIn + setTimeout 背景同步
-await indexedDB.update(id, syncData);
+await indexedDB.update(id, syncData)
 setTimeout(async () => {
-  await sync.uploadLocalChanges();
-}, 0);
-return updatedItem;
+  await sync.uploadLocalChanges()
+}, 0)
+return updatedItem
 ```
 
 #### ✅ 改為即時同步
+
 ```typescript
 // ✅ 新版：即時同步
-await indexedDB.update(id, syncData);
+await indexedDB.update(id, syncData)
 try {
-  await sync.uploadLocalChanges();
+  await sync.uploadLocalChanges()
 } catch (syncError) {
-  logger.warn(`⚠️ 同步失敗（本地資料已保存）`);
+  logger.warn(`⚠️ 同步失敗（本地資料已保存）`)
 }
-return updatedItem;
+return updatedItem
 ```
 
 ---
@@ -130,22 +139,24 @@ return updatedItem;
 ### 4. `src/stores/operations/delete.ts`
 
 #### ❌ 移除延遲同步
+
 ```typescript
 // ❌ 舊版：FastIn + setTimeout 背景同步
-await indexedDB.delete(id);
+await indexedDB.delete(id)
 setTimeout(async () => {
-  await sync.uploadLocalChanges();
-}, 0);
+  await sync.uploadLocalChanges()
+}, 0)
 ```
 
 #### ✅ 改為即時同步
+
 ```typescript
 // ✅ 新版：即時同步
-await indexedDB.delete(id);
+await indexedDB.delete(id)
 try {
-  await sync.uploadLocalChanges();
+  await sync.uploadLocalChanges()
 } catch (syncError) {
-  logger.warn(`⚠️ 同步刪除失敗（本地已刪除）`);
+  logger.warn(`⚠️ 同步刪除失敗（本地已刪除）`)
 }
 ```
 
@@ -154,65 +165,65 @@ try {
 ### 5. `src/stores/core/create-store-new.ts` ⭐ 核心改造
 
 #### ✅ 加入 Realtime Manager
+
 ```typescript
-import { realtimeManager } from '@/lib/realtime';
+import { realtimeManager } from '@/lib/realtime'
 ```
 
 #### ✅ 在 Store 建立時自動訂閱 Realtime（Line 319-377）
+
 ```typescript
 // 🔥 註冊 Realtime 訂閱（自動同步）
 if (enableSupabase) {
-  const subscriptionId = `${tableName}-realtime`;
+  const subscriptionId = `${tableName}-realtime`
 
   realtimeManager.subscribe<T>({
     table: tableName,
     subscriptionId,
     handlers: {
       // 新增資料
-      onInsert: async (record) => {
-        logger.log(`📥 [${tableName}] Realtime INSERT:`, record.id);
+      onInsert: async record => {
+        logger.log(`📥 [${tableName}] Realtime INSERT:`, record.id)
 
         // 更新 IndexedDB
-        await indexedDB.put(record);
+        await indexedDB.put(record)
 
         // 更新 Zustand 狀態
-        store.setState((state) => {
-          const exists = state.items.some(item => item.id === record.id);
-          if (exists) return state; // 避免重複
+        store.setState(state => {
+          const exists = state.items.some(item => item.id === record.id)
+          if (exists) return state // 避免重複
 
           return {
-            items: [...state.items, record]
-          };
-        });
+            items: [...state.items, record],
+          }
+        })
       },
 
       // 更新資料
-      onUpdate: async (record) => {
-        logger.log(`📥 [${tableName}] Realtime UPDATE:`, record.id);
+      onUpdate: async record => {
+        logger.log(`📥 [${tableName}] Realtime UPDATE:`, record.id)
 
-        await indexedDB.put(record);
+        await indexedDB.put(record)
 
-        store.setState((state) => ({
-          items: state.items.map(item =>
-            item.id === record.id ? record : item
-          )
-        }));
+        store.setState(state => ({
+          items: state.items.map(item => (item.id === record.id ? record : item)),
+        }))
       },
 
       // 刪除資料
-      onDelete: async (oldRecord) => {
-        logger.log(`📥 [${tableName}] Realtime DELETE:`, oldRecord.id);
+      onDelete: async oldRecord => {
+        logger.log(`📥 [${tableName}] Realtime DELETE:`, oldRecord.id)
 
-        await indexedDB.delete(oldRecord.id);
+        await indexedDB.delete(oldRecord.id)
 
-        store.setState((state) => ({
-          items: state.items.filter(item => item.id !== oldRecord.id)
-        }));
-      }
-    }
-  });
+        store.setState(state => ({
+          items: state.items.filter(item => item.id !== oldRecord.id),
+        }))
+      },
+    },
+  })
 
-  logger.log(`🔔 [${tableName}] Realtime 訂閱已啟用`);
+  logger.log(`🔔 [${tableName}] Realtime 訂閱已啟用`)
 }
 ```
 
@@ -221,6 +232,7 @@ if (enableSupabase) {
 ## 🎯 實作成果
 
 ### Before (Phase 4 前)
+
 ```
 設備 A 新增旅遊團
     ↓
@@ -234,6 +246,7 @@ if (enableSupabase) {
 ```
 
 ### After (Phase 4 後)
+
 ```
 設備 A 新增旅遊團
     ↓
@@ -258,20 +271,21 @@ React 重新渲染
 
 ## 📊 改善對比
 
-| 操作 | Before (舊版) | After (Phase 4) |
-|------|--------------|-----------------|
-| 載入資料 | IndexedDB → setTimeout → Supabase | Supabase → IndexedDB ✅ |
-| 新增資料 | setTimeout 背景同步 | 即時同步 + Realtime ✅ |
-| 更新資料 | setTimeout 背景同步 | 即時同步 + Realtime ✅ |
-| 刪除資料 | setTimeout 背景同步 | 即時同步 + Realtime ✅ |
-| 多裝置同步 | 需手動 F5 | 自動即時更新 ✅ |
-| 資料延遲 | 數秒～數分鐘 | < 100ms ✅ |
+| 操作       | Before (舊版)                     | After (Phase 4)         |
+| ---------- | --------------------------------- | ----------------------- |
+| 載入資料   | IndexedDB → setTimeout → Supabase | Supabase → IndexedDB ✅ |
+| 新增資料   | setTimeout 背景同步               | 即時同步 + Realtime ✅  |
+| 更新資料   | setTimeout 背景同步               | 即時同步 + Realtime ✅  |
+| 刪除資料   | setTimeout 背景同步               | 即時同步 + Realtime ✅  |
+| 多裝置同步 | 需手動 F5                         | 自動即時更新 ✅         |
+| 資料延遲   | 數秒～數分鐘                      | < 100ms ✅              |
 
 ---
 
 ## 🔄 架構變更
 
 ### Before (舊版架構)
+
 ```
 ┌─────────────────────────────────────┐
 │          React Component            │
@@ -301,6 +315,7 @@ React 重新渲染
 ```
 
 ### After (Phase 4 架構)
+
 ```
 ┌─────────────────────────────────────┐
 │          React Component            │
@@ -359,11 +374,12 @@ React 重新渲染
 ## 💡 關鍵創新
 
 ### 自動化 Realtime 訂閱
+
 所有使用 `createStore` 的表格**自動獲得** Realtime 能力：
 
 ```typescript
 // 開發者只需要這樣寫：
-export const useTourStore = createStore<Tour>('tours', 'T');
+export const useTourStore = createStore<Tour>('tours', 'T')
 
 // 系統自動：
 // ✅ 建立 Zustand Store
@@ -380,6 +396,7 @@ export const useTourStore = createStore<Tour>('tours', 'T');
 ## 📈 效能估算
 
 ### 連線數
+
 ```
 Phase 1-3: 2 個連線
 - channels: 1
@@ -399,11 +416,13 @@ Phase 4: +16 個連線
 ### ⚠️ 連線數超標問題
 
 **解決方案**：
+
 1. **按需訂閱** - 只訂閱當前頁面使用的表格
 2. **延遲訂閱** - 頁面載入後才訂閱
 3. **取消訂閱** - 離開頁面時取消訂閱
 
 ### 建議改進（Optional）
+
 ```typescript
 // 在 create-store-new.ts 加入條件訂閱
 if (enableSupabase && shouldSubscribe(tableName)) {
@@ -427,6 +446,7 @@ function shouldSubscribe(tableName: string): boolean {
 ## ✅ 測試清單
 
 ### 業務實體測試
+
 - [ ] tours - 新增/修改/刪除 → 其他裝置即時更新
 - [ ] orders - 新增/修改/刪除 → 其他裝置即時更新
 - [ ] quotes - 新增/修改/刪除 → 其他裝置即時更新
@@ -434,6 +454,7 @@ function shouldSubscribe(tableName: string): boolean {
 - [ ] itineraries - 新增/修改/刪除 → 其他裝置即時更新
 
 ### 效能測試
+
 - [ ] 檢查 Realtime 連線數 (應該 < 200)
 - [ ] 檢查記憶體使用 (無洩漏)
 - [ ] 檢查 Console 錯誤 (無錯誤)
@@ -444,26 +465,28 @@ function shouldSubscribe(tableName: string): boolean {
 ## 🚀 下一步建議
 
 ### 優化方向
+
 1. **按需訂閱** - 只訂閱當前使用的表格
 2. **延遲訂閱** - 頁面載入後才訂閱
 3. **訂閱優先級** - 重要表格優先訂閱
 4. **連線池管理** - 限制最大連線數
 
 ### 實作範例
+
 ```typescript
 // 在各別頁面使用 Hook 手動訂閱
 function ToursPage() {
-  useRealtimeSubscription('tours');
-  const tours = useTourStore(state => state.items);
+  useRealtimeSubscription('tours')
+  const tours = useTourStore(state => state.items)
   // ...
 }
 
 // 離開頁面時自動取消訂閱
 useEffect(() => {
   return () => {
-    realtimeManager.unsubscribe('tours-realtime');
-  };
-}, []);
+    realtimeManager.unsubscribe('tours-realtime')
+  }
+}, [])
 ```
 
 ---
@@ -479,6 +502,7 @@ useEffect(() => {
 ## 🎉 總結
 
 ### 改造成果
+
 - ✅ **5 個 operations 檔案**全面移除 setTimeout
 - ✅ **1 個核心檔案** (create-store-new.ts) 加入 Realtime
 - ✅ **16 個資料表**自動支援 Realtime
@@ -486,7 +510,9 @@ useEffect(() => {
 - ✅ Build 成功
 
 ### 技術突破
+
 通過修改通用 operations 層，實現了：
+
 - 一次修改，所有表格受益
 - 自動化 Realtime 訂閱
 - 零業務代碼侵入

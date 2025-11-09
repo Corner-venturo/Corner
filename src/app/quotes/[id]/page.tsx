@@ -15,7 +15,11 @@ import {
   PrintableQuotation,
   QuickQuoteDetail,
 } from '@/features/quotes/components'
-import { useRealtimeForQuotes, useRealtimeForTours, useRealtimeForQuoteItems } from '@/hooks/use-realtime-hooks'
+import {
+  useRealtimeForQuotes,
+  useRealtimeForTours,
+  useRealtimeForQuoteItems,
+} from '@/hooks/use-realtime-hooks'
 
 export default function QuoteDetailPage() {
   // ✅ Realtime 訂閱（必須！否則重新整理時無法載入資料）
@@ -175,7 +179,7 @@ export default function QuoteDetailPage() {
 
   // ✅ 如果是快速報價單，顯示快速報價單介面
   if (quote.quote_type === 'quick') {
-    return <QuickQuoteDetail quote={quote} onUpdate={(data) => updateQuote(quote.id, data)} />
+    return <QuickQuoteDetail quote={quote} onUpdate={data => updateQuote(quote.id, data)} />
   }
 
   return (

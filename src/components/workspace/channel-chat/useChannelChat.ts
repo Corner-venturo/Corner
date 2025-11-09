@@ -1,7 +1,11 @@
-import { useState } from 'react';
-import { useWorkspaceChannels, useWorkspaceChat, useWorkspaceWidgets } from '@/stores/workspace-store';
-import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat';
-import { useChatRealtime } from '@/hooks/useChatRealtime';
+import { useState } from 'react'
+import {
+  useWorkspaceChannels,
+  useWorkspaceChat,
+  useWorkspaceWidgets,
+} from '@/stores/workspace-store'
+import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
+import { useChatRealtime } from '@/hooks/useChatRealtime'
 import {
   useDialogStates,
   useSelectionState,
@@ -9,7 +13,7 @@ import {
   useChannelOperations,
   useChannelEffects,
   useMessageHandlers,
-} from './hooks';
+} from './hooks'
 
 /**
  * Channel Chat 主 Hook
@@ -19,14 +23,14 @@ import {
  */
 export function useChannelChat() {
   // Basic state
-  const [messageText, setMessageText] = useState('');
-  const [showMemberSidebar, setShowMemberSidebar] = useState(false);
+  const [messageText, setMessageText] = useState('')
+  const [showMemberSidebar, setShowMemberSidebar] = useState(false)
 
   // Dialog states (拆分到 useDialogStates)
-  const dialogStates = useDialogStates();
+  const dialogStates = useDialogStates()
 
   // Selection states (拆分到 useSelectionState)
-  const selectionState = useSelectionState();
+  const selectionState = useSelectionState()
 
   // Use selective hooks for better performance
   const {
@@ -38,13 +42,9 @@ export function useChannelChat() {
     loadChannels,
     updateChannel,
     deleteChannel,
-  } = useWorkspaceChannels();
+  } = useWorkspaceChannels()
 
-  const {
-    channelMessages,
-    messagesLoading,
-    loadMessages,
-  } = useWorkspaceChat();
+  const { channelMessages, messagesLoading, loadMessages } = useWorkspaceChat()
 
   const {
     advanceLists,
@@ -52,21 +52,19 @@ export function useChannelChat() {
     loadAdvanceLists,
     loadSharedOrderLists,
     deleteAdvanceList,
-  } = useWorkspaceWidgets();
+  } = useWorkspaceWidgets()
 
   // Derived state
-  const currentMessages = selectedChannel?.id && channelMessages?.[selectedChannel.id]
-    ? channelMessages[selectedChannel.id]
-    : [];
+  const currentMessages =
+    selectedChannel?.id && channelMessages?.[selectedChannel.id]
+      ? channelMessages[selectedChannel.id]
+      : []
   const isMessagesLoading = selectedChannel?.id
     ? (messagesLoading?.[selectedChannel.id] ?? false)
-    : false;
+    : false
 
   // Edit state (拆分到 useChannelEditState)
-  const editState = useChannelEditState(
-    dialogStates.showSettingsDialog,
-    selectedChannel
-  );
+  const editState = useChannelEditState(dialogStates.showSettingsDialog, selectedChannel)
 
   // Channel operations (拆分到 useChannelOperations)
   const channelOps = useChannelOperations(
@@ -75,12 +73,19 @@ export function useChannelChat() {
     updateChannel,
     deleteChannel,
     dialogStates.setShowSettingsDialog
-  );
+  )
 
   // Message operations
-  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations();
-  const { attachedFiles, setAttachedFiles, uploadingFiles, uploadProgress, uploadFiles, clearFiles } = useFileUpload();
-  const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0);
+  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations()
+  const {
+    attachedFiles,
+    setAttachedFiles,
+    uploadingFiles,
+    uploadProgress,
+    uploadFiles,
+    clearFiles,
+  } = useFileUpload()
+  const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0)
 
   // Message handlers (拆分到 useMessageHandlers)
   const messageHandlers = useMessageHandlers(
@@ -95,10 +100,10 @@ export function useChannelChat() {
     handleSendMessage,
     handleReaction,
     handleDeleteMessage
-  );
+  )
 
   // Realtime subscription for messages
-  useChatRealtime(selectedChannel?.id);
+  useChatRealtime(selectedChannel?.id)
 
   // Effects (拆分到 useChannelEffects)
   useChannelEffects(
@@ -110,7 +115,7 @@ export function useChannelChat() {
     loadMessages,
     loadAdvanceLists,
     loadSharedOrderLists
-  );
+  )
 
   return {
     // State
@@ -157,6 +162,7 @@ export function useChannelChat() {
     handleDeleteMessageClick: messageHandlers.handleDeleteMessageClick,
     handleChannelSwitch: channelOps.handleChannelSwitch,
     handleDeleteChannel: channelOps.handleDeleteChannel,
-    handleUpdateChannel: () => channelOps.handleUpdateChannel(editState.editChannelName, editState.editChannelDescription),
-  };
+    handleUpdateChannel: () =>
+      channelOps.handleUpdateChannel(editState.editChannelName, editState.editChannelDescription),
+  }
 }

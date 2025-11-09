@@ -2,7 +2,16 @@
 
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react'
-import { Plus, TrendingUp, Zap, Package, Edit3, ChevronRight, Wallet, CreditCard } from 'lucide-react'
+import {
+  Plus,
+  TrendingUp,
+  Zap,
+  Package,
+  Edit3,
+  ChevronRight,
+  Wallet,
+  CreditCard,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { AddAccountDialog } from '@/components/accounting/add-account-dialog'
@@ -21,7 +30,8 @@ import { cn } from '@/lib/utils'
 
 export default function AccountingPage() {
   const router = useRouter()
-  const { accounts, stats, categories, transactions, addTransaction, initialize } = useAccountingStore()
+  const { accounts, stats, categories, transactions, addTransaction, initialize } =
+    useAccountingStore()
   const [isAccountsManagementOpen, setIsAccountsManagementOpen] = useState(false)
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false)
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false)
@@ -143,7 +153,7 @@ export default function AccountingPage() {
         icon={CreditCard}
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '記帳管理', href: '/accounting' }
+          { label: '記帳管理', href: '/accounting' },
         ]}
       >
         {/* 自定義按鈕群組 */}
@@ -187,7 +197,9 @@ export default function AccountingPage() {
                 NT$ {(stats?.monthly_expense || 0).toLocaleString()}
               </div>
               {expenseDifference > 0 && (
-                <div className="text-xs text-[#A8B4A5] mt-2">↓ 比上月省 NT$ {expenseDifference.toLocaleString()}</div>
+                <div className="text-xs text-[#A8B4A5] mt-2">
+                  ↓ 比上月省 NT$ {expenseDifference.toLocaleString()}
+                </div>
               )}
             </div>
 
@@ -202,9 +214,7 @@ export default function AccountingPage() {
             {/* 月底倒數 - 柔和金米色 */}
             <div className="bg-gradient-to-br from-[#F9F5ED] to-[#F5EDDC] rounded-xl p-6">
               <div className="text-[#9E8F81] text-sm mb-2">距離月底</div>
-              <div className="text-2xl font-bold text-[#C9A961]">
-                {daysToEndOfMonth} 天
-              </div>
+              <div className="text-2xl font-bold text-[#C9A961]">{daysToEndOfMonth} 天</div>
             </div>
           </div>
 
@@ -288,7 +298,9 @@ export default function AccountingPage() {
                 <span>收入 NT$ {(stats?.monthly_income || 0).toLocaleString()}</span>
               </div>
               {expenseDifference > 0 && (
-                <span className="text-[#A8B4A5]">↓ 省 NT$ {expenseDifference.toLocaleString()}</span>
+                <span className="text-[#A8B4A5]">
+                  ↓ 省 NT$ {expenseDifference.toLocaleString()}
+                </span>
               )}
             </div>
             <div className="text-xs text-[#AFA598] mt-2">距離月底 {daysToEndOfMonth} 天</div>
@@ -493,7 +505,10 @@ export default function AccountingPage() {
       <AddAccountDialog isOpen={isAddAccountOpen} onClose={() => setIsAddAccountOpen(false)} />
 
       {/* 新增記帳對話框 */}
-      <AddTransactionDialog isOpen={isAddTransactionOpen} onClose={() => setIsAddTransactionOpen(false)} />
+      <AddTransactionDialog
+        isOpen={isAddTransactionOpen}
+        onClose={() => setIsAddTransactionOpen(false)}
+      />
     </>
   )
 }

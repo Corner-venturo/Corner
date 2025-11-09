@@ -12,7 +12,11 @@ interface SystemSettingsProps {
   setClearingCache: (clearing: boolean) => void
 }
 
-export function SystemSettings({ cacheInfo, clearingCache, setClearingCache }: SystemSettingsProps) {
+export function SystemSettings({
+  cacheInfo,
+  clearingCache,
+  setClearingCache,
+}: SystemSettingsProps) {
   const handleClearCache = async () => {
     const confirmed = await alert(
       '確定要清除所有本地快取嗎？\n\n' +
@@ -94,8 +98,8 @@ export function SystemSettings({ cacheInfo, clearingCache, setClearingCache }: S
                 <h3 className="font-medium">清除本地快取</h3>
               </div>
               <p className="text-sm text-morandi-secondary mb-3">
-                清除所有本地儲存的資料，包括 IndexedDB、localStorage 和 sessionStorage。
-                清除後會從 Supabase 重新載入最新資料。
+                清除所有本地儲存的資料，包括 IndexedDB、localStorage 和 sessionStorage。 清除後會從
+                Supabase 重新載入最新資料。
               </p>
 
               {/* 快取狀態顯示 */}

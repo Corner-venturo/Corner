@@ -286,10 +286,7 @@ export class LocalAuthService {
     if (!user) return false
 
     const permissions = user.permissions || []
-    return (
-      permissions.includes(permission) ||
-      permissions.includes('admin')
-    )
+    return permissions.includes(permission) || permissions.includes('admin')
   }
 
   /**

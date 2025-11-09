@@ -91,11 +91,7 @@ export function TourExpandedView({
 
       // 獲取預設工作空間 ID
       const { supabase } = await import('@/lib/supabase/client')
-      const { data: workspaces } = await supabase
-        .from('workspaces')
-        .select('id')
-        .limit(1)
-        .single()
+      const { data: workspaces } = await supabase.from('workspaces').select('id').limit(1).single()
 
       if (!workspaces) {
         toast.error('找不到工作空間')

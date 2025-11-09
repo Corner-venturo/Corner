@@ -217,9 +217,7 @@ export class BackgroundSyncService {
 
           // 如果有刪除記錄，不要上傳，直接清理本地資料
           if (hasDeleteRecord) {
-            logger.log(
-              `⚠️ [${tableName}] 發現刪除記錄，跳過同步並清理本地資料: ${item.id}`
-            )
+            logger.log(`⚠️ [${tableName}] 發現刪除記錄，跳過同步並清理本地資料: ${item.id}`)
             await localDB.delete(tableName, item.id)
             continue
           }

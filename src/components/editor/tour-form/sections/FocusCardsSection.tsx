@@ -27,7 +27,10 @@ export function FocusCardsSection({
       </div>
 
       {data.focusCards?.map((card: FocusCard, index: number) => (
-        <div key={index} className="p-4 border-2 border-morandi-container rounded-lg space-y-3 bg-morandi-container/20">
+        <div
+          key={index}
+          className="p-4 border-2 border-morandi-container rounded-lg space-y-3 bg-morandi-container/20"
+        >
           <div className="flex justify-between items-start">
             <span className="text-sm font-medium text-morandi-secondary">景點 {index + 1}</span>
             <button

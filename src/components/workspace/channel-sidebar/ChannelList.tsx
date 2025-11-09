@@ -109,26 +109,27 @@ export function ChannelList({
           )}
 
           {/* 2. 使用者自訂群組 */}
-          {userGroupedChannels.map(({ group, channels: groupChannels }) => (
-            groupChannels.length > 0 && (
-              <GroupedChannelList
-                key={group.id}
-                group={group}
-                channels={groupChannels}
-                selectedChannelId={selectedChannelId}
-                onSelectChannel={onSelectChannel}
-                toggleChannelFavorite={toggleChannelFavorite}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onJoinChannel={onJoinChannel}
-                onLeaveChannel={onLeaveChannel}
-                isAdmin={isAdmin}
-                checkIsMember={checkIsMember}
-                toggleGroupCollapse={toggleGroupCollapse}
-                handleDeleteGroupClick={handleDeleteGroupClick}
-              />
-            )
-          ))}
+          {userGroupedChannels.map(
+            ({ group, channels: groupChannels }) =>
+              groupChannels.length > 0 && (
+                <GroupedChannelList
+                  key={group.id}
+                  group={group}
+                  channels={groupChannels}
+                  selectedChannelId={selectedChannelId}
+                  onSelectChannel={onSelectChannel}
+                  toggleChannelFavorite={toggleChannelFavorite}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onJoinChannel={onJoinChannel}
+                  onLeaveChannel={onLeaveChannel}
+                  isAdmin={isAdmin}
+                  checkIsMember={checkIsMember}
+                  toggleGroupCollapse={toggleGroupCollapse}
+                  handleDeleteGroupClick={handleDeleteGroupClick}
+                />
+              )
+          )}
 
           {/* 3. 未分組頻道 */}
           {ungroupedChannels.length > 0 && (

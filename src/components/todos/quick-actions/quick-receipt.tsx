@@ -149,8 +149,8 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
                   !selectedTourId
                     ? '請先選擇團體'
                     : availableOrders.length === 0
-                    ? '此團體沒有訂單'
-                    : '請選擇訂單...'
+                      ? '此團體沒有訂單'
+                      : '請選擇訂單...'
                 }
               />
             </SelectTrigger>
@@ -279,7 +279,9 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
             <Input
               placeholder="1234"
               value={paymentItem.card_last_four || ''}
-              onChange={e => updatePaymentItem({ card_last_four: e.target.value.replace(/\D/g, '') })}
+              onChange={e =>
+                updatePaymentItem({ card_last_four: e.target.value.replace(/\D/g, '') })
+              }
               className="mt-1 border-morandi-container/30"
               maxLength={4}
             />
@@ -351,7 +353,9 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-morandi-secondary">付款名稱（客戶看到的）</Label>
+              <Label className="text-sm font-medium text-morandi-secondary">
+                付款名稱（客戶看到的）
+              </Label>
               <Input
                 placeholder="例如：峇里島五日遊 - 尾款"
                 value={paymentItem.payment_name || ''}

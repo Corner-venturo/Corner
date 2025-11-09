@@ -258,12 +258,7 @@ export function AddVisaDialog({
               className="w-32"
             />
 
-            <Input
-              type="date"
-              value={applicant.received_date}
-              readOnly
-              className="w-32 bg-muted"
-            />
+            <Input type="date" value={applicant.received_date} readOnly className="w-32 bg-muted" />
 
             <Input
               type="number"

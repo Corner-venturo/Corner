@@ -9,6 +9,7 @@
 ## 🎯 核心問題
 
 ### 原始問題
+
 系統文檔和註釋廣泛使用「離線優先 (Offline-First)」描述，但實際架構是「快取優先 (Cache-First)」：
 
 - ❌ **誤導**: 文檔暗示支援離線編輯功能
@@ -16,6 +17,7 @@
 - ❌ **混淆**: `indexedDB.clear()` 被誤認為是 bug（實際是正確的）
 
 ### 真實架構
+
 ```
 Supabase = 唯一的 Source of Truth（資料權威來源）
 IndexedDB = 快取層（Cache，加速載入，可隨時清空）
@@ -34,16 +36,19 @@ Zustand = UI 狀態管理
 ### 1. ✅ 修正核心文檔
 
 #### 創建新的準確文檔
+
 - **新建**: `COMPLETE_REALTIME_CACHE_LOGIC.md`
   - 正確描述快取優先架構
   - 明確說明無離線編輯功能
   - 解釋 Supabase 作為 Source of Truth
 
 #### 移除舊的誤導文檔
+
 - **重命名**: `COMPLETE_REALTIME_OFFLINE_LOGIC.md` → `.old`
 - **標記為過時**: `OFFLINE_FIRST_SYNC_STRATEGY.md` → `.deprecated`
 
 #### 更新主要文檔
+
 - **README.md**:
   - 前: "離線支援 - 網路斷線也能操作，連線後自動同步"
   - 後: "快取優先 - 使用 IndexedDB 快取加速載入，確保流暢體驗"
@@ -53,6 +58,7 @@ Zustand = UI 狀態管理
 ### 2. ✅ 修正核心程式碼註釋
 
 #### `src/stores/operations/fetch.ts`
+
 ```typescript
 // ❌ 舊註釋
 /**
@@ -73,6 +79,7 @@ Zustand = UI 狀態管理
 ```
 
 #### `src/stores/core/create-store-new.ts`
+
 ```typescript
 // ❌ 舊註釋
 /**
@@ -97,6 +104,7 @@ Zustand = UI 狀態管理
 ```
 
 #### `src/stores/operations/create.ts` 和 `update.ts`
+
 ```typescript
 // ✅ 新註釋
 /**
@@ -113,11 +121,14 @@ Zustand = UI 狀態管理
 ### 3. ✅ 修正 Realtime 訂閱策略
 
 #### 問題
+
 - 原本文檔建議 employees 表格「永久訂閱」
 - 實際上應該「按需訂閱」（進入頁面才訂閱）
 
 #### 修正
+
 **`src/hooks/use-realtime-hooks.ts`**:
+
 ```typescript
 // ❌ 舊註釋
 /**
@@ -139,12 +150,14 @@ Zustand = UI 狀態管理
 ### 4. ✅ 清理 console.log 除錯訊息
 
 #### 清理統計
+
 - **移除 console.log**: 31 個除錯訊息
 - **保留 console.error**: 1 個（channels-store.ts 的 deleteChannelGroup 錯誤）
 - **保留 console.warn**: 0 個
 - **API Routes**: 未修改（保留請求日誌）
 
 #### 清理的檔案 (10 個)
+
 1. **src/stores/workspace/channels-store.ts** (13 個)
 2. **src/stores/workspace/widgets-store-facade.ts** (4 個)
 3. **src/stores/workspace/chat-store-facade.ts** (3 個)
@@ -157,6 +170,7 @@ Zustand = UI 狀態管理
 10. **src/hooks/use-auto-add-order-members.ts** (1 個)
 
 #### 成果
+
 - ✅ Production 環境不再有除錯訊息
 - ✅ Console 輸出乾淨
 - ✅ 保留合法的錯誤日誌
@@ -166,11 +180,13 @@ Zustand = UI 狀態管理
 ### 5. ✅ 驗證循環依賴
 
 #### 檢查工具
+
 ```bash
 npx madge --circular src/
 ```
 
 #### 結果
+
 ```
 ✔ No circular dependency found!
 ```
@@ -183,10 +199,12 @@ npx madge --circular src/
 ### 6. ✅ 清理 TODO 註釋
 
 #### 清理結果
+
 - **原始**: 433 個 TODO 註釋
 - **現在**: 13 個合理保留的 TODO
 
 #### 保留的 TODO (13 個)
+
 1. **LinkPay API Route** (7 個) - 待實作的 API 整合
 2. **Finance Payments Page** (2 個) - 功能佔位符
 3. **Stores Index** (1 個) - 文檔註記
@@ -202,11 +220,13 @@ npx madge --circular src/
 ### 7. ✅ Build 驗證
 
 #### 執行
+
 ```bash
 npm run build
 ```
 
 #### 結果
+
 ```
 ✓ Compiled successfully
 ✓ Linting and checking validity of types
@@ -228,27 +248,29 @@ Route (app)                                                Size     First Load J
 - ✅ 編譯成功
 - ✅ 無 TypeScript 錯誤
 - ✅ 51 個路由全部正常
-- ⚠️  1 個輕微警告（workspace root inferred，不影響運行）
+- ⚠️ 1 個輕微警告（workspace root inferred，不影響運行）
 
 ---
 
 ## 📊 完整統計
 
 ### 修改概覽
-| 項目 | 數量 | 狀態 |
-|-----|------|------|
-| 創建新文檔 | 1 | `COMPLETE_REALTIME_CACHE_LOGIC.md` |
-| 過時舊文檔 | 2 | `.old`, `.deprecated` |
-| 修正核心程式碼 | 4 | fetch.ts, create.ts, update.ts, create-store-new.ts |
-| 修正 Hook 註釋 | 1 | use-realtime-hooks.ts |
-| 移除 console.log | 31 | 10 個檔案 |
-| 循環依賴 | 0 | ✅ 無問題 |
-| TODO 註釋 | 13 | ✅ 合理保留 |
-| Build 狀態 | ✅ | 編譯成功 |
+
+| 項目             | 數量 | 狀態                                                |
+| ---------------- | ---- | --------------------------------------------------- |
+| 創建新文檔       | 1    | `COMPLETE_REALTIME_CACHE_LOGIC.md`                  |
+| 過時舊文檔       | 2    | `.old`, `.deprecated`                               |
+| 修正核心程式碼   | 4    | fetch.ts, create.ts, update.ts, create-store-new.ts |
+| 修正 Hook 註釋   | 1    | use-realtime-hooks.ts                               |
+| 移除 console.log | 31   | 10 個檔案                                           |
+| 循環依賴         | 0    | ✅ 無問題                                           |
+| TODO 註釋        | 13   | ✅ 合理保留                                         |
+| Build 狀態       | ✅   | 編譯成功                                            |
 
 ### 程式碼健康度
 
 #### 修正前
+
 - **架構描述**: ❌ 誤導（離線優先 vs 實際快取優先）
 - **console.log**: ❌ 45 個除錯訊息
 - **TODO 註釋**: ❌ 433 個過時註釋
@@ -256,6 +278,7 @@ Route (app)                                                Size     First Load J
 - **文檔一致性**: ❌ 不一致
 
 #### 修正後
+
 - **架構描述**: ✅ 正確（快取優先 + Supabase Source of Truth）
 - **console.log**: ✅ 14 個（全部在 API routes，合理）
 - **TODO 註釋**: ✅ 13 個（全部合理）
@@ -306,6 +329,7 @@ Route (app)                                                Size     First Load J
 ### 關鍵特性
 
 #### ✅ 快取優先載入
+
 ```typescript
 fetchAll 流程：
 1. 立即從 IndexedDB 讀取快取 → 快速顯示（避免空白畫面）
@@ -315,6 +339,7 @@ fetchAll 流程：
 ```
 
 #### ✅ FastInsert 樂觀更新
+
 ```typescript
 create/update 流程：
 1. 立即寫入 IndexedDB（快取）→ 樂觀更新
@@ -323,6 +348,7 @@ create/update 流程：
 ```
 
 #### ✅ Realtime 按需訂閱
+
 ```typescript
 Realtime 訂閱：
 1. 進入頁面 → 觸發 useRealtimeFor[Table]()
@@ -335,6 +361,7 @@ Realtime 訂閱：
 ```
 
 #### ❌ 無離線編輯
+
 ```typescript
 斷網情況：
 - ✅ 可查看 IndexedDB 快取資料（唯讀）
@@ -351,6 +378,7 @@ Realtime 訂閱：
 ## 🔍 驗證方式
 
 ### 1. 架構準確性
+
 ```bash
 # 檢查是否還有誤導性文字
 grep -r "離線優先\|離線編輯\|offline.*first" src/ --include="*.ts" --include="*.tsx"
@@ -358,6 +386,7 @@ grep -r "離線優先\|離線編輯\|offline.*first" src/ --include="*.ts" --inc
 ```
 
 ### 2. Console 清理
+
 ```bash
 # 檢查 console.log
 grep -r "console\.log" src/ --include="*.ts" --include="*.tsx" | wc -l
@@ -365,12 +394,14 @@ grep -r "console\.log" src/ --include="*.ts" --include="*.tsx" | wc -l
 ```
 
 ### 3. 循環依賴
+
 ```bash
 npx madge --circular src/
 # 結果: ✔ No circular dependency found!
 ```
 
 ### 4. Build 狀態
+
 ```bash
 npm run build
 # 結果: ✓ Compiled successfully
@@ -381,15 +412,18 @@ npm run build
 ## 📚 相關文檔
 
 ### 主要文檔
+
 - ✅ `COMPLETE_REALTIME_CACHE_LOGIC.md` - 準確的快取優先架構
 - ✅ `README.md` - 已更新核心特色描述
 - ✅ `ARCHITECTURE_CORRECTION_COMPLETE.md` - 本報告
 
 ### 過時文檔（已標記）
+
 - 🗑️ `COMPLETE_REALTIME_OFFLINE_LOGIC.md.old` - 舊的誤導文檔
 - 🗑️ `OFFLINE_FIRST_SYNC_STRATEGY.md.deprecated` - 舊的離線策略
 
 ### 核心程式碼
+
 - ✅ `src/stores/core/create-store-new.ts` - Store 工廠（已修正註釋）
 - ✅ `src/stores/operations/fetch.ts` - 快取優先載入（已修正註釋）
 - ✅ `src/stores/operations/create.ts` - FastInsert 策略（已修正註釋）
@@ -416,9 +450,11 @@ npm run build
 ## 🎉 結論
 
 ### 完成狀態
+
 **✅ 100% 完成** - 所有目標達成
 
 ### 主要成果
+
 1. ✅ **架構描述準確** - 統一為「快取優先」，移除所有「離線優先」誤導
 2. ✅ **程式碼註釋正確** - 所有核心檔案註釋已更新
 3. ✅ **Console 輸出乾淨** - 移除 31 個除錯訊息
@@ -427,6 +463,7 @@ npm run build
 6. ✅ **Build 成功** - 51 個路由全部正常編譯
 
 ### 專案狀態
+
 **🚀 準備部署** - 架構清晰、文檔準確、程式碼乾淨
 
 ---

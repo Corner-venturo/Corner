@@ -26,7 +26,11 @@ interface CostPayment extends Payment {
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
   const { items: orders } = useOrderStore()
-  const { items: paymentRequests, create: createPaymentRequest, fetchAll: fetchPaymentRequests } = usePaymentRequestStore()
+  const {
+    items: paymentRequests,
+    create: createPaymentRequest,
+    fetchAll: fetchPaymentRequests,
+  } = usePaymentRequestStore()
   const { items: suppliers } = useSupplierStore()
   const { toast } = useToast()
 
@@ -44,12 +48,12 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
       // 類別映射：英文 -> 中文
       const categoryMap: Record<string, '住宿' | '交通' | '餐食' | '門票' | '導遊' | '其他'> = {
-        'transport': '交通',
-        'accommodation': '住宿',
-        'food': '餐食',
-        'attraction': '門票',
-        'guide': '導遊',
-        'other': '其他',
+        transport: '交通',
+        accommodation: '住宿',
+        food: '餐食',
+        attraction: '門票',
+        guide: '導遊',
+        other: '其他',
       }
 
       // 建立請款單項目
@@ -146,7 +150,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         }
 
         // 顯示所有屬於這個團的請款
-        return request.tour_id === tour.id || (request.order_id && tourOrderIds.has(request.order_id))
+        return (
+          request.tour_id === tour.id || (request.order_id && tourOrderIds.has(request.order_id))
+        )
       })
       .flatMap(request =>
         // 將每個請款單的項目展開成 CostPayment 格式

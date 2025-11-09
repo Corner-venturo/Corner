@@ -2,23 +2,23 @@
  * 工作空間標題列
  */
 
-import { Filter, Settings, Plus, RefreshCw } from 'lucide-react';
+import { Filter, Settings, Plus, RefreshCw } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 
 interface WorkspaceHeaderProps {
-  workspaceName: string;
-  workspaceIcon: string;
-  channelFilter: string;
-  onFilterChange: (filter: 'all' | 'starred' | 'unread' | 'muted') => void;
-  onCreateChannel: () => void;
-  onCreateGroup: () => void;
-  onRefresh?: () => void;
-  isRefreshing?: boolean;
+  workspaceName: string
+  workspaceIcon: string
+  channelFilter: string
+  onFilterChange: (filter: 'all' | 'starred' | 'unread' | 'muted') => void
+  onCreateChannel: () => void
+  onCreateGroup: () => void
+  onRefresh?: () => void
+  isRefreshing?: boolean
 }
 
 export function WorkspaceHeader({
@@ -84,17 +84,11 @@ export function WorkspaceHeader({
               <Settings size={14} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[140px]">
-              <DropdownMenuItem
-                onClick={onCreateChannel}
-                className="dropdown-item-morandi"
-              >
+              <DropdownMenuItem onClick={onCreateChannel} className="dropdown-item-morandi">
                 <Plus size={14} className="mr-2" />
                 建立頻道
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={onCreateGroup}
-                className="dropdown-item-morandi"
-              >
+              <DropdownMenuItem onClick={onCreateGroup} className="dropdown-item-morandi">
                 <Plus size={14} className="mr-2" />
                 建立群組
               </DropdownMenuItem>
@@ -103,5 +97,5 @@ export function WorkspaceHeader({
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -9,6 +9,7 @@
 ## 問題描述
 
 在 `/itinerary/new` 頁面，當使用者：
+
 1. 從旅遊團選擇器選擇一個團號（例如：`25JFO21CIG`）
 2. 手動刪除團號欄位
 3. 團號自動還原回 `25JFO21CIG`
@@ -28,14 +29,14 @@ useEffect(() => {
   const initializeTourData = () => {
     // ... 載入 tour 資料
     setTourData({
-      tourCode: tour.code,  // ← 問題：每次都重設
+      tourCode: tour.code, // ← 問題：每次都重設
       title: tour.name,
       // ...
     })
   }
 
   initializeTourData()
-}, [tourId, tours, countries, cities])  // ← 依賴太多
+}, [tourId, tours, countries, cities]) // ← 依賴太多
 ```
 
 ### 觸發流程
@@ -129,16 +130,17 @@ useEffect(() => {
 ```typescript
 // ❌ 使用 useState（會造成額外渲染）
 const [hasInitialized, setHasInitialized] = useState(false)
-setHasInitialized(true)  // 觸發重新渲染
+setHasInitialized(true) // 觸發重新渲染
 
 // ✅ 使用 useRef（不觸發渲染）
 const hasInitializedRef = useRef(false)
-hasInitializedRef.current = true  // 不觸發渲染
+hasInitializedRef.current = true // 不觸發渲染
 ```
 
 ### useEffect 依賴陣列
 
 保留 `[tourId, tours, countries, cities]` 依賴的原因：
+
 - `tourId` 改變 → 需要載入新團號的資料 ✅
 - `tours/countries/cities` 改變 → 需要檢查是否首次載入 ✅
 - 用 `ref` 控制是否執行初始化邏輯
@@ -188,9 +190,11 @@ hasInitializedRef.current = true  // 不觸發渲染
 ## 檔案位置
 
 **修改檔案**:
+
 - `src/app/itinerary/new/page.tsx` (第 268-412 行)
 
 **相關文件**:
+
 - `docs/REGION_STORE_GUIDE.md` - Region Store 使用指南
 - `COMPLETE_REALTIME_OFFLINE_LOGIC.md` - Realtime 同步邏輯
 

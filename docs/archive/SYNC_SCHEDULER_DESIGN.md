@@ -5,16 +5,19 @@
 目前 Venturo 的同步架構存在以下問題：
 
 ### 1. 快取資料不會更新
+
 - **現象**：有 IndexedDB 快取時，直接返回舊資料，不檢查 Supabase
 - **影響**：多裝置/多人協作時，看不到其他人新增的資料
 - **受影響表格**：所有 17 個使用 `createStore` 的表格
 
 ### 2. 重複同步與連線浪費
+
 - **現象**：每個頁面獨立調度同步，無法控制總連線數
 - **影響**：可能超過 Supabase 免費版 200 連線上限
 - **風險**：高流量時觸發限流
 
 ### 3. Realtime 訂閱時機問題
+
 - **現象**：Realtime 只監聽未來變更，訂閱前的資料不會推送
 - **影響**：首次進入頁面時，舊資料＋新資料會不一致
 
@@ -49,13 +52,13 @@
 interface SyncStrategy {
   // 快取優先 + 背景驗證
   cacheFirst: {
-    maxAge: number        // 快取有效期限 (ms)
-    backgroundRefresh: boolean  // 背景更新
+    maxAge: number // 快取有效期限 (ms)
+    backgroundRefresh: boolean // 背景更新
   }
 
   // 網路優先 + 快取備援
   networkFirst: {
-    timeout: number       // 網路超時時間 (ms)
+    timeout: number // 網路超時時間 (ms)
     fallbackToCache: boolean
   }
 
@@ -71,13 +74,13 @@ interface SyncStrategy {
 const todos = await syncScheduler.fetch('todos', {
   strategy: 'cacheFirst',
   maxAge: 5 * 60 * 1000,
-  backgroundRefresh: true
+  backgroundRefresh: true,
 })
 
 // 訂單：網路優先（即時性要求高）
 const orders = await syncScheduler.fetch('orders', {
   strategy: 'networkFirst',
-  timeout: 3000
+  timeout: 3000,
 })
 ```
 
@@ -85,7 +88,7 @@ const orders = await syncScheduler.fetch('orders', {
 
 ```typescript
 class ConnectionPool {
-  private maxConnections = 50      // 全域最大連線數
+  private maxConnections = 50 // 全域最大連線數
   private activeConnections = 0
   private waitingQueue: Request[] = []
 
@@ -107,6 +110,7 @@ class ConnectionPool {
 ```
 
 **優點**：
+
 - ✅ 確保不超過 Supabase 連線上限
 - ✅ 低優先級請求自動排隊
 - ✅ 高優先級請求可插隊
@@ -122,7 +126,7 @@ class BatchRequestOptimizer {
   async batchFetch(tables: string[]): Promise<Map<string, any[]>> {
     // 使用 Supabase RPC 一次查詢多個表格
     const { data } = await supabase.rpc('batch_fetch', {
-      tables: tables.join(',')
+      tables: tables.join(','),
     })
 
     return new Map(data)
@@ -131,12 +135,13 @@ class BatchRequestOptimizer {
 ```
 
 **範例**：
+
 ```typescript
 // 同時請求 3 個表格
 const [todos, tours, quotes] = await Promise.all([
   syncScheduler.fetch('todos'),
   syncScheduler.fetch('tours'),
-  syncScheduler.fetch('quotes')
+  syncScheduler.fetch('quotes'),
 ])
 
 // 實際只發送 1 次 HTTP 請求！
@@ -148,13 +153,13 @@ const [todos, tours, quotes] = await Promise.all([
 interface CacheEntry<T> {
   data: T[]
   timestamp: number
-  hits: number          // 存取次數（用於 LRU）
-  ttl: number           // 有效期限
+  hits: number // 存取次數（用於 LRU）
+  ttl: number // 有效期限
 }
 
 class SmartCache {
   private cache = new Map<string, CacheEntry<any>>()
-  private maxSize = 100  // 最多快取 100 個表格
+  private maxSize = 100 // 最多快取 100 個表格
 
   get<T>(table: string): T[] | null {
     const entry = this.cache.get(table)
@@ -181,7 +186,7 @@ class SmartCache {
       data,
       timestamp: Date.now(),
       hits: 0,
-      ttl
+      ttl,
     })
   }
 }
@@ -221,11 +226,13 @@ class SmartCache {
 ## 效能預估
 
 ### 目前架構
+
 - 17 個表格 × 2 裝置 × 2.5 頁面 = **85 個連線**（接近上限）
 - 每次進入頁面：1-3 秒載入時間
 - 快取命中率：~30%（有快取但不檢查新資料）
 
 ### 新架構
+
 - 智慧調度後：**20-30 個連線**（大幅降低）
 - 首次載入：0.5-1 秒（快取優先）
 - 快取命中率：~80%（TTL 機制）
@@ -235,12 +242,12 @@ class SmartCache {
 
 ## 風險評估
 
-| 風險 | 影響 | 緩解措施 |
-|------|------|----------|
-| 重構導致現有功能損壞 | 高 | 分階段遷移，保留舊代碼 |
-| 快取過期導致資料不一致 | 中 | 設定合理 TTL + Realtime 補充 |
-| 連線池阻塞高優先級請求 | 中 | 優先級隊列 + 可中斷低優先級 |
-| Supabase RPC 效能問題 | 低 | 先測試，不行退回單獨請求 |
+| 風險                   | 影響 | 緩解措施                     |
+| ---------------------- | ---- | ---------------------------- |
+| 重構導致現有功能損壞   | 高   | 分階段遷移，保留舊代碼       |
+| 快取過期導致資料不一致 | 中   | 設定合理 TTL + Realtime 補充 |
+| 連線池阻塞高優先級請求 | 中   | 優先級隊列 + 可中斷低優先級  |
+| Supabase RPC 效能問題  | 低   | 先測試，不行退回單獨請求     |
 
 ---
 

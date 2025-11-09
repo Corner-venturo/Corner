@@ -26,7 +26,11 @@ export function EditorContainer({
             size="sm"
             variant={formData.type === 'accommodation' ? 'default' : 'outline'}
             onClick={() => onTypeChange('accommodation')}
-            className={formData.type === 'accommodation' ? 'bg-white text-morandi-gold hover:bg-gray-100' : 'text-white border-white hover:bg-morandi-gold-dark'}
+            className={
+              formData.type === 'accommodation'
+                ? 'bg-white text-morandi-gold hover:bg-gray-100'
+                : 'text-white border-white hover:bg-morandi-gold-dark'
+            }
           >
             住宿確認單
           </Button>
@@ -34,7 +38,11 @@ export function EditorContainer({
             size="sm"
             variant={formData.type === 'flight' ? 'default' : 'outline'}
             onClick={() => onTypeChange('flight')}
-            className={formData.type === 'flight' ? 'bg-white text-morandi-gold hover:bg-gray-100' : 'text-white border-white hover:bg-morandi-gold-dark'}
+            className={
+              formData.type === 'flight'
+                ? 'bg-white text-morandi-gold hover:bg-gray-100'
+                : 'text-white border-white hover:bg-morandi-gold-dark'
+            }
           >
             機票確認單
           </Button>

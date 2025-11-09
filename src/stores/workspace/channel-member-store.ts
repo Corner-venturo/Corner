@@ -33,10 +33,13 @@ export interface ChannelMemberBase {
  * 表格: channel_members
  * 快取策略: 全量快取 (數量不多，經常使用)
  */
-export const useChannelMemberStore = createStore<ChannelMemberBase & BaseEntity>('channel_members', {
-  cacheStrategy: 'full',
-  enableRealtime: true,
-})
+export const useChannelMemberStore = createStore<ChannelMemberBase & BaseEntity>(
+  'channel_members',
+  {
+    cacheStrategy: 'full',
+    enableRealtime: true,
+  }
+)
 
 /**
  * Hook 型別（方便使用）

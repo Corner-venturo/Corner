@@ -22,7 +22,7 @@ export function useAttractionsFilters({
   selectedCategory,
   selectedCountry,
   selectedRegion,
-  selectedCity
+  selectedCity,
 }: UseAttractionsFiltersProps) {
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)

@@ -80,8 +80,11 @@ export function AttractionsListVirtualized({
   // 渲染景點項目（簡化版，移除虛擬滾動）
   const renderAttractionItem = (attraction: Attraction) => {
     return (
-      <div key={attraction.id} className="border-b border-border hover:bg-morandi-container/20 transition-colors">
-        {(
+      <div
+        key={attraction.id}
+        className="border-b border-border hover:bg-morandi-container/20 transition-colors"
+      >
+        {
           <div className="flex items-center px-4 py-3 gap-3 hover:bg-morandi-container/20 transition-colors border-b border-border h-full">
             {/* 圖片 */}
             <div className="w-24 h-20 bg-morandi-container/30 rounded overflow-hidden flex-shrink-0">
@@ -158,7 +161,9 @@ export function AttractionsListVirtualized({
                     </span>
                   ))}
                   {attraction.tags.length > 2 && (
-                    <span className="text-xs text-morandi-secondary">+{attraction.tags.length - 2}</span>
+                    <span className="text-xs text-morandi-secondary">
+                      +{attraction.tags.length - 2}
+                    </span>
                   )}
                 </div>
               )}
@@ -207,7 +212,7 @@ export function AttractionsListVirtualized({
               </Button>
             </div>
           </div>
-        )}
+        }
       </div>
     )
   }
@@ -272,8 +277,8 @@ export function AttractionsListVirtualized({
           {/* 分頁資訊 */}
           <div className="px-4 py-2 bg-morandi-container/20 border-b text-sm text-morandi-secondary flex items-center justify-between">
             <div>
-              共 <span className="font-semibold text-morandi-gold">{sortedAttractions.length}</span> 筆景點
-              （第 {startIndex + 1}-{endIndex} 筆）
+              共 <span className="font-semibold text-morandi-gold">{sortedAttractions.length}</span>{' '}
+              筆景點 （第 {startIndex + 1}-{endIndex} 筆）
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs">

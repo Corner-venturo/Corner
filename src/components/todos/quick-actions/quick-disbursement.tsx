@@ -136,7 +136,11 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       }
     } else {
       // Batch request validation
-      if (selectedTourIds.length === 0 || requestItems.length === 0 || !batchFormData.request_date) {
+      if (
+        selectedTourIds.length === 0 ||
+        requestItems.length === 0 ||
+        !batchFormData.request_date
+      ) {
         alert('請填寫必填欄位（至少一個團體、請款日期、至少一項請款項目）')
         return
       }
@@ -250,7 +254,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           <input
             type="checkbox"
             id="isSpecialBilling"
-            checked={mode === 'single' ? formData.is_special_billing : batchFormData.is_special_billing}
+            checked={
+              mode === 'single' ? formData.is_special_billing : batchFormData.is_special_billing
+            }
             onChange={e => {
               if (mode === 'single') {
                 setFormData(prev => ({
@@ -268,10 +274,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
             }}
             className="rounded border-border"
           />
-          <label
-            htmlFor="isSpecialBilling"
-            className="text-sm text-morandi-primary cursor-pointer"
-          >
+          <label htmlFor="isSpecialBilling" className="text-sm text-morandi-primary cursor-pointer">
             特殊出帳 (可選擇任何日期)
           </label>
         </div>
@@ -327,9 +330,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">
-                類別
-              </label>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">類別</label>
               <Select
                 value={newItem.category}
                 onValueChange={value =>
@@ -385,22 +386,20 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">
-                單價
-              </label>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">單價</label>
               <Input
                 type="number"
                 value={newItem.unit_price || ''}
-                onChange={e => setNewItem(prev => ({ ...prev, unit_price: Number(e.target.value) }))}
+                onChange={e =>
+                  setNewItem(prev => ({ ...prev, unit_price: Number(e.target.value) }))
+                }
                 placeholder="0"
                 className="border-morandi-container/30"
               />
             </div>
 
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">
-                數量
-              </label>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">數量</label>
               <Input
                 type="number"
                 value={newItem.quantity || ''}
@@ -411,9 +410,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
             </div>
 
             <div>
-              <label className="text-xs font-medium text-morandi-secondary mb-1 block">
-                小計
-              </label>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">小計</label>
               <Input
                 value={`NT$ ${(newItem.unit_price * newItem.quantity).toLocaleString()}`}
                 disabled
@@ -506,7 +503,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         disabled={
           mode === 'single'
             ? !formData.tour_id || requestItems.length === 0 || !formData.request_date
-            : selectedTourIds.length === 0 || requestItems.length === 0 || !batchFormData.request_date
+            : selectedTourIds.length === 0 ||
+              requestItems.length === 0 ||
+              !batchFormData.request_date
         }
         className={cn(
           'w-full text-white',

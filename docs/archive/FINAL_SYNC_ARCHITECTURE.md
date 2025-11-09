@@ -39,23 +39,24 @@
 
 **使用情境**：經常在客戶面前/緊急情況下查詢
 
-| 表格 | 用途 | 預估大小 | 快取策略 |
-|------|------|---------|---------|
-| tours | 旅遊團 | 2.5 MB | 全量 |
-| quotes | 報價單 | 3 MB | 全量 |
-| customers | 客戶資料 | 4 MB | 全量 |
-| orders | 訂單 | 6 MB | 全量 |
-| suppliers | 供應商/飯店 | 0.6 MB | 全量 |
-| calendar_events | 行事曆 | 0.5 MB | 全量 |
-| itineraries | 行程詳情 | 10 MB | 全量 |
-| members | 團員名單 | 1 MB | 全量 |
-| employees | 員工資料 | 1 MB | 全量 |
-| **小計** | - | **~29 MB** | ✅ |
+| 表格            | 用途        | 預估大小   | 快取策略 |
+| --------------- | ----------- | ---------- | -------- |
+| tours           | 旅遊團      | 2.5 MB     | 全量     |
+| quotes          | 報價單      | 3 MB       | 全量     |
+| customers       | 客戶資料    | 4 MB       | 全量     |
+| orders          | 訂單        | 6 MB       | 全量     |
+| suppliers       | 供應商/飯店 | 0.6 MB     | 全量     |
+| calendar_events | 行事曆      | 0.5 MB     | 全量     |
+| itineraries     | 行程詳情    | 10 MB      | 全量     |
+| members         | 團員名單    | 1 MB       | 全量     |
+| employees       | 員工資料    | 1 MB       | 全量     |
+| **小計**        | -           | **~29 MB** | ✅       |
 
 **實作**：
+
 ```typescript
 export const useTourStore = createStore<Tour>('tours', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 ```
 
@@ -65,32 +66,33 @@ export const useTourStore = createStore<Tour>('tours', {
 
 **使用情境**：自己查歷史紀錄，不會在客戶面前看
 
-| 表格 | 用途 | 快取範圍 | 預估大小 |
-|------|------|---------|---------|
-| messages | 聊天訊息 | 最近 1000 則 | 5 MB |
-| financial_reports | 財務報表 | 最近 6 個月 | 3 MB |
-| disbursements | 請款單 | 最近 6 個月 | 5 MB |
-| receipt_orders | 收款單 | 最近 6 個月 | 5 MB |
-| payment_requests | 付款請求 | 最近 3 個月 | 3 MB |
-| todos | 待辦事項 | 未完成 + 最近 100 則 | 1 MB |
-| **小計** | - | - | **~22 MB** |
+| 表格              | 用途     | 快取範圍             | 預估大小   |
+| ----------------- | -------- | -------------------- | ---------- |
+| messages          | 聊天訊息 | 最近 1000 則         | 5 MB       |
+| financial_reports | 財務報表 | 最近 6 個月          | 3 MB       |
+| disbursements     | 請款單   | 最近 6 個月          | 5 MB       |
+| receipt_orders    | 收款單   | 最近 6 個月          | 5 MB       |
+| payment_requests  | 付款請求 | 最近 3 個月          | 3 MB       |
+| todos             | 待辦事項 | 未完成 + 最近 100 則 | 1 MB       |
+| **小計**          | -        | -                    | **~22 MB** |
 
 **實作**：
+
 ```typescript
 export const useMessageStore = createStore<Message>('messages', {
   cacheStrategy: 'time_range',
   cacheConfig: {
     limit: 1000,
     sortBy: 'created_at',
-    order: 'desc'
-  }
+    order: 'desc',
+  },
 })
 
 export const useFinancialReportStore = createStore<Report>('financial_reports', {
   cacheStrategy: 'time_range',
   cacheConfig: {
-    months: 6
-  }
+    months: 6,
+  },
 })
 ```
 
@@ -100,25 +102,27 @@ export const useFinancialReportStore = createStore<Report>('financial_reports', 
 
 **使用情境**：資料量巨大，只快取瀏覽過的
 
-| 表格 | 用途 | 快取策略 | 預估大小 |
-|------|------|---------|---------|
-| spots | 景點管理 | 分頁快取（每頁 20 筆）| ~10 MB |
-| regions | 地區管理 | 分頁快取（每頁 50 筆）| ~5 MB |
-| images | 景點圖片 | 縮圖快取（原圖不快取）| ~10 MB |
-| **小計** | - | - | **~25 MB** |
+| 表格     | 用途     | 快取策略               | 預估大小   |
+| -------- | -------- | ---------------------- | ---------- |
+| spots    | 景點管理 | 分頁快取（每頁 20 筆） | ~10 MB     |
+| regions  | 地區管理 | 分頁快取（每頁 50 筆） | ~5 MB      |
+| images   | 景點圖片 | 縮圖快取（原圖不快取） | ~10 MB     |
+| **小計** | -        | -                      | **~25 MB** |
 
 **實作**：
+
 ```typescript
 export const useSpotStore = createStore<Spot>('spots', {
   cacheStrategy: 'paginated',
   cacheConfig: {
     pageSize: 20,
-    preloadPages: 1 // 預載下一頁
-  }
+    preloadPages: 1, // 預載下一頁
+  },
 })
 ```
 
 **圖片處理**：
+
 ```typescript
 // 只快取縮圖，原圖按需下載
 <img
@@ -238,12 +242,10 @@ export const useSpotStore = createStore<Spot>('spots', {
 if (localItem._needs_sync && !remoteItem.updated_at) {
   // 本地有未同步的修改，上傳
   await supabase.update(localItem)
-}
-else if (remoteItem.updated_at > localItem.updated_at) {
+} else if (remoteItem.updated_at > localItem.updated_at) {
   // 遠端更新，下載
   await indexedDB.put(remoteItem)
-}
-else {
+} else {
   // 本地較新，上傳
   await supabase.update(localItem)
 }
@@ -265,8 +267,8 @@ if (detectConflict(localItem, remoteItem)) {
     message: '本地和遠端資料不一致，要使用哪個版本？',
     options: [
       { label: '使用本地版本', value: 'local' },
-      { label: '使用遠端版本', value: 'remote' }
-    ]
+      { label: '使用遠端版本', value: 'remote' },
+    ],
   })
 
   if (choice === 'local') {
@@ -310,19 +312,19 @@ src/stores/
 
 // 第一層：全量快取
 export const useTourStore = createStore<Tour>('tours', {
-  cacheStrategy: 'full'
+  cacheStrategy: 'full',
 })
 
 // 第二層：時間範圍快取
 export const useMessageStore = createStore<Message>('messages', {
   cacheStrategy: 'time_range',
-  cacheConfig: { limit: 1000 }
+  cacheConfig: { limit: 1000 },
 })
 
 // 第三層：分頁快取
 export const useSpotStore = createStore<Spot>('spots', {
   cacheStrategy: 'paginated',
-  cacheConfig: { pageSize: 20 }
+  cacheConfig: { pageSize: 20 },
 })
 ```
 
@@ -347,7 +349,7 @@ function createStore<T extends BaseEntity>(
     }
 
     // Realtime 訂閱
-    enableRealtime?: boolean  // 預設 true
+    enableRealtime?: boolean // 預設 true
 
     // 其他選項
     idPrefix?: string
@@ -361,14 +363,14 @@ function createStore<T extends BaseEntity>(
 
 ### 目標
 
-| 指標 | 目標值 | 實際預期 |
-|------|--------|---------|
-| 首次載入（有快取）| < 0.2 秒 | 0.1 秒 ✅ |
-| 首次載入（無快取）| < 2 秒 | 1-2 秒 ✅ |
-| 頁面切換 | < 0.1 秒 | 0.05 秒 ✅ |
-| 背景同步 | 不阻擋 UI | ✅ |
-| 儲存空間 | < 100 MB | 81 MB ✅ |
-| 離線可用性 | > 90% 資料 | ~95% ✅ |
+| 指標               | 目標值     | 實際預期   |
+| ------------------ | ---------- | ---------- |
+| 首次載入（有快取） | < 0.2 秒   | 0.1 秒 ✅  |
+| 首次載入（無快取） | < 2 秒     | 1-2 秒 ✅  |
+| 頁面切換           | < 0.1 秒   | 0.05 秒 ✅ |
+| 背景同步           | 不阻擋 UI  | ✅         |
+| 儲存空間           | < 100 MB   | 81 MB ✅   |
+| 離線可用性         | > 90% 資料 | ~95% ✅    |
 
 ### 連線數管理
 
@@ -399,6 +401,7 @@ function createStore<T extends BaseEntity>(
 5. ✅ 推送通知（可選）
 
 **只需額外做**：
+
 - [ ] 添加 manifest.json
 - [ ] 註冊 Service Worker
 - [ ] 圖示和啟動畫面
@@ -494,6 +497,7 @@ function createStore<T extends BaseEntity>(
 - ✅ 常理來說不會再修改
 
 **除非**：
+
 - 使用者行為大幅改變（如改為完全離線工作）
 - Supabase 政策變更（如連線數限制調整）
 - 法規要求（如資料必須本地儲存）

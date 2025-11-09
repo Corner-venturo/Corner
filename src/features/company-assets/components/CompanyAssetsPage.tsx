@@ -10,7 +10,11 @@ import { Input } from '@/components/ui/input'
 import { Upload, Trash2, Download, Eye, Search } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { CompanyAsset, CompanyAssetCategory, COMPANY_ASSET_CATEGORY_LABELS } from '@/types/company-asset.types'
+import {
+  CompanyAsset,
+  CompanyAssetCategory,
+  COMPANY_ASSET_CATEGORY_LABELS,
+} from '@/types/company-asset.types'
 import { cn } from '@/lib/utils'
 
 export const CompanyAssetsPage: React.FC = () => {
@@ -100,10 +104,7 @@ export const CompanyAssetsPage: React.FC = () => {
       if (storageError) throw storageError
 
       // 從資料表刪除
-      const { error: dbError } = await supabase
-        .from('company_assets')
-        .delete()
-        .eq('id', asset.id)
+      const { error: dbError } = await supabase.from('company_assets').delete().eq('id', asset.id)
 
       if (dbError) throw dbError
 
@@ -117,18 +118,14 @@ export const CompanyAssetsPage: React.FC = () => {
 
   // 預覽檔案
   const handlePreview = (asset: CompanyAsset) => {
-    const { data } = supabase.storage
-      .from('company-assets')
-      .getPublicUrl(asset.file_path)
+    const { data } = supabase.storage.from('company-assets').getPublicUrl(asset.file_path)
 
     setPreviewUrl(data.publicUrl)
   }
 
   // 下載檔案
   const handleDownload = async (asset: CompanyAsset) => {
-    const { data } = supabase.storage
-      .from('company-assets')
-      .getPublicUrl(asset.file_path)
+    const { data } = supabase.storage.from('company-assets').getPublicUrl(asset.file_path)
 
     window.open(data.publicUrl, '_blank')
   }
@@ -217,9 +214,7 @@ export const CompanyAssetsPage: React.FC = () => {
       {/* 檔案列表 */}
       <div className="grid grid-cols-4 gap-4">
         {filteredAssets.map(asset => {
-          const { data } = supabase.storage
-            .from('company-assets')
-            .getPublicUrl(asset.file_path)
+          const { data } = supabase.storage.from('company-assets').getPublicUrl(asset.file_path)
 
           return (
             <div

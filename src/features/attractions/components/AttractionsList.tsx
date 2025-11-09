@@ -97,9 +97,7 @@ export function AttractionsList({
       sortable: false,
       render: (_: any, attraction: Attraction) => (
         <div className="min-w-[200px] text-sm text-morandi-secondary">
-          <p className="line-clamp-2 leading-relaxed">
-            {attraction.description || '暫無簡介'}
-          </p>
+          <p className="line-clamp-2 leading-relaxed">{attraction.description || '暫無簡介'}</p>
         </div>
       ),
     },
@@ -187,9 +185,7 @@ export function AttractionsList({
           >
             <Power
               size={14}
-              className={
-                attraction.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
-              }
+              className={attraction.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
             />
           </Button>
           <Button

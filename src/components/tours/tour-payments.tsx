@@ -47,10 +47,10 @@ export const TourPayments = React.memo(function TourPayments({
 
       // 轉換付款方式為 ReceiptType
       const receiptTypeMap: Record<string, ReceiptType> = {
-        'bank_transfer': 0, // 匯款
-        'cash': 1,          // 現金
-        'credit_card': 2,   // 刷卡
-        'check': 3,         // 支票
+        bank_transfer: 0, // 匯款
+        cash: 1, // 現金
+        credit_card: 2, // 刷卡
+        check: 3, // 支票
       }
 
       const receiptData: Partial<Receipt> = {
@@ -131,7 +131,9 @@ export const TourPayments = React.memo(function TourPayments({
         amount: receipt.actual_amount,
         description: receipt.note || '',
         status: receipt.status === 1 ? 'confirmed' : 'pending',
-        method: ['bank_transfer', 'cash', 'credit_card', 'check', 'linkpay'][receipt.receipt_type] || 'bank_transfer',
+        method:
+          ['bank_transfer', 'cash', 'credit_card', 'check', 'linkpay'][receipt.receipt_type] ||
+          'bank_transfer',
         created_at: receipt.created_at,
       })) as ReceiptPayment[]
   }, [receipts, tourOrders, tour.id, orderFilter])

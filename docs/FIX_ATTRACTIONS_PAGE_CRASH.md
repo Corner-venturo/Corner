@@ -10,6 +10,7 @@
 ## 🚨 問題診斷
 
 ### 實際資料量
+
 ```
 📊 資料庫實際數量（截至 2025-11-01）：
   📍 景點：375 筆 ← 問題根源！
@@ -19,11 +20,12 @@
 ```
 
 ### 當機原因
+
 ```javascript
 // ❌ 問題代碼
-{sortedAttractions.map(attraction => (
-  <AttractionRow key={attraction.id} attraction={attraction} />
-))}
+{
+  sortedAttractions.map(attraction => <AttractionRow key={attraction.id} attraction={attraction} />)
+}
 
 // 結果：
 // - 375 個 DOM 元素同時渲染
@@ -32,6 +34,7 @@
 ```
 
 ### 效能瓶頸
+
 1. **DOM 元素過多**: 375 × 平均 15 個子元素 = 5,625+ DOM 節點
 2. **圖片全部載入**: 375 張圖片同時請求
 3. **無虛擬化**: 即使不在視窗內的元素也渲染
@@ -44,6 +47,7 @@
 ### 方案設計：虛擬滾動 + 分頁
 
 #### 1. 分頁系統
+
 ```typescript
 const ITEMS_PER_PAGE = 50 // 每頁顯示 50 筆
 const totalPages = Math.ceil(375 / 50) // = 8 頁
@@ -55,6 +59,7 @@ const totalPages = Math.ceil(375 / 50) // = 8 頁
 ```
 
 #### 2. 虛擬滾動
+
 ```typescript
 const ITEM_HEIGHT = 100 // 每個項目 100px 高
 const BUFFER_SIZE = 10 // 上下各緩衝 10 個項目
@@ -70,6 +75,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ```
 
 #### 3. 懶加載圖片
+
 ```typescript
 <img loading="lazy" /> // 瀏覽器原生懶加載
 
@@ -84,13 +90,13 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 
 ### 修復前 vs 修復後
 
-| 指標 | 修復前 | 修復後 | 改善 |
-|------|--------|--------|------|
-| **初始渲染 DOM 數** | 5,625+ | ~500 | **↓ 91%** |
-| **記憶體使用** | ~800MB | ~70MB | **↓ 91%** |
-| **初始載入時間** | 15-20秒（當機） | <1秒 | **↓ 95%** |
-| **滾動 FPS** | 0（當機） | 60 FPS | **✅ 流暢** |
-| **圖片同時載入數** | 375 張 | 10-15 張 | **↓ 96%** |
+| 指標                | 修復前          | 修復後   | 改善        |
+| ------------------- | --------------- | -------- | ----------- |
+| **初始渲染 DOM 數** | 5,625+          | ~500     | **↓ 91%**   |
+| **記憶體使用**      | ~800MB          | ~70MB    | **↓ 91%**   |
+| **初始載入時間**    | 15-20秒（當機） | <1秒     | **↓ 95%**   |
+| **滾動 FPS**        | 0（當機）       | 60 FPS   | **✅ 流暢** |
+| **圖片同時載入數**  | 375 張          | 10-15 張 | **↓ 96%**   |
 
 ---
 
@@ -99,6 +105,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ### 新增檔案
 
 **src/features/attractions/components/AttractionsListVirtualized.tsx**
+
 ```typescript
 // 核心特性：
 1. 虛擬滾動容器
@@ -120,6 +127,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ### 修改檔案
 
 **src/features/attractions/components/AttractionsPage.tsx**
+
 ```typescript
 // 變更：
 - import { AttractionsList } from './AttractionsList'
@@ -134,6 +142,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ## 🎯 使用說明
 
 ### 分頁操作
+
 ```
 1. 底部分頁控制：
    [上一頁] [1] [2] [3] [4] [5] [6] [7] [下一頁]
@@ -148,6 +157,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ```
 
 ### 虛擬滾動
+
 ```
 ✅ 自動運作，無需手動操作
 ✅ 滑動時自動載入/卸載元素
@@ -159,6 +169,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ## 📈 可擴展性
 
 ### 未來資料增長
+
 ```
 當前：375 筆景點
 可支援：10,000+ 筆景點
@@ -170,6 +181,7 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ```
 
 ### 類似頁面應用
+
 ```
 可套用到：
 📍 景點管理（已套用）
@@ -185,12 +197,14 @@ const bufferedItems = visibleItems + 上下緩衝（約 30-35 個）
 ## 🔍 相關問題修復
 
 ### 同類型問題
+
 1. **行程管理頁面** - 已修復（docs/FIX_ITINERARY_CRASH.md）
 2. **景點管理頁面** - 本次修復 ✅
 3. **米其林餐廳頁面** - 目前資料少（26筆），暫無問題
 4. **頂級體驗頁面** - 目前資料少（27筆），暫無問題
 
 ### 預防措施
+
 ```typescript
 // 未來新頁面建議使用虛擬滾動的標準：
 if (資料筆數 > 100) {
@@ -207,6 +221,7 @@ if (資料筆數 > 100) {
 ## ✅ 驗證測試
 
 ### 測試項目
+
 - [x] 頁面可正常開啟（不當機）
 - [x] 分頁功能正常
 - [x] 滾動流暢（60 FPS）
@@ -218,6 +233,7 @@ if (資料筆數 > 100) {
 - [x] 建置成功無錯誤
 
 ### 測試環境
+
 - Chrome 最新版 ✅
 - Safari ✅
 - Firefox ✅
@@ -239,9 +255,11 @@ if (資料筆數 > 100) {
 ## 📝 技術文檔參考
 
 相關修復文檔：
+
 - `docs/FIX_ITINERARY_CRASH.md` - 行程管理當機修復
 - `docs/WORKSPACE_PERFORMANCE_FIX.md` - Workspace 虛擬滾動實作
 
 虛擬滾動實作參考：
+
 - `src/components/workspace/chat/MessageList.tsx` - 訊息列表虛擬滾動
 - `src/features/attractions/components/AttractionsListVirtualized.tsx` - 景點列表虛擬滾動

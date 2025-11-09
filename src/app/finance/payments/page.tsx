@@ -9,69 +9,64 @@
  * 5. Realtime 即時同步
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Button } from '@/components/ui/button';
-import { EnhancedTable } from '@/components/ui/enhanced-table';
-import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { Plus } from 'lucide-react'
 
 // Realtime Hooks
 import {
   useRealtimeForOrders,
   useRealtimeForReceipts,
-  useRealtimeForLinkPayLogs
-} from '@/hooks/use-realtime-hooks';
+  useRealtimeForLinkPayLogs,
+} from '@/hooks/use-realtime-hooks'
 
 // Components
-import { createPaymentColumns, CreateReceiptDialog } from './components';
+import { createPaymentColumns, CreateReceiptDialog } from './components'
 
 // Hooks
-import { usePaymentData } from './hooks/usePaymentData';
+import { usePaymentData } from './hooks/usePaymentData'
 
 // Types
-import type { Receipt } from '@/stores';
+import type { Receipt } from '@/stores'
 
 export default function PaymentsPage() {
   // Realtime 訂閱
-  useRealtimeForOrders();
-  useRealtimeForReceipts();
-  useRealtimeForLinkPayLogs();
+  useRealtimeForOrders()
+  useRealtimeForReceipts()
+  useRealtimeForLinkPayLogs()
 
   // 資料與業務邏輯
-  const {
-    receipts,
-    availableOrders,
-    fetchReceipts,
-    handleCreateReceipt,
-  } = usePaymentData();
+  const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
 
   // UI 狀態
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // 初始化載入資料
   useEffect(() => {
-    fetchReceipts();
-  }, [fetchReceipts]);
+    fetchReceipts()
+  }, [fetchReceipts])
 
   // 事件處理
   const handleViewDetail = (receipt: Receipt) => {
-    alert(`查看收款單 ${receipt.receipt_number}`);
-  };
+    alert(`查看收款單 ${receipt.receipt_number}`)
+  }
 
   const handleSubmit = async (data: any) => {
     try {
-      await handleCreateReceipt(data);
-      setIsDialogOpen(false);
+      await handleCreateReceipt(data)
+      setIsDialogOpen(false)
     } catch (error) {
-      console.error('建立收款單失敗:', error);
-      alert('建立收款單失敗');
+      console.error('建立收款單失敗:', error)
+      alert('建立收款單失敗')
     }
-  };
+  }
 
   // 表格欄位
-  const columns = createPaymentColumns(handleViewDetail);
+  const columns = createPaymentColumns(handleViewDetail)
 
   return (
     <div className="h-full flex flex-col">
@@ -107,5 +102,5 @@ export default function PaymentsPage() {
         onSubmit={handleSubmit}
       />
     </div>
-  );
+  )
 }

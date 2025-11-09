@@ -74,25 +74,30 @@ export const useRegionsStore = () => {
 ## 📋 可用方法
 
 ### 資料
+
 - `countries: Country[]` - 所有國家
 - `regions: Region[]` - 所有地區
 - `cities: City[]` - 所有城市
 - `stats: Record<string, RegionStats>` - 統計資料
 
 ### 狀態
+
 - `loading: boolean` - 任一 store 在載入中
 - `error: string | null` - 錯誤訊息
 
 ### 載入方法
+
 - `fetchAll(): Promise<void>` - 載入所有資料
 - `fetchStats(): Promise<void>` - 載入統計資料
 
 ### CRUD 方法
+
 - `createCountry(data)` / `updateCountry(id, data)` / `deleteCountry(id)`
 - `createRegion(data)` / `updateRegion(id, data)` / `deleteRegion(id)`
 - `createCity(data)` / `updateCity(id, data)` / `deleteCity(id)`
 
 ### 查詢方法
+
 - `getCountry(id)` - 根據 ID 取得國家
 - `getRegionsByCountry(countryId)` - 取得國家的所有地區
 - `getCitiesByCountry(countryId)` - 取得國家的所有城市
@@ -104,11 +109,13 @@ export const useRegionsStore = () => {
 ## 🐛 已知問題與修復歷史
 
 ### 2025-11-01: 無限迴圈問題
+
 **問題**: `fetchAll` 每次呼叫都是新的函數引用，導致 `useEffect` 無限觸發
 
 **修復**: 使用 `useCallback` 和 `useMemo` 穩定所有方法引用
 
 **影響檔案**:
+
 - `src/stores/region-store.ts` - 重構 hook
 - `src/components/editor/tour-form/hooks/useRegionData.ts` - 恢復依賴
 - `src/app/itinerary/new/page.tsx` - 修正 import 名稱

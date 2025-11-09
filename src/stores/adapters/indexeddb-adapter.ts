@@ -82,7 +82,6 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
     let successCount = 0
     let failCount = 0
 
-
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize)
 

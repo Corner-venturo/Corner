@@ -647,13 +647,13 @@ async function seedData() {
   console.log(`\n頂級體驗：${experiencesSuccess}/${premiumExperiences.length}\n`)
 
   // 總結
-  console.log('=' .repeat(60))
+  console.log('='.repeat(60))
   console.log('🎉 資料匯入總結：')
   console.log(`  📍 景點：${attractionsSuccess}/${attractions.length}`)
   console.log(`  ⭐ 米其林餐廳：${restaurantsSuccess}/${michelinRestaurants.length}`)
   console.log(`  ✨ 頂級體驗：${experiencesSuccess}/${premiumExperiences.length}`)
   console.log(`  📊 總計成功：${attractionsSuccess + restaurantsSuccess + experiencesSuccess} 筆`)
-  console.log('=' .repeat(60))
+  console.log('='.repeat(60))
 }
 
 seedData()

@@ -10,6 +10,7 @@
 ## 問題描述
 
 ### 用戶回報
+
 > "剛剛點進去景點管理好像還是有點問題誒～～ 又當機了"
 
 ### 根本原因
@@ -17,11 +18,15 @@
 雖然組件名稱為 `AttractionsListVirtualized`，但實際上**並未真正實現虛擬滾動**。
 
 **錯誤的實作方式**（第 325 行）：
+
 ```typescript
-{currentPageData.map((attraction, index) => renderAttractionItem(attraction, index))}
+{
+  currentPageData.map((attraction, index) => renderAttractionItem(attraction, index))
+}
 ```
 
 這段代碼的問題：
+
 1. ❌ 渲染**所有** 50 個項目（每頁 50 筆）
 2. ❌ 使用 `opacity: 0` 隱藏不可見項目
 3. ❌ 所有 50 個項目的 DOM 節點仍然被創建
@@ -38,11 +43,13 @@
 ### 1. 減少初始渲染數量
 
 **修改前**（第 44 行）：
+
 ```typescript
 const [visibleRange, setVisibleRange] = useState({ start: 0, end: ITEMS_PER_PAGE }) // 50 items
 ```
 
 **修改後**：
+
 ```typescript
 const [visibleRange, setVisibleRange] = useState({ start: 0, end: 20 }) // 只渲染 20 個
 ```
@@ -52,6 +59,7 @@ const [visibleRange, setVisibleRange] = useState({ start: 0, end: 20 }) // 只�
 ### 2. 改進滾動處理邏輯
 
 **修改前**（第 53-66 行）：
+
 ```typescript
 const handleScroll = useCallback(() => {
   if (!containerRef.current) return
@@ -66,6 +74,7 @@ const handleScroll = useCallback(() => {
 ```
 
 **修改後**：
+
 ```typescript
 const handleScroll = useCallback(() => {
   if (!containerRef.current) return
@@ -74,16 +83,14 @@ const handleScroll = useCallback(() => {
   const containerHeight = containerRef.current.clientHeight
   const start = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - BUFFER_SIZE)
   const visibleCount = Math.ceil(containerHeight / ITEM_HEIGHT)
-  const end = Math.min(
-    currentPageData.length,
-    start + visibleCount + BUFFER_SIZE * 2
-  )
+  const end = Math.min(currentPageData.length, start + visibleCount + BUFFER_SIZE * 2)
 
   setVisibleRange({ start, end })
 }, [currentPageData.length])
 ```
 
 **改進點**：
+
 - ✅ 根據容器實際高度計算可見項目數量
 - ✅ 更精確的結束索引計算
 - ✅ 緩衝區大小更合理（上下各 10 個項目）
@@ -93,6 +100,7 @@ const handleScroll = useCallback(() => {
 ### 3. 簡化渲染函數
 
 **修改前**（第 100-111 行）：
+
 ```typescript
 const renderAttractionItem = (attraction: Attraction, index: number) => {
   const isVisible = index >= visibleRange.start && index < visibleRange.end
@@ -110,6 +118,7 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ```
 
 **修改後**：
+
 ```typescript
 const renderAttractionItem = (attraction: Attraction, index: number) => {
   return (
@@ -127,6 +136,7 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ```
 
 **改進點**：
+
 - ✅ 移除不必要的 `isVisible` 檢查（因為已經在外層過濾）
 - ✅ 移除 `opacity-0` 樣式（不再需要隱藏）
 - ✅ 簡化類名和邏輯
@@ -136,22 +146,28 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ### 4. 核心修復：只渲染可見項目 ⭐
 
 **修改前**（第 325 行）：
+
 ```typescript
-{currentPageData.map((attraction, index) => renderAttractionItem(attraction, index))}
+{
+  currentPageData.map((attraction, index) => renderAttractionItem(attraction, index))
+}
 ```
+
 **問題**：渲染全部 50 個項目！
 
 **修改後**（第 325-330 行）：
+
 ```typescript
-{currentPageData
-  .slice(visibleRange.start, visibleRange.end)
-  .map((attraction, i) => {
+{
+  currentPageData.slice(visibleRange.start, visibleRange.end).map((attraction, i) => {
     const actualIndex = visibleRange.start + i
     return renderAttractionItem(attraction, actualIndex)
-  })}
+  })
+}
 ```
 
 **改進點**：
+
 - ✅ 使用 `.slice()` 只取可見範圍的資料
 - ✅ 只渲染 20-30 個項目（取決於視窗高度）
 - ✅ 計算正確的絕對索引用於定位
@@ -162,6 +178,7 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ## 效能提升
 
 ### 修復前
+
 ```
 頁面載入：50 個項目 × 每個 6+ 個子元素 = 300+ DOM 節點
 滾動時：持續維持 300+ DOM 節點
@@ -169,6 +186,7 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ```
 
 ### 修復後
+
 ```
 頁面載入：20 個項目 × 每個 6+ 個子元素 = 120 DOM 節點
 滾動時：動態渲染 20-30 個項目
@@ -176,6 +194,7 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ```
 
 **效能改善**：
+
 - 📉 DOM 節點數量減少 **60%**
 - ⚡ 初始載入時間減少 **50%+**
 - 🚀 滾動效能提升 **3-4 倍**
@@ -209,12 +228,15 @@ const renderAttractionItem = (attraction: Attraction, index: number) => {
 ## 驗證結果
 
 ### 建置測試
+
 ```bash
 npm run build
 ```
+
 ✅ 編譯成功，無 TypeScript 錯誤
 
 ### 功能測試
+
 1. ✅ 頁面載入正常（375 筆資料）
 2. ✅ 滾動流暢無卡頓
 3. ✅ 分頁切換正常
@@ -227,13 +249,15 @@ npm run build
 ## 技術細節
 
 ### 虛擬滾動參數
+
 ```typescript
-const ITEM_HEIGHT = 100      // 每個項目高度（px）
-const ITEMS_PER_PAGE = 50    // 每頁顯示數量
-const BUFFER_SIZE = 10       // 緩衝區大小
+const ITEM_HEIGHT = 100 // 每個項目高度（px）
+const ITEMS_PER_PAGE = 50 // 每頁顯示數量
+const BUFFER_SIZE = 10 // 緩衝區大小
 ```
 
 ### 可見範圍計算
+
 ```typescript
 // 開始索引 = 當前滾動位置 / 項目高度 - 緩衝區
 const start = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - BUFFER_SIZE)
@@ -242,13 +266,11 @@ const start = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - BUFFER_SIZE)
 const visibleCount = Math.ceil(containerHeight / ITEM_HEIGHT)
 
 // 結束索引 = 開始索引 + 可見數量 + 雙倍緩衝區
-const end = Math.min(
-  currentPageData.length,
-  start + visibleCount + BUFFER_SIZE * 2
-)
+const end = Math.min(currentPageData.length, start + visibleCount + BUFFER_SIZE * 2)
 ```
 
 ### 絕對定位系統
+
 ```typescript
 <div
   style={{
@@ -257,6 +279,7 @@ const end = Math.min(
   }}
 >
 ```
+
 - 每個項目使用絕對定位
 - 高度固定為 100px
 - 位置根據索引計算（index × 100px）

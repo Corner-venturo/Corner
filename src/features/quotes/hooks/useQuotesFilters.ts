@@ -14,7 +14,12 @@ interface UseQuotesFiltersParams {
   authorFilter?: string
 }
 
-export const useQuotesFilters = ({ quotes, statusFilter, searchTerm, authorFilter }: UseQuotesFiltersParams) => {
+export const useQuotesFilters = ({
+  quotes,
+  statusFilter,
+  searchTerm,
+  authorFilter,
+}: UseQuotesFiltersParams) => {
   const filteredQuotes = useMemo(() => {
     return (
       quotes

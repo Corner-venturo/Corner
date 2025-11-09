@@ -3,11 +3,11 @@
  */
 
 interface CreateGroupDialogProps {
-  isOpen: boolean;
-  groupName: string;
-  onGroupNameChange: (name: string) => void;
-  onClose: () => void;
-  onCreate: () => void;
+  isOpen: boolean
+  groupName: string
+  onGroupNameChange: (name: string) => void
+  onClose: () => void
+  onCreate: () => void
 }
 
 export function CreateGroupDialog({
@@ -17,7 +17,7 @@ export function CreateGroupDialog({
   onClose,
   onCreate,
 }: CreateGroupDialogProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-50">
@@ -33,20 +33,14 @@ export function CreateGroupDialog({
           className="input-morandi"
         />
         <div className="flex gap-2 mt-3 justify-end">
-          <button
-            className="btn-morandi-secondary !py-1.5 !px-3 text-sm"
-            onClick={onClose}
-          >
+          <button className="btn-morandi-secondary !py-1.5 !px-3 text-sm" onClick={onClose}>
             取消
           </button>
-          <button
-            className="btn-morandi-primary !py-1.5 !px-3 text-sm"
-            onClick={onCreate}
-          >
+          <button className="btn-morandi-primary !py-1.5 !px-3 text-sm" onClick={onCreate}>
             建立
           </button>
         </div>
       </div>
     </div>
-  );
+  )
 }

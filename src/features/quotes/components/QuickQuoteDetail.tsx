@@ -331,7 +331,9 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                       onChange={e => {
                         let val = e.target.value
                         // 全形轉半形
-                        val = val.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+                        val = val.replace(/[０-９]/g, s =>
+                          String.fromCharCode(s.charCodeAt(0) - 0xfee0)
+                        )
                         val = val.replace(/[．]/g, '.')
                         val = val.replace(/[－]/g, '-')
 
@@ -364,7 +366,9 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                       onChange={e => {
                         let val = e.target.value
                         // 全形轉半形
-                        val = val.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+                        val = val.replace(/[０-９]/g, s =>
+                          String.fromCharCode(s.charCodeAt(0) - 0xfee0)
+                        )
                         val = val.replace(/[．]/g, '.')
                         val = val.replace(/[－]/g, '-')
 
@@ -456,7 +460,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                 onChange={e => {
                   let val = e.target.value
                   // 全形轉半形
-                  val = val.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+                  val = val.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
                   val = val.replace(/[．]/g, '.')
                   val = val.replace(/[－]/g, '-')
 

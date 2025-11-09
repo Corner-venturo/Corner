@@ -30,14 +30,14 @@ export const ConfirmationsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const confirmations = useConfirmationStore((state) => state.items)
-  const createItem = useConfirmationStore((state) => state.createItem)
-  const deleteItem = useConfirmationStore((state) => state.deleteItem)
-  const currentWorkspace = useUserStore((state) => state.currentWorkspace)
-  const currentUser = useUserStore((state) => state.user)
+  const confirmations = useConfirmationStore(state => state.items)
+  const createItem = useConfirmationStore(state => state.createItem)
+  const deleteItem = useConfirmationStore(state => state.deleteItem)
+  const currentWorkspace = useUserStore(state => state.currentWorkspace)
+  const currentUser = useUserStore(state => state.user)
 
   // 過濾確認單
-  const filteredConfirmations = confirmations.filter((conf) => {
+  const filteredConfirmations = confirmations.filter(conf => {
     const matchesSearch =
       conf.booking_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       conf.confirmation_number?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -88,7 +88,7 @@ export const ConfirmationsPage: React.FC = () => {
           { label: '首頁', href: '/' },
           { label: '確認單管理', href: '/confirmations' },
         ]}
-        tabs={STATUS_FILTERS.map((f) => ({
+        tabs={STATUS_FILTERS.map(f => ({
           value: f.value,
           label: f.label,
           icon: f.icon,

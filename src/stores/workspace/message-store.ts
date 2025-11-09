@@ -11,9 +11,10 @@ import type { BaseEntity } from '@/types'
 /**
  * Message 擴展型別（符合 BaseEntity）
  */
-type MessageEntity = Omit<Message, 'edited_at'> & Pick<BaseEntity, 'updated_at'> & {
-  edited_at?: string
-}
+type MessageEntity = Omit<Message, 'edited_at'> &
+  Pick<BaseEntity, 'updated_at'> & {
+    edited_at?: string
+  }
 
 /**
  * Message Store

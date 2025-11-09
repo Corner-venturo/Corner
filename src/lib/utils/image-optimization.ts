@@ -41,7 +41,10 @@ interface SupabaseImageTransform {
  * @param options - 優化選項
  * @returns 優化後的 URL
  */
-export function getOptimizedImageUrl(url: string | null | undefined, options: ImageOptimizationOptions = {}): string {
+export function getOptimizedImageUrl(
+  url: string | null | undefined,
+  options: ImageOptimizationOptions = {}
+): string {
   // 如果沒有 URL，返回佔位圖
   if (!url) {
     return getPlaceholderImage(options.width, options.height)
@@ -53,19 +56,16 @@ export function getOptimizedImageUrl(url: string | null | undefined, options: Im
   }
 
   // 預設選項
-  const {
-    width,
-    height,
-    quality = 80,
-    format = 'webp',
-    thumbnail = false,
-  } = options
+  const { width, height, quality = 80, format = 'webp', thumbnail = false } = options
 
   try {
     const urlObj = new URL(url)
 
     // 將 /storage/v1/object/public/ 轉換為 /storage/v1/render/image/public/
-    const renderPath = urlObj.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+    const renderPath = urlObj.pathname.replace(
+      '/storage/v1/object/public/',
+      '/storage/v1/render/image/public/'
+    )
 
     // 建立查詢參數
     const params = new URLSearchParams()
@@ -156,8 +156,8 @@ export function getResponsiveWidth(): number {
   const width = window.innerWidth
 
   // 根據常見斷點決定圖片大小
-  if (width <= 640) return 640   // Mobile
-  if (width <= 768) return 768   // Tablet
+  if (width <= 640) return 640 // Mobile
+  if (width <= 768) return 768 // Tablet
   if (width <= 1024) return 1024 // Laptop
   if (width <= 1280) return 1280 // Desktop
   return 1920 // Large Desktop
@@ -171,9 +171,8 @@ export function getCityBackgroundImage(
   options: ImageOptimizationOptions = {}
 ): string {
   // 根據 primary_image 選擇主要圖片
-  const primaryUrl = city.primary_image === 2
-    ? city.background_image_url_2
-    : city.background_image_url
+  const primaryUrl =
+    city.primary_image === 2 ? city.background_image_url_2 : city.background_image_url
 
   return getOptimizedImageUrl(primaryUrl, options)
 }
@@ -181,9 +180,10 @@ export function getCityBackgroundImage(
 /**
  * 取得城市所有背景圖的縮圖（用於預覽）
  */
-export function getCityBackgroundThumbnails(
-  city: { background_image_url?: string; background_image_url_2?: string }
-): { url1: string; url2: string } {
+export function getCityBackgroundThumbnails(city: {
+  background_image_url?: string
+  background_image_url_2?: string
+}): { url1: string; url2: string } {
   return {
     url1: getOptimizedImageUrl(city.background_image_url, { thumbnail: true }),
     url2: getOptimizedImageUrl(city.background_image_url_2, { thumbnail: true }),

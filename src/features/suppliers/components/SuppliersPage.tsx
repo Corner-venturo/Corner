@@ -2,23 +2,23 @@
  * SuppliersPage - Main suppliers management page
  */
 
-'use client';
+'use client'
 
-import React, { useState, useCallback } from 'react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { Building2 } from 'lucide-react';
-import { SuppliersList } from './SuppliersList';
-import { SuppliersDialog } from './SuppliersDialog';
-import { useSuppliersData } from '../hooks/useSuppliersData';
-import { useSuppliersFilters } from '../hooks/useSuppliersFilters';
-import { useSupplierForm } from '../hooks/useSupplierForm';
-import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks';
+import React, { useState, useCallback } from 'react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Building2 } from 'lucide-react'
+import { SuppliersList } from './SuppliersList'
+import { SuppliersDialog } from './SuppliersDialog'
+import { useSuppliersData } from '../hooks/useSuppliersData'
+import { useSuppliersFilters } from '../hooks/useSuppliersFilters'
+import { useSupplierForm } from '../hooks/useSupplierForm'
+import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks'
 
 export const SuppliersPage: React.FC = () => {
   // ✅ Realtime 訂閱
-  useRealtimeForSuppliers();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  useRealtimeForSuppliers()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
   // Data hooks
   const {
@@ -30,10 +30,10 @@ export const SuppliersPage: React.FC = () => {
     getCitiesByCountry,
     getCitiesByRegion,
     handleCreateSupplier,
-  } = useSuppliersData();
+  } = useSuppliersData()
 
   // Filter hooks
-  const { filteredSuppliers } = useSuppliersFilters({ suppliers, searchQuery });
+  const { filteredSuppliers } = useSuppliersFilters({ suppliers, searchQuery })
 
   // Form hooks
   const {
@@ -54,29 +54,29 @@ export const SuppliersPage: React.FC = () => {
     getRegionsByCountry,
     getCitiesByCountry,
     getCitiesByRegion,
-  });
+  })
 
   // Lazy load: only load regions when opening dialog
   const handleOpenAddDialog = useCallback(() => {
     if (countries.length === 0) {
-      fetchRegions();
+      fetchRegions()
     }
-    setIsAddDialogOpen(true);
-  }, [countries.length, fetchRegions]);
+    setIsAddDialogOpen(true)
+  }, [countries.length, fetchRegions])
 
   const handleCloseDialog = useCallback(() => {
-    setIsAddDialogOpen(false);
-    resetForm();
-  }, [resetForm]);
+    setIsAddDialogOpen(false)
+    resetForm()
+  }, [resetForm])
 
   const handleSubmit = useCallback(async () => {
     try {
-      await submitForm();
-      handleCloseDialog();
+      await submitForm()
+      handleCloseDialog()
     } catch (error) {
-      alert(error instanceof Error ? error.message : '新增供應商失敗，請稍後再試');
+      alert(error instanceof Error ? error.message : '新增供應商失敗，請稍後再試')
     }
-  }, [submitForm, handleCloseDialog]);
+  }, [submitForm, handleCloseDialog])
 
   return (
     <div className="h-full flex flex-col">
@@ -86,7 +86,7 @@ export const SuppliersPage: React.FC = () => {
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
-          { label: '供應商管理', href: '/database/suppliers' }
+          { label: '供應商管理', href: '/database/suppliers' },
         ]}
         showSearch={true}
         searchTerm={searchQuery}
@@ -119,5 +119,5 @@ export const SuppliersPage: React.FC = () => {
         onSubmit={handleSubmit}
       />
     </div>
-  );
-};
+  )
+}

@@ -20,13 +20,13 @@ import { NextRequest, NextResponse } from 'next/server'
 // ============================================
 
 interface CreateLinkPayRequest {
-  receiptNumber: string   // 收款單號：R2501280001
-  userName: string        // 付款人姓名
-  email: string           // 客戶 Email
-  paymentName: string     // 付款名稱（客戶看到的標題）
-  createUser: string      // 建立人員 UUID
-  amount: number          // 金額
-  endDate: string         // 付款截止日 (YYYY-MM-DD)
+  receiptNumber: string // 收款單號：R2501280001
+  userName: string // 付款人姓名
+  email: string // 客戶 Email
+  paymentName: string // 付款名稱（客戶看到的標題）
+  createUser: string // 建立人員 UUID
+  amount: number // 金額
+  endDate: string // 付款截止日 (YYYY-MM-DD)
 }
 
 interface LinkPayApiResponse {
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: '缺少必填欄位：receiptNumber, userName, email, amount'
+          message: '缺少必填欄位：receiptNumber, userName, email, amount',
         },
         { status: 400 }
       )
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       email,
       paymentName,
       amount,
-      endDate
+      endDate,
     })
 
     // 模擬生成付款連結
@@ -130,19 +130,18 @@ export async function POST(req: NextRequest) {
       success: true,
       message: '✅ 測試模式：付款連結生成成功（這是假資料）',
       paymentLink: mockPaymentLink,
-      linkpayOrderNumber: mockLinkpayOrderNumber
+      linkpayOrderNumber: mockLinkpayOrderNumber,
     })
 
     // ==========================================
     // 🚧 實作完成後：刪除上面的測試代碼，取消註解真實 API 代碼
     // ==========================================
-
   } catch (error) {
     console.error('❌ LinkPay API 錯誤:', error)
     return NextResponse.json(
       {
         success: false,
-        message: '處理 LinkPay 請求時發生錯誤'
+        message: '處理 LinkPay 請求時發生錯誤',
       },
       { status: 500 }
     )

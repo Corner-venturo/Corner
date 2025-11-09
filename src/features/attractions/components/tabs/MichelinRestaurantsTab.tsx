@@ -286,9 +286,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
               >
                 <Power
                   size={14}
-                  className={
-                    restaurant.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
-                  }
+                  className={restaurant.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
                 />
               </Button>
               <Button

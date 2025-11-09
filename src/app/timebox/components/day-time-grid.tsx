@@ -182,12 +182,7 @@ export default function DayTimeGrid({ selectedDay, timeInterval }: DayTimeGridPr
             const height = Math.max((adjustedDuration / slotMinutes) * slotHeight, 12)
 
             return (
-              <ScheduledBoxItem
-                key={box.id}
-                scheduledBox={box}
-                height={height}
-                topOffset={top}
-              />
+              <ScheduledBoxItem key={box.id} scheduledBox={box} height={height} topOffset={top} />
             )
           })}
         </div>

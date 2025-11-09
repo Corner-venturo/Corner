@@ -6,7 +6,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseServiceKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
@@ -47,13 +48,15 @@ async function seedMichelinRestaurants() {
       avg_price_dinner: 40000,
       currency: 'JPY',
       phone: '+81-3-3535-3600',
-      description: '由壽司之神小野二郎親手製作的江戶前壽司，被譽為全球最難訂位的餐廳。每日僅提供晚餐，座位僅10席，需透過五星級飯店禮賓部預約。',
+      description:
+        '由壽司之神小野二郎親手製作的江戶前壽司，被譽為全球最難訂位的餐廳。每日僅提供晚餐，座位僅10席，需透過五星級飯店禮賓部預約。',
       chef_name: '小野二郎',
       chef_profile: '95歲高齡的壽司之神，70年壽司職人生涯，2011年紀錄片《壽司之神》主角。',
       signature_dishes: ['赤身', '中トロ', '大トロ', '車海老', '煮蛤'],
       specialties: ['全球最高齡米其林三星主廚', '歐巴馬曾造訪', '僅10個吧台座位'],
       commission_rate: 5.0,
-      booking_notes: '需透過五星級飯店禮賓部預約，至少提前3個月。強烈建議安排翻譯陪同。用餐時間嚴格控制在30分鐘內。',
+      booking_notes:
+        '需透過五星級飯店禮賓部預約，至少提前3個月。強烈建議安排翻譯陪同。用餐時間嚴格控制在30分鐘內。',
       recommended_for: ['once_in_lifetime', 'culinary_pilgrimage', 'vip_client', 'honeymoon'],
     },
     {
@@ -137,7 +140,8 @@ async function seedMichelinRestaurants() {
       avg_price_dinner: 6500,
       currency: 'THB',
       website: 'https://www.gaggananand.com',
-      description: '曾4度蟬聯亞洲50最佳餐廳冠軍，Gaggan 主廚的全新力作。25道式Emoji菜單，每道菜都是驚喜。',
+      description:
+        '曾4度蟬聯亞洲50最佳餐廳冠軍，Gaggan 主廚的全新力作。25道式Emoji菜單，每道菜都是驚喜。',
       chef_name: 'Gaggan Anand',
       chef_profile: '印度裔主廚，將分子料理技法融入印度料理，創造獨一無二的用餐體驗。',
       signature_dishes: ['Lick It Up', 'Charcoal', 'Yogurt Explosion'],
@@ -532,8 +536,7 @@ async function seedPremiumExperiences() {
         '量身訂製一件高級旗袍（30天後寄送）',
         '專業旗袍攝影（含妝髮）',
       ],
-      what_makes_it_special:
-        '這位師傅的旗袍曾被宋美齡、鄧麗君穿著，現為上海博物館御用修復師。',
+      what_makes_it_special: '這位師傅的旗袍曾被宋美齡、鄧麗君穿著，現為上海博物館御用修復師。',
       expert_name: '褚宏生',
       expert_title: '旗袍製作技藝國家級非遺傳承人',
       expert_credentials: [
@@ -551,13 +554,7 @@ async function seedPremiumExperiences() {
       price_per_person_min: 15000,
       price_per_person_max: 35000,
       currency: 'CNY',
-      price_includes: [
-        '大師課程',
-        '博物館參觀',
-        '一件高級訂製旗袍',
-        '專業攝影',
-        '30天後國際郵寄',
-      ],
+      price_includes: ['大師課程', '博物館參觀', '一件高級訂製旗袍', '專業攝影', '30天後國際郵寄'],
       commission_rate: 18.0,
       recommended_for: [
         'culture_enthusiast',

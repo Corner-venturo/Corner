@@ -18,8 +18,21 @@ import {
   useEventOperations,
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
-import { useTourStore, useOrderStore, useMemberStore, useCustomerStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
-import { useRealtimeForCalendarEvents, useRealtimeForTours, useRealtimeForOrders, useRealtimeForMembers, useRealtimeForCustomers } from '@/hooks/use-realtime-hooks'
+import {
+  useTourStore,
+  useOrderStore,
+  useMemberStore,
+  useCustomerStore,
+  useCalendarEventStore,
+  useEmployeeStore,
+} from '@/stores'
+import {
+  useRealtimeForCalendarEvents,
+  useRealtimeForTours,
+  useRealtimeForOrders,
+  useRealtimeForMembers,
+  useRealtimeForCustomers,
+} from '@/hooks/use-realtime-hooks'
 
 export default function CalendarPage() {
   // ✅ Realtime 訂閱
@@ -54,13 +67,8 @@ export default function CalendarPage() {
 
   // Custom hooks for calendar logic
   const { filteredEvents } = useCalendarEvents()
-  const {
-    calendarRef,
-    handlePrevMonth,
-    handleNextMonth,
-    handleToday,
-    getCurrentMonthYear,
-  } = useCalendarNavigation()
+  const { calendarRef, handlePrevMonth, handleNextMonth, handleToday, getCurrentMonthYear } =
+    useCalendarNavigation()
 
   const {
     eventDetailDialog,
@@ -153,7 +161,7 @@ export default function CalendarPage() {
                 events={filteredEvents}
                 onDateClick={handleDateClick}
                 onEventClick={handleEventClick}
-                onMoreLinkClick={(info) => handleMoreLinkClick(info, filteredEvents)}
+                onMoreLinkClick={info => handleMoreLinkClick(info, filteredEvents)}
               />
             </div>
           </div>

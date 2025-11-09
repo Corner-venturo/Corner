@@ -363,7 +363,8 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              訂單編號 <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
+              訂單編號{' '}
+              <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
             </label>
             <Combobox
               value={orderNumber}
@@ -406,7 +407,10 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
       {/* 下半部：批次網卡列表 */}
       <div className="space-y-2">
         {esimItems.map((item, index) => (
-          <div key={item.id} className="grid grid-cols-[140px_180px_70px_1fr_120px_40px] gap-2 items-center">
+          <div
+            key={item.id}
+            className="grid grid-cols-[140px_180px_70px_1fr_120px_40px] gap-2 items-center"
+          >
             <div className="relative">
               <select
                 value={item.product_region}

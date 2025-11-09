@@ -124,8 +124,8 @@ export function SortableChannelItem({
                   if (isTourChannel) {
                     const password = prompt(
                       '⚠️ 刪除旅遊團頻道需要密碼確認\n\n' +
-                      `即將刪除：${channel.name}\n` +
-                      '此操作無法復原，請輸入密碼：'
+                        `即將刪除：${channel.name}\n` +
+                        '此操作無法復原，請輸入密碼：'
                     )
 
                     // 使用者取消

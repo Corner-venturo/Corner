@@ -30,7 +30,15 @@ export interface StatusConfig {
 /**
  * 狀態配置類型
  */
-type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa' | 'esim'
+type StatusType =
+  | 'payment'
+  | 'disbursement'
+  | 'todo'
+  | 'invoice'
+  | 'tour'
+  | 'order'
+  | 'visa'
+  | 'esim'
 
 /**
  * 所有狀態配置的中央存儲

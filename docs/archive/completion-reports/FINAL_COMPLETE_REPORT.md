@@ -9,16 +9,20 @@
 ## 🎉 任務總結
 
 ### 問題根源
+
 用戶報告：**「公司刪除的檔案，回到家怎麼重新整理都沒有反應」**
 
 **分析結果**：
+
 1. ❌ Zustand persist middleware 導致跨裝置同步失效
 2. ❌ setTimeout(..., 0) 背景同步被忽略，無法更新 UI
 3. ❌ 沒有 Realtime 訂閱，無法即時推送變更
 4. ❌ 自動訂閱所有 50 個表格 → 2000+ 連線超標
 
 ### 解決方案
+
 ✅ **完整的按需訂閱 Realtime 系統**
+
 - 移除 setTimeout，改為即時同步
 - 實作按需訂閱（進入頁面才訂閱）
 - 永久訂閱系統表格（user_roles, workspaces, employees）
@@ -33,6 +37,7 @@
 ✅ **20 個按需訂閱 Hooks**
 
 #### 業務實體（13 個）
+
 1. ✅ `useRealtimeForTours()` - 旅遊團
 2. ✅ `useRealtimeForOrders()` - 訂單
 3. ✅ `useRealtimeForQuotes()` - 報價單
@@ -48,15 +53,18 @@
 13. ✅ `useRealtimeForTodos()` - 待辦事項
 
 #### 子實體（3 個）
+
 14. ✅ `useRealtimeForMembers()` - 團員
 15. ✅ `useRealtimeForQuoteItems()` - 報價項目
 16. ✅ `useRealtimeForTourAddons()` - 加購項目
 
 #### Workspace 系統（2 個）
+
 17. ✅ `useChannelsRealtime()` - 頻道（Phase 2）
 18. ✅ `useChatRealtime()` - 訊息（Phase 3）
 
 #### 系統表格（2 個）
+
 19. ✅ `useRealtimeForEmployees()` - 員工
 20. ✅ `PermanentRealtimeSubscriptions` - 永久訂閱組件
 
@@ -68,23 +76,23 @@
 
 ✅ **15+ 個主要頁面已整合**
 
-| 頁面 | 訂閱表格 | 狀態 |
-|------|---------|------|
-| Tours | tours, orders, members, quotes | ✅ |
-| Quotes | quotes, tours, quote_items | ✅ |
-| Customers | customers, orders, tours | ✅ |
-| Calendar | calendar_events, tours, orders, members | ✅ |
-| Contracts | tours, orders, members | ✅ |
-| Suppliers | suppliers | ✅ |
-| Visas | visas, tours, orders, members, customers | ✅ |
-| Workspace | channels, messages | ✅ |
-| Orders | orders, tours | ✅ |
-| Itinerary | itineraries | ✅ |
-| Todos | todos | ✅ |
-| Finance/Payments | orders | ✅ |
-| Regions | regions | ✅ |
-| Disbursement | disbursement_orders | ✅ |
-| Attractions | activities | ✅ |
+| 頁面             | 訂閱表格                                 | 狀態 |
+| ---------------- | ---------------------------------------- | ---- |
+| Tours            | tours, orders, members, quotes           | ✅   |
+| Quotes           | quotes, tours, quote_items               | ✅   |
+| Customers        | customers, orders, tours                 | ✅   |
+| Calendar         | calendar_events, tours, orders, members  | ✅   |
+| Contracts        | tours, orders, members                   | ✅   |
+| Suppliers        | suppliers                                | ✅   |
+| Visas            | visas, tours, orders, members, customers | ✅   |
+| Workspace        | channels, messages                       | ✅   |
+| Orders           | orders, tours                            | ✅   |
+| Itinerary        | itineraries                              | ✅   |
+| Todos            | todos                                    | ✅   |
+| Finance/Payments | orders                                   | ✅   |
+| Regions          | regions                                  | ✅   |
+| Disbursement     | disbursement_orders                      | ✅   |
+| Attractions      | activities                               | ✅   |
 
 ---
 
@@ -92,13 +100,14 @@
 
 ✅ **3 個系統表格永久訂閱**
 
-| 表格 | 用途 | 訂閱策略 |
-|------|------|---------|
-| user_roles | 權限管理 | 永久訂閱，變更時通知 + 2秒後重新整理 |
-| workspaces | 工作空間設定 | 永久訂閱，變更時通知所有成員 |
-| employees | 員工資料 | 永久訂閱，即時更新 IndexedDB + Zustand |
+| 表格       | 用途         | 訂閱策略                               |
+| ---------- | ------------ | -------------------------------------- |
+| user_roles | 權限管理     | 永久訂閱，變更時通知 + 2秒後重新整理   |
+| workspaces | 工作空間設定 | 永久訂閱，變更時通知所有成員           |
+| employees  | 員工資料     | 永久訂閱，即時更新 IndexedDB + Zustand |
 
 **實作位置**:
+
 - `src/components/PermanentRealtimeSubscriptions.tsx`
 - `src/components/layout/main-layout.tsx`
 
@@ -109,63 +118,68 @@
 #### 4.1 修正多裝置同步
 
 **修正前**：
+
 ```typescript
 // ❌ setTimeout 背景同步被忽略
 setTimeout(async () => {
-  const remoteItems = await supabase.fetchAll();
+  const remoteItems = await supabase.fetchAll()
   // 無法更新 UI（已經 return 了）
-}, 0);
+}, 0)
 ```
 
 **修正後**：
+
 ```typescript
 // ✅ 即時同步 + Realtime 推送
 try {
-  await sync.uploadLocalChanges();
-  const remoteItems = await supabase.fetchAll();
-  await indexedDB.batchPut(remoteItems);
-  return remoteItems; // ✅ 立即返回給 UI
+  await sync.uploadLocalChanges()
+  const remoteItems = await supabase.fetchAll()
+  await indexedDB.batchPut(remoteItems)
+  return remoteItems // ✅ 立即返回給 UI
 } catch (syncError) {
-  return cachedItems; // ✅ 離線模式降級
+  return cachedItems // ✅ 離線模式降級
 }
 ```
 
 #### 4.2 連線數控制
 
 **修正前**：
+
 ```typescript
 // ❌ 自動訂閱所有表格
 if (enableSupabase) {
-  realtimeManager.subscribe({ table: tableName });
+  realtimeManager.subscribe({ table: tableName })
 }
 // 結果: 50 表格 × 40 使用者 = 2000 連線 ❌
 ```
 
 **修正後**：
+
 ```typescript
 // ✅ 按需訂閱（只訂閱當前頁面）
 useEffect(() => {
-  realtimeManager.subscribe({ table: tableName });
-  return () => realtimeManager.unsubscribe(subscriptionId);
-}, []);
+  realtimeManager.subscribe({ table: tableName })
+  return () => realtimeManager.unsubscribe(subscriptionId)
+}, [])
 // 結果: 平均 2-4 表格 × 10 在線使用者 = 100 連線 ✅
 ```
 
 #### 4.3 權限即時更新
 
 **新增功能**：
+
 ```typescript
 // ✅ 管理員變更權限 → 使用者立即收到通知
 realtimeManager.subscribe({
   table: 'user_roles',
   filter: `user_id=eq.${user.id}`,
   handlers: {
-    onUpdate: (newRole) => {
-      toast({ title: '你的權限已更新！' });
-      setTimeout(() => window.location.reload(), 2000);
+    onUpdate: newRole => {
+      toast({ title: '你的權限已更新！' })
+      setTimeout(() => window.location.reload(), 2000)
     },
   },
-});
+})
 ```
 
 ---
@@ -239,11 +253,13 @@ Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
 ## 📁 新增/修改的檔案
 
 ### 核心檔案（3 個）
+
 1. ✅ `src/hooks/use-realtime-hooks.ts` - 20 個 Realtime Hooks
 2. ✅ `src/components/PermanentRealtimeSubscriptions.tsx` - 永久訂閱組件
 3. ✅ `src/components/layout/main-layout.tsx` - 整合永久訂閱
 
 ### 頁面檔案（15+ 個）
+
 4. ✅ `src/features/tours/components/ToursPage.tsx`
 5. ✅ `src/features/quotes/components/QuotesPage.tsx`
 6. ✅ `src/app/customers/page.tsx`
@@ -258,6 +274,7 @@ Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
 15. ...以及其他頁面
 
 ### 文檔檔案（4 個）
+
 16. ✅ `CLAUDE.md` - 更新規範（加入 Realtime 規範）
 17. ✅ `PHASE_4_COMPLETE_ON_DEMAND_REALTIME.md` - Phase 4 報告
 18. ✅ `COMPLETE_REALTIME_OFFLINE_LOGIC.md` - 完整邏輯說明
@@ -270,24 +287,28 @@ Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
 ### 基本功能測試
 
 #### ✅ Test Case 1: 多裝置新增同步
+
 - 公司電腦：新增旅遊團「北海道賞雪」
 - 家裡電腦：打開旅遊團頁面
 - **預期結果**：立即看到「北海道賞雪」
 - **延遲**：< 100ms
 
 #### ✅ Test Case 2: 多裝置刪除同步
+
 - 公司電腦：刪除旅遊團「北海道賞雪」
 - 家裡電腦：旅遊團頁面已開啟
 - **預期結果**：旅遊團立即消失
 - **延遲**：< 100ms
 
 #### ✅ Test Case 3: 多裝置更新同步
+
 - 公司電腦：修改旅遊團「北海道賞雪」→「北海道滑雪」
 - 家裡電腦：旅遊團頁面已開啟
 - **預期結果**：名稱立即更新為「北海道滑雪」
 - **延遲**：< 100ms
 
 #### ✅ Test Case 4: 離線新增後同步
+
 - 家裡電腦：斷網
 - 家裡電腦：新增旅遊團「沖繩陽光」
 - 家裡電腦：恢復網路
@@ -298,18 +319,21 @@ Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
 ### 進階功能測試
 
 #### ✅ Test Case 5: 權限即時更新（在線）
+
 - 威廉（管理員）：新增雅萍的「財務管理」權限
 - 雅萍：正在線上
 - **預期結果**：雅萍立即收到通知，2 秒後頁面重新整理
 - **延遲**：< 100ms 通知，2秒後重新整理
 
 #### ✅ Test Case 6: 權限更新（離線）
+
 - 威廉（管理員）：新增雅萍的「財務管理」權限
 - 雅萍：離線
 - 雅萍：下次登入
 - **預期結果**：載入最新權限，看到新功能
 
 #### ✅ Test Case 7: 連線數檢查
+
 - 登入系統
 - 打開開發者工具 → Network → WS
 - **預期結果**：3-4 個 WebSocket 連線
@@ -319,6 +343,7 @@ Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
   - 當前頁面表格 (1-4 個)
 
 #### ✅ Test Case 8: 頁面切換連線管理
+
 - 從旅遊團頁面 → 切換到行事曆頁面
 - 觀察 Network → WS
 - **預期結果**：
@@ -356,20 +381,20 @@ export const useRealtimeForXXX = createRealtimeHook<XXX>({
   tableName: 'xxx',
   indexedDB: new IndexedDBAdapter<XXX>('xxx'),
   store: useXXXStore,
-});
+})
 ```
 
 ---
 
 ## 📚 相關文檔
 
-| 文檔 | 說明 |
-|------|------|
-| `COMPLETE_REALTIME_OFFLINE_LOGIC.md` | 完整邏輯說明、流程圖、實作細節 |
-| `ALL_TABLES_REALTIME_STATUS.md` | 所有 50 個表格狀態和優先級 |
-| `PHASE_4_COMPLETE_ON_DEMAND_REALTIME.md` | Phase 4 詳細報告 |
-| `CLAUDE.md` | 更新了 Realtime 規範 |
-| `src/hooks/use-realtime-hooks.ts` | 所有 Hooks 集中匯出 |
+| 文檔                                     | 說明                           |
+| ---------------------------------------- | ------------------------------ |
+| `COMPLETE_REALTIME_OFFLINE_LOGIC.md`     | 完整邏輯說明、流程圖、實作細節 |
+| `ALL_TABLES_REALTIME_STATUS.md`          | 所有 50 個表格狀態和優先級     |
+| `PHASE_4_COMPLETE_ON_DEMAND_REALTIME.md` | Phase 4 詳細報告               |
+| `CLAUDE.md`                              | 更新了 Realtime 規範           |
+| `src/hooks/use-realtime-hooks.ts`        | 所有 Hooks 集中匯出            |
 
 ---
 
@@ -426,15 +451,19 @@ export const useRealtimeForXXX = createRealtimeHook<XXX>({
 ### 問題解決率：100%
 
 ✅ **原始問題**：「公司刪除的檔案，回到家怎麼重新整理都沒有反應」
+
 - **現狀**：公司刪除 → 家裡立即消失（< 100ms）
 
 ✅ **setTimeout 問題**：背景同步被忽略
+
 - **現狀**：即時同步 + Realtime 推送
 
 ✅ **連線數問題**：2000+ 連線超標
+
 - **現狀**：平均 100 連線（55% 占用率）
 
 ✅ **權限更新問題**：需要重新登入
+
 - **現狀**：立即通知 + 2秒自動重新整理
 
 ### 系統覆蓋率
@@ -517,13 +546,13 @@ export const useRealtimeForXXX = createRealtimeHook<XXX>({
 
 ### 數字對比
 
-| 指標 | Before | After | 改善 |
-|------|--------|-------|------|
-| 同步延遲 | ∞（需手動刷新） | < 100ms | 🚀 無限改善 |
-| 連線數 | 2000+ | ~100 | ↓ 95% |
-| 權限更新 | 需重新登入 | 即時通知 | ⚡ 即時 |
-| 離線支援 | ❌ | ✅ | 🎯 新功能 |
-| Build 狀態 | - | ✅ 成功 | - |
+| 指標       | Before          | After    | 改善        |
+| ---------- | --------------- | -------- | ----------- |
+| 同步延遲   | ∞（需手動刷新） | < 100ms  | 🚀 無限改善 |
+| 連線數     | 2000+           | ~100     | ↓ 95%       |
+| 權限更新   | 需重新登入      | 即時通知 | ⚡ 即時     |
+| 離線支援   | ❌              | ✅       | 🎯 新功能   |
+| Build 狀態 | -               | ✅ 成功  | -           |
 
 ---
 

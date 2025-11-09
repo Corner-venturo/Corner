@@ -163,7 +163,8 @@ export default function HRPage() {
         label: '入職日期',
         sortable: true,
         render: (_value, employee) => {
-          if (!employee.job_info?.hire_date) return <span className="text-morandi-muted text-sm">未設定</span>
+          if (!employee.job_info?.hire_date)
+            return <span className="text-morandi-muted text-sm">未設定</span>
           return <DateCell value={employee.job_info.hire_date} />
         },
       },

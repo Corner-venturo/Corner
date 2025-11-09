@@ -4,18 +4,19 @@
  * 使用 createRealtimeHook 工廠函數創建
  */
 
-'use client';
+'use client'
 
-import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook';
-import { useMessageStore } from '@/stores/workspace/message-store';
-import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter';
-import type { Message } from '@/stores/workspace/types';
-import type { BaseEntity } from '@/types';
+import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook'
+import { useMessageStore } from '@/stores/workspace/message-store'
+import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter'
+import type { Message } from '@/stores/workspace/types'
+import type { BaseEntity } from '@/types'
 
 // Message Entity 型別（與 message-store.ts 一致）
-type MessageEntity = Omit<Message, 'edited_at'> & Pick<BaseEntity, 'updated_at'> & {
-  edited_at?: string
-};
+type MessageEntity = Omit<Message, 'edited_at'> &
+  Pick<BaseEntity, 'updated_at'> & {
+    edited_at?: string
+  }
 
 /**
  * Messages Realtime Hook
@@ -41,4 +42,4 @@ export const useChatRealtime = createRealtimeHook<MessageEntity>({
   tableName: 'messages',
   indexedDB: new IndexedDBAdapter<MessageEntity>('messages'),
   store: useMessageStore,
-});
+})

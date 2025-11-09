@@ -454,13 +454,16 @@ function NewItineraryPageContent() {
 
   // Convert icon strings to components for preview
   // 使用 useMemo 穩定 processedData 引用，避免無限循環
-  const processedData = React.useMemo(() => ({
-    ...tourData,
-    features: tourData.features.map((f: any) => ({
-      ...f,
-      iconComponent: iconMap[f.icon] || IconSparkles,
-    })),
-  }), [tourData])
+  const processedData = React.useMemo(
+    () => ({
+      ...tourData,
+      features: tourData.features.map((f: any) => ({
+        ...f,
+        iconComponent: iconMap[f.icon] || IconSparkles,
+      })),
+    }),
+    [tourData]
+  )
 
   if (loading) {
     return (

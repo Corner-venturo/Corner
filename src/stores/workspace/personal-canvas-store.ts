@@ -11,10 +11,11 @@ import type { BaseEntity } from '@/types'
 /**
  * Personal Canvas 擴展型別（符合 BaseEntity）
  */
-type PersonalCanvasEntity = PersonalCanvas & Pick<BaseEntity, 'updated_at'> & {
-  created_at: string
-  updated_at: string
-}
+type PersonalCanvasEntity = PersonalCanvas &
+  Pick<BaseEntity, 'updated_at'> & {
+    created_at: string
+    updated_at: string
+  }
 
 /**
  * Personal Canvas Store

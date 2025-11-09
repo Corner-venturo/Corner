@@ -12,9 +12,9 @@
  * ```
  */
 
-'use client';
+'use client'
 
-import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook';
+import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook'
 
 // Stores
 import {
@@ -38,10 +38,10 @@ import {
   useReceiptStore,
   useLinkPayLogStore,
   useConfirmationStore,
-} from '@/stores';
+} from '@/stores'
 
 // IndexedDB adapters
-import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter';
+import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter'
 
 // Types
 import type {
@@ -60,10 +60,10 @@ import type {
   QuoteItem,
   Todo,
   Employee,
-} from '@/stores/types';
-import type { TourAddOn } from '@/stores/types';
-import type { CalendarEvent } from '@/types/calendar.types';
-import type { Receipt, LinkPayLog } from '@/types/receipt.types';
+} from '@/stores/types'
+import type { TourAddOn } from '@/stores/types'
+import type { CalendarEvent } from '@/types/calendar.types'
+import type { Receipt, LinkPayLog } from '@/types/receipt.types'
 
 // ============================================
 // 業務實體（13 個）
@@ -77,7 +77,7 @@ export const useRealtimeForTours = createRealtimeHook<Tour>({
   tableName: 'tours',
   indexedDB: new IndexedDBAdapter<Tour>('tours'),
   store: useTourStore,
-});
+})
 
 /**
  * 訂單 Realtime Hook
@@ -87,7 +87,7 @@ export const useRealtimeForOrders = createRealtimeHook<Order>({
   tableName: 'orders',
   indexedDB: new IndexedDBAdapter<Order>('orders'),
   store: useOrderStore,
-});
+})
 
 /**
  * 報價單 Realtime Hook
@@ -97,7 +97,7 @@ export const useRealtimeForQuotes = createRealtimeHook<Quote>({
   tableName: 'quotes',
   indexedDB: new IndexedDBAdapter<Quote>('quotes'),
   store: useQuoteStore,
-});
+})
 
 /**
  * 客戶 Realtime Hook
@@ -107,7 +107,7 @@ export const useRealtimeForCustomers = createRealtimeHook<Customer>({
   tableName: 'customers',
   indexedDB: new IndexedDBAdapter<Customer>('customers'),
   store: useCustomerStore,
-});
+})
 
 /**
  * 行程表 Realtime Hook
@@ -117,7 +117,7 @@ export const useRealtimeForItineraries = createRealtimeHook<Itinerary>({
   tableName: 'itineraries',
   indexedDB: new IndexedDBAdapter<Itinerary>('itineraries'),
   store: useItineraryStore,
-});
+})
 
 /**
  * 請款單 Realtime Hook
@@ -127,7 +127,7 @@ export const useRealtimeForPaymentRequests = createRealtimeHook<PaymentRequest>(
   tableName: 'payment_requests',
   indexedDB: new IndexedDBAdapter<PaymentRequest>('payment_requests'),
   store: usePaymentRequestStore,
-});
+})
 
 /**
  * 出納單 Realtime Hook
@@ -137,7 +137,7 @@ export const useRealtimeForDisbursementOrders = createRealtimeHook<DisbursementO
   tableName: 'disbursement_orders',
   indexedDB: new IndexedDBAdapter<DisbursementOrder>('disbursement_orders'),
   store: useDisbursementOrderStore,
-});
+})
 
 /**
  * 收款單 Realtime Hook
@@ -147,7 +147,7 @@ export const useRealtimeForReceiptOrders = createRealtimeHook<ReceiptOrder>({
   tableName: 'receipt_orders',
   indexedDB: new IndexedDBAdapter<ReceiptOrder>('receipt_orders'),
   store: useReceiptOrderStore,
-});
+})
 
 /**
  * 簽證 Realtime Hook
@@ -157,7 +157,7 @@ export const useRealtimeForVisas = createRealtimeHook<Visa>({
   tableName: 'visas',
   indexedDB: new IndexedDBAdapter<Visa>('visas'),
   store: useVisaStore,
-});
+})
 
 /**
  * 供應商 Realtime Hook
@@ -167,7 +167,7 @@ export const useRealtimeForSuppliers = createRealtimeHook<Supplier>({
   tableName: 'suppliers',
   indexedDB: new IndexedDBAdapter<Supplier>('suppliers'),
   store: useSupplierStore,
-});
+})
 
 /**
  * 地區 Realtime Hook
@@ -177,7 +177,7 @@ export const useRealtimeForRegions = createRealtimeHook<Region>({
   tableName: 'regions',
   indexedDB: new IndexedDBAdapter<Region>('regions'),
   store: useRegionStore,
-});
+})
 
 /**
  * 行事曆 Realtime Hook
@@ -187,7 +187,7 @@ export const useRealtimeForCalendarEvents = createRealtimeHook<CalendarEvent>({
   tableName: 'calendar_events',
   indexedDB: new IndexedDBAdapter<CalendarEvent>('calendar_events'),
   store: useCalendarEventStore,
-});
+})
 
 /**
  * 待辦事項 Realtime Hook
@@ -197,7 +197,7 @@ export const useRealtimeForTodos = createRealtimeHook<Todo>({
   tableName: 'todos',
   indexedDB: new IndexedDBAdapter<Todo>('todos'),
   store: useTodoStore,
-});
+})
 
 // ============================================
 // 子實體（3 個）
@@ -211,7 +211,7 @@ export const useRealtimeForMembers = createRealtimeHook<Member>({
   tableName: 'members',
   indexedDB: new IndexedDBAdapter<Member>('members'),
   store: useMemberStore,
-});
+})
 
 /**
  * 報價項目 Realtime Hook
@@ -221,7 +221,7 @@ export const useRealtimeForQuoteItems = createRealtimeHook<QuoteItem>({
   tableName: 'quote_items',
   indexedDB: new IndexedDBAdapter<QuoteItem>('quote_items'),
   store: useQuoteItemStore,
-});
+})
 
 /**
  * 加購項目 Realtime Hook
@@ -231,7 +231,7 @@ export const useRealtimeForTourAddons = createRealtimeHook<TourAddOn>({
   tableName: 'tour_addons',
   indexedDB: new IndexedDBAdapter<TourAddOn>('tour_addons'),
   store: useTourAddOnStore,
-});
+})
 
 // ============================================
 // Workspace 系統（5 個）- 已有專用 Hooks
@@ -241,25 +241,25 @@ export const useRealtimeForTourAddons = createRealtimeHook<TourAddOn>({
  * Workspaces Realtime Hook
  * 使用時機：進入工作空間頁面（永久訂閱）
  */
-export { useChannelsRealtime } from './useChannelsRealtime';
+export { useChannelsRealtime } from './useChannelsRealtime'
 
 /**
  * Channels Realtime Hook
  * 使用時機：進入工作空間頁面
  */
-export { useChannelsRealtime as useRealtimeForChannels } from './useChannelsRealtime';
+export { useChannelsRealtime as useRealtimeForChannels } from './useChannelsRealtime'
 
 /**
  * Messages Realtime Hook
  * 使用時機：進入頻道聊天頁面
  */
-export { useChatRealtime } from './useChatRealtime';
+export { useChatRealtime } from './useChatRealtime'
 
 /**
  * Messages Realtime Hook (別名)
  * 使用時機：進入頻道聊天頁面
  */
-export { useChatRealtime as useRealtimeForMessages } from './useChatRealtime';
+export { useChatRealtime as useRealtimeForMessages } from './useChatRealtime'
 
 // ============================================
 // 其他（2 個）
@@ -274,12 +274,11 @@ export const useRealtimeForEmployees = createRealtimeHook<Employee>({
   tableName: 'employees',
   indexedDB: new IndexedDBAdapter<Employee>('employees'),
   store: useEmployeeStore,
-});
+})
 
 // ============================================
 // 未來擴充（高優先級 - 10 個）
 // ============================================
-
 
 // 1. Workspace 系統
 // export const useRealtimeForWorkspaces = ...
@@ -303,7 +302,7 @@ export const useRealtimeForReceipts = createRealtimeHook<Receipt>({
   tableName: 'receipts',
   indexedDB: new IndexedDBAdapter<Receipt>('receipts'),
   store: useReceiptStore,
-});
+})
 
 /**
  * LinkPay 記錄 Realtime Hook
@@ -313,17 +312,21 @@ export const useRealtimeForLinkPayLogs = createRealtimeHook<LinkPayLog>({
   tableName: 'linkpay_logs',
   indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs'),
   store: useLinkPayLogStore,
-});
+})
 
 /**
  * 確認單（航班/住宿）Realtime Hook
  * 使用時機：進入確認單列表頁面
  */
-export const useRealtimeForConfirmations = createRealtimeHook<import('@/types/confirmation.types').Confirmation>({
+export const useRealtimeForConfirmations = createRealtimeHook<
+  import('@/types/confirmation.types').Confirmation
+>({
   tableName: 'confirmations',
-  indexedDB: new IndexedDBAdapter<import('@/types/confirmation.types').Confirmation>('confirmations'),
+  indexedDB: new IndexedDBAdapter<import('@/types/confirmation.types').Confirmation>(
+    'confirmations'
+  ),
   store: useConfirmationStore,
-});
+})
 
 // 4. 協作功能
 // export const useRealtimeForAdvanceLists = ...

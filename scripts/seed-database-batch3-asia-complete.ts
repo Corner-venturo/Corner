@@ -333,7 +333,7 @@ const michelinRestaurants = [
     currency: 'THB',
     description: '全球唯一米其林一星街頭小吃，蟹肉歐姆蛋傳奇',
     commission_rate: 0, // 街頭小吃不給佣金但超有名
-    awards: ['米其林一星', 'Netflix Chef\'s Table'],
+    awards: ['米其林一星', "Netflix Chef's Table"],
     is_active: true,
   },
 
@@ -476,7 +476,13 @@ const premiumExperiences = [
     city_id: 'seoul',
     exclusivity_level: 'highly_exclusive',
     description: '參觀正在拍攝的韓劇現場，與明星近距離接觸，由製作人導覽',
-    highlights: ['現場拍攝觀摩', '可能遇見明星', '製作人親自導覽', '韓劇拍攝技巧講解', '劇組便當體驗'],
+    highlights: [
+      '現場拍攝觀摩',
+      '可能遇見明星',
+      '製作人親自導覽',
+      '韓劇拍攝技巧講解',
+      '劇組便當體驗',
+    ],
     duration_hours: 4.0,
     group_size_min: 2,
     group_size_max: 6,
@@ -524,7 +530,13 @@ const premiumExperiences = [
     city_id: 'shanghai',
     exclusivity_level: 'highly_exclusive',
     description: '搭乘私人遊艇巡遊黃浦江，欣賞外灘萬國建築與陸家嘴天際線',
-    highlights: ['70呎豪華遊艇', '米其林主廚船上晚宴', '專業調酒師', '私人攝影師', '煙火季特別航線'],
+    highlights: [
+      '70呎豪華遊艇',
+      '米其林主廚船上晚宴',
+      '專業調酒師',
+      '私人攝影師',
+      '煙火季特別航線',
+    ],
     duration_hours: 3.0,
     group_size_min: 2,
     group_size_max: 12,
@@ -572,7 +584,13 @@ const premiumExperiences = [
     city_id: 'kyoto',
     exclusivity_level: 'highly_exclusive',
     description: '在平時不開放的私人庭園，穿著高級和服進行專業攝影',
-    highlights: ['非公開私人庭園獨家拍攝', '和服大師協助著裝', '專業攝影師', '妝髮造型', '精修20張照片'],
+    highlights: [
+      '非公開私人庭園獨家拍攝',
+      '和服大師協助著裝',
+      '專業攝影師',
+      '妝髮造型',
+      '精修20張照片',
+    ],
     duration_hours: 4.0,
     group_size_min: 1,
     group_size_max: 4,
@@ -596,7 +614,13 @@ const premiumExperiences = [
     city_id: 'chiang-mai',
     exclusivity_level: 'exclusive',
     description: '學習泰北蘭納王朝宮廷料理，由皇室御廚傳人教授',
-    highlights: ['皇室御廚傳人親授', '學習6道蘭納宮廷料理', '傳統市場採購', '精緻午餐', '獲得認證證書'],
+    highlights: [
+      '皇室御廚傳人親授',
+      '學習6道蘭納宮廷料理',
+      '傳統市場採購',
+      '精緻午餐',
+      '獲得認證證書',
+    ],
     duration_hours: 5.0,
     group_size_min: 2,
     group_size_max: 8,
@@ -707,16 +731,20 @@ async function seedData() {
   console.log(`頂級體驗：${experiencesSuccess}/${premiumExperiences.length}\n`)
 
   // 總結
-  console.log('=' .repeat(70))
+  console.log('='.repeat(70))
   console.log('🎉 第三批資料匯入總結：')
   console.log(`  🗾 日本景點：${japanSuccess}/${japanAttractions.length}（札幌、福岡、熊本）`)
   console.log(`  🇰🇷 韓國景點：${koreaSuccess}/${koreaAttractions.length}（釜山、濟州島）`)
   console.log(`  🇹🇭 泰國景點：${thailandSuccess}/${thailandAttractions.length}（普吉島、清邁）`)
-  console.log(`  ⭐ 米其林餐廳：${restaurantsSuccess}/${michelinRestaurants.length}（Jay Fai、Jungsik等）`)
-  console.log(`  ✨ 頂級體驗：${experiencesSuccess}/${premiumExperiences.length}（相撲、K-Drama、遊艇等）`)
+  console.log(
+    `  ⭐ 米其林餐廳：${restaurantsSuccess}/${michelinRestaurants.length}（Jay Fai、Jungsik等）`
+  )
+  console.log(
+    `  ✨ 頂級體驗：${experiencesSuccess}/${premiumExperiences.length}（相撲、K-Drama、遊艇等）`
+  )
   console.log(`  📊 總計成功：${totalSuccess} 筆`)
   console.log(`  ❌ 失敗：${totalFailed} 筆`)
-  console.log('=' .repeat(70))
+  console.log('='.repeat(70))
 
   console.log('\n📈 資料庫完整度提升：')
   console.log('  札幌：1 → 6 筆資料')

@@ -2,29 +2,29 @@
  * 頻道列表區塊組件
  */
 
-import { ChevronDown, ChevronRight, Hash, Star, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SortableChannelItem } from './SortableChannelItem';
-import { DroppableGroupHeader } from './DroppableGroupHeader';
-import type { Channel } from '@/stores/workspace-store';
+import { ChevronDown, ChevronRight, Hash, Star, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { SortableChannelItem } from './SortableChannelItem'
+import { DroppableGroupHeader } from './DroppableGroupHeader'
+import type { Channel } from '@/stores/workspace-store'
 
 interface ChannelListSectionProps {
-  channels: Channel[];
-  selectedChannelId: string | null;
-  onSelectChannel: (channelId: string) => void;
-  toggleChannelFavorite: (channelId: string) => void;
-  onDelete: (channelId: string) => void;
-  onEdit: (channelId: string) => void;
-  onJoinChannel: (channelId: string) => void;
-  onLeaveChannel: (channelId: string) => void;
-  isAdmin: boolean;
-  checkIsMember: (channelId: string) => boolean;
-  isExpanded: boolean;
-  onToggleExpanded: () => void;
-  title: string;
-  icon: 'star' | 'hash';
-  showAddButton?: boolean;
-  onAddClick?: () => void;
+  channels: Channel[]
+  selectedChannelId: string | null
+  onSelectChannel: (channelId: string) => void
+  toggleChannelFavorite: (channelId: string) => void
+  onDelete: (channelId: string) => void
+  onEdit: (channelId: string) => void
+  onJoinChannel: (channelId: string) => void
+  onLeaveChannel: (channelId: string) => void
+  isAdmin: boolean
+  checkIsMember: (channelId: string) => boolean
+  isExpanded: boolean
+  onToggleExpanded: () => void
+  title: string
+  icon: 'star' | 'hash'
+  showAddButton?: boolean
+  onAddClick?: () => void
 }
 
 export function ChannelListSection({
@@ -45,9 +45,9 @@ export function ChannelListSection({
   showAddButton,
   onAddClick,
 }: ChannelListSectionProps) {
-  if (channels.length === 0) return null;
+  if (channels.length === 0) return null
 
-  const Icon = icon === 'star' ? Star : Hash;
+  const Icon = icon === 'star' ? Star : Hash
 
   return (
     <div className="px-2 py-2">
@@ -91,23 +91,23 @@ export function ChannelListSection({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 interface GroupedChannelListProps {
-  group: import('@/stores/workspace-store').ChannelGroup;
-  channels: Channel[];
-  selectedChannelId: string | null;
-  onSelectChannel: (channelId: string) => void;
-  toggleChannelFavorite: (channelId: string) => void;
-  onDelete: (channelId: string) => void;
-  onEdit: (channelId: string) => void;
-  onJoinChannel: (channelId: string) => void;
-  onLeaveChannel: (channelId: string) => void;
-  isAdmin: boolean;
-  checkIsMember: (channelId: string) => boolean;
-  toggleGroupCollapse: (groupId: string) => void;
-  handleDeleteGroupClick: (groupId: string) => void;
+  group: import('@/stores/workspace-store').ChannelGroup
+  channels: Channel[]
+  selectedChannelId: string | null
+  onSelectChannel: (channelId: string) => void
+  toggleChannelFavorite: (channelId: string) => void
+  onDelete: (channelId: string) => void
+  onEdit: (channelId: string) => void
+  onJoinChannel: (channelId: string) => void
+  onLeaveChannel: (channelId: string) => void
+  isAdmin: boolean
+  checkIsMember: (channelId: string) => boolean
+  toggleGroupCollapse: (groupId: string) => void
+  handleDeleteGroupClick: (groupId: string) => void
 }
 
 export function GroupedChannelList({
@@ -156,5 +156,5 @@ export function GroupedChannelList({
         </div>
       )}
     </div>
-  );
+  )
 }

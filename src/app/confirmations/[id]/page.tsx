@@ -8,7 +8,11 @@ import { PreviewContainer } from '../components/PreviewContainer'
 import { Button } from '@/components/ui/button'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useUserStore } from '@/stores/user-store'
-import type { ConfirmationFormData, ConfirmationType, Confirmation } from '@/types/confirmation.types'
+import type {
+  ConfirmationFormData,
+  ConfirmationType,
+  Confirmation,
+} from '@/types/confirmation.types'
 import { toast } from 'sonner'
 
 export default function EditConfirmationPage() {
@@ -16,10 +20,10 @@ export default function EditConfirmationPage() {
   const params = useParams()
   const id = params.id as string
 
-  const confirmations = useConfirmationStore((state) => state.items)
-  const updateItem = useConfirmationStore((state) => state.updateItem)
-  const fetchAll = useConfirmationStore((state) => state.fetchAll)
-  const currentUser = useUserStore((state) => state.user)
+  const confirmations = useConfirmationStore(state => state.items)
+  const updateItem = useConfirmationStore(state => state.updateItem)
+  const fetchAll = useConfirmationStore(state => state.fetchAll)
+  const currentUser = useUserStore(state => state.user)
 
   const [formData, setFormData] = useState<ConfirmationFormData>({
     type: 'flight',
@@ -42,7 +46,7 @@ export default function EditConfirmationPage() {
 
   useEffect(() => {
     if (!isLoading) {
-      const confirmation = confirmations.find((c) => c.id === id)
+      const confirmation = confirmations.find(c => c.id === id)
       if (confirmation) {
         setFormData({
           type: confirmation.type,

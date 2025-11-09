@@ -1,44 +1,42 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { ResponsiveHeader } from '@/components/layout/responsive-header';
-import { ChannelChat } from '@/components/workspace/ChannelChat';
-import { useWorkspaceChannels } from '@/stores/workspace-store';
+import { useEffect, useState } from 'react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ChannelChat } from '@/components/workspace/ChannelChat'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
 
 export default function WorkspacePage() {
-  const { loadWorkspaces, loadChannelGroups, loadChannels, currentWorkspace } = useWorkspaceChannels();
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const { loadWorkspaces, loadChannelGroups, loadChannels, currentWorkspace } =
+    useWorkspaceChannels()
+  const [hasLoaded, setHasLoaded] = useState(false)
 
   // 🔥 Step 1: 載入 workspaces（只執行一次）
   useEffect(() => {
-    if (hasLoaded) return;
+    if (hasLoaded) return
 
     const init = async () => {
-      console.log('🔵 [WorkspacePage] 載入工作空間');
-      await loadWorkspaces();
-    };
+      console.log('🔵 [WorkspacePage] 載入工作空間')
+      await loadWorkspaces()
+    }
 
-    init();
+    init()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   // 🔥 Step 2: 當 workspace 載入後，載入 channels 和 groups（只執行一次）
   useEffect(() => {
-    if (hasLoaded || !currentWorkspace) return;
+    if (hasLoaded || !currentWorkspace) return
 
     const loadData = async () => {
-      console.log('🔵 [WorkspacePage] 載入頻道和群組');
-      await Promise.all([
-        loadChannelGroups(currentWorkspace.id),
-        loadChannels(currentWorkspace.id)
-      ]);
-      setHasLoaded(true);
-      console.log('✅ [WorkspacePage] 初始化完成');
-    };
+      console.log('🔵 [WorkspacePage] 載入頻道和群組')
+      await Promise.all([loadChannelGroups(currentWorkspace.id), loadChannels(currentWorkspace.id)])
+      setHasLoaded(true)
+      console.log('✅ [WorkspacePage] 初始化完成')
+    }
 
-    loadData();
+    loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentWorkspace?.id]);
+  }, [currentWorkspace?.id])
 
   return (
     <div className="h-full flex flex-col">
@@ -54,5 +52,5 @@ export default function WorkspacePage() {
         <ChannelChat />
       </div>
     </div>
-  );
+  )
 }

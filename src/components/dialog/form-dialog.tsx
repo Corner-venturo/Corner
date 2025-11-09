@@ -129,7 +129,12 @@ export function FormDialog({
               <div className="flex justify-end gap-2 pt-4 border-t border-border">
                 {footer || (
                   <>
-                    <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCancel}
+                      disabled={loading}
+                    >
                       {cancelLabel}
                     </Button>
                     <Button

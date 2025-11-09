@@ -12,12 +12,14 @@
 ## 🎯 使用方式
 
 ### 刪除一般頻道
+
 1. 進入工作空間
 2. 找到要刪除的頻道
 3. 滑鼠移到頻道上，點擊 🗑️ 刪除按鈕
 4. 確認刪除即可
 
 ### 刪除旅遊團頻道
+
 1. 進入工作空間
 2. 找到要刪除的旅遊團頻道（有 `tour_id` 的頻道）
 3. 滑鼠移到頻道上，點擊 🗑️ 刪除按鈕
@@ -33,11 +35,11 @@
 ```typescript
 /**
  * 刪除旅遊團頻道所需的密碼
- * 
+ *
  * 預設密碼：delete123
  * 修改此密碼以提高安全性
  */
-export const DELETE_TOUR_CHANNEL_PASSWORD = 'delete123'  // ← 修改這裡
+export const DELETE_TOUR_CHANNEL_PASSWORD = 'delete123' // ← 修改這裡
 ```
 
 ### 修改步驟
@@ -57,17 +59,20 @@ export const DELETE_TOUR_CHANNEL_PASSWORD = 'delete123'  // ← 修改這裡
 ## 🚨 緊急情況：忘記密碼怎麼辦？
 
 ### 方法 1：查看設定檔
+
 ```bash
 cat src/lib/constants/workspace-settings.ts
 ```
 
 ### 方法 2：用 Script 直接刪除
+
 ```bash
 # 建立刪除腳本
 node scripts/delete_channel.js
 ```
 
 ### 方法 3：直接從資料庫刪除
+
 ```sql
 -- 查詢頻道
 SELECT id, name, tour_id FROM channels WHERE name ILIKE '%關鍵字%';
@@ -98,7 +103,7 @@ DELETE FROM channels WHERE id = '頻道ID';
 /**
  * 是否啟用旅遊團頻道刪除保護
  */
-export const ENABLE_TOUR_CHANNEL_DELETE_PROTECTION = false  // ← 改為 false
+export const ENABLE_TOUR_CHANNEL_DELETE_PROTECTION = false // ← 改為 false
 ```
 
 然後修改 `SortableChannelItem.tsx`：

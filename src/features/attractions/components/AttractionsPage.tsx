@@ -42,9 +42,45 @@ export default function AttractionsPage() {
 
   // 硬編碼測試資料
   const attractions = [
-    { id: '1', name: '測試景點 1', name_en: 'Test Attraction 1', country_id: 'japan', city_id: 'tokyo', category: '景點', description: '測試用', duration_minutes: 60, tags: [], thumbnail: '', is_active: true },
-    { id: '2', name: '測試景點 2', name_en: 'Test Attraction 2', country_id: 'japan', city_id: 'osaka', category: '餐廳', description: '測試用', duration_minutes: 90, tags: [], thumbnail: '', is_active: true },
-    { id: '3', name: '測試景點 3', name_en: 'Test Attraction 3', country_id: 'thailand', city_id: 'bangkok', category: '住宿', description: '測試用', duration_minutes: 120, tags: [], thumbnail: '', is_active: false },
+    {
+      id: '1',
+      name: '測試景點 1',
+      name_en: 'Test Attraction 1',
+      country_id: 'japan',
+      city_id: 'tokyo',
+      category: '景點',
+      description: '測試用',
+      duration_minutes: 60,
+      tags: [],
+      thumbnail: '',
+      is_active: true,
+    },
+    {
+      id: '2',
+      name: '測試景點 2',
+      name_en: 'Test Attraction 2',
+      country_id: 'japan',
+      city_id: 'osaka',
+      category: '餐廳',
+      description: '測試用',
+      duration_minutes: 90,
+      tags: [],
+      thumbnail: '',
+      is_active: true,
+    },
+    {
+      id: '3',
+      name: '測試景點 3',
+      name_en: 'Test Attraction 3',
+      country_id: 'thailand',
+      city_id: 'bangkok',
+      category: '住宿',
+      description: '測試用',
+      duration_minutes: 120,
+      tags: [],
+      thumbnail: '',
+      is_active: false,
+    },
   ]
   const loading = false
   const addAttraction = async () => ({ success: true })

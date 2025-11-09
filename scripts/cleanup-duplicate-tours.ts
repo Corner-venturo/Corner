@@ -62,7 +62,9 @@ async function checkDuplicates() {
     console.log(`📋 ${code} (${tours.length} 筆):`)
     tours.forEach((tour, index) => {
       const marker = index === 0 ? '✅ [保留]' : '❌ [待刪除]'
-      console.log(`   ${marker} ${tour.id} - ${tour.created_at} - ${(tour as any).name || (tour as any).location || ''}`)
+      console.log(
+        `   ${marker} ${tour.id} - ${tour.created_at} - ${(tour as any).name || (tour as any).location || ''}`
+      )
     })
     console.log()
   }

@@ -2,15 +2,10 @@
  * 收款管理資料處理 Hook
  */
 
-import { useMemo } from 'react';
-import {
-  useOrderStore,
-  useReceiptStore,
-  useLinkPayLogStore,
-  useAuthStore,
-} from '@/stores';
-import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator';
-import type { ReceiptItem } from '@/stores';
+import { useMemo } from 'react'
+import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore } from '@/stores'
+import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
+import type { ReceiptItem } from '@/stores'
 
 const RECEIPT_TYPES = {
   BANK_TRANSFER: 0,
@@ -18,20 +13,20 @@ const RECEIPT_TYPES = {
   CREDIT_CARD: 2,
   CHECK: 3,
   LINK_PAY: 4,
-} as const;
+} as const
 
 export function usePaymentData() {
-  const { items: orders } = useOrderStore();
-  const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore();
-  const { items: linkpayLogs } = useLinkPayLogStore();
-  const { user } = useAuthStore();
+  const { items: orders } = useOrderStore()
+  const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore()
+  const { items: linkpayLogs } = useLinkPayLogStore()
+  const { user } = useAuthStore()
 
   // 過濾可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
-    return orders.filter(order =>
-      order.payment_status === 'unpaid' || order.payment_status === 'partial'
-    );
-  }, [orders]);
+    return orders.filter(
+      order => order.payment_status === 'unpaid' || order.payment_status === 'partial'
+    )
+  }, [orders])
 
   const handleCreateLinkPay = async (receiptNumber: string, item: ReceiptItem) => {
     try {
@@ -46,38 +41,38 @@ export function usePaymentData() {
           createUser: user?.id || '',
           amount: item.amount,
           endDate: item.pay_dateline || '',
-        })
-      });
+        }),
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.success) {
-        alert('✅ LinkPay 付款連結生成成功');
+        alert('✅ LinkPay 付款連結生成成功')
       } else {
-        alert(`❌ LinkPay 生成失敗: ${data.message}`);
+        alert(`❌ LinkPay 生成失敗: ${data.message}`)
       }
     } catch (error) {
-      console.error('LinkPay API 錯誤:', error);
-      alert('❌ LinkPay 連結生成失敗');
+      console.error('LinkPay API 錯誤:', error)
+      alert('❌ LinkPay 連結生成失敗')
     }
-  };
+  }
 
   const handleCreateReceipt = async (data: {
-    selectedOrderId: string;
-    paymentItems: ReceiptItem[];
+    selectedOrderId: string
+    paymentItems: ReceiptItem[]
   }) => {
-    const { selectedOrderId, paymentItems } = data;
+    const { selectedOrderId, paymentItems } = data
 
     if (!selectedOrderId || paymentItems.length === 0 || !user?.id) {
-      throw new Error('請填寫完整資訊');
+      throw new Error('請填寫完整資訊')
     }
 
-    const selectedOrder = orders.find(order => order.id === selectedOrderId);
+    const selectedOrder = orders.find(order => order.id === selectedOrderId)
 
     // 為每個收款項目建立收款單
     for (const item of paymentItems) {
       // 生成收款單號
-      const receiptNumber = generateReceiptNumber(item.transaction_date, receipts);
+      const receiptNumber = generateReceiptNumber(item.transaction_date, receipts)
 
       // 建立收款單
       await createReceipt({
@@ -105,17 +100,17 @@ export function usePaymentData() {
         note: item.note || null,
         created_by: user.id,
         updated_by: user.id,
-      });
+      })
 
       // 如果是 LinkPay，呼叫 API 生成付款連結
       if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
-        await handleCreateLinkPay(receiptNumber, item);
+        await handleCreateLinkPay(receiptNumber, item)
       }
     }
 
     // 重新載入資料
-    await fetchReceipts();
-  };
+    await fetchReceipts()
+  }
 
   return {
     receipts,
@@ -125,5 +120,5 @@ export function usePaymentData() {
     user,
     fetchReceipts,
     handleCreateReceipt,
-  };
+  }
 }

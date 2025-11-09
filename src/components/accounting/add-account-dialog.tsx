@@ -186,7 +186,11 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                 {isSelected && (
                   <div className="w-5 h-5 rounded-full bg-[#C9A961] flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                 )}
@@ -299,7 +303,10 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         <div className="p-4 bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EB] rounded-xl">
           <div className="text-xs font-medium text-[#9E8F81] mb-3">預覽效果</div>
           <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: formData.color }} />
+            <div
+              className="w-3 h-3 rounded-full shadow-sm"
+              style={{ backgroundColor: formData.color }}
+            />
             <div className="flex-1">
               <div className="font-medium text-[#3D2914] text-sm">{formData.name}</div>
               {formData.description && (

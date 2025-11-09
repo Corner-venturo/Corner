@@ -35,10 +35,7 @@ export default function DatabaseManagementPage() {
   useEffect(() => {
     const loadCountries = async () => {
       try {
-        const { data, error } = await supabase
-          .from('countries')
-          .select('*')
-          .order('display_order')
+        const { data, error } = await supabase.from('countries').select('*').order('display_order')
 
         if (error) {
           console.error('Error loading countries:', error)
@@ -143,12 +140,15 @@ export default function DatabaseManagementPage() {
 
       <div className="flex-1 overflow-auto">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
-
           {/* 分頁內容 - 只載入已訪問過的 tab */}
           <div className="flex-1 overflow-hidden">
             <TabsContent value="attractions" className="h-full mt-0 data-[state=inactive]:hidden">
               {loadedTabs.has('attractions') && (
-                <Suspense fallback={<div className="flex items-center justify-center h-full">載入中...</div>}>
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full">載入中...</div>
+                  }
+                >
                   <AttractionsTab
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
@@ -163,7 +163,11 @@ export default function DatabaseManagementPage() {
 
             <TabsContent value="michelin" className="h-full mt-0 data-[state=inactive]:hidden">
               {loadedTabs.has('michelin') && (
-                <Suspense fallback={<div className="flex items-center justify-center h-full">載入中...</div>}>
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full">載入中...</div>
+                  }
+                >
                   <MichelinRestaurantsTab selectedCountry={selectedCountry} />
                 </Suspense>
               )}
@@ -171,7 +175,11 @@ export default function DatabaseManagementPage() {
 
             <TabsContent value="experiences" className="h-full mt-0 data-[state=inactive]:hidden">
               {loadedTabs.has('experiences') && (
-                <Suspense fallback={<div className="flex items-center justify-center h-full">載入中...</div>}>
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full">載入中...</div>
+                  }
+                >
                   <PremiumExperiencesTab selectedCountry={selectedCountry} />
                 </Suspense>
               )}

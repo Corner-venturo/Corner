@@ -461,7 +461,6 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     ],
   },
 
-
   // 工作空間表
   {
     name: 'workspace_items',

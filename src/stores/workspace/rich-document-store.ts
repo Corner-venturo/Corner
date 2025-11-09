@@ -11,10 +11,11 @@ import type { BaseEntity } from '@/types'
 /**
  * Rich Document 擴展型別（符合 BaseEntity）
  */
-type RichDocumentEntity = RichDocument & Pick<BaseEntity, 'updated_at'> & {
-  created_at: string
-  updated_at: string
-}
+type RichDocumentEntity = RichDocument &
+  Pick<BaseEntity, 'updated_at'> & {
+    created_at: string
+    updated_at: string
+  }
 
 /**
  * Rich Document Store

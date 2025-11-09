@@ -12,7 +12,11 @@ export function isComparable(value: unknown): value is number | string {
 /**
  * 型別安全的比較函數
  */
-export function compareValues(a: unknown, b: unknown, operator: 'gt' | 'gte' | 'lt' | 'lte'): boolean {
+export function compareValues(
+  a: unknown,
+  b: unknown,
+  operator: 'gt' | 'gte' | 'lt' | 'lte'
+): boolean {
   // 如果兩個值都可比較，進行比較
   if (isComparable(a) && isComparable(b)) {
     switch (operator) {

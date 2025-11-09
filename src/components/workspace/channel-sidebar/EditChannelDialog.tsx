@@ -3,13 +3,13 @@
  */
 
 interface EditChannelDialogProps {
-  isOpen: boolean;
-  channelName: string;
-  channelDescription: string;
-  onChannelNameChange: (name: string) => void;
-  onChannelDescriptionChange: (desc: string) => void;
-  onClose: () => void;
-  onSave: () => void;
+  isOpen: boolean
+  channelName: string
+  channelDescription: string
+  onChannelNameChange: (name: string) => void
+  onChannelDescriptionChange: (desc: string) => void
+  onClose: () => void
+  onSave: () => void
 }
 
 export function EditChannelDialog({
@@ -21,7 +21,7 @@ export function EditChannelDialog({
   onClose,
   onSave,
 }: EditChannelDialogProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -70,5 +70,5 @@ export function EditChannelDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

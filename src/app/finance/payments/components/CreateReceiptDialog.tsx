@@ -2,15 +2,21 @@
  * 新增收款單 Dialog
  */
 
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
-import { PaymentItemForm } from './PaymentItemForm';
-import type { ReceiptItem } from '@/stores';
-import type { Order } from '@/stores/order-store';
+import { useState } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Plus } from 'lucide-react'
+import { PaymentItemForm } from './PaymentItemForm'
+import type { ReceiptItem } from '@/stores'
+import type { Order } from '@/stores/order-store'
 
 const RECEIPT_TYPES = {
   BANK_TRANSFER: 0,
@@ -18,87 +24,82 @@ const RECEIPT_TYPES = {
   CREDIT_CARD: 2,
   CHECK: 3,
   LINK_PAY: 4,
-} as const;
+} as const
 
 interface CreateReceiptDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  availableOrders: Order[];
-  onSubmit: (data: {
-    selectedOrderId: string;
-    paymentItems: ReceiptItem[];
-  }) => Promise<void>;
+  isOpen: boolean
+  onClose: () => void
+  availableOrders: Order[]
+  onSubmit: (data: { selectedOrderId: string; paymentItems: ReceiptItem[] }) => Promise<void>
 }
 
 export function CreateReceiptDialog({
   isOpen,
   onClose,
   availableOrders,
-  onSubmit
+  onSubmit,
 }: CreateReceiptDialogProps) {
-  const [selectedOrderId, setSelectedOrderId] = useState('');
+  const [selectedOrderId, setSelectedOrderId] = useState('')
   const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([
     {
       id: '1',
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0]
-    }
-  ]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+      transaction_date: new Date().toISOString().split('T')[0],
+    },
+  ])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const selectedOrder = availableOrders.find(order => order.id === selectedOrderId);
+  const selectedOrder = availableOrders.find(order => order.id === selectedOrderId)
 
-  const totalAmount = paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const totalAmount = paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0)
 
   const addPaymentItem = () => {
     const newItem: ReceiptItem = {
       id: Date.now().toString(),
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0]
-    };
-    setPaymentItems(prev => [...prev, newItem]);
-  };
+      transaction_date: new Date().toISOString().split('T')[0],
+    }
+    setPaymentItems(prev => [...prev, newItem])
+  }
 
   const removePaymentItem = (id: string) => {
     if (paymentItems.length > 1) {
-      setPaymentItems(prev => prev.filter(item => item.id !== id));
+      setPaymentItems(prev => prev.filter(item => item.id !== id))
     }
-  };
+  }
 
   const updatePaymentItem = (id: string, updates: Partial<ReceiptItem>) => {
-    setPaymentItems(prev => prev.map(item =>
-      item.id === id ? { ...item, ...updates } : item
-    ));
-  };
+    setPaymentItems(prev => prev.map(item => (item.id === id ? { ...item, ...updates } : item)))
+  }
 
   const resetForm = () => {
-    setSelectedOrderId('');
+    setSelectedOrderId('')
     setPaymentItems([
       {
         id: '1',
         receipt_type: RECEIPT_TYPES.CASH,
         amount: 0,
-        transaction_date: new Date().toISOString().split('T')[0]
-      }
-    ]);
-  };
+        transaction_date: new Date().toISOString().split('T')[0],
+      },
+    ])
+  }
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
-      await onSubmit({ selectedOrderId, paymentItems });
-      resetForm();
+      await onSubmit({ selectedOrderId, paymentItems })
+      resetForm()
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    onClose();
-    resetForm();
-  };
+    onClose()
+    resetForm()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -113,7 +114,9 @@ export function CreateReceiptDialog({
             <h3 className="text-lg font-semibold mb-4">基本資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-morandi-primary mb-2 block">選擇訂單 *</label>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  選擇訂單 *
+                </label>
                 <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
                   <SelectTrigger>
                     <SelectValue placeholder="請選擇待收款的訂單..." />
@@ -122,9 +125,12 @@ export function CreateReceiptDialog({
                     {availableOrders.map(order => (
                       <SelectItem key={order.id} value={order.id}>
                         <div>
-                          <div className="font-medium">{order.order_number} - {order.tour_name}</div>
+                          <div className="font-medium">
+                            {order.order_number} - {order.tour_name}
+                          </div>
                           <div className="text-sm text-morandi-secondary">
-                            {order.contact_person} | 待收: NT$ {order.remaining_amount?.toLocaleString() || 0}
+                            {order.contact_person} | 待收: NT${' '}
+                            {order.remaining_amount?.toLocaleString() || 0}
                           </div>
                         </div>
                       </SelectItem>
@@ -135,7 +141,9 @@ export function CreateReceiptDialog({
 
               {selectedOrder && (
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary mb-2 block">待收金額</label>
+                  <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                    待收金額
+                  </label>
                   <Input
                     value={`NT$ ${selectedOrder.remaining_amount?.toLocaleString() || 0}`}
                     disabled
@@ -182,11 +190,7 @@ export function CreateReceiptDialog({
 
           {/* 操作按鈕 */}
           <div className="flex justify-end gap-4">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
+            <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
               取消
             </Button>
             <Button
@@ -200,5 +204,5 @@ export function CreateReceiptDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
