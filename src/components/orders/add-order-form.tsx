@@ -197,10 +197,17 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           <label className="text-sm font-medium text-morandi-primary">團員人數</label>
           <Input
             type="number"
-            value={formData.member_count || 1}
-            onChange={e => updateFormData?.({ ...formData, member_count: Number(e.target.value) })}
+            value={formData.member_count || ''}
+            onChange={e => {
+              const value = e.target.value
+              updateFormData?.({
+                ...formData,
+                member_count: value === '' ? undefined : Number(value),
+              })
+            }}
+            placeholder="1"
             className="mt-1"
-            min="1"
+            min="0"
           />
         </div>
         <div>

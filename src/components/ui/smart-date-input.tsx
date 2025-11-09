@@ -126,8 +126,8 @@ export function SmartDateInput({
   }
 
   return (
-    <div className={cn('flex items-center gap-1', className)}>
-      <div className="flex items-center gap-1 px-3 h-10 border border-input rounded-md bg-background flex-1 focus-within:border-morandi-gold transition-colors">
+    <div className={cn('flex items-center gap-2', className)}>
+      <div className="flex items-center px-3 h-10 border border-input rounded-md bg-background flex-1 focus-within:border-morandi-gold transition-colors">
         <input
           ref={yearRef}
           type="text"
@@ -136,11 +136,14 @@ export function SmartDateInput({
           onChange={handleYearChange}
           onKeyDown={e => handleKeyDown(e, 'year')}
           placeholder="YYYY"
-          className="w-14 bg-transparent outline-none text-center placeholder:text-muted-foreground text-base md:text-sm"
+          className="bg-transparent outline-none text-center placeholder:text-muted-foreground/40 text-base md:text-sm"
+          style={{ width: '56px', maxWidth: '56px', minWidth: '56px', flex: 'none', fontSize: '13px' }}
           maxLength={4}
           required={required}
         />
-        <span className="text-morandi-secondary">/</span>
+        <span className="text-morandi-secondary" style={{ padding: '0 4px', flex: 'none' }}>
+          /
+        </span>
         <input
           ref={monthRef}
           type="text"
@@ -149,11 +152,14 @@ export function SmartDateInput({
           onChange={handleMonthChange}
           onKeyDown={e => handleKeyDown(e, 'month')}
           placeholder="MM"
-          className="w-10 bg-transparent outline-none text-center placeholder:text-muted-foreground text-base md:text-sm"
+          className="bg-transparent outline-none text-center placeholder:text-muted-foreground/40 text-base md:text-sm"
+          style={{ width: '40px', maxWidth: '40px', minWidth: '40px', flex: 'none', fontSize: '13px' }}
           maxLength={2}
           required={required}
         />
-        <span className="text-morandi-secondary">/</span>
+        <span className="text-morandi-secondary" style={{ padding: '0 4px', flex: 'none' }}>
+          /
+        </span>
         <input
           ref={dayRef}
           type="text"
@@ -162,7 +168,8 @@ export function SmartDateInput({
           onChange={handleDayChange}
           onKeyDown={e => handleKeyDown(e, 'day')}
           placeholder="DD"
-          className="w-10 bg-transparent outline-none text-center placeholder:text-muted-foreground text-base md:text-sm"
+          className="bg-transparent outline-none text-center placeholder:text-muted-foreground/40 text-base md:text-sm"
+          style={{ width: '40px', maxWidth: '40px', minWidth: '40px', flex: 'none', fontSize: '13px' }}
           maxLength={2}
           required={required}
         />

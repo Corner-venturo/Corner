@@ -2,7 +2,7 @@ import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { SmartDateInput } from '@/components/ui/smart-date-input'
+import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form'
 import { AlertCircle } from 'lucide-react'
@@ -194,7 +194,7 @@ export function TourForm({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-morandi-primary">出發日期</label>
-                    <SmartDateInput
+                    <SimpleDateInput
                       value={newTour.departure_date}
                       onChange={departure_date => {
                         setNewTour(prev => {
@@ -217,13 +217,12 @@ export function TourForm({
                   </div>
                   <div>
                     <label className="text-sm font-medium text-morandi-primary">返回日期</label>
-                    <SmartDateInput
+                    <SimpleDateInput
                       value={newTour.return_date}
                       onChange={return_date => {
                         setNewTour(prev => ({ ...prev, return_date }))
                       }}
                       min={newTour.departure_date || new Date().toISOString().split('T')[0]}
-                      initialMonth={newTour.departure_date}
                       className="mt-1"
                       required
                     />

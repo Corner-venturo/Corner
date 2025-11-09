@@ -200,11 +200,11 @@ export function DateInput({
         onKeyDown={handleYearKeyDown}
         placeholder="YYYY"
         disabled={disabled}
-        className="flex-1 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
+        className="w-14 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
         style={{ boxShadow: 'none' }}
         maxLength={4}
       />
-      <span className="text-morandi-secondary/50">/</span>
+      <span className="text-morandi-secondary/50 px-1">/</span>
       <input
         ref={monthRef}
         type="text"
@@ -214,11 +214,11 @@ export function DateInput({
         onKeyDown={handleMonthKeyDown}
         placeholder="MM"
         disabled={disabled}
-        className="flex-1 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
+        className="w-10 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
         style={{ boxShadow: 'none' }}
         maxLength={2}
       />
-      <span className="text-morandi-secondary/50">/</span>
+      <span className="text-morandi-secondary/50 px-1">/</span>
       <input
         ref={dayRef}
         type="text"
@@ -228,7 +228,7 @@ export function DateInput({
         onKeyDown={handleDayKeyDown}
         placeholder="DD"
         disabled={disabled}
-        className="flex-1 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
+        className="w-10 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
         style={{ boxShadow: 'none' }}
         maxLength={2}
       />

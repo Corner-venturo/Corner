@@ -10,6 +10,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AppInitializer } from '@/components/AppInitializer'
 import { GlobalDialogs } from '@/lib/ui/alert-dialog'
 import { GlobalDialogOverride } from '@/lib/ui/global-dialog-override'
+import { LayoutRouter } from '@/components/layout/layout-router'
 // import { DevAutoLogin } from '@/components/dev-auto-login'; // 停用自動登入
 
 export const dynamic = 'force-dynamic'
@@ -45,12 +46,12 @@ export default function RootLayout({
         <AppInitializer>
           <ErrorBoundary>
             <ThemeProvider>
-              <MainLayout>
+              <LayoutRouter>
                 <AuthProvider>
                   {/* <DevAutoLogin /> 停用自動登入 */}
                   {children}
                 </AuthProvider>
-              </MainLayout>
+              </LayoutRouter>
             </ThemeProvider>
           </ErrorBoundary>
         </AppInitializer>

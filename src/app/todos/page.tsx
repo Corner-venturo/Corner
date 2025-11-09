@@ -217,6 +217,7 @@ export default function TodosPage() {
       key: 'deadline',
       label: '期限',
       sortable: true,
+      width: '140px',
       render: (value: string) => (
         <div className="flex items-center gap-2">
           <Calendar size={14} className="text-morandi-secondary" />
