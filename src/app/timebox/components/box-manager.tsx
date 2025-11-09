@@ -188,7 +188,7 @@ export default function BoxManager() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {boxes.length === 0 ? (
+        {!boxes || boxes.length === 0 ? (
           <div className="text-center text-morandi-secondary/80 py-16">還沒有建立任何箱子</div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -32,6 +32,7 @@ export const useWorkspaceChannels = () => {
     // State
     workspaces: channelsStore.workspaces,
     currentWorkspace: channelsStore.currentWorkspace,
+    currentWorkspaceId: channelsStore.currentWorkspaceId,
     bulletins: channelsStore.bulletins,
     channels: channelsStore.channels,
     channelGroups: channelsStore.channelGroups,
@@ -176,6 +177,7 @@ export const useWorkspaceStore = () => {
     // Workspaces & Channels
     workspaces: channelsStore.workspaces,
     currentWorkspace: channelsStore.currentWorkspace,
+    currentWorkspaceId: channelsStore.currentWorkspaceId,
     bulletins: channelsStore.bulletins,
     channels: channelsStore.channels,
     channelGroups: channelsStore.channelGroups,

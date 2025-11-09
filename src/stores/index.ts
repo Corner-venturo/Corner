@@ -131,6 +131,12 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 // 供應商類別 Store
 export { useSupplierCategoryStore } from './supplier-category-store'
 
+// 企業客戶 Store
+export const useCompanyStore = createStore<import('./types').Company>('companies')
+
+// 企業聯絡人 Store
+export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts')
+
 // 地區 Store（舊版，保留向後相容）
 export const useRegionStore = createStore<Region>('regions')
 
@@ -237,6 +243,9 @@ export type {
   Supplier,
   Region,
 }
+
+// 企業客戶系統型別
+export type { Company, CompanyContact } from './types'
 
 // 財務收款系統型別
 export type {

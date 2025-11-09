@@ -20,6 +20,7 @@ interface ChannelsUIState {
   selectedChannel: Channel | null
   currentChannel: Channel | null
   currentWorkspace: Workspace | null
+  currentWorkspaceId: string | null // For RLS
 
   // 搜尋與過濾
   searchQuery: string
@@ -38,6 +39,7 @@ const useChannelsUIStore = create<
     setSelectedChannel: (channel: Channel | null) => void
     setCurrentChannel: (channel: Channel | null) => void
     setCurrentWorkspace: (workspace: Workspace | null) => void
+    setCurrentWorkspaceId: (workspaceId: string | null) => void
     setSearchQuery: (query: string) => void
     setChannelFilter: (filter: 'all' | 'starred' | 'unread' | 'muted') => void
     setError: (error: string | null) => void
@@ -47,6 +49,7 @@ const useChannelsUIStore = create<
   selectedChannel: null,
   currentChannel: null,
   currentWorkspace: null,
+  currentWorkspaceId: null,
   searchQuery: '',
   channelFilter: 'all',
   error: null,
@@ -54,6 +57,7 @@ const useChannelsUIStore = create<
   setSelectedChannel: channel => set({ selectedChannel: channel }),
   setCurrentChannel: channel => set({ currentChannel: channel }),
   setCurrentWorkspace: workspace => set({ currentWorkspace: workspace }),
+  setCurrentWorkspaceId: workspaceId => set({ currentWorkspaceId: workspaceId }),
   setSearchQuery: query => set({ searchQuery: query }),
   setChannelFilter: filter => set({ channelFilter: filter }),
   setError: error => set({ error }),
@@ -88,6 +92,7 @@ export const useChannelsStore = () => {
     selectedChannel: uiStore.selectedChannel,
     currentChannel: uiStore.currentChannel,
     currentWorkspace: uiStore.currentWorkspace,
+    currentWorkspaceId: uiStore.currentWorkspaceId,
     searchQuery: uiStore.searchQuery,
     channelFilter: uiStore.channelFilter,
 
@@ -109,7 +114,19 @@ export const useChannelsStore = () => {
       }
     },
 
-    setCurrentWorkspace: uiStore.setCurrentWorkspace,
+    setCurrentWorkspace: (workspace: Workspace | string | null) => {
+      if (typeof workspace === 'string') {
+        // 如果傳入 workspace ID，設定 ID
+        uiStore.setCurrentWorkspaceId(workspace)
+        // 嘗試從列表中找到對應的 workspace 物件
+        const ws = workspaceStore.items.find(w => w.id === workspace || w.code === workspace)
+        uiStore.setCurrentWorkspace(ws || null)
+      } else {
+        // 如果傳入 workspace 物件
+        uiStore.setCurrentWorkspace(workspace)
+        uiStore.setCurrentWorkspaceId(workspace?.id || workspace?.code || null)
+      }
+    },
 
     // ============================================
     // Channel 操作 (使用 createStore 的方法)

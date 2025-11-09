@@ -6,7 +6,13 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { User, LogOut } from 'lucide-react'
 import { useSettingsState } from './hooks/useSettingsState'
-import { AppearanceSettings, AccountSettings, SystemSettings, OtherSettings } from './components'
+import {
+  AppearanceSettings,
+  AccountSettings,
+  SystemSettings,
+  OtherSettings,
+  PermissionManagementSettings,
+} from './components'
 
 // 強制客戶端渲染，不預取伺服器資料
 export const dynamic = 'force-dynamic'
@@ -90,6 +96,9 @@ export default function SettingsPage() {
             passwordUpdateLoading={passwordUpdateLoading}
             setPasswordUpdateLoading={setPasswordUpdateLoading}
           />
+
+          {/* 權限管理 */}
+          <PermissionManagementSettings />
 
           {/* 系統維護 */}
           <SystemSettings

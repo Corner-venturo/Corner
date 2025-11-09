@@ -11,6 +11,7 @@ import { AppInitializer } from '@/components/AppInitializer'
 import { GlobalDialogs } from '@/lib/ui/alert-dialog'
 import { GlobalDialogOverride } from '@/lib/ui/global-dialog-override'
 import { LayoutRouter } from '@/components/layout/layout-router'
+import { WorkspaceRLSProvider } from '@/components/WorkspaceRLSProvider'
 // import { DevAutoLogin } from '@/components/dev-auto-login'; // 停用自動登入
 
 export const dynamic = 'force-dynamic'
@@ -48,6 +49,7 @@ export default function RootLayout({
             <ThemeProvider>
               <LayoutRouter>
                 <AuthProvider>
+                  <WorkspaceRLSProvider />
                   {/* <DevAutoLogin /> 停用自動登入 */}
                   {children}
                 </AuthProvider>

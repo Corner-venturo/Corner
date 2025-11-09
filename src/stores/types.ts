@@ -626,5 +626,71 @@ export interface Visa {
   updated_at: string
 }
 
+// 企業客戶
+export interface Company {
+  id: string
+  workspace_id: string
+
+  // 基本資訊
+  company_name: string
+  tax_id: string | null // 統一編號
+  phone: string | null
+  email: string | null
+  website: string | null
+
+  // 發票資訊
+  invoice_title: string | null // 發票抬頭
+  invoice_address: string | null
+  invoice_email: string | null
+
+  // 付款資訊
+  payment_terms: number // 付款期限（天）
+  payment_method: 'transfer' | 'cash' | 'check' | 'credit_card'
+  credit_limit: number // 信用額度
+
+  // 銀行資訊
+  bank_name: string | null
+  bank_account: string | null
+  bank_branch: string | null
+
+  // 地址資訊
+  registered_address: string | null // 登記地址
+  mailing_address: string | null // 通訊地址
+
+  // VIP 等級
+  vip_level: number // 0: 普通, 1-5: VIP等級
+
+  // 備註
+  note: string | null
+
+  // 系統欄位
+  created_at: string
+  updated_at: string
+  created_by: string | null
+}
+
+export interface CompanyContact {
+  id: string
+  company_id: string
+
+  // 聯絡人資訊
+  name: string
+  title: string | null // 職稱
+  department: string | null // 部門
+  phone: string | null
+  mobile: string | null
+  email: string | null
+
+  // 主要聯絡人標記
+  is_primary: boolean
+
+  // 備註
+  note: string | null
+
+  // 系統欄位
+  created_at: string
+  updated_at: string
+}
+
 // 系統功能權限清單 - 從統一配置自動生成
 export { SYSTEM_PERMISSIONS, FEATURE_PERMISSIONS } from '@/lib/permissions'

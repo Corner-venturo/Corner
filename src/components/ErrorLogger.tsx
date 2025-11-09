@@ -43,13 +43,20 @@ export function ErrorLogger() {
     }
 
     // 捕獲 React Hydration 錯誤
-    const originalConsoleError = console.error.bind(console)
-    console.error = (...args) => {
+    const originalConsoleError = console.error
+    let isLoggingError = false // 防止無限循環的標誌
+
+    console.error = function (...args) {
       // 先輸出到原始的 console.error
-      originalConsoleError(...args)
+      originalConsoleError.apply(console, args)
+
+      // 如果正在記錄錯誤，直接返回避免無限循環
+      if (isLoggingError) return
 
       // 避免在 ErrorLogger 內部再次觸發錯誤日誌
       try {
+        isLoggingError = true
+
         const errorString = args
           .map(arg => {
             try {
@@ -84,6 +91,9 @@ export function ErrorLogger() {
       } catch (err) {
         // 如果日誌記錄本身出錯，使用原始的 console.error
         originalConsoleError('ErrorLogger internal error:', err)
+      } finally {
+        // 重置標誌，允許下次記錄
+        isLoggingError = false
       }
     }
 
