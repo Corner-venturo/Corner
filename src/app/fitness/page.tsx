@@ -341,13 +341,14 @@ export default function FitnessPage() {
                   <button
                     key={group.id}
                     onClick={() => setSelectedCategory(group.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1.5 ${
                       selectedCategory === group.id
                         ? 'bg-[#C9A961] text-white'
                         : 'bg-[#FEFEFE] text-[#6B5D52] border border-[#E0D8CC]'
                     }`}
                   >
-                    {group.emoji} {group.name}
+                    <MuscleGroupIcon groupId={group.id} className="w-3.5 h-3.5" />
+                    {group.name}
                   </button>
                 ))}
               </div>
