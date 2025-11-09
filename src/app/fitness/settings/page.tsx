@@ -102,14 +102,11 @@ export default function FitnessSettingsPage() {
                   簡潔優雅的健身記錄工具，專為 Corner
                   團隊設計。
                 </p>
-                <p className="mt-3 pt-3 border-t border-[#EDE8E0]">
-                  💪 支援 134+ 訓練動作
-                  <br />
-                  📊 訓練容量自動計算
-                  <br />
-                  📱 PWA 離線使用
-                  <br />
-                  🔄 多裝置同步（開發中）
+                <p className="mt-3 pt-3 border-t border-[#EDE8E0] space-y-1">
+                  <div>• 支援 134+ 訓練動作</div>
+                  <div>• 訓練容量自動計算</div>
+                  <div>• PWA 離線使用</div>
+                  <div>• 多裝置同步（開發中）</div>
                 </p>
               </div>
             </div>
