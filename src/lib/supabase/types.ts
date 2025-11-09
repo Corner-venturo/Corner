@@ -1,13 +1,100 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '13.0.5'
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
+      accounting_accounts: {
+        Row: {
+          available_credit: number | null
+          balance: number
+          color: string | null
+          created_at: string | null
+          credit_limit: number | null
+          currency: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          available_credit?: number | null
+          balance?: number
+          color?: string | null
+          created_at?: string | null
+          credit_limit?: number | null
+          currency?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          available_credit?: number | null
+          balance?: number
+          color?: string | null
+          created_at?: string | null
+          credit_limit?: number | null
+          currency?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      accounting_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_system: boolean | null
+          name: string
+          type: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_system?: boolean | null
+          name: string
+          type: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_system?: boolean | null
+          name?: string
+          type?: string
+        }
+        Relationships: []
+      }
       accounting_entries: {
         Row: {
           amount: number
@@ -67,6 +154,75 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      accounting_transactions: {
+        Row: {
+          account_id: string
+          account_name: string | null
+          amount: number
+          category_id: string | null
+          category_name: string | null
+          created_at: string | null
+          currency: string
+          date: string
+          description: string | null
+          id: string
+          to_account_id: string | null
+          to_account_name: string | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          account_name?: string | null
+          amount: number
+          category_id?: string | null
+          category_name?: string | null
+          created_at?: string | null
+          currency?: string
+          date?: string
+          description?: string | null
+          id?: string
+          to_account_id?: string | null
+          to_account_name?: string | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          account_name?: string | null
+          amount?: number
+          category_id?: string | null
+          category_name?: string | null
+          created_at?: string | null
+          currency?: string
+          date?: string
+          description?: string | null
+          id?: string
+          to_account_id?: string | null
+          to_account_name?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_transactions_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       accounts: {
         Row: {
@@ -227,18 +383,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'advance_items_advance_list_id_fkey'
-            columns: ['advance_list_id']
+            foreignKeyName: "advance_items_advance_list_id_fkey"
+            columns: ["advance_list_id"]
             isOneToOne: false
-            referencedRelation: 'advance_lists'
-            referencedColumns: ['id']
+            referencedRelation: "advance_lists"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'advance_items_processed_by_fkey'
-            columns: ['processed_by']
+            foreignKeyName: "advance_items_processed_by_fkey"
+            columns: ["processed_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -278,18 +434,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'advance_lists_channel_id_fkey'
-            columns: ['channel_id']
+            foreignKeyName: "advance_lists_channel_id_fkey"
+            columns: ["channel_id"]
             isOneToOne: false
-            referencedRelation: 'channels'
-            referencedColumns: ['id']
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'advance_lists_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "advance_lists_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -374,25 +530,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'attractions_city_id_fkey'
-            columns: ['city_id']
+            foreignKeyName: "attractions_city_id_fkey"
+            columns: ["city_id"]
             isOneToOne: false
-            referencedRelation: 'cities'
-            referencedColumns: ['id']
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'attractions_country_id_fkey'
-            columns: ['country_id']
+            foreignKeyName: "attractions_country_id_fkey"
+            columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: 'countries'
-            referencedColumns: ['id']
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'attractions_region_id_fkey'
-            columns: ['region_id']
+            foreignKeyName: "attractions_region_id_fkey"
+            columns: ["region_id"]
             isOneToOne: false
-            referencedRelation: 'regions'
-            referencedColumns: ['id']
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -432,11 +588,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'budgets_category_id_fkey'
-            columns: ['category_id']
+            foreignKeyName: "budgets_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -488,11 +644,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'bulletins_author_id_fkey'
-            columns: ['author_id']
+            foreignKeyName: "bulletins_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -565,25 +721,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'calendar_events_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "calendar_events_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'calendar_events_owner_id_fkey'
-            columns: ['owner_id']
+            foreignKeyName: "calendar_events_owner_id_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'calendar_events_updated_by_fkey'
-            columns: ['updated_by']
+            foreignKeyName: "calendar_events_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -623,11 +779,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'categories_parent_id_fkey'
-            columns: ['parent_id']
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -676,11 +832,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'channel_groups_workspace_id_fkey'
-            columns: ['workspace_id']
+            foreignKeyName: "channel_groups_workspace_id_fkey"
+            columns: ["workspace_id"]
             isOneToOne: false
-            referencedRelation: 'workspaces'
-            referencedColumns: ['id']
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -717,25 +873,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'channel_members_channel_id_fkey'
-            columns: ['channel_id']
+            foreignKeyName: "channel_members_channel_id_fkey"
+            columns: ["channel_id"]
             isOneToOne: false
-            referencedRelation: 'channels'
-            referencedColumns: ['id']
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'channel_members_employee_id_fkey'
-            columns: ['employee_id']
+            foreignKeyName: "channel_members_employee_id_fkey"
+            columns: ["employee_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'channel_members_workspace_id_fkey'
-            columns: ['workspace_id']
+            foreignKeyName: "channel_members_workspace_id_fkey"
+            columns: ["workspace_id"]
             isOneToOne: false
-            referencedRelation: 'workspaces'
-            referencedColumns: ['id']
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -744,12 +900,15 @@ export type Database = {
           _deleted: boolean | null
           _needs_sync: boolean | null
           _synced_at: string | null
+          archived_at: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
           group_id: string | null
           id: string
+          is_archived: boolean | null
           is_favorite: boolean | null
+          is_pinned: boolean | null
           name: string
           order: number | null
           tour_id: string | null
@@ -761,12 +920,15 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          archived_at?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           group_id?: string | null
           id?: string
+          is_archived?: boolean | null
           is_favorite?: boolean | null
+          is_pinned?: boolean | null
           name: string
           order?: number | null
           tour_id?: string | null
@@ -778,12 +940,15 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          archived_at?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           group_id?: string | null
           id?: string
+          is_archived?: boolean | null
           is_favorite?: boolean | null
+          is_pinned?: boolean | null
           name?: string
           order?: number | null
           tour_id?: string | null
@@ -793,25 +958,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'channels_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "channels_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'channels_group_id_fkey'
-            columns: ['group_id']
+            foreignKeyName: "channels_group_id_fkey"
+            columns: ["group_id"]
             isOneToOne: false
-            referencedRelation: 'channel_groups'
-            referencedColumns: ['id']
+            referencedRelation: "channel_groups"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'channels_tour_id_fkey'
-            columns: ['tour_id']
+            foreignKeyName: "channels_tour_id_fkey"
+            columns: ["tour_id"]
             isOneToOne: false
-            referencedRelation: 'tours'
-            referencedColumns: ['id']
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -869,18 +1034,113 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'cities_country_id_fkey'
-            columns: ['country_id']
+            foreignKeyName: "cities_country_id_fkey"
+            columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: 'countries'
-            referencedColumns: ['id']
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'cities_region_id_fkey'
-            columns: ['region_id']
+            foreignKeyName: "cities_region_id_fkey"
+            columns: ["region_id"]
             isOneToOne: false
-            referencedRelation: 'regions'
-            referencedColumns: ['id']
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_assets: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          name: string
+          updated_at: string | null
+          uploaded_by: string | null
+          uploaded_by_name: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          uploaded_by_name?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          uploaded_by_name?: string | null
+        }
+        Relationships: []
+      }
+      confirmations: {
+        Row: {
+          booking_number: string
+          confirmation_number: string | null
+          created_at: string | null
+          created_by: string | null
+          data: Json
+          id: string
+          notes: string | null
+          status: string | null
+          type: Database["public"]["Enums"]["confirmation_type"]
+          updated_at: string | null
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          booking_number: string
+          confirmation_number?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json
+          id?: string
+          notes?: string | null
+          status?: string | null
+          type: Database["public"]["Enums"]["confirmation_type"]
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          booking_number?: string
+          confirmation_number?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json
+          id?: string
+          notes?: string | null
+          status?: string | null
+          type?: Database["public"]["Enums"]["confirmation_type"]
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "confirmations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -971,25 +1231,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'cost_templates_attraction_id_fkey'
-            columns: ['attraction_id']
+            foreignKeyName: "cost_templates_attraction_id_fkey"
+            columns: ["attraction_id"]
             isOneToOne: false
-            referencedRelation: 'attractions'
-            referencedColumns: ['id']
+            referencedRelation: "attractions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'cost_templates_city_id_fkey'
-            columns: ['city_id']
+            foreignKeyName: "cost_templates_city_id_fkey"
+            columns: ["city_id"]
             isOneToOne: false
-            referencedRelation: 'cities'
-            referencedColumns: ['id']
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'cost_templates_supplier_id_fkey'
-            columns: ['supplier_id']
+            foreignKeyName: "cost_templates_supplier_id_fkey"
+            columns: ["supplier_id"]
             isOneToOne: false
-            referencedRelation: 'suppliers'
-            referencedColumns: ['id']
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1266,6 +1526,80 @@ export type Database = {
         }
         Relationships: []
       }
+      esims: {
+        Row: {
+          activation_date: string | null
+          cost: number | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          data_limit: number | null
+          data_plan: string | null
+          data_used: number | null
+          destination: string | null
+          expiry_date: string | null
+          iccid: string
+          id: string
+          name: string
+          notes: string | null
+          operator: string | null
+          status: string
+          updated_at: string | null
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          activation_date?: string | null
+          cost?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          data_limit?: number | null
+          data_plan?: string | null
+          data_used?: number | null
+          destination?: string | null
+          expiry_date?: string | null
+          iccid: string
+          id?: string
+          name: string
+          notes?: string | null
+          operator?: string | null
+          status?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          activation_date?: string | null
+          cost?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          data_limit?: number | null
+          data_plan?: string | null
+          data_used?: number | null
+          destination?: string | null
+          expiry_date?: string | null
+          iccid?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          operator?: string | null
+          status?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "esims_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       heroic_summon_history: {
         Row: {
           answers: Json
@@ -1302,18 +1636,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'heroic_summon_history_employee_id_fkey'
-            columns: ['employee_id']
+            foreignKeyName: "heroic_summon_history_employee_id_fkey"
+            columns: ["employee_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'heroic_summon_history_result_id_fkey'
-            columns: ['result_id']
+            foreignKeyName: "heroic_summon_history_result_id_fkey"
+            columns: ["result_id"]
             isOneToOne: false
-            referencedRelation: 'heroic_summon_results'
-            referencedColumns: ['id']
+            referencedRelation: "heroic_summon_results"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1389,11 +1723,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'heroic_summon_results_employee_id_fkey'
-            columns: ['employee_id']
+            foreignKeyName: "heroic_summon_results_employee_id_fkey"
+            columns: ["employee_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1517,11 +1851,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'itineraries_tour_id_fkey'
-            columns: ['tour_id']
+            foreignKeyName: "itineraries_tour_id_fkey"
+            columns: ["tour_id"]
             isOneToOne: false
-            referencedRelation: 'tours'
-            referencedColumns: ['id']
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1573,18 +1907,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'linkpay_logs_receipt_number_fkey'
-            columns: ['receipt_number']
+            foreignKeyName: "linkpay_logs_receipt_number_fkey"
+            columns: ["receipt_number"]
             isOneToOne: false
-            referencedRelation: 'receipts'
-            referencedColumns: ['receipt_number']
+            referencedRelation: "receipts"
+            referencedColumns: ["receipt_number"]
           },
           {
-            foreignKeyName: 'linkpay_logs_workspace_id_fkey'
-            columns: ['workspace_id']
+            foreignKeyName: "linkpay_logs_workspace_id_fkey"
+            columns: ["workspace_id"]
             isOneToOne: false
-            referencedRelation: 'workspaces'
-            referencedColumns: ['id']
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1615,11 +1949,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'manifestation_records_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "manifestation_records_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1731,18 +2065,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'members_order_id_fkey'
-            columns: ['order_id']
+            foreignKeyName: "members_order_id_fkey"
+            columns: ["order_id"]
             isOneToOne: false
-            referencedRelation: 'orders'
-            referencedColumns: ['id']
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'members_tour_id_fkey'
-            columns: ['tour_id']
+            foreignKeyName: "members_tour_id_fkey"
+            columns: ["tour_id"]
             isOneToOne: false
-            referencedRelation: 'tours'
-            referencedColumns: ['id']
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1794,11 +2128,219 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'messages_author_id_fkey'
-            columns: ['author_id']
+            foreignKeyName: "messages_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      michelin_restaurants: {
+        Row: {
+          address: string | null
+          address_en: string | null
+          avg_price_dinner: number | null
+          avg_price_lunch: number | null
+          awards: string[] | null
+          best_season: string[] | null
+          bib_gourmand: boolean | null
+          booking_contact: string | null
+          booking_email: string | null
+          booking_notes: string | null
+          chef_name: string | null
+          chef_profile: string | null
+          city_id: string
+          commission_rate: number | null
+          country_id: string
+          created_at: string | null
+          created_by: string | null
+          cuisine_type: string[] | null
+          currency: string | null
+          description: string | null
+          description_en: string | null
+          dining_restrictions: Json | null
+          dining_style: string | null
+          display_order: number | null
+          dress_code: string | null
+          email: string | null
+          facilities: Json | null
+          google_maps_url: string | null
+          green_star: boolean | null
+          group_menu_available: boolean | null
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          max_group_size: number | null
+          menu_images: string[] | null
+          michelin_guide_year: number | null
+          michelin_plate: boolean | null
+          michelin_stars: number | null
+          min_group_size: number | null
+          name: string
+          name_en: string | null
+          name_local: string | null
+          notes: string | null
+          opening_hours: Json | null
+          phone: string | null
+          price_range: string | null
+          ratings: Json | null
+          recommended_for: string[] | null
+          region_id: string | null
+          reservation_required: boolean | null
+          reservation_url: string | null
+          signature_dishes: string[] | null
+          specialties: string[] | null
+          thumbnail: string | null
+          updated_at: string | null
+          updated_by: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          address_en?: string | null
+          avg_price_dinner?: number | null
+          avg_price_lunch?: number | null
+          awards?: string[] | null
+          best_season?: string[] | null
+          bib_gourmand?: boolean | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_notes?: string | null
+          chef_name?: string | null
+          chef_profile?: string | null
+          city_id: string
+          commission_rate?: number | null
+          country_id: string
+          created_at?: string | null
+          created_by?: string | null
+          cuisine_type?: string[] | null
+          currency?: string | null
+          description?: string | null
+          description_en?: string | null
+          dining_restrictions?: Json | null
+          dining_style?: string | null
+          display_order?: number | null
+          dress_code?: string | null
+          email?: string | null
+          facilities?: Json | null
+          google_maps_url?: string | null
+          green_star?: boolean | null
+          group_menu_available?: boolean | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_group_size?: number | null
+          menu_images?: string[] | null
+          michelin_guide_year?: number | null
+          michelin_plate?: boolean | null
+          michelin_stars?: number | null
+          min_group_size?: number | null
+          name: string
+          name_en?: string | null
+          name_local?: string | null
+          notes?: string | null
+          opening_hours?: Json | null
+          phone?: string | null
+          price_range?: string | null
+          ratings?: Json | null
+          recommended_for?: string[] | null
+          region_id?: string | null
+          reservation_required?: boolean | null
+          reservation_url?: string | null
+          signature_dishes?: string[] | null
+          specialties?: string[] | null
+          thumbnail?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          address_en?: string | null
+          avg_price_dinner?: number | null
+          avg_price_lunch?: number | null
+          awards?: string[] | null
+          best_season?: string[] | null
+          bib_gourmand?: boolean | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_notes?: string | null
+          chef_name?: string | null
+          chef_profile?: string | null
+          city_id?: string
+          commission_rate?: number | null
+          country_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          cuisine_type?: string[] | null
+          currency?: string | null
+          description?: string | null
+          description_en?: string | null
+          dining_restrictions?: Json | null
+          dining_style?: string | null
+          display_order?: number | null
+          dress_code?: string | null
+          email?: string | null
+          facilities?: Json | null
+          google_maps_url?: string | null
+          green_star?: boolean | null
+          group_menu_available?: boolean | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_group_size?: number | null
+          menu_images?: string[] | null
+          michelin_guide_year?: number | null
+          michelin_plate?: boolean | null
+          michelin_stars?: number | null
+          min_group_size?: number | null
+          name?: string
+          name_en?: string | null
+          name_local?: string | null
+          notes?: string | null
+          opening_hours?: Json | null
+          phone?: string | null
+          price_range?: string | null
+          ratings?: Json | null
+          recommended_for?: string[] | null
+          region_id?: string | null
+          reservation_required?: boolean | null
+          reservation_url?: string | null
+          signature_dishes?: string[] | null
+          specialties?: string[] | null
+          thumbnail?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "michelin_restaurants_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "michelin_restaurants_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "michelin_restaurants_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1835,11 +2377,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'notes_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "notes_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1951,18 +2493,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'orders_customer_id_fkey'
-            columns: ['customer_id']
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: 'customers'
-            referencedColumns: ['id']
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'orders_tour_id_fkey'
-            columns: ['tour_id']
+            foreignKeyName: "orders_tour_id_fkey"
+            columns: ["tour_id"]
             isOneToOne: false
-            referencedRelation: 'tours'
-            referencedColumns: ['id']
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2056,18 +2598,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'payment_requests_approved_by_fkey'
-            columns: ['approved_by']
+            foreignKeyName: "payment_requests_approved_by_fkey"
+            columns: ["approved_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'payment_requests_paid_by_fkey'
-            columns: ['paid_by']
+            foreignKeyName: "payment_requests_paid_by_fkey"
+            columns: ["paid_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2157,6 +2699,262 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: []
+      }
+      premium_experiences: {
+        Row: {
+          advance_booking_days: number | null
+          available_seasons: string[] | null
+          awards: string[] | null
+          best_for_age_group: string | null
+          best_time_of_day: string | null
+          booking_contact: string | null
+          booking_email: string | null
+          booking_phone: string | null
+          cancellation_policy: string | null
+          category: string
+          certifications: string[] | null
+          city_id: string
+          combine_with: string[] | null
+          commission_rate: number | null
+          country_id: string
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          description: string
+          description_en: string | null
+          difficulty_level: string | null
+          display_order: number | null
+          dress_code: string | null
+          duration_hours: number | null
+          eco_friendly: boolean | null
+          exclusivity_level: string
+          expert_credentials: string[] | null
+          expert_name: string | null
+          expert_profile: string | null
+          expert_title: string | null
+          group_size_max: number | null
+          group_size_min: number | null
+          highlights: string[] | null
+          id: string
+          images: string[] | null
+          inclusions: Json | null
+          internal_notes: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          language_support: string[] | null
+          latitude: number | null
+          longitude: number | null
+          media_features: string[] | null
+          meeting_point: string | null
+          meeting_point_coords: Json | null
+          minimum_participants: number | null
+          name: string
+          name_en: string | null
+          name_local: string | null
+          net_price_per_person: number | null
+          physical_requirement: string | null
+          pickup_service: boolean | null
+          price_excludes: string[] | null
+          price_includes: string[] | null
+          price_per_person_max: number | null
+          price_per_person_min: number | null
+          ratings: Json | null
+          recommended_for: string[] | null
+          region_id: string | null
+          related_attractions: string[] | null
+          restrictions: string[] | null
+          review_count: number | null
+          specific_location: string | null
+          sub_category: string[] | null
+          suitable_for_children: boolean | null
+          supports_local_community: boolean | null
+          sustainability_practices: string[] | null
+          tagline: string | null
+          thumbnail: string | null
+          transportation_included: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+          video_url: string | null
+          what_makes_it_special: string | null
+          what_to_bring: string[] | null
+        }
+        Insert: {
+          advance_booking_days?: number | null
+          available_seasons?: string[] | null
+          awards?: string[] | null
+          best_for_age_group?: string | null
+          best_time_of_day?: string | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          cancellation_policy?: string | null
+          category: string
+          certifications?: string[] | null
+          city_id: string
+          combine_with?: string[] | null
+          commission_rate?: number | null
+          country_id: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          description: string
+          description_en?: string | null
+          difficulty_level?: string | null
+          display_order?: number | null
+          dress_code?: string | null
+          duration_hours?: number | null
+          eco_friendly?: boolean | null
+          exclusivity_level: string
+          expert_credentials?: string[] | null
+          expert_name?: string | null
+          expert_profile?: string | null
+          expert_title?: string | null
+          group_size_max?: number | null
+          group_size_min?: number | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          inclusions?: Json | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          language_support?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          media_features?: string[] | null
+          meeting_point?: string | null
+          meeting_point_coords?: Json | null
+          minimum_participants?: number | null
+          name: string
+          name_en?: string | null
+          name_local?: string | null
+          net_price_per_person?: number | null
+          physical_requirement?: string | null
+          pickup_service?: boolean | null
+          price_excludes?: string[] | null
+          price_includes?: string[] | null
+          price_per_person_max?: number | null
+          price_per_person_min?: number | null
+          ratings?: Json | null
+          recommended_for?: string[] | null
+          region_id?: string | null
+          related_attractions?: string[] | null
+          restrictions?: string[] | null
+          review_count?: number | null
+          specific_location?: string | null
+          sub_category?: string[] | null
+          suitable_for_children?: boolean | null
+          supports_local_community?: boolean | null
+          sustainability_practices?: string[] | null
+          tagline?: string | null
+          thumbnail?: string | null
+          transportation_included?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+          video_url?: string | null
+          what_makes_it_special?: string | null
+          what_to_bring?: string[] | null
+        }
+        Update: {
+          advance_booking_days?: number | null
+          available_seasons?: string[] | null
+          awards?: string[] | null
+          best_for_age_group?: string | null
+          best_time_of_day?: string | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          cancellation_policy?: string | null
+          category?: string
+          certifications?: string[] | null
+          city_id?: string
+          combine_with?: string[] | null
+          commission_rate?: number | null
+          country_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          description?: string
+          description_en?: string | null
+          difficulty_level?: string | null
+          display_order?: number | null
+          dress_code?: string | null
+          duration_hours?: number | null
+          eco_friendly?: boolean | null
+          exclusivity_level?: string
+          expert_credentials?: string[] | null
+          expert_name?: string | null
+          expert_profile?: string | null
+          expert_title?: string | null
+          group_size_max?: number | null
+          group_size_min?: number | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          inclusions?: Json | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          language_support?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          media_features?: string[] | null
+          meeting_point?: string | null
+          meeting_point_coords?: Json | null
+          minimum_participants?: number | null
+          name?: string
+          name_en?: string | null
+          name_local?: string | null
+          net_price_per_person?: number | null
+          physical_requirement?: string | null
+          pickup_service?: boolean | null
+          price_excludes?: string[] | null
+          price_includes?: string[] | null
+          price_per_person_max?: number | null
+          price_per_person_min?: number | null
+          ratings?: Json | null
+          recommended_for?: string[] | null
+          region_id?: string | null
+          related_attractions?: string[] | null
+          restrictions?: string[] | null
+          review_count?: number | null
+          specific_location?: string | null
+          sub_category?: string[] | null
+          suitable_for_children?: boolean | null
+          supports_local_community?: boolean | null
+          sustainability_practices?: string[] | null
+          tagline?: string | null
+          thumbnail?: string | null
+          transportation_included?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+          video_url?: string | null
+          what_makes_it_special?: string | null
+          what_to_bring?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_experiences_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premium_experiences_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premium_experiences_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_list_items: {
         Row: {
@@ -2290,11 +3088,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'quote_items_quote_id_fkey'
-            columns: ['quote_id']
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
             isOneToOne: false
-            referencedRelation: 'quotes'
-            referencedColumns: ['id']
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2340,11 +3138,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'quote_regions_quote_id_fkey'
-            columns: ['quote_id']
+            foreignKeyName: "quote_regions_quote_id_fkey"
+            columns: ["quote_id"]
             isOneToOne: false
-            referencedRelation: 'quotes'
-            referencedColumns: ['id']
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2382,9 +3180,12 @@ export type Database = {
         Row: {
           accommodation_days: number | null
           adult_count: number | null
+          balance_amount: number | null
           categories: Json | null
           child_count: number | null
           code: string | null
+          contact_address: string | null
+          contact_phone: string | null
           converted_to_tour: boolean | null
           country_id: string | null
           created_at: string | null
@@ -2398,10 +3199,12 @@ export type Database = {
           destination: string | null
           end_date: string | null
           group_size: number | null
+          handler_name: string | null
           id: string
           infant_count: number | null
           is_active: boolean | null
           is_pinned: boolean | null
+          issue_date: string | null
           main_city_id: string | null
           name: string | null
           nights: number | null
@@ -2409,11 +3212,15 @@ export type Database = {
           number_of_people: number | null
           other_city_ids: string[] | null
           participant_counts: Json | null
+          quick_quote_items: Json | null
+          quote_type: string | null
+          received_amount: number | null
           selling_prices: Json | null
           start_date: string | null
           status: string | null
           total_amount: number | null
           total_cost: number | null
+          tour_code: string | null
           tour_id: string | null
           updated_at: string | null
           valid_until: string | null
@@ -2423,9 +3230,12 @@ export type Database = {
         Insert: {
           accommodation_days?: number | null
           adult_count?: number | null
+          balance_amount?: number | null
           categories?: Json | null
           child_count?: number | null
           code?: string | null
+          contact_address?: string | null
+          contact_phone?: string | null
           converted_to_tour?: boolean | null
           country_id?: string | null
           created_at?: string | null
@@ -2439,10 +3249,12 @@ export type Database = {
           destination?: string | null
           end_date?: string | null
           group_size?: number | null
+          handler_name?: string | null
           id: string
           infant_count?: number | null
           is_active?: boolean | null
           is_pinned?: boolean | null
+          issue_date?: string | null
           main_city_id?: string | null
           name?: string | null
           nights?: number | null
@@ -2450,11 +3262,15 @@ export type Database = {
           number_of_people?: number | null
           other_city_ids?: string[] | null
           participant_counts?: Json | null
+          quick_quote_items?: Json | null
+          quote_type?: string | null
+          received_amount?: number | null
           selling_prices?: Json | null
           start_date?: string | null
           status?: string | null
           total_amount?: number | null
           total_cost?: number | null
+          tour_code?: string | null
           tour_id?: string | null
           updated_at?: string | null
           valid_until?: string | null
@@ -2464,9 +3280,12 @@ export type Database = {
         Update: {
           accommodation_days?: number | null
           adult_count?: number | null
+          balance_amount?: number | null
           categories?: Json | null
           child_count?: number | null
           code?: string | null
+          contact_address?: string | null
+          contact_phone?: string | null
           converted_to_tour?: boolean | null
           country_id?: string | null
           created_at?: string | null
@@ -2480,10 +3299,12 @@ export type Database = {
           destination?: string | null
           end_date?: string | null
           group_size?: number | null
+          handler_name?: string | null
           id?: string
           infant_count?: number | null
           is_active?: boolean | null
           is_pinned?: boolean | null
+          issue_date?: string | null
           main_city_id?: string | null
           name?: string | null
           nights?: number | null
@@ -2491,11 +3312,15 @@ export type Database = {
           number_of_people?: number | null
           other_city_ids?: string[] | null
           participant_counts?: Json | null
+          quick_quote_items?: Json | null
+          quote_type?: string | null
+          received_amount?: number | null
           selling_prices?: Json | null
           start_date?: string | null
           status?: string | null
           total_amount?: number | null
           total_cost?: number | null
+          tour_code?: string | null
           tour_id?: string | null
           updated_at?: string | null
           valid_until?: string | null
@@ -2504,18 +3329,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'quotes_country_id_fkey'
-            columns: ['country_id']
+            foreignKeyName: "quotes_country_id_fkey"
+            columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: 'countries'
-            referencedColumns: ['id']
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'quotes_main_city_id_fkey'
-            columns: ['main_city_id']
+            foreignKeyName: "quotes_main_city_id_fkey"
+            columns: ["main_city_id"]
             isOneToOne: false
-            referencedRelation: 'cities'
-            referencedColumns: ['id']
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2558,11 +3383,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'receipt_orders_order_id_fkey'
-            columns: ['order_id']
+            foreignKeyName: "receipt_orders_order_id_fkey"
+            columns: ["order_id"]
             isOneToOne: false
-            referencedRelation: 'orders'
-            referencedColumns: ['id']
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2716,11 +3541,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'receipts_workspace_id_fkey'
-            columns: ['workspace_id']
+            foreignKeyName: "receipts_workspace_id_fkey"
+            columns: ["workspace_id"]
             isOneToOne: false
-            referencedRelation: 'workspaces'
-            referencedColumns: ['id']
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2751,11 +3576,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'region_stats_city_id_fkey'
-            columns: ['city_id']
+            foreignKeyName: "region_stats_city_id_fkey"
+            columns: ["city_id"]
             isOneToOne: true
-            referencedRelation: 'cities'
-            referencedColumns: ['id']
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2795,11 +3620,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'regions_country_id_fkey'
-            columns: ['country_id']
+            foreignKeyName: "regions_country_id_fkey"
+            columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: 'countries'
-            referencedColumns: ['id']
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2878,11 +3703,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'shared_order_lists_channel_id_fkey'
-            columns: ['channel_id']
+            foreignKeyName: "shared_order_lists_channel_id_fkey"
+            columns: ["channel_id"]
             isOneToOne: false
-            referencedRelation: 'channels'
-            referencedColumns: ['id']
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2949,11 +3774,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'supplier_payment_accounts_supplier_id_fkey'
-            columns: ['supplier_id']
+            foreignKeyName: "supplier_payment_accounts_supplier_id_fkey"
+            columns: ["supplier_id"]
             isOneToOne: false
-            referencedRelation: 'suppliers'
-            referencedColumns: ['id']
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3008,11 +3833,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'supplier_price_list_supplier_id_fkey'
-            columns: ['supplier_id']
+            foreignKeyName: "supplier_price_list_supplier_id_fkey"
+            columns: ["supplier_id"]
             isOneToOne: false
-            referencedRelation: 'suppliers'
-            referencedColumns: ['id']
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3040,18 +3865,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'supplier_cities_city_id_fkey'
-            columns: ['city_id']
+            foreignKeyName: "supplier_cities_city_id_fkey"
+            columns: ["city_id"]
             isOneToOne: false
-            referencedRelation: 'cities'
-            referencedColumns: ['id']
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'supplier_cities_supplier_id_fkey'
-            columns: ['supplier_id']
+            foreignKeyName: "supplier_cities_supplier_id_fkey"
+            columns: ["supplier_id"]
             isOneToOne: false
-            referencedRelation: 'suppliers'
-            referencedColumns: ['id']
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3163,11 +3988,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'suppliers_country_id_fkey'
-            columns: ['country_id']
+            foreignKeyName: "suppliers_country_id_fkey"
+            columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: 'countries'
-            referencedColumns: ['id']
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3381,18 +4206,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'timebox_schedules_box_id_fkey'
-            columns: ['box_id']
+            foreignKeyName: "timebox_schedules_box_id_fkey"
+            columns: ["box_id"]
             isOneToOne: false
-            referencedRelation: 'timebox_boxes'
-            referencedColumns: ['id']
+            referencedRelation: "timebox_boxes"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'timebox_schedules_week_id_fkey'
-            columns: ['week_id']
+            foreignKeyName: "timebox_schedules_week_id_fkey"
+            columns: ["week_id"]
             isOneToOne: false
-            referencedRelation: 'timebox_weeks'
-            referencedColumns: ['id']
+            referencedRelation: "timebox_weeks"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3507,18 +4332,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'todos_assignee_fkey'
-            columns: ['assignee']
+            foreignKeyName: "todos_assignee_fkey"
+            columns: ["assignee"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'todos_creator_fkey'
-            columns: ['creator']
+            foreignKeyName: "todos_creator_fkey"
+            columns: ["creator"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3555,11 +4380,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'tour_addons_tour_id_fkey'
-            columns: ['tour_id']
+            foreignKeyName: "tour_addons_tour_id_fkey"
+            columns: ["tour_id"]
             isOneToOne: false
-            referencedRelation: 'tours'
-            referencedColumns: ['id']
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3755,18 +4580,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'tours_country_id_fkey'
-            columns: ['country_id']
+            foreignKeyName: "tours_country_id_fkey"
+            columns: ["country_id"]
             isOneToOne: false
-            referencedRelation: 'countries'
-            referencedColumns: ['id']
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'tours_main_city_id_fkey'
-            columns: ['main_city_id']
+            foreignKeyName: "tours_main_city_id_fkey"
+            columns: ["main_city_id"]
             isOneToOne: false
-            referencedRelation: 'cities'
-            referencedColumns: ['id']
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3836,11 +4661,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_preferences_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3922,11 +4747,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'visas_tour_id_fkey'
-            columns: ['tour_id']
+            foreignKeyName: "visas_tour_id_fkey"
+            columns: ["tour_id"]
             isOneToOne: false
-            referencedRelation: 'tours'
-            referencedColumns: ['id']
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -4017,11 +4842,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'workspaces_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "workspaces_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'employees'
-            referencedColumns: ['id']
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -4034,7 +4859,7 @@ export type Database = {
       update_city_stats: { Args: { p_city_id: string }; Returns: undefined }
     }
     Enums: {
-      [_ in never]: never
+      confirmation_type: "accommodation" | "flight"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4042,31 +4867,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -4075,23 +4902,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -4100,23 +4927,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -4125,40 +4952,42 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      confirmation_type: ["accommodation", "flight"],
+    },
   },
 } as const

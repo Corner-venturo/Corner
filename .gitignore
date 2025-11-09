@@ -85,3 +85,8 @@ fix-types-to-snake.js
 .claude/SUPABASE_CREDENTIALS.md
 .claude/*_CREDENTIALS.md
 .claude/*_PASSWORD*.md
+
+# Backup and temporary directories
+Corner/
+backup/
+temp/
