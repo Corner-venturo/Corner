@@ -362,7 +362,7 @@ export default function FitnessPage() {
                   className="w-full bg-[#FEFEFE] border border-[#EDE8E0] rounded-xl p-4 text-left hover:border-[#C9A961] transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{exercise.emoji}</span>
+                    <ExerciseIcon iconName={exercise.icon} className="w-6 h-6" />
                     <span className="text-sm font-medium text-[#3D2914]">
                       {exercise.name}
                     </span>
