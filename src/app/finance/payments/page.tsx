@@ -11,11 +11,11 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
-import { Plus } from 'lucide-react'
+import { Plus, Search, FileDown } from 'lucide-react'
 
 // Realtime Hooks
 import {
@@ -25,13 +25,17 @@ import {
 } from '@/hooks/use-realtime-hooks'
 
 // Components
-import { createPaymentColumns, CreateReceiptDialog } from './components'
+import { createPaymentColumns, CreateReceiptDialog, ReceiptSearchDialog } from './components'
 
 // Hooks
 import { usePaymentData } from './hooks/usePaymentData'
 
+// Utils
+import { exportReceiptsToExcel } from '@/lib/excel/receipt-excel'
+
 // Types
 import type { Receipt } from '@/stores'
+import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
 
 export default function PaymentsPage() {
   // Realtime 訂閱
@@ -44,15 +48,56 @@ export default function PaymentsPage() {
 
   // UI 狀態
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
+  const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
 
   // 初始化載入資料
   useEffect(() => {
     fetchReceipts()
   }, [fetchReceipts])
 
+  // 篩選後的收款單
+  const filteredReceipts = useMemo(() => {
+    let filtered = [...receipts]
+
+    if (searchFilters.receiptNumber) {
+      filtered = filtered.filter(r =>
+        r.receipt_number.toLowerCase().includes(searchFilters.receiptNumber!.toLowerCase())
+      )
+    }
+
+    if (searchFilters.orderNumber) {
+      filtered = filtered.filter(r =>
+        r.order_number?.toLowerCase().includes(searchFilters.orderNumber!.toLowerCase())
+      )
+    }
+
+    if (searchFilters.dateFrom) {
+      filtered = filtered.filter(r => r.receipt_date >= searchFilters.dateFrom!)
+    }
+
+    if (searchFilters.dateTo) {
+      filtered = filtered.filter(r => r.receipt_date <= searchFilters.dateTo!)
+    }
+
+    if (searchFilters.receiptTypes && searchFilters.receiptTypes.length > 0) {
+      filtered = filtered.filter(r => searchFilters.receiptTypes!.includes(r.receipt_type))
+    }
+
+    if (searchFilters.statuses && searchFilters.statuses.length > 0) {
+      filtered = filtered.filter(r => searchFilters.statuses!.includes(r.status))
+    }
+
+    if (searchFilters.limit && filtered.length > searchFilters.limit) {
+      filtered = filtered.slice(0, searchFilters.limit)
+    }
+
+    return filtered
+  }, [receipts, searchFilters])
+
   // 事件處理
   const handleViewDetail = (receipt: Receipt) => {
-    alert(`查看收款單 ${receipt.receipt_number}`)
+    window.location.href = `/finance/payments/${receipt.id}`
   }
 
   const handleSubmit = async (data: any) => {
@@ -65,6 +110,15 @@ export default function PaymentsPage() {
     }
   }
 
+  const handleSearch = (filters: ReceiptSearchFilters) => {
+    setSearchFilters(filters)
+    setIsSearchDialogOpen(false)
+  }
+
+  const handleExportExcel = () => {
+    exportReceiptsToExcel(filteredReceipts)
+  }
+
   // 表格欄位
   const columns = createPaymentColumns(handleViewDetail)
 
@@ -73,20 +127,58 @@ export default function PaymentsPage() {
       <ResponsiveHeader
         title="收款管理"
         actions={
-          <Button
-            onClick={() => setIsDialogOpen(true)}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            <Plus size={16} className="mr-2" />
-            新增收款
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsSearchDialogOpen(true)}
+              className="text-morandi-secondary"
+            >
+              <Search size={16} className="mr-2" />
+              進階搜尋
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportExcel}
+              className="text-morandi-secondary"
+            >
+              <FileDown size={16} className="mr-2" />
+              匯出 Excel
+            </Button>
+            <Button
+              onClick={() => setIsDialogOpen(true)}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <Plus size={16} className="mr-2" />
+              新增收款
+            </Button>
+          </div>
         }
       />
 
       <div className="flex-1 overflow-auto">
+        {Object.keys(searchFilters).length > 0 && (
+          <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-3 mb-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-morandi-secondary">
+                已套用進階搜尋 • 顯示 {filteredReceipts.length} 筆結果
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchFilters({})}
+                className="text-morandi-secondary hover:text-morandi-primary"
+              >
+                清除篩選
+              </Button>
+            </div>
+          </div>
+        )}
+
         <EnhancedTable
           className="min-h-full"
-          data={receipts}
+          data={filteredReceipts}
           columns={columns}
           defaultSort={{ key: 'receipt_date', direction: 'desc' }}
           searchable
@@ -100,6 +192,14 @@ export default function PaymentsPage() {
         onClose={() => setIsDialogOpen(false)}
         availableOrders={availableOrders}
         onSubmit={handleSubmit}
+      />
+
+      {/* 進階搜尋對話框 */}
+      <ReceiptSearchDialog
+        isOpen={isSearchDialogOpen}
+        onClose={() => setIsSearchDialogOpen(false)}
+        onSearch={handleSearch}
+        currentFilters={searchFilters}
       />
     </div>
   )
