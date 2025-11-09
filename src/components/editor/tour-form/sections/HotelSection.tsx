@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { TourFormData, HotelInfo } from '../types'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { supabase } from '@/lib/supabase/client'
 
 interface HotelSectionProps {
   data: TourFormData
@@ -9,6 +10,8 @@ interface HotelSectionProps {
 
 export function HotelSection({ data, updateField }: HotelSectionProps) {
   const hotels = data.hotels || []
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null)
+  const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({})
 
   const addHotel = () => {
     updateField('hotels', [
@@ -32,6 +35,58 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
       'hotels',
       hotels.filter((_, i) => i !== index)
     )
+  }
+
+  const handleFileChange = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 驗證檔案類型
+    if (!file.type.startsWith('image/')) {
+      alert('請選擇圖片檔案')
+      return
+    }
+
+    // 驗證檔案大小（5MB）
+    if (file.size > 5 * 1024 * 1024) {
+      alert('圖片大小不可超過 5MB')
+      return
+    }
+
+    setUploadingIndex(index)
+
+    try {
+      // 生成唯一檔名
+      const timestamp = Date.now()
+      const filename = `hotel-${timestamp}-${index}.jpg`
+
+      // 上傳到 Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('tour-hotels')
+        .upload(filename, file, {
+          contentType: file.type,
+          upsert: true,
+        })
+
+      if (uploadError) throw uploadError
+
+      // 取得公開 URL
+      const { data: urlData } = supabase.storage.from('tour-hotels').getPublicUrl(filename)
+
+      // 更新飯店圖片 URL
+      updateHotel(index, 'image', urlData.publicUrl)
+
+      alert('圖片上傳成功！')
+    } catch (error) {
+      console.error('上傳失敗:', error)
+      alert('圖片上傳失敗，請稍後再試')
+    } finally {
+      setUploadingIndex(null)
+      // 清空 input，允許重新上傳相同檔案
+      if (fileInputRefs.current[index]) {
+        fileInputRefs.current[index]!.value = ''
+      }
+    }
   }
 
   return (
@@ -116,25 +171,48 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">
-                    飯店圖片網址
+                    飯店圖片
                   </label>
+
+                  {/* 預覽區域 */}
+                  <div className="aspect-video w-full border-2 border-dashed border-morandi-container rounded-lg overflow-hidden bg-gray-50 mb-3">
+                    {hotel.image ? (
+                      <img
+                        src={hotel.image}
+                        alt={hotel.name || '飯店圖片'}
+                        className="w-full h-full object-cover"
+                        onError={e => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                        <ImageIcon size={48} className="mb-2 opacity-50" />
+                        <p className="text-sm">尚未上傳圖片</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 上傳按鈕 */}
                   <input
-                    type="url"
-                    value={hotel.image || ''}
-                    onChange={e => updateHotel(index, 'image', e.target.value)}
-                    className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-                    placeholder="https://example.com/hotel.jpg"
+                    ref={el => (fileInputRefs.current[index] = el)}
+                    type="file"
+                    accept="image/*"
+                    onChange={e => handleFileChange(index, e)}
+                    className="hidden"
                   />
-                  {hotel.image && (
-                    <img
-                      src={hotel.image}
-                      alt={hotel.name}
-                      className="mt-2 w-full h-32 object-cover rounded-lg"
-                      onError={e => {
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRefs.current[index]?.click()}
+                    disabled={uploadingIndex === index}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-morandi-container rounded-lg hover:bg-morandi-container/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Upload size={16} />
+                    {uploadingIndex === index ? '上傳中...' : hotel.image ? '更換圖片' : '上傳圖片'}
+                  </button>
+                  <p className="mt-1 text-xs text-morandi-secondary">
+                    建議使用 16:9 高解析度圖片，檔案大小不超過 5MB
+                  </p>
                 </div>
               </div>
             </div>

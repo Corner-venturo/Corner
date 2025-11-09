@@ -43,7 +43,7 @@ export function DestinationSelector({
   // 載入地區資料（只在需要時載入）
   useEffect(() => {
     // ✅ 只在 countries 為空時才載入，避免重複請求
-    if (regionStore.countries.length === 0) {
+    if (!regionStore.countries || regionStore.countries.length === 0) {
       regionStore.fetchAll()
     }
   }, [])

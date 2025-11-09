@@ -25,10 +25,10 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-white rounded-2xl shadow-xl p-6 border border-border"
+            className="bg-white rounded-2xl shadow-xl p-6 border border-morandi-gold/20"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-morandi-gold to-morandi-gold/80 rounded-xl flex items-center justify-center shadow-lg">
                 <IconPlane className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -47,7 +47,7 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                   <div className="text-2xl font-bold text-morandi-primary">
                     {data.outboundFlight?.departureAirport || 'TPE'}
                   </div>
-                  <div className="text-base text-blue-600 font-semibold">
+                  <div className="text-base text-morandi-gold font-semibold">
                     {data.outboundFlight?.departureTime || '06:50'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">
@@ -57,9 +57,9 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
 
                 <div className="flex-1 flex flex-col items-center px-3">
                   <div className="text-xs text-morandi-secondary mb-3">飛行時間</div>
-                  <div className="w-full border-t-2 border-dashed border-border relative my-2">
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-blue-100 px-1.5 py-0.5 rounded-full">
-                      <IconPlane className="w-3 h-3 text-blue-600" />
+                  <div className="w-full border-t-2 border-dashed border-morandi-container relative my-2">
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-morandi-gold/10 px-1.5 py-0.5 rounded-full">
+                      <IconPlane className="w-3 h-3 text-morandi-gold" />
                     </div>
                   </div>
                   <div className="text-xs font-semibold text-morandi-primary mt-3">
@@ -72,7 +72,7 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                   <div className="text-2xl font-bold text-morandi-primary">
                     {data.outboundFlight?.arrivalAirport || 'FUK'}
                   </div>
-                  <div className="text-base text-blue-600 font-semibold">
+                  <div className="text-base text-morandi-gold font-semibold">
                     {data.outboundFlight?.arrivalTime || '09:55'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">當地時間</div>
@@ -87,10 +87,10 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-xl p-6 border border-border"
+            className="bg-white rounded-2xl shadow-xl p-6 border border-morandi-secondary/20"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-morandi-secondary to-morandi-secondary/80 rounded-xl flex items-center justify-center shadow-lg">
                 <IconPlane className="w-6 h-6 text-white rotate-180" />
               </div>
               <div>
@@ -109,7 +109,7 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                   <div className="text-2xl font-bold text-morandi-primary">
                     {data.returnFlight?.departureAirport || 'FUK'}
                   </div>
-                  <div className="text-base text-indigo-600 font-semibold">
+                  <div className="text-base text-morandi-secondary font-semibold">
                     {data.returnFlight?.departureTime || '11:00'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">
@@ -119,9 +119,9 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
 
                 <div className="flex-1 flex flex-col items-center px-3">
                   <div className="text-xs text-morandi-secondary mb-3">飛行時間</div>
-                  <div className="w-full border-t-2 border-dashed border-border relative my-2">
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-indigo-100 px-1.5 py-0.5 rounded-full">
-                      <IconPlane className="w-3 h-3 text-indigo-600 rotate-180" />
+                  <div className="w-full border-t-2 border-dashed border-morandi-container relative my-2">
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-morandi-secondary/10 px-1.5 py-0.5 rounded-full">
+                      <IconPlane className="w-3 h-3 text-morandi-secondary rotate-180" />
                     </div>
                   </div>
                   <div className="text-xs font-semibold text-morandi-primary mt-3">
@@ -134,7 +134,7 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                   <div className="text-2xl font-bold text-morandi-primary">
                     {data.returnFlight?.arrivalAirport || 'TPE'}
                   </div>
-                  <div className="text-base text-indigo-600 font-semibold">
+                  <div className="text-base text-morandi-secondary font-semibold">
                     {data.returnFlight?.arrivalTime || '12:30'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">台灣時間</div>

@@ -148,11 +148,45 @@ export function DateInput({
     }
   }
 
+  const handleCalendarClick = () => {
+    const input = document.createElement('input')
+    input.type = 'date'
+    input.value = value || ''
+    input.style.position = 'absolute'
+    input.style.opacity = '0'
+    input.style.pointerEvents = 'none'
+    input.style.left = '-9999px'
+    document.body.appendChild(input)
+
+    const cleanup = () => {
+      if (document.body.contains(input)) {
+        document.body.removeChild(input)
+      }
+    }
+
+    input.addEventListener('change', () => {
+      if (input.value) {
+        onChange(input.value)
+      }
+      cleanup()
+    })
+
+    input.addEventListener('blur', cleanup)
+    input.addEventListener('cancel', cleanup)
+
+    try {
+      input.showPicker()
+    } catch (error) {
+      console.error('showPicker failed:', error)
+      cleanup()
+    }
+  }
+
   return (
     <div
       className={cn(
-        'flex items-center h-10 w-full rounded-md border border-input bg-background px-3 text-sm',
-        'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+        'flex items-center h-10 w-full rounded-md border border-morandi-container/30 bg-background px-3 text-sm',
+        'focus-within:outline-none focus-within:ring-2 focus-within:ring-morandi-gold focus-within:ring-offset-2',
         disabled && 'cursor-not-allowed opacity-50',
         className
       )}
@@ -164,12 +198,13 @@ export function DateInput({
         value={year}
         onChange={handleYearChange}
         onKeyDown={handleYearKeyDown}
-        _placeholder="YYYY"
+        placeholder="YYYY"
         disabled={disabled}
-        className="w-12 bg-transparent outline-none text-center"
+        className="flex-1 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
+        style={{ boxShadow: 'none' }}
         maxLength={4}
       />
-      <span className="text-muted-foreground mx-1">/</span>
+      <span className="text-morandi-secondary/50">/</span>
       <input
         ref={monthRef}
         type="text"
@@ -177,12 +212,13 @@ export function DateInput({
         value={month}
         onChange={handleMonthChange}
         onKeyDown={handleMonthKeyDown}
-        _placeholder="MM"
+        placeholder="MM"
         disabled={disabled}
-        className="w-8 bg-transparent outline-none text-center"
+        className="flex-1 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
+        style={{ boxShadow: 'none' }}
         maxLength={2}
       />
-      <span className="text-muted-foreground mx-1">/</span>
+      <span className="text-morandi-secondary/50">/</span>
       <input
         ref={dayRef}
         type="text"
@@ -190,11 +226,36 @@ export function DateInput({
         value={day}
         onChange={handleDayChange}
         onKeyDown={handleDayKeyDown}
-        _placeholder="DD"
+        placeholder="DD"
         disabled={disabled}
-        className="w-8 bg-transparent outline-none text-center"
+        className="flex-1 !h-auto !p-0 !border-0 !rounded-none !bg-transparent !outline-none !ring-0 !shadow-none placeholder:text-morandi-secondary/50 text-center"
+        style={{ boxShadow: 'none' }}
         maxLength={2}
       />
+      <button
+        type="button"
+        onClick={handleCalendarClick}
+        disabled={disabled}
+        className="ml-auto text-morandi-secondary hover:text-morandi-primary transition-colors"
+        aria-label="選擇日期"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      </button>
     </div>
   )
 }

@@ -12,8 +12,7 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
 
   return (
     <section
-      className={viewMode === 'mobile' ? 'pt-4 pb-8' : 'pt-8 pb-16'}
-      style={{ backgroundColor: morandiColors.background.main }}
+      className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-white' : 'pt-8 pb-16 bg-white'}
     >
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <motion.div

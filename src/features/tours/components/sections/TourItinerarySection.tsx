@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { TracingBeam } from '@/components/ui/tracing-beam'
 import { cn } from '@/lib/utils'
 import { DailyImageCarousel } from './DailyImageCarousel'
 import { MutableRefObject } from 'react'
@@ -73,17 +72,19 @@ export function TourItinerarySection({
                           : 'bg-transparent text-morandi-secondary hover:bg-white/60 hover:text-morandi-primary'
                       )}
                     >
-                      <span className="text-[11px] uppercase tracking-[0.35em] text-morandi-secondary/70">
-                        {day.dayLabel || `Day ${index + 1}`}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] uppercase tracking-[0.35em] text-morandi-secondary/70">
+                          {day.dayLabel || `Day ${index + 1}`}
+                        </span>
+                        {day.date && (
+                          <span className="text-xs text-morandi-secondary/80">
+                            {day.date}
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-2 text-base font-semibold leading-snug">
                         {day.title || `行程第 ${index + 1} 天`}
                       </p>
-                      {day.date && (
-                        <span className="mt-1 block text-xs text-morandi-secondary/80">
-                          {day.date}
-                        </span>
-                      )}
                     </button>
                   </li>
                 ))}
@@ -119,21 +120,20 @@ export function TourItinerarySection({
               </div>
             )}
 
-            <TracingBeam>
-              <div className="space-y-12">
-                {dailyItinerary.map((day: any, index: number) => (
-                  <article
-                    key={`day-section-${index}`}
-                    id={`day-${index + 1}`}
-                    ref={el => {
-                      dayRefs.current[index] = el
-                    }}
-                    className="relative overflow-hidden rounded-[36px] border border-morandi-border/60 bg-white/95 p-8 shadow-xl ring-1 ring-morandi-border/40 backdrop-blur-sm"
-                  >
-                    <div className="flex flex-wrap items-center gap-4 mb-6">
-                      <DayLabel dayNumber={index + 1} variant="default" />
-                      {day.date && <DateSubtitle date={day.date} />}
-                    </div>
+            <div className="space-y-12">
+              {dailyItinerary.map((day: any, index: number) => (
+                <article
+                  key={`day-section-${index}`}
+                  id={`day-${index + 1}`}
+                  ref={el => {
+                    dayRefs.current[index] = el
+                  }}
+                  className="relative overflow-hidden rounded-[36px] border border-morandi-border/60 bg-white/95 p-8 shadow-xl ring-1 ring-morandi-border/40 backdrop-blur-sm"
+                >
+                  <div className="flex flex-wrap items-center gap-4 mb-6">
+                    <DayLabel dayNumber={index + 1} variant="default" />
+                    {day.date && <DateSubtitle date={day.date} />}
+                  </div>
 
                     <h3 className="text-2xl font-bold leading-snug text-morandi-primary md:text-3xl">
                       {day.title || `行程第 ${index + 1} 天`}
@@ -200,19 +200,19 @@ export function TourItinerarySection({
                     )}
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                      <div className="rounded-3xl border border-morandi-border/40 bg-morandi-container/20 p-5">
+                      <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 p-5">
                         <p className="text-sm text-morandi-secondary/80">早餐</p>
                         <p className="mt-2 font-semibold text-morandi-primary">
                           {day.meals?.breakfast || '敬請自理'}
                         </p>
                       </div>
-                      <div className="rounded-3xl border border-morandi-border/40 bg-morandi-container/20 p-5">
+                      <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 p-5">
                         <p className="text-sm text-morandi-secondary/80">午餐</p>
                         <p className="mt-2 font-semibold text-morandi-primary">
                           {day.meals?.lunch || '敬請自理'}
                         </p>
                       </div>
-                      <div className="rounded-3xl border border-morandi-border/40 bg-morandi-container/20 p-5">
+                      <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 p-5">
                         <p className="text-sm text-morandi-secondary/80">晚餐</p>
                         <p className="mt-2 font-semibold text-morandi-primary">
                           {day.meals?.dinner || '敬請自理'}
@@ -229,7 +229,6 @@ export function TourItinerarySection({
                   </article>
                 ))}
               </div>
-            </TracingBeam>
           </div>
         </div>
       </div>
