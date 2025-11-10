@@ -6,27 +6,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function generateTourCode(location: string, date: Date, isSpecial = false): string {
-  if (isSpecial) {
-    const dateStr = format(date, 'yyMMdd')
-    return `SPC${dateStr}01`
-  }
-
-  const locationCodes: Record<string, string> = {
-    Tokyo: 'TYO',
-    Okinawa: 'OKA',
-    Osaka: 'OSA',
-    Kyoto: 'KYO',
-    Hokkaido: 'HOK',
-  }
-
-  const locationCode = locationCodes[location] || 'UNK'
-  const dateStr = format(date, 'yyMMdd')
-  const sequence = '01' // 實際應該從資料庫查詢當天同地點已有數量
-
-  return `${locationCode}${dateStr}${sequence}`
-}
-
 // 根據身分證字號判斷性別 (僅台灣身分證字號)
 export function getGenderFromIdNumber(idNumber: string): 'M' | 'F' | '' {
   if (!idNumber) return ''

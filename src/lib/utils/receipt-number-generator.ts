@@ -1,8 +1,8 @@
 /**
  * 收款單號生成工具
  *
- * 格式：R{年2碼}{月2碼}{日2碼}{流水號4位}
- * 範例：R2501280001 (2025年1月28日第1筆)
+ * 格式：{辦公室代碼}-R{年2碼}{月2碼}{日2碼}{流水號4位}
+ * 範例：TP-R2501280001 (台北 2025年1月28日第1筆)
  */
 
 interface Receipt {
@@ -12,19 +12,21 @@ interface Receipt {
 /**
  * 生成收款單號
  *
+ * @param workspaceCode - 辦公室代碼（如 TP, TC）
  * @param receiptDate - 收款日期 (ISO 8601 格式或 Date 物件)
- * @param existingReceipts - 現有收款單列表
- * @returns 收款單號（例如：R2501280001）
+ * @param existingReceipts - 現有收款單列表（同 workspace）
+ * @returns 收款單號（例如：TP-R2501280001）
  *
  * @example
- * generateReceiptNumber('2025-01-28', existingReceipts)
- * // => 'R2501280001' (2025年1月28日第1筆)
+ * generateReceiptNumber('TP', '2025-01-28', existingReceipts)
+ * // => 'TP-R2501280001' (台北 2025年1月28日第1筆)
  *
  * @example
- * generateReceiptNumber(new Date('2025-01-28'), existingReceipts)
- * // => 'R2501280002' (如果已有1筆，則生成第2筆)
+ * generateReceiptNumber('TC', new Date('2025-01-28'), existingReceipts)
+ * // => 'TC-R2501280002' (台中 如果已有1筆，則生成第2筆)
  */
 export function generateReceiptNumber(
+  workspaceCode: string,
   receiptDate: string | Date,
   existingReceipts: Receipt[]
 ): string {
@@ -35,9 +37,9 @@ export function generateReceiptNumber(
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const day = date.getDate().toString().padStart(2, '0')
 
-  const datePrefix = `R${year}${month}${day}`
+  const datePrefix = `${workspaceCode}-R${year}${month}${day}`
 
-  // 找出同日期的最大流水號
+  // 找出同日期同辦公室的最大流水號
   let maxSequence = 0
   existingReceipts.forEach(receipt => {
     if (receipt.receipt_number?.startsWith(datePrefix)) {
@@ -62,14 +64,17 @@ export function generateReceiptNumber(
  * @returns 是否為有效格式
  *
  * @example
- * isValidReceiptNumber('R2501280001')  // => true
- * isValidReceiptNumber('R25012800')    // => false (太短)
- * isValidReceiptNumber('ABC123')       // => false (格式錯誤)
+ * isValidReceiptNumber('TP-R2501280001')  // => true
+ * isValidReceiptNumber('R2501280001')     // => true (舊格式也接受)
+ * isValidReceiptNumber('R25012800')       // => false (太短)
+ * isValidReceiptNumber('ABC123')          // => false (格式錯誤)
  */
 export function isValidReceiptNumber(receiptNumber: string): boolean {
-  // 格式：R + 2碼年 + 2碼月 + 2碼日 + 4碼流水號 = 11碼
-  const regex = /^R\d{10}$/
-  return regex.test(receiptNumber)
+  // 新格式：TP-R + 2碼年 + 2碼月 + 2碼日 + 4碼流水號
+  const newFormatRegex = /^(TP|TC)-R\d{10}$/
+  // 舊格式（向下相容）：R + 2碼年 + 2碼月 + 2碼日 + 4碼流水號
+  const oldFormatRegex = /^R\d{10}$/
+  return newFormatRegex.test(receiptNumber) || oldFormatRegex.test(receiptNumber)
 }
 
 /**
@@ -79,25 +84,37 @@ export function isValidReceiptNumber(receiptNumber: string): boolean {
  * @returns 解析結果，包含日期和流水號
  *
  * @example
- * parseReceiptNumber('R2501280001')
- * // => { year: 2025, month: 1, day: 28, sequence: 1 }
+ * parseReceiptNumber('TP-R2501280001')
+ * // => { year: 2025, month: 1, day: 28, sequence: 1, workspaceCode: 'TP' }
  */
 export function parseReceiptNumber(receiptNumber: string): {
   year: number
   month: number
   day: number
   sequence: number
+  workspaceCode?: string
 } | null {
   if (!isValidReceiptNumber(receiptNumber)) {
     return null
   }
 
-  const year = parseInt(`20${receiptNumber.slice(1, 3)}`, 10)
-  const month = parseInt(receiptNumber.slice(3, 5), 10)
-  const day = parseInt(receiptNumber.slice(5, 7), 10)
-  const sequence = parseInt(receiptNumber.slice(7, 11), 10)
+  let workspaceCode: string | undefined
+  let datePart: string
 
-  return { year, month, day, sequence }
+  // 檢查是新格式還是舊格式
+  if (receiptNumber.startsWith('TP-') || receiptNumber.startsWith('TC-')) {
+    workspaceCode = receiptNumber.substring(0, 2)
+    datePart = receiptNumber.substring(4) // 跳過 "TP-R"
+  } else {
+    datePart = receiptNumber.substring(1) // 跳過 "R"
+  }
+
+  const year = parseInt(`20${datePart.slice(0, 2)}`, 10)
+  const month = parseInt(datePart.slice(2, 4), 10)
+  const day = parseInt(datePart.slice(4, 6), 10)
+  const sequence = parseInt(datePart.slice(6, 10), 10)
+
+  return { year, month, day, sequence, workspaceCode }
 }
 
 /**

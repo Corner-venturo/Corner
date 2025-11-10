@@ -5,6 +5,7 @@
 import { useMemo } from 'react'
 import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
+import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import type { ReceiptItem } from '@/stores'
 
 const RECEIPT_TYPES = {
@@ -72,7 +73,11 @@ export function usePaymentData() {
     // 為每個收款項目建立收款單
     for (const item of paymentItems) {
       // 生成收款單號
-      const receiptNumber = generateReceiptNumber(item.transaction_date, receipts)
+      const workspaceCode = getCurrentWorkspaceCode()
+      if (!workspaceCode) {
+        throw new Error('無法取得 workspace code')
+      }
+      const receiptNumber = generateReceiptNumber(workspaceCode, item.transaction_date, receipts)
 
       // 建立收款單
       await createReceipt({

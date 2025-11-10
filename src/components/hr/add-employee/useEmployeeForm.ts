@@ -3,9 +3,12 @@ import { useState } from 'react'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { hashPassword } from '@/lib/auth'
 import { EmployeeFormData, CreatedEmployeeInfo } from './types'
+import { getCurrentWorkspaceId, isSuperAdmin } from '@/lib/workspace-helpers'
 
 export function useEmployeeForm(onSubmit: () => void) {
   const { create: addUser } = useUserStore()
+  const currentWorkspaceId = getCurrentWorkspaceId()
+  const isSuper = isSuperAdmin()
 
   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
   const [createdEmployee, setCreatedEmployee] = useState<CreatedEmployeeInfo | null>(null)
@@ -51,12 +54,24 @@ export function useEmployeeForm(onSubmit: () => void) {
       const employee_number = userStoreHelpers.generateUserNumber(formData.english_name)
       const hashedPassword = await hashPassword(formData.defaultPassword)
 
+      // 決定 workspace_id
+      // super_admin 可以選擇，一般 admin 使用自己的 workspace
+      const targetWorkspaceId = isSuper
+        ? formData.workspace_id || currentWorkspaceId
+        : currentWorkspaceId
+
+      if (!targetWorkspaceId) {
+        alert('無法取得 workspace，請重新登入')
+        return
+      }
+
       const dbEmployeeData = {
         employee_number: employee_number,
         english_name: formData.english_name,
         display_name: formData.display_name,
         chinese_name: formData.chinese_name,
         password_hash: hashedPassword,
+        workspace_id: targetWorkspaceId,
         roles: formData.roles,
         personal_info: {
           national_id: formData.personal_info.national_id,
@@ -123,5 +138,6 @@ export function useEmployeeForm(onSubmit: () => void) {
     handleSubmit,
     copyToClipboard,
     handleCloseSuccess,
+    isSuperAdmin: isSuper, // 供表單判斷是否顯示 workspace 選擇
   }
 }

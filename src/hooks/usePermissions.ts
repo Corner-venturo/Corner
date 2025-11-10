@@ -14,6 +14,7 @@ export const usePermissions = () => {
         canViewFinance: false,
         canManageFinance: false,
         isAdmin: false,
+        isSuperAdmin: false,
         isAccountant: false,
       }
     }
@@ -37,6 +38,7 @@ export const usePermissions = () => {
         userPermissions.includes('accounting'),
       canManageFinance: isSuperAdmin || userPermissions.includes('finance'),
       isAdmin,
+      isSuperAdmin,
       isAccountant:
         isSuperAdmin ||
         userPermissions.includes('accounting') ||

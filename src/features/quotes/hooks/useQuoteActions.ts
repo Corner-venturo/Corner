@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
-import { generateTourCode } from '@/lib/utils'
+import { generateTourCode } from '@/stores/utils/code-generator'
+import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { logger } from '@/lib/utils/logger'
 import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
 
@@ -221,7 +222,16 @@ export const useQuoteActions = ({
     const cityName = selectedCityObj?.name || selectedCity
 
     // 從選擇的地區生成團號
-    const tourCode = generateTourCode(selectedCity, departure_date, false)
+    const workspaceCode = getCurrentWorkspaceCode()
+    if (!workspaceCode) {
+      throw new Error('無法取得 workspace code')
+    }
+    const tourCode = generateTourCode(
+      workspaceCode,
+      selectedCity,
+      departure_date.toISOString(),
+      [] // TODO: 傳入現有的 tours 來避免編號衝突
+    )
 
     const newTour = await addTour({
       name: quoteName,

@@ -3,6 +3,7 @@ export interface EmployeeFormData {
   display_name: string
   chinese_name: string
   defaultPassword: string
+  workspace_id?: string // super_admin 可以選擇 workspace
   roles: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant')[]
   personal_info: {
     national_id: string

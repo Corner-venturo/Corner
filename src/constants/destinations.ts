@@ -191,44 +191,6 @@ function getSequence(): string {
 }
 
 /**
- * 生成團號
- * @param countryCode 國家代碼 (如: THI, JPN)
- * @param cityCode 城市代碼 (如: BKK, TYO)
- * @param date 出發日期
- * @param isSpecial 是否為特殊團
- * @returns 團號 (如: BKK241225001 或 SPC241225001)
- */
-export function generateTourCode(
-  countryCode: string,
-  cityCode: string,
-  date: Date,
-  isSpecial: boolean = false
-): string {
-  if (isSpecial) {
-    return `SPC${format(date, 'yyMMdd')}${getSequence()}`
-  }
-  return `${cityCode}${format(date, 'yyMMdd')}${getSequence()}`
-}
-
-/**
- * 生成報價單編號
- * @param date 日期
- * @returns 報價單編號 (如: Q241225001)
- */
-export function generateQuoteNumber(date: Date): string {
-  return `Q${format(date, 'yyMMdd')}${getSequence()}`
-}
-
-/**
- * 生成訂單編號
- * @param tourCode 團號
- * @returns 訂單編號 (如: BKK241225001-001)
- */
-export function generateOrderNumber(tourCode: string): string {
-  return `${tourCode}-${getSequence()}`
-}
-
-/**
  * 取得所有目的地選項
  */
 export function getAllDestinations(): Destination[] {

@@ -2,6 +2,8 @@ import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { Tour } from '@/stores/types'
 import { useTourStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
+import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
+import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 
 interface TourFinancialSummary {
   total_revenue: number
@@ -74,50 +76,40 @@ class TourService extends BaseService<Tour> {
 
   /**
    * 生成團號
-   * @param cityCode - 3碼城市代號 (如: TYO, BKK, OSA)
+   * @param cityCode - 3碼城市代號 (如: CNX, BKK, OSA)
    * @param date - 出發日期
-   * @param isSpecial - 是否為特殊團
-   * @returns 團號 (格式: TYO25010101 或 SPC25010101)
+   * @param isSpecial - 是否為特殊團（目前未使用）
+   * @returns 團號 (格式: TP-CNX25012801)
    */
   async generateTourCode(
     cityCode: string,
     date: Date,
     isSpecial: boolean = false
   ): Promise<string> {
-    const year = date.getFullYear().toString().slice(-2)
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0')
-    const dateStr = `${year}${month}${day}`
+    // 取得當前 workspace code
+    const workspaceCode = getCurrentWorkspaceCode()
+    if (!workspaceCode) {
+      throw new Error('無法取得 workspace code')
+    }
 
-    const prefix = isSpecial ? 'SPC' : cityCode.toUpperCase()
-
-    // 獲取當日同地點已有的團號來生成流水號
+    // 獲取所有現有 tours
     const allTours = await this.list()
-    const samePrefixDateTours = allTours.data.filter(
-      t => t.code && t.code.startsWith(`${prefix}${dateStr}`)
+
+    // 使用統一的 code generator
+    const code = generateTourCodeUtil(
+      workspaceCode,
+      cityCode.toUpperCase(),
+      date.toISOString(),
+      allTours.data
     )
-
-    // 找出最大的流水號並 +1，避免重複
-    let maxSequence = 0
-    samePrefixDateTours.forEach(tour => {
-      // 團號格式: TYO25010101 (3碼城市+6碼日期+2碼流水號 = 11碼)
-      // 或: SPC25010101 (3碼SPC+6碼日期+2碼流水號 = 11碼)
-      const match = tour.code.match(/(\d{2})$/)
-      if (match) {
-        const seq = parseInt(match[1], 10)
-        if (seq > maxSequence) maxSequence = seq
-      }
-    })
-
-    const sequence = (maxSequence + 1).toString().padStart(2, '0')
-    const code = `${prefix}${dateStr}${sequence}`
 
     // 雙重檢查：確保生成的團號不存在
     const exists = await this.isTourCodeExists(code)
     if (exists) {
       // 如果仍然重複，使用時間戳確保唯一性
       const timestamp = Date.now().toString().slice(-2)
-      return `${prefix}${dateStr}${timestamp}`
+      const dateStr = date.toISOString().split('T')[0].replace(/-/g, '').slice(2) // YYMMDD
+      return `${workspaceCode}-${cityCode}${dateStr}${timestamp}`
     }
 
     return code

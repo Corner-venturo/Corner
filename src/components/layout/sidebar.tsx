@@ -33,6 +33,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { SyncStatusIndicator } from './sync-status-indicator'
+import { isMenuItemHidden } from '@/constants/menu-items'
 
 interface MenuItem {
   href: string
@@ -359,7 +360,7 @@ export function Sidebar() {
     return item?.children || []
   }
 
-  // 使用 useMemo 優化權限過濾
+  // 使用 useMemo 優化權限過濾和個人化隱藏
   const visibleMenuItems = useMemo(() => {
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
       if (!user) {
@@ -368,9 +369,15 @@ export function Sidebar() {
 
       const userPermissions = user.permissions || []
       const isSuperAdmin = userPermissions.includes('admin') // admin 就是管理員
+      const hiddenMenuItems = user.hidden_menu_items || []
 
       return items
         .map(item => {
+          // 檢查是否被使用者隱藏
+          if (isMenuItemHidden(item.href, hiddenMenuItems)) {
+            return null
+          }
+
           // 如果有子選單，先過濾子選單
           if (item.children) {
             const visibleChildren = filterMenuByPermissions(item.children)
@@ -405,9 +412,15 @@ export function Sidebar() {
 
       const userPermissions = user.permissions || []
       const isSuperAdmin = userPermissions.includes('admin')
+      const hiddenMenuItems = user.hidden_menu_items || []
 
       return items
         .map(item => {
+          // 檢查是否被使用者隱藏
+          if (isMenuItemHidden(item.href, hiddenMenuItems)) {
+            return null
+          }
+
           if (!item.requiredPermission) return item
           if (isSuperAdmin) return item
           return userPermissions.includes(item.requiredPermission) ? item : null
