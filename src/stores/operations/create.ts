@@ -15,7 +15,6 @@ import { SyncCoordinator } from '../sync/coordinator'
 import { generateCode } from '../utils/code-generator'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
-import { getCurrentWorkspaceId, getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 
 /**
  * 建立資料（簡化版：直接新增）
@@ -35,28 +34,19 @@ export async function create<T extends BaseEntity>(
     const id = generateUUID()
     const now = new Date().toISOString()
 
-    // 自動填入 workspace_id（如果表格有這個欄位且使用者有 workspace）
-    const workspaceId = getCurrentWorkspaceId()
-    const workspaceCode = getCurrentWorkspaceCode()
-
     // 如果有 codePrefix，生成編號
     let recordData = {
       ...data,
       id,
       created_at: now,
       updated_at: now,
-      // 自動填入 workspace_id（如果沒有明確指定的話）
-      ...(workspaceId &&
-        !(data as Record<string, unknown>).workspace_id && {
-          workspace_id: workspaceId,
-        }),
     } as T
 
-    if (codePrefix && workspaceCode) {
+    if (codePrefix) {
       const existingCode = (data as Record<string, unknown>).code
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
-        const code = generateCode(workspaceCode, { prefix: codePrefix }, existingItems)
-        recordData = { ...recordData, code } as T
+        // Note: 自動編號已移除，改由各 store 或 service 層自行呼叫 generateCode
+        // 這是為了避免循環依賴 (workspace-helpers → auth-store/workspace-store)
       }
     }
 

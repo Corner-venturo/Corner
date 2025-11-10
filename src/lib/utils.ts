@@ -6,6 +6,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Export formatDate from utils
+export { formatDate } from './utils/format-date'
+
 // 根據身分證字號判斷性別 (僅台灣身分證字號)
 export function getGenderFromIdNumber(idNumber: string): 'M' | 'F' | '' {
   if (!idNumber) return ''

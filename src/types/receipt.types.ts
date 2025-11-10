@@ -141,6 +141,24 @@ export const LINKPAY_STATUS_COLORS: Record<LinkPayStatus, string> = {
 }
 
 // ============================================
+// 輔助函數
+// ============================================
+
+/**
+ * 取得收款方式名稱
+ */
+export function getReceiptTypeName(type: ReceiptType): string {
+  return RECEIPT_TYPE_LABELS[type] || '未知'
+}
+
+/**
+ * 取得收款狀態名稱
+ */
+export function getReceiptStatusName(status: ReceiptStatus): string {
+  return RECEIPT_STATUS_LABELS[status] || '未知'
+}
+
+// ============================================
 // 表單資料型別
 // ============================================
 
