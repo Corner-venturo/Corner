@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
+import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
@@ -15,6 +16,7 @@ import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
+  const { items: workspaces } = useWorkspaceStoreData()
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const { confirm, confirmDialogProps } = useConfirmDialog()
@@ -112,6 +114,16 @@ export default function HRPage() {
     }
   }
 
+  // 取得 workspace 名稱
+  const getWorkspaceName = useCallback(
+    (workspaceId: string | undefined) => {
+      if (!workspaceId) return '未設定'
+      const workspace = workspaces.find(w => w.id === workspaceId)
+      return workspace ? `${workspace.name} (${workspace.code})` : '未知辦公室'
+    },
+    [workspaces]
+  )
+
   // 定義表格欄位
   const columns: TableColumn<Employee>[] = useMemo(
     () => [
@@ -127,6 +139,16 @@ export default function HRPage() {
         sortable: true,
         render: (value, employee) => (
           <span className="font-medium">{value || employee.chinese_name || '未命名員工'}</span>
+        ),
+      },
+      {
+        key: 'workspace_id',
+        label: '所屬辦公室',
+        sortable: true,
+        render: (value, employee) => (
+          <span className="text-sm font-medium text-morandi-primary">
+            {getWorkspaceName(employee.workspace_id)}
+          </span>
         ),
       },
       {
@@ -169,7 +191,7 @@ export default function HRPage() {
         },
       },
     ],
-    []
+    [getWorkspaceName]
   )
 
   const renderActions = useCallback(
