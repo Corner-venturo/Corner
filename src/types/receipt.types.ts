@@ -158,6 +158,13 @@ export function getReceiptStatusName(status: ReceiptStatus): string {
   return RECEIPT_STATUS_LABELS[status] || '未知'
 }
 
+/**
+ * 取得收款狀態顏色
+ */
+export function getReceiptStatusColor(status: ReceiptStatus): string {
+  return RECEIPT_STATUS_COLORS[status] || 'text-gray-600'
+}
+
 // ============================================
 // 表單資料型別
 // ============================================
