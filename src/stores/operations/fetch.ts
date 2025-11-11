@@ -15,6 +15,7 @@ import { SupabaseAdapter } from '../adapters/supabase-adapter'
 import { SyncCoordinator } from '../sync/coordinator'
 import { MergeStrategy } from '../sync/merge-strategy'
 import { logger } from '@/lib/utils/logger'
+import { getWorkspaceFilterForQuery } from '@/lib/workspace-filter'
 
 /**
  * 取得所有資料（快取優先顯示，Supabase 為權威來源）
@@ -34,17 +35,28 @@ export async function fetchAll<T extends BaseEntity>(
 ): Promise<T[]> {
   const { tableName, enableSupabase } = config
 
+  // 取得 workspace 篩選設定
+  const workspaceId = getWorkspaceFilterForQuery(tableName)
+
+  // 篩選函數（用於 IndexedDB 快取資料）
+  const applyWorkspaceFilter = (items: T[]): T[] => {
+    if (!workspaceId) return items
+    return items.filter((item: any) => item.workspace_id === workspaceId)
+  }
+
   try {
     if (enableSupabase && typeof window !== 'undefined') {
       // Step 1: 先從 IndexedDB 讀取快取（快速顯示 UI）
       let cachedItems: T[] = []
       try {
-        cachedItems = await indexedDB.getAll(3000) // 3 秒超時
+        const allCached = await indexedDB.getAll(3000) // 3 秒超時
+        cachedItems = applyWorkspaceFilter(allCached) // 套用篩選
       } catch (error) {
         cachedItems = []
       }
 
       // Step 2: 從 Supabase 拉取最新資料（權威來源）
+      // 注意：Supabase 已經在 adapter 層套用篩選了
       try {
         const latestItems = await supabase.fetchAll(controller?.signal)
 
@@ -67,14 +79,14 @@ export async function fetchAll<T extends BaseEntity>(
       }
     } else {
       // 從 IndexedDB 讀取（離線模式或未啟用 Supabase）
-      const items = await indexedDB.getAll()
-      return items
+      const allItems = await indexedDB.getAll()
+      return applyWorkspaceFilter(allItems) // 套用篩選
     }
   } catch (error) {
     // 任何錯誤：靜默切換到本地模式
     try {
-      const items = await indexedDB.getAll()
-      return items
+      const allItems = await indexedDB.getAll()
+      return applyWorkspaceFilter(allItems) // 套用篩選
     } catch (localError) {
       logger.error(`❌ [${tableName}] 無法載入資料:`, localError)
       throw new Error('無法載入資料')

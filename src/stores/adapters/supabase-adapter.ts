@@ -7,6 +7,7 @@ import type { BaseEntity } from '@/types'
 import type { TableName } from '@/lib/db/schemas'
 import type { RemoteAdapter } from '../core/types'
 import { logger } from '@/lib/utils/logger'
+import { getWorkspaceFilterForQuery } from '@/lib/workspace-filter'
 
 export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
   constructor(
@@ -24,10 +25,17 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const query = supabase
+      let query = supabase
         .from(this.tableName)
         .select('*')
         .order('created_at', { ascending: true })
+
+      // 套用 workspace 篩選（如果有的話）
+      const workspaceId = getWorkspaceFilterForQuery(this.tableName)
+      if (workspaceId) {
+        query = query.eq('workspace_id', workspaceId)
+        logger.log(`🔍 [${this.tableName}] 套用 workspace 篩選:`, workspaceId)
+      }
 
       if (signal) {
         query.abortSignal(signal)

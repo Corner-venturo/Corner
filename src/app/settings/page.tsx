@@ -12,6 +12,7 @@ import {
   SystemSettings,
   OtherSettings,
   PermissionManagementSettings,
+  WorkspaceSwitcher,
 } from './components'
 
 // 強制客戶端渲染，不預取伺服器資料
@@ -99,6 +100,9 @@ export default function SettingsPage() {
 
           {/* 權限管理 */}
           <PermissionManagementSettings />
+
+          {/* 工作空間切換 */}
+          <WorkspaceSwitcher />
 
           {/* 系統維護 */}
           <SystemSettings

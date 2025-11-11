@@ -47,11 +47,18 @@ export function ErrorLogger() {
     let isLoggingError = false // 防止無限循環的標誌
 
     console.error = function (...args) {
-      // 先輸出到原始的 console.error
-      originalConsoleError.apply(console, args)
+      // 如果正在記錄錯誤，直接使用原始 console.error 並返回
+      if (isLoggingError) {
+        originalConsoleError.apply(console, args)
+        return
+      }
 
-      // 如果正在記錄錯誤，直接返回避免無限循環
-      if (isLoggingError) return
+      // 先輸出到原始的 console.error
+      try {
+        originalConsoleError.apply(console, args)
+      } catch (err) {
+        // 如果輸出失敗，靜默處理
+      }
 
       // 避免在 ErrorLogger 內部再次觸發錯誤日誌
       try {

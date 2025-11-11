@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useWorkspaceStore } from '@/stores'
+import React, { useState, useEffect } from 'react'
+import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { useEmployeeStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -13,7 +14,8 @@ import { Plus, Building2, Users, Shield } from 'lucide-react'
  * 支援 RLS (Row Level Security) 資料隔離
  */
 export default function WorkspacesPage() {
-  const { items: workspaces, create, update, remove } = useWorkspaceStore()
+  const workspaceStore = useWorkspaceStoreData()
+  const employeeStore = useEmployeeStore()
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newWorkspace, setNewWorkspace] = useState({
     name: '',
@@ -21,13 +23,24 @@ export default function WorkspacesPage() {
     description: '',
   })
 
+  // 載入 workspaces 和 employees 資料
+  useEffect(() => {
+    workspaceStore.fetchAll()
+    employeeStore.fetchAll()
+  }, [])
+
+  // 計算每個 workspace 的員工數
+  const getEmployeeCount = (workspaceId: string) => {
+    return employeeStore.items?.filter(emp => emp.workspace_id === workspaceId).length || 0
+  }
+
   const handleCreate = async () => {
     if (!newWorkspace.name || !newWorkspace.code) {
       alert('請填寫工作空間名稱和代碼')
       return
     }
 
-    await create({
+    await workspaceStore.create({
       name: newWorkspace.name,
       code: newWorkspace.code,
       description: newWorkspace.description,
@@ -40,7 +53,7 @@ export default function WorkspacesPage() {
   }
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
-    await update(id, { is_active: !currentStatus })
+    await workspaceStore.update(id, { is_active: !currentStatus })
   }
 
   return (
@@ -83,7 +96,7 @@ export default function WorkspacesPage() {
 
       {/* 工作空間列表 */}
       <div className="grid gap-4 md:grid-cols-2">
-        {workspaces.map(workspace => (
+        {workspaceStore.items?.map(workspace => (
           <Card
             key={workspace.id}
             className="border-morandi-container/30 p-6 hover:shadow-lg transition-shadow"
@@ -124,7 +137,7 @@ export default function WorkspacesPage() {
 
             <div className="flex items-center gap-2 text-sm text-morandi-secondary mb-4">
               <Users size={16} />
-              <span>員工數：計算中...</span>
+              <span>員工數：{getEmployeeCount(workspace.id)} 人</span>
             </div>
 
             <div className="flex gap-2">
@@ -221,7 +234,7 @@ export default function WorkspacesPage() {
       )}
 
       {/* Empty State */}
-      {workspaces.length === 0 && !showAddDialog && (
+      {workspaceStore.items?.length === 0 && !showAddDialog && (
         <Card className="border-dashed border-2 border-morandi-container/30 p-12 text-center">
           <Building2 size={48} className="text-morandi-muted mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-morandi-primary mb-2">尚未建立工作空間</h3>
