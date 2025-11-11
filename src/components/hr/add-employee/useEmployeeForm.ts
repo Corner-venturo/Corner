@@ -99,7 +99,7 @@ export function useEmployeeForm(onSubmit: () => void) {
             },
           ],
         },
-        permissions: [],
+        permissions: ['settings'],
         status: 'active',
       }
 
