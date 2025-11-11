@@ -8,7 +8,7 @@ import type { Receipt } from '@/types/receipt.types'
 
 export const useReceiptStore = createStore<Receipt>({
   tableName: 'receipts',
-  idField: 'id',
-  enableRealtime: true,
-  enableIndexedDB: true,
+  codePrefix: 'R',
+  enableSupabase: true,
+  fastInsert: true,
 })
