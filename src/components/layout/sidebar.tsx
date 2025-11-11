@@ -368,7 +368,7 @@ export function Sidebar() {
       }
 
       const userPermissions = user.permissions || []
-      const isSuperAdmin = userPermissions.includes('admin') // admin 就是管理員
+      const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
       const hiddenMenuItems = user.hidden_menu_items || []
 
       return items
@@ -411,7 +411,7 @@ export function Sidebar() {
       }
 
       const userPermissions = user.permissions || []
-      const isSuperAdmin = userPermissions.includes('admin')
+      const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
       const hiddenMenuItems = user.hidden_menu_items || []
 
       return items
