@@ -23,7 +23,11 @@ interface SellingPriceSectionProps {
   setSellingPrices: React.Dispatch<React.SetStateAction<SellingPrices>>
   identityProfits: IdentityProfits
   isReadOnly: boolean
-  handleGenerateQuotation: () => void
+  handleGenerateQuotation: (
+    tierParticipantCounts?: ParticipantCounts,
+    tierSellingPrices?: any,
+    tierLabel?: string
+  ) => void
   accommodationSummary: AccommodationSummaryItem[]
   categories: CostCategory[] // 用於計算檻次表成本
 }
@@ -475,8 +479,9 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               </span>
               <Button
                 onClick={() => {
-                  // 用檻次表的數據產生報價單
-                  handleGenerateQuotation(tier.participant_counts, tier.selling_prices)
+                  // 用檻次表的數據產生報價單，並傳遞檻次標籤
+                  const tierLabel = `檻次報價 - ${tier.participant_count} 人`
+                  handleGenerateQuotation(tier.participant_counts, tier.selling_prices, tierLabel)
                 }}
                 size="sm"
                 className="h-7 text-xs bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"

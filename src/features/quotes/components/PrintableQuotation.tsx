@@ -37,6 +37,7 @@ interface PrintableQuotationProps {
     days: number
     capacity: number
   }>
+  tierLabel?: string // 檻次標籤（例如：「檻次 1 - 20 人」）
 }
 
 export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
@@ -50,6 +51,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
   onClose,
   onPrint,
   accommodationSummary = [],
+  tierLabel,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>('')
@@ -300,6 +302,14 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                 <td>
                   {/* 旅程資訊區 */}
                   <div className="mb-6">
+                    {tierLabel && (
+                      <div
+                        className="mb-3 px-3 py-2 rounded-md inline-block"
+                        style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}
+                      >
+                        <span className="text-sm font-semibold">{tierLabel}</span>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex">
                         <span className="font-semibold w-32">行程名稱：</span>
@@ -561,6 +571,14 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
 
             {/* 旅程資訊 */}
             <div className="mb-6">
+              {tierLabel && (
+                <div
+                  className="mb-3 px-3 py-2 rounded-md inline-block"
+                  style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}
+                >
+                  <span className="text-sm font-semibold">{tierLabel}</span>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex">
                   <span className="font-semibold w-32">行程名稱：</span>

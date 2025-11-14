@@ -130,12 +130,14 @@ export default function QuoteDetailPage() {
   const [previewParticipantCounts, setPreviewParticipantCounts] =
     React.useState<ParticipantCounts | null>(null)
   const [previewSellingPrices, setPreviewSellingPrices] = React.useState<any>(null)
+  const [previewTierLabel, setPreviewTierLabel] = React.useState<string | undefined>(undefined)
 
   const handleGenerateQuotation = useCallback(
-    (tierParticipantCounts?: ParticipantCounts, tierSellingPrices?: any) => {
+    (tierParticipantCounts?: ParticipantCounts, tierSellingPrices?: any, tierLabel?: string) => {
       // 如果有傳入檻次表數據，使用檻次表數據；否則使用原始數據
       setPreviewParticipantCounts(tierParticipantCounts || null)
       setPreviewSellingPrices(tierSellingPrices || null)
+      setPreviewTierLabel(tierLabel)
       setShowQuotationPreview(true)
     },
     []
@@ -306,6 +308,7 @@ export default function QuoteDetailPage() {
         onClose={handleClosePreview}
         onPrint={handlePrint}
         accommodationSummary={accommodationSummary}
+        tierLabel={previewTierLabel}
       />
     </div>
   )
