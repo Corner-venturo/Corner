@@ -38,6 +38,17 @@ interface PrintableQuotationProps {
     capacity: number
   }>
   tierLabel?: string // 檻次標籤（例如：「檻次 1 - 20 人」）
+  tierPricings?: Array<{
+    // 所有檻次表的價格（用於顯示多欄位比較）
+    participant_count: number
+    selling_prices: {
+      adult: number
+      child_with_bed: number
+      child_no_bed: number
+      single_room: number
+      infant: number
+    }
+  }>
 }
 
 export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
@@ -52,6 +63,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
   onPrint,
   accommodationSummary = [],
   tierLabel,
+  tierPricings = [],
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>('')
@@ -376,8 +388,22 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                               fontWeight: 600,
                             }}
                           >
-                            單價
+                            基本報價
                           </th>
+                          {tierPricings.map((tier, index) => (
+                            <th
+                              key={tier.participant_count}
+                              className="px-4 py-3 text-center"
+                              style={{
+                                borderBottom: '1px solid #E5E7EB',
+                                borderLeft: '1px solid #E5E7EB',
+                                color: '#6B5B4F',
+                                fontWeight: 600,
+                              }}
+                            >
+                              {tier.participant_count} 人
+                            </th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody>
@@ -399,6 +425,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                             >
                               NT$ {sellingPrices.adult.toLocaleString()}
                             </td>
+                            {tierPricings.map(tier => (
+                              <td
+                                key={tier.participant_count}
+                                className="px-4 py-3 text-center text-lg font-semibold"
+                                style={{
+                                  borderBottom: '1px solid #E5E7EB',
+                                  borderLeft: '1px solid #E5E7EB',
+                                  color: '#6B5B4F',
+                                }}
+                              >
+                                NT$ {tier.selling_prices.adult.toLocaleString()}
+                              </td>
+                            ))}
                           </tr>
                         )}
                         {sellingPrices.child_with_bed > 0 && (
@@ -419,6 +458,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                             >
                               NT$ {sellingPrices.child_with_bed.toLocaleString()}
                             </td>
+                            {tierPricings.map(tier => (
+                              <td
+                                key={tier.participant_count}
+                                className="px-4 py-3 text-center text-lg font-semibold"
+                                style={{
+                                  borderBottom: '1px solid #E5E7EB',
+                                  borderLeft: '1px solid #E5E7EB',
+                                  color: '#6B5B4F',
+                                }}
+                              >
+                                NT$ {tier.selling_prices.child_with_bed.toLocaleString()}
+                              </td>
+                            ))}
                           </tr>
                         )}
                         {sellingPrices.child_no_bed > 0 && (
@@ -439,6 +491,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                             >
                               NT$ {sellingPrices.child_no_bed.toLocaleString()}
                             </td>
+                            {tierPricings.map(tier => (
+                              <td
+                                key={tier.participant_count}
+                                className="px-4 py-3 text-center text-lg font-semibold"
+                                style={{
+                                  borderBottom: '1px solid #E5E7EB',
+                                  borderLeft: '1px solid #E5E7EB',
+                                  color: '#6B5B4F',
+                                }}
+                              >
+                                NT$ {tier.selling_prices.child_no_bed.toLocaleString()}
+                              </td>
+                            ))}
                           </tr>
                         )}
                         {sellingPrices.single_room > 0 && (
@@ -459,6 +524,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                             >
                               NT$ {sellingPrices.single_room.toLocaleString()}
                             </td>
+                            {tierPricings.map(tier => (
+                              <td
+                                key={tier.participant_count}
+                                className="px-4 py-3 text-center text-lg font-semibold"
+                                style={{
+                                  borderBottom: '1px solid #E5E7EB',
+                                  borderLeft: '1px solid #E5E7EB',
+                                  color: '#6B5B4F',
+                                }}
+                              >
+                                NT$ {tier.selling_prices.single_room.toLocaleString()}
+                              </td>
+                            ))}
                           </tr>
                         )}
                         {sellingPrices.infant > 0 && (
@@ -472,6 +550,15 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                             >
                               NT$ {sellingPrices.infant.toLocaleString()}
                             </td>
+                            {tierPricings.map(tier => (
+                              <td
+                                key={tier.participant_count}
+                                className="px-4 py-3 text-center text-lg font-semibold"
+                                style={{ borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}
+                              >
+                                NT$ {tier.selling_prices.infant.toLocaleString()}
+                              </td>
+                            ))}
                           </tr>
                         )}
                       </tbody>
@@ -641,8 +728,22 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                         fontWeight: 600,
                       }}
                     >
-                      單價
+                      基本報價
                     </th>
+                    {tierPricings.map((tier, index) => (
+                      <th
+                        key={tier.participant_count}
+                        className="px-4 py-3 text-center"
+                        style={{
+                          borderBottom: '1px solid #E5E7EB',
+                          borderLeft: '1px solid #E5E7EB',
+                          color: '#6B5B4F',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {tier.participant_count} 人
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -664,6 +765,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                       >
                         NT$ {sellingPrices.adult.toLocaleString()}
                       </td>
+                      {tierPricings.map(tier => (
+                        <td
+                          key={tier.participant_count}
+                          className="px-4 py-3 text-center text-lg font-semibold"
+                          style={{
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                          }}
+                        >
+                          NT$ {tier.selling_prices.adult.toLocaleString()}
+                        </td>
+                      ))}
                     </tr>
                   )}
                   {sellingPrices.child_with_bed > 0 && (
@@ -684,6 +798,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                       >
                         NT$ {sellingPrices.child_with_bed.toLocaleString()}
                       </td>
+                      {tierPricings.map(tier => (
+                        <td
+                          key={tier.participant_count}
+                          className="px-4 py-3 text-center text-lg font-semibold"
+                          style={{
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                          }}
+                        >
+                          NT$ {tier.selling_prices.child_with_bed.toLocaleString()}
+                        </td>
+                      ))}
                     </tr>
                   )}
                   {sellingPrices.child_no_bed > 0 && (
@@ -704,6 +831,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                       >
                         NT$ {sellingPrices.child_no_bed.toLocaleString()}
                       </td>
+                      {tierPricings.map(tier => (
+                        <td
+                          key={tier.participant_count}
+                          className="px-4 py-3 text-center text-lg font-semibold"
+                          style={{
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                          }}
+                        >
+                          NT$ {tier.selling_prices.child_no_bed.toLocaleString()}
+                        </td>
+                      ))}
                     </tr>
                   )}
                   {sellingPrices.single_room > 0 && (
@@ -724,6 +864,19 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                       >
                         NT$ {sellingPrices.single_room.toLocaleString()}
                       </td>
+                      {tierPricings.map(tier => (
+                        <td
+                          key={tier.participant_count}
+                          className="px-4 py-3 text-center text-lg font-semibold"
+                          style={{
+                            borderBottom: '1px solid #E5E7EB',
+                            borderLeft: '1px solid #E5E7EB',
+                            color: '#6B5B4F',
+                          }}
+                        >
+                          NT$ {tier.selling_prices.single_room.toLocaleString()}
+                        </td>
+                      ))}
                     </tr>
                   )}
                   {sellingPrices.infant > 0 && (
@@ -737,6 +890,15 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                       >
                         NT$ {sellingPrices.infant.toLocaleString()}
                       </td>
+                      {tierPricings.map(tier => (
+                        <td
+                          key={tier.participant_count}
+                          className="px-4 py-3 text-center text-lg font-semibold"
+                          style={{ borderLeft: '1px solid #E5E7EB', color: '#6B5B4F' }}
+                        >
+                          NT$ {tier.selling_prices.infant.toLocaleString()}
+                        </td>
+                      ))}
                     </tr>
                   )}
                 </tbody>

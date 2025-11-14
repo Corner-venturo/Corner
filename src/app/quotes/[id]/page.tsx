@@ -131,13 +131,40 @@ export default function QuoteDetailPage() {
     React.useState<ParticipantCounts | null>(null)
   const [previewSellingPrices, setPreviewSellingPrices] = React.useState<any>(null)
   const [previewTierLabel, setPreviewTierLabel] = React.useState<string | undefined>(undefined)
+  const [previewTierPricings, setPreviewTierPricings] = React.useState<
+    Array<{
+      participant_count: number
+      selling_prices: {
+        adult: number
+        child_with_bed: number
+        child_no_bed: number
+        single_room: number
+        infant: number
+      }
+    }>
+  >([])
 
   const handleGenerateQuotation = useCallback(
-    (tierParticipantCounts?: ParticipantCounts, tierSellingPrices?: any, tierLabel?: string) => {
+    (
+      tierParticipantCounts?: ParticipantCounts,
+      tierSellingPrices?: any,
+      tierLabel?: string,
+      allTierPricings?: Array<{
+        participant_count: number
+        selling_prices: {
+          adult: number
+          child_with_bed: number
+          child_no_bed: number
+          single_room: number
+          infant: number
+        }
+      }>
+    ) => {
       // 如果有傳入檻次表數據，使用檻次表數據；否則使用原始數據
       setPreviewParticipantCounts(tierParticipantCounts || null)
       setPreviewSellingPrices(tierSellingPrices || null)
       setPreviewTierLabel(tierLabel)
+      setPreviewTierPricings(allTierPricings || [])
       setShowQuotationPreview(true)
     },
     []
@@ -309,6 +336,7 @@ export default function QuoteDetailPage() {
         onPrint={handlePrint}
         accommodationSummary={accommodationSummary}
         tierLabel={previewTierLabel}
+        tierPricings={previewTierPricings}
       />
     </div>
   )

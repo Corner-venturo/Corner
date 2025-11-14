@@ -26,7 +26,17 @@ interface SellingPriceSectionProps {
   handleGenerateQuotation: (
     tierParticipantCounts?: ParticipantCounts,
     tierSellingPrices?: any,
-    tierLabel?: string
+    tierLabel?: string,
+    allTierPricings?: Array<{
+      participant_count: number
+      selling_prices: {
+        adult: number
+        child_with_bed: number
+        child_no_bed: number
+        single_room: number
+        infant: number
+      }
+    }>
   ) => void
   accommodationSummary: AccommodationSummaryItem[]
   categories: CostCategory[] // 用於計算檻次表成本
@@ -179,7 +189,14 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
     <div className="lg:col-span-3 space-y-3">
       {/* 產生報價單按鈕 */}
       <Button
-        onClick={handleGenerateQuotation}
+        onClick={() => {
+          // 將所有檻次表的數據傳遞給報價單
+          const tierPricingsData = tierPricings.map(tier => ({
+            participant_count: tier.participant_count,
+            selling_prices: tier.selling_prices,
+          }))
+          handleGenerateQuotation(undefined, undefined, undefined, tierPricingsData)
+        }}
         className="w-full h-9 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
         title="產生報價單預覽"
         type="button"
