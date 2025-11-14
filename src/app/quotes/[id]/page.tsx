@@ -271,6 +271,7 @@ export default function QuoteDetailPage() {
             isReadOnly={isReadOnly}
             handleGenerateQuotation={handleGenerateQuotation}
             accommodationSummary={accommodationSummary}
+            categories={categories}
           />
         </div>
       </div>

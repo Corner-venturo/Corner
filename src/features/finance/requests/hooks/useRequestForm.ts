@@ -93,7 +93,7 @@ export function useRequestForm() {
 
     const employeeList = employees.map(e => ({
       id: e.id,
-      name: e.name,
+      name: (e as any).display_name || (e as any).english_name || (e as any).chinese_name || e.employee_number || '未命名員工',
       type: 'employee' as const,
       group: '員工',
     }))

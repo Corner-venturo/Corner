@@ -105,3 +105,13 @@ export const categoryIcons: Record<string, any> = {
   others: 'MoreHorizontal',
   guide: 'Users',
 }
+
+// 檻次表（Tier Pricing Table）- 用於比較不同人數的報價
+export interface TierPricing {
+  id: string // 唯一識別
+  participant_count: number // 總人數（用於重新計算成本）
+  participant_counts: ParticipantCounts // 各身份人數分布
+  identity_costs: IdentityCosts // 重新計算的各身份成本
+  selling_prices: SellingPrices // 各身份售價
+  identity_profits: IdentityProfits // 各身份利潤
+}

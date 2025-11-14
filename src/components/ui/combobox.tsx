@@ -295,8 +295,10 @@ export function Combobox<T = unknown>({
       {isOpen && !disabled && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 z-[100] mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
-          style={{ maxHeight }}
+          className="absolute z-50 bg-card border border-border rounded-lg shadow-lg overflow-hidden mt-1 w-full"
+          style={{
+            maxHeight,
+          }}
         >
           <div className="overflow-y-auto" style={{ maxHeight }}>
             {filteredOptions.length > 0 ? (

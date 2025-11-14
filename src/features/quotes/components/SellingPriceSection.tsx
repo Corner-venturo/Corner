@@ -1,13 +1,20 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { Plus, X } from 'lucide-react'
 import {
   ParticipantCounts,
   SellingPrices,
   IdentityCosts,
   IdentityProfits,
   AccommodationSummaryItem,
+  TierPricing,
+  CostCategory,
 } from '../types'
+import { calculateTierPricingCosts } from '../utils/calculateTierPricing'
 
 interface SellingPriceSectionProps {
   participantCounts: ParticipantCounts
@@ -18,6 +25,7 @@ interface SellingPriceSectionProps {
   isReadOnly: boolean
   handleGenerateQuotation: () => void
   accommodationSummary: AccommodationSummaryItem[]
+  categories: CostCategory[] // 用於計算檻次表成本
 }
 
 export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
@@ -29,10 +37,87 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   isReadOnly,
   handleGenerateQuotation,
   accommodationSummary,
+  categories,
 }) => {
+  // 檻次表狀態
+  const [tierPricings, setTierPricings] = useState<TierPricing[]>([])
+  const [newTierCount, setNewTierCount] = useState<string>('')
+
   // 全形轉半形數字
   const normalizeNumber = (value: string): string => {
     return value.replace(/[０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+  }
+
+  // 新增檻次表
+  const handleAddTier = () => {
+    const count = Number(newTierCount)
+    if (!count || count <= 0) {
+      alert('請輸入有效的人數')
+      return
+    }
+
+    // 計算新的人數分布（保持原始比例）
+    const totalOriginal =
+      participantCounts.adult +
+      participantCounts.child_with_bed +
+      participantCounts.child_no_bed +
+      participantCounts.single_room
+
+    const ratio = totalOriginal > 0 ? count / totalOriginal : 1
+
+    const newCounts: ParticipantCounts = {
+      adult: Math.round(participantCounts.adult * ratio),
+      child_with_bed: Math.round(participantCounts.child_with_bed * ratio),
+      child_no_bed: Math.round(participantCounts.child_no_bed * ratio),
+      single_room: Math.round(participantCounts.single_room * ratio),
+      infant: Math.round(participantCounts.infant * ratio),
+    }
+
+    // 計算新的成本
+    const newCosts = calculateTierPricingCosts(categories, newCounts)
+
+    // 建立新的檻次表
+    const newTier: TierPricing = {
+      id: Date.now().toString(),
+      participant_count: count,
+      participant_counts: newCounts,
+      identity_costs: newCosts,
+      selling_prices: { ...sellingPrices }, // 複製原始售價
+      identity_profits: {
+        adult: sellingPrices.adult - newCosts.adult,
+        child_with_bed: sellingPrices.child_with_bed - newCosts.child_with_bed,
+        child_no_bed: sellingPrices.child_no_bed - newCosts.child_no_bed,
+        single_room: sellingPrices.single_room - newCosts.single_room,
+        infant: sellingPrices.infant - newCosts.infant,
+      },
+    }
+
+    setTierPricings(prev => [...prev, newTier])
+    setNewTierCount('')
+  }
+
+  // 刪除檻次表
+  const handleRemoveTier = (id: string) => {
+    setTierPricings(prev => prev.filter(tier => tier.id !== id))
+  }
+
+  // 更新檻次表售價
+  const handleTierPriceChange = (tierId: string, identity: keyof SellingPrices, value: string) => {
+    const normalized = normalizeNumber(value)
+    setTierPricings(prev =>
+      prev.map(tier => {
+        if (tier.id !== tierId) return tier
+        const newPrice = Number(normalized) || 0
+        return {
+          ...tier,
+          selling_prices: { ...tier.selling_prices, [identity]: newPrice },
+          identity_profits: {
+            ...tier.identity_profits,
+            [identity]: newPrice - tier.identity_costs[identity as keyof IdentityCosts],
+          },
+        }
+      })
+    )
   }
 
   const handlePriceChange = (identity: keyof SellingPrices, value: string) => {
@@ -348,6 +433,239 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* 新增檻次表 */}
+      {!isReadOnly && (
+        <div className="mt-3 space-y-2">
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              value={newTierCount}
+              onChange={e => setNewTierCount(e.target.value)}
+              placeholder="輸入人數（如：20、30、40）"
+              className="flex-1 h-9 text-sm"
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleAddTier()
+              }}
+            />
+            <Button
+              onClick={handleAddTier}
+              size="sm"
+              className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              type="button"
+            >
+              <Plus size={16} className="mr-1" />
+              新增檻次表
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* 檻次表列表 */}
+      {tierPricings.map(tier => (
+        <div
+          key={tier.id}
+          className="mt-3 bg-card border border-morandi-gold/30 rounded-xl overflow-hidden shadow-sm"
+        >
+          {/* 檻次表標題 */}
+          <div className="bg-morandi-gold/10 px-4 py-2 flex items-center justify-between border-b border-morandi-gold/30">
+            <div className="text-sm font-medium text-morandi-primary">
+              檻次報價 - {tier.participant_count} 人
+              <span className="ml-2 text-xs text-morandi-secondary">
+                ({tier.participant_counts.adult}成人 + {tier.participant_counts.child_with_bed}小孩 +{' '}
+                {tier.participant_counts.child_no_bed}不佔床 + {tier.participant_counts.single_room}
+                單人房 + {tier.participant_counts.infant}嬰兒)
+              </span>
+            </div>
+            {!isReadOnly && (
+              <button
+                onClick={() => handleRemoveTier(tier.id)}
+                className="text-morandi-red hover:bg-morandi-red/10 p-1 rounded transition-colors"
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* 檻次表內容 */}
+          <table className="w-full text-sm">
+            <thead className="bg-morandi-container/20 border-b border-border/60">
+              <tr>
+                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
+                  身份
+                </th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
+                  成本
+                </th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
+                  售價
+                </th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary">
+                  利潤
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* 單人房 */}
+              <tr className="border-b border-border">
+                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
+                  單人房
+                </td>
+                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
+                  {tier.identity_costs.single_room.toLocaleString()}
+                </td>
+                <td className="py-2 px-2 text-center border-r border-border">
+                  <input
+                    type="number"
+                    value={tier.selling_prices.single_room || ''}
+                    onChange={e => handleTierPriceChange(tier.id, 'single_room', e.target.value)}
+                    disabled={isReadOnly}
+                    className={cn(
+                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      isReadOnly && 'cursor-not-allowed opacity-60'
+                    )}
+                  />
+                </td>
+                <td
+                  className={cn(
+                    'py-2 px-2 text-center text-xs font-medium',
+                    tier.identity_profits.single_room >= 0
+                      ? 'text-morandi-green'
+                      : 'text-morandi-red'
+                  )}
+                >
+                  {tier.identity_profits.single_room.toLocaleString()}
+                </td>
+              </tr>
+
+              {/* 成人 */}
+              <tr className="border-b border-border">
+                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
+                  成人
+                </td>
+                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
+                  {tier.identity_costs.adult.toLocaleString()}
+                </td>
+                <td className="py-2 px-2 text-center border-r border-border">
+                  <input
+                    type="number"
+                    value={tier.selling_prices.adult || ''}
+                    onChange={e => handleTierPriceChange(tier.id, 'adult', e.target.value)}
+                    disabled={isReadOnly}
+                    className={cn(
+                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      isReadOnly && 'cursor-not-allowed opacity-60'
+                    )}
+                  />
+                </td>
+                <td
+                  className={cn(
+                    'py-2 px-2 text-center text-xs font-medium',
+                    tier.identity_profits.adult >= 0 ? 'text-morandi-green' : 'text-morandi-red'
+                  )}
+                >
+                  {tier.identity_profits.adult.toLocaleString()}
+                </td>
+              </tr>
+
+              {/* 小孩 */}
+              <tr className="border-b border-border">
+                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
+                  小孩
+                </td>
+                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
+                  {tier.identity_costs.child_with_bed.toLocaleString()}
+                </td>
+                <td className="py-2 px-2 text-center border-r border-border">
+                  <input
+                    type="number"
+                    value={tier.selling_prices.child_with_bed || ''}
+                    onChange={e => handleTierPriceChange(tier.id, 'child_with_bed', e.target.value)}
+                    disabled={isReadOnly}
+                    className={cn(
+                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      isReadOnly && 'cursor-not-allowed opacity-60'
+                    )}
+                  />
+                </td>
+                <td
+                  className={cn(
+                    'py-2 px-2 text-center text-xs font-medium',
+                    tier.identity_profits.child_with_bed >= 0
+                      ? 'text-morandi-green'
+                      : 'text-morandi-red'
+                  )}
+                >
+                  {tier.identity_profits.child_with_bed.toLocaleString()}
+                </td>
+              </tr>
+
+              {/* 不佔床 */}
+              <tr className="border-b border-border">
+                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
+                  不佔床
+                </td>
+                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
+                  {tier.identity_costs.child_no_bed.toLocaleString()}
+                </td>
+                <td className="py-2 px-2 text-center border-r border-border">
+                  <input
+                    type="number"
+                    value={tier.selling_prices.child_no_bed || ''}
+                    onChange={e => handleTierPriceChange(tier.id, 'child_no_bed', e.target.value)}
+                    disabled={isReadOnly}
+                    className={cn(
+                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      isReadOnly && 'cursor-not-allowed opacity-60'
+                    )}
+                  />
+                </td>
+                <td
+                  className={cn(
+                    'py-2 px-2 text-center text-xs font-medium',
+                    tier.identity_profits.child_no_bed >= 0
+                      ? 'text-morandi-green'
+                      : 'text-morandi-red'
+                  )}
+                >
+                  {tier.identity_profits.child_no_bed.toLocaleString()}
+                </td>
+              </tr>
+
+              {/* 嬰兒 */}
+              <tr>
+                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
+                  嬰兒
+                </td>
+                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
+                  {tier.identity_costs.infant.toLocaleString()}
+                </td>
+                <td className="py-2 px-2 text-center border-r border-border">
+                  <input
+                    type="number"
+                    value={tier.selling_prices.infant || ''}
+                    onChange={e => handleTierPriceChange(tier.id, 'infant', e.target.value)}
+                    disabled={isReadOnly}
+                    className={cn(
+                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      isReadOnly && 'cursor-not-allowed opacity-60'
+                    )}
+                  />
+                </td>
+                <td
+                  className={cn(
+                    'py-2 px-2 text-center text-xs font-medium',
+                    tier.identity_profits.infant >= 0 ? 'text-morandi-green' : 'text-morandi-red'
+                  )}
+                >
+                  {tier.identity_profits.infant.toLocaleString()}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   )
 }

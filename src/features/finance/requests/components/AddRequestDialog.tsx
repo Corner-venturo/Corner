@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Combobox } from '@/components/ui/combobox'
 import {
   Select,
   SelectContent,
@@ -14,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Combobox } from '@/components/ui/combobox'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
 import { categoryOptions } from '../types'
@@ -58,19 +58,27 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
   const { generateRequestNumber, createRequest } = useRequestOperations()
 
-  // ✅ 載入團體和訂單資料（開啟對話框時）
+  // ✅ 載入團體、訂單和供應商資料（開啟對話框時）
   useEffect(() => {
     if (open) {
       const loadData = async () => {
-        const { useTourStore, useOrderStore } = await import('@/stores')
+        const { useTourStore, useOrderStore, useSupplierStore, useEmployeeStore } = await import('@/stores')
         const tourStore = useTourStore.getState()
         const orderStore = useOrderStore.getState()
+        const supplierStore = useSupplierStore.getState()
+        const employeeStore = useEmployeeStore.getState()
 
         if (tourStore.items.length === 0) {
           await tourStore.fetchAll()
         }
         if (orderStore.items.length === 0) {
           await orderStore.fetchAll()
+        }
+        if (supplierStore.items.length === 0) {
+          await supplierStore.fetchAll()
+        }
+        if (employeeStore.items.length === 0) {
+          await employeeStore.fetchAll()
         }
       }
       loadData()
@@ -138,7 +146,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto">
+      <DialogContent className="max-w-[90vw] w-[90vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>新增請款單</DialogTitle>
           <p className="text-sm text-morandi-secondary">
@@ -146,11 +154,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
           </p>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <div className="bg-white border border-border rounded-md p-4 shadow-sm">
-            <h3 className="text-sm font-medium text-morandi-primary mb-4">基本資訊</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Info - Single Row */}
+        <div className="bg-white border border-border rounded-md p-4 shadow-sm overflow-visible">
+          <div className="grid grid-cols-3 gap-4">
               {/* 選擇團體 */}
               <div>
                 <Label className="text-sm font-medium text-morandi-secondary">團體 *</Label>
@@ -168,6 +174,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                     }))
                   }}
                   placeholder="請選擇團體..."
+                  emptyMessage="找不到團體"
                   className="mt-1"
                 />
               </div>
@@ -203,95 +210,78 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
               {/* Request Date */}
               <div>
-                <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                  請款日期 <span className="text-morandi-red">*</span>
-                </label>
-
-                <div className="mb-3 flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isSpecialBilling"
-                    checked={formData.is_special_billing}
-                    onChange={e => {
-                      setFormData(prev => ({
-                        ...prev,
-                        is_special_billing: e.target.checked,
-                        request_date: '',
-                      }))
-                    }}
-                    className="rounded border-border"
-                  />
-                  <label htmlFor="isSpecialBilling" className="text-sm text-morandi-primary cursor-pointer">
-                    特殊出帳 (可選擇任何日期)
-                  </label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label className="text-sm font-medium text-morandi-secondary">
+                    請款日期 <span className="text-morandi-red">*</span>
+                  </Label>
+                  <div className="flex items-center space-x-1">
+                    <input
+                      type="checkbox"
+                      id="isSpecialBilling"
+                      checked={formData.is_special_billing}
+                      onChange={e => {
+                        setFormData(prev => ({
+                          ...prev,
+                          is_special_billing: e.target.checked,
+                          request_date: '',
+                        }))
+                      }}
+                      className="rounded border-border"
+                    />
+                    <label htmlFor="isSpecialBilling" className="text-xs text-morandi-primary cursor-pointer">
+                      特殊出帳
+                    </label>
+                  </div>
                 </div>
 
                 {formData.is_special_billing ? (
-                  <div>
-                    <Input
-                      type="date"
-                      value={formData.request_date}
-                      onChange={e => setFormData(prev => ({ ...prev, request_date: e.target.value }))}
-                      className="bg-morandi-gold/10 border-morandi-container/30"
-                    />
-                    <p className="text-xs text-morandi-gold mt-1.5">⚠️ 特殊出帳：可選擇任何日期</p>
-                  </div>
+                  <Input
+                    type="date"
+                    value={formData.request_date}
+                    onChange={e => setFormData(prev => ({ ...prev, request_date: e.target.value }))}
+                    className="bg-morandi-gold/10 border-morandi-container/30"
+                  />
                 ) : (
-                  <div>
-                    <Select
-                      value={formData.request_date}
-                      onValueChange={value => setFormData(prev => ({ ...prev, request_date: value }))}
-                    >
-                      <SelectTrigger className="border-morandi-container/30">
-                        <SelectValue placeholder="選擇請款日期 (週四)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {upcomingThursdays.map(thursday => (
-                          <SelectItem key={thursday.value} value={thursday.value}>
-                            {thursday.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-morandi-secondary mt-1.5">💼 一般請款固定每週四</p>
-                  </div>
+                  <Select
+                    value={formData.request_date}
+                    onValueChange={value => setFormData(prev => ({ ...prev, request_date: value }))}
+                  >
+                    <SelectTrigger className="border-morandi-container/30">
+                      <SelectValue placeholder="選擇請款日期 (週四)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {upcomingThursdays.map(thursday => (
+                        <SelectItem key={thursday.value} value={thursday.value}>
+                          {thursday.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               </div>
-
-              {/* Note */}
-              <div>
-                <Label className="text-sm font-medium text-morandi-secondary">備註</Label>
-                <Textarea
-                  placeholder="請款相關說明..."
-                  rows={3}
-                  value={formData.note}
-                  onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
-                  className="mt-1 border-morandi-container/30"
-                />
-              </div>
             </div>
-          </div>
+        </div>
 
-          {/* Add Item Form - Table Style */}
-          <div className="bg-white border border-border rounded-md p-4 shadow-sm">
+        {/* Add Item Form - Table Style */}
+        <div className="bg-white border border-border rounded-md p-4 shadow-sm flex-1 flex flex-col overflow-hidden mt-4">
             <h3 className="text-sm font-medium text-morandi-primary mb-4">請款項目</h3>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto flex-1">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-32">
                       請款類型
                     </th>
-                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-64">
                       供應商
                     </th>
-                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-28">
                       單價
                     </th>
-                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-24">
                       數量
                     </th>
-                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-28">
                       小計
                     </th>
                     <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
@@ -305,7 +295,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                 <tbody>
                   {/* New Item Row */}
                   <tr className="bg-morandi-gold/5 border-b-2 border-morandi-gold/30">
-                    <td className="py-2 px-3">
+                    <td className="py-2 px-3 w-32">
                       <Select
                         value={newItem.category}
                         onValueChange={value =>
@@ -324,24 +314,20 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="py-2 px-3">
-                      <Select
+                    <td className="py-2 px-3 w-64">
+                      <Combobox
+                        options={suppliers.map(supplier => ({
+                          value: supplier.id,
+                          label: `${supplier.name} (${supplier.group})`,
+                        }))}
                         value={newItem.supplier_id}
-                        onValueChange={value => setNewItem(prev => ({ ...prev, supplier_id: value }))}
-                      >
-                        <SelectTrigger className="h-9 border-morandi-container/30">
-                          <SelectValue placeholder="選擇供應商" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {suppliers.map(supplier => (
-                            <SelectItem key={supplier.id} value={supplier.id}>
-                              {supplier.name} ({supplier.group})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onChange={value => setNewItem(prev => ({ ...prev, supplier_id: value }))}
+                        placeholder="搜尋供應商..."
+                        emptyMessage="找不到供應商"
+                        className="h-9"
+                      />
                     </td>
-                    <td className="py-2 px-3">
+                    <td className="py-2 px-3 w-28">
                       <Input
                         type="number"
                         value={newItem.unit_price || ''}
@@ -352,7 +338,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         className="h-9 border-morandi-container/30"
                       />
                     </td>
-                    <td className="py-2 px-3">
+                    <td className="py-2 px-3 w-24">
                       <Input
                         type="number"
                         value={newItem.quantity || ''}
@@ -363,7 +349,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         className="h-9 border-morandi-container/30"
                       />
                     </td>
-                    <td className="py-2 px-3 text-sm font-bold text-morandi-gold">
+                    <td className="py-2 px-3 w-28 text-sm font-bold text-morandi-gold">
                       {(newItem.unit_price * newItem.quantity).toLocaleString()}
                     </td>
                     <td className="py-2 px-3">
@@ -374,7 +360,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         className="h-9 border-morandi-container/30"
                       />
                     </td>
-                    <td className="py-2 px-3 text-center">
+                    <td className="py-2 px-3 w-20 text-center">
                       <Button
                         onClick={addItemToList}
                         disabled={!newItem.supplier_id || !newItem.description}
@@ -395,23 +381,23 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         index % 2 === 1 && 'bg-morandi-container/5'
                       )}
                     >
-                      <td className="py-3 px-3">
+                      <td className="py-3 px-3 w-32">
                         <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded font-medium">
                           {categoryOptions.find(c => c.value === item.category)?.label}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-sm text-morandi-primary font-medium">
+                      <td className="py-3 px-3 w-64 text-sm text-morandi-primary font-medium">
                         {item.supplierName}
                       </td>
-                      <td className="py-3 px-3 text-sm text-morandi-secondary">
+                      <td className="py-3 px-3 w-28 text-sm text-morandi-secondary">
                         {item.unit_price.toLocaleString()}
                       </td>
-                      <td className="py-3 px-3 text-sm text-morandi-secondary">{item.quantity}</td>
-                      <td className="py-3 px-3 text-sm font-bold text-morandi-gold">
+                      <td className="py-3 px-3 w-24 text-sm text-morandi-secondary">{item.quantity}</td>
+                      <td className="py-3 px-3 w-28 text-sm font-bold text-morandi-gold">
                         {(item.unit_price * item.quantity).toLocaleString()}
                       </td>
                       <td className="py-3 px-3 text-sm text-morandi-secondary">{item.description}</td>
-                      <td className="py-3 px-3 text-center">
+                      <td className="py-3 px-3 w-20 text-center">
                         <button
                           onClick={() => removeItem(item.id)}
                           className="text-morandi-red hover:bg-morandi-red/10 p-2 rounded-lg transition-colors"
@@ -433,21 +419,20 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                 </div>
               )}
             </div>
-          </div>
+        </div>
 
-          {/* Actions */}
-          <div className="flex justify-end space-x-2 pt-4 border-t border-border">
-            <Button variant="outline" onClick={handleCancel}>
-              取消
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!formData.tour_id || requestItems.length === 0 || !formData.request_date}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md"
-            >
-              新增請款單 (共 {requestItems.length} 項，NT$ {total_amount.toLocaleString()})
-            </Button>
-          </div>
+        {/* Actions */}
+        <div className="flex justify-end space-x-2 pt-4 border-t border-border mt-4">
+          <Button variant="outline" onClick={handleCancel}>
+            取消
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={!formData.tour_id || requestItems.length === 0 || !formData.request_date}
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md"
+          >
+            新增請款單 (共 {requestItems.length} 項，NT$ {total_amount.toLocaleString()})
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

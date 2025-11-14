@@ -8,6 +8,7 @@ import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Combobox } from '@/components/ui/combobox'
 import {
   Select,
   SelectContent,
@@ -71,7 +72,8 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
           const target = e.target as HTMLElement
           if (
             target.closest('[role="listbox"]') ||
-            target.closest('[data-radix-select-viewport]')
+            target.closest('[data-radix-select-viewport]') ||
+            target.closest('[cmdk-root]')
           ) {
             e.preventDefault()
           }
@@ -84,10 +86,20 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
           {/* 選擇是否關聯旅遊團 */}
           <div>
             <label className="text-sm font-medium text-morandi-primary">關聯旅遊團（選填）</label>
-            <Select
-              value={formData.tour_id || 'none'}
-              onValueChange={value => {
-                if (value === 'none') {
+            <Combobox
+              options={[
+                { value: '', label: '獨立報價單（無旅遊團）' },
+                ...tours
+                  .filter(t => !t._deleted)
+                  .map(tour => ({
+                    value: tour.id,
+                    label: `${tour.code} - ${tour.name}`,
+                    data: tour,
+                  })),
+              ]}
+              value={formData.tour_id || ''}
+              onChange={value => {
+                if (!value) {
                   setFormField('tour_id', null)
                 } else {
                   const tour = tours.find(t => t.id === value)
@@ -100,21 +112,10 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
                   }
                 }
               }}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="獨立報價單（無旅遊團）" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">獨立報價單（無旅遊團）</SelectItem>
-                {tours
-                  .filter(t => !t._deleted)
-                  .map(tour => (
-                    <SelectItem key={tour.id} value={tour.id}>
-                      {tour.code} - {tour.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+              placeholder="搜尋或選擇旅遊團..."
+              emptyMessage="找不到旅遊團"
+              className="mt-1"
+            />
             <p className="text-xs text-morandi-secondary mt-1">
               選擇旅遊團後，報價單編號將使用團號
             </p>
