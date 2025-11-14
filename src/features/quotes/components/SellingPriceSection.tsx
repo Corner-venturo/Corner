@@ -469,8 +469,21 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
         >
           {/* 檻次表標題 */}
           <div className="bg-morandi-gold/10 px-4 py-2 flex items-center justify-between border-b border-morandi-gold/30">
-            <div className="text-sm font-medium text-morandi-primary">
-              檻次報價 - {tier.participant_count} 人
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-morandi-primary">
+                檻次報價 - {tier.participant_count} 人
+              </span>
+              <Button
+                onClick={() => {
+                  // 用檻次表的數據產生報價單
+                  handleGenerateQuotation(tier.participant_counts, tier.selling_prices)
+                }}
+                size="sm"
+                className="h-7 text-xs bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
+                type="button"
+              >
+                產生報價單
+              </Button>
             </div>
             {!isReadOnly && (
               <button

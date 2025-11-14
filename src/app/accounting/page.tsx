@@ -36,7 +36,7 @@ export default function AccountingPage() {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false)
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false)
 
-  // 初始化資料
+  // 載入資料
   useEffect(() => {
     initialize()
   }, [])

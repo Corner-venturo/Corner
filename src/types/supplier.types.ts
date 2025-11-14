@@ -59,6 +59,7 @@ export type SupplierType =
   | 'guide' // 導遊
   | 'agency' // 旅行社
   | 'ticketing' // 票務
+  | 'employee' // 員工（領隊/導遊薪資請款用）
   | 'other' // 其他
 
 // ============================================
@@ -110,6 +111,16 @@ export interface CostTemplate extends SyncableEntity {
   duration_minutes?: number | null
   capacity?: number | null
   notes?: string | null
+
+  // 🚗 交通服務專用欄位
+  vehicle_type?: string | null // 車型：4人車、7人車、16人車、VIP車
+  trip_type?: string | null // 行程類型：單程、往返
+  route_origin?: string | null // 起點：市區飯店、峴港機場
+  route_destination?: string | null // 終點：會安、巴拿山
+  base_distance_km?: number | null // 基本公里數
+  base_hours?: number | null // 基本時數
+  overtime_rate?: number | null // 超時費率（每小時）
+  extra_km_rate?: number | null // 超公里費率（每公里）
 
   // 管理
   is_active?: boolean

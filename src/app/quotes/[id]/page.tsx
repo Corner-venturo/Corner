@@ -127,10 +127,19 @@ export default function QuoteDetailPage() {
 
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
+  const [previewParticipantCounts, setPreviewParticipantCounts] =
+    React.useState<ParticipantCounts | null>(null)
+  const [previewSellingPrices, setPreviewSellingPrices] = React.useState<any>(null)
 
-  const handleGenerateQuotation = useCallback(() => {
-    setShowQuotationPreview(true)
-  }, [])
+  const handleGenerateQuotation = useCallback(
+    (tierParticipantCounts?: ParticipantCounts, tierSellingPrices?: any) => {
+      // 如果有傳入檻次表數據，使用檻次表數據；否則使用原始數據
+      setPreviewParticipantCounts(tierParticipantCounts || null)
+      setPreviewSellingPrices(tierSellingPrices || null)
+      setShowQuotationPreview(true)
+    },
+    []
+  )
 
   const handlePrint = useCallback(() => {
     window.print()
@@ -289,8 +298,8 @@ export default function QuoteDetailPage() {
       <PrintableQuotation
         quote={quote}
         quoteName={quoteName}
-        participantCounts={participantCounts}
-        sellingPrices={sellingPrices}
+        participantCounts={previewParticipantCounts || participantCounts}
+        sellingPrices={previewSellingPrices || sellingPrices}
         categories={updatedCategories}
         totalCost={total_cost}
         isOpen={showQuotationPreview}

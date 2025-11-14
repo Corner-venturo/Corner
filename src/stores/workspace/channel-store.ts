@@ -17,11 +17,9 @@ type ChannelEntity = Channel & Pick<BaseEntity, 'updated_at'>
  * Channel Store
  * 表格: channels
  * 快取策略: 全量快取 (Workspace 核心功能)
+ * 注意：channels 不使用 code 欄位
  */
-export const useChannelStore = createStore<ChannelEntity>('channels', {
-  cacheStrategy: 'full',
-  enableRealtime: true,
-})
+export const useChannelStore = createStore<ChannelEntity>('channels', undefined, true)
 
 /**
  * Hook 型別（方便使用）

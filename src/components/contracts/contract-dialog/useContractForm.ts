@@ -201,7 +201,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       const templateMap: Record<string, string> = {
         domestic: 'domestic.html',
         international: 'international.html',
-        individual_international: 'individual_international_full.html',
+        individual_international: 'individual_international.html',
       }
       const templateFile = templateMap[selectedTemplate as string] || 'international.html'
       const response = await fetch(`/contract-templates/${templateFile}`)

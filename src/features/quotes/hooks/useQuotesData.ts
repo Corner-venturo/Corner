@@ -13,13 +13,17 @@ import { logger } from '@/lib/utils/logger'
 export const useQuotesData = () => {
   const router = useRouter()
   const { quotes, addQuote, updateQuote, deleteQuote, duplicateQuote, loadQuotes } = useQuotes()
-  const { items: tours } = useTourStore()
+  const { items: tours, fetchAll: fetchTours } = useTourStore()
   const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
 
   // 載入報價單資料 - 只在首次載入時執行
   useEffect(() => {
     const timer = setTimeout(() => {
       loadQuotes()
+      // ✅ 載入 tours（報價單需要關聯旅遊團）
+      if (tours.length === 0) {
+        fetchTours()
+      }
       // ✅ 移除自動載入 regions（改為在打開對話框時才載入）
       // fetchRegions()
     }, 100)

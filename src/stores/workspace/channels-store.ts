@@ -157,6 +157,8 @@ export const useChannelsStore = () => {
           // Silently fail
         }
       }
+
+      return newChannel
     },
 
     updateChannel: async (id: string, updates: Partial<Channel>) => {

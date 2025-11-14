@@ -4,8 +4,13 @@ import { useEffect, useState } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ChannelChat } from '@/components/workspace/ChannelChat'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
+import { useRealtimeForChannels, useRealtimeForMessages } from '@/hooks/use-realtime-hooks'
 
 export default function WorkspacePage() {
+  // ✅ Realtime 訂閱
+  useRealtimeForChannels()
+  useRealtimeForMessages()
+
   const { loadWorkspaces, loadChannelGroups, loadChannels, currentWorkspace } =
     useWorkspaceChannels()
   const [hasLoaded, setHasLoaded] = useState(false)

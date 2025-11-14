@@ -26,6 +26,11 @@ export function handleUpgrade(
     if (oldVersion === 1 && (newVersion === null || newVersion >= 2)) {
       upgradeToV2(db)
     }
+
+    // v2 -> v3: 新增供應商管理相關表格
+    if (oldVersion === 2 && (newVersion === null || newVersion >= 3)) {
+      upgradeToV3(db)
+    }
   } catch (error) {
     throw error
   }
@@ -100,6 +105,48 @@ function upgradeToV2(db: IDBDatabase): void {
   console.log('✓ regions 表保持不變')
 
   console.log('✅ [IndexedDB] v2 升級完成（所有現有資料保留）')
+}
+
+/**
+ * 升級到 v3：新增供應商管理相關表格
+ * 只新增缺少的表格，不刪除任何現有資料
+ */
+function upgradeToV3(db: IDBDatabase): void {
+  console.log('🔄 [IndexedDB] 開始升級到 v3（新增 cost_templates 和 supplier_categories 表）')
+
+  // 找到兩個表的 schema
+  const costTemplatesSchema = TABLE_SCHEMAS.find(s => s.name === 'cost_templates')
+  const supplierCategoriesSchema = TABLE_SCHEMAS.find(s => s.name === 'supplier_categories')
+
+  // 1. 建立 cost_templates 表（如果不存在）
+  if (costTemplatesSchema && !db.objectStoreNames.contains('cost_templates')) {
+    console.log('📦 建立 cost_templates 表')
+    const costTemplatesStore = db.createObjectStore(costTemplatesSchema.name, {
+      keyPath: costTemplatesSchema.keyPath,
+      autoIncrement: costTemplatesSchema.autoIncrement,
+    })
+    costTemplatesSchema.indexes.forEach(index => {
+      costTemplatesStore.createIndex(index.name, index.keyPath, { unique: index.unique })
+    })
+  } else {
+    console.log('✓ cost_templates 表已存在，跳過')
+  }
+
+  // 2. 建立 supplier_categories 表（如果不存在）
+  if (supplierCategoriesSchema && !db.objectStoreNames.contains('supplier_categories')) {
+    console.log('📦 建立 supplier_categories 表')
+    const supplierCategoriesStore = db.createObjectStore(supplierCategoriesSchema.name, {
+      keyPath: supplierCategoriesSchema.keyPath,
+      autoIncrement: supplierCategoriesSchema.autoIncrement,
+    })
+    supplierCategoriesSchema.indexes.forEach(index => {
+      supplierCategoriesStore.createIndex(index.name, index.keyPath, { unique: index.unique })
+    })
+  } else {
+    console.log('✓ supplier_categories 表已存在，跳過')
+  }
+
+  console.log('✅ [IndexedDB] v3 升級完成（所有現有資料保留）')
 }
 
 /**

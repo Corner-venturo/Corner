@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { Quote, QuickQuoteItem } from '@/types/quote.types'
+import { COMPANY } from '@/lib/constants/company'
 
 // 添加頁首（Logo + 標題）
 const addHeaders = (doc: jsPDF, logoUrl: string) => {
@@ -36,7 +37,7 @@ const addFooters = (doc: jsPDF) => {
 
     // 副標題（斜體效果用較小字型模擬）
     doc.setFontSize(10)
-    doc.text('─ 如果可以，讓我們一起探索世界上每個角落 ─', pageWidth / 2, pageHeight - 20, {
+    doc.text(COMPANY.subtitleWithDash, pageWidth / 2, pageHeight - 20, {
       align: 'center',
     })
 

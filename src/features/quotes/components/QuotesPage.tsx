@@ -11,12 +11,14 @@ import { Calculator } from 'lucide-react'
 import { QuotesList } from './QuotesList'
 import { QuoteDialog } from './QuoteDialog'
 import { QuickQuoteDialog } from './QuickQuoteDialog'
+import { PrintableQuickQuote } from './PrintableQuickQuote'
+import { PrintableQuotation } from './PrintableQuotation'
 import { useQuotesData } from '../hooks/useQuotesData'
 import { useQuotesFilters } from '../hooks/useQuotesFilters'
 import { useQuoteForm } from '../hooks/useQuoteForm'
 import { useQuickQuoteForm } from '../hooks/useQuickQuoteForm'
 import { useQuoteTourSync } from '../hooks/useQuoteTourSync'
-import { STATUS_FILTERS } from '../constants'
+import { STATUS_FILTERS, TYPE_FILTERS } from '../constants'
 import {
   useRealtimeForQuotes,
   useRealtimeForTours,
@@ -25,6 +27,13 @@ import {
 import { useRegionsStore } from '@/stores'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export const QuotesPage: React.FC = () => {
   // ✅ Realtime 訂閱
@@ -34,10 +43,13 @@ export const QuotesPage: React.FC = () => {
   const router = useRouter()
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [authorFilter, setAuthorFilter] = useState<string>('all')
+  const [typeFilter, setTypeFilter] = useState<string>('all')
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isQuickDialogOpen, setIsQuickDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [previewQuoteId, setPreviewQuoteId] = useState<string | null>(null)
+  const [previewQuoteItems, setPreviewQuoteItems] = useState<any[]>([])
 
   // Data and actions
   const {
@@ -108,7 +120,13 @@ export const QuotesPage: React.FC = () => {
   }, [quotes])
 
   // Filtering
-  const { filteredQuotes } = useQuotesFilters({ quotes, statusFilter, searchTerm, authorFilter })
+  const { filteredQuotes } = useQuotesFilters({
+    quotes,
+    statusFilter,
+    searchTerm,
+    authorFilter,
+    typeFilter,
+  })
 
   // Tour sync - auto-open dialog when coming from tours page
   const { clearTourParam } = useQuoteTourSync({
@@ -138,6 +156,42 @@ export const QuotesPage: React.FC = () => {
     resetQuickForm()
   }
 
+  const handlePreview = async (quoteId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const quote = quotes.find(q => q.id === quoteId)
+    if (!quote) return
+
+    console.log('🔍 Preview quote:', {
+      id: quote.id,
+      name: quote.name,
+      quote_type: (quote as any).quote_type,
+      categories: quote.categories,
+      selling_prices: quote.selling_prices,
+      participant_counts: quote.participant_counts,
+    })
+
+    console.log('💰 Selling prices detailed:', JSON.stringify(quote.selling_prices, null, 2))
+
+    // 如果是快速報價單，需要載入 items
+    if ((quote as any).quote_type === 'quick') {
+      const { supabase } = await import('@/lib/supabase/client')
+      const { data: items, error } = await supabase
+        .from('quote_items')
+        .select('*')
+        .eq('quote_id', quoteId)
+        .order('created_at', { ascending: true })
+
+      console.log('📦 Quick quote items:', items, 'Error:', error)
+      setPreviewQuoteItems(items || [])
+    } else {
+      setPreviewQuoteItems([])
+    }
+
+    setPreviewQuoteId(quoteId)
+  }
+
+  const previewQuote = previewQuoteId ? quotes.find(q => q.id === previewQuoteId) : null
+
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
@@ -158,11 +212,38 @@ export const QuotesPage: React.FC = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋報價單名稱..."
-        showFilter={true}
-        filterOptions={authors.map(author => ({ value: author, label: author }))}
-        filterValue={authorFilter}
-        onFilterChange={setAuthorFilter}
-        filterLabel="作者"
+        filters={
+          <>
+            {/* 類型篩選 */}
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="類型" />
+              </SelectTrigger>
+              <SelectContent>
+                {TYPE_FILTERS.map(filter => (
+                  <SelectItem key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* 作者篩選 */}
+            <Select value={authorFilter} onValueChange={setAuthorFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="作者" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部作者</SelectItem>
+                {authors.map(author => (
+                  <SelectItem key={author} value={author}>
+                    {author}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </>
+        }
         onAdd={handleOpenTypeSelect}
         addLabel="新增報價單"
       />
@@ -199,6 +280,7 @@ export const QuotesPage: React.FC = () => {
             tours={tours}
             searchTerm={searchTerm}
             onQuoteClick={handleQuoteClick}
+            onPreview={handlePreview}
             onDuplicate={handleDuplicateQuote}
             onTogglePin={handleTogglePin}
             onDelete={handleDeleteQuote}
@@ -234,6 +316,92 @@ export const QuotesPage: React.FC = () => {
         onSubmit={handleQuickSubmit}
         onClose={handleQuickDialogClose}
       />
+
+      {/* 預覽對話框 */}
+      {previewQuote && (
+        <>
+          {/* 快速報價單 */}
+          {(previewQuote as any).quote_type === 'quick' &&
+            previewQuoteItems.length > 0 && (
+              <PrintableQuickQuote
+                quote={previewQuote}
+                items={previewQuoteItems}
+                isOpen={!!previewQuoteId}
+                onClose={() => setPreviewQuoteId(null)}
+                onPrint={() => window.print()}
+              />
+            )}
+
+          {/* 團體報價單 */}
+          {(previewQuote as any).quote_type !== 'quick' &&
+            previewQuote.categories &&
+            previewQuote.categories.length > 0 && (
+              <PrintableQuotation
+                quote={previewQuote}
+                quoteName={previewQuote.name}
+                participantCounts={
+                  previewQuote.participant_counts || {
+                    adult: previewQuote.group_size || 1,
+                    child_with_bed: 0,
+                    child_no_bed: 0,
+                    single_room: 0,
+                    infant: 0,
+                  }
+                }
+                sellingPrices={
+                  previewQuote.selling_prices || {
+                    adult: 0,
+                    child_with_bed: 0,
+                    child_no_bed: 0,
+                    single_room: 0,
+                    infant: 0,
+                  }
+                }
+                categories={previewQuote.categories || []}
+                totalCost={previewQuote.total_cost || 0}
+                isOpen={!!previewQuoteId}
+                onClose={() => setPreviewQuoteId(null)}
+                onPrint={() => window.print()}
+              />
+            )}
+
+          {/* 草稿編輯中 */}
+          {(((previewQuote as any).quote_type === 'quick' && previewQuoteItems.length === 0) ||
+            ((previewQuote as any).quote_type !== 'quick' &&
+              (!previewQuote.categories || previewQuote.categories.length === 0))) && (
+            <Dialog open={!!previewQuoteId} onOpenChange={open => !open && setPreviewQuoteId(null)}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>報價單預覽</DialogTitle>
+                </DialogHeader>
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📝</div>
+                    <div className="text-xl font-medium text-muted-foreground">草稿編輯中</div>
+                    <div className="text-sm text-muted-foreground mt-2">
+                      此報價單尚未新增任何{(previewQuote as any).quote_type === 'quick' ? '項目' : '費用'}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 justify-end border-t pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPreviewQuoteId(null)
+                      handleQuoteClick(previewQuote.id)
+                    }}
+                  >
+                    開啟編輯
+                  </Button>
+                  <Button variant="outline" onClick={() => setPreviewQuoteId(null)}>
+                    關閉
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+        </>
+      )}
     </div>
   )
 }

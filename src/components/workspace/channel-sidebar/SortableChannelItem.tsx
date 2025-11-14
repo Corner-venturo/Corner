@@ -100,17 +100,17 @@ export function SortableChannelItem({
                 <Edit2 size={12} />
               </button>
             )}
-            {/* 收藏按鈕 */}
+            {/* 釘選按鈕 */}
             <button
               onClick={e => {
                 e.stopPropagation()
                 toggleChannelFavorite(channel.id)
               }}
               className={cn(
-                'opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 transition-opacity',
-                channel.is_favorite && 'opacity-100 text-morandi-gold'
+                'p-0.5 rounded hover:bg-morandi-gold/20 transition-colors',
+                channel.is_favorite ? 'text-morandi-gold' : 'text-morandi-secondary opacity-0 group-hover:opacity-100'
               )}
-              title="收藏頻道"
+              title={channel.is_favorite ? '取消釘選' : '釘選頻道'}
             >
               <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
             </button>

@@ -17,11 +17,18 @@ export interface PermissionConfig {
  */
 export const FEATURE_PERMISSIONS: PermissionConfig[] = [
   {
+    id: 'super_admin',
+    label: '超級管理員',
+    category: '全部',
+    routes: ['*'], // 所有路由
+    description: '擁有系統最高權限，包含所有功能',
+  },
+  {
     id: 'admin',
     label: '系統管理員',
     category: '全部',
-    routes: ['*'], // 所有路由
-    description: '擁有系統所有權限',
+    routes: ['*'], // 所有路由（含 settings）
+    description: '擁有系統所有權限（含系統管理功能）',
   },
   {
     id: 'calendar',
@@ -207,8 +214,8 @@ export function getRequiredPermissions(pathname: string): string[] {
  * 檢查用戶是否有權限訪問指定路由
  */
 export function hasPermissionForRoute(userPermissions: string[], pathname: string): boolean {
-  // 系統管理員有所有權限
-  if (userPermissions.includes('admin')) {
+  // 超級管理員和系統管理員有所有權限
+  if (userPermissions.includes('super_admin') || userPermissions.includes('admin')) {
     return true
   }
 

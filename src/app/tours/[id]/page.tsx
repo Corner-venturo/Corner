@@ -54,20 +54,18 @@ export default function TourDetailPage() {
     try {
       const newChannel = await createChannel({
         workspace_id: currentWorkspace.id,
-        name: `${tour.code} ${tour.name}`,
-        description: `${tour.name} 的工作頻道`,
+        name: tour.name, // 只顯示團名
+        description: `${tour.code} - ${tour.name} 的工作頻道`,
         type: 'public',
         tour_id: tour.id,
+        created_by: user.id, // 設定創建者
       })
 
-      if (newChannel && user.id) {
-        // 將當前用戶加入頻道作為 owner
-        await addChannelMembers(currentWorkspace.id, newChannel.id, [user.id], 'owner')
+      if (newChannel) {
+        toast.success('工作頻道已建立！')
+        // 跳轉到 workspace 並選擇該頻道
+        router.push(`/workspace?channel=${newChannel.id}`)
       }
-
-      toast.success('工作頻道已建立！')
-      // 跳轉到 workspace 並選擇該頻道
-      router.push(`/workspace?channel=${newChannel.id}`)
     } catch (error) {
       toast.error('建立頻道失敗')
     } finally {

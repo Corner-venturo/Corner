@@ -29,27 +29,10 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
     }, [employee.permissions, employee.roles])
 
     const handlePermissionToggle = async (permissionId: string) => {
-      let newPermissions: string[]
-
-      // 如果勾選系統管理員，自動全選所有權限
-      if (permissionId === 'admin') {
-        const isAdminSelected = selectedPermissions.includes('admin')
-        if (!isAdminSelected) {
-          newPermissions = SYSTEM_PERMISSIONS.map(p => p.id)
-        } else {
-          newPermissions = []
-        }
-      } else {
-        // 切換其他權限
-        newPermissions = selectedPermissions.includes(permissionId)
-          ? selectedPermissions.filter(id => id !== permissionId)
-          : [...selectedPermissions, permissionId]
-
-        // 如果取消勾選任何權限，自動取消系統管理員
-        if (selectedPermissions.includes('admin') && !newPermissions.includes(permissionId)) {
-          newPermissions = newPermissions.filter(id => id !== 'admin')
-        }
-      }
+      // 切換權限（移除自動全選邏輯）
+      const newPermissions = selectedPermissions.includes(permissionId)
+        ? selectedPermissions.filter(id => id !== permissionId)
+        : [...selectedPermissions, permissionId]
 
       setSelectedPermissions(newPermissions)
 

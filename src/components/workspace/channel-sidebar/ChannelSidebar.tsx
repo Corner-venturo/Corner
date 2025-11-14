@@ -204,7 +204,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
     try {
       await updateChannel(channelId, {
-        is_pinned: !channel.is_pinned,
+        is_favorite: !channel.is_favorite,
       })
     } catch (error) {
       console.error('Failed to toggle pin:', error)
@@ -374,7 +374,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
 
     try {
-      await createChannel({
+      // 建立頻道
+      const newChannel = await createChannel({
         workspace_id: currentWorkspace.id,
         name: newChannelName.trim(),
         description: newChannelDescription.trim() || undefined,
@@ -382,9 +383,32 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         created_by: user.id,
       })
 
+      // 🔥 自動將建立者加入頻道（作為 owner）
+      // 直接操作 channel_members store，不透過 API
+      if (newChannel?.id) {
+        try {
+          const { useChannelMemberStore } = await import('@/stores/workspace/channel-member-store')
+          const channelMemberStore = useChannelMemberStore.getState()
+
+          await channelMemberStore.create({
+            workspace_id: currentWorkspace.id,
+            channel_id: newChannel.id,
+            employee_id: user.id,
+            role: 'owner',
+            status: 'active',
+          })
+
+          console.log('✅ Creator added as owner')
+        } catch (memberError) {
+          console.warn('⚠️ Failed to add creator as member:', memberError)
+          // 不顯示錯誤，因為用戶可以手動加入
+        }
+      }
+
       resetCreateChannelDialog()
     } catch (error) {
       console.error('Failed to create channel:', error)
+      alert('建立頻道失敗')
     }
   }
 

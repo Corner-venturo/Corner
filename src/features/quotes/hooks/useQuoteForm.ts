@@ -110,6 +110,14 @@ export const useQuoteForm = ({ addQuote, getCitiesByCountry }: UseQuoteFormParam
         number_of_people: groupSize,
         total_amount: 0,
         is_pinned: formData.is_pinned || false,
+        // 根據 group_size 初始化 participant_counts（預設全部為成人）
+        participant_counts: {
+          adult: groupSize,
+          child_with_bed: 0,
+          child_no_bed: 0,
+          single_room: 0,
+          infant: 0,
+        },
       })
 
       // 重置表單

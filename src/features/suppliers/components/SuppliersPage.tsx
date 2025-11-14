@@ -1,5 +1,5 @@
 /**
- * SuppliersPage - 簡化版供應商管理頁面
+ * SuppliersPage - 簡化版供應商管理頁面（含價目表）
  */
 
 'use client'
@@ -9,7 +9,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
-import { useSupplierStore, useSupplierCategoryStore } from '@/stores'
+import { useSupplierStore, useSupplierCategoryStore, useCostTemplateStore } from '@/stores'
 import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks'
 
 export const SuppliersPage: React.FC = () => {
@@ -19,13 +19,16 @@ export const SuppliersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  const { items: suppliers, create } = useSupplierStore()
+  const { items: suppliers, create, fetchAll: fetchSuppliers } = useSupplierStore()
   const { fetchAll: fetchCategories } = useSupplierCategoryStore()
+  const { fetchAll: fetchCostTemplates } = useCostTemplateStore()
 
-  // 載入類別資料
+  // 載入資料
   useEffect(() => {
+    fetchSuppliers()
     fetchCategories()
-  }, [fetchCategories])
+    fetchCostTemplates()
+  }, [fetchSuppliers, fetchCategories, fetchCostTemplates])
 
   // 簡化的表單狀態
   const [formData, setFormData] = useState({
@@ -94,7 +97,7 @@ export const SuppliersPage: React.FC = () => {
           { label: '資料庫管理', href: '/database' },
           { label: '供應商管理', href: '/database/suppliers' },
         ]}
-        showSearch={true}
+        showSearch
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="搜尋供應商名稱或銀行資訊..."
@@ -102,7 +105,6 @@ export const SuppliersPage: React.FC = () => {
         addLabel="新增供應商"
       />
 
-      {/* 供應商列表 */}
       <div className="flex-1 overflow-auto">
         <SuppliersList suppliers={filteredSuppliers} />
       </div>

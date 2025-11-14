@@ -4,6 +4,9 @@ import { useEffect } from 'react'
 
 export function ErrorLogger() {
   useEffect(() => {
+    // 🔥 暫時禁用以查看完整錯誤訊息
+    return
+
     // 捕獲未處理的錯誤
     const handleError = (event: ErrorEvent) => {
       console.error('Global error:', event.error)

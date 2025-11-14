@@ -16,17 +16,20 @@ import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
-  const { items: workspaces } = useWorkspaceStoreData()
+  const { items: workspaces, fetchAll: fetchWorkspaces } = useWorkspaceStoreData()
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  // 初始化時載入員工資料（只在沒有資料時載入）
+  // 初始化時載入員工和工作空間資料
   useEffect(() => {
     if (users.length === 0) {
       fetchAll()
     }
-  }, [users.length, fetchAll])
+    if (workspaces.length === 0) {
+      fetchWorkspaces()
+    }
+  }, [users.length, workspaces.length, fetchAll, fetchWorkspaces])
 
   const getStatusLabel = (status: Employee['status']) => {
     const statusMap = {

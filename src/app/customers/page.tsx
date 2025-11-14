@@ -32,7 +32,12 @@ export default function CustomersPage() {
   // ✅ Realtime 訂閱
   useRealtimeForCustomers()
 
-  const { items: customers, create: addCustomer } = useCustomerStore()
+  const { items: customers, create: addCustomer, fetchAll: fetchCustomers } = useCustomerStore()
+
+  // 載入資料
+  useEffect(() => {
+    fetchCustomers()
+  }, [])
 
   // 搜尋狀態
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false)

@@ -8,7 +8,7 @@ import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Quote } from '@/stores/types'
-import { Calculator, Copy, Pin, Trash2, Users } from 'lucide-react'
+import { Calculator, Copy, Eye, Pin, Trash2, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
 import { STATUS_COLORS } from '../constants'
@@ -18,6 +18,7 @@ interface QuotesListProps {
   tours: any[]
   searchTerm: string
   onQuoteClick: (quoteId: string) => void
+  onPreview: (quoteId: string, e: React.MouseEvent) => void
   onDuplicate: (quoteId: string, e: React.MouseEvent) => void
   onTogglePin: (quoteId: string, isPinned: boolean, e: React.MouseEvent) => void
   onDelete: (quoteId: string, e: React.MouseEvent) => void
@@ -28,6 +29,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
   tours,
   searchTerm,
   onQuoteClick,
+  onPreview,
   onDuplicate,
   onTogglePin,
   onDelete,
@@ -194,6 +196,16 @@ export const QuotesList: React.FC<QuotesListProps> = ({
             title={quote.is_pinned ? '取消置頂' : '設為置頂範本'}
           >
             <Pin size={16} />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="iconSm"
+            onClick={e => onPreview(quote.id, e)}
+            className="text-morandi-green hover:bg-morandi-green/10"
+            title="預覽報價單"
+          >
+            <Eye size={16} />
           </Button>
           <Button
             type="button"

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { X, Printer } from 'lucide-react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
+import { COMPANY } from '@/lib/constants/company'
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -233,7 +234,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                   <div className="pt-2 border-t border-gray-200">
                     <div className="text-center py-1">
                       <p className="text-sm text-gray-600 italic">
-                        如果可以，讓我們一起探索世界上每個角落
+                        {COMPANY.subtitle}
                       </p>
                     </div>
                     <div className="flex justify-between items-center text-xs text-gray-500 px-4">
@@ -884,7 +885,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             {/* 副標題和頁腳 */}
             <div className="text-center mt-8 pt-4">
               <p className="text-base text-gray-600 italic mb-4">
-                如果可以，讓我們一起探索世界上每個角落
+                {COMPANY.subtitle}
               </p>
               <p className="text-xs text-gray-500">
                 角落旅行社股份有限公司 © {new Date().getFullYear()}

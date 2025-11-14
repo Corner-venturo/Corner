@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
 import { useTourStore, useRegionStore, useOrderStore } from '@/stores'
+import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types'
 
 export const useQuoteState = () => {
@@ -12,9 +13,18 @@ export const useQuoteState = () => {
   const { items: orders } = useOrderStore()
   const regionStore = useRegionStore()
   const { items: regions } = regionStore
+  const workspaceStore = useWorkspaceStoreData()
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
+
+  // 自動載入 workspaces（如果還沒載入）
+  useEffect(() => {
+    if (workspaceStore.items.length === 0) {
+      workspaceStore.fetchAll()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 自動載入 quotes（如果還沒載入）
   useEffect(() => {
@@ -113,16 +123,85 @@ export const useQuoteState = () => {
 
   const [accommodationDays, setAccommodationDays] = useState<number>(quote?.accommodation_days || 0)
 
-  // 多身份人數統計
-  const [participantCounts, setParticipantCounts] = useState<ParticipantCounts>(
-    quote?.participant_counts || {
+  // 多身份人數統計（初始值：從 quote 載入，或從 tour/order 推算，最後才用預設值 1）
+  const [participantCounts, setParticipantCounts] = useState<ParticipantCounts>(() => {
+    if (quote?.participant_counts) {
+      return quote.participant_counts
+    }
+
+    // 如果有 tour，從 tour 的訂單計算預計人數
+    if (quote?.tour_id && relatedTour) {
+      const tourOrders = orders.filter(order => order.tour_id === relatedTour.id)
+      const totalMembers = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
+
+      if (totalMembers > 0) {
+        return {
+          adult: totalMembers,
+          child_with_bed: 0,
+          child_no_bed: 0,
+          single_room: 0,
+          infant: 0,
+        }
+      }
+
+      // 如果訂單沒有人數，用 tour 的 max_participants
+      if (relatedTour.max_participants) {
+        return {
+          adult: relatedTour.max_participants,
+          child_with_bed: 0,
+          child_no_bed: 0,
+          single_room: 0,
+          infant: 0,
+        }
+      }
+    }
+
+    // 如果 quote 有 group_size 或 number_of_people，使用它們
+    const quoteGroupSize = quote?.group_size || quote?.number_of_people
+    if (quoteGroupSize && quoteGroupSize > 0) {
+      return {
+        adult: quoteGroupSize,
+        child_with_bed: 0,
+        child_no_bed: 0,
+        single_room: 0,
+        infant: 0,
+      }
+    }
+
+    // 最後才用預設值
+    return {
       adult: 1,
       child_with_bed: 0,
       child_no_bed: 0,
       single_room: 0,
       infant: 0,
     }
-  )
+  })
+
+  // 當 quote 載入後，更新所有狀態
+  useEffect(() => {
+    if (quote) {
+      if (quote.categories) {
+        const loadedCategories = quote.categories.map(cat => ({
+          ...cat,
+          total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
+        }))
+        setCategories(loadedCategories)
+      }
+      if (quote.accommodation_days !== undefined) {
+        setAccommodationDays(quote.accommodation_days)
+      }
+      if (quote.participant_counts) {
+        setParticipantCounts(quote.participant_counts)
+      }
+      if (quote.selling_prices) {
+        setSellingPrices(quote.selling_prices)
+      }
+      if (quote.name) {
+        setQuoteName(quote.name)
+      }
+    }
+  }, [quote?.id]) // 只在 quote.id 改變時執行
 
   // 總人數：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
   const groupSize =

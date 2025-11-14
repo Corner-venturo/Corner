@@ -4,28 +4,37 @@
 
 'use client'
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
 import { Supplier } from '../types'
-import { useSupplierCategoryStore } from '@/stores'
 
 interface SuppliersListProps {
   suppliers: Supplier[]
   loading?: boolean
 }
 
+// 供應商類型中文對應
+const TYPE_LABELS: Record<string, string> = {
+  hotel: '飯店',
+  restaurant: '餐廳',
+  transport: '交通',
+  attraction: '景點',
+  guide: '導遊',
+  agency: '旅行社',
+  ticketing: '票務',
+  employee: '員工',
+  other: '其他',
+}
+
 export const SuppliersList: React.FC<SuppliersListProps> = ({ suppliers, loading = false }) => {
-  const { items: categories } = useSupplierCategoryStore()
-
-  // 建立類別 lookup
-  const categoryMap = useMemo(() => {
-    const map = new Map()
-    categories.forEach(cat => map.set(cat.id, cat))
-    return map
-  }, [categories])
-
   const columns: TableColumn[] = [
+    {
+      key: 'code',
+      label: '供應商編號',
+      sortable: true,
+      render: value => <span className="font-mono text-sm text-morandi-secondary">{value || '-'}</span>,
+    },
     {
       key: 'name',
       label: '供應商名稱',
@@ -33,16 +42,14 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({ suppliers, loading
       render: value => <span className="font-medium text-morandi-primary">{value}</span>,
     },
     {
-      key: 'category_id',
-      label: '類別',
+      key: 'type',
+      label: '類型',
       sortable: true,
       render: (value: string) => {
-        const category = categoryMap.get(value)
-        if (!category) return <span className="text-morandi-muted">-</span>
+        const label = TYPE_LABELS[value] || value
         return (
           <Badge variant="secondary" className="text-xs">
-            {category.icon && <span className="mr-1">{category.icon}</span>}
-            {category.name}
+            {label}
           </Badge>
         )
       },

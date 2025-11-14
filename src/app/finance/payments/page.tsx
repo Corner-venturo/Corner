@@ -15,7 +15,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown } from 'lucide-react'
+import { Plus, Search, FileDown, Layers } from 'lucide-react'
 
 // Realtime Hooks
 import {
@@ -25,7 +25,8 @@ import {
 } from '@/hooks/use-realtime-hooks'
 
 // Components
-import { createPaymentColumns, CreateReceiptDialog, ReceiptSearchDialog } from './components'
+import { createPaymentColumns, ReceiptSearchDialog } from './components'
+import { AddReceiptDialog, BatchReceiptDialog } from '@/features/finance/payments'
 
 // Hooks
 import { usePaymentData } from './hooks/usePaymentData'
@@ -48,6 +49,7 @@ export default function PaymentsPage() {
 
   // UI 狀態
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
 
@@ -147,6 +149,15 @@ export default function PaymentsPage() {
               匯出 Excel
             </Button>
             <Button
+              size="sm"
+              onClick={() => setIsBatchDialogOpen(true)}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <Layers size={16} className="mr-2" />
+              批量收款
+            </Button>
+            <Button
+              size="sm"
               onClick={() => setIsDialogOpen(true)}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
@@ -187,11 +198,10 @@ export default function PaymentsPage() {
       </div>
 
       {/* 新增收款對話框 */}
-      <CreateReceiptDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        availableOrders={availableOrders}
-        onSubmit={handleSubmit}
+      <AddReceiptDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSuccess={fetchReceipts}
       />
 
       {/* 進階搜尋對話框 */}
@@ -201,6 +211,9 @@ export default function PaymentsPage() {
         onSearch={handleSearch}
         currentFilters={searchFilters}
       />
+
+      {/* 批量收款對話框 */}
+      <BatchReceiptDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
     </div>
   )
 }

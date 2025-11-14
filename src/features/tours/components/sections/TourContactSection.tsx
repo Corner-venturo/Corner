@@ -22,9 +22,8 @@ export function TourContactSection({ data, viewMode }: TourContactSectionProps) 
     const fetchSalesEmployees = async () => {
       try {
         // 先從 IndexedDB 嘗試讀取所有員工
-        const { db } = await import('@/lib/db')
-        const indexedDB = db()
-        const allEmployees = await indexedDB.getAll('employees')
+        const { localDB } = await import('@/lib/db')
+        const allEmployees = await localDB.getAll('employees')
 
         // 篩選出有電話號碼的員工作為業務
         const sales = allEmployees

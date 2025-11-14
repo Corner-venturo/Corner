@@ -146,7 +146,7 @@ export function ChannelList({
               checkIsMember={checkIsMember}
               isExpanded={expandedSections.ungrouped !== false}
               onToggleExpanded={(expanded: boolean) => onToggleExpanded('ungrouped', expanded)}
-              title="未分組"
+              title="頻道"
               icon="hash"
               showAddButton
               onAddClick={() => {}}

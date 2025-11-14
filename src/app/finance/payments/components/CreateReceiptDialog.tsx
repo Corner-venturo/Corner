@@ -2,7 +2,7 @@
  * 新增收款單 Dialog
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/select'
 import { Plus } from 'lucide-react'
 import { PaymentItemForm } from './PaymentItemForm'
+import { Combobox } from '@/components/ui/combobox'
+import { useTourStore } from '@/stores'
 import type { ReceiptItem } from '@/stores'
 import type { Order } from '@/stores/order-store'
 
@@ -39,6 +41,8 @@ export function CreateReceiptDialog({
   availableOrders,
   onSubmit,
 }: CreateReceiptDialogProps) {
+  const { items: tours } = useTourStore()
+  const [selectedTourId, setSelectedTourId] = useState('')
   const [selectedOrderId, setSelectedOrderId] = useState('')
   const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([
     {
@@ -50,7 +54,13 @@ export function CreateReceiptDialog({
   ])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const selectedOrder = availableOrders.find(order => order.id === selectedOrderId)
+  // 可用訂單（根據選中的團體過濾）
+  const filteredOrders = useMemo(() => {
+    if (!selectedTourId) return []
+    return availableOrders.filter(order => order.tour_id === selectedTourId)
+  }, [availableOrders, selectedTourId])
+
+  const selectedOrder = filteredOrders.find(order => order.id === selectedOrderId)
 
   const totalAmount = paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0)
 
@@ -75,6 +85,7 @@ export function CreateReceiptDialog({
   }
 
   const resetForm = () => {
+    setSelectedTourId('')
     setSelectedOrderId('')
     setPaymentItems([
       {
@@ -113,24 +124,55 @@ export function CreateReceiptDialog({
           <div>
             <h3 className="text-lg font-semibold mb-4">基本資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* 選擇團體 */}
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  選擇團體 *
+                </label>
+                <Combobox
+                  options={tours.map(tour => ({
+                    value: tour.id,
+                    label: `${tour.code || ''} - ${tour.name || ''}`,
+                  }))}
+                  value={selectedTourId}
+                  onChange={value => {
+                    setSelectedTourId(value)
+                    setSelectedOrderId('') // 清空已選訂單
+                  }}
+                  placeholder="請先選擇團體..."
+                />
+              </div>
+
+              {/* 選擇訂單 */}
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
                   選擇訂單 *
                 </label>
-                <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                <Select
+                  disabled={!selectedTourId || filteredOrders.length === 0}
+                  value={selectedOrderId}
+                  onValueChange={setSelectedOrderId}
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="請選擇待收款的訂單..." />
+                    <SelectValue
+                      placeholder={
+                        !selectedTourId
+                          ? '請先選擇團體'
+                          : filteredOrders.length === 0
+                            ? '此團體沒有訂單'
+                            : '請選擇訂單...'
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableOrders.map(order => (
+                    {filteredOrders.map(order => (
                       <SelectItem key={order.id} value={order.id}>
                         <div>
                           <div className="font-medium">
-                            {order.order_number} - {order.tour_name}
+                            {order.order_number} - {order.contact_person}
                           </div>
                           <div className="text-sm text-morandi-secondary">
-                            {order.contact_person} | 待收: NT${' '}
-                            {order.remaining_amount?.toLocaleString() || 0}
+                            待收: NT$ {order.remaining_amount?.toLocaleString() || 0}
                           </div>
                         </div>
                       </SelectItem>

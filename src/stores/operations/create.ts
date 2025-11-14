@@ -32,6 +32,22 @@ function getWorkspaceCodeLazy(): string | null {
 }
 
 /**
+ * Lazy get workspace ID to avoid circular dependency
+ * 延遲取得 workspace ID，避免在模組載入時觸發循環依賴
+ */
+function getWorkspaceIdLazy(): string | null {
+  try {
+    // 動態 require auth-store 避免頂層循環依賴
+    const { useAuthStore } = require('@/stores/auth-store')
+    const user = useAuthStore.getState().user
+    return user?.workspace_id || null
+  } catch (error) {
+    logger.warn('⚠️ 無法取得 workspace ID')
+    return null
+  }
+}
+
+/**
  * 建立資料（簡化版：直接新增）
  */
 export async function create<T extends BaseEntity>(
@@ -49,12 +65,19 @@ export async function create<T extends BaseEntity>(
     const id = generateUUID()
     const now = new Date().toISOString()
 
+    // 取得 workspace_id（如果資料中沒有提供）
+    const workspaceId = getWorkspaceIdLazy()
+
     // 如果有 codePrefix，生成編號
     let recordData = {
       ...data,
       id,
       created_at: now,
       updated_at: now,
+      // 自動填入 workspace_id（如果資料中沒有提供且能取得）
+      ...(workspaceId && !(data as Record<string, unknown>).workspace_id
+        ? { workspace_id: workspaceId }
+        : {}),
     } as T
 
     if (codePrefix) {

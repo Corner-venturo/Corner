@@ -32,13 +32,12 @@ export interface ChannelMemberBase {
  * Channel Member Store
  * 表格: channel_members
  * 快取策略: 全量快取 (數量不多，經常使用)
+ * 注意：channel_members 不使用 code 欄位
  */
 export const useChannelMemberStore = createStore<ChannelMemberBase & BaseEntity>(
   'channel_members',
-  {
-    cacheStrategy: 'full',
-    enableRealtime: true,
-  }
+  undefined,
+  true
 )
 
 /**

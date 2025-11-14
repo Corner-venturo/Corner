@@ -12,6 +12,7 @@ interface UseQuotesFiltersParams {
   statusFilter: string
   searchTerm: string
   authorFilter?: string
+  typeFilter?: string
 }
 
 export const useQuotesFilters = ({
@@ -19,39 +20,55 @@ export const useQuotesFilters = ({
   statusFilter,
   searchTerm,
   authorFilter,
+  typeFilter,
 }: UseQuotesFiltersParams) => {
   const filteredQuotes = useMemo(() => {
-    return (
-      quotes
-        .filter(quote => {
-          const matchesStatus = statusFilter === 'all' || quote.status === statusFilter
+    // 分離置頂和非置頂報價單
+    const pinnedQuotes = quotes.filter(quote => quote.is_pinned)
+    const unpinnedQuotes = quotes.filter(quote => !quote.is_pinned)
 
-          // 搜尋 - 搜尋所有文字欄位
-          const searchLower = searchTerm.toLowerCase()
-          const matchesSearch =
-            !searchTerm ||
-            quote.name?.toLowerCase().includes(searchLower) ||
-            quote.quote_number?.toLowerCase().includes(searchLower) ||
-            quote.status?.toLowerCase().includes(searchLower)
+    // 對非置頂報價單進行篩選
+    const filteredUnpinned = unpinnedQuotes.filter(quote => {
+      const matchesStatus = statusFilter === 'all' || quote.status === statusFilter
 
-          // 作者篩選
-          const matchesAuthor =
-            !authorFilter ||
-            authorFilter === 'all' ||
-            quote.created_by_name === authorFilter ||
-            quote.handler_name === authorFilter
+      // 搜尋 - 搜尋所有文字欄位
+      const searchLower = searchTerm.toLowerCase()
+      const matchesSearch =
+        !searchTerm ||
+        quote.name?.toLowerCase().includes(searchLower) ||
+        quote.quote_number?.toLowerCase().includes(searchLower) ||
+        quote.status?.toLowerCase().includes(searchLower)
 
-          return matchesStatus && matchesSearch && matchesAuthor
-        })
-        // 排序：置頂的報價單排在最前面
-        .sort((a, b) => {
-          if (a.is_pinned && !b.is_pinned) return -1
-          if (!a.is_pinned && b.is_pinned) return 1
-          // 同樣是置頂或都不是置頂，按建立時間排序
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        })
+      // 作者篩選
+      const matchesAuthor =
+        !authorFilter ||
+        authorFilter === 'all' ||
+        quote.created_by_name === authorFilter ||
+        quote.handler_name === authorFilter
+
+      // 類型篩選（快速/團體報價單）
+      const matchesType =
+        !typeFilter ||
+        typeFilter === 'all' ||
+        (typeFilter === 'quick' && (quote as any).quote_type === 'quick') ||
+        (typeFilter === 'group' && (quote as any).quote_type !== 'quick')
+
+      return matchesStatus && matchesSearch && matchesAuthor && matchesType
+    })
+
+    // 排序非置頂報價單（按建立時間）
+    const sortedUnpinned = filteredUnpinned.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )
-  }, [quotes, statusFilter, searchTerm, authorFilter])
+
+    // 排序置頂報價單（按建立時間）
+    const sortedPinned = pinnedQuotes.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+
+    // 置頂報價單永遠在最前面
+    return [...sortedPinned, ...sortedUnpinned]
+  }, [quotes, statusFilter, searchTerm, authorFilter, typeFilter])
 
   return { filteredQuotes }
 }

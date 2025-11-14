@@ -9,8 +9,6 @@ import { useTourFormHandlers } from './tour-form/hooks/useTourFormHandlers'
 import { CoverInfoSection } from './tour-form/sections/CoverInfoSection'
 import { CountriesSection } from './tour-form/sections/CountriesSection'
 import { FlightInfoSection } from './tour-form/sections/FlightInfoSection'
-import { FeaturesSection } from './tour-form/sections/FeaturesSection'
-import { FocusCardsSection } from './tour-form/sections/FocusCardsSection'
 import { LeaderMeetingSection } from './tour-form/sections/LeaderMeetingSection'
 import { HotelSection } from './tour-form/sections/HotelSection'
 import { DailyItinerarySection } from './tour-form/sections/DailyItinerarySection'
@@ -79,27 +77,13 @@ export function TourForm({ data, onChange }: TourFormProps) {
 
       <FlightInfoSection data={data} updateFlightField={handlers.updateFlightField} />
 
-      <FeaturesSection
-        data={data}
-        addFeature={handlers.addFeature}
-        updateFeature={handlers.updateFeature}
-        removeFeature={handlers.removeFeature}
-      />
-
-      <FocusCardsSection
-        data={data}
-        addFocusCard={handlers.addFocusCard}
-        updateFocusCard={handlers.updateFocusCard}
-        removeFocusCard={handlers.removeFocusCard}
-      />
+      <HotelSection data={data} updateField={handlers.updateField} />
 
       <LeaderMeetingSection
         data={data}
         updateNestedField={handlers.updateNestedField}
         updateField={handlers.updateField}
       />
-
-      <HotelSection data={data} updateField={handlers.updateField} />
 
       <DailyItinerarySection
         data={data}

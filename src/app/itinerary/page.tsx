@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 // import { Button } from '@/components/ui/button';
@@ -17,9 +17,15 @@ export default function ItineraryPage() {
   // ✅ Realtime 訂閱
   useRealtimeForItineraries()
   const router = useRouter()
-  const { items: itineraries, delete: deleteItinerary } = useItineraryStore()
+  const { items: itineraries, delete: deleteItinerary, fetchAll: fetchItineraries } =
+    useItineraryStore()
   const [statusFilter, setStatusFilter] = useState<string>('全部')
   const [searchTerm, setSearchTerm] = useState('')
+
+  // 載入資料
+  React.useEffect(() => {
+    fetchItineraries()
+  }, [])
 
   // 複製行程
   const handleDuplicate = useCallback(async (id: string) => {

@@ -107,7 +107,16 @@ export const useAuthStore = create<AuthState>(
         })
       },
 
-      logout: () => {
+      logout: async () => {
+        // 🔐 登出 Supabase Auth session
+        try {
+          const { supabase } = await import('@/lib/supabase/client')
+          await supabase.auth.signOut()
+          logger.log('✅ Supabase Auth session 已登出')
+        } catch (error) {
+          logger.warn('⚠️ Supabase Auth 登出失敗:', error)
+        }
+
         // 使用離線認證服務登出
         OfflineAuthService.logout()
 
@@ -328,6 +337,65 @@ export const useAuthStore = create<AuthState>(
           logger.log('✅ Supabase 驗證成功，建立角色卡...')
           recordLoginAttempt(username, true)
 
+          // 🔐 建立 Supabase Auth session（用於 RLS）
+          try {
+            const email = `${username}@venturo.com` // 使用員工編號作為 email
+            logger.log('🔐 嘗試建立 Supabase Auth session...', email)
+
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+              email,
+              password,
+            })
+
+            if (authError) {
+              logger.warn('⚠️ Supabase Auth 登入失敗（不影響系統登入）:', authError.message)
+
+              // 🔧 如果是密碼錯誤，嘗試同步密碼（透過 API Route）
+              if (authError.message.includes('Invalid login credentials')) {
+                logger.log('🔧 嘗試同步 auth.users 密碼...')
+                try {
+                  // 呼叫 API Route 同步密碼
+                  const syncResponse = await fetch('/api/auth/sync-password', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      userId: employee.id,
+                      password: password,
+                    }),
+                  })
+
+                  if (syncResponse.ok) {
+                    logger.log('✅ auth.users 密碼已同步，重新嘗試登入...')
+
+                    // 重新嘗試登入
+                    const { data: retryAuthData, error: retryAuthError } =
+                      await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                      })
+
+                    if (retryAuthError) {
+                      logger.warn('⚠️ 重新登入仍然失敗:', retryAuthError.message)
+                    } else {
+                      logger.log('✅ Supabase Auth session 已建立:', retryAuthData.user?.id)
+                    }
+                  } else {
+                    const errorText = await syncResponse.text()
+                    logger.warn('⚠️ 同步密碼失敗:', errorText)
+                  }
+                } catch (syncError) {
+                  logger.warn('⚠️ 密碼同步錯誤:', syncError)
+                }
+              }
+            } else {
+              logger.log('✅ Supabase Auth session 已建立:', authData.user?.id)
+            }
+          } catch (authError) {
+            logger.warn('⚠️ Supabase Auth 登入失敗（不影響系統登入）:', authError)
+          }
+
           // 建立用戶對象（向下相容）
           const user: User = {
             id: employee.id,
@@ -368,9 +436,27 @@ export const useAuthStore = create<AuthState>(
           }
 
           // 💾 儲存角色卡到 local-auth-manager（下次可離線登入）
+          // 先移除舊的，再新增（確保完全更新）
+          const oldProfile = localAuthStore.profiles.find(p => p.id === employee.id)
+          if (oldProfile) {
+            logger.log('🔄 發現舊角色卡，移除後重新建立...')
+            localAuthStore.removeProfile(employee.id)
+          }
+
           localAuthStore.addProfile(profile)
           localAuthStore.setCurrentProfile(profile)
-          logger.log('🎴 角色卡已建立，下次可離線登入')
+          logger.log('🎴 角色卡已建立/更新，下次可離線登入')
+
+          // 💾 同步更新 IndexedDB 的 employees 資料（確保離線資料最新）
+          try {
+            const { localDB } = await import('@/lib/db')
+            const { TABLES } = await import('@/lib/db/schemas')
+
+            await localDB.put(TABLES.EMPLOYEES, employee)
+            logger.log('✅ IndexedDB employees 資料已同步')
+          } catch (dbError) {
+            logger.warn('⚠️ IndexedDB 同步失敗（不影響登入）:', dbError)
+          }
 
           // 生成 JWT token
           const authPayload: AuthPayload = {

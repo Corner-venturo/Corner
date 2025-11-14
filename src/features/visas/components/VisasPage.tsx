@@ -47,6 +47,23 @@ export default function VisasPage() {
     addOrder,
   } = useVisasData()
 
+  // 載入資料
+  React.useEffect(() => {
+    const loadData = async () => {
+      const { useVisaStore, useOrderStore, useMemberStore, useCustomerStore } = await import(
+        '@/stores'
+      )
+      await Promise.all([
+        useVisaStore.getState().fetchAll(),
+        fetchTours(),
+        useOrderStore.getState().fetchAll(),
+        useMemberStore.getState().fetchAll(),
+        useCustomerStore.getState().fetchAll(),
+      ])
+    }
+    loadData()
+  }, [])
+
   // 篩選管理
   const { activeTab, setActiveTab, selectedRows, setSelectedRows, filteredVisas } =
     useVisasFilters(visas)

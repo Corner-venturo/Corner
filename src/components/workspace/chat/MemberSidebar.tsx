@@ -14,19 +14,28 @@ interface MemberSidebarProps {
 export function MemberSidebar({ isOpen }: MemberSidebarProps) {
   const { selectedChannel, currentWorkspace } = useWorkspaceChannels()
   const { channelMembers, loadChannelMembers } = useWorkspaceMembers()
-  const { items: employees } = useUserStore()
+  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
   const { user } = useAuthStore()
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false)
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [isAdding, setIsAdding] = useState(false)
 
+  // 載入頻道成員
   useEffect(() => {
     if (selectedChannel?.id && currentWorkspace?.id) {
       loadChannelMembers(currentWorkspace.id, selectedChannel.id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChannel?.id, currentWorkspace?.id])
+
+  // 🔥 載入員工資料（用於新增成員）
+  useEffect(() => {
+    if (isOpen && employees.length === 0) {
+      fetchEmployees()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -56,7 +65,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       const query = searchQuery.toLowerCase()
       return (
         emp.display_name.toLowerCase().includes(query) ||
-        emp.english_name.toLowerCase().includes(query) ||
+        emp.english_name?.toLowerCase().includes(query) ||
         emp.employee_number.toLowerCase().includes(query)
       )
     }

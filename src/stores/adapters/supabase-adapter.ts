@@ -133,8 +133,14 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       }
 
       logger.log(`☁️ [${this.tableName}] Supabase upsert:`, item.id)
-    } catch (error) {
-      logger.error(`❌ [${this.tableName}] Supabase upsert 失敗:`, error)
+    } catch (error: any) {
+      logger.error(`❌ [${this.tableName}] Supabase upsert 失敗:`, {
+        message: error?.message || '未知錯誤',
+        details: error?.details || '',
+        hint: error?.hint || '',
+        code: error?.code || '',
+        item_id: item?.id,
+      })
       throw error
     }
   }

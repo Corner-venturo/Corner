@@ -20,8 +20,9 @@ export interface IndexSchema {
  * 資料庫版本
  * v1: 完整的 Offline-First 架構，包含所有資料表（含 regions 和 workspace）
  * v2: 新增 countries 和 cities 表（不刪除任何資料）
+ * v3: 新增 cost_templates 和 supplier_categories 表（供應商管理系統）
  */
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 
 /**
  * 資料庫名稱
@@ -331,6 +332,42 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'code', keyPath: 'code', unique: true },
       { name: 'name', keyPath: 'name', unique: false },
       { name: 'type', keyPath: 'type', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 成本模板表（供應商報價用）
+  {
+    name: 'cost_templates',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'supplier_id', keyPath: 'supplier_id', unique: false },
+      { name: 'city_id', keyPath: 'city_id', unique: false },
+      { name: 'attraction_id', keyPath: 'attraction_id', unique: false },
+      { name: 'category', keyPath: 'category', unique: false },
+      { name: 'unit', keyPath: 'unit', unique: false },
+      { name: 'season', keyPath: 'season', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 供應商類別表
+  {
+    name: 'supplier_categories',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'display_order', keyPath: 'display_order', unique: false },
       { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
@@ -687,6 +724,8 @@ export const TABLES = {
   TODOS: 'todos',
   VISAS: 'visas',
   SUPPLIERS: 'suppliers',
+  COST_TEMPLATES: 'cost_templates',
+  SUPPLIER_CATEGORIES: 'supplier_categories',
   // 地區管理系統（三層架構）
   COUNTRIES: 'countries',
   REGIONS: 'regions',

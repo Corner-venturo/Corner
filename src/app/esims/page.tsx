@@ -14,10 +14,15 @@ import { EsimCreateDialog } from '@/features/esims/components/EsimCreateDialog'
 
 export default function EsimsPage() {
   const router = useRouter()
-  const { items, remove } = useEsimStore()
+  const { items, remove, fetchAll: fetchEsims } = useEsimStore()
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [search, setSearch] = useState('')
+
+  // 載入資料
+  React.useEffect(() => {
+    fetchEsims()
+  }, [])
 
   // 簡單的客戶端過濾
   const filteredItems = (items || []).filter((item: Esim) => {

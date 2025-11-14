@@ -131,6 +131,9 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 // 供應商類別 Store
 export { useSupplierCategoryStore } from './supplier-category-store'
 
+// 成本模板 Store
+export { useCostTemplateStore } from './cost-template-store'
+
 // 企業客戶 Store
 export const useCompanyStore = createStore<import('./types').Company>('companies')
 

@@ -8,6 +8,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 // import { Combobox } from '@/components/ui/combobox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useOrderStore, useTourStore } from '@/stores'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
@@ -19,12 +20,20 @@ export default function OrdersPage() {
   useRealtimeForOrders()
   useRealtimeForTours()
   const router = useRouter()
-  const { items: orders, create: addOrder } = useOrderStore()
-  const { items: tours } = useTourStore()
+  const { items: orders, create: addOrder, fetchAll: fetchOrders } = useOrderStore()
+  const { items: tours, fetchAll: fetchTours } = useTourStore()
+  const { currentWorkspace, loadWorkspaces } = useWorkspaceChannels()
   const [statusFilter, setStatusFilter] = useState('all')
   const [tourFilter, _setTourFilter] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+
+  // 🔥 載入資料
+  React.useEffect(() => {
+    loadWorkspaces() // 載入 workspace
+    fetchOrders()
+    fetchTours()
+  }, [])
 
   const filteredOrders = orders.filter(order => {
     const matchesStatus = statusFilter === 'all' || order.payment_status === statusFilter
@@ -111,7 +120,7 @@ export default function OrdersPage() {
     total_amount: number
   }) => {
     const selectedTour = tours.find(t => t.id === orderData.tour_id)
-    if (!selectedTour) return
+    if (!selectedTour || !currentWorkspace) return
 
     // 計算該團的訂單序號
     const tourOrders = orders.filter(o => o.tour_id === orderData.tour_id)
@@ -131,6 +140,7 @@ export default function OrdersPage() {
       paid_amount: 0,
       payment_status: 'unpaid',
       remaining_amount: orderData.total_amount,
+      workspace_id: currentWorkspace.id, // 🔥 設定 workspace_id
     } as unknown)
 
     setIsAddDialogOpen(false)

@@ -13,6 +13,7 @@ import { TourLeaderSection } from '@/features/tours/components/sections/TourLead
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
 import { TourContactSection } from '@/features/tours/components/sections/TourContactSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
+import { COMPANY } from '@/lib/constants/company'
 
 interface TourPageProps {
   data: any
@@ -167,7 +168,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
                 </svg>
               )}
             </div>
-            <p className="text-slate-300 mb-6 text-sm">如果可以，讓我們一起探索世界上每個角落</p>
+            <p className="text-slate-300 mb-6 text-sm">{COMPANY.subtitle}</p>
             <p className="text-slate-500 text-xs">© 2025 Corner Travel. All rights reserved.</p>
           </div>
         </div>
