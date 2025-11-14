@@ -10,11 +10,13 @@ import {
  *
  * @param categories - 原始的費用分類資料
  * @param newParticipantCounts - 新的人數分布
+ * @param originalParticipantCounts - 原始的人數分布（用於還原團體費用）
  * @returns 重新計算後的各身份成本
  */
 export function calculateTierPricingCosts(
   categories: CostCategory[],
-  newParticipantCounts: ParticipantCounts
+  newParticipantCounts: ParticipantCounts,
+  originalParticipantCounts: ParticipantCounts
 ): IdentityCosts {
   const costs: IdentityCosts = {
     adult: 0,
@@ -25,11 +27,18 @@ export function calculateTierPricingCosts(
   }
 
   // 計算新的總人數（不含嬰兒）
-  const totalParticipants =
+  const newTotalParticipants =
     newParticipantCounts.adult +
     newParticipantCounts.child_with_bed +
     newParticipantCounts.child_no_bed +
     newParticipantCounts.single_room
+
+  // 計算原始總人數（用於還原團體費用）
+  const originalTotalParticipants =
+    originalParticipantCounts.adult +
+    originalParticipantCounts.child_with_bed +
+    originalParticipantCounts.child_no_bed +
+    originalParticipantCounts.single_room
 
   // 計算住宿總成本
   const accommodationCategory = categories.find(cat => cat.id === 'accommodation')
@@ -95,13 +104,17 @@ export function calculateTierPricingCosts(
         costs.single_room += itemCost
       } else if (category.id === 'group-transport' || category.id === 'guide') {
         // 團體分攤、領隊導遊 - 關鍵：用新的總人數重新計算分攤費用
-        const totalCost = item.unit_price * item.quantity
-        const costPerPerson = totalParticipants > 0 ? totalCost / totalParticipants : 0
+        // item.total 是原始人數分攤過的每人費用，需要還原成總費用
+        const originalCostPerPerson = item.total || 0
+        const totalCost = originalCostPerPerson * originalTotalParticipants
 
-        costs.adult += costPerPerson
-        costs.child_with_bed += costPerPerson
-        costs.child_no_bed += costPerPerson
-        costs.single_room += costPerPerson
+        // 用新人數重新分攤
+        const newCostPerPerson = newTotalParticipants > 0 ? totalCost / newTotalParticipants : 0
+
+        costs.adult += newCostPerPerson
+        costs.child_with_bed += newCostPerPerson
+        costs.child_no_bed += newCostPerPerson
+        costs.single_room += newCostPerPerson
       }
     })
   })

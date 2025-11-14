@@ -73,8 +73,8 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
       infant: Math.round(participantCounts.infant * ratio),
     }
 
-    // 計算新的成本
-    const newCosts = calculateTierPricingCosts(categories, newCounts)
+    // 計算新的成本（傳入原始人數用於還原團體費用）
+    const newCosts = calculateTierPricingCosts(categories, newCounts, participantCounts)
 
     // 建立新的檻次表
     const newTier: TierPricing = {
@@ -471,11 +471,6 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
           <div className="bg-morandi-gold/10 px-4 py-2 flex items-center justify-between border-b border-morandi-gold/30">
             <div className="text-sm font-medium text-morandi-primary">
               檻次報價 - {tier.participant_count} 人
-              <span className="ml-2 text-xs text-morandi-secondary">
-                ({tier.participant_counts.adult}成人 + {tier.participant_counts.child_with_bed}小孩 +{' '}
-                {tier.participant_counts.child_no_bed}不佔床 + {tier.participant_counts.single_room}
-                單人房 + {tier.participant_counts.infant}嬰兒)
-              </span>
             </div>
             {!isReadOnly && (
               <button
