@@ -1,5 +1,5 @@
 /**
- * SuppliersPage - 簡化版供應商管理頁面（含價目表）
+ * SuppliersPage - 供應商管理頁面（僅基本資訊）
  */
 
 'use client'
@@ -9,7 +9,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
-import { useSupplierStore, useSupplierCategoryStore, useCostTemplateStore } from '@/stores'
+import { useSupplierStore } from '@/stores'
 import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks'
 
 export const SuppliersPage: React.FC = () => {
@@ -20,20 +20,15 @@ export const SuppliersPage: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
   const { items: suppliers, create, fetchAll: fetchSuppliers } = useSupplierStore()
-  const { fetchAll: fetchCategories } = useSupplierCategoryStore()
-  const { fetchAll: fetchCostTemplates } = useCostTemplateStore()
 
   // 載入資料
   useEffect(() => {
     fetchSuppliers()
-    fetchCategories()
-    fetchCostTemplates()
-  }, [fetchSuppliers, fetchCategories, fetchCostTemplates])
+  }, [fetchSuppliers])
 
   // 簡化的表單狀態
   const [formData, setFormData] = useState({
     name: '',
-    category_id: '',
     bank_name: '',
     bank_account: '',
     note: '',
@@ -56,7 +51,6 @@ export const SuppliersPage: React.FC = () => {
     setIsAddDialogOpen(false)
     setFormData({
       name: '',
-      category_id: '',
       bank_name: '',
       bank_account: '',
       note: '',
@@ -74,7 +68,6 @@ export const SuppliersPage: React.FC = () => {
     try {
       await create({
         name: formData.name,
-        category_id: formData.category_id,
         bank_name: formData.bank_name,
         bank_account: formData.bank_account,
         notes: formData.note,

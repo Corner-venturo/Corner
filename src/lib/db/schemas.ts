@@ -696,6 +696,24 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
+
+  // PNR 管理（Amadeus 電報）
+  {
+    name: 'pnrs',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'record_locator', keyPath: 'record_locator', unique: true },
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'employee_id', keyPath: 'employee_id', unique: false },
+      { name: 'ticketing_deadline', keyPath: 'ticketing_deadline', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
 ]
 
 /**
@@ -748,6 +766,7 @@ export const TABLES = {
   SHARED_ORDER_LISTS: 'shared_order_lists',
   ESIMS: 'esims',
   CONFIRMATIONS: 'confirmations',
+  PNRS: 'pnrs',
 } as const
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES]

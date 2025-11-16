@@ -4,11 +4,33 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Save, Trash2, Plus, Printer } from 'lucide-react'
+import { Save, Trash2, Plus, Printer, FilePlus, History } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { PrintableQuickQuote } from './PrintableQuickQuote'
 
@@ -34,23 +56,47 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     received_amount: quote.received_amount || 0,
   })
 
-  // 從 quote.quick_quote_items 載入項目（初始化時）
-  const [items, setItems] = useState<QuickQuoteItem[]>(() => {
-    return quote.quick_quote_items || []
-  })
+  // 從 quote_items 表格載入項目
+  const [items, setItems] = useState<QuickQuoteItem[]>([])
+  const [isLoadingItems, setIsLoadingItems] = useState(true)
 
-  // 當重新整理頁面時（quote.id 變化），重新載入 items
-  const [loadedQuoteId, setLoadedQuoteId] = useState(quote.id)
   useEffect(() => {
-    if (quote.id !== loadedQuoteId) {
-      setItems(quote.quick_quote_items || [])
-      setLoadedQuoteId(quote.id)
+    const loadQuoteItems = async () => {
+      try {
+        const { useQuoteItemStore } = await import('@/stores')
+
+        // 先確保資料已載入
+        await useQuoteItemStore.getState().fetchAll()
+
+        const { items: allItems } = useQuoteItemStore.getState()
+
+        // 篩選屬於此報價單的項目
+        const quoteItems = allItems
+          .filter(item => (item as any).quote_id === quote.id && !(item as any)._deleted)
+          .map(item => ({
+            id: item.id,
+            description: (item as any).description || '',
+            quantity: (item as any).quantity || 1,
+            unit_price: (item as any).unit_price || 0,
+            amount: (item as any).total_price || 0,
+            notes: (item as any).notes || '',
+          }))
+
+        setItems(quoteItems)
+      } catch (error) {
+        console.error('載入 quote_items 失敗:', error)
+      } finally {
+        setIsLoadingItems(false)
+      }
     }
-  }, [quote.id, loadedQuoteId, quote.quick_quote_items])
+
+    loadQuoteItems()
+  }, [quote.id])
 
   const setFormField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
+
 
   // 計算應收金額
   const totalAmount = items.reduce((sum, item) => sum + item.amount, 0)
@@ -95,10 +141,10 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   }
 
   // 儲存變更
-  const handleSave = async () => {
+  const handleSave = async (showAlert = false) => {
     setIsSaving(true)
     try {
-      await onUpdate({
+      const updateData = {
         customer_name: formData.customer_name,
         contact_phone: formData.contact_phone,
         contact_address: formData.contact_address,
@@ -107,16 +153,113 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         issue_date: formData.issue_date,
         total_amount: totalAmount,
         received_amount: formData.received_amount,
+        balance_amount: totalAmount - formData.received_amount,
         quick_quote_items: items, // ✅ 儲存 items 到 quick_quote_items 欄位
+      }
+
+      console.log('🔄 [QuickQuote] 準備儲存:', {
+        quoteId: quote.id,
+        itemsCount: items.length,
+        totalAmount,
+        updateData
       })
-      setIsEditing(false)
-      alert('儲存成功！')
+
+      await onUpdate(updateData)
+
+      console.log('✅ [QuickQuote] 儲存成功')
+      if (showAlert) {
+        setIsEditing(false)
+        alert('儲存成功！')
+      }
     } catch (error) {
-      console.error('Save error:', error)
-      alert('儲存失敗：' + (error as Error).message)
+      console.error('❌ [QuickQuote] 儲存失敗:', error)
+      if (showAlert) {
+        alert('儲存失敗：' + (error as Error).message)
+      }
     } finally {
       setIsSaving(false)
     }
+  }
+
+
+  // 儲存版本
+  const [isSaveVersionDialogOpen, setIsSaveVersionDialogOpen] = useState(false)
+  const [versionName, setVersionName] = useState('')
+
+  const handleSaveVersion = async () => {
+    if (!versionName.trim()) {
+      alert('請輸入版本名稱')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      // 獲取當前報價單的最大版本號
+      const currentVersion = quote.version || 1
+      const newVersion = currentVersion + 1
+
+      // 準備版本資料
+      const versionData = {
+        quote_id: quote.id,
+        version: newVersion,
+        version_name: versionName.trim(),
+        customer_name: formData.customer_name,
+        contact_phone: formData.contact_phone,
+        contact_address: formData.contact_address,
+        tour_code: formData.tour_code,
+        handler_name: formData.handler_name,
+        issue_date: formData.issue_date,
+        total_amount: totalAmount,
+        received_amount: formData.received_amount,
+        balance_amount: totalAmount - formData.received_amount,
+        items: items, // 儲存當前的項目
+        created_at: new Date().toISOString(),
+      }
+
+      // 更新報價單的版本號和版本資料
+      await onUpdate({
+        version: newVersion,
+        versions: [...(quote.versions || []), versionData],
+      })
+
+      console.log('✅ [QuickQuote] 儲存版本成功:', versionData)
+      setIsSaveVersionDialogOpen(false)
+      setVersionName('')
+      alert('版本儲存成功！')
+    } catch (error) {
+      console.error('❌ [QuickQuote] 儲存版本失敗:', error)
+      alert('版本儲存失敗：' + (error as Error).message)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // 載入版本
+  const handleLoadVersion = (versionIndex: string) => {
+    const versions = quote.versions || []
+    const index = parseInt(versionIndex)
+
+    if (index < 0 || index >= versions.length) return
+
+    const versionData = versions[index]
+
+    // 更新表單資料
+    setFormData({
+      customer_name: versionData.customer_name || '',
+      contact_phone: versionData.contact_phone || '',
+      contact_address: versionData.contact_address || '',
+      tour_code: versionData.tour_code || '',
+      handler_name: versionData.handler_name || 'William',
+      issue_date: versionData.issue_date || new Date().toISOString().split('T')[0],
+      received_amount: versionData.received_amount || 0,
+    })
+
+    // 更新項目
+    if (versionData.items) {
+      setItems(versionData.items)
+    }
+
+    alert(`已載入版本：${versionData.version_name}`)
   }
 
   // 列印預覽
@@ -138,61 +281,77 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 pb-6">
-      {/* 頂部導航 */}
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={() => router.push('/quotes')} className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          返回報價單列表
-        </Button>
-        <div className="flex items-center gap-2">
-          {!isEditing && (
-            <>
-              <Button onClick={handlePrintPreview} variant="outline" className="gap-2">
-                <Printer className="h-4 w-4" />
-                列印
-              </Button>
-              <Button onClick={() => setIsEditing(true)} variant="outline">
-                編輯
-              </Button>
-            </>
-          )}
-          {isEditing && (
-            <>
-              <Button onClick={() => setIsEditing(false)} variant="outline">
-                取消
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
-              >
-                <Save className="h-4 w-4" />
-                {isSaving ? '儲存中...' : '儲存'}
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* 標題 */}
-      <div className="bg-card border border-border rounded-xl p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-morandi-primary">快速報價單</h1>
-            <p className="text-sm text-morandi-secondary mt-1">
-              報價單編號：{quote.code || '-'}
-              {formData.customer_name && ` | 客戶：${formData.customer_name}`}
-            </p>
+    <>
+      <ResponsiveHeader
+        title={`快速報價單 ${quote.code || ''}`}
+        subtitle={formData.customer_name ? `客戶：${formData.customer_name}` : undefined}
+        showBackButton={true}
+        onBack={() => router.push('/quotes')}
+        actions={
+          <div className="flex items-center gap-2">
+            {/* 版本選擇下拉選單 */}
+            {!isEditing && (quote.versions?.length || 0) > 0 && (
+              <Select onValueChange={handleLoadVersion}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="選擇版本" />
+                </SelectTrigger>
+                <SelectContent>
+                  {quote.versions?.map((version, index) => (
+                    <SelectItem key={index} value={index.toString()}>
+                      <div className="flex items-center gap-2">
+                        <History className="h-4 w-4" />
+                        <span>{version.version_name}</span>
+                        <span className="text-xs text-gray-500">
+                          (v{version.version})
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {!isEditing && (
+              <>
+                <Button onClick={handlePrintPreview} variant="outline" className="gap-2">
+                  <Printer className="h-4 w-4" />
+                  列印
+                </Button>
+                <Button onClick={() => setIsEditing(true)} variant="outline">
+                  編輯
+                </Button>
+              </>
+            )}
+            {isEditing && (
+              <>
+                <Button onClick={() => setIsEditing(false)} variant="outline">
+                  取消
+                </Button>
+                <Button
+                  onClick={() => setIsSaveVersionDialogOpen(true)}
+                  disabled={isSaving}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <FilePlus className="h-4 w-4" />
+                  儲存版本
+                </Button>
+                <Button
+                  onClick={() => handleSave(true)}
+                  disabled={isSaving}
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {isSaving ? '儲存中...' : '儲存'}
+                </Button>
+              </>
+            )}
           </div>
-          <div className="px-4 py-2 bg-morandi-green/10 text-morandi-green rounded-lg text-sm font-medium">
-            快速報價單
-          </div>
-        </div>
-      </div>
+        }
+      />
 
-      {/* 客戶資訊 */}
-      <div className="bg-card border border-border rounded-xl p-6">
+      <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+          {/* 客戶資訊 */}
+          <div className="bg-card border border-border rounded-xl p-6">
         <h2 className="text-lg font-semibold text-morandi-primary mb-4">客戶資訊</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -326,7 +485,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   </td>
                   <td className="px-3 py-2">
                     <Input
-                      type="number"
+                      type="text"
                       value={item.quantity === 0 ? '' : item.quantity}
                       onChange={e => {
                         let val = e.target.value
@@ -355,13 +514,12 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                       }}
                       disabled={!isEditing}
                       className="h-8 text-center"
-                      step="0.01"
                       placeholder=""
                     />
                   </td>
                   <td className="px-3 py-2">
                     <Input
-                      type="number"
+                      type="text"
                       value={item.unit_price === 0 ? '' : item.unit_price}
                       onChange={e => {
                         let val = e.target.value
@@ -390,7 +548,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                       }}
                       disabled={!isEditing}
                       className="h-8 text-right"
-                      step="0.01"
                       placeholder=""
                     />
                   </td>
@@ -503,14 +660,51 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         </div>
       </div>
 
-      {/* 列印預覽對話框 */}
-      <PrintableQuickQuote
-        quote={quote}
-        items={items}
-        isOpen={showPrintPreview}
-        onClose={() => setShowPrintPreview(false)}
-        onPrint={handlePrint}
-      />
-    </div>
+        {/* 儲存版本對話框 */}
+        <Dialog open={isSaveVersionDialogOpen} onOpenChange={setIsSaveVersionDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>儲存新版本</DialogTitle>
+              <DialogDescription>
+                請輸入版本名稱，例如：「初稿」「修訂版」「最終版」
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                placeholder="版本名稱"
+                value={versionName}
+                onChange={(e) => setVersionName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                    handleSaveVersion()
+                  }
+                }}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsSaveVersionDialogOpen(false)}>
+                取消
+              </Button>
+              <Button
+                onClick={handleSaveVersion}
+                disabled={isSaving || !versionName.trim()}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover"
+              >
+                {isSaving ? '儲存中...' : '儲存'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 列印預覽對話框 */}
+        <PrintableQuickQuote
+          quote={quote}
+          items={items}
+          isOpen={showPrintPreview}
+          onClose={() => setShowPrintPreview(false)}
+          onPrint={handlePrint}
+        />
+      </div>
+    </>
   )
 }

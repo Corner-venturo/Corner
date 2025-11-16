@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts } from '@/features/quotes/types'
 import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
@@ -54,10 +54,10 @@ export default function QuoteDetailPage() {
     setIsSaveDialogOpen,
     versionName,
     setVersionName,
+    currentEditingVersion,
+    setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
-    selectedCity,
-    availableCities,
     updateQuote,
     addTour,
     router,
@@ -103,16 +103,15 @@ export default function QuoteDetailPage() {
     participantCounts,
     sellingPrices,
     versionName,
+    currentEditingVersion,
     setSaveSuccess,
     setCategories,
-    selectedCity,
-    availableCities,
   })
-  const { handleSaveVersion, formatDateTime, handleFinalize, handleCreateTour } = actions
+  const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
 
   // 載入特定版本
   const handleLoadVersion = useCallback(
-    (versionData: any) => {
+    (versionIndex: number, versionData: any) => {
       setCategories(versionData.categories)
       setAccommodationDays(versionData.accommodation_days || 0)
       if (versionData.participant_counts) {
@@ -121,9 +120,12 @@ export default function QuoteDetailPage() {
       if (versionData.selling_prices) {
         setSellingPrices(versionData.selling_prices)
       }
+      // 記錄當前編輯的版本索引（-1 表示主版本，null 表示初始狀態）
+      setCurrentEditingVersion(versionIndex === -1 ? null : versionIndex)
     },
-    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices]
+    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion]
   )
+
 
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
@@ -235,9 +237,13 @@ export default function QuoteDetailPage() {
         setIsSaveDialogOpen={setIsSaveDialogOpen}
         formatDateTime={formatDateTime}
         handleLoadVersion={handleLoadVersion}
+        handleSave={handleSave}
+        handleSaveAsNewVersion={() => setIsSaveDialogOpen(true)}
         handleFinalize={handleFinalize}
         handleCreateTour={handleCreateTour}
         handleGenerateQuotation={handleGenerateQuotation}
+        handleDeleteVersion={handleDeleteVersion}
+        currentEditingVersion={currentEditingVersion}
         router={router}
       />
 
@@ -314,13 +320,13 @@ export default function QuoteDetailPage() {
         </div>
       </div>
 
-      {/* 保存版本對話框 */}
+      {/* 另存新版本對話框 */}
       <SaveVersionDialog
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}
         versionName={versionName}
         setVersionName={setVersionName}
-        onSave={handleSaveVersion}
+        onSave={(note) => handleSaveAsNewVersion(note, setCurrentEditingVersion)}
       />
 
       {/* 可列印的報價單 */}

@@ -16,9 +16,6 @@ interface QuoteFormData {
   tour_id: string | null
   is_pinned: boolean
   code: string
-  country_id: string | null
-  main_city_id: string | null
-  other_city_ids: string[]
 }
 
 const initialFormData: QuoteFormData = {
@@ -28,31 +25,19 @@ const initialFormData: QuoteFormData = {
   tour_id: null,
   is_pinned: false,
   code: '',
-  country_id: null,
-  main_city_id: null,
-  other_city_ids: [],
 }
 
 interface UseQuoteFormParams {
   addQuote: (data: any) => Promise<any>
-  getCitiesByCountry: (countryId: string) => any[]
 }
 
-export const useQuoteForm = ({ addQuote, getCitiesByCountry }: UseQuoteFormParams) => {
+export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [formData, setFormData] = useState<QuoteFormData>(initialFormData)
-  const [citySearchTerm, setCitySearchTerm] = useState('')
-
-  // 根據選擇的國家，取得可選城市
-  const availableCities = useMemo(() => {
-    if (!formData.country_id) return []
-    return getCitiesByCountry(formData.country_id).filter(city => city.is_active)
-  }, [formData.country_id, getCitiesByCountry])
 
   const resetForm = () => {
     setFormData(initialFormData)
-    setCitySearchTerm('')
   }
 
   const setFormField = <K extends keyof QuoteFormData>(field: K, value: QuoteFormData[K]) => {
@@ -67,9 +52,6 @@ export const useQuoteForm = ({ addQuote, getCitiesByCountry }: UseQuoteFormParam
       tour_id: tour.id,
       is_pinned: false,
       code: '',
-      country_id: tour.country_id || null,
-      main_city_id: tour.main_city_id || null,
-      other_city_ids: [],
     })
   }
 
@@ -141,9 +123,6 @@ export const useQuoteForm = ({ addQuote, getCitiesByCountry }: UseQuoteFormParam
     formData,
     setFormData,
     setFormField,
-    citySearchTerm,
-    setCitySearchTerm,
-    availableCities,
     resetForm,
     initFormWithTour,
     handleSubmit,

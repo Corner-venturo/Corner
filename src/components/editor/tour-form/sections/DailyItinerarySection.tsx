@@ -60,17 +60,19 @@ export function DailyItinerarySection({
 
     // 將選擇的景點轉換為活動
     attractions.forEach(attraction => {
-      addActivity(currentDayIndex)
+      // 先取得當前索引（新增前的長度）
       const day = data.dailyItinerary[currentDayIndex]
       const newActivityIndex = day.activities.length
+
+      // 再新增活動
+      addActivity(currentDayIndex)
 
       // 設定活動資料
       updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍')
       updateActivity(currentDayIndex, newActivityIndex, 'title', attraction.name)
       updateActivity(currentDayIndex, newActivityIndex, 'description', attraction.description || '')
-      if (attraction.thumbnail) {
-        updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail)
-      }
+      // 設定圖片（如果有的話）
+      updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail || '')
     })
 
     setCurrentDayIndex(-1)
@@ -78,24 +80,13 @@ export function DailyItinerarySection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
-        <h2 className="text-lg font-bold text-morandi-primary">📅 逐日行程</h2>
+        <h2 className="text-lg font-bold text-morandi-primary">逐日行程</h2>
         <button
           onClick={addDailyItinerary}
           className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
         >
           + 新增天數
         </button>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">行程副標題</label>
-        <input
-          type="text"
-          value={data.itinerarySubtitle || ''}
-          onChange={e => updateField('itinerarySubtitle', e.target.value)}
-          className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-          placeholder="5天4夜精彩旅程規劃"
-        />
       </div>
 
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
@@ -229,7 +220,7 @@ export function DailyItinerarySection({
                   onClick={() => handleOpenAttractionSelector(dayIndex)}
                   className="px-2.5 py-1 bg-morandi-gold text-white rounded text-xs shadow hover:bg-morandi-gold-hover"
                 >
-                  📍 從景點庫選擇
+                  從景點庫選擇
                 </button>
                 <button
                   onClick={() => addActivity(dayIndex)}

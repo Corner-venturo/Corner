@@ -60,6 +60,7 @@ export function OrderMembersExpandable({
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [memberCountToAdd, setMemberCountToAdd] = useState(1)
   const [showIdentityColumn, setShowIdentityColumn] = useState(false) // 控制身份欄位顯示
+  const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
 
   // 載入成員資料和出發日期
   useEffect(() => {
@@ -142,17 +143,32 @@ export function OrderMembersExpandable({
     }
   }
 
-  // 全形轉半形
+  // 全形轉半形工具函式（只轉換全形英數字和標點符號，不影響中文和注音）
   const toHalfWidth = (str: string): string => {
-    return str.replace(/[\uff01-\uff5e]/g, (ch) => {
-      return String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
-    }).replace(/\u3000/g, ' ') // 全形空格轉半形
+    return str.replace(/[\uFF01-\uFF5E]/g, (s) => {
+      // 全形字符範圍 FF01-FF5E 對應半形 21-7E
+      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    })
+  }
+
+  // 更新本地狀態（不立即寫入資料庫，不做任何轉換）
+  const updateLocalField = (memberId: string, field: keyof OrderMember, value: string | number) => {
+    setMembers(members.map(m => (m.id === memberId ? { ...m, [field]: value } : m)))
   }
 
   // 直接更新欄位到資料庫和本地狀態
   const updateField = async (memberId: string, field: keyof OrderMember, value: string | number) => {
+    // 如果正在使用輸入法，只更新本地狀態，不寫入資料庫
+    if (isComposing) {
+      updateLocalField(memberId, field, value)
+      return
+    }
+
     // 如果是字串，自動轉半形
-    let processedValue: string | number | null = typeof value === 'string' ? toHalfWidth(value) : value
+    let processedValue: string | number | null = value
+    if (typeof value === 'string') {
+      processedValue = toHalfWidth(value)
+    }
 
     // 如果是空字串，對於日期欄位轉成 null
     if (processedValue === '' && (field.includes('date') || field.includes('expiry'))) {
@@ -240,6 +256,16 @@ export function OrderMembersExpandable({
       // 如果格式不符且已輸入至少2個字元，提示手動選擇
       alert('⚠️ 無法自動辨識性別\n\n請手動點擊性別欄位選擇')
     }
+  }
+
+  // 處理數字輸入（含全形半形轉換）
+  const handleNumberInput = (memberId: string, field: keyof OrderMember, value: string) => {
+    // 全形轉半形並只保留數字
+    const processedValue = value
+      .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+      .replace(/[^\d.]/g, '')
+
+    updateField(memberId, field, processedValue ? parseFloat(processedValue) : 0)
   }
 
   return (
@@ -349,8 +375,13 @@ export function OrderMembersExpandable({
                         type="text"
                         value={member.identity || ''}
                         onChange={e => updateField(member.id, 'identity', e.target.value)}
+                        onCompositionStart={() => setIsComposing(true)}
+                        onCompositionEnd={(e) => {
+                          setIsComposing(false)
+                          updateField(member.id, 'identity', e.currentTarget.value)
+                        }}
                         className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                         placeholder=""
                       />
                     </td>
@@ -362,6 +393,11 @@ export function OrderMembersExpandable({
                       type="text"
                       value={member.chinese_name || ''}
                       onChange={e => updateField(member.id, 'chinese_name', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        updateField(member.id, 'chinese_name', e.currentTarget.value)
+                      }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                       placeholder=""
@@ -374,6 +410,11 @@ export function OrderMembersExpandable({
                       type="text"
                       value={member.passport_name || ''}
                       onChange={e => updateField(member.id, 'passport_name', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        updateField(member.id, 'passport_name', e.currentTarget.value)
+                      }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -423,6 +464,11 @@ export function OrderMembersExpandable({
                       type="text"
                       value={member.passport_number || ''}
                       onChange={e => updateField(member.id, 'passport_number', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        updateField(member.id, 'passport_number', e.currentTarget.value)
+                      }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -447,6 +493,11 @@ export function OrderMembersExpandable({
                       type="text"
                       value={member.special_meal || ''}
                       onChange={e => updateField(member.id, 'special_meal', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        updateField(member.id, 'special_meal', e.currentTarget.value)
+                      }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -458,6 +509,11 @@ export function OrderMembersExpandable({
                       type="text"
                       value={member.pnr || ''}
                       onChange={e => updateField(member.id, 'pnr', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        updateField(member.id, 'pnr', e.currentTarget.value)
+                      }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -466,9 +522,10 @@ export function OrderMembersExpandable({
                   {/* 機票費用 */}
                   <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={member.flight_cost || ''}
-                      onChange={e => updateField(member.id, 'flight_cost', parseFloat(e.target.value) || 0)}
+                      onChange={e => handleNumberInput(member.id, 'flight_cost', e.target.value)}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -477,9 +534,10 @@ export function OrderMembersExpandable({
                   {/* 應付金額 */}
                   <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={member.total_payable || ''}
-                      onChange={e => updateField(member.id, 'total_payable', parseFloat(e.target.value) || 0)}
+                      onChange={e => handleNumberInput(member.id, 'total_payable', e.target.value)}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -488,9 +546,10 @@ export function OrderMembersExpandable({
                   {/* 訂金 */}
                   <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={member.deposit_amount || ''}
-                      onChange={e => updateField(member.id, 'deposit_amount', parseFloat(e.target.value) || 0)}
+                      onChange={e => handleNumberInput(member.id, 'deposit_amount', e.target.value)}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -508,6 +567,11 @@ export function OrderMembersExpandable({
                         type="text"
                         value={member.remarks || ''}
                         onChange={e => updateField(member.id, 'remarks', e.target.value)}
+                        onCompositionStart={() => setIsComposing(true)}
+                        onCompositionEnd={(e) => {
+                          setIsComposing(false)
+                          updateField(member.id, 'remarks', e.currentTarget.value)
+                        }}
                         className="flex-1 bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                       />

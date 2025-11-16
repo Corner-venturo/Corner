@@ -9,6 +9,7 @@ import { useTourFormHandlers } from './tour-form/hooks/useTourFormHandlers'
 import { CoverInfoSection } from './tour-form/sections/CoverInfoSection'
 import { CountriesSection } from './tour-form/sections/CountriesSection'
 import { FlightInfoSection } from './tour-form/sections/FlightInfoSection'
+import { FeaturesSection } from './tour-form/sections/FeaturesSection'
 import { LeaderMeetingSection } from './tour-form/sections/LeaderMeetingSection'
 import { HotelSection } from './tour-form/sections/HotelSection'
 import { DailyItinerarySection } from './tour-form/sections/DailyItinerarySection'
@@ -77,13 +78,29 @@ export function TourForm({ data, onChange }: TourFormProps) {
 
       <FlightInfoSection data={data} updateFlightField={handlers.updateFlightField} />
 
-      <HotelSection data={data} updateField={handlers.updateField} />
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 p-4 bg-morandi-container/10 rounded-lg border border-morandi-container/30">
+          <input
+            type="checkbox"
+            id="showFeatures"
+            checked={data.showFeatures !== false}
+            onChange={e => onChange({ ...data, showFeatures: e.target.checked })}
+            className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
+          />
+          <label htmlFor="showFeatures" className="text-sm font-medium text-morandi-primary cursor-pointer">
+            顯示行程特色區塊
+          </label>
+        </div>
 
-      <LeaderMeetingSection
-        data={data}
-        updateNestedField={handlers.updateNestedField}
-        updateField={handlers.updateField}
-      />
+        {data.showFeatures !== false && (
+          <FeaturesSection
+            data={data}
+            addFeature={handlers.addFeature}
+            updateFeature={handlers.updateFeature}
+            removeFeature={handlers.removeFeature}
+          />
+        )}
+      </div>
 
       <DailyItinerarySection
         data={data}
@@ -101,6 +118,14 @@ export function TourForm({ data, onChange }: TourFormProps) {
         updateRecommendation={handlers.updateRecommendation}
         removeRecommendation={handlers.removeRecommendation}
       />
+
+      <LeaderMeetingSection
+        data={data}
+        updateNestedField={handlers.updateNestedField}
+        updateField={handlers.updateField}
+      />
+
+      <HotelSection data={data} updateField={handlers.updateField} />
     </div>
   )
 }

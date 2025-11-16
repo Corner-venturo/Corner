@@ -18,7 +18,7 @@ export function FeaturesSection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
-        <h2 className="text-lg font-bold text-morandi-primary">✨ 行程特色</h2>
+        <h2 className="text-lg font-bold text-morandi-primary">行程特色</h2>
         <button
           onClick={addFeature}
           className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"

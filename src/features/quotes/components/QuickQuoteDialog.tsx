@@ -116,12 +116,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.customer_name}
                 onChange={e => setFormField('customer_name', e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    e.currentTarget.blur()
-                  }
-                }}
                 placeholder="輸入客戶姓名"
                 className="mt-1"
                 required
@@ -132,12 +126,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.contact_phone}
                 onChange={e => setFormField('contact_phone', e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    e.currentTarget.blur()
-                  }
-                }}
                 placeholder="輸入聯絡電話"
                 className="mt-1"
               />
@@ -147,12 +135,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.contact_address}
                 onChange={e => setFormField('contact_address', e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    e.currentTarget.blur()
-                  }
-                }}
                 placeholder="輸入通訊地址"
                 className="mt-1"
               />
@@ -162,12 +144,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.tour_code}
                 onChange={e => setFormField('tour_code', e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    e.currentTarget.blur()
-                  }
-                }}
                 placeholder="輸入團體編號"
                 className="mt-1"
               />
@@ -177,12 +153,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.handler_name}
                 onChange={e => setFormField('handler_name', e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    e.currentTarget.blur()
-                  }
-                }}
                 placeholder="輸入承辦業務"
                 className="mt-1"
               />
@@ -225,12 +195,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                         <Input
                           value={item.description}
                           onChange={e => updateItem(item.id, 'description', e.target.value)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              e.currentTarget.blur()
-                            }
-                          }}
                           placeholder="項目說明"
                           className="h-8"
                         />
@@ -249,12 +213,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                               if (!isNaN(num)) {
                                 updateItem(item.id, 'quantity', num)
                               }
-                            }
-                          }}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              e.currentTarget.blur() // 失去焦點
                             }
                           }}
                           className="h-8 text-center"
@@ -278,12 +236,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                               }
                             }
                           }}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              e.currentTarget.blur() // 失去焦點
-                            }
-                          }}
                           className="h-8 text-right"
                           step="0.01"
                           placeholder=""
@@ -296,12 +248,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                         <Input
                           value={item.notes}
                           onChange={e => updateItem(item.id, 'notes', e.target.value)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              e.currentTarget.blur()
-                            }
-                          }}
                           placeholder="備註"
                           className="h-8"
                         />
@@ -345,12 +291,6 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                 onChange={e => {
                   const value = e.target.value
                   setFormField('received_amount', value === '' ? '' : Number(value))
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    e.currentTarget.blur()
-                  }
                 }}
                 placeholder="0"
                 className="mt-1"

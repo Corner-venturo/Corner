@@ -65,31 +65,60 @@ export function generateTourCode(
  * 生成報價單編號（字母循環系統）
  *
  * @param workspaceCode - 辦公室代碼（如 TP, TC）
- * @param config - 配置（保留供未來擴展）
+ * @param config - 配置（可包含 quoteType: 'quick' | 'standard'）
  * @param existingItems - 現有項目列表（同 workspace）
  *
  * @example
  * generateCode('TP', { prefix: 'Q' }, existingQuotes)
- * // => 'TP-A001' (第1筆)
- * // => 'TP-A999' (第999筆)
- * // => 'TP-B001' (第1000筆)
+ * // 標準報價單: 'TP-A001', 'TP-A002'...
+ * // 快速報價單: 'TP-Q001', 'TP-Q002'...
  */
 export function generateCode(
   workspaceCode: string,
   config: CodeConfig,
   existingItems: BaseEntity[]
 ): string {
-  // 找出所有現有編號，解析出最大的字母和數字
+  const prefix = `${workspaceCode}-`
+
+  // 檢查是否為快速報價單（從 existingItems 中的第一個 item 或 config 判斷）
+  const firstItem = existingItems[0] as any
+  const isQuickQuote = firstItem?.quote_type === 'quick' || (config as any)?.quoteType === 'quick'
+
+  // 快速報價單使用 Q 開頭
+  if (isQuickQuote) {
+    let maxNumber = 0
+
+    existingItems.forEach(item => {
+      if ('code' in item && 'quote_type' in item) {
+        const code = (item as { code?: string; quote_type?: string }).code
+        const quoteType = (item as { quote_type?: string }).quote_type
+
+        // 只計算快速報價單的編號
+        if (code && quoteType === 'quick' && new RegExp(`^${workspaceCode}-Q\\d{3}$`).test(code)) {
+          const numberPart = code.substring(prefix.length + 1) // 移除 "TP-Q"
+          const number = parseInt(numberPart, 10)
+          if (!isNaN(number) && number > maxNumber) {
+            maxNumber = number
+          }
+        }
+      }
+    })
+
+    const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
+    return `${workspaceCode}-Q${nextNumber}`
+  }
+
+  // 標準報價單使用字母循環系統 (A-Z)
   let maxLetter = ''
   let maxNumber = 0
-
-  const prefix = `${workspaceCode}-`
 
   existingItems.forEach(item => {
     if ('code' in item) {
       const code = (item as { code?: string }).code
-      // 匹配格式：TP-A001 或 TC-B999
-      if (code && new RegExp(`^${workspaceCode}-[A-Z]\\d{3}$`).test(code)) {
+      const quoteType = (item as { quote_type?: string })?.quote_type
+
+      // 只計算標準報價單的編號（排除快速報價單）
+      if (code && quoteType !== 'quick' && new RegExp(`^${workspaceCode}-[A-Z]\\d{3}$`).test(code)) {
         const codePart = code.substring(prefix.length) // 移除前綴
         const letter = codePart[0]
         const number = parseInt(codePart.substring(1), 10)

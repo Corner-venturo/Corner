@@ -79,6 +79,7 @@ export interface User {
   }[]
   status: 'active' | 'probation' | 'leave' | 'terminated'
   avatar?: string
+  workspace_id?: string // 所屬工作空間 ID
 
   // 認證相關
   password_hash?: string // 加密後的密碼

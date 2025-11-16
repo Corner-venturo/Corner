@@ -6,7 +6,7 @@ export interface TodoExpandedViewProps {
   onClose: () => void
 }
 
-export type QuickActionTab = 'receipt' | 'invoice' | 'group' | 'quote' | 'share'
+export type QuickActionTab = 'receipt' | 'invoice' | 'group' | 'pnr' | 'share'
 
 export interface QuickActionTabConfig {
   key: QuickActionTab

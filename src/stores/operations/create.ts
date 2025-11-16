@@ -20,13 +20,41 @@ import { logger } from '@/lib/utils/logger'
  * Lazy get workspace code to avoid circular dependency
  * 延遲取得 workspace code，避免在模組載入時觸發循環依賴
  */
-function getWorkspaceCodeLazy(): string | null {
+async function getWorkspaceCodeLazy(): Promise<string | null> {
   try {
-    // 動態 require workspace-helpers 避免頂層循環依賴
+    // 方法 1：從 workspace-helpers 取得（如果 store 已載入）
     const { getCurrentWorkspaceCode } = require('@/lib/workspace-helpers')
-    return getCurrentWorkspaceCode()
+    const codeFromStore = getCurrentWorkspaceCode()
+    if (codeFromStore) {
+      return codeFromStore
+    }
+
+    // 方法 2：直接從 IndexedDB 查詢（fallback）
+    logger.log('📦 Workspace store 未載入，從 IndexedDB 查詢...')
+    const { useAuthStore } = require('@/stores/auth-store')
+    const user = useAuthStore.getState().user
+    const workspaceId = user?.workspace_id
+
+    if (!workspaceId) {
+      logger.warn('⚠️ 無法取得 workspace_id')
+      return null
+    }
+
+    const { openDB } = await import('idb')
+    const db = await openDB('VenturoOfflineDB')
+    const tx = db.transaction('workspaces', 'readonly')
+    const store = tx.objectStore('workspaces')
+    const workspace = await store.get(workspaceId)
+
+    if (workspace?.code) {
+      logger.log('✅ 從 IndexedDB 取得 workspace code:', workspace.code)
+      return workspace.code
+    }
+
+    logger.warn('⚠️ IndexedDB 中找不到 workspace')
+    return null
   } catch (error) {
-    logger.warn('⚠️ 無法取得 workspace code，使用預設編號')
+    logger.warn('⚠️ 無法取得 workspace code，使用預設編號', error)
     return null
   }
 }
@@ -40,9 +68,21 @@ function getWorkspaceIdLazy(): string | null {
     // 動態 require auth-store 避免頂層循環依賴
     const { useAuthStore } = require('@/stores/auth-store')
     const user = useAuthStore.getState().user
-    return user?.workspace_id || null
+    const workspaceId = user?.workspace_id || null
+
+    if (!workspaceId) {
+      logger.warn('⚠️ 無法取得 workspace ID', {
+        hasUser: !!user,
+        userId: user?.id,
+        userWorkspaceId: user?.workspace_id,
+      })
+    } else {
+      logger.log('✅ 取得 workspace ID:', workspaceId)
+    }
+
+    return workspaceId
   } catch (error) {
-    logger.warn('⚠️ 無法取得 workspace ID')
+    logger.warn('⚠️ 取得 workspace ID 時發生錯誤:', error)
     return null
   }
 }
@@ -68,14 +108,26 @@ export async function create<T extends BaseEntity>(
     // 取得 workspace_id（如果資料中沒有提供）
     const workspaceId = getWorkspaceIdLazy()
 
+    // 某些表格不需要 workspace_id（例如：子項目表格，已透過外鍵關聯）
+    const tablesWithoutWorkspaceId = [
+      'quote_items',
+      'order_members',
+      'tour_participants',
+      'itinerary_days',
+      'itinerary_activities',
+    ]
+    const shouldAddWorkspaceId = !tablesWithoutWorkspaceId.includes(tableName)
+
     // 如果有 codePrefix，生成編號
     let recordData = {
       ...data,
       id,
       created_at: now,
       updated_at: now,
-      // 自動填入 workspace_id（如果資料中沒有提供且能取得）
-      ...(workspaceId && !(data as Record<string, unknown>).workspace_id
+      // 自動填入 workspace_id（如果資料中沒有提供且能取得且表格需要）
+      ...(shouldAddWorkspaceId &&
+      workspaceId &&
+      !(data as Record<string, unknown>).workspace_id
         ? { workspace_id: workspaceId }
         : {}),
     } as T
@@ -84,9 +136,15 @@ export async function create<T extends BaseEntity>(
       const existingCode = (data as Record<string, unknown>).code
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
         // 延遲取得 workspace code（避免循環依賴）
-        const workspaceCode = getWorkspaceCodeLazy()
+        const workspaceCode = await getWorkspaceCodeLazy()
         if (workspaceCode) {
-          const code = generateCode(workspaceCode, { prefix: codePrefix }, existingItems)
+          // 傳遞 quote_type 給 generateCode（用於區分快速報價單和標準報價單）
+          const quoteType = (data as Record<string, unknown>).quote_type as string | undefined
+          const code = generateCode(
+            workspaceCode,
+            { prefix: codePrefix, quoteType } as any,
+            existingItems
+          )
           recordData = { ...recordData, code } as T
         } else {
           // 沒有 workspace code，使用傳統編號（無前綴）
@@ -113,7 +171,23 @@ export async function create<T extends BaseEntity>(
 
       // 使用 put (upsert) 而非 insert，避免主鍵衝突
       supabase.put(cleanedData as T).catch(error => {
-        logger.warn(`⚠️ [${tableName}] Supabase 背景同步失敗（已保存到本地）:`, error)
+        logger.error(`❌ [${tableName}] Supabase 背景同步失敗（資料僅存於本地）:`, {
+          error,
+          data: cleanedData,
+          message: '重新整理頁面後此資料可能消失！'
+        })
+
+        // 在開發環境顯示警告
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`
+🚨 Supabase 同步失敗警告 🚨
+表格: ${tableName}
+錯誤: ${error?.message || error}
+資料 ID: ${cleanedData.id}
+
+⚠️ 此資料僅儲存在本地 IndexedDB，重新整理頁面後可能消失！
+          `)
+        }
       })
     }
 

@@ -97,7 +97,7 @@ export const useMemberStore = createStore<Member>('members')
  * 報價項目 Store
  * 無獨立編號，依附於報價單
  */
-export const useQuoteItemStore = createStore<QuoteItem>('quote_items')
+export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>('quote_items')
 
 /**
  * 團體加購項目 Store

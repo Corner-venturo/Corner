@@ -27,16 +27,9 @@ interface QuoteDialogProps {
     tour_id: string | null
     is_pinned: boolean
     code: string
-    country_id: string | null
-    main_city_id: string | null
-    other_city_ids: string[]
   }
   setFormField: (field: string, value: any) => void
-  citySearchTerm: string
-  setCitySearchTerm: (term: string) => void
-  availableCities: any[]
   tours: any[]
-  countries: any[]
   onSubmit: () => Promise<boolean>
   onClose: () => void
 }
@@ -46,11 +39,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
   onOpenChange,
   formData,
   setFormField,
-  citySearchTerm,
-  setCitySearchTerm,
-  availableCities,
   tours,
-  countries,
   onSubmit,
   onClose,
 }) => {
@@ -107,8 +96,6 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
                     setFormField('tour_id', value)
                     setFormField('name', tour.name)
                     setFormField('group_size', tour.max_participants || 1)
-                    setFormField('country_id', tour.country_id || null)
-                    setFormField('main_city_id', tour.main_city_id || null)
                   }
                 }
               }}
@@ -120,147 +107,6 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
               選擇旅遊團後，報價單編號將使用團號
             </p>
           </div>
-
-          {/* 國家選擇 */}
-          <div>
-            <label className="text-sm font-medium text-morandi-primary">國家</label>
-            <Select
-              value={formData.country_id || 'none'}
-              onValueChange={value => {
-                if (value === 'none') {
-                  setFormField('country_id', null)
-                  setFormField('main_city_id', null)
-                  setFormField('other_city_ids', [])
-                } else {
-                  setFormField('country_id', value)
-                  setFormField('main_city_id', null)
-                  setFormField('other_city_ids', [])
-                }
-              }}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="選擇國家" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">請選擇國家</SelectItem>
-                {countries
-                  .filter(c => c.is_active)
-                  .map(country => (
-                    <SelectItem key={country.id} value={country.id}>
-                      {country.emoji} {country.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 主要城市選擇 */}
-          {formData.country_id && (
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">主要城市</label>
-              <Select
-                value={formData.main_city_id || 'none'}
-                onValueChange={value => {
-                  setFormField('main_city_id', value === 'none' ? null : value)
-                }}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="選擇主要城市" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">請選擇主要城市</SelectItem>
-                  {availableCities.map(city => (
-                    <SelectItem key={city.id} value={city.id}>
-                      {city.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-morandi-secondary mt-1">主要城市用於團號生成</p>
-            </div>
-          )}
-
-          {/* 其他城市選擇（多選） */}
-          {formData.country_id &&
-            formData.main_city_id &&
-            availableCities.filter(city => city.id !== formData.main_city_id).length > 0 && (
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">其他城市（選填）</label>
-                <div className="mt-1 space-y-2">
-                  <Input
-                    placeholder="輸入城市名稱搜尋（例如：清）..."
-                    value={citySearchTerm}
-                    onChange={e => setCitySearchTerm(e.target.value)}
-                    className="text-sm"
-                  />
-
-                  {formData.other_city_ids.length > 0 && (
-                    <div className="flex flex-wrap gap-2 p-2 border border-border rounded-md bg-morandi-container/10">
-                      {formData.other_city_ids.map(cityId => {
-                        const city = availableCities.find(c => c.id === cityId)
-                        if (!city) return null
-                        return (
-                          <span
-                            key={cityId}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-morandi-gold/20 text-morandi-primary text-xs rounded"
-                          >
-                            {city.name}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setFormField(
-                                  'other_city_ids',
-                                  formData.other_city_ids.filter(id => id !== cityId)
-                                )
-                              }}
-                              className="hover:text-morandi-red"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        )
-                      })}
-                    </div>
-                  )}
-
-                  <div className="max-h-32 overflow-y-auto border border-border rounded-md">
-                    {availableCities
-                      .filter(
-                        city =>
-                          city.id !== formData.main_city_id &&
-                          !formData.other_city_ids.includes(city.id) &&
-                          (citySearchTerm === '' ||
-                            city.name.toLowerCase().includes(citySearchTerm.toLowerCase()))
-                      )
-                      .map(city => (
-                        <button
-                          key={city.id}
-                          type="button"
-                          onClick={() => {
-                            setFormField('other_city_ids', [...formData.other_city_ids, city.id])
-                            setCitySearchTerm('')
-                          }}
-                          className="w-full px-3 py-2 text-left text-sm hover:bg-morandi-container/20 transition-colors"
-                        >
-                          {city.name}
-                        </button>
-                      ))}
-                    {availableCities.filter(
-                      city =>
-                        city.id !== formData.main_city_id &&
-                        !formData.other_city_ids.includes(city.id) &&
-                        (citySearchTerm === '' ||
-                          city.name.toLowerCase().includes(citySearchTerm.toLowerCase()))
-                    ).length === 0 && (
-                      <div className="px-3 py-6 text-center text-sm text-morandi-secondary">
-                        無符合的城市
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <p className="text-xs text-morandi-secondary mt-1">點擊城市加入，用於廠商篩選</p>
-              </div>
-            )}
 
           {/* 團體名稱 */}
           <div>

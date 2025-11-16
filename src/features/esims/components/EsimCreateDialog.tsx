@@ -163,9 +163,19 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
   const fetchProducts = async () => {
     setIsLoadingProducts(true)
     try {
-      const productList = await fastMoveService.getProducts()
+      // TODO: 等 FastMove API Key 配置後，取消註解下面這行
+      // const productList = await fastMoveService.getProducts()
+
+      // 🧪 臨時使用 Mock 資料測試
+      const productList = [
+        { wmproduct_id: 'JP-7D-UNLIM', product_id: 'JP-7D-UNLIM', product_name: '日本 7天無限流量', product_region: 'JPN', product_price: 500, product_type: 1, le_sim: false },
+        { wmproduct_id: 'JP-14D-UNLIM', product_id: 'JP-14D-UNLIM', product_name: '日本 14天無限流量', product_region: 'JPN', product_price: 800, product_type: 1, le_sim: false },
+        { wmproduct_id: 'KR-7D-UNLIM', product_id: 'KR-7D-UNLIM', product_name: '韓國 7天無限流量', product_region: 'KOR', product_price: 450, product_type: 1, le_sim: false },
+        { wmproduct_id: 'TH-7D-UNLIM', product_id: 'TH-7D-UNLIM', product_name: '泰國 7天無限流量', product_region: 'THI', product_price: 350, product_type: 1, le_sim: false },
+      ]
+
       setProducts(productList)
-      toast.success(`已更新 ${productList.length} 個產品`)
+      toast.success(`已更新 ${productList.length} 個產品（測試資料）`)
     } catch (error) {
       toast.error('無法載入產品列表，請稍後再試')
       console.error('Failed to fetch products:', error)
@@ -281,18 +291,45 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
         const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1
         const esimNumber = `${prefix}${String(nextNumber).padStart(2, '0')}`
 
+        // 從產品列表找到選中的產品，取得價格
+        const selectedProduct = products.find(p => p.product_id === item.product_id)
+        const productPrice = selectedProduct?.product_price || 0
+
+        // 產生請款單號（給 FastMove 使用）
+        // TODO: 實作 maxNumberGetDbNumber 或使用簡單的遞增邏輯
+        const invoiceNumber = `I${finalGroupCode}${String(Date.now()).slice(-4)}`
+
         await create({
           esim_number: esimNumber,
           group_code: finalGroupCode,
           order_number: targetOrderNumber || undefined,
           product_id: item.product_id,
           quantity: item.quantity,
+          price: productPrice, // 儲存產品價格
           email: item.email,
           note: item.note || '',
           status: 0, // 待確認
         } as any)
 
-        // TODO: 調用 FastMove API 下單
+        // TODO: 調用 FastMove API 下單，並傳入 invoiceNumber
+        // FastMove API 會自動產生請款單，請款日期為「下個月第一個週四」
+        try {
+          await fastMoveService.createOrder({
+            email: item.email,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            price: productPrice,
+            group_code: finalGroupCode,
+            order_number: targetOrderNumber || '',
+            created_by: user.id,
+            invoice_number: invoiceNumber,
+            esim_number: esimNumber,
+          })
+          console.log('FastMove 下單成功，請款單號：', invoiceNumber)
+        } catch (error) {
+          console.error('FastMove API 調用錯誤:', error)
+          // 不中斷流程，網卡已建立，只是 FastMove 失敗
+        }
       }
 
       // 重置表單，重新自動選擇預設團號
@@ -436,10 +473,16 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
               </Button>
             </div>
 
-            <Input
+            <Combobox
               value={item.product_id}
-              onChange={e => updateEsimItem(item.id, 'product_id', e.target.value)}
-              placeholder="產品"
+              onChange={value => updateEsimItem(item.id, 'product_id', value)}
+              options={productOptions.filter(p => {
+                const product = products.find(pr => pr.product_id === p.value)
+                return !item.product_region || product?.product_region === item.product_region
+              })}
+              placeholder="選擇產品..."
+              disabled={!item.product_region || products.length === 0}
+              showSearchIcon
             />
 
             <select

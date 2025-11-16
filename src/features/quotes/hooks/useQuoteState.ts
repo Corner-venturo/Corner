@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useTourStore, useRegionStore, useOrderStore } from '@/stores'
+import { useTourStore, useOrderStore } from '@/stores'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types'
 
@@ -11,8 +11,6 @@ export const useQuoteState = () => {
   const { quotes, updateQuote, loadQuotes } = useQuotes()
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
-  const regionStore = useRegionStore()
-  const { items: regions } = regionStore
   const workspaceStore = useWorkspaceStoreData()
 
   const quote_id = params.id as string
@@ -46,71 +44,6 @@ export const useQuoteState = () => {
     return tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
   }, [relatedTour, orders])
 
-  // 懶載入 regions（只在報價單頁面才載入）
-  useEffect(() => {
-    if (regions.length === 0) {
-      regionStore.fetchAll()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regions.length])
-
-  // 從 regions 取得啟用的國家清單
-  const activeCountries = useMemo(() => {
-    return regions
-      .filter(r => r.type === 'country' && r.status === 'active' && !r._deleted)
-      .map(r => ({ code: r.code, name: r.name }))
-  }, [regions])
-
-  // 根據國家代碼取得城市清單
-  const getCitiesByCountryCode = useCallback(
-    (countryCode: string) => {
-      return regions
-        .filter(
-          r =>
-            r.type === 'city' &&
-            r.country_code === countryCode &&
-            r.status === 'active' &&
-            !r._deleted
-        )
-        .map(r => ({ code: r.code, name: r.name }))
-    },
-    [regions]
-  )
-
-  // 從旅遊團的 location 反查國家和城市代碼
-  const getCountryAndCityFromLocation = useCallback(
-    (location: string) => {
-      for (const country of activeCountries) {
-        const cities = getCitiesByCountryCode(country.code)
-        const matchedCity = cities.find(city => city.name === location)
-        if (matchedCity) {
-          return { countryCode: country.code, cityCode: matchedCity.code }
-        }
-      }
-      return { countryCode: '', cityCode: '' }
-    },
-    [activeCountries, getCitiesByCountryCode]
-  )
-
-  // 國家和城市選擇 state
-  const [selectedCountry, setSelectedCountry] = useState<string>(() => {
-    if (relatedTour) {
-      return getCountryAndCityFromLocation(relatedTour.location).countryCode
-    }
-    return activeCountries[0]?.code || ''
-  })
-
-  const [selectedCity, setSelectedCity] = useState<string>(() => {
-    if (relatedTour) {
-      return getCountryAndCityFromLocation(relatedTour.location).cityCode
-    }
-    const defaultCities = selectedCountry ? getCitiesByCountryCode(selectedCountry) : []
-    return defaultCities[0]?.code || ''
-  })
-
-  const [availableCities, setAvailableCities] = useState(() => {
-    return selectedCountry ? getCitiesByCountryCode(selectedCountry) : []
-  })
 
   const [categories, setCategories] = useState<CostCategory[]>(() => {
     const initialCategories = quote?.categories || costCategories
@@ -226,6 +159,7 @@ export const useQuoteState = () => {
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false)
   const [versionName, setVersionName] = useState<string>('')
+  const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null) // 追蹤當前編輯的版本索引
 
   // 多身份售價
   const [sellingPrices, setSellingPrices] = useState<SellingPrices>(
@@ -246,33 +180,12 @@ export const useQuoteState = () => {
     }
   }, [quote, quotes.length, router])
 
-  // 當國家改變時，更新城市清單
-  useEffect(() => {
-    if (selectedCountry && !relatedTour) {
-      const cities = getCitiesByCountryCode(selectedCountry)
-      setAvailableCities(cities)
-      if (cities.length > 0) {
-        setSelectedCity(cities[0].code)
-      }
-    }
-  }, [selectedCountry, relatedTour, getCitiesByCountryCode])
-
   return {
     quote_id,
     quote,
     relatedTour,
     isSpecialTour,
     isReadOnly,
-    regions,
-    activeCountries,
-    getCitiesByCountryCode,
-    getCountryAndCityFromLocation,
-    selectedCountry,
-    setSelectedCountry,
-    selectedCity,
-    setSelectedCity,
-    availableCities,
-    setAvailableCities,
     categories,
     setCategories,
     accommodationDays,
@@ -289,6 +202,8 @@ export const useQuoteState = () => {
     setIsSaveDialogOpen,
     versionName,
     setVersionName,
+    currentEditingVersion,
+    setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
     updateQuote,

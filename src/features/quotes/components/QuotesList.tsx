@@ -99,7 +99,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                 'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
                 isQuick
                   ? 'bg-morandi-green/10 text-morandi-green'
-                  : 'bg-morandi-blue/10 text-morandi-blue'
+                  : 'bg-morandi-gold/10 text-morandi-gold'
               )}
             >
               {isQuick ? '快速報價單' : '團體報價單'}

@@ -259,30 +259,64 @@ SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
 - 欄位錯誤 → 建立 migration → 執行 db push
 - 資料類型不符 → 建立 migration → 執行 db push
 - 索引缺失 → 建立 migration → 執行 db push
-- **RLS 錯誤 → 禁用 RLS（見下方 RLS 規範）**
+- **RLS 問題 → 依照 RLS 規範修正（見下方）**
 
-### ⚠️ RLS (Row Level Security) 規範
+### 🔐 RLS (Row Level Security) 規範
 
-**Venturo 是內部管理系統，所有表格都應該禁用 RLS。**
+**❌ Venturo 完全不使用 RLS（2025-11-15 最終決定）**
+
+#### 決策理由
+
+1. **內部管理系統** - 員工都是信任的，不需要資料庫層強制隔離
+2. **簡化架構** - 避免 RLS 帶來的複雜度和 Debug 困難
+3. **提升效能** - 減少每次查詢的權限檢查開銷
+4. **彈性需求** - 主管可能需要跨 workspace 查詢資料
+5. **開發效率** - 專注於業務邏輯，不用處理 RLS 相關問題
+
+#### Venturo 權限控制架構
+
+```typescript
+Layer 1: Supabase Auth (登入驗證)
+         ↓
+Layer 2: employees.permissions (功能權限控制)
+         ↓
+Layer 3: employees.workspace_id (資料隔離 - 前端 filter)
+         ↓
+Layer 4: user.roles (角色標籤 - admin, tour_leader 等)
+```
+
+#### 創建新表時的標準模板
 
 ```sql
--- 創建新表時的標準模板
 CREATE TABLE public.new_table (...);
 
--- 立即禁用 RLS（必須！）
+-- 確保禁用 RLS
 ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
 ```
 
-**原因**：
-- ✅ 內部系統，所有已認證用戶都應該能訪問所有數據
-- ✅ 使用 Supabase Auth 控制登入即可
-- ❌ 不需要 RLS 的複雜策略
+#### 權限處理範例
 
-**詳細說明**: `docs/SUPABASE_RLS_POLICY.md`
+```typescript
+// 一般員工：看自己 workspace 的所有資料
+fetchOrders({ workspace_id: user.workspace_id })
+
+// 領隊：只能看自己帶的團
+if (user.roles.includes('tour_leader')) {
+  fetchOrders({ tour_leader_id: user.id })
+}
+
+// Super Admin：可以跨 workspace 查看
+if (user.permissions.includes('super_admin')) {
+  fetchOrders({}) // 不使用 workspace_id filter
+}
+```
+
+**Migration**: `supabase/migrations/20251115060000_final_disable_all_rls.sql`
 
 ### Migration 記錄（自動更新）
 | 日期 | Migration 檔案 | 目的 | 狀態 |
 |------|---------------|------|------|
+| 2025-11-12 | `20251112080525_complete_rls_implementation.sql` | 完整 RLS 權限控制系統 | ✅ 已執行 |
 | 2025-10-27 | `20251027000000_add_channel_order.sql` | 新增 channels.order 欄位用於拖曳排序 | ✅ 已執行 |
 
 ### 詳細文檔

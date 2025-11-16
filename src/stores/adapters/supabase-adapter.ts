@@ -154,8 +154,14 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
+      // 清理過時欄位（特別是 todos 的 description）
+      const cleanedData = { ...data }
+      if (this.tableName === 'todos' && 'description' in cleanedData) {
+        delete (cleanedData as any).description
+      }
+
       const { supabase } = await import('@/lib/supabase/client')
-      const { error } = await supabase.from(this.tableName).update(data).eq('id', id)
+      const { error } = await supabase.from(this.tableName).update(cleanedData).eq('id', id)
 
       if (error) throw error
 

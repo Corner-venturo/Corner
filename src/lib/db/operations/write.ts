@@ -120,6 +120,11 @@ export async function update<T extends { id: string }>(
       updated_at: new Date().toISOString(),
     }
 
+    // 清理 todos 表格的過時欄位（description 不存在於資料庫中）
+    if (tableName === 'todos' && 'description' in updated) {
+      delete (updated as any).description
+    }
+
     const request = objectStore.put(updated)
 
     request.onsuccess = () => {

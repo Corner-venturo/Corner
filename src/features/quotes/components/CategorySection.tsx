@@ -1,10 +1,25 @@
-import React from 'react'
-import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal } from 'lucide-react'
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CostCategory, CostItem } from '../types'
 import { CostItemRow } from './CostItemRow'
 import { AccommodationItemRow } from './AccommodationItemRow'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { supabase } from '@/lib/supabase/client'
 
 const categoryIcons: Record<string, React.ElementType> = {
   transport: Car,
@@ -14,6 +29,23 @@ const categoryIcons: Record<string, React.ElementType> = {
   activities: MapPin,
   others: MoreHorizontal,
   guide: Users,
+}
+
+interface TransportationRate {
+  id: string
+  country_id: string
+  country_name: string
+  vehicle_type: string
+  price: number
+  currency: string
+  unit: string
+  notes: string | null
+}
+
+interface Country {
+  id: string
+  name: string
+  emoji: string | null
 }
 
 interface CategorySectionProps {
@@ -51,6 +83,45 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleRemoveItem,
 }) => {
   const Icon = categoryIcons[category.id]
+  const [countries, setCountries] = useState<Country[]>([])
+  const [selectedCountry, setSelectedCountry] = useState<string>('')
+  const [transportRates, setTransportRates] = useState<TransportationRate[]>([])
+  const [loading, setLoading] = useState(false)
+
+  // 載入國家列表
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const { data } = await supabase
+        .from('countries')
+        .select('id, name, emoji')
+        .order('display_order')
+
+      if (data) setCountries(data)
+    }
+    fetchCountries()
+  }, [])
+
+  // 當選擇國家時載入該國家的車資資料
+  useEffect(() => {
+    if (!selectedCountry) {
+      setTransportRates([])
+      return
+    }
+
+    const fetchRates = async () => {
+      setLoading(true)
+      const { data } = await supabase
+        .from('transportation_rates')
+        .select('*')
+        .eq('country_id', selectedCountry)
+        .eq('is_active', true)
+        .order('display_order')
+
+      if (data) setTransportRates(data)
+      setLoading(false)
+    }
+    fetchRates()
+  }, [selectedCountry])
 
   return (
     <React.Fragment>
@@ -60,6 +131,89 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           <div className="flex items-center space-x-2">
             <Icon size={16} className="text-morandi-gold" />
             <span>{category.name}</span>
+
+            {/* 參考報價圖示 - 僅顯示於交通和團體交通分類 */}
+            {(category.id === 'transport' || category.id === 'group-transport') && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+                    title="查看參考報價"
+                  >
+                    <DollarSign size={14} className="text-morandi-gold" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-96" align="start">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm text-morandi-primary">
+                      參考報價
+                    </h4>
+
+                    {/* 國家選擇 */}
+                    <div>
+                      <label className="text-xs text-morandi-secondary mb-1.5 block">
+                        選擇國家
+                      </label>
+                      <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="請選擇國家" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map(country => (
+                            <SelectItem key={country.id} value={country.id}>
+                              {country.emoji} {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* 車資列表 */}
+                    {loading ? (
+                      <div className="text-sm text-morandi-secondary text-center py-4">
+                        載入中...
+                      </div>
+                    ) : transportRates.length > 0 ? (
+                      <div className="space-y-2 max-h-80 overflow-y-auto">
+                        {transportRates.map(rate => (
+                          <div
+                            key={rate.id}
+                            className="flex items-center justify-between py-2 px-3 bg-morandi-container/30 rounded text-sm"
+                          >
+                            <div className="flex-1">
+                              <div className="text-morandi-primary font-medium">
+                                {rate.vehicle_type}
+                              </div>
+                              {rate.notes && (
+                                <div className="text-xs text-morandi-secondary mt-0.5">
+                                  {rate.notes}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 ml-4">
+                              <span className="font-medium text-morandi-gold">
+                                {rate.currency} {rate.price.toLocaleString()}
+                              </span>
+                              <span className="text-xs text-morandi-secondary">
+                                / {rate.unit}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : selectedCountry ? (
+                      <div className="text-sm text-morandi-secondary text-center py-4">
+                        此國家尚無車資資料
+                      </div>
+                    ) : (
+                      <div className="text-sm text-morandi-secondary text-center py-4">
+                        請先選擇國家
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
         </td>
         <td className="py-3 px-4"></td>

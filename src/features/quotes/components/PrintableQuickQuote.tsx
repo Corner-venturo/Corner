@@ -139,19 +139,15 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               display: table-row-group;
             }
 
+            /* A4 頁面設定 */
+            @page {
+              size: A4;
+              margin: 8mm;
+            }
+
             /* 防止表格內容被切斷 */
             .avoid-break {
               page-break-inside: avoid;
-            }
-
-            /* 頁碼 */
-            body {
-              counter-reset: page 0;
-            }
-
-            .page-number::before {
-              counter-increment: page;
-              content: counter(page);
             }
 
             body {
@@ -178,15 +174,15 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
         </div>
 
         {/* 列印內容 */}
-        <div className="bg-white p-8 print:p-4" id="printable-quote">
+        <div className="bg-white p-8 print:p-0" id="printable-quote">
           <table className="print-wrapper print:table hidden">
             {/* 頁首（每頁都會顯示） */}
             <thead>
               <tr>
                 <td>
                   <div
-                    className="relative mb-1 pb-4"
-                    style={{ borderBottom: '1px solid #D4AF37', marginTop: '6px' }}
+                    className="relative pb-4 mb-6"
+                    style={{ borderBottom: '1px solid #D4AF37' }}
                   >
                     {/* Logo - 左上角 */}
                     {logoUrl ? (
@@ -231,17 +227,18 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <tfoot>
               <tr>
                 <td>
-                  <div className="pt-2 border-t border-gray-200">
-                    <div className="text-center py-1">
-                      <p className="text-sm text-gray-600 italic">
+                  <div style={{
+                    marginTop: '24px',
+                    paddingTop: '16px',
+                    borderTop: '1px solid #F3F4F6'
+                  }}>
+                    <div className="text-center" style={{ marginBottom: '12px' }}>
+                      <p className="text-sm italic" style={{ color: '#9CA3AF', margin: 0 }}>
                         {COMPANY.subtitle}
                       </p>
                     </div>
-                    <div className="flex justify-between items-center text-xs text-gray-500 px-4">
+                    <div className="text-center text-xs" style={{ color: '#D1D5DB' }}>
                       <span>角落旅行社股份有限公司 © {new Date().getFullYear()}</span>
-                      <span>
-                        第 <span className="page-number"></span> 頁
-                      </span>
                     </div>
                   </div>
                 </td>
@@ -394,7 +391,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                               color: '#4B5563',
                             }}
                           >
-                            {item.quantity !== 0 ? item.quantity : '\u00A0'}
+                            {item.quantity && item.quantity !== 0 ? item.quantity : '\u00A0'}
                           </td>
                           <td
                             className="px-2 py-1 text-right"
@@ -405,7 +402,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                               color: '#4B5563',
                             }}
                           >
-                            {item.unit_price !== 0 ? item.unit_price.toLocaleString() : '\u00A0'}
+                            {item.unit_price && item.unit_price !== 0 ? (item.unit_price || 0).toLocaleString() : '\u00A0'}
                           </td>
                           <td
                             className="px-2 py-1 text-right"
@@ -417,7 +414,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                               fontWeight: 600,
                             }}
                           >
-                            {item.amount !== 0 ? item.amount.toLocaleString() : '\u00A0'}
+                            {item.amount && item.amount !== 0 ? (item.amount || 0).toLocaleString() : '\u00A0'}
                           </td>
                           <td
                             className="px-2 py-1"
@@ -448,61 +445,73 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                   </table>
 
                   {/* 金額統計區 */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div
-                      className="p-3"
-                      style={{
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '8px',
-                        backgroundColor: '#FAF7F2',
-                      }}
-                    >
-                      <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
-                        應收金額
-                      </div>
-                      <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
-                        NT$ {totalAmount.toLocaleString()}
-                      </div>
-                    </div>
-                    <div
-                      className="p-3"
-                      style={{
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '8px',
-                        backgroundColor: '#FAF7F2',
-                      }}
-                    >
-                      <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
-                        已收金額
-                      </div>
-                      <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
-                        NT$ {(quote.received_amount || 0).toLocaleString()}
-                      </div>
-                    </div>
-                    <div
-                      className="p-3"
-                      style={{
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '8px',
-                        backgroundColor: '#FAF7F2',
-                      }}
-                    >
-                      <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
-                        應收餘額
-                      </div>
+                  <div className="mb-6">
+                    {quote.received_amount && quote.received_amount > 0 ? (
                       <div
-                        className="text-xl font-bold"
-                        style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
+                        className="px-4 py-3 flex items-center justify-end gap-8"
+                        style={{
+                          backgroundColor: '#FAF7F2',
+                          borderRadius: '8px',
+                          border: '1px solid #E5E7EB',
+                        }}
                       >
-                        NT$ {balanceAmount.toLocaleString()}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>應收金額</span>
+                          <span className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                            NT$ {totalAmount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            width: '1px',
+                            height: '24px',
+                            backgroundColor: '#D1D5DB',
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>已收金額</span>
+                          <span className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                            NT$ {(quote.received_amount || 0).toLocaleString()}
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            width: '1px',
+                            height: '24px',
+                            backgroundColor: '#D1D5DB',
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>應收餘額</span>
+                          <span
+                            className="text-xl font-bold"
+                            style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
+                          >
+                            NT$ {balanceAmount.toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div
+                        className="px-4 py-3 flex items-center justify-end gap-2"
+                        style={{
+                          backgroundColor: '#FAF7F2',
+                          borderRadius: '8px',
+                          border: '1px solid #E5E7EB',
+                        }}
+                      >
+                        <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>應收金額</span>
+                        <span className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                          NT$ {totalAmount.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* 付款資訊區 */}
                   <div
                     className="grid grid-cols-2 gap-6 pt-4 text-sm"
-                    style={{ borderTop: '1px solid #E5E7EB' }}
+                    style={{ borderTop: '1px solid #F3F4F6' }}
                   >
                     <div>
                       <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
@@ -532,7 +541,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                   </div>
 
                   {/* 收據資訊 */}
-                  <div className="mt-4 pt-4 text-sm" style={{ borderTop: '1px solid #E5E7EB' }}>
+                  <div className="mt-4 pt-4 text-sm" style={{ borderTop: '1px solid #F3F4F6' }}>
                     <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
                       收據資訊
                     </h4>
@@ -728,7 +737,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                         color: '#4B5563',
                       }}
                     >
-                      {item.quantity !== 0 ? item.quantity : '\u00A0'}
+                      {item.quantity && item.quantity !== 0 ? item.quantity : '\u00A0'}
                     </td>
                     <td
                       className="px-2 py-1 text-right"
@@ -738,7 +747,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                         color: '#4B5563',
                       }}
                     >
-                      {item.unit_price !== 0 ? item.unit_price.toLocaleString() : '\u00A0'}
+                      {item.unit_price && item.unit_price !== 0 ? (item.unit_price || 0).toLocaleString() : '\u00A0'}
                     </td>
                     <td
                       className="px-2 py-1 text-right"
@@ -749,7 +758,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                         fontWeight: 600,
                       }}
                     >
-                      {item.amount !== 0 ? item.amount.toLocaleString() : '\u00A0'}
+                      {item.amount && item.amount !== 0 ? (item.amount || 0).toLocaleString() : '\u00A0'}
                     </td>
                     <td
                       className="px-2 py-1"
@@ -774,61 +783,73 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             </table>
 
             {/* 金額統計 */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div
-                className="p-3"
-                style={{
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  backgroundColor: '#FAF7F2',
-                }}
-              >
-                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
-                  應收金額
-                </div>
-                <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
-                  NT$ {totalAmount.toLocaleString()}
-                </div>
-              </div>
-              <div
-                className="p-3"
-                style={{
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  backgroundColor: '#FAF7F2',
-                }}
-              >
-                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
-                  已收金額
-                </div>
-                <div className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
-                  NT$ {(quote.received_amount || 0).toLocaleString()}
-                </div>
-              </div>
-              <div
-                className="p-3"
-                style={{
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  backgroundColor: '#FAF7F2',
-                }}
-              >
-                <div className="text-sm font-semibold mb-1" style={{ color: '#6B5B4F' }}>
-                  應收餘額
-                </div>
+            <div className="mb-6">
+              {quote.received_amount && quote.received_amount > 0 ? (
                 <div
-                  className="text-xl font-bold"
-                  style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
+                  className="px-4 py-3 flex items-center justify-end gap-8"
+                  style={{
+                    backgroundColor: '#FAF7F2',
+                    borderRadius: '8px',
+                    border: '1px solid #E5E7EB',
+                  }}
                 >
-                  NT$ {balanceAmount.toLocaleString()}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>應收金額</span>
+                    <span className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                      NT$ {totalAmount.toLocaleString()}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      width: '1px',
+                      height: '24px',
+                      backgroundColor: '#D1D5DB',
+                    }}
+                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>已收金額</span>
+                    <span className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                      NT$ {(quote.received_amount || 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      width: '1px',
+                      height: '24px',
+                      backgroundColor: '#D1D5DB',
+                    }}
+                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>應收餘額</span>
+                    <span
+                      className="text-xl font-bold"
+                      style={{ color: balanceAmount > 0 ? '#DC2626' : '#059669' }}
+                    >
+                      NT$ {balanceAmount.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div
+                  className="px-4 py-3 flex items-center justify-end gap-2"
+                  style={{
+                    backgroundColor: '#FAF7F2',
+                    borderRadius: '8px',
+                    border: '1px solid #E5E7EB',
+                  }}
+                >
+                  <span className="text-xs font-semibold" style={{ color: '#6B5B4F' }}>應收金額</span>
+                  <span className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                    NT$ {totalAmount.toLocaleString()}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* 付款資訊 */}
             <div
               className="grid grid-cols-2 gap-6 pt-4 text-sm mb-6"
-              style={{ borderTop: '1px solid #E5E7EB' }}
+              style={{ borderTop: '1px solid #F3F4F6' }}
             >
               <div>
                 <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
@@ -858,7 +879,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             </div>
 
             {/* 收據資訊 */}
-            <div className="pt-4 text-sm mb-6" style={{ borderTop: '1px solid #E5E7EB' }}>
+            <div className="pt-4 text-sm" style={{ borderTop: '1px solid #F3F4F6' }}>
               <h4 className="font-semibold mb-2" style={{ color: '#6B5B4F' }}>
                 收據資訊
               </h4>
@@ -882,12 +903,12 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               </div>
             </div>
 
-            {/* 副標題和頁腳 */}
-            <div className="text-center mt-8 pt-4">
-              <p className="text-base text-gray-600 italic mb-4">
+            {/* 副標題和頁腳 - 固定在底部 */}
+            <div className="text-center mt-16 pt-8" style={{ borderTop: '1px solid #F3F4F6' }}>
+              <p className="text-sm italic mb-3" style={{ color: '#9CA3AF' }}>
                 {COMPANY.subtitle}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs" style={{ color: '#D1D5DB' }}>
                 角落旅行社股份有限公司 © {new Date().getFullYear()}
               </p>
             </div>

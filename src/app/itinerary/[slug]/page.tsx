@@ -226,9 +226,16 @@ export default function EditItineraryPage() {
       setScale(finalScale)
     }
 
-    calculateScale()
+    // 延遲計算，確保 DOM 已完全更新
+    const timer = setTimeout(() => {
+      calculateScale()
+    }, 100)
+
     window.addEventListener('resize', calculateScale)
-    return () => window.removeEventListener('resize', calculateScale)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('resize', calculateScale)
+    }
   }, [viewMode])
 
   // 載入中狀態

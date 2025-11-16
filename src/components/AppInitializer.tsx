@@ -10,12 +10,18 @@ import { initLocalDatabase } from '@/lib/db/init-local-data'
 
 export function AppInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // 初始化本地資料庫
+    // 初始化本地資料庫和關鍵資料
     const init = async () => {
       try {
         // 初始化 IndexedDB
         await initLocalDatabase()
-      } catch (error) {}
+
+        // 載入 workspaces 資料（用於編號生成等核心功能）
+        const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
+        await useWorkspaceStoreData.getState().fetchAll()
+      } catch (error) {
+        console.error('AppInitializer error:', error)
+      }
     }
 
     init()

@@ -9,15 +9,18 @@ interface DailyImageCarouselProps {
 export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
   const [current, setCurrent] = useState(0)
 
-  if (!images || images.length === 0) {
+  // 過濾掉空值和無效的圖片
+  const validImages = images?.filter(img => img && typeof img === 'string' && img.trim() !== '') || []
+
+  if (validImages.length === 0) {
     return null
   }
 
-  const showControls = images.length > 1
+  const showControls = validImages.length > 1
 
   const goToSlide = (index: number) => {
     if (!showControls) return
-    const total = images.length
+    const total = validImages.length
     const next = (index + total) % total
     setCurrent(next)
   }
@@ -26,7 +29,7 @@ export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
     <div className="relative mb-8 mt-6">
       <div className="overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-2xl ring-1 ring-morandi-border/20">
         <div className="relative aspect-[16/9] w-full">
-          {images.map((image, index) => (
+          {validImages.map((image, index) => (
             <img
               key={`${image}-${index}`}
               src={image}
@@ -59,7 +62,7 @@ export function DailyImageCarousel({ images, title }: DailyImageCarouselProps) {
             ›
           </button>
           <div className="mt-4 flex justify-center gap-2">
-            {images.map((_, index) => (
+            {validImages.map((_, index) => (
               <button
                 key={index}
                 type="button"

@@ -199,19 +199,15 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
               vertical-align: top; /* 內容靠上對齊 */
             }
 
+            /* A4 頁面設定 */
+            @page {
+              size: A4;
+              margin: 8mm;
+            }
+
             /* 防止表格內容被切斷 */
             .avoid-break {
               page-break-inside: avoid;
-            }
-
-            /* 頁碼 */
-            body {
-              counter-reset: page 0;
-            }
-
-            .page-number::before {
-              counter-increment: page;
-              content: counter(page);
             }
 
             body {
@@ -238,15 +234,15 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
         </div>
 
         {/* 列印內容 */}
-        <div className="bg-white p-8 print:p-4" id="printable-quotation">
+        <div className="bg-white p-8 print:p-0" id="printable-quotation">
           <table className="print-wrapper print:table hidden">
             {/* 頁首（每頁都會顯示） */}
             <thead>
               <tr>
                 <td>
                   <div
-                    className="relative mb-1 pb-4"
-                    style={{ borderBottom: '1px solid #D4AF37', marginTop: '6px' }}
+                    className="relative pb-4 mb-6"
+                    style={{ borderBottom: '1px solid #D4AF37' }}
                   >
                     {/* Logo - 左上角 */}
                     {logoUrl ? (
@@ -291,17 +287,17 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             <tfoot>
               <tr>
                 <td>
-                  <div className="pt-2 border-t border-gray-200">
-                    <div className="text-center py-1">
-                      <p className="text-sm text-gray-600 italic">
+                  <div className="border-t border-gray-200" style={{
+                    marginTop: '24px',
+                    paddingTop: '16px'
+                  }}>
+                    <div className="text-center" style={{ marginBottom: '12px' }}>
+                      <p className="text-sm italic" style={{ color: '#6B7280', margin: 0 }}>
                         {COMPANY.subtitle}
                       </p>
                     </div>
-                    <div className="flex justify-between items-center text-xs text-gray-500 px-4">
+                    <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>
                       <span>角落旅行社股份有限公司 © {new Date().getFullYear()}</span>
-                      <span>
-                        第 <span className="page-number"></span> 頁
-                      </span>
                     </div>
                   </div>
                 </td>

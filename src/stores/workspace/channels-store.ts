@@ -11,6 +11,7 @@ import { useChannelStore } from './channel-store'
 import { useChannelGroupStore } from './channel-group-store'
 import { useWorkspaceStoreData } from './workspace-store'
 import type { Workspace, Channel, ChannelGroup } from './types'
+import { setCurrentWorkspaceFilter } from '@/lib/workspace-filter'
 
 /**
  * 額外狀態 (不需要同步到 Supabase 的 UI 狀態)
@@ -111,6 +112,8 @@ export const useChannelsStore = () => {
       // 🔥 使用 fetchAll 的返回值，而不是 items (避免競爭條件)
       if (workspaces && workspaces.length > 0 && !uiStore.currentWorkspace) {
         uiStore.setCurrentWorkspace(workspaces[0])
+        // 🔥 設定 workspace filter
+        setCurrentWorkspaceFilter(workspaces[0].id || workspaces[0].code)
       }
     },
 
@@ -121,10 +124,15 @@ export const useChannelsStore = () => {
         // 嘗試從列表中找到對應的 workspace 物件
         const ws = workspaceStore.items.find(w => w.id === workspace || w.code === workspace)
         uiStore.setCurrentWorkspace(ws || null)
+        // 🔥 設定 workspace filter，讓 fetchAll 可以正確過濾
+        setCurrentWorkspaceFilter(workspace)
       } else {
         // 如果傳入 workspace 物件
         uiStore.setCurrentWorkspace(workspace)
-        uiStore.setCurrentWorkspaceId(workspace?.id || workspace?.code || null)
+        const workspaceId = workspace?.id || workspace?.code || null
+        uiStore.setCurrentWorkspaceId(workspaceId)
+        // 🔥 設定 workspace filter，讓 fetchAll 可以正確過濾
+        setCurrentWorkspaceFilter(workspaceId)
       }
     },
 

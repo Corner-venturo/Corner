@@ -19,10 +19,9 @@ interface UseQuoteActionsProps {
   participantCounts: ParticipantCounts
   sellingPrices: SellingPrices
   versionName: string
+  currentEditingVersion: number | null
   setSaveSuccess: (value: boolean) => void
   setCategories: React.Dispatch<React.SetStateAction<CostCategory[]>>
-  selectedCity: string
-  availableCities: Array<{ code: string; name: string }>
 }
 
 export const useQuoteActions = ({
@@ -39,10 +38,9 @@ export const useQuoteActions = ({
   participantCounts,
   sellingPrices,
   versionName,
+  currentEditingVersion,
   setSaveSuccess,
   setCategories,
-  selectedCity,
-  availableCities,
 }: UseQuoteActionsProps) => {
   // 當人數改變時，重新計算所有團體分攤項目
   useEffect(() => {
@@ -95,31 +93,95 @@ export const useQuoteActions = ({
     })
   }, [participantCounts, groupSize, groupSizeForGuide, setCategories]) // 監聽人數變化
 
-  // 保存版本
-  const handleSaveVersion = useCallback(
-    (note?: string) => {
+  // 儲存當前版本（覆蓋）
+  const handleSave = useCallback(
+    () => {
       if (!quote) return
 
       try {
+        const baseUpdate = {
+          categories: updatedCategories,
+          total_cost,
+          group_size: groupSize,
+          name: quoteName,
+          accommodation_days: accommodationDays,
+          participant_counts: participantCounts,
+          selling_prices: sellingPrices,
+        }
+
+        // 如果正在編輯某個版本，更新該版本
+        if (currentEditingVersion !== null && quote.versions) {
+          const existingVersions = [...quote.versions]
+          existingVersions[currentEditingVersion] = {
+            ...existingVersions[currentEditingVersion],
+            categories: updatedCategories,
+            total_cost,
+            group_size: groupSize,
+            accommodation_days: accommodationDays,
+            participant_counts: participantCounts,
+            selling_prices: sellingPrices,
+            updated_at: new Date().toISOString(),
+          }
+
+          updateQuote(quote.id, {
+            ...baseUpdate,
+            versions: existingVersions,
+          })
+        } else {
+          // 沒有編輯版本，只更新主資料
+          updateQuote(quote.id, baseUpdate)
+        }
+
+        setSaveSuccess(true)
+        setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
+      } catch (error) {
+        logger.error('儲存失敗:', error)
+      }
+    },
+    [
+      quote,
+      updatedCategories,
+      total_cost,
+      groupSize,
+      quoteName,
+      accommodationDays,
+      participantCounts,
+      sellingPrices,
+      currentEditingVersion,
+      updateQuote,
+      setSaveSuccess,
+    ]
+  )
+
+  // 另存新版本
+  const handleSaveAsNewVersion = useCallback(
+    (note?: string, setCurrentEditingVersion?: (index: number) => void) => {
+      if (!quote) return
+
+      try {
+        // 計算新的版本號（取得版本歷史中的最大版本號 + 1）
+        const existingVersions = quote.versions || []
+        const maxVersion = existingVersions.reduce((max: number, v: any) =>
+          Math.max(max, v.version || 0), 0
+        )
+        const newVersion = maxVersion + 1
+
         // 創建新的版本記錄
-        const currentVersion = quote.version || 1
         const newVersionRecord = {
           id: Date.now().toString(),
-          version: currentVersion,
+          version: newVersion,
           categories: updatedCategories,
           total_cost,
           group_size: groupSize,
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          note: note || versionName || `版本 ${currentVersion}`,
+          note: note || versionName || `版本 ${newVersion}`,
           created_at: new Date().toISOString(),
         }
 
-        // 取得現有的版本歷史
-        const existingVersions = quote.versions || []
-
-        // 更新報價單：增加版本號，將當前狀態加入版本歷史
+        // 更新報價單：將新版本加入版本歷史
+        const newVersions = [...existingVersions, newVersionRecord]
         updateQuote(quote.id, {
           categories: updatedCategories,
           total_cost,
@@ -128,9 +190,13 @@ export const useQuoteActions = ({
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          version: currentVersion + 1, // 版本號 +1
-          versions: [...existingVersions, newVersionRecord],
+          versions: newVersions,
         })
+
+        // 自動切換到新創建的版本（新版本的索引是 length - 1）
+        if (setCurrentEditingVersion) {
+          setCurrentEditingVersion(newVersions.length - 1)
+        }
 
         // 顯示成功提示
         setSaveSuccess(true)
@@ -170,8 +236,25 @@ export const useQuoteActions = ({
   const handleFinalize = useCallback(() => {
     if (!quote) return
 
-    // 先保存當前版本
-    handleSaveVersion('轉為最終版本前的狀態')
+    // 先保存當前版本為新版本
+    const existingVersions = quote.versions || []
+    const maxVersion = existingVersions.reduce((max: number, v: any) =>
+      Math.max(max, v.version || 0), 0
+    )
+    const newVersion = maxVersion + 1
+
+    const finalizeVersionRecord = {
+      id: Date.now().toString(),
+      version: newVersion,
+      categories: updatedCategories,
+      total_cost,
+      group_size: groupSize,
+      accommodation_days: accommodationDays,
+      participant_counts: participantCounts,
+      selling_prices: sellingPrices,
+      note: '轉為最終版本前的狀態',
+      created_at: new Date().toISOString(),
+    }
 
     // 更新狀態為最終版本
     updateQuote(quote.id, {
@@ -183,13 +266,13 @@ export const useQuoteActions = ({
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices,
+      versions: [...existingVersions, finalizeVersionRecord],
     })
 
     // 自動跳轉到旅遊團新增頁面，並帶上報價單ID
     router.push(`/tours?fromQuote=${quote.id}`)
   }, [
     quote,
-    handleSaveVersion,
     updateQuote,
     updatedCategories,
     total_cost,
@@ -205,37 +288,56 @@ export const useQuoteActions = ({
   const handleCreateTour = useCallback(async () => {
     if (!quote) return
 
-    // 先保存目前的報價單狀態
-    handleSaveVersion('轉為旅遊團前的版本')
+    // 先保存目前的報價單狀態為新版本
+    const existingVersions = quote.versions || []
+    const maxVersion = existingVersions.reduce((max: number, v: any) =>
+      Math.max(max, v.version || 0), 0
+    )
+    const newVersion = maxVersion + 1
+
+    const createTourVersionRecord = {
+      id: Date.now().toString(),
+      version: newVersion,
+      categories: updatedCategories,
+      total_cost,
+      group_size: groupSize,
+      accommodation_days: accommodationDays,
+      participant_counts: participantCounts,
+      selling_prices: sellingPrices,
+      note: '轉為旅遊團前的版本',
+      created_at: new Date().toISOString(),
+    }
 
     // 更新報價單狀態為最終版本
-    updateQuote(quote.id, { status: 'approved' })
+    updateQuote(quote.id, {
+      status: 'approved',
+      versions: [...existingVersions, createTourVersionRecord],
+    })
 
-    // 創建旅遊團（使用報價單選擇的城市）
+    // 創建旅遊團
     const departure_date = new Date()
     departure_date.setDate(departure_date.getDate() + 30) // 預設30天後出發
     const return_date = new Date(departure_date)
     return_date.setDate(return_date.getDate() + 5) // 預設5天行程
 
-    // 取得選擇的城市名稱
-    const selectedCityObj = availableCities.find(c => c.code === selectedCity)
-    const cityName = selectedCityObj?.name || selectedCity
+    // 使用報價單名稱作為地點（用戶可以在旅遊團頁面再修改）
+    const location = quoteName || '待定'
 
-    // 從選擇的地區生成團號
+    // 生成團號（使用預設地區代碼 'XX'）
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
       throw new Error('無法取得 workspace code')
     }
     const tourCode = generateTourCode(
       workspaceCode,
-      selectedCity,
+      'XX', // 預設地區代碼，用戶可以後續修改
       departure_date.toISOString(),
       [] // TODO: 傳入現有的 tours 來避免編號衝突
     )
 
     const newTour = await addTour({
       name: quoteName,
-      location: cityName, // 使用城市名稱
+      location: location,
       departure_date: departure_date.toISOString().split('T')[0],
       return_date: return_date.toISOString().split('T')[0],
       price: Math.round(total_cost / groupSize), // 每人單價
@@ -256,21 +358,46 @@ export const useQuoteActions = ({
     router.push(`/tours?highlight=${newTour?.id}`)
   }, [
     quote,
-    handleSaveVersion,
-    updateQuote,
-    quoteName,
+    updatedCategories,
     total_cost,
     groupSize,
-    selectedCity,
-    availableCities,
+    accommodationDays,
+    participantCounts,
+    sellingPrices,
+    updateQuote,
+    quoteName,
     addTour,
     router,
   ])
 
+  // 刪除版本
+  const handleDeleteVersion = useCallback(
+    (versionIndex: number) => {
+      if (!quote || !quote.versions) return
+
+      try {
+        const existingVersions = [...quote.versions]
+        existingVersions.splice(versionIndex, 1)
+
+        updateQuote(quote.id, {
+          versions: existingVersions,
+        })
+
+        setSaveSuccess(true)
+        setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
+      } catch (error) {
+        logger.error('刪除版本失敗:', error)
+      }
+    },
+    [quote, updateQuote, setSaveSuccess]
+  )
+
   return {
-    handleSaveVersion,
+    handleSave,
+    handleSaveAsNewVersion,
     formatDateTime,
     handleFinalize,
     handleCreateTour,
+    handleDeleteVersion,
   }
 }

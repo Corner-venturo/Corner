@@ -37,7 +37,7 @@ export function LeaderMeetingSection({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2 flex-1">
-          👤 領隊與集合資訊
+          領隊與集合資訊
         </h2>
         <label className="flex items-center gap-2 text-sm">
           <input

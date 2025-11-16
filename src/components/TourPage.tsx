@@ -7,11 +7,9 @@ import { useTourItineraryNav } from '@/features/tours/hooks/useTourItineraryNav'
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
-import { TourAttractionsSection } from '@/features/tours/components/sections/TourAttractionsSection'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
 import { TourLeaderSection } from '@/features/tours/components/sections/TourLeaderSection'
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
-import { TourContactSection } from '@/features/tours/components/sections/TourContactSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
 import { COMPANY } from '@/lib/constants/company'
 
@@ -26,7 +24,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null)
 
   // Custom hooks
-  const { scrollOpacity, attractionsProgress } = useTourScrollEffects({ viewMode, isPreview })
+  const { scrollOpacity } = useTourScrollEffects({ viewMode, isPreview })
   const { activeDayIndex, dayRefs, handleDayNavigate } = useTourItineraryNav(dailyItinerary)
 
   // 載入公司 LOGO
@@ -81,33 +79,23 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* Flight Section */}
       <TourFlightSection data={data} viewMode={viewMode} />
 
-      {/* Divider */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-t border-border"></div>
-      </div>
-
       {/* Features Section */}
-      <TourFeaturesSection data={data} viewMode={viewMode} />
+      {data.showFeatures !== false && (
+        <>
+          {/* Divider */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="border-t border-border"></div>
+          </div>
 
-      {/* Divider */}
-      {viewMode !== 'mobile' && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-border"></div>
-        </div>
-      )}
+          <TourFeaturesSection data={data} viewMode={viewMode} />
 
-      {/* Attractions Section */}
-      <TourAttractionsSection
-        data={data}
-        viewMode={viewMode}
-        attractionsProgress={attractionsProgress}
-      />
-
-      {/* Divider */}
-      {viewMode !== 'mobile' && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-border"></div>
-        </div>
+          {/* Divider */}
+          {viewMode !== 'mobile' && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="border-t border-border"></div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Itinerary Section */}
@@ -120,24 +108,26 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       />
 
       {/* Divider */}
-      {data.showLeaderMeeting !== false && <div className="border-t border-border"></div>}
+      {data.showLeaderMeeting !== false && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-border"></div>
+        </div>
+      )}
 
       {/* Leader and Meeting Section */}
       {data.showLeaderMeeting !== false && <TourLeaderSection data={data} viewMode={viewMode} />}
 
-      {/* Hotels Section */}
+      {/* Divider */}
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
-        <>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
-          <TourHotelsSection data={data} viewMode={viewMode} />
-        </>
+        </div>
       )}
 
-      {/* Divider */}
-      <div className="border-t border-border"></div>
-
-      {/* Contact Section */}
-      <TourContactSection data={data} viewMode={viewMode} />
+      {/* Hotels Section */}
+      {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
+        <TourHotelsSection data={data} viewMode={viewMode} />
+      )}
 
       {/* Footer */}
       <footer className="bg-slate-900 py-12">
@@ -152,20 +142,9 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
                   className="h-8 w-auto object-contain"
                 />
               ) : (
-                <svg
-                  className="h-6 w-auto text-morandi-gold"
-                  viewBox="0 0 200 200"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="4" />
-                  <path
-                    d="M100 40 L120 80 L165 85 L130 115 L140 160 L100 135 L60 160 L70 115 L35 85 L80 80 Z"
-                    fill="currentColor"
-                    opacity="0.9"
-                  />
-                  <circle cx="100" cy="100" r="25" fill="currentColor" opacity="0.8" />
-                </svg>
+                <h3 className="text-2xl font-bold text-morandi-gold">
+                  {COMPANY.name}
+                </h3>
               )}
             </div>
             <p className="text-slate-300 mb-6 text-sm">{COMPANY.subtitle}</p>

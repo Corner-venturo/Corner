@@ -220,6 +220,7 @@ export const useAuthStore = create<AuthState>(
                 attendance: employee.attendance || { leave_records: [], overtime_records: [] },
                 contracts: employee.contracts || [],
                 status: employee.status,
+                workspace_id: employee.workspace_id, // ✅ 從資料庫讀取 workspace_id
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               }
@@ -411,6 +412,7 @@ export const useAuthStore = create<AuthState>(
             attendance: employee.attendance,
             contracts: employee.contracts,
             status: employee.status,
+            workspace_id: employee.workspace_id, // ✅ 從資料庫讀取 workspace_id
             created_at: employee.created_at || new Date().toISOString(),
             updated_at: employee.updated_at || new Date().toISOString(),
           }
@@ -538,6 +540,7 @@ export const useAuthStore = create<AuthState>(
               attendance: profile.attendance || { leave_records: [], overtime_records: [] },
               contracts: profile.contracts || [],
               status: profile.status as 'active' | 'probation' | 'leave' | 'terminated',
+              workspace_id: profile.workspace_id, // ✅ 從資料庫讀取 workspace_id
               created_at: profile.created_at || new Date().toISOString(),
               updated_at: new Date().toISOString(),
             }
@@ -580,4 +583,36 @@ export const useAuthStore = create<AuthState>(
 if (typeof window !== 'undefined') {
   // @ts-expect-error - zustand persist API type issue
   useAuthStore.persist.rehydrate()
+
+  // 🔧 自動修復：如果 user 缺少 workspace_id，從 IndexedDB 補上
+  setTimeout(async () => {
+    const state = useAuthStore.getState()
+    if (state.user && !state.user.workspace_id) {
+      console.warn('⚠️ 偵測到 user 缺少 workspace_id，嘗試自動修復...')
+
+      try {
+        const { openDB } = await import('idb')
+        const db = await openDB('VenturoOfflineDB')
+        const tx = db.transaction('employees', 'readonly')
+        const store = tx.objectStore('employees')
+        const allEmployees = await store.getAll()
+        const employee = allEmployees.find((emp: any) => emp.user_id === state.user?.id)
+
+        if (employee?.workspace_id) {
+          // 更新 user 物件
+          useAuthStore.setState({
+            user: {
+              ...state.user,
+              workspace_id: employee.workspace_id,
+            },
+          })
+          console.log('✅ 已自動補上 workspace_id:', employee.workspace_id)
+        } else {
+          console.error('❌ 無法從 IndexedDB 找到 workspace_id')
+        }
+      } catch (error) {
+        console.error('❌ 自動修復失敗:', error)
+      }
+    }
+  }, 1000)
 }

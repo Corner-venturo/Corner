@@ -55,9 +55,6 @@ export const QuotesPage: React.FC = () => {
   const {
     quotes,
     tours,
-    countries,
-    cities,
-    getCitiesByCountry,
     addQuote,
     handleDuplicateQuote,
     handleTogglePin,
@@ -65,17 +62,10 @@ export const QuotesPage: React.FC = () => {
     handleQuoteClick,
   } = useQuotesData()
 
-  // ✅ 延遲載入 regions（只在打開對話框時載入）
-  const { fetchAll: fetchRegions } = useRegionsStore()
-
   // 打開類型選擇對話框
   const handleOpenTypeSelect = React.useCallback(async () => {
     setIsTypeSelectOpen(true)
-    // 預先載入 regions（為標準報價單準備）
-    if (countries.length === 0) {
-      await fetchRegions()
-    }
-  }, [countries.length, fetchRegions])
+  }, [])
 
   // 選擇標準報價單
   const handleSelectStandard = () => {
@@ -93,13 +83,10 @@ export const QuotesPage: React.FC = () => {
   const {
     formData,
     setFormField,
-    citySearchTerm,
-    setCitySearchTerm,
-    availableCities,
     resetForm,
     initFormWithTour,
     handleSubmit,
-  } = useQuoteForm({ addQuote, getCitiesByCountry })
+  } = useQuoteForm({ addQuote })
 
   // Quick quote form management
   const {
@@ -153,7 +140,7 @@ export const QuotesPage: React.FC = () => {
 
   const handleQuickDialogClose = () => {
     setIsQuickDialogOpen(false)
-    resetQuickForm()
+    // 不要在關閉時清除草稿，只有成功建立後才清除
   }
 
   const handlePreview = async (quoteId: string, e: React.MouseEvent) => {
@@ -296,11 +283,7 @@ export const QuotesPage: React.FC = () => {
         }}
         formData={formData}
         setFormField={setFormField}
-        citySearchTerm={citySearchTerm}
-        setCitySearchTerm={setCitySearchTerm}
-        availableCities={availableCities}
         tours={tours}
-        countries={countries}
         onSubmit={handleSubmit}
         onClose={handleDialogClose}
       />

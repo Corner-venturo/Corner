@@ -36,7 +36,7 @@ export function CoverInfoSection({
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2">
-        📸 封面設定
+        封面設定
       </h2>
 
       <div>

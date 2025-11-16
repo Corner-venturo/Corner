@@ -10,7 +10,6 @@ import {
   ShoppingCart,
   Users,
   CreditCard,
-  CheckSquare,
   Settings,
   Calculator,
   Database,
@@ -29,6 +28,8 @@ import {
   CircleDot,
   Wifi,
   ImageIcon,
+  Bus,
+  CheckSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -160,15 +161,15 @@ const menuItems: MenuItem[] = [
         requiredPermission: 'database',
       },
       {
-        href: '/database/activities',
-        label: '活動門票',
-        icon: CheckSquare,
-        requiredPermission: 'database',
-      },
-      {
         href: '/database/attractions',
         label: '景點管理',
         icon: MapPin,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/transportation-rates',
+        label: '車資管理',
+        icon: Bus,
         requiredPermission: 'database',
       },
       {

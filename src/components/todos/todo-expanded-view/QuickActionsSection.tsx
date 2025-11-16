@@ -13,7 +13,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { Receipt, FileText, Users, DollarSign, UserPlus } from 'lucide-react'
+import { Receipt, FileText, Users, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
 // 使用懶加載避免打包問題
 const QuickReceipt = lazy(() =>
@@ -25,12 +25,15 @@ const QuickDisbursement = lazy(() =>
 const QuickGroup = lazy(() =>
   import('../quick-actions/quick-group').then(m => ({ default: m.QuickGroup }))
 )
+const QuickPNR = lazy(() =>
+  import('../quick-actions/quick-pnr').then(m => ({ default: m.QuickPNR }))
+)
 
 const quickActionTabs: QuickActionTabConfig[] = [
   { key: 'receipt' as const, label: '收款', icon: Receipt },
   { key: 'invoice' as const, label: '請款', icon: FileText },
   { key: 'group' as const, label: '開團', icon: Users },
-  { key: 'quote' as const, label: '報價', icon: DollarSign },
+  { key: 'pnr' as const, label: 'PNR', icon: Plane },
   { key: 'share' as const, label: '共享', icon: UserPlus },
 ]
 
@@ -188,26 +191,11 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
         </Suspense>
       )
 
-    case 'quote':
+    case 'pnr':
       return (
-        <div className="flex flex-col items-center justify-center h-full space-y-4 py-12">
-          <div className="p-4 bg-morandi-gold/10 rounded-full">
-            <DollarSign size={32} className="text-morandi-gold" />
-          </div>
-          <div className="text-center space-y-2">
-            <h5 className="text-base font-semibold text-morandi-primary">快速報價</h5>
-            <p className="text-sm text-morandi-secondary max-w-sm">
-              此功能開發中，請暫時使用報價單管理頁面
-            </p>
-          </div>
-          <Button
-            onClick={() => (window.location.href = '/quotes')}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-md"
-          >
-            <DollarSign size={16} className="mr-2" />
-            前往報價單管理
-          </Button>
-        </div>
+        <Suspense fallback={LoadingFallback}>
+          <QuickPNR todo={todo} onUpdate={onUpdate} />
+        </Suspense>
       )
 
     case 'share':

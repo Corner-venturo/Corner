@@ -365,12 +365,14 @@ export default function CustomersPage() {
           <EnhancedTable
             columns={tableColumns}
             data={filteredCustomers}
-            actions={() => (
+            onRowClick={handleRowClick}
+            actions={(customer: Customer) => (
               <Button
                 variant="outline"
                 size="sm"
                 className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
                 title="編輯顧客"
+                onClick={() => router.push(`/customers/${customer.id}`)}
               >
                 <Edit size={14} className="text-morandi-gold" />
               </Button>

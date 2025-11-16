@@ -14,7 +14,7 @@ export function FlightInfoSection({ data, updateFlightField }: FlightInfoSection
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-[#C9A961] pb-2">
-        ✈️ 航班資訊
+        航班資訊
       </h2>
 
       <div className="bg-[#F9F5ED] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">

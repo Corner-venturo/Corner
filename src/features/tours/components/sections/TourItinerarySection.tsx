@@ -47,49 +47,9 @@ export function TourItinerarySection({
           >
             詳細行程
           </h2>
-          <p className="text-xl text-morandi-secondary">
-            {data.itinerarySubtitle || '精彩旅程規劃'}
-          </p>
         </motion.div>
 
-        <div className={viewMode === 'mobile' ? '' : 'lg:grid lg:grid-cols-[240px,1fr] lg:gap-10'}>
-          {/* Desktop sidebar navigation */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-6 rounded-3xl border border-morandi-border/60 bg-morandi-container/30 p-6 shadow-xl ring-1 ring-morandi-border/30 backdrop-blur">
-              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-morandi-secondary">
-                Daily Guide
-              </p>
-              <ul className="space-y-2">
-                {dailyItinerary.map((day: any, index: number) => (
-                  <li key={`day-nav-${day.dayLabel || index}`}>
-                    <button
-                      type="button"
-                      onClick={() => handleDayNavigate(index)}
-                      className={cn(
-                        'w-full rounded-2xl px-4 py-3 text-left transition-all duration-300',
-                        activeDayIndex === index
-                          ? 'bg-white text-morandi-primary shadow-lg'
-                          : 'bg-transparent text-morandi-secondary hover:bg-white/60 hover:text-morandi-primary'
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] uppercase tracking-[0.35em] text-morandi-secondary/70">
-                          {day.dayLabel || `Day ${index + 1}`}
-                        </span>
-                        {day.date && (
-                          <span className="text-xs text-morandi-secondary/80">{day.date}</span>
-                        )}
-                      </div>
-                      <p className="mt-2 text-base font-semibold leading-snug">
-                        {day.title || `行程第 ${index + 1} 天`}
-                      </p>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-
+        <div>
           <div>
             {/* Mobile horizontal navigation */}
             {viewMode === 'mobile' && dailyItinerary.length > 0 && (
@@ -126,7 +86,7 @@ export function TourItinerarySection({
                   ref={el => {
                     dayRefs.current[index] = el
                   }}
-                  className="relative overflow-hidden rounded-[36px] border border-morandi-border/60 bg-white/95 p-8 shadow-xl ring-1 ring-morandi-border/40 backdrop-blur-sm"
+                  className="relative overflow-hidden rounded-[36px] border border-morandi-container/30 bg-white/95 p-8 shadow-lg backdrop-blur-sm"
                 >
                   <div className="flex flex-wrap items-center gap-4 mb-6">
                     <DayLabel dayNumber={index + 1} variant="default" />
@@ -157,17 +117,11 @@ export function TourItinerarySection({
                   {day.activities && day.activities.length > 0 && (
                     <div className="mb-8 space-y-4">
                       <DecorativeDivider variant="simple" />
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-lg font-semibold text-morandi-primary">亮點景點</h4>
-                        <span className="text-sm text-morandi-secondary/80">
-                          {String(day.activities.length).padStart(2, '0')} Spots
-                        </span>
-                      </div>
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                         {day.activities.map((activity: any, actIndex: number) => (
                           <AttractionCard
                             key={`activity-${index}-${actIndex}`}
-                            title={`${activity.icon || '📍'} ${activity.title}`}
+                            title={activity.icon ? `${activity.icon} ${activity.title}` : activity.title}
                             description={activity.description || ''}
                             image={activity.image}
                             layout={activity.image ? 'vertical' : 'horizontal'}
@@ -181,7 +135,7 @@ export function TourItinerarySection({
                   {day.recommendations && day.recommendations.length > 0 && (
                     <div className="mb-8 rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-inner">
                       <h4 className="mb-3 flex items-center gap-2 text-lg font-semibold text-emerald-900">
-                        🎉 推薦行程
+                        推薦行程
                       </h4>
                       <ul className="space-y-2 text-emerald-800">
                         {day.recommendations.map((rec: string, recIndex: number) => (
@@ -220,7 +174,7 @@ export function TourItinerarySection({
 
                   {day.accommodation && (
                     <div className="mt-6 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 text-blue-900 shadow-inner">
-                      <p className="text-sm font-medium tracking-wide">🏨 住宿</p>
+                      <p className="text-sm font-medium tracking-wide">住宿</p>
                       <p className="mt-1 text-lg font-semibold">{day.accommodation}</p>
                     </div>
                   )}

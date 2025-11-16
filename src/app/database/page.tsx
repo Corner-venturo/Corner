@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MapPin, MapIcon, Calculator, Building2, ImageIcon } from 'lucide-react'
+import { MapPin, MapIcon, Bus, Building2, ImageIcon, FileText } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -18,21 +18,21 @@ const databaseModules = [
     count: 3,
   },
   {
-    id: 'activities',
-    title: '活動門票',
-    description: '管理景點門票和活動價格',
-    icon: MapIcon,
-    href: '/database/activities',
-    color: 'bg-purple-500',
-    count: 18,
-  },
-  {
     id: 'attractions',
     title: '景點管理',
     description: '管理各地區的旅遊景點資訊',
     icon: MapIcon,
     href: '/database/attractions',
     color: 'bg-rose-500',
+    count: 0,
+  },
+  {
+    id: 'transportation-rates',
+    title: '車資管理',
+    description: '管理各國車資參考報價',
+    icon: Bus,
+    href: '/database/transportation-rates',
+    color: 'bg-green-500',
     count: 0,
   },
   {
@@ -152,10 +152,18 @@ export default function DatabasePage() {
             <Button
               variant="outline"
               className="h-auto p-4 text-left flex flex-col items-start"
-              onClick={() => router.push('/database/activities')}
+              onClick={() => router.push('/database/transportation-rates')}
             >
-              <div className="font-medium text-morandi-primary">更新門票價格</div>
-              <div className="text-sm text-morandi-secondary mt-1">同步最新的景點門票價格</div>
+              <div className="font-medium text-morandi-primary">新增車資</div>
+              <div className="text-sm text-morandi-secondary mt-1">更新各國車資參考報價</div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto p-4 text-left flex flex-col items-start"
+              onClick={() => router.push('/database/attractions')}
+            >
+              <div className="font-medium text-morandi-primary">新增景點</div>
+              <div className="text-sm text-morandi-secondary mt-1">快速添加新的旅遊景點</div>
             </Button>
           </div>
         </div>

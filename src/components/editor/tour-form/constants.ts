@@ -9,12 +9,12 @@ import {
 import { IconOption } from './types'
 
 export const iconOptions: IconOption[] = [
-  { value: 'IconBuilding', label: '🏨 建築/飯店', component: IconBuilding },
-  { value: 'IconToolsKitchen2', label: '🍽️ 餐食', component: IconToolsKitchen2 },
-  { value: 'IconSparkles', label: '✨ 特色', component: IconSparkles },
-  { value: 'IconCalendar', label: '📅 行程', component: IconCalendar },
-  { value: 'IconPlane', label: '✈️ 航班', component: IconPlane },
-  { value: 'IconMapPin', label: '📍 景點', component: IconMapPin },
+  { value: 'IconBuilding', label: '建築/飯店', component: IconBuilding },
+  { value: 'IconToolsKitchen2', label: '餐食', component: IconToolsKitchen2 },
+  { value: 'IconSparkles', label: '特色', component: IconSparkles },
+  { value: 'IconCalendar', label: '行程', component: IconCalendar },
+  { value: 'IconPlane', label: '航班', component: IconPlane },
+  { value: 'IconMapPin', label: '景點', component: IconMapPin },
 ]
 
 // 城市圖片對照表（擴充版）

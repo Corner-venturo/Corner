@@ -25,6 +25,7 @@ export interface Esim {
   status: EsimStatus
   product_id?: string
   quantity: number
+  price?: number // 網卡單價（從 FastMove 取得）
   email?: string
   note?: string
   created_at: string

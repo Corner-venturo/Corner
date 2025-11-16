@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
@@ -20,7 +20,7 @@ export default function EsimsPage() {
   const [search, setSearch] = useState('')
 
   // 載入資料
-  React.useEffect(() => {
+  useEffect(() => {
     fetchEsims()
   }, [])
 
@@ -75,15 +75,6 @@ export default function EsimsPage() {
       ),
     },
     {
-      key: 'supplier_order_number',
-      label: '供應商訂單編號',
-      render: (_: unknown, row: Esim) => (
-        <span className="text-morandi-text-secondary text-xs font-mono">
-          {row.supplier_order_number || '-'}
-        </span>
-      ),
-    },
-    {
       key: 'product_id',
       label: '商品ID',
       render: (_: unknown, row: Esim) => (
@@ -95,6 +86,33 @@ export default function EsimsPage() {
       label: '數量',
       render: (_: unknown, row: Esim) => (
         <span className="text-morandi-text-primary">{row.quantity} 張</span>
+      ),
+    },
+    {
+      key: 'price',
+      label: '單價',
+      render: (_: unknown, row: Esim) => (
+        <span className="text-morandi-text-primary font-medium">
+          {row.price ? `$${row.price}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'total_amount',
+      label: '總金額',
+      render: (_: unknown, row: Esim) => (
+        <span className="text-morandi-gold font-semibold">
+          {row.price ? `$${row.price * row.quantity}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'supplier_order_number',
+      label: '供應商訂單號',
+      render: (_: unknown, row: Esim) => (
+        <span className="text-morandi-text-secondary text-xs font-mono">
+          {row.supplier_order_number || '-'}
+        </span>
       ),
     },
     {

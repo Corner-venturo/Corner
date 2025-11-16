@@ -1,5 +1,7 @@
-import React from 'react'
-import { ArrowLeft, Save, CheckCircle, Plane, FileText } from 'lucide-react'
+'use client'
+
+import React, { useState } from 'react'
+import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -22,10 +24,14 @@ interface QuoteHeaderProps {
   saveSuccess: boolean
   setIsSaveDialogOpen: (open: boolean) => void
   formatDateTime: (dateString: string) => string
-  handleLoadVersion: (versionData: any) => void
+  handleLoadVersion: (versionIndex: number, versionData: any) => void
+  handleSave: () => void
+  handleSaveAsNewVersion: () => void
   handleFinalize: () => void
   handleCreateTour: () => void
   handleGenerateQuotation: () => void
+  handleDeleteVersion: (versionIndex: number) => void
+  currentEditingVersion: number | null
   router: any
 }
 
@@ -62,11 +68,17 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   setIsSaveDialogOpen,
   formatDateTime,
   handleLoadVersion,
+  handleSave,
+  handleSaveAsNewVersion,
   handleFinalize,
   handleCreateTour,
   handleGenerateQuotation,
+  handleDeleteVersion,
+  currentEditingVersion,
   router,
 }) => {
+  const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
+
   return (
     <>
       {/* 特殊團鎖定警告 */}
@@ -127,15 +139,16 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         </div>
 
         {/* 右區：功能區域 (原中+右合併) */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           {/* 總人數 */}
-          <div className="flex items-center space-x-1 whitespace-nowrap text-xs">
-            <span className="text-morandi-secondary">總人數:</span>
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="text-sm text-morandi-secondary">總人數</span>
             <input
               type="number"
               value={
                 participantCounts.adult +
                 participantCounts.child_with_bed +
+                participantCounts.child_no_bed +
                 participantCounts.child_no_bed +
                 participantCounts.single_room +
                 participantCounts.infant
@@ -153,18 +166,20 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               }}
               disabled={isReadOnly}
               className={cn(
-                'w-16 px-2 py-1 text-xs text-center bg-morandi-container rounded border-0 focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                'w-10 h-8 px-1 text-sm text-center bg-morandi-container rounded leading-8 focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                 isReadOnly && 'cursor-not-allowed opacity-60'
               )}
             />
-            <span className="text-morandi-secondary">人</span>
+            <span className="text-sm text-morandi-secondary">人</span>
           </div>
 
-          <div className="flex items-center space-x-1 whitespace-nowrap">
-            <span className="text-sm text-morandi-secondary">狀態:</span>
+          <div className="h-4 w-px bg-morandi-container" />
+
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="text-sm text-morandi-secondary">狀態</span>
             <span
               className={cn(
-                'inline-flex items-center px-2 py-1 rounded text-sm font-medium',
+                'inline-flex items-center h-8 px-3 rounded text-sm font-medium',
                 quote && quote.status === 'proposed'
                   ? 'bg-morandi-gold text-white'
                   : 'bg-morandi-green text-white'
@@ -178,8 +193,10 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             </span>
           </div>
 
+          <div className="h-4 w-px bg-morandi-container" />
+
           <Button
-            onClick={() => setIsSaveDialogOpen(true)}
+            onClick={handleSave}
             disabled={isReadOnly}
             className={cn(
               'h-8 px-3 text-sm transition-all duration-200',
@@ -190,7 +207,20 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             )}
           >
             <Save size={14} className="mr-1.5" />
-            {saveSuccess ? '已保存' : '保存版本'}
+            {saveSuccess ? '已儲存' : '儲存'}
+          </Button>
+
+          <Button
+            onClick={() => setIsSaveDialogOpen(true)}
+            disabled={isReadOnly}
+            variant="outline"
+            className={cn(
+              'h-8 px-3 text-sm',
+              isReadOnly && 'cursor-not-allowed opacity-60'
+            )}
+          >
+            <Save size={14} className="mr-1.5" />
+            另存新版本
           </Button>
 
           <DropdownMenu>
@@ -202,56 +232,63 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               )}
             >
               <History size={14} className="mr-1.5" />
-              版本 {quote?.version || 1}
+              版本歷史
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64" align="end">
               <div className="px-2 py-1 text-sm font-medium text-morandi-primary border-b border-border">
                 版本歷史
               </div>
 
-              {/* 當前版本（僅在有未保存修改時顯示） */}
-              {!saveSuccess && (
-                <DropdownMenuItem className="flex items-center justify-between py-2">
-                  <div className="flex flex-col">
-                    <span className="font-medium">版本 {quote?.version || 1} (當前)</span>
-                    <span className="text-xs text-morandi-secondary">
-                      {quote?.updated_at ? formatDateTime(quote.updated_at) : ''}
-                    </span>
-                  </div>
-                  <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>
-                </DropdownMenuItem>
-              )}
-
               {/* 歷史版本 */}
-              {quote?.versions && quote.versions.length > 0 && (
+              {quote?.versions && quote.versions.length > 0 ? (
                 <>
                   {quote.versions
                     .sort((a: VersionRecord, b: VersionRecord) => b.version - a.version)
-                    .map((version: VersionRecord) => (
-                      <DropdownMenuItem
-                        key={version.id}
-                        className="flex items-center justify-between py-2 cursor-pointer hover:bg-morandi-container/30"
-                        onClick={() => handleLoadVersion(version)}
-                      >
-                        <div className="flex flex-col">
-                          <span className="font-medium">
-                            {version.note || `版本 ${version.version}`}
-                          </span>
-                          <span className="text-xs text-morandi-secondary">
-                            {formatDateTime(version.created_at)}
-                          </span>
-                        </div>
-                        <div className="text-xs text-morandi-secondary">
-                          NT$ {version.total_cost.toLocaleString()}
-                        </div>
-                      </DropdownMenuItem>
-                    ))}
+                    .map((version: VersionRecord, index: number) => {
+                      const isCurrentEditing = currentEditingVersion === index
+                      return (
+                        <DropdownMenuItem
+                          key={version.id}
+                          className="flex items-center justify-between py-2 cursor-pointer hover:bg-morandi-container/30 relative"
+                          onMouseEnter={() => setHoveredVersionIndex(index)}
+                          onMouseLeave={() => setHoveredVersionIndex(null)}
+                          onClick={() => handleLoadVersion(index, version)}
+                        >
+                          <div className="flex flex-col flex-1">
+                            <span className="font-medium">
+                              {version.note || `版本 ${version.version}`}
+                            </span>
+                            <span className="text-xs text-morandi-secondary">
+                              {formatDateTime(version.created_at)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-xs text-morandi-secondary">
+                              NT$ {version.total_cost.toLocaleString()}
+                            </div>
+                            {isCurrentEditing && (
+                              <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>
+                            )}
+                            {hoveredVersionIndex === index && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeleteVersion(index)
+                                }}
+                                className="p-1 hover:bg-red-100 rounded transition-colors"
+                                title="刪除版本"
+                              >
+                                <Trash2 size={14} className="text-red-500" />
+                              </button>
+                            )}
+                          </div>
+                        </DropdownMenuItem>
+                      )
+                    })}
                 </>
-              )}
-
-              {(!quote?.versions || quote.versions.length === 0) && (
+              ) : (
                 <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-                  尚無歷史版本
+                  尚無版本，點擊「另存新版本」創建第一個版本
                 </div>
               )}
             </DropdownMenuContent>

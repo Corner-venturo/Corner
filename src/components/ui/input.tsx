@@ -1,10 +1,63 @@
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
-import { withHalfWidthConversion } from '@/lib/utils/text'
+import { toHalfWidth } from '@/lib/utils/text'
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
-  ({ className, type, onChange, style, ...props }, ref) => {
+  ({ className, type, onChange, onKeyDown, style, ...props }, ref) => {
+    const isComposingRef = React.useRef(false)
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!onChange) return
+
+      // 如果正在使用輸入法，直接傳遞，不轉換
+      if (isComposingRef.current) {
+        onChange(e)
+        return
+      }
+
+      // 非輸入法狀態，進行全形轉半形
+      const convertedValue = toHalfWidth(e.target.value)
+      if (convertedValue !== e.target.value) {
+        const newEvent = {
+          ...e,
+          target: { ...e.target, value: convertedValue },
+        } as React.ChangeEvent<HTMLInputElement>
+        onChange(newEvent)
+      } else {
+        onChange(e)
+      }
+    }
+
+    const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+      isComposingRef.current = false
+
+      // 輸入法結束後，立即轉換全形到半形
+      if (onChange) {
+        const convertedValue = toHalfWidth(e.currentTarget.value)
+        if (convertedValue !== e.currentTarget.value) {
+          const syntheticEvent = {
+            target: { value: convertedValue },
+            currentTarget: { value: convertedValue },
+          } as React.ChangeEvent<HTMLInputElement>
+          onChange(syntheticEvent)
+        }
+      }
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // 先調用外部的 onKeyDown
+      if (onKeyDown) {
+        onKeyDown(e)
+      }
+
+      // 只在非中文輸入狀態下處理 Enter
+      if (e.key === 'Enter' && !isComposingRef.current && !e.defaultPrevented) {
+        e.preventDefault()
+        e.currentTarget.blur()
+      }
+    }
+
     return (
       <input
         type={type}
@@ -14,7 +67,10 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         )}
         style={style}
         ref={ref}
-        onChange={withHalfWidthConversion(onChange)}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onCompositionStart={() => { isComposingRef.current = true }}
+        onCompositionEnd={handleCompositionEnd}
         {...props}
       />
     )
