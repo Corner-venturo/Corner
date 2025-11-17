@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { StatusCell, ActionCell } from '@/components/table-cells'
@@ -14,7 +14,7 @@ import { EsimCreateDialog } from '@/features/esims/components/EsimCreateDialog'
 
 export default function EsimsPage() {
   const router = useRouter()
-  const { items, remove, fetchAll: fetchEsims } = useEsimStore()
+  const { items, delete: remove, fetchAll: fetchEsims } = useEsimStore()
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -127,8 +127,10 @@ export default function EsimsPage() {
       label: '操作',
       render: (_: unknown, row: Esim) => (
         <ActionCell
-          onEdit={() => router.push(`/esims/${row.esim_number}`)}
-          onDelete={() => handleDelete(row.id)}
+          actions={[
+            { icon: Edit2, label: '編輯', onClick: () => router.push(`/esims/${row.esim_number}`) },
+            { icon: Trash2, label: '刪除', onClick: () => handleDelete(row.id), variant: 'danger' },
+          ]}
         />
       ),
     },

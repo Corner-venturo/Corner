@@ -56,7 +56,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <Combobox
                   value={contactInfo.tour_id}
                   onChange={value => {
-                    setContactInfo(prev => ({ ...prev, tour_id: value, order_id: '' }))
+                    setContactInfo((prev: typeof contactInfo) => ({ ...prev, tour_id: value, order_id: '' }))
                   }}
                   options={tourOptions}
                   placeholder="請輸入或選擇團號（例如：0810）"
@@ -72,7 +72,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 </label>
                 <Combobox
                   value={contactInfo.order_id}
-                  onChange={value => setContactInfo(prev => ({ ...prev, order_id: value }))}
+                  onChange={value => setContactInfo((prev: typeof contactInfo) => ({ ...prev, order_id: value }))}
                   options={orderOptions}
                   placeholder={contactInfo.tour_id ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
                   className="mt-1"
@@ -89,7 +89,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <Input
                   value={contactInfo.contact_person}
                   onChange={e =>
-                    setContactInfo(prev => ({ ...prev, contact_person: e.target.value }))
+                    setContactInfo((prev: typeof contactInfo) => ({ ...prev, contact_person: e.target.value }))
                   }
                   className="mt-1"
                   placeholder="請輸入聯絡人"
@@ -100,7 +100,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <Input
                   value={contactInfo.applicant_name}
                   onChange={e =>
-                    setContactInfo(prev => ({ ...prev, applicant_name: e.target.value }))
+                    setContactInfo((prev: typeof contactInfo) => ({ ...prev, applicant_name: e.target.value }))
                   }
                   className="mt-1"
                   placeholder="請輸入申請人姓名"
@@ -111,7 +111,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                 <Input
                   value={contactInfo.contact_phone}
                   onChange={e =>
-                    setContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))
+                    setContactInfo((prev: typeof contactInfo) => ({ ...prev, contact_phone: e.target.value }))
                   }
                   className="mt-1"
                   placeholder="請輸入聯絡電話"

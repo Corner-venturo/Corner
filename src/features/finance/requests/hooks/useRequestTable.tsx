@@ -7,56 +7,56 @@ import { statusLabels, statusColors } from '../types'
 
 export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Table columns configuration
-  const tableColumns: TableColumn[] = useMemo(
+  const tableColumns: TableColumn<PaymentRequest>[] = useMemo(
     () => [
       {
         key: 'request_number',
         label: '請款單號',
         sortable: true,
         filterable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value) => <div className="font-medium text-morandi-primary">{String(value || '')}</div>,
       },
       {
-        key: 'tour_name',
-        label: '團號',
+        key: 'tour_id',
+        label: '關聯團號',
         sortable: true,
         filterable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value) => <div className="text-sm text-morandi-secondary">{String(value || '無')}</div>,
       },
       {
-        key: 'order_number',
+        key: 'code',
         label: '訂單編號',
         sortable: true,
         filterable: true,
-        render: value => <div className="text-sm text-morandi-primary">{value || '無'}</div>,
+        render: (value) => <div className="text-sm text-morandi-primary">{String(value || '無')}</div>,
       },
       {
-        key: 'request_date',
+        key: 'created_at',
         label: '請款日期',
         sortable: true,
         filterable: true,
         filterType: 'date',
-        render: (value, row) => (
+        render: (value, row: PaymentRequest) => (
           <div className="text-sm">
             <div
               className={
                 row.is_special_billing ? 'text-morandi-gold font-medium' : 'text-morandi-secondary'
               }
             >
-              {value ? new Date(value).toLocaleDateString('zh-TW') : '未設定'}
+              {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '未設定'}
             </div>
             {row.is_special_billing && <div className="text-xs text-morandi-gold">⚠️ 特殊出帳</div>}
           </div>
         ),
       },
       {
-        key: 'total_amount',
+        key: 'amount',
         label: '金額',
         sortable: true,
         filterable: true,
         filterType: 'number',
-        render: value => (
-          <div className="font-semibold text-morandi-gold">NT$ {value.toLocaleString()}</div>
+        render: (_value, row: PaymentRequest) => (
+          <div className="font-semibold text-morandi-gold">NT$ {row.amount.toLocaleString()}</div>
         ),
       },
       {
@@ -71,8 +71,8 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
           { value: 'confirmed', label: '已確認' },
           { value: 'paid', label: '已付款' },
         ],
-        render: value => {
-          const statusBadge = getStatusBadge(value)
+        render: (_value, row: PaymentRequest) => {
+          const statusBadge = getStatusBadge(row.status)
           return (
             <Badge className={cn('text-xs text-white', statusBadge.color)}>
               {statusBadge.label}
@@ -95,25 +95,25 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
             aValue = a.request_number
             bValue = b.request_number
             break
-          case 'tour_name':
-            aValue = a.tour_name || ''
-            bValue = b.tour_name || ''
+          case 'tour_id':
+            aValue = a.tour_id || ''
+            bValue = b.tour_id || ''
             break
-          case 'order_number':
-            aValue = a.order_number || ''
-            bValue = b.order_number || ''
+          case 'code':
+            aValue = a.code || ''
+            bValue = b.code || ''
             break
-          case 'request_date':
-            aValue = new Date(a.request_date || 0)
-            bValue = new Date(b.request_date || 0)
+          case 'created_at':
+            aValue = new Date(a.created_at || 0)
+            bValue = new Date(b.created_at || 0)
             break
-          case 'total_amount':
-            aValue = a.total_amount
-            bValue = b.total_amount
+          case 'amount':
+            aValue = a.amount
+            bValue = b.amount
             break
           case 'status':
-            aValue = statusLabels[a.status]
-            bValue = statusLabels[b.status]
+            aValue = a.status ? statusLabels[a.status] : ''
+            bValue = b.status ? statusLabels[b.status] : ''
             break
           default:
             return 0
@@ -133,14 +133,14 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
       return (
         (!filters.request_number ||
           request.request_number.toLowerCase().includes(filters.request_number.toLowerCase())) &&
-        (!filters.tour_name ||
-          (request.tour_name || '').toLowerCase().includes(filters.tour_name.toLowerCase())) &&
-        (!filters.order_number ||
-          (request.order_number || '')
+        (!filters.tour_id ||
+          (request.tour_id || '').toLowerCase().includes(filters.tour_id.toLowerCase())) &&
+        (!filters.code ||
+          (request.code || '')
             .toLowerCase()
-            .includes(filters.order_number.toLowerCase())) &&
-        (!filters.request_date || (request.request_date || '').includes(filters.request_date)) &&
-        (!filters.total_amount || request.total_amount.toString().includes(filters.total_amount)) &&
+            .includes(filters.code.toLowerCase())) &&
+        (!filters.created_at || (request.created_at || '').includes(filters.created_at)) &&
+        (!filters.amount || request.amount.toString().includes(filters.amount)) &&
         (!filters.status || request.status === filters.status)
       )
     })
@@ -150,7 +150,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
     data: filteredAndSortedRequests,
     handleSort,
     handleFilter,
-  } = useEnhancedTable(payment_requests as unknown, sortFunction, filterFunction)
+  } = useEnhancedTable(payment_requests as PaymentRequest[], sortFunction, filterFunction)
 
   return {
     tableColumns,
@@ -162,7 +162,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
 
 function getStatusBadge(status: PaymentRequest['status']) {
   return {
-    label: statusLabels[status],
-    color: statusColors[status],
+    label: status ? statusLabels[status] : '',
+    color: status ? statusColors[status] : '',
   }
 }

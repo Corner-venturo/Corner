@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -177,7 +178,7 @@ export function DateInput({
     try {
       input.showPicker()
     } catch (error) {
-      console.error('showPicker failed:', error)
+      logger.error('showPicker failed:', error)
       cleanup()
     }
   }

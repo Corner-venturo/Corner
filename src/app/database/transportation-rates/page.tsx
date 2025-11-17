@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { Bus, Plus } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -26,21 +27,21 @@ export default function TransportationRatesPage() {
   // 載入車資資料
   const fetchRates = async () => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('transportation_rates')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from as any)('transportation_rates')
       .select('*')
       .order('category')
       .order('supplier')
       .order('route')
 
     if (error) {
-      console.error('Error fetching rates:', error)
+      logger.error('Error fetching rates:', error)
       toast.error('載入車資資料失敗')
       setLoading(false)
       return
     }
 
-    setRates(data || [])
+    if (data) setRates(data)
     setLoading(false)
   }
 

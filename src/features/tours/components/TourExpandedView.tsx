@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import React from 'react'
 import { Tour } from '@/stores/types'
 import {
@@ -17,6 +18,7 @@ import {
   Edit2,
   MessageSquare,
 } from 'lucide-react'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { cn } from '@/lib/utils'
 import { ExpandableOrderTable } from '@/components/orders/expandable-order-table'
 import { TourMembers } from '@/components/tours/tour-members'
@@ -76,18 +78,19 @@ export function TourExpandedView({
   setTriggerCostAdd,
 }: TourExpandedViewProps) {
   const handleCreateChannel = async () => {
+    const auth = useRequireAuthSync()
+
+    if (!auth.isAuthenticated) {
+      const { toast } = await import('sonner')
+      auth.showLoginRequired()
+      return
+    }
+
     try {
       const { useWorkspaceChannels } = await import('@/stores/workspace/channels-store')
-      const { useAuthStore } = await import('@/stores/auth-store')
       const { toast } = await import('sonner')
 
       const { createChannel } = useWorkspaceChannels.getState()
-      const { user } = useAuthStore.getState()
-
-      if (!user) {
-        toast.error('請先登入')
-        return
-      }
 
       // 獲取預設工作空間 ID
       const { supabase } = await import('@/lib/supabase/client')
@@ -104,13 +107,13 @@ export function TourExpandedView({
         description: `${tour.code} - ${tour.departure_date || ''} 出發`,
         type: 'tour' as const,
         tour_id: tour.id,
-        created_by: user.id,
+        created_by: auth.user!.id,
       })
 
       toast.success(`已建立頻道：${tour.name || tour.code}`)
     } catch (error) {
       const { toast } = await import('sonner')
-      console.error('Failed to create channel:', error)
+      logger.error('Failed to create channel:', error)
       toast.error('建立頻道失敗')
     }
   }

@@ -71,31 +71,31 @@ export function DisbursementDialog({
         key: 'request_number',
         label: '請款單號',
         sortable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value) => <div className="font-medium text-morandi-primary">{String(value || '')}</div>,
       },
       {
         key: 'code',
         label: '團號',
         sortable: true,
-        render: value => <div className="font-medium">{value}</div>,
+        render: (value) => <div className="font-medium">{String(value || '')}</div>,
       },
       {
         key: 'tour_name',
         label: '團名',
         sortable: true,
-        render: value => <div className="text-morandi-secondary">{value}</div>,
+        render: (value) => <div className="text-morandi-secondary">{String(value || '')}</div>,
       },
       {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: value => <div className="text-sm text-morandi-secondary">{value}</div>,
+        render: (value) => <div className="text-sm text-morandi-secondary">{String(value || '')}</div>,
       },
       {
-        key: 'total_amount',
+        key: 'amount',
         label: '金額',
         sortable: true,
-        render: value => (
+        render: (value: unknown) => (
           <div className="font-bold text-morandi-primary text-right">
             NT$ {value.toLocaleString()}
           </div>

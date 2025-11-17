@@ -39,8 +39,8 @@ class CustomerService extends BaseService<Customer> {
       throw new ValidationError('phone', '電話格式錯誤')
     }
 
-    if (data.id_number && !this.isValidIdNumber(data.id_number)) {
-      throw new ValidationError('id_number', '身份證字號格式錯誤')
+    if (data.national_id && !this.isValidIdNumber(data.national_id)) {
+      throw new ValidationError('national_id', '身份證字號格式錯誤')
     }
   }
 
@@ -52,9 +52,9 @@ class CustomerService extends BaseService<Customer> {
     return /^[\d\s\-+()]{8,}$/.test(phone)
   }
 
-  private isValidIdNumber(id_number: string): boolean {
+  private isValidIdNumber(national_id: string): boolean {
     // 台灣身份證或護照基本驗證
-    return /^[A-Z][12]\d{8}$/.test(id_number) || /^[A-Z]{1,2}\d{6,9}$/.test(id_number)
+    return /^[A-Z][12]\d{8}$/.test(national_id) || /^[A-Z]{1,2}\d{6,9}$/.test(national_id)
   }
 
   // ========== 業務邏輯方法 ==========
@@ -67,7 +67,7 @@ class CustomerService extends BaseService<Customer> {
         c.name.toLowerCase().includes(term) ||
         c.email?.toLowerCase().includes(term) ||
         c.phone?.includes(term) ||
-        c.id_number?.toLowerCase().includes(term)
+        c.national_id?.toLowerCase().includes(term)
     )
   }
 

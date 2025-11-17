@@ -3,6 +3,7 @@
  * 統一管理所有 Store 的離線/線上同步邏輯
  */
 
+import { logger } from '@/lib/utils/logger'
 import { localDB, TableName } from '@/lib/db'
 import { supabase } from '@/lib/supabase/client'
 
@@ -45,7 +46,7 @@ export async function syncData<T extends { id: string; updated_at?: string }>(
     const raw = await localDB.getAll<T>(config.tableName)
     cachedData = config.filter ? raw.filter(config.filter) : raw
   } catch (error) {
-    console.warn(`[SyncManager] 本地載入失敗 (${config.tableName}):`, error)
+    logger.warn(`[SyncManager] 本地載入失敗 (${config.tableName}):`, error)
   }
 
   // 如果離線，直接返回快取
@@ -86,7 +87,7 @@ export async function syncData<T extends { id: string; updated_at?: string }>(
       conflicts,
     }
   } catch (error) {
-    console.error(`[SyncManager] 遠端同步失敗 (${config.tableName}):`, error)
+    logger.error(`[SyncManager] 遠端同步失敗 (${config.tableName}):`, error)
 
     // 同步失敗，返回快取
     return {
@@ -164,7 +165,7 @@ export async function loadLocal<T>(
     const data = await localDB.getAll<T>(tableName)
     return filter ? data.filter(filter) : data
   } catch (error) {
-    console.error(`[SyncManager] 本地載入失敗 (${tableName}):`, error)
+    logger.error(`[SyncManager] 本地載入失敗 (${tableName}):`, error)
     return []
   }
 }

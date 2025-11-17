@@ -30,7 +30,7 @@ interface ChannelListProps {
   isAdmin: boolean
   expandedSections: Record<string, boolean>
   // Callbacks
-  onSelectChannel: (channel: Channel) => void
+  onSelectChannel: (channel: Channel | null) => void
   toggleChannelFavorite: (id: string) => void
   onDelete: (id: string) => void
   onEdit: (id: string) => void
@@ -145,7 +145,7 @@ export function ChannelList({
               isAdmin={isAdmin}
               checkIsMember={checkIsMember}
               isExpanded={expandedSections.ungrouped !== false}
-              onToggleExpanded={(expanded: boolean) => onToggleExpanded('ungrouped', expanded)}
+              onToggleExpanded={() => onToggleExpanded('ungrouped', !expandedSections.ungrouped)}
               title="頻道"
               icon="hash"
               showAddButton
@@ -167,7 +167,7 @@ export function ChannelList({
               isAdmin={isAdmin}
               checkIsMember={checkIsMember}
               isExpanded={expandedSections.unjoined || false}
-              onToggleExpanded={(expanded: boolean) => onToggleExpanded('unjoined', expanded)}
+              onToggleExpanded={() => onToggleExpanded('unjoined', !expandedSections.unjoined)}
               title="未加入的頻道"
               icon="hash"
             />

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
+      logger.error('Supabase error:', error)
       return NextResponse.json({ error: 'Itinerary not found' }, { status: 404 })
     }
 
@@ -44,9 +45,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Itinerary not found' }, { status: 404 })
     }
 
+    // 可選：驗證 workspace_id（如果請求帶有 workspace header）
+    const requestedWorkspace = request.headers.get('x-workspace-id')
+    if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
+      logger.warn('Workspace mismatch:', {
+        requested: requestedWorkspace,
+        actual: data.workspace_id,
+      })
+      // 僅記錄警告，不阻擋請求（因為這是公開分享功能）
+    }
+
     return NextResponse.json(data)
   } catch (error) {
-    console.error('API error:', error)
+    logger.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

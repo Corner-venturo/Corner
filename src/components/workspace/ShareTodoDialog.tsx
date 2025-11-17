@@ -26,8 +26,8 @@ interface ShareTodoDialogProps {
 }
 
 export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDialogProps) {
-  const { items: todos, updateItem } = useTodoStore()
-  const { items: employees, loadItems } = useUserStore()
+  const { items: todos, update } = useTodoStore()
+  const { items: employees, fetchAll } = useUserStore()
   const { sendMessage } = useWorkspaceChat()
   const { user } = useAuthStore()
 
@@ -39,9 +39,9 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
   // 載入員工資料
   useEffect(() => {
     if (employees.length === 0) {
-      void loadItems()
+      void fetchAll()
     }
-  }, [employees.length, loadItems])
+  }, [employees.length, fetchAll])
 
   const selectedTodo = todos.find(t => t.id === selectedTodoId)
 
@@ -63,7 +63,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
     try {
       // 1. 如果選擇了指派對象，先更新代辦事項
       if (selectedAssignee && selectedAssignee !== selectedTodo.assignee) {
-        await updateItem(selectedTodo.id, { assignee: selectedAssignee })
+        await update(selectedTodo.id, { assignee: selectedAssignee })
       }
 
       // 2. 建立訊息內容

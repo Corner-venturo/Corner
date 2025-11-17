@@ -9,12 +9,19 @@ import { BarChart3, TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucid
 export default function ReportsPage() {
   const { items: tours } = useTourStore()
   const { items: _orders } = useOrderStore()
-  const payments: unknown[] = [] // 待實作: 完整財務報表
+
+  // 定義 Payment 型別
+  interface Payment {
+    type: '收款' | '請款'
+    amount: number
+  }
+
+  const payments: Payment[] = [] // 待實作: 完整財務報表
 
   const total_revenue = payments
-    .filter(p => p.type === '收款')
-    .reduce((sum, p) => sum + p.amount, 0)
-  const totalCosts = payments.filter(p => p.type === '請款').reduce((sum, p) => sum + p.amount, 0)
+    .filter((p: Payment) => p.type === '收款')
+    .reduce((sum: number, p: Payment) => sum + p.amount, 0)
+  const totalCosts = payments.filter((p: Payment) => p.type === '請款').reduce((sum: number, p: Payment) => sum + p.amount, 0)
   const netProfit = total_revenue - totalCosts
 
   return (

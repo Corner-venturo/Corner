@@ -1,14 +1,17 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
-import { Users, Edit2, Trash2, UserX } from 'lucide-react'
+import { SalaryPaymentDialog, SalaryPaymentData } from '@/components/hr/salary-payment-dialog'
+import { Users, Edit2, Trash2, UserX, DollarSign } from 'lucide-react'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
@@ -19,6 +22,7 @@ export default function HRPage() {
   const { items: workspaces, fetchAll: fetchWorkspaces } = useWorkspaceStoreData()
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isSalaryPaymentDialogOpen, setIsSalaryPaymentDialogOpen] = useState(false)
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
   // 初始化時載入員工和工作空間資料
@@ -122,7 +126,7 @@ export default function HRPage() {
     (workspaceId: string | undefined) => {
       if (!workspaceId) return '未設定'
       const workspace = workspaces.find(w => w.id === workspaceId)
-      return workspace ? `${workspace.name} (${workspace.code})` : '未知辦公室'
+      return workspace ? workspace.name : '未知辦公室'
     },
     [workspaces]
   )
@@ -134,21 +138,21 @@ export default function HRPage() {
         key: 'employee_number',
         label: '員工編號',
         sortable: true,
-        render: value => <span className="font-mono text-sm">{value}</span>,
+        render: (value) => <span className="font-mono text-sm">{String(value || '')}</span>,
       },
       {
         key: 'display_name',
         label: '姓名',
         sortable: true,
-        render: (value, employee) => (
-          <span className="font-medium">{value || employee.chinese_name || '未命名員工'}</span>
+        render: (value, employee: Employee) => (
+          <span className="font-medium">{String(value || employee.chinese_name || '未命名員工')}</span>
         ),
       },
       {
         key: 'workspace_id',
         label: '所屬辦公室',
         sortable: true,
-        render: (value, employee) => (
+        render: (_value, employee: Employee) => (
           <span className="text-sm font-medium text-morandi-primary">
             {getWorkspaceName(employee.workspace_id)}
           </span>
@@ -158,28 +162,35 @@ export default function HRPage() {
         key: 'job_info',
         label: '職位',
         sortable: false,
-        render: value => <span className="text-sm">{value?.position || '未設定'}</span>,
+        render: (_value, employee: Employee) => (
+          <span className="text-sm">{(employee.job_info as any)?.position || '未設定'}</span>
+        ),
       },
       {
         key: 'personal_info',
         label: '聯絡方式',
         sortable: false,
-        render: value => (
-          <div className="text-sm">
-            <div>{value?.phone || '未提供'}</div>
-            <div className="text-morandi-muted text-xs truncate max-w-[200px]">
-              {value?.email || '未提供'}
+        render: (_value, employee: Employee) => {
+          const info = employee.personal_info as { phone?: string | string[]; email?: string } | null
+          return (
+            <div className="text-sm">
+              <div>{Array.isArray(info?.phone) ? info.phone[0] : info?.phone || '未提供'}</div>
+              <div className="text-morandi-muted text-xs truncate max-w-[200px]">
+                {info?.email || '未提供'}
+              </div>
             </div>
-          </div>
-        ),
+          )
+        },
       },
       {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: value => (
-          <span className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(value)}`}>
-            {getStatusLabel(value)}
+        render: (_value, employee: Employee) => (
+          <span
+            className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(employee.status as any)}`}
+          >
+            {getStatusLabel(employee.status as any)}
           </span>
         ),
       },
@@ -187,10 +198,10 @@ export default function HRPage() {
         key: 'hire_date',
         label: '入職日期',
         sortable: true,
-        render: (_value, employee) => {
+        render: (_value, employee: Employee) => {
           if (!employee.job_info?.hire_date)
             return <span className="text-morandi-muted text-sm">未設定</span>
-          return <DateCell value={employee.job_info.hire_date} />
+          return <DateCell date={employee.job_info.hire_date} />
         },
       },
     ],
@@ -228,6 +239,13 @@ export default function HRPage() {
     []
   )
 
+  // Handle salary payment submission
+  const handleSalaryPaymentSubmit = async (data: SalaryPaymentData) => {
+    // TODO: 創建薪資請款單
+    logger.log('建立薪資請款：', data)
+    // 這裡之後要實作創建請款單的邏輯
+  }
+
   return (
     <>
       <ListPageLayout
@@ -239,18 +257,31 @@ export default function HRPage() {
         ]}
         data={users}
         columns={columns}
-        searchFields={[
-          'display_name',
-          'employee_number',
-          'personal_info.email',
-          'personal_info.phone',
-        ]}
+        searchFields={['display_name', 'employee_number', 'personal_info'] as (keyof Employee)[]}
         searchPlaceholder="搜尋員工..."
         onRowClick={handleEmployeeClick}
         renderActions={renderActions}
-        onAdd={() => setIsAddDialogOpen(true)}
-        addButtonLabel="新增員工"
         bordered={true}
+        headerActions={
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setIsSalaryPaymentDialogOpen(true)}
+              className="bg-morandi-gold hover:bg-morandi-gold/90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+            >
+              <DollarSign className="w-4 h-4 mr-2" />
+              薪資請款
+            </Button>
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              新增員工
+            </Button>
+          </div>
+        }
       />
 
       {/* 員工詳細資料展開視圖 */}
@@ -273,6 +304,14 @@ export default function HRPage() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* 薪資請款對話框 */}
+      <SalaryPaymentDialog
+        open={isSalaryPaymentDialogOpen}
+        onOpenChange={setIsSalaryPaymentDialogOpen}
+        employees={users}
+        onSubmit={handleSalaryPaymentSubmit}
+      />
 
       {/* Confirm Dialog */}
       <ConfirmDialog {...confirmDialogProps} />

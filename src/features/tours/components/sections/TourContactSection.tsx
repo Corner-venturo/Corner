@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
@@ -40,7 +41,7 @@ export function TourContactSection({ data, viewMode }: TourContactSectionProps) 
           setSelectedEmployee(sales[0])
         }
       } catch (error) {
-        console.error('載入業務人員失敗:', error)
+        logger.error('載入業務人員失敗:', error)
       }
     }
 

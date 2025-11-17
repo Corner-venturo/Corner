@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -135,7 +136,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         quick_quote_items: items, // ✅ 儲存 items 到 quick_quote_items 欄位
       }
 
-      console.log('🔄 [QuickQuote] 準備儲存:', {
+      logger.log('🔄 [QuickQuote] 準備儲存:', {
         quoteId: quote.id,
         itemsCount: items.length,
         totalAmount,
@@ -144,13 +145,13 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
       await onUpdate(updateData)
 
-      console.log('✅ [QuickQuote] 儲存成功')
+      logger.log('✅ [QuickQuote] 儲存成功')
       if (showAlert) {
         setIsEditing(false)
         alert('儲存成功！')
       }
     } catch (error) {
-      console.error('❌ [QuickQuote] 儲存失敗:', error)
+      logger.error('❌ [QuickQuote] 儲存失敗:', error)
       if (showAlert) {
         alert('儲存失敗：' + (error as Error).message)
       }
@@ -200,12 +201,12 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         versions: [...(quote.versions || []), versionData],
       })
 
-      console.log('✅ [QuickQuote] 儲存版本成功:', versionData)
+      logger.log('✅ [QuickQuote] 儲存版本成功:', versionData)
       setIsSaveVersionDialogOpen(false)
       setVersionName('')
       alert('版本儲存成功！')
     } catch (error) {
-      console.error('❌ [QuickQuote] 儲存版本失敗:', error)
+      logger.error('❌ [QuickQuote] 儲存版本失敗:', error)
       alert('版本儲存失敗：' + (error as Error).message)
     } finally {
       setIsSaving(false)
@@ -254,7 +255,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       await onUpdate({ status: 'billed' })
       setShowPrintPreview(false)
     } catch (error) {
-      console.error('更新狀態失敗:', error)
+      logger.error('更新狀態失敗:', error)
     }
   }
 

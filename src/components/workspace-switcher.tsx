@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useWorkspaceStore } from '@/stores'
 import { switchWorkspace } from '@/hooks/use-workspace-rls'
@@ -20,9 +21,7 @@ export function WorkspaceSwitcher() {
   const { workspaces, currentWorkspaceId } = useWorkspaceStore()
   const [switching, setSwitching] = useState(false)
 
-  const currentWorkspace = workspaces.find(
-    w => w.id === currentWorkspaceId || w.code === currentWorkspaceId
-  )
+  const currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId)
 
   const handleSwitch = async (workspaceId: string) => {
     if (workspaceId === currentWorkspaceId || switching) {
@@ -33,7 +32,7 @@ export function WorkspaceSwitcher() {
     try {
       await switchWorkspace(workspaceId)
     } catch (error) {
-      console.error('切換 Workspace 失敗:', error)
+      logger.error('切換 Workspace 失敗:', error)
       alert('切換失敗，請稍後再試')
       setSwitching(false)
     }
@@ -58,12 +57,12 @@ export function WorkspaceSwitcher() {
           .map(workspace => (
             <DropdownMenuItem
               key={workspace.id}
-              onClick={() => handleSwitch(workspace.id || workspace.code)}
+              onClick={() => handleSwitch(workspace.id)}
               className="cursor-pointer"
             >
               <div className="flex items-center justify-between w-full">
                 <span>{workspace.name}</span>
-                {(workspace.id === currentWorkspaceId || workspace.code === currentWorkspaceId) && (
+                {workspace.id === currentWorkspaceId && (
                   <Check size={16} className="text-morandi-gold" />
                 )}
               </div>

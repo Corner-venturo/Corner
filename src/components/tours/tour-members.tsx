@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Tour } from '@/stores/types'
 import { useOrderStore, useMemberStore } from '@/stores'
@@ -348,7 +349,7 @@ export const TourMembers = React.memo(function TourMembers({
             }
           }}
           onKeyDown={e => {
-            console.log('Key pressed:', e.key, 'Field:', field, 'Row:', rowIndex)
+            logger.log('Key pressed:', e.key, 'Field:', field, 'Row:', rowIndex)
 
             // Enter：移動到下一列同一欄位
             if (e.key === 'Enter') {

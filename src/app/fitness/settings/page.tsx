@@ -44,9 +44,9 @@ export default function FitnessSettingsPage() {
             </div>
             <div>
               <div className="font-medium text-[#3D2914]">
-                {user?.user_metadata?.full_name || '使用者'}
+                {user?.display_name || user?.chinese_name || '使用者'}
               </div>
-              <div className="text-sm text-[#9E8F81]">{user?.email}</div>
+              <div className="text-sm text-[#9E8F81]">{user?.personal_info?.email}</div>
             </div>
           </div>
         </div>

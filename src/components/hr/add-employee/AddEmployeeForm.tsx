@@ -57,7 +57,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
               <SelectContent>
                 {availableWorkspaces.map(workspace => (
                   <SelectItem key={workspace.id} value={workspace.id}>
-                    {workspace.name} ({workspace.code})
+                    {workspace.name}
                   </SelectItem>
                 ))}
               </SelectContent>

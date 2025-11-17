@@ -11,7 +11,7 @@ import type { Channel } from '@/stores/workspace-store'
 interface ChannelListSectionProps {
   channels: Channel[]
   selectedChannelId: string | null
-  onSelectChannel: (channelId: string) => void
+  onSelectChannel: (channel: Channel | null) => void
   toggleChannelFavorite: (channelId: string) => void
   onDelete: (channelId: string) => void
   onEdit: (channelId: string) => void
@@ -98,7 +98,7 @@ interface GroupedChannelListProps {
   group: import('@/stores/workspace-store').ChannelGroup
   channels: Channel[]
   selectedChannelId: string | null
-  onSelectChannel: (channelId: string) => void
+  onSelectChannel: (channel: Channel | null) => void
   toggleChannelFavorite: (channelId: string) => void
   onDelete: (channelId: string) => void
   onEdit: (channelId: string) => void
@@ -131,7 +131,7 @@ export function GroupedChannelList({
         <DroppableGroupHeader
           groupId={group.id}
           groupName={group.name}
-          isCollapsed={group.is_collapsed}
+          isCollapsed={group.is_collapsed ?? false}
           onToggle={() => toggleGroupCollapse(group.id)}
           onDelete={handleDeleteGroupClick}
         />

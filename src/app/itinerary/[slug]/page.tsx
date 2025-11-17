@@ -64,8 +64,8 @@ export default function EditItineraryPage() {
           const { countries, cities } = useRegionsStore.getState()
 
           // 找到國家和城市名稱
-          const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
-          const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
+          const country = tour.country_id ? countries.find((c: { id: string }) => c.id === tour.country_id) : null
+          const city = tour.main_city_id ? cities.find((c: { id: string }) => c.id === tour.main_city_id) : null
 
           // 計算天數
           const departureDate = new Date(tour.departure_date)
@@ -174,14 +174,14 @@ export default function EditItineraryPage() {
     ? {
         ...itineraryData,
         features:
-          itineraryData.features?.map(f => ({
+          itineraryData.features?.map((f: { icon: string }) => ({
             ...f,
             iconComponent: iconMap[f.icon] || IconSparkles,
           })) || [],
       }
     : null
 
-  const typedItinerary = useMemo(() => itineraryData, [itineraryData])
+  const typedItinerary = useMemo(() => itineraryData as any, [itineraryData])
   const totalDays = useMemo(
     () =>
       Array.isArray(typedItinerary?.dailyItinerary) ? typedItinerary.dailyItinerary.length : 0,

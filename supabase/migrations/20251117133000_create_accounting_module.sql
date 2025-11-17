@@ -142,6 +142,12 @@ INSERT INTO public.accounting_subjects (workspace_id, code, name, type, level, i
 (NULL, '1100', '流動資產', 'asset', 2, true, true),
 (NULL, '1101', '現金', 'asset', 3, true, true),
 (NULL, '1102', '銀行存款', 'asset', 3, true, true),
+(NULL, '110201', '銀行存款-中國信託', 'asset', 4, true, true),
+(NULL, '110202', '銀行存款-台灣銀行', 'asset', 4, true, true),
+(NULL, '110203', '銀行存款-玉山銀行', 'asset', 4, true, true),
+(NULL, '110204', '銀行存款-國泰世華', 'asset', 4, true, true),
+(NULL, '110205', '銀行存款-第一銀行', 'asset', 4, true, true),
+(NULL, '110206', '銀行存款-台新銀行', 'asset', 4, true, true),
 (NULL, '1103', '應收帳款', 'asset', 3, true, true),
 (NULL, '1104', '預付團費', 'asset', 3, true, true),
 
@@ -183,6 +189,7 @@ ON CONFLICT (workspace_id, code) DO NOTHING;
 -- =====================================================
 UPDATE public.accounting_subjects SET parent_id = (SELECT id FROM public.accounting_subjects WHERE code = '1000') WHERE code = '1100';
 UPDATE public.accounting_subjects SET parent_id = (SELECT id FROM public.accounting_subjects WHERE code = '1100') WHERE code IN ('1101', '1102', '1103', '1104');
+UPDATE public.accounting_subjects SET parent_id = (SELECT id FROM public.accounting_subjects WHERE code = '1102') WHERE code IN ('110201', '110202', '110203', '110204', '110205', '110206');
 UPDATE public.accounting_subjects SET parent_id = (SELECT id FROM public.accounting_subjects WHERE code = '2000') WHERE code = '2100';
 UPDATE public.accounting_subjects SET parent_id = (SELECT id FROM public.accounting_subjects WHERE code = '2100') WHERE code IN ('2101', '2102');
 UPDATE public.accounting_subjects SET parent_id = (SELECT id FROM public.accounting_subjects WHERE code = '3000') WHERE code IN ('3101', '3201');

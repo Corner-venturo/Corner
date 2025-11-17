@@ -30,19 +30,20 @@ export interface ExpandableConfig {
 
 export interface EnhancedTableProps {
   columns: TableColumn[]
-  data: unknown[]
+  data: any[]
   loading?: boolean
   error?: string | null
   onSort?: (column: string, direction: 'asc' | 'desc') => void
   onFilter?: (filters: Record<string, string>) => void
-  onRowClick?: (row: any, rowIndex: number) => void
+  onRowClick?: (row: any, rowIndex?: number) => void
   onRowDoubleClick?: (row: any, rowIndex: number) => void
   className?: string
   showFilters?: boolean
-  searchableFields?: string[]
+  searchableFields?: readonly string[]
   initialPageSize?: number
   searchTerm?: string
   emptyState?: React.ReactNode
+  emptyMessage?: string
   defaultSort?: { key: string; direction: 'asc' | 'desc' }
   searchable?: boolean
   searchPlaceholder?: string
@@ -51,6 +52,8 @@ export interface EnhancedTableProps {
   actions?: (row: any) => React.ReactNode
   rowClassName?: (row: any) => string
   _bordered?: boolean
+  bordered?: boolean
   striped?: boolean
   hoverable?: boolean
+  isLoading?: boolean
 }

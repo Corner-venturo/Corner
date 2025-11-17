@@ -6,6 +6,7 @@ export interface FullCalendarEvent {
   title: string
   start: string
   end?: string
+  allDay?: boolean // 🔥 新增：是否為全天事件
   backgroundColor: string
   borderColor: string
   extendedProps: {
@@ -19,7 +20,12 @@ export interface FullCalendarEvent {
     code?: string
     member_id?: string
     member_name?: string
+    customer_id?: string
+    customer_name?: string
     order_id?: string
+    created_by?: string
+    creator_name?: string
+    source?: 'member' | 'customer'
   }
 }
 

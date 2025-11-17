@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
 /**
  * IndexedDB 版本管理器
@@ -29,13 +30,13 @@ export async function checkAndHandleVersion(): Promise<boolean> {
   }
 
   // 版本不同，需要處理升級
-  console.log(`🔄 [IndexedDB] 偵測到版本變化: v${lastVersion} -> v${currentVersion}`)
+  logger.log(`🔄 [IndexedDB] 偵測到版本變化: v${lastVersion} -> v${currentVersion}`)
 
   // ✅ 不清空資料庫，直接更新版本記錄
   // IndexedDB 的 onupgradeneeded 會自動處理表格建立
   localStorage.setItem(VERSION_KEY, currentVersion)
 
-  console.log('✅ [IndexedDB] 版本更新完成（資料保留）')
+  logger.log('✅ [IndexedDB] 版本更新完成（資料保留）')
   return false // 不需要重新同步，資料都還在
 }
 

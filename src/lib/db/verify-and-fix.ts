@@ -9,6 +9,7 @@
  * 2. 或直接在任何頁面執行（已自動掛載到 window）
  */
 
+import { logger } from '@/lib/utils/logger'
 import { localDB } from '@/lib/db'
 import { Employee as User } from '@/stores/types'
 
@@ -28,7 +29,7 @@ export async function verifyAndFix() {
 
     if (users.length > 0) {
       users.forEach(u => {
-        console.log(`User: ${u.employee_number}, Status: ${u.status}`)
+        logger.log(`User: ${u.employee_number}, Status: ${u.status}`)
       })
     }
 

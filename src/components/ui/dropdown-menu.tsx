@@ -28,7 +28,8 @@ const DropdownMenu = React.forwardRef<
     <div ref={ref} className={cn('relative', className)} {...props}>
       {React.Children.map(children, child =>
         React.isValidElement(child)
-          ? React.cloneElement(child, {
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            React.cloneElement(child as any, {
               isOpen,
               onOpenChange: handleOpenChange,
             })

@@ -5,6 +5,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
@@ -85,7 +86,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           .single()
 
         if (error) {
-          console.error('載入 Logo 失敗:', error)
+          logger.error('載入 Logo 失敗:', error)
           return
         }
 
@@ -97,7 +98,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
           setLogoUrl(`${urlData.publicUrl}?t=${Date.now()}`)
         }
       } catch (error) {
-        console.error('載入 Logo 錯誤:', error)
+        logger.error('載入 Logo 錯誤:', error)
       }
     }
 

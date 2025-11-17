@@ -3,12 +3,15 @@
 export interface Workspace {
   id: string
   name: string
-  description?: string
-  icon?: string
-  is_active: boolean
-  created_by?: string
-  created_at?: string
-  updated_at?: string
+  description?: string | null
+  icon?: string | null
+  is_active: boolean | null
+  created_by?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  _deleted?: boolean | null
+  _needs_sync?: boolean | null
+  _synced_at?: string | null
 }
 
 export interface Bulletin {
@@ -32,14 +35,21 @@ export interface Channel {
   id: string
   workspace_id: string
   name: string
-  description?: string
-  type: 'public' | 'private' | 'direct'
-  created_by?: string
+  description?: string | null
+  type: 'public' | 'private' | 'direct' | string | null
+  created_by?: string | null
   created_at: string
-  is_favorite?: boolean
-  group_id?: string
-  tour_id?: string
-  order?: number
+  is_favorite?: boolean | null
+  is_archived?: boolean | null
+  archived_at?: string | null
+  is_pinned?: boolean | null
+  group_id?: string | null
+  tour_id?: string | null
+  order?: number | null
+  updated_at?: string | null
+  _deleted?: boolean | null
+  _needs_sync?: boolean | null
+  _synced_at?: string | null
 }
 
 export interface ChannelGroup {

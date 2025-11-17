@@ -5,6 +5,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
 import { initLocalDatabase } from '@/lib/db/init-local-data'
 
@@ -20,7 +21,7 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
         await useWorkspaceStoreData.getState().fetchAll()
       } catch (error) {
-        console.error('AppInitializer error:', error)
+        logger.error('AppInitializer error:', error)
       }
     }
 

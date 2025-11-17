@@ -5,6 +5,7 @@ import { Lock, EyeOff, Eye } from 'lucide-react'
 import { alert, alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
 interface AccountSettingsProps {
   user: {
@@ -38,6 +39,13 @@ export function AccountSettings({
   setPasswordUpdateLoading,
 }: AccountSettingsProps) {
   const handlePasswordUpdate = async () => {
+    const auth = useRequireAuthSync()
+
+    if (!auth.isAuthenticated) {
+      auth.showLoginRequired()
+      return
+    }
+
     if (!user) {
       await alertWarning('請先登入')
       return
@@ -91,7 +99,7 @@ export function AccountSettings({
 
       const isPasswordValid = await verifyPassword(
         passwordData.currentPassword,
-        userData.password_hash
+        userData.password_hash || ''
       )
       if (!isPasswordValid) {
         await alertError('目前密碼錯誤！')

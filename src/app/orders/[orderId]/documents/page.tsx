@@ -58,10 +58,10 @@ export default function DocumentsDetailPage() {
         label: '文件名稱',
         sortable: true,
         filterable: true,
-        render: (value, row) => (
+        render: (value, row: any) => (
           <div className="flex items-center space-x-2">
             {getFileIcon(row._type)}
-            <span className="font-medium text-morandi-primary">{value}</span>
+            <span className="font-medium text-morandi-primary">{String(value || '')}</span>
           </div>
         ),
       },
@@ -76,14 +76,14 @@ export default function DocumentsDetailPage() {
           { value: '保險文件', label: '保險文件' },
           { value: '成員資料', label: '成員資料' },
         ],
-        render: value => (
+        render: (value) => (
           <span
             className={cn(
               'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
               'bg-morandi-container text-morandi-primary'
             )}
           >
-            {value}
+            {String(value || '')}
           </span>
         ),
       },
@@ -92,14 +92,14 @@ export default function DocumentsDetailPage() {
         label: '類型',
         sortable: true,
         filterable: true,
-        render: value => <span className="text-morandi-secondary">{value}</span>,
+        render: (value) => <span className="text-morandi-secondary">{String(value || '')}</span>,
       },
       {
         key: 'size',
         label: '大小',
         sortable: true,
         filterable: true,
-        render: value => <span className="text-morandi-secondary">{value}</span>,
+        render: (value) => <span className="text-morandi-secondary">{String(value || '')}</span>,
       },
       {
         key: 'uploadDate',
@@ -107,7 +107,7 @@ export default function DocumentsDetailPage() {
         sortable: true,
         filterable: true,
         filterType: 'date',
-        render: value => <span className="text-morandi-secondary">{value}</span>,
+        render: (value) => <span className="text-morandi-secondary">{String(value || '')}</span>,
       },
       {
         key: 'actions',
@@ -142,8 +142,8 @@ export default function DocumentsDetailPage() {
   )
 
   // 排序和篩選函數
-  const sortFunction = (data: unknown[], column: string, direction: 'asc' | 'desc') => {
-    return [...data].sort((a, b) => {
+  const sortFunction = (data: any[], column: string, direction: 'asc' | 'desc') => {
+    return [...data].sort((a: any, b: any) => {
       let aValue: string | number | Date = a[column as keyof typeof a]
       let bValue: string | number | Date = b[column as keyof typeof b]
 
@@ -158,8 +158,8 @@ export default function DocumentsDetailPage() {
     })
   }
 
-  const filterFunction = (data: unknown[], filters: Record<string, string>) => {
-    return data.filter(doc => {
+  const filterFunction = (data: any[], filters: Record<string, string>) => {
+    return data.filter((doc: any) => {
       return (
         (!filters.name || doc.name.toLowerCase().includes(filters.name.toLowerCase())) &&
         (!filters.category || doc.category === filters.category) &&

@@ -230,7 +230,7 @@ export function ReactDatasheetWrapper({
           onSelect={handleSelect}
           parsePaste={parsePaste}
           tabBehaviour="default"
-          onKeyDown={e => {
+          onKeyDown={(e: React.KeyboardEvent) => {
             if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
               e.preventDefault()
               e.stopPropagation()

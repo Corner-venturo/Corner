@@ -18,7 +18,7 @@ export class OfflineAuthService {
       // 從 IndexedDB 讀取真實使用者
       await localDB.init() // 確保資料庫已初始化
       const users = await localDB.getAll(TABLES.EMPLOYEES)
-      const employee = users.find(u => u.employee_number === email || u.employee_number === email)
+      const employee = users.find(u => u.employee_number === email) as any
 
       if (!employee) {
         return {
@@ -27,8 +27,8 @@ export class OfflineAuthService {
         }
       }
 
-      // 驗證密碼 - 支援多種欄位名稱
-      const password_hash = employee.password_hash || employee.password_hash
+      // 驗證密碼
+      const password_hash = employee.password_hash
       if (!password_hash) {
         return {
           success: false,
@@ -52,29 +52,24 @@ export class OfflineAuthService {
         throw encErr
       }
 
-      // 支援多種屬性名稱格式
+      // 從 employee 建立 profile
       const profile: LocalProfile = {
         id: employee.id,
-        email: employee.email || employee.employee_number + '@venturo.local',
-        employee_number: employee.employee_number || employee.employee_number,
-        display_name: employee.name || employee.display_name || employee.display_name,
-        english_name: employee.english_name || employee.english_name || employee.name,
+        email: employee.personal_info?.email || employee.employee_number + '@venturo.local',
+        employee_number: employee.employee_number,
+        display_name: employee.display_name || employee.chinese_name || employee.english_name || '',
+        english_name: employee.english_name || '',
         role: this.determineRole(employee.permissions),
         permissions: employee.permissions || [],
         cachedPassword: encryptedPassword,
-        personal_info: employee.personal_info || employee.personal_info,
-        job_info: employee.job_info ||
-          employee.job_info || {
-            department: employee.department,
-            position: employee.position,
-            salary: employee.salary,
-          },
-        salary_info: employee.salary_info || employee.salary_info,
+        personal_info: employee.personal_info,
+        job_info: employee.job_info,
+        salary_info: employee.salary_info,
         contracts: employee.contracts,
         attendance: employee.attendance,
         lastLoginAt: new Date().toISOString(),
-        created_at: employee.created_at || employee.created_at || new Date().toISOString(),
-        status: employee.is_active || employee.is_active ? 'active' : 'inactive',
+        created_at: employee.created_at || new Date().toISOString(),
+        status: employee.status || 'active',
       }
 
       // 4. 儲存到本地

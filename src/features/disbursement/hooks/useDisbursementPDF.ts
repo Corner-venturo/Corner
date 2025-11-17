@@ -3,6 +3,7 @@
  * 處理出納單 PDF 生成邏輯
  */
 
+import { logger } from '@/lib/utils/logger'
 import { useCallback } from 'react'
 import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
 import { usePaymentRequestStore, usePaymentRequestItemStore } from '@/stores'
@@ -42,7 +43,7 @@ export function useDisbursementPDF() {
           paymentRequestItems: relatedItems,
         })
       } catch (error) {
-        console.error('生成 PDF 失敗:', error)
+        logger.error('生成 PDF 失敗:', error)
         alert('❌ 生成 PDF 失敗，請稍後再試')
       }
     },

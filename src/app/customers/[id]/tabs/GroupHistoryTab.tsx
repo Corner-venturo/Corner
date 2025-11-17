@@ -65,7 +65,7 @@ export function GroupHistoryTab({ customerId }: GroupHistoryTabProps) {
           return_date: tour.return_date,
           status: order.status,
           member_count: orderMembers.length,
-          total_price: order.total_price || 0,
+          total_price: order.total_amount || 0,
           created_at: order.created_at,
         }
       })

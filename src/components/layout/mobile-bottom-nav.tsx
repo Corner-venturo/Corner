@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -102,7 +103,7 @@ function getStoredNavItems(): string[] {
       return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_SELECTED_IDS
     }
   } catch (error) {
-    console.error('Failed to parse mobile nav config:', error)
+    logger.error('Failed to parse mobile nav config:', error)
   }
 
   return DEFAULT_SELECTED_IDS
@@ -115,7 +116,7 @@ function saveNavItems(itemIds: string[]) {
   try {
     localStorage.setItem('venturo_mobile_nav', JSON.stringify(itemIds))
   } catch (error) {
-    console.error('Failed to save mobile nav config:', error)
+    logger.error('Failed to save mobile nav config:', error)
   }
 }
 

@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EditableRatesTable } from '@/components/transportation/editable-rates-table'
@@ -41,7 +42,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     const { error } = await supabase.from('transportation_rates').update(updates).eq('id', id)
 
     if (error) {
-      console.error('Error updating rate:', error)
+      logger.error('Error updating rate:', error)
       toast.error('更新失敗')
       return
     }
@@ -57,7 +58,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     const { error } = await supabase.from('transportation_rates').delete().eq('id', id)
 
     if (error) {
-      console.error('Error deleting rate:', error)
+      logger.error('Error deleting rate:', error)
       toast.error('刪除失敗')
       return
     }
@@ -82,7 +83,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     })
 
     if (error) {
-      console.error('Error creating rate:', error)
+      logger.error('Error creating rate:', error)
       toast.error('新增失敗')
       return
     }

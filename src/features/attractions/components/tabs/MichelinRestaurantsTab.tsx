@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Star, Edit2, Power, Trash2 } from 'lucide-react'
@@ -77,7 +78,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         }
       }
     } catch (error: any) {
-      console.error('載入米其林餐廳失敗:', error)
+      logger.error('載入米其林餐廳失敗:', error)
       toast.error('載入失敗：' + error.message)
     } finally {
       setLoading(false)
@@ -257,7 +258,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
           initialPageSize={20}
           onRowClick={restaurant => {
             // TODO: 打開編輯對話框
-            console.log('Edit restaurant:', restaurant)
+            logger.log('Edit restaurant:', restaurant)
           }}
           actions={(restaurant: MichelinRestaurant) => (
             <div className="flex items-center gap-1">
@@ -267,7 +268,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                 onClick={e => {
                   e.stopPropagation()
                   // TODO: 打開編輯對話框
-                  console.log('Edit restaurant:', restaurant)
+                  logger.log('Edit restaurant:', restaurant)
                 }}
                 className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
                 title="編輯"

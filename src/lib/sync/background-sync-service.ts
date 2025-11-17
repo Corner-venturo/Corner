@@ -96,8 +96,7 @@ export class BackgroundSyncService {
 
           // 上傳到 Supabase（會自動生成正式編號）
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: supabaseData, error } = await supabase
-            .from(tableName)
+          const { data: supabaseData, error } = await (supabase.from as any)(tableName)
             .insert([itemData])
             .select()
             .single()
@@ -173,39 +172,37 @@ export class BackgroundSyncService {
 
           // 🔥 特殊處理：為 quotes 表補充必填欄位的預設值
           if (tableName === 'quotes') {
-            const quoteData = syncData
+            const quoteData = syncData as Record<string, unknown>
             // 如果缺少 customer_name，提供預設值
-            if (!(quoteData as { customer_name?: string }).customer_name) {
-              ;(quoteData as { customer_name: string }).customer_name = '待指定'
+            if (!quoteData.customer_name) {
+              quoteData.customer_name = '待指定'
             }
             // 確保其他必填欄位也有值
-            if (!(quoteData as { destination?: string }).destination) {
-              ;(quoteData as { destination: string }).destination = '待指定'
+            if (!quoteData.destination) {
+              quoteData.destination = '待指定'
             }
-            if (!(quoteData as { start_date?: string }).start_date) {
-              ;(quoteData as { start_date: string }).start_date = new Date()
-                .toISOString()
-                .split('T')[0]
+            if (!quoteData.start_date) {
+              quoteData.start_date = new Date().toISOString().split('T')[0]
             }
-            if (!(quoteData as { end_date?: string }).end_date) {
-              ;(quoteData as { end_date: string }).end_date = new Date().toISOString().split('T')[0]
+            if (!quoteData.end_date) {
+              quoteData.end_date = new Date().toISOString().split('T')[0]
             }
-            if (!(quoteData as { days?: number }).days) {
-              ;(quoteData as { days: number }).days = 1
+            if (!quoteData.days) {
+              quoteData.days = 1
             }
-            if (!(quoteData as { nights?: number }).nights) {
-              ;(quoteData as { nights: number }).nights = 0
+            if (!quoteData.nights) {
+              quoteData.nights = 0
             }
-            if (!(quoteData as { number_of_people?: number }).number_of_people) {
-              ;(quoteData as { number_of_people: number }).number_of_people = 1
+            if (!quoteData.number_of_people) {
+              quoteData.number_of_people = 1
             }
-            if (!(quoteData as { total_amount?: number }).total_amount) {
-              ;(quoteData as { total_amount: number }).total_amount = 0
+            if (!quoteData.total_amount) {
+              quoteData.total_amount = 0
             }
           }
 
-          // 🔥 先檢查 syncQueue 是否有此項目的刪除記錄
-          const allQueueItems = await localDB.getAll('syncQueue')
+          // 🔥 先檢查 syncqueue 是否有此項目的刪除記錄
+          const allQueueItems = await localDB.getAll('syncqueue')
           const hasDeleteRecord = allQueueItems.some(queueItem => {
             if (!isSyncQueueItem(queueItem)) return false
             return (
@@ -223,8 +220,8 @@ export class BackgroundSyncService {
           }
 
           // 檢查是否已存在（update）或新建（insert）
-          const { data: existing } = await supabase
-            .from(tableName)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: existing } = await (supabase.from as any)(tableName)
             .select('id')
             .eq('id', item.id)
             .maybeSingle() // ✅ 使用 maybeSingle() 避免 406 錯誤
@@ -232,7 +229,7 @@ export class BackgroundSyncService {
           if (existing) {
             // 更新
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await supabase.from(tableName).update(syncData).eq('id', item.id)
+            const { error } = await (supabase.from as any)(tableName).update(syncData).eq('id', item.id)
 
             if (error) throw error
             logger.log(`✅ [${tableName}] 更新成功: ${item.id}`)
@@ -254,7 +251,7 @@ export class BackgroundSyncService {
 
             // 真的是新資料，執行插入
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await supabase.from(tableName).insert([syncData])
+            const { error } = await (supabase.from as any)(tableName).insert([syncData])
 
             if (error) throw error
             logger.log(`✅ [${tableName}] 新增成功: ${item.id}`)
@@ -306,8 +303,8 @@ export class BackgroundSyncService {
    */
   private async syncPendingDeletes(tableName: TableName): Promise<void> {
     try {
-      // 從 syncQueue 表中取得該表的刪除操作
-      const allQueueItems = await localDB.getAll('syncQueue')
+      // 從 syncqueue 表中取得該表的刪除操作
+      const allQueueItems = await localDB.getAll('syncqueue')
 
       // 使用型別守衛過濾刪除操作
       const pendingDeletes = allQueueItems.filter((item): item is SyncQueueItem => {
@@ -322,10 +319,11 @@ export class BackgroundSyncService {
       for (const queueItem of pendingDeletes) {
         try {
           // 從 Supabase 刪除
-          const { error } = await supabase.from(tableName).delete().eq('id', queueItem.record_id)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (supabase.from as any)(tableName).delete().eq('id', queueItem.record_id)
 
           // 刪除成功或資料已不存在，清除隊列記錄
-          await localDB.delete('syncQueue', queueItem.id)
+          await localDB.delete('syncqueue', queueItem.id)
 
           if (error) {
             logger.warn(
@@ -360,7 +358,7 @@ export class BackgroundSyncService {
       })
 
       // 檢查是否有刪除隊列
-      const allQueueItems = await localDB.getAll('syncQueue')
+      const allQueueItems = await localDB.getAll('syncqueue')
       const hasDeletePending = allQueueItems.some(item => {
         if (!isSyncQueueItem(item)) return false
         return item.table_name === tableName && item.operation === 'delete'
@@ -388,7 +386,7 @@ export class BackgroundSyncService {
       }).length
 
       // 計算刪除隊列數量
-      const allQueueItems = await localDB.getAll('syncQueue')
+      const allQueueItems = await localDB.getAll('syncqueue')
       const deletePendingCount = allQueueItems.filter(item => {
         if (!isSyncQueueItem(item)) return false
         return item.table_name === tableName && item.operation === 'delete'

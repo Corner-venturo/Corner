@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 export function PublishButton({ data }: { data: any }) {
   const [saving, setSaving] = useState(false)
   const { create, update } = useItineraryStore()
-  const { _user } = useAuthStore()
+  const { user } = useAuthStore()
   const router = useRouter()
 
   const saveItinerary = async () => {

@@ -28,6 +28,18 @@ export async function update<T extends BaseEntity>(
   const { tableName, enableSupabase } = config
 
   try {
+    // 取得當前使用者 ID（用於自動填入 updated_by）
+    const getUserId = () => {
+      try {
+        const { useAuthStore } = require('@/stores/auth-store')
+        const { user } = useAuthStore.getState()
+        return user?.id || null
+      } catch {
+        return null
+      }
+    }
+    const userId = getUserId()
+
     // 清理資料：將空字串的時間欄位轉為 null（PostgreSQL 不接受空字串）
     const cleanedData = { ...data } as Record<string, unknown>
     Object.keys(cleanedData).forEach(key => {
@@ -37,6 +49,11 @@ export async function update<T extends BaseEntity>(
         cleanedData[key] = null
       }
     })
+
+    // 自動填入 updated_by（如果資料中沒有提供且有登入使用者）
+    if (cleanedData.updated_by === undefined && userId) {
+      cleanedData.updated_by = userId
+    }
 
     // ✅ 步驟 1：更新 IndexedDB（本地快取）⚡ 立即反映
     await indexedDB.update(id, cleanedData as UpdateInput<T>)

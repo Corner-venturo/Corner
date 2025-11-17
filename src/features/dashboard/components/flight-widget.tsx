@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import {
   Plane,
@@ -95,7 +96,7 @@ function setCachedData(query: string, data: FlightData | RouteData[]) {
 
     localStorage.setItem(STORAGE_KEYS.CACHE, JSON.stringify(newCache))
   } catch (error) {
-    console.error('快取儲存失敗:', error)
+    logger.error('快取儲存失敗:', error)
   }
 }
 
@@ -130,7 +131,7 @@ function incrementApiKeyUsage(apiKey: string) {
 
     localStorage.setItem(STORAGE_KEYS.API_KEYS, JSON.stringify(updatedKeys))
   } catch (error) {
-    console.error('更新 API 使用次數失敗:', error)
+    logger.error('更新 API 使用次數失敗:', error)
   }
 }
 

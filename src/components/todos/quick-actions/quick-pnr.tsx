@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -37,14 +38,14 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
     setIsParsing(true)
     try {
       const parsed = parseAmadeusPNR(rawPNR)
-      console.log('🔍 解析結果:', parsed)
-      console.log('📅 出票期限:', parsed.ticketingDeadline)
-      console.log('✈️ 航班數量:', parsed.segments.length)
+      logger.log('🔍 解析結果:', parsed)
+      logger.log('📅 出票期限:', parsed.ticketingDeadline)
+      logger.log('✈️ 航班數量:', parsed.segments.length)
       setParsedData(parsed)
       toast.success('電報解析成功！')
     } catch (error) {
       toast.error('電報格式錯誤，請檢查內容')
-      console.error(error)
+      logger.error(error)
     } finally {
       setIsParsing(false)
     }
@@ -52,7 +53,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
 
   // 新增期限到待辦事項
   const handleAddDeadline = async () => {
-    console.log('🔍 handleAddDeadline called', {
+    logger.log('🔍 handleAddDeadline called', {
       parsedData,
       onUpdate: !!onUpdate,
       todo
@@ -65,7 +66,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
 
     if (!onUpdate) {
       toast.error('無法更新待辦事項（onUpdate 未傳入）')
-      console.error('❌ onUpdate is not defined');
+      logger.error('❌ onUpdate is not defined');
       return
     }
 
@@ -76,10 +77,10 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
         title: `出票：${parsedData.recordLocator} - ${parsedData.passengerNames[0]}`,
       };
 
-      console.log('📝 Updating todo with:', JSON.stringify(updates, null, 2));
-      console.log('📝 Update keys:', Object.keys(updates));
+      logger.log('📝 Updating todo with:', JSON.stringify(updates, null, 2));
+      logger.log('📝 Update keys:', Object.keys(updates));
       await onUpdate(updates);
-      console.log('✅ Todo updated successfully');
+      logger.log('✅ Todo updated successfully');
 
       // 儲存 PNR 記錄
       if (user && currentWorkspace && parsedData.recordLocator) {
@@ -102,7 +103,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
       // 不清空電報，讓使用者可以繼續操作
     } catch (error) {
       toast.error('設定失敗，請稍後再試')
-      console.error('新增期限失敗:', error)
+      logger.error('新增期限失敗:', error)
     }
   }
 
@@ -154,7 +155,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
       // 不清空電報，讓使用者可以繼續操作
     } catch (error) {
       toast.error('新增失敗，請稍後再試')
-      console.error('新增行事曆失敗:', error)
+      logger.error('新增行事曆失敗:', error)
     }
   }
 

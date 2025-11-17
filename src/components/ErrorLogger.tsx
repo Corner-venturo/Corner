@@ -5,7 +5,8 @@ import { useEffect } from 'react'
 export function ErrorLogger() {
   useEffect(() => {
     // 🔥 暫時禁用以查看完整錯誤訊息
-    return
+    /* eslint-disable no-unreachable */
+    return undefined
 
     // 捕獲未處理的錯誤
     const handleError = (event: ErrorEvent) => {
@@ -115,6 +116,7 @@ export function ErrorLogger() {
       window.removeEventListener('unhandledrejection', handleRejection)
       console.error = originalConsoleError
     }
+    /* eslint-enable no-unreachable */
   }, [])
 
   return null

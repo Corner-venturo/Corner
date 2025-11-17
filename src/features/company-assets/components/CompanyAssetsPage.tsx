@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,7 +37,7 @@ export const CompanyAssetsPage: React.FC = () => {
       if (error) throw error
       setAssets(data || [])
     } catch (error) {
-      console.error('載入公司資源失敗:', error)
+      logger.error('載入公司資源失敗:', error)
     }
   }
 
@@ -59,12 +60,12 @@ export const CompanyAssetsPage: React.FC = () => {
         .upload(filePath, file)
 
       if (uploadError) {
-        console.error('Storage upload error:', uploadError)
+        logger.error('Storage upload error:', uploadError)
         throw uploadError
       }
 
       // 儲存到資料表
-      const userName = user?.full_name || user?.display_name || user?.email || 'Unknown'
+      const userName = user?.display_name || user?.chinese_name || user?.personal_info?.email || 'Unknown'
 
       const { error: dbError } = await supabase.from('company_assets').insert({
         name: file.name,
@@ -77,14 +78,14 @@ export const CompanyAssetsPage: React.FC = () => {
       })
 
       if (dbError) {
-        console.error('Database insert error:', dbError)
+        logger.error('Database insert error:', dbError)
         throw dbError
       }
 
       alert('上傳成功！')
       fetchAssets()
     } catch (error: any) {
-      console.error('上傳失敗:', error)
+      logger.error('上傳失敗:', error)
       alert(`上傳失敗: ${error.message || '未知錯誤'}`)
     } finally {
       setIsUploading(false)
@@ -111,7 +112,7 @@ export const CompanyAssetsPage: React.FC = () => {
       alert('刪除成功！')
       fetchAssets()
     } catch (error) {
-      console.error('刪除失敗:', error)
+      logger.error('刪除失敗:', error)
       alert('刪除失敗')
     }
   }

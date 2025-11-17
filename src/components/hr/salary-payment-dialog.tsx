@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Employee } from '@/stores/types'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface SalaryPaymentDialogProps {
   open: boolean
@@ -27,6 +28,7 @@ export interface SalaryPaymentData {
 }
 
 export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }: SalaryPaymentDialogProps) {
+  const currentUser = useAuthStore(state => state.user)
   const [requestDate, setRequestDate] = useState('')
   const [isSpecialBilling, setIsSpecialBilling] = useState(false)
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([])
@@ -48,10 +50,24 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
     return thursdays
   }, [])
 
-  // Filter active employees
+  // Filter active employees by workspace
   const activeEmployees = useMemo(
-    () => employees.filter(emp => emp.status === 'active' || emp.status === 'probation'),
-    [employees]
+    () =>
+      employees
+        .filter(emp => {
+          // 過濾特殊帳號
+          if (emp.employee_number === 'liao00') return false
+
+          // 只顯示同一個 workspace 的員工
+          const isSameWorkspace = emp.workspace_id === currentUser?.workspace_id
+          const isActive = emp.status === 'active' || emp.status === 'probation'
+          return isSameWorkspace && isActive
+        })
+        .map(emp => ({
+          ...emp,
+          monthly_salary: (emp as any).monthly_salary ?? 30000,
+        })),
+    [employees, currentUser?.workspace_id]
   )
 
   // Toggle employee selection
@@ -65,7 +81,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
   const totalAmount = useMemo(() => {
     return selectedEmployeeIds.reduce((sum, empId) => {
       const employee = activeEmployees.find(e => e.id === empId)
-      const amount = customAmounts[empId] ?? employee?.monthly_salary ?? 30000
+      const amount = customAmounts[empId] ?? (employee as any)?.monthly_salary ?? 30000
       return sum + amount
     }, 0)
   }, [selectedEmployeeIds, customAmounts, activeEmployees])
@@ -77,8 +93,8 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
       const employee = activeEmployees.find(e => e.id === empId)!
       return {
         employee_id: empId,
-        employee_name: employee.name,
-        amount: customAmounts[empId] ?? employee.monthly_salary ?? 30000,
+        employee_name: employee.display_name || employee.chinese_name,
+        amount: customAmounts[empId] ?? (employee as any).monthly_salary ?? 30000,
       }
     })
 
@@ -181,7 +197,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {activeEmployees.map(employee => {
                 const isSelected = selectedEmployeeIds.includes(employee.id)
-                const amount = customAmounts[employee.id] ?? employee.monthly_salary ?? 30000
+                const amount = customAmounts[employee.id] ?? (employee as any).monthly_salary ?? 30000
 
                 return (
                   <div
@@ -198,9 +214,11 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                       className="w-4 h-4 rounded border-morandi-container"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">{employee.name}</div>
+                      <div className="font-medium text-sm">
+                        {employee.display_name || employee.chinese_name}
+                      </div>
                       <div className="text-xs text-morandi-secondary">
-                        {employee.email} · 預設薪資: NT$ {(employee.monthly_salary ?? 30000).toLocaleString()}
+                        {employee.personal_info?.email || 'N/A'} · 預設薪資: NT$ {((employee as any).monthly_salary ?? 30000).toLocaleString()}
                       </div>
                     </div>
                     {isSelected && (

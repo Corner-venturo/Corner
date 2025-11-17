@@ -2,6 +2,7 @@
  * 收款管理資料處理 Hook
  */
 
+import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
 import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
@@ -53,7 +54,7 @@ export function usePaymentData() {
         alert(`❌ LinkPay 生成失敗: ${data.message}`)
       }
     } catch (error) {
-      console.error('LinkPay API 錯誤:', error)
+      logger.error('LinkPay API 錯誤:', error)
       alert('❌ LinkPay 連結生成失敗')
     }
   }

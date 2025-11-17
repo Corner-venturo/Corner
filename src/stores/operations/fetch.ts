@@ -60,15 +60,31 @@ export async function fetchAll<T extends BaseEntity>(
       try {
         const latestItems = await supabase.fetchAll(controller?.signal)
 
-        // Step 3: 更新快取（清空舊資料 + 寫入新資料）
-        // 說明：因為 Supabase 是唯一的 Source of Truth，
-        //      我們直接清空並重寫快取，確保資料完全一致
-        //      沒有離線編輯功能，所以不會丟失本地變更
-        await indexedDB.clear()
-        await indexedDB.batchPut(latestItems)
+        // Step 3: 合併本地待同步資料與雲端資料
+        // 說明：保留 _needs_sync: true 的本地資料，避免重新整理時丟失
+        const allCachedItems = await indexedDB.getAll()
+        const pendingSyncItems = allCachedItems.filter(
+          (item: any) => item._needs_sync === true
+        )
 
-        logger.log(`✅ [${tableName}] 從 Supabase 同步 ${latestItems.length} 筆資料`)
-        return latestItems
+        // 建立已同步資料的 ID 集合（用於快速查找）
+        const syncedIds = new Set(latestItems.map(item => item.id))
+
+        // 合併策略：
+        // 1. Supabase 的資料（已同步）
+        // 2. 本地待同步的資料（不在 Supabase 中的）
+        const mergedItems = [
+          ...latestItems,
+          ...pendingSyncItems.filter(item => !syncedIds.has(item.id))
+        ]
+
+        // Step 4: 更新快取
+        await indexedDB.clear()
+        await indexedDB.batchPut(mergedItems)
+
+        logger.log(`✅ [${tableName}] 同步完成：Supabase ${latestItems.length} 筆 + 待同步 ${pendingSyncItems.length} 筆`)
+
+        return applyWorkspaceFilter(mergedItems) // ✅ 套用 workspace 篩選後返回
       } catch (supabaseError) {
         // Step 4: Supabase 失敗時，使用快取（唯讀降級模式）
         logger.warn(

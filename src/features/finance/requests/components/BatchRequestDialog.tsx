@@ -66,7 +66,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
 
     const employeeList = employees.map(e => ({
       id: e.id,
-      name: e.name,
+      name: e.display_name || e.chinese_name || e.english_name || 'Unknown',
       type: 'employee' as const,
       group: '員工',
     }))

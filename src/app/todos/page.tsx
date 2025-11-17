@@ -16,6 +16,7 @@ import { useTodoStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { alertError, alertWarning } from '@/lib/ui/alert-dialog'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import {
   CheckCircle,
   Clock,
@@ -303,15 +304,17 @@ export default function TodosPage() {
 
   const handleAddTodo = useCallback(
     async (formData: any) => {
-      if (!user?.id) {
-        await alertWarning('請先登入')
+      const auth = useRequireAuthSync()
+
+      if (!auth.isAuthenticated) {
+        auth.showLoginRequired()
         return
       }
 
       try {
         // 計算 visibility - 包含建立者和被指派者
-        const visibilityList = [user.id]
-        if (formData.assignee && formData.assignee !== user.id) {
+        const visibilityList = [auth.user!.id]
+        if (formData.assignee && formData.assignee !== auth.user!.id) {
           visibilityList.push(formData.assignee)
         }
 
@@ -321,7 +324,7 @@ export default function TodosPage() {
           deadline: formData.deadline || null, // ✅ 空字串轉 null
           status: 'pending' as const,
           completed: false,
-          creator: user.id, // ✅ 使用當前登入用戶
+          creator: auth.user!.id, // ✅ 使用當前登入用戶
           assignee: formData.assignee || null,
           visibility: visibilityList, // ✅ 包含建立者和被指派者
           related_items: [],
@@ -337,7 +340,7 @@ export default function TodosPage() {
         await alertError('新增失敗，請稍後再試')
       }
     },
-    [addTodo, user?.id]
+    [addTodo]
   )
 
   return (
@@ -365,8 +368,9 @@ export default function TodosPage() {
                 !e.nativeEvent.isComposing
               ) {
                 e.preventDefault()
-                if (!user?.id) {
-                  await alertWarning('請先登入')
+                const auth = useRequireAuthSync()
+                if (!auth.isAuthenticated) {
+                  auth.showLoginRequired()
                   return
                 }
                 const title = quickAddValue.trim()
@@ -379,9 +383,9 @@ export default function TodosPage() {
                   deadline: null, // ✅ 使用 null 而非空字串
                   status: 'pending' as const,
                   completed: false,
-                  creator: user.id,
+                  creator: auth.user!.id,
                   assignee: null,
-                  visibility: [user.id],
+                  visibility: [auth.user!.id],
                   related_items: [],
                   sub_tasks: [],
                   notes: [],
@@ -511,7 +515,7 @@ export default function TodosPage() {
 }
 
 // 新增待辦事項表單組件
-function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data) => void; onCancel: () => void }) {
+function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: { title: string; priority: 1 | 2 | 3 | 4 | 5; deadline: string; assigned_user_id: string; description: string; tags: string[] }) => void; onCancel: () => void }) {
   const { items: users, fetchAll: loadUsersFromDatabase } = useUserStore()
   const [isLoadingUsers, _setIsLoadingUsers] = useState(false)
   const [formData, setFormData] = useState({

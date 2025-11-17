@@ -15,6 +15,7 @@ import { SyncCoordinator } from '../sync/coordinator'
 import { generateCode } from '../utils/code-generator'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
+import { useAuthStore } from '@/stores/auth-store'
 
 /**
  * Lazy get workspace code to avoid circular dependency
@@ -100,6 +101,15 @@ export async function create<T extends BaseEntity>(
 ): Promise<T> {
   const { tableName, codePrefix, enableSupabase } = config
 
+  // 🔥 最早期的 debug：檢查傳入的 data
+  if (tableName === 'quotes') {
+    logger.log('🔍 [create.ts] 一開始收到的 data:', {
+      quote_type: (data as any).quote_type,
+      codePrefix,
+      tableName,
+    })
+  }
+
   try {
     // 生成 ID 和時間戳記
     const id = generateUUID()
@@ -112,11 +122,34 @@ export async function create<T extends BaseEntity>(
     const tablesWithoutWorkspaceId = [
       'quote_items',
       'order_members',
+      'members', // ✅ 新增：團員表
+      'payment_request_items', // ✅ 新增：請款項目
       'tour_participants',
       'itinerary_days',
       'itinerary_activities',
     ]
     const shouldAddWorkspaceId = !tablesWithoutWorkspaceId.includes(tableName)
+
+    // 檢查資料中是否已有 workspace_id
+    const hasWorkspaceId = !!(data as Record<string, unknown>).workspace_id
+
+    // 如果需要 workspace_id 但資料中沒有，且無法取得，則拋出錯誤
+    if (shouldAddWorkspaceId && !hasWorkspaceId && !workspaceId) {
+      const errorMsg = `❌ [${tableName}] 無法取得 workspace_id，請確認已登入`
+      logger.error(errorMsg)
+      throw new Error(errorMsg)
+    }
+
+    // 取得當前使用者 ID（用於自動填入 created_by/updated_by）
+    const getUserId = () => {
+      try {
+        const { user } = useAuthStore.getState()
+        return user?.id || null
+      } catch {
+        return null
+      }
+    }
+    const userId = getUserId()
 
     // 如果有 codePrefix，生成編號
     let recordData = {
@@ -124,31 +157,53 @@ export async function create<T extends BaseEntity>(
       id,
       created_at: now,
       updated_at: now,
-      // 自動填入 workspace_id（如果資料中沒有提供且能取得且表格需要）
-      ...(shouldAddWorkspaceId &&
-      workspaceId &&
-      !(data as Record<string, unknown>).workspace_id
+      // 自動填入 workspace_id（如果資料中沒有提供且表格需要）
+      ...(shouldAddWorkspaceId && !hasWorkspaceId && workspaceId
         ? { workspace_id: workspaceId }
+        : {}),
+      // 自動填入 created_by（如果資料中沒有提供且有登入使用者）
+      ...((data as Record<string, unknown>).created_by === undefined && userId
+        ? { created_by: userId }
+        : {}),
+      // 自動填入 updated_by（如果資料中沒有提供且有登入使用者）
+      ...((data as Record<string, unknown>).updated_by === undefined && userId
+        ? { updated_by: userId }
         : {}),
     } as T
 
     if (codePrefix) {
       const existingCode = (data as Record<string, unknown>).code
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
+        // 🔥 修正：從 IndexedDB 讀取所有資料以生成編號（避免重複）
+        const allItemsFromDB = await indexedDB.getAll()
+        const itemsForCodeGeneration = allItemsFromDB.filter(
+          item => !item._deleted && item.workspace_id === workspaceId
+        )
+
         // 延遲取得 workspace code（避免循環依賴）
         const workspaceCode = await getWorkspaceCodeLazy()
         if (workspaceCode) {
-          // 傳遞 quote_type 給 generateCode（用於區分快速報價單和標準報價單）
+          // 🔥 傳遞 quote_type 給 generateCode（用於區分快速報價單和標準報價單）
           const quoteType = (data as Record<string, unknown>).quote_type as string | undefined
+
+          logger.log('🔍 [create.ts] generateCode 參數:', {
+            workspaceCode,
+            codePrefix,
+            quoteType,
+            dataQuoteType: (data as any).quote_type,
+          })
+
           const code = generateCode(
             workspaceCode,
             { prefix: codePrefix, quoteType } as any,
-            existingItems
+            itemsForCodeGeneration as BaseEntity[] // 🔥 使用 IndexedDB 資料
           )
+
+          logger.log('✅ [create.ts] 生成編號:', code)
           recordData = { ...recordData, code } as T
         } else {
           // 沒有 workspace code，使用傳統編號（無前綴）
-          const code = generateCode('', { prefix: codePrefix }, existingItems)
+          const code = generateCode('', { prefix: codePrefix }, itemsForCodeGeneration as BaseEntity[])
           recordData = { ...recordData, code } as T
         }
       }
@@ -170,22 +225,35 @@ export async function create<T extends BaseEntity>(
       })
 
       // 使用 put (upsert) 而非 insert，避免主鍵衝突
-      supabase.put(cleanedData as T).catch(error => {
+      supabase.put(cleanedData as T).catch(async error => {
         logger.error(`❌ [${tableName}] Supabase 背景同步失敗（資料僅存於本地）:`, {
           error,
           data: cleanedData,
           message: '重新整理頁面後此資料可能消失！'
         })
 
+        // 🔥 重要：標記為待同步，避免重新整理時資料消失
+        try {
+          const dataWithSync = {
+            ...recordData,
+            _needs_sync: true,
+            _synced_at: null
+          } as T
+          await indexedDB.put(dataWithSync)
+          logger.log(`✅ [${tableName}] 已標記為待同步，資料將在網路恢復後自動上傳`)
+        } catch (updateError) {
+          logger.error(`❌ [${tableName}] 無法標記待同步狀態:`, updateError)
+        }
+
         // 在開發環境顯示警告
         if (process.env.NODE_ENV === 'development') {
-          console.error(`
+          logger.error(`
 🚨 Supabase 同步失敗警告 🚨
 表格: ${tableName}
 錯誤: ${error?.message || error}
 資料 ID: ${cleanedData.id}
 
-⚠️ 此資料僅儲存在本地 IndexedDB，重新整理頁面後可能消失！
+⚠️ 資料已標記為「待同步」，網路恢復後將自動上傳
           `)
         }
       })

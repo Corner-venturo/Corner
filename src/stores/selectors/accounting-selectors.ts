@@ -25,7 +25,7 @@ export function useAccountBalance(accountId: string) {
       return account?.balance || 0
     },
     // Shallow equality check - 只有當 balance 改變時才更新
-    (a, b) => a === b
+    (a: number, b: number) => a === b
   )
 }
 
@@ -62,7 +62,7 @@ export function useAccountBalanceMap() {
       return map
     },
     // 自定義比較函數 - 比較 Map 內容
-    (a, b) => {
+    (a: Map<string, number>, b: Map<string, number>) => {
       if (a.size !== b.size) return false
       for (const [key, value] of a) {
         if (b.get(key) !== value) return false

@@ -2,6 +2,8 @@
  * Supabase Realtime 統一入口
  */
 
+'use client'
+
 export { realtimeManager, RealtimeManager } from './realtime-manager'
 export {
   useRealtimeSubscription,

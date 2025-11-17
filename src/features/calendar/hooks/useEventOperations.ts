@@ -97,6 +97,7 @@ export function useEventOperations() {
         title: info.event.title,
         start: info.event.startStr,
         end: info.event.endStr,
+        allDay: info.event.allDay, // 🔥 傳遞 allDay 屬性（從 FullCalendar 事件取得）
         backgroundColor: info.event.backgroundColor || '',
         borderColor: info.event.borderColor || '',
         extendedProps: info.event.extendedProps,

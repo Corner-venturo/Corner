@@ -2,6 +2,7 @@
  * 查詢操作模組
  */
 
+import { logger } from '@/lib/utils/logger'
 import type { TableName } from '../schemas'
 import type { FilterCondition } from '../types'
 import { compareValues } from '../utils/helpers'
@@ -58,7 +59,7 @@ export async function count(db: IDBDatabase, tableName: TableName): Promise<numb
 
     request.onerror = () => {
       const error = new Error(`計數失敗 (${tableName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })

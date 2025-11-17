@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useMemo } from 'react'
 import { Receipt as ReceiptIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -105,7 +106,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
       onSubmit?.()
       resetForm()
     } catch (error) {
-      console.error('❌ Save Error:', error)
+      logger.error('❌ Save Error:', error)
       alert('❌ 建立失敗，請稍後再試')
     }
   }
@@ -119,7 +120,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
           <Label className="text-sm font-medium text-morandi-secondary">團體</Label>
           <Combobox
             options={tours.map(tour => {
-              console.log('🎯 Tour:', tour.id, tour.code, tour.name)
+              logger.log('🎯 Tour:', tour.id, tour.code, tour.name)
               return {
                 value: tour.id,
                 label: `${tour.code || ''} - ${tour.name || ''}`,
@@ -127,7 +128,7 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
             })}
             value={selectedTourId}
             onChange={value => {
-              console.log('✅ Selected Tour ID:', value)
+              logger.log('✅ Selected Tour ID:', value)
               setSelectedTourId(value)
             }}
             placeholder="請選擇團體..."

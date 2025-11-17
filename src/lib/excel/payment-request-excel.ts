@@ -15,9 +15,9 @@ export function exportPaymentRequestsToExcel(
   const summaryData = requests.map(r => ({
     '請款單號': r.request_number,
     '團號': r.code || '-',
-    '團名': r.tour_name || '-',
+    '關聯團號ID': r.tour_id || '-',
     '請款日期': formatDate(r.request_date),
-    '總金額': r.total_amount,
+    '總金額': r.amount,
     '項目數': items.filter(i => i.request_id === r.id).length,
     '狀態': r.status || '-',
     '建立時間': formatDate(r.created_at),

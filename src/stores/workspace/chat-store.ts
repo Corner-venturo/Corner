@@ -4,6 +4,7 @@
  * 保持與舊版 chat-store 相同的 API
  */
 
+import { logger } from '@/lib/utils/logger'
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
@@ -144,7 +145,7 @@ export const useChatStore = () => {
         uiStore.setCurrentChannelMessages(channelId, channelMessages)
         uiStore.setMessagesLoading(channelId, false)
       } catch (error) {
-        console.error('Failed to load messages:', error)
+        logger.error('Failed to load messages:', error)
         uiStore.setMessagesLoading(channelId, false)
       }
     },

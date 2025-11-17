@@ -12,6 +12,7 @@ export interface LocalProfile {
   role: 'SUPER_ADMIN' | 'ADMIN' | 'EMPLOYEE'
   permissions: string[]
   roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant')[] // 附加身份標籤（支援多重角色）
+  workspace_id?: string // 所屬 workspace ID（如果有的話）
 
   // 離線認證相關
   cachedPassword?: string // 加密的密碼快取（用於背景同步）

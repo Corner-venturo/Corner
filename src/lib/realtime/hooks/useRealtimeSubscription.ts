@@ -5,6 +5,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useEffect, useRef, useState } from 'react'
 import { realtimeManager } from '../realtime-manager'
 import type { RealtimeSubscriptionConfig, RealtimeStatus } from '../types'
@@ -35,10 +36,10 @@ interface UseRealtimeSubscriptionReturn {
  *     table: 'channels',
  *     handlers: {
  *       onInsert: (channel) => {
- *         console.log('New channel:', channel);
+ *         logger.log('New channel:', channel);
  *       },
  *       onDelete: (oldChannel) => {
- *         console.log('Deleted channel:', oldChannel);
+ *         logger.log('Deleted channel:', oldChannel);
  *       },
  *     },
  *   });

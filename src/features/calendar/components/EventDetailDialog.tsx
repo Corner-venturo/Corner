@@ -59,31 +59,95 @@ export function EventDetailDialog({ open, event, onClose, onDelete }: EventDetai
 
             {/* 日期時間 */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <CalendarIcon size={16} className="text-morandi-secondary" />
-                <span className="text-morandi-primary">
-                  {new Date(event.start).toLocaleDateString('zh-TW', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'long',
-                  })}
-                </span>
-              </div>
+              {(() => {
+                // 🔥 使用 ISO 格式解析（避免時區問題）
+                const startDate = event.start.includes('T') ? event.start : `${event.start}T00:00:00`
+                const endDate = event.end
+                  ? event.end.includes('T')
+                    ? event.end
+                    : `${event.end}T00:00:00`
+                  : null
 
-              {event.end && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-morandi-secondary ml-6">至</span>
-                  <span className="text-morandi-primary">
-                    {new Date(event.end).toLocaleDateString('zh-TW', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      weekday: 'long',
-                    })}
-                  </span>
-                </div>
-              )}
+                const isAllDay = event.allDay ?? true // 預設為全天事件
+
+                if (isAllDay) {
+                  // 全天事件：只顯示日期
+                  const start = new Date(startDate)
+                  const end = endDate ? new Date(endDate) : null
+
+                  // FullCalendar 的全天事件 end 是隔天 00:00，所以要減一天
+                  const actualEnd = end ? new Date(end.getTime() - 24 * 60 * 60 * 1000) : null
+
+                  const isSameDay =
+                    !actualEnd ||
+                    start.toDateString() === actualEnd.toDateString()
+
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 text-sm">
+                        <CalendarIcon size={16} className="text-morandi-secondary" />
+                        <span className="text-morandi-primary">
+                          {start.toLocaleDateString('zh-TW', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            weekday: 'long',
+                          })}
+                        </span>
+                      </div>
+                      {!isSameDay && actualEnd && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-morandi-secondary ml-6">至</span>
+                          <span className="text-morandi-primary">
+                            {actualEnd.toLocaleDateString('zh-TW', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              weekday: 'long',
+                            })}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )
+                } else {
+                  // 指定時間事件：顯示日期 + 時間範圍
+                  const start = new Date(startDate)
+                  const end = endDate ? new Date(endDate) : null
+
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 text-sm">
+                        <CalendarIcon size={16} className="text-morandi-secondary" />
+                        <span className="text-morandi-primary">
+                          {start.toLocaleDateString('zh-TW', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            weekday: 'long',
+                          })}
+                        </span>
+                      </div>
+                      {end && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock size={16} className="text-morandi-secondary" />
+                          <span className="text-morandi-primary">
+                            {start.toLocaleTimeString('zh-TW', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                            {' - '}
+                            {end.toLocaleTimeString('zh-TW', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )
+                }
+              })()}
             </div>
 
             {/* 建立者（僅公司事項） */}

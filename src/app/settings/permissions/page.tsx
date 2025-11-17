@@ -250,11 +250,14 @@ export default function PermissionsManagementPage() {
                   <SelectValue placeholder="請選擇員工" />
                 </SelectTrigger>
                 <SelectContent>
-                  {employees.map(emp => (
-                    <SelectItem key={emp.user_id} value={emp.user_id}>
-                      {emp.name} ({emp.email})
-                    </SelectItem>
-                  ))}
+                  {employees.map(emp => {
+                    const personalInfo = emp.personal_info as { email?: string } | null
+                    return (
+                      <SelectItem key={emp.id} value={emp.id}>
+                        {emp.display_name || emp.chinese_name || emp.english_name} ({personalInfo?.email || '無email'})
+                      </SelectItem>
+                    )
+                  })}
                 </SelectContent>
               </Select>
             </div>

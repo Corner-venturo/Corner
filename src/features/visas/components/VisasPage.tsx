@@ -85,6 +85,7 @@ export default function VisasPage() {
   } = useVisasDialog(tours)
 
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   // 權限檢查：清除選擇
   useEffect(() => {
@@ -106,6 +107,11 @@ export default function VisasPage() {
 
   // 處理批次新增簽證
   const handleAddVisa = async () => {
+    // 防止重複提交
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
+    try {
     if (!canManageVisas || !contact_info.applicant_name || !user) return
 
     let selectedTour
@@ -172,14 +178,15 @@ export default function VisasPage() {
       return
     }
 
-    // 批次建立簽證
-    applicants.forEach(applicant => {
-      if (!applicant.name) return
+    // 批次建立簽證（使用 for...of 確保順序執行）
+    for (const applicant of applicants) {
+      if (!applicant.name) continue
 
       const fee = calculateFee(applicant.country)
       const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
-      addVisa({
+      await addVisa({
+        workspace_id: user.workspace_id, // ✅ 明確傳入 workspace_id
         applicant_name: applicant.name,
         contact_person: contact_info.contact_person,
         contact_phone: contact_info.contact_phone,
@@ -197,14 +204,20 @@ export default function VisasPage() {
         created_by: user.id,
         note: '',
       })
-    })
+    }
 
-    // 重置表單
-    const currentYear = new Date().getFullYear()
-    const visaCode = `VISA${currentYear}001`
-    const defaultVisaTour = tours.find(t => t.code === visaCode)
-    resetForm(defaultVisaTour?.id)
-    setIsDialogOpen(false)
+      // 重置表單
+      const currentYear = new Date().getFullYear()
+      const visaCode = `VISA${currentYear}001`
+      const defaultVisaTour = tours.find(t => t.code === visaCode)
+      resetForm(defaultVisaTour?.id)
+      setIsDialogOpen(false)
+    } catch (error) {
+      logger.error('批次新增簽證失敗', error)
+      toast.error('新增簽證失敗，請稍後再試')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   // 批次送件
@@ -333,6 +346,7 @@ export default function VisasPage() {
         removeApplicant={removeApplicant}
         updateApplicant={updateApplicant}
         canSubmit={!!contact_info.applicant_name && applicants.some(a => a.name)}
+        isSubmitting={isSubmitting}
       />
     </div>
   )

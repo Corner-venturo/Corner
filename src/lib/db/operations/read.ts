@@ -2,6 +2,7 @@
  * 讀取操作模組
  */
 
+import { logger } from '@/lib/utils/logger'
 import type { TableName } from '../schemas'
 import type { QueryOptions } from '../types'
 
@@ -24,7 +25,7 @@ export async function read<T>(
 
     request.onerror = () => {
       const error = new Error(`讀取資料失敗 (${tableName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })
@@ -74,7 +75,7 @@ export async function getAll<T>(
 
     request.onerror = () => {
       const error = new Error(`查詢失敗 (${tableName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })
@@ -101,7 +102,7 @@ export async function findByIndex<T>(
 
     request.onerror = () => {
       const error = new Error(`索引查詢失敗 (${tableName}.${indexName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })

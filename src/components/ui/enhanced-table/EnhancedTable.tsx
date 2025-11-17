@@ -20,18 +20,23 @@ export function EnhancedTable({
   onRowDoubleClick,
   className,
   showFilters: defaultShowFilters = false,
-  searchableFields = [],
+  searchableFields = [] as readonly string[],
   initialPageSize = 10,
   searchTerm: externalSearchTerm = '',
   emptyState,
+  emptyMessage,
   selection,
   expandable,
   actions,
   rowClassName,
   _bordered = true,
+  bordered,
   striped = false,
   hoverable = true,
+  isLoading,
 }: EnhancedTableProps) {
+  // Handle loading aliases
+  const actualLoading = loading || isLoading || false
   const {
     sortColumn,
     sortDirection,
@@ -127,7 +132,7 @@ export function EnhancedTable({
   }
 
   // Loading and error states
-  if (loading) {
+  if (actualLoading) {
     return (
       <div
         className={cn(

@@ -3,6 +3,7 @@
  * 這個欄位在資料庫中不存在，但可能存在於舊的本地快取中
  */
 
+import { logger } from '@/lib/utils/logger'
 import { localDB } from '../database'
 
 export async function cleanTodosDescription() {
@@ -22,10 +23,10 @@ export async function cleanTodosDescription() {
       }
     }
 
-    console.log(`✅ 清理完成: ${cleanedCount} 個 todos 移除了 description 欄位`)
+    logger.log(`✅ 清理完成: ${cleanedCount} 個 todos 移除了 description 欄位`)
     return cleanedCount
   } catch (error) {
-    console.error('❌ 清理失敗:', error)
+    logger.error('❌ 清理失敗:', error)
     throw error
   }
 }

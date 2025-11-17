@@ -10,7 +10,7 @@ interface StatisticsPanelProps {
 
 function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
   const { getWeekStatistics } = useTimeboxStore()
-  const stats = getWeekStatistics()
+  const stats = getWeekStatistics() as any
 
   const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60)

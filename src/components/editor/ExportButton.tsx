@@ -1,6 +1,20 @@
 'use client'
 
-export function ExportButton({ data }: { data: any }) {
+interface ItineraryData {
+  tourCode?: string
+  title: string
+  subtitle: string
+  departureDate: string
+  price?: number
+  attractions: Array<{ title: string; description: string }>
+  leader: {
+    name: string
+    phone: string
+    overseasPhone: string
+  }
+}
+
+export function ExportButton({ data }: { data: ItineraryData }) {
   const exportHTML = () => {
     const html = generateFullHTML(data)
     const blob = new Blob([html], { type: 'text/html' })
@@ -11,7 +25,7 @@ export function ExportButton({ data }: { data: any }) {
     a.click()
   }
 
-  const generateFullHTML = data => {
+  const generateFullHTML = (data: ItineraryData): string => {
     return `
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -50,7 +64,7 @@ export function ExportButton({ data }: { data: any }) {
         <div class="grid md:grid-cols-3 gap-6">
           ${data.attractions
             .map(
-              a => `
+              (a: { title: string; description: string }) => `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
               <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-400"></div>
               <div class="p-6">

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Realtime 功能測試</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    h1 { color: #2563eb; }
+    .status {
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 2px solid;
+    }
+    .success {
+      background: #dcfce7;
+      border-color: #16a34a;
+      color: #166534;
+    }
+    .error {
+      background: #fee2e2;
+      border-color: #dc2626;
+      color: #991b1b;
+    }
+    .info {
+      background: #dbeafe;
+      border-color: #2563eb;
+      color: #1e40af;
+    }
+    .step {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f3f4f6;
+      border-left: 4px solid #6366f1;
+      border-radius: 4px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>📡 Realtime 功能測試指南</h1>
+
+  <div class="status info">
+    <strong>⚠️ 重要：</strong>請在瀏覽器開啟 <code>http://localhost:3000/calendar</code> 並打開開發者工具 (F12) 的 Console 視窗
+  </div>
+
+  <div class="step">
+    <h3>步驟 1：檢查 Realtime Manager 是否載入</h3>
+    <p>在 Console 中輸入：</p>
+    <pre>window.realtimeManager</pre>
+    <p><strong>預期結果：</strong>應該會看到 RealtimeManager 物件（不是 undefined）</p>
+    <p><strong>如果是 undefined：</strong>表示 realtime-manager.ts 沒有正確載入</p>
+  </div>
+
+  <div class="step">
+    <h3>步驟 2：檢查目前的訂閱狀態</h3>
+    <p>在 Console 中輸入：</p>
+    <pre>window.realtimeManager.getAllSubscriptions()</pre>
+    <p><strong>預期結果：</strong>應該會看到一個陣列，包含目前的訂閱（例如 calendar_events-realtime）</p>
+    <p><strong>如果是空陣列 []：</strong>表示 Hook 沒有被執行</p>
+  </div>
+
+  <div class="step">
+    <h3>步驟 3：檢查 Console 是否有訂閱訊息</h3>
+    <p>重新整理行事曆頁面，應該會看到：</p>
+    <pre>🔄 [calendar_events] 開始訂閱 Realtime
+[RealtimeManager] Creating subscription: calendar_events-realtime
+✅ [calendar_events] Realtime 訂閱已建立</pre>
+    <p><strong>如果沒看到：</strong>表示 useRealtimeForCalendarEvents() 沒有被呼叫</p>
+  </div>
+
+  <div class="step">
+    <h3>步驟 4：測試 Realtime 是否運作</h3>
+    <p>請同事新增一筆行事曆事項，你的 Console 應該會看到：</p>
+    <pre>➕ [calendar_events] Realtime INSERT: {...}
+✅ [calendar_events] 新增到 Store</pre>
+    <p>同時畫面應該<strong>立即顯示</strong>新增的事項（無需重新整理）</p>
+  </div>
+
+  <div class="step">
+    <h3>步驟 5：手動觸發訂閱（除錯用）</h3>
+    <p>如果上述步驟都沒有反應，可以手動測試 Supabase Realtime 連線：</p>
+    <button onclick="testRealtimeConnection()">測試 Realtime 連線</button>
+    <pre id="result" style="display: none; margin-top: 10px;"></pre>
+  </div>
+
+  <div class="status error" id="troubleshooting" style="display: none;">
+    <h3>❌ 常見問題排除</h3>
+    <ul id="issues"></ul>
+  </div>
+
+  <script>
+    function testRealtimeConnection() {
+      const result = document.getElementById('result');
+      result.style.display = 'block';
+      result.textContent = '正在測試連線...';
+
+      if (typeof window.realtimeManager === 'undefined') {
+        result.textContent = '❌ 錯誤：window.realtimeManager 不存在\n\n這表示 realtime-manager.ts 沒有正確載入。\n請確認檔案路徑正確。';
+        return;
+      }
+
+      const subs = window.realtimeManager.getAllSubscriptions();
+      result.textContent = `✅ RealtimeManager 已載入\n\n目前訂閱數量：${subs.length}\n\n訂閱詳情：\n${JSON.stringify(subs, null, 2)}`;
+
+      if (subs.length === 0) {
+        result.textContent += '\n\n⚠️ 警告：沒有任何訂閱！\n這表示 useRealtimeForCalendarEvents() Hook 沒有被執行。\n請檢查 src/app/calendar/page.tsx 是否正確呼叫該 Hook。';
+      }
+    }
+
+    // 自動檢查常見問題
+    setTimeout(() => {
+      const issues = [];
+
+      if (typeof window.realtimeManager === 'undefined') {
+        issues.push('RealtimeManager 未載入 - 請檢查 src/lib/realtime/realtime-manager.ts');
+      }
+
+      if (issues.length > 0) {
+        const troubleshooting = document.getElementById('troubleshooting');
+        const issuesList = document.getElementById('issues');
+
+        issues.forEach(issue => {
+          const li = document.createElement('li');
+          li.textContent = issue;
+          issuesList.appendChild(li);
+        });
+
+        troubleshooting.style.display = 'block';
+      }
+    }, 2000);
+  </script>
+</body>
+</html>

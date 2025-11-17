@@ -13,6 +13,7 @@
  * 4. 處理錯誤情況
  */
 
+import { logger } from '@/lib/utils/logger'
 import { NextRequest, NextResponse } from 'next/server'
 
 // ============================================
@@ -113,7 +114,7 @@ export async function POST(req: NextRequest) {
     // 🧪 暫時回傳測試資料（開發/測試用）
     // ==========================================
 
-    console.log('📝 LinkPay 測試模式 - 收到請求：', {
+    logger.log('📝 LinkPay 測試模式 - 收到請求：', {
       receiptNumber,
       userName,
       email,
@@ -137,7 +138,7 @@ export async function POST(req: NextRequest) {
     // 🚧 實作完成後：刪除上面的測試代碼，取消註解真實 API 代碼
     // ==========================================
   } catch (error) {
-    console.error('❌ LinkPay API 錯誤:', error)
+    logger.error('❌ LinkPay API 錯誤:', error)
     return NextResponse.json(
       {
         success: false,
@@ -169,7 +170,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Webhook 錯誤:', error)
+    logger.error('Webhook 錯誤:', error)
     return NextResponse.json({ success: false }, { status: 500 })
   }
 }

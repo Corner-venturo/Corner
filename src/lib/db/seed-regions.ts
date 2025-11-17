@@ -3,6 +3,7 @@
  * 將 region-hierarchy.ts 的資料匯入到 IndexedDB
  */
 
+import { logger } from '@/lib/utils/logger'
 import { COUNTRIES } from '@/data/region-hierarchy'
 import { localDB } from '@/lib/db'
 import type { Country, Region, City } from '@/stores/region-store'
@@ -22,13 +23,13 @@ export async function seedRegions(): Promise<void> {
   }
 
   isSeeding = true
-  console.log('🌍 [Seed] 開始初始化地區資料...')
+  logger.log('🌍 [Seed] 開始初始化地區資料...')
 
   try {
     // 檢查是否已有資料
     const existingCountries = await localDB.getAll<Country>('countries')
     if (existingCountries.length > 0) {
-      console.log('✓ [Seed] 地區資料已存在，跳過初始化')
+      logger.log('✓ [Seed] 地區資料已存在，跳過初始化')
       hasSeeded = true
       isSeeding = false
       return
@@ -59,7 +60,7 @@ export async function seedRegions(): Promise<void> {
       }
 
       await localDB.create('countries', country)
-      console.log(`✓ [Seed] 建立國家: ${country.name}`)
+      logger.log(`✓ [Seed] 建立國家: ${country.name}`)
 
       // 2. 建立地區（如果有）
       if (countryData.regions) {
@@ -76,7 +77,7 @@ export async function seedRegions(): Promise<void> {
           }
 
           await localDB.create('regions', region)
-          console.log(`  ✓ [Seed] 建立地區: ${region.name}`)
+          logger.log(`  ✓ [Seed] 建立地區: ${region.name}`)
 
           // 3. 建立城市
           for (const cityData of regionData.cities) {
@@ -123,14 +124,14 @@ export async function seedRegions(): Promise<void> {
     const finalRegions = await localDB.getAll<Region>('regions')
     const finalCities = await localDB.getAll<City>('cities')
 
-    console.log('✅ [Seed] 地區資料初始化完成')
-    console.log(`   📊 國家: ${finalCountries.length} 筆`)
-    console.log(`   📊 地區: ${finalRegions.length} 筆`)
-    console.log(`   📊 城市: ${finalCities.length} 筆`)
+    logger.log('✅ [Seed] 地區資料初始化完成')
+    logger.log(`   📊 國家: ${finalCountries.length} 筆`)
+    logger.log(`   📊 地區: ${finalRegions.length} 筆`)
+    logger.log(`   📊 城市: ${finalCities.length} 筆`)
 
     hasSeeded = true
   } catch (error) {
-    console.error('❌ [Seed] 初始化失敗:', error)
+    logger.error('❌ [Seed] 初始化失敗:', error)
     throw error
   } finally {
     isSeeding = false

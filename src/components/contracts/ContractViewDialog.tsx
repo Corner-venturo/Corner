@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useMemo, useState, useEffect } from 'react'
 import { FileSignature, X, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -70,7 +71,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
         setContractHtml(template)
       } catch (error) {
-        console.error('載入合約失敗:', error)
+        logger.error('載入合約失敗:', error)
         setContractHtml('<p class="text-red-500">載入合約範本失敗，請稍後再試</p>')
       } finally {
         setLoading(false)
@@ -108,7 +109,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         }
       }
     } catch (error) {
-      console.error('列印錯誤:', error)
+      logger.error('列印錯誤:', error)
       alert('列印合約時發生錯誤，請稍後再試')
     } finally {
       setPrinting(false)

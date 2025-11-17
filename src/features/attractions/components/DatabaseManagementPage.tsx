@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { MapPin, Star, Sparkles } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -38,16 +39,16 @@ export default function DatabaseManagementPage() {
         const { data, error } = await supabase.from('countries').select('*').order('display_order')
 
         if (error) {
-          console.error('Error loading countries:', error)
+          logger.error('Error loading countries:', error)
           return
         }
 
         if (data) {
-          console.log('Loaded countries:', data.length)
+          logger.log('Loaded countries:', data.length)
           setCountries(data)
         }
       } catch (err) {
-        console.error('Exception loading countries:', err)
+        logger.error('Exception loading countries:', err)
       }
     }
     loadCountries()

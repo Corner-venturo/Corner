@@ -151,8 +151,8 @@ export class LazyStore<T extends { id: string }> {
 
     // 3. 從 Supabase 讀取
     try {
-      const { data, error } = await supabase
-        .from(this.options.table)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.from as any)(this.options.table)
         .select('*')
         .eq('id', id)
         .single()
@@ -241,8 +241,8 @@ export class LazyStore<T extends { id: string }> {
     const start = (page - 1) * pageSize
     const end = start + pageSize - 1
 
-    const { data, error, count } = await supabase
-      .from(this.options.table)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error, count } = await (supabase.from as any)(this.options.table)
       .select('*', { count: 'exact' })
       .range(start, end)
       .order('created_at', { ascending: false })

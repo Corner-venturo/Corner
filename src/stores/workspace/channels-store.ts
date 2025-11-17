@@ -113,7 +113,7 @@ export const useChannelsStore = () => {
       if (workspaces && workspaces.length > 0 && !uiStore.currentWorkspace) {
         uiStore.setCurrentWorkspace(workspaces[0])
         // 🔥 設定 workspace filter
-        setCurrentWorkspaceFilter(workspaces[0].id || workspaces[0].code)
+        setCurrentWorkspaceFilter(workspaces[0].id)
       }
     },
 
@@ -122,14 +122,14 @@ export const useChannelsStore = () => {
         // 如果傳入 workspace ID，設定 ID
         uiStore.setCurrentWorkspaceId(workspace)
         // 嘗試從列表中找到對應的 workspace 物件
-        const ws = workspaceStore.items.find(w => w.id === workspace || w.code === workspace)
+        const ws = workspaceStore.items.find(w => w.id === workspace)
         uiStore.setCurrentWorkspace(ws || null)
         // 🔥 設定 workspace filter，讓 fetchAll 可以正確過濾
         setCurrentWorkspaceFilter(workspace)
       } else {
         // 如果傳入 workspace 物件
         uiStore.setCurrentWorkspace(workspace)
-        const workspaceId = workspace?.id || workspace?.code || null
+        const workspaceId = workspace?.id || null
         uiStore.setCurrentWorkspaceId(workspaceId)
         // 🔥 設定 workspace filter，讓 fetchAll 可以正確過濾
         setCurrentWorkspaceFilter(workspaceId)

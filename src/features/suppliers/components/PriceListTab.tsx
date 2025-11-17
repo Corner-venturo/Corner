@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -158,7 +159,7 @@ export const PriceListTab: React.FC = () => {
     try {
       await deleteTemplate(templateId)
     } catch (error) {
-      console.error('刪除失敗:', error)
+      logger.error('刪除失敗:', error)
       alert('刪除失敗')
     }
   }

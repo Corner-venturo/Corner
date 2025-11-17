@@ -32,7 +32,8 @@ export default function OrderOverviewPage() {
     )
   }
 
-  const getPaymentBadge = (status: string) => {
+  const getPaymentBadge = (status: string | null) => {
+    if (!status) return 'bg-morandi-container text-morandi-secondary'
     const badges: Record<string, string> = {
       已收款: 'bg-morandi-green text-white',
       部分收款: 'bg-morandi-gold text-white',

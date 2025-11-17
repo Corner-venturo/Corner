@@ -2,6 +2,7 @@
  * IndexedDB 資料庫升級與遷移邏輯
  */
 
+import { logger } from '@/lib/utils/logger'
 import { TABLE_SCHEMAS } from './schemas'
 import { _isSyncableTable } from './sync-schema-helper'
 
@@ -67,7 +68,7 @@ function createAllTables(db: IDBDatabase): void {
  * 只新增缺少的表格，不刪除任何現有資料
  */
 function upgradeToV2(db: IDBDatabase): void {
-  console.log('🔄 [IndexedDB] 開始升級到 v2（新增 countries 和 cities 表）')
+  logger.log('🔄 [IndexedDB] 開始升級到 v2（新增 countries 和 cities 表）')
 
   // 找到三個表的 schema
   const countriesSchema = TABLE_SCHEMAS.find(s => s.name === 'countries')
@@ -75,7 +76,7 @@ function upgradeToV2(db: IDBDatabase): void {
 
   // 1. 建立 countries 表（如果不存在）
   if (countriesSchema && !db.objectStoreNames.contains('countries')) {
-    console.log('📦 建立 countries 表')
+    logger.log('📦 建立 countries 表')
     const countriesStore = db.createObjectStore(countriesSchema.name, {
       keyPath: countriesSchema.keyPath,
       autoIncrement: countriesSchema.autoIncrement,
@@ -84,12 +85,12 @@ function upgradeToV2(db: IDBDatabase): void {
       countriesStore.createIndex(index.name, index.keyPath, { unique: index.unique })
     })
   } else {
-    console.log('✓ countries 表已存在，跳過')
+    logger.log('✓ countries 表已存在，跳過')
   }
 
   // 2. 建立 cities 表（如果不存在）
   if (citiesSchema && !db.objectStoreNames.contains('cities')) {
-    console.log('📦 建立 cities 表')
+    logger.log('📦 建立 cities 表')
     const citiesStore = db.createObjectStore(citiesSchema.name, {
       keyPath: citiesSchema.keyPath,
       autoIncrement: citiesSchema.autoIncrement,
@@ -98,13 +99,13 @@ function upgradeToV2(db: IDBDatabase): void {
       citiesStore.createIndex(index.name, index.keyPath, { unique: index.unique })
     })
   } else {
-    console.log('✓ cities 表已存在，跳過')
+    logger.log('✓ cities 表已存在，跳過')
   }
 
   // 3. regions 表保持不變（不刪除任何資料）
-  console.log('✓ regions 表保持不變')
+  logger.log('✓ regions 表保持不變')
 
-  console.log('✅ [IndexedDB] v2 升級完成（所有現有資料保留）')
+  logger.log('✅ [IndexedDB] v2 升級完成（所有現有資料保留）')
 }
 
 /**
@@ -112,7 +113,7 @@ function upgradeToV2(db: IDBDatabase): void {
  * 只新增缺少的表格，不刪除任何現有資料
  */
 function upgradeToV3(db: IDBDatabase): void {
-  console.log('🔄 [IndexedDB] 開始升級到 v3（新增 cost_templates 和 supplier_categories 表）')
+  logger.log('🔄 [IndexedDB] 開始升級到 v3（新增 cost_templates 和 supplier_categories 表）')
 
   // 找到兩個表的 schema
   const costTemplatesSchema = TABLE_SCHEMAS.find(s => s.name === 'cost_templates')
@@ -120,7 +121,7 @@ function upgradeToV3(db: IDBDatabase): void {
 
   // 1. 建立 cost_templates 表（如果不存在）
   if (costTemplatesSchema && !db.objectStoreNames.contains('cost_templates')) {
-    console.log('📦 建立 cost_templates 表')
+    logger.log('📦 建立 cost_templates 表')
     const costTemplatesStore = db.createObjectStore(costTemplatesSchema.name, {
       keyPath: costTemplatesSchema.keyPath,
       autoIncrement: costTemplatesSchema.autoIncrement,
@@ -129,12 +130,12 @@ function upgradeToV3(db: IDBDatabase): void {
       costTemplatesStore.createIndex(index.name, index.keyPath, { unique: index.unique })
     })
   } else {
-    console.log('✓ cost_templates 表已存在，跳過')
+    logger.log('✓ cost_templates 表已存在，跳過')
   }
 
   // 2. 建立 supplier_categories 表（如果不存在）
   if (supplierCategoriesSchema && !db.objectStoreNames.contains('supplier_categories')) {
-    console.log('📦 建立 supplier_categories 表')
+    logger.log('📦 建立 supplier_categories 表')
     const supplierCategoriesStore = db.createObjectStore(supplierCategoriesSchema.name, {
       keyPath: supplierCategoriesSchema.keyPath,
       autoIncrement: supplierCategoriesSchema.autoIncrement,
@@ -143,10 +144,10 @@ function upgradeToV3(db: IDBDatabase): void {
       supplierCategoriesStore.createIndex(index.name, index.keyPath, { unique: index.unique })
     })
   } else {
-    console.log('✓ supplier_categories 表已存在，跳過')
+    logger.log('✓ supplier_categories 表已存在，跳過')
   }
 
-  console.log('✅ [IndexedDB] v3 升級完成（所有現有資料保留）')
+  logger.log('✅ [IndexedDB] v3 升級完成（所有現有資料保留）')
 }
 
 /**

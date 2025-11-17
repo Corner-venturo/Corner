@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from './auth-store'
@@ -146,11 +147,11 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
   addAccount: async accountData => {
     const user = useAuthStore.getState().user
     if (!user) {
-      console.error('[addAccount] 用戶未登入')
+      logger.error('[addAccount] 用戶未登入')
       return null
     }
 
-    console.log('[addAccount] 準備插入資料:', { ...accountData, user_id: user.id })
+    logger.log('[addAccount] 準備插入資料:', { ...accountData, user_id: user.id })
 
     const { data, error } = await supabase
       .from('accounting_accounts')
@@ -162,12 +163,12 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .single()
 
     if (error) {
-      console.error('[addAccount] Supabase 錯誤:', error)
+      logger.error('[addAccount] Supabase 錯誤:', error)
       return null
     }
 
     if (data) {
-      console.log('[addAccount] 成功建立帳戶:', data)
+      logger.log('[addAccount] 成功建立帳戶:', data)
       set(state => ({ accounts: [...state.accounts, data] }))
       get().calculateStats()
       return data

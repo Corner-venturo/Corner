@@ -19,7 +19,6 @@ export default function WorkspacesPage() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newWorkspace, setNewWorkspace] = useState({
     name: '',
-    code: '',
     description: '',
   })
 
@@ -30,25 +29,24 @@ export default function WorkspacesPage() {
   }, [])
 
   // 計算每個 workspace 的員工數
+  // Note: employees 表沒有 workspace_id 欄位，暫時回傳 0
   const getEmployeeCount = (workspaceId: string) => {
-    return employeeStore.items?.filter(emp => emp.workspace_id === workspaceId).length || 0
+    return 0 // TODO: 如果需要顯示員工數，需在資料庫新增 workspace_id 欄位
   }
 
   const handleCreate = async () => {
-    if (!newWorkspace.name || !newWorkspace.code) {
-      alert('請填寫工作空間名稱和代碼')
+    if (!newWorkspace.name) {
+      alert('請填寫工作空間名稱')
       return
     }
 
     await workspaceStore.create({
       name: newWorkspace.name,
-      code: newWorkspace.code,
       description: newWorkspace.description,
       is_active: true,
-      settings: {},
     })
 
-    setNewWorkspace({ name: '', code: '', description: '' })
+    setNewWorkspace({ name: '', description: '' })
     setShowAddDialog(false)
   }
 
@@ -117,7 +115,7 @@ export default function WorkspacesPage() {
                   <h3 className="font-semibold text-lg text-morandi-primary">
                     {workspace.name}
                   </h3>
-                  <p className="text-sm text-morandi-secondary">代碼：{workspace.code}</p>
+                  <p className="text-sm text-morandi-secondary">{workspace.description || '無描述'}</p>
                 </div>
               </div>
               <div
@@ -183,23 +181,6 @@ export default function WorkspacesPage() {
 
               <div>
                 <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                  代碼 <span className="text-morandi-red">*</span>
-                </label>
-                <Input
-                  value={newWorkspace.code}
-                  onChange={e =>
-                    setNewWorkspace(prev => ({ ...prev, code: e.target.value.toLowerCase() }))
-                  }
-                  placeholder="例如：taipei、taichung"
-                  className="border-morandi-container/30"
-                />
-                <p className="text-xs text-morandi-secondary mt-1">
-                  請使用英文小寫，此代碼將用於資料隔離
-                </p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-morandi-secondary mb-2 block">
                   說明
                 </label>
                 <Input
@@ -223,7 +204,7 @@ export default function WorkspacesPage() {
               </Button>
               <Button
                 onClick={handleCreate}
-                disabled={!newWorkspace.name || !newWorkspace.code}
+                disabled={!newWorkspace.name}
                 className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 建立

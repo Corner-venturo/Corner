@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { X, Calendar } from 'lucide-react'
 import { useTourStore, usePaymentRequestStore } from '@/stores'
@@ -85,7 +86,7 @@ export function CreatePaymentRequestDialog({
       onSuccess()
       onClose()
     } catch (error) {
-      console.error('建立請款單失敗：', error)
+      logger.error('建立請款單失敗：', error)
       alert('建立失敗，請稍後再試')
     }
   }

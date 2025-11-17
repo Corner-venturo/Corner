@@ -26,10 +26,10 @@ export function AssignmentSection({ todo, onUpdate }: AssignmentSectionProps) {
     if (todo.assignee) {
       // 優先檢查當前登入用戶，再檢查員工列表
       if (user?.id === todo.assignee) {
-        setAssigneeName(user.display_name || user.name || user.email || '未知員工')
+        setAssigneeName(user.display_name || user.chinese_name || user.personal_info?.email || '未知員工')
       } else {
         const assignee = employees.find(e => e.id === todo.assignee)
-        setAssigneeName(assignee?.display_name || assignee?.name || '未知員工')
+        setAssigneeName(assignee?.display_name || assignee?.chinese_name || '未知員工')
       }
     } else {
       setAssigneeName('')

@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useMemo, useEffect } from 'react'
 import { MapPin, Building2, Map, Edit } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
@@ -16,11 +17,13 @@ interface Country {
   id: string
   name: string
   name_en: string
-  code: string
+  code: string | null
   emoji: string | null
-  has_regions: boolean
-  display_order: number
-  is_active: boolean
+  has_regions: boolean | null
+  display_order: number | null
+  is_active: boolean | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 interface Region {
@@ -29,8 +32,10 @@ interface Region {
   name: string
   name_en: string | null
   description: string | null
-  display_order: number
-  is_active: boolean
+  display_order: number | null
+  is_active: boolean | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 interface City {
@@ -41,12 +46,14 @@ interface City {
   name_en: string | null
   description: string | null
   timezone: string | null
-  display_order: number
-  is_active: boolean
+  display_order: number | null
+  is_active: boolean | null
   background_image_url: string | null
   background_image_url_2: string | null
   primary_image: number | null
   airport_code: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export default function RegionsPage() {
@@ -75,13 +82,13 @@ export default function RegionsPage() {
       supabase.from('cities').select('*').order('country_id').order('region_id').order('name'),
     ])
 
-    if (countriesRes.error) console.error('Error fetching countries:', countriesRes.error)
-    if (regionsRes.error) console.error('Error fetching regions:', regionsRes.error)
-    if (citiesRes.error) console.error('Error fetching cities:', citiesRes.error)
+    if (countriesRes.error) logger.error('Error fetching countries:', countriesRes.error)
+    if (regionsRes.error) logger.error('Error fetching regions:', regionsRes.error)
+    if (citiesRes.error) logger.error('Error fetching cities:', citiesRes.error)
 
-    setCountries(countriesRes.data || [])
-    setRegions(regionsRes.data || [])
-    setCities(citiesRes.data || [])
+    if (countriesRes.data) setCountries(countriesRes.data)
+    if (regionsRes.data) setRegions(regionsRes.data)
+    if (citiesRes.data) setCities(citiesRes.data)
     setLoading(false)
   }
 
@@ -110,7 +117,7 @@ export default function RegionsPage() {
       .eq('id', editingCity.id)
 
     if (error) {
-      console.error('Error updating city:', error)
+      logger.error('Error updating city:', error)
       toast.error('更新失敗')
       return
     }
@@ -128,7 +135,7 @@ export default function RegionsPage() {
       .eq('id', id)
 
     if (error) {
-      console.error('Error updating region:', error)
+      logger.error('Error updating region:', error)
       toast.error('更新失敗')
       return
     }
@@ -144,7 +151,7 @@ export default function RegionsPage() {
     const { error } = await supabase.from('regions').delete().eq('id', id)
 
     if (error) {
-      console.error('Error deleting region:', error)
+      logger.error('Error deleting region:', error)
       toast.error('刪除失敗')
       return
     }
@@ -159,17 +166,17 @@ export default function RegionsPage() {
       {
         key: 'emoji',
         label: '',
-        render: value => <span className="text-2xl">{value || '🌍'}</span>,
+        render: (value: unknown) => <span className="text-2xl">{(value as string) || '🌍'}</span>,
       },
       {
         key: 'name',
         label: '國家名稱',
         sortable: true,
         filterable: true,
-        render: (value, row: Country) => (
+        render: (value: unknown, row: any) => (
           <div>
-            <div className="font-medium text-morandi-primary">{value}</div>
-            <div className="text-xs text-morandi-secondary">{row.name_en}</div>
+            <div className="font-medium text-morandi-primary">{value as string}</div>
+            <div className="text-xs text-morandi-secondary">{(row as Country).name_en}</div>
           </div>
         ),
       },
@@ -181,7 +188,7 @@ export default function RegionsPage() {
       {
         key: 'has_regions',
         label: '有地區分類',
-        render: value => (
+        render: (value: unknown) => (
           <span className={value ? 'text-green-600' : 'text-gray-400'}>
             {value ? '是' : '否'}
           </span>
@@ -190,7 +197,7 @@ export default function RegionsPage() {
       {
         key: 'is_active',
         label: '狀態',
-        render: value => (
+        render: (value: unknown) => (
           <span className={value ? 'text-green-600' : 'text-gray-400'}>
             {value ? '啟用' : '停用'}
           </span>
@@ -206,9 +213,9 @@ export default function RegionsPage() {
       {
         key: 'country_id',
         label: '國家',
-        render: value => {
+        render: (value: unknown) => {
           const country = countries.find(c => c.id === value)
-          return <span>{country?.emoji} {country?.name || value}</span>
+          return <span>{country?.emoji} {country?.name || (value as string)}</span>
         },
       },
       {
@@ -216,26 +223,26 @@ export default function RegionsPage() {
         label: '地區名稱',
         sortable: true,
         filterable: true,
-        render: (value, row: Region) => (
+        render: (value: unknown, row: any) => (
           <div>
-            <div className="font-medium text-morandi-primary">{value}</div>
-            <div className="text-xs text-morandi-secondary">{row.name_en}</div>
+            <div className="font-medium text-morandi-primary">{value as string}</div>
+            <div className="text-xs text-morandi-secondary">{(row as Region).name_en}</div>
           </div>
         ),
       },
       {
         key: 'description',
         label: '描述',
-        render: value => (
+        render: (value: unknown) => (
           <span className="text-sm text-morandi-secondary truncate max-w-xs block">
-            {value || '-'}
+            {(value as string) || '-'}
           </span>
         ),
       },
       {
         key: 'is_active',
         label: '狀態',
-        render: value => (
+        render: (value: unknown) => (
           <span className={value ? 'text-green-600' : 'text-gray-400'}>
             {value ? '啟用' : '停用'}
           </span>
@@ -244,20 +251,20 @@ export default function RegionsPage() {
       {
         key: 'actions',
         label: '操作',
-        render: (_value, row: Region) => (
+        render: (_value: unknown, row: any) => (
           <div className="flex gap-2">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleToggleRegionStatus(row.id, row.is_active)}
+              onClick={() => handleToggleRegionStatus((row as Region).id, (row as Region).is_active ?? false)}
               className="h-8 px-2 text-xs"
             >
-              {row.is_active ? '停用' : '啟用'}
+              {(row as Region).is_active ? '停用' : '啟用'}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleDeleteRegion(row.id)}
+              onClick={() => handleDeleteRegion((row as Region).id)}
               className="h-8 px-2 text-xs text-red-500 hover:text-red-600"
             >
               刪除
@@ -287,18 +294,18 @@ export default function RegionsPage() {
       {
         key: 'country_id',
         label: '國家',
-        render: value => {
+        render: (value: unknown) => {
           const country = countries.find(c => c.id === value)
-          return <span>{country?.emoji} {country?.name || value}</span>
+          return <span>{country?.emoji} {country?.name || (value as string)}</span>
         },
       },
       {
         key: 'region_id',
         label: '地區',
-        render: value => {
+        render: (value: unknown) => {
           if (!value) return <span className="text-gray-400">-</span>
           const region = regions.find(r => r.id === value)
-          return <span>{region?.name || value}</span>
+          return <span>{region?.name || (value as string)}</span>
         },
       },
       {
@@ -306,23 +313,23 @@ export default function RegionsPage() {
         label: '城市名稱',
         sortable: true,
         filterable: true,
-        render: (value, row: City) => (
+        render: (value: unknown, row: any) => (
           <div>
-            <div className="font-medium text-morandi-primary">{value}</div>
-            <div className="text-xs text-morandi-secondary">{row.name_en}</div>
+            <div className="font-medium text-morandi-primary">{value as string}</div>
+            <div className="text-xs text-morandi-secondary">{(row as City).name_en}</div>
           </div>
         ),
       },
       {
         key: 'background_image_url',
         label: '封面圖',
-        render: value => {
+        render: (value: unknown) => {
           if (!value) {
             return <span className="text-xs text-gray-400">未設定</span>
           }
           return (
             <img
-              src={value}
+              src={value as string}
               alt="封面圖"
               className="w-16 h-10 object-cover rounded"
               onError={(e) => {
@@ -336,7 +343,7 @@ export default function RegionsPage() {
       {
         key: 'is_active',
         label: '狀態',
-        render: value => (
+        render: (value: unknown) => (
           <span className={value ? 'text-green-600' : 'text-gray-400'}>
             {value ? '啟用' : '停用'}
           </span>
@@ -345,11 +352,11 @@ export default function RegionsPage() {
       {
         key: 'actions',
         label: '操作',
-        render: (_value, row: City) => (
+        render: (_value: unknown, row: any) => (
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleEditCity(row)}
+            onClick={() => handleEditCity(row as City)}
             className="h-8 w-8 p-0"
           >
             <Edit size={16} />

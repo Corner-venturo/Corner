@@ -13,8 +13,9 @@
  */
 export interface BaseEntity {
   id: string
-  created_at: string // ISO 8601 格式
-  updated_at: string // ISO 8601 格式
+  workspace_id?: string // 工作空間 ID（業務表格必填，系統表格選填）
+  created_at: string | null // ISO 8601 格式（Supabase 可能回傳 null）
+  updated_at: string | null // ISO 8601 格式（Supabase 可能回傳 null）
   created_by?: string | null
   updated_by?: string | null
 }
@@ -27,11 +28,13 @@ export interface BaseEntity {
  * - _needs_sync: 是否需要同步到 Supabase（true = 待同步）
  * - _synced_at: 最後同步時間（null = 尚未同步）
  * - _deleted: 軟刪除標記（用於延遲刪除同步）
+ *
+ * 注意：使用 null 而非 undefined 以符合 Supabase PostgreSQL 規範
  */
 export interface SyncableEntity extends BaseEntity {
-  _needs_sync: boolean // 是否待同步
+  _needs_sync: boolean | null // 是否待同步（Supabase 可能回傳 null）
   _synced_at: string | null // 最後同步時間 (ISO 8601)
-  _deleted?: boolean // 軟刪除標記
+  _deleted?: boolean | null // 軟刪除標記
 }
 
 /**

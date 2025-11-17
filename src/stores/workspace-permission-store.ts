@@ -3,6 +3,7 @@
  * 管理跨分公司權限
  */
 
+import { logger } from '@/lib/utils/logger'
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase/client'
 import type {
@@ -61,7 +62,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
 
       set({ permissions, loading: false })
     } catch (error: any) {
-      console.error('[Workspace Permission] Fetch all failed:', error)
+      logger.error('[Workspace Permission] Fetch all failed:', error)
       set({ error: error.message, loading: false })
     }
   },
@@ -78,7 +79,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
 
       set({ userAccess: data || [], loading: false })
     } catch (error: any) {
-      console.error('[Workspace Permission] Fetch user access failed:', error)
+      logger.error('[Workspace Permission] Fetch user access failed:', error)
       set({ error: error.message, loading: false })
     }
   },
@@ -106,7 +107,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
       set({ loading: false })
       return data as string
     } catch (error: any) {
-      console.error('[Workspace Permission] Grant access failed:', error)
+      logger.error('[Workspace Permission] Grant access failed:', error)
       set({ error: error.message, loading: false })
       return null
     }
@@ -129,7 +130,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
       set({ loading: false })
       return data as boolean
     } catch (error: any) {
-      console.error('[Workspace Permission] Revoke access failed:', error)
+      logger.error('[Workspace Permission] Revoke access failed:', error)
       set({ error: error.message, loading: false })
       return false
     }

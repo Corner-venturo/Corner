@@ -60,8 +60,7 @@ export default function SettingsPage() {
                   {user.display_name ||
                     user.chinese_name ||
                     user.english_name ||
-                    user.name ||
-                    user.email ||
+                    user.personal_info?.email ||
                     '使用者'}
                 </span>
               </div>

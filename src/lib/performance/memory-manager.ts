@@ -8,6 +8,7 @@
  * - 支援手動回收
  */
 
+import { logger } from '@/lib/utils/logger'
 import { cacheStrategy } from '@/lib/cache/cache-strategy'
 
 // Chrome 專屬 API 型別擴展
@@ -182,12 +183,12 @@ class MemoryManager {
       const stats = this.getMemoryStats()
       if (stats) {
         const emoji = stats.isUnderPressure ? '⚠️' : '✅'
-        console.log(
+        logger.log(
           `${emoji} Memory: ${stats.usedMemory}MB / ${stats.totalMemory}MB (${stats.usagePercent}%)`
         )
 
         if (stats.isUnderPressure) {
-          console.warn('Memory pressure detected, cleaning up...')
+          logger.warn('Memory pressure detected, cleaning up...')
           this.cleanup({ clearHot: true, force: true })
         }
       }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useRef } from 'react'
 import { TourFormData, HotelInfo } from '../types'
 import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
@@ -78,7 +79,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
       alert('圖片上傳成功！')
     } catch (error) {
-      console.error('上傳失敗:', error)
+      logger.error('上傳失敗:', error)
       alert('圖片上傳失敗，請稍後再試')
     } finally {
       setUploadingIndex(null)

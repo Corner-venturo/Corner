@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -24,6 +25,7 @@ import {
   FileSignature,
   Flag,
   MessageSquare,
+  LockOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -33,8 +35,10 @@ import {
   useEmployeeStore,
   useRegionsStore,
 } from '@/stores'
+import { useAuthStore } from '@/stores/auth-store'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { Tour } from '@/stores/types'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { useDialog } from '@/hooks/useDialog'
 import { useTourPageState } from '../hooks/useTourPageState'
@@ -59,6 +63,7 @@ export const ToursPage: React.FC = () => {
 
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { user } = useAuthStore()
   const orderStore = useOrderStore()
   const { items: orders } = orderStore
   const addOrder = orderStore.create
@@ -173,6 +178,22 @@ export const ToursPage: React.FC = () => {
 
   // Filter tours by status and search query
   const filteredTours = (tours || []).filter(tour => {
+    // 封存分頁：只顯示已結團的
+    if (activeStatusTab === 'archived') {
+      const searchLower = searchQuery.toLowerCase()
+      const searchMatch =
+        !searchQuery ||
+        tour.name.toLowerCase().includes(searchLower) ||
+        tour.code.toLowerCase().includes(searchLower) ||
+        tour.location.toLowerCase().includes(searchLower) ||
+        tour.status.toLowerCase().includes(searchLower) ||
+        tour.description?.toLowerCase().includes(searchLower)
+
+      return tour.closing_status === 'closed' && searchMatch
+    }
+
+    // 其他分頁：排除已結團的
+    const notClosed = tour.closing_status !== 'closed'
     const statusMatch = activeStatusTab === 'all' || tour.status === activeStatusTab
     const searchLower = searchQuery.toLowerCase()
     const searchMatch =
@@ -183,7 +204,7 @@ export const ToursPage: React.FC = () => {
       tour.status.toLowerCase().includes(searchLower) ||
       tour.description?.toLowerCase().includes(searchLower)
 
-    return statusMatch && searchMatch
+    return notClosed && statusMatch && searchMatch
   })
 
   // Handle edit mode: load tour data when dialog opens in edit mode
@@ -341,13 +362,13 @@ export const ToursPage: React.FC = () => {
         key: 'code',
         label: '團號',
         sortable: true,
-        render: value => <span className="text-sm text-morandi-primary">{value}</span>,
+        render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
       },
       {
         key: 'name',
         label: '旅遊團名稱',
         sortable: true,
-        render: value => <span className="text-sm text-morandi-primary">{value}</span>,
+        render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
       },
       {
         key: 'departure_date',
@@ -409,21 +430,19 @@ export const ToursPage: React.FC = () => {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const { useAuthStore } = await import('@/stores/auth-store')
-
-      console.log('🔵 [建立頻道] 開始處理:', tour.code, tour.name)
+      logger.log('🔵 [建立頻道] 開始處理:', tour.code, tour.name)
 
       // 從 Zustand store 獲取當前登入使用者（支援本地認證）
-      const { user } = useAuthStore.getState()
+      const auth = useRequireAuthSync()
 
-      if (!user) {
-        console.error('❌ [建立頻道] 使用者未登入')
+      if (!auth.isAuthenticated) {
+        logger.error('❌ [建立頻道] 使用者未登入')
         toast.dismiss(loadingToast)
-        toast.error('請先登入')
+        auth.showLoginRequired()
         return
       }
 
-      console.log('✅ [建立頻道] 使用者已登入:', user.id)
+      logger.log('✅ [建立頻道] 使用者已登入:', auth.user!.id)
 
       // 獲取預設工作空間 ID
       const { data: workspaces, error: wsError } = await supabase
@@ -433,27 +452,28 @@ export const ToursPage: React.FC = () => {
         .single()
 
       if (wsError || !workspaces) {
-        console.error('❌ [建立頻道] 找不到工作空間:', wsError)
+        logger.error('❌ [建立頻道] 找不到工作空間:', wsError)
         toast.dismiss(loadingToast)
         toast.error('找不到工作空間')
         return
       }
 
-      console.log('✅ [建立頻道] 工作空間:', workspaces.id)
+      logger.log('✅ [建立頻道] 工作空間:', workspaces.id)
 
-      // 檢查是否已有頻道
+      // 檢查是否已有頻道（加上 workspace_id 過濾）
       const { data: existingChannel, error: checkError } = await supabase
         .from('channels')
         .select('id, name')
+        .eq('workspace_id', workspaces.id)
         .eq('tour_id', tour.id)
         .maybeSingle()
 
       if (checkError) {
-        console.error('❌ [建立頻道] 檢查失敗:', checkError)
+        logger.error('❌ [建立頻道] 檢查失敗:', checkError)
       }
 
       if (existingChannel) {
-        console.log('ℹ️ [建立頻道] 頻道已存在:', existingChannel.name)
+        logger.log('ℹ️ [建立頻道] 頻道已存在:', existingChannel.name)
         toast.dismiss(loadingToast)
         toast.info(`頻道已存在：${existingChannel.name}`)
         return
@@ -461,7 +481,7 @@ export const ToursPage: React.FC = () => {
 
       // 建立頻道
       const channelName = `${tour.code} ${tour.name}`
-      console.log('🔵 [建立頻道] 準備建立:', channelName)
+      logger.log('🔵 [建立頻道] 準備建立:', channelName)
 
       const { error: insertError, data: newChannel } = await supabase
         .from('channels')
@@ -471,45 +491,73 @@ export const ToursPage: React.FC = () => {
           description: `${tour.name} - ${tour.departure_date || ''} 出發`,
           type: 'public',
           tour_id: tour.id,
-          created_by: user.id,
+          created_by: auth.user!.id,
         })
         .select()
         .single()
 
       if (insertError) {
-        console.error('❌ [建立頻道] 建立失敗:', insertError)
+        logger.error('❌ [建立頻道] 建立失敗:', insertError)
         throw insertError
       }
 
-      console.log('✅ [建立頻道] 建立成功:', newChannel)
+      logger.log('✅ [建立頻道] 建立成功:', newChannel)
 
       // 自動將創建者加入為頻道擁有者
       try {
         const { error: memberError } = await supabase.from('channel_members').insert({
           workspace_id: workspaces.id,
           channel_id: newChannel.id,
-          employee_id: user.id,
+          employee_id: auth.user!.id,
           role: 'owner',
           status: 'active',
         })
 
         if (memberError) {
-          console.warn('⚠️ [建立頻道] 加入成員失敗（可能已存在）:', memberError)
+          logger.warn('⚠️ [建立頻道] 加入成員失敗（可能已存在）:', memberError)
         } else {
-          console.log('✅ [建立頻道] 創建者已加入為擁有者')
+          logger.log('✅ [建立頻道] 創建者已加入為擁有者')
         }
       } catch (memberErr) {
-        console.warn('⚠️ [建立頻道] 加入成員異常:', memberErr)
+        logger.warn('⚠️ [建立頻道] 加入成員異常:', memberErr)
       }
 
       toast.dismiss(loadingToast)
       toast.success(`已建立頻道：${channelName}`)
     } catch (error: any) {
-      console.error('❌ [建立頻道] 發生錯誤:', error)
+      logger.error('❌ [建立頻道] 發生錯誤:', error)
       toast.dismiss(loadingToast)
       toast.error(`建立頻道失敗：${error.message || '未知錯誤'}`)
     }
   }, [])
+
+  // 解鎖結團（管理員專用）
+  const handleUnlockTour = useCallback(async (tour: Tour) => {
+    const { toast } = await import('sonner')
+    const { supabase } = await import('@/lib/supabase/client')
+
+    if (!confirm(`確定要解鎖「${tour.name}」嗎？\n\n解鎖後可以繼續編輯和修改此團體。`)) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('tours')
+        .update({
+          closing_status: 'open',
+        })
+        .eq('id', tour.id)
+
+      if (error) throw error
+
+      toast.success('已解鎖結團')
+      // 重新載入資料
+      actions.loadTours()
+    } catch (error: any) {
+      logger.error('解鎖失敗:', error)
+      toast.error(`解鎖失敗：${error.message || '未知錯誤'}`)
+    }
+  }, [actions])
 
   const renderActions = useCallback(
     (tour: Tour) => {
@@ -588,6 +636,21 @@ export const ToursPage: React.FC = () => {
           >
             {tour.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
           </button>
+          {/* 解鎖結團按鈕（僅封存分頁且管理員可見） */}
+          {activeStatusTab === 'archived' &&
+           tour.closing_status === 'closed' &&
+           user?.permissions?.includes('super_admin') && (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                handleUnlockTour(tour)
+              }}
+              className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+              title="解鎖結團"
+            >
+              <LockOpen size={14} />
+            </button>
+          )}
           <button
             onClick={e => {
               e.stopPropagation()
@@ -601,7 +664,7 @@ export const ToursPage: React.FC = () => {
         </div>
       )
     },
-    [quotes, openDialog, router, operations, setSelectedTour, setDeleteConfirm, handleCreateChannel]
+    [quotes, openDialog, router, operations, setSelectedTour, setDeleteConfirm, handleCreateChannel, handleUnlockTour, activeStatusTab, user]
   )
 
   const renderExpanded = useCallback(
@@ -672,6 +735,7 @@ export const ToursPage: React.FC = () => {
             { value: '進行中', label: '進行中', icon: Calendar },
             { value: '待結案', label: '待結案', icon: AlertCircle },
             { value: '結案', label: '結案', icon: FileCheck },
+            { value: 'archived', label: '封存', icon: Archive },
           ],
           activeTab: activeStatusTab,
           onTabChange: (tab: string) => {

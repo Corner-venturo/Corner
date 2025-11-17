@@ -11,6 +11,7 @@
  * 例如：TP-E001 (台北第1位員工)
  */
 
+import { logger } from '@/lib/utils/logger'
 import type { BaseEntity } from '@/types'
 import type { CodeConfig } from '../core/types'
 
@@ -83,8 +84,17 @@ export function generateCode(
   // 檢查是否為快速報價單（優先從 config 判斷，而非 existingItems）
   const isQuickQuote = (config as any)?.quoteType === 'quick'
 
+  logger.log('🔍 [code-generator] generateCode 參數:', {
+    workspaceCode,
+    config,
+    configQuoteType: (config as any)?.quoteType,
+    isQuickQuote,
+    existingItemsCount: existingItems.length,
+  })
+
   // 快速報價單使用 Q 開頭
   if (isQuickQuote) {
+    logger.log('✅ [code-generator] 判定為快速報價單，使用 Q 系列')
     let maxNumber = 0
 
     existingItems.forEach(item => {
@@ -104,10 +114,13 @@ export function generateCode(
     })
 
     const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-    return `${workspaceCode}-Q${nextNumber}`
+    const finalCode = `${workspaceCode}-Q${nextNumber}`
+    logger.log('✅ [code-generator] 快速報價單編號生成:', finalCode)
+    return finalCode
   }
 
   // 標準報價單使用字母循環系統 (A-Z)
+  logger.log('📋 [code-generator] 判定為標準報價單，使用 A-Z 系列')
   let maxLetter = ''
   let maxNumber = 0
 
@@ -137,15 +150,19 @@ export function generateCode(
   }
 
   // 計算下一個編號
+  let finalCode: string
   if (maxNumber < 999) {
     // 同字母，數字 +1
     const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-    return `${workspaceCode}-${maxLetter}${nextNumber}`
+    finalCode = `${workspaceCode}-${maxLetter}${nextNumber}`
   } else {
     // 數字已達 999，字母進位
     const nextLetter = String.fromCharCode(maxLetter.charCodeAt(0) + 1)
-    return `${workspaceCode}-${nextLetter}001`
+    finalCode = `${workspaceCode}-${nextLetter}001`
   }
+
+  logger.log('✅ [code-generator] 標準報價單編號生成:', finalCode, { maxLetter, maxNumber })
+  return finalCode
 }
 
 /**

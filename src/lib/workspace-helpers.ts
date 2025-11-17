@@ -30,6 +30,7 @@ export function getCurrentWorkspaceId(): string | null {
 
 /**
  * 取得當前使用者的 workspace code (TP, TC)
+ * 由於資料庫沒有 code 欄位，從 name 取前兩個字元作為代碼
  *
  * @returns workspace code 或 null
  */
@@ -47,7 +48,7 @@ export function getCurrentWorkspaceCode(): string | null {
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
       const workspace = workspaces.find(w => w.id === selectedWorkspaceId)
-      return workspace?.code || null
+      return workspace ? workspace.name.substring(0, 2).toUpperCase() : null
     }
     return null
   }
@@ -59,7 +60,7 @@ export function getCurrentWorkspaceCode(): string | null {
   }
 
   const workspace = workspaces.find(w => w.id === workspaceId)
-  return workspace?.code || null
+  return workspace ? workspace.name.substring(0, 2).toUpperCase() : null
 }
 
 /**

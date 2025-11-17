@@ -41,9 +41,9 @@ export async function generatePaymentRequestPDF(data: PaymentRequestPDFData): Pr
   yPos += 6
   doc.text(`Tour Code / 團號: ${request.code || '-'}`, infoLeft, yPos)
   yPos += 6
-  doc.text(`Tour Name / 團名: ${request.tour_name || '-'}`, infoLeft, yPos)
+  doc.text(`Tour ID / 關聯團號ID: ${request.tour_id || '-'}`, infoLeft, yPos)
   yPos += 6
-  doc.text(`Total Amount / 總金額: NT$ ${request.total_amount.toLocaleString()}`, infoLeft, yPos)
+  doc.text(`Total Amount / 總金額: NT$ ${request.amount.toLocaleString()}`, infoLeft, yPos)
   yPos += 10
 
   // 請款項目表格
@@ -98,7 +98,7 @@ export async function generatePaymentRequestPDF(data: PaymentRequestPDFData): Pr
   // 總計
   doc.setFontSize(12)
   doc.setFont('helvetica', 'bold')
-  doc.text(`Total Amount / 總金額: NT$ ${request.total_amount.toLocaleString()}`, infoLeft, yPos)
+  doc.text(`Total Amount / 總金額: NT$ ${request.amount.toLocaleString()}`, infoLeft, yPos)
 
   // 頁尾
   const pageCount = doc.getNumberOfPages()

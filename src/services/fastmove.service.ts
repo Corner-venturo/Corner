@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import type { FastMoveProduct, FastMoveOrderRequest, FastMoveOrderDetail } from '@/types/esim.types'
 
 const FASTMOVE_API_BASE = process.env.NEXT_PUBLIC_FASTMOVE_API_URL || 'https://api.fastmove.com'
@@ -27,7 +28,7 @@ class FastMoveService {
       const data = await response.json()
       return data.products || []
     } catch (error) {
-      console.error('Failed to fetch FastMove products:', error)
+      logger.error('Failed to fetch FastMove products:', error)
       throw error
     }
   }
@@ -53,7 +54,7 @@ class FastMoveService {
       const data = await response.json()
       return data
     } catch (error) {
-      console.error('Failed to create FastMove order:', error)
+      logger.error('Failed to create FastMove order:', error)
       throw error
     }
   }
@@ -77,7 +78,7 @@ class FastMoveService {
       const data = await response.json()
       return data
     } catch (error) {
-      console.error('Failed to fetch FastMove order status:', error)
+      logger.error('Failed to fetch FastMove order status:', error)
       throw error
     }
   }

@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
 import {
   Dialog,
@@ -134,7 +135,7 @@ export const CostTemplateDialog: React.FC<CostTemplateDialogProps> = ({
 
       onClose()
     } catch (error) {
-      console.error('儲存失敗:', error)
+      logger.error('儲存失敗:', error)
       alert('儲存失敗，請稍後再試')
     }
   }

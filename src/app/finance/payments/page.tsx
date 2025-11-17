@@ -11,6 +11,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -107,7 +108,7 @@ export default function PaymentsPage() {
       await handleCreateReceipt(data)
       setIsDialogOpen(false)
     } catch (error) {
-      console.error('建立收款單失敗:', error)
+      logger.error('建立收款單失敗:', error)
       alert('建立收款單失敗')
     }
   }

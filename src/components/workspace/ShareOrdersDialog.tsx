@@ -6,6 +6,7 @@ import { useOrderStore } from '@/stores'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { _Order } from '@/stores/types'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
 interface ShareOrdersDialogProps {
   channelId: string
@@ -100,13 +101,15 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
       return
     }
 
-    if (!user) {
-      alert('請先登入')
+    const auth = useRequireAuthSync()
+
+    if (!auth.isAuthenticated) {
+      auth.showLoginRequired()
       return
     }
 
     try {
-      await shareOrderList(channelId, Array.from(selectedOrders), user.id)
+      await shareOrderList(channelId, Array.from(selectedOrders), auth.user!.id)
       onSuccess()
       onClose()
     } catch (error) {

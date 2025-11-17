@@ -9,6 +9,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -66,7 +67,7 @@ export function BatchCreateReceiptDialog({
 
       setReceipts(parsedReceipts)
     } catch (error) {
-      console.error('解析 Excel 失敗:', error)
+      logger.error('解析 Excel 失敗:', error)
       alert('❌ 解析 Excel 失敗，請檢查檔案格式')
     } finally {
       setIsProcessing(false)
@@ -97,7 +98,7 @@ export function BatchCreateReceiptDialog({
       onClose()
       alert(`✅ 成功建立 ${receipts.length} 筆收款單`)
     } catch (error) {
-      console.error('批量創建收款單失敗:', error)
+      logger.error('批量創建收款單失敗:', error)
       alert('❌ 批量創建收款單失敗')
     }
   }

@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useEffect, useRef, lazy, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -142,7 +143,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
             await orderStore.fetchAll()
           }
         } catch (error) {
-          console.error('載入收款資料失敗:', error)
+          logger.error('載入收款資料失敗:', error)
         } finally {
           setIsLoadingReceipt(false)
         }

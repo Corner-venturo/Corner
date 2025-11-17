@@ -98,27 +98,9 @@ export const useAuthStore = create<AuthState>(
       _hasHydrated: false,
 
       login: async user => {
-        // ✅ 確保 user 一定有 workspace_id
-        let finalUser = user
-
-        // 如果缺少 workspace_id，從 IndexedDB 補上
-        if (!finalUser.workspace_id) {
-          logger.warn('⚠️ login: user 缺少 workspace_id，從 IndexedDB 補上...')
-          try {
-            const { localDB } = await import('@/lib/db')
-            const { TABLES } = await import('@/lib/db/schemas')
-            const employee = await localDB.read(TABLES.EMPLOYEES, user.id)
-
-            if (employee?.workspace_id) {
-              finalUser = { ...user, workspace_id: employee.workspace_id }
-              logger.log('✅ login: 已補上 workspace_id:', employee.workspace_id)
-            } else {
-              logger.error('❌ login: 無法從 IndexedDB 找到 workspace_id')
-            }
-          } catch (error) {
-            logger.error('❌ login: 補上 workspace_id 失敗:', error)
-          }
-        }
+        // Note: employees 表沒有 workspace_id 欄位
+        // workspace 關聯改由其他方式處理
+        const finalUser = user
 
         // 同時更新 user 和 currentProfile
         const profile = useLocalAuthStore.getState().currentProfile
@@ -188,7 +170,7 @@ export const useAuthStore = create<AuthState>(
               const { localDB } = await import('@/lib/db')
               const { TABLES } = await import('@/lib/db/schemas')
 
-              const employee = await localDB.read(TABLES.EMPLOYEES, existingProfile.id)
+              const employee = (await localDB.read(TABLES.EMPLOYEES, existingProfile.id)) as User | undefined
 
               if (!employee) {
                 logger.error('❌ IndexedDB 找不到員工資料')
@@ -242,7 +224,7 @@ export const useAuthStore = create<AuthState>(
                 attendance: employee.attendance || { leave_records: [], overtime_records: [] },
                 contracts: employee.contracts || [],
                 status: employee.status,
-                workspace_id: employee.workspace_id, // ✅ 從資料庫讀取 workspace_id
+                workspace_id: undefined, // Note: employees 表沒有 workspace_id 欄位
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               }
@@ -300,7 +282,7 @@ export const useAuthStore = create<AuthState>(
             return { success: false, message: '帳號或密碼錯誤' }
           }
 
-          const employeeData = employees
+          const employeeData = employees as any
           logger.log('✅ 找到員工資料:', employeeData.display_name)
 
           // 將 snake_case 轉換為 camelCase（前端統一格式）
@@ -321,6 +303,7 @@ export const useAuthStore = create<AuthState>(
             attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
             contracts: employeeData.contracts || [],
             status: employeeData.status,
+            workspace_id: undefined, // Note: employees 表沒有 workspace_id 欄位
             created_at: employeeData.created_at,
             updated_at: employeeData.updated_at,
           }
@@ -440,9 +423,10 @@ export const useAuthStore = create<AuthState>(
           }
 
           // 🎴 建立角色卡（Profile Card）- 用於離線快速登入
+          const personalInfo = employee.personal_info as { email?: string; phone?: string | string[] } | null
           const profile: LocalProfile = {
             id: employee.id,
-            email: employee.personal_info?.email || `${username}@venturo.local`,
+            email: personalInfo?.email || `${username}@venturo.local`,
             employee_number: employee.employee_number,
             display_name: employee.display_name,
             english_name: employee.english_name,
@@ -610,7 +594,7 @@ if (typeof window !== 'undefined') {
   setTimeout(async () => {
     const state = useAuthStore.getState()
     if (state.user && !state.user.workspace_id) {
-      console.warn('⚠️ 偵測到 user 缺少 workspace_id，嘗試自動修復...')
+      logger.warn('⚠️ 偵測到 user 缺少 workspace_id，嘗試自動修復...')
 
       try {
         const { openDB } = await import('idb')
@@ -629,9 +613,9 @@ if (typeof window !== 'undefined') {
               workspace_id: employee.workspace_id,
             },
           })
-          console.log('✅ 已自動補上 workspace_id:', employee.workspace_id)
+          logger.log('✅ 已自動補上 workspace_id:', employee.workspace_id)
         } else {
-          console.error('❌ 無法從 IndexedDB 找到 workspace_id，嘗試使用第一個員工的 workspace')
+          logger.error('❌ 無法從 IndexedDB 找到 workspace_id，嘗試使用第一個員工的 workspace')
           // 備用方案：使用第一個員工的 workspace_id
           if (allEmployees.length > 0 && allEmployees[0].workspace_id) {
             useAuthStore.setState({
@@ -640,11 +624,11 @@ if (typeof window !== 'undefined') {
                 workspace_id: allEmployees[0].workspace_id,
               },
             })
-            console.log('✅ 使用第一個員工的 workspace_id:', allEmployees[0].workspace_id)
+            logger.log('✅ 使用第一個員工的 workspace_id:', allEmployees[0].workspace_id)
           }
         }
       } catch (error) {
-        console.error('❌ 自動修復失敗:', error)
+        logger.error('❌ 自動修復失敗:', error)
       }
     }
   }, 1000)

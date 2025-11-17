@@ -10,6 +10,12 @@
  * AP TPE 02-2712-8888
  */
 
+import { logger } from '@/lib/utils/logger'
+
+/**
+ * 電報解析錯誤
+ */
+
 export interface ParsedPNR {
   recordLocator: string;
   passengerNames: string[];
@@ -42,7 +48,7 @@ export interface FlightSegment {
 export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
   const lines = rawPNR.split('\n').map(line => line.trim()).filter(Boolean);
 
-  console.log('📋 開始解析電報，共', lines.length, '行');
+  logger.log('📋 開始解析電報，共', lines.length, '行');
 
   const result: ParsedPNR = {
     recordLocator: '',
@@ -56,7 +62,7 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
   };
 
   for (const line of lines) {
-    console.log('  檢查行:', line);
+    logger.log('  檢查行:', line);
     // 0. 解析 Header Line 提取 Record Locator
     // 格式: "RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY"
     // Record Locator 在最後 6 個字元
@@ -111,11 +117,11 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     // 格式: "OPW-20NOV:2038/1C7/BR REQUIRES TICKET ON OR BEFORE 23NOV:2038"
     const opwMatch = line.match(/(?:ON OR BEFORE|BEFORE)\s+(\d{2})([A-Z]{3}):?\d*/i);
     if (opwMatch) {
-      console.log('    ✅ 找到出票期限!', opwMatch);
+      logger.log('    ✅ 找到出票期限!', opwMatch);
       const day = opwMatch[1];
       const monthStr = opwMatch[2].toUpperCase();
       const deadline = parseAmadeusDate(day, monthStr);
-      console.log('    📅 解析日期:', deadline);
+      logger.log('    📅 解析日期:', deadline);
       result.ticketingDeadline = deadline;
       continue;
     }

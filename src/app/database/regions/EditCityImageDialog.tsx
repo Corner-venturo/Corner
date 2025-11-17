@@ -28,7 +28,8 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
     if (city) {
       setPreviewUrl1(city.background_image_url || null)
       setPreviewUrl2(city.background_image_url_2 || null)
-      setPrimaryImage(city.primary_image || 1)
+      const primary = city.primary_image
+      setPrimaryImage(primary === 2 ? 2 : 1)
     } else {
       setPreviewUrl1(null)
       setPreviewUrl2(null)

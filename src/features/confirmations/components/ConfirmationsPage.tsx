@@ -4,14 +4,17 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { FileCheck, FileText, CheckCircle, Send, XCircle } from 'lucide-react'
 import { ConfirmationsList } from './ConfirmationsList'
 import { useConfirmationStore } from '@/stores/confirmation-store'
-import { useUserStore } from '@/stores/user-store'
+import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useRealtimeForConfirmations } from '@/hooks/use-realtime-hooks'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
 // 狀態篩選器
 const STATUS_FILTERS = [
@@ -31,10 +34,8 @@ export const ConfirmationsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const confirmations = useConfirmationStore(state => state.items)
-  const createItem = useConfirmationStore(state => state.createItem)
-  const deleteItem = useConfirmationStore(state => state.deleteItem)
-  const currentWorkspace = useUserStore(state => state.currentWorkspace)
-  const currentUser = useUserStore(state => state.user)
+  const create = useConfirmationStore(state => state.create)
+  const remove = useConfirmationStore(state => state.delete)
 
   // 過濾確認單
   const filteredConfirmations = confirmations.filter(conf => {
@@ -46,32 +47,41 @@ export const ConfirmationsPage: React.FC = () => {
   })
 
   const handleAdd = async () => {
-    if (!currentWorkspace?.id || !currentUser?.id) {
-      alert('請先登入')
+    const auth = useRequireAuthSync()
+
+    if (!auth.isAuthenticated) {
+      auth.showLoginRequired()
       return
     }
 
+    if (!auth.workspaceId) {
+      auth.showWorkspaceMissing()
+      return
+    }
+
+    logger.log('✅ 準備建立確認單:', { userId: auth.user!.id, workspaceId: auth.workspaceId })
+
     // 直接創建一個空白確認單並跳轉
     try {
-      const newConf = await createItem({
-        workspace_id: currentWorkspace.id,
+      const newConf = await create({
+        workspace_id: auth.workspaceId,
         type: 'flight', // 預設航班，可在編輯頁修改
         booking_number: '',
         data: {},
         status: 'draft',
-        created_by: currentUser.id,
-        updated_by: currentUser.id,
+        created_by: auth.user!.id,
+        updated_by: auth.user!.id,
       })
       router.push(`/confirmations/${newConf.id}`)
     } catch (error) {
-      console.error('建立失敗:', error)
+      logger.error('建立失敗:', error)
       alert('建立失敗')
     }
   }
 
   const handleDelete = async (id: string) => {
     if (confirm('確定要刪除這個確認單嗎？')) {
-      await deleteItem(id)
+      await remove(id)
     }
   }
 

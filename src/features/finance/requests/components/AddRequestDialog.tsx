@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useEffect, useMemo } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -134,7 +135,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       resetForm()
       onOpenChange(false)
     } catch (error) {
-      console.error('❌ Create Request Error:', error)
+      logger.error('❌ Create Request Error:', error)
       alert('❌ 建立失敗，請稍後再試')
     }
   }

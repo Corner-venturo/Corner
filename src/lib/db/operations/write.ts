@@ -2,6 +2,7 @@
  * 寫入操作模組
  */
 
+import { logger } from '@/lib/utils/logger'
 import type { TableName } from '../schemas'
 import type { WithTimestamps } from '../types'
 
@@ -42,20 +43,21 @@ export async function put<T extends { id: string }>(
       request.onerror = () => {
         const errorMsg = request.error?.message || request.error?.name || '未知錯誤'
         const error = new Error(`Put 資料失敗 (${tableName}): ${errorMsg}`)
-        console.error('[LocalDB] ❌ Put 失敗詳情:', {
+        logger.error('[LocalDB] ❌ Put 失敗詳情:', {
           tableName,
           errorName: request.error?.name,
           errorMessage: request.error?.message,
           errorCode: (request.error as any)?.code,
           dataId: data?.id,
+          dataCode: (data as any)?.code, // 🔥 加入：顯示重複的 code
           dataKeys: data ? Object.keys(data) : [],
-          data: data,
+          fullData: data, // 🔥 改名：更清楚
         })
         reject(error)
       }
     })
   } catch (error) {
-    console.error('[LocalDB] put 方法錯誤:', error)
+    logger.error('[LocalDB] put 方法錯誤:', error)
     throw error
   }
 }
@@ -89,7 +91,7 @@ export async function create<T extends { id: string }>(
 
     request.onerror = () => {
       const error = new Error(`新增資料失敗 (${tableName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })
@@ -137,7 +139,7 @@ export async function update<T extends { id: string }>(
 
     request.onerror = () => {
       const error = new Error(`更新資料失敗 (${tableName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })
@@ -163,7 +165,7 @@ export async function createMany<T extends { id: string }>(
 
     transaction.onerror = () => {
       const error = new Error(`批次新增失敗 (${tableName}): ${transaction.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
 

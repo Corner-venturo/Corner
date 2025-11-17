@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
 import { MapPin } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -150,7 +151,7 @@ export default function AttractionsPage() {
   // 暫時禁用地區資料載入，避免崩潰
   useEffect(() => {
     // fetchAll() // 暫時註解
-    console.log('[Attractions] Skipping regions fetchAll to prevent crash')
+    logger.log('[Attractions] Skipping regions fetchAll to prevent crash')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

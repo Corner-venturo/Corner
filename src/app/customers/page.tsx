@@ -11,6 +11,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -32,6 +33,7 @@ export default function CustomersPage() {
   // ✅ Realtime 訂閱
   useRealtimeForCustomers()
 
+  const router = useRouter()
   const { items: customers, create: addCustomer, fetchAll: fetchCustomers } = useCustomerStore()
 
   // 載入資料
@@ -173,6 +175,10 @@ export default function CustomersPage() {
 
   const handleClearSearch = () => {
     setSearchParams({})
+  }
+
+  const handleRowClick = (customer: Customer) => {
+    router.push(`/customers/${customer.id}`)
   }
 
   const hasActiveFilters = Object.keys(searchParams).length > 0

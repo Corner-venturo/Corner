@@ -36,7 +36,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
   const [notes, setNotes] = useState('')
 
-  const stats = getWeekStatistics()
+  const stats = getWeekStatistics() as any
 
   // 生成預設存檔名稱
   const getDefaultArchiveName = () => {

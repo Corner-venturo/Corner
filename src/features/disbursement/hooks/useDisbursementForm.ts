@@ -15,7 +15,7 @@ export function useDisbursementForm(pendingRequests: PaymentRequest[]) {
   const selectedAmount = useMemo(() => {
     return selectedRequests.reduce((sum, requestId) => {
       const request = pendingRequests.find((r: PaymentRequest) => r.id === requestId)
-      return sum + (request?.total_amount || 0)
+      return sum + (request?.amount || 0)
     }, 0)
   }, [selectedRequests, pendingRequests])
 
@@ -23,7 +23,7 @@ export function useDisbursementForm(pendingRequests: PaymentRequest[]) {
   const selectedAmountForNew = useMemo(() => {
     return selectedRequestsForNew.reduce((sum, requestId) => {
       const request = pendingRequests.find((r: PaymentRequest) => r.id === requestId)
-      return sum + (request?.total_amount || 0)
+      return sum + (request?.amount || 0)
     }, 0)
   }, [selectedRequestsForNew, pendingRequests])
 

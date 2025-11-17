@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { useState } from 'react'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
@@ -103,7 +104,36 @@ export function useEmployeeForm(onSubmit: () => void) {
         status: 'active',
       }
 
-      addUser(dbEmployeeData)
+      const newEmployee = await addUser(dbEmployeeData)
+
+      // 自動加入該 workspace 的所有頻道
+      if (newEmployee?.id) {
+        try {
+          const { supabase } = await import('@/lib/supabase/client')
+
+          // 取得該 workspace 的所有頻道
+          const { data: channels } = await supabase
+            .from('channels')
+            .select('id')
+            .eq('workspace_id', targetWorkspaceId)
+
+          // 將新員工加入所有頻道
+          if (channels && channels.length > 0) {
+            const channelMembers = channels.map(channel => ({
+              workspace_id: targetWorkspaceId,
+              channel_id: channel.id,
+              employee_id: newEmployee.id,
+              role: 'member',
+              status: 'active',
+            }))
+
+            await supabase.from('channel_members').insert(channelMembers)
+            logger.log(`✅ 已將新員工加入 ${channels.length} 個頻道`)
+          }
+        } catch (channelError) {
+          logger.error('⚠️ 加入頻道失敗（不影響員工建立）:', channelError)
+        }
+      }
 
       setCreatedEmployee({
         display_name: formData.display_name,

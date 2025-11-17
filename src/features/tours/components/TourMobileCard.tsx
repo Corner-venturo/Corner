@@ -37,9 +37,9 @@ export function TourMobileCard({ tour, onClick, getStatusColor }: TourMobileCard
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-morandi-primary text-base truncate mb-1">
-            {tour.tour_code || '未命名旅遊團'}
+            {tour.code || '未命名旅遊團'}
           </h3>
-          <p className="text-sm text-morandi-secondary truncate">{tour.tour_name || '無團名'}</p>
+          <p className="text-sm text-morandi-secondary truncate">{tour.name || '無團名'}</p>
         </div>
         <ChevronRight size={20} className="text-morandi-secondary flex-shrink-0 ml-2" />
       </div>

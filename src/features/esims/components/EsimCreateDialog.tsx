@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -68,7 +69,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
   ])
 
   const tourOptions = useMemo(() => {
-    console.log('Tours data:', tours?.length)
+    logger.log('Tours data:', tours?.length)
     return (tours || []).map(tour => ({
       value: tour.id,
       label: `${tour.code} - ${tour.name}`,
@@ -109,7 +110,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
             setHasInitialized(true)
           }
         } catch (error) {
-          console.error('Failed to initialize esim dialog:', error)
+          logger.error('Failed to initialize esim dialog:', error)
         }
       }
       void init()
@@ -139,7 +140,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
             setTourOrders([])
           }
         } catch (error) {
-          console.error('Failed to fetch tour orders:', error)
+          logger.error('Failed to fetch tour orders:', error)
           setTourOrders([])
         }
       }
@@ -178,7 +179,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
       toast.success(`已更新 ${productList.length} 個產品（測試資料）`)
     } catch (error) {
       toast.error('無法載入產品列表，請稍後再試')
-      console.error('Failed to fetch products:', error)
+      logger.error('Failed to fetch products:', error)
     } finally {
       setIsLoadingProducts(false)
     }
@@ -325,9 +326,9 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
             invoice_number: invoiceNumber,
             esim_number: esimNumber,
           })
-          console.log('FastMove 下單成功，請款單號：', invoiceNumber)
+          logger.log('FastMove 下單成功，請款單號：', invoiceNumber)
         } catch (error) {
-          console.error('FastMove API 調用錯誤:', error)
+          logger.error('FastMove API 調用錯誤:', error)
           // 不中斷流程，網卡已建立，只是 FastMove 失敗
         }
       }
@@ -346,7 +347,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
       ])
       router.refresh()
     } catch (error) {
-      console.error('建立失敗:', error)
+      logger.error('建立失敗:', error)
       throw error
     }
   }

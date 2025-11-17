@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
@@ -98,7 +99,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         description: '請款單建立成功',
       })
     } catch (error) {
-      console.error('建立請款單失敗:', error)
+      logger.error('建立請款單失敗:', error)
       toast({
         title: '錯誤',
         description: '建立請款單失敗',
@@ -156,7 +157,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
       })
       .flatMap(request =>
         // 將每個請款單的項目展開成 CostPayment 格式
-        request.items.map(item => ({
+        request.items.map((item: { id: string; category: string; supplier_name: string; description: string; unit_price: number; quantity: number; subtotal: number }) => ({
           id: item.id,
           type: 'request' as const,
           tour_id: request.tour_id || tour.id,

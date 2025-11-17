@@ -80,6 +80,8 @@ export interface User {
   status: 'active' | 'probation' | 'leave' | 'terminated'
   avatar?: string
   workspace_id?: string // 所屬工作空間 ID
+  selected_workspace_id?: string // Super Admin 選擇的工作空間 ID
+  hidden_menu_items?: string[] // 隱藏的選單項目 ID
 
   // 認證相關
   password_hash?: string // 加密後的密碼
@@ -482,13 +484,17 @@ export type {
 export interface PaymentRequest {
   id: string
   code: string // 請款單編號（由 store 自動生成）
+  request_number: string // 請款單號（與 code 同義，向下相容）
+  order_id?: string | null // 關聯的訂單ID
   tour_id?: string | null
   request_type: string // 請款類型（例：員工代墊、供應商支出）
   amount: number // 總金額
   supplier_id?: string | null
   supplier_name?: string | null
   status?: string | null // pending, approved, paid
+  is_special_billing?: boolean | null // 是否為特殊出帳
   notes?: string | null
+  items?: PaymentRequestItem[] // 請款項目列表
   approved_at?: string | null
   approved_by?: string | null
   paid_at?: string | null

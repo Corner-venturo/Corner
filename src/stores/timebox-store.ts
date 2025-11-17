@@ -142,7 +142,34 @@ export const useScheduledBoxesStore = createStore<ScheduledBox>(
 interface TimeboxState {
   // 當前週記錄
   currentWeekId: string | null
+  currentWeek: WeekRecord | null
   setCurrentWeekId: (weekId: string | null) => void
+
+  // 箱子相關（from useBoxesStore）
+  boxes: BaseBox[]
+  createBox: (data: Omit<BaseBox, 'id' | 'created_at' | 'updated_at'>) => Promise<BaseBox>
+  updateBox: (id: string, data: Partial<BaseBox>) => Promise<BaseBox>
+  deleteBox: (id: string) => Promise<void>
+
+  // 排程箱子相關（from useScheduledBoxesStore）
+  scheduledBoxes: ScheduledBox[]
+  addScheduledBox: (data: Omit<ScheduledBox, 'id' | 'created_at' | 'updated_at'>) => Promise<ScheduledBox>
+  removeScheduledBox: (id: string) => Promise<void>
+  toggleBoxCompletion: (id: string) => Promise<void>
+
+  // 重訓相關
+  addWorkoutExercise: (scheduledBoxId: string, exercise: WorkoutExercise) => Promise<void>
+  removeWorkoutExercise: (scheduledBoxId: string, exerciseId: string) => Promise<void>
+  updateWorkoutExercise: (scheduledBoxId: string, exerciseId: string, data: Partial<WorkoutExercise>) => Promise<void>
+  toggleSetCompletion: (scheduledBoxId: string, exerciseId: string, setIndex: number) => Promise<void>
+
+  // 提醒相關
+  updateReminderData: (scheduledBoxId: string, text: string) => Promise<void>
+
+  // 週記錄相關（from useWeeksStore）
+  weekRecords: WeekRecord[]
+  archiveCurrentWeek: (notes?: string) => Promise<void>
+  copyToNextWeek: () => Promise<void>
 
   // 初始化當前週
   initializeCurrentWeek: (weekStart: Date, userId: string) => Promise<void>
@@ -175,11 +202,100 @@ const getWeekEnd = (date: Date) => {
   return end
 }
 
-// 組合 Store
-export const useTimeboxStore = create<TimeboxState>((set, get) => ({
+// 組合 Store（內部）
+const useTimeboxStoreInternal = create<Omit<TimeboxState, 'boxes' | 'scheduledBoxes' | 'weekRecords' | 'currentWeek'>>((set, get) => ({
+  // 狀態
   currentWeekId: null,
 
   setCurrentWeekId: weekId => set({ currentWeekId: weekId }),
+
+  // 箱子 CRUD（委派給 useBoxesStore）
+  createBox: async (data) => {
+    return await useBoxesStore.getState().create(data)
+  },
+  updateBox: async (id, data) => {
+    return await useBoxesStore.getState().update(id, data)
+  },
+  deleteBox: async (id) => {
+    await useBoxesStore.getState().delete(id)
+  },
+
+  // 排程箱子（委派給 useScheduledBoxesStore）
+  addScheduledBox: async (data) => {
+    return await useScheduledBoxesStore.getState().create(data)
+  },
+  removeScheduledBox: async (id) => {
+    await useScheduledBoxesStore.getState().delete(id)
+  },
+  toggleBoxCompletion: async (id) => {
+    const box = useScheduledBoxesStore.getState().items.find(b => b.id === id)
+    if (!box) return
+    await useScheduledBoxesStore.getState().update(id, {
+      completed: !box.completed,
+      completed_at: !box.completed ? new Date().toISOString() : undefined,
+    })
+  },
+
+  // 重訓相關（委派給 helpers）
+  addWorkoutExercise: async (scheduledBoxId, exercise) => {
+    const box = useScheduledBoxesStore.getState().items.find(b => b.id === scheduledBoxId)
+    if (!box) return
+    const workoutData = (box.data as WorkoutData) || { exercises: [] }
+    workoutData.exercises.push(exercise)
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, { data: workoutData })
+  },
+  removeWorkoutExercise: async (scheduledBoxId, exerciseId) => {
+    const box = useScheduledBoxesStore.getState().items.find(b => b.id === scheduledBoxId)
+    if (!box || !box.data) return
+    const workoutData = box.data as WorkoutData
+    workoutData.exercises = workoutData.exercises.filter(e => e.id !== exerciseId)
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, { data: workoutData })
+  },
+  updateWorkoutExercise: async (scheduledBoxId, exerciseId, data) => {
+    const box = useScheduledBoxesStore.getState().items.find(b => b.id === scheduledBoxId)
+    if (!box || !box.data) return
+    const workoutData = box.data as WorkoutData
+    const exerciseIndex = workoutData.exercises.findIndex(e => e.id === exerciseId)
+    if (exerciseIndex === -1) return
+    workoutData.exercises[exerciseIndex] = { ...workoutData.exercises[exerciseIndex], ...data }
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, { data: workoutData })
+  },
+  toggleSetCompletion: async (scheduledBoxId, exerciseId, setIndex) => {
+    const box = useScheduledBoxesStore.getState().items.find(b => b.id === scheduledBoxId)
+    if (!box || !box.data) return
+    const workoutData = box.data as WorkoutData
+    const exercise = workoutData.exercises.find(e => e.id === exerciseId)
+    if (!exercise) return
+    exercise.setsCompleted[setIndex] = !exercise.setsCompleted[setIndex]
+    exercise.completedSetsTime[setIndex] = exercise.setsCompleted[setIndex] ? new Date().toISOString() : null
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, { data: workoutData })
+  },
+
+  // 提醒相關
+  updateReminderData: async (scheduledBoxId, text) => {
+    const reminderData: ReminderData = {
+      text,
+      lastUpdated: new Date().toISOString(),
+    }
+    await useScheduledBoxesStore.getState().update(scheduledBoxId, { data: reminderData })
+  },
+
+  // 週記錄
+  archiveCurrentWeek: async (notes) => {
+    const { currentWeekId } = get()
+    if (!currentWeekId) return
+    await useWeeksStore.getState().update(currentWeekId, {
+      archived: true,
+      review_notes: notes,
+      review_created_at: new Date().toISOString(),
+    })
+  },
+  copyToNextWeek: async () => {
+    const { currentWeekId } = get()
+    if (!currentWeekId) return
+    const currentScheduledBoxes = useScheduledBoxesStore.getState().items.filter(sb => sb.week_id === currentWeekId)
+    // TODO: Implement copy logic
+  },
 
   initializeCurrentWeek: async (weekStart, userId) => {
     const start = getWeekStart(weekStart)
@@ -359,8 +475,8 @@ export const timeboxHelpers = {
     const nextWeekStart = new Date(sourceWeek.week_start)
     nextWeekStart.setDate(nextWeekStart.getDate() + 7)
 
-    await useTimeboxStore.getState().initializeCurrentWeek(nextWeekStart, userId)
-    const newWeekId = useTimeboxStore.getState().currentWeekId
+    await useTimeboxStoreInternal.getState().initializeCurrentWeek(nextWeekStart, userId)
+    const newWeekId = useTimeboxStoreInternal.getState().currentWeekId
 
     if (!newWeekId) return
 
@@ -376,4 +492,24 @@ export const timeboxHelpers = {
       })
     }
   },
+}
+
+// ============================================
+// 公開的組合 Hook（合併所有子 stores）
+// ============================================
+
+export const useTimeboxStore = (): TimeboxState => {
+  const internal = useTimeboxStoreInternal()
+  const boxes = useBoxesStore(state => state.items)
+  const scheduledBoxes = useScheduledBoxesStore(state => state.items)
+  const weekRecords = useWeeksStore(state => state.items)
+  const currentWeek = weekRecords.find(w => w.id === internal.currentWeekId) || null
+
+  return {
+    ...internal,
+    boxes,
+    scheduledBoxes,
+    weekRecords,
+    currentWeek,
+  }
 }

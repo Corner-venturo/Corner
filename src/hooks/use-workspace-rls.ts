@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useWorkspaceStore } from '@/stores'
@@ -30,12 +31,12 @@ export function useWorkspaceRLS() {
         })
 
         if (error) {
-          console.error('[Workspace RLS] 設定失敗:', error)
+          logger.error('[Workspace RLS] 設定失敗:', error)
         } else {
-          console.log('[Workspace RLS] 已設定 workspace:', currentWorkspaceId)
+          logger.log('[Workspace RLS] 已設定 workspace:', currentWorkspaceId)
         }
       } catch (err) {
-        console.error('[Workspace RLS] 執行錯誤:', err)
+        logger.error('[Workspace RLS] 執行錯誤:', err)
       }
     }
 
@@ -51,7 +52,7 @@ export function useWorkspaceRLS() {
     // 從員工資料取得預設 workspace
     const defaultWorkspace = currentProfile.workspace_id || 'taipei'
 
-    console.log('[Workspace RLS] 自動設定預設 workspace:', defaultWorkspace)
+    logger.log('[Workspace RLS] 自動設定預設 workspace:', defaultWorkspace)
     setCurrentWorkspace(defaultWorkspace)
   }, [currentProfile, currentWorkspaceId, setCurrentWorkspace])
 }
@@ -66,11 +67,11 @@ export async function switchWorkspace(workspaceId: string) {
   })
 
   if (error) {
-    console.error('[Workspace Switch] 失敗:', error)
+    logger.error('[Workspace Switch] 失敗:', error)
     throw error
   }
 
-  console.log('[Workspace Switch] 已切換到:', workspaceId)
+  logger.log('[Workspace Switch] 已切換到:', workspaceId)
 
   // 重新載入資料
   window.location.reload()

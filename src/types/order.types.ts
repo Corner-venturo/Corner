@@ -10,24 +10,25 @@ import { BaseEntity } from './base.types'
 
 /**
  * Order - 訂單資料
+ * 注意：所有可選欄位使用 | null 以符合 Supabase PostgreSQL 規範
  */
 export interface Order extends BaseEntity {
   order_number: string // 訂單編號（相容舊欄位：code）
   code: string // 團號代碼
   tour_id: string // 旅遊團 ID
   tour_name: string // 旅遊團名稱
-  customer_id?: string // 客戶 ID（可選）
+  customer_id?: string | null // 客戶 ID（可選）
   contact_person: string // 聯絡人
-  contact_phone?: string // 聯絡電話（可選）
+  contact_phone?: string | null // 聯絡電話（可選）
   sales_person: string // 業務人員
   assistant: string // 助理
   member_count: number // 團員人數
   payment_status: PaymentStatus // 付款狀態
-  status?: OrderStatus // 訂單狀態
+  status?: OrderStatus | null // 訂單狀態
   total_amount: number // 總金額
   paid_amount: number // 已付金額
   remaining_amount: number // 待付金額
-  notes?: string // 備註
+  notes?: string | null // 備註
 }
 
 // ============================================
@@ -36,6 +37,7 @@ export interface Order extends BaseEntity {
 
 /**
  * Member - 團員資料
+ * 注意：所有可選欄位使用 | null 以符合 Supabase PostgreSQL 規範
  */
 export interface Member extends BaseEntity {
   order_id: string // 訂單 ID
@@ -47,20 +49,20 @@ export interface Member extends BaseEntity {
   passport_expiry: string // 護照到期日 YYYY-MM-DD
   id_number: string // 身分證字號
   gender: 'M' | 'F' | '' // 性別
-  age?: number // 年齡（可計算，前端使用）
-  phone?: string // 電話
-  email?: string // Email
-  emergency_contact?: string // 緊急聯絡人
-  emergency_phone?: string // 緊急聯絡電話
-  dietary_restrictions?: string // 飲食限制
-  medical_conditions?: string // 醫療狀況
-  room_preference?: string // 房間偏好
-  assigned_room?: string // 分配的房間
-  is_child_no_bed?: boolean // 小孩不佔床
-  reservation_code?: string // 訂位代號
-  add_ons?: string[] // 加購項目IDs
-  refunds?: string[] // 退費項目IDs
-  notes?: string // 備註
+  age?: number | null // 年齡（可計算，前端使用）
+  phone?: string | null // 電話
+  email?: string | null // Email
+  emergency_contact?: string | null // 緊急聯絡人
+  emergency_phone?: string | null // 緊急聯絡電話
+  dietary_restrictions?: string | null // 飲食限制
+  medical_conditions?: string | null // 醫療狀況
+  room_preference?: string | null // 房間偏好
+  assigned_room?: string | null // 分配的房間
+  is_child_no_bed?: boolean | null // 小孩不佔床
+  reservation_code?: string | null // 訂位代號
+  add_ons?: string[] | null // 加購項目IDs
+  refunds?: string[] | null // 退費項目IDs
+  notes?: string | null // 備註
 }
 
 // ============================================

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Attraction, AttractionFormData } from '../types'
@@ -24,7 +25,7 @@ export function useAttractionsData() {
       if (error) throw error
       setAttractions(data || [])
     } catch (error) {
-      console.error('Error fetching attractions:', error)
+      logger.error('Error fetching attractions:', error)
       setAttractions([])
     } finally {
       setLoading(false)

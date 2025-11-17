@@ -46,7 +46,7 @@ export function OrderListCard({
   const totalGap = orderList.orders.reduce((sum, order) => sum + order.gap, 0)
   const canProcess = userRole === 'admin' || userRole === 'finance'
 
-  const getOrderStatus = order => {
+  const getOrderStatus = (order: { total_amount: number; paid_amount: number; collection_rate: number }) => {
     const isFullyUnpaid = order.total_amount > 0 && order.paid_amount === 0
     const isLowRate = order.collection_rate < 30
 

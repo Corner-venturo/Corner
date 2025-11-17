@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Award, Users, Clock, Edit2, Power, Trash2 } from 'lucide-react'
@@ -84,7 +85,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         }
       }
     } catch (error: any) {
-      console.error('載入頂級體驗失敗:', error)
+      logger.error('載入頂級體驗失敗:', error)
       toast.error('載入失敗：' + error.message)
     } finally {
       setLoading(false)
@@ -343,7 +344,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
           initialPageSize={20}
           onRowClick={experience => {
             // TODO: 打開編輯對話框
-            console.log('Edit experience:', experience)
+            logger.log('Edit experience:', experience)
           }}
           actions={(experience: PremiumExperience) => (
             <div className="flex items-center gap-1">
@@ -353,7 +354,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                 onClick={e => {
                   e.stopPropagation()
                   // TODO: 打開編輯對話框
-                  console.log('Edit experience:', experience)
+                  logger.log('Edit experience:', experience)
                 }}
                 className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
                 title="編輯"

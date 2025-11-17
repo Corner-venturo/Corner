@@ -25,8 +25,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
         user.display_name ||
         user.chinese_name ||
         user.english_name ||
-        user.name ||
-        user.email ||
+        user.personal_info?.email ||
         '未知使用者',
     }
 

@@ -37,10 +37,11 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   useEffect(() => {
     if (isOpen && user) {
       // 從 HR 帶入員工資料
-      setSenderName(user.display_name || user.username || '')
+      setSenderName(user.display_name || user.chinese_name || user.english_name || '')
       // 從 user 物件取得電話，如果沒有就使用公司總機（可手動修改）
-      const userPhone =
-        (user as Record<string, unknown>).phone || (user as Record<string, unknown>).mobile || ''
+      const userPhone = Array.isArray(user.personal_info?.phone)
+        ? user.personal_info.phone[0]
+        : user.personal_info?.phone || ''
       setSenderPhone(userPhone || '02-7751-6051')
     } else if (!isOpen) {
       // 對話框關閉時重置欄位

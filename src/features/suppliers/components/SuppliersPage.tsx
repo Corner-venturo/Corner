@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback, useEffect } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Building2 } from 'lucide-react'
@@ -75,7 +76,7 @@ export const SuppliersPage: React.FC = () => {
       handleCloseDialog()
       alert('✅ 供應商建立成功')
     } catch (error) {
-      console.error('❌ Create Supplier Error:', error)
+      logger.error('❌ Create Supplier Error:', error)
       alert('❌ 建立失敗，請稍後再試')
     }
   }, [formData, create, handleCloseDialog])

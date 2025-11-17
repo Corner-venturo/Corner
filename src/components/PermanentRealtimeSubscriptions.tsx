@@ -35,7 +35,6 @@ interface Workspace {
 
 export function PermanentRealtimeSubscriptions() {
   const user = useAuthStore(state => state.user)
-  const employeeStore = useEmployeeStore()
   const { toast } = useToast()
 
   useEffect(() => {
@@ -130,7 +129,7 @@ export function PermanentRealtimeSubscriptions() {
           await indexedDB.put(employee)
 
           // 更新 Zustand 狀態
-          employeeStore.setState(state => {
+          useEmployeeStore.setState(state => {
             const exists = state.items.some(item => item.id === employee.id)
             if (exists) return state
             return {
@@ -145,7 +144,7 @@ export function PermanentRealtimeSubscriptions() {
           const indexedDB = new IndexedDBAdapter('employees')
           await indexedDB.put(employee)
 
-          employeeStore.setState(state => ({
+          useEmployeeStore.setState(state => ({
             items: state.items.map(item => (item.id === employee.id ? employee : item)),
           }))
         },
@@ -156,7 +155,7 @@ export function PermanentRealtimeSubscriptions() {
           const indexedDB = new IndexedDBAdapter('employees')
           await indexedDB.delete(employee.id)
 
-          employeeStore.setState(state => ({
+          useEmployeeStore.setState(state => ({
             items: state.items.filter(item => item.id !== employee.id),
           }))
         },

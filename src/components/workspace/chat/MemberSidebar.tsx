@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
+import { useEffect, useState, useMemo } from 'react'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
+import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useUserStore, useAuthStore } from '@/stores'
 import { User, UserPlus, X } from 'lucide-react'
-import { addChannelMembers } from '@/services/workspace-members'
 import { Button } from '@/components/ui/button'
 
 interface MemberSidebarProps {
@@ -13,7 +13,7 @@ interface MemberSidebarProps {
 
 export function MemberSidebar({ isOpen }: MemberSidebarProps) {
   const { selectedChannel, currentWorkspace } = useWorkspaceChannels()
-  const { channelMembers, loadChannelMembers } = useWorkspaceMembers()
+  const { items: channelMembers, fetchAll: fetchChannelMembers, create: addMember } = useChannelMemberStore()
   const { items: employees, fetchAll: fetchEmployees } = useUserStore()
   const { user } = useAuthStore()
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false)
@@ -21,25 +21,40 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isAdding, setIsAdding] = useState(false)
 
-  // 載入頻道成員
+  // 載入頻道成員和員工資料
   useEffect(() => {
-    if (selectedChannel?.id && currentWorkspace?.id) {
-      loadChannelMembers(currentWorkspace.id, selectedChannel.id)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChannel?.id, currentWorkspace?.id])
-
-  // 🔥 載入員工資料（用於新增成員）
-  useEffect(() => {
-    if (isOpen && employees.length === 0) {
-      fetchEmployees()
+    if (isOpen) {
+      fetchChannelMembers()
+      if (employees.length === 0) {
+        fetchEmployees()
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  if (!isOpen) return null
+  // 計算當前頻道的成員（含員工資料）
+  const members = useMemo(() => {
+    if (!selectedChannel?.id) return []
 
-  const members = selectedChannel?.id ? channelMembers[selectedChannel.id] || [] : []
+    return channelMembers
+      .filter(m => m.channel_id === selectedChannel.id && m.status === 'active')
+      .map(member => {
+        const employee = employees.find(emp => emp.id === member.employee_id)
+        return {
+          id: member.id,
+          employeeId: member.employee_id,
+          role: member.role,
+          status: member.status,
+          profile: employee ? {
+            displayName: employee.display_name,
+            englishName: employee.english_name,
+            email: employee.personal_info?.email,
+            status: employee.status,
+          } : null,
+        }
+      })
+  }, [channelMembers, employees, selectedChannel?.id])
+
   const memberEmployeeIds = new Set(members.map(m => m.employeeId))
 
   // 🔐 權限驗證：檢查當前用戶在此頻道的角色
@@ -78,10 +93,19 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
 
     setIsAdding(true)
     try {
-      await addChannelMembers(currentWorkspace.id, selectedChannel.id, selectedEmployees, 'member')
+      // 使用 Store 批次新增成員
+      for (const employeeId of selectedEmployees) {
+        await addMember({
+          workspace_id: currentWorkspace.id,
+          channel_id: selectedChannel.id,
+          employee_id: employeeId,
+          role: 'member',
+          status: 'active',
+        })
+      }
 
       // 重新載入成員列表
-      await loadChannelMembers(currentWorkspace.id, selectedChannel.id)
+      await fetchChannelMembers()
 
       // 重置狀態
       setSelectedEmployees([])
@@ -99,6 +123,8 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       prev.includes(employeeId) ? prev.filter(id => id !== employeeId) : [...prev, employeeId]
     )
   }
+
+  if (!isOpen) return null
 
   return (
     <div className="w-64 border-l border-border bg-white flex flex-col shrink-0">

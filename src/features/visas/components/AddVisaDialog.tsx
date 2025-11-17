@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
@@ -36,6 +37,7 @@ interface AddVisaDialogProps {
   removeApplicant: (id: string) => void
   updateApplicant: (id: string, field: keyof VisaApplicant, value: unknown) => void
   canSubmit: boolean
+  isSubmitting: boolean
 }
 
 export function AddVisaDialog({
@@ -51,6 +53,7 @@ export function AddVisaDialog({
   removeApplicant,
   updateApplicant,
   canSubmit,
+  isSubmitting,
 }: AddVisaDialogProps) {
   const [tourOrders, setTourOrders] = React.useState<any[]>([])
   const [hasInitialized, setHasInitialized] = React.useState(false)
@@ -76,7 +79,7 @@ export function AddVisaDialog({
             setHasInitialized(true)
           }
         } catch (error) {
-          console.error('Failed to initialize visa dialog:', error)
+          logger.error('Failed to initialize visa dialog:', error)
         }
       }
       void init()
@@ -106,7 +109,7 @@ export function AddVisaDialog({
             setTourOrders([])
           }
         } catch (error) {
-          console.error('Failed to fetch tour orders:', error)
+          logger.error('Failed to fetch tour orders:', error)
           setTourOrders([])
         }
       }
@@ -148,6 +151,7 @@ export function AddVisaDialog({
       onCancel={onClose}
       submitLabel="批次新增簽證"
       submitDisabled={!canSubmit}
+      loading={isSubmitting}
       maxWidth="6xl"
       contentClassName="max-h-[75vh] overflow-y-auto"
     >

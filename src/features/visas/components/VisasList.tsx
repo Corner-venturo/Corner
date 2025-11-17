@@ -33,22 +33,22 @@ export function VisasList({
       key: 'applicant_name',
       label: '申請人',
       sortable: true,
-      render: value => <span className="text-sm text-morandi-primary">{value}</span>,
+      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
     },
     {
       key: 'contact_person',
       label: '聯絡人',
-      render: value => <span className="text-sm text-morandi-primary">{value}</span>,
+      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
     },
     {
       key: 'contact_phone',
       label: '聯絡電話',
-      render: value => <span className="text-sm text-morandi-primary">{value}</span>,
+      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
     },
     {
       key: 'country',
       label: '簽證',
-      render: value => <span className="text-sm text-morandi-primary">{value}</span>,
+      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
     },
     {
       key: 'status',
@@ -71,26 +71,26 @@ export function VisasList({
     {
       key: 'submission_date',
       label: '送件時間',
-      render: value => (
+      render: (value) => (
         <span className="text-sm text-morandi-secondary">
-          {value ? new Date(value).toLocaleDateString() : '-'}
+          {value ? new Date(String(value)).toLocaleDateString() : '-'}
         </span>
       ),
     },
     {
       key: 'received_date',
       label: '下件時間',
-      render: value => (
+      render: (value) => (
         <span className="text-sm text-morandi-secondary">
-          {value ? new Date(value).toLocaleDateString() : '-'}
+          {value ? new Date(String(value)).toLocaleDateString() : '-'}
         </span>
       ),
     },
     {
       key: 'fee',
       label: '代辦費',
-      render: value => (
-        <span className="text-sm text-morandi-primary">NT$ {value.toLocaleString()}</span>
+      render: (value) => (
+        <span className="text-sm text-morandi-primary">NT$ {Number(value || 0).toLocaleString()}</span>
       ),
     },
   ]

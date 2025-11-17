@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
-import { useRegionStore } from '@/stores'
+import { useRegionsStore } from '@/stores/region-store'
 
 interface DestinationSelectorProps {
   countryCode: string
@@ -35,7 +35,7 @@ export function DestinationSelector({
   onCustomCityCodeChange,
   showCustomFields = true,
 }: DestinationSelectorProps) {
-  const regionStore = useRegionStore()
+  const regionStore = useRegionsStore()
   const [availableCities, setAvailableCities] = useState<
     Array<{ id: string; code: string; name: string }>
   >([])
@@ -49,15 +49,15 @@ export function DestinationSelector({
   }, [])
 
   // 取得啟用的國家列表
-  const activeCountries = regionStore.items
-    .filter(r => r.type === 'country' && r.is_active)
-    .map(r => ({ id: r.id, code: r.code, name: r.name }))
+  const activeCountries = (regionStore.countries || [])
+    .filter(r => r.is_active)
+    .map(r => ({ id: r.id, code: r.code || r.id, name: r.name }))
 
   // 根據國家 ID 取得城市列表
   const getCitiesByCountryId = (countryId: string) => {
-    return regionStore.items
-      .filter(r => r.type === 'city' && r.parent_id === countryId && r.is_active)
-      .map(r => ({ id: r.id, code: r.code, name: r.name }))
+    return regionStore.getCitiesByCountry(countryId)
+      .filter(c => c.is_active)
+      .map(c => ({ id: c.id, code: c.airport_code || c.id, name: c.name }))
   }
 
   const handleCountryChange = (selectedCountryCode: string) => {

@@ -35,6 +35,7 @@ export interface Receipt {
   auth_code: string | null // 授權碼（刷卡用）
   check_number: string | null // 支票號碼
   check_bank: string | null // 開票銀行
+  check_date: string | null // 支票兌現日期
 
   note: string | null
 
@@ -52,12 +53,14 @@ export interface Receipt {
 
 export interface LinkPayLog {
   id: string
+  receipt_id: string // 關聯的收款單ID
   receipt_number: string
   workspace_id: string
 
   // LinkPay 資訊
   linkpay_order_number: string | null // LinkPay 訂單號（API 返回）
   price: number
+  amount: number // 付款金額（與 price 同義，向下相容）
   end_date: string | null // ISO date
   link: string | null // 付款連結
   status: LinkPayStatus // 0:待付款 1:已付款 2:失敗 3:過期

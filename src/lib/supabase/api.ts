@@ -4,12 +4,12 @@ import { supabase } from './client'
  * 將 camelCase 轉換為 snake_case
  * 並清理空字串（轉換為 null）
  */
-function toSnakeCase(obj): any {
+function toSnakeCase(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (Array.isArray(obj)) return obj.map(toSnakeCase)
   if (typeof obj !== 'object') return obj
 
-  const result: unknown = {}
+  const result: Record<string, any> = {}
   for (const key in obj) {
     const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase()
     const value = obj[key]
@@ -22,14 +22,14 @@ function toSnakeCase(obj): any {
 /**
  * 將 snake_case 轉換為 camelCase
  */
-function toCamelCase(obj): any {
+function toCamelCase(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (Array.isArray(obj)) return obj.map(toCamelCase)
   if (typeof obj !== 'object') return obj
 
-  const result: unknown = {}
+  const result: Record<string, any> = {}
   for (const key in obj) {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+    const camelKey = key.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase())
     result[camelKey] = toCamelCase(obj[key])
   }
   return result
@@ -56,7 +56,8 @@ export class VenturoAPI {
       // 將 camelCase 轉換為 snake_case
       const snakeData = toSnakeCase(data)
 
-      const { data: result, error } = await supabase.from(table).insert(snakeData).select().single()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: result, error } = await (supabase.from as any)(table).insert(snakeData).select().single()
 
       if (error) {
         throw new Error(`創建失敗: ${error.message}`)
@@ -78,7 +79,7 @@ export class VenturoAPI {
       const snakeData = data.map(toSnakeCase)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: result, error } = await supabase.from(table).insert(snakeData).select()
+      const { data: result, error } = await (supabase.from as any)(table).insert(snakeData).select()
 
       if (error) {
         throw new Error(`批量創建失敗: ${error.message}`)
@@ -96,7 +97,8 @@ export class VenturoAPI {
    */
   static async read<T = any>(table: string, options: QueryOptions = {}): Promise<T[]> {
     try {
-      let query = supabase.from(table).select(options.select || '*')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase.from as any)(table).select(options.select || '*')
 
       // 添加過濾條件 (將 camelCase key 轉為 snake_case)
       if (options.filters) {
@@ -144,7 +146,8 @@ export class VenturoAPI {
    */
   static async readById<T = any>(table: string, id: string): Promise<T | null> {
     try {
-      const { data, error } = await supabase.from(table).select('*').eq('id', id).single()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.from as any)(table).select('*').eq('id', id).single()
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -178,8 +181,7 @@ export class VenturoAPI {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: result, error } = await supabase
-        .from(table)
+      const { data: result, error } = await (supabase.from as any)(table)
         .update(updateData)
         .eq('id', id)
         .select()
@@ -213,7 +215,7 @@ export class VenturoAPI {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = supabase.from(table)
+      let query = (supabase.from as any)(table)
       query = query.update(updateData)
 
       // 過濾條件也轉換
@@ -240,7 +242,8 @@ export class VenturoAPI {
    */
   static async delete(table: string, id: string): Promise<boolean> {
     try {
-      const { error } = await supabase.from(table).delete().eq('id', id)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from as any)(table).delete().eq('id', id)
 
       if (error) {
         throw new Error(`刪除失敗: ${error.message}`)
@@ -257,7 +260,8 @@ export class VenturoAPI {
    */
   static async deleteWhere(table: string, filters: Record<string, unknown>): Promise<boolean> {
     try {
-      let query = supabase.from(table).delete()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase.from as any)(table).delete()
 
       Object.entries(filters).forEach(([key, value]) => {
         query = query.eq(key, value)
@@ -280,7 +284,8 @@ export class VenturoAPI {
    */
   static async count(table: string, filters?: Record<string, unknown>): Promise<number> {
     try {
-      let query = supabase.from(table).select('*', { count: 'exact', head: true })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase.from as any)(table).select('*', { count: 'exact', head: true })
 
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
@@ -306,7 +311,7 @@ export class VenturoAPI {
   static async query<T = any>(sql: string, params?: unknown[]): Promise<T[]> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await supabase.rpc('execute_sql', {
+      const { data, error } = await (supabase.rpc as any)('execute_sql', {
         query: sql,
         params: params || [],
       })

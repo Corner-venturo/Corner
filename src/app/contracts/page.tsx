@@ -148,17 +148,15 @@ export default function ContractsPage() {
       }
 
       try {
-        // 準備更新資料：只包含需要清除的欄位，使用空字串而不是 null
-        const updateData: Partial<Tour> = {
+        // 準備更新資料：只包含需要清除的欄位
+        await updateTour(tour.id, {
           contract_template: null,
-          contract_content: '',
-          contract_created_at: '',
-          contract_notes: '',
+          contract_content: null,
+          contract_created_at: null,
+          contract_notes: null,
           contract_completed: false,
-          contract_archived_date: '',
-        }
-
-        await updateTour(tour.id, updateData)
+          contract_archived_date: null,
+        })
 
         toast({
           title: '刪除成功',

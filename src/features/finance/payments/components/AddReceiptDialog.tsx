@@ -5,6 +5,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
 import { Plus } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -91,7 +92,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
       onOpenChange(false)
       onSuccess?.()
     } catch (error) {
-      console.error('❌ Create Receipt Error:', error)
+      logger.error('❌ Create Receipt Error:', error)
       toast({
         title: '❌ 建立失敗',
         description: '請稍後再試',

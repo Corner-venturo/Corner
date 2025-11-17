@@ -2,6 +2,7 @@
  * 刪除操作模組
  */
 
+import { logger } from '@/lib/utils/logger'
 import type { TableName } from '../schemas'
 import { clearAllTables } from '../migrations'
 
@@ -25,16 +26,16 @@ export async function deleteRecord(
 
       request.onerror = () => {
         const error = new Error(`刪除資料失敗 (${tableName}): ${request.error?.message}`)
-        console.error('[LocalDB]', error)
+        logger.error('[LocalDB]', error)
         reject(error)
       }
 
       transaction.onerror = () => {
-        console.error('transaction 錯誤:', transaction.error)
+        logger.error('transaction 錯誤:', transaction.error)
       }
     })
   } catch (error) {
-    console.error('delete 方法異常:', error)
+    logger.error('delete 方法異常:', error)
     throw error
   }
 }
@@ -57,7 +58,7 @@ export async function deleteMany(
 
     transaction.onerror = () => {
       const error = new Error(`批次刪除失敗 (${tableName}): ${transaction.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
 
@@ -82,7 +83,7 @@ export async function clear(db: IDBDatabase, tableName: TableName): Promise<void
 
     request.onerror = () => {
       const error = new Error(`清空失敗 (${tableName}): ${request.error?.message}`)
-      console.error('[LocalDB]', error)
+      logger.error('[LocalDB]', error)
       reject(error)
     }
   })

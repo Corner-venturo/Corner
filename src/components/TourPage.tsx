@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useTourScrollEffects } from '@/features/tours/hooks/useTourScrollEffects'
@@ -39,7 +40,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           .single()
 
         if (error || !assets) {
-          console.log('No company logo found')
+          logger.log('No company logo found')
           return
         }
 
@@ -51,7 +52,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           setCompanyLogoUrl(urlData.publicUrl)
         }
       } catch (error) {
-        console.error('Error fetching company logo:', error)
+        logger.error('Error fetching company logo:', error)
       }
     }
 

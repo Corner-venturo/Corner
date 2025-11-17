@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { Tour, Payment } from '@/stores/types'
 import { useOrderStore, useReceiptStore } from '@/stores'
@@ -74,7 +75,7 @@ export const TourPayments = React.memo(function TourPayments({
         description: '收款單建立成功',
       })
     } catch (error) {
-      console.error('建立收款單失敗:', error)
+      logger.error('建立收款單失敗:', error)
       toast({
         title: '錯誤',
         description: '建立收款單失敗',

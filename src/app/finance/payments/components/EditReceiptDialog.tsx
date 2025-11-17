@@ -41,7 +41,7 @@ export function EditReceiptDialog({
     card_last_four: receipt.card_last_four || '',
     check_number: receipt.check_number || '',
     check_date: receipt.check_date || '',
-    notes: receipt.notes || '',
+    notes: receipt.note || '',
   })
 
   // 當 receipt 更新時同步 formData
@@ -54,7 +54,7 @@ export function EditReceiptDialog({
       card_last_four: receipt.card_last_four || '',
       check_number: receipt.check_number || '',
       check_date: receipt.check_date || '',
-      notes: receipt.notes || '',
+      notes: receipt.note || '',
     })
   }, [receipt])
 
@@ -67,7 +67,7 @@ export function EditReceiptDialog({
       card_last_four: formData.card_last_four || null,
       check_number: formData.check_number || null,
       check_date: formData.check_date || null,
-      notes: formData.notes || null,
+      note: formData.notes || null,
     }
 
     await onSubmit(updateData)

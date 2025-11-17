@@ -32,8 +32,8 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new ValidationError('tour_id', '必須關聯旅遊團')
     }
 
-    if (data.total_amount !== undefined && data.total_amount < 0) {
-      throw new ValidationError('total_amount', '總金額不能為負數')
+    if (data.amount !== undefined && data.amount < 0) {
+      throw new ValidationError('amount', '總金額不能為負數')
     }
 
     if (data.request_date) {
@@ -76,13 +76,13 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       updated_at: now,
     }
 
-    // 更新 request 的 items 和 total_amount
+    // 更新 request 的 items 和 amount
     const updatedItems = [...request.items, item]
     const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
 
     await this.update(requestId, {
       items: updatedItems,
-      total_amount: totalAmount,
+      amount: totalAmount,
       updated_at: now,
     })
 
@@ -103,7 +103,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     }
 
     const now = this.now()
-    const updatedItems = request.items.map(item => {
+    const updatedItems = request.items.map((item: PaymentRequestItem) => {
       if (item.id === itemId) {
         const updated = { ...item, ...itemData, updated_at: now }
         updated.subtotal = updated.unit_price * updated.quantity
@@ -112,11 +112,11 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       return item
     })
 
-    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
+    const totalAmount = updatedItems.reduce((sum: number, i: PaymentRequestItem) => sum + i.subtotal, 0)
 
     await this.update(requestId, {
       items: updatedItems,
-      total_amount: totalAmount,
+      amount: totalAmount,
       updated_at: now,
     })
   }
@@ -131,12 +131,12 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     }
 
     const now = this.now()
-    const updatedItems = request.items.filter(item => item.id !== itemId)
-    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
+    const updatedItems = request.items.filter((item: PaymentRequestItem) => item.id !== itemId)
+    const totalAmount = updatedItems.reduce((sum: number, i: PaymentRequestItem) => sum + i.subtotal, 0)
 
     await this.update(requestId, {
       items: updatedItems,
-      total_amount: totalAmount,
+      amount: totalAmount,
       updated_at: now,
     })
   }
@@ -152,10 +152,10 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const totalAmount = request.items.reduce((sum, item) => sum + item.subtotal, 0)
+    const totalAmount = request.items.reduce((sum: number, item: PaymentRequestItem) => sum + item.subtotal, 0)
 
     await this.update(requestId, {
-      total_amount: totalAmount,
+      amount: totalAmount,
       updated_at: this.now(),
     })
 
@@ -192,7 +192,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       quote_id: quoteId,
       request_date: requestDate,
       items: [],
-      total_amount: 0,
+      amount: 0,
       status: 'pending' as const,
       note: '從報價單自動生成',
       budget_warning: false,

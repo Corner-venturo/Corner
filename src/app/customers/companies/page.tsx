@@ -11,6 +11,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -46,11 +47,11 @@ export default function CompaniesPage() {
   // 新增企業客戶
   const handleCreate = async (data: CreateCompanyData) => {
     try {
-      await create(data)
+      await create(data as Parameters<typeof create>[0])
       setIsDialogOpen(false)
       alert('✅ 企業客戶新增成功')
     } catch (error) {
-      console.error('新增企業客戶失敗:', error)
+      logger.error('新增企業客戶失敗:', error)
       alert('❌ 新增企業客戶失敗')
     }
   }
@@ -65,7 +66,7 @@ export default function CompaniesPage() {
       setIsDialogOpen(false)
       alert('✅ 企業客戶更新成功')
     } catch (error) {
-      console.error('更新企業客戶失敗:', error)
+      logger.error('更新企業客戶失敗:', error)
       alert('❌ 更新企業客戶失敗')
     }
   }

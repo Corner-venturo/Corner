@@ -10,6 +10,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -88,7 +89,7 @@ export function CreateLinkPayDialog({
         description: '',
       })
     } catch (error) {
-      console.error('建立 LinkPay 失敗:', error)
+      logger.error('建立 LinkPay 失敗:', error)
       alert('❌ 建立 LinkPay 失敗')
     } finally {
       setIsSubmitting(false)

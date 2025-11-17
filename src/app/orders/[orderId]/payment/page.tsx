@@ -19,7 +19,7 @@ export default function PaymentDetailPage() {
   const paymentStore: any = null
 
   // 等待 store 載入
-  const orders = orderStore?.orders || []
+  const orders = orderStore?.items || []
   const paymentRequests = paymentStore?.payment_requests || []
 
   const order = orders.find((o: any) => o.id === orderId)
@@ -48,7 +48,7 @@ export default function PaymentDetailPage() {
         label: '請款單號',
         sortable: true,
         filterable: true,
-        render: value => <span className="text-morandi-primary font-medium">{value}</span>,
+        render: (value) => <span className="text-morandi-primary font-medium">{String(value || '')}</span>,
       },
       {
         key: 'request_date',
@@ -56,8 +56,8 @@ export default function PaymentDetailPage() {
         sortable: true,
         filterable: true,
         filterType: 'date',
-        render: value => (
-          <span className="text-morandi-primary">{new Date(value).toLocaleDateString()}</span>
+        render: (value) => (
+          <span className="text-morandi-primary">{value ? new Date(String(value)).toLocaleDateString() : '-'}</span>
         ),
       },
       {
@@ -65,7 +65,7 @@ export default function PaymentDetailPage() {
         label: '團體名稱',
         sortable: true,
         filterable: true,
-        render: value => <span className="text-morandi-primary">{value}</span>,
+        render: (value) => <span className="text-morandi-primary">{String(value || '')}</span>,
       },
       {
         key: 'total_amount',
@@ -73,8 +73,8 @@ export default function PaymentDetailPage() {
         sortable: true,
         filterable: true,
         filterType: 'number',
-        render: value => (
-          <span className="font-medium text-morandi-red">NT$ {value.toLocaleString()}</span>
+        render: (value) => (
+          <span className="font-medium text-morandi-red">NT$ {Number(value || 0).toLocaleString()}</span>
         ),
       },
       {
@@ -89,13 +89,14 @@ export default function PaymentDetailPage() {
           { value: 'confirmed', label: '已確認' },
           { value: 'paid', label: '已付款' },
         ],
-        render: value => {
+        render: (value) => {
           const statusMap = {
             pending: '待處理',
             processing: '處理中',
             confirmed: '已確認',
             paid: '已付款',
           }
+          const statusKey = String(value || 'pending') as keyof typeof statusMap
           return (
             <span
               className={cn(
@@ -107,7 +108,7 @@ export default function PaymentDetailPage() {
                     : 'bg-morandi-gold text-white'
               )}
             >
-              {statusMap[value as keyof typeof statusMap] || value}
+              {statusMap[statusKey] || statusKey}
             </span>
           )
         },

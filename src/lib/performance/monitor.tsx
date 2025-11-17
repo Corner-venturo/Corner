@@ -3,6 +3,7 @@
  * 效能監控工具 - 生產環境可用
  */
 
+import { logger } from '@/lib/utils/logger'
 import * as React from 'react'
 
 // Window 擴展介面（開發工具）
@@ -48,7 +49,7 @@ class PerformanceMonitor {
 
       // 警告慢速操作
       if (duration > 100) {
-        console.warn(`⚠️ Slow operation: ${name} took ${duration.toFixed(2)}ms`, context)
+        logger.warn(`⚠️ Slow operation: ${name} took ${duration.toFixed(2)}ms`, context)
       }
 
       return result
@@ -83,7 +84,7 @@ class PerformanceMonitor {
 
     if (duration > 16) {
       // > 1 frame
-      console.warn(`⚠️ Slow sync operation: ${name} took ${duration.toFixed(2)}ms`)
+      logger.warn(`⚠️ Slow sync operation: ${name} took ${duration.toFixed(2)}ms`)
     }
 
     return result
@@ -210,7 +211,7 @@ export function usePerformanceTracking(hookName: string) {
     return () => {
       const duration = performance.now() - start
       if (duration > 50) {
-        console.warn(`⚠️ Slow hook: ${hookName} took ${duration.toFixed(2)}ms`)
+        logger.warn(`⚠️ Slow hook: ${hookName} took ${duration.toFixed(2)}ms`)
       }
     }
   }, [hookName])

@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { Users, Plus, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -84,7 +85,7 @@ export function OrderMembersExpandable({
       if (error) throw error
       setDepartureDate(data?.departure_date || null)
     } catch (error) {
-      console.error('載入出發日期失敗:', error)
+      logger.error('載入出發日期失敗:', error)
     }
   }
 
@@ -100,7 +101,7 @@ export function OrderMembersExpandable({
       if (error) throw error
       setMembers(data || [])
     } catch (error) {
-      console.error('載入成員失敗:', error)
+      logger.error('載入成員失敗:', error)
     } finally {
       setLoading(false)
     }
@@ -132,7 +133,7 @@ export function OrderMembersExpandable({
       setIsAddDialogOpen(false)
       setMemberCountToAdd(1)
     } catch (error) {
-      console.error('新增成員失敗:', error)
+      logger.error('新增成員失敗:', error)
       alert('新增失敗')
     }
   }
@@ -146,7 +147,7 @@ export function OrderMembersExpandable({
       if (error) throw error
       setMembers(members.filter(m => m.id !== memberId))
     } catch (error) {
-      console.error('刪除成員失敗:', error)
+      logger.error('刪除成員失敗:', error)
       alert('刪除失敗')
     }
   }
@@ -167,6 +168,16 @@ export function OrderMembersExpandable({
   // 鍵盤導航處理
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, memberIndex: number, fieldName: string) => {
     const currentFieldIndex = editableFields.indexOf(fieldName)
+
+    // 性別欄位：Enter 切換性別
+    if (fieldName === 'gender' && e.key === 'Enter') {
+      e.preventDefault()
+      const member = members[memberIndex]
+      const currentGender = member.gender
+      const newGender = !currentGender ? 'M' : currentGender === 'M' ? 'F' : ''
+      updateField(member.id, 'gender', newGender)
+      return
+    }
 
     // Enter / 下鍵：移動到下一列同一欄位
     if (e.key === 'Enter' || e.key === 'ArrowDown') {
@@ -246,7 +257,7 @@ export function OrderMembersExpandable({
       // 確保本地狀態同步（使用處理過的值）
       setMembers(members.map(m => (m.id === memberId ? { ...m, [field]: processedValue } : m)))
     } catch (error) {
-      console.error('更新失敗:', error)
+      logger.error('更新失敗:', error)
       // 失敗時回滾本地狀態
       loadMembers()
     }
@@ -444,6 +455,9 @@ export function OrderMembersExpandable({
                             updateField(member.id, 'identity', e.currentTarget.value)
                           }, 0)
                         }}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'identity')}
+                        data-member={member.id}
+                        data-field="identity"
                         className="w-full bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                         placeholder=""
@@ -464,6 +478,9 @@ export function OrderMembersExpandable({
                           updateField(member.id, 'chinese_name', e.currentTarget.value)
                         }, 0)
                       }}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'chinese_name')}
+                      data-member={member.id}
+                      data-field="chinese_name"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                       placeholder=""
@@ -483,6 +500,9 @@ export function OrderMembersExpandable({
                           updateField(member.id, 'passport_name', e.currentTarget.value)
                         }, 0)
                       }}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_name')}
+                      data-member={member.id}
+                      data-field="passport_name"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -495,6 +515,9 @@ export function OrderMembersExpandable({
                       placeholder=""
                       value={member.birth_date || ''}
                       onChange={e => handleDateInput(member.id, 'birth_date', e.target.value)}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'birth_date')}
+                      data-member={member.id}
+                      data-field="birth_date"
                       maxLength={10}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -502,16 +525,23 @@ export function OrderMembersExpandable({
                   </td>
 
                   {/* 性別 */}
-                  <td
-                    className="border border-morandi-gold/20 px-2 py-1 bg-white text-xs text-center cursor-pointer hover:bg-morandi-container/30"
-                    onClick={() => {
-                      const currentGender = member.gender
-                      const newGender = !currentGender ? 'M' : currentGender === 'M' ? 'F' : ''
-                      updateField(member.id, 'gender', newGender)
-                    }}
-                    title="點擊切換性別"
-                  >
-                    {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
+                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white text-xs text-center relative">
+                    <input
+                      type="text"
+                      value={member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
+                      readOnly
+                      onClick={() => {
+                        const currentGender = member.gender
+                        const newGender = !currentGender ? 'M' : currentGender === 'M' ? 'F' : ''
+                        updateField(member.id, 'gender', newGender)
+                      }}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'gender')}
+                      data-member={member.id}
+                      data-field="gender"
+                      className="w-full bg-transparent text-xs text-center cursor-pointer hover:bg-morandi-container/30"
+                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      title="點擊或按 Enter 切換性別"
+                    />
                   </td>
 
                   {/* 身分證號 */}
@@ -520,6 +550,9 @@ export function OrderMembersExpandable({
                       type="text"
                       value={member.id_number || ''}
                       onChange={e => handleIdNumberChange(member.id, e.target.value)}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'id_number')}
+                      data-member={member.id}
+                      data-field="id_number"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                       placeholder=""
@@ -539,6 +572,9 @@ export function OrderMembersExpandable({
                           updateField(member.id, 'passport_number', e.currentTarget.value)
                         }, 0)
                       }}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_number')}
+                      data-member={member.id}
+                      data-field="passport_number"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -551,6 +587,9 @@ export function OrderMembersExpandable({
                       placeholder=""
                       value={member.passport_expiry || ''}
                       onChange={e => handleDateInput(member.id, 'passport_expiry', e.target.value)}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_expiry')}
+                      data-member={member.id}
+                      data-field="passport_expiry"
                       maxLength={10}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -570,6 +609,9 @@ export function OrderMembersExpandable({
                           updateField(member.id, 'special_meal', e.currentTarget.value)
                         }, 0)
                       }}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'special_meal')}
+                      data-member={member.id}
+                      data-field="special_meal"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -588,6 +630,9 @@ export function OrderMembersExpandable({
                           updateField(member.id, 'pnr', e.currentTarget.value)
                         }, 0)
                       }}
+                      onKeyDown={e => handleKeyDown(e, memberIndex, 'pnr')}
+                      data-member={member.id}
+                      data-field="pnr"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />

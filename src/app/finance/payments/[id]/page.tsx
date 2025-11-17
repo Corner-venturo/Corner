@@ -11,6 +11,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Edit, Trash2, Check, X, FileText } from 'lucide-react'
@@ -42,7 +43,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
   const router = useRouter()
 
   // Stores
-  const { items: receipts, update: updateReceipt, deleteItem: deleteReceipt } = useReceiptStore()
+  const { items: receipts, update: updateReceipt, delete: deleteReceipt } = useReceiptStore()
   const { items: orders } = useOrderStore()
   const { items: linkPayLogs } = useLinkPayLogStore()
 
@@ -99,7 +100,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
       setIsConfirming(false)
       alert('✅ 收款已確認')
     } catch (error) {
-      console.error('確認收款失敗:', error)
+      logger.error('確認收款失敗:', error)
       alert('❌ 確認收款失敗')
     }
   }
@@ -122,7 +123,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
       alert('✅ 收款單已刪除')
       router.push('/finance/payments')
     } catch (error) {
-      console.error('刪除收款單失敗:', error)
+      logger.error('刪除收款單失敗:', error)
       alert('❌ 刪除收款單失敗')
     }
   }
@@ -134,7 +135,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
       setIsEditDialogOpen(false)
       alert('✅ 收款單已更新')
     } catch (error) {
-      console.error('更新收款單失敗:', error)
+      logger.error('更新收款單失敗:', error)
       alert('❌ 更新收款單失敗')
     }
   }
@@ -147,7 +148,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
         order,
       })
     } catch (error) {
-      console.error('生成 PDF 失敗:', error)
+      logger.error('生成 PDF 失敗:', error)
       alert('❌ 生成 PDF 失敗')
     }
   }

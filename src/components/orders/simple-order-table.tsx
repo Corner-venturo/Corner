@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -173,7 +174,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                           e.stopPropagation()
                           e.preventDefault()
                           const newExpandedId = expandedOrderId === order.id ? null : order.id
-                          console.log('成員按鈕點擊', {
+                          logger.log('成員按鈕點擊', {
                             orderId: order.id,
                             currentExpandedId: expandedOrderId,
                             newExpandedId,

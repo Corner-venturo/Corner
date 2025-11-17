@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Save } from 'lucide-react'
@@ -37,7 +38,8 @@ export default function CustomerDetailPage() {
     const found = customers.find(c => c.id === customerId)
     if (found) {
       setCustomer(found)
-      setFormData(found)
+      const { id, created_at, ...editableData } = found
+      setFormData(editableData)
     }
   }, [customers, customerId])
 
@@ -45,12 +47,12 @@ export default function CustomerDetailPage() {
     if (!customer) return
 
     try {
-      await update(customer.id, formData as Customer)
+      await update(customer.id, formData)
       toast.success('客戶資料已更新')
       setIsEditing(false)
     } catch (error) {
       toast.error('更新失敗')
-      console.error('Failed to update customer:', error)
+      logger.error('Failed to update customer:', error)
     }
   }
 

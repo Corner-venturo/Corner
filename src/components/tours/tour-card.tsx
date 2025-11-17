@@ -15,7 +15,8 @@ interface TourCardProps {
 }
 
 export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: TourCardProps) {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null | undefined) => {
+    if (!status) return 'bg-morandi-container border-morandi-secondary'
     const colors: Record<string, string> = {
       提案: 'bg-morandi-blue border-morandi-blue',
       進行中: 'bg-morandi-green border-morandi-green',

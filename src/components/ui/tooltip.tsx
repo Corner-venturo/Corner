@@ -41,7 +41,8 @@ export function TooltipTrigger({
   const handleMouseLeave = () => setOpen(false)
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return React.cloneElement(children as any, {
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
     })

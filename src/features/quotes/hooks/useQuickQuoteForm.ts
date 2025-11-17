@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores'
 
@@ -82,7 +83,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
         return parsed
       }
     } catch (error) {
-      console.error('Failed to load quick quote draft:', error)
+      logger.error('Failed to load quick quote draft:', error)
     }
     return initialFormData
   })
@@ -94,7 +95,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData))
     } catch (error) {
-      console.error('Failed to save quick quote draft:', error)
+      logger.error('Failed to save quick quote draft:', error)
     }
   }, [formData])
 
@@ -132,16 +133,16 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
 
         if (employee?.workspace_id) {
           finalWorkspaceId = employee.workspace_id
-          console.log('從 IndexedDB 取得 workspace_id:', finalWorkspaceId)
+          logger.log('從 IndexedDB 取得 workspace_id:', finalWorkspaceId)
         }
       } catch (error) {
-        console.error('無法從 IndexedDB 讀取 workspace_id:', error)
+        logger.error('無法從 IndexedDB 讀取 workspace_id:', error)
       }
     }
 
     if (!finalWorkspaceId) {
       alert('無法取得工作空間資訊，請聯繫管理員')
-      console.error('workspace_id 取得失敗', { user, workspaceId })
+      logger.error('workspace_id 取得失敗', { user, workspaceId })
       return false
     }
 
@@ -165,7 +166,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
         is_pinned: false,
         workspace_id: finalWorkspaceId,
         created_by: user?.id,
-        created_by_name: user?.full_name || formData.handler_name,
+        created_by_name: user?.display_name || user?.chinese_name || formData.handler_name,
         // ✅ 快速報價單項目直接存入 JSONB 欄位（不使用 quote_items 表格）
         quick_quote_items: formData.items,
       })
@@ -174,11 +175,11 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
         throw new Error('建立快速報價單失敗')
       }
 
-      console.log('Quick quote created:', newQuote)
+      logger.log('Quick quote created:', newQuote)
       resetForm()
       return true
     } catch (error) {
-      console.error('Error creating quick quote:', error)
+      logger.error('Error creating quick quote:', error)
       alert('建立快速報價單失敗')
       return false
     }

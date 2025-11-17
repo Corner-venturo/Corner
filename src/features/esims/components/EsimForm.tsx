@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -29,7 +30,7 @@ interface EsimFormProps {
 
 export function EsimForm({ mode, esimNumber }: EsimFormProps) {
   const router = useRouter()
-  const { items: esims, create, getById } = useEsimStore()
+  const { items: esims, create, fetchById } = useEsimStore()
   const { tours } = useTours()
   const orders: any[] = [] // TODO: 實作 orders hook
 
@@ -109,7 +110,7 @@ export function EsimForm({ mode, esimNumber }: EsimFormProps) {
         router.push('/esims')
       }
     } catch (error) {
-      console.error('儲存失敗:', error)
+      logger.error('儲存失敗:', error)
     } finally {
       setLoading(false)
     }

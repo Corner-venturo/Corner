@@ -10,13 +10,15 @@ import { useAuthStore } from '@/stores/auth-store'
 import { addChannelMembers } from '@/services/workspace-members'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
-import { TourMembers } from '@/components/tours/tour-members'
+import { TourMembersAdvanced } from '@/components/tours/tour-members-advanced'
 import { TourOperations } from '@/components/tours/tour-operations'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
 import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourAddOns } from '@/components/tours/tour-add-ons'
-import { MessageSquare } from 'lucide-react'
+import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
+import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
+import { MessageSquare, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 
 const tabs = [
@@ -41,11 +43,13 @@ export default function TourDetailPage() {
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
   const [triggerMemberAdd, setTriggerMemberAdd] = useState(false)
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
+  const [showCloseDialog, setShowCloseDialog] = useState(false)
+  const [showDepartureDialog, setShowDepartureDialog] = useState(false)
 
   const tour = tours.find(t => t.id === params.id)
 
   // 檢查是否已有工作頻道
-  const existingChannel = channels.find(ch => ch.tour_id === tour?.id)
+  const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour?.id)
 
   // 建立工作頻道
   const handleCreateWorkChannel = async () => {
@@ -103,8 +107,6 @@ export default function TourDetailPage() {
           return '新增成本'
         case 'orders':
           return '新增訂單'
-        case 'members':
-          return '新增團員'
         default:
           return null // 不顯示按鈕
       }
@@ -135,9 +137,6 @@ export default function TourDetailPage() {
           case 'orders':
             // 功能: 新增訂單
             break
-          case 'members':
-            setTriggerMemberAdd(true)
-            break
         }
       },
       addLabel: buttonLabel,
@@ -151,13 +150,7 @@ export default function TourDetailPage() {
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
-        return (
-          <TourMembers
-            tour={tour}
-            triggerAdd={triggerMemberAdd}
-            onTriggerAddComplete={() => setTriggerMemberAdd(false)}
-          />
-        )
+        return <TourMembersAdvanced tour={tour} />
       case 'operations':
         return <TourOperations tour={tour} />
       case 'addons':
@@ -198,28 +191,68 @@ export default function TourDetailPage() {
         onBack={() => router.push('/tours')}
         {...(buttonConfig ? { onAdd: buttonConfig.onAdd, addLabel: buttonConfig.addLabel } : {})}
         actions={
-          existingChannel ? (
+          <div className="flex items-center gap-2">
+            {/* 出團資料表按鈕 */}
             <button
-              onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
+              onClick={() => setShowDepartureDialog(true)}
               className="flex items-center gap-2 px-4 py-2 text-sm text-morandi-primary border border-morandi-gold/30 rounded-lg hover:bg-morandi-gold/10 transition-colors"
             >
-              <MessageSquare size={16} />
-              前往工作頻道
+              <FileText size={16} />
+              出團資料表
             </button>
-          ) : (
-            <button
-              onClick={handleCreateWorkChannel}
-              disabled={isCreatingChannel}
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <MessageSquare size={16} />
-              {isCreatingChannel ? '建立中...' : '建立工作頻道'}
-            </button>
-          )
+
+            {/* 結團按鈕 */}
+            {!tour.archived && (
+              <button
+                onClick={() => setShowCloseDialog(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+              >
+                結團
+              </button>
+            )}
+
+            {/* 工作頻道按鈕 */}
+            {existingChannel ? (
+              <button
+                onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-morandi-primary border border-morandi-gold/30 rounded-lg hover:bg-morandi-gold/10 transition-colors"
+              >
+                <MessageSquare size={16} />
+                前往工作頻道
+              </button>
+            ) : (
+              <button
+                onClick={handleCreateWorkChannel}
+                disabled={isCreatingChannel}
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <MessageSquare size={16} />
+                {isCreatingChannel ? '建立中...' : '建立工作頻道'}
+              </button>
+            )}
+          </div>
         }
       />
 
       <ContentContainer>{renderTabContent()}</ContentContainer>
+
+      {/* 結團對話框 */}
+      <TourCloseDialog
+        tour={tour}
+        open={showCloseDialog}
+        onOpenChange={setShowCloseDialog}
+        onSuccess={() => {
+          // 重新載入旅遊團資料
+          window.location.reload()
+        }}
+      />
+
+      {/* 出團資料表對話框 */}
+      <TourDepartureDialog
+        tour={tour}
+        open={showDepartureDialog}
+        onOpenChange={setShowDepartureDialog}
+      />
     </>
   )
 }

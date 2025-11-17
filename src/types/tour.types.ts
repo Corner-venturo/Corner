@@ -10,43 +10,49 @@ import { BaseEntity } from './base.types'
 
 /**
  * Tour - 旅遊團資料
+ * 注意：所有可選欄位使用 | null 以符合 Supabase PostgreSQL 規範
  */
 export interface Tour extends BaseEntity {
   code: string // 團號（統一使用 code）
   name: string // 團名
-  location?: string // 目的地（相容舊欄位：destination）
-  country_id?: string // 國家 ID
-  main_city_id?: string // 主要城市 ID
+  location?: string | null // 目的地（相容舊欄位：destination）
+  country_id?: string | null // 國家 ID
+  main_city_id?: string | null // 主要城市 ID
   departure_date: string // 出發日期 (ISO 8601)（相容舊欄位：start_date）
   return_date: string // 返回日期 (ISO 8601)（相容舊欄位：end_date）
-  status?: string // 狀態（英文）
-  price?: number // 基本價格
-  max_participants?: number // 最大參與人數（相容舊欄位：max_people）
-  current_participants?: number // 當前參與人數
+  status?: string | null // 狀態（英文）
+  price?: number | null // 基本價格
+  max_participants?: number | null // 最大參與人數（相容舊欄位：max_people）
+  current_participants?: number | null // 當前參與人數
   contract_status: string // 合約狀態
   total_revenue: number // 總收入
   total_cost: number // 總成本
   profit: number // 利潤
-  description?: string // 團體說明/描述
-  archived?: boolean // 是否已封存
-  is_active?: boolean // 是否啟用
+  description?: string | null // 團體說明/描述
+  archived?: boolean | null // 是否已封存
+  is_active?: boolean | null // 是否啟用
   features?: unknown // 行程特色（用於展示頁面）
-  quote_id?: string // 關聯的報價單ID
+  quote_id?: string | null // 關聯的報價單ID
   quote_cost_structure?: unknown // 報價成本結構快照
 
   // 合約相關欄位
-  contract_template?: string // 合約範本
-  contract_content?: string // 合約內容
-  contract_notes?: string // 合約備註
-  contract_completed?: boolean // 合約是否完成
-  contract_created_at?: string // 合約建立時間
-  contract_archived_date?: string // 合約封存日期
-  envelope_records?: string // 信封記錄
+  contract_template?: string | null // 合約範本
+  contract_content?: string | null // 合約內容
+  contract_notes?: string | null // 合約備註
+  contract_completed?: boolean | null // 合約是否完成
+  contract_created_at?: string | null // 合約建立時間
+  contract_archived_date?: string | null // 合約封存日期
+  envelope_records?: string | null // 信封記錄
+
+  // 結團相關欄位
+  closing_status?: string | null // 結團狀態：open(進行中), closing(結團中), closed(已結團)
+  closing_date?: string | null // 結團日期
+  closed_by?: string | null // 結團操作人員 ID
 
   // 同步欄位
-  _deleted?: boolean // 軟刪除標記
-  _needs_sync?: boolean // 需要同步
-  _synced_at?: string // 最後同步時間
+  _deleted?: boolean | null // 軟刪除標記
+  _needs_sync?: boolean | null // 需要同步
+  _synced_at?: string | null // 最後同步時間
 }
 
 // ============================================

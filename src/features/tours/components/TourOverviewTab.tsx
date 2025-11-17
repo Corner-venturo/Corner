@@ -42,13 +42,13 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
   const tourPaymentRequests = paymentRequests.filter(req => req.tour_id === tour.id)
   const quoteBudget = tourQuote?.categories || []
 
-  const actualExpenses = quoteBudget.map(category => {
-    const categoryTotal = tourPaymentRequests.reduce((sum: any, request: any) => {
+  const actualExpenses = quoteBudget.map((category: { name: string; total?: number }) => {
+    const categoryTotal = tourPaymentRequests.reduce((sum: number, request: { items?: Array<{ category: string; unit_price: number; quantity: number }> }) => {
       const categoryItems = request.items?.filter(item => item.category === category.name) || []
       return (
         sum +
         categoryItems.reduce(
-          (itemSum: any, item: any) => itemSum + item.unit_price * item.quantity,
+          (itemSum: number, item: { unit_price: number; quantity: number }) => itemSum + item.unit_price * item.quantity,
           0
         )
       )

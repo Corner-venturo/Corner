@@ -3,6 +3,9 @@
  * 負責管理所有 Realtime 訂閱的生命週期
  */
 
+'use client'
+
+import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import type {
   RealtimeSubscriptionConfig,
@@ -125,7 +128,8 @@ class RealtimeManager {
       const channel = supabase.channel(channelName)
 
       // 設定 Postgres 變更監聽
-      channel.on(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (channel as any).on(
         'postgres_changes',
         {
           event: config.event || '*',
@@ -298,8 +302,15 @@ class RealtimeManager {
    */
   private log(message: string, ...args: unknown[]): void {
     if (this.config.debug) {
-      console.log(`[RealtimeManager] ${message}`, ...args)
+      logger.log(`[RealtimeManager] ${message}`, ...args)
     }
+  }
+
+  /**
+   * 取得管理器設定（用於除錯）
+   */
+  getConfig(): Required<RealtimeManagerConfig> {
+    return this.config
   }
 }
 
@@ -309,8 +320,15 @@ export const realtimeManager = new RealtimeManager({
   autoReconnect: true,
   maxRetries: 5,
   retryDelay: 1000,
-  debug: process.env.NODE_ENV === 'development',
+  debug: true, // 🔥 強制啟用 debug 模式
 })
+
+// 在瀏覽器中暴露給開發者工具
+if (typeof window !== 'undefined') {
+  ;(window as any).realtimeManager = realtimeManager
+  logger.log('✅ RealtimeManager 已載入，可使用 window.realtimeManager 查看狀態')
+  logger.log('📊 使用 window.realtimeManager.getAllSubscriptions() 查看所有訂閱')
+}
 
 // 匯出類別供測試使用
 export { RealtimeManager }

@@ -42,38 +42,38 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         key: 'request_number',
         label: '請款單號',
         sortable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'code',
         label: '團號',
         sortable: true,
-        render: value => <div className="font-medium">{value}</div>,
+        render: (value: unknown) => <div className="font-medium">{value as string}</div>,
       },
       {
         key: 'tour_name',
         label: '團體名稱',
         sortable: true,
-        render: value => (
-          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value}</div>
+        render: (value: unknown) => (
+          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value as string}</div>
         ),
       },
       {
-        key: 'total_amount',
+        key: 'amount',
         label: '金額',
         sortable: true,
-        render: value => <div className="font-medium text-right">NT$ {value.toLocaleString()}</div>,
+        render: (value: unknown) => <div className="font-medium text-right">NT$ {(value as number).toLocaleString()}</div>,
       },
       {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: value => <div className="text-sm text-morandi-secondary">{value}</div>,
+        render: (value: unknown) => <div className="text-sm text-morandi-secondary">{value as string}</div>,
       },
       {
         key: 'status',
         label: '狀態',
-        render: value => (
+        render: (value: unknown) => (
           <Badge className={cn('text-white', STATUS_COLORS[value as keyof typeof STATUS_COLORS])}>
             {STATUS_LABELS[value as keyof typeof STATUS_LABELS]}
           </Badge>
@@ -96,39 +96,39 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
         key: 'request_number',
         label: '請款單號',
         sortable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'code',
         label: '團號',
         sortable: true,
-        render: value => <div className="font-medium">{value}</div>,
+        render: (value: unknown) => <div className="font-medium">{value as string}</div>,
       },
       {
         key: 'tour_name',
         label: '團體名稱',
         sortable: true,
-        render: value => (
-          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value}</div>
+        render: (value: unknown) => (
+          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value as string}</div>
         ),
       },
       {
-        key: 'total_amount',
+        key: 'amount',
         label: '金額',
         sortable: true,
-        render: value => <div className="font-medium text-right">NT$ {value.toLocaleString()}</div>,
+        render: (value: unknown) => <div className="font-medium text-right">NT$ {(value as number).toLocaleString()}</div>,
       },
       {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: value => <div className="text-sm text-morandi-secondary">{value}</div>,
+        render: (value: unknown) => <div className="text-sm text-morandi-secondary">{value as string}</div>,
       },
       {
         key: 'actions',
         label: '操作',
         width: '80px',
-        render: (_value, row) => (
+        render: (_value: unknown, row: any) => (
           <button
             onClick={() => onRemove(row.id)}
             disabled={currentOrder?.status !== 'pending'}
@@ -155,29 +155,29 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         key: 'order_number',
         label: '出納單號',
         sortable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'disbursement_date',
         label: '出帳日期',
         sortable: true,
-        render: value => <div className="text-sm text-morandi-secondary">{value}</div>,
+        render: (value: unknown) => <div className="text-sm text-morandi-secondary">{value as string}</div>,
       },
       {
-        key: 'total_amount',
+        key: 'amount',
         label: '總金額',
         sortable: true,
-        render: value => <div className="font-medium text-right">NT$ {value.toLocaleString()}</div>,
+        render: (value: unknown) => <div className="font-medium text-right">NT$ {(value as number).toLocaleString()}</div>,
       },
       {
         key: 'payment_request_ids',
         label: '請款單數',
-        render: value => <div className="text-center">{value.length} 筆</div>,
+        render: (value: unknown) => <div className="text-center">{(value as string[]).length} 筆</div>,
       },
       {
         key: 'status',
         label: '狀態',
-        render: value => (
+        render: (value: unknown) => (
           <Badge
             className={cn(
               'text-white',
@@ -192,9 +192,9 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         key: 'created_at',
         label: '建立時間',
         sortable: true,
-        render: value => (
+        render: (value: unknown) => (
           <div className="text-sm text-morandi-secondary">
-            {new Date(value).toLocaleDateString('zh-TW')}
+            {new Date(value as string).toLocaleDateString('zh-TW')}
           </div>
         ),
       },
@@ -202,7 +202,7 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         key: 'actions',
         label: '操作',
         width: '100px',
-        render: (_value, row) => (
+        render: (_value: unknown, row: any) => (
           <Button
             variant="outline"
             size="sm"

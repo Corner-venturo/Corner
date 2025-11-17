@@ -1,3 +1,4 @@
+import { logger } from '@/lib/utils/logger'
 import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
@@ -18,8 +19,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const supabase = getSupabaseAdminClient()
 
-    const { data, error } = await supabase
-      .from('channel_members' as unknown)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from as any)('channel_members')
       .select(
         `
           id,
@@ -45,7 +46,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
       .order('created_at', { ascending: true })
 
     if (error) {
-      console.error('Failed to load channel members:', error)
+      logger.error('Failed to load channel members:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -120,10 +121,11 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     // 只插入新成員
-    const { data, error } = await supabase.from('channel_members').insert(newMembers).select()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from as any)('channel_members').insert(newMembers).select()
 
     if (error) {
-      console.error('Failed to add channel members:', error)
+      logger.error('Failed to add channel members:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -149,15 +151,15 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const supabase = getSupabaseAdminClient()
 
-    const { error } = await supabase
-      .from('channel_members' as unknown)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from as any)('channel_members')
       .delete()
       .eq('workspace_id', workspaceId)
       .eq('channel_id', channelId)
       .eq('id', memberId)
 
     if (error) {
-      console.error('Failed to remove channel member:', error)
+      logger.error('Failed to remove channel member:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 

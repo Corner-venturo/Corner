@@ -57,7 +57,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     const roomOptions: RoomOption[] = []
 
     tourPaymentRequests.forEach(request => {
-      request.items.forEach(item => {
+      request.items.forEach((item: { category: string; description: string }) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g)

@@ -3,19 +3,26 @@
  * 使用 Service Role Key 更新 Supabase Auth 密碼
  */
 
+import { logger } from '@/lib/utils/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// ✅ 延遲初始化，避免建置時錯誤
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-// 使用 Service Role 創建 admin client
-const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,20 +32,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing userId or password' }, { status: 400 })
     }
 
+    // ✅ 執行時才初始化 Supabase Admin
+    const supabaseAdmin = getSupabaseAdmin()
+
     // 使用 Admin API 更新密碼
     const { data, error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       password: password,
     })
 
     if (error) {
-      console.error('❌ 同步密碼失敗:', error)
+      logger.error('❌ 同步密碼失敗:', error)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    console.log('✅ auth.users 密碼已同步:', userId)
+    logger.log('✅ auth.users 密碼已同步:', userId)
     return NextResponse.json({ success: true, user: data.user })
   } catch (error) {
-    console.error('💥 同步密碼錯誤:', error)
+    logger.error('💥 同步密碼錯誤:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

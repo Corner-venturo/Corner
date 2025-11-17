@@ -2,13 +2,13 @@ import type { Channel } from '@/stores/workspace-store'
 
 export interface ChannelSidebarProps {
   selectedChannelId: string | null
-  onSelectChannel: (channel: Channel) => void
+  onSelectChannel: (channel: Channel | null) => void
 }
 
 export interface SortableChannelItemProps {
   channel: Channel
   isActive: boolean
-  onSelectChannel: (channel: Channel) => void
+  onSelectChannel: (channel: Channel | null) => void
   toggleChannelFavorite: (id: string) => void
   onDelete?: (id: string) => void
   onEdit?: (id: string) => void

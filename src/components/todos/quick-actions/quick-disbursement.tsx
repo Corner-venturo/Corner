@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useMemo, useState } from 'react'
 import { FileText, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -140,14 +141,14 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           requestItems,
           selectedTour.name,
           selectedTour.code,
-          selectedOrder?.order_number
+          selectedOrder?.order_number || undefined
         )
 
         alert('✅ 請款單建立成功')
         resetForm()
         onSubmit?.()
       } catch (error) {
-        console.error('❌ Create Request Error:', error)
+        logger.error('❌ Create Request Error:', error)
         alert('❌ 建立失敗，請稍後再試')
       }
     } else {
@@ -169,7 +170,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         resetForm() // Also reset items
         onSubmit?.()
       } catch (error) {
-        console.error('❌ Create Batch Request Error:', error)
+        logger.error('❌ Create Batch Request Error:', error)
         alert('❌ 建立失敗，請稍後再試')
       }
     }

@@ -33,20 +33,20 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({ suppliers, loading
       key: 'code',
       label: '供應商編號',
       sortable: true,
-      render: value => <span className="font-mono text-sm text-morandi-secondary">{value || '-'}</span>,
+      render: (value) => <span className="font-mono text-sm text-morandi-secondary">{String(value || '-')}</span>,
     },
     {
       key: 'name',
       label: '供應商名稱',
       sortable: true,
-      render: value => <span className="font-medium text-morandi-primary">{value}</span>,
+      render: (value) => <span className="font-medium text-morandi-primary">{String(value || '')}</span>,
     },
     {
       key: 'type',
       label: '類型',
       sortable: true,
-      render: (value: string) => {
-        const label = TYPE_LABELS[value] || value
+      render: (value) => {
+        const label = TYPE_LABELS[String(value)] || String(value)
         return (
           <Badge variant="secondary" className="text-xs">
             {label}
@@ -58,19 +58,19 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({ suppliers, loading
       key: 'bank_name',
       label: '銀行名稱',
       sortable: true,
-      render: value => <span className="text-morandi-primary">{value || '-'}</span>,
+      render: (value) => <span className="text-morandi-primary">{String(value || '-')}</span>,
     },
     {
       key: 'bank_account',
       label: '銀行帳號',
       sortable: true,
-      render: value => <span className="text-morandi-secondary">{value || '-'}</span>,
+      render: (value) => <span className="text-morandi-secondary">{String(value || '-')}</span>,
     },
     {
       key: 'notes',
       label: '備註',
       sortable: false,
-      render: value => <span className="text-sm text-morandi-muted">{value || '-'}</span>,
+      render: (value) => <span className="text-sm text-morandi-muted">{String(value || '-')}</span>,
     },
   ]
 

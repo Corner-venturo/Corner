@@ -4,6 +4,7 @@
 
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -148,7 +149,7 @@ export const QuotesPage: React.FC = () => {
     const quote = quotes.find(q => q.id === quoteId)
     if (!quote) return
 
-    console.log('🔍 Preview quote:', {
+    logger.log('🔍 Preview quote:', {
       id: quote.id,
       name: quote.name,
       quote_type: (quote as any).quote_type,
@@ -157,7 +158,7 @@ export const QuotesPage: React.FC = () => {
       participant_counts: quote.participant_counts,
     })
 
-    console.log('💰 Selling prices detailed:', JSON.stringify(quote.selling_prices, null, 2))
+    logger.log('💰 Selling prices detailed:', JSON.stringify(quote.selling_prices, null, 2))
 
     // 如果是快速報價單，需要載入 items
     if ((quote as any).quote_type === 'quick') {
@@ -168,7 +169,7 @@ export const QuotesPage: React.FC = () => {
         .eq('quote_id', quoteId)
         .order('created_at', { ascending: true })
 
-      console.log('📦 Quick quote items:', items, 'Error:', error)
+      logger.log('📦 Quick quote items:', items, 'Error:', error)
       setPreviewQuoteItems(items || [])
     } else {
       setPreviewQuoteItems([])

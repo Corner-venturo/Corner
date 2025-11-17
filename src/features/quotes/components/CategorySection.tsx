@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
 import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -154,7 +155,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
   // 插入車資到團體分攤
   const handleInsertRate = (rate: TransportationRate) => {
-    console.log('🔄 [CategorySection] 插入車資:', rate)
+    logger.log('🔄 [CategorySection] 插入車資:', rate)
 
     // 建立描述：使用 route（例如「包車1天（100公里／10小時）」）
     const description = rate.route || rate.category || rate.vehicle_type || '車資'
@@ -170,7 +171,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       is_group_cost: true, // 標記為團體費用
     }
 
-    console.log('📝 [CategorySection] 插入項目:', newItem)
+    logger.log('📝 [CategorySection] 插入項目:', newItem)
 
     // 直接插入完整項目
     handleInsertItem('group-transport', newItem)

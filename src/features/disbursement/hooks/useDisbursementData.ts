@@ -20,7 +20,7 @@ export function useDisbursementData() {
     getNextThursday = () => new Date().toLocaleDateString('zh-TW'),
     createDisbursementOrder = () => {},
     generateDisbursementNumber = () => 'DISB-000001',
-  } = {} as unknown
+  } = {} as any
 
   const pendingRequests = useMemo(
     () => (getPendingPaymentRequests ? getPendingPaymentRequests() : []),

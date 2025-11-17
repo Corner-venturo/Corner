@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -7,13 +8,14 @@ import { EditorContainer } from '../components/EditorContainer'
 import { PreviewContainer } from '../components/PreviewContainer'
 import { Button } from '@/components/ui/button'
 import { useConfirmationStore } from '@/stores/confirmation-store'
-import { useUserStore } from '@/stores/user-store'
+import { useAuthStore } from '@/stores/auth-store'
 import type {
   ConfirmationFormData,
   ConfirmationType,
   Confirmation,
 } from '@/types/confirmation.types'
 import { toast } from 'sonner'
+import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
 export default function EditConfirmationPage() {
   const router = useRouter()
@@ -21,9 +23,9 @@ export default function EditConfirmationPage() {
   const id = params.id as string
 
   const confirmations = useConfirmationStore(state => state.items)
-  const updateItem = useConfirmationStore(state => state.updateItem)
+  const update = useConfirmationStore(state => state.update)
   const fetchAll = useConfirmationStore(state => state.fetchAll)
-  const currentUser = useUserStore(state => state.user)
+  const currentUser = useAuthStore(state => state.user)
 
   const [formData, setFormData] = useState<ConfirmationFormData>({
     type: 'flight',
@@ -72,8 +74,10 @@ export default function EditConfirmationPage() {
   }
 
   const handleSave = async () => {
-    if (!currentUser?.id) {
-      toast.error('請先登入')
+    const auth = useRequireAuthSync()
+
+    if (!auth.isAuthenticated) {
+      auth.showLoginRequired()
       return
     }
 
@@ -84,20 +88,20 @@ export default function EditConfirmationPage() {
 
     setIsSaving(true)
     try {
-      await updateItem(id, {
+      await update(id, {
         type: formData.type,
         booking_number: formData.booking_number,
         confirmation_number: formData.confirmation_number,
         data: formData.data,
         status: formData.status,
         notes: formData.notes,
-        updated_by: currentUser.id,
+        updated_by: auth.user!.id,
       } as Partial<Confirmation>)
 
       toast.success('確認單已更新')
       router.push('/confirmations/list')
     } catch (error) {
-      console.error('更新失敗:', error)
+      logger.error('更新失敗:', error)
       toast.error('更新失敗')
     } finally {
       setIsSaving(false)
