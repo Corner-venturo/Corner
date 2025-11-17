@@ -284,10 +284,16 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                     <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-28">
                       小計
                     </th>
-                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary">
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-32">
+                      付款方式
+                    </th>
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-32">
+                      甲存日期
+                    </th>
+                    <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-48">
                       備註
                     </th>
-                    <th className="text-center py-2 px-3 text-sm font-medium text-morandi-secondary w-20">
+                    <th className="text-center py-2 px-3 text-sm font-medium text-morandi-secondary w-32">
                       操作
                     </th>
                   </tr>
@@ -372,7 +378,35 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                     <td className="py-2 px-3 w-28 text-sm font-bold text-morandi-gold">
                       {(newItem.unit_price * newItem.quantity).toLocaleString()}
                     </td>
-                    <td className="py-2 px-3">
+                    <td className="py-2 px-3 w-32">
+                      <Select
+                        value={newItem.payment_method || 'transfer'}
+                        onValueChange={value =>
+                          setNewItem(prev => ({ ...prev, payment_method: value as 'transfer' | 'deposit' | 'cash' | 'check' }))
+                        }
+                      >
+                        <SelectTrigger className="h-9 border-morandi-container/30">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="transfer">轉帳</SelectItem>
+                          <SelectItem value="deposit">甲存</SelectItem>
+                          <SelectItem value="cash">現金</SelectItem>
+                          <SelectItem value="check">支票</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="py-2 px-3 w-32">
+                      {newItem.payment_method === 'deposit' && (
+                        <Input
+                          type="date"
+                          value={newItem.custom_request_date || ''}
+                          onChange={e => setNewItem(prev => ({ ...prev, custom_request_date: e.target.value }))}
+                          className="h-9 border-morandi-container/30"
+                        />
+                      )}
+                    </td>
+                    <td className="py-2 px-3 w-48">
                       <Input
                         value={newItem.description}
                         onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
@@ -389,10 +423,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         className="h-9 border-morandi-container/30"
                       />
                     </td>
-                    <td className="py-2 px-3 w-20 text-center">
+                    <td className="py-2 px-3 w-32 text-center">
                       <Button
                         onClick={addItemToList}
-                        disabled={!newItem.supplier_id || !newItem.description}
                         size="sm"
                         className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                       >
@@ -425,8 +458,24 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                       <td className="py-3 px-3 w-28 text-sm font-bold text-morandi-gold">
                         {(item.unit_price * item.quantity).toLocaleString()}
                       </td>
-                      <td className="py-3 px-3 text-sm text-morandi-secondary">{item.description}</td>
-                      <td className="py-3 px-3 w-20 text-center">
+                      <td className="py-3 px-3 w-32">
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                          {item.payment_method === 'transfer' && '轉帳'}
+                          {item.payment_method === 'deposit' && '甲存'}
+                          {item.payment_method === 'cash' && '現金'}
+                          {item.payment_method === 'check' && '支票'}
+                          {!item.payment_method && '轉帳'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 w-32 text-sm text-morandi-secondary">
+                        {item.custom_request_date && (
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                            {new Date(item.custom_request_date).toLocaleDateString('zh-TW')}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 w-48 text-sm text-morandi-secondary">{item.description}</td>
+                      <td className="py-3 px-3 w-32 text-center">
                         <button
                           onClick={() => removeItem(item.id)}
                           className="text-morandi-red hover:bg-morandi-red/10 p-2 rounded-lg transition-colors"

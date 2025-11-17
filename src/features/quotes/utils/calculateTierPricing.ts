@@ -78,13 +78,13 @@ export function calculateTierPricingCosts(
     category.items.forEach(item => {
       if (category.id === 'transport') {
         // 交通類別
-        if (item.name === '成人機票') {
+        if (item.name === '成人') {
           costs.adult += item.adult_price || 0
           costs.single_room += item.adult_price || 0
-        } else if (item.name === '小孩機票') {
+        } else if (item.name === '兒童') {
           costs.child_with_bed += item.child_price || 0
           costs.child_no_bed += item.child_price || 0
-        } else if (item.name === '嬰兒機票') {
+        } else if (item.name === '嬰兒') {
           costs.infant += item.infant_price || 0
         } else {
           const itemCost = item.unit_price || 0

@@ -24,6 +24,8 @@ export interface RequestItem {
   description: string
   unit_price: number
   quantity: number
+  payment_method?: 'transfer' | 'deposit' | 'cash' | 'check'
+  custom_request_date?: string // 甲存日期（只有選甲存時才填）
 }
 
 export interface NewItemFormData {
@@ -32,6 +34,8 @@ export interface NewItemFormData {
   description: string
   unit_price: number
   quantity: number
+  payment_method?: 'transfer' | 'deposit' | 'cash' | 'check'
+  custom_request_date?: string // 甲存日期（只有選甲存時才填）
 }
 
 export const statusLabels: Record<PaymentRequest['status'], string> = {

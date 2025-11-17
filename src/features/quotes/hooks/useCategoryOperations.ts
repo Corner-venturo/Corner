@@ -128,18 +128,18 @@ export const useCategoryOperations = ({
       })
     }
 
-    // 2. 計算成人機票費用
+    // 2. 計算成人費用
     const transportCategory = categories.find(cat => cat.id === 'transport')
     let adultTicketCost = 0
 
     if (transportCategory && transportCategory.items.length > 0) {
-      const adultTicket = transportCategory.items.find(item => item.name === '成人機票')
+      const adultTicket = transportCategory.items.find(item => item.name === '成人')
       if (adultTicket) {
         adultTicketCost = adultTicket.adult_price || 0
       }
     }
 
-    // 3. 領隊總成本 = 住宿第一房型總和 + 成人機票費用（不除法）
+    // 3. 領隊總成本 = 住宿第一房型總和 + 成人費用（不除法）
     const totalGuideCost = dailyFirstRoomCost + adultTicketCost
 
     return totalGuideCost
@@ -191,7 +191,7 @@ export const useCategoryOperations = ({
         quantity: 1,
         unit_price: totalGuideCost,
         total: groupSizeForGuide > 0 ? Math.ceil(totalGuideCost / groupSizeForGuide) : 0,
-        note: '自動計算：住宿第一房型 + 成人機票',
+        note: '自動計算：住宿第一房型 + 成人',
       }
 
       setCategories(prev =>
@@ -209,12 +209,12 @@ export const useCategoryOperations = ({
     [categories, calculateGuideWithCategories, groupSizeForGuide, setCategories]
   )
 
-  // 新增成人機票
+  // 新增成人
   const handleAddAdultTicket = useCallback(
     (category_id: string) => {
       const newItem: CostItem = {
         id: Date.now().toString(),
-        name: '成人機票',
+        name: '成人',
         quantity: 0,
         unit_price: 0,
         total: 0,
@@ -238,12 +238,12 @@ export const useCategoryOperations = ({
     [setCategories]
   )
 
-  // 新增小孩機票
+  // 新增兒童
   const handleAddChildTicket = useCallback(
     (category_id: string) => {
       const newItem: CostItem = {
         id: Date.now().toString(),
-        name: '小孩機票',
+        name: '兒童',
         quantity: 0,
         unit_price: 0,
         total: 0,
@@ -267,12 +267,12 @@ export const useCategoryOperations = ({
     [setCategories]
   )
 
-  // 新增嬰兒機票
+  // 新增嬰兒
   const handleAddInfantTicket = useCallback(
     (category_id: string) => {
       const newItem: CostItem = {
         id: Date.now().toString(),
-        name: '嬰兒機票',
+        name: '嬰兒',
         quantity: 0,
         unit_price: 0,
         total: 0,
@@ -348,12 +348,12 @@ export const useCategoryOperations = ({
                   const effectiveQuantity =
                     updatedItem.quantity === 0 ? 1 : updatedItem.quantity || 1
 
-                  // 成人、小孩、嬰兒機票：顯示對應票價在小計欄位
-                  if (updatedItem.name === '成人機票') {
+                  // 成人、兒童、嬰兒：顯示對應票價在小計欄位
+                  if (updatedItem.name === '成人') {
                     updatedItem.total = updatedItem.adult_price || 0
-                  } else if (updatedItem.name === '小孩機票') {
+                  } else if (updatedItem.name === '兒童') {
                     updatedItem.total = updatedItem.child_price || 0
-                  } else if (updatedItem.name === '嬰兒機票') {
+                  } else if (updatedItem.name === '嬰兒') {
                     updatedItem.total = updatedItem.infant_price || 0
                   } else if (category_id === 'accommodation') {
                     // 住宿特殊邏輯：小計 = 單價 ÷ 人數

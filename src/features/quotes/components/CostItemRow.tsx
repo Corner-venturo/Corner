@@ -19,8 +19,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
   handleUpdateItem,
   handleRemoveItem,
 }) => {
-  // 判斷是否為小孩或嬰兒機票（顯示為灰色）
-  const isChildOrInfantTicket = item.name === '小孩機票' || item.name === '嬰兒機票'
+  // 判斷是否為兒童或嬰兒（顯示為灰色）
+  const isChildOrInfantTicket = item.name === '兒童' || item.name === '嬰兒'
 
   return (
     <tr
@@ -49,7 +49,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
         />
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
-        {item.name === '成人機票' ? (
+        {item.name === '成人' ? (
           <input
             type="number"
             value={item.adult_price || ''}
@@ -59,7 +59,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             placeholder="成人票價"
           />
-        ) : item.name === '小孩機票' ? (
+        ) : item.name === '兒童' ? (
           <input
             type="number"
             value={item.child_price || ''}
@@ -67,9 +67,9 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
               handleUpdateItem(categoryId, item.id, 'child_price', Number(e.target.value) || 0)
             }
             className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            placeholder="小孩票價"
+            placeholder="兒童票價"
           />
-        ) : item.name === '嬰兒機票' ? (
+        ) : item.name === '嬰兒' ? (
           <input
             type="number"
             value={item.infant_price || ''}

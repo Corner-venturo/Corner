@@ -147,16 +147,16 @@ export const useQuoteCalculations = ({
         category.items.forEach(item => {
           if (category.id === 'transport') {
             // 交通類別：依照項目名稱區分身份
-            if (item.name === '成人機票') {
-              // 成人機票：只加給成人和單人房
+            if (item.name === '成人') {
+              // 成人：只加給成人和單人房
               costs.adult += item.adult_price || 0
               costs.single_room += item.adult_price || 0
-            } else if (item.name === '小孩機票') {
-              // 小孩機票：只加給小孩（佔床、不佔床）
+            } else if (item.name === '兒童') {
+              // 兒童：只加給小孩（佔床、不佔床）
               costs.child_with_bed += item.child_price || 0
               costs.child_no_bed += item.child_price || 0
-            } else if (item.name === '嬰兒機票') {
-              // 嬰兒機票：只加給嬰兒
+            } else if (item.name === '嬰兒') {
+              // 嬰兒：只加給嬰兒
               costs.infant += item.infant_price || 0
             } else {
               // 其他交通費用（遊覽車等統一價）：成人、小孩佔床、單人房

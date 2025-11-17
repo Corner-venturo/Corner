@@ -277,7 +277,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                成人機票
+                成人
               </Button>
               <Button
                 variant="ghost"
@@ -290,7 +290,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                小孩機票
+                兒童
               </Button>
               <Button
                 variant="ghost"
@@ -303,7 +303,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                嬰兒機票
+                嬰兒
               </Button>
               <Button
                 variant="ghost"
@@ -397,9 +397,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               if (category.id === 'accommodation') {
                 return accommodationTotal.toLocaleString()
               } else if (category.id === 'transport') {
-                // 機票小計：只計算成人機票
+                // 機票小計：只計算成人
                 const adultTicketTotal = category.items
-                  .filter(item => item.name === '成人機票')
+                  .filter(item => item.name === '成人')
                   .reduce((sum, item) => sum + (item.total || 0), 0)
                 return adultTicketTotal.toLocaleString()
               } else {
