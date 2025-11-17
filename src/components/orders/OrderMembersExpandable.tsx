@@ -62,6 +62,11 @@ export function OrderMembersExpandable({
   const [showIdentityColumn, setShowIdentityColumn] = useState(false) // 控制身份欄位顯示
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
 
+  // 定義可編輯欄位的順序（用於方向鍵導航）
+  const editableFields = showIdentityColumn
+    ? ['identity', 'chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal', 'pnr']
+    : ['chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal', 'pnr']
+
   // 載入成員資料和出發日期
   useEffect(() => {
     loadMembers()
@@ -159,11 +164,63 @@ export function OrderMembersExpandable({
     setMembers(members.map(m => (m.id === memberId ? { ...m, [field]: value } : m)))
   }
 
+  // 鍵盤導航處理
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, memberIndex: number, fieldName: string) => {
+    const currentFieldIndex = editableFields.indexOf(fieldName)
+
+    // Enter / 下鍵：移動到下一列同一欄位
+    if (e.key === 'Enter' || e.key === 'ArrowDown') {
+      e.preventDefault()
+      const nextMemberIndex = memberIndex + 1
+      if (nextMemberIndex < members.length) {
+        const nextInput = document.querySelector(`input[data-member="${members[nextMemberIndex].id}"][data-field="${fieldName}"]`) as HTMLInputElement
+        nextInput?.focus()
+      }
+    }
+    // 上鍵：移動到上一列同一欄位
+    else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      const prevMemberIndex = memberIndex - 1
+      if (prevMemberIndex >= 0) {
+        const prevInput = document.querySelector(`input[data-member="${members[prevMemberIndex].id}"][data-field="${fieldName}"]`) as HTMLInputElement
+        prevInput?.focus()
+      }
+    }
+    // Tab：移動到右邊欄位
+    else if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault()
+      if (currentFieldIndex < editableFields.length - 1) {
+        const nextField = editableFields[currentFieldIndex + 1]
+        const nextInput = document.querySelector(`input[data-member="${members[memberIndex].id}"][data-field="${nextField}"]`) as HTMLInputElement
+        nextInput?.focus()
+      } else {
+        // 最後一欄，移到下一列第一欄
+        const nextMemberIndex = memberIndex + 1
+        if (nextMemberIndex < members.length) {
+          const firstField = editableFields[0]
+          const nextInput = document.querySelector(`input[data-member="${members[nextMemberIndex].id}"][data-field="${firstField}"]`) as HTMLInputElement
+          nextInput?.focus()
+        }
+      }
+    }
+    // Shift+Tab：移動到左邊欄位
+    else if (e.key === 'Tab' && e.shiftKey) {
+      e.preventDefault()
+      if (currentFieldIndex > 0) {
+        const prevField = editableFields[currentFieldIndex - 1]
+        const prevInput = document.querySelector(`input[data-member="${members[memberIndex].id}"][data-field="${prevField}"]`) as HTMLInputElement
+        prevInput?.focus()
+      }
+    }
+  }
+
   // 直接更新欄位到資料庫和本地狀態
   const updateField = async (memberId: string, field: keyof OrderMember, value: string | number) => {
-    // 如果正在使用輸入法，只更新本地狀態，不寫入資料庫
+    // 先更新本地狀態（即時反應）
+    updateLocalField(memberId, field, value)
+
+    // 如果正在使用輸入法，延遲資料庫寫入
     if (isComposing) {
-      updateLocalField(memberId, field, value)
       return
     }
 
@@ -186,11 +243,12 @@ export function OrderMembersExpandable({
 
       if (error) throw error
 
-      // 更新本地狀態
+      // 確保本地狀態同步（使用處理過的值）
       setMembers(members.map(m => (m.id === memberId ? { ...m, [field]: processedValue } : m)))
     } catch (error) {
       console.error('更新失敗:', error)
-      alert('更新失敗')
+      // 失敗時回滾本地狀態
+      loadMembers()
     }
   }
 
@@ -366,7 +424,7 @@ export function OrderMembersExpandable({
               </tr>
             </thead>
             <tbody>
-              {members.map(member => (
+              {members.map((member, memberIndex) => (
                 <tr
                   key={member.id}
                   className="group relative hover:bg-morandi-container/20 transition-colors"
@@ -381,7 +439,10 @@ export function OrderMembersExpandable({
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={(e) => {
                           setIsComposing(false)
-                          updateField(member.id, 'identity', e.currentTarget.value)
+                          // 輸入法結束後立即寫入資料庫
+                          setTimeout(() => {
+                            updateField(member.id, 'identity', e.currentTarget.value)
+                          }, 0)
                         }}
                         className="w-full bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -399,7 +460,9 @@ export function OrderMembersExpandable({
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
                         setIsComposing(false)
-                        updateField(member.id, 'chinese_name', e.currentTarget.value)
+                        setTimeout(() => {
+                          updateField(member.id, 'chinese_name', e.currentTarget.value)
+                        }, 0)
                       }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -416,7 +479,9 @@ export function OrderMembersExpandable({
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
                         setIsComposing(false)
-                        updateField(member.id, 'passport_name', e.currentTarget.value)
+                        setTimeout(() => {
+                          updateField(member.id, 'passport_name', e.currentTarget.value)
+                        }, 0)
                       }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -470,7 +535,9 @@ export function OrderMembersExpandable({
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
                         setIsComposing(false)
-                        updateField(member.id, 'passport_number', e.currentTarget.value)
+                        setTimeout(() => {
+                          updateField(member.id, 'passport_number', e.currentTarget.value)
+                        }, 0)
                       }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -499,7 +566,9 @@ export function OrderMembersExpandable({
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
                         setIsComposing(false)
-                        updateField(member.id, 'special_meal', e.currentTarget.value)
+                        setTimeout(() => {
+                          updateField(member.id, 'special_meal', e.currentTarget.value)
+                        }, 0)
                       }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -515,7 +584,9 @@ export function OrderMembersExpandable({
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
                         setIsComposing(false)
-                        updateField(member.id, 'pnr', e.currentTarget.value)
+                        setTimeout(() => {
+                          updateField(member.id, 'pnr', e.currentTarget.value)
+                        }, 0)
                       }}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
@@ -573,7 +644,9 @@ export function OrderMembersExpandable({
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={(e) => {
                           setIsComposing(false)
-                          updateField(member.id, 'remarks', e.currentTarget.value)
+                          setTimeout(() => {
+                            updateField(member.id, 'remarks', e.currentTarget.value)
+                          }, 0)
                         }}
                         className="flex-1 bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}

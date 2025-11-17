@@ -1,8 +1,10 @@
 'use client'
 
-import React, { forwardRef, useImperativeHandle } from 'react'
+import React, { forwardRef, useImperativeHandle, useState } from 'react'
 import { Employee } from '@/stores/types'
 import { TrendingUp } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { useUserStore } from '@/stores/user-store'
 
 interface SalaryTabProps {
   employee: Employee
@@ -11,10 +13,14 @@ interface SalaryTabProps {
 }
 
 export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
-  ({ employee }, ref) => {
+  ({ employee, isEditing }, ref) => {
+    const [monthlySalary, setMonthlySalary] = useState((employee as any).monthly_salary ?? 30000)
+    const { update } = useUserStore()
+
     useImperativeHandle(ref, () => ({
       handleSave: async () => {
-        // 薪資資訊目前為唯讀，未來若需編輯功能可在此實作
+        // 儲存月薪
+        await update(employee.id, { monthly_salary: monthlySalary } as any)
       },
     }))
 
@@ -25,29 +31,49 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
 
     return (
       <div className="space-y-6">
-        {/* 目前薪資資訊 */}
-        <div className="bg-morandi-container/10 rounded-lg p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-morandi-primary">
-                NT$ {baseSalary.toLocaleString()}
+        {/* 月薪設定（主要薪資）*/}
+        <div className="bg-morandi-gold/10 rounded-lg p-4 border-2 border-morandi-gold/30">
+          <h4 className="font-medium text-morandi-primary mb-3">月薪</h4>
+          <div className="flex items-center gap-4">
+            {isEditing ? (
+              <>
+                <span className="text-sm text-morandi-secondary">NT$</span>
+                <Input
+                  type="number"
+                  value={monthlySalary}
+                  onChange={e => setMonthlySalary(Number(e.target.value))}
+                  className="w-48 text-xl font-bold"
+                />
+              </>
+            ) : (
+              <p className="text-3xl font-bold text-morandi-primary">
+                NT$ {monthlySalary.toLocaleString()}
               </p>
-              <p className="text-sm text-morandi-muted">底薪</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-morandi-gold">
-                NT$ {totalAllowances.toLocaleString()}
-              </p>
-              <p className="text-sm text-morandi-muted">津貼</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">
-                NT$ {(baseSalary + totalAllowances).toLocaleString()}
-              </p>
-              <p className="text-sm text-morandi-muted">總薪資</p>
+            )}
+          </div>
+          <p className="text-xs text-morandi-secondary mt-2">用於薪資請款的主要薪資金額</p>
+        </div>
+
+        {/* 目前薪資資訊（舊系統 salary_info）*/}
+        {(baseSalary > 0 || allowances.length > 0) && (
+          <div className="bg-morandi-container/10 rounded-lg p-4">
+            <h4 className="font-medium text-morandi-primary mb-3 text-sm">薪資詳細結構（選填）</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-xl font-bold text-morandi-primary">NT$ {baseSalary.toLocaleString()}</p>
+                <p className="text-xs text-morandi-muted">底薪</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold text-morandi-gold">NT$ {totalAllowances.toLocaleString()}</p>
+                <p className="text-xs text-morandi-muted">津貼</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold text-green-600">NT$ {(baseSalary + totalAllowances).toLocaleString()}</p>
+                <p className="text-xs text-morandi-muted">總薪資</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* 津貼明細 */}
         <div className="bg-morandi-container/10 rounded-lg p-4">
