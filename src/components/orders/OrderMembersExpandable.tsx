@@ -58,7 +58,7 @@ export function OrderMembersExpandable({
   const [loading, setLoading] = useState(false)
   const [departureDate, setDepartureDate] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [memberCountToAdd, setMemberCountToAdd] = useState(1)
+  const [memberCountToAdd, setMemberCountToAdd] = useState<number | ''>(1)
   const [showIdentityColumn, setShowIdentityColumn] = useState(false) // 控制身份欄位顯示
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
 
@@ -106,8 +106,11 @@ export function OrderMembersExpandable({
   }
 
   const confirmAddMembers = async () => {
+    // 如果是空白或無效數字，預設為 1
+    const count = typeof memberCountToAdd === 'number' ? memberCountToAdd : 1
+
     try {
-      const newMembers = Array.from({ length: memberCountToAdd }, () => ({
+      const newMembers = Array.from({ length: count }, () => ({
         order_id: orderId,
         workspace_id: workspaceId,
         member_type: 'adult',
@@ -604,8 +607,34 @@ export function OrderMembersExpandable({
               min="1"
               max="50"
               value={memberCountToAdd}
-              onChange={e => setMemberCountToAdd(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onChange={e => {
+                let value = e.target.value
+
+                // 全形轉半形
+                value = value.replace(/[\uff10-\uff19]/g, ch =>
+                  String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+                )
+
+                // 允許空白（使用者刪除時）
+                if (value === '') {
+                  setMemberCountToAdd('')
+                  return
+                }
+
+                // 轉換數字並限制範圍
+                const num = parseInt(value, 10)
+                if (!isNaN(num)) {
+                  setMemberCountToAdd(Math.min(50, Math.max(1, num)))
+                }
+              }}
+              onFocus={e => e.target.select()}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  confirmAddMembers()
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+              autoFocus
             />
           </div>
           <DialogFooter>

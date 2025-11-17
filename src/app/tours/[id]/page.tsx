@@ -39,6 +39,7 @@ export default function TourDetailPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false)
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
+  const [triggerMemberAdd, setTriggerMemberAdd] = useState(false)
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
 
   const tour = tours.find(t => t.id === params.id)
@@ -135,7 +136,7 @@ export default function TourDetailPage() {
             // 功能: 新增訂單
             break
           case 'members':
-            // 功能: 新增團員
+            setTriggerMemberAdd(true)
             break
         }
       },
@@ -150,7 +151,13 @@ export default function TourDetailPage() {
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
-        return <TourMembers tour={tour} />
+        return (
+          <TourMembers
+            tour={tour}
+            triggerAdd={triggerMemberAdd}
+            onTriggerAddComplete={() => setTriggerMemberAdd(false)}
+          />
+        )
       case 'operations':
         return <TourOperations tour={tour} />
       case 'addons':

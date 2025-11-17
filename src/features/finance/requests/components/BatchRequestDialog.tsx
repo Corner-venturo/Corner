@@ -48,6 +48,9 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
     quantity: 1,
   })
 
+  // Allocation amounts for each tour
+  const [tourAllocations, setTourAllocations] = useState<Record<string, number>>({})
+
   // Supplier search states
   const [supplierSearchValue, setSupplierSearchValue] = useState('')
   const [showSupplierDropdown, setShowSupplierDropdown] = useState(false)
@@ -77,7 +80,8 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
       combinedSuppliers.filter(supplier => {
         const searchTerm = supplierSearchValue.toLowerCase()
         if (!searchTerm) return true
-        return supplier.name.toLowerCase().includes(searchTerm)
+        const supplierName = supplier.name?.toLowerCase() || ''
+        return supplierName.includes(searchTerm)
       }),
     [combinedSuppliers, supplierSearchValue]
   )
@@ -120,8 +124,13 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
     setRequestItems(prev => prev.filter(item => item.id !== itemId))
   }, [])
 
+  // Handle allocation change
+  const handleAllocationChange = useCallback((tourId: string, amount: number) => {
+    setTourAllocations(prev => ({ ...prev, [tourId]: amount }))
+  }, [])
+
   const handleSubmit = async () => {
-    await createBatchRequests(formData, requestItems, selectedTourIds, tours)
+    await createBatchRequests(formData, requestItems, selectedTourIds, tours, tourAllocations)
 
     resetForm()
     setRequestItems([])
@@ -132,6 +141,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
       unit_price: 0,
       quantity: 1,
     })
+    setTourAllocations({})
     onOpenChange(false)
   }
 
@@ -147,6 +157,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
     })
     setSupplierSearchValue('')
     setShowSupplierDropdown(false)
+    setTourAllocations({})
     onOpenChange(false)
   }
 
@@ -170,6 +181,9 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
             showDropdown={showBatchTourDropdown}
             onShowDropdown={setShowBatchTourDropdown}
             allTours={tours}
+            tourAllocations={tourAllocations}
+            onAllocationChange={handleAllocationChange}
+            totalItemsAmount={total_amount}
           />
 
           {/* Basic Info */}

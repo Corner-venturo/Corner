@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils'
 interface TourMembersProps {
   tour: Tour
   orderFilter?: string // 選填：只顯示特定訂單的團員
+  triggerAdd?: boolean
+  onTriggerAddComplete?: () => void
 }
 
 interface EditingMember {
@@ -39,6 +41,8 @@ interface EditingCell {
 export const TourMembers = React.memo(function TourMembers({
   tour,
   orderFilter,
+  triggerAdd,
+  onTriggerAddComplete,
 }: TourMembersProps) {
   const { items: orders } = useOrderStore()
   const {
@@ -50,7 +54,19 @@ export const TourMembers = React.memo(function TourMembers({
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([])
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [draggedRow, setDraggedRow] = useState<number | null>(null)
+  const [isNavigating, setIsNavigating] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // 定義可編輯欄位的順序（用於左右鍵導航）
+  const editableFields: (keyof EditingMember)[] = [
+    'name',
+    'nameEn',
+    'birthday',
+    'gender',
+    'idNumber',
+    'passportNumber',
+    'passportExpiry',
+  ]
 
   // 獲取屬於這個旅遊團的所有訂單（如果有 orderFilter，則只取該訂單）
   const tourOrders = useMemo(() => {
@@ -85,6 +101,30 @@ export const TourMembers = React.memo(function TourMembers({
 
   const totalMembers = tableMembers.length
   const completedMembers = tableMembers.filter(member => member.name && member.idNumber).length
+
+  // 處理新增團員觸發
+  useEffect(() => {
+    if (triggerAdd && tourOrders.length > 0) {
+      // 預設加到第一個訂單
+      const firstOrder = tourOrders[0]
+      const newMember: EditingMember = {
+        order_id: firstOrder.id,
+        name: '',
+        nameEn: '',
+        birthday: '',
+        passportNumber: '',
+        passportExpiry: '',
+        idNumber: '',
+        gender: '',
+        age: 0,
+        isNew: true,
+        order_number: firstOrder.order_number,
+        contact_person: firstOrder.contact_person,
+      }
+      setTableMembers([...tableMembers, newMember])
+      onTriggerAddComplete?.()
+    }
+  }, [triggerAdd, tourOrders, onTriggerAddComplete])
 
   // 點擊單元格開始編輯
   const startCellEdit = (rowIndex: number, field: keyof EditingMember) => {
@@ -287,33 +327,109 @@ export const TourMembers = React.memo(function TourMembers({
     }
 
     if (isEditing) {
+      // 計算顯示值
+      let displayValue = ''
+      if (field === 'age') {
+        displayValue = ''
+      } else if (field === 'gender') {
+        displayValue = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+      } else {
+        displayValue = (member[field] as string) || ''
+      }
+
       return (
         <input
           ref={inputRef}
-          value={
-            field === 'age'
-              ? ''
-              : field === 'gender'
-                ? member.gender === 'M'
-                  ? '男'
-                  : member.gender === 'F'
-                    ? '女'
-                    : ''
-                : (member[field] as string)
-          }
+          value={displayValue}
           onChange={e => updateCellValue(e.target.value)}
-          onBlur={() => setEditingCell(null)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === 'Tab') {
-              e.preventDefault()
+          onBlur={() => {
+            if (!isNavigating) {
               setEditingCell(null)
             }
-            if (e.key === 'Escape') {
+          }}
+          onKeyDown={e => {
+            console.log('Key pressed:', e.key, 'Field:', field, 'Row:', rowIndex)
+
+            // Enter：移動到下一列同一欄位
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              const nextRow = rowIndex + 1
+              if (nextRow < tableMembers.length) {
+                setEditingCell({ rowIndex: nextRow, field })
+              } else {
+                setEditingCell(null)
+              }
+            }
+            // Tab：移動到右邊欄位（Shift+Tab 移動到左邊）
+            else if (e.key === 'Tab') {
+              e.preventDefault()
+              const currentFieldIndex = editableFields.indexOf(field)
+              if (e.shiftKey) {
+                // Shift+Tab：往左
+                if (currentFieldIndex > 0) {
+                  setEditingCell({ rowIndex, field: editableFields[currentFieldIndex - 1] })
+                }
+              } else {
+                // Tab：往右
+                if (currentFieldIndex < editableFields.length - 1) {
+                  setEditingCell({ rowIndex, field: editableFields[currentFieldIndex + 1] })
+                } else {
+                  // 最後一個欄位，移到下一列第一個欄位
+                  const nextRow = rowIndex + 1
+                  if (nextRow < tableMembers.length) {
+                    setEditingCell({ rowIndex: nextRow, field: editableFields[0] })
+                  } else {
+                    setEditingCell(null)
+                  }
+                }
+              }
+            }
+            // Escape：取消編輯
+            else if (e.key === 'Escape') {
               setEditingCell(null)
+            }
+            // 方向鍵導航
+            else if (e.key === 'ArrowDown') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsNavigating(true)
+              const nextRow = rowIndex + 1
+              if (nextRow < tableMembers.length) {
+                setEditingCell({ rowIndex: nextRow, field })
+              }
+              setTimeout(() => setIsNavigating(false), 100)
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsNavigating(true)
+              const prevRow = rowIndex - 1
+              if (prevRow >= 0) {
+                setEditingCell({ rowIndex: prevRow, field })
+              }
+              setTimeout(() => setIsNavigating(false), 100)
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsNavigating(true)
+              const currentFieldIndex = editableFields.indexOf(field)
+              if (currentFieldIndex < editableFields.length - 1) {
+                setEditingCell({ rowIndex, field: editableFields[currentFieldIndex + 1] })
+              }
+              setTimeout(() => setIsNavigating(false), 100)
+            } else if (e.key === 'ArrowLeft') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsNavigating(true)
+              const currentFieldIndex = editableFields.indexOf(field)
+              if (currentFieldIndex > 0) {
+                setEditingCell({ rowIndex, field: editableFields[currentFieldIndex - 1] })
+              }
+              setTimeout(() => setIsNavigating(false), 100)
             }
           }}
           type={field === 'birthday' || field === 'passportExpiry' ? 'date' : 'text'}
           className="h-8 w-full border-none outline-none bg-transparent p-0 px-2 focus:ring-0 focus:border-none"
+          autoFocus
         />
       )
     }
@@ -321,13 +437,13 @@ export const TourMembers = React.memo(function TourMembers({
     return (
       <div
         className={cn(
-          'h-8 px-2 py-1 flex items-center',
-          isAutoField ? 'cursor-not-allowed text-gray-500' : 'cursor-text',
+          'h-8 px-2 py-1 flex items-center w-full',
+          isAutoField ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer hover:bg-morandi-gold/5',
           member[field] && !isAutoField && 'font-medium'
         )}
         onClick={() => !isAutoField && startCellEdit(rowIndex, field)}
       >
-        {value || ''}
+        {value || <span className="text-gray-300">點擊輸入</span>}
       </div>
     )
   }
@@ -422,33 +538,33 @@ export const TourMembers = React.memo(function TourMembers({
                     </td>
 
                     {/* 可編輯欄位 */}
-                    <td className="border border-gray-300">{renderCell(member, index, 'name')}</td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">{renderCell(member, index, 'name')}</td>
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'nameEn')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'birthday')}
                     </td>
-                    <td className="border border-gray-300">{renderCell(member, index, 'age')}</td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">{renderCell(member, index, 'age')}</td>
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'gender')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'idNumber')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'passportNumber')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'passportExpiry')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'order_number')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'contact_person')}
                     </td>
-                    <td className="border border-gray-300">
+                    <td className="border border-gray-300 p-0">
                       {renderCell(member, index, 'assignedRoom')}
                     </td>
 

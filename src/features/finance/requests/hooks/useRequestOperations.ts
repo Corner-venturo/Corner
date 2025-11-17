@@ -64,15 +64,26 @@ export function useRequestOperations() {
       formData: BatchRequestFormData,
       items: RequestItem[],
       tourIds: string[],
-      tours: Array<{ id: string; code: string; name: string }>
+      tours: Array<{ id: string; code: string; name: string }>,
+      tourAllocations?: Record<string, number>
     ) => {
       if (tourIds.length === 0 || items.length === 0) return []
 
       const createdRequests = []
 
+      // Calculate total amount from items
+      const totalItemsAmount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
+
       for (const tourId of tourIds) {
         const selectedTour = tours.find(t => t.id === tourId)
         if (!selectedTour) continue
+
+        // Determine this tour's allocation amount
+        // If allocation is specified, use it; otherwise distribute evenly
+        const tourAmount = tourAllocations?.[tourId] || totalItemsAmount / tourIds.length
+
+        // Calculate adjustment ratio
+        const adjustmentRatio = tourAmount / totalItemsAmount
 
         // Create payment request
         const request = await createPaymentRequest({
@@ -87,15 +98,17 @@ export function useRequestOperations() {
           budget_warning: false,
         } as unknown)
 
-        // Add all items
+        // Add all items with adjusted amounts
         for (let i = 0; i < items.length; i++) {
           const item = items[i]
+          const adjustedUnitPrice = Math.round(item.unit_price * adjustmentRatio)
+
           await addPaymentItem(request.id, {
             category: item.category,
             supplier_id: item.supplier_id,
             supplier_name: item.supplierName,
             description: item.description,
-            unit_price: item.unit_price,
+            unit_price: adjustedUnitPrice,
             quantity: item.quantity,
             note: '',
             sort_order: i + 1,

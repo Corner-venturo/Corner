@@ -288,7 +288,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                       付款方式
                     </th>
                     <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-32">
-                      甲存日期
+                      支票日期
                     </th>
                     <th className="text-left py-2 px-3 text-sm font-medium text-morandi-secondary w-48">
                       備註
@@ -381,23 +381,28 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                     <td className="py-2 px-3 w-32">
                       <Select
                         value={newItem.payment_method || 'transfer'}
-                        onValueChange={value =>
-                          setNewItem(prev => ({ ...prev, payment_method: value as 'transfer' | 'deposit' | 'cash' | 'check' }))
-                        }
+                        onValueChange={value => {
+                          const paymentMethod = value as 'transfer' | 'check' | 'cash'
+                          setNewItem(prev => ({
+                            ...prev,
+                            payment_method: paymentMethod,
+                            // 清空支票日期（如果不是支票）
+                            custom_request_date: paymentMethod === 'check' ? prev.custom_request_date : undefined,
+                          }))
+                        }}
                       >
                         <SelectTrigger className="h-9 border-morandi-container/30">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="transfer">轉帳</SelectItem>
-                          <SelectItem value="deposit">甲存</SelectItem>
-                          <SelectItem value="cash">現金</SelectItem>
                           <SelectItem value="check">支票</SelectItem>
+                          <SelectItem value="cash">現金</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
                     <td className="py-2 px-3 w-32">
-                      {newItem.payment_method === 'deposit' && (
+                      {newItem.payment_method === 'check' && (
                         <Input
                           type="date"
                           value={newItem.custom_request_date || ''}
