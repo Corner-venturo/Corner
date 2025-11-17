@@ -1,0 +1,89 @@
+/**
+ * CountryList - 國家列表（按國家分組顯示車資統計）
+ */
+
+'use client'
+
+import React, { useMemo } from 'react'
+import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
+import { Button } from '@/components/ui/button'
+import { Bus, Edit2 } from 'lucide-react'
+import { TransportationRate } from '@/types/transportation-rates.types'
+
+interface CountryListProps {
+  rates: TransportationRate[]
+  loading?: boolean
+  onOpenCountry: (countryName: string, isEditMode: boolean) => void
+}
+
+interface CountryGroup {
+  country: string
+  count: number
+}
+
+export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false, onOpenCountry }) => {
+  // 按國家分組統計
+  const countryGroups = useMemo(() => {
+    const groups = new Map<string, number>()
+
+    rates.forEach(rate => {
+      const country = rate.country_name || '未分類'
+      groups.set(country, (groups.get(country) || 0) + 1)
+    })
+
+    return Array.from(groups.entries()).map(([country, count]) => ({
+      country,
+      count,
+    }))
+  }, [rates])
+
+  const columns: TableColumn[] = [
+    {
+      key: 'country',
+      label: '國家',
+      sortable: true,
+      render: (_value, row: CountryGroup) => (
+        <div
+          className="flex items-center cursor-pointer hover:text-morandi-gold transition-colors"
+          onClick={() => onOpenCountry(row.country, false)}
+        >
+          <Bus size={18} className="mr-3 text-morandi-gold" />
+          <span className="font-medium text-morandi-primary text-base">{row.country}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'count',
+      label: '車資筆數',
+      sortable: true,
+      render: (_value, row: CountryGroup) => (
+        <span className="text-morandi-secondary text-sm">{row.count} 筆</span>
+      ),
+    },
+  ]
+
+  return (
+    <EnhancedTable
+      className="min-h-full"
+      columns={columns}
+      data={countryGroups}
+      loading={loading}
+      emptyMessage="尚無車資資料"
+      onRowClick={(row: CountryGroup) => onOpenCountry(row.country, false)}
+      actions={(row: CountryGroup) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation()
+            onOpenCountry(row.country, true)
+          }}
+          className="h-8 w-8 p-0 text-morandi-blue hover:bg-morandi-blue/10"
+          title="編輯車資"
+        >
+          <Edit2 size={16} />
+        </Button>
+      )}
+    />
+  )
+}

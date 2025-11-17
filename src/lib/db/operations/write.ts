@@ -42,9 +42,13 @@ export async function put<T extends { id: string }>(
       request.onerror = () => {
         const errorMsg = request.error?.message || request.error?.name || '未知錯誤'
         const error = new Error(`Put 資料失敗 (${tableName}): ${errorMsg}`)
-        console.error('[LocalDB] Put 失敗詳情:', {
+        console.error('[LocalDB] ❌ Put 失敗詳情:', {
           tableName,
-          error: request.error,
+          errorName: request.error?.name,
+          errorMessage: request.error?.message,
+          errorCode: (request.error as any)?.code,
+          dataId: data?.id,
+          dataKeys: data ? Object.keys(data) : [],
           data: data,
         })
         reject(error)

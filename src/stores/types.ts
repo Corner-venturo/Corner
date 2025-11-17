@@ -340,7 +340,8 @@ export interface Quote {
   id: string
   code?: string // 報價單編號 (Q20250001 或自訂編號如 JP-BASIC)
   quote_number?: string // 報價單號碼 (QUOTE-2025-0001) - 向下相容
-  name: string // 團體名稱
+  quote_type: 'standard' | 'quick' // ✅ 報價單類型（標準報價單 / 快速報價單）
+  name?: string // 團體名稱（標準報價單必填，快速報價單選填）
   status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
   // draft: 草稿
   // proposed: 提案
@@ -356,12 +357,21 @@ export interface Quote {
   // 客戶資訊
   customer_name?: string // 客戶名稱
   contact_person?: string // 聯絡人
-  contact_phone?: string // 聯絡電話
+  contact_phone?: string // 聯絡電話（標準報價單）
   contact_email?: string // Email
 
+  // 快速報價單專用欄位
+  contact_address?: string // 通訊地址（快速報價單用）
+  tour_code?: string // 團體編號（快速報價單用）
+  handler_name?: string // 承辦業務（快速報價單用）
+  issue_date?: string // 開單日期（快速報價單用）
+  received_amount?: number // 已收金額（快速報價單用）
+  balance_amount?: number // 應收餘額（快速報價單用，自動計算）
+  quick_quote_items?: QuickQuoteItem[] // ✅ 快速報價單的收費明細項目（JSONB 欄位）
+
   // 需求資訊
-  group_size: number // 團體人數（向下相容：總人數）
-  accommodation_days: number // 住宿天數
+  group_size?: number // 團體人數（向下相容：總人數）
+  accommodation_days?: number // 住宿天數
   requirements?: string // 需求說明
   budget_range?: string // 預算範圍
   valid_until?: string // 報價有效期
@@ -385,12 +395,25 @@ export interface Quote {
     infant: number
   }
 
-  categories: QuoteCategory[] // 費用分類
-  total_cost: number // 總成本
+  categories?: QuoteCategory[] // 費用分類（標準報價單用）
+  total_cost?: number // 總成本
+  total_amount?: number // 總金額
   version?: number // 版本號
   versions?: QuoteVersion[] // 版本歷史
   created_at: string
   updated_at: string
+}
+
+/**
+ * QuickQuoteItem - 快速報價單項目
+ */
+export interface QuickQuoteItem {
+  id: string
+  description: string // 摘要
+  quantity: number // 數量
+  unit_price: number // 單價
+  amount: number // 金額（quantity * unit_price）
+  notes: string // 備註
 }
 
 export interface QuoteVersion {
@@ -455,35 +478,33 @@ export type {
 } from '@/types/supplier.types'
 
 // === 請款單管理系統 ===
+// === 請款單（當前簡化版 - 符合資料庫實際結構）===
 export interface PaymentRequest {
   id: string
-  request_number: string // REQ-2024001
-
-  // 分配模式
-  allocation_mode: 'single' | 'multiple' // 單一團體 or 批量分配
-
-  // 單一團體模式（向下相容）
-  tour_id?: string // 團號（allocation_mode = 'single' 時使用）
-  code?: string // CNX241225
-  tour_name?: string // 團體名稱快照
-
-  // 批量分配模式（一筆帳分多團）
-  tour_allocations?: TourAllocation[] // 團體分配列表（allocation_mode = 'multiple' 時使用）
-
-  // 共用欄位
-  quote_id?: string // 關聯的報價單ID
-  order_id?: string // 訂單ID（選填）
-  order_number?: string // 訂單號碼
-  request_date: string // 請款日期 (固定只能選每週四)
-  items: PaymentRequestItem[]
-  total_amount: number
-  status: 'pending' | 'processing' | 'confirmed' | 'paid'
-  note?: string // 請款備註
-  budget_warning?: boolean // 超預算警告
-  created_by: string // 建立者ID
-  created_at: string
-  updated_at: string
+  code: string // 請款單編號（由 store 自動生成）
+  tour_id?: string | null
+  request_type: string // 請款類型（例：員工代墊、供應商支出）
+  amount: number // 總金額
+  supplier_id?: string | null
+  supplier_name?: string | null
+  status?: string | null // pending, approved, paid
+  notes?: string | null
+  approved_at?: string | null
+  approved_by?: string | null
+  paid_at?: string | null
+  paid_by?: string | null
+  workspace_id?: string | null
+  created_at?: string
+  updated_at?: string
 }
+
+// === 請款單（完整版 - 未來升級版）===
+// 升級後將包含：
+// - request_date: string (請款日期)
+// - items: PaymentRequestItem[] (請款項目)
+// - total_amount: number (自動加總)
+// - allocation_mode: 'single' | 'multiple'
+// 升級 SQL: supabase/migrations/20251117122000_update_payment_requests_structure.sql
 
 export interface PaymentRequestItem {
   id: string

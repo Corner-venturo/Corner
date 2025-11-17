@@ -291,6 +291,7 @@ export default function QuoteDetailPage() {
                         isReadOnly={isReadOnly}
                         handleAddAccommodationDay={categoryOps.handleAddAccommodationDay}
                         handleAddRow={categoryOps.handleAddRow}
+                        handleInsertItem={categoryOps.handleInsertItem}
                         handleAddGuideRow={categoryOps.handleAddGuideRow}
                         handleAddAdultTicket={categoryOps.handleAddAdultTicket}
                         handleAddChildTicket={categoryOps.handleAddChildTicket}

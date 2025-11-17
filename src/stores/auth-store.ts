@@ -97,11 +97,33 @@ export const useAuthStore = create<AuthState>(
       isOfflineMode: false,
       _hasHydrated: false,
 
-      login: user => {
+      login: async user => {
+        // ✅ 確保 user 一定有 workspace_id
+        let finalUser = user
+
+        // 如果缺少 workspace_id，從 IndexedDB 補上
+        if (!finalUser.workspace_id) {
+          logger.warn('⚠️ login: user 缺少 workspace_id，從 IndexedDB 補上...')
+          try {
+            const { localDB } = await import('@/lib/db')
+            const { TABLES } = await import('@/lib/db/schemas')
+            const employee = await localDB.read(TABLES.EMPLOYEES, user.id)
+
+            if (employee?.workspace_id) {
+              finalUser = { ...user, workspace_id: employee.workspace_id }
+              logger.log('✅ login: 已補上 workspace_id:', employee.workspace_id)
+            } else {
+              logger.error('❌ login: 無法從 IndexedDB 找到 workspace_id')
+            }
+          } catch (error) {
+            logger.error('❌ login: 補上 workspace_id 失敗:', error)
+          }
+        }
+
         // 同時更新 user 和 currentProfile
         const profile = useLocalAuthStore.getState().currentProfile
         set({
-          user,
+          user: finalUser,
           isAuthenticated: true,
           currentProfile: profile,
         })
@@ -596,7 +618,8 @@ if (typeof window !== 'undefined') {
         const tx = db.transaction('employees', 'readonly')
         const store = tx.objectStore('employees')
         const allEmployees = await store.getAll()
-        const employee = allEmployees.find((emp: any) => emp.user_id === state.user?.id)
+        // 修正：employees 表的主鍵是 id，不是 user_id
+        const employee = allEmployees.find((emp: any) => emp.id === state.user?.id)
 
         if (employee?.workspace_id) {
           // 更新 user 物件
@@ -608,7 +631,17 @@ if (typeof window !== 'undefined') {
           })
           console.log('✅ 已自動補上 workspace_id:', employee.workspace_id)
         } else {
-          console.error('❌ 無法從 IndexedDB 找到 workspace_id')
+          console.error('❌ 無法從 IndexedDB 找到 workspace_id，嘗試使用第一個員工的 workspace')
+          // 備用方案：使用第一個員工的 workspace_id
+          if (allEmployees.length > 0 && allEmployees[0].workspace_id) {
+            useAuthStore.setState({
+              user: {
+                ...state.user,
+                workspace_id: allEmployees[0].workspace_id,
+              },
+            })
+            console.log('✅ 使用第一個員工的 workspace_id:', allEmployees[0].workspace_id)
+          }
         }
       } catch (error) {
         console.error('❌ 自動修復失敗:', error)

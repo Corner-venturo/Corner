@@ -61,37 +61,15 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   const [isLoadingItems, setIsLoadingItems] = useState(true)
 
   useEffect(() => {
-    const loadQuoteItems = async () => {
-      try {
-        const { useQuoteItemStore } = await import('@/stores')
-
-        // 先確保資料已載入
-        await useQuoteItemStore.getState().fetchAll()
-
-        const { items: allItems } = useQuoteItemStore.getState()
-
-        // 篩選屬於此報價單的項目
-        const quoteItems = allItems
-          .filter(item => (item as any).quote_id === quote.id && !(item as any)._deleted)
-          .map(item => ({
-            id: item.id,
-            description: (item as any).description || '',
-            quantity: (item as any).quantity || 1,
-            unit_price: (item as any).unit_price || 0,
-            amount: (item as any).total_price || 0,
-            notes: (item as any).notes || '',
-          }))
-
-        setItems(quoteItems)
-      } catch (error) {
-        console.error('載入 quote_items 失敗:', error)
-      } finally {
-        setIsLoadingItems(false)
-      }
+    // ✅ 快速報價單項目只從 quote.quick_quote_items 欄位讀取
+    if (quote.quick_quote_items && Array.isArray(quote.quick_quote_items)) {
+      setItems(quote.quick_quote_items as QuickQuoteItem[])
+    } else {
+      // 如果沒有項目，設為空陣列
+      setItems([])
     }
-
-    loadQuoteItems()
-  }, [quote.id])
+    setIsLoadingItems(false)
+  }, [quote.quick_quote_items])
 
   const setFormField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))

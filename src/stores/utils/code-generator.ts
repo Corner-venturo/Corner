@@ -80,9 +80,8 @@ export function generateCode(
 ): string {
   const prefix = `${workspaceCode}-`
 
-  // 檢查是否為快速報價單（從 existingItems 中的第一個 item 或 config 判斷）
-  const firstItem = existingItems[0] as any
-  const isQuickQuote = firstItem?.quote_type === 'quick' || (config as any)?.quoteType === 'quick'
+  // 檢查是否為快速報價單（優先從 config 判斷，而非 existingItems）
+  const isQuickQuote = (config as any)?.quoteType === 'quick'
 
   // 快速報價單使用 Q 開頭
   if (isQuickQuote) {

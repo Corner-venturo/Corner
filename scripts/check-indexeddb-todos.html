@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>檢查 IndexedDB 代辦事項</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    .todo-item {
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+      border-left: 4px solid #4CAF50;
+    }
+    .todo-item.invisible {
+      border-left-color: #f44336;
+      opacity: 0.6;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    pre {
+      background: white;
+      padding: 10px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 檢查 IndexedDB 代辦事項</h1>
+
+  <div class="section">
+    <h2>1️⃣ 當前登入用戶</h2>
+    <div id="current-user"></div>
+  </div>
+
+  <div class="section">
+    <h2>2️⃣ 代辦事項統計</h2>
+    <div id="stats"></div>
+  </div>
+
+  <div class="section">
+    <h2>3️⃣ 可見的代辦事項</h2>
+    <div id="visible-todos"></div>
+  </div>
+
+  <div class="section">
+    <h2>4️⃣ 看不到的代辦事項</h2>
+    <div id="invisible-todos"></div>
+  </div>
+
+  <div class="section">
+    <button onclick="fixVisibility()">🔧 修正所有代辦事項的可見性</button>
+    <button onclick="location.reload()">🔄 重新檢查</button>
+  </div>
+
+  <script>
+    const DB_NAME = 'venturo-db';
+    const DB_VERSION = 1;
+
+    async function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function getAllFromStore(storeName) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function updateItem(storeName, item) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.put(item);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function checkTodos() {
+      try {
+        // 從 localStorage 取得當前用戶（支援多種格式）
+        let currentUserId = null;
+        let userName = null;
+
+        // 方法 1: auth-store (舊格式)
+        const authData = localStorage.getItem('auth-store');
+        if (authData) {
+          const parsed = JSON.parse(authData);
+          currentUserId = parsed.state?.user?.id;
+          userName = parsed.state?.user?.display_name || parsed.state?.user?.email;
+        }
+
+        // 方法 2: local-auth-store (新格式)
+        if (!currentUserId) {
+          const localAuthData = localStorage.getItem('local-auth-store');
+          if (localAuthData) {
+            const parsed = JSON.parse(localAuthData);
+            currentUserId = parsed.state?.currentProfile?.id || parsed.state?.activeProfile?.id;
+            userName = parsed.state?.currentProfile?.name || parsed.state?.activeProfile?.name;
+          }
+        }
+
+        // 方法 3: 從 IndexedDB 的 employees 表查找
+        if (!currentUserId) {
+          try {
+            const employees = await getAllFromStore('employees');
+            if (employees && employees.length > 0) {
+              // 假設第一個員工就是當前用戶
+              currentUserId = employees[0].id;
+              userName = employees[0].display_name;
+              console.log('從 IndexedDB 推測當前用戶:', userName);
+            }
+          } catch (e) {
+            console.log('無法從 IndexedDB 讀取員工資料:', e);
+          }
+        }
+
+        document.getElementById('current-user').innerHTML = currentUserId
+          ? `<pre>User ID: ${currentUserId}\nUser Name: ${userName || '未知'}</pre>`
+          : '<pre style="color: red;">❌ 找不到當前登入用戶</pre>';
+
+        // 取得所有代辦事項
+        const todos = await getAllFromStore('todos');
+
+        // 統計
+        const stats = {
+          total: todos.length,
+          visible: 0,
+          invisible: 0,
+          pending: 0,
+          in_progress: 0,
+          completed: 0
+        };
+
+        const visibleTodos = [];
+        const invisibleTodos = [];
+
+        todos.forEach(todo => {
+          // 統計狀態
+          if (todo.status === 'pending') stats.pending++;
+          if (todo.status === 'in_progress') stats.in_progress++;
+          if (todo.status === 'completed') stats.completed++;
+
+          // 檢查可見性
+          if (currentUserId) {
+            const isCreator = todo.creator === currentUserId;
+            const isAssignee = todo.assignee === currentUserId;
+            const inVisibility = todo.visibility?.includes(currentUserId);
+
+            if (isCreator || isAssignee || inVisibility) {
+              stats.visible++;
+              visibleTodos.push(todo);
+            } else {
+              stats.invisible++;
+              invisibleTodos.push(todo);
+            }
+          }
+        });
+
+        // 顯示統計
+        document.getElementById('stats').innerHTML = `
+          <pre>
+總數: ${stats.total}
+可見: ${stats.visible}
+不可見: ${stats.invisible}
+
+狀態分佈:
+- 待辦: ${stats.pending}
+- 進行中: ${stats.in_progress}
+- 已完成: ${stats.completed}
+          </pre>
+        `;
+
+        // 顯示可見的代辦事項
+        document.getElementById('visible-todos').innerHTML = visibleTodos.length > 0
+          ? visibleTodos.map(todo => `
+            <div class="todo-item">
+              <strong>${todo.title}</strong> (${todo.status})<br>
+              <small>
+                Creator: ${todo.creator === currentUserId ? '✓ 你' : todo.creator}<br>
+                Assignee: ${todo.assignee === currentUserId ? '✓ 你' : (todo.assignee || '無')}<br>
+                Visibility: ${JSON.stringify(todo.visibility)}
+              </small>
+            </div>
+          `).join('')
+          : '<p>沒有可見的代辦事項</p>';
+
+        // 顯示不可見的代辦事項
+        document.getElementById('invisible-todos').innerHTML = invisibleTodos.length > 0
+          ? invisibleTodos.map(todo => `
+            <div class="todo-item invisible">
+              <strong>${todo.title}</strong> (${todo.status})<br>
+              <small>
+                Creator: ${todo.creator}<br>
+                Assignee: ${todo.assignee || '無'}<br>
+                Visibility: ${JSON.stringify(todo.visibility)}
+              </small>
+            </div>
+          `).join('')
+          : '<p style="color: green;">✅ 所有代辦事項都可見！</p>';
+
+      } catch (error) {
+        console.error('檢查失敗:', error);
+        alert('檢查失敗: ' + error.message);
+      }
+    }
+
+    async function fixVisibility() {
+      if (!confirm('確定要修正所有代辦事項的可見性嗎？\n這會將你的 user_id 加入所有代辦事項的 visibility 列表。')) {
+        return;
+      }
+
+      try {
+        // 取得當前用戶 ID（支援多種格式）
+        let currentUserId = null;
+
+        const authData = localStorage.getItem('auth-store');
+        if (authData) {
+          const parsed = JSON.parse(authData);
+          currentUserId = parsed.state?.user?.id;
+        }
+
+        if (!currentUserId) {
+          const localAuthData = localStorage.getItem('local-auth-store');
+          if (localAuthData) {
+            const parsed = JSON.parse(localAuthData);
+            currentUserId = parsed.state?.currentProfile?.id || parsed.state?.activeProfile?.id;
+          }
+        }
+
+        if (!currentUserId) {
+          const employees = await getAllFromStore('employees');
+          if (employees && employees.length > 0) {
+            currentUserId = employees[0].id;
+          }
+        }
+
+        if (!currentUserId) {
+          alert('找不到當前登入用戶');
+          return;
+        }
+
+        const todos = await getAllFromStore('todos');
+        let fixed = 0;
+
+        for (const todo of todos) {
+          // 確保 visibility 包含當前用戶
+          if (!todo.visibility) {
+            todo.visibility = [currentUserId];
+            await updateItem('todos', todo);
+            fixed++;
+          } else if (!todo.visibility.includes(currentUserId)) {
+            todo.visibility.push(currentUserId);
+            await updateItem('todos', todo);
+            fixed++;
+          }
+        }
+
+        alert(`✅ 已修正 ${fixed} 個代辦事項的可見性`);
+        location.reload();
+
+      } catch (error) {
+        console.error('修正失敗:', error);
+        alert('修正失敗: ' + error.message);
+      }
+    }
+
+    // 頁面載入時執行檢查
+    checkTodos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>代辦事項除錯工具</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      border-left: 4px solid #4CAF50;
+    }
+    .error {
+      border-left-color: #f44336;
+    }
+    .warning {
+      border-left-color: #ff9800;
+    }
+    h1, h2 { color: #4CAF50; margin-top: 0; }
+    pre {
+      background: #1a1a1a;
+      padding: 10px;
+      overflow-x: auto;
+      border-radius: 4px;
+    }
+    .highlight { color: #ffeb3b; font-weight: bold; }
+    .success { color: #4CAF50; }
+    .error-text { color: #f44336; }
+    button {
+      padding: 12px 24px;
+      margin: 5px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button:hover { background: #45a049; }
+    .todo-item {
+      margin: 8px 0;
+      padding: 12px;
+      background: #1a1a1a;
+      border-left: 3px solid #2196F3;
+      border-radius: 4px;
+    }
+    .invisible { border-left-color: #f44336; opacity: 0.7; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+    th { background: #1a1a1a; color: #4CAF50; }
+    .copy-btn {
+      background: #2196F3;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 代辦事項除錯工具</h1>
+
+  <div class="section">
+    <h2>步驟 1：當前登入狀態</h2>
+    <div id="auth-status"></div>
+    <button onclick="copyToClipboard('auth-status')">📋 複製</button>
+  </div>
+
+  <div class="section">
+    <h2>步驟 2：IndexedDB 資料</h2>
+    <div id="db-status"></div>
+    <button onclick="copyToClipboard('db-status')">📋 複製</button>
+  </div>
+
+  <div class="section">
+    <h2>步驟 3：代辦事項分析</h2>
+    <div id="todos-analysis"></div>
+    <button onclick="copyToClipboard('todos-analysis')">📋 複製</button>
+  </div>
+
+  <div class="section">
+    <h2>步驟 4：可見性問題診斷</h2>
+    <div id="visibility-issues"></div>
+  </div>
+
+  <div class="section">
+    <h2>🔧 修復工具</h2>
+    <button onclick="fixAllVisibility()">修復所有代辦事項的可見性</button>
+    <button onclick="clearAndReload()">清空資料重新同步</button>
+    <button onclick="location.reload()">🔄 重新檢查</button>
+  </div>
+
+  <script>
+    const DB_NAME = 'VenturoOfflineDB';
+
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      const text = element.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('已複製到剪貼簿！');
+      });
+    }
+
+    async function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function getAllFromStore(storeName) {
+      try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(storeName, 'readonly');
+          const store = tx.objectStore(storeName);
+          const request = store.getAll();
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      } catch (error) {
+        console.error(`讀取 ${storeName} 失敗:`, error);
+        return null;
+      }
+    }
+
+    async function diagnose() {
+      console.log('🔍 開始診斷...');
+
+      // === 步驟 1：檢查登入狀態 ===
+      let currentUserId = null;
+      let currentUserName = null;
+      let authSource = null;
+
+      const authStore = localStorage.getItem('auth-store');
+      const localAuthStore = localStorage.getItem('local-auth-store');
+
+      let authHtml = '<table>';
+      authHtml += '<tr><th>儲存位置</th><th>狀態</th><th>內容</th></tr>';
+
+      if (authStore) {
+        try {
+          const parsed = JSON.parse(authStore);
+          currentUserId = parsed.state?.user?.id;
+          currentUserName = parsed.state?.user?.display_name;
+          authSource = 'auth-store';
+          authHtml += `<tr><td>auth-store</td><td class="success">✓ 有資料</td><td>`;
+          authHtml += `User ID: ${currentUserId || '<span class="error-text">缺失</span>'}<br>`;
+          authHtml += `Name: ${currentUserName || '<span class="error-text">缺失</span>'}<br>`;
+          authHtml += `Workspace ID: ${parsed.state?.user?.workspace_id || '<span class="error-text">缺失</span>'}`;
+          authHtml += `</td></tr>`;
+        } catch (e) {
+          authHtml += `<tr><td>auth-store</td><td class="error-text">✗ 解析失敗</td><td>${e.message}</td></tr>`;
+        }
+      } else {
+        authHtml += `<tr><td>auth-store</td><td class="error-text">✗ 無資料</td><td>-</td></tr>`;
+      }
+
+      if (localAuthStore) {
+        try {
+          const parsed = JSON.parse(localAuthStore);
+          if (!currentUserId) {
+            currentUserId = parsed.state?.currentProfile?.id;
+            currentUserName = parsed.state?.currentProfile?.name;
+            authSource = 'local-auth-store';
+          }
+          authHtml += `<tr><td>local-auth-store</td><td class="success">✓ 有資料</td><td>`;
+          authHtml += `Profile ID: ${parsed.state?.currentProfile?.id || '無'}<br>`;
+          authHtml += `Name: ${parsed.state?.currentProfile?.name || '無'}`;
+          authHtml += `</td></tr>`;
+        } catch (e) {
+          authHtml += `<tr><td>local-auth-store</td><td class="error-text">✗ 解析失敗</td><td>${e.message}</td></tr>`;
+        }
+      } else {
+        authHtml += `<tr><td>local-auth-store</td><td class="error-text">✗ 無資料</td><td>-</td></tr>`;
+      }
+
+      authHtml += '</table>';
+
+      if (currentUserId) {
+        authHtml += `<pre class="success">✅ 當前登入用戶\nID: ${currentUserId}\n名稱: ${currentUserName}\n來源: ${authSource}</pre>`;
+      } else {
+        authHtml += `<pre class="error-text">❌ 找不到登入用戶！這是主要問題。</pre>`;
+      }
+
+      document.getElementById('auth-status').innerHTML = authHtml;
+
+      // === 步驟 2：檢查 IndexedDB ===
+      let dbHtml = '<table>';
+      dbHtml += '<tr><th>資料表</th><th>數量</th><th>狀態</th></tr>';
+
+      const employees = await getAllFromStore('employees');
+      const todos = await getAllFromStore('todos');
+
+      dbHtml += `<tr><td>employees</td><td>${employees?.length || 0}</td><td>${employees ? '<span class="success">✓</span>' : '<span class="error-text">✗ 讀取失敗</span>'}</td></tr>`;
+      dbHtml += `<tr><td>todos</td><td>${todos?.length || 0}</td><td>${todos ? '<span class="success">✓</span>' : '<span class="error-text">✗ 讀取失敗</span>'}</td></tr>`;
+      dbHtml += '</table>';
+
+      if (!employees || employees.length === 0) {
+        dbHtml += '<pre class="error-text">❌ IndexedDB 中沒有員工資料！可能尚未同步。</pre>';
+      }
+
+      if (!todos || todos.length === 0) {
+        dbHtml += '<pre class="error-text">❌ IndexedDB 中沒有代辦事項！可能尚未同步。</pre>';
+      }
+
+      document.getElementById('db-status').innerHTML = dbHtml;
+
+      // === 步驟 3：分析代辦事項 ===
+      if (!todos || !currentUserId) {
+        document.getElementById('todos-analysis').innerHTML = '<pre class="error-text">無法分析（缺少資料）</pre>';
+        document.getElementById('visibility-issues').innerHTML = '<pre class="error-text">無法診斷（缺少資料）</pre>';
+        return;
+      }
+
+      const activeTodos = todos.filter(t => !t._deleted);
+      const visibleTodos = [];
+      const invisibleTodos = [];
+
+      activeTodos.forEach(todo => {
+        const isCreator = todo.creator === currentUserId;
+        const isAssignee = todo.assignee === currentUserId;
+        const inVisibility = todo.visibility?.includes(currentUserId);
+
+        if (isCreator || isAssignee || inVisibility) {
+          visibleTodos.push(todo);
+        } else {
+          invisibleTodos.push({
+            ...todo,
+            reason: `Creator: ${todo.creator} (${isCreator ? '✓' : '✗'})\nAssignee: ${todo.assignee || '無'} (${isAssignee ? '✓' : '✗'})\nVisibility: ${JSON.stringify(todo.visibility)} (${inVisibility ? '✓' : '✗'})`
+          });
+        }
+      });
+
+      let analysisHtml = `<pre>`;
+      analysisHtml += `總代辦事項: ${activeTodos.length}\n`;
+      analysisHtml += `<span class="success">可見: ${visibleTodos.length}</span>\n`;
+      analysisHtml += `<span class="error-text">不可見: ${invisibleTodos.length}</span>\n`;
+      analysisHtml += `</pre>`;
+
+      if (visibleTodos.length > 0) {
+        analysisHtml += '<h3 class="success">✅ 可見的代辦事項</h3>';
+        visibleTodos.slice(0, 10).forEach(todo => {
+          analysisHtml += `<div class="todo-item">`;
+          analysisHtml += `<strong>${todo.title}</strong> (${todo.status})<br>`;
+          analysisHtml += `<small>Created: ${new Date(todo.created_at).toLocaleString()}</small>`;
+          analysisHtml += `</div>`;
+        });
+        if (visibleTodos.length > 10) {
+          analysisHtml += `<p>... 還有 ${visibleTodos.length - 10} 個</p>`;
+        }
+      }
+
+      document.getElementById('todos-analysis').innerHTML = analysisHtml;
+
+      // === 步驟 4：可見性問題 ===
+      let issuesHtml = '';
+
+      if (invisibleTodos.length === 0) {
+        issuesHtml = '<pre class="success">✅ 沒有可見性問題！所有代辦事項都正常顯示。</pre>';
+      } else {
+        issuesHtml = `<pre class="error-text">❌ 發現 ${invisibleTodos.length} 個代辦事項看不到！</pre>`;
+        issuesHtml += '<h3>不可見的代辦事項：</h3>';
+
+        invisibleTodos.forEach(todo => {
+          issuesHtml += `<div class="todo-item invisible">`;
+          issuesHtml += `<strong>${todo.title}</strong> (${todo.status})<br>`;
+          issuesHtml += `<pre>${todo.reason}</pre>`;
+          issuesHtml += `<small>你的 User ID: ${currentUserId}</small>`;
+          issuesHtml += `</div>`;
+        });
+
+        issuesHtml += `<h3>🔧 問題原因與解決方案：</h3>`;
+        issuesHtml += `<pre>`;
+        issuesHtml += `問題：代辦事項的 visibility 列表不包含你的 user_id\n\n`;
+        issuesHtml += `解決方案：\n`;
+        issuesHtml += `1. 點擊上方「修復所有代辦事項的可見性」按鈕\n`;
+        issuesHtml += `2. 或執行以下 SQL（需要資料庫權限）：\n\n`;
+        issuesHtml += `UPDATE todos\nSET visibility = array_append(visibility, '${currentUserId}')\nWHERE NOT (visibility @> ARRAY['${currentUserId}']::uuid[]);`;
+        issuesHtml += `</pre>`;
+      }
+
+      document.getElementById('visibility-issues').innerHTML = issuesHtml;
+    }
+
+    async function fixAllVisibility() {
+      if (!confirm('確定要修復所有代辦事項的可見性嗎？')) return;
+
+      const authStore = localStorage.getItem('auth-store');
+      if (!authStore) {
+        alert('找不到登入資訊！');
+        return;
+      }
+
+      const parsed = JSON.parse(authStore);
+      const currentUserId = parsed.state?.user?.id;
+      if (!currentUserId) {
+        alert('找不到 user.id！');
+        return;
+      }
+
+      try {
+        const db = await openDB();
+        const tx = db.transaction('todos', 'readwrite');
+        const store = tx.objectStore('todos');
+        const allTodos = await store.getAll();
+
+        let fixed = 0;
+        for (const todo of allTodos) {
+          if (!todo.visibility) {
+            todo.visibility = [currentUserId];
+            await store.put(todo);
+            fixed++;
+          } else if (!todo.visibility.includes(currentUserId)) {
+            todo.visibility.push(currentUserId);
+            await store.put(todo);
+            fixed++;
+          }
+        }
+
+        alert(`✅ 已修復 ${fixed} 個代辦事項！\n\n請重新整理代辦事項頁面。`);
+        location.reload();
+
+      } catch (error) {
+        console.error('修復失敗:', error);
+        alert('修復失敗: ' + error.message);
+      }
+    }
+
+    async function clearAndReload() {
+      if (!confirm('確定要清空所有本地資料並重新同步嗎？\n\n這會登出並要求重新登入。')) return;
+
+      try {
+        localStorage.clear();
+        await indexedDB.deleteDatabase(DB_NAME);
+        alert('✅ 已清空本地資料！\n\n即將跳轉到登入頁...');
+        location.href = '/login';
+      } catch (error) {
+        alert('清空失敗: ' + error.message);
+      }
+    }
+
+    // 頁面載入時執行診斷
+    diagnose();
+  </script>
+</body>
+</html>

@@ -60,26 +60,17 @@ export function CreatePaymentRequestDialog({
     }
 
     try {
-      // 建立請款單
+      // 建立請款單（簡化版 - 符合現有資料庫結構）
       const paymentRequest = await createPaymentRequest({
         tour_id: selectedTourId,
-        request_date: requestDate,
-        total_amount: totalAmount,
-        items: itemsArray.map((item, index) => ({
-          item_number: `${index + 1}`.padStart(3, '0'),
-          category,
-          supplier,
-          description: `${item.name} - ${item.description}`,
-          unit_price: item.amount,
-          quantity: 1,
-          subtotal: item.amount,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })),
+        request_type: category || '員工代墊',
+        amount: totalAmount,
+        supplier_name: supplier,
         status: 'pending',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      } as unknown)
+        notes: itemsArray.map((item, i) =>
+          `${i + 1}. ${item.name} - ${item.description} ($${item.amount.toLocaleString()})`
+        ).join('\n'),
+      })
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {
@@ -94,7 +85,8 @@ export function CreatePaymentRequestDialog({
       onSuccess()
       onClose()
     } catch (error) {
-      alert('建立請款單失敗，請稍後再試')
+      console.error('建立請款單失敗：', error)
+      alert('建立失敗，請稍後再試')
     }
   }
 

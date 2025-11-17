@@ -84,6 +84,24 @@ export const useCategoryOperations = ({
     [handleAddAccommodationRoomType, setCategories]
   )
 
+  // 插入完整的項目（用於從車資管理插入）
+  const handleInsertItem = useCallback(
+    (category_id: string, item: CostItem) => {
+      setCategories(prev =>
+        prev.map(cat => {
+          if (cat.id === category_id) {
+            return {
+              ...cat,
+              items: [...cat.items, item],
+            }
+          }
+          return cat
+        })
+      )
+    },
+    [setCategories]
+  )
+
   // 使用特定的 categories 來計算領隊費用
   const calculateGuideWithCategories = useCallback((categories: CostCategory[]) => {
     // 1. 計算住宿每日第一個房型的單價總和
@@ -449,6 +467,7 @@ export const useCategoryOperations = ({
 
   return {
     handleAddRow,
+    handleInsertItem,
     handleAddGuideRow,
     handleAddAdultTicket,
     handleAddChildTicket,

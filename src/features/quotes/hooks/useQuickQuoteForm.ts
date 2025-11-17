@@ -57,29 +57,16 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
         return
       }
 
-      if (!user?.id) return
-
-      try {
-        const { createClient } = await import('@supabase/supabase-js')
-        const supabase = createClient(
-          'https://pfqvdacxowpgfamuvnsn.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMDgzMjAsImV4cCI6MjA3NDY4NDMyMH0.5YC6YwTE3xmfHMQYdv1c7UcjIjYK7OjXYv4Z-lUmxFE'
-        )
-        const { data } = await supabase
-          .from('employees')
-          .select('workspace_id')
-          .eq('user_id', user.id)
-          .single()
-
-        if (data?.workspace_id) {
-          setWorkspaceId(data.workspace_id)
-        }
-      } catch (error) {
-        console.error('Failed to fetch workspace_id:', error)
+      // ✅ 直接使用 user.workspace_id（已在 auth-store 中確保一定有值）
+      if (user?.workspace_id) {
+        setWorkspaceId(user.workspace_id)
       }
     }
 
-    fetchWorkspaceId()
+    // 同步執行，不需要 async
+    if (user?.workspace_id) {
+      setWorkspaceId(user.workspace_id)
+    }
   }, [user?.id, user?.workspace_id])
 
   // 初始化時從 localStorage 載入草稿
@@ -162,7 +149,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
       // 計算應收金額
       const totalAmount = formData.items.reduce((sum, item) => sum + item.amount, 0)
 
-      // 建立快速報價單（不傳 code，讓系統自動產生 TP-Q001 格式）
+      // ✅ 建立快速報價單（項目直接存入 quick_quote_items JSONB 欄位）
       const newQuote = await addQuote({
         quote_type: 'quick', // 快速報價單類型
         customer_name: formData.customer_name,
@@ -176,38 +163,15 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
         status: 'draft',
         is_active: true,
         is_pinned: false,
-        workspace_id: finalWorkspaceId, // 使用 fallback workspace_id
+        workspace_id: finalWorkspaceId,
         created_by: user?.id,
         created_by_name: user?.full_name || formData.handler_name,
+        // ✅ 快速報價單項目直接存入 JSONB 欄位（不使用 quote_items 表格）
+        quick_quote_items: formData.items,
       })
 
       if (!newQuote || !newQuote.id) {
         throw new Error('建立快速報價單失敗')
-      }
-
-      // 等待 quote 同步到 Supabase（確保外鍵存在）
-      console.log('等待 quote 同步到 Supabase...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // 儲存收費明細項目到 quote_items 表格
-      if (formData.items.length > 0) {
-        console.log('開始儲存收費明細項目:', formData.items.length, '個')
-        const { useQuoteItemStore } = await import('@/stores')
-        const { create } = useQuoteItemStore.getState()
-
-        for (const item of formData.items) {
-          console.log('儲存項目:', item.description)
-          await create({
-            quote_id: newQuote.id,
-            description: item.description,
-            category: '其他', // 快速報價單預設分類
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            total_price: item.amount,
-            notes: item.notes || '',
-          } as any) // 使用 as any 因為資料庫欄位和型別定義不一致
-        }
-        console.log('收費明細項目儲存完成')
       }
 
       console.log('Quick quote created:', newQuote)

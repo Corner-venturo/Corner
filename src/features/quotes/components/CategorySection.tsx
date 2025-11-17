@@ -8,10 +8,11 @@ import { CostCategory, CostItem } from '../types'
 import { CostItemRow } from './CostItemRow'
 import { AccommodationItemRow } from './AccommodationItemRow'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -20,6 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { supabase } from '@/lib/supabase/client'
+import { RatesDetailDialog } from '@/features/transportation-rates/components/RatesDetailDialog'
+import { TransportationRate } from '@/types/transportation-rates.types'
 
 const categoryIcons: Record<string, React.ElementType> = {
   transport: Car,
@@ -55,6 +58,7 @@ interface CategorySectionProps {
   isReadOnly: boolean
   handleAddAccommodationDay: () => void
   handleAddRow: (categoryId: string) => void
+  handleInsertItem: (categoryId: string, item: CostItem) => void
   handleAddGuideRow: (categoryId: string) => void
   handleAddAdultTicket: (categoryId: string) => void
   handleAddChildTicket: (categoryId: string) => void
@@ -75,6 +79,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   isReadOnly,
   handleAddAccommodationDay,
   handleAddRow,
+  handleInsertItem,
   handleAddGuideRow,
   handleAddAdultTicket,
   handleAddChildTicket,
@@ -83,45 +88,96 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleRemoveItem,
 }) => {
   const Icon = categoryIcons[category.id]
-  const [countries, setCountries] = useState<Country[]>([])
+
+  // 對話框狀態
+  const [isCountryDialogOpen, setIsCountryDialogOpen] = useState(false)
+  const [isRatesDialogOpen, setIsRatesDialogOpen] = useState(false)
+  const [countries, setCountries] = useState<{ name: string }[]>([])
   const [selectedCountry, setSelectedCountry] = useState<string>('')
   const [transportRates, setTransportRates] = useState<TransportationRate[]>([])
   const [loading, setLoading] = useState(false)
 
-  // 載入國家列表
-  useEffect(() => {
-    const fetchCountries = async () => {
-      const { data } = await supabase
-        .from('countries')
-        .select('id, name, emoji')
-        .order('display_order')
-
-      if (data) setCountries(data)
-    }
-    fetchCountries()
-  }, [])
-
-  // 當選擇國家時載入該國家的車資資料
-  useEffect(() => {
-    if (!selectedCountry) {
-      setTransportRates([])
+  // 載入車資資料庫中有資料的國家列表
+  const fetchCountriesWithRates = async () => {
+    if (countries.length > 0) {
+      setIsCountryDialogOpen(true)
       return
     }
 
-    const fetchRates = async () => {
-      setLoading(true)
-      const { data } = await supabase
-        .from('transportation_rates')
-        .select('*')
-        .eq('country_id', selectedCountry)
-        .eq('is_active', true)
-        .order('display_order')
+    const { data } = await supabase
+      .from('transportation_rates')
+      .select('country_name')
+      .eq('is_active', true)
 
-      if (data) setTransportRates(data)
-      setLoading(false)
+    if (data) {
+      const uniqueCountries = Array.from(
+        new Set(data.map(item => item.country_name))
+      ).map(name => ({ name }))
+      setCountries(uniqueCountries)
+      setIsCountryDialogOpen(true)
     }
-    fetchRates()
-  }, [selectedCountry])
+  }
+
+  // 當選擇國家時載入該國家的車資資料
+  const handleCountrySelect = async (countryName: string) => {
+    setSelectedCountry(countryName)
+    setLoading(true)
+
+    const { data } = await supabase
+      .from('transportation_rates')
+      .select('*')
+      .eq('country_name', countryName)
+      .eq('is_active', true)
+      .order('display_order')
+
+    if (data) {
+      setTransportRates(data)
+      setIsCountryDialogOpen(false)
+      setIsRatesDialogOpen(true)
+    }
+    setLoading(false)
+  }
+
+  // 重新載入車資資料
+  const refreshRates = async () => {
+    if (!selectedCountry) return
+
+    const { data } = await supabase
+      .from('transportation_rates')
+      .select('*')
+      .eq('country_name', selectedCountry)
+      .eq('is_active', true)
+      .order('display_order')
+
+    if (data) setTransportRates(data)
+  }
+
+  // 插入車資到團體分攤
+  const handleInsertRate = (rate: TransportationRate) => {
+    console.log('🔄 [CategorySection] 插入車資:', rate)
+
+    // 建立描述：使用 route（例如「包車1天（100公里／10小時）」）
+    const description = rate.route || rate.category || rate.vehicle_type || '車資'
+
+    // 建立完整的 CostItem
+    const newItem: CostItem = {
+      id: `item-${Date.now()}`,
+      name: description,
+      quantity: 1,
+      unit_price: rate.price_twd || 0,
+      total: rate.price_twd || 0,
+      note: rate.notes || '',
+      is_group_cost: true, // 標記為團體費用
+    }
+
+    console.log('📝 [CategorySection] 插入項目:', newItem)
+
+    // 直接插入完整項目
+    handleInsertItem('group-transport', newItem)
+
+    // 關閉對話框
+    setIsRatesDialogOpen(false)
+  }
 
   return (
     <React.Fragment>
@@ -132,87 +188,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             <Icon size={16} className="text-morandi-gold" />
             <span>{category.name}</span>
 
-            {/* 參考報價圖示 - 僅顯示於交通和團體交通分類 */}
-            {(category.id === 'transport' || category.id === 'group-transport') && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-                    title="查看參考報價"
-                  >
-                    <DollarSign size={14} className="text-morandi-gold" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-96" align="start">
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-sm text-morandi-primary">
-                      參考報價
-                    </h4>
-
-                    {/* 國家選擇 */}
-                    <div>
-                      <label className="text-xs text-morandi-secondary mb-1.5 block">
-                        選擇國家
-                      </label>
-                      <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                        <SelectTrigger className="h-9">
-                          <SelectValue placeholder="請選擇國家" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countries.map(country => (
-                            <SelectItem key={country.id} value={country.id}>
-                              {country.emoji} {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* 車資列表 */}
-                    {loading ? (
-                      <div className="text-sm text-morandi-secondary text-center py-4">
-                        載入中...
-                      </div>
-                    ) : transportRates.length > 0 ? (
-                      <div className="space-y-2 max-h-80 overflow-y-auto">
-                        {transportRates.map(rate => (
-                          <div
-                            key={rate.id}
-                            className="flex items-center justify-between py-2 px-3 bg-morandi-container/30 rounded text-sm"
-                          >
-                            <div className="flex-1">
-                              <div className="text-morandi-primary font-medium">
-                                {rate.vehicle_type}
-                              </div>
-                              {rate.notes && (
-                                <div className="text-xs text-morandi-secondary mt-0.5">
-                                  {rate.notes}
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 ml-4">
-                              <span className="font-medium text-morandi-gold">
-                                {rate.currency} {rate.price.toLocaleString()}
-                              </span>
-                              <span className="text-xs text-morandi-secondary">
-                                / {rate.unit}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : selectedCountry ? (
-                      <div className="text-sm text-morandi-secondary text-center py-4">
-                        此國家尚無車資資料
-                      </div>
-                    ) : (
-                      <div className="text-sm text-morandi-secondary text-center py-4">
-                        請先選擇國家
-                      </div>
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
+            {/* 參考報價圖示 - 僅顯示於團體分攤分類 */}
+            {category.id === 'group-transport' && (
+              <button
+                className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
+                title="查看參考報價"
+                onClick={fetchCountriesWithRates}
+              >
+                <DollarSign size={14} className="text-morandi-gold" />
+              </button>
             )}
           </div>
         </td>
@@ -427,6 +411,52 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           </td>
           <td className="py-2 px-4"></td>
         </tr>
+      )}
+
+      {/* 選擇國家對話框 */}
+      <Dialog open={isCountryDialogOpen} onOpenChange={setIsCountryDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>選擇國家</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {loading ? (
+              <div className="text-center py-8 text-morandi-secondary">
+                載入中...
+              </div>
+            ) : countries.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {countries.map(country => (
+                  <Button
+                    key={country.name}
+                    variant="outline"
+                    className="h-auto py-4 text-base"
+                    onClick={() => handleCountrySelect(country.name)}
+                  >
+                    {country.name}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-morandi-secondary">
+                車資管理中尚無任何國家資料
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 車資管理表格對話框 */}
+      {selectedCountry && (
+        <RatesDetailDialog
+          isOpen={isRatesDialogOpen}
+          onClose={() => setIsRatesDialogOpen(false)}
+          countryName={selectedCountry}
+          rates={transportRates}
+          onUpdate={refreshRates}
+          onInsert={handleInsertRate}
+          isEditMode={false}
+        />
       )}
     </React.Fragment>
   )

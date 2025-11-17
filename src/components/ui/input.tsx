@@ -6,6 +6,7 @@ import { toHalfWidth } from '@/lib/utils/text'
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
   ({ className, type, onChange, onKeyDown, style, ...props }, ref) => {
     const isComposingRef = React.useRef(false)
+    const justFinishedComposingRef = React.useRef(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!onChange) return
@@ -13,6 +14,12 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
       // 如果正在使用輸入法，直接傳遞，不轉換
       if (isComposingRef.current) {
         onChange(e)
+        return
+      }
+
+      // ⚠️ 如果剛結束輸入法，跳過這次 onChange（避免重複）
+      if (justFinishedComposingRef.current) {
+        justFinishedComposingRef.current = false
         return
       }
 
@@ -31,18 +38,22 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
 
     const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
       isComposingRef.current = false
+      justFinishedComposingRef.current = true
 
-      // 輸入法結束後，立即轉換全形到半形
+      // 轉換全形到半形並立即觸發 onChange
+      const convertedValue = toHalfWidth(e.currentTarget.value)
       if (onChange) {
-        const convertedValue = toHalfWidth(e.currentTarget.value)
-        if (convertedValue !== e.currentTarget.value) {
-          const syntheticEvent = {
-            target: { value: convertedValue },
-            currentTarget: { value: convertedValue },
-          } as React.ChangeEvent<HTMLInputElement>
-          onChange(syntheticEvent)
-        }
+        const syntheticEvent = {
+          target: { value: convertedValue },
+          currentTarget: { value: convertedValue },
+        } as React.ChangeEvent<HTMLInputElement>
+        onChange(syntheticEvent)
       }
+
+      // 重置標記（延遲一點，確保下一次 input 事件被跳過）
+      setTimeout(() => {
+        justFinishedComposingRef.current = false
+      }, 0)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
