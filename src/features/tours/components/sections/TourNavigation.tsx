@@ -1,4 +1,4 @@
-import { IconHome } from '@tabler/icons-react'
+import { Home } from 'lucide-react'
 import { FloatingDock } from '@/components/ui/floating-dock'
 
 interface TourNavigationProps {
@@ -9,7 +9,7 @@ interface TourNavigationProps {
 }
 
 export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: TourNavigationProps) {
-  const navLinks = data.navLinks || [{ title: '首頁', icon: IconHome, href: '#top' }]
+  const navLinks = data.navLinks || [{ title: '首頁', icon: Home, href: '#top' }]
 
   return (
     <>
@@ -35,7 +35,7 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
               </div>
               <div className="flex items-center gap-8">
                 {navLinks.map((link: any) => {
-                  const IconComponent = link.icon || IconHome
+                  const IconComponent = link.icon || Home
                   return (
                     <a
                       key={link.href}

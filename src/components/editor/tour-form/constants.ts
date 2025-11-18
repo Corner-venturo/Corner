@@ -1,20 +1,20 @@
 import {
-  IconBuilding,
-  IconToolsKitchen2,
-  IconSparkles,
-  IconCalendar,
-  IconPlane,
-  IconMapPin,
-} from '@tabler/icons-react'
+  Building2,
+  UtensilsCrossed,
+  Sparkles,
+  Calendar,
+  Plane,
+  MapPin,
+} from 'lucide-react'
 import { IconOption } from './types'
 
 export const iconOptions: IconOption[] = [
-  { value: 'IconBuilding', label: '建築/飯店', component: IconBuilding },
-  { value: 'IconToolsKitchen2', label: '餐食', component: IconToolsKitchen2 },
-  { value: 'IconSparkles', label: '特色', component: IconSparkles },
-  { value: 'IconCalendar', label: '行程', component: IconCalendar },
-  { value: 'IconPlane', label: '航班', component: IconPlane },
-  { value: 'IconMapPin', label: '景點', component: IconMapPin },
+  { value: 'IconBuilding', label: '建築/飯店', component: Building2 },
+  { value: 'IconToolsKitchen2', label: '餐食', component: UtensilsCrossed },
+  { value: 'IconSparkles', label: '特色', component: Sparkles },
+  { value: 'IconCalendar', label: '行程', component: Calendar },
+  { value: 'IconPlane', label: '航班', component: Plane },
+  { value: 'IconMapPin', label: '景點', component: MapPin },
 ]
 
 // 城市圖片對照表（擴充版）

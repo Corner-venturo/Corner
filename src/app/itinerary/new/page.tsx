@@ -8,22 +8,22 @@ import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
 import { useTourStore, useRegionsStore } from '@/stores'
 import {
-  IconBuilding,
-  IconToolsKitchen2,
-  IconSparkles,
-  IconCalendar,
-  IconPlane,
-  IconMapPin,
-} from '@tabler/icons-react'
+  Building2,
+  UtensilsCrossed,
+  Sparkles,
+  Calendar,
+  Plane,
+  MapPin,
+} from 'lucide-react'
 
 // Icon mapping
 const iconMap: any = {
-  IconBuilding,
-  IconToolsKitchen2,
-  IconSparkles,
-  IconCalendar,
-  IconPlane,
-  IconMapPin,
+  IconBuilding: Building2,
+  IconToolsKitchen2: UtensilsCrossed,
+  IconSparkles: Sparkles,
+  IconCalendar: Calendar,
+  IconPlane: Plane,
+  IconMapPin: MapPin,
 }
 
 // 預設的空白行程資料
@@ -459,7 +459,7 @@ function NewItineraryPageContent() {
       ...tourData,
       features: (tourData.features || []).map((f: any) => ({
         ...f,
-        iconComponent: iconMap[f.icon] || IconSparkles,
+        iconComponent: iconMap[f.icon] || Sparkles,
       })),
     }),
     [tourData]

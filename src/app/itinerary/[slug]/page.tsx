@@ -8,25 +8,25 @@ import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
 import { useItineraryStore } from '@/stores'
 import {
-  IconBuilding,
-  IconToolsKitchen2,
-  IconSparkles,
-  IconCalendar,
-  IconPlane,
-  IconMapPin,
-  IconDeviceDesktop,
-  IconDeviceMobile,
-  IconClock,
-} from '@tabler/icons-react'
+  Building2,
+  UtensilsCrossed,
+  Sparkles,
+  Calendar,
+  Plane,
+  MapPin,
+  Monitor,
+  Smartphone,
+  Clock,
+} from 'lucide-react'
 
 // Icon mapping
 const iconMap: any = {
-  IconBuilding,
-  IconToolsKitchen2,
-  IconSparkles,
-  IconCalendar,
-  IconPlane,
-  IconMapPin,
+  IconBuilding: Building2,
+  IconToolsKitchen2: UtensilsCrossed,
+  IconSparkles: Sparkles,
+  IconCalendar: Calendar,
+  IconPlane: Plane,
+  IconMapPin: MapPin,
 }
 
 export default function EditItineraryPage() {
@@ -181,7 +181,7 @@ export default function EditItineraryPage() {
         features:
           (itineraryData as any).features?.map((f: { icon: string }) => ({
             ...f,
-            iconComponent: iconMap[f.icon] || IconSparkles,
+            iconComponent: iconMap[f.icon] || Sparkles,
           })) || [],
       }
     : null
@@ -280,7 +280,7 @@ export default function EditItineraryPage() {
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-12">
           <div className="w-full max-w-xl rounded-3xl border border-white/60 bg-white/85 p-10 text-center shadow-2xl backdrop-blur-xl">
             <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0f6eea]/10 text-[#0f6eea]">
-              <IconSparkles size={32} stroke={1.6} />
+              <Sparkles size={32} strokeWidth={1.6} />
             </div>
             <h2 className="text-2xl font-semibold text-morandi-primary">找不到此行程</h2>
             <p className="mt-3 text-morandi-secondary">
@@ -345,31 +345,31 @@ export default function EditItineraryPage() {
                 <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-morandi-secondary">
                   {typedItinerary?.tourCode && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-[#0f6eea]/10 px-3 py-1 font-medium text-[#0f3d5c]">
-                      <IconSparkles size={16} stroke={1.6} />
+                      <Sparkles size={16} strokeWidth={1.6} />
                       {typedItinerary.tourCode}
                     </span>
                   )}
                   {locationLabel && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
-                      <IconMapPin size={16} stroke={1.6} />
+                      <MapPin size={16} strokeWidth={1.6} />
                       {locationLabel}
                     </span>
                   )}
                   {travelRange && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
-                      <IconCalendar size={16} stroke={1.6} />
+                      <Calendar size={16} strokeWidth={1.6} />
                       {travelRange}
                     </span>
                   )}
                   {totalDays > 0 && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
-                      <IconClock size={16} stroke={1.6} />
+                      <Clock size={16} strokeWidth={1.6} />
                       {totalDays} 天行程 · {Math.max(totalDays - 1, 0)} 晚
                     </span>
                   )}
                   {featureCount > 0 && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1">
-                      <IconSparkles size={16} stroke={1.6} />
+                      <Sparkles size={16} strokeWidth={1.6} />
                       精選亮點 {featureCount} 項
                     </span>
                   )}
@@ -407,7 +407,7 @@ export default function EditItineraryPage() {
                     </h2>
                   </div>
                   <div className="hidden items-center gap-2 text-sm text-morandi-secondary xl:flex">
-                    <IconSparkles size={18} stroke={1.6} />
+                    <Sparkles size={18} strokeWidth={1.6} />
                     即時儲存預覽
                   </div>
                 </div>
@@ -437,7 +437,7 @@ export default function EditItineraryPage() {
                           : 'text-morandi-secondary hover:text-morandi-primary hover:bg-white/80'
                       }`}
                     >
-                      <IconDeviceDesktop size={18} stroke={1.6} />
+                      <Monitor size={18} strokeWidth={1.6} />
                       桌機
                     </button>
                     <button
@@ -448,7 +448,7 @@ export default function EditItineraryPage() {
                           : 'text-morandi-secondary hover:text-morandi-primary hover:bg-white/80'
                       }`}
                     >
-                      <IconDeviceMobile size={18} stroke={1.6} />
+                      <Smartphone size={18} strokeWidth={1.6} />
                       手機
                     </button>
                   </div>

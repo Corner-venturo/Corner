@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { IconSparkles } from '@tabler/icons-react'
+import { Sparkles } from 'lucide-react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 
 interface TourFeaturesSectionProps {
@@ -31,7 +31,7 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
           className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-2 md:grid-cols-3 gap-7'}
         >
           {features.map((feature: any, index: number) => {
-            const FeatureIcon = feature.iconComponent || IconSparkles
+            const FeatureIcon = feature.iconComponent || Sparkles
             return (
               <motion.div
                 key={index}
