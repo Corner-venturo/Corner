@@ -98,8 +98,7 @@ export const useAuthStore = create<AuthState>(
       _hasHydrated: false,
 
       login: async user => {
-        // Note: employees 表沒有 workspace_id 欄位
-        // workspace 關聯改由其他方式處理
+        // ✅ employees 表有 workspace_id 欄位，登入時會自動載入
         const finalUser = user
 
         // 同時更新 user 和 currentProfile

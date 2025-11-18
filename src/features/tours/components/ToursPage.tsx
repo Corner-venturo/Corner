@@ -4,8 +4,7 @@
 
 'use client'
 
-import { logger } from '@/lib/utils/logger'
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { useTours } from '../hooks/useTours-advanced'
@@ -14,33 +13,20 @@ import {
   Calendar,
   FileText,
   MapPin,
-  Calculator,
   BarChart3,
   FileCheck,
   AlertCircle,
-  Edit2,
-  Trash2,
   Archive,
-  ArchiveRestore,
-  FileSignature,
-  Flag,
-  MessageSquare,
-  LockOpen,
-  Eye,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import {
-  useTourStore,
   useOrderStore,
-  useMemberStore,
   useEmployeeStore,
   useRegionsStore,
 } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { Tour } from '@/stores/types'
-import { useRequireAuthSync } from '@/hooks/useRequireAuth'
-import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { useDialog } from '@/hooks/useDialog'
 import { useTourPageState } from '../hooks/useTourPageState'
 import { useTourOperations } from '../hooks/useTourOperations'
@@ -48,6 +34,9 @@ import { TourForm } from './TourForm'
 import { TourExpandedView } from './TourExpandedView'
 import { TourMobileCard } from './TourMobileCard'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
+import { useTourTableColumns } from './TourTableColumns'
+import { useTourChannelOperations } from './TourChannelOperations'
+import { useTourActionButtons } from './TourActionButtons'
 import {
   useRealtimeForTours,
   useRealtimeForOrders,
@@ -357,329 +346,22 @@ export const ToursPage: React.FC = () => {
     setDeleteConfirm({ isOpen: false, tour: null })
   }, [operations, deleteConfirm.tour, setDeleteConfirm])
 
-  // Define table columns
-  const columns: TableColumn[] = useMemo(
-    () => [
-      {
-        key: 'code',
-        label: '團號',
-        sortable: true,
-        render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
-      },
-      {
-        key: 'name',
-        label: '旅遊團名稱',
-        sortable: true,
-        render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
-      },
-      {
-        key: 'departure_date',
-        label: '出發日期',
-        sortable: true,
-        render: (value, tour) => {
-          if (!tour.departure_date) return <span className="text-sm text-morandi-red">未設定</span>
-          const date = new Date(tour.departure_date)
-          return (
-            <span className="text-sm text-morandi-primary">
-              {isNaN(date.getTime()) ? '無效日期' : date.toLocaleDateString()}
-            </span>
-          )
-        },
-      },
-      {
-        key: 'return_date',
-        label: '回程日期',
-        sortable: true,
-        render: (value, tour) => {
-          if (!tour.return_date) return <span className="text-sm text-morandi-secondary">-</span>
-          const date = new Date(tour.return_date)
-          return (
-            <span className="text-sm text-morandi-primary">
-              {isNaN(date.getTime()) ? '無效日期' : date.toLocaleDateString()}
-            </span>
-          )
-        },
-      },
-      {
-        key: 'participants',
-        label: '人數',
-        render: (value, tour) => {
-          const tourOrders = orders.filter(order => order.tour_id === tour.id)
-          // 計算預計人數：訂單的 member_count 加總
-          const plannedCount = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
-          return <span className="text-sm text-morandi-primary">{plannedCount}</span>
-        },
-      },
-      {
-        key: 'status',
-        label: '狀態',
-        sortable: true,
-        render: (value, tour) => (
-          <span className={cn('text-sm font-medium', getStatusColor(tour.status))}>
-            {tour.status}
-          </span>
-        ),
-      },
-    ],
-    [orders, members, getStatusColor]
-  )
+  // Use extracted hooks for table columns, channel operations, and action buttons
+  const columns = useTourTableColumns({ orders, getStatusColor })
 
-  const handleCreateChannel = useCallback(async (tour: Tour) => {
-    const { toast } = await import('sonner')
+  const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions })
 
-    // 立即顯示載入提示
-    const loadingToast = toast.loading('正在建立頻道...')
-
-    try {
-      const { supabase } = await import('@/lib/supabase/client')
-      logger.log('🔵 [建立頻道] 開始處理:', tour.code, tour.name)
-
-      // 從 Zustand store 獲取當前登入使用者（支援本地認證）
-      const auth = useRequireAuthSync()
-
-      if (!auth.isAuthenticated) {
-        logger.error('❌ [建立頻道] 使用者未登入')
-        toast.dismiss(loadingToast)
-        auth.showLoginRequired()
-        return
-      }
-
-      logger.log('✅ [建立頻道] 使用者已登入:', auth.user!.id)
-
-      // 獲取預設工作空間 ID
-      const { data: workspaces, error: wsError } = await supabase
-        .from('workspaces')
-        .select('id')
-        .limit(1)
-        .single()
-
-      if (wsError || !workspaces) {
-        logger.error('❌ [建立頻道] 找不到工作空間:', wsError)
-        toast.dismiss(loadingToast)
-        toast.error('找不到工作空間')
-        return
-      }
-
-      logger.log('✅ [建立頻道] 工作空間:', workspaces.id)
-
-      // 檢查是否已有頻道（加上 workspace_id 過濾）
-      const { data: existingChannel, error: checkError } = await supabase
-        .from('channels')
-        .select('id, name')
-        .eq('workspace_id', workspaces.id)
-        .eq('tour_id', tour.id)
-        .maybeSingle()
-
-      if (checkError) {
-        logger.error('❌ [建立頻道] 檢查失敗:', checkError)
-      }
-
-      if (existingChannel) {
-        logger.log('ℹ️ [建立頻道] 頻道已存在:', existingChannel.name)
-        toast.dismiss(loadingToast)
-        toast.info(`頻道已存在：${existingChannel.name}`)
-        return
-      }
-
-      // 建立頻道
-      const channelName = `${tour.code} ${tour.name}`
-      logger.log('🔵 [建立頻道] 準備建立:', channelName)
-
-      const { error: insertError, data: newChannel } = await supabase
-        .from('channels')
-        .insert({
-          workspace_id: workspaces.id,
-          name: channelName,
-          description: `${tour.name} - ${tour.departure_date || ''} 出發`,
-          type: 'public',
-          tour_id: tour.id,
-          created_by: auth.user!.id,
-        })
-        .select()
-        .single()
-
-      if (insertError) {
-        logger.error('❌ [建立頻道] 建立失敗:', insertError)
-        throw insertError
-      }
-
-      logger.log('✅ [建立頻道] 建立成功:', newChannel)
-
-      // 自動將創建者加入為頻道擁有者
-      try {
-        const { error: memberError } = await supabase.from('channel_members').insert({
-          workspace_id: workspaces.id,
-          channel_id: newChannel.id,
-          employee_id: auth.user!.id,
-          role: 'owner',
-          status: 'active',
-        })
-
-        if (memberError) {
-          logger.warn('⚠️ [建立頻道] 加入成員失敗（可能已存在）:', memberError)
-        } else {
-          logger.log('✅ [建立頻道] 創建者已加入為擁有者')
-        }
-      } catch (memberErr) {
-        logger.warn('⚠️ [建立頻道] 加入成員異常:', memberErr)
-      }
-
-      toast.dismiss(loadingToast)
-      toast.success(`已建立頻道：${channelName}`)
-    } catch (error: any) {
-      logger.error('❌ [建立頻道] 發生錯誤:', error)
-      toast.dismiss(loadingToast)
-      toast.error(`建立頻道失敗：${error.message || '未知錯誤'}`)
-    }
-  }, [])
-
-  // 解鎖結團（管理員專用）
-  const handleUnlockTour = useCallback(async (tour: Tour) => {
-    const { toast } = await import('sonner')
-    const { supabase } = await import('@/lib/supabase/client')
-
-    if (!confirm(`確定要解鎖「${tour.name}」嗎？\n\n解鎖後可以繼續編輯和修改此團體。`)) {
-      return
-    }
-
-    try {
-      const { error } = await supabase
-        .from('tours')
-        .update({
-          closing_status: 'open',
-        } as any)
-        .eq('id', tour.id)
-
-      if (error) throw error
-
-      toast.success('已解鎖結團')
-      // 重新載入資料
-      if ('fetchAll' in actions && typeof actions.fetchAll === 'function') {
-        await actions.fetchAll()
-      }
-    } catch (error: any) {
-      logger.error('解鎖失敗:', error)
-      toast.error(`解鎖失敗：${error.message || '未知錯誤'}`)
-    }
-  }, [actions])
-
-  const renderActions = useCallback(
-    (tour: Tour) => {
-      const tourQuote = quotes.find(q => q.tour_id === tour.id)
-      const hasQuote = !!tourQuote
-
-      return (
-        <div className="flex items-center gap-1">
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              router.push(`/tours/${tour.id}`)
-            }}
-            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="查看詳情"
-          >
-            <Eye size={14} />
-          </button>
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              openDialog('edit', tour)
-            }}
-            className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-            title="編輯"
-          >
-            <Edit2 size={14} />
-          </button>
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              handleCreateChannel(tour)
-            }}
-            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="建立工作空間頻道"
-          >
-            <MessageSquare size={14} />
-          </button>
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              setSelectedTour(tour)
-              if (hasQuote) {
-                router.push(`/quotes/${tourQuote.id}`)
-              } else {
-                router.push(`/quotes?tour_id=${tour.id}`)
-              }
-            }}
-            className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-            title={hasQuote ? '查看報價單' : '新增報價單'}
-          >
-            <Calculator size={14} />
-          </button>
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              router.push(`/itinerary/${tour.id}`)
-            }}
-            className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
-            title="編輯行程表"
-          >
-            <Flag size={14} />
-          </button>
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              router.push(`/contracts?tour_id=${tour.id}`)
-            }}
-            className="p-1 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-            title="合約管理"
-          >
-            <FileSignature size={14} />
-          </button>
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              operations.handleArchiveTour(tour)
-            }}
-            className={cn(
-              'p-1 rounded transition-colors',
-              tour.archived
-                ? 'text-morandi-gold/60 hover:text-morandi-gold hover:bg-morandi-gold/10'
-                : 'text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-container'
-            )}
-            title={tour.archived ? '解除封存' : '封存'}
-          >
-            {tour.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
-          </button>
-          {/* 解鎖結團按鈕（僅封存分頁且管理員可見） */}
-          {activeStatusTab === 'archived' &&
-           tour.closing_status === 'closed' &&
-           user?.permissions?.includes('super_admin') && (
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                handleUnlockTour(tour)
-              }}
-              className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
-              title="解鎖結團"
-            >
-              <LockOpen size={14} />
-            </button>
-          )}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              setDeleteConfirm({ isOpen: true, tour })
-            }}
-            className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-            title="刪除"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      )
-    },
-    [quotes, openDialog, router, operations, setSelectedTour, setDeleteConfirm, handleCreateChannel, handleUnlockTour, activeStatusTab, user]
-  )
+  const { renderActions } = useTourActionButtons({
+    quotes,
+    activeStatusTab,
+    user,
+    operations,
+    openDialog,
+    setSelectedTour,
+    setDeleteConfirm,
+    handleCreateChannel,
+    handleUnlockTour,
+  })
 
   const renderExpanded = useCallback(
     (tour: Tour) => (

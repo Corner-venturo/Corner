@@ -1,12 +1,10 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Trash2, Plus, Copy, GripVertical, Check, X, PlusCircle } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { TransportationRate, GroupedRate } from '@/types/transportation-rates.types'
-import { cn } from '@/lib/utils'
+import { TransportationRate } from '@/types/transportation-rates.types'
 import {
   DndContext,
   closestCenter,
@@ -20,10 +18,10 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { AddRow } from './components/add-row'
+import { CategoryGroupRow } from './components/category-group-row'
 
 interface EditableRatesTableProps {
   rates: TransportationRate[]
@@ -153,39 +151,6 @@ export function EditableRatesTable({
     }
   }
 
-  // 新增空白列
-  const addNewRow = () => {
-    setIsAdding(true)
-    setNewRow({
-      category: '',
-      supplier: '',
-      route: '',
-      trip_type: '',
-      cost_vnd: 0,
-      price_twd: 0,
-      kkday_selling_price: 0,
-      kkday_cost: 0,
-      kkday_profit: 0,
-      is_backup: false,
-    })
-  }
-
-  // 複製最後一列
-  const copyLastRow = () => {
-    if (rates.length === 0) return
-    const lastRate = rates[rates.length - 1]
-    setIsAdding(true)
-    setNewRow({
-      category: lastRate.category,
-      supplier: lastRate.supplier,
-      route: '',
-      trip_type: '',
-      cost_vnd: 0,
-      price_twd: 0,
-      is_backup: lastRate.is_backup,
-    })
-  }
-
   // 儲存新增列
   const saveNewRow = async () => {
     if (!newRow.category || !newRow.route) {
@@ -293,142 +258,6 @@ export function EditableRatesTable({
     })
 
     await Promise.all(updatePromises)
-  }
-
-  // 渲染新增列
-  const renderAddRow = () => {
-    // 是否從品項旁點 +（需鎖定品項和廠商）
-    const isAddingToCategory = addingAfterCategory !== null
-
-    return (
-      <tr className="bg-blue-50/30">
-        {/* 排序欄位（編輯模式才顯示） */}
-        {isEditMode && (
-          <td className="px-2 py-2.5 text-center border-r border-border/40">
-            {/* 空白，新增時不需要拖曳手把 */}
-          </td>
-        )}
-
-        {/* 品項欄位 */}
-        <td className="px-3 py-2 border-r border-border/40 bg-morandi-container/20">
-          {isAddingToCategory ? (
-            <span className="text-sm font-medium text-morandi-primary">
-              {newRow.category || '-'}
-            </span>
-          ) : (
-            <Input
-              placeholder="品項（如：7座車）"
-              value={newRow.category || ''}
-              onChange={e => setNewRow({ ...newRow, category: e.target.value })}
-              className="h-8 text-sm"
-            />
-          )}
-        </td>
-
-        {/* 廠商欄位 */}
-        <td className="px-3 py-2 border-r border-border/40 bg-morandi-container/20">
-          {isAddingToCategory ? (
-            <span className="text-sm text-muted-foreground">
-              {newRow.supplier || '-'}
-            </span>
-          ) : (
-            <Input
-              placeholder="廠商名稱"
-              value={newRow.supplier || ''}
-              onChange={e => setNewRow({ ...newRow, supplier: e.target.value })}
-              className="h-8 text-sm"
-            />
-          )}
-        </td>
-
-        <td className="px-3 py-2 border-r border-border/40">
-        <Input
-          placeholder="行程路線"
-          value={newRow.route || ''}
-          onChange={e => setNewRow({ ...newRow, route: e.target.value })}
-          className="h-8 text-sm"
-        />
-      </td>
-      <td className="px-3 py-2 border-r border-border/40">
-        <Input
-          placeholder="單程/往返"
-          value={newRow.trip_type || ''}
-          onChange={e => setNewRow({ ...newRow, trip_type: e.target.value })}
-          className="h-8 text-sm"
-        />
-      </td>
-      <td className="px-3 py-2 border-r border-border/40">
-        <Input
-          type="number"
-          placeholder="0"
-          value={newRow.cost_vnd || ''}
-          onChange={e => setNewRow({ ...newRow, cost_vnd: parseFloat(e.target.value) || 0 })}
-          className="h-8 text-sm"
-        />
-      </td>
-      <td className="px-3 py-2 border-r border-amber-200/60">
-        <Input
-          type="number"
-          placeholder="0"
-          value={newRow.price_twd || ''}
-          onChange={e => setNewRow({ ...newRow, price_twd: parseFloat(e.target.value) || 0 })}
-          className="h-8 text-sm"
-        />
-      </td>
-      {!hideKKDAYColumns && (
-        <>
-          <td className="px-3 py-2 bg-amber-50/30 border-r border-amber-200/60">
-            <Input
-              type="number"
-              placeholder="0"
-              value={newRow.kkday_selling_price || ''}
-              onChange={e => setNewRow({ ...newRow, kkday_selling_price: parseFloat(e.target.value) || 0 })}
-              className="h-8 text-sm"
-            />
-          </td>
-          <td className="px-3 py-2 bg-amber-50/30 border-r border-amber-200/60">
-            <Input
-              type="number"
-              placeholder="0"
-              value={newRow.kkday_cost || ''}
-              onChange={e => setNewRow({ ...newRow, kkday_cost: parseFloat(e.target.value) || 0 })}
-              className="h-8 text-sm"
-            />
-          </td>
-          <td className="px-3 py-2 bg-amber-50/30 border-r border-border/40">
-            <Input
-              type="number"
-              placeholder="0"
-              value={newRow.kkday_profit || ''}
-              onChange={e => setNewRow({ ...newRow, kkday_profit: parseFloat(e.target.value) || 0 })}
-              className="h-8 text-sm"
-            />
-          </td>
-        </>
-      )}
-      <td className="px-3 py-2">
-        <div className="flex gap-1">
-          <Button
-            onClick={saveNewRow}
-            size="sm"
-            className="h-7 px-2 gap-1 bg-morandi-gold/20 hover:bg-morandi-gold/30 text-morandi-gold border border-morandi-gold/30"
-          >
-            <Check size={14} />
-            儲存
-          </Button>
-          <Button
-            onClick={cancelNewRow}
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 gap-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
-          >
-            <X size={14} />
-            取消
-          </Button>
-        </div>
-      </td>
-    </tr>
-    )
   }
 
   if (isLoading) {
@@ -557,18 +386,34 @@ export function EditableRatesTable({
                         setNewRow={setNewRow}
                         handleItemDragEnd={handleItemDragEnd}
                         sensors={sensors}
-                        isAdding={isAdding}
-                        addingAfterCategory={addingAfterCategory}
-                        renderAddRow={renderAddRow}
-                        hasAddingRow={isAdding && addingAfterCategory === group.category}
                       />
                       {/* 在該品項後插入新增列 */}
-                      {isAdding && addingAfterCategory === group.category && renderAddRow()}
+                      {isAdding && addingAfterCategory === group.category && (
+                        <AddRow
+                          newRow={newRow}
+                          setNewRow={setNewRow}
+                          addingAfterCategory={addingAfterCategory}
+                          isEditMode={isEditMode}
+                          hideKKDAYColumns={hideKKDAYColumns}
+                          onSave={saveNewRow}
+                          onCancel={cancelNewRow}
+                        />
+                      )}
                     </React.Fragment>
                   ))}
 
                   {/* 新品項（插在最後） */}
-                  {isAdding && addingAfterCategory === null && renderAddRow()}
+                  {isAdding && addingAfterCategory === null && (
+                    <AddRow
+                      newRow={newRow}
+                      setNewRow={setNewRow}
+                      addingAfterCategory={addingAfterCategory}
+                      isEditMode={isEditMode}
+                      hideKKDAYColumns={hideKKDAYColumns}
+                      onSave={saveNewRow}
+                      onCancel={cancelNewRow}
+                    />
+                  )}
                 </SortableContext>
               )}
             </tbody>
@@ -576,306 +421,6 @@ export function EditableRatesTable({
         </div>
       </div>
     </DndContext>
-  )
-}
-
-// 品項組件（支援拖曳整組）
-function CategoryGroupRow({
-  group,
-  isEditMode,
-  hideKKDAYColumns,
-  editingCell,
-  editValue,
-  setEditValue,
-  inputRef,
-  startEdit,
-  saveEdit,
-  handleKeyDown,
-  renderEditableCell,
-  onUpdate,
-  onDelete,
-  onInsert,
-  setAddingAfterCategory,
-  setIsAdding,
-  setNewRow,
-  handleItemDragEnd,
-  sensors,
-  isAdding: _isAdding,
-  addingAfterCategory: _addingAfterCategory,
-  renderAddRow: _renderAddRow,
-  hasAddingRow: _hasAddingRow,
-}: any) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: `${group.category}_${group.supplier}`,
-  })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
-  const categoryKey = `${group.category}_${group.supplier}`
-
-  // 收集所有要渲染的列
-  const rows: any[] = []
-  // @ts-ignore - Unused variables from destructuring
-
-  // 品項的資料列
-  group.rates.forEach((rate: TransportationRate, index: number) => {
-    rows.push(
-      <ItemRow
-        key={rate.id}
-        rate={rate}
-        index={index}
-        groupSize={group.rates.length}
-        isEditMode={isEditMode}
-        hideKKDAYColumns={hideKKDAYColumns}
-        editingCell={editingCell}
-        editValue={editValue}
-        setEditValue={setEditValue}
-        inputRef={inputRef}
-        startEdit={startEdit}
-        saveEdit={saveEdit}
-        handleKeyDown={handleKeyDown}
-        renderEditableCell={renderEditableCell}
-        onUpdate={onUpdate}
-        onDelete={onDelete}
-        onInsert={onInsert}
-        setAddingAfterCategory={setAddingAfterCategory}
-        setIsAdding={setIsAdding}
-        setNewRow={setNewRow}
-        category={group.category}
-        supplier={group.supplier}
-        isBackup={rate.is_backup}
-        categoryDragRef={index === 0 ? setNodeRef : undefined}
-        categoryDragStyle={index === 0 ? style : undefined}
-        categoryDragAttributes={index === 0 ? attributes : undefined}
-        categoryDragListeners={index === 0 ? listeners : undefined}
-      />
-    )
-  })
-
-  // 包裹 DndContext 和 SortableContext（細項拖曳）
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={(event) => handleItemDragEnd(categoryKey, event)}
-    >
-      <SortableContext items={group.rates.map((r: TransportationRate) => r.id)} strategy={verticalListSortingStrategy}>
-        {rows}
-      </SortableContext>
-    </DndContext>
-  )
-}
-
-// 細項組件（支援拖曳單一細項）
-function ItemRow({
-  rate,
-  index,
-  groupSize,
-  isEditMode,
-  hideKKDAYColumns,
-  editingCell,
-  editValue,
-  setEditValue,
-  inputRef,
-  startEdit,
-  saveEdit,
-  handleKeyDown,
-  renderEditableCell,
-  onUpdate,
-  onDelete,
-  onInsert,
-  setAddingAfterCategory,
-  setIsAdding,
-  setNewRow,
-  category,
-  supplier,
-  isBackup,
-  categoryDragRef,
-  categoryDragStyle,
-  categoryDragAttributes,
-  categoryDragListeners,
-}: any) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: rate.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
-  const isFirstInGroup = index === 0
-
-  return (
-    <tr
-      ref={isFirstInGroup && categoryDragRef ? categoryDragRef : setNodeRef}
-      style={isFirstInGroup && categoryDragStyle ? categoryDragStyle : style}
-      className={cn(
-        'border-b border-border/50 hover:bg-morandi-container/20 transition-colors',
-        isBackup && 'bg-amber-50/20'
-      )}
-    >
-      {/* 拖曳手把 */}
-      {isEditMode && (
-        <td className="px-2 py-2.5 text-center border-r border-border/40">
-          <div className="flex flex-col gap-0.5">
-            {/* 品項拖曳手把（只在第一列顯示） */}
-            {isFirstInGroup && (
-              <button
-                {...(categoryDragAttributes || {})}
-                {...(categoryDragListeners || {})}
-                className="cursor-move text-morandi-gold/60 hover:text-morandi-gold"
-                title="拖曳整個品項"
-              >
-                <GripVertical size={14} />
-              </button>
-            )}
-            {/* 細項拖曳手把（每一列都有） */}
-            <button
-              {...attributes}
-              {...listeners}
-              className="cursor-move text-morandi-secondary/60 hover:text-morandi-secondary"
-              title="拖曳此細項"
-            >
-              <GripVertical size={12} />
-            </button>
-          </div>
-        </td>
-      )}
-
-      {/* 品項（合併儲存格） */}
-      {isFirstInGroup && (
-        <td
-          rowSpan={groupSize}
-          className="px-4 py-2.5 align-top bg-morandi-container/20 border-r border-border/40 group relative"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex-1" onDoubleClick={() => startEdit(rate.id, 'category', category)}>
-              {editingCell?.rowId === rate.id && editingCell?.field === 'category' ? (
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  value={editValue}
-                  onChange={e => setEditValue(e.target.value)}
-                  onBlur={saveEdit}
-                  onKeyDown={e => handleKeyDown(e, rate.id, 'category')}
-                  className="h-7 text-sm"
-                />
-              ) : (
-                <span className="text-sm font-medium text-morandi-primary cursor-pointer hover:text-morandi-gold">
-                  {category || '-'}
-                </span>
-              )}
-            </div>
-            {isEditMode && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setAddingAfterCategory(category ?? '')
-                  setIsAdding(true)
-                  setNewRow({
-                    category,
-                    supplier,
-                    route: '',
-                    trip_type: '',
-                    cost_vnd: 0,
-                    price_twd: 0,
-                    is_backup: isBackup,
-                  })
-                }}
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-morandi-gold hover:bg-morandi-gold/10 flex-shrink-0"
-                title={`新增 ${category} 路線`}
-              >
-                <Plus size={14} />
-              </Button>
-            )}
-          </div>
-        </td>
-      )}
-
-      {/* 廠商（合併儲存格） */}
-      {isFirstInGroup && (
-        <td
-          rowSpan={groupSize}
-          className="px-4 py-2.5 align-top bg-morandi-container/20 border-r border-border/40"
-        >
-          {renderEditableCell(rate, 'supplier', supplier)}
-        </td>
-      )}
-
-      {/* 行程路線 */}
-      <td className="px-4 py-2.5 border-r border-border/40">
-        {renderEditableCell(rate, 'route', rate.route)}
-      </td>
-
-      {/* 類型 */}
-      <td className="px-4 py-2.5 text-center border-r border-border/40">
-        {renderEditableCell(rate, 'trip_type', rate.trip_type)}
-      </td>
-
-      {/* 越南盾 */}
-      <td className="px-4 py-2.5 text-right border-r border-border/40">
-        {renderEditableCell(rate, 'cost_vnd', rate.cost_vnd?.toLocaleString() || '0', 'number')}
-      </td>
-
-      {/* 台幣 */}
-      <td className="px-4 py-2.5 text-right border-r border-amber-200/60">
-        {renderEditableCell(rate, 'price_twd', rate.price_twd?.toLocaleString() || '0', 'number')}
-      </td>
-
-      {!hideKKDAYColumns && (
-        <>
-          {/* KKDAY售價 */}
-          <td className="px-4 py-2.5 text-right bg-amber-50/30 border-r border-amber-200/60">
-            {renderEditableCell(rate, 'kkday_selling_price', rate.kkday_selling_price?.toLocaleString() || '0', 'number')}
-          </td>
-
-          {/* KKDAY成本 */}
-          <td className="px-4 py-2.5 text-right bg-amber-50/30 border-r border-amber-200/60">
-            {renderEditableCell(rate, 'kkday_cost', rate.kkday_cost?.toLocaleString() || '0', 'number')}
-          </td>
-
-          {/* 利潤（自動計算，不可編輯） */}
-          <td className="px-4 py-2.5 text-right bg-amber-50/30 border-r border-border/40">
-            <span className="font-mono text-sm text-amber-800 font-medium" title="自動計算（售價 - 成本）">
-              {rate.kkday_profit?.toLocaleString() || '0'}
-            </span>
-          </td>
-        </>
-      )}
-
-      {/* 操作 */}
-      <td className="px-4 py-2.5 text-center">
-        <div className="flex items-center justify-center gap-1">
-          {onInsert && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onInsert(rate)}
-              className="h-7 w-7 p-0 text-morandi-gold hover:bg-morandi-gold/10"
-              title="插入到報價單"
-            >
-              <PlusCircle size={14} />
-            </Button>
-          )}
-          {isEditMode && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete(rate.id)}
-              className="h-7 w-7 p-0 text-morandi-red hover:bg-morandi-red/10"
-              title="刪除此筆車資"
-            >
-              <Trash2 size={14} />
-            </Button>
-          )}
-        </div>
-      </td>
-    </tr>
   )
 }
 

@@ -16,6 +16,31 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
       try {
         logger.log('🚀 AppInitializer: Starting initialization...')
 
+        // 🔧 修復：等待 auth-store hydration 完成
+        const { useAuthStore } = await import('@/stores/auth-store')
+        const authStore = useAuthStore.getState()
+
+        if (!authStore._hasHydrated) {
+          logger.log('⏳ Waiting for auth-store hydration...')
+
+          await new Promise<void>(resolve => {
+            const unsubscribe = useAuthStore.subscribe(state => {
+              if (state._hasHydrated) {
+                logger.log('✅ Auth-store hydrated')
+                unsubscribe()
+                resolve()
+              }
+            })
+
+            // 安全超時（5 秒）
+            setTimeout(() => {
+              logger.warn('⚠️ Auth-store hydration timeout, continuing anyway')
+              unsubscribe()
+              resolve()
+            }, 5000)
+          })
+        }
+
         // 初始化 IndexedDB
         await initLocalDatabase()
         logger.log('✅ IndexedDB initialized')

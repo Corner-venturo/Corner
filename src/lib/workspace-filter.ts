@@ -82,6 +82,34 @@ export function getWorkspaceFilterForQuery(tableName: string): string | null {
     return null
   }
 
-  // 取得當前篩選設定
-  return getCurrentWorkspaceFilter()
+  // 🔐 安全性修復：一般使用者自動使用自己的 workspace_id
+  // 只有 super_admin 可以透過 localStorage 手動切換 workspace
+  try {
+    // 動態引入避免循環依賴
+    const { useAuthStore } = require('@/stores/auth-store')
+    const user = useAuthStore.getState().user
+
+    if (!user) {
+      return null // 未登入，不篩選
+    }
+
+    // super_admin: 可以手動切換查看不同 workspace
+    if (user.permissions?.includes('super_admin')) {
+      const manualFilter = getCurrentWorkspaceFilter()
+
+      // 如果手動選擇了 workspace，使用該選擇
+      if (manualFilter) {
+        return manualFilter
+      }
+
+      // 未選擇時，預設使用自己的 workspace
+      return user.workspace_id || null
+    }
+
+    // ✅ 一般使用者：強制使用自己的 workspace_id（不可切換）
+    return user.workspace_id || null
+  } catch (error) {
+    console.warn('⚠️ getWorkspaceFilterForQuery 取得 user 失敗:', error)
+    return null
+  }
 }
