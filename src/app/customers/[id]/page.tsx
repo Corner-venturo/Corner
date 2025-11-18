@@ -37,9 +37,9 @@ export default function CustomerDetailPage() {
   useEffect(() => {
     const found = customers.find(c => c.id === customerId)
     if (found) {
-      setCustomer(found)
+      setCustomer(found as any)
       const { id, created_at, ...editableData } = found
-      setFormData(editableData)
+      setFormData(editableData as any)
     }
   }, [customers, customerId])
 

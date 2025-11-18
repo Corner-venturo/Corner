@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Settings } from 'lucide-react'
 import { useWidgets } from '@/features/dashboard/hooks'
 import { WidgetSettingsDialog, AVAILABLE_WIDGETS } from '@/features/dashboard/components'
+import type { WidgetType } from '@/features/dashboard/types'
 import {
   DndContext,
   closestCenter,
@@ -67,8 +68,8 @@ export default function Home() {
     const { active, over } = event
 
     if (over && active.id !== over.id) {
-      const oldIndex = activeWidgets.indexOf(active.id as string)
-      const newIndex = activeWidgets.indexOf(over.id as string)
+      const oldIndex = activeWidgets.indexOf(active.id as WidgetType)
+      const newIndex = activeWidgets.indexOf(over.id as WidgetType)
       reorderWidgets(oldIndex, newIndex)
     }
   }

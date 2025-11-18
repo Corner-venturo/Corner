@@ -26,7 +26,7 @@ interface RoomOption {
 }
 
 interface MemberWithRoom extends Member {
-  assignedRoom?: string
+  // Uses assigned_room from Member interface
 }
 
 export function RoomAllocation({ tour }: RoomAllocationProps) {
@@ -57,7 +57,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     const roomOptions: RoomOption[] = []
 
     tourPaymentRequests.forEach(request => {
-      request.items.forEach((item: { category: string; description: string }) => {
+      (request.items || []).forEach((item: { category: string; description: string }) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g)
@@ -103,7 +103,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
   const assignMemberToRoom = (member_id: string, roomValue: string) => {
     setMembersWithRooms(prev =>
       prev.map(member =>
-        member.id === member_id ? { ...member, assignedRoom: roomValue || undefined } : member
+        member.id === member_id ? { ...member, assigned_room: roomValue || undefined } : member
       )
     )
 
@@ -116,14 +116,14 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     setRoomOptions(prev =>
       prev.map(room => ({
         ...room,
-        currentCount: membersWithRooms.filter(member => member.assignedRoom === room.value).length,
+        currentCount: membersWithRooms.filter(member => member.assigned_room === room.value).length,
       }))
     )
   }
 
   // 統計資料
   const totalRooms = roomOptions.length
-  const assignedCount = membersWithRooms.filter(member => member.assignedRoom).length
+  const assignedCount = membersWithRooms.filter(member => member.assigned_room).length
   const unassignedCount = membersWithRooms.length - assignedCount
   const totalCapacity = roomOptions.reduce((sum, room) => sum + room.capacity, 0)
 
@@ -131,7 +131,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
   const isRoomFull = (roomValue: string) => {
     const room = roomOptions.find(r => r.value === roomValue)
     if (!room) return false
-    const currentOccupancy = membersWithRooms.filter(m => m.assignedRoom === roomValue).length
+    const currentOccupancy = membersWithRooms.filter(m => m.assigned_room === roomValue).length
     return currentOccupancy >= room.capacity
   }
 
@@ -192,7 +192,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
             </thead>
             <tbody>
               {membersWithRooms.map((member, index) => {
-                const assignedRoom = member.assignedRoom
+                const assignedRoom = member.assigned_room
                 const roomIsFull = assignedRoom && isRoomFull(assignedRoom)
 
                 return (
@@ -209,7 +209,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                     </td>
                     <td className="py-3 px-4 border border-gray-300">
                       <Select
-                        value={member.assignedRoom || ''}
+                        value={member.assigned_room || ''}
                         onValueChange={value => assignMemberToRoom(member.id, value)}
                       >
                         <SelectTrigger className="w-full h-8">
@@ -219,7 +219,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                           <SelectItem value="">未分配</SelectItem>
                           {roomOptions.map(room => {
                             const isFull = isRoomFull(room.value)
-                            const isCurrentRoom = member.assignedRoom === room.value
+                            const isCurrentRoom = member.assigned_room === room.value
 
                             return (
                               <SelectItem
@@ -275,7 +275,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
           <h3 className="text-lg font-semibold text-morandi-primary mb-4">房間使用狀況</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {roomOptions.map(room => {
-              const occupants = membersWithRooms.filter(m => m.assignedRoom === room.value)
+              const occupants = membersWithRooms.filter(m => m.assigned_room === room.value)
               const isFull = occupants.length >= room.capacity
 
               return (

@@ -59,7 +59,6 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     suppliers,
     tours,
     orders,
-    loadTours,
   } = useRequestForm()
 
   // ✅ 載入團體和訂單資料（進入請款頁面時）

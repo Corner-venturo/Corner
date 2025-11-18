@@ -90,6 +90,7 @@ export interface TourFormData {
   leader: LeaderInfo
   meetingPoints: MeetingPoint[] // 改為陣列支援多個集合地點
   hotels: HotelInfo[] // 新增飯店資訊陣列
+  showFeatures?: boolean // 是否顯示行程特色區塊
   showLeaderMeeting?: boolean // 是否顯示領隊與集合資訊
   showHotels?: boolean // 是否顯示飯店資訊
   itinerarySubtitle: string

@@ -72,7 +72,7 @@ export default function MemberDetailPage() {
             ref={memberTableRef}
             order_id={orderId}
             departure_date={tour?.departure_date || ''}
-            member_count={order.member_count}
+            member_count={order.member_count ?? 0}
           />
         </div>
       </div>

@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Plane, Calendar, AlertCircle, Clock } from 'lucide-react'
 import { parseAmadeusPNR, formatSegment, extractImportantDates, isUrgent } from '@/lib/pnr-parser'
 import { usePNRStore } from '@/stores/pnrs-store'
-import { useCalendarStore } from '@/stores/calendar-store'
+import { useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { toast } from 'sonner'
@@ -24,7 +24,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
   const [parsedData, setParsedData] = useState<ReturnType<typeof parseAmadeusPNR> | null>(null)
 
   const { create: createPNR } = usePNRStore()
-  const { create: createCalendarEvent } = useCalendarStore()
+  const { create: createCalendarEvent } = useCalendarEventStore()
   const { user } = useAuthStore()
   const { currentWorkspace } = useWorkspaceStore()
 
@@ -90,13 +90,13 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           employee_id: user.id,
           raw_pnr: rawPNR,
           passenger_names: parsedData.passengerNames,
-          ticketing_deadline: parsedData.ticketingDeadline,
-          cancellation_deadline: parsedData.cancellationDeadline,
+          ticketing_deadline: parsedData.ticketingDeadline ? parsedData.ticketingDeadline.toISOString() : null,
+          cancellation_deadline: parsedData.cancellationDeadline ? parsedData.cancellationDeadline.toISOString() : null,
           segments: parsedData.segments,
           special_requests: parsedData.specialRequests,
           other_info: parsedData.otherInfo,
           status: 'active',
-        })
+        } as any)
       }
 
       toast.success('出票期限已設定！')
@@ -142,13 +142,13 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           employee_id: user.id,
           raw_pnr: rawPNR,
           passenger_names: parsedData.passengerNames,
-          ticketing_deadline: parsedData.ticketingDeadline,
-          cancellation_deadline: parsedData.cancellationDeadline,
+          ticketing_deadline: parsedData.ticketingDeadline ? parsedData.ticketingDeadline.toISOString() : null,
+          cancellation_deadline: parsedData.cancellationDeadline ? parsedData.cancellationDeadline.toISOString() : null,
           segments: parsedData.segments,
           special_requests: parsedData.specialRequests,
           other_info: parsedData.otherInfo,
           status: 'active',
-        })
+        } as any)
       }
 
       toast.success(`已新增 ${departureDates.length} 個航班到行事曆！`)

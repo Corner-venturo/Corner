@@ -116,24 +116,24 @@ export default function TourClosingReportPage() {
           if (orderIds.length > 0) {
             const { data: bonusRequests } = await supabase
               .from('payment_requests')
-              .select('supplier_name, amount, description')
+              .select('supplier_name, amount, notes')
               .in('order_id', orderIds)
               .eq('supplier_type', 'bonus')
 
             bonusRequests?.forEach(bonus => {
-              // 從 description 解析百分比（如果有）
-              const percentageMatch = bonus.description?.match(/(\d+\.?\d*)%/)
+              // 從 notes 解析百分比（如果有）
+              const percentageMatch = bonus.notes?.match(/(\d+\.?\d*)%/)
               const percentage = percentageMatch ? parseFloat(percentageMatch[1]) : 0
 
               if (bonus.supplier_name === '業務業績') {
                 salesBonuses.push({
-                  employee_name: bonus.description?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
+                  employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
                   percentage,
                   amount: bonus.amount || 0,
                 })
               } else if (bonus.supplier_name === 'OP 獎金') {
                 opBonuses.push({
-                  employee_name: bonus.description?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
+                  employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
                   percentage,
                   amount: bonus.amount || 0,
                 })
@@ -288,21 +288,21 @@ export default function TourClosingReportPage() {
       key: 'total_revenue',
       label: '收入',
       sortable: true,
-      render: (value: unknown) => <span className="text-morandi-green">NT$ {value.toLocaleString()}</span>,
+      render: (value: unknown) => <span className="text-morandi-green">NT$ {Number(value).toLocaleString()}</span>,
     },
     {
       key: 'total_cost',
       label: '成本',
       sortable: true,
-      render: (value: unknown) => <span className="text-morandi-red">NT$ {value.toLocaleString()}</span>,
+      render: (value: unknown) => <span className="text-morandi-red">NT$ {Number(value).toLocaleString()}</span>,
     },
     {
       key: 'net_profit',
       label: '淨利',
       sortable: true,
       render: (value: unknown) => (
-        <span className={value >= 0 ? 'text-morandi-primary font-bold' : 'text-morandi-red font-bold'}>
-          NT$ {value.toLocaleString()}
+        <span className={Number(value) >= 0 ? 'text-morandi-primary font-bold' : 'text-morandi-red font-bold'}>
+          NT$ {Number(value).toLocaleString()}
         </span>
       ),
     },

@@ -99,7 +99,7 @@ function WishCard({ wish, index }: { wish: Wish; index: number }) {
 
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
         <span className="text-xs text-morandi-secondary">
-          {new Date(wish.created_at).toLocaleDateString('zh-TW')}
+          {new Date(wish.created_at || '').toLocaleDateString('zh-TW')}
         </span>
         <button
           className="text-morandi-secondary hover:text-morandi-gold transition-colors"

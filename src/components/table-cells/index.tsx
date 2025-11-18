@@ -14,7 +14,7 @@ import type { LucideIcon } from 'lucide-react'
 
 // ========== 類型定義 ==========
 
-type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa'
+type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa' | 'voucher' | 'receipt'
 
 export interface DateCellProps {
   date?: string | Date | null
@@ -186,12 +186,12 @@ export function StatusCell({
   showIcon = false,
   className,
 }: StatusCellProps) {
-  const color = getStatusColor(type, status)
-  const label = getStatusLabel(type, status)
-  const IconComponent = getStatusIcon(type, status)
+  const color = getStatusColor(type as any, status)
+  const label = getStatusLabel(type as any, status)
+  const IconComponent = getStatusIcon(type as any, status)
 
   if (variant === 'badge') {
-    const bgColor = getStatusBgColor(type, status)
+    const bgColor = getStatusBgColor(type as any, status)
     return (
       <Badge className={cn('text-white', bgColor, className)}>
         {showIcon && IconComponent && <IconComponent className="w-3 h-3 mr-1" />}

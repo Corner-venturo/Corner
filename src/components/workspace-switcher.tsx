@@ -21,7 +21,7 @@ export function WorkspaceSwitcher() {
   const { workspaces, currentWorkspaceId } = useWorkspaceStore()
   const [switching, setSwitching] = useState(false)
 
-  const currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId)
+  const currentWorkspace = workspaces.find((w: any) => w.id === currentWorkspaceId)
 
   const handleSwitch = async (workspaceId: string) => {
     if (workspaceId === currentWorkspaceId || switching) {
@@ -53,8 +53,8 @@ export function WorkspaceSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         {workspaces
-          .filter(w => w.is_active)
-          .map(workspace => (
+          .filter((w: any) => w.is_active)
+          .map((workspace: any) => (
             <DropdownMenuItem
               key={workspace.id}
               onClick={() => handleSwitch(workspace.id)}

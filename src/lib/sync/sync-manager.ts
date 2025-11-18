@@ -61,7 +61,7 @@ export async function syncData<T extends { id: string; updated_at?: string }>(
 
   // 📍 步驟 2：背景同步遠端資料
   try {
-    const query = supabase.from(config.supabaseTable).select(config.select || '*')
+    const query = (supabase as any).from(config.supabaseTable).select(config.select || '*')
 
     const { data: remoteData, error } = await query
 
@@ -77,7 +77,7 @@ export async function syncData<T extends { id: string; updated_at?: string }>(
 
     // 📍 步驟 4：更新本地快取
     for (const item of merged) {
-      await localDB.put(config.tableName, item)
+      await localDB.put(config.tableName as any, item)
     }
 
     return {
@@ -185,7 +185,7 @@ export async function pushToRemote<T extends { id: string }>(
   }
 
   try {
-    const { error } = await supabase.from(supabaseTable).upsert(data)
+    const { error } = await (supabase as any).from(supabaseTable).upsert(data)
 
     if (error) throw error
 

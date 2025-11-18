@@ -10,7 +10,6 @@ export const useAccounting = () => {
     accounts: store.accounts,
     categories: store.categories,
     transactions: store.transactions,
-    budgets: store.budgets,
     stats: store.stats,
 
     // ========== Account 操作 ==========
@@ -27,7 +26,7 @@ export const useAccounting = () => {
     },
 
     loadAccounts: async () => {
-      return await store.loadAccounts()
+      return await store.fetchAccounts()
     },
 
     getAccountsByType: (type: Account['type']) => {
@@ -39,20 +38,12 @@ export const useAccounting = () => {
     },
 
     // ========== Category 操作 ==========
-    createCategory: async (data: Omit<Category, 'id' | 'created_at' | 'updated_at'>) => {
+    createCategory: async (data: any) => {
       return await store.addCategory(data)
     },
 
-    updateCategory: async (id: string, data: Partial<Category>) => {
-      return await store.updateCategory(id, data)
-    },
-
-    deleteCategory: async (id: string) => {
-      return await store.deleteCategory(id)
-    },
-
     loadCategories: async () => {
-      return await store.loadCategories()
+      return await store.fetchCategories()
     },
 
     getCategoriesByType: (type: Category['type']) => {
@@ -64,16 +55,16 @@ export const useAccounting = () => {
     },
 
     // ========== Transaction 操作 ==========
-    createTransaction: (data: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => {
-      return accountingService.addTransaction(data)
+    createTransaction: async (data: any) => {
+      return await accountingService.addTransaction(data)
     },
 
-    updateTransaction: (id: string, data: Partial<Transaction>) => {
-      accountingService.updateTransaction(id, data)
+    updateTransaction: async (id: string, data: any) => {
+      return await accountingService.updateTransaction(id, data)
     },
 
-    deleteTransaction: (id: string) => {
-      accountingService.deleteTransaction(id)
+    deleteTransaction: async (id: string) => {
+      return await accountingService.deleteTransaction(id)
     },
 
     getTransactionsByAccount: (account_id: string) => {
@@ -85,8 +76,8 @@ export const useAccounting = () => {
     },
 
     // ========== 統計方法 ==========
-    calculateStats: () => {
-      accountingService.calculateStats()
+    calculateStats: async () => {
+      return await accountingService.calculateStats()
     },
 
     getTotalAssets: () => {

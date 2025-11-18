@@ -129,6 +129,13 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     description: '財務報表查看',
   },
   {
+    id: 'vouchers',
+    label: '會計傳票',
+    category: '全部',
+    routes: ['/finance/vouchers'],
+    description: '會計傳票管理（需啟用會計模組）',
+  },
+  {
     id: 'hr',
     label: '人資管理',
     category: '全部',

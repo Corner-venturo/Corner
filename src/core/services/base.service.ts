@@ -43,7 +43,7 @@ export abstract class BaseService<T extends BaseEntity> {
       this.validate(data as Partial<T>)
 
       const entity: T = {
-        ...data,
+        ...(data as any),
         id: this.generateId(),
         created_at: this.now(),
         updated_at: this.now(),
@@ -133,8 +133,8 @@ export abstract class BaseService<T extends BaseEntity> {
       }
 
       const updated = {
-        ...existing,
-        ...data,
+        ...(existing as any),
+        ...(data as any),
         id, // 確保 ID 不會被覆蓋
         updated_at: this.now(),
       } as T
@@ -171,7 +171,7 @@ export abstract class BaseService<T extends BaseEntity> {
 
     for (const item of items) {
       try {
-        const created = await this.create(item)
+        const created = await this.create(item as any)
         results.push(created)
       } catch (error) {
         // Continue processing other items on error
@@ -186,7 +186,7 @@ export abstract class BaseService<T extends BaseEntity> {
 
     for (const { id, data } of updates) {
       try {
-        const updated = await this.update(id, data)
+        const updated = await this.update(id, data as any)
         results.push(updated)
       } catch (error) {
         // Continue processing other items on error

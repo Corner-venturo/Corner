@@ -37,7 +37,7 @@ export async function generatePaymentRequestPDF(data: PaymentRequestPDFData): Pr
 
   doc.text(`Request No. / 請款單號: ${request.request_number}`, infoLeft, yPos)
   yPos += 6
-  doc.text(`Request Date / 請款日期: ${formatDate(request.request_date)}`, infoLeft, yPos)
+  doc.text(`Request Date / 請款日期: ${formatDate(request.created_at)}`, infoLeft, yPos)
   yPos += 6
   doc.text(`Tour Code / 團號: ${request.code || '-'}`, infoLeft, yPos)
   yPos += 6
@@ -115,6 +115,6 @@ export async function generatePaymentRequestPDF(data: PaymentRequestPDFData): Pr
     )
   }
 
-  const filename = `PaymentRequest_${request.request_number}_${formatDate(request.request_date)}.pdf`
+  const filename = `PaymentRequest_${request.request_number}_${formatDate(request.created_at)}.pdf`
   doc.save(filename)
 }

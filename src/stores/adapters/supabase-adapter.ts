@@ -25,7 +25,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      let query = supabase
+      let query: any = (supabase as any)
         .from(this.tableName)
         .select('*')
         .order('created_at', { ascending: true })
@@ -65,16 +65,16 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const { data: result, error } = await supabase
+      const result: any = await (supabase as any)
         .from(this.tableName)
-        .insert(data)
+        .insert(data as any)
         .select()
         .single()
 
-      if (error) throw error
+      if (result.error) throw result.error
 
-      logger.log(`☁️ [${this.tableName}] Supabase insert:`, result.id)
-      return result as T
+      logger.log(`☁️ [${this.tableName}] Supabase insert:`, result.data.id)
+      return result.data as T
     } catch (error) {
       logger.error(`❌ [${this.tableName}] Supabase insert 失敗:`, error)
       throw error
@@ -91,11 +91,11 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const { data, error } = await supabase.from(this.tableName).select('*').eq('id', id).single()
+      const result: any = await (supabase as any).from(this.tableName).select('*').eq('id', id).single()
 
-      if (error) throw error
+      if (result.error) throw result.error
 
-      return data as T
+      return result.data as T
     } catch (error) {
       logger.warn(`⚠️ [${this.tableName}] Supabase getById 失敗:`, error)
       throw error
@@ -120,16 +120,16 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const { error } = await supabase.from(this.tableName).upsert(item)
+      const result: any = await (supabase as any).from(this.tableName).upsert(item as any)
 
-      if (error) {
+      if (result.error) {
         logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
+          message: result.error.message,
+          details: result.error.details,
+          hint: result.error.hint,
+          code: result.error.code,
         })
-        throw error
+        throw result.error
       }
 
       logger.log(`☁️ [${this.tableName}] Supabase upsert:`, item.id)
@@ -161,9 +161,9 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       }
 
       const { supabase } = await import('@/lib/supabase/client')
-      const { error } = await supabase.from(this.tableName).update(cleanedData).eq('id', id)
+      const result: any = await (supabase as any).from(this.tableName).update(cleanedData as any).eq('id', id)
 
-      if (error) throw error
+      if (result.error) throw result.error
 
       logger.log(`☁️ [${this.tableName}] Supabase update:`, id)
     } catch (error) {
@@ -182,9 +182,9 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const { error } = await supabase.from(this.tableName).delete().eq('id', id)
+      const result: any = await (supabase as any).from(this.tableName).delete().eq('id', id)
 
-      if (error) throw error
+      if (result.error) throw result.error
 
       logger.log(`☁️ [${this.tableName}] Supabase delete:`, id)
     } catch (error) {

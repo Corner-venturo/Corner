@@ -3,7 +3,7 @@
 import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
 
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
-import { _Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Employee, SYSTEM_PERMISSIONS } from '@/stores/types'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -97,7 +97,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           login({
             ...user,
             roles,
-          })
+          } as any)
 
           // 🎴 同步更新 LocalProfile（角色卡）
           try {
@@ -148,7 +148,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           login({
             ...user,
             permissions: permissions,
-          })
+          } as any)
         }
 
         // 顯示儲存成功訊息

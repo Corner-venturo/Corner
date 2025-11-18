@@ -95,7 +95,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
       await updateReceipt(receipt.id, {
         actual_amount: parseFloat(actualAmount),
         status: 1, // 已確認
-        notes: confirmNote ? `${receipt.notes}\n[會計確認] ${confirmNote}` : receipt.notes,
+        note: confirmNote ? `${receipt.note ?? ''}\n[會計確認] ${confirmNote}` : receipt.note,
       })
       setIsConfirming(false)
       alert('✅ 收款已確認')
@@ -329,10 +329,10 @@ export default function ReceiptDetailPage({ params }: PageProps) {
         </Card>
 
         {/* 備註 */}
-        {receipt.notes && (
+        {receipt.note && (
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-morandi-primary mb-4">備註</h3>
-            <p className="text-morandi-secondary whitespace-pre-wrap">{receipt.notes}</p>
+            <p className="text-morandi-secondary whitespace-pre-wrap">{receipt.note}</p>
           </Card>
         )}
 
@@ -358,7 +358,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-morandi-primary mb-4">關聯訂單</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <InfoItem label="訂單編號" value={order.order_number} />
+              <InfoItem label="訂單編號" value={order.order_number ?? '-'} />
               <InfoItem label="聯絡人" value={order.contact_person || '-'} />
               <InfoItem label="聯絡電話" value={order.contact_phone || '-'} />
             </div>

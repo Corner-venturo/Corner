@@ -1,7 +1,7 @@
 'use client'
 
-import { OrderMember } from '@/types/order-member.types'
 import { Tour } from '@/types/tour.types'
+import { Member as OrderMember } from '@/stores/types'
 
 interface MemberFieldValue {
   [memberId: string]: {

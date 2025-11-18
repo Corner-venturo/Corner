@@ -11,7 +11,7 @@ import type { LucideIcon } from 'lucide-react'
  */
 export interface BreadcrumbItem {
   label: string
-  href?: string
+  href: string
 }
 
 /**
@@ -86,7 +86,7 @@ export interface ListPageLayoutProps<T extends Record<string, any>> {
 
   // ========== 展開控制 ==========
   /** 外部控制的展開行 */
-  expandedRows?: Set<string>
+  expandedRows?: string[]
   /** 展開/收合切換事件 */
   onToggleExpand?: (id: string) => void
 
@@ -200,7 +200,7 @@ export function ListPageLayout<T extends Record<string, any>>({
             onRowClick={onRowClick}
             actions={renderActions}
             expandable={
-              renderExpanded
+              renderExpanded && expandedRows && onToggleExpand
                 ? {
                     expanded: expandedRows,
                     onExpand: onToggleExpand,

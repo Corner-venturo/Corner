@@ -29,7 +29,7 @@ export function TourCard({ tour, onClick, onEdit, onQuote, actualMembers }: Tour
 
   const profitColor = tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red'
   const occupancyRate =
-    tour.max_participants > 0 ? (actualMembers / tour.max_participants) * 100 : 0
+    (tour.max_participants ?? 0) > 0 ? (actualMembers / (tour.max_participants ?? 0)) * 100 : 0
   const occupancyColor =
     occupancyRate >= 80
       ? 'text-morandi-green'

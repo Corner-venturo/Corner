@@ -12,7 +12,7 @@ interface FitnessLayoutProps {
 
 export function FitnessLayout({ children, activeTab = 'workout' }: FitnessLayoutProps) {
   const router = useRouter()
-  const { user, loading } = useAuthStore()
+  const { user, _hasHydrated } = useAuthStore()
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -21,14 +21,14 @@ export function FitnessLayout({ children, activeTab = 'workout' }: FitnessLayout
 
   // 登入檢查
   useEffect(() => {
-    if (!loading && !user && isClient) {
+    if (_hasHydrated && !user && isClient) {
       // 未登入 → 跳轉到主系統登入頁面
       router.push('/login?redirect=/fitness')
     }
-  }, [user, loading, router, isClient])
+  }, [user, _hasHydrated, router, isClient])
 
   // 載入中或未登入 → 顯示載入畫面
-  if (loading || !user || !isClient) {
+  if (!_hasHydrated || !user || !isClient) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
         <div className="text-center">

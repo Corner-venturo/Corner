@@ -19,7 +19,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
   const [text, setText] = useState('')
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  const box = boxes.find(b => b.id === scheduledBox.boxId)
+  const box = boxes.find(b => b.id === scheduledBox.box_id)
 
   // 載入現有資料
   useEffect(() => {
@@ -31,12 +31,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
 
   // 更新內容
   const handleUpdate = () => {
-    const reminderData: ReminderData = {
-      text,
-      lastUpdated: new Date(),
-    }
-
-    updateReminderData(scheduledBox.id, reminderData)
+    updateReminderData(scheduledBox.id, text)
     onClose()
   }
 
@@ -92,7 +87,7 @@ export default function ReminderDialog({ scheduledBox, onClose }: ReminderDialog
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {box.name} - {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}
+            {box.name} - {formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}
           </DialogTitle>
         </DialogHeader>
 

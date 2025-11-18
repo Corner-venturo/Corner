@@ -33,6 +33,11 @@ interface Workspace {
   updated_at: string
 }
 
+interface Employee {
+  id: string
+  [key: string]: unknown
+}
+
 export function PermanentRealtimeSubscriptions() {
   const user = useAuthStore(state => state.user)
   const { toast } = useToast()
@@ -120,43 +125,46 @@ export function PermanentRealtimeSubscriptions() {
       table: 'employees',
       subscriptionId: employeeSubscriptionId,
       handlers: {
-        onInsert: async employee => {
-          logger.log('🔔 [employees] 新增員工:', employee)
+        onInsert: async (employee: unknown) => {
+          const emp = employee as Employee
+          logger.log('🔔 [employees] 新增員工:', emp)
 
           // 更新 IndexedDB
           const { IndexedDBAdapter } = await import('@/stores/adapters/indexeddb-adapter')
           const indexedDB = new IndexedDBAdapter('employees')
-          await indexedDB.put(employee)
+          await indexedDB.put(emp as any)
 
           // 更新 Zustand 狀態
           useEmployeeStore.setState(state => {
-            const exists = state.items.some(item => item.id === employee.id)
+            const exists = state.items.some(item => item.id === emp.id)
             if (exists) return state
             return {
-              items: [...state.items, employee],
+              items: [...state.items, emp as any],
             }
           })
         },
-        onUpdate: async employee => {
-          logger.log('🔔 [employees] 更新員工:', employee)
+        onUpdate: async (employee: unknown) => {
+          const emp = employee as Employee
+          logger.log('🔔 [employees] 更新員工:', emp)
 
           const { IndexedDBAdapter } = await import('@/stores/adapters/indexeddb-adapter')
           const indexedDB = new IndexedDBAdapter('employees')
-          await indexedDB.put(employee)
+          await indexedDB.put(emp as any)
 
           useEmployeeStore.setState(state => ({
-            items: state.items.map(item => (item.id === employee.id ? employee : item)),
+            items: state.items.map(item => (item.id === emp.id ? emp as any : item)),
           }))
         },
-        onDelete: async employee => {
-          logger.log('🔔 [employees] 刪除員工:', employee)
+        onDelete: async (employee: unknown) => {
+          const emp = employee as Employee
+          logger.log('🔔 [employees] 刪除員工:', emp)
 
           const { IndexedDBAdapter } = await import('@/stores/adapters/indexeddb-adapter')
           const indexedDB = new IndexedDBAdapter('employees')
-          await indexedDB.delete(employee.id)
+          await indexedDB.delete(emp.id)
 
           useEmployeeStore.setState(state => ({
-            items: state.items.filter(item => item.id !== employee.id),
+            items: state.items.filter(item => item.id !== (employee as any).id),
           }))
         },
       },

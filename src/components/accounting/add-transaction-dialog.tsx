@@ -109,7 +109,8 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       name: newCategoryName.trim(),
       type: transactionType,
       color: transactionType === 'expense' ? '#C89B9B' : '#7B9B7E',
-    })
+      is_system: false,
+    } as any)
 
     if (newCategory) {
       setSelectedCategory(newCategory.id)
@@ -157,7 +158,6 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
         title="選擇交易類型"
         onCancel={handleClose}
         maxWidth="sm"
-        hideActions
       >
         <div className="grid grid-cols-2 gap-3">
           {transactionTypes.map(type => {
@@ -189,7 +189,6 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
         title={`選擇${transactionType === 'expense' ? '支出' : '收入'}分類`}
         onCancel={handleClose}
         maxWidth="md"
-        hideActions
       >
         {/* 返回按鈕 */}
         <button

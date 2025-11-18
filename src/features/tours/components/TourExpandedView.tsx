@@ -251,12 +251,11 @@ export function TourExpandedView({
         )}
         {activeTabs[tour.id] === 'costs' && (
           <TourCosts
-            {...({
-              tour,
-              triggerAdd: triggerCostAdd[tour.id] || false,
-              onTriggerAddComplete: () =>
-                setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false })),
-            } as unknown)}
+            tour={tour}
+            triggerAdd={triggerCostAdd[tour.id] || false}
+            onTriggerAddComplete={() =>
+              setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))
+            }
           />
         )}
         {activeTabs[tour.id] === 'documents' && (

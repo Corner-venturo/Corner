@@ -157,7 +157,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
       })
       .flatMap(request =>
         // 將每個請款單的項目展開成 CostPayment 格式
-        request.items.map((item: { id: string; category: string; supplier_name: string; description: string; unit_price: number; quantity: number; subtotal: number }) => ({
+        (request.items || []).map((item: { id: string; category: string; supplier_name: string; description: string; unit_price: number; quantity: number; subtotal: number }) => ({
           id: item.id,
           type: 'request' as const,
           tour_id: request.tour_id || tour.id,

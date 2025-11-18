@@ -16,9 +16,11 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
   useEffect(() => {
     if (
       !currentWeek ||
-      new Date(currentWeek.weekStart).getTime() !== getWeekStart(selectedWeek).getTime()
+      new Date(currentWeek.week_start).getTime() !== getWeekStart(selectedWeek).getTime()
     ) {
-      initializeCurrentWeek(selectedWeek)
+      // TODO: Get userId from auth context
+      const userId = 'temp-user-id' // Placeholder
+      initializeCurrentWeek(selectedWeek, userId)
     }
   }, [selectedWeek, currentWeek, initializeCurrentWeek])
 

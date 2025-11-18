@@ -55,15 +55,15 @@ import type {
   ReceiptOrder,
   Visa,
   Supplier,
-  Region,
   Member,
   QuoteItem,
   Todo,
   Employee,
+  TourAddOn,
 } from '@/stores/types'
-import type { TourAddOn } from '@/stores/types'
 import type { CalendarEvent } from '@/types/calendar.types'
 import type { Receipt, LinkPayLog } from '@/types/receipt.types'
+import type { Confirmation } from '@/types/confirmation.types'
 
 // ============================================
 // 業務實體（13 個）
@@ -76,7 +76,7 @@ import type { Receipt, LinkPayLog } from '@/types/receipt.types'
 export const useRealtimeForTours = createRealtimeHook<Tour>({
   tableName: 'tours',
   indexedDB: new IndexedDBAdapter<Tour>('tours'),
-  store: useTourStore,
+  store: useTourStore as any,
 })
 
 /**
@@ -86,7 +86,7 @@ export const useRealtimeForTours = createRealtimeHook<Tour>({
 export const useRealtimeForOrders = createRealtimeHook<Order>({
   tableName: 'orders',
   indexedDB: new IndexedDBAdapter<Order>('orders'),
-  store: useOrderStore,
+  store: useOrderStore as any,
 })
 
 /**
@@ -96,7 +96,7 @@ export const useRealtimeForOrders = createRealtimeHook<Order>({
 export const useRealtimeForQuotes = createRealtimeHook<Quote>({
   tableName: 'quotes',
   indexedDB: new IndexedDBAdapter<Quote>('quotes'),
-  store: useQuoteStore,
+  store: useQuoteStore as any,
 })
 
 /**
@@ -106,7 +106,7 @@ export const useRealtimeForQuotes = createRealtimeHook<Quote>({
 export const useRealtimeForCustomers = createRealtimeHook<Customer>({
   tableName: 'customers',
   indexedDB: new IndexedDBAdapter<Customer>('customers'),
-  store: useCustomerStore,
+  store: useCustomerStore as any,
 })
 
 /**
@@ -116,7 +116,7 @@ export const useRealtimeForCustomers = createRealtimeHook<Customer>({
 export const useRealtimeForItineraries = createRealtimeHook<Itinerary>({
   tableName: 'itineraries',
   indexedDB: new IndexedDBAdapter<Itinerary>('itineraries'),
-  store: useItineraryStore,
+  store: useItineraryStore as any,
 })
 
 /**
@@ -126,7 +126,7 @@ export const useRealtimeForItineraries = createRealtimeHook<Itinerary>({
 export const useRealtimeForPaymentRequests = createRealtimeHook<PaymentRequest>({
   tableName: 'payment_requests',
   indexedDB: new IndexedDBAdapter<PaymentRequest>('payment_requests'),
-  store: usePaymentRequestStore,
+  store: usePaymentRequestStore as any,
 })
 
 /**
@@ -136,7 +136,7 @@ export const useRealtimeForPaymentRequests = createRealtimeHook<PaymentRequest>(
 export const useRealtimeForDisbursementOrders = createRealtimeHook<DisbursementOrder>({
   tableName: 'disbursement_orders',
   indexedDB: new IndexedDBAdapter<DisbursementOrder>('disbursement_orders'),
-  store: useDisbursementOrderStore,
+  store: useDisbursementOrderStore as any,
 })
 
 /**
@@ -146,7 +146,7 @@ export const useRealtimeForDisbursementOrders = createRealtimeHook<DisbursementO
 export const useRealtimeForReceiptOrders = createRealtimeHook<ReceiptOrder>({
   tableName: 'receipt_orders',
   indexedDB: new IndexedDBAdapter<ReceiptOrder>('receipt_orders'),
-  store: useReceiptOrderStore,
+  store: useReceiptOrderStore as any,
 })
 
 /**
@@ -156,7 +156,7 @@ export const useRealtimeForReceiptOrders = createRealtimeHook<ReceiptOrder>({
 export const useRealtimeForVisas = createRealtimeHook<Visa>({
   tableName: 'visas',
   indexedDB: new IndexedDBAdapter<Visa>('visas'),
-  store: useVisaStore,
+  store: useVisaStore as any,
 })
 
 /**
@@ -166,17 +166,17 @@ export const useRealtimeForVisas = createRealtimeHook<Visa>({
 export const useRealtimeForSuppliers = createRealtimeHook<Supplier>({
   tableName: 'suppliers',
   indexedDB: new IndexedDBAdapter<Supplier>('suppliers'),
-  store: useSupplierStore,
+  store: useSupplierStore as any,
 })
 
 /**
  * 地區 Realtime Hook
  * 使用時機：進入 /regions 頁面
  */
-export const useRealtimeForRegions = createRealtimeHook<Region>({
+export const useRealtimeForRegions = createRealtimeHook<any>({
   tableName: 'regions',
-  indexedDB: new IndexedDBAdapter<Region>('regions'),
-  store: useRegionStore,
+  indexedDB: new IndexedDBAdapter<any>('regions'),
+  store: useRegionStore as any,
 })
 
 /**
@@ -186,7 +186,7 @@ export const useRealtimeForRegions = createRealtimeHook<Region>({
 export const useRealtimeForCalendarEvents = createRealtimeHook<CalendarEvent>({
   tableName: 'calendar_events',
   indexedDB: new IndexedDBAdapter<CalendarEvent>('calendar_events'),
-  store: useCalendarEventStore,
+  store: useCalendarEventStore as any,
 })
 
 /**
@@ -196,7 +196,7 @@ export const useRealtimeForCalendarEvents = createRealtimeHook<CalendarEvent>({
 export const useRealtimeForTodos = createRealtimeHook<Todo>({
   tableName: 'todos',
   indexedDB: new IndexedDBAdapter<Todo>('todos'),
-  store: useTodoStore,
+  store: useTodoStore as any,
 })
 
 // ============================================
@@ -210,7 +210,7 @@ export const useRealtimeForTodos = createRealtimeHook<Todo>({
 export const useRealtimeForMembers = createRealtimeHook<Member>({
   tableName: 'members',
   indexedDB: new IndexedDBAdapter<Member>('members'),
-  store: useMemberStore,
+  store: useMemberStore as any,
 })
 
 /**
@@ -220,7 +220,7 @@ export const useRealtimeForMembers = createRealtimeHook<Member>({
 export const useRealtimeForQuoteItems = createRealtimeHook<QuoteItem>({
   tableName: 'quote_items',
   indexedDB: new IndexedDBAdapter<QuoteItem>('quote_items'),
-  store: useQuoteItemStore,
+  store: useQuoteItemStore as any,
 })
 
 /**
@@ -230,7 +230,7 @@ export const useRealtimeForQuoteItems = createRealtimeHook<QuoteItem>({
 export const useRealtimeForTourAddons = createRealtimeHook<TourAddOn>({
   tableName: 'tour_addons',
   indexedDB: new IndexedDBAdapter<TourAddOn>('tour_addons'),
-  store: useTourAddOnStore,
+  store: useTourAddOnStore as any,
 })
 
 // ============================================
@@ -273,7 +273,7 @@ export { useChatRealtime as useRealtimeForMessages } from './useChatRealtime'
 export const useRealtimeForEmployees = createRealtimeHook<Employee>({
   tableName: 'employees',
   indexedDB: new IndexedDBAdapter<Employee>('employees'),
-  store: useEmployeeStore,
+  store: useEmployeeStore as any,
 })
 
 // ============================================
@@ -299,9 +299,9 @@ export const useRealtimeForEmployees = createRealtimeHook<Employee>({
  * 使用時機：進入 /finance/payments 或 /receipts 頁面
  */
 export const useRealtimeForReceipts = createRealtimeHook<Receipt>({
-  tableName: 'receipts',
-  indexedDB: new IndexedDBAdapter<Receipt>('receipts'),
-  store: useReceiptStore,
+  tableName: 'receipts' as any,
+  indexedDB: new IndexedDBAdapter<Receipt>('receipts' as any),
+  store: useReceiptStore as any,
 })
 
 /**
@@ -309,23 +309,19 @@ export const useRealtimeForReceipts = createRealtimeHook<Receipt>({
  * 使用時機：進入收款單詳情頁面（如果有 LinkPay）
  */
 export const useRealtimeForLinkPayLogs = createRealtimeHook<LinkPayLog>({
-  tableName: 'linkpay_logs',
-  indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs'),
-  store: useLinkPayLogStore,
+  tableName: 'linkpay_logs' as any,
+  indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs' as any),
+  store: useLinkPayLogStore as any,
 })
 
 /**
  * 確認單（航班/住宿）Realtime Hook
  * 使用時機：進入確認單列表頁面
  */
-export const useRealtimeForConfirmations = createRealtimeHook<
-  import('@/types/confirmation.types').Confirmation
->({
+export const useRealtimeForConfirmations = createRealtimeHook<Confirmation>({
   tableName: 'confirmations',
-  indexedDB: new IndexedDBAdapter<import('@/types/confirmation.types').Confirmation>(
-    'confirmations'
-  ),
-  store: useConfirmationStore,
+  indexedDB: new IndexedDBAdapter<Confirmation>('confirmations'),
+  store: useConfirmationStore as any,
 })
 
 // 4. 協作功能

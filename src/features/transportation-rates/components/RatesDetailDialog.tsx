@@ -71,16 +71,16 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   const handleCreate = async (data: Partial<TransportationRate>) => {
     const { error } = await supabase.from('transportation_rates').insert({
       ...data,
-      workspace_id: user?.workspace_id || null,
+      workspace_id: (user as any)?.workspace_id || null,
       country_id: data.country_id || '',
       country_name: countryName,
-      vehicle_type: data.vehicle_type || data.category || '',
-      price: data.price_twd || 0,
+      vehicle_type: data.vehicle_type || (data as any).category || '',
+      price: (data as any).price_twd || 0,
       currency: 'TWD',
       unit: 'trip',
       is_active: true,
       display_order: 0,
-    })
+    } as any)
 
     if (error) {
       logger.error('Error creating rate:', error)

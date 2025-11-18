@@ -56,12 +56,16 @@ export default function EditItineraryPage() {
 
         // 2. 找不到行程，嘗試從旅遊團載入
         const { useTourStore } = await import('@/stores')
-        const tour = useTourStore.getState().items.find(t => t.id === slug)
+        const tourStore = useTourStore.getState()
+        await tourStore.fetchAll()
+        const tour = tourStore.items.find(t => t.id === slug)
 
         if (tour) {
           // 從旅遊團建立行程資料
           const { useRegionsStore } = await import('@/stores')
-          const { countries, cities } = useRegionsStore.getState()
+          const regionsStore = useRegionsStore.getState()
+          await regionsStore.fetchAll()
+          const { countries, cities } = regionsStore
 
           // 找到國家和城市名稱
           const country = tour.country_id ? countries.find((c: { id: string }) => c.id === tour.country_id) : null

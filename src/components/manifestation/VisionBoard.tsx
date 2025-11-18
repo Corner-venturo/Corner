@@ -5,7 +5,7 @@ import { Type, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { VisionBoardData, VisionBoardText } from '@/types/manifestation'
-import { _cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 interface VisionBoardProps {
   data?: VisionBoardData

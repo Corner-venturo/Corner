@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Tour } from '@/stores/types'
 import { useOrderStore, useMemberStore, useTourAddOnStore, usePaymentRequestStore } from '@/stores'
-import { _Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { _Input } from '@/components/ui/input'
 import { Eye } from 'lucide-react'
-import { _cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { getFieldCoordinate } from '@/lib/formula-calculator'
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper'
 
@@ -34,8 +34,8 @@ interface EditingMember {
   isNew?: boolean
   order_number?: string
   contact_person?: string
-  assignedRoom?: string
-  isChildNoBed?: boolean
+  assigned_room?: string // Changed from assigned_room to match Member type
+  is_child_no_bed?: boolean // Changed from is_child_no_bed to match Member type
   reservationCode?: string
   addOns?: string[]
   refunds?: string[]
@@ -100,7 +100,7 @@ export const TourOperations = React.memo(function TourOperations({
       setTableMembers(prev =>
         prev.map(member =>
           member.id === member_id
-            ? { ...member, isChildNoBed: true, assignedRoom: undefined }
+            ? { ...member, is_child_no_bed: true, assigned_room: undefined }
             : member
         )
       )
@@ -111,7 +111,7 @@ export const TourOperations = React.memo(function TourOperations({
       setTableMembers(prev =>
         prev.map(member =>
           member.id === member_id
-            ? { ...member, isChildNoBed: true, assignedRoom: actualRoom }
+            ? { ...member, is_child_no_bed: true, assigned_room: actualRoom }
             : member
         )
       )
@@ -126,7 +126,7 @@ export const TourOperations = React.memo(function TourOperations({
       setTableMembers(prev =>
         prev.map(member =>
           member.id === member_id
-            ? { ...member, assignedRoom: roomValue || undefined, isChildNoBed: false }
+            ? { ...member, assigned_room: roomValue || undefined, is_child_no_bed: false }
             : member
         )
       )
@@ -139,7 +139,7 @@ export const TourOperations = React.memo(function TourOperations({
     const capacity = roomCapacity[roomValue] || 0
     const currentOccupants = tableMembers.filter(
       member =>
-        member.assignedRoom === roomValue && member.id !== excludeMemberId && !member.isChildNoBed // 不佔床的人不計入容量
+        member.assigned_room === roomValue && member.id !== excludeMemberId && !member.is_child_no_bed // 不佔床的人不計入容量
     )
     return currentOccupants.length >= capacity
   }
@@ -147,9 +147,9 @@ export const TourOperations = React.memo(function TourOperations({
   // 獲取房間使用情況（分別統計佔床和不佔床）
   const getRoomUsage = (roomValue: string) => {
     const capacity = roomCapacity[roomValue] || 0
-    const occupants = tableMembers.filter(member => member.assignedRoom === roomValue)
-    const bedCount = occupants.filter(member => !member.isChildNoBed).length // 佔床人數
-    const noBedCount = occupants.filter(member => member.isChildNoBed).length // 不佔床人數
+    const occupants = tableMembers.filter(member => member.assigned_room === roomValue)
+    const bedCount = occupants.filter(member => !member.is_child_no_bed).length // 佔床人數
+    const noBedCount = occupants.filter(member => member.is_child_no_bed).length // 不佔床人數
     return { bedCount, noBedCount, totalCount: occupants.length, capacity }
   }
 
@@ -207,8 +207,8 @@ export const TourOperations = React.memo(function TourOperations({
           order_number: relatedOrder?.order_number || '',
           contact_person: relatedOrder?.contact_person || '',
           // 保留現有的分房數據，不要覆蓋
-          assignedRoom: member.assigned_room,
-          isChildNoBed: member.is_child_no_bed,
+          assigned_room: member.assigned_room,
+          is_child_no_bed: member.is_child_no_bed,
         } as EditingMember
       })
 
@@ -221,7 +221,7 @@ export const TourOperations = React.memo(function TourOperations({
     const roomOptions: RoomOption[] = []
 
     tourPaymentRequests.forEach(request => {
-      request.items.forEach((item: { category: string; description: string }) => {
+      (request.items || []).forEach((item: { category: string; description: string }) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g)
@@ -258,12 +258,13 @@ export const TourOperations = React.memo(function TourOperations({
   // 處理資料更新
   const handleDataUpdate = useCallback(
     (newData: unknown[]) => {
-      setTableMembers(newData)
+      const typedData = newData as EditingMember[]
+      setTableMembers(typedData)
 
       // 更新到 store
-      newData.forEach(member => {
+      typedData.forEach(member => {
         if (member.id) {
-          updateMember(member.id, member)
+          updateMember(member.id, member as any)
         }
       })
     },
@@ -336,7 +337,7 @@ export const TourOperations = React.memo(function TourOperations({
     { key: 'passportNumber', label: '護照號碼', width: 100 },
     { key: 'passportExpiry', label: '護照效期', width: 100 },
     { key: 'reservationCode', label: '訂位代號', width: 100 },
-    { key: 'assignedRoom', label: '分房', width: 120 },
+    { key: 'assigned_room', label: '分房', width: 120 },
 
     // 動態欄位
     ...(extraFields?.addOns
@@ -391,9 +392,9 @@ export const TourOperations = React.memo(function TourOperations({
             index: index + 1,
             age: member.age > 0 ? `${member.age}歲` : '',
             gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
-            assignedRoom: member.isChildNoBed
-              ? `不佔床${member.assignedRoom ? ` - ${member.assignedRoom}` : ''}`
-              : member.assignedRoom || '未分配',
+            assigned_room: member.is_child_no_bed
+              ? `不佔床${member.assigned_room ? ` - ${member.assigned_room}` : ''}`
+              : member.assigned_room || '未分配',
           }))}
           tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id)}
           onDataUpdate={handleDataUpdate}

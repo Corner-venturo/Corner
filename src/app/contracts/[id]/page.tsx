@@ -81,15 +81,13 @@ export default function ContractDetailPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        {...({
-          title: '合約詳情',
-          icon: FileSignature,
-          breadcrumb: [
-            { label: '首頁', href: '/' },
-            { label: '合約管理', href: '/contracts' },
-            { label: '合約詳情', href: `/contracts/${tourId}` },
-          ],
-        } as unknown)}
+        title="合約詳情"
+        icon={FileSignature}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '合約管理', href: '/contracts' },
+          { label: '合約詳情', href: `/contracts/${tourId}` },
+        ]}
       />
 
       <div className="flex-1 overflow-auto p-6">
@@ -134,7 +132,7 @@ export default function ContractDetailPage() {
               <div>
                 <div className="text-sm text-morandi-secondary">合約範本</div>
                 <div className="text-morandi-primary font-medium">
-                  {CONTRACT_TEMPLATE_LABELS[tour.contract_template]}
+                  {CONTRACT_TEMPLATE_LABELS[tour.contract_template as any]}
                 </div>
               </div>
               <div>

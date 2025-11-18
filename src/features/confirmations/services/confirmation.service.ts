@@ -15,20 +15,20 @@ export const confirmationService = {
       .from('confirmations')
       .select('*')
       .eq('workspace_id', workspaceId)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as any
 
     if (error) throw error
-    return data || []
+    return (data || []) as any
   },
 
   /**
    * 取得單一確認單
    */
   async fetchById(id: string): Promise<Confirmation | null> {
-    const { data, error } = await supabase.from('confirmations').select('*').eq('id', id).single()
+    const { data, error } = await supabase.from('confirmations').select('*').eq('id', id).single() as any
 
     if (error) throw error
-    return data
+    return data as any
   },
 
   /**
@@ -39,12 +39,12 @@ export const confirmationService = {
   ): Promise<Confirmation> {
     const { data, error } = await supabase
       .from('confirmations')
-      .insert(confirmation)
+      .insert(confirmation as any)
       .select()
-      .single()
+      .single() as any
 
     if (error) throw error
-    return data
+    return data as any
   },
 
   /**
@@ -53,13 +53,13 @@ export const confirmationService = {
   async update(id: string, updates: Partial<Confirmation>): Promise<Confirmation> {
     const { data, error } = await supabase
       .from('confirmations')
-      .update(updates)
+      .update(updates as any)
       .eq('id', id)
       .select()
-      .single()
+      .single() as any
 
     if (error) throw error
-    return data
+    return data as any
   },
 
   /**
@@ -83,10 +83,10 @@ export const confirmationService = {
       .select('*')
       .eq('workspace_id', workspaceId)
       .eq('type', type)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as any
 
     if (error) throw error
-    return data || []
+    return (data || []) as any
   },
 
   /**
@@ -98,10 +98,10 @@ export const confirmationService = {
       .select('*')
       .eq('workspace_id', workspaceId)
       .eq('booking_number', bookingNumber)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as any
 
     if (error) throw error
-    return data || []
+    return (data || []) as any
   },
 
   /**
@@ -116,9 +116,9 @@ export const confirmationService = {
       .select('*')
       .eq('workspace_id', workspaceId)
       .eq('status', status)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as any
 
     if (error) throw error
-    return data || []
+    return (data || []) as any
   },
 }

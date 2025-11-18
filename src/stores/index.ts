@@ -97,13 +97,13 @@ export const useMemberStore = createStore<Member>('members')
  * 報價項目 Store
  * 無獨立編號，依附於報價單
  */
-export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>('quote_items')
+export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>('quote_items' as any)
 
 /**
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons')
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as any)
 
 // ============================================
 // 系統管理 Stores（無編號）
@@ -135,10 +135,10 @@ export { useSupplierCategoryStore } from './supplier-category-store'
 export { useCostTemplateStore } from './cost-template-store'
 
 // 企業客戶 Store
-export const useCompanyStore = createStore<import('./types').Company>('companies')
+export const useCompanyStore = createStore<import('./types').Company>('companies' as any)
 
 // 企業聯絡人 Store
-export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts')
+export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts' as any)
 
 // 地區 Store（舊版，保留向後相容）
 export const useRegionStore = createStore<Region>('regions')

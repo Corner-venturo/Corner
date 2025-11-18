@@ -298,8 +298,8 @@ export function OrderMembersExpandable({
   const checkPassportExpiry = (expiryDate: string) => {
     if (!departureDate) return
 
-    const expiry = new Date(expiryDate)
-    const departure = new Date(departureDate)
+    const expiry = new Date(expiryDate || '')
+    const departure = new Date(departureDate || '')
     const sixMonthsBeforeDeparture = new Date(departure)
     sixMonthsBeforeDeparture.setMonth(sixMonthsBeforeDeparture.getMonth() - 6)
 

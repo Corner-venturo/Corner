@@ -8,9 +8,9 @@
  */
 
 // import { useAutoSync } from '@/lib/offline/auto-sync-provider'
-import { _Badge } from '@/components/ui/badge'
-import { _Button } from '@/components/ui/button'
-import { _AlertCircle } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { AlertCircle } from 'lucide-react'
 import {} from '@/components/ui/tooltip'
 
 export function SyncIndicator() {

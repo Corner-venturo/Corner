@@ -74,7 +74,7 @@ export default function OrderOverviewPage() {
               <div className="flex justify-between items-center py-2 border-b border-border/30">
                 <span className="text-morandi-secondary">最後更新</span>
                 <span className="text-morandi-primary">
-                  {new Date(order.updated_at).toLocaleDateString()}
+                  {new Date(order.updated_at || '').toLocaleDateString()}
                 </span>
               </div>
               {tour && (
@@ -127,19 +127,19 @@ export default function OrderOverviewPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-primary mb-1">
-                  NT$ {order.total_amount.toLocaleString()}
+                  NT$ {(order.total_amount ?? 0).toLocaleString()}
                 </div>
                 <div className="text-morandi-secondary text-sm">總金額</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-green mb-1">
-                  NT$ {order.paid_amount.toLocaleString()}
+                  NT$ {(order.paid_amount ?? 0).toLocaleString()}
                 </div>
                 <div className="text-morandi-secondary text-sm">已收款</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-red mb-1">
-                  NT$ {order.remaining_amount.toLocaleString()}
+                  NT$ {(order.remaining_amount ?? 0).toLocaleString()}
                 </div>
                 <div className="text-morandi-secondary text-sm">待收款</div>
               </div>

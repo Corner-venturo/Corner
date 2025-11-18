@@ -226,7 +226,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       const { error: updateError } = await supabase
         .from('tours')
         .update({
-          closing_status: 'closed',
+          status: '結案',
           closing_date: new Date().toISOString().split('T')[0]
         })
         .eq('id', tour.id)

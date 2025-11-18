@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { User } from './types'
-import { _useUserStore } from './user-store'
+import { useUserStore } from './user-store'
 import { generateToken, type AuthPayload } from '@/lib/auth'
 import { useLocalAuthStore, LocalProfile } from '@/lib/auth/local-auth-manager'
 import { OfflineAuthService } from '@/services/offline-auth.service'
@@ -538,13 +538,13 @@ export const useAuthStore = create<AuthState>(
               english_name: profile.english_name,
               display_name: profile.display_name,
               chinese_name: profile.display_name, // 從 profile 取得
-              personal_info: profile.personal_info || {},
-              job_info: profile.job_info || {},
-              salary_info: profile.salary_info || {},
+              personal_info: profile.personal_info || {} as any,
+              job_info: profile.job_info || {} as any,
+              salary_info: profile.salary_info || {} as any,
               permissions: profile.permissions || [],
               roles: profile.roles || [], // 附加身份標籤
-              attendance: profile.attendance || { leave_records: [], overtime_records: [] },
-              contracts: profile.contracts || [],
+              attendance: profile.attendance || { leave_records: [], overtime_records: [] } as any,
+              contracts: profile.contracts || [] as any,
               status: profile.status as 'active' | 'probation' | 'leave' | 'terminated',
               workspace_id: profile.workspace_id, // ✅ 從資料庫讀取 workspace_id
               created_at: profile.created_at || new Date().toISOString(),

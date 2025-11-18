@@ -54,7 +54,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     ]
 
     useEffect(() => {
-      const existingMembers = orderMembers.map(member => ({ ...member }))
+      const existingMembers = orderMembers.map(member => ({ ...member })) as any[]
 
       // 確保至少有member_count行
       while (existingMembers.length < member_count) {
@@ -67,23 +67,22 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           passport_expiry: '',
           id_number: '',
           gender: '',
-          age: 0,
           reservation_code: '',
           add_ons: [],
           refunds: [],
           isNew: true,
-        })
+        } as any)
       }
 
-      setTableMembers(existingMembers)
+      setTableMembers(existingMembers as any)
     }, [orderMembers, member_count, order_id])
 
     // 自動儲存成員
     const autoSaveMember = useCallback(
-      async (member: EditingMember, index: number) => {
-        if (member.isNew && member.name.trim()) {
+      async (member: any, index: number) => {
+        if (member.isNew && member.name?.trim()) {
           const { isNew, ...memberData } = member
-          const created = await memberStore.create(memberData as unknown)
+          const created = await memberStore.create(memberData as any)
           const newId = created?.id
 
           const updatedMembers = [...tableMembers]
@@ -99,19 +98,19 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
     // 處理資料更新 (用於 ReactDataSheet)
     const handleDataUpdate = useCallback(
-      (newData: EditingMember[]) => {
+      (newData: any[]) => {
         // 處理自動計算欄位
-        const processedData = newData.map(member => {
+        const processedData = newData.map((member: any) => {
           const processed = { ...member }
 
           // 從身分證號自動計算性別和年齡
           if (processed.id_number) {
             processed.gender = getGenderFromIdNumber(processed.id_number)
-            processed.age = calculateAge(processed.id_number, departure_date) as number
+            processed.age = calculateAge(processed.id_number, departure_date) ?? 0
           }
           // 從生日計算年齡
           else if (processed.birthday) {
-            processed.age = calculateAge(processed.birthday as string, departure_date) as number
+            processed.age = calculateAge(String(processed.birthday), departure_date) ?? 0
           }
 
           return processed
@@ -129,7 +128,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
     // 新增行
     const addRow = () => {
-      const newMember: EditingMember = {
+      const newMember: any = {
         order_id,
         name: '',
         name_en: '',
@@ -138,7 +137,6 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         passport_expiry: '',
         id_number: '',
         gender: '',
-        age: 0,
         reservation_code: '',
         add_ons: [],
         refunds: [],
@@ -157,13 +155,13 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         {/* 使用 ReactDataSheet 替代原來的表格 */}
         <ReactDataSheetWrapper
           columns={dataSheetColumns}
-          data={tableMembers.map((member, index) => ({
+          data={tableMembers.map((member: any, index: number) => ({
             ...member,
             index: index + 1,
-            age: member.age > 0 ? `${member.age}歲` : '',
-            gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
+            age: ((member as any).age ?? 0) > 0 ? `${(member as any).age}歲` : '',
+            gender: (member as any).gender === 'M' ? '男' : (member as any).gender === 'F' ? '女' : '',
           }))}
-          onDataUpdate={handleDataUpdate}
+          onDataUpdate={handleDataUpdate as any}
           className="min-h-[400px]"
         />
 

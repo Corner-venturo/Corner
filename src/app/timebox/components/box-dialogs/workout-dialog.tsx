@@ -10,6 +10,9 @@ import { Input } from '@/components/ui/input'
 import { useTimeboxStore, WorkoutData, WorkoutExercise, ScheduledBox } from '@/stores/timebox-store'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
+import { generateUUID } from '@/lib/utils/uuid'
+
+const generateId = () => generateUUID()
 
 interface WorkoutDialogProps {
   scheduledBox: ScheduledBox
@@ -39,7 +42,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
   })
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  const box = boxes.find(b => b.id === scheduledBox.boxId)
+  const box = boxes.find(b => b.id === scheduledBox.box_id)
 
   // 即時獲取最新的 scheduledBox 資料
   const currentScheduledBox = scheduledBoxes.find(sb => sb.id === scheduledBox.id) || scheduledBox
@@ -63,6 +66,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
 
     setIsAdding(true)
     addWorkoutExercise(scheduledBox.id, {
+      id: generateId(),
       ...exerciseForm,
       setsCompleted: Array(exerciseForm.sets).fill(false),
       completedSetsTime: Array(exerciseForm.sets).fill(null),
@@ -200,7 +204,7 @@ export default function WorkoutDialog({ scheduledBox, onClose }: WorkoutDialogPr
             <span>{box.name}</span>
           </DialogTitle>
           <p className="text-sm text-gray-500">
-            {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}
+            {formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}
           </p>
         </DialogHeader>
 

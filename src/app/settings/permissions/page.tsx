@@ -271,8 +271,8 @@ export default function PermissionsManagementPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {workspaces
-                    .filter(w => w.is_active)
-                    .map(ws => (
+                    .filter((w: any) => w.is_active)
+                    .map((ws: any) => (
                       <SelectItem key={ws.id} value={ws.id}>
                         {ws.name}
                       </SelectItem>

@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from 'react'
 import { Employee } from '@/stores/types'
-import { _Clock } from 'lucide-react'
+import { Clock } from 'lucide-react'
 
 interface AttendanceTabProps {
   employee: Employee

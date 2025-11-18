@@ -35,7 +35,7 @@ export function DevAutoLogin() {
       }
 
       // 登入
-      login(devUser)
+      login(devUser as any)
 
       // 導向旅遊團頁面
       router.push('/tours')

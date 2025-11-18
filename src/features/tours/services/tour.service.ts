@@ -21,7 +21,7 @@ class TourService extends BaseService<Tour> {
       getAll: () => store.items,
       getById: (id: string) => store.items.find(t => t.id === id),
       add: async (tour: Tour) => {
-        const result = await store.create(tour)
+        const result = await store.create(tour as any)
         return result || tour
       },
       update: async (id: string, data: Partial<Tour>) => {
@@ -187,7 +187,7 @@ class TourService extends BaseService<Tour> {
         status: newStatus,
         // 可以在這裡記錄狀態變更的原因和時間
         updated_at: this.now(),
-      })
+      } as any)
     } catch (error) {
       throw error
     }
@@ -259,11 +259,11 @@ class TourService extends BaseService<Tour> {
       name: `${targetYear}年度簽證專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: 'special',
+      status: 'special' as any,
       location: '簽證專用',
       price: 0,
       max_participants: 9999,
-      contract_status: 'pending',
+      contract_status: 'pending' as any,
       total_revenue: 0,
       total_cost: 0,
       profit: 0,
@@ -271,7 +271,7 @@ class TourService extends BaseService<Tour> {
       updated_at: this.now(),
     }
 
-    return await this.create(visaTour as Tour)
+    return await this.create(visaTour as any)
   }
 
   async getOrCreateEsimTour(year?: number): Promise<Tour> {
@@ -335,11 +335,11 @@ class TourService extends BaseService<Tour> {
       name: `${targetYear}年度網卡專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: 'special',
+      status: 'special' as any,
       location: '網卡專用',
       price: 0,
       max_participants: 9999,
-      contract_status: 'pending',
+      contract_status: 'pending' as any,
       total_revenue: 0,
       total_cost: 0,
       profit: 0,
@@ -347,7 +347,7 @@ class TourService extends BaseService<Tour> {
       updated_at: this.now(),
     }
 
-    return await this.create(esimTour as Tour)
+    return await this.create(esimTour as any)
   }
 
   /**

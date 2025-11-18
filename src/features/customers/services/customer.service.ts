@@ -1,16 +1,16 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
-import { Customer } from '@/types/customer.types'
+import { Customer } from '@/types/models'
 import { useCustomerStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 
-class CustomerService extends BaseService<Customer> {
+class CustomerService extends BaseService<any> {
   protected resourceName = 'customers'
 
   protected getStore = (): StoreOperations<Customer> => {
     const store = useCustomerStore.getState()
     return {
-      getAll: () => store.items,
-      getById: (id: string) => store.items.find(c => c.id === id),
+      getAll: () => store.items as Customer[],
+      getById: (id: string) => store.items.find((c: any) => c.id === id) as Customer | undefined,
       add: async (customer: Customer) => {
         // Type assertion needed: store.create expects Database type, but we work with domain Customer type
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,7 +18,7 @@ class CustomerService extends BaseService<Customer> {
         return customer
       },
       update: async (id: string, data: Partial<Customer>) => {
-        await store.update(id, data)
+        await store.update(id, data as any)
       },
       delete: async (id: string) => {
         await store.delete(id)
@@ -62,13 +62,13 @@ class CustomerService extends BaseService<Customer> {
   searchCustomers(searchTerm: string): Customer[] {
     const store = useCustomerStore.getState()
     const term = searchTerm.toLowerCase()
-    return store.items.filter(
-      c =>
-        c.name.toLowerCase().includes(term) ||
-        c.email?.toLowerCase().includes(term) ||
-        c.phone?.includes(term) ||
-        c.national_id?.toLowerCase().includes(term)
-    )
+    return (store.items as any[]).filter(
+      (c: any) =>
+        (c.name || '').toLowerCase().includes(term) ||
+        (c.email || '').toLowerCase().includes(term) ||
+        (c.phone || '').includes(term) ||
+        (c.national_id || '').toLowerCase().includes(term)
+    ) as Customer[]
   }
 
   getCustomersByTour(_tour_id: string): Customer[] {
@@ -82,7 +82,7 @@ class CustomerService extends BaseService<Customer> {
 
   getVIPCustomers(): Customer[] {
     const store = useCustomerStore.getState()
-    return store.items.filter(c => c.is_vip)
+    return (store.items as any[]).filter((c: any) => c.is_vip) as Customer[]
   }
 }
 

@@ -30,6 +30,7 @@ import {
   ImageIcon,
   Bus,
   CheckSquare,
+  Plane,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -114,6 +115,12 @@ const menuItems: MenuItem[] = [
         label: '出納管理',
         icon: Wallet,
         requiredPermission: 'disbursement',
+      },
+      {
+        href: '/finance/vouchers',
+        label: '會計傳票',
+        icon: FileText,
+        requiredPermission: 'vouchers',
       },
       {
         href: '/finance/travel-invoice',
@@ -469,9 +476,9 @@ export function Sidebar() {
           'hidden lg:flex',
           sidebarCollapsed
             ? isSidebarHovered || isDropdownHovered
-              ? 'w-[190px]'
+              ? 'w-[170px]'
               : 'w-16'
-            : 'w-[190px]'
+            : 'w-[170px]'
         )}
       >
         {/* Logo區域 */}
@@ -506,14 +513,14 @@ export function Sidebar() {
 
         {/* 導航選單 */}
         <nav className="flex-1 py-4 overflow-y-auto min-h-0">
-          <ul className="space-y-1">
+          <ul className="space-y-px">
             {visibleMenuItems.map(item => (
               <li key={item.href}>
                 {item.children ? (
                   // 有子選單的項目
                   <div
                     className={cn(
-                      'w-full relative h-10 text-sm text-morandi-secondary transition-all duration-200 cursor-pointer',
+                      'w-full relative h-9 text-xs text-morandi-secondary transition-all duration-200 cursor-pointer',
                       'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
                       (is_active(item.href) || clickedItem === item.href) &&
                         'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
@@ -523,12 +530,12 @@ export function Sidebar() {
                     onClick={e => handleClick(item, e.currentTarget)}
                   >
                     <item.icon
-                      size={20}
+                      size={18}
                       className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2"
                     />
                     <span
                       className={cn(
-                        'ml-[58px] block text-left leading-10 transition-opacity duration-300',
+                        'ml-[58px] block text-left leading-9 transition-opacity duration-300',
                         sidebarCollapsed
                           ? isSidebarHovered || isDropdownHovered
                             ? 'opacity-100 pointer-events-auto'
@@ -554,19 +561,19 @@ export function Sidebar() {
                     href={item.href}
                     prefetch={false}
                     className={cn(
-                      'w-full relative block h-10 text-sm text-morandi-secondary transition-all duration-200',
+                      'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
                       'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
                       is_active(item.href) &&
                         'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold shadow-sm'
                     )}
                   >
                     <item.icon
-                      size={20}
+                      size={18}
                       className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2"
                     />
                     <span
                       className={cn(
-                        'ml-[58px] block text-left leading-10 transition-opacity duration-300',
+                        'ml-[58px] block text-left leading-9 transition-opacity duration-300',
                         sidebarCollapsed
                           ? isSidebarHovered || isDropdownHovered
                             ? 'opacity-100 pointer-events-auto'
@@ -602,7 +609,7 @@ export function Sidebar() {
             </div>
           )}
 
-          <ul className="space-y-1">
+          <ul className="space-y-px">
             {/* 個人工具選單 */}
             {visiblePersonalToolItems.map(item => (
               <li key={item.href}>
@@ -610,19 +617,19 @@ export function Sidebar() {
                   href={item.href}
                   prefetch={false}
                   className={cn(
-                    'w-full relative block h-10 text-sm text-morandi-secondary transition-all duration-200',
+                    'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
                     'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
                     is_active(item.href) &&
                       'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold shadow-sm'
                   )}
                 >
                   <item.icon
-                    size={20}
+                    size={18}
                     className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2"
                   />
                   <span
                     className={cn(
-                      'ml-[58px] block text-left leading-10 transition-opacity duration-300',
+                      'ml-[58px] block text-left leading-9 transition-opacity duration-300',
                       sidebarCollapsed
                         ? isSidebarHovered || isDropdownHovered
                           ? 'opacity-100'
@@ -656,7 +663,7 @@ export function Sidebar() {
                 href="/settings"
                 prefetch={false}
                 className={cn(
-                  'w-full relative block h-10 text-sm text-morandi-secondary transition-all duration-200',
+                  'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
                   'hover:bg-morandi-gold/5 hover:text-morandi-gold hover:border-l-3 hover:border-morandi-gold hover:shadow-sm',
                   mounted &&
                     pathname === '/settings' &&
@@ -664,12 +671,12 @@ export function Sidebar() {
                 )}
               >
                 <Settings
-                  size={20}
+                  size={18}
                   className="absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 />
                 <span
                   className={cn(
-                    'ml-[58px] block text-left leading-10 transition-opacity duration-300',
+                    'ml-[58px] block text-left leading-9 transition-opacity duration-300',
                     sidebarCollapsed
                       ? isSidebarHovered || isDropdownHovered
                         ? 'opacity-100 pointer-events-auto'

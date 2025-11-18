@@ -142,7 +142,7 @@ export default function WorkspacesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => toggleActive(workspace.id, workspace.is_active)}
+                onClick={() => toggleActive(workspace.id, workspace.is_active ?? false)}
                 className="flex-1"
               >
                 {workspace.is_active ? '停用' : '啟用'}

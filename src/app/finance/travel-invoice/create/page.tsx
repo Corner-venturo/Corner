@@ -78,8 +78,8 @@ export default function CreateInvoicePage() {
 
     // 自動計算金額
     if (field === 'item_price' || field === 'item_count') {
-      const price = field === 'item_price' ? value : newItems[index].item_price
-      const count = field === 'item_count' ? value : newItems[index].item_count
+      const price = Number(field === 'item_price' ? value : newItems[index].item_price)
+      const count = Number(field === 'item_count' ? value : newItems[index].item_count)
       newItems[index].itemAmt = price * count
     }
 

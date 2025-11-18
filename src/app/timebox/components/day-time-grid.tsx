@@ -62,8 +62,8 @@ export default function DayTimeGrid({ selectedDay, timeInterval }: DayTimeGridPr
     const endMinutes = startMinutes + duration
 
     return scheduledBoxes.some(box => {
-      if (box.dayOfWeek !== dayOfWeek) return false
-      if (currentWeek?.id && box.weekId !== currentWeek.id) return false
+      if (box.day_of_week !== dayOfWeek) return false
+      if (currentWeek?.id && box.week_id !== currentWeek.id) return false
 
       const boxStart = timeToMinutes(box.start_time)
       const boxEnd = boxStart + box.duration
@@ -92,8 +92,8 @@ export default function DayTimeGrid({ selectedDay, timeInterval }: DayTimeGridPr
   const handleCellClick = (timeSlot: string) => {
     const startMinutes = timeToMinutes(timeSlot)
     const overlap = scheduledBoxes.some(box => {
-      if (box.dayOfWeek !== dayOfWeek) return false
-      if (currentWeek?.id && box.weekId !== currentWeek.id) return false
+      if (box.day_of_week !== dayOfWeek) return false
+      if (currentWeek?.id && box.week_id !== currentWeek.id) return false
       const boxStart = timeToMinutes(box.start_time)
       const boxEnd = boxStart + box.duration
       return startMinutes >= boxStart && startMinutes < boxEnd
@@ -120,9 +120,9 @@ export default function DayTimeGrid({ selectedDay, timeInterval }: DayTimeGridPr
     }
 
     addScheduledBox({
-      boxId,
-      weekId: currentWeek.id,
-      dayOfWeek,
+      box_id: boxId,
+      week_id: currentWeek.id,
+      day_of_week: dayOfWeek,
       start_time,
       duration,
       completed: false,
@@ -137,8 +137,8 @@ export default function DayTimeGrid({ selectedDay, timeInterval }: DayTimeGridPr
 
   const boxesInDay = (scheduledBoxes || [])
     .filter(box => {
-      if (box.dayOfWeek !== dayOfWeek) return false
-      if (currentWeek?.id && box.weekId !== currentWeek.id) return false
+      if (box.day_of_week !== dayOfWeek) return false
+      if (currentWeek?.id && box.week_id !== currentWeek.id) return false
       return true
     })
     .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time))

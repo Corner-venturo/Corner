@@ -39,6 +39,7 @@ type StatusType =
   | 'order'
   | 'visa'
   | 'esim'
+  | 'voucher'
 
 /**
  * 所有狀態配置的中央存儲
@@ -328,6 +329,36 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       label: '錯誤',
       icon: XCircle,
       bgColor: 'bg-morandi-red/10',
+    },
+    default: {
+      color: 'text-morandi-secondary',
+      label: '未知',
+      icon: AlertCircle,
+    },
+  },
+
+  // 會計傳票狀態
+  voucher: {
+    draft: {
+      color: 'text-morandi-gold',
+      label: '草稿',
+      icon: FileText,
+      bgColor: 'bg-morandi-gold/10',
+      borderColor: 'border-morandi-gold',
+    },
+    posted: {
+      color: 'text-morandi-green',
+      label: '已過帳',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+      borderColor: 'border-morandi-green',
+    },
+    void: {
+      color: 'text-morandi-red',
+      label: '已作廢',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
+      borderColor: 'border-morandi-red',
     },
     default: {
       color: 'text-morandi-secondary',

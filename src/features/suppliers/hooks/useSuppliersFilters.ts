@@ -27,11 +27,11 @@ export function useSuppliersFilters({ suppliers, searchQuery }: UseSuppliersFilt
     const query = searchQuery.toLowerCase()
     return suppliersArray.filter(supplier => {
       return (
-        supplier.name.toLowerCase().includes(query) ||
+        (supplier.name || '').toLowerCase().includes(query) ||
         (supplier.code && supplier.code.toLowerCase().includes(query)) ||
-        (supplier.country && supplier.country.toLowerCase().includes(query)) ||
-        (supplier.location && supplier.location.toLowerCase().includes(query)) ||
-        supplier.contact.contact_person.toLowerCase().includes(query)
+        (supplier.contact_person && supplier.contact_person.toLowerCase().includes(query)) ||
+        (supplier.email && supplier.email.toLowerCase().includes(query)) ||
+        (supplier.phone && supplier.phone.includes(query))
       )
     })
   }, [suppliers, searchQuery])

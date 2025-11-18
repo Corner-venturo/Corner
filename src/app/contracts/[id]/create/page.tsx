@@ -76,15 +76,13 @@ export default function CreateContractPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        {...({
-          title: '建立合約',
-          icon: FileSignature,
-          breadcrumb: [
-            { label: '首頁', href: '/' },
-            { label: '合約管理', href: '/contracts' },
-            { label: '建立合約', href: `/contracts/${tourId}/create` },
-          ],
-        } as unknown)}
+        title="建立合約"
+        icon={FileSignature}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '合約管理', href: '/contracts' },
+          { label: '建立合約', href: `/contracts/${tourId}/create` },
+        ]}
       />
 
       <div className="flex-1 overflow-auto p-6">

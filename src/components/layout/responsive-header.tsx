@@ -42,7 +42,7 @@ interface ResponsiveHeaderProps {
 }
 
 export const ResponsiveHeader = memo(function ResponsiveHeader(props: ResponsiveHeaderProps) {
-  const { _sidebarCollapsed } = useAuthStore()
+  const { sidebarCollapsed } = useAuthStore()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (

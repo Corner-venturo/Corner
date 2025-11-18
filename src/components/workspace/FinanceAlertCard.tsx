@@ -3,7 +3,7 @@
 import { AlertTriangle, ChevronDown, ChevronUp, Send } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { _cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { useTourStore } from '@/stores'
 
 interface FinanceAlertCardProps {

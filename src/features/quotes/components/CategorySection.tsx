@@ -35,15 +35,18 @@ const categoryIcons: Record<string, React.ElementType> = {
   guide: Users,
 }
 
-interface TransportationRate {
+interface CategoryTransportationRate {
   id: string
   country_id: string
   country_name: string
   vehicle_type: string
   price: number
+  price_twd?: number
   currency: string
   unit: string
   notes: string | null
+  route?: string
+  category?: string
 }
 
 interface Country {
@@ -95,7 +98,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   const [isRatesDialogOpen, setIsRatesDialogOpen] = useState(false)
   const [countries, setCountries] = useState<{ name: string }[]>([])
   const [selectedCountry, setSelectedCountry] = useState<string>('')
-  const [transportRates, setTransportRates] = useState<TransportationRate[]>([])
+  const [transportRates, setTransportRates] = useState<CategoryTransportationRate[]>([])
   const [loading, setLoading] = useState(false)
 
   // 載入車資資料庫中有資料的國家列表
@@ -112,9 +115,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
     if (data) {
       const uniqueCountries = Array.from(
-        new Set(data.map(item => item.country_name))
-      ).map(name => ({ name }))
-      setCountries(uniqueCountries)
+        new Set((data as any).map((item: any) => item.country_name))
+      ).map((name: any) => ({ name }))
+      setCountries(uniqueCountries as any)
       setIsCountryDialogOpen(true)
     }
   }
@@ -132,7 +135,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       .order('display_order')
 
     if (data) {
-      setTransportRates(data)
+      setTransportRates(data as any)
       setIsCountryDialogOpen(false)
       setIsRatesDialogOpen(true)
     }
@@ -150,11 +153,11 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       .eq('is_active', true)
       .order('display_order')
 
-    if (data) setTransportRates(data)
+    if (data) setTransportRates(data as any)
   }
 
   // 插入車資到團體分攤
-  const handleInsertRate = (rate: TransportationRate) => {
+  const handleInsertRate = (rate: CategoryTransportationRate) => {
     logger.log('🔄 [CategorySection] 插入車資:', rate)
 
     // 建立描述：使用 route（例如「包車1天（100公里／10小時）」）
@@ -169,7 +172,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       total: rate.price_twd || 0,
       note: rate.notes || '',
       is_group_cost: true, // 標記為團體費用
-    }
+    } as any
 
     logger.log('📝 [CategorySection] 插入項目:', newItem)
 
@@ -453,9 +456,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           isOpen={isRatesDialogOpen}
           onClose={() => setIsRatesDialogOpen(false)}
           countryName={selectedCountry}
-          rates={transportRates}
+          rates={transportRates as any}
           onUpdate={refreshRates}
-          onInsert={handleInsertRate}
+          onInsert={handleInsertRate as any}
           isEditMode={false}
         />
       )}

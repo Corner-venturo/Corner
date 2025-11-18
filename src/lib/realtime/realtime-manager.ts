@@ -143,7 +143,7 @@ class RealtimeManager {
       )
 
       // 訂閱並處理狀態變更
-      channel.subscribe(status => {
+      channel.subscribe((status: any) => {
         this.handleSubscriptionStatus(subscriptionId, status)
       })
 

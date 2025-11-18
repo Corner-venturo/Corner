@@ -7,11 +7,11 @@ import { useAuthStore } from '@/stores/auth-store'
 
 export default function FitnessSettingsPage() {
   const router = useRouter()
-  const { user, signOut } = useAuthStore()
+  const { user, logout } = useAuthStore()
 
   const handleLogout = async () => {
     if (confirm('確定要登出嗎？')) {
-      await signOut()
+      await logout()
       router.push('/login')
     }
   }

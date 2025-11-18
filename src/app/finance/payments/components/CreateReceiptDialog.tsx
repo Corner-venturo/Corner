@@ -17,8 +17,7 @@ import { Plus } from 'lucide-react'
 import { PaymentItemForm } from './PaymentItemForm'
 import { Combobox } from '@/components/ui/combobox'
 import { useTourStore } from '@/stores'
-import type { ReceiptItem } from '@/stores'
-import type { Order } from '@/stores/order-store'
+import type { ReceiptItem, Order } from '@/stores'
 
 const RECEIPT_TYPES = {
   BANK_TRANSFER: 0,

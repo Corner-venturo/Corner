@@ -202,7 +202,7 @@ export class BackgroundSyncService {
           }
 
           // 🔥 先檢查 syncqueue 是否有此項目的刪除記錄
-          const allQueueItems = await localDB.getAll('syncqueue')
+          const allQueueItems = await localDB.getAll('syncqueue' as any)
           const hasDeleteRecord = allQueueItems.some(queueItem => {
             if (!isSyncQueueItem(queueItem)) return false
             return (
@@ -304,7 +304,7 @@ export class BackgroundSyncService {
   private async syncPendingDeletes(tableName: TableName): Promise<void> {
     try {
       // 從 syncqueue 表中取得該表的刪除操作
-      const allQueueItems = await localDB.getAll('syncqueue')
+      const allQueueItems = await localDB.getAll('syncqueue' as any)
 
       // 使用型別守衛過濾刪除操作
       const pendingDeletes = allQueueItems.filter((item): item is SyncQueueItem => {
@@ -323,7 +323,7 @@ export class BackgroundSyncService {
           const { error } = await (supabase.from as any)(tableName).delete().eq('id', queueItem.record_id)
 
           // 刪除成功或資料已不存在，清除隊列記錄
-          await localDB.delete('syncqueue', queueItem.id)
+          await localDB.delete('syncqueue' as any, queueItem.id)
 
           if (error) {
             logger.warn(
@@ -358,7 +358,7 @@ export class BackgroundSyncService {
       })
 
       // 檢查是否有刪除隊列
-      const allQueueItems = await localDB.getAll('syncqueue')
+      const allQueueItems = await localDB.getAll('syncqueue' as any)
       const hasDeletePending = allQueueItems.some(item => {
         if (!isSyncQueueItem(item)) return false
         return item.table_name === tableName && item.operation === 'delete'
@@ -386,7 +386,7 @@ export class BackgroundSyncService {
       }).length
 
       // 計算刪除隊列數量
-      const allQueueItems = await localDB.getAll('syncqueue')
+      const allQueueItems = await localDB.getAll('syncqueue' as any)
       const deletePendingCount = allQueueItems.filter(item => {
         if (!isSyncQueueItem(item)) return false
         return item.table_name === tableName && item.operation === 'delete'

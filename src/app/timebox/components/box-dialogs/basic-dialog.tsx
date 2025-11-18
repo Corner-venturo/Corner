@@ -16,7 +16,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
   const { boxes, toggleBoxCompletion, removeScheduledBox } = useTimeboxStore()
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  const box = boxes.find(b => b.id === scheduledBox.boxId)
+  const box = boxes.find(b => b.id === scheduledBox.box_id)
 
   // 標記完成
   const handleComplete = () => {
@@ -34,7 +34,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
       message: '確定要移除此排程嗎？',
       details: [
         `箱子：${box?.name}`,
-        `時間：${formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}`,
+        `時間：${formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}`,
       ],
       confirmLabel: '確認移除',
       cancelLabel: '取消',
@@ -69,7 +69,7 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {box.name} - {formatDateTime(scheduledBox.dayOfWeek, scheduledBox.start_time)}
+            {box.name} - {formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}
           </DialogTitle>
         </DialogHeader>
 
@@ -89,11 +89,11 @@ export default function BasicDialog({ scheduledBox, onClose }: BasicDialogProps)
                   {scheduledBox.completed ? '已完成' : '未完成'}
                 </span>
               </div>
-              {scheduledBox.completed && scheduledBox.completedAt && (
+              {scheduledBox.completed && scheduledBox.completed_at && (
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">完成時間：</span>
                   <span className="text-sm">
-                    {new Date(scheduledBox.completedAt).toLocaleString('zh-TW')}
+                    {new Date(scheduledBox.completed_at).toLocaleString('zh-TW')}
                   </span>
                 </div>
               )}

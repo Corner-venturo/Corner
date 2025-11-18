@@ -49,7 +49,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && tour.contract_template) {
-        setSelectedTemplate(tour.contract_template)
+        setSelectedTemplate(tour.contract_template as ContractTemplate)
         setContractNotes(tour.contract_notes || '')
         setContractCompleted(tour.contract_completed || false)
         setArchivedDate(tour.contract_archived_date || '')
@@ -63,13 +63,13 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             // 如果 contract_content 不是 JSON,就重新準備資料
             if (selectedOrder) {
               const firstMember = selectedOrderMembers[0]
-              const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary)
+              const autoData = prepareContractData(tour, selectedOrder as any, firstMember as any, itinerary)
               setContractData(autoData)
             }
           }
         } else if (selectedOrder) {
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary)
+          const autoData = prepareContractData(tour, selectedOrder as any, firstMember as any, itinerary)
           setContractData(autoData)
         }
       } else {
@@ -82,7 +82,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         if (selectedOrder) {
           // 有訂單資料，自動帶入
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary)
+          const autoData = prepareContractData(tour, selectedOrder as any, firstMember as any, itinerary)
           setContractData(autoData)
         } else {
           // 沒有訂單資料，初始化空白欄位

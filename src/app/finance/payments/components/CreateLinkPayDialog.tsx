@@ -77,7 +77,7 @@ export function CreateLinkPayDialog({
         status: data.status,
         link: data.link,
         end_date: data.end_date,
-      })
+      } as any)
 
       alert('✅ LinkPay 付款連結已建立！')
       onClose()

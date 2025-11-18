@@ -57,7 +57,7 @@ export function DatasheetCell({
         onMouseEnter={() => {}}
         onMouseLeave={() => {}}
       >
-        <span className="text-xs font-medium text-morandi-secondary">{cell.value}</span>
+        <span className="text-xs font-medium text-morandi-secondary">{cell.value as React.ReactNode}</span>
 
         {/* Column resize handle */}
         {enableColumnResize && hoveredColumn === col && (
@@ -113,17 +113,17 @@ export function DatasheetCell({
   // Special handling for room assignment
   if (col < visibleColumns.length) {
     const column = visibleColumns[col]
-    if (column.key === 'assignedRoom' && orderFilter && cell.rowData?.id) {
+    if (column.key === 'assigned_room' && orderFilter && cell.rowData?.id) {
       const member = cell.rowData
+      const selectValue = member.is_child_no_bed
+        ? member.assigned_room
+          ? `no-bed-${String(member.assigned_room)}`
+          : 'no-bed'
+        : String(member.assigned_room || '')
+
       return (
         <select
-          value={
-            member.isChildNoBed
-              ? member.assignedRoom
-                ? `no-bed-${member.assignedRoom}`
-                : 'no-bed'
-              : member.assignedRoom || ''
-          }
+          value={selectValue}
           onChange={e => {
             // Handler should be passed as prop if needed
           }}
@@ -134,13 +134,13 @@ export function DatasheetCell({
           <option value="no-bed">不佔床</option>
 
           {/* Regular room options */}
-          {roomOptions
+          {(roomOptions
             .map(roomOption => {
               const usage = getRoomUsage
                 ? getRoomUsage(roomOption.value)
                 : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
               const isFull = isRoomFull ? isRoomFull(roomOption.value, member.id as string) : false
-              const isCurrentRoom = member.assignedRoom === roomOption.value && !member.isChildNoBed
+              const isCurrentRoom = member.assigned_room === roomOption.value && !member.is_child_no_bed
 
               if (isFull && !isCurrentRoom) {
                 return null
@@ -153,10 +153,10 @@ export function DatasheetCell({
                 </option>
               )
             })
-            .filter(Boolean)}
+            .filter((option): option is React.ReactElement => option !== null)) as React.ReactNode}
 
           {/* No-bed room options */}
-          {member.isChildNoBed &&
+          {member.is_child_no_bed &&
             roomOptions.map(roomOption => (
               <option key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
                 不佔床 - {roomOption.value}
@@ -169,9 +169,9 @@ export function DatasheetCell({
 
   // Formula result display
   if (cell.displayValue !== cell.value) {
-    return <span className="text-morandi-primary text-xs">{cell.displayValue}</span>
+    return <span className="text-morandi-primary text-xs">{cell.displayValue as React.ReactNode}</span>
   }
 
   // Default cell display
-  return <span className="text-morandi-primary text-xs">{cell.value}</span>
+  return <span className="text-morandi-primary text-xs">{cell.value as React.ReactNode}</span>
 }

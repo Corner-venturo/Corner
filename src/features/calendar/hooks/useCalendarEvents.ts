@@ -23,9 +23,9 @@ export function useCalendarEvents() {
   const { items: employees } = useEmployeeStore()
 
   // 根據類型取得顏色 - 使用莫蘭迪配色
-  const getEventColor = useCallback((type: string, status?: Tour['status']) => {
+  const getEventColor = useCallback((type: string, status?: string) => {
     if (type === 'tour' && status) {
-      const colors: Record<Tour['status'], { bg: string; border: string }> = {
+      const colors: Record<string, { bg: string; border: string }> = {
         draft: { bg: '#9BB5D6', border: '#8AA4C5' }, // 提案
         active: { bg: '#A8C4A2', border: '#97B391' }, // 進行中
         pending_close: { bg: '#D4B896', border: '#C3A785' }, // 待結案
@@ -49,7 +49,7 @@ export function useCalendarEvents() {
     return (tours || [])
       .filter(tour => tour.status !== 'special') // 過濾掉簽證專用團等特殊團
       .map(tour => {
-        const color = getEventColor('tour', tour.status)
+        const color = getEventColor('tour', tour.status || 'draft')
         const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
         const actualMembers = (members || []).filter(member =>
           tourOrders.some(order => order.id === member.order_id)
@@ -66,21 +66,21 @@ export function useCalendarEvents() {
 
         return {
           id: `tour-${tour.id}`,
-          title: tour.name,
-          start: tour.departure_date,
-          end: end_date,
+          title: tour.name || '',
+          start: tour.departure_date || '',
+          end: end_date || '',
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {
             type: 'tour' as const,
             tour_id: tour.id,
-            code: tour.code,
-            location: tour.location,
+            code: tour.code || '',
+            location: tour.location || '',
             participants: actualMembers,
-            max_participants: tour.max_participants,
-            status: tour.status,
+            max_participants: tour.max_participants || 0,
+            status: tour.status || '',
           },
-        }
+        } as FullCalendarEvent
       })
   }, [tours, orders, members, getEventColor])
 
@@ -118,7 +118,7 @@ export function useCalendarEvents() {
         // 找出建立者姓名（用於詳細頁面）
         // 優先檢查當前登入用戶，再檢查員工列表
         let creatorName = '未知使用者'
-        if (user?.id === event.created_by) {
+        if (user && user.id === event.created_by) {
           creatorName =
             user.display_name ||
             user.chinese_name ||
@@ -148,7 +148,7 @@ export function useCalendarEvents() {
             created_by: event.created_by,
             creator_name: creatorName, // 保留在 extendedProps，詳細頁面可以用
           },
-        }
+        } as FullCalendarEvent
       })
   }, [calendarEvents, getEventColor, employees, user])
 

@@ -42,7 +42,7 @@ export default function OrdersPage() {
     const searchLower = searchQuery.toLowerCase()
     const matchesSearch =
       !searchQuery ||
-      order.order_number.toLowerCase().includes(searchLower) ||
+      (order.order_number || '').toLowerCase().includes(searchLower) ||
       order.code?.toLowerCase().includes(searchLower) ||
       order.tour_name?.toLowerCase().includes(searchLower) ||
       order.contact_person.toLowerCase().includes(searchLower) ||
@@ -53,8 +53,15 @@ export default function OrdersPage() {
   })
 
   // 計算待辦事項
+  interface TodoItem {
+    type: 'payment' | 'overdue' | 'partial'
+    priority: 'high' | 'medium'
+    message: string
+    order_id: string
+  }
+
   const todos = React.useMemo(() => {
-    const result: unknown[] = []
+    const result: TodoItem[] = []
     const today = new Date()
     const _sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
 
@@ -102,7 +109,7 @@ export default function OrdersPage() {
         result.push({
           type: 'partial',
           priority: 'medium',
-          message: `${order.order_number} - 尚有 NT$ ${order.remaining_amount.toLocaleString()} 未收`,
+          message: `${order.order_number} - 尚有 NT$ ${(order.remaining_amount ?? 0).toLocaleString()} 未收`,
           order_id: order.id,
         })
       }
@@ -141,7 +148,7 @@ export default function OrdersPage() {
       payment_status: 'unpaid',
       remaining_amount: orderData.total_amount,
       workspace_id: currentWorkspace.id, // 🔥 設定 workspace_id
-    } as unknown)
+    } as any)
 
     setIsAddDialogOpen(false)
   }
@@ -149,10 +156,8 @@ export default function OrdersPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        {...({
-          title: '訂單管理',
-          icon: ShoppingCart,
-        } as unknown)}
+        title="訂單管理"
+        icon={ShoppingCart}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '訂單管理', href: '/orders' },
@@ -191,7 +196,7 @@ export default function OrdersPage() {
                 <h3 className="font-semibold text-morandi-primary">待辦事項</h3>
               </div>
               <div className="space-y-2">
-                {todos.map((todo, index) => (
+                {todos.map((todo: TodoItem, index) => (
                   <div
                     key={index}
                     className="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-morandi-container/20 transition-colors cursor-pointer"
@@ -224,7 +229,7 @@ export default function OrdersPage() {
         )}
 
         {/* 訂單列表 */}
-        <SimpleOrderTable className="min-h-full" orders={filteredOrders} showTourInfo={true} />
+        <SimpleOrderTable className="min-h-full" orders={filteredOrders as any} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}

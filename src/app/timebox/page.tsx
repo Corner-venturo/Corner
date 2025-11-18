@@ -32,7 +32,9 @@ export default function TimeboxPage() {
   // 初始化當前週（純本地模式）
   useEffect(() => {
     if (!currentWeek) {
-      initializeCurrentWeek(new Date())
+      // TODO: Get userId from auth context
+      const userId = 'temp-user-id' // Placeholder
+      initializeCurrentWeek(new Date(), userId)
     }
   }, [currentWeek, initializeCurrentWeek])
 

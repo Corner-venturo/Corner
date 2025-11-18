@@ -136,6 +136,7 @@ export const ToursPage: React.FC = () => {
   const pageRequest: PageRequest = useMemo(
     () => ({
       page: currentPage,
+      pageSize: 20,
       search: '',
       sortBy,
       sortOrder,
@@ -185,8 +186,8 @@ export const ToursPage: React.FC = () => {
         !searchQuery ||
         tour.name.toLowerCase().includes(searchLower) ||
         tour.code.toLowerCase().includes(searchLower) ||
-        tour.location.toLowerCase().includes(searchLower) ||
-        tour.status.toLowerCase().includes(searchLower) ||
+        (tour.location || '').toLowerCase().includes(searchLower) ||
+        (tour.status || '').toLowerCase().includes(searchLower) ||
         tour.description?.toLowerCase().includes(searchLower)
 
       return tour.closing_status === 'closed' && searchMatch
@@ -200,8 +201,8 @@ export const ToursPage: React.FC = () => {
       !searchQuery ||
       tour.name.toLowerCase().includes(searchLower) ||
       tour.code.toLowerCase().includes(searchLower) ||
-      tour.location.toLowerCase().includes(searchLower) ||
-      tour.status.toLowerCase().includes(searchLower) ||
+      (tour.location || '').toLowerCase().includes(searchLower) ||
+      (tour.status || '').toLowerCase().includes(searchLower) ||
       tour.description?.toLowerCase().includes(searchLower)
 
     return notClosed && statusMatch && searchMatch
@@ -244,11 +245,11 @@ export const ToursPage: React.FC = () => {
         name: tour.name,
         countryCode,
         cityCode,
-        customLocation: countryCode === '__custom__' ? tour.location : undefined,
-        departure_date: tour.departure_date,
-        return_date: tour.return_date,
-        price: tour.price,
-        status: tour.status,
+        customLocation: countryCode === '__custom__' ? (tour.location || undefined) : undefined,
+        departure_date: tour.departure_date || '',
+        return_date: tour.return_date || '',
+        price: tour.price ?? 0,
+        status: (tour.status || 'draft') as Tour['status'],
         isSpecial: tour.status === 'special',
         max_participants: tour.max_participants || 20,
         description: tour.description || '',
@@ -269,8 +270,8 @@ export const ToursPage: React.FC = () => {
       if (sourceQuote) {
         setNewTour(prev => ({
           ...prev,
-          name: sourceQuote.name,
-          price: Math.round(sourceQuote.total_cost / sourceQuote.group_size),
+          name: sourceQuote.name || prev.name,
+          price: Math.round((sourceQuote.total_cost ?? 0) / (sourceQuote.group_size ?? 1)),
         }))
         handleOpenCreateDialog(null, fromQuoteId)
       }
@@ -324,13 +325,13 @@ export const ToursPage: React.FC = () => {
     closeDialog,
     setSubmitting,
     setFormError,
-    dialogType: dialog.type,
+    dialogType: dialog.type || 'create',
     dialogData: dialog.data,
   })
 
   const handleAddTour = useCallback(() => {
     const fromQuoteId = searchParams.get('fromQuote')
-    operations.handleAddTour(newTour, newOrder, fromQuoteId || undefined)
+    operations.handleAddTour(newTour, newOrder, fromQuoteId ?? undefined)
   }, [operations, newTour, newOrder, searchParams])
 
   const handleSortChange = useCallback(
@@ -545,14 +546,16 @@ export const ToursPage: React.FC = () => {
         .from('tours')
         .update({
           closing_status: 'open',
-        })
+        } as any)
         .eq('id', tour.id)
 
       if (error) throw error
 
       toast.success('已解鎖結團')
       // 重新載入資料
-      actions.loadTours()
+      if ('fetchAll' in actions && typeof actions.fetchAll === 'function') {
+        await actions.fetchAll()
+      }
     } catch (error: any) {
       logger.error('解鎖失敗:', error)
       toast.error(`解鎖失敗：${error.message || '未知錯誤'}`)
@@ -716,33 +719,31 @@ export const ToursPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        {...({
-          title: '旅遊團管理',
-          icon: MapPin,
-          breadcrumb: [
-            { label: '首頁', href: '/' },
-            { label: '旅遊團管理', href: '/tours' },
-          ],
-          showSearch: true,
-          searchTerm: searchQuery,
-          onSearchChange: setSearchQuery,
-          searchPlaceholder: '搜尋旅遊團...',
-          onAdd: handleOpenCreateDialog,
-          addLabel: '新增旅遊團',
-          tabs: [
-            { value: 'all', label: '全部', icon: BarChart3 },
-            { value: '提案', label: '提案', icon: FileText },
-            { value: '進行中', label: '進行中', icon: Calendar },
-            { value: '待結案', label: '待結案', icon: AlertCircle },
-            { value: '結案', label: '結案', icon: FileCheck },
-            { value: 'archived', label: '封存', icon: Archive },
-          ],
-          activeTab: activeStatusTab,
-          onTabChange: (tab: string) => {
-            setActiveStatusTab(tab)
-            setCurrentPage(1)
-          },
-        } as unknown)}
+        title="旅遊團管理"
+        icon={MapPin}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '旅遊團管理', href: '/tours' },
+        ]}
+        showSearch={true}
+        searchTerm={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="搜尋旅遊團..."
+        onAdd={handleOpenCreateDialog}
+        addLabel="新增旅遊團"
+        tabs={[
+          { value: 'all', label: '全部', icon: BarChart3 },
+          { value: '提案', label: '提案', icon: FileText },
+          { value: '進行中', label: '進行中', icon: Calendar },
+          { value: '待結案', label: '待結案', icon: AlertCircle },
+          { value: '結案', label: '結案', icon: FileCheck },
+          { value: 'archived', label: '封存', icon: Archive },
+        ]}
+        activeTab={activeStatusTab}
+        onTabChange={(tab: string) => {
+          setActiveStatusTab(tab)
+          setCurrentPage(1)
+        }}
       />
 
       {/* Tour list */}

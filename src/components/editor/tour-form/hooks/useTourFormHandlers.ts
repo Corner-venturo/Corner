@@ -163,8 +163,8 @@ export function useTourFormHandlers(
 
     const newItinerary = data.dailyItinerary
       .filter((_: unknown, i: number) => i !== index)
-      .map((day: unknown, i: number) => ({
-        ...day,
+      .map((day: any, i: number) => ({
+        ...(day as object),
         dayLabel: `Day ${i + 1}`, // 自動更新 dayLabel
         date: calculateDate(data.departureDate, i), // 自動更新日期
       }))

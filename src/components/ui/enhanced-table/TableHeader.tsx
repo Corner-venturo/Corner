@@ -75,7 +75,7 @@ export function TableHeader({
 
         {columns.map((column, index) => (
           <th
-            key={column.key}
+            key={String(column.key)}
             className={cn(
               'text-left py-2.5 px-4 text-xs relative align-middle',
               index === columns.length - 1 && 'border-r-0'
@@ -90,10 +90,10 @@ export function TableHeader({
                   variant="ghost"
                   size="sm"
                   className="h-auto p-0 hover:bg-transparent text-xs font-medium text-morandi-secondary transition-colors [&_svg]:!size-[12px]"
-                  onClick={() => onSort(column.key)}
+                  onClick={() => onSort(String(column.key))}
                 >
                   {column.label}
-                  {getSortIcon(column.key)}
+                  {getSortIcon(String(column.key))}
                 </Button>
               ) : (
                 <span className="text-xs font-medium text-morandi-secondary">{column.label}</span>
@@ -133,12 +133,12 @@ export function TableHeader({
           {selection && <td className="py-3 px-4"></td>}
 
           {columns.map(column => (
-            <td key={column.key} className="py-3 px-4">
+            <td key={String(column.key)} className="py-3 px-4">
               {column.filterable ? (
                 column.filterType === 'select' ? (
                   <Select
-                    value={filters[column.key] || '__all__'}
-                    onValueChange={value => onFilterChange(column.key, value)}
+                    value={filters[String(column.key)] || '__all__'}
+                    onValueChange={value => onFilterChange(String(column.key), value)}
                   >
                     <SelectTrigger className="h-9 text-sm">
                       <SelectValue placeholder={`選擇${column.label}...`} />
@@ -156,8 +156,8 @@ export function TableHeader({
                   <Input
                     type={column.filterType || 'text'}
                     placeholder={`搜尋${column.label}...`}
-                    value={filters[column.key] || ''}
-                    onChange={e => onFilterChange(column.key, e.target.value)}
+                    value={filters[String(column.key)] || ''}
+                    onChange={e => onFilterChange(String(column.key), e.target.value)}
                     className="h-9 text-sm"
                   />
                 )

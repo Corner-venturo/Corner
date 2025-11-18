@@ -24,9 +24,11 @@ export default function DayView({ selectedDay, timeInterval }: DayViewProps) {
   useEffect(() => {
     if (
       !currentWeek ||
-      new Date(currentWeek.weekStart).getTime() !== getWeekStart(selectedDay).getTime()
+      new Date(currentWeek.week_start).getTime() !== getWeekStart(selectedDay).getTime()
     ) {
-      initializeCurrentWeek(selectedDay)
+      // TODO: Get userId from auth context
+      const userId = 'temp-user-id' // Placeholder
+      initializeCurrentWeek(selectedDay, userId)
     }
   }, [selectedDay, currentWeek, initializeCurrentWeek])
 

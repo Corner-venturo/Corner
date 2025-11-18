@@ -40,15 +40,16 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      const { data, error } = await supabase
+      const result: any = await (supabase as any)
         .from('manifestation_entries')
         .select('*')
         .eq('user_id', user.id)
         .order('chapter_number', { ascending: true })
 
-      if (error) throw error
+      if (result.error) throw result.error
+      const data = result.data
 
-      set({ entries: data || [], isLoading: false })
+      set({ entries: (data || []) as any, isLoading: false })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '獲取記錄失敗',
@@ -68,7 +69,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      const { data, error } = await supabase
+      const result: any = await (supabase as any)
         .from('manifestation_entries')
         .select('*')
         .eq('user_id', user.id)
@@ -77,12 +78,13 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         .limit(1)
         .single()
 
-      if (error && error.code !== 'PGRST116') {
+      if (result.error && result.error.code !== 'PGRST116') {
         // PGRST116 = No rows found
-        throw error
+        throw result.error
       }
+      const data = result.data
 
-      set({ currentEntry: data || null, isLoading: false })
+      set({ currentEntry: (data || null) as any, isLoading: false })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '獲取章節記錄失敗',
@@ -109,18 +111,19 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         updated_at: new Date().toISOString(),
       }
 
-      const { data, error } = await supabase
+      const result: any = await (supabase as any)
         .from('manifestation_entries')
-        .insert(newEntry)
+        .insert(newEntry as any)
         .select()
         .single()
 
-      if (error) throw error
+      if (result.error) throw result.error
+      const data = result.data
 
       // 更新本地狀態
       set(state => ({
-        entries: [...state.entries, data],
-        currentEntry: data,
+        entries: [...state.entries, data as any],
+        currentEntry: data as any,
         isLoading: false,
       }))
 
@@ -142,22 +145,23 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      const { data, error } = await supabase
+      const result: any = await (supabase as any)
         .from('manifestation_entries')
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', id)
         .select()
         .single()
 
-      if (error) throw error
+      if (result.error) throw result.error
+      const data = result.data
 
       // 更新本地狀態
       set(state => ({
-        entries: state.entries.map(e => (e.id === id ? data : e)),
-        currentEntry: state.currentEntry?.id === id ? data : state.currentEntry,
+        entries: state.entries.map(e => (e.id === id ? data as any : e)),
+        currentEntry: state.currentEntry?.id === id ? data as any : state.currentEntry,
         isLoading: false,
       }))
 
@@ -181,9 +185,9 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      const { error } = await supabase.from('manifestation_entries').delete().eq('id', id)
+      const result: any = await (supabase as any).from('manifestation_entries').delete().eq('id', id)
 
-      if (error) throw error
+      if (result.error) throw result.error
 
       // 更新本地狀態
       set(state => ({
@@ -211,17 +215,18 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     if (!user) return
 
     try {
-      const { data, error } = await supabase
+      const result: any = await (supabase as any)
         .from('manifestation_user_progress')
         .select('*')
         .eq('user_id', user.id)
         .single()
 
-      if (error && error.code !== 'PGRST116') {
-        throw error
+      if (result.error && result.error.code !== 'PGRST116') {
+        throw result.error
       }
+      const data = result.data
 
-      set({ progress: data || null })
+      set({ progress: (data || null) as any })
     } catch (error) {}
   },
 

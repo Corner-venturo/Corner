@@ -22,7 +22,7 @@ export class LocalAuthService {
       // 1. 從 IndexedDB 查詢員工
       const employees = await localDB.filter('employees', [
         { field: 'employee_number', operator: 'eq', value: username },
-      ])
+      ] as any)
 
       if (employees.length === 0) {
         return {
@@ -72,7 +72,7 @@ export class LocalAuthService {
           const hashedPassword = await bcrypt.hash(password, 10)
           await localDB.update('employees', employee.id, {
             password_hash: hashedPassword,
-          })
+          } as any)
           isValidPassword = true
         }
       }
@@ -100,7 +100,7 @@ export class LocalAuthService {
         lastLoginAt: new Date().toISOString(),
         loginAttempts: 0,
         lockedUntil: null,
-      })
+      } as any)
 
       // 6. 建立使用者物件
       const user: any = {
@@ -166,7 +166,7 @@ export class LocalAuthService {
       await localDB.update('employees', user_id, {
         password_hash: newPasswordHash,
         updated_at: new Date().toISOString(),
-      })
+      } as any)
 
       return { success: true }
     } catch (error) {
@@ -194,7 +194,7 @@ export class LocalAuthService {
         loginAttempts: 0,
         lockedUntil: null,
         updated_at: new Date().toISOString(),
-      })
+      } as any)
 
       return { success: true }
     } catch (error) {
@@ -221,7 +221,7 @@ export class LocalAuthService {
       // 檢查員工編號是否已存在
       const existing = await localDB.filter('employees', [
         { field: 'employee_number', operator: 'eq', value: userData.employee_number },
-      ])
+      ] as any)
 
       if (existing.length > 0) {
         return {
@@ -251,7 +251,7 @@ export class LocalAuthService {
       }
 
       // 儲存到 IndexedDB
-      const created = await localDB.create('employees', newEmployee)
+      const created = await localDB.create('employees', newEmployee as any)
 
       // 建立使用者物件
       const user: any = {
@@ -285,7 +285,7 @@ export class LocalAuthService {
   static hasPermission(user: User | null, permission: string): boolean {
     if (!user) return false
 
-    const permissions = user.permissions || []
+    const permissions = (user as any).permissions || []
     return permissions.includes(permission) || permissions.includes('admin')
   }
 

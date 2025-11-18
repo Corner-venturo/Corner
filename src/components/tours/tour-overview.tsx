@@ -80,7 +80,7 @@ export const TourOverview = React.memo(function TourOverview({
     : [
         {
           title: '報價單價格',
-          value: `NT$ ${tour.price.toLocaleString()}`,
+          value: `NT$ ${(tour.price ?? 0).toLocaleString()}`,
           icon: DollarSign,
           color: 'text-morandi-gold',
         },
@@ -154,7 +154,7 @@ export const TourOverview = React.memo(function TourOverview({
                 <span
                   className={cn(
                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                    getStatusBadge(tour.status)
+                    getStatusBadge(tour.status ?? '')
                   )}
                 >
                   {tour.status}

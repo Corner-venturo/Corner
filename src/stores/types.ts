@@ -162,22 +162,57 @@ export type { Tour } from '@/types/tour.types'
 export interface Member {
   id: string
   order_id: string
-  name: string
-  name_en: string // 拼音
-  birthday: string // YYYY-MM-DD
-  passport_number: string
-  passport_expiry: string // YYYY-MM-DD
-  id_number: string // 身分證字號
-  gender: 'M' | 'F' | '' // 根據身分證自動判斷
-  age: number // 根據生日和出發日自動計算
-  assigned_room?: string // 分配的房間
+  // 基本資料
+  chinese_name: string | null // 中文姓名
+  passport_name: string | null // 護照拼音
+  name?: string // 向下相容
+  name_en?: string // 向下相容（拼音）
+  birth_date: string | null // YYYY-MM-DD
+  birthday?: string // 向下相容
+  passport_number: string | null
+  passport_expiry: string | null // YYYY-MM-DD
+  id_number: string | null // 身分證字號
+  gender: 'M' | 'F' | '' | null // 性別
+  age: number | null // 年齡
+  member_type: string // 成員類型
+  identity: string | null // 身份（主要聯絡人等）
+
+  // 餐食與健康
+  special_meal: string | null // 特殊餐食需求
+
+  // 訂位與航班
+  pnr: string | null // 訂位代號
+  reservation_code?: string // 向下相容
+
+  // 住宿資訊
+  hotel_1_name: string | null
+  hotel_1_checkin: string | null
+  hotel_1_checkout: string | null
+  hotel_2_name: string | null
+  hotel_2_checkin: string | null
+  hotel_2_checkout: string | null
+  assigned_room?: string // 向下相容
+
+  // 財務資訊
+  cost_price: number | null // 成本價
+  flight_cost: number | null // 機票成本
+  misc_cost: number | null // 雜費
+  profit: number | null // 利潤
+  deposit_amount: number | null // 訂金
+  deposit_receipt_no: string | null // 訂金收據號
+  balance_amount: number | null // 尾款
+  balance_receipt_no: string | null // 尾款收據號
+
+  // 關聯
+  customer_id: string | null
+
+  // 其他
   is_child_no_bed?: boolean // 小孩不佔床
-  reservation_code?: string // 訂位代號
   add_ons?: string[] // 加購項目IDs
   refunds?: string[] // 退費項目IDs
   custom_fields?: Record<string, unknown> // 自定義欄位數據 {fieldId: value}
-  created_at: string
-  updated_at: string
+  created_at: string | null
+  updated_at: string | null
 }
 
 export interface TourAddOn {
@@ -499,9 +534,9 @@ export interface PaymentRequest {
   approved_by?: string | null
   paid_at?: string | null
   paid_by?: string | null
-  workspace_id?: string | null
-  created_at?: string
-  updated_at?: string
+  workspace_id?: string
+  created_at: string
+  updated_at: string
 }
 
 // === 請款單（完整版 - 未來升級版）===

@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Database, Trash2 } from 'lucide-react'
-import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
+import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
 import { CacheInfo } from '../types'
@@ -18,14 +18,17 @@ export function SystemSettings({
   setClearingCache,
 }: SystemSettingsProps) {
   const handleClearCache = async () => {
-    const confirmed = await alert(
+    const confirmed = await confirm(
       '確定要清除所有本地快取嗎？\n\n' +
         '這會刪除：\n' +
         '• IndexedDB 本地資料庫\n' +
         '• localStorage 儲存的狀態\n' +
         '• sessionStorage 暫存資料\n\n' +
         '清除後系統會重新整理，從 Supabase 載入最新資料。',
-      '清除快取確認'
+      {
+        type: 'warning',
+        title: '清除快取確認',
+      }
     )
 
     if (!confirmed) return

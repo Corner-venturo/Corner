@@ -11,8 +11,7 @@ import { useMemo } from 'react'
  * 使用 Map 避免重複查找，降低 O(n²) 到 O(n)
  */
 export function useWeekStatistics() {
-  const scheduledBoxes = useTimeboxStore((state: any) => state.scheduledBoxes || [])
-  const boxes = useTimeboxStore((state: any) => state.boxes || [])
+  const { scheduledBoxes = [], boxes = [] } = useTimeboxStore()
 
   return useMemo(() => {
     // 建立 box 查找 Map (O(n))
@@ -64,11 +63,11 @@ export function useWeekStatistics() {
  * 取得運動趨勢 (優化版本)
  */
 export function useWorkoutTrends(weeks: number = 4) {
-  const weekRecords = useTimeboxStore((state: any) => state.weekRecords || [])
+  const { weekRecords = [] } = useTimeboxStore()
 
   return useMemo(() => {
     return weekRecords.slice(-weeks).map((record: any) => ({
-      week: record.weekStart,
+      week: record.week_start,
       workoutTime: record.totalWorkoutTime || 0,
       completionRate: record.completionRate || 0,
     }))
@@ -79,7 +78,7 @@ export function useWorkoutTrends(weeks: number = 4) {
  * 取得今日已排程的 boxes
  */
 export function useTodayScheduledBoxes() {
-  const scheduledBoxes = useTimeboxStore((state: any) => state.scheduledBoxes || [])
+  const { scheduledBoxes = [] } = useTimeboxStore()
 
   return useMemo(() => {
     const today = new Date().toISOString().split('T')[0]
@@ -91,7 +90,7 @@ export function useTodayScheduledBoxes() {
  * 取得週視圖的 boxes (依日期分組)
  */
 export function useWeekViewBoxes(weekStart: string) {
-  const scheduledBoxes = useTimeboxStore((state: any) => state.scheduledBoxes || [])
+  const { scheduledBoxes = [] } = useTimeboxStore()
 
   return useMemo(() => {
     const weekStartDate = new Date(weekStart)
@@ -126,8 +125,7 @@ export function useWeekViewBoxes(weekStart: string) {
  * 取得 box 完成率 (按類型)
  */
 export function useBoxCompletionByType() {
-  const scheduledBoxes = useTimeboxStore((state: any) => state.scheduledBoxes || [])
-  const boxes = useTimeboxStore((state: any) => state.boxes || [])
+  const { scheduledBoxes = [], boxes = [] } = useTimeboxStore()
 
   return useMemo(() => {
     const boxMap = new Map(boxes.map((b: any) => [b.id, b]))

@@ -6,8 +6,6 @@ import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useMemberStore, useOrderStore, useTourStore } from '@/stores'
 import { StatusCell } from '@/components/table-cells'
-import { STATUS_CONFIG } from '@/lib/status-config'
-import type { Member } from '@/types/member.types'
 
 interface GroupHistoryTabProps {
   customerId: string
@@ -42,7 +40,7 @@ export function GroupHistoryTab({ customerId }: GroupHistoryTabProps) {
   // 計算參團歷史
   useEffect(() => {
     // 找出此客戶的所有會員記錄
-    const customerMembers = members.filter(m => m.customer_id === customerId)
+    const customerMembers = members.filter((m: any) => m.customer_id === customerId)
 
     // 根據會員記錄找出訂單
     const customerOrders = orders.filter(order =>
@@ -50,7 +48,7 @@ export function GroupHistoryTab({ customerId }: GroupHistoryTabProps) {
     )
 
     // 組合歷史記錄
-    const history: GroupHistory[] = customerOrders
+    const history = customerOrders
       .map(order => {
         const tour = tours.find(t => t.id === order.tour_id)
         const orderMembers = members.filter(m => m.order_id === order.id)
@@ -105,7 +103,7 @@ export function GroupHistoryTab({ customerId }: GroupHistoryTabProps) {
                     <span className="text-lg font-semibold text-morandi-primary">
                       {history.tour_name}
                     </span>
-                    <StatusCell status={history.status} config={STATUS_CONFIG.order} />
+                    <StatusCell type="order" status={history.status.toString()} />
                   </div>
                   <div className="text-sm text-morandi-text-secondary mt-1">
                     團號：{history.tour_code} | 訂單：{history.order_code}

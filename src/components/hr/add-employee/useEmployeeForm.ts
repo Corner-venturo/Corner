@@ -104,7 +104,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         status: 'active',
       }
 
-      const newEmployee = await addUser(dbEmployeeData)
+      const newEmployee = await addUser(dbEmployeeData as any)
 
       // 自動加入該 workspace 的所有頻道
       if (newEmployee?.id) {

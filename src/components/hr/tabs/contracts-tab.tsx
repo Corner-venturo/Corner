@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from 'react'
 import { Employee } from '@/stores/types'
-import { _FileText } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 interface ContractsTabProps {
   employee: Employee

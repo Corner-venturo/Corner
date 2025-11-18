@@ -159,9 +159,9 @@ export default function TodosPage() {
       key: 'title',
       label: '任務標題',
       sortable: true,
-      render: (value: string, todo: Todo) => (
+      render: (value: unknown, todo: Todo) => (
         <div>
-          <div className="text-sm font-medium text-morandi-primary">{value}</div>
+          <div className="text-sm font-medium text-morandi-primary">{String(value)}</div>
           {todo.related_items && todo.related_items.length > 0 && (
             <div className="flex gap-1 mt-1">
               {todo.related_items.map((item, index) => (
@@ -194,7 +194,7 @@ export default function TodosPage() {
       key: 'priority',
       label: '優先級',
       sortable: true,
-      render: (value: number, todo: Todo) => (
+      render: (value: unknown, todo: Todo) => (
         <div onClick={e => e.stopPropagation()}>
           <StarRating
             value={todo.priority}
@@ -208,9 +208,9 @@ export default function TodosPage() {
       key: 'status',
       label: '狀態',
       sortable: true,
-      render: (value: Todo['status']) => (
-        <span className={cn('text-sm font-medium', getStatusColor(value))}>
-          {getStatusLabel(value)}
+      render: (value: unknown) => (
+        <span className={cn('text-sm font-medium', getStatusColor(value as Todo['status']))}>
+          {getStatusLabel(value as Todo['status'])}
         </span>
       ),
     },
@@ -219,11 +219,11 @@ export default function TodosPage() {
       label: '期限',
       sortable: true,
       width: '140px',
-      render: (value: string) => (
+      render: (value: unknown) => (
         <div className="flex items-center gap-2">
           <Calendar size={14} className="text-morandi-secondary" />
-          <span className={cn('text-sm', getDeadlineColor(value))}>
-            {value ? new Date(value).toLocaleDateString() : '未設定'}
+          <span className={cn('text-sm', getDeadlineColor(value ? String(value) : undefined))}>
+            {value ? new Date(String(value)).toLocaleDateString() : '未設定'}
           </span>
         </div>
       ),
@@ -333,7 +333,7 @@ export default function TodosPage() {
           enabled_quick_actions: formData.enabled_quick_actions || ['receipt', 'quote'],
         }
 
-        await addTodo(newTodoData as unknown)
+        await addTodo(newTodoData as any)
         setIsAddDialogOpen(false)
       } catch (error) {
         logger.error('新增待辦事項失敗:', error)
@@ -393,7 +393,7 @@ export default function TodosPage() {
                 }
 
                 try {
-                  await addTodo(newTodoData as unknown)
+                  await addTodo(newTodoData as any)
                   logger.log('✅ 待辦事項新增成功')
                 } catch (error) {
                   logger.error('快速新增失敗:', error)
@@ -549,7 +549,7 @@ function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: { title: string;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) return
-    onSubmit(formData)
+    onSubmit(formData as any)
   }
 
   return (

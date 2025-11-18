@@ -19,14 +19,10 @@ export function useAccountingStats() {
  * 避免在每次渲染時重新查找帳戶
  */
 export function useAccountBalance(accountId: string) {
-  return useAccountingStore(
-    state => {
-      const account = state.accounts.find(a => a.id === accountId)
-      return account?.balance || 0
-    },
-    // Shallow equality check - 只有當 balance 改變時才更新
-    (a: number, b: number) => a === b
-  )
+  return useAccountingStore(state => {
+    const account = state.accounts.find(a => a.id === accountId)
+    return account?.balance || 0
+  })
 }
 
 /**
@@ -53,23 +49,13 @@ export function useCategoryTotal(categoryId: string, startDate?: string, endDate
  * 避免多次查找時的 O(n) 複雜度
  */
 export function useAccountBalanceMap() {
-  return useAccountingStore(
-    state => {
-      const map = new Map<string, number>()
-      state.accounts.forEach(account => {
-        map.set(account.id, account.balance)
-      })
-      return map
-    },
-    // 自定義比較函數 - 比較 Map 內容
-    (a: Map<string, number>, b: Map<string, number>) => {
-      if (a.size !== b.size) return false
-      for (const [key, value] of a) {
-        if (b.get(key) !== value) return false
-      }
-      return true
-    }
-  )
+  return useAccountingStore(state => {
+    const map = new Map<string, number>()
+    state.accounts.forEach(account => {
+      map.set(account.id, account.balance)
+    })
+    return map
+  })
 }
 
 /**
@@ -91,8 +77,8 @@ export function useCategoryTotalsMap(startDate?: string, endDate?: string) {
       if (startDate && t.date < startDate) return
       if (endDate && t.date > endDate) return
 
-      const current = map.get(t.category_id) || 0
-      map.set(t.category_id, current + t.amount)
+      const current = map.get(t.category_id || '') || 0
+      map.set(t.category_id || '', current + t.amount)
     })
 
     return map
@@ -105,7 +91,7 @@ export function useCategoryTotalsMap(startDate?: string, endDate?: string) {
 export function useAccountsByType(type: 'asset' | 'liability' | 'all' = 'all') {
   return useAccountingStore(state => {
     if (type === 'all') return state.accounts
-    return state.accounts.filter(a => a.type === type)
+    return state.accounts.filter(a => (a as any).type === type)
   })
 }
 

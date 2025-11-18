@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTimeboxStore } from '@/stores/timebox-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,7 +36,15 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
   const [notes, setNotes] = useState('')
 
-  const stats = getWeekStatistics() as any
+  const { currentWeekId } = useTimeboxStore()
+  // Use Promise-based getWeekStatistics in useEffect
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    if (currentWeekId) {
+      getWeekStatistics(currentWeekId).then(setStats)
+    }
+  }, [currentWeekId, getWeekStatistics])
 
   // 生成預設存檔名稱
   const getDefaultArchiveName = () => {
@@ -68,23 +76,13 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
   }
 
   const handleArchive = () => {
-    const finalArchiveName = archiveName.trim() || getDefaultArchiveName()
-
-    // 存檔當前週
-    archiveCurrentWeek(finalArchiveName)
+    // Store notes and archive
+    archiveCurrentWeek(notes)
 
     // 如果選擇複製到下週
     if (copyToNext) {
-      const nextWeekStart = new Date(weekEnd)
-      nextWeekStart.setDate(nextWeekStart.getDate() + 1)
-
-      if (selectedTemplate) {
-        // 使用選擇的模板
-        copyToNextWeek(selectedTemplate)
-      } else {
-        // 初始化空白的下週
-        initializeCurrentWeek(nextWeekStart)
-      }
+      // copyToNextWeek doesn't take any parameters
+      copyToNextWeek()
     }
 
     onClose()

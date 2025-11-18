@@ -119,8 +119,8 @@ export const TourMembers = React.memo(function TourMembers({
         gender: '',
         age: 0,
         isNew: true,
-        order_number: firstOrder.order_number,
-        contact_person: firstOrder.contact_person,
+        order_number: firstOrder.order_number ?? undefined,
+        contact_person: firstOrder.contact_person ?? undefined,
       }
       setTableMembers([...tableMembers, newMember])
       onTriggerAddComplete?.()
@@ -172,7 +172,7 @@ export const TourMembers = React.memo(function TourMembers({
       }
     } else {
       // 使用型別安全的方式更新屬性
-      member[field] = value as never
+      (member as any)[field] = value
     }
 
     updatedMembers[rowIndex] = member
@@ -205,7 +205,7 @@ export const TourMembers = React.memo(function TourMembers({
         assigned_room: assignedRoom,
       }
 
-      const newMember = await addMember(convertedData)
+      const newMember = await addMember(convertedData as any)
 
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }
@@ -231,7 +231,7 @@ export const TourMembers = React.memo(function TourMembers({
         assigned_room: assignedRoom,
       }
 
-      await updateMember(member.id, convertedData)
+      await updateMember(member.id, convertedData as any)
     }
   }
 
@@ -251,8 +251,8 @@ export const TourMembers = React.memo(function TourMembers({
       gender: '',
       age: 0,
       isNew: true,
-      order_number: _relatedOrder.order_number,
-      contact_person: _relatedOrder.contact_person,
+      order_number: _relatedOrder.order_number ?? undefined,
+      contact_person: _relatedOrder.contact_person ?? undefined,
     }
     setTableMembers([...tableMembers, newMember])
   }
@@ -324,7 +324,7 @@ export const TourMembers = React.memo(function TourMembers({
     } else if (field === 'age') {
       value = member.age > 0 ? `${member.age}歲` : ''
     } else if (field === 'assignedRoom') {
-      value = member.assignedRoom || '未分房'
+      value = (member as any).assignedRoom || '未分房'
     }
 
     if (isEditing) {

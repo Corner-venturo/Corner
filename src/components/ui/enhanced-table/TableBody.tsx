@@ -118,7 +118,7 @@ export function TableBody({
               {/* Data columns */}
               {columns.map((column, colIndex) => (
                 <td
-                  key={column.key}
+                  key={String(column.key)}
                   className={cn(
                     'py-3 px-4 text-sm text-morandi-primary',
                     colIndex === columns.length - 1 && 'pr-4',

@@ -101,7 +101,7 @@ export const QuotesPage: React.FC = () => {
   const authors = React.useMemo(() => {
     const authorSet = new Set<string>()
     quotes.forEach(quote => {
-      const author = quote.created_by_name || quote.handler_name
+      const author = (quote as any).created_by_name || quote.handler_name
       if (author) authorSet.add(author)
     })
     return Array.from(authorSet).sort()
@@ -283,7 +283,7 @@ export const QuotesPage: React.FC = () => {
           setIsAddDialogOpen(open)
         }}
         formData={formData}
-        setFormField={setFormField}
+        setFormField={setFormField as any}
         tours={tours}
         onSubmit={handleSubmit}
         onClose={handleDialogClose}
@@ -296,7 +296,7 @@ export const QuotesPage: React.FC = () => {
           setIsQuickDialogOpen(open)
         }}
         formData={quickFormData}
-        setFormField={setQuickFormField}
+        setFormField={setQuickFormField as any}
         onSubmit={handleQuickSubmit}
         onClose={handleQuickDialogClose}
       />
@@ -308,7 +308,7 @@ export const QuotesPage: React.FC = () => {
           {(previewQuote as any).quote_type === 'quick' &&
             previewQuoteItems.length > 0 && (
               <PrintableQuickQuote
-                quote={previewQuote}
+                quote={previewQuote as any}
                 items={previewQuoteItems}
                 isOpen={!!previewQuoteId}
                 onClose={() => setPreviewQuoteId(null)}
@@ -321,8 +321,8 @@ export const QuotesPage: React.FC = () => {
             previewQuote.categories &&
             previewQuote.categories.length > 0 && (
               <PrintableQuotation
-                quote={previewQuote}
-                quoteName={previewQuote.name}
+                quote={previewQuote as any}
+                quoteName={previewQuote.name || ''}
                 participantCounts={
                   previewQuote.participant_counts || {
                     adult: previewQuote.group_size || 1,

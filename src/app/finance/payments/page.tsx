@@ -16,7 +16,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers } from 'lucide-react'
+import { Plus, Search, FileDown, Layers, Eye } from 'lucide-react'
 
 // Realtime Hooks
 import {
@@ -26,8 +26,9 @@ import {
 } from '@/hooks/use-realtime-hooks'
 
 // Components
-import { createPaymentColumns, ReceiptSearchDialog } from './components'
+import { ReceiptSearchDialog } from './components'
 import { AddReceiptDialog, BatchReceiptDialog } from '@/features/finance/payments'
+import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
 
 // Hooks
 import { usePaymentData } from './hooks/usePaymentData'
@@ -123,7 +124,16 @@ export default function PaymentsPage() {
   }
 
   // 表格欄位
-  const columns = createPaymentColumns(handleViewDetail)
+  const columns = [
+    { key: 'receipt_number', label: '收款單號', sortable: true },
+    { key: 'receipt_date', label: '收款日期', sortable: true, render: (value: unknown) => <DateCell date={String(value)} /> },
+    { key: 'order_number', label: '訂單編號', sortable: true },
+    { key: 'tour_name', label: '團名', sortable: true },
+    { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value: unknown) => `NT$ ${Number(value).toLocaleString()}` },
+    { key: 'receipt_type', label: '收款方式', sortable: true },
+    { key: 'status', label: '狀態', render: (value: unknown) => <StatusCell type="receipt" status={String(value)} /> },
+    { key: 'actions', label: '操作', render: (_: unknown, row: Receipt) => <ActionCell actions={[{ icon: Eye as any, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
+  ]
 
   return (
     <div className="h-full flex flex-col">

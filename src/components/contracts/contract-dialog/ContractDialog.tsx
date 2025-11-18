@@ -170,7 +170,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 <div>
                   <div className="text-xs text-morandi-secondary">合約範本</div>
                   <div className="text-sm text-morandi-primary font-medium">
-                    {CONTRACT_TEMPLATE_LABELS[tour.contract_template]}
+                    {CONTRACT_TEMPLATE_LABELS[tour.contract_template as any]}
                   </div>
                 </div>
                 <div>

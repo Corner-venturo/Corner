@@ -76,22 +76,22 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
         setAccommodations(accomData || [])
 
         // 載入活動
-        const { data: activData } = await supabase
-          .from('tour_departure_activities')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: activData } = await (supabase.from as any)('tour_departure_activities')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setActivities(activData || [])
+        setActivities((activData || []) as TourDepartureActivity[])
 
         // 載入其他
-        const { data: othersData } = await supabase
-          .from('tour_departure_others')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: othersData } = await (supabase.from as any)('tour_departure_others')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setOthers(othersData || [])
+        setOthers((othersData || []) as TourDepartureOther[])
       } else {
         // 初始化空資料
         setData({
@@ -120,11 +120,11 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
 
       if (!departureDataId) {
         // 新建
-        const { data: newData, error } = await supabase
-          .from('tour_departure_data')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: newData, error } = await (supabase.from as any)('tour_departure_data')
           .insert({
-            tour_id: tour.id,
             ...data,
+            tour_id: tour.id,
           })
           .select()
           .single()
@@ -133,8 +133,8 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
         departureDataId = newData.id
       } else {
         // 更新
-        const { error } = await supabase
-          .from('tour_departure_data')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.from as any)('tour_departure_data')
           .update(data)
           .eq('id', departureDataId)
 

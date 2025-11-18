@@ -37,7 +37,7 @@ export function ContractPrintDialog({ isOpen, onClose, tour }: ContractPrintDial
   // 準備合約資料
   const autoFilledData = useMemo(() => {
     if (!firstOrder || tourMembers.length === 0) return null
-    return prepareContractData(tour, firstOrder, tourMembers[0], itinerary)
+    return prepareContractData(tour, firstOrder as any, tourMembers[0] as any, itinerary)
   }, [tour, firstOrder, tourMembers, itinerary])
 
   // 可編輯的欄位

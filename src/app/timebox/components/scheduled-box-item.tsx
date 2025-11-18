@@ -40,7 +40,7 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
     }
   }, [scheduledBox.id])
 
-  const box = boxes.find(b => b.id === scheduledBox.boxId)
+  const box = boxes.find(b => b.id === scheduledBox.box_id)
   if (!box) return null
 
   const Icon = typeIcons[box.type]
@@ -81,10 +81,10 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0 }: ScheduledBoxI
           </div>
         </div>
 
-        {scheduledBox.completed && scheduledBox.completedAt && (
+        {scheduledBox.completed && scheduledBox.completed_at && (
           <div className="text-[11px] opacity-90">
             ✓{' '}
-            {new Date(scheduledBox.completedAt).toLocaleTimeString('zh-TW', {
+            {new Date(scheduledBox.completed_at).toLocaleTimeString('zh-TW', {
               hour: '2-digit',
               minute: '2-digit',
             })}

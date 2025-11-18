@@ -139,7 +139,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .order('created_at', { ascending: false })
 
     if (!error && data) {
-      set({ accounts: data })
+      set({ accounts: data as Account[] })
       get().calculateStats()
     }
   },
@@ -169,9 +169,9 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
     if (data) {
       logger.log('[addAccount] 成功建立帳戶:', data)
-      set(state => ({ accounts: [...state.accounts, data] }))
+      set(state => ({ accounts: [...state.accounts, data as Account] }))
       get().calculateStats()
-      return data
+      return data as Account
     }
 
     return null
@@ -191,10 +191,10 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
     if (!error && data) {
       set(state => ({
-        accounts: state.accounts.map(a => (a.id === id ? data : a)),
+        accounts: state.accounts.map(a => (a.id === id ? (data as Account) : a)),
       }))
       get().calculateStats()
-      return data
+      return data as Account
     }
     return null
   },
@@ -229,7 +229,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .order('name', { ascending: true })
 
     if (!error && data) {
-      set({ categories: data })
+      set({ categories: data as TransactionCategory[] })
     }
   },
 
@@ -244,8 +244,8 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .single()
 
     if (!error && data) {
-      set(state => ({ categories: [...state.categories, data] }))
-      return data
+      set(state => ({ categories: [...state.categories, data as TransactionCategory] }))
+      return data as TransactionCategory
     }
     return null
   },
@@ -263,7 +263,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .order('created_at', { ascending: false })
 
     if (!error && data) {
-      set({ transactions: data })
+      set({ transactions: data as Transaction[] })
       get().calculateStats()
     }
   },
@@ -282,15 +282,16 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .single()
 
     if (!error && data) {
-      set(state => ({ transactions: [data, ...state.transactions] }))
+      const transaction = data as Transaction
+      set(state => ({ transactions: [transaction, ...state.transactions] }))
 
       // 更新帳戶餘額
-      await get().updateAccountBalance(data)
+      await (get() as any).updateAccountBalance(transaction)
 
       // 重新載入帳戶資料
       await get().fetchAccounts()
 
-      return data.id
+      return transaction.id
     }
     return null
   },
@@ -309,7 +310,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
 
     if (!error && data) {
       set(state => ({
-        transactions: state.transactions.map(t => (t.id === id ? data : t)),
+        transactions: state.transactions.map(t => (t.id === id ? (data as Transaction) : t)),
       }))
 
       // 重新載入帳戶資料
@@ -347,7 +348,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       const balanceChange = transaction.type === 'income' ? transaction.amount : -transaction.amount
 
       const newBalance = account.balance + balanceChange
-      const updates: any = { balance: newBalance }
+      const updates: Record<string, unknown> = { balance: newBalance }
 
       // 信用卡額度計算
       if (account.type === 'credit' && account.credit_limit) {
@@ -362,7 +363,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       const toAccount = accounts.find(a => a.id === transaction.to_account_id)
       if (toAccount) {
         const newBalance = toAccount.balance + transaction.amount
-        const updates: any = { balance: newBalance }
+        const updates: Record<string, unknown> = { balance: newBalance }
 
         if (toAccount.type === 'credit' && toAccount.credit_limit) {
           updates.available_credit = toAccount.credit_limit + newBalance

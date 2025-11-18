@@ -69,7 +69,7 @@ export const OrderList = React.memo(function OrderList({
               <div className="font-medium text-morandi-primary">{order.order_number}</div>
               <div className="text-xs text-morandi-secondary flex items-center">
                 <Calendar size={12} className="mr-1" />
-                {new Date(order.created_at).toLocaleDateString()}
+                {new Date(order.created_at || '').toLocaleDateString()}
               </div>
             </td>
 

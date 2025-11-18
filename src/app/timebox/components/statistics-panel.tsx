@@ -1,6 +1,6 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 
 import { useTimeboxStore } from '@/stores/timebox-store'
 
@@ -9,8 +9,14 @@ interface StatisticsPanelProps {
 }
 
 function StatisticsPanel({ variant = 'panel' }: StatisticsPanelProps) {
-  const { getWeekStatistics } = useTimeboxStore()
-  const stats = getWeekStatistics() as any
+  const { getWeekStatistics, currentWeekId } = useTimeboxStore()
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    if (currentWeekId) {
+      getWeekStatistics(currentWeekId).then(setStats)
+    }
+  }, [currentWeekId, getWeekStatistics])
 
   const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60)

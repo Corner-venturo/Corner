@@ -1,0 +1,404 @@
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { useWorkspaceModuleStore } from '@/stores/workspace-module-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Package,
+  FileText,
+  BarChart3,
+  CheckCircle2,
+  XCircle,
+  Calendar,
+  AlertCircle,
+} from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+
+const MODULE_INFO = {
+  accounting: {
+    name: '會計模組',
+    description: '完整的會計傳票系統，支援自動拋轉與財務報表',
+    icon: FileText,
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    features: [
+      '自動產生會計傳票',
+      '收款/付款自動拋轉',
+      '結團自動產生收入與成本傳票',
+      '手工傳票輸入',
+      '傳票過帳與作廢',
+      '借貸平衡檢查',
+    ],
+  },
+  inventory: {
+    name: '庫存模組',
+    description: '庫存管理系統（開發中）',
+    icon: Package,
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    features: ['庫存追蹤', '進銷存管理', '盤點功能', '庫存警報'],
+  },
+  bi_analytics: {
+    name: 'BI 分析模組',
+    description: 'Business Intelligence 商業智能分析（開發中）',
+    icon: BarChart3,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    features: ['銷售分析', '成本分析', '利潤分析', '自訂報表'],
+  },
+} as const
+
+type ModuleName = keyof typeof MODULE_INFO
+
+export default function ModulesManagementPage() {
+  const user = useAuthStore(state => state.user)
+  const { items: modules, create, update, fetchAll } = useWorkspaceModuleStore()
+  const { workspaces, loadWorkspaces } = useWorkspaceStore()
+
+  const [selectedModule, setSelectedModule] = useState<ModuleName | null>(null)
+  const [showEnableDialog, setShowEnableDialog] = useState(false)
+  const [expiresDate, setExpiresDate] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    fetchAll()
+    loadWorkspaces()
+  }, [])
+
+  const currentWorkspace = workspaces.find((w: any) => w.id === user?.workspace_id)
+
+  const getModuleStatus = (moduleName: ModuleName) => {
+    const module = modules.find(
+      m => m.workspace_id === user?.workspace_id && m.module_name === moduleName
+    )
+
+    if (!module || !module.is_enabled) {
+      return { enabled: false, expired: false, expiresAt: null }
+    }
+
+    const isExpired = module.expires_at ? new Date(module.expires_at) < new Date() : false
+
+    return {
+      enabled: true,
+      expired: isExpired,
+      expiresAt: module.expires_at,
+    }
+  }
+
+  const handleEnableModule = (moduleName: ModuleName) => {
+    setSelectedModule(moduleName)
+    setExpiresDate('')
+    setShowEnableDialog(true)
+  }
+
+  const handleConfirmEnable = async () => {
+    if (!selectedModule || !user?.workspace_id) return
+
+    setLoading(true)
+    try {
+      const existingModule = modules.find(
+        m => m.workspace_id === user.workspace_id && m.module_name === selectedModule
+      )
+
+      if (existingModule) {
+        // 更新現有模組
+        await update(existingModule.id, {
+          is_enabled: true,
+          enabled_at: new Date().toISOString(),
+          expires_at: expiresDate || null,
+        })
+      } else {
+        // 建立新模組
+        await create({
+          workspace_id: user.workspace_id,
+          module_name: selectedModule,
+          is_enabled: true,
+          enabled_at: new Date().toISOString(),
+          expires_at: expiresDate || null,
+        } as any)
+      }
+
+      toast.success(`${MODULE_INFO[selectedModule].name} 已啟用`)
+      setShowEnableDialog(false)
+      setSelectedModule(null)
+    } catch (error) {
+      toast.error('啟用失敗，請稍後再試')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDisableModule = async (moduleName: ModuleName) => {
+    if (!user?.workspace_id) return
+
+    const module = modules.find(
+      m => m.workspace_id === user.workspace_id && m.module_name === moduleName
+    )
+
+    if (!module) return
+
+    if (
+      !confirm(
+        `確定要停用 ${MODULE_INFO[moduleName].name} 嗎？\n\n停用後相關功能將無法使用。`
+      )
+    ) {
+      return
+    }
+
+    setLoading(true)
+    try {
+      await update(module.id, {
+        is_enabled: false,
+      })
+
+      toast.success(`${MODULE_INFO[moduleName].name} 已停用`)
+    } catch (error) {
+      toast.error('停用失敗，請稍後再試')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      <ResponsiveHeader
+        title="系統模組管理"
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '設定', href: '/settings' },
+          { label: '模組管理', href: '/settings/modules' },
+        ]}
+      />
+
+      <div className="pt-[72px] p-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* 工作空間資訊 */}
+          <Card className="bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EB] border-[#E0D8CC]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                當前工作空間
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg font-semibold text-[#3D2914]">
+                {currentWorkspace?.name || '未知工作空間'}
+              </div>
+              <div className="text-sm text-[#9E8F81] mt-1">
+                工作空間 ID: {user?.workspace_id}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 模組列表 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(Object.keys(MODULE_INFO) as ModuleName[]).map(moduleName => {
+              const info = MODULE_INFO[moduleName]
+              const status = getModuleStatus(moduleName)
+              const Icon = info.icon
+
+              return (
+                <Card
+                  key={moduleName}
+                  className={cn(
+                    'overflow-hidden transition-all hover:shadow-lg',
+                    status.enabled && !status.expired && 'ring-2 ring-green-500 ring-offset-2'
+                  )}
+                >
+                  <CardHeader className={cn('pb-4', info.bgColor, info.borderColor, 'border-b')}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            'w-12 h-12 rounded-lg flex items-center justify-center bg-white',
+                            info.borderColor,
+                            'border-2'
+                          )}
+                        >
+                          <Icon className={cn('h-6 w-6', info.color)} />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">{info.name}</CardTitle>
+                          <CardDescription className="mt-1">{info.description}</CardDescription>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="pt-4 space-y-4">
+                    {/* 狀態 */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-[#6B5D52]">狀態</span>
+                      {status.enabled && !status.expired ? (
+                        <Badge className="bg-green-100 text-green-700 border-green-300">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          已啟用
+                        </Badge>
+                      ) : status.enabled && status.expired ? (
+                        <Badge className="bg-red-100 text-red-700 border-red-300">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          已過期
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-gray-600">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          未啟用
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* 到期日 */}
+                    {status.enabled && status.expiresAt && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-[#9E8F81]">到期日</span>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-[#9E8F81]" />
+                          <span
+                            className={cn(
+                              'font-medium',
+                              status.expired ? 'text-red-600' : 'text-[#3D2914]'
+                            )}
+                          >
+                            {new Date(status.expiresAt).toLocaleDateString('zh-TW')}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 功能列表 */}
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-[#6B5D52]">功能特性</div>
+                      <ul className="space-y-1.5">
+                        {info.features.map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm text-[#9E8F81]">
+                            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* 操作按鈕 */}
+                    <div className="pt-2">
+                      {status.enabled && !status.expired ? (
+                        <Button
+                          onClick={() => handleDisableModule(moduleName)}
+                          variant="outline"
+                          className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                          disabled={loading}
+                        >
+                          停用模組
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleEnableModule(moduleName)}
+                          className="w-full bg-[#C9A961] hover:bg-[#B8985A] text-white"
+                          disabled={loading}
+                        >
+                          {status.enabled && status.expired ? '重新啟用' : '啟用模組'}
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+
+          {/* 說明 */}
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div className="flex-1">
+                  <div className="font-semibold text-blue-900 mb-1">模組說明</div>
+                  <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                    <li>模組需要啟用後才能使用相關功能</li>
+                    <li>可設定到期日，過期後會自動停用</li>
+                    <li>停用模組不會刪除已建立的資料，重新啟用後可繼續使用</li>
+                    <li>每個工作空間可獨立管理模組授權</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* 啟用模組對話框 */}
+      <Dialog open={showEnableDialog} onOpenChange={setShowEnableDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              啟用 {selectedModule && MODULE_INFO[selectedModule].name}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedModule && MODULE_INFO[selectedModule].description}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="expires">授權到期日（選填）</Label>
+              <Input
+                id="expires"
+                type="date"
+                value={expiresDate}
+                onChange={e => setExpiresDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+              />
+              <p className="text-sm text-[#9E8F81]">留空表示永久授權</p>
+            </div>
+
+            {selectedModule && (
+              <div className="bg-[#FAF8F5] border border-[#E0D8CC] rounded-lg p-4">
+                <div className="text-sm font-medium text-[#6B5D52] mb-2">包含功能</div>
+                <ul className="space-y-1.5">
+                  {MODULE_INFO[selectedModule].features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-[#9E8F81]">
+                      <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEnableDialog(false)} disabled={loading}>
+              取消
+            </Button>
+            <Button
+              onClick={handleConfirmEnable}
+              className="bg-[#C9A961] hover:bg-[#B8985A] text-white"
+              disabled={loading}
+            >
+              {loading ? '處理中...' : '確認啟用'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

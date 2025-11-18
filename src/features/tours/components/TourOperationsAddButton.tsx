@@ -33,7 +33,7 @@ export function TourOperationsAddButton({
   )
 
   // Calculate assigned members
-  const assignedMembers = allTourMembers.filter(member => member.assignedRoom).length
+  const assignedMembers = allTourMembers.filter(member => member.assigned_room).length
 
   return (
     <>

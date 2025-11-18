@@ -48,7 +48,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
           granted_by_employee:employees!user_workspace_permissions_granted_by_fkey(id, name)
         `)
         .eq('is_active', true)
-        .order('granted_at', { ascending: false })
+        .order('granted_at', { ascending: false }) as any
 
       if (error) throw error
 
@@ -71,9 +71,9 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   fetchUserAccess: async (userId: string) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.rpc('get_user_workspace_permissions', {
+      const { data, error } = await supabase.rpc('get_user_workspace_permissions' as any, {
         p_user_id: userId,
-      })
+      }) as any
 
       if (error) throw error
 
@@ -88,7 +88,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   grantAccess: async (params: GrantWorkspaceAccessParams) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.rpc('grant_workspace_access', {
+      const { data, error } = await supabase.rpc('grant_workspace_access' as any, {
         p_target_user_id: params.target_user_id,
         p_workspace_id: params.workspace_id,
         p_can_view: params.can_view ?? true,
@@ -97,7 +97,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
         p_can_manage_finance: params.can_manage_finance ?? false,
         p_expires_at: params.expires_at ?? null,
         p_notes: params.notes ?? null,
-      })
+      }) as any
 
       if (error) throw error
 
@@ -105,7 +105,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
       await get().fetchAllPermissions()
 
       set({ loading: false })
-      return data as string
+      return (data as any) as string
     } catch (error: any) {
       logger.error('[Workspace Permission] Grant access failed:', error)
       set({ error: error.message, loading: false })
@@ -117,10 +117,10 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   revokeAccess: async (userId: string, workspaceId: string) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.rpc('revoke_workspace_access', {
+      const { data, error } = await supabase.rpc('revoke_workspace_access' as any, {
         p_target_user_id: userId,
         p_workspace_id: workspaceId,
-      })
+      }) as any
 
       if (error) throw error
 
@@ -128,7 +128,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
       await get().fetchAllPermissions()
 
       set({ loading: false })
-      return data as boolean
+      return (data as any) as boolean
     } catch (error: any) {
       logger.error('[Workspace Permission] Revoke access failed:', error)
       set({ error: error.message, loading: false })

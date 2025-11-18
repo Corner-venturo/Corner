@@ -5,7 +5,7 @@ import { X, Search, Receipt } from 'lucide-react'
 import { useOrderStore } from '@/stores'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { _Order } from '@/stores/types'
+import { Order } from '@/stores/types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
 interface ShareOrdersDialogProps {
@@ -45,8 +45,8 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
         // 1. 成本 > 0 且收款 = 0（完全沒收）
         // 2. 收款率 < 30%
         // 3. 缺口金額大的優先
-        const aFullyUnpaid = a.total_amount > 0 && a.paid_amount === 0
-        const bFullyUnpaid = b.total_amount > 0 && b.paid_amount === 0
+        const aFullyUnpaid = (a.total_amount || 0) > 0 && (a.paid_amount || 0) === 0
+        const bFullyUnpaid = (b.total_amount || 0) > 0 && (b.paid_amount || 0) === 0
 
         if (aFullyUnpaid && !bFullyUnpaid) return -1
         if (!aFullyUnpaid && bFullyUnpaid) return 1
@@ -68,7 +68,7 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
     const query = searchQuery.toLowerCase()
     return ordersWithGap.filter(
       order =>
-        order.order_number.toLowerCase().includes(query) ||
+        order.order_number?.toLowerCase().includes(query) ||
         order.contact_person?.toLowerCase().includes(query) ||
         order.tour_name?.toLowerCase().includes(query)
     )
@@ -188,7 +188,7 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
               <tbody>
                 {filteredOrders.map(order => {
                   const isSelected = selectedOrders.has(order.id)
-                  const isFullyUnpaid = order.total_amount > 0 && order.paid_amount === 0
+                  const isFullyUnpaid = (order.total_amount || 0) > 0 && (order.paid_amount || 0) === 0
                   const isLowRate = order.collectionRate < 30
 
                   return (
@@ -215,10 +215,10 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
                         {order.contact_person || '-'}
                       </td>
                       <td className="py-2 px-2 text-sm text-right text-morandi-primary">
-                        ${order.total_amount.toLocaleString()}
+                        ${(order.total_amount || 0).toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-sm text-right text-morandi-primary">
-                        ${order.paid_amount.toLocaleString()}
+                        ${(order.paid_amount || 0).toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-sm text-right font-semibold text-red-600">
                         ${order.gap.toLocaleString()}

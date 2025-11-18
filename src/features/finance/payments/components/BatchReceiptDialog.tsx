@@ -88,10 +88,10 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       {
         order_id: firstAvailableOrder.id,
         order_number: firstAvailableOrder.code,
-        tour_id: firstAvailableOrder.tour_id,
+        tour_id: firstAvailableOrder.tour_id ?? '',
         code: firstAvailableOrder.code || '',
         tour_name: firstAvailableOrder.tour_name || '',
-        contact_person: firstAvailableOrder.contact_person,
+        contact_person: firstAvailableOrder.contact_person ?? '',
         allocated_amount: 0,
       },
     ])
@@ -117,10 +117,10 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     updateOrderAllocation(index, {
       order_id: order.id,
       order_number: order.code,
-      tour_id: order.tour_id,
+      tour_id: order.tour_id ?? '',
       code: order.code || '',
       tour_name: order.tour_name || '',
-      contact_person: order.contact_person,
+      contact_person: order.contact_person ?? '',
     })
   }
 
@@ -205,7 +205,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         status: '已收款',
         note,
         created_by: '1', // 從 auth store 取得當前用戶
-      } as unknown)
+      } as any)
 
       alert('✅ 批量收款單建立成功')
       onOpenChange(false)
@@ -248,7 +248,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                   <Select
                     value={item.payment_method}
                     onValueChange={value =>
-                      updatePaymentItem(index, { payment_method: value as unknown })
+                      updatePaymentItem(index, { payment_method: value as any })
                     }
                   >
                     <SelectTrigger className="w-32">

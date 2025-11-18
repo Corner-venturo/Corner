@@ -177,20 +177,20 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       key: 'title',
       label: '任務標題',
       sortable: true,
-      render: (value: string, todo: Todo) => (
+      render: (value: unknown, todo: Todo) => (
         <div className="flex items-center gap-2">
           <StarRating value={todo.priority} readonly size="sm" />
-          <span className="font-medium text-morandi-primary">{value}</span>
+          <span className="font-medium text-morandi-primary">{String(value)}</span>
         </div>
       ),
     },
     {
       key: 'assignee',
       label: '負責人',
-      render: (value: string) => (
+      render: (value: unknown) => (
         <div className="flex items-center gap-2">
           <User size={14} className="text-morandi-secondary" />
-          <span className="text-morandi-primary">{getEmployeeName(value)}</span>
+          <span className="text-morandi-primary">{getEmployeeName(String(value))}</span>
         </div>
       ),
     },
@@ -198,11 +198,11 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       key: 'deadline',
       label: '期限',
       sortable: true,
-      render: (value: string) => (
+      render: (value: unknown) => (
         <div className="flex items-center gap-2">
           <Calendar size={14} className="text-morandi-secondary" />
           <span className="text-sm text-morandi-primary">
-            {value ? new Date(value).toLocaleDateString() : '未設定'}
+            {value ? new Date(String(value)).toLocaleDateString() : '未設定'}
           </span>
         </div>
       ),
@@ -230,16 +230,16 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     {
       key: 'status',
       label: '狀態',
-      render: (value: Todo['status']) => (
+      render: (value: unknown) => (
         <span
           className={cn(
             'inline-flex items-center gap-1 text-sm font-medium',
-            getStatusColor(value)
+            getStatusColor(value as Todo['status'])
           )}
         >
           {value === 'completed' && <CheckCircle size={14} />}
           {value === 'in_progress' && <Clock size={14} />}
-          {getStatusLabel(value)}
+          {getStatusLabel(value as Todo['status'])}
         </span>
       ),
     },

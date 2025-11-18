@@ -7,6 +7,8 @@ import { useMemo } from 'react'
 import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+import { generateVoucherFromPayment } from '@/services/voucher-auto-generator'
+import { useAccountingModule } from '@/hooks/use-accounting-module'
 import type { ReceiptItem } from '@/stores'
 
 const RECEIPT_TYPES = {
@@ -22,6 +24,7 @@ export function usePaymentData() {
   const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore()
   const { items: linkpayLogs } = useLinkPayLogStore()
   const { user } = useAuthStore()
+  const { hasAccounting, isExpired } = useAccountingModule()
 
   // 過濾可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
@@ -81,7 +84,7 @@ export function usePaymentData() {
       const receiptNumber = generateReceiptNumber(workspaceCode, item.transaction_date, receipts)
 
       // 建立收款單
-      await createReceipt({
+      const receipt = await createReceipt({
         receipt_number: receiptNumber,
         workspace_id: user.workspace_id || '',
         order_id: selectedOrderId,
@@ -106,7 +109,30 @@ export function usePaymentData() {
         note: item.note || null,
         created_by: user.id,
         updated_by: user.id,
-      })
+      } as any)
+
+      // ✅ 自動產生會計傳票（如果啟用會計模組）
+      if (hasAccounting && !isExpired && user.workspace_id) {
+        try {
+          // 判斷收款方式
+          const paymentMethod = item.receipt_type === RECEIPT_TYPES.CASH ? 'cash' : 'bank'
+
+          // 產生傳票
+          await generateVoucherFromPayment({
+            workspace_id: user.workspace_id,
+            order_id: selectedOrderId,
+            payment_amount: item.amount,
+            payment_date: item.transaction_date,
+            payment_method: paymentMethod,
+            description: `${selectedOrder?.order_number || ''} - ${receiptNumber} 收款`,
+          })
+
+          logger.info('✅ 收款傳票已自動產生', { receiptNumber, amount: item.amount })
+        } catch (error) {
+          logger.error('❌ 傳票產生失敗（不影響收款單建立）:', error)
+          // 不阻斷收款流程
+        }
+      }
 
       // 如果是 LinkPay，呼叫 API 生成付款連結
       if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {

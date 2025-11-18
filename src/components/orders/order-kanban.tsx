@@ -5,7 +5,7 @@ import { Order, Tour } from '@/stores/types'
 import { useOrderStore } from '@/stores'
 import { Users, DollarSign, Calendar, User, AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { _Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 interface OrderKanbanProps {
   orders: Order[]
@@ -55,7 +55,7 @@ export function OrderKanban({ orders, tours, onOrderClick }: OrderKanbanProps) {
 
   const handleDrop = (status: PaymentStatus) => {
     if (draggedOrder) {
-      updateOrder(draggedOrder.id, { payment_status: status as unknown })
+      updateOrder(draggedOrder.id, { payment_status: status })
       setDraggedOrder(null)
     }
   }
