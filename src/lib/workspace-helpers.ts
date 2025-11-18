@@ -55,7 +55,7 @@ export function getCurrentWorkspaceCode(): string | null {
     // 嘗試載入 workspaces
     if (workspaceStore.fetchAll) {
       logger.log('[getCurrentWorkspaceCode] Triggering fetchAll()...')
-      workspaceStore.fetchAll()
+      workspaceStore.fetchAll().catch((err: any) => logger.error('fetchAll failed:', err))
     }
     return null
   }
@@ -68,7 +68,7 @@ export function getCurrentWorkspaceCode(): string | null {
       const workspace = workspaces.find(w => w.id === selectedWorkspaceId)
       if (workspace) {
         // ✅ 使用 workspace.code 欄位（如 TP, TC）
-        return workspace.code || workspace.name.substring(0, 2).toUpperCase()
+        return (workspace as any).code || workspace.name.substring(0, 2).toUpperCase()
       }
       logger.warn(`[getCurrentWorkspaceCode] Super admin selected workspace ${selectedWorkspaceId} not found`)
     }
@@ -78,7 +78,7 @@ export function getCurrentWorkspaceCode(): string | null {
       const defaultWorkspace = workspaces[0]
       logger.warn(`[getCurrentWorkspaceCode] Super admin has no selected workspace, using default: ${defaultWorkspace.name}`)
       // ✅ 使用 workspace.code 欄位（如 TP, TC）
-      return defaultWorkspace.code || defaultWorkspace.name.substring(0, 2).toUpperCase()
+      return (defaultWorkspace as any).code || defaultWorkspace.name.substring(0, 2).toUpperCase()
     }
 
     logger.warn('[getCurrentWorkspaceCode] Super admin has no workspace available')
@@ -95,7 +95,7 @@ export function getCurrentWorkspaceCode(): string | null {
   const workspace = workspaces.find(w => w.id === workspaceId)
   if (workspace) {
     // ✅ 使用 workspace.code 欄位（如 TP, TC）
-    return workspace.code || workspace.name.substring(0, 2).toUpperCase()
+    return (workspace as any).code || workspace.name.substring(0, 2).toUpperCase()
   }
 
   logger.warn(`[getCurrentWorkspaceCode] Workspace ${workspaceId} not found in store`)
@@ -119,7 +119,7 @@ export function getCurrentWorkspace() {
   // 檢查 workspaces 是否已載入
   if (workspaces.length === 0) {
     logger.warn('[getCurrentWorkspace] Workspaces not loaded yet')
-    workspaceStore.fetchAll?.()
+    workspaceStore.fetchAll?.().catch((err: any) => logger.error('fetchAll failed:', err))
     return null
   }
 

@@ -1,13 +1,5 @@
 'use client'
 
-import { _Input } from '@/components/ui/input'
-import { _DollarSign } from 'lucide-react'
-// import { useCurrency } from './currency/useCurrency';
-// import { currencies } from './currency/currencyData';
-// import { getCurrencyInfo, getCurrentRate, convertAmount } from './currency/currencyUtils';
-// import { CurrencySelector } from './currency/CurrencySelector';
-// import { ExchangeRateDisplay } from './currency/ExchangeRateDisplay';
-
 /**
  * 匯率轉換小工具
  * - 支援多種貨幣轉換

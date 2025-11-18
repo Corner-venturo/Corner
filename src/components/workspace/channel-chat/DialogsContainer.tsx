@@ -33,14 +33,14 @@ interface DialogsContainerProps {
   // Create Receipt Dialog
   showCreateReceiptDialog: boolean
   setShowCreateReceiptDialog: (show: boolean) => void
-  selectedOrder: unknown
-  setSelectedOrder: (order: unknown) => void
+  selectedOrder: any
+  setSelectedOrder: (order: any) => void
 
   // Create Payment Dialog
   showCreatePaymentDialog: boolean
   setShowCreatePaymentDialog: (show: boolean) => void
-  selectedAdvanceItem: unknown
-  setSelectedAdvanceItem: (item: unknown) => void
+  selectedAdvanceItem: any
+  setSelectedAdvanceItem: (item: any) => void
   selectedAdvanceListId: string
   setSelectedAdvanceListId: (id: string) => void
   onCreatePaymentSuccess: () => void

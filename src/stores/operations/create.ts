@@ -177,7 +177,7 @@ export async function create<T extends BaseEntity>(
         // 🔥 修正：從 IndexedDB 讀取所有資料以生成編號（避免重複）
         const allItemsFromDB = await indexedDB.getAll()
         const itemsForCodeGeneration = allItemsFromDB.filter(
-          item => !item._deleted && item.workspace_id === workspaceId
+          item => !(item as any)._deleted && (item as any).workspace_id === workspaceId
         )
 
         // 延遲取得 workspace code（避免循環依賴）

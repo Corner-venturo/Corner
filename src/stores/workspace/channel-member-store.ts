@@ -35,8 +35,8 @@ export interface ChannelMemberBase {
  * 注意：channel_members 不使用 code 欄位
  */
 export const useChannelMemberStore = createStore<ChannelMemberBase & BaseEntity>(
-  'channel_members',
-  undefined,
+  'channel_members' as any,
+  undefined as any,
   true
 )
 

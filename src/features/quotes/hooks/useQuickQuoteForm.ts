@@ -7,6 +7,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores'
+import { supabase } from '@/lib/supabase/client'
 
 interface QuickQuoteItem {
   id: string
@@ -47,28 +48,9 @@ interface UseQuickQuoteFormParams {
 
 export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
   const user = useAuthStore(state => state.user)
-  const [workspaceId, setWorkspaceId] = useState<string | null>(null)
 
-
-  // 如果 user.workspace_id 不存在，從資料庫讀取
-  useEffect(() => {
-    const fetchWorkspaceId = async () => {
-      if (user?.workspace_id) {
-        setWorkspaceId(user.workspace_id)
-        return
-      }
-
-      // ✅ 直接使用 user.workspace_id（已在 auth-store 中確保一定有值）
-      if (user?.workspace_id) {
-        setWorkspaceId(user.workspace_id)
-      }
-    }
-
-    // 同步執行，不需要 async
-    if (user?.workspace_id) {
-      setWorkspaceId(user.workspace_id)
-    }
-  }, [user?.id, user?.workspace_id])
+  // ✅ 直接從 user 取得 workspace_id（確保非空）
+  const workspaceId = user?.workspace_id || null
 
   // 初始化時從 localStorage 載入草稿
   const [formData, setFormData] = useState<QuickQuoteFormData>(() => {

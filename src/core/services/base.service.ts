@@ -78,8 +78,8 @@ export abstract class BaseService<T extends BaseEntity> {
       // 排序
       if (params?.sortBy) {
         allData.sort((a, b) => {
-          const aVal = (a as Record<string, unknown>)[params.sortBy!]
-          const bVal = (b as Record<string, unknown>)[params.sortBy!]
+          const aVal = (a as any)[params.sortBy!]
+          const bVal = (b as any)[params.sortBy!]
 
           if (aVal < bVal) return params.sortOrder === 'desc' ? 1 : -1
           if (aVal > bVal) return params.sortOrder === 'desc' ? -1 : 1

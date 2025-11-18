@@ -431,8 +431,8 @@ export const useTimeboxStore = create<TimeboxState>((set, get) => ({
     const updated = { ...currentData }
     updated.setsCompleted[setIndex] = !updated.setsCompleted[setIndex]
     updated.completedSetsTime[setIndex] = updated.setsCompleted[setIndex]
-      ? new Date()
-      : (null as unknown)
+      ? (new Date() as any)
+      : (null as any)
 
     await get().updateScheduledBox(boxId, { workoutData: updated })
   },

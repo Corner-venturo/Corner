@@ -11,7 +11,7 @@ export function TimerWidget() {
   const [isRunning, setIsRunning] = useState(false)
 
   useEffect(() => {
-    let interval: unknown
+    let interval: any
     if (isRunning) {
       interval = setInterval(() => {
         setSeconds(s => s + 1)

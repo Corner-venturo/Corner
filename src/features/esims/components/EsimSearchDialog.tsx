@@ -112,7 +112,7 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
             <Label htmlFor="status">狀態</Label>
             <Select
               value={filters.status?.toString()}
-              onValueChange={value => setFilters({ ...filters, status: Number(value) })}
+              onValueChange={value => setFilters({ ...filters, status: Number(value) as any })}
             >
               <SelectTrigger id="status">
                 <SelectValue placeholder="選擇狀態" />

@@ -132,7 +132,7 @@ export default function ContractDetailPage() {
               <div>
                 <div className="text-sm text-morandi-secondary">合約範本</div>
                 <div className="text-morandi-primary font-medium">
-                  {CONTRACT_TEMPLATE_LABELS[tour.contract_template as any]}
+                  {(CONTRACT_TEMPLATE_LABELS as any)[tour.contract_template]}
                 </div>
               </div>
               <div>

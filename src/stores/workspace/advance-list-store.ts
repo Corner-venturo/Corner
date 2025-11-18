@@ -23,13 +23,14 @@ type AdvanceListEntity = AdvanceList & Pick<BaseEntity, 'updated_at'>
  * - 通常只需要查看最近的墊款
  * - 歷史墊款可以按需載入
  */
-export const useAdvanceListStore = createStore<AdvanceListEntity>('advance_lists', {
+export const useAdvanceListStore = createStore<AdvanceListEntity>({
+  tableName: 'advance_lists' as any,
   cacheStrategy: 'time_range',
   cacheConfig: {
     months: 3,
   },
   enableRealtime: true,
-})
+} as any)
 
 /**
  * Hook 型別（方便使用）

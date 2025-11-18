@@ -52,8 +52,6 @@ interface TourExpandedViewProps {
   setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
   triggerAddOnAdd: Record<string, boolean>
   setTriggerAddOnAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
-  triggerRefundAdd: Record<string, boolean>
-  setTriggerRefundAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   triggerPaymentAdd: Record<string, boolean>
   setTriggerPaymentAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   triggerCostAdd: Record<string, boolean>
@@ -70,8 +68,6 @@ export function TourExpandedView({
   setTourExtraFields,
   triggerAddOnAdd,
   setTriggerAddOnAdd,
-  triggerRefundAdd,
-  setTriggerRefundAdd,
   triggerPaymentAdd,
   setTriggerPaymentAdd,
   triggerCostAdd,
@@ -87,10 +83,10 @@ export function TourExpandedView({
     }
 
     try {
-      const { useWorkspaceChannels } = await import('@/stores/workspace/channels-store')
+      const { useChannelStore } = await import('@/stores/workspace/channel-store')
       const { toast } = await import('sonner')
 
-      const { createChannel } = useWorkspaceChannels.getState()
+      const { create: createChannel } = useChannelStore.getState()
 
       // 獲取預設工作空間 ID
       const { supabase } = await import('@/lib/supabase/client')
@@ -189,15 +185,6 @@ export function TourExpandedView({
               新增加購
             </button>
           )}
-          {activeTabs[tour.id] === 'refunds' && (
-            <button
-              onClick={() => setTriggerRefundAdd(prev => ({ ...prev, [tour.id]: true }))}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
-            >
-              <Plus size={14} className="mr-1" />
-              新增退費
-            </button>
-          )}
           {activeTabs[tour.id] === 'payments' && (
             <button
               onClick={() => setTriggerPaymentAdd(prev => ({ ...prev, [tour.id]: true }))}
@@ -250,13 +237,7 @@ export function TourExpandedView({
           />
         )}
         {activeTabs[tour.id] === 'costs' && (
-          <TourCosts
-            tour={tour}
-            triggerAdd={triggerCostAdd[tour.id] || false}
-            onTriggerAddComplete={() =>
-              setTriggerCostAdd(prev => ({ ...prev, [tour.id]: false }))
-            }
-          />
+          <TourCosts tour={tour} />
         )}
         {activeTabs[tour.id] === 'documents' && (
           <div className="text-center py-8 text-morandi-secondary">

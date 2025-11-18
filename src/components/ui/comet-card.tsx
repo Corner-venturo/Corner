@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils'
-import { _motion } from 'framer-motion'
 import React, { useState, useRef } from 'react'
 
 interface CometCardProps {

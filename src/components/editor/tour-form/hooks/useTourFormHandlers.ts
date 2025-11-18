@@ -17,7 +17,7 @@ export function useTourFormHandlers(
   // 更新城市時自動設定封面圖片（從 Supabase 取得）
   const updateCity = (city: string) => {
     // 從資料庫找城市資料
-    const cityData = cities.find(c => c.name === city)
+    const cityData = cities.find((c: any) => c.name === city)
 
     // 優先使用 Supabase Storage 的圖片
     let coverImage = data.coverImage // 保留現有圖片
@@ -40,7 +40,7 @@ export function useTourFormHandlers(
       ...data,
       city,
       coverImage,
-    })
+    } as any)
   }
 
   const updateNestedField = (parent: string, field: string, value: unknown) => {

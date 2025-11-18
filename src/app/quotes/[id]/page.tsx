@@ -112,7 +112,7 @@ export default function QuoteDetailPage() {
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: any) => {
-      setCategories(versionData.categories)
+      setCategories(versionData.categories || [])
       setAccommodationDays(versionData.accommodation_days || 0)
       if (versionData.participant_counts) {
         setParticipantCounts(versionData.participant_counts)
@@ -194,7 +194,7 @@ export default function QuoteDetailPage() {
           if (scrollRef.current) {
             scrollRef.current.classList.remove('scrolling')
           }
-        }, 1000)
+        }, 1000) as any
       }
     }
 
@@ -219,7 +219,7 @@ export default function QuoteDetailPage() {
 
   // ✅ 如果是快速報價單，顯示快速報價單介面
   if (quote.quote_type === 'quick') {
-    return <QuickQuoteDetail quote={quote} onUpdate={data => updateQuote(quote.id, data)} />
+    return <QuickQuoteDetail quote={quote as any} onUpdate={(data: any) => updateQuote(quote.id, data as any) as any} />
   }
 
   return (

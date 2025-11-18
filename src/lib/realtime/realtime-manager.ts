@@ -125,11 +125,10 @@ class RealtimeManager {
     try {
       // 創建唯一的 channel 名稱
       const channelName = `realtime:${config.table}:${subscriptionId}`
-      const channel = supabase.channel(channelName)
+      const channel: any = supabase.channel(channelName)
 
       // 設定 Postgres 變更監聽
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (channel as any).on(
+      channel.on(
         'postgres_changes',
         {
           event: config.event || '*',
@@ -137,13 +136,13 @@ class RealtimeManager {
           table: config.table,
           filter: config.filter,
         },
-        (payload: PostgresChangesPayload<T>) => {
-          this.handleRealtimeChange(subscriptionId, config, payload)
+        (payload: any) => {
+          this.handleRealtimeChange(subscriptionId, config, payload as any)
         }
       )
 
       // 訂閱並處理狀態變更
-      channel.subscribe((status: any) => {
+      channel.subscribe((status: string) => {
         this.handleSubscriptionStatus(subscriptionId, status)
       })
 
@@ -158,10 +157,10 @@ class RealtimeManager {
   /**
    * 處理 Realtime 變更事件
    */
-  private handleRealtimeChange<T>(
+  private handleRealtimeChange<T = any>(
     subscriptionId: string,
     config: RealtimeSubscriptionConfig<T>,
-    payload: PostgresChangesPayload<T>
+    payload: any
   ): void {
     this.log(`Realtime change [${subscriptionId}]:`, payload)
 

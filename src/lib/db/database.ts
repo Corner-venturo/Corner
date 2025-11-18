@@ -119,7 +119,7 @@ export class LocalDatabase {
     updates: Array<{ id: string; data: Partial<T> }>
   ): Promise<T[]> {
     const db = await this.ensureInit()
-    return WriteOps.updateMany<T>(db, tableName, updates, WriteOps.update)
+    return WriteOps.updateMany<T>(db, tableName, updates, WriteOps.update as any)
   }
 
   /**

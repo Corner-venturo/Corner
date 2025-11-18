@@ -35,6 +35,7 @@ export const TourPayments = React.memo(function TourPayments({
   const { toast } = useToast()
 
   const addPayment = async (data: {
+    type?: string
     tour_id: string
     order_id?: string
     amount: number
@@ -75,7 +76,7 @@ export const TourPayments = React.memo(function TourPayments({
         description: '收款單建立成功',
       })
     } catch (error) {
-      logger.error('建立收款單失敗:', error)
+      logger.error('建立收款單失敗:', error as any)
       toast({
         title: '錯誤',
         description: '建立收款單失敗',
@@ -171,12 +172,17 @@ export const TourPayments = React.memo(function TourPayments({
   const remaining_amount = Math.max(0, totalOrderAmount - totalConfirmed)
 
   const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, string> = {
+      confirmed: '已確認',
+      pending: '待確認',
+      completed: '已完成',
+    }
     const badges: Record<string, string> = {
       已確認: 'bg-morandi-green text-white',
       待確認: 'bg-morandi-gold text-white',
       已完成: 'bg-morandi-container text-morandi-primary',
     }
-    return badges[status] || 'bg-morandi-container text-morandi-secondary'
+    return badges[statusMap[status] || status] || 'bg-morandi-container text-morandi-secondary'
   }
 
   const getMethodBadge = (method: string) => {

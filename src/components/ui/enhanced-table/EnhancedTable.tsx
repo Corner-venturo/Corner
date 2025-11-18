@@ -29,8 +29,6 @@ export function EnhancedTable({
   expandable,
   actions,
   rowClassName,
-  _bordered = true,
-  bordered,
   striped = false,
   hoverable = true,
   isLoading,

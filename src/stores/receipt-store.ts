@@ -7,8 +7,8 @@ import { createStore } from './core/create-store'
 import type { Receipt } from '@/types/receipt.types'
 
 export const useReceiptStore = createStore<Receipt>({
-  tableName: 'receipts',
+  tableName: 'receipts' as any,
   codePrefix: 'R',
   enableSupabase: true,
   fastInsert: true,
-})
+} as any)

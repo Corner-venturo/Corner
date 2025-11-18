@@ -53,10 +53,9 @@ export function MainLayout({ children }: MainLayoutProps) {
 
     // 給 Zustand persist 一點時間載入
     const checkTimeout = setTimeout(() => {
-      const authState = useAuthStore.getState()
-      const authUser = authState.user
-
       // 暫時停用檢查,避免無限循環
+      // const authState = useAuthStore.getState()
+      // const authUser = authState.user
       // if (!authUser) {
       //   router.push('/login');
       // }

@@ -305,6 +305,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           group_code: finalGroupCode,
           order_number: targetOrderNumber || undefined,
           product_id: item.product_id,
+          product_region: item.product_region,
           quantity: item.quantity,
           price: productPrice, // 儲存產品價格
           email: item.email,
@@ -339,6 +340,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
       setEsimItems([
         {
           id: '1',
+          product_region: '',
           product_id: '',
           quantity: 1,
           email: '',

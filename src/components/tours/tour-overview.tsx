@@ -30,7 +30,7 @@ export const TourOverview = React.memo(function TourOverview({
   const { items: orders } = useOrderStore()
 
   // 如果有 orderFilter，取得該訂單的資料
-  const order = orderFilter ? orders.find(o => o.id === orderFilter) : null
+  const order = (orderFilter ? orders.find(o => o.id === orderFilter) : null) as any
 
   // 根據是否為訂單視圖，顯示不同的卡片資料
   const overviewCards = order
@@ -86,27 +86,27 @@ export const TourOverview = React.memo(function TourOverview({
         },
         {
           title: '合約狀態',
-          value: tour.contract_status,
+          value: tour.contract_status || '未簽約',
           icon: tour.contract_status === 'signed' ? CheckCircle : AlertCircle,
           color: tour.contract_status === 'signed' ? 'text-morandi-green' : 'text-morandi-red',
         },
         {
           title: '總收入',
-          value: `NT$ ${tour.total_revenue.toLocaleString()}`,
+          value: `NT$ ${(tour.total_revenue ?? 0).toLocaleString()}`,
           icon: TrendingUp,
           color: 'text-morandi-green',
         },
         {
           title: '總支出',
-          value: `NT$ ${tour.total_cost.toLocaleString()}`,
+          value: `NT$ ${(tour.total_cost ?? 0).toLocaleString()}`,
           icon: TrendingUp,
           color: 'text-morandi-red',
         },
         {
           title: '淨利潤',
-          value: `NT$ ${tour.profit.toLocaleString()}`,
+          value: `NT$ ${(tour.profit ?? 0).toLocaleString()}`,
           icon: TrendingUp,
-          color: tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red',
+          color: (tour.profit ?? 0) >= 0 ? 'text-morandi-green' : 'text-morandi-red',
         },
         {
           title: '總訂單數',
@@ -116,7 +116,7 @@ export const TourOverview = React.memo(function TourOverview({
         },
       ]
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | undefined) => {
     const badges: Record<string, string> = {
       提案: 'bg-morandi-gold text-white',
       進行中: 'bg-morandi-green text-white',
@@ -124,7 +124,7 @@ export const TourOverview = React.memo(function TourOverview({
       結案: 'bg-morandi-container text-morandi-secondary',
       特殊團: 'bg-morandi-red text-white',
     }
-    return badges[status] || 'bg-morandi-container text-morandi-secondary'
+    return badges[status || ''] || 'bg-morandi-container text-morandi-secondary'
   }
 
   return (

@@ -67,7 +67,7 @@ export function GroupHistoryTab({ customerId }: GroupHistoryTabProps) {
           created_at: order.created_at,
         }
       })
-      .filter(Boolean) as GroupHistory[]
+      .filter(Boolean) as unknown as GroupHistory[]
 
     // 按建立時間排序（最新的在前）
     history.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())

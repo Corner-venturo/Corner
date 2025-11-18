@@ -89,8 +89,8 @@ export const useQuoteState = () => {
       }
     }
 
-    // 如果 quote 有 group_size 或 number_of_people，使用它們
-    const quoteGroupSize = quote?.group_size || quote?.number_of_people
+    // 如果 quote 有 group_size，使用它
+    const quoteGroupSize = quote?.group_size
     if (quoteGroupSize && quoteGroupSize > 0) {
       return {
         adult: quoteGroupSize,

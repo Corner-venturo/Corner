@@ -6,7 +6,7 @@
 import _bcrypt from 'bcryptjs'
 import { localDB } from '@/lib/db'
 import { DB_NAME } from '@/lib/db/schemas'
-import { _generateUUID } from '@/lib/utils/uuid'
+import { generateUUID as _generateUUID } from '@/lib/utils/uuid'
 
 /**
  * 產生 UUID（已移除，改用系統統一的 UUID 生成器）
@@ -62,7 +62,7 @@ async function syncFromSupabase(): Promise<boolean> {
     const { supabase } = await import('@/lib/supabase/client')
 
     // 下載 employees 資料
-    const { data: employees, error } = await (supabase as unknown)
+    const { data: employees, error } = await (supabase as any)
       .from('employees')
       .select('*')
       .eq('status', 'active')
@@ -76,7 +76,7 @@ async function syncFromSupabase(): Promise<boolean> {
     }
 
     // 寫入到 IndexedDB（使用 put 允許更新現有資料）
-    for (const employee of employees) {
+    for (const employee of employees as any[]) {
       await localDB.put('employees', employee)
     }
 
@@ -132,7 +132,7 @@ export async function clearAllData(): Promise<void> {
 
   for (const table of tables) {
     try {
-      await localDB.clear(table as unknown)
+      await localDB.clear(table as any)
     } catch (error) {}
   }
 }

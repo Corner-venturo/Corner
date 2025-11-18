@@ -39,7 +39,8 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   fetchAllPermissions: async () => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase
+      // @ts-ignore - Supabase select with joins
+      const { data, error } = await (supabase as any)
         .from('user_workspace_permissions')
         .select(`
           *,
@@ -48,7 +49,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
           granted_by_employee:employees!user_workspace_permissions_granted_by_fkey(id, name)
         `)
         .eq('is_active', true)
-        .order('granted_at', { ascending: false }) as any
+        .order('granted_at', { ascending: false })
 
       if (error) throw error
 
@@ -71,9 +72,10 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   fetchUserAccess: async (userId: string) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.rpc('get_user_workspace_permissions' as any, {
+      // @ts-ignore - Supabase RPC function
+      const { data, error } = await supabase.rpc('get_user_workspace_permissions', {
         p_user_id: userId,
-      }) as any
+      })
 
       if (error) throw error
 
@@ -97,7 +99,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
         p_can_manage_finance: params.can_manage_finance ?? false,
         p_expires_at: params.expires_at ?? null,
         p_notes: params.notes ?? null,
-      }) as any
+      })
 
       if (error) throw error
 

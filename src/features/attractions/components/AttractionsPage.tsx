@@ -33,9 +33,9 @@ export default function AttractionsPage() {
   const regions: any[] = []
   const cities: any[] = []
   const fetchAll = async () => {}
-  const getRegionsByCountry = () => []
-  const getCitiesByCountry = () => []
-  const getCitiesByRegion = () => []
+  const getRegionsByCountry = (_countryId: string) => []
+  const getCitiesByCountry = (_countryId: string) => []
+  const getCitiesByRegion = (_regionId: string) => []
 
   // 景點資料管理（暫時使用硬編碼資料測試）
   // const { attractions, loading, addAttraction, updateAttraction, deleteAttraction, toggleStatus } =

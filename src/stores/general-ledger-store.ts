@@ -24,7 +24,7 @@ import type { GeneralLedger } from '@/types/accounting-pro.types'
  * ```
  */
 export const useGeneralLedgerStore = createStore<GeneralLedger>({
-  tableName: 'general_ledger',
+  tableName: 'general_ledger' as any,
   enableSupabase: true,
   fastInsert: true,
 })

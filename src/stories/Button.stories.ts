@@ -1,8 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/nextjs'
-
-import { fn } from 'storybook/test'
-
+import type { Meta, StoryObj } from '@storybook/react'
+import { fn } from '@storybook/test'
 import { Button } from './Button'
+
+type ButtonArgs = {
+  primary?: boolean
+  backgroundColor?: string
+  size?: 'small' | 'medium' | 'large'
+  label: string
+  onClick: () => void
+}
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -19,8 +25,10 @@ const meta = {
     backgroundColor: { control: 'color' },
   },
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
+  // @ts-ignore - Storybook fn() type compatibility
   args: { onClick: fn() },
-} satisfies Meta<typeof Button>
+// @ts-ignore - Meta type compatibility
+} satisfies Meta<ButtonArgs>
 
 export default meta
 type Story = StoryObj<typeof meta>

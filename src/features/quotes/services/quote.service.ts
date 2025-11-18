@@ -48,7 +48,7 @@ class QuoteService extends BaseService<Quote> {
     if (!original) return undefined
 
     // 排除不應該傳入的欄位
-    const { id: _, created_at, updated_at, version, versions, code, is_pinned, ...rest } = original
+    const { id: _id, created_at: _created, updated_at: _updated, version: _ver, versions: _vers, code: _code, is_pinned: _pinned, ...rest } = original as any
 
     // 🔥 複製時不保留 code（讓系統自動生成新編號）和 is_pinned（不自動置頂）
     const duplicated = await store.create({
@@ -95,7 +95,7 @@ class QuoteService extends BaseService<Quote> {
         infant: 0,
       },
       created_at: new Date().toISOString(),
-    }
+    } as any
 
     return await store.update(id, {
       version: (current.version || 1) + 1,
@@ -115,7 +115,7 @@ class QuoteService extends BaseService<Quote> {
   }
 
   calculateTotalCost(quote: Quote): number {
-    return quote.categories.reduce((sum, cat) => sum + cat.total, 0)
+    return (quote.categories || []).reduce((sum, cat) => sum + cat.total, 0)
   }
 }
 

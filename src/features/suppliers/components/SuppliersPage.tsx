@@ -72,7 +72,7 @@ export const SuppliersPage: React.FC = () => {
         bank_name: formData.bank_name,
         bank_account: formData.bank_account,
         notes: formData.note,
-      })
+      } as any)
       handleCloseDialog()
       alert('✅ 供應商建立成功')
     } catch (error) {

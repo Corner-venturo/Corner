@@ -4,7 +4,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { TABLE_SCHEMAS } from './schemas'
-import { _isSyncableTable } from './sync-schema-helper'
+import { isSyncableTable as _isSyncableTable } from './sync-schema-helper'
 
 /**
  * 資料庫升級處理器

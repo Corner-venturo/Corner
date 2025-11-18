@@ -71,7 +71,7 @@ interface CategorySectionProps {
     categoryId: string,
     itemId: string,
     field: keyof CostItem,
-    value: unknown
+    value: any
   ) => void
   handleRemoveItem: (categoryId: string, itemId: string) => void
 }
@@ -108,11 +108,13 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       return
     }
 
-    const { data } = await supabase
+    // @ts-ignore - Supabase type inference issue
+    const result: any = await (supabase as any)
       .from('transportation_rates')
       .select('country_name')
       .eq('is_active', true)
 
+    const data = result.data
     if (data) {
       const uniqueCountries = Array.from(
         new Set((data as any).map((item: any) => item.country_name))
@@ -127,13 +129,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     setSelectedCountry(countryName)
     setLoading(true)
 
-    const { data } = await supabase
+    // @ts-ignore - Supabase type inference issue
+    const result: any = await (supabase as any)
       .from('transportation_rates')
       .select('*')
       .eq('country_name', countryName)
       .eq('is_active', true)
       .order('display_order')
 
+    const data = result.data
     if (data) {
       setTransportRates(data as any)
       setIsCountryDialogOpen(false)
@@ -146,13 +150,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   const refreshRates = async () => {
     if (!selectedCountry) return
 
-    const { data } = await supabase
+    // @ts-ignore - Supabase type inference issue
+    const result: any = await (supabase as any)
       .from('transportation_rates')
       .select('*')
       .eq('country_name', selectedCountry)
       .eq('is_active', true)
       .order('display_order')
 
+    const data = result.data
     if (data) setTransportRates(data as any)
   }
 

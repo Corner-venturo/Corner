@@ -1,4 +1,3 @@
-import { _verifyPassword } from '@/lib/auth'
 import { useLocalAuthStore, LocalProfile, PasswordEncryption } from '@/lib/auth/local-auth-manager'
 import { localDB } from '@/lib/db'
 import { TABLES } from '@/lib/db/schemas'
@@ -18,7 +17,7 @@ export class OfflineAuthService {
       // 從 IndexedDB 讀取真實使用者
       await localDB.init() // 確保資料庫已初始化
       const users = await localDB.getAll(TABLES.EMPLOYEES)
-      const employee = users.find(u => u.employee_number === email) as any
+      const employee = users.find((u: any) => u.employee_number === email) as any
 
       if (!employee) {
         return {
@@ -59,7 +58,7 @@ export class OfflineAuthService {
         employee_number: employee.employee_number,
         display_name: employee.display_name || employee.chinese_name || employee.english_name || '',
         english_name: employee.english_name || '',
-        role: this.determineRole(employee.permissions),
+        role: this.determineRole(employee.permissions || []),
         permissions: employee.permissions || [],
         cachedPassword: encryptedPassword,
         personal_info: employee.personal_info,
@@ -221,7 +220,7 @@ export class OfflineAuthService {
   /**
    * 判斷用戶角色
    */
-  private static determineRole(permissions: string[]): 'ADMIN' | 'EMPLOYEE' {
+  private static determineRole(permissions: string[] | undefined): 'ADMIN' | 'EMPLOYEE' {
     if (permissions?.includes('admin')) return 'ADMIN'
     return 'EMPLOYEE'
   }

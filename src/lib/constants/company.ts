@@ -12,4 +12,16 @@ export const COMPANY = {
 
   /** 公司副標題（帶裝飾線） */
   subtitleWithDash: '─ 如果可以，讓我們一起探索世界的每個角落 ─',
+
+  /** 公司地址 */
+  address: '台北市中山區南京東路三段168號',
+
+  /** 公司電話 */
+  phone: '(02) 2545-1234',
+
+  /** 公司傳真 */
+  fax: '(02) 2545-5678',
+
+  /** 公司 Email */
+  email: 'info@venturo.com.tw',
 } as const;

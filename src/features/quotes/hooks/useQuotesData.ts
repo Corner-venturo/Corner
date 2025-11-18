@@ -36,8 +36,8 @@ export const useQuotesData = () => {
 
     try {
       const duplicated = await duplicateQuote(quote_id)
-      if (duplicated && (duplicated as unknown).id) {
-        router.push(`/quotes/${(duplicated as unknown).id}`)
+      if (duplicated && (duplicated as any).id) {
+        router.push(`/quotes/${(duplicated as any).id}`)
       } else {
         alert('複製報價單失敗，請重試')
       }
@@ -67,7 +67,7 @@ export const useQuotesData = () => {
     tours,
     countries,
     cities,
-    getCitiesByCountry,
+    getCitiesByCountry: getCitiesByCountry as any,
 
     // Actions
     addQuote,

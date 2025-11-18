@@ -84,7 +84,7 @@ export function TourItinerarySection({
                   key={`day-section-${index}`}
                   id={`day-${index + 1}`}
                   ref={el => {
-                    dayRefs.current[index] = el
+                    dayRefs.current[index] = el as HTMLDivElement | null
                   }}
                   className="relative overflow-hidden rounded-[36px] border border-morandi-container/30 bg-white/95 p-8 shadow-lg backdrop-blur-sm"
                 >

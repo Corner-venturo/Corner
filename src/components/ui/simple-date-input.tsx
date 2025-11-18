@@ -48,6 +48,10 @@ export function SimpleDateInput({
       const formatted = format(date, 'yyyy-MM-dd')
       onChange(formatted)
       setIsCalendarOpen(false)
+    } else if (date && typeof date === 'object' && 'from' in date && date.from) {
+      const formatted = format(date.from, 'yyyy-MM-dd')
+      onChange(formatted)
+      setIsCalendarOpen(false)
     }
   }
 

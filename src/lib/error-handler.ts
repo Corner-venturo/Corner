@@ -34,6 +34,7 @@ class ErrorHandler {
     const entry: ErrorLogEntry = {
       timestamp: new Date().toISOString(),
       level: 'error',
+      context,
       message: this.extractMessage(error),
       stack: error instanceof Error ? error.stack : undefined,
       metadata,
@@ -166,7 +167,7 @@ export function handleError(
   context: string,
   metadata?: Record<string, unknown>
 ): void {
-  errorHandler.handle(error, metadata)
+  errorHandler.handle(error, context, metadata)
 }
 
 /**
@@ -180,7 +181,7 @@ export async function withErrorHandling<T>(
   try {
     return await fn()
   } catch (error) {
-    handleError(error, metadata)
+    handleError(error, context, metadata)
     return null
   }
 }

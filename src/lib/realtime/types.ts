@@ -73,4 +73,4 @@ export interface RealtimeManagerConfig {
 /**
  * Postgres 變更 Payload (簡化版型別)
  */
-export type PostgresChangesPayload<T = unknown> = RealtimePostgresChangesPayload<T>
+export type PostgresChangesPayload<T extends Record<string, any> = Record<string, any>> = RealtimePostgresChangesPayload<T>

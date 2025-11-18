@@ -129,9 +129,9 @@ export function TableBody({
                   style={{ width: column.width }}
                 >
                   {column.render ? (
-                    column.render(row[column.key as keyof typeof row], row)
+                    column.render((row as any)[column.key as keyof typeof row], row)
                   ) : (
-                    <span>{String(row[column.key as keyof typeof row] ?? '')}</span>
+                    <span>{String((row as any)[column.key as keyof typeof row] ?? '')}</span>
                   )}
                 </td>
               ))}
@@ -139,7 +139,7 @@ export function TableBody({
               {/* Actions column */}
               {actions && (
                 <td className="py-3 px-4">
-                  <div onClick={e => e.stopPropagation()}>{actions(row)}</div>
+                  <div onClick={(e: any) => e.stopPropagation()}>{actions(row)}</div>
                 </td>
               )}
             </tr>

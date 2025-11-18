@@ -263,7 +263,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     <>
       <ResponsiveHeader
         title={`快速報價單 ${quote.code || ''}`}
-        subtitle={formData.customer_name ? `客戶：${formData.customer_name}` : undefined}
         showBackButton={true}
         onBack={() => router.push('/quotes')}
         actions={

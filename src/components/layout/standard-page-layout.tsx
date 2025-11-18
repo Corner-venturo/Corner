@@ -158,7 +158,7 @@ export function StandardPageLayout({
 
       {/* 內容區域 */}
       <div
-        className={`flex-1 flex flex-col ${contentOverflow === 'hidden' ? 'overflow-hidden' : 'overflow-auto'}`}
+        className={`flex-1 flex flex-col ${contentOverflow === 'hidden' ? 'overflow-hidden' : 'overflow-auto'} ${contentPadding ? 'p-4' : ''}`}
       >
         {children}
       </div>

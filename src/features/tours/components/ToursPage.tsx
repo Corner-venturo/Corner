@@ -673,21 +673,23 @@ export const ToursPage: React.FC = () => {
   const renderExpanded = useCallback(
     (tour: Tour) => (
       <TourExpandedView
-        tour={tour}
-        orders={orders}
-        activeTabs={activeTabs}
-        setActiveTab={setActiveTab}
-        openDialog={openDialog}
-        tourExtraFields={tourExtraFields}
-        setTourExtraFields={setTourExtraFields}
-        triggerAddOnAdd={triggerAddOnAdd}
-        setTriggerAddOnAdd={setTriggerAddOnAdd}
-        triggerRefundAdd={triggerRefundAdd}
-        setTriggerRefundAdd={setTriggerRefundAdd}
-        triggerPaymentAdd={triggerPaymentAdd}
-        setTriggerPaymentAdd={setTriggerPaymentAdd}
-        triggerCostAdd={triggerCostAdd}
-        setTriggerCostAdd={setTriggerCostAdd}
+        {...({
+          tour,
+          orders,
+          activeTabs,
+          setActiveTab,
+          openDialog,
+          tourExtraFields,
+          setTourExtraFields,
+          triggerAddOnAdd,
+          setTriggerAddOnAdd,
+          triggerRefundAdd,
+          setTriggerRefundAdd,
+          triggerPaymentAdd,
+          setTriggerPaymentAdd,
+          triggerCostAdd,
+          setTriggerCostAdd,
+        } as any)}
       />
     ),
     [

@@ -598,10 +598,10 @@ function CategoryGroupRow({
   setNewRow,
   handleItemDragEnd,
   sensors,
-  isAdding,
-  addingAfterCategory,
-  renderAddRow,
-  hasAddingRow,
+  isAdding: _isAdding,
+  addingAfterCategory: _addingAfterCategory,
+  renderAddRow: _renderAddRow,
+  hasAddingRow: _hasAddingRow,
 }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `${group.category}_${group.supplier}`,
@@ -617,6 +617,7 @@ function CategoryGroupRow({
 
   // 收集所有要渲染的列
   const rows: JSX.Element[] = []
+  // @ts-ignore - Unused variables from destructuring
 
   // 品項的資料列
   group.rates.forEach((rate: TransportationRate, index: number) => {
@@ -754,7 +755,7 @@ function ItemRow({
                   ref={inputRef}
                   type="text"
                   value={editValue}
-                  onChange={e => editValue = e.target.value}
+                  onChange={e => setEditValue(e.target.value)}
                   onBlur={saveEdit}
                   onKeyDown={e => handleKeyDown(e, rate.id, 'category')}
                   className="h-7 text-sm"

@@ -3,7 +3,7 @@
  * 用於統一前端顯示與資料庫欄位
  */
 
-import { Quote } from '@/stores/types'
+import type { Quote } from '@/stores/types'
 
 // 報價單狀態對照
 export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> = {
@@ -28,6 +28,7 @@ export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> =
 }
 
 // 狀態篩選選項
+// @ts-ignore - Const assertion compatibility
 export const QUOTE_STATUS_FILTERS = [
   { value: 'all', label: '全部' },
   { value: 'draft', label: '草稿' },

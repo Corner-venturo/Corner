@@ -38,7 +38,7 @@ export type AccountingSubjectType = 'asset' | 'liability' | 'equity' | 'revenue'
  * 會計科目
  */
 export interface AccountingSubject extends BaseEntity {
-  workspace_id: string | null // NULL = 系統預設科目
+  workspace_id?: string // NULL = 系統預設科目
   code: string // 科目代碼，如：1101, 1102
   name: string // 科目名稱，如：現金、銀行存款
   type: AccountingSubjectType

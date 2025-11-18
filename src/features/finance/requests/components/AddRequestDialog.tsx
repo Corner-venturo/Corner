@@ -33,21 +33,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     requestItems,
     newItem,
     setNewItem,
-    tourSearchValue,
-    setTourSearchValue,
-    orderSearchValue,
-    setOrderSearchValue,
-    supplierSearchValue,
-    setSupplierSearchValue,
-    showTourDropdown,
-    setShowTourDropdown,
-    showOrderDropdown,
-    setShowOrderDropdown,
-    showSupplierDropdown,
-    setShowSupplierDropdown,
-    filteredTours,
     filteredOrders,
-    filteredSuppliers,
     total_amount,
     addItemToList,
     removeItem,
@@ -82,8 +68,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
           await employeeStore.fetchAll()
         }
       }
-      loadData()
+      loadData().catch((err: any) => logger.error('載入資料失敗:', err))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   // Generate upcoming Thursdays for request date (20 weeks = ~5 months)
@@ -126,9 +113,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       await createRequest(
         formData,
         requestItems,
-        selectedTour.name,
-        selectedTour.code,
-        selectedOrder?.order_number
+        selectedTour.name || '',
+        selectedTour.code || '',
+        selectedOrder?.order_number || undefined
       )
 
       alert('✅ 請款單建立成功')
@@ -467,7 +454,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                       <td className="py-3 px-3 w-32">
                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                           {item.payment_method === 'transfer' && '轉帳'}
-                          {item.payment_method === 'deposit' && '甲存'}
+                          {(item.payment_method as any) === 'deposit' && '甲存'}
                           {item.payment_method === 'cash' && '現金'}
                           {item.payment_method === 'check' && '支票'}
                           {!item.payment_method && '轉帳'}

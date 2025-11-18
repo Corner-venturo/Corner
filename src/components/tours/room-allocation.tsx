@@ -37,9 +37,9 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
   const [membersWithRooms, setMembersWithRooms] = useState<MemberWithRoom[]>([])
 
   // 獲取屬於這個旅遊團的所有訂單和團員
-  const tourOrders = orders.filter(order => order.tour_id === tour.id)
-  const tourMembers = members.filter(member =>
-    tourOrders.some(order => order.id === member.order_id)
+  const tourOrders = orders.filter((order: any) => order.tour_id === tour.id)
+  const tourMembers = members.filter((member: any) =>
+    tourOrders.some((order: any) => order.id === member.order_id)
   )
 
   // 根據房型名稱推算容量
@@ -53,7 +53,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
 
   // 從請款單解析房間配額，生成房間選項
   const generateRoomOptions = useCallback((): RoomOption[] => {
-    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id)
+    const tourPaymentRequests = paymentRequests.filter((request: any) => request.tour_id === tour.id)
     const roomOptions: RoomOption[] = []
 
     tourPaymentRequests.forEach(request => {

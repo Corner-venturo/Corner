@@ -117,7 +117,8 @@ class SupplierService extends BaseService<any> {
       }))
 
       // 批次寫入 Supabase
-      const { error } = await supabase.from('supplier_cities').insert(supplierCities as any) as any
+      const result: any = await (supabase as any).from('supplier_cities').insert(supplierCities)
+      const { error } = result
 
       if (error) {
         throw error

@@ -209,7 +209,7 @@ export const TourOperations = React.memo(function TourOperations({
           // 保留現有的分房數據，不要覆蓋
           assigned_room: member.assigned_room,
           is_child_no_bed: member.is_child_no_bed,
-        } as EditingMember
+        } as any as EditingMember
       })
 
     setTableMembers(allTourMembers)

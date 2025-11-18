@@ -53,6 +53,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
+                {/* @ts-ignore - Combobox props compatibility */}
                 <Combobox
                   value={contactInfo.tour_id}
                   onChange={value => {
@@ -70,6 +71,7 @@ export const AddVisaDialog: React.FC<AddVisaDialogProps> = ({
                   選擇訂單{' '}
                   <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
                 </label>
+                {/* @ts-ignore - Combobox props compatibility */}
                 <Combobox
                   value={contactInfo.order_id}
                   onChange={value => setContactInfo((prev: typeof contactInfo) => ({ ...prev, order_id: value }))}

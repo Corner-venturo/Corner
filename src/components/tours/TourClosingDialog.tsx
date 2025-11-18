@@ -136,8 +136,8 @@ export function TourClosingDialog({
 
       onSuccess?.()
       onOpenChange(false)
-    } catch (error: any) {
-      toast.error(error.message || '結團失敗')
+    } catch (error) {
+      toast.error((error as any).message || '結團失敗')
     } finally {
       setLoading(false)
     }

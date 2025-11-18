@@ -304,7 +304,7 @@ export function Combobox<T = unknown>({
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <button
-                  key={option.value}
+                  key={`${option.value}-${index}`}
                   ref={el => {
                     optionRefs.current[index] = el
                   }}

@@ -89,7 +89,9 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
               updated_at: new Date().toISOString(),
             })
           }
-        } catch (error) {}
+        } catch (error) {
+          // Ignore error
+        }
 
         // 如果修改的是當前登入用戶，更新 auth-store 和 LocalProfile
         if (user && user.id === employee.id) {
@@ -110,7 +112,9 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
                 roles,
               })
             }
-          } catch (error) {}
+          } catch (error) {
+            // Ignore error
+          }
         }
 
         // 顯示儲存成功訊息
@@ -182,6 +186,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
 
     const categories = Object.keys(permissionsByCategory)
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _roleLabels = {
       admin: '管理員',
       employee: '員工',

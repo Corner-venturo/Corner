@@ -183,7 +183,7 @@ export function useTourDetails(tour_id: string) {
 
       try {
         setError(null)
-        const updated = await tourService.updateTourStatus(tour_id, newStatus, reason)
+        const updated = await tourService.updateTourStatus(tour_id, newStatus)
         setTour(updated)
         return updated
       } catch (err) {

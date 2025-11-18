@@ -1,5 +1,5 @@
-import { logger } from '@/lib/utils/logger'
 import React, { useState, useRef } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { TourFormData, HotelInfo } from '../types'
 import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'

@@ -19,7 +19,7 @@ import type { VoucherEntry } from '@/types/accounting-pro.types'
  * ```
  */
 export const useVoucherEntryStore = createStore<VoucherEntry>({
-  tableName: 'voucher_entries',
+  tableName: 'voucher_entries' as any,
   enableSupabase: true,
   fastInsert: true,
-})
+} as any)

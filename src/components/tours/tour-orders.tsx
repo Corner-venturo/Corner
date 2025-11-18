@@ -12,7 +12,7 @@ export function TourOrders({ tour }: TourOrdersProps) {
   const { items: orders } = useOrderStore()
 
   // 過濾出屬於這個旅遊團的訂單
-  const tourOrders = orders.filter(order => order.tour_id === tour.id)
+  const tourOrders = orders.filter(order => order.tour_id === tour.id) as any
 
   return (
     <div className="space-y-6">

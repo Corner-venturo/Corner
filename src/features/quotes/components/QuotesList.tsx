@@ -69,7 +69,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
 
           return (
             <div className="flex items-center gap-2">
-              {quote.is_pinned && <Pin size={14} className="text-morandi-gold" title="置頂範本" />}
+              {quote.is_pinned && <Pin size={14} className="text-morandi-gold" />}
               <span className={cn('text-sm font-mono', codeColor)}>{displayCode}</span>
             </div>
           )

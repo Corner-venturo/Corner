@@ -118,10 +118,10 @@ export function ChannelChat() {
               isLoading={isMessagesLoading}
               showMemberSidebar={showMemberSidebar}
               messageText={messageText}
-              attachedFiles={attachedFiles}
-              uploadingFiles={uploadingFiles}
-              uploadProgress={uploadProgress}
-              messagesEndRef={messagesEndRef}
+              attachedFiles={attachedFiles as any}
+              uploadingFiles={uploadingFiles as any}
+              uploadProgress={uploadProgress as any}
+              messagesEndRef={messagesEndRef as any}
               onReaction={handleReactionClick}
               onDeleteMessage={handleDeleteMessageClick}
               onCreatePayment={(itemId, item) => {
@@ -132,7 +132,7 @@ export function ChannelChat() {
                 setShowCreatePaymentDialog(true)
               }}
               onDeleteAdvanceList={deleteAdvanceList}
-              onCreateReceipt={(orderId, order) => {
+              onCreateReceipt={(_orderId, order) => {
                 setSelectedOrder(order)
                 setShowCreateReceiptDialog(true)
               }}

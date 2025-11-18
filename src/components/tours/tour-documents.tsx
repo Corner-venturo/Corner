@@ -23,6 +23,7 @@ interface TourDocumentsProps {
 }
 
 export function TourDocuments({ orderFilter }: TourDocumentsProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [newDocument, setNewDocument] = useState({
     name: '',
@@ -110,7 +111,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
   }
 
   const getStatusIcon = (status: string) => {
-    const icons: Record<string, unknown> = {
+    const icons: Record<string, any> = {
       已簽署: CheckCircle,
       已確認: CheckCircle,
       待確認: Clock,

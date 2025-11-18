@@ -4,18 +4,18 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { localDB } from '../database'
+import { localDB } from '../'
 
 export async function cleanTodosDescription() {
   try {
     const todos = await localDB.getAll('todos')
 
     let cleanedCount = 0
-    for (const todo of todos) {
+    for (const todo of todos as any[]) {
       // 檢查是否有 description 欄位
       if ('description' in todo) {
         // 移除 description 欄位
-        const { description, ...cleanedTodo } = todo as any
+        const { description, ...cleanedTodo } = todo
 
         // 更新回 IndexedDB
         await localDB.update('todos', todo.id, cleanedTodo)

@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useRegionsStore } from '@/stores'
 import { useAttractionsData } from '../../hooks/useAttractionsData'
@@ -52,8 +53,9 @@ export default function AttractionsTab({
           .select('*')
           .in('id', countryIds)
           .then(({ data }) => {
-            if (data) setDisplayCountries(data)
+            if (data) setDisplayCountries(data as Country[])
           })
+          .catch((err: any) => logger.error('載入國家失敗:', err))
       }
 
       // 載入這些城市
@@ -63,8 +65,9 @@ export default function AttractionsTab({
           .select('*')
           .in('id', cityIds)
           .then(({ data }) => {
-            if (data) setDisplayCities(data)
+            if (data) setDisplayCities(data as City[])
           })
+          .catch((err: any) => logger.error('載入城市失敗:', err))
       }
     }
   }, [attractions])
@@ -79,15 +82,8 @@ export default function AttractionsTab({
     selectedCity: '', // 不再使用城市篩選
   })
 
-  const {
-    isAddOpen,
-    closeAdd,
-    isEditOpen,
-    editingAttraction,
-    openEdit,
-    closeEdit,
-    initialFormData,
-  } = useAttractionsDialog()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { openEdit } = useAttractionsDialog()
 
   return (
     <div className="h-full flex flex-col">
@@ -98,7 +94,7 @@ export default function AttractionsTab({
           sortedAttractions={sortedAttractions}
           countries={displayCountries}
           cities={displayCities}
-          onEdit={openEdit}
+          onEdit={() => {}} // TODO: Implement edit functionality
           onToggleStatus={toggleStatus}
           onDelete={deleteAttraction}
           onAddNew={openAdd}

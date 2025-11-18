@@ -1,7 +1,7 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -157,7 +157,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
       })
       .flatMap(request =>
         // 將每個請款單的項目展開成 CostPayment 格式
-        (request.items || []).map((item: { id: string; category: string; supplier_name: string; description: string; unit_price: number; quantity: number; subtotal: number }) => ({
+        (request.items || []).map((item: any) => ({
           id: item.id,
           type: 'request' as const,
           tour_id: request.tour_id || tour.id,

@@ -26,7 +26,8 @@ type MessageEntity = Omit<Message, 'edited_at'> &
  * - 通常只需要查看最近的訊息
  * - 歷史訊息可以按需載入
  */
-export const useMessageStore = createStore<MessageEntity>('messages', {
+export const useMessageStore = createStore<MessageEntity>({
+  tableName: 'messages' as any,
   cacheStrategy: 'time_range',
   cacheConfig: {
     limit: 1000, // 最近 1000 則訊息
@@ -34,7 +35,7 @@ export const useMessageStore = createStore<MessageEntity>('messages', {
     order: 'desc',
   },
   enableRealtime: true,
-})
+} as any)
 
 /**
  * Hook 型別（方便使用）

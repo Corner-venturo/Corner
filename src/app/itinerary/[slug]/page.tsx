@@ -56,20 +56,20 @@ export default function EditItineraryPage() {
 
         // 2. 找不到行程，嘗試從旅遊團載入
         const { useTourStore } = await import('@/stores')
-        const tourStore = useTourStore.getState()
+        const tourStore = useTourStore.getState() as any
         await tourStore.fetchAll()
-        const tour = tourStore.items.find(t => t.id === slug)
+        const tour = tourStore.items.find((t: any) => t.id === slug)
 
         if (tour) {
           // 從旅遊團建立行程資料
           const { useRegionsStore } = await import('@/stores')
-          const regionsStore = useRegionsStore.getState()
+          const regionsStore = useRegionsStore.getState() as any
           await regionsStore.fetchAll()
-          const { countries, cities } = regionsStore
+          const { countries, cities } = regionsStore as any
 
           // 找到國家和城市名稱
-          const country = tour.country_id ? countries.find((c: { id: string }) => c.id === tour.country_id) : null
-          const city = tour.main_city_id ? cities.find((c: { id: string }) => c.id === tour.main_city_id) : null
+          const country = tour.country_id ? countries.find((c: any) => c.id === tour.country_id) : null
+          const city = tour.main_city_id ? cities.find((c: any) => c.id === tour.main_city_id) : null
 
           // 計算天數
           const departureDate = new Date(tour.departure_date)
@@ -88,7 +88,7 @@ export default function EditItineraryPage() {
             departureDate: departureDate.toLocaleDateString('zh-TW'),
             tourCode: tour.code,
             coverImage:
-              city?.background_image_url ||
+              (city as any)?.background_image_url ||
               'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop',
             country: country?.name || tour.location || '',
             city: city?.name || tour.location || '',
@@ -102,14 +102,14 @@ export default function EditItineraryPage() {
                 month: '2-digit',
                 day: '2-digit',
               }),
-              arrivalAirport: city?.airport_code || '',
+              arrivalAirport: (city as any)?.airport_code || '',
               arrivalTime: '',
               duration: '',
             },
             returnFlight: {
               airline: '',
               flightNumber: '',
-              departureAirport: city?.airport_code || '',
+              departureAirport: (city as any)?.airport_code || '',
               departureTime: '',
               departureDate: returnDate.toLocaleDateString('zh-TW', {
                 month: '2-digit',
@@ -176,9 +176,9 @@ export default function EditItineraryPage() {
   // Convert icon strings to components for preview
   const processedData = itineraryData
     ? {
-        ...itineraryData,
+        ...(itineraryData as any),
         features:
-          itineraryData.features?.map((f: { icon: string }) => ({
+          (itineraryData as any).features?.map((f: { icon: string }) => ({
             ...f,
             iconComponent: iconMap[f.icon] || IconSparkles,
           })) || [],

@@ -2,7 +2,7 @@
  * Suppliers feature types
  */
 
-import { Supplier, SupplierPaymentAccount } from '@/types/supplier.types'
+import type { Supplier, SupplierPaymentAccount } from '@/types/supplier.types'
 
 export type { Supplier, SupplierPaymentAccount }
 
@@ -12,7 +12,7 @@ export interface SupplierFormData {
   country: string
   region: string
   cities: string[]
-  type: Supplier['type']
+  type: 'hotel' | 'restaurant' | 'bus_company' | 'airline' | 'attraction' | 'other'
   contact: {
     contact_person: string
     phone: string
@@ -20,13 +20,13 @@ export interface SupplierFormData {
     address: string
     website: string
   }
-  status: Supplier['status']
+  status: 'active' | 'inactive'
   note: string
 }
 
 export interface SupplierFilters {
   searchQuery: string
-  statusFilter?: Supplier['status']
-  typeFilter?: Supplier['type']
+  statusFilter?: 'active' | 'inactive'
+  typeFilter?: 'hotel' | 'restaurant' | 'bus_company' | 'airline' | 'attraction' | 'other'
   countryFilter?: string
 }

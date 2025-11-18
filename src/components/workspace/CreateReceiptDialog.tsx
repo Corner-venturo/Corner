@@ -51,7 +51,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
         updated_at: new Date().toISOString(),
       }
 
-      const receipt = await createReceipt(receiptData as unknown)
+      const receipt = await createReceipt(receiptData as any)
       onSuccess(receipt.id)
       onClose()
     } catch (error) {
@@ -133,7 +133,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
             </label>
             <select
               value={paymentMethod}
-              onChange={e => setPaymentMethod(e.target.value as unknown)}
+              onChange={e => setPaymentMethod(e.target.value as any)}
             >
               <option value="現金">現金</option>
               <option value="匯款">匯款</option>

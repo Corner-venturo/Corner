@@ -331,16 +331,16 @@ function NewItineraryPageContent() {
         return
       }
 
-      // 有 tour_id，從旅遊團載入資料
-      const tour = tours.find(t => t.id === tourId)
+      // 有 tour_id,從旅遊團載入資料
+      const tour = tours.find((t: any) => t.id === tourId)
       if (!tour) {
         setLoading(false)
         return
       }
 
       // 找到國家和城市名稱
-      const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
-      const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
+      const country = tour.country_id ? countries.find((c: any) => c.id === tour.country_id) : null
+      const city = tour.main_city_id ? cities.find((c: any) => c.id === tour.main_city_id) : null
 
       // 計算天數
       const departureDate = new Date(tour.departure_date)
@@ -457,7 +457,7 @@ function NewItineraryPageContent() {
   const processedData = React.useMemo(
     () => ({
       ...tourData,
-      features: tourData.features.map((f: any) => ({
+      features: (tourData.features || []).map((f: any) => ({
         ...f,
         iconComponent: iconMap[f.icon] || IconSparkles,
       })),

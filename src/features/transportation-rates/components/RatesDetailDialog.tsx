@@ -39,7 +39,9 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   // 更新單筆資料
   const handleUpdate = async (id: string, updates: Partial<TransportationRate>) => {
-    const { error } = await supabase.from('transportation_rates').update(updates).eq('id', id)
+    // @ts-ignore - Supabase type inference issue
+    const result: any = await supabase.from('transportation_rates').update(updates).eq('id', id)
+    const error = result.error
 
     if (error) {
       logger.error('Error updating rate:', error)
@@ -55,7 +57,9 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   const handleDelete = async (id: string) => {
     if (!confirm('確定要刪除這筆車資資料嗎？')) return
 
-    const { error } = await supabase.from('transportation_rates').delete().eq('id', id)
+    // @ts-ignore - Supabase type inference issue
+    const result: any = await supabase.from('transportation_rates').delete().eq('id', id)
+    const error = result.error
 
     if (error) {
       logger.error('Error deleting rate:', error)
@@ -69,18 +73,21 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   // 新增資料
   const handleCreate = async (data: Partial<TransportationRate>) => {
-    const { error } = await supabase.from('transportation_rates').insert({
+    const dataWithCategory = data as any
+    // @ts-ignore - Supabase type inference issue
+    const result: any = await supabase.from('transportation_rates').insert({
       ...data,
-      workspace_id: (user as any)?.workspace_id || null,
+      workspace_id: user?.workspace_id || null,
       country_id: data.country_id || '',
       country_name: countryName,
-      vehicle_type: data.vehicle_type || (data as any).category || '',
-      price: (data as any).price_twd || 0,
+      vehicle_type: data.vehicle_type || dataWithCategory?.category || '',
+      price: dataWithCategory?.price_twd || 0,
       currency: 'TWD',
       unit: 'trip',
       is_active: true,
       display_order: 0,
     } as any)
+    const error = result.error
 
     if (error) {
       logger.error('Error creating rate:', error)

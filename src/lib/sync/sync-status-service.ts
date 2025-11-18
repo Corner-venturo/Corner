@@ -16,7 +16,7 @@ export async function checkPendingCount(tableName: TableName): Promise<number> {
   try {
     const items = await localDB.getAll(tableName)
     const pending = items.filter(
-      item => item._needs_sync === true || (item.code && item.code.endsWith('TBC'))
+      (item: any) => item._needs_sync === true || (item.code && String(item.code).endsWith('TBC'))
     )
     return pending.length
   } catch (_error) {
@@ -45,7 +45,7 @@ export function useSyncStatus() {
 
     try {
       // 檢查所有表的待同步數量（動態讀取 TABLES）
-      const tables = Object.values(TABLES)
+      const tables = Object.values(TABLES) as TableName[]
       let total = 0
       for (const table of tables) {
         const count = await checkPendingCount(table)

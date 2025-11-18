@@ -97,7 +97,7 @@ export function DisbursementDialog({
         sortable: true,
         render: (value: unknown) => (
           <div className="font-bold text-morandi-primary text-right">
-            NT$ {value.toLocaleString()}
+            NT$ {(value as number)?.toLocaleString() ?? 0}
           </div>
         ),
       },

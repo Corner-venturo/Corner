@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
 import { Combobox } from '@/components/ui/combobox'
 import { supabase } from '@/lib/supabase/client'
-import type { Country, Region, City } from '@/stores/region-store'
+import type { Country } from '@/stores/region-store'
 
 // Lazy load tabs - 只有切換到該 tab 才載入組件
 const AttractionsTab = lazy(() => import('./tabs/AttractionsTab'))
@@ -45,13 +45,13 @@ export default function DatabaseManagementPage() {
 
         if (data) {
           logger.log('Loaded countries:', data.length)
-          setCountries(data)
+          setCountries(data as Country[])
         }
       } catch (err) {
         logger.error('Exception loading countries:', err)
       }
     }
-    loadCountries()
+    loadCountries().catch(err => logger.error('載入國家失敗:', err))
   }, [])
 
   // 當切換 tab 時，標記該 tab 已載入

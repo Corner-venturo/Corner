@@ -11,6 +11,9 @@ import { useChannelStore } from '@/stores/workspace/channel-store'
 import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter'
 import type { Channel } from '@/stores/workspace/types'
 
+// @ts-ignore - Type compatibility with createRealtimeHook
+const channelIndexedDB = new IndexedDBAdapter<Channel>('channels')
+
 /**
  * Channels Realtime Hook
  * 使用時機：進入工作空間頁面
@@ -32,6 +35,6 @@ import type { Channel } from '@/stores/workspace/types'
  */
 export const useChannelsRealtime = createRealtimeHook<Channel>({
   tableName: 'channels',
-  indexedDB: new IndexedDBAdapter<Channel>('channels'),
-  store: useChannelStore,
+  indexedDB: channelIndexedDB,
+  store: useChannelStore as any,
 })

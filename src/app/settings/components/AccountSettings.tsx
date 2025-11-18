@@ -39,7 +39,7 @@ export function AccountSettings({
   setPasswordUpdateLoading,
 }: AccountSettingsProps) {
   const handlePasswordUpdate = async () => {
-    const auth = useRequireAuthSync()
+    const auth = useRequireAuthSync() as any
 
     if (!auth.isAuthenticated) {
       auth.showLoginRequired()
@@ -146,7 +146,7 @@ export function AccountSettings({
             password_hash: hashedPassword,
             last_password_change: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-          })
+          } as any)
           logger.log('✅ IndexedDB 密碼已更新')
         }
       } catch (dbError) {

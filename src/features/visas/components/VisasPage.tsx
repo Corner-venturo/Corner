@@ -62,6 +62,7 @@ export default function VisasPage() {
       ])
     }
     loadData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // 篩選管理
@@ -103,7 +104,8 @@ export default function VisasPage() {
         return updated
       })
     }
-  }, [contact_info.applicant_name, applicants.length, setApplicants])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contact_info.applicant_name, applicants.length])
 
   // 處理批次新增簽證
   const handleAddVisa = async () => {
@@ -166,7 +168,7 @@ export default function VisasPage() {
         paid_amount: 0,
         remaining_amount: totalFee,
         payment_status: 'unpaid' as const,
-      })
+      } as any)
 
       if (contact_info.order_id === '__create_new__') {
         toast.success(`已建立訂單：${order_number}`)
@@ -186,10 +188,9 @@ export default function VisasPage() {
       const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
       await addVisa({
-        workspace_id: user.workspace_id, // ✅ 明確傳入 workspace_id
         applicant_name: applicant.name,
-        contact_person: contact_info.contact_person,
-        contact_phone: contact_info.contact_phone,
+        contact_person: contact_info.contact_person || '',
+        contact_phone: contact_info.contact_phone || '',
         visa_type: applicant.country,
         country: applicant.country,
         submission_date: applicant.submission_date,
@@ -198,7 +199,7 @@ export default function VisasPage() {
         cost: total_cost,
         status: 'pending',
         order_id: targetOrder.id,
-        order_number: targetOrder.order_number,
+        order_number: targetOrder.order_number || '',
         tour_id: selectedTour.id,
         code: selectedTour.code,
         created_by: user.id,

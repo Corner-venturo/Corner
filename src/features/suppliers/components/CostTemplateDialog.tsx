@@ -112,7 +112,7 @@ export const CostTemplateDialog: React.FC<CostTemplateDialogProps> = ({
         await update(editingTemplate.id, {
           item_name: formData.item_name.trim(),
           cost_price: Number(formData.cost_price),
-          unit: formData.unit,
+          unit: formData.unit as any,
           currency: formData.currency,
           notes: formData.notes.trim() || null,
         })
@@ -130,7 +130,7 @@ export const CostTemplateDialog: React.FC<CostTemplateDialogProps> = ({
           notes: formData.notes.trim() || null,
           is_active: true,
           display_order: 0,
-        })
+        } as any)
       }
 
       onClose()

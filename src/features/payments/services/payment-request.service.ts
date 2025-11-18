@@ -173,7 +173,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   ): PaymentRequestItem[] {
     const store = usePaymentRequestStore.getState()
     const request = store.items.find((r: PaymentRequest) => r.id === requestId)
-    return request?.items.filter((item: PaymentRequestItem) => item.category === category) || []
+    return request?.items?.filter((item: PaymentRequestItem) => item.category === category) || []
   }
 
   /**

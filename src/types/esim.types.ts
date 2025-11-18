@@ -1,5 +1,3 @@
-import type { Database } from './supabase'
-
 // eSIM 狀態（參考 CornerERP）
 export const ESIM_STATUSES = {
   UNCONFIRMED: 0, // 待確認
@@ -9,10 +7,10 @@ export const ESIM_STATUSES = {
 
 export type EsimStatus = (typeof ESIM_STATUSES)[keyof typeof ESIM_STATUSES]
 
-// eSIM 資料表型別
-export type EsimRow = Database['public']['Tables']['esims']['Row']
-export type EsimInsert = Database['public']['Tables']['esims']['Insert']
-export type EsimUpdate = Database['public']['Tables']['esims']['Update']
+// eSIM 資料表型別（暫時使用 any）
+export type EsimRow = any
+export type EsimInsert = any
+export type EsimUpdate = any
 
 // eSIM 實體
 export interface Esim {

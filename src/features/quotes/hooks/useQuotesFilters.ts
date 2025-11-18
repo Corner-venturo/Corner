@@ -43,8 +43,8 @@ export const useQuotesFilters = ({
       const matchesAuthor =
         !authorFilter ||
         authorFilter === 'all' ||
-        quote.created_by_name === authorFilter ||
-        quote.handler_name === authorFilter
+        (quote as any).created_by_name === authorFilter ||
+        (quote as any).handler_name === authorFilter
 
       // 類型篩選（快速/團體報價單）
       const matchesType =

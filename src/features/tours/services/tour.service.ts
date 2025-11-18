@@ -12,7 +12,7 @@ interface TourFinancialSummary {
   profitMargin: number
 }
 
-class TourService extends BaseService<Tour> {
+class TourService extends BaseService<any> {
   protected resourceName = 'tours'
 
   protected getStore = (): StoreOperations<Tour> => {
@@ -25,7 +25,7 @@ class TourService extends BaseService<Tour> {
         return result || tour
       },
       update: async (id: string, data: Partial<Tour>) => {
-        await store.update(id, data)
+        await store.update(id, data as any)
       },
       delete: async (id: string) => {
         await store.delete(id)
@@ -125,7 +125,7 @@ class TourService extends BaseService<Tour> {
 
       // 這裡需要獲取相關訂單資料來計算
       // 目前先使用模擬邏輯
-      const total_revenue = tour.price * (tour.current_participants || 0)
+      const total_revenue = (tour.price || 0) * (tour.current_participants || 0)
       const estimatedCost = total_revenue * 0.7 // 假設成本為收入的70%
       const profit = total_revenue - estimatedCost
       const profitMargin = total_revenue > 0 ? (profit / total_revenue) * 100 : 0
@@ -142,16 +142,16 @@ class TourService extends BaseService<Tour> {
   }
 
   // 檢查團體是否可以取消
-  async canCancelTour(tour_id: string): Promise<{ canCancel: boolean; _reason?: string }> {
+  async canCancelTour(tour_id: string): Promise<{ canCancel: boolean; reason?: string }> {
     try {
       const tour = await this.getById(tour_id)
       if (!tour) {
-        return { canCancel: false, _reason: '找不到該旅遊團' }
+        return { canCancel: false, reason: '找不到該旅遊團' }
       }
 
       // Tour 狀態檢查
       if (tour.status === 'closed') {
-        return { canCancel: false, _reason: '該旅遊團已經結案，無法取消' }
+        return { canCancel: false, reason: '該旅遊團已經結案，無法取消' }
       }
 
       const departure_date = new Date(tour.departure_date)
@@ -159,7 +159,7 @@ class TourService extends BaseService<Tour> {
       const daysDiff = Math.ceil((departure_date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
       if (daysDiff < 3) {
-        return { canCancel: false, _reason: '出發前3天內無法取消' }
+        return { canCancel: false, reason: '出發前3天內無法取消' }
       }
 
       return { canCancel: true }
@@ -171,8 +171,7 @@ class TourService extends BaseService<Tour> {
   // 更新團體狀態
   async updateTourStatus(
     tour_id: string,
-    newStatus: Tour['status'],
-    _reason?: string
+    newStatus: Tour['status']
   ): Promise<Tour> {
     try {
       const tour = await this.getById(tour_id)
@@ -229,7 +228,6 @@ class TourService extends BaseService<Tour> {
 
             if (!updateError && updated) {
               // 重新載入 tours
-              const _store = this.getStore()
               const tourStore = useTourStore.getState()
               await tourStore.fetchAll()
               return updated as Tour
@@ -305,7 +303,6 @@ class TourService extends BaseService<Tour> {
 
             if (!updateError && updated) {
               // 重新載入 tours
-              const _store = this.getStore()
               const tourStore = useTourStore.getState()
               await tourStore.fetchAll()
               return updated as Tour

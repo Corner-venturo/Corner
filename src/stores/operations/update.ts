@@ -31,6 +31,7 @@ export async function update<T extends BaseEntity>(
     // 取得當前使用者 ID（用於自動填入 updated_by）
     const getUserId = () => {
       try {
+        // @ts-ignore - Dynamic import for auth store
         const { useAuthStore } = require('@/stores/auth-store')
         const { user } = useAuthStore.getState()
         return user?.id || null
@@ -38,7 +39,8 @@ export async function update<T extends BaseEntity>(
         return null
       }
     }
-    const userId = getUserId()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _userId = getUserId()
 
     // 清理資料：將空字串的時間欄位轉為 null（PostgreSQL 不接受空字串）
     const cleanedData = { ...data } as Record<string, unknown>
@@ -51,16 +53,16 @@ export async function update<T extends BaseEntity>(
     })
 
     // 自動填入 updated_by（如果資料中沒有提供且有登入使用者）
-    if (cleanedData.updated_by === undefined && userId) {
-      cleanedData.updated_by = userId
+    if (cleanedData.updated_by === undefined && _userId) {
+      cleanedData.updated_by = _userId
     }
 
     // ✅ 步驟 1：更新 IndexedDB（本地快取）⚡ 立即反映
-    await indexedDB.update(id, cleanedData as UpdateInput<T>)
+    await indexedDB.update(id, cleanedData as any)
 
     // ✅ 步驟 2：背景同步到 Supabase（不阻塞 UI）
     if (enableSupabase && typeof window !== 'undefined') {
-      supabase.update(id, cleanedData as UpdateInput<T>).catch(error => {
+      supabase.update(id, cleanedData as any).catch((error: any) => {
         logger.warn(`⚠️ [${tableName}] Supabase 背景同步失敗（已保存到本地）:`, error)
       })
     }

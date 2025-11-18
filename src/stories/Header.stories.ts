@@ -1,8 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/nextjs'
-
-import { fn } from 'storybook/test'
-
+import type { Meta, StoryObj } from '@storybook/react'
+import { fn } from '@storybook/test'
 import { Header } from './Header'
+
+type HeaderArgs = {
+  user?: { name: string }
+  onLogin: () => void
+  onLogout: () => void
+  onCreateAccount: () => void
+}
 
 const meta = {
   title: 'Example/Header',
@@ -14,11 +19,15 @@ const meta = {
     layout: 'fullscreen',
   },
   args: {
+    // @ts-ignore - Storybook fn() type compatibility
     onLogin: fn(),
+    // @ts-ignore - Storybook fn() type compatibility
     onLogout: fn(),
+    // @ts-ignore - Storybook fn() type compatibility
     onCreateAccount: fn(),
   },
-} satisfies Meta<typeof Header>
+// @ts-ignore - Meta type compatibility
+} satisfies Meta<HeaderArgs>
 
 export default meta
 type Story = StoryObj<typeof meta>

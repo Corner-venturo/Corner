@@ -27,10 +27,11 @@ type RichDocumentEntity = RichDocument &
  * - 經常需要快速搜尋和查看
  * - 全量快取提升使用體驗
  */
-export const useRichDocumentStore = createStore<RichDocumentEntity>('rich_documents', {
+export const useRichDocumentStore = createStore<RichDocumentEntity>({
+  tableName: 'rich_documents' as any,
   cacheStrategy: 'full',
   enableRealtime: true,
-})
+} as any)
 
 /**
  * Hook 型別（方便使用）

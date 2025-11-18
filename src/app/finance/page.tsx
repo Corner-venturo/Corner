@@ -136,7 +136,7 @@ export default function FinancePage() {
       description: '日常收支與現金流管理',
       icon: Wallet,
       href: '/finance/treasury',
-      stats: `${payments.filter(p => p.type === '出納').length} 筆交易`,
+      stats: `${payments.filter(p => (p as any).type === '出納').length} 筆交易`,
       color: 'text-morandi-gold',
       bgColor: 'bg-morandi-gold/10',
     },

@@ -7,7 +7,7 @@
 import { createStore } from './core/create-store'
 
 // 從 @/types 匯入（使用 types/ 目錄下的標準定義）
-import type { Tour, Order, Member, Customer, ReceiptOrder, Employee, Region } from '@/types'
+import type { Tour, Order, Member, Customer, ReceiptOrder, Employee } from '@/types'
 
 // 從本地 types 匯入（包含 PaymentRequest, DisbursementOrder 等）
 import type {
@@ -69,7 +69,7 @@ export const usePaymentRequestStore = createStore<PaymentRequest>('payment_reque
  * 請款項目 Store
  * 無獨立編號，依附於請款單
  */
-export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items')
+export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items' as any)
 
 /**
  * 出納單 Store
@@ -97,13 +97,13 @@ export const useMemberStore = createStore<Member>('members')
  * 報價項目 Store
  * 無獨立編號，依附於報價單
  */
-export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>('quote_items' as any)
+export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>('quote_items')
 
 /**
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons' as any)
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons')
 
 // ============================================
 // 系統管理 Stores（無編號）
@@ -141,13 +141,14 @@ export const useCompanyStore = createStore<import('./types').Company>('companies
 export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts' as any)
 
 // 地區 Store（舊版，保留向後相容）
-export const useRegionStore = createStore<Region>('regions')
+export const useRegionStore = createStore<any>('regions')
 
 // 地區 Store（新版，三層架構）
 // 支援 Countries > Regions > Cities 三層架構
 // 使用 createStore 工廠，提供統一的快取優先架構
 export { useRegionsStore } from './region-store'
-export type { Country, Region as RegionNew, City, RegionStats } from './region-store'
+export type { Country, City, RegionStats } from './region-store'
+export type { Region as RegionNew } from './region-store'
 
 // 行事曆事件 Store
 export const useCalendarEventStore =
@@ -244,7 +245,6 @@ export type {
   Todo,
   Visa,
   Supplier,
-  Region,
 }
 
 // 企業客戶系統型別

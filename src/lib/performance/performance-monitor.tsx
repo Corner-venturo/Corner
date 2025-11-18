@@ -12,7 +12,7 @@ import { cacheStrategy } from '@/lib/cache/cache-strategy'
 
 export function PerformanceMonitor() {
   const [stats, setStats] = useState<MemoryStats | null>(null)
-  const [cacheStats, setCacheStats] = useState<unknown>(null)
+  const [cacheStats, setCacheStats] = useState<any>(null)
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -78,11 +78,11 @@ export function PerformanceMonitor() {
                 <div className="space-y-1">
                   <div className="flex justify-between">
                     <span className="text-morandi-muted">熱快取 (記憶體):</span>
-                    <span>{cacheStats.hot.size} 項</span>
+                    <span>{cacheStats.hot?.size ?? 0} 項</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-morandi-muted">溫快取 (Session):</span>
-                    <span>{cacheStats.warm.size} 項</span>
+                    <span>{cacheStats.warm?.size ?? 0} 項</span>
                   </div>
                 </div>
               </>

@@ -1,7 +1,7 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
 import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { Tour } from '@/stores/types'
 import { useOrderStore, useMemberStore } from '@/stores'
 import { Button } from '@/components/ui/button'
@@ -55,7 +55,7 @@ export const TourMembers = React.memo(function TourMembers({
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([])
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [draggedRow, setDraggedRow] = useState<number | null>(null)
-  const [isNavigating, setIsNavigating] = useState(false)
+  const [_isNavigating, setIsNavigating] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // 定義可編輯欄位的順序（用於左右鍵導航）
@@ -344,7 +344,7 @@ export const TourMembers = React.memo(function TourMembers({
           value={displayValue}
           onChange={e => updateCellValue(e.target.value)}
           onBlur={() => {
-            if (!isNavigating) {
+            if (!_isNavigating) {
               setEditingCell(null)
             }
           }}

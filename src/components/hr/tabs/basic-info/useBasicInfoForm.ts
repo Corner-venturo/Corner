@@ -79,6 +79,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
         },
       },
       job_info: {
+        position: employee.job_info?.position || '',
         supervisor: employee.job_info?.supervisor || '',
         hire_date: employee.job_info?.hire_date || '',
         probation_end_date: employee.job_info?.probation_end_date || '',

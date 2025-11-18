@@ -31,7 +31,7 @@ interface OrderListCardProps {
   orderList: SharedOrderList
   userName?: string
   onCreateReceipt: (orderId: string, order: any) => void
-  currentUserId: string
+  currentUserId?: string
   userRole?: 'admin' | 'finance' | 'member'
 }
 
@@ -150,7 +150,7 @@ export function OrderListCard({
                   </tr>
                 </thead>
                 <tbody>
-                  {orderList.orders.map((order, _index) => {
+                  {orderList.orders.map((order) => {
                     const status = getOrderStatus(order)
                     const isProcessed = order.receipt_status === 'received'
 

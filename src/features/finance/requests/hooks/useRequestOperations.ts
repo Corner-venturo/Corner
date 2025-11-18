@@ -36,7 +36,7 @@ export function useRequestOperations() {
         status: 'pending',
         note: formData.note,
         budget_warning: false,
-      } as unknown)
+      } as any)
 
       // Add all items sequentially
       for (let i = 0; i < items.length; i++) {
@@ -96,7 +96,7 @@ export function useRequestOperations() {
           status: 'pending',
           note: formData.note,
           budget_warning: false,
-        } as unknown)
+        } as any)
 
         // Add all items with adjusted amounts
         for (let i = 0; i < items.length; i++) {

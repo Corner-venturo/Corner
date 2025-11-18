@@ -156,7 +156,7 @@ export function OrderMembersExpandable({
   const toHalfWidth = (str: string): string => {
     return str.replace(/[\uFF01-\uFF5E]/g, (s) => {
       // 全形字符範圍 FF01-FF5E 對應半形 21-7E
-      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+      return String.fromCharCode(s.charCodeAt(0) - 0xfee0)
     })
   }
 

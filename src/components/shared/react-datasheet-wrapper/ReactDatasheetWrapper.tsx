@@ -179,15 +179,15 @@ export function ReactDatasheetWrapper({
   // Cell renderer with width support
   const cellRenderer = useCallback((props: any) => {
     const {
-      editing,
-      selected,
-      updated,
+      editing: _editing,
+      selected: _selected,
+      updated: _updated,
       width,
-      columnKey,
-      rowIndex,
-      attributesRenderer,
-      valueRenderer,
-      dataRenderer,
+      columnKey: _columnKey,
+      rowIndex: _rowIndex,
+      attributesRenderer: _attributesRenderer,
+      valueRenderer: _valueRenderer,
+      dataRenderer: _dataRenderer,
       ...tdProps
     } = props
     const cellWidth = width || 100
@@ -226,7 +226,7 @@ export function ReactDatasheetWrapper({
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
           dataRenderer={cell => cell.value}
-          onContextMenu={(e: any, cell: any, _i: any, j: any) => e.preventDefault()}
+          onContextMenu={(e: any, _cell: any, _i: any, _j: any) => e.preventDefault()}
           onSelect={handleSelect}
           parsePaste={parsePaste}
           tabBehaviour="default"

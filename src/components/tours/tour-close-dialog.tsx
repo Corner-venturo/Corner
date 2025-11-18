@@ -58,6 +58,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       loadEmployees()
       calculateTourFinance()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, tour.id])
 
   const loadEmployees = async () => {
@@ -113,12 +114,11 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       if (orderIds.length > 0) {
         const { data: paymentRequests } = await supabase
           .from('payment_requests')
-          .select('amount, supplier_type')
+          .select('amount')
           .in('order_id', orderIds)
-          .eq('status', 'paid')
-          .neq('supplier_type', 'bonus')
+          .eq('status', 'paid') as any
 
-        const cost = paymentRequests?.reduce((sum, pr) => sum + (pr.amount || 0), 0) || 0
+        const cost = paymentRequests?.reduce((sum: number, pr: any) => sum + (pr.amount || 0), 0) || 0
         setTotalCost(cost)
       }
 
@@ -192,18 +192,27 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
 
     setLoading(true)
     try {
+      // 取得第一個訂單 ID（用於關聯請款單）
+      const { data: firstOrder } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('tour_id', tour.id)
+        .limit(1)
+        .single()
+
+      const orderId = firstOrder?.id
+
       // 1. 產生業務業績請款單
       for (const recipient of salesRecipients) {
         if (recipient.percentage > 0) {
           const amount = Math.round(netProfit * (recipient.percentage / 100))
           await supabase.from('payment_requests').insert({
-            order_id: (await supabase.from('orders').select('id').eq('tour_id', tour.id).limit(1).single()).data?.id,
-            supplier_type: 'bonus',
+            order_id: orderId,
             supplier_name: '業務業績',
             amount,
             description: `業務業績 ${recipient.percentage}%`,
             status: 'pending'
-          })
+          } as any)
         }
       }
 
@@ -212,13 +221,12 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
         if (recipient.percentage > 0) {
           const amount = Math.round(netProfit * (recipient.percentage / 100))
           await supabase.from('payment_requests').insert({
-            order_id: (await supabase.from('orders').select('id').eq('tour_id', tour.id).limit(1).single()).data?.id,
-            supplier_type: 'bonus',
+            order_id: orderId,
             supplier_name: 'OP 獎金',
             amount,
             description: `OP 獎金 ${recipient.percentage}%`,
             status: 'pending'
-          })
+          } as any)
         }
       }
 

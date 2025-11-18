@@ -224,7 +224,7 @@ export const useAuthStore = create<AuthState>(
                 attendance: employee.attendance || { leave_records: [], overtime_records: [] },
                 contracts: employee.contracts || [],
                 status: employee.status,
-                workspace_id: undefined, // Note: employees 表沒有 workspace_id 欄位
+                workspace_id: employee.workspace_id, // ✅ 從資料庫讀取 workspace_id
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               }
@@ -303,7 +303,7 @@ export const useAuthStore = create<AuthState>(
             attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
             contracts: employeeData.contracts || [],
             status: employeeData.status,
-            workspace_id: undefined, // Note: employees 表沒有 workspace_id 欄位
+            workspace_id: employeeData.workspace_id, // ✅ 從資料庫讀取 workspace_id
             created_at: employeeData.created_at,
             updated_at: employeeData.updated_at,
           }

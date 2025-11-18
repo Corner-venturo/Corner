@@ -103,7 +103,7 @@ const useStatsStore = create<StatsState>(set => ({
       // 轉換為 Record
       const statsMap: Record<string, RegionStats> = {}
       data?.forEach(stat => {
-        statsMap[stat.city_id] = stat
+        statsMap[stat.city_id] = stat as any
       })
 
       set({ stats: statsMap, loading: false })

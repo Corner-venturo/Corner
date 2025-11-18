@@ -20,7 +20,7 @@ export function EditCityImageDialog({ open, onClose, city, onUpdate }: EditCityI
   const [previewUrl2, setPreviewUrl2] = useState<string | null>(null)
   const [selectedFile1, setSelectedFile1] = useState<File | null>(null)
   const [selectedFile2, setSelectedFile2] = useState<File | null>(null)
-  const [primaryImage, setPrimaryImage] = useState<1 | 2>(1)
+  const [primaryImage, setPrimaryImage] = useState<number>(1)
   const fileInput1Ref = useRef<HTMLInputElement>(null)
   const fileInput2Ref = useRef<HTMLInputElement>(null)
 

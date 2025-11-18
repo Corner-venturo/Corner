@@ -76,7 +76,8 @@ export function useChannelChat() {
   )
 
   // Message operations
-  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = useMessageOperations()
+  const messageOps = useMessageOperations()
+  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = messageOps as any
   const {
     attachedFiles,
     setAttachedFiles,

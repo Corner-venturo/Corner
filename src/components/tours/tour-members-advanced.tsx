@@ -183,7 +183,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
       // 4. 載入動態欄位的值
       await loadFieldValues()
     } catch (error) {
-      logger.error('載入團員失敗:', error)
+      logger.error('載入團員失敗:', error as any)
     } finally {
       setLoading(false)
     }
@@ -217,6 +217,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       // 組織成 { memberId: { fieldName: value } } 結構
       const values: MemberFieldValue = {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       ;(data as any)?.forEach((item: any) => {
         if (!values[item.order_member_id]) {
           values[item.order_member_id] = {}

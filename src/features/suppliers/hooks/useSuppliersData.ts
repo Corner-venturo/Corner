@@ -35,7 +35,7 @@ export function useSuppliersData() {
         name: string
         country: string
         region: string
-        type: Supplier['type']
+        type: 'hotel' | 'restaurant' | 'bus_company' | 'airline' | 'attraction' | 'other'
         contact: {
           contact_person: string
           phone: string
@@ -43,7 +43,7 @@ export function useSuppliersData() {
           address?: string
           website?: string
         }
-        status: Supplier['status']
+        status: 'active' | 'inactive'
         note?: string
       },
       cityIds: string[],
@@ -56,9 +56,9 @@ export function useSuppliersData() {
       const country = countries.find(c => c.id === supplierData.country)
       const countryCode = country?.code || 'OTH'
 
-      const suppliersArray = suppliers ? Object.values(suppliers) : []
+      const suppliersArray = suppliers ? (Array.isArray(suppliers) ? suppliers : Object.values(suppliers)) : []
       const sameCountryCount = suppliersArray.filter(
-        (s: Supplier) => s.country === supplierData.country
+        (s: any) => s.country === supplierData.country
       ).length
 
       const sequence = (sameCountryCount + 1).toString().padStart(3, '0')

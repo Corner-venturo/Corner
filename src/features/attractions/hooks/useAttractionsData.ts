@@ -127,7 +127,7 @@ export function useAttractionsData() {
 
   // 初始載入（只執行一次，避免無限迴圈）
   useEffect(() => {
-    fetchAttractions()
+    void fetchAttractions()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

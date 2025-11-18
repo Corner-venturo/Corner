@@ -1,7 +1,7 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Plane, Calendar, AlertCircle, Clock } from 'lucide-react'
