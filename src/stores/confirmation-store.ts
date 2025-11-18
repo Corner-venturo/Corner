@@ -8,7 +8,7 @@ import type { Confirmation } from '@/types/confirmation.types'
 
 export const useConfirmationStore = createStore<Confirmation>({
   tableName: 'confirmations',
-  codePrefix: 'CONF',
+  // 確認單不需要自動生成 code，使用 booking_number 和 confirmation_number
   enableSupabase: true,
   fastInsert: true,
 })

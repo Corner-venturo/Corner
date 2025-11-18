@@ -6,6 +6,7 @@
 
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 取得當前使用者的 workspace_id
@@ -36,9 +37,26 @@ export function getCurrentWorkspaceId(): string | null {
  */
 export function getCurrentWorkspaceCode(): string | null {
   const { user } = useAuthStore.getState()
-  const { items: workspaces } = useWorkspaceStoreData.getState()
+  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaces = workspaceStore.items || []
 
   if (!user) {
+    logger.warn('[getCurrentWorkspaceCode] No user found')
+    return null
+  }
+
+  // 檢查 workspaces 是否已載入
+  if (workspaces.length === 0) {
+    logger.error('[getCurrentWorkspaceCode] ❌ Workspaces not loaded! Store state:', {
+      hasItems: !!workspaceStore.items,
+      itemsLength: workspaceStore.items?.length,
+      hasFetchAll: !!workspaceStore.fetchAll
+    })
+    // 嘗試載入 workspaces
+    if (workspaceStore.fetchAll) {
+      logger.log('[getCurrentWorkspaceCode] Triggering fetchAll()...')
+      workspaceStore.fetchAll()
+    }
     return null
   }
 
@@ -48,19 +66,40 @@ export function getCurrentWorkspaceCode(): string | null {
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
       const workspace = workspaces.find(w => w.id === selectedWorkspaceId)
-      return workspace ? workspace.name.substring(0, 2).toUpperCase() : null
+      if (workspace) {
+        // ✅ 使用 workspace.code 欄位（如 TP, TC）
+        return workspace.code || workspace.name.substring(0, 2).toUpperCase()
+      }
+      logger.warn(`[getCurrentWorkspaceCode] Super admin selected workspace ${selectedWorkspaceId} not found`)
     }
+
+    // ✅ Super admin 沒有選擇 workspace 時，使用第一個 workspace
+    if (!selectedWorkspaceId && workspaces.length > 0) {
+      const defaultWorkspace = workspaces[0]
+      logger.warn(`[getCurrentWorkspaceCode] Super admin has no selected workspace, using default: ${defaultWorkspace.name}`)
+      // ✅ 使用 workspace.code 欄位（如 TP, TC）
+      return defaultWorkspace.code || defaultWorkspace.name.substring(0, 2).toUpperCase()
+    }
+
+    logger.warn('[getCurrentWorkspaceCode] Super admin has no workspace available')
     return null
   }
 
   // 一般使用者從自己的 workspace_id 找到對應的 code
   const workspaceId = user.workspace_id
   if (!workspaceId) {
+    logger.warn('[getCurrentWorkspaceCode] User has no workspace_id')
     return null
   }
 
   const workspace = workspaces.find(w => w.id === workspaceId)
-  return workspace ? workspace.name.substring(0, 2).toUpperCase() : null
+  if (workspace) {
+    // ✅ 使用 workspace.code 欄位（如 TP, TC）
+    return workspace.code || workspace.name.substring(0, 2).toUpperCase()
+  }
+
+  logger.warn(`[getCurrentWorkspaceCode] Workspace ${workspaceId} not found in store`)
+  return null
 }
 
 /**
@@ -70,9 +109,17 @@ export function getCurrentWorkspaceCode(): string | null {
  */
 export function getCurrentWorkspace() {
   const { user } = useAuthStore.getState()
-  const { items: workspaces } = useWorkspaceStoreData.getState()
+  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaces = workspaceStore.items || []
 
   if (!user) {
+    return null
+  }
+
+  // 檢查 workspaces 是否已載入
+  if (workspaces.length === 0) {
+    logger.warn('[getCurrentWorkspace] Workspaces not loaded yet')
+    workspaceStore.fetchAll?.()
     return null
   }
 
@@ -148,7 +195,8 @@ export function canManageWorkspace(targetWorkspaceId: string): boolean {
  */
 export function getAvailableWorkspaces() {
   const { user } = useAuthStore.getState()
-  const { items: workspaces } = useWorkspaceStoreData.getState()
+  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaces = workspaceStore.items || []
 
   if (!user) {
     return []

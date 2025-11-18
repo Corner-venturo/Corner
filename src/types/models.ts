@@ -54,6 +54,7 @@ export interface User {
 export interface Workspace {
   id: ID
   name: string
+  code: string // 辦公室代碼（如 TP, TC）
   description?: string
   owner_id: ID
   member_ids: ID[]
