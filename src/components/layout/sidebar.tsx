@@ -378,12 +378,21 @@ export function Sidebar() {
       const userPermissions = user.permissions || []
       const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
       const hiddenMenuItems = user.hidden_menu_items || []
+      const preferredFeatures = user.preferred_features || []
 
       return items
         .map(item => {
           // 檢查是否被使用者隱藏
           if (isMenuItemHidden(item.href, hiddenMenuItems)) {
             return null
+          }
+
+          // ⭐ 新增：檢查是否在常用功能列表中
+          // 如果使用者有設定 preferred_features，且該功能不在列表中，則隱藏
+          if (preferredFeatures.length > 0 && item.requiredPermission) {
+            if (!preferredFeatures.includes(item.requiredPermission)) {
+              return null
+            }
           }
 
           // 如果有子選單，先過濾子選單

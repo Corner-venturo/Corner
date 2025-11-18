@@ -14,6 +14,7 @@ import {
   PermissionManagementSettings,
   WorkspaceSwitcher,
   ModuleManagementSettings,
+  PreferredFeaturesSettings,
 } from './components'
 
 // 強制客戶端渲染，不預取伺服器資料
@@ -84,6 +85,9 @@ export default function SettingsPage() {
         <div className="max-w-4xl mx-auto space-y-8 p-6">
           {/* 主題設定 */}
           <AppearanceSettings currentTheme={currentTheme} onThemeChange={setTheme} />
+
+          {/* 常用功能設定 */}
+          <PreferredFeaturesSettings />
 
           {/* 帳號安全設定 */}
           <AccountSettings

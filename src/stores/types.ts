@@ -82,6 +82,7 @@ export interface User {
   workspace_id?: string // 所屬工作空間 ID
   selected_workspace_id?: string // Super Admin 選擇的工作空間 ID
   hidden_menu_items?: string[] // 隱藏的選單項目 ID
+  preferred_features?: string[] // 個人常用功能列表（用於個人化 Sidebar），例如: ["tours", "orders", "calendar"]
 
   // 認證相關
   password_hash?: string // 加密後的密碼
