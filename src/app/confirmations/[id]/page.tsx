@@ -6,14 +6,21 @@ import { useRouter, useParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EditorContainer } from '../components/EditorContainer'
 import { PreviewContainer } from '../components/PreviewContainer'
+import { PrintableConfirmation } from '../components/PrintableConfirmation'
+import { ImportPNRDialog } from '../components/ImportPNRDialog'
 import { Button } from '@/components/ui/button'
+import { Printer, Upload } from 'lucide-react'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type {
   ConfirmationFormData,
   ConfirmationType,
   Confirmation,
+  FlightData,
+  FlightPassenger,
+  FlightSegment,
 } from '@/types/confirmation.types'
+import type { ParsedHTMLConfirmation } from '@/lib/pnr-parser'
 import { toast } from 'sonner'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
@@ -37,6 +44,8 @@ export default function EditConfirmationPage() {
 
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   useEffect(() => {
     const loadConfirmation = async () => {
@@ -60,7 +69,7 @@ export default function EditConfirmationPage() {
         })
       } else {
         toast.error('找不到確認單')
-        router.push('/confirmations/list')
+        router.push('/confirmations')
       }
     }
   }, [id, confirmations, isLoading, router])
@@ -99,7 +108,7 @@ export default function EditConfirmationPage() {
       } as Partial<Confirmation>)
 
       toast.success('確認單已更新')
-      router.push('/confirmations/list')
+      router.push('/confirmations')
     } catch (error) {
       logger.error('更新失敗:', error)
       toast.error('更新失敗')
@@ -107,6 +116,60 @@ export default function EditConfirmationPage() {
       setIsSaving(false)
     }
   }
+
+  const handlePrint = () => {
+    window.print()
+  }
+
+  // 處理 PNR 匯入
+  const handleImportPNR = (parsed: ParsedHTMLConfirmation) => {
+    // 轉換成 FlightData 格式
+    const passengers: FlightPassenger[] = parsed.passengerNames.map((name, idx) => {
+      const ticket = parsed.ticketNumbers.find(t => t.passenger === name)
+      return {
+        nameEn: name,
+        cabin: parsed.segments[0]?.cabin || '經濟',
+        ticketNumber: ticket?.number || '',
+        bookingCode: parsed.recordLocator,
+      }
+    })
+
+    const segments: FlightSegment[] = parsed.segments.map(seg => ({
+      route: `${seg.departureAirport} - ${seg.arrivalAirport}`,
+      departureDate: seg.departureDate,
+      departureTime: seg.departureTime,
+      departureAirport: seg.departureAirport,
+      departureTerminal: seg.terminal,
+      arrivalDate: seg.departureDate, // 目前 HTML 沒有抵達日期，使用出發日期
+      arrivalTime: seg.arrivalTime,
+      arrivalAirport: seg.arrivalAirport,
+      arrivalTerminal: seg.terminal,
+      airline: seg.airline,
+      flightNumber: seg.flightNumber,
+    }))
+
+    const flightData: FlightData = {
+      passengers,
+      segments,
+      baggage: [], // HTML 格式沒有行李資訊
+      importantNotes: [],
+      ...((parsed as any).airlineContacts && {
+        airlineContacts: (parsed as any).airlineContacts,
+      }),
+    }
+
+    // 更新表單
+    setFormData({
+      ...formData,
+      type: 'flight',
+      booking_number: parsed.recordLocator,
+      data: flightData,
+    })
+
+    toast.success('PNR 已成功匯入！')
+  }
+
+  const currentConfirmation = confirmations.find(c => c.id === id)
 
   if (isLoading) {
     return (
@@ -123,13 +186,31 @@ export default function EditConfirmationPage() {
         title="編輯確認單"
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '確認單管理', href: '/confirmations/list' },
+          { label: '確認單管理', href: '/confirmations' },
           { label: '編輯確認單', href: '#' },
         ]}
         showBackButton={true}
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push('/confirmations/list')}>
+            {formData.type === 'flight' && (
+              <Button
+                variant="outline"
+                onClick={() => setIsImportDialogOpen(true)}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                匯入 PNR
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => setIsPrintDialogOpen(true)}
+              className="gap-2"
+            >
+              <Printer className="h-4 w-4" />
+              列印
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/confirmations')}>
               取消
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
@@ -150,6 +231,23 @@ export default function EditConfirmationPage() {
           <PreviewContainer formData={formData} />
         </div>
       </div>
+
+      {/* 列印預覽 */}
+      {currentConfirmation && (
+        <PrintableConfirmation
+          confirmation={currentConfirmation}
+          isOpen={isPrintDialogOpen}
+          onClose={() => setIsPrintDialogOpen(false)}
+          onPrint={handlePrint}
+        />
+      )}
+
+      {/* PNR 匯入對話框 */}
+      <ImportPNRDialog
+        isOpen={isImportDialogOpen}
+        onClose={() => setIsImportDialogOpen(false)}
+        onImport={handleImportPNR}
+      />
     </div>
   )
 }
