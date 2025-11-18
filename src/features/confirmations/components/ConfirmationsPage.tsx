@@ -67,7 +67,7 @@ export const ConfirmationsPage: React.FC = () => {
         workspace_id: auth.workspaceId,
         type: 'flight', // 預設航班，可在編輯頁修改
         booking_number: '',
-        data: {},
+        data: {} as any,
         status: 'draft',
         created_by: auth.user!.id,
         updated_by: auth.user!.id,

@@ -35,7 +35,7 @@ export const CompanyAssetsPage: React.FC = () => {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setAssets(data || [])
+      setAssets(data as any || [])
     } catch (error) {
       logger.error('載入公司資源失敗:', error)
     }

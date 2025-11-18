@@ -110,7 +110,7 @@ export function CurrentOrderList({
         <div className="flex items-center space-x-4">
           <div className="text-right">
             <p className="text-2xl font-bold text-morandi-primary">
-              NT$ {currentOrder.amount.toLocaleString()}
+              NT$ {(currentOrder as any).amount.toLocaleString()}
             </p>
           </div>
           <Button

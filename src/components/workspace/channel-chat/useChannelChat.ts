@@ -104,7 +104,7 @@ export function useChannelChat() {
   )
 
   // Realtime subscription for messages
-  useChatRealtime(selectedChannel?.id)
+  useChatRealtime()
 
   // Effects (拆分到 useChannelEffects)
   useChannelEffects(

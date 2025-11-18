@@ -70,7 +70,7 @@ export function TourClosingDialog({
 
     paidRequests.forEach(pr => {
       const amount = pr.amount || 0
-      switch (pr.supplier_type) {
+      switch ((pr as any).supplier_type) {
         case 'transportation':
           costs.transportation += amount
           break

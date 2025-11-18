@@ -196,7 +196,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
                   {/* 上傳按鈕 */}
                   <input
-                    ref={el => (fileInputRefs.current[index] = el)}
+                    ref={el => ((fileInputRefs.current[index] = el) as any)}
                     type="file"
                     accept="image/*"
                     onChange={e => handleFileChange(index, e)}

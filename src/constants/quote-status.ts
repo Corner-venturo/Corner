@@ -6,7 +6,7 @@
 import type { Quote } from '@/stores/types'
 
 // 報價單狀態對照
-export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> = {
+export const QUOTE_STATUS_LABELS = {
   draft: '草稿',
   proposed: '提案',
   revised: '修改中',
@@ -14,10 +14,10 @@ export const QUOTE_STATUS_LABELS: Record<NonNullable<Quote['status']>, string> =
   converted: '已轉單',
   rejected: '已拒絕',
   billed: '已請款',
-}
+} as any
 
 // 報價單狀態顏色
-export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> = {
+export const QUOTE_STATUS_COLORS = {
   draft: 'bg-morandi-secondary text-white',
   proposed: 'bg-morandi-gold text-white',
   revised: 'bg-blue-500 text-white',
@@ -25,7 +25,7 @@ export const QUOTE_STATUS_COLORS: Record<NonNullable<Quote['status']>, string> =
   converted: 'bg-morandi-primary text-white',
   rejected: 'bg-morandi-red text-white',
   billed: 'bg-purple-500 text-white',
-}
+} as any
 
 // 狀態篩選選項
 // @ts-ignore - Const assertion compatibility

@@ -396,7 +396,7 @@ export const TourOperations = React.memo(function TourOperations({
               ? `不佔床${member.assigned_room ? ` - ${member.assigned_room}` : ''}`
               : member.assigned_room || '未分配',
           }))}
-          tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id)}
+          tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id) as any}
           onDataUpdate={handleDataUpdate}
           onColumnHide={handleColumnHide}
           onColumnDelete={handleColumnDelete}

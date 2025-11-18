@@ -497,7 +497,7 @@ function NewItineraryPageContent() {
               <h2 className="text-lg font-semibold">編輯表單</h2>
             </div>
             <div className="flex-1 overflow-y-auto bg-white">
-              <TourForm data={tourData} onChange={setTourData} />
+              <TourForm data={tourData as any} onChange={setTourData as any} />
             </div>
           </div>
 

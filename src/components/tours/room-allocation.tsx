@@ -96,7 +96,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
     const rooms = generateRoomOptions()
     setRoomOptions(rooms)
     // 保留 members 中原有的 assignedRoom 數據
-    setMembersWithRooms(tourMembers.map(member => ({ ...member }) as MemberWithRoom))
+    setMembersWithRooms(tourMembers.map(member => ({ ...member } as unknown as MemberWithRoom)))
   }, [tour.id, paymentRequests, tourMembers, generateRoomOptions])
 
   // 分配房間
@@ -205,7 +205,7 @@ export function RoomAllocation({ tour }: RoomAllocationProps) {
                       {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
                     </td>
                     <td className="py-3 px-4 text-morandi-secondary border border-gray-300">
-                      {member.age > 0 ? `${member.age}歲` : '-'}
+                      {(member.age ?? 0) > 0 ? `${member.age}歲` : '-'}
                     </td>
                     <td className="py-3 px-4 border border-gray-300">
                       <Select

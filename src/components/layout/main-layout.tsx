@@ -75,7 +75,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       try {
         // 載入工作空間（全域需要）
         const { useChannelsStore } = await import('@/stores/workspace/channels-store')
-        const workspaceState = useChannelsStore.getState()
+        const workspaceState = (useChannelsStore as any).getState()
         if (!workspaceState.currentWorkspace) {
           await workspaceState.loadWorkspaces()
         }

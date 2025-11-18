@@ -46,7 +46,7 @@ export function useTourFormHandlers(
   const updateNestedField = (parent: string, field: string, value: unknown) => {
     onChange({
       ...data,
-      [parent]: { ...data[parent], [field]: value },
+      [parent]: { ...(data as any)[parent], [field]: value },
     })
   }
 
@@ -168,7 +168,7 @@ export function useTourFormHandlers(
         dayLabel: `Day ${i + 1}`, // 自動更新 dayLabel
         date: calculateDate(data.departureDate, i), // 自動更新日期
       }))
-    onChange({ ...data, dailyItinerary: newItinerary })
+    onChange({ ...data, dailyItinerary: newItinerary as any })
   }
 
   // 活動管理

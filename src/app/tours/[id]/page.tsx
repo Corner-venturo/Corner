@@ -35,7 +35,7 @@ const tabs = [
 export default function TourDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { items: tours } = useTourStore()
+  const { items: tours, loading } = useTourStore()
   const { channels, createChannel, currentWorkspace } = useWorkspaceChannels()
   const { user } = useAuthStore()
   const [activeTab, setActiveTab] = useState('overview')
@@ -78,6 +78,20 @@ export default function TourDetailPage() {
     }
   }
 
+  // 載入中
+  if (loading) {
+    return (
+      <div className="p-6">
+        <ContentContainer>
+          <div className="text-center py-12">
+            <p className="text-morandi-secondary">載入中...</p>
+          </div>
+        </ContentContainer>
+      </div>
+    )
+  }
+
+  // 找不到旅遊團
   if (!tour) {
     return (
       <div className="p-6">

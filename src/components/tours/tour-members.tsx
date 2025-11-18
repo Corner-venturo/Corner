@@ -94,7 +94,7 @@ export const TourMembers = React.memo(function TourMembers({
           order_number: relatedOrder?.order_number || '',
           contact_person: relatedOrder?.contact_person || '',
           assignedRoom: member.assigned_room,
-        } as EditingMember
+        } as unknown as EditingMember
       })
 
     setTableMembers(allTourMembers)

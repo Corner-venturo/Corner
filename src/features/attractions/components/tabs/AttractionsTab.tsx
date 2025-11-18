@@ -48,24 +48,24 @@ export default function AttractionsTab({
 
       // 載入這些國家
       if (countryIds.length > 0) {
-        supabase
+        (supabase
           .from('countries')
           .select('*')
-          .in('id', countryIds)
-          .then(({ data }) => {
-            if (data) setDisplayCountries(data as Country[])
+          .in('id', countryIds) as any)
+          .then(({ data }: any) => {
+            if (data) setDisplayCountries(data as any)
           })
           .catch((err: any) => logger.error('載入國家失敗:', err))
       }
 
       // 載入這些城市
       if (cityIds.length > 0) {
-        supabase
+        (supabase
           .from('cities')
           .select('*')
-          .in('id', cityIds)
-          .then(({ data }) => {
-            if (data) setDisplayCities(data as City[])
+          .in('id', cityIds) as any)
+          .then(({ data }: any) => {
+            if (data) setDisplayCities(data as any)
           })
           .catch((err: any) => logger.error('載入城市失敗:', err))
       }

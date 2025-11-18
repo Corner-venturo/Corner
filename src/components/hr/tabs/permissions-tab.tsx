@@ -74,7 +74,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
     ) => {
       setIsSaving(true)
       try {
-        await updateUser(employee.id, { roles })
+        await updateUser(employee.id, { roles: roles as any })
 
         // 同步更新 IndexedDB
         try {
@@ -87,7 +87,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
               ...existingEmployee,
               roles: roles,
               updated_at: new Date().toISOString(),
-            })
+            } as any)
           }
         } catch (error) {
           // Ignore error
@@ -108,7 +108,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
             const currentProfile = localAuthStore.currentProfile
 
             if (currentProfile && currentProfile.id === employee.id) {
-              localAuthStore.updateProfile(employee.id, {
+              (localAuthStore as any).updateProfile(employee.id, {
                 roles,
               })
             }
@@ -143,7 +143,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
               ...existingEmployee,
               permissions: permissions,
               updated_at: new Date().toISOString(),
-            })
+            } as any)
           }
         } catch (error) {}
 

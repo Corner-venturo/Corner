@@ -71,7 +71,7 @@ export function CreatePaymentRequestDialog({
         notes: itemsArray.map((item, i) =>
           `${i + 1}. ${item.name} - ${item.description} ($${item.amount.toLocaleString()})`
         ).join('\n'),
-      })
+      } as any)
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {

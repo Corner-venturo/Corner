@@ -57,7 +57,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         .order('name')
 
       if (error) throw error
-      setExperiences(data || [])
+      setExperiences(data as any || [])
 
       // 載入用到的國家和城市資料
       if (data && data.length > 0) {

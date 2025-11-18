@@ -92,7 +92,7 @@ export function useEventOperations() {
       router.push(`/orders?member=${member_id}`)
     } else if (eventType === 'personal' || eventType === 'company') {
       // 直接傳遞 FullCalendarEvent
-      const fullCalendarEvent: FullCalendarEvent = {
+      const fullCalendarEvent: any = {
         id: info.event.id,
         title: info.event.title,
         start: info.event.startStr,

@@ -119,7 +119,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                 return (
                   <OrderListCard
                     key={item.data.id}
-                    orderList={item.data}
+                    orderList={item.data as any}
                     userName={item.data.author?.display_name}
                     currentUserId={currentUserId || ''}
                     userRole="admin"

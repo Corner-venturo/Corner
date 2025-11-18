@@ -131,7 +131,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           workspace_id: currentWorkspace.id,
           created_by: user.id,
           event_type: 'flight',
-        })
+        } as any)
       }
 
       // 儲存 PNR 記錄

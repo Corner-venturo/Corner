@@ -31,72 +31,13 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
     description: '',
   })
 
-  // 模擬文件資料（實際使用時會從 store 取得）
-  const allMockDocuments = [
-    {
-      id: '1',
-      name: '旅遊合約書',
-      type: '合約',
-      status: '已簽署',
-      uploadDate: '2024-11-01',
-      size: '2.5 MB',
-      format: 'PDF',
-      description: '客戶已簽署完成',
-      signedBy: '王小明',
-    },
-    {
-      id: '2',
-      name: '行程表',
-      type: '行程',
-      status: '已確認',
-      uploadDate: '2024-11-05',
-      size: '1.2 MB',
-      format: 'PDF',
-      description: '詳細行程安排',
-      signedBy: '',
-    },
-    {
-      id: '3',
-      name: '保險單',
-      type: '保險',
-      status: '待確認',
-      uploadDate: '2024-11-10',
-      size: '800 KB',
-      format: 'PDF',
-      description: '旅遊保險證明',
-      signedBy: '',
-    },
-    {
-      id: '4',
-      name: '機票確認書',
-      type: '票務',
-      status: '已確認',
-      uploadDate: '2024-11-08',
-      size: '1.5 MB',
-      format: 'PDF',
-      description: '航班資訊確認',
-      signedBy: '',
-    },
-    {
-      id: '5',
-      name: '飯店確認書',
-      type: '住宿',
-      status: '已確認',
-      uploadDate: '2024-11-09',
-      size: '900 KB',
-      format: 'PDF',
-      description: '住宿預訂確認',
-      signedBy: '',
-    },
-  ]
+  // TODO: 實作文件管理功能後，從 store 取得實際的文件資料
+  // 目前暫時使用空陣列，避免顯示假資料
+  const allMockDocuments: any[] = []
 
-  // 根據 orderFilter 過濾文件（實際使用時會從 store 根據 order_id 過濾）
+  // 根據 orderFilter 過濾文件
   const mockDocuments = orderFilter
-    ? allMockDocuments.filter(doc => {
-        // 模擬：當有 orderFilter 時，只顯示部分文件
-        // 實際使用時會根據 doc.order_id === orderFilter 過濾
-        return doc.type === '合約' || doc.type === '行程表'
-      })
+    ? allMockDocuments.filter(doc => doc.order_id === orderFilter)
     : allMockDocuments
 
   const handleUploadDocument = () => {
@@ -205,13 +146,13 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
                 <FileText size={20} className={`mr-2 ${getTypeColor(type)}`} />
                 {type}文件
                 <span className="ml-2 text-sm text-morandi-secondary">
-                  ({documents.length} 個文件)
+                  ({(documents as any).length} 個文件)
                 </span>
               </h4>
             </div>
 
             <div className="space-y-2">
-              {documents.map(doc => {
+              {(documents as any).map((doc: any) => {
                 const StatusIcon = getStatusIcon(doc.status)
                 return (
                   <div

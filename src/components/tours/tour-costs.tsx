@@ -76,8 +76,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
       }
 
       // 建立請款單
-      const paymentRequestData: Partial<PaymentRequest> = {
-        allocation_mode: 'single',
+      const paymentRequestData = {
+        allocation_mode: 'single' as any,
         tour_id: data.tour_id,
         code: tour.code,
         tour_name: tour.name,
@@ -91,7 +91,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         updated_at: new Date().toISOString(),
       }
 
-      await createPaymentRequest(paymentRequestData as PaymentRequest)
+      await createPaymentRequest(paymentRequestData as unknown as PaymentRequest)
       await fetchPaymentRequests()
 
       toast({

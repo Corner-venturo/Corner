@@ -87,8 +87,8 @@ export function ReactDatasheetWrapper({
 
         // Calculate formulas
         if (typeof value === 'string' && value.startsWith('=')) {
-          const context = getMemberContext(cell.rowData || {}, tour_add_ons, tourPrice)
-          displayValue = calculateFormula(value, context)
+          const context = getMemberContext((cell as any).rowData || {}, tour_add_ons, tourPrice)
+          displayValue = calculateFormula(value, context) as any
           className = cn(className, 'datasheet-formula')
         }
 

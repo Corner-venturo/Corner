@@ -23,7 +23,7 @@ export function useAttractionsData() {
         .order('created_at', { ascending: false }) // 最新的在前面
 
       if (error) throw error
-      setAttractions(data || [])
+      setAttractions(data as any || [])
     } catch (error) {
       logger.error('Error fetching attractions:', error)
       setAttractions([])

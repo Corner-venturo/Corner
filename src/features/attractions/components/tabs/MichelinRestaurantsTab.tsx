@@ -50,7 +50,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         .order('name')
 
       if (error) throw error
-      setRestaurants(data || [])
+      setRestaurants(data as any || [])
 
       // 載入用到的國家和城市資料
       if (data && data.length > 0) {

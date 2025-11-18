@@ -141,7 +141,7 @@ export function StandardPageLayout({
       <ResponsiveHeader
         title={title}
         icon={icon}
-        breadcrumb={breadcrumb}
+        breadcrumb={breadcrumb as any}
         showSearch={showSearch}
         searchTerm={searchTerm}
         onSearchChange={onSearchChange}

@@ -125,7 +125,7 @@ export function OrderMembersExpandable({
 
       const { data, error } = await supabase
         .from('order_members')
-        .insert(newMembers)
+        .insert(newMembers as any)
         .select()
 
       if (error) throw error

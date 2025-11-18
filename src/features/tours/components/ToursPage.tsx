@@ -26,6 +26,7 @@ import {
   Flag,
   MessageSquare,
   LockOpen,
+  Eye,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -569,6 +570,16 @@ export const ToursPage: React.FC = () => {
 
       return (
         <div className="flex items-center gap-1">
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              router.push(`/tours/${tour.id}`)
+            }}
+            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            title="查看詳情"
+          >
+            <Eye size={14} />
+          </button>
           <button
             onClick={e => {
               e.stopPropagation()

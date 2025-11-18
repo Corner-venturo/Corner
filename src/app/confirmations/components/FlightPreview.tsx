@@ -68,7 +68,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
                   {segment.departureTime} 出發: {segment.departureAirport}
                 </div>
                 <div className="col-span-4" style={{ color: '#6B7280' }}>
-                  {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{segment.cabin || '經濟'} /OK
+                  {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{(segment as any).cabin || '經濟'} /OK
                 </div>
               </div>
 

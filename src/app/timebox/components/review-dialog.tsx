@@ -123,9 +123,9 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             <div className="mt-3 pt-3 border-t border-gray-200">
               <div className="text-sm text-morandi-secondary">完成項目分布：</div>
               <div className="flex space-x-4 mt-1 text-sm">
-                <span>運動 {stats?.completedByType?.workout ?? 0} 次</span>
-                <span>保養 {stats?.completedByType?.reminder ?? 0} 次</span>
-                <span>其他 {stats?.completedByType?.basic ?? 0} 次</span>
+                <span>運動 {(stats as any)?.completedByType?.workout ?? 0} 次</span>
+                <span>保養 {(stats as any)?.completedByType?.reminder ?? 0} 次</span>
+                <span>其他 {(stats as any)?.completedByType?.basic ?? 0} 次</span>
               </div>
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
                       .map(record => (
                         <SelectItem key={record.id} value={record.id}>
                           {record.name} (完成率:{' '}
-                          {Math.round(record.statistics.completionRate * 100)}%)
+                          {Math.round((record as any).statistics.completionRate * 100)}%)
                         </SelectItem>
                       ))}
                   </SelectContent>

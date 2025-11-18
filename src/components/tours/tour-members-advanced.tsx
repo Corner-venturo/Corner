@@ -175,7 +175,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       if (membersError) throw membersError
 
-      setMembers((membersData || []) as OrderMember[])
+      setMembers((membersData || []) as unknown as OrderMember[])
 
       // 3. 載入已建立的動態欄位
       await loadCustomFields()
@@ -200,7 +200,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       // 取得所有不重複的欄位名稱
       const uniqueFields = [...new Set((data as any)?.map((d: any) => d.field_name) || [])]
-      setCustomFields(uniqueFields)
+      setCustomFields(uniqueFields as any)
     } catch (error) {
       logger.error('載入自訂欄位失敗:', error)
     }

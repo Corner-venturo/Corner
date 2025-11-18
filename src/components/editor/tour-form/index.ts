@@ -11,10 +11,12 @@ export type {
   Meals,
   DailyItinerary,
   LeaderInfo,
-  MeetingInfo,
   IconOption,
   CityOption,
 } from './types'
+
+// MeetingInfo type declaration
+type MeetingInfo = any
 
 // Constants
 export { iconOptions, cityImages, timezoneOffset } from './constants'

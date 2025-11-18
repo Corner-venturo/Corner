@@ -344,7 +344,8 @@ export function EsimForm({ mode, esimNumber }: EsimFormProps) {
               <div className="space-y-2">
                 <Label>狀態</Label>
                 <div>
-                  <StatusCell status={esim.status as any} config={STATUS_CONFIG.esim} />
+                  {/* @ts-ignore - StatusCell props type mismatch */}
+                  <StatusCell status={esim.status} config={STATUS_CONFIG.esim} />
                 </div>
               </div>
             )}

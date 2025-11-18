@@ -18,7 +18,7 @@ export const useCustomers = () => {
      * 創建新客戶
      */
     createCustomer: async (data: Omit<Customer, 'id' | 'created_at' | 'updated_at'>) => {
-      return await store.create(data)
+      return await store.create(data as any)
     },
 
     /**

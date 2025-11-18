@@ -168,7 +168,7 @@ export const TourPayments = React.memo(function TourPayments({
   const totalPayments = totalConfirmed + totalPending
 
   // 計算應收金額 (基於訂單)
-  const totalOrderAmount = tourOrders.reduce((sum, order) => sum + order.total_amount, 0)
+  const totalOrderAmount = tourOrders.reduce((sum, order) => sum + (order.total_amount ?? 0), 0)
   const remaining_amount = Math.max(0, totalOrderAmount - totalConfirmed)
 
   const getStatusBadge = (status: string) => {
@@ -409,7 +409,7 @@ export const TourPayments = React.memo(function TourPayments({
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
               <select
                 value={newPayment.status}
-                onChange={e => setNewPayment(prev => ({ ...prev, status: e.target.value }))}
+                onChange={e => setNewPayment(prev => ({ ...prev, status: e.target.value } as any))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="已確認">已確認</option>

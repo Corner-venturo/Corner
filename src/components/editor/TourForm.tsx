@@ -60,8 +60,8 @@ export function TourForm({ data, onChange }: TourFormProps) {
         selectedCountry={selectedCountry}
         setSelectedCountry={setSelectedCountry}
         setSelectedCountryCode={setSelectedCountryCode}
-        allDestinations={allDestinations}
-        availableCities={availableCities}
+        allDestinations={allDestinations as any}
+        availableCities={availableCities as any}
         countryNameToCode={countryNameToCode}
         updateField={handlers.updateField}
         updateCity={handlers.updateCity}
@@ -72,7 +72,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
         data={data}
         allCountries={allCountries}
         availableCities={availableCities}
-        getCitiesByCountryId={getCitiesByCountryId}
+        getCitiesByCountryId={getCitiesByCountryId as any}
         onChange={onChange}
       />
 

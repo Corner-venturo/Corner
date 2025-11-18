@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Receipt, ChevronDown, ChevronUp, DollarSign, Check } from 'lucide-react'
-import { _Order } from '@/stores/types'
+import type { Order } from '@/stores/types'
 
 interface SharedOrderList {
   id: string

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox, ComboboxOption } from '@/components/ui/combobox'
-import type { VisaApplicant, VisaContactInfo } from '@/hooks'
+import type { VisaApplicant, VisaContactInfo } from '@/hooks/use-visa-form'
 
 interface AddVisaDialogProps {
   open: boolean

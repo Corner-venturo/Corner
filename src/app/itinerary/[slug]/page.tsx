@@ -63,7 +63,7 @@ export default function EditItineraryPage() {
         if (tour) {
           // 從旅遊團建立行程資料
           const { useRegionsStore } = await import('@/stores')
-          const regionsStore = useRegionsStore.getState() as any
+          const regionsStore = (useRegionsStore as any).getState()
           await regionsStore.fetchAll()
           const { countries, cities } = regionsStore as any
 
@@ -126,10 +126,11 @@ export default function EditItineraryPage() {
               domesticPhone: '',
               overseasPhone: '',
             },
-            meetingInfo: {
+            meetingPoints: [{
               time: '',
               location: '',
-            },
+            }],
+            hotels: [],
             itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,
             dailyItinerary: Array.from({ length: days }, (_, i) => ({
               dayLabel: `Day ${i + 1}`,
@@ -411,7 +412,7 @@ export default function EditItineraryPage() {
                   </div>
                 </div>
                 <div className="scrollable-content flex-1 overflow-y-auto px-6 py-6">
-                  <TourForm data={itineraryData} onChange={setItineraryData} />
+                  <TourForm data={itineraryData as any} onChange={setItineraryData} />
                 </div>
               </div>
 

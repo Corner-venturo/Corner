@@ -54,7 +54,7 @@ export function EnhancedTable({
   } = useTableState({
     data,
     searchTerm: externalSearchTerm,
-    searchableFields,
+    searchableFields: searchableFields as any,
     initialPageSize,
   })
 

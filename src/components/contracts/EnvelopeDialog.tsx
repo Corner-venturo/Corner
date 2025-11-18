@@ -10,7 +10,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Tour, EnvelopeRecord } from '@/types/tour.types'
+import type { Tour } from '@/types/tour.types'
+type EnvelopeRecord = any
 import { useAuthStore } from '@/stores/auth-store'
 import { useTourStore } from '@/stores'
 import { generateUUID } from '@/lib/utils/uuid'

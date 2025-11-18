@@ -543,6 +543,7 @@ export function EditableRatesTable({
                         hideKKDAYColumns={hideKKDAYColumns}
                         editingCell={editingCell}
                         editValue={editValue}
+                        setEditValue={setEditValue}
                         inputRef={inputRef}
                         startEdit={startEdit}
                         saveEdit={saveEdit}
@@ -585,6 +586,7 @@ function CategoryGroupRow({
   hideKKDAYColumns,
   editingCell,
   editValue,
+  setEditValue,
   inputRef,
   startEdit,
   saveEdit,
@@ -616,7 +618,7 @@ function CategoryGroupRow({
   const categoryKey = `${group.category}_${group.supplier}`
 
   // 收集所有要渲染的列
-  const rows: JSX.Element[] = []
+  const rows: any[] = []
   // @ts-ignore - Unused variables from destructuring
 
   // 品項的資料列
@@ -631,6 +633,7 @@ function CategoryGroupRow({
         hideKKDAYColumns={hideKKDAYColumns}
         editingCell={editingCell}
         editValue={editValue}
+        setEditValue={setEditValue}
         inputRef={inputRef}
         startEdit={startEdit}
         saveEdit={saveEdit}
@@ -676,6 +679,7 @@ function ItemRow({
   hideKKDAYColumns,
   editingCell,
   editValue,
+  setEditValue,
   inputRef,
   startEdit,
   saveEdit,
