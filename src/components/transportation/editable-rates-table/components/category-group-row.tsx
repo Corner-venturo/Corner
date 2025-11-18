@@ -95,7 +95,7 @@ export function CategoryGroupRow({
       setNewRow={setNewRow}
       category={group.category}
       supplier={group.supplier}
-      isBackup={rate.is_backup}
+      isBackup={rate.is_backup || false}
       categoryDragRef={index === 0 ? setNodeRef : undefined}
       categoryDragStyle={index === 0 ? style : undefined}
       categoryDragAttributes={index === 0 ? attributes : undefined}

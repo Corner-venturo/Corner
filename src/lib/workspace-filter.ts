@@ -3,6 +3,8 @@
  * 用於 super_admin 切換查看特定 workspace 的資料
  */
 
+import { canCrossWorkspace, type UserRole } from './rbac-config'
+
 /**
  * 取得當前選擇的 workspace ID（如果有的話）
  * @returns workspace ID 或 null（表示查看全部）
@@ -83,7 +85,7 @@ export function getWorkspaceFilterForQuery(tableName: string): string | null {
   }
 
   // 🔐 安全性修復：一般使用者自動使用自己的 workspace_id
-  // 只有 super_admin 可以透過 localStorage 手動切換 workspace
+  // 只有具有跨 workspace 權限的角色可以透過 localStorage 手動切換 workspace
   try {
     // 動態引入避免循環依賴
     const { useAuthStore } = require('@/stores/auth-store')
@@ -93,8 +95,11 @@ export function getWorkspaceFilterForQuery(tableName: string): string | null {
       return null // 未登入，不篩選
     }
 
-    // super_admin: 可以手動切換查看不同 workspace
-    if (user.permissions?.includes('super_admin')) {
+    // 取得使用者角色
+    const userRole = user.roles?.[0] as UserRole
+
+    // 檢查是否有跨 workspace 權限（super_admin）
+    if (canCrossWorkspace(userRole)) {
       const manualFilter = getCurrentWorkspaceFilter()
 
       // 如果手動選擇了 workspace，使用該選擇

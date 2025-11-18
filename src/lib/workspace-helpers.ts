@@ -7,11 +7,12 @@
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { logger } from '@/lib/utils/logger'
+import { canCrossWorkspace, canManageWorkspace as canManageWorkspaceByRole, type UserRole } from './rbac-config'
 
 /**
  * 取得當前使用者的 workspace_id
  *
- * @returns workspace_id (UUID) 或 null（super_admin）
+ * @returns workspace_id (UUID) 或 null（可跨 workspace 的角色）
  */
 export function getCurrentWorkspaceId(): string | null {
   const { user } = useAuthStore.getState()
@@ -20,8 +21,9 @@ export function getCurrentWorkspaceId(): string | null {
     return null
   }
 
-  // super_admin 沒有固定的 workspace_id
-  if (user.permissions?.includes('super_admin')) {
+  // 檢查是否為可跨 workspace 的角色
+  const userRole = user.roles?.[0] as UserRole
+  if (canCrossWorkspace(userRole)) {
     return null
   }
 
@@ -60,8 +62,9 @@ export function getCurrentWorkspaceCode(): string | null {
     return null
   }
 
-  // super_admin 需要從前端選擇的 workspace 取得 code
-  if (user.permissions?.includes('super_admin')) {
+  // 可跨 workspace 的角色需要從前端選擇的 workspace 取得 code
+  const userRole = user.roles?.[0] as UserRole
+  if (canCrossWorkspace(userRole)) {
     // 如果有選擇的 workspace，從 store 取得
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
@@ -70,18 +73,18 @@ export function getCurrentWorkspaceCode(): string | null {
         // ✅ 使用 workspace.code 欄位（如 TP, TC）
         return (workspace as any).code || workspace.name.substring(0, 2).toUpperCase()
       }
-      logger.warn(`[getCurrentWorkspaceCode] Super admin selected workspace ${selectedWorkspaceId} not found`)
+      logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user selected workspace ${selectedWorkspaceId} not found`)
     }
 
-    // ✅ Super admin 沒有選擇 workspace 時，使用第一個 workspace
+    // ✅ 沒有選擇 workspace 時，使用第一個 workspace
     if (!selectedWorkspaceId && workspaces.length > 0) {
       const defaultWorkspace = workspaces[0]
-      logger.warn(`[getCurrentWorkspaceCode] Super admin has no selected workspace, using default: ${defaultWorkspace.name}`)
+      logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user has no selected workspace, using default: ${defaultWorkspace.name}`)
       // ✅ 使用 workspace.code 欄位（如 TP, TC）
       return (defaultWorkspace as any).code || defaultWorkspace.name.substring(0, 2).toUpperCase()
     }
 
-    logger.warn('[getCurrentWorkspaceCode] Super admin has no workspace available')
+    logger.warn('[getCurrentWorkspaceCode] Cross-workspace user has no workspace available')
     return null
   }
 
@@ -123,8 +126,9 @@ export function getCurrentWorkspace() {
     return null
   }
 
-  // super_admin 從選擇的 workspace 取得
-  if (user.permissions?.includes('super_admin')) {
+  // 可跨 workspace 的角色從選擇的 workspace 取得
+  const userRole = user.roles?.[0] as UserRole
+  if (canCrossWorkspace(userRole)) {
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
       return workspaces.find(w => w.id === selectedWorkspaceId) || null
@@ -148,7 +152,10 @@ export function getCurrentWorkspace() {
  */
 export function isSuperAdmin(): boolean {
   const { user } = useAuthStore.getState()
-  return user?.permissions?.includes('super_admin') || false
+  if (!user) return false
+
+  const userRole = user.roles?.[0] as UserRole
+  return userRole === 'super_admin'
 }
 
 /**
@@ -158,8 +165,10 @@ export function isSuperAdmin(): boolean {
  */
 export function isAdmin(): boolean {
   const { user } = useAuthStore.getState()
-  const permissions = user?.permissions || []
-  return permissions.includes('super_admin') || permissions.includes('admin')
+  if (!user) return false
+
+  const userRole = user.roles?.[0] as UserRole
+  return userRole === 'super_admin' || userRole === 'admin'
 }
 
 /**
@@ -175,17 +184,20 @@ export function canManageWorkspace(targetWorkspaceId: string): boolean {
     return false
   }
 
+  const userRole = user.roles?.[0] as UserRole
+
+  // 檢查是否有管理 workspace 的權限
+  if (!canManageWorkspaceByRole(userRole)) {
+    return false
+  }
+
   // super_admin 可以管理任何 workspace
-  if (user.permissions?.includes('super_admin')) {
+  if (canCrossWorkspace(userRole)) {
     return true
   }
 
   // 一般 admin 只能管理自己的 workspace
-  if (user.permissions?.includes('admin')) {
-    return user.workspace_id === targetWorkspaceId
-  }
-
-  return false
+  return user.workspace_id === targetWorkspaceId
 }
 
 /**
@@ -202,8 +214,10 @@ export function getAvailableWorkspaces() {
     return []
   }
 
-  // super_admin 可以看到所有 workspaces
-  if (user.permissions?.includes('super_admin')) {
+  const userRole = user.roles?.[0] as UserRole
+
+  // 可跨 workspace 的角色可以看到所有 workspaces
+  if (canCrossWorkspace(userRole)) {
     return workspaces
   }
 

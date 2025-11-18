@@ -7,7 +7,7 @@
 import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { EditableRatesTable } from '@/components/transportation/editable-rates-table'
+import { EditableRatesTable } from '@/components/transportation/editable-rates-table/index'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'

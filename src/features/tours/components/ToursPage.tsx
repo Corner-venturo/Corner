@@ -22,6 +22,7 @@ import {
   useOrderStore,
   useEmployeeStore,
   useRegionsStore,
+  useMemberStore,
 } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
@@ -347,7 +348,7 @@ export const ToursPage: React.FC = () => {
   }, [operations, deleteConfirm.tour, setDeleteConfirm])
 
   // Use extracted hooks for table columns, channel operations, and action buttons
-  const columns = useTourTableColumns({ orders, getStatusColor })
+  const columns = useTourTableColumns({ orders: orders as any, getStatusColor })
 
   const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions })
 

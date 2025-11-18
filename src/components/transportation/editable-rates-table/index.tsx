@@ -373,7 +373,7 @@ export function EditableRatesTable({
                         editingCell={editingCell}
                         editValue={editValue}
                         setEditValue={setEditValue}
-                        inputRef={inputRef}
+                        inputRef={inputRef as any}
                         startEdit={startEdit}
                         saveEdit={saveEdit}
                         handleKeyDown={handleKeyDown}

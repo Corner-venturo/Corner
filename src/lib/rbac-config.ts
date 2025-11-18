@@ -1,0 +1,196 @@
+/**
+ * RBAC (Role-Based Access Control) 配置
+ *
+ * 核心概念：
+ * - Role (角色): 描述「你是誰」（職位）
+ * - Permission (權限): 描述「你能做什麼」（功能）
+ * - 一個員工只有一個主要角色，但可以有多個權限
+ */
+
+export type UserRole =
+  | 'super_admin'    // 超級管理員（跨 workspace）
+  | 'admin'          // 管理員（workspace 內）
+  | 'tour_leader'    // 領隊
+  | 'sales'          // 業務
+  | 'accountant'     // 會計
+  | 'assistant'      // 助理
+  | 'staff'          // 一般員工
+
+export interface RoleConfig {
+  id: UserRole
+  label: string
+  description: string
+  color: string
+  permissions: string[]  // 該角色預設擁有的功能權限
+  canManageWorkspace: boolean
+  canCrossWorkspace: boolean
+}
+
+/**
+ * 角色定義與預設權限
+ */
+export const ROLES: Record<UserRole, RoleConfig> = {
+  super_admin: {
+    id: 'super_admin',
+    label: '超級管理員',
+    description: '擁有所有權限，可跨 workspace 管理所有資料',
+    color: 'text-red-600 bg-red-50 border-red-200',
+    permissions: ['*'], // 所有權限
+    canManageWorkspace: true,
+    canCrossWorkspace: true,
+  },
+
+  admin: {
+    id: 'admin',
+    label: '管理員',
+    description: '擁有 workspace 內所有管理權限，包含人資和設定',
+    color: 'text-purple-600 bg-purple-50 border-purple-200',
+    permissions: [
+      'tours', 'orders', 'quotes', 'customers',
+      'finance', 'payments', 'hr', 'settings',
+      'calendar', 'workspace', 'todos', 'database',
+    ],
+    canManageWorkspace: true,
+    canCrossWorkspace: false,
+  },
+
+  tour_leader: {
+    id: 'tour_leader',
+    label: '領隊',
+    description: '可管理自己帶的旅遊團和相關訂單',
+    color: 'text-blue-600 bg-blue-50 border-blue-200',
+    permissions: [
+      'tours',           // 查看旅遊團（限自己的）
+      'orders',          // 管理訂單（限自己的團）
+      'customers',       // 查看客戶資料
+      'calendar',        // 行事曆
+      'workspace',       // 工作空間
+    ],
+    canManageWorkspace: false,
+    canCrossWorkspace: false,
+  },
+
+  sales: {
+    id: 'sales',
+    label: '業務',
+    description: '可建立報價單、管理客戶和訂單',
+    color: 'text-green-600 bg-green-50 border-green-200',
+    permissions: [
+      'quotes',          // 報價管理
+      'customers',       // 客戶管理
+      'orders',          // 訂單管理
+      'tours',           // 查看旅遊團
+      'calendar',        // 行事曆
+      'workspace',       // 工作空間
+    ],
+    canManageWorkspace: false,
+    canCrossWorkspace: false,
+  },
+
+  accountant: {
+    id: 'accountant',
+    label: '會計',
+    description: '可管理財務、付款和會計相關功能',
+    color: 'text-orange-600 bg-orange-50 border-orange-200',
+    permissions: [
+      'finance',         // 財務管理
+      'payments',        // 付款管理
+      'accounting',      // 記帳
+      'orders',          // 查看訂單
+      'tours',           // 查看旅遊團
+      'calendar',        // 行事曆
+      'workspace',       // 工作空間
+    ],
+    canManageWorkspace: false,
+    canCrossWorkspace: false,
+  },
+
+  assistant: {
+    id: 'assistant',
+    label: '助理',
+    description: '可協助處理訂單、客戶和一般行政工作',
+    color: 'text-cyan-600 bg-cyan-50 border-cyan-200',
+    permissions: [
+      'orders',          // 訂單管理
+      'customers',       // 客戶管理
+      'tours',           // 查看旅遊團
+      'calendar',        // 行事曆
+      'workspace',       // 工作空間
+      'todos',           // 待辦事項
+    ],
+    canManageWorkspace: false,
+    canCrossWorkspace: false,
+  },
+
+  staff: {
+    id: 'staff',
+    label: '一般員工',
+    description: '基本查看權限，可使用個人工作空間',
+    color: 'text-gray-600 bg-gray-50 border-gray-200',
+    permissions: [
+      'calendar',        // 行事曆
+      'workspace',       // 工作空間
+      'todos',           // 待辦事項
+    ],
+    canManageWorkspace: false,
+    canCrossWorkspace: false,
+  },
+}
+
+/**
+ * 取得角色配置
+ */
+export function getRoleConfig(role: UserRole | null): RoleConfig | null {
+  if (!role) return null
+  return ROLES[role] || null
+}
+
+/**
+ * 檢查使用者是否有特定權限
+ */
+export function hasPermission(
+  userRole: UserRole | null,
+  userPermissions: string[],
+  requiredPermission: string
+): boolean {
+  if (!userRole) return false
+
+  const roleConfig = getRoleConfig(userRole)
+  if (!roleConfig) return false
+
+  // super_admin 和 admin 有 '*' 萬用權限
+  if (roleConfig.permissions.includes('*')) return true
+
+  // 檢查角色預設權限
+  if (roleConfig.permissions.includes(requiredPermission)) return true
+
+  // 檢查使用者額外權限（可能被管理員單獨賦予）
+  if (userPermissions.includes(requiredPermission)) return true
+
+  return false
+}
+
+/**
+ * 檢查是否可以管理 workspace
+ */
+export function canManageWorkspace(userRole: UserRole | null): boolean {
+  if (!userRole) return false
+  const roleConfig = getRoleConfig(userRole)
+  return roleConfig?.canManageWorkspace || false
+}
+
+/**
+ * 檢查是否可以跨 workspace
+ */
+export function canCrossWorkspace(userRole: UserRole | null): boolean {
+  if (!userRole) return false
+  const roleConfig = getRoleConfig(userRole)
+  return roleConfig?.canCrossWorkspace || false
+}
+
+/**
+ * 取得所有可用角色列表
+ */
+export function getAllRoles(): RoleConfig[] {
+  return Object.values(ROLES)
+}

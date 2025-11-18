@@ -10,8 +10,9 @@ import { User, DollarSign, Shield, X, Edit, Save } from 'lucide-react'
 // 導入分頁組件
 import { BasicInfoTab } from './tabs/basic-info'
 import { SalaryTab } from './tabs/salary-tab'
-import { PermissionsTab } from './tabs/permissions-tab'
+import { PermissionsTabNew } from './tabs/permissions-tab-new'
 import { SYSTEM_PERMISSIONS } from '@/stores/types'
+import { getRoleConfig } from '@/lib/rbac-config'
 
 interface EmployeeExpandedViewProps {
   employee_id: string
@@ -57,13 +58,18 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
           </div>
         )
       case 'permissions':
-        // 如果有 admin 權限，視為全選
-        const hasAdmin = employee.permissions.includes('admin')
-        const permissionCount = hasAdmin ? SYSTEM_PERMISSIONS.length : employee.permissions.length
+        // 使用新的 RBAC 系統顯示角色資訊
+        const userRole = employee.roles?.[0]
+        const roleConfig = userRole ? getRoleConfig(userRole as any) : null
+        const roleLabel = roleConfig?.label || '未設定'
+        const permissionCount = roleConfig?.permissions.includes('*')
+          ? SYSTEM_PERMISSIONS.length
+          : (employee.permissions?.length || 0)
 
         return (
-          <div className="text-morandi-muted">
-            已授權 {permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能
+          <div className="flex items-center gap-4 text-morandi-muted">
+            <span>角色：<span className="font-medium text-morandi-primary">{roleLabel}</span></span>
+            <span>權限：{permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能</span>
           </div>
         )
       default:
@@ -111,7 +117,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
           />
         )
       case 'permissions':
-        return <PermissionsTab employee={employee} />
+        return <PermissionsTabNew ref={null as any} employee={employee} />
       default:
         return null
     }
