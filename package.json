@@ -22,7 +22,8 @@
     "db:init": "tsx scripts/init-db.ts",
     "db:export": "node scripts/export-db.js",
     "db:import": "node scripts/import-db.js",
-    "db:reset": "node scripts/reset-db.js"
+    "db:reset": "node scripts/reset-db.js",
+    "db:migrate": "node scripts/db-migrate.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

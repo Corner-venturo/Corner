@@ -240,11 +240,20 @@ WHERE channels.id = subquery.id;
 COMMIT;
 ```
 
-#### 3. 執行 Migration
+#### 3. 執行 Migration（推薦方式）
 ```bash
-# 使用環境變數傳遞 token（自動確認）
+# 使用自動化工具（推薦！每台電腦都能自動執行）
+npm run db:migrate
+
+# 或使用 Supabase CLI（可能遇到 SSL 問題）
 echo "Y" | SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 npx supabase db push
 ```
+
+**自動化工具優勢**：
+- ✅ 使用 Supabase Management API，避免 SSL 連線問題
+- ✅ 自動追蹤已執行的 migrations
+- ✅ 支援斷點續傳（失敗後可重新執行）
+- ✅ 在任何電腦上都能可靠執行
 
 #### 4. 驗證結果（可選）
 ```bash
