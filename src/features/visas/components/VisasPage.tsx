@@ -15,10 +15,6 @@ import { VisasInfoDialog } from './VisasInfoDialog'
 import { AddVisaDialog } from './AddVisaDialog'
 import {
   useRealtimeForVisas,
-  useRealtimeForTours,
-  useRealtimeForOrders,
-  useRealtimeForMembers,
-  useRealtimeForCustomers,
 } from '@/hooks/use-realtime-hooks'
 
 // ============================================
@@ -26,12 +22,9 @@ import {
 // ============================================
 
 export default function VisasPage() {
-  // ✅ Realtime 訂閱
+  // ✅ Realtime 訂閱（只訂閱 Visas）
+  // Tours, Orders, Members, Customers 只用來顯示名稱，不需要即時訂閱
   useRealtimeForVisas()
-  useRealtimeForTours()
-  useRealtimeForOrders()
-  useRealtimeForMembers()
-  useRealtimeForCustomers()
   // 資料管理
   const {
     visas,

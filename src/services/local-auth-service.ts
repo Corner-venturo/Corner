@@ -5,7 +5,7 @@
 
 import bcrypt from 'bcryptjs'
 import { localDB } from '@/lib/db'
-import type { User } from '@/stores/types'
+import type { User, Employee } from '@/stores/types'
 
 export interface LocalLoginResult {
   success: boolean
@@ -22,7 +22,7 @@ export class LocalAuthService {
       // 1. 從 IndexedDB 查詢員工
       const employees = await localDB.filter('employees', [
         { field: 'employee_number', operator: 'eq', value: username },
-      ] as any)
+      ])
 
       if (employees.length === 0) {
         return {
@@ -31,10 +31,16 @@ export class LocalAuthService {
         }
       }
 
-      const employee: any = employees[0]
+      const employee = employees[0] as Employee & {
+        is_active?: boolean
+        lockedUntil?: string
+        loginAttempts?: number
+        password_hash?: string
+        lastLoginAt?: string
+      }
 
       // 2. 檢查帳號是否啟用
-      if (employee.is_active === false) {
+      if (employee.status === 'terminated') {
         return {
           success: false,
           message: '帳號已停用，請聯繫管理員',
@@ -72,7 +78,7 @@ export class LocalAuthService {
           const hashedPassword = await bcrypt.hash(password, 10)
           await localDB.update('employees', employee.id, {
             password_hash: hashedPassword,
-          } as any)
+          } as Partial<Employee>)
           isValidPassword = true
         }
       }
@@ -80,14 +86,14 @@ export class LocalAuthService {
       if (!isValidPassword) {
         // 記錄失敗次數
         const attempts = (employee.loginAttempts || 0) + 1
-        const updates: any = { loginAttempts: attempts }
+        const updates: Record<string, unknown> = { loginAttempts: attempts }
 
         // 超過 5 次鎖定 30 分鐘
         if (attempts >= 5) {
           updates.lockedUntil = new Date(Date.now() + 30 * 60 * 1000).toISOString()
         }
 
-        await localDB.update('employees', employee.id, updates)
+        await localDB.update('employees', employee.id, updates as Partial<Employee>)
 
         return {
           success: false,
@@ -100,22 +106,10 @@ export class LocalAuthService {
         lastLoginAt: new Date().toISOString(),
         loginAttempts: 0,
         lockedUntil: null,
-      } as any)
+      } as Partial<Employee>)
 
-      // 6. 建立使用者物件
-      const user: any = {
-        id: employee.id,
-        employee_number: employee.employee_number,
-        name: employee.name,
-        email: employee.email,
-        permissions: employee.permissions || [],
-        department: employee.department,
-        position: employee.position,
-        avatar: employee.avatar,
-        is_active: employee.is_active !== false,
-        created_at: employee.created_at,
-        updated_at: employee.updated_at || employee.updatedAt,
-      }
+      // 6. 建立使用者物件（使用 employee 資料）
+      const user = employee as User
 
       return {
         success: true,
@@ -139,7 +133,7 @@ export class LocalAuthService {
   ): Promise<{ success: boolean; message?: string }> {
     try {
       // 1. 取得使用者資料
-      const employee: any = await localDB.read('employees', user_id)
+      const employee = await localDB.read('employees', user_id) as (Employee & { password_hash?: string }) | null
 
       if (!employee) {
         return {
@@ -166,7 +160,7 @@ export class LocalAuthService {
       await localDB.update('employees', user_id, {
         password_hash: newPasswordHash,
         updated_at: new Date().toISOString(),
-      } as any)
+      } as Partial<Employee>)
 
       return { success: true }
     } catch (error) {
@@ -194,7 +188,7 @@ export class LocalAuthService {
         loginAttempts: 0,
         lockedUntil: null,
         updated_at: new Date().toISOString(),
-      } as any)
+      } as Partial<Employee>)
 
       return { success: true }
     } catch (error) {
@@ -221,7 +215,7 @@ export class LocalAuthService {
       // 檢查員工編號是否已存在
       const existing = await localDB.filter('employees', [
         { field: 'employee_number', operator: 'eq', value: userData.employee_number },
-      ] as any)
+      ])
 
       if (existing.length > 0) {
         return {
@@ -251,21 +245,10 @@ export class LocalAuthService {
       }
 
       // 儲存到 IndexedDB
-      const created = await localDB.create('employees', newEmployee as any)
+      const created = await localDB.create('employees', newEmployee as Employee)
 
       // 建立使用者物件
-      const user: any = {
-        id: created.id,
-        employee_number: created.employee_number,
-        name: created.name,
-        email: created.email,
-        permissions: created.permissions,
-        department: created.department,
-        position: created.position,
-        is_active: true,
-        created_at: created.created_at,
-        updated_at: created.updated_at,
-      }
+      const user = created as unknown as User
 
       return {
         success: true,
@@ -285,7 +268,7 @@ export class LocalAuthService {
   static hasPermission(user: User | null, permission: string): boolean {
     if (!user) return false
 
-    const permissions = (user as any).permissions || []
+    const permissions = user.permissions || []
     return permissions.includes(permission) || permissions.includes('admin')
   }
 

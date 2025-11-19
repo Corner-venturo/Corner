@@ -4,6 +4,7 @@ import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { logger } from '@/lib/utils/logger'
 import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
+import { useTourStore } from '@/stores'
 
 interface UseQuoteActionsProps {
   quote: any
@@ -328,11 +329,14 @@ export const useQuoteActions = ({
     if (!workspaceCode) {
       throw new Error('無法取得 workspace code')
     }
+
+    // 獲取現有的 tours 來避免編號衝突
+    const existingTours = useTourStore.getState().items
     const tourCode = generateTourCode(
       workspaceCode,
       'XX', // 預設地區代碼，用戶可以後續修改
       departure_date.toISOString(),
-      [] // TODO: 傳入現有的 tours 來避免編號衝突
+      existingTours
     )
 
     const newTour = await addTour({

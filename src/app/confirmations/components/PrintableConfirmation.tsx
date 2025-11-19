@@ -412,10 +412,12 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
                     {segment.airline}({segment.flightNumber})
                   </td>
                   <td className="py-1.5" style={{ color: '#6B7280' }}>
-                    {(segment as any).duration || ''}
+                    {'duration' in segment ? (segment.duration as string) : ''}
                   </td>
                   <td className="py-1.5" style={{ width: '110px', color: '#6B7280' }}>
-                    {(segment as any).stops === 0 ? '/直飛' : `/轉機${(segment as any).stops}次`}
+                    {'stops' in segment && typeof segment.stops === 'number'
+                      ? segment.stops === 0 ? '/直飛' : `/轉機${segment.stops}次`
+                      : ''}
                   </td>
                 </tr>
                 {/* 出發行 */}
@@ -427,7 +429,7 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
                     {segment.departureTime} 出發: {segment.departureAirport}
                   </td>
                   <td className="py-1.5" style={{ width: '180px', color: '#6B7280' }}>
-                    {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{(segment as any).cabin || '經濟'} /OK
+                    {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{'cabin' in segment ? (segment.cabin as string) : '經濟'} /OK
                   </td>
                   <td className="py-1.5" style={{ width: '110px', color: '#6B7280' }}>
                   </td>
@@ -464,13 +466,13 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
       </div>
 
       {/* 航空公司確認電話 */}
-      {(data as any).airlineContacts && (data as any).airlineContacts.length > 0 && (
+      {'airlineContacts' in data && Array.isArray(data.airlineContacts) && data.airlineContacts.length > 0 && (
         <div className="text-sm bg-blue-50 p-4 rounded-lg border border-blue-200">
           <div className="font-semibold mb-2" style={{ color: '#1E40AF' }}>
             航空公司確認電話:
           </div>
           <div className="space-y-1" style={{ color: '#374151' }}>
-            {(data as any).airlineContacts.map((contact: any, idx: number) => (
+            {(data.airlineContacts as string[]).map((contact: string, idx: number) => (
               <div key={idx} className="pl-4">
                 {contact}
               </div>

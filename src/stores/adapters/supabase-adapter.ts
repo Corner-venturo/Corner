@@ -25,8 +25,10 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      let query: any = (supabase as any)
-        .from(this.tableName)
+      // Dynamic table name - using TableName type from schemas
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = supabase
+        .from(this.tableName as any)
         .select('*')
         .order('created_at', { ascending: true })
 
@@ -65,16 +67,18 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const result: any = await (supabase as any)
-        .from(this.tableName)
-        .insert(data as any)
+      // Dynamic table name - using TableName type from schemas
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: insertedData, error } = await supabase
+        .from(this.tableName as any)
+        .insert(data)
         .select()
         .single()
 
-      if (result.error) throw result.error
+      if (error) throw error
 
-      logger.log(`☁️ [${this.tableName}] Supabase insert:`, result.data.id)
-      return result.data as T
+      logger.log(`☁️ [${this.tableName}] Supabase insert:`, insertedData.id)
+      return insertedData as T
     } catch (error) {
       logger.error(`❌ [${this.tableName}] Supabase insert 失敗:`, error)
       throw error
@@ -91,11 +95,13 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const result: any = await (supabase as any).from(this.tableName).select('*').eq('id', id).single()
+      // Dynamic table name - using TableName type from schemas
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await supabase.from(this.tableName as any).select('*').eq('id', id).single()
 
-      if (result.error) throw result.error
+      if (error) throw error
 
-      return result.data as T
+      return data as T
     } catch (error) {
       logger.warn(`⚠️ [${this.tableName}] Supabase getById 失敗:`, error)
       throw error
@@ -120,25 +126,28 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const result: any = await (supabase as any).from(this.tableName).upsert(item as any)
+      // Dynamic table name - using TableName type from schemas
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from(this.tableName as any).upsert(item)
 
-      if (result.error) {
+      if (error) {
         logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
-          message: result.error.message,
-          details: result.error.details,
-          hint: result.error.hint,
-          code: result.error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
         })
-        throw result.error
+        throw error
       }
 
       logger.log(`☁️ [${this.tableName}] Supabase upsert:`, item.id)
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as { message?: string; details?: string; hint?: string; code?: string }
       logger.error(`❌ [${this.tableName}] Supabase upsert 失敗:`, {
-        message: error?.message || '未知錯誤',
-        details: error?.details || '',
-        hint: error?.hint || '',
-        code: error?.code || '',
+        message: err?.message || '未知錯誤',
+        details: err?.details || '',
+        hint: err?.hint || '',
+        code: err?.code || '',
         item_id: item?.id,
       })
       throw error
@@ -157,13 +166,15 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       // 清理過時欄位（特別是 todos 的 description）
       const cleanedData = { ...data }
       if (this.tableName === 'todos' && 'description' in cleanedData) {
-        delete (cleanedData as any).description
+        delete cleanedData.description
       }
 
       const { supabase } = await import('@/lib/supabase/client')
-      const result: any = await (supabase as any).from(this.tableName).update(cleanedData as any).eq('id', id)
+      // Dynamic table name - using TableName type from schemas
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from(this.tableName as any).update(cleanedData).eq('id', id)
 
-      if (result.error) throw result.error
+      if (error) throw error
 
       logger.log(`☁️ [${this.tableName}] Supabase update:`, id)
     } catch (error) {
@@ -182,9 +193,11 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      const result: any = await (supabase as any).from(this.tableName).delete().eq('id', id)
+      // Dynamic table name - using TableName type from schemas
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from(this.tableName as any).delete().eq('id', id)
 
-      if (result.error) throw result.error
+      if (error) throw error
 
       logger.log(`☁️ [${this.tableName}] Supabase delete:`, id)
     } catch (error) {

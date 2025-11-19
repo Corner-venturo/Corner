@@ -175,7 +175,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       if (membersError) throw membersError
 
-      setMembers((membersData || []) as unknown as OrderMember[])
+      setMembers((membersData || []) as OrderMember[])
 
       // 3. 載入已建立的動態欄位
       await loadCustomFields()
@@ -183,7 +183,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
       // 4. 載入動態欄位的值
       await loadFieldValues()
     } catch (error) {
-      logger.error('載入團員失敗:', error as any)
+      logger.error('載入團員失敗:', error)
     } finally {
       setLoading(false)
     }
@@ -192,15 +192,16 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
   const loadCustomFields = async () => {
     try {
       const { data, error } = await supabase
-        .from('tour_member_fields' as any)
+        .from('tour_member_fields')
         .select('field_name')
         .eq('tour_id', tour.id)
 
       if (error) throw error
 
       // 取得所有不重複的欄位名稱
-      const uniqueFields = [...new Set((data as any)?.map((d: any) => d.field_name) || [])]
-      setCustomFields(uniqueFields as any)
+      const fieldData = data as Array<{ field_name: string }> | null
+      const uniqueFields = [...new Set(fieldData?.map(d => d.field_name) || [])]
+      setCustomFields(uniqueFields)
     } catch (error) {
       logger.error('載入自訂欄位失敗:', error)
     }
@@ -209,7 +210,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
   const loadFieldValues = async () => {
     try {
       const { data, error } = await supabase
-        .from('tour_member_fields' as any)
+        .from('tour_member_fields')
         .select('*')
         .eq('tour_id', tour.id)
 
@@ -217,8 +218,13 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       // 組織成 { memberId: { fieldName: value } } 結構
       const values: MemberFieldValue = {}
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      ;(data as any)?.forEach((item: any) => {
+      const fieldData = data as Array<{
+        order_member_id: string
+        field_name: string
+        field_value: string | null
+      }> | null
+
+      fieldData?.forEach(item => {
         if (!values[item.order_member_id]) {
           values[item.order_member_id] = {}
         }
@@ -258,7 +264,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
     try {
       // 刪除資料庫中的所有該欄位資料
       const { error } = await supabase
-        .from('tour_member_fields' as any)
+        .from('tour_member_fields')
         .delete()
         .eq('tour_id', tour.id)
         .eq('field_name', fieldName)
@@ -296,16 +302,16 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
     try {
       // Upsert 到資料庫
       const { error } = await supabase
-        .from('tour_member_fields' as any)
+        .from('tour_member_fields')
         .upsert({
           tour_id: tour.id,
           order_member_id: memberId,
           field_name: fieldName,
           field_value: value,
           display_order: 0
-        } as any, {
+        }, {
           onConflict: 'tour_id,order_member_id,field_name'
-        } as any)
+        })
 
       if (error) throw error
     } catch (error) {
@@ -514,7 +520,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
           </div>
           <TourHandoverPrint
             tour={tour}
-            members={members as any}
+            members={members}
             customFields={customFields}
             fieldValues={fieldValues}
           />

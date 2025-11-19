@@ -69,6 +69,7 @@ export const usePaymentRequestStore = createStore<PaymentRequest>('payment_reque
  * 請款項目 Store
  * 無獨立編號，依附於請款單
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items' as any)
 
 /**
@@ -135,9 +136,11 @@ export { useSupplierCategoryStore } from './supplier-category-store'
 export { useCostTemplateStore } from './cost-template-store'
 
 // 企業客戶 Store
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useCompanyStore = createStore<import('./types').Company>('companies' as any)
 
 // 企業聯絡人 Store
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts' as any)
 
 // 地區 Store（舊版，保留向後相容）
@@ -149,6 +152,10 @@ export const useRegionStore = createStore<any>('regions')
 export { useRegionsStore } from './region-store'
 export type { Country, City, RegionStats } from './region-store'
 export type { Region as RegionNew } from './region-store'
+
+// 景點 Store
+export { useAttractionStore } from './attraction-store'
+export type { Attraction } from './attraction-store'
 
 // 行事曆事件 Store
 export const useCalendarEventStore =

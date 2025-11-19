@@ -2,24 +2,23 @@ import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { useSupplierStore, useRegionStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { supabase } from '@/lib/supabase/client'
-import type { SupplierPaymentAccount } from '@/types/supplier.types'
+import type { Supplier, SupplierPaymentAccount } from '@/types/supplier.types'
 
-// Use any to bypass type constraint
-class SupplierService extends BaseService<any> {
+class SupplierService extends BaseService<Supplier> {
   protected resourceName = 'suppliers'
 
-  protected getStore = (): StoreOperations<any> => {
+  protected getStore = (): StoreOperations<Supplier> => {
     const store = useSupplierStore.getState()
     return {
       getAll: () => store.items,
-      getById: (id: string) => store.items.find((s: any) => s.id === id),
-      add: async (supplier: any) => {
+      getById: (id: string) => store.items.find((s) => s.id === id),
+      add: async (supplier: Supplier) => {
         // 移除系統自動生成的欄位
-        const { id, created_at, updated_at, ...createData } = supplier as any
-        const result = await store.create(createData as any)
-        return result as any
+        const { id, created_at, updated_at, ...createData } = supplier
+        const result = await store.create(createData)
+        return result
       },
-      update: async (id: string, data: any) => {
+      update: async (id: string, data: Partial<Supplier>) => {
         await store.update(id, data)
       },
       delete: async (id: string) => {
@@ -28,17 +27,16 @@ class SupplierService extends BaseService<any> {
     }
   }
 
-  protected validate(data: any): void {
+  protected validate(data: Partial<Supplier>): void {
     if (data.name && data.name.trim().length < 2) {
       throw new ValidationError('name', '供應商名稱至少需要 2 個字符')
     }
 
-    // Supplier 使用 contact 物件
-    if ((data as any).contact?.email && !this.isValidEmail((data as any).contact.email)) {
+    if (data.email && !this.isValidEmail(data.email)) {
       throw new ValidationError('email', '郵件格式錯誤')
     }
 
-    if ((data as any).contact?.phone && !this.isValidPhone((data as any).contact.phone)) {
+    if (data.phone && !this.isValidPhone(data.phone)) {
       throw new ValidationError('phone', '電話格式錯誤')
     }
   }
@@ -53,24 +51,24 @@ class SupplierService extends BaseService<any> {
 
   // ========== 業務邏輯方法 ==========
 
-  getSuppliersByCategory(category: any): any[] {
+  getSuppliersByCategory(category: string): Supplier[] {
     const store = useSupplierStore.getState()
-    return store.items.filter((s: any) => s.type === category)
+    return store.items.filter((s) => s.type === category)
   }
 
-  getActiveSuppliers(): any[] {
+  getActiveSuppliers(): Supplier[] {
     const store = useSupplierStore.getState()
-    return store.items.filter((s: any) => (s as any).status === 'active' || (s as any).is_active === true)
+    return store.items.filter((s) => s.is_active === true)
   }
 
-  searchSuppliers(searchTerm: string): any[] {
+  searchSuppliers(searchTerm: string): Supplier[] {
     const store = useSupplierStore.getState()
     const term = searchTerm.toLowerCase()
     return store.items.filter(
-      (s: any) =>
+      (s) =>
         s.name.toLowerCase().includes(term) ||
-        (s as any).contact?.contact_person?.toLowerCase().includes(term) ||
-        (s as any).contact?.email?.toLowerCase().includes(term)
+        s.contact_person?.toLowerCase().includes(term) ||
+        s.email?.toLowerCase().includes(term)
     )
   }
 
@@ -94,7 +92,7 @@ class SupplierService extends BaseService<any> {
 
     // 找出該國家現有的供應商數量，作為流水號
     const sameCountrySuppliers = supplierStore.items.filter(
-      (s) => (s as any).country === countryName
+      (s) => s.country_id === countryName
     )
 
     // 生成流水號（從現有數量 +1 開始）
@@ -117,8 +115,7 @@ class SupplierService extends BaseService<any> {
       }))
 
       // 批次寫入 Supabase
-      const result: any = await (supabase as any).from('supplier_cities').insert(supplierCities)
-      const { error } = result
+      const { error } = await supabase.from('supplier_cities').insert(supplierCities)
 
       if (error) {
         throw error
@@ -145,7 +142,7 @@ class SupplierService extends BaseService<any> {
       }))
 
       // 批次寫入 Supabase
-      const { error } = await supabase.from('supplier_payment_accounts').insert(paymentAccounts as any) as any
+      const { error } = await supabase.from('supplier_payment_accounts').insert(paymentAccounts)
 
       if (error) {
         throw error
@@ -202,9 +199,9 @@ class SupplierService extends BaseService<any> {
       // 2. 直接寫入 Supabase
       const { data: newSupplier, error: supplierError } = await supabase
         .from('suppliers')
-        .insert([dbData] as any)
+        .insert([dbData])
         .select('id')
-        .single() as any
+        .single()
 
       if (supplierError) {
         throw supplierError

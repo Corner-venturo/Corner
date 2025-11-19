@@ -275,7 +275,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
           payment_request_id: requestId,
           payment_amount: request.amount || 0,
           payment_date: now.split('T')[0], // YYYY-MM-DD
-          supplier_type: supplierType as any,
+          supplier_type: supplierType as 'transportation' | 'accommodation' | 'meal' | 'attraction' | 'insurance' | 'other',
           description: `${request.request_number || ''} - 付款`,
         })
 

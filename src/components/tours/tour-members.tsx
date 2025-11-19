@@ -171,8 +171,11 @@ export const TourMembers = React.memo(function TourMembers({
         member.gender = ''
       }
     } else {
-      // 使用型別安全的方式更新屬性
-      (member as any)[field] = value
+      // Generic field update - safely handle all string fields
+      const updatedMember = { ...member, [field]: value }
+      updatedMembers[rowIndex] = updatedMember as EditingMember
+      setTableMembers(updatedMembers)
+      return
     }
 
     updatedMembers[rowIndex] = member
@@ -205,7 +208,7 @@ export const TourMembers = React.memo(function TourMembers({
         assigned_room: assignedRoom,
       }
 
-      const newMember = await addMember(convertedData as any)
+      const newMember = await addMember(convertedData)
 
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }
@@ -231,7 +234,7 @@ export const TourMembers = React.memo(function TourMembers({
         assigned_room: assignedRoom,
       }
 
-      await updateMember(member.id, convertedData as any)
+      await updateMember(member.id, convertedData)
     }
   }
 
@@ -324,7 +327,7 @@ export const TourMembers = React.memo(function TourMembers({
     } else if (field === 'age') {
       value = member.age > 0 ? `${member.age}歲` : ''
     } else if (field === 'assignedRoom') {
-      value = (member as any).assignedRoom || '未分房'
+      value = member.assignedRoom || '未分房'
     }
 
     if (isEditing) {

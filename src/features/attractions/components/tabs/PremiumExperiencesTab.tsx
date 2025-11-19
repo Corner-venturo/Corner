@@ -8,6 +8,14 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { cn } from '@/lib/utils'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 
 interface PremiumExperience {
   id: string
@@ -42,6 +50,8 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
   const [loading, setLoading] = useState(true)
   const [countries, setCountries] = useState<any[]>([])
   const [cities, setCities] = useState<any[]>([])
+  const [editingExperience, setEditingExperience] = useState<PremiumExperience | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   // 載入體驗資料
   useEffect(() => {
@@ -103,6 +113,37 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       toast.success('刪除成功')
     } catch (error) {
       toast.error('刪除失敗')
+    }
+  }
+
+  // 開啟編輯對話框
+  const handleEdit = (experience: PremiumExperience) => {
+    setEditingExperience(experience)
+    setIsEditDialogOpen(true)
+  }
+
+  // 關閉編輯對話框
+  const handleCloseEdit = () => {
+    setEditingExperience(null)
+    setIsEditDialogOpen(false)
+  }
+
+  // 更新體驗
+  const handleUpdate = async (updatedData: Partial<PremiumExperience>) => {
+    if (!editingExperience) return
+
+    try {
+      const { error } = await supabase
+        .from('premium_experiences')
+        .update(updatedData)
+        .eq('id', editingExperience.id)
+
+      if (error) throw error
+      await loadExperiences()
+      handleCloseEdit()
+      toast.success('更新成功')
+    } catch (error) {
+      toast.error('更新失敗')
     }
   }
 
@@ -335,63 +376,135 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
   )
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={columns}
-          data={filteredExperiences}
-          loading={loading}
-          initialPageSize={20}
-          onRowClick={experience => {
-            // TODO: 打開編輯對話框
-            logger.log('Edit experience:', experience)
-          }}
-          actions={(experience: PremiumExperience) => (
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  // TODO: 打開編輯對話框
-                  logger.log('Edit experience:', experience)
-                }}
-                className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                title="編輯"
-              >
-                <Edit2 size={14} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  handleToggleStatus(experience)
-                }}
-                className="h-8 px-2"
-                title={experience.is_active ? '停用' : '啟用'}
-              >
-                <Power
-                  size={14}
-                  className={experience.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
+    <>
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-auto">
+          <EnhancedTable
+            columns={columns}
+            data={filteredExperiences}
+            loading={loading}
+            initialPageSize={20}
+            onRowClick={handleEdit}
+            actions={(experience: PremiumExperience) => (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleEdit(experience)
+                  }}
+                  className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
+                  title="編輯"
+                >
+                  <Edit2 size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleToggleStatus(experience)
+                  }}
+                  className="h-8 px-2"
+                  title={experience.is_active ? '停用' : '啟用'}
+                >
+                  <Power
+                    size={14}
+                    className={experience.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
+                  />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleDelete(experience.id)
+                  }}
+                  className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+                  title="刪除"
+                >
+                  <Trash2 size={14} />
+                </Button>
+              </div>
+            )}
+          />
+        </div>
+      </div>
+
+      {/* 編輯對話框 */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>編輯頂級體驗</DialogTitle>
+          </DialogHeader>
+          {editingExperience && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">名稱</label>
+                  <Input
+                    value={editingExperience.name}
+                    onChange={e =>
+                      setEditingExperience({ ...editingExperience, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">英文名稱</label>
+                  <Input
+                    value={editingExperience.name_en || ''}
+                    onChange={e =>
+                      setEditingExperience({ ...editingExperience, name_en: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium">描述</label>
+                <textarea
+                  value={editingExperience.description || ''}
+                  onChange={e =>
+                    setEditingExperience({ ...editingExperience, description: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm min-h-[100px]"
                 />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  handleDelete(experience.id)
-                }}
-                className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
-              >
-                <Trash2 size={14} />
-              </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">專家名稱</label>
+                  <Input
+                    value={editingExperience.expert_name || ''}
+                    onChange={e =>
+                      setEditingExperience({ ...editingExperience, expert_name: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">專家資格</label>
+                  <Input
+                    value={editingExperience.expert_credentials || ''}
+                    onChange={e =>
+                      setEditingExperience({
+                        ...editingExperience,
+                        expert_credentials: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
             </div>
           )}
-        />
-      </div>
-    </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseEdit}>
+              取消
+            </Button>
+            <Button onClick={() => editingExperience && handleUpdate(editingExperience)}>
+              儲存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

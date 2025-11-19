@@ -5,7 +5,7 @@ import { MessageList, MessageInput, MemberSidebar } from '../chat'
 // @ts-ignore - Theme placeholder
 const theme = {}
 
-interface ChatMessagesProps {
+interface ChannelChatMessagesProps {
   messages: any[]
   advanceLists: any[]
   sharedOrderLists: any[]
@@ -61,7 +61,7 @@ export function ChatMessages({
   onShowNewReceipt,
   onShowShareAdvance,
   onShowNewTask,
-}: ChatMessagesProps) {
+}: ChannelChatMessagesProps) {
   return (
     <>
       <div className="flex-1 flex min-h-0">
@@ -79,7 +79,7 @@ export function ChatMessages({
           onDeleteAdvanceList={onDeleteAdvanceList}
           onCreateReceipt={onCreateReceipt}
           messagesEndRef={messagesEndRef}
-          theme={theme as any}
+          theme={theme}
         />
 
         <MemberSidebar isOpen={showMemberSidebar} />
@@ -92,8 +92,8 @@ export function ChatMessages({
         onSubmit={onSubmit}
         attachedFiles={attachedFiles}
         onFilesChange={onFilesChange}
-        uploadingFiles={uploadingFiles as any}
-        uploadProgress={uploadProgress as any}
+        uploadingFiles={uploadingFiles}
+        uploadProgress={uploadProgress}
         onShowShareOrders={onShowShareOrders}
         onShowShareQuote={onShowShareQuote}
         onShowNewPayment={onShowNewPayment}

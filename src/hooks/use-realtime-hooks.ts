@@ -38,6 +38,7 @@ import {
   useReceiptStore,
   useLinkPayLogStore,
   useConfirmationStore,
+  useAttractionStore,
 } from '@/stores'
 
 // IndexedDB adapters
@@ -64,6 +65,7 @@ import type {
 import type { CalendarEvent } from '@/types/calendar.types'
 import type { Receipt, LinkPayLog } from '@/types/receipt.types'
 import type { Confirmation } from '@/types/confirmation.types'
+import type { Attraction } from '@/features/attractions/types'
 
 // ============================================
 // 業務實體（13 個）
@@ -177,6 +179,16 @@ export const useRealtimeForRegions = createRealtimeHook<any>({
   tableName: 'regions',
   indexedDB: new IndexedDBAdapter<any>('regions'),
   store: useRegionStore as any,
+})
+
+/**
+ * 景點 Realtime Hook
+ * 使用時機：進入 /database/attractions 頁面
+ */
+export const useRealtimeForAttractions = createRealtimeHook<Attraction>({
+  tableName: 'attractions',
+  indexedDB: new IndexedDBAdapter<Attraction>('attractions'),
+  store: useAttractionStore as any,
 })
 
 /**
@@ -299,8 +311,8 @@ export const useRealtimeForEmployees = createRealtimeHook<Employee>({
  * 使用時機：進入 /finance/payments 或 /receipts 頁面
  */
 export const useRealtimeForReceipts = createRealtimeHook<Receipt>({
-  tableName: 'receipts' as any,
-  indexedDB: new IndexedDBAdapter<Receipt>('receipts' as any),
+  tableName: 'receipts',
+  indexedDB: new IndexedDBAdapter<Receipt>('receipts'),
   store: useReceiptStore as any,
 })
 
@@ -309,8 +321,8 @@ export const useRealtimeForReceipts = createRealtimeHook<Receipt>({
  * 使用時機：進入收款單詳情頁面（如果有 LinkPay）
  */
 export const useRealtimeForLinkPayLogs = createRealtimeHook<LinkPayLog>({
-  tableName: 'linkpay_logs' as any,
-  indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs' as any),
+  tableName: 'linkpay_logs',
+  indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs'),
   store: useLinkPayLogStore as any,
 })
 
@@ -328,6 +340,72 @@ export const useRealtimeForConfirmations = createRealtimeHook<Confirmation>({
 // export const useRealtimeForAdvanceLists = ...
 // export const useRealtimeForSharedOrderLists = ...
 // export const useRealtimeForActivities = ...
+
+// ============================================
+// 帶 Filter 的 Realtime Hooks（展開時才訂閱）
+// ============================================
+
+/**
+ * 帶 filter 的訂單 Realtime Hook
+ * 使用時機：展開旅遊團/客戶時，只訂閱該對象的訂單
+ *
+ * @example
+ * ```typescript
+ * // 展開旅遊團時
+ * function TourExpandedView({ tour }) {
+ *   useRealtimeForOrdersFiltered(`tour_id=eq.${tour.id}`);
+ *   // ...
+ * }
+ *
+ * // 不展開時傳 null，不會訂閱
+ * useRealtimeForOrdersFiltered(null);
+ * ```
+ */
+export const useRealtimeForOrdersFiltered = createRealtimeHook<Order>({
+  tableName: 'orders',
+  indexedDB: new IndexedDBAdapter<Order>('orders'),
+  store: useOrderStore as any,
+})
+
+/**
+ * 帶 filter 的團員 Realtime Hook
+ * 使用時機：展開訂單/旅遊團時，只訂閱該對象的團員
+ */
+export const useRealtimeForMembersFiltered = createRealtimeHook<Member>({
+  tableName: 'members',
+  indexedDB: new IndexedDBAdapter<Member>('members'),
+  store: useMemberStore as any,
+})
+
+/**
+ * 帶 filter 的報價項目 Realtime Hook
+ * 使用時機：編輯報價單時，只訂閱該報價單的項目
+ */
+export const useRealtimeForQuoteItemsFiltered = createRealtimeHook<QuoteItem>({
+  tableName: 'quote_items',
+  indexedDB: new IndexedDBAdapter<QuoteItem>('quote_items'),
+  store: useQuoteItemStore as any,
+})
+
+/**
+ * 帶 filter 的收款記錄 Realtime Hook
+ * 使用時機：查看收款單詳情時，只訂閱該收款單的記錄
+ */
+export const useRealtimeForReceiptsFiltered = createRealtimeHook<Receipt>({
+  tableName: 'receipts',
+  indexedDB: new IndexedDBAdapter<Receipt>('receipts'),
+  store: useReceiptStore as any,
+})
+
+/**
+ * 帶 filter 的 LinkPay 記錄 Realtime Hook
+ * 使用時機：查看收款單詳情時，只訂閱該收款單的 LinkPay 記錄
+ */
+export const useRealtimeForLinkPayLogsFiltered = createRealtimeHook<LinkPayLog>({
+  tableName: 'linkpay_logs',
+  indexedDB: new IndexedDBAdapter<LinkPayLog>('linkpay_logs'),
+  store: useLinkPayLogStore as any,
+})
 
 // ============================================
 // 使用範例

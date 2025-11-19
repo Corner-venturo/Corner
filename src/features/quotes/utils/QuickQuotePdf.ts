@@ -94,6 +94,7 @@ export const generateQuickQuotePDF = async (
   })
 
   // 收費明細表標題
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (pdf as any).lastAutoTable.finalY + 10
   pdf.setFontSize(12)
   pdf.setFont('ChironHeiHK', 'bold')
@@ -138,6 +139,7 @@ export const generateQuickQuotePDF = async (
   })
 
   // 金額統計
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (pdf as any).lastAutoTable.finalY + 10
   const totalAmount = items.reduce((sum, item) => sum + item.amount, 0)
   const receivedAmount = quote.received_amount || 0
@@ -170,6 +172,7 @@ export const generateQuickQuotePDF = async (
   })
 
   // 付款資訊
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (pdf as any).lastAutoTable.finalY + 10
   pdf.setFontSize(11)
   pdf.setFont('ChironHeiHK', 'bold')
@@ -198,6 +201,7 @@ export const generateQuickQuotePDF = async (
   })
 
   // 支票資訊
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (pdf as any).lastAutoTable.finalY + 5
   pdf.setFontSize(11)
   pdf.setFont('ChironHeiHK', 'bold')
@@ -226,6 +230,7 @@ export const generateQuickQuotePDF = async (
   })
 
   // 收據資訊
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = Math.max((pdf as any).lastAutoTable.finalY + 10, yPos + 30)
   pdf.setFontSize(11)
   pdf.setFont('ChironHeiHK', 'bold')

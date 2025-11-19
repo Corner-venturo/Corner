@@ -15,15 +15,12 @@ import { ContractViewDialog } from '@/components/contracts/ContractViewDialog'
 import { EnvelopeDialog } from '@/components/contracts/EnvelopeDialog'
 import {
   useRealtimeForTours,
-  useRealtimeForOrders,
-  useRealtimeForMembers,
 } from '@/hooks/use-realtime-hooks'
 
 export default function ContractsPage() {
-  // ✅ Realtime 訂閱
+  // ✅ Realtime 訂閱（只訂閱 Tours）
+  // Orders 和 Members 只用來計算人數，不需要即時訂閱
   useRealtimeForTours()
-  useRealtimeForOrders()
-  useRealtimeForMembers()
   const router = useRouter()
   const searchParams = useSearchParams()
   const tourIdParam = searchParams?.get('tour_id')

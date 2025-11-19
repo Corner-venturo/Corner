@@ -90,13 +90,18 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           employee_id: user.id,
           raw_pnr: rawPNR,
           passenger_names: parsedData.passengerNames,
-          ticketing_deadline: parsedData.ticketingDeadline ? parsedData.ticketingDeadline.toISOString() : null,
-          cancellation_deadline: parsedData.cancellationDeadline ? parsedData.cancellationDeadline.toISOString() : null,
+          ticketing_deadline: parsedData.ticketingDeadline?.toISOString() ?? null,
+          cancellation_deadline: parsedData.cancellationDeadline?.toISOString() ?? null,
           segments: parsedData.segments,
-          special_requests: parsedData.specialRequests,
-          other_info: parsedData.otherInfo,
-          status: 'active',
-        } as any)
+          special_requests: parsedData.specialRequests ?? [],
+          other_info: parsedData.otherInfo ?? [],
+          status: 'active' as const,
+          notes: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          created_by: user.id,
+          updated_by: null,
+        })
       }
 
       toast.success('出票期限已設定！')
@@ -126,12 +131,17 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
         await createCalendarEvent({
           title: description,
           description: `PNR: ${parsedData.recordLocator}\n旅客: ${parsedData.passengerNames.join(', ')}`,
-          start_time: date.toISOString(),
-          end_time: new Date(date.getTime() + 2 * 60 * 60 * 1000).toISOString(), // 預設 2 小時
+          start: date.toISOString(),
+          end: new Date(date.getTime() + 2 * 60 * 60 * 1000).toISOString(), // 預設 2 小時
+          all_day: false,
+          type: 'other' as const,
+          visibility: 'company' as const,
+          owner_id: user.id,
           workspace_id: currentWorkspace.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           created_by: user.id,
-          event_type: 'flight',
-        } as any)
+        })
       }
 
       // 儲存 PNR 記錄
@@ -142,13 +152,18 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           employee_id: user.id,
           raw_pnr: rawPNR,
           passenger_names: parsedData.passengerNames,
-          ticketing_deadline: parsedData.ticketingDeadline ? parsedData.ticketingDeadline.toISOString() : null,
-          cancellation_deadline: parsedData.cancellationDeadline ? parsedData.cancellationDeadline.toISOString() : null,
+          ticketing_deadline: parsedData.ticketingDeadline?.toISOString() ?? null,
+          cancellation_deadline: parsedData.cancellationDeadline?.toISOString() ?? null,
           segments: parsedData.segments,
-          special_requests: parsedData.specialRequests,
-          other_info: parsedData.otherInfo,
-          status: 'active',
-        } as any)
+          special_requests: parsedData.specialRequests ?? [],
+          other_info: parsedData.otherInfo ?? [],
+          status: 'active' as const,
+          notes: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          created_by: user.id,
+          updated_by: null,
+        })
       }
 
       toast.success(`已新增 ${departureDates.length} 個航班到行事曆！`)

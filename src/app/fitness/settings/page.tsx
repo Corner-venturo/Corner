@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { LogOut, Trash2, Info, User } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
 import { useAuthStore } from '@/stores/auth-store'
+import { localDB } from '@/lib/db'
 
 export default function FitnessSettingsPage() {
   const router = useRouter()
@@ -16,15 +17,32 @@ export default function FitnessSettingsPage() {
     }
   }
 
-  const handleClearData = () => {
+  const handleClearData = async () => {
     if (
       confirm(
         '⚠️ 警告：這將清除所有本地健身資料（訓練記錄、身體數據、目標等）。\n\n此操作無法復原，確定要繼續嗎？'
       )
     ) {
-      // TODO: 清除 IndexedDB 中的健身資料
-      alert('本地資料已清除')
-      router.push('/fitness')
+      try {
+        // 清除健身相關的 IndexedDB 資料表
+        // 根據健身模組可能使用的表格，這裡列出常見的健身資料表
+        // 如果有其他健身相關表格，可在此添加
+        const fitnessTable = 'fitness_records' as const
+
+        // 使用 try-catch 避免表格不存在時報錯
+        try {
+          await localDB.clear(fitnessTable)
+        } catch (error) {
+          // 表格不存在或其他錯誤，忽略
+          console.warn('清除健身資料時發生錯誤:', error)
+        }
+
+        alert('本地資料已清除')
+        router.push('/fitness')
+      } catch (error) {
+        console.error('清除資料失敗:', error)
+        alert('清除資料失敗，請稍後再試')
+      }
     }
   }
 

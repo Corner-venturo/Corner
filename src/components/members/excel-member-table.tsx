@@ -54,7 +54,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     ]
 
     useEffect(() => {
-      const existingMembers = orderMembers.map(member => ({ ...member })) as any[]
+      const existingMembers: EditingMember[] = orderMembers.map(member => ({ ...member }))
 
       // 確保至少有member_count行
       while (existingMembers.length < member_count) {
@@ -71,18 +71,18 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           add_ons: [],
           refunds: [],
           isNew: true,
-        } as any)
+        })
       }
 
-      setTableMembers(existingMembers as any)
+      setTableMembers(existingMembers)
     }, [orderMembers, member_count, order_id])
 
     // 自動儲存成員
     const autoSaveMember = useCallback(
-      async (member: any, index: number) => {
+      async (member: EditingMember, index: number) => {
         if (member.isNew && member.name?.trim()) {
           const { isNew, ...memberData } = member
-          const created = await memberStore.create(memberData as any)
+          const created = await memberStore.create(memberData as Omit<Member, 'id' | 'created_at' | 'updated_at'>)
           const newId = created?.id
 
           const updatedMembers = [...tableMembers]
@@ -90,7 +90,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           setTableMembers(updatedMembers)
         } else if (member.id && !member.isNew) {
           const { isNew, ...memberData } = member
-          await memberStore.update(member.id, memberData)
+          await memberStore.update(member.id, memberData as Partial<Member>)
         }
       },
       [memberStore, tableMembers]
@@ -98,19 +98,25 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
     // 處理資料更新 (用於 ReactDataSheet)
     const handleDataUpdate = useCallback(
-      (newData: any[]) => {
+      (newData: EditingMember[]) => {
         // 處理自動計算欄位
-        const processedData = newData.map((member: any) => {
+        const processedData = newData.map((member) => {
           const processed = { ...member }
 
           // 從身分證號自動計算性別和年齡
           if (processed.id_number) {
             processed.gender = getGenderFromIdNumber(processed.id_number)
-            processed.age = calculateAge(processed.id_number, departure_date) ?? 0
+            const age = calculateAge(processed.id_number, departure_date)
+            if (age !== null && 'age' in processed) {
+              (processed as EditingMember & { age: number }).age = age
+            }
           }
           // 從生日計算年齡
           else if (processed.birthday) {
-            processed.age = calculateAge(String(processed.birthday), departure_date) ?? 0
+            const age = calculateAge(String(processed.birthday), departure_date)
+            if (age !== null && 'age' in processed) {
+              (processed as EditingMember & { age: number }).age = age
+            }
           }
 
           return processed
@@ -119,7 +125,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         setTableMembers(processedData)
 
         // 自動儲存到 store
-        processedData.forEach((member: any, index: number) => {
+        processedData.forEach((member, index: number) => {
           autoSaveMember(member, index)
         })
       },
@@ -128,7 +134,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
     // 新增行
     const addRow = () => {
-      const newMember: any = {
+      const newMember: EditingMember = {
         order_id,
         name: '',
         name_en: '',
@@ -155,13 +161,16 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         {/* 使用 ReactDataSheet 替代原來的表格 */}
         <ReactDataSheetWrapper
           columns={dataSheetColumns}
-          data={tableMembers.map((member: any, index: number) => ({
-            ...member,
-            index: index + 1,
-            age: ((member as any).age ?? 0) > 0 ? `${(member as any).age}歲` : '',
-            gender: (member as any).gender === 'M' ? '男' : (member as any).gender === 'F' ? '女' : '',
-          }))}
-          onDataUpdate={handleDataUpdate as any}
+          data={tableMembers.map((member, index: number) => {
+            const age = 'age' in member ? (member as EditingMember & { age: number }).age : 0
+            return {
+              ...member,
+              index: index + 1,
+              age: age > 0 ? `${age}歲` : '',
+              gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
+            }
+          })}
+          onDataUpdate={handleDataUpdate as (data: unknown[]) => void}
           className="min-h-[400px]"
         />
 

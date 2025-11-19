@@ -40,17 +40,13 @@ import { useTourChannelOperations } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
 import {
   useRealtimeForTours,
-  useRealtimeForOrders,
-  useRealtimeForMembers,
-  useRealtimeForQuotes,
 } from '@/hooks/use-realtime-hooks'
 
 export const ToursPage: React.FC = () => {
-  // ✅ Realtime 訂閱（進入頁面時訂閱，離開時自動取消）
+  // ✅ Realtime 訂閱（只訂閱 Tours）
+  // Orders, Members, Quotes 只用來顯示統計數字，不需要即時訂閱
+  // 展開時的詳細資料會在 TourExpandedView 中按需訂閱
   useRealtimeForTours()
-  useRealtimeForOrders()
-  useRealtimeForMembers()
-  useRealtimeForQuotes()
 
   const router = useRouter()
   const searchParams = useSearchParams()

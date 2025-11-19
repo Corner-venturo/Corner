@@ -78,7 +78,8 @@ export async function closeTour(
 
   paidRequests.forEach(pr => {
     const amount = pr.amount || 0
-    const supplierType = (pr as any).supplier_type
+    const prData = pr as Record<string, unknown>
+    const supplierType = prData.supplier_type as string | undefined
     switch (supplierType) {
       case 'transportation':
         costs.transportation += amount
@@ -136,8 +137,8 @@ export async function closeTour(
   // 5. 更新團體狀態為已結團
   await tourStore.update(tourId, {
     archived: true,
-    closing_status: 'closed' as any,
-  } as any)
+    closing_status: 'closed',
+  })
 
   logger.info('✅ 結團完成', { tourId, tourCode: tour.code })
 
@@ -167,8 +168,8 @@ export async function reopenTour(tourId: string): Promise<void> {
 
   await tourStore.update(tourId, {
     archived: false,
-    closing_status: 'pending' as any,
-  } as any)
+    closing_status: 'pending',
+  })
 
   logger.warn('⚠️ 結團已取消，請手動作廢相關傳票', { tourId })
 }

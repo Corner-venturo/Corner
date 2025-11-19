@@ -59,10 +59,10 @@ export function TourMobileCard({ tour, onClick, getStatusColor }: TourMobileCard
       {/* 資訊網格 */}
       <div className="space-y-2">
         {/* 目的地 */}
-        {(tour as any).destination && (
+        {'destination' in tour && tour.destination && (
           <div className="flex items-center text-sm">
             <MapPin size={16} className="text-morandi-secondary mr-2 flex-shrink-0" />
-            <span className="text-morandi-primary truncate">{(tour as any).destination}</span>
+            <span className="text-morandi-primary truncate">{tour.destination as string}</span>
           </div>
         )}
 
@@ -86,7 +86,7 @@ export function TourMobileCard({ tour, onClick, getStatusColor }: TourMobileCard
         <div className="flex items-center text-sm">
           <Users size={16} className="text-morandi-secondary mr-2 flex-shrink-0" />
           <span className="text-morandi-primary">
-            {(tour as any).member_count || 0} 人
+            {('member_count' in tour && typeof tour.member_count === 'number' ? tour.member_count : 0)} 人
             {tour.max_participants && (
               <span className="text-morandi-secondary"> / {tour.max_participants}</span>
             )}
@@ -94,11 +94,11 @@ export function TourMobileCard({ tour, onClick, getStatusColor }: TourMobileCard
         </div>
 
         {/* 價格（如果有） */}
-        {(tour as any).price_per_person && (
+        {'price_per_person' in tour && tour.price_per_person && (
           <div className="flex items-center text-sm">
             <DollarSign size={16} className="text-morandi-secondary mr-2 flex-shrink-0" />
             <span className="text-morandi-primary font-medium">
-              NT$ {(tour as any).price_per_person.toLocaleString()}
+              NT$ {(tour.price_per_person as number).toLocaleString()}
             </span>
             <span className="text-morandi-secondary text-xs ml-1">/ 人</span>
           </div>
@@ -106,11 +106,11 @@ export function TourMobileCard({ tour, onClick, getStatusColor }: TourMobileCard
       </div>
 
       {/* 領隊資訊（如果有） */}
-      {(tour as any).tour_leader_name && (
+      {'tour_leader_name' in tour && tour.tour_leader_name && (
         <div className="mt-3 pt-3 border-t border-border">
           <div className="flex items-center justify-between text-xs">
             <span className="text-morandi-secondary">領隊</span>
-            <span className="text-morandi-primary font-medium">{(tour as any).tour_leader_name}</span>
+            <span className="text-morandi-primary font-medium">{tour.tour_leader_name as string}</span>
           </div>
         </div>
       )}

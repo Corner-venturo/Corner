@@ -40,13 +40,14 @@ export function useTourFormHandlers(
       ...data,
       city,
       coverImage,
-    } as any)
+    })
   }
 
   const updateNestedField = (parent: string, field: string, value: unknown) => {
+    const parentData = data[parent as keyof TourFormData]
     onChange({
       ...data,
-      [parent]: { ...(data as any)[parent], [field]: value },
+      [parent]: { ...(typeof parentData === 'object' ? parentData : {}), [field]: value },
     })
   }
 
@@ -163,12 +164,12 @@ export function useTourFormHandlers(
 
     const newItinerary = data.dailyItinerary
       .filter((_: unknown, i: number) => i !== index)
-      .map((day: any, i: number) => ({
-        ...(day as object),
+      .map((day, i: number) => ({
+        ...day,
         dayLabel: `Day ${i + 1}`, // 自動更新 dayLabel
         date: calculateDate(data.departureDate, i), // 自動更新日期
       }))
-    onChange({ ...data, dailyItinerary: newItinerary as any })
+    onChange({ ...data, dailyItinerary: newItinerary })
   }
 
   // 活動管理

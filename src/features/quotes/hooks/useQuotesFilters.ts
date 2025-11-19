@@ -43,15 +43,15 @@ export const useQuotesFilters = ({
       const matchesAuthor =
         !authorFilter ||
         authorFilter === 'all' ||
-        (quote as any).created_by_name === authorFilter ||
-        (quote as any).handler_name === authorFilter
+        ('created_by_name' in quote && quote.created_by_name === authorFilter) ||
+        ('handler_name' in quote && quote.handler_name === authorFilter)
 
       // 類型篩選（快速/團體報價單）
       const matchesType =
         !typeFilter ||
         typeFilter === 'all' ||
-        (typeFilter === 'quick' && (quote as any).quote_type === 'quick') ||
-        (typeFilter === 'group' && (quote as any).quote_type !== 'quick')
+        (typeFilter === 'quick' && 'quote_type' in quote && quote.quote_type === 'quick') ||
+        (typeFilter === 'group' && (!('quote_type' in quote) || quote.quote_type !== 'quick'))
 
       return matchesStatus && matchesSearch && matchesAuthor && matchesType
     })

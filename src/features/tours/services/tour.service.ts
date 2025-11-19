@@ -4,6 +4,7 @@ import { useTourStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+import { BaseEntity } from '@/core/types/common'
 
 interface TourFinancialSummary {
   total_revenue: number
@@ -12,17 +13,17 @@ interface TourFinancialSummary {
   profitMargin: number
 }
 
-class TourService extends BaseService<any> {
+class TourService extends BaseService<Tour & BaseEntity> {
   protected resourceName = 'tours'
 
-  protected getStore = (): StoreOperations<Tour> => {
+  protected getStore = (): StoreOperations<Tour & BaseEntity> => {
     const store = useTourStore.getState()
     return {
-      getAll: () => store.items,
-      getById: (id: string) => store.items.find(t => t.id === id),
-      add: async (tour: Tour) => {
+      getAll: () => store.items as (Tour & BaseEntity)[],
+      getById: (id: string) => store.items.find(t => t.id === id) as (Tour & BaseEntity) | undefined,
+      add: async (tour: Tour & BaseEntity) => {
         const result = await store.create(tour as any)
-        return result || tour
+        return (result || tour) as unknown as Tour & BaseEntity
       },
       update: async (id: string, data: Partial<Tour>) => {
         await store.update(id, data as any)
@@ -33,8 +34,8 @@ class TourService extends BaseService<any> {
     }
   }
 
-  protected validate(data: Partial<Tour>): void {
-    super.validate(data)
+  protected validate(data: Partial<Tour & BaseEntity>): void {
+    super.validate(data as Partial<Tour & BaseEntity>)
 
     if (data.name && data.name.trim().length < 2) {
       throw new ValidationError('name', '旅遊團名稱至少需要 2 個字符')
@@ -186,7 +187,7 @@ class TourService extends BaseService<any> {
         status: newStatus,
         // 可以在這裡記錄狀態變更的原因和時間
         updated_at: this.now(),
-      } as any)
+      })
     } catch (error) {
       throw error
     }
@@ -257,11 +258,11 @@ class TourService extends BaseService<any> {
       name: `${targetYear}年度簽證專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: 'special' as any,
+      status: 'special',
       location: '簽證專用',
       price: 0,
       max_participants: 9999,
-      contract_status: 'pending' as any,
+      contract_status: 'pending',
       total_revenue: 0,
       total_cost: 0,
       profit: 0,
@@ -269,7 +270,7 @@ class TourService extends BaseService<any> {
       updated_at: this.now(),
     }
 
-    return await this.create(visaTour as any)
+    return await this.create(visaTour as unknown as Tour & BaseEntity)
   }
 
   async getOrCreateEsimTour(year?: number): Promise<Tour> {
@@ -332,11 +333,11 @@ class TourService extends BaseService<any> {
       name: `${targetYear}年度網卡專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: 'special' as any,
+      status: 'special',
       location: '網卡專用',
       price: 0,
       max_participants: 9999,
-      contract_status: 'pending' as any,
+      contract_status: 'pending',
       total_revenue: 0,
       total_cost: 0,
       profit: 0,
@@ -344,7 +345,7 @@ class TourService extends BaseService<any> {
       updated_at: this.now(),
     }
 
-    return await this.create(esimTour as any)
+    return await this.create(esimTour as unknown as Tour & BaseEntity)
   }
 
   /**

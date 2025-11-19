@@ -86,7 +86,6 @@ function setSecureCookie(token: string, rememberMe: boolean = false): void {
 }
 
 export const useAuthStore = create<AuthState>(
-  // @ts-expect-error - zustand persist middleware type issue
   persist(
     (set, get) => ({
       user: null,
@@ -281,7 +280,29 @@ export const useAuthStore = create<AuthState>(
             return { success: false, message: '帳號或密碼錯誤' }
           }
 
-          const employeeData = employees as any
+          interface EmployeeData {
+            id: string
+            employee_number: string
+            display_name: string
+            english_name: string
+            chinese_name: string
+            password_hash: string
+            must_change_password: boolean
+            last_password_change?: string
+            personal_info?: Record<string, unknown>
+            job_info?: Record<string, unknown>
+            salary_info?: Record<string, unknown>
+            permissions?: string[]
+            roles?: string[]
+            attendance?: Record<string, unknown>
+            contracts?: unknown[]
+            status: string
+            workspace_id: string
+            created_at?: string
+            updated_at?: string
+          }
+
+          const employeeData = employees as EmployeeData
           logger.log('✅ 找到員工資料:', employeeData.display_name)
 
           // 將 snake_case 轉換為 camelCase（前端統一格式）
@@ -537,13 +558,29 @@ export const useAuthStore = create<AuthState>(
               english_name: profile.english_name,
               display_name: profile.display_name,
               chinese_name: profile.display_name, // 從 profile 取得
-              personal_info: profile.personal_info || {} as any,
-              job_info: profile.job_info || {} as any,
-              salary_info: profile.salary_info || {} as any,
+              personal_info: (profile.personal_info as User['personal_info']) || {
+                national_id: '',
+                birthday: '',
+                phone: '',
+                email: '',
+                address: '',
+                emergency_contact: { name: '', relationship: '', phone: '' }
+              },
+              job_info: (profile.job_info as User['job_info']) || {
+                hire_date: new Date().toISOString()
+              },
+              salary_info: (profile.salary_info as User['salary_info']) || {
+                base_salary: 0,
+                allowances: [],
+                salary_history: []
+              },
               permissions: profile.permissions || [],
-              roles: profile.roles || [], // 附加身份標籤
-              attendance: profile.attendance || { leave_records: [], overtime_records: [] } as any,
-              contracts: profile.contracts || [] as any,
+              roles: profile.roles as User['roles'] || [],
+              attendance: (profile.attendance as User['attendance']) || {
+                leave_records: [],
+                overtime_records: []
+              },
+              contracts: (profile.contracts as User['contracts']) || [],
               status: profile.status as 'active' | 'probation' | 'leave' | 'terminated',
               workspace_id: profile.workspace_id, // ✅ 從資料庫讀取 workspace_id
               created_at: profile.created_at || new Date().toISOString(),
@@ -586,8 +623,8 @@ export const useAuthStore = create<AuthState>(
 
 // 🔄 客戶端自動 hydrate（恢復登入狀態）
 if (typeof window !== 'undefined') {
-  // @ts-expect-error - zustand persist API type issue
-  useAuthStore.persist.rehydrate()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(useAuthStore as any).persist.rehydrate()
 
   // 🔧 自動修復：如果 user 缺少 workspace_id，從 IndexedDB 補上
   setTimeout(async () => {

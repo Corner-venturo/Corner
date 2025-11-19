@@ -28,19 +28,12 @@ import {
 } from '@/stores'
 import {
   useRealtimeForCalendarEvents,
-  useRealtimeForTours,
-  useRealtimeForOrders,
-  useRealtimeForMembers,
-  useRealtimeForCustomers,
 } from '@/hooks/use-realtime-hooks'
 
 export default function CalendarPage() {
-  // ✅ Realtime 訂閱
+  // ✅ Realtime 訂閱（只訂閱行事曆事件）
+  // Tours, Orders, Members, Customers 只用來顯示名稱，重新整理即可更新，不需要即時訂閱
   useRealtimeForCalendarEvents()
-  useRealtimeForTours()
-  useRealtimeForOrders()
-  useRealtimeForMembers()
-  useRealtimeForCustomers() // 新增客戶訂閱（顯示客戶生日）
 
   // Stores
   const { fetchAll: fetchTours } = useTourStore()

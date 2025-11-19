@@ -15,7 +15,11 @@ import { useAuthStore } from '@/stores/auth-store'
  * ```
  */
 export function useWorkspaceRLS() {
-  const { currentWorkspaceId, setCurrentWorkspace } = useWorkspaceStore() as any
+  interface WorkspaceStore {
+    currentWorkspaceId?: string
+    setCurrentWorkspace: (id: string) => void
+  }
+  const { currentWorkspaceId, setCurrentWorkspace } = useWorkspaceStore() as WorkspaceStore
   const { currentProfile } = useAuthStore()
 
   useEffect(() => {
@@ -26,7 +30,7 @@ export function useWorkspaceRLS() {
     // 呼叫 Supabase Function 設定當前 workspace
     const setWorkspaceInDatabase = async () => {
       try {
-        const { error } = await supabase.rpc('set_current_workspace' as any, {
+        const { error } = await supabase.rpc('set_current_workspace', {
           workspace_id: currentWorkspaceId,
         })
 
@@ -62,7 +66,7 @@ export function useWorkspaceRLS() {
  * 可用於 UI 切換器
  */
 export async function switchWorkspace(workspaceId: string) {
-  const { error } = await supabase.rpc('set_current_workspace' as any, {
+  const { error } = await supabase.rpc('set_current_workspace', {
     workspace_id: workspaceId,
   })
 

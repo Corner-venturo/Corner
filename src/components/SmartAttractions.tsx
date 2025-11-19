@@ -4,13 +4,14 @@ import { FocusCards } from '@/components/ui/focus-cards'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 
-interface Attraction {
+// 展示用的景點型別（與資料庫 Attraction 不同）
+interface AttractionDisplay {
   title: string
   src: string
   description?: string
 }
 
-export function SmartAttractions({ attractions }: { attractions: Attraction[] }) {
+export function SmartAttractions({ attractions }: { attractions: AttractionDisplay[] }) {
   const count = attractions.length
 
   // 1個景點 - 全寬英雄卡片

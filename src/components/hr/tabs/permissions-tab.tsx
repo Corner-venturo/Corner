@@ -74,7 +74,7 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
     ) => {
       setIsSaving(true)
       try {
-        await updateUser(employee.id, { roles: roles as any })
+        await updateUser(employee.id, { roles })
 
         // 同步更新 IndexedDB
         try {
@@ -85,9 +85,9 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              roles: roles,
+              roles: roles as any,
               updated_at: new Date().toISOString(),
-            } as any)
+            })
           }
         } catch (error) {
           // Ignore error
@@ -99,16 +99,16 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           login({
             ...user,
             roles,
-          } as any)
+          })
 
-          // 🎴 同步更新 LocalProfile（角色卡）
+          // 同步更新 LocalProfile（角色卡）
           try {
             const { useLocalAuthStore } = await import('@/lib/auth/local-auth-manager')
             const localAuthStore = useLocalAuthStore.getState()
             const currentProfile = localAuthStore.currentProfile
 
-            if (currentProfile && currentProfile.id === employee.id) {
-              (localAuthStore as any).updateProfile(employee.id, {
+            if (currentProfile && currentProfile.id === employee.id && 'updateProfile' in localAuthStore) {
+              (localAuthStore.updateProfile as (id: string, data: Partial<Employee>) => void)(employee.id, {
                 roles,
               })
             }
@@ -141,9 +141,9 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              permissions: permissions,
+              permissions,
               updated_at: new Date().toISOString(),
-            } as any)
+            })
           }
         } catch (error) {}
 
@@ -151,8 +151,8 @@ export const PermissionsTab = forwardRef<{ handleSave: () => void }, Permissions
         if (user && user.id === employee.id) {
           login({
             ...user,
-            permissions: permissions,
-          } as any)
+            permissions,
+          })
         }
 
         // 顯示儲存成功訊息

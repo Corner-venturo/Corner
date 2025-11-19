@@ -38,7 +38,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
 
   const { currentWeekId } = useTimeboxStore()
   // Use Promise-based getWeekStatistics in useEffect
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<ReturnType<typeof getWeekStatistics> | null>(null)
 
   useEffect(() => {
     if (currentWeekId) {
@@ -104,13 +104,13 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-morandi-secondary">完成率：</span>
-                <span className="font-medium">{Math.round((stats?.completionRate ?? 0) * 100)}%</span>
+                <span className="font-medium">{Math.round(((stats as any)?.completionRate ?? 0) * 100)}%</span>
               </div>
               <div>
                 <span className="text-morandi-secondary">運動時間：</span>
-                <span className="font-medium">{formatTime(stats?.totalWorkoutTime ?? 0)}</span>
+                <span className="font-medium">{formatTime((stats as any)?.totalWorkoutTime ?? 0)}</span>
               </div>
-              {stats?.totalWorkoutVolume && stats.totalWorkoutVolume > 0 && (
+              {(stats as any)?.totalWorkoutVolume && stats.totalWorkoutVolume > 0 && (
                 <div className="col-span-2">
                   <span className="text-morandi-secondary">總訓練量：</span>
                   <span className="font-medium">
@@ -123,9 +123,9 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
             <div className="mt-3 pt-3 border-t border-gray-200">
               <div className="text-sm text-morandi-secondary">完成項目分布：</div>
               <div className="flex space-x-4 mt-1 text-sm">
-                <span>運動 {(stats as any)?.completedByType?.workout ?? 0} 次</span>
-                <span>保養 {(stats as any)?.completedByType?.reminder ?? 0} 次</span>
-                <span>其他 {(stats as any)?.completedByType?.basic ?? 0} 次</span>
+                <span>運動 {stats && 'completedByType' in stats && stats.completedByType?.workout ? stats.completedByType.workout : 0} 次</span>
+                <span>保養 {stats && 'completedByType' in stats && stats.completedByType?.reminder ? stats.completedByType.reminder : 0} 次</span>
+                <span>其他 {stats && 'completedByType' in stats && stats.completedByType?.basic ? stats.completedByType.basic : 0} 次</span>
               </div>
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function ReviewDialog({ isOpen, onClose, weekStart, weekEnd }: Re
                       .map(record => (
                         <SelectItem key={record.id} value={record.id}>
                           {record.name} (完成率:{' '}
-                          {Math.round((record as any).statistics.completionRate * 100)}%)
+                          {Math.round(('statistics' in record && record.statistics && 'completionRate' in record.statistics ? record.statistics.completionRate : 0) * 100)}%)
                         </SelectItem>
                       ))}
                   </SelectContent>

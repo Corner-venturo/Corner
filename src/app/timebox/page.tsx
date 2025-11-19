@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Calendar, Clock, Package2 } from 'lucide-react'
 
 import { useTimeboxStore } from '@/stores/timebox-store'
+import { useAuthStore } from '@/stores/auth-store'
 
 import BoxManager from './components/box-manager'
 import ReviewDialog from './components/review-dialog'
@@ -23,6 +24,7 @@ export default function TimeboxPage() {
   const [showBoxManager, setShowBoxManager] = useState(false)
 
   const { currentWeek, initializeCurrentWeek } = useTimeboxStore()
+  const user = useAuthStore(state => state.user)
 
   // 手機模式滑動導航
   const touchStartX = useRef<number>(0)
@@ -32,11 +34,10 @@ export default function TimeboxPage() {
   // 初始化當前週（純本地模式）
   useEffect(() => {
     if (!currentWeek) {
-      // TODO: Get userId from auth context
-      const userId = 'temp-user-id' // Placeholder
+      const userId = user?.id || 'temp-user-id'
       initializeCurrentWeek(new Date(), userId)
     }
-  }, [currentWeek, initializeCurrentWeek])
+  }, [currentWeek, initializeCurrentWeek, user])
 
   // 手機模式滑動切換日期
   useEffect(() => {

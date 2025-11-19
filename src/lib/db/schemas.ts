@@ -760,13 +760,19 @@ export const TABLES = {
   WORKSPACES: 'workspaces',
   CHANNELS: 'channels',
   CHANNEL_GROUPS: 'channel_groups',
+  CHANNEL_MEMBERS: 'channel_members',
   MESSAGES: 'messages',
   BULLETINS: 'bulletins',
   ADVANCE_LISTS: 'advance_lists',
   SHARED_ORDER_LISTS: 'shared_order_lists',
+  PERSONAL_CANVASES: 'personal_canvases',
+  RICH_DOCUMENTS: 'rich_documents',
   ESIMS: 'esims',
   CONFIRMATIONS: 'confirmations',
   PNRS: 'pnrs',
+  ATTRACTIONS: 'attractions',
+  RECEIPTS: 'receipts',
+  LINKPAY_LOGS: 'linkpay_logs',
 } as const
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES]

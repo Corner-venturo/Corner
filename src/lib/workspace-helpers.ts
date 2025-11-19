@@ -71,7 +71,12 @@ export function getCurrentWorkspaceCode(): string | null {
       const workspace = workspaces.find(w => w.id === selectedWorkspaceId)
       if (workspace) {
         // ✅ 使用 workspace.code 欄位（如 TP, TC）
-        return (workspace as any).code || workspace.name.substring(0, 2).toUpperCase()
+        interface WorkspaceWithCode {
+          id: string
+          name: string
+          code?: string
+        }
+        return (workspace as WorkspaceWithCode).code || workspace.name.substring(0, 2).toUpperCase()
       }
       logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user selected workspace ${selectedWorkspaceId} not found`)
     }
@@ -81,7 +86,12 @@ export function getCurrentWorkspaceCode(): string | null {
       const defaultWorkspace = workspaces[0]
       logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user has no selected workspace, using default: ${defaultWorkspace.name}`)
       // ✅ 使用 workspace.code 欄位（如 TP, TC）
-      return (defaultWorkspace as any).code || defaultWorkspace.name.substring(0, 2).toUpperCase()
+      interface WorkspaceWithCode {
+        id: string
+        name: string
+        code?: string
+      }
+      return (defaultWorkspace as WorkspaceWithCode).code || defaultWorkspace.name.substring(0, 2).toUpperCase()
     }
 
     logger.warn('[getCurrentWorkspaceCode] Cross-workspace user has no workspace available')
@@ -98,7 +108,12 @@ export function getCurrentWorkspaceCode(): string | null {
   const workspace = workspaces.find(w => w.id === workspaceId)
   if (workspace) {
     // ✅ 使用 workspace.code 欄位（如 TP, TC）
-    return (workspace as any).code || workspace.name.substring(0, 2).toUpperCase()
+    interface WorkspaceWithCode {
+      id: string
+      name: string
+      code?: string
+    }
+    return (workspace as WorkspaceWithCode).code || workspace.name.substring(0, 2).toUpperCase()
   }
 
   logger.warn(`[getCurrentWorkspaceCode] Workspace ${workspaceId} not found in store`)

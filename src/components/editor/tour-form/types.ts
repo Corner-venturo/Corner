@@ -25,6 +25,7 @@ export interface Activity {
   title: string
   description: string
   image?: string
+  attraction_id?: string // 關聯的景點 ID（從景點選擇器選擇時會設定）
 }
 
 export interface Meals {

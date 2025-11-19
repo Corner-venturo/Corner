@@ -54,11 +54,13 @@ export async function loadWithSync<T extends { id: string }>(
     // 2. 背景同步 (如果在線上且啟用 Supabase)
     if (isOnline && supabaseEnabled) {
       try {
-        let query = (supabase as any).from(tableName).select(select)
+        // Dynamic table name - using TableName type
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let query = supabase.from(tableName as any).select(select)
 
         // 套用過濾
         if (filter) {
-          query = query.eq(filter.field, filter.value as any)
+          query = query.eq(filter.field, filter.value)
         }
 
         // 套用排序
@@ -77,10 +79,10 @@ export async function loadWithSync<T extends { id: string }>(
 
         // 更新 IndexedDB
         if (data) {
-          await Promise.all(data.map((item: any) => localDB.put(tableName as any, item)))
+          await Promise.all(data.map((item: T) => localDB.put(tableName as any, item)))
         }
 
-        return { cached, fresh: (data as unknown as T[]) || [], error: null }
+        return { cached, fresh: (data as T[]) || [], error: null }
       } catch (syncError) {
         logger.error(`Sync error for ${tableName}:`, syncError)
         return {
@@ -119,7 +121,9 @@ export async function createWithSync<T extends { id: string }>(
 
     // 2. 同步到 Supabase (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await (supabase as any).from(tableName).insert(data as any)
+      // Dynamic table name - using TableName type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from(tableName as any).insert(data)
 
       if (error) {
         logger.warn(`Supabase create failed for ${tableName}:`, error)
@@ -151,7 +155,8 @@ export async function updateWithSync<T extends { id: string }>(
 
   try {
     // 1. 從 IndexedDB 取得當前資料
-    const current = await localDB.getAll(tableName as any).then((items: any[]) => items.find((item: any) => item.id === id))
+    const items = (await localDB.getAll(tableName as any)) as T[]
+    const current = items.find((item) => item.id === id)
     if (!current) {
       return { data: null, error: new Error('Item not found') }
     }
@@ -163,7 +168,9 @@ export async function updateWithSync<T extends { id: string }>(
 
     // 3. 同步到 Supabase (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await (supabase as any).from(tableName).update(updates as any).eq('id', id)
+      // Dynamic table name - using TableName type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from(tableName as any).update(updates).eq('id', id)
 
       if (error) {
         logger.warn(`Supabase update failed for ${tableName}:`, error)
@@ -197,7 +204,9 @@ export async function deleteWithSync(
 
     // 2. 從 Supabase 刪除 (如果在線上)
     if (isOnline && supabaseEnabled) {
-      const { error } = await (supabase as any).from(tableName).delete().eq('id', id)
+      // Dynamic table name - using TableName type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from(tableName as any).delete().eq('id', id)
 
       if (error) {
         logger.warn(`Supabase delete failed for ${tableName}:`, error)
@@ -226,8 +235,8 @@ export async function batchUpdateWithSync<T extends { id: string }>(
     // 1. 批次更新 IndexedDB
     await Promise.all(
       updates.map(async ({ id, data }) => {
-        const items = await localDB.getAll(tableName as any)
-        const current = (items as any[]).find((item: any) => item.id === id)
+        const items = (await localDB.getAll(tableName as any)) as T[]
+        const current = items.find((item) => item.id === id)
         if (current) {
           await localDB.put(tableName as any, { ...current, ...data })
         }
@@ -240,8 +249,10 @@ export async function batchUpdateWithSync<T extends { id: string }>(
 
     if (isOnline && supabaseEnabled) {
       // Supabase 不支援真正的批次更新，但可以用 Promise.all
+      // Dynamic table name - using TableName type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await Promise.all(
-        updates.map(({ id, data }) => (supabase as any).from(tableName).update(data as any).eq('id', id))
+        updates.map(({ id, data }) => supabase.from(tableName as any).update(data).eq('id', id))
       )
     }
 

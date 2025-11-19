@@ -8,6 +8,14 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { cn } from '@/lib/utils'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 
 interface MichelinRestaurant {
   id: string
@@ -35,6 +43,8 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
   const [loading, setLoading] = useState(true)
   const [countries, setCountries] = useState<any[]>([])
   const [cities, setCities] = useState<any[]>([])
+  const [editingRestaurant, setEditingRestaurant] = useState<MichelinRestaurant | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   // 載入餐廳資料
   useEffect(() => {
@@ -96,6 +106,37 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       toast.success('刪除成功')
     } catch (error) {
       toast.error('刪除失敗')
+    }
+  }
+
+  // 開啟編輯對話框
+  const handleEdit = (restaurant: MichelinRestaurant) => {
+    setEditingRestaurant(restaurant)
+    setIsEditDialogOpen(true)
+  }
+
+  // 關閉編輯對話框
+  const handleCloseEdit = () => {
+    setEditingRestaurant(null)
+    setIsEditDialogOpen(false)
+  }
+
+  // 更新餐廳
+  const handleUpdate = async (updatedData: Partial<MichelinRestaurant>) => {
+    if (!editingRestaurant) return
+
+    try {
+      const { error } = await supabase
+        .from('michelin_restaurants')
+        .update(updatedData)
+        .eq('id', editingRestaurant.id)
+
+      if (error) throw error
+      await loadRestaurants()
+      handleCloseEdit()
+      toast.success('更新成功')
+    } catch (error) {
+      toast.error('更新失敗')
     }
   }
 
@@ -249,63 +290,146 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
   )
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={columns}
-          data={filteredRestaurants}
-          loading={loading}
-          initialPageSize={20}
-          onRowClick={restaurant => {
-            // TODO: 打開編輯對話框
-            logger.log('Edit restaurant:', restaurant)
-          }}
-          actions={(restaurant: MichelinRestaurant) => (
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  // TODO: 打開編輯對話框
-                  logger.log('Edit restaurant:', restaurant)
-                }}
-                className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                title="編輯"
-              >
-                <Edit2 size={14} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  handleToggleStatus(restaurant)
-                }}
-                className="h-8 px-2"
-                title={restaurant.is_active ? '停用' : '啟用'}
-              >
-                <Power
-                  size={14}
-                  className={restaurant.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
-                />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  handleDelete(restaurant.id)
-                }}
-                className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
-              >
-                <Trash2 size={14} />
-              </Button>
+    <>
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-auto">
+          <EnhancedTable
+            columns={columns}
+            data={filteredRestaurants}
+            loading={loading}
+            initialPageSize={20}
+            onRowClick={handleEdit}
+            actions={(restaurant: MichelinRestaurant) => (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleEdit(restaurant)
+                  }}
+                  className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
+                  title="編輯"
+                >
+                  <Edit2 size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleToggleStatus(restaurant)
+                  }}
+                  className="h-8 px-2"
+                  title={restaurant.is_active ? '停用' : '啟用'}
+                >
+                  <Power
+                    size={14}
+                    className={restaurant.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
+                  />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleDelete(restaurant.id)
+                  }}
+                  className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+                  title="刪除"
+                >
+                  <Trash2 size={14} />
+                </Button>
+              </div>
+            )}
+          />
+        </div>
+      </div>
+
+      {/* 編輯對話框 */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>編輯米其林餐廳</DialogTitle>
+          </DialogHeader>
+          {editingRestaurant && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">餐廳名稱</label>
+                  <Input
+                    value={editingRestaurant.name}
+                    onChange={e =>
+                      setEditingRestaurant({ ...editingRestaurant, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">英文名稱</label>
+                  <Input
+                    value={editingRestaurant.name_en || ''}
+                    onChange={e =>
+                      setEditingRestaurant({ ...editingRestaurant, name_en: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">主廚名稱</label>
+                  <Input
+                    value={editingRestaurant.chef_name || ''}
+                    onChange={e =>
+                      setEditingRestaurant({ ...editingRestaurant, chef_name: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">電話</label>
+                  <Input
+                    value={editingRestaurant.phone || ''}
+                    onChange={e =>
+                      setEditingRestaurant({ ...editingRestaurant, phone: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">平均晚餐價格</label>
+                  <Input
+                    type="number"
+                    value={editingRestaurant.avg_price_dinner || ''}
+                    onChange={e =>
+                      setEditingRestaurant({
+                        ...editingRestaurant,
+                        avg_price_dinner: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">貨幣</label>
+                  <Input
+                    value={editingRestaurant.currency || ''}
+                    onChange={e =>
+                      setEditingRestaurant({ ...editingRestaurant, currency: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
             </div>
           )}
-        />
-      </div>
-    </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseEdit}>
+              取消
+            </Button>
+            <Button onClick={() => editingRestaurant && handleUpdate(editingRestaurant)}>
+              儲存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

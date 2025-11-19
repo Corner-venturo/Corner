@@ -12,8 +12,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, // 暫時忽略，TypeScript 檢查已在編譯階段通過
   },
-  // 禁用錯誤頁面的靜態生成
-  generateStaticParams: false,
   // 停用所有自動靜態優化（修復 Html 組件錯誤）
   onDemandEntries: {
     maxInactiveAge: 60 * 1000,

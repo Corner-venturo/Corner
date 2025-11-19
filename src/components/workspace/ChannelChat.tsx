@@ -118,10 +118,10 @@ export function ChannelChat() {
               isLoading={isMessagesLoading}
               showMemberSidebar={showMemberSidebar}
               messageText={messageText}
-              attachedFiles={attachedFiles as any}
-              uploadingFiles={uploadingFiles as any}
-              uploadProgress={uploadProgress as any}
-              messagesEndRef={messagesEndRef as any}
+              attachedFiles={attachedFiles}
+              uploadingFiles={uploadingFiles}
+              uploadProgress={uploadProgress}
+              messagesEndRef={messagesEndRef}
               onReaction={handleReactionClick}
               onDeleteMessage={handleDeleteMessageClick}
               onCreatePayment={(itemId, item) => {

@@ -19,10 +19,9 @@ type ChannelGroupEntity = Omit<ChannelGroup, 'created_at' | 'updated_at'> & Base
  * 快取策略: 全量快取 (數量少，經常使用)
  */
 export const useChannelGroupStore = createStore<ChannelGroupEntity>({
-  tableName: 'channel_groups' as any,
-  cacheStrategy: 'full',
+  tableName: 'channel_groups',
   enableRealtime: true,
-} as any)
+})
 
 /**
  * Hook 型別（方便使用）

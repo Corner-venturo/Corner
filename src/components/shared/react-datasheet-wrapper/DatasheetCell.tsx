@@ -47,8 +47,8 @@ export function DatasheetCell({
     const column = visibleColumns[col]
     if (!column) return null
 
-    const isCoreField = CORE_FIELD_KEYS.includes(column.key as any)
-    const isCustomField = !PROTECTED_FIELD_KEYS.includes(column.key as any)
+    const isCoreField = CORE_FIELD_KEYS.includes(column.key as (typeof CORE_FIELD_KEYS)[number])
+    const isCustomField = !PROTECTED_FIELD_KEYS.includes(column.key as (typeof PROTECTED_FIELD_KEYS)[number])
     const canHide = !isCoreField
 
     return (
@@ -134,8 +134,8 @@ export function DatasheetCell({
           <option value="no-bed">不佔床</option>
 
           {/* Regular room options */}
-          {(roomOptions as any)
-            .map((roomOption: any) => {
+          {roomOptions
+            .map((roomOption) => {
               const usage = getRoomUsage
                 ? getRoomUsage(roomOption.value)
                 : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
@@ -153,7 +153,7 @@ export function DatasheetCell({
                 </option>
               )
             })
-            .filter((option: any): option is React.ReactElement => option !== null)}
+            .filter((option): option is React.ReactElement => option !== null)}
 
           {/* No-bed room options */}
           {member.is_child_no_bed &&

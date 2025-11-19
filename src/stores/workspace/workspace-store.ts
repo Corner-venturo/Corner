@@ -19,10 +19,9 @@ type WorkspaceEntity = Workspace & BaseEntity
  * 快取策略: 全量快取 (數量極少，通常 1-3 個)
  */
 export const useWorkspaceStoreData = createStore<WorkspaceEntity>({
-  tableName: 'workspaces' as any,
-  cacheStrategy: 'full',
+  tableName: 'workspaces',
   enableRealtime: true,
-} as any)
+})
 
 /**
  * Hook 型別（方便使用）

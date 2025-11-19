@@ -1,82 +1,62 @@
-import { logger } from '@/lib/utils/logger'
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { useCallback } from 'react'
+import { useAttractionStore } from '@/stores'
 import { Attraction, AttractionFormData } from '../types'
 
 // ============================================
-// Hook: 景點資料管理（僅負責 CRUD，不做篩選）
+// Hook: 景點資料管理（使用 Store 架構）
 // ============================================
 
+/**
+ * 景點資料管理 Hook
+ *
+ * ✅ 使用 useAttractionStore（支援離線 + Realtime）
+ * ✅ 提供向後相容的 API
+ * ✅ 處理表單資料轉換
+ */
 export function useAttractionsData() {
-  const [attractions, setAttractions] = useState<Attraction[]>([])
-  const [loading, setLoading] = useState(false)
+  const store = useAttractionStore()
 
-  // 載入景點資料（使用分頁功能，不需要限制）
-  const fetchAttractions = useCallback(async () => {
-    setLoading(true)
-    try {
-      const { data, error } = await supabase
-        .from('attractions')
-        .select(
-          'id, name, name_en, country_id, city_id, region_id, category, description, duration_minutes, tags, thumbnail, images, is_active, created_at, updated_at'
-        )
-        .order('created_at', { ascending: false }) // 最新的在前面
-
-      if (error) throw error
-      setAttractions(data as any || [])
-    } catch (error) {
-      logger.error('Error fetching attractions:', error)
-      setAttractions([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  // 新增景點
+  // 新增景點（處理表單資料轉換）
   const addAttraction = useCallback(
     async (formData: AttractionFormData) => {
       try {
-        const { error } = await supabase.from('attractions').insert([
-          {
-            ...formData,
-            tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
-            images: formData.images ? formData.images.split(',').map(url => url.trim()) : [],
-            region_id: formData.region_id || null,
-          },
-        ])
+        // 轉換表單資料為 Attraction 格式
+        const attractionData: Partial<Attraction> = {
+          ...formData,
+          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
+          images: formData.images ? formData.images.split(',').map(url => url.trim()) : [],
+          region_id: formData.region_id || undefined,
+          display_order: 0,
+        }
 
-        if (error) throw error
-        await fetchAttractions()
+        await store.create(attractionData as Attraction)
         return { success: true }
       } catch (error) {
         return { success: false, error }
       }
     },
-    [fetchAttractions]
+    [store]
   )
 
-  // 更新景點
+  // 更新景點（處理表單資料轉換）
   const updateAttraction = useCallback(
     async (id: string, formData: AttractionFormData) => {
       try {
-        const { error } = await supabase
-          .from('attractions')
-          .update({
-            ...formData,
-            tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
-            images: formData.images ? formData.images.split(',').map(url => url.trim()) : [],
-            region_id: formData.region_id || null,
-          })
-          .eq('id', id)
+        // 轉換表單資料為 Attraction 格式
+        const attractionData: Partial<Attraction> = {
+          ...formData,
+          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
+          images: formData.images ? formData.images.split(',').map(url => url.trim()) : [],
+          region_id: formData.region_id || undefined,
+        }
 
-        if (error) throw error
-        await fetchAttractions()
+        await store.update(id, attractionData as Attraction)
         return { success: true }
       } catch (error) {
         return { success: false, error }
       }
     },
-    [fetchAttractions]
+    [store]
   )
 
   // 刪除景點
@@ -85,56 +65,36 @@ export function useAttractionsData() {
       if (!confirm('確定要刪除此景點？')) return { success: false, cancelled: true }
 
       try {
-        const { error } = await supabase.from('attractions').delete().eq('id', id)
-
-        if (error) throw error
-        await fetchAttractions()
+        await store.delete(id)
         return { success: true }
       } catch (error) {
         alert('刪除失敗')
         return { success: false, error }
       }
     },
-    [fetchAttractions]
+    [store]
   )
 
-  // 切換啟用狀態（樂觀更新，避免畫面閃爍）
-  const toggleStatus = useCallback(async (attraction: Attraction) => {
-    // 樂觀更新：立即更新本地狀態
-    const newStatus = !attraction.is_active
-    setAttractions(prev =>
-      prev.map(item => (item.id === attraction.id ? { ...item, is_active: newStatus } : item))
-    )
+  // 切換啟用狀態
+  const toggleStatus = useCallback(
+    async (attraction: Attraction) => {
+      try {
+        await store.update(attraction.id, {
+          is_active: !attraction.is_active
+        })
+        return { success: true }
+      } catch (error) {
+        return { success: false, error }
+      }
+    },
+    [store]
+  )
 
-    try {
-      const { error } = await supabase
-        .from('attractions')
-        .update({ is_active: newStatus })
-        .eq('id', attraction.id)
-
-      if (error) throw error
-      return { success: true }
-    } catch (error) {
-      // 如果更新失敗，還原本地狀態
-      setAttractions(prev =>
-        prev.map(item =>
-          item.id === attraction.id ? { ...item, is_active: attraction.is_active } : item
-        )
-      )
-      return { success: false, error }
-    }
-  }, [])
-
-  // 初始載入（只執行一次，避免無限迴圈）
-  useEffect(() => {
-    void fetchAttractions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+  // 返回向後相容的 API
   return {
-    attractions,
-    loading,
-    fetchAttractions,
+    attractions: store.items,
+    loading: store.loading,
+    fetchAttractions: store.fetchAll,
     addAttraction,
     updateAttraction,
     deleteAttraction,

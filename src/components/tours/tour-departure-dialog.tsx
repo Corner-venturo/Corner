@@ -44,8 +44,8 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
       setLoading(true)
 
       // 載入主表資料
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: mainData, error: mainError } = await (supabase.from as any)('tour_departure_data')
+      const { data: mainData, error: mainError } = await supabase
+        .from('tour_departure_data')
         .select('*')
         .eq('tour_id', tour.id)
         .single()
@@ -58,26 +58,26 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
         setData(mainData as unknown as TourDepartureData)
 
         // 載入餐食
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: mealsData } = await (supabase.from as any)('tour_departure_meals')
+        const { data: mealsData } = await supabase
+          .from('tour_departure_meals')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setMeals(mealsData || [])
+        setMeals((mealsData || []) as TourDepartureMeal[])
 
         // 載入住宿
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: accomData } = await (supabase.from as any)('tour_departure_accommodations')
+        const { data: accomData } = await supabase
+          .from('tour_departure_accommodations')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setAccommodations(accomData || [])
+        setAccommodations((accomData || []) as TourDepartureAccommodation[])
 
         // 載入活動
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: activData } = await (supabase.from as any)('tour_departure_activities')
+        const { data: activData } = await supabase
+          .from('tour_departure_activities')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
@@ -85,8 +85,8 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
         setActivities((activData || []) as TourDepartureActivity[])
 
         // 載入其他
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: othersData } = await (supabase.from as any)('tour_departure_others')
+        const { data: othersData } = await supabase
+          .from('tour_departure_others')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
@@ -99,7 +99,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
           tour_id: tour.id,
           service_fee_per_person: 1500,
           petty_cash: 0,
-        } as TourDepartureData)
+        } as unknown as TourDepartureData)
       }
     } catch (error) {
       logger.error('載入出團資料失敗:', error)
@@ -120,8 +120,8 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
 
       if (!departureDataId) {
         // 新建
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: newData, error } = await (supabase.from as any)('tour_departure_data')
+        const { data: newData, error } = await supabase
+          .from('tour_departure_data')
           .insert({
             ...data,
             tour_id: tour.id,
@@ -133,8 +133,8 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
         departureDataId = newData.id
       } else {
         // 更新
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from as any)('tour_departure_data')
+        const { error } = await supabase
+          .from('tour_departure_data')
           .update(data)
           .eq('id', departureDataId)
 

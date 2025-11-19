@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useTimeboxStore } from '@/stores/timebox-store'
+import { useAuthStore } from '@/stores/auth-store'
 import TimeGrid from './time-grid'
 
 interface WeekViewProps {
@@ -11,6 +12,7 @@ interface WeekViewProps {
 
 export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) {
   const { currentWeek, initializeCurrentWeek } = useTimeboxStore()
+  const user = useAuthStore(state => state.user)
 
   // 初始化當前週
   useEffect(() => {
@@ -18,11 +20,10 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
       !currentWeek ||
       new Date(currentWeek.week_start).getTime() !== getWeekStart(selectedWeek).getTime()
     ) {
-      // TODO: Get userId from auth context
-      const userId = 'temp-user-id' // Placeholder
+      const userId = user?.id || 'temp-user-id'
       initializeCurrentWeek(selectedWeek, userId)
     }
-  }, [selectedWeek, currentWeek, initializeCurrentWeek])
+  }, [selectedWeek, currentWeek, initializeCurrentWeek, user])
 
   const getWeekStart = (date: Date) => {
     const d = new Date(date)

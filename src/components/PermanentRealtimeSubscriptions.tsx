@@ -125,46 +125,43 @@ export function PermanentRealtimeSubscriptions() {
       table: 'employees',
       subscriptionId: employeeSubscriptionId,
       handlers: {
-        onInsert: async (employee: unknown) => {
-          const emp = employee as Employee
-          logger.log('🔔 [employees] 新增員工:', emp)
+        onInsert: async (employee: Employee) => {
+          logger.log('🔔 [employees] 新增員工:', employee)
 
           // 更新 IndexedDB
           const { IndexedDBAdapter } = await import('@/stores/adapters/indexeddb-adapter')
           const indexedDB = new IndexedDBAdapter('employees')
-          await indexedDB.put(emp as any)
+          await indexedDB.put(employee)
 
           // 更新 Zustand 狀態
           useEmployeeStore.setState(state => {
-            const exists = state.items.some(item => item.id === emp.id)
+            const exists = state.items.some(item => item.id === employee.id)
             if (exists) return state
             return {
-              items: [...state.items, emp as any],
+              items: [...state.items, employee],
             }
           })
         },
-        onUpdate: async (employee: unknown) => {
-          const emp = employee as Employee
-          logger.log('🔔 [employees] 更新員工:', emp)
+        onUpdate: async (employee: Employee) => {
+          logger.log('🔔 [employees] 更新員工:', employee)
 
           const { IndexedDBAdapter } = await import('@/stores/adapters/indexeddb-adapter')
           const indexedDB = new IndexedDBAdapter('employees')
-          await indexedDB.put(emp as any)
+          await indexedDB.put(employee)
 
           useEmployeeStore.setState(state => ({
-            items: state.items.map(item => (item.id === emp.id ? emp as any : item)),
+            items: state.items.map(item => (item.id === employee.id ? employee : item)),
           }))
         },
-        onDelete: async (employee: unknown) => {
-          const emp = employee as Employee
-          logger.log('🔔 [employees] 刪除員工:', emp)
+        onDelete: async (employee: Employee) => {
+          logger.log('🔔 [employees] 刪除員工:', employee)
 
           const { IndexedDBAdapter } = await import('@/stores/adapters/indexeddb-adapter')
           const indexedDB = new IndexedDBAdapter('employees')
-          await indexedDB.delete(emp.id)
+          await indexedDB.delete(employee.id)
 
           useEmployeeStore.setState(state => ({
-            items: state.items.filter(item => item.id !== (employee as any).id),
+            items: state.items.filter(item => item.id !== employee.id),
           }))
         },
       },

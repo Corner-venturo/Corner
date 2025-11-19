@@ -65,7 +65,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
         })
         .map(emp => ({
           ...emp,
-          monthly_salary: (emp as any).monthly_salary ?? 30000,
+          monthly_salary: emp.salary_info?.base_salary ?? 30000,
         })),
     [employees, currentUser?.workspace_id]
   )
@@ -81,7 +81,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
   const totalAmount = useMemo(() => {
     return selectedEmployeeIds.reduce((sum, empId) => {
       const employee = activeEmployees.find(e => e.id === empId)
-      const amount = customAmounts[empId] ?? (employee as any)?.monthly_salary ?? 30000
+      const amount = customAmounts[empId] ?? employee?.monthly_salary ?? 30000
       return sum + amount
     }, 0)
   }, [selectedEmployeeIds, customAmounts, activeEmployees])
@@ -94,7 +94,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
       return {
         employee_id: empId,
         employee_name: employee.display_name || employee.chinese_name,
-        amount: customAmounts[empId] ?? (employee as any).monthly_salary ?? 30000,
+        amount: customAmounts[empId] ?? employee.monthly_salary ?? 30000,
       }
     })
 
@@ -197,7 +197,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {activeEmployees.map(employee => {
                 const isSelected = selectedEmployeeIds.includes(employee.id)
-                const amount = customAmounts[employee.id] ?? (employee as any).monthly_salary ?? 30000
+                const amount = customAmounts[employee.id] ?? employee.monthly_salary ?? 30000
 
                 return (
                   <div
@@ -218,7 +218,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                         {employee.display_name || employee.chinese_name}
                       </div>
                       <div className="text-xs text-morandi-secondary">
-                        {employee.personal_info?.email || 'N/A'} · 預設薪資: NT$ {((employee as any).monthly_salary ?? 30000).toLocaleString()}
+                        {employee.personal_info?.email || 'N/A'} · 預設薪資: NT$ {(employee.monthly_salary ?? 30000).toLocaleString()}
                       </div>
                     </div>
                     {isSelected && (

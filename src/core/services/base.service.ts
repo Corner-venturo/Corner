@@ -43,7 +43,7 @@ export abstract class BaseService<T extends BaseEntity> {
       this.validate(data as Partial<T>)
 
       const entity: T = {
-        ...(data as any),
+        ...data,
         id: this.generateId(),
         created_at: this.now(),
         updated_at: this.now(),
@@ -78,8 +78,8 @@ export abstract class BaseService<T extends BaseEntity> {
       // 排序
       if (params?.sortBy) {
         allData.sort((a, b) => {
-          const aVal = (a as any)[params.sortBy!]
-          const bVal = (b as any)[params.sortBy!]
+          const aVal = a[params.sortBy as keyof T]
+          const bVal = b[params.sortBy as keyof T]
 
           if (aVal < bVal) return params.sortOrder === 'desc' ? 1 : -1
           if (aVal > bVal) return params.sortOrder === 'desc' ? -1 : 1
@@ -133,8 +133,8 @@ export abstract class BaseService<T extends BaseEntity> {
       }
 
       const updated = {
-        ...(existing as any),
-        ...(data as any),
+        ...existing,
+        ...data,
         id, // 確保 ID 不會被覆蓋
         updated_at: this.now(),
       } as T
@@ -171,7 +171,7 @@ export abstract class BaseService<T extends BaseEntity> {
 
     for (const item of items) {
       try {
-        const created = await this.create(item as any)
+        const created = await this.create(item)
         results.push(created)
       } catch (error) {
         // Continue processing other items on error
@@ -186,7 +186,7 @@ export abstract class BaseService<T extends BaseEntity> {
 
     for (const { id, data } of updates) {
       try {
-        const updated = await this.update(id, data as any)
+        const updated = await this.update(id, data)
         results.push(updated)
       } catch (error) {
         // Continue processing other items on error

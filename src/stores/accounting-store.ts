@@ -93,6 +93,8 @@ interface AccountingStore {
   addCategory: (
     category: Omit<TransactionCategory, 'id' | 'created_at'>
   ) => Promise<TransactionCategory | null>
+  updateCategory: (id: string, category: Partial<TransactionCategory>) => Promise<TransactionCategory | null>
+  deleteCategory: (id: string) => Promise<boolean>
 
   // 交易記錄
   fetchTransactions: () => Promise<void>
@@ -248,6 +250,39 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       return data as TransactionCategory
     }
     return null
+  },
+
+  updateCategory: async (id, categoryData) => {
+    const { data, error } = await supabase
+      .from('accounting_categories')
+      .update(categoryData)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (!error && data) {
+      set(state => ({
+        categories: state.categories.map(c => (c.id === id ? (data as TransactionCategory) : c)),
+      }))
+      return data as TransactionCategory
+    }
+    return null
+  },
+
+  deleteCategory: async id => {
+    const { error } = await supabase
+      .from('accounting_categories')
+      .delete()
+      .eq('id', id)
+      .eq('is_system', false)
+
+    if (!error) {
+      set(state => ({
+        categories: state.categories.filter(c => c.id !== id),
+      }))
+      return true
+    }
+    return false
   },
 
   // ===== 交易記錄 =====

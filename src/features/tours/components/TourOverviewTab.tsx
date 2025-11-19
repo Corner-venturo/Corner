@@ -22,7 +22,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
 
   // Calculate tour order info
   const tourOrders = orders.filter(order => order.tour_id === tour.id)
-  const totalPaidAmount = tourOrders.reduce((sum: any, order: any) => sum + order.paid_amount, 0)
+  const totalPaidAmount = tourOrders.reduce((sum, order) => sum + (order.paid_amount || 0), 0)
 
   // Calculate current participants (from members)
   const tourMembers = members.filter(member =>
@@ -39,16 +39,32 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
 
   // Budget vs actual expenses
   const paymentRequests = paymentStore.payment_requests
-  const tourPaymentRequests = paymentRequests.filter((req: any) => (req as any)?.tour_id === tour.id)
+  const tourPaymentRequests = paymentRequests.filter(req => req?.tour_id === tour.id)
   const quoteBudget = tourQuote?.categories || []
 
-  const actualExpenses = (quoteBudget as any).map((category: { name: string; total?: number }) => {
-    const categoryTotal = tourPaymentRequests.reduce((sum: number, request: any) => {
-      const categoryItems = (request as any)?.items?.filter((item: any) => item.category === category.name) || []
+  interface QuoteCategory {
+    name: string
+    total?: number
+  }
+
+  interface PaymentRequestItem {
+    category: string
+    unit_price?: number
+    quantity?: number
+  }
+
+  interface PaymentRequest {
+    tour_id?: string
+    items?: PaymentRequestItem[]
+  }
+
+  const actualExpenses = (quoteBudget as QuoteCategory[]).map((category) => {
+    const categoryTotal = tourPaymentRequests.reduce((sum, request: PaymentRequest) => {
+      const categoryItems = request?.items?.filter(item => item.category === category.name) || []
       return (
         sum +
         categoryItems.reduce(
-          (itemSum: number, item: { unit_price: number; quantity: number }) => itemSum + (item.unit_price || 0) * (item.quantity || 0),
+          (itemSum, item) => itemSum + (item.unit_price || 0) * (item.quantity || 0),
           0
         )
       )
@@ -109,7 +125,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             <div className="flex justify-between">
               <span className="text-morandi-secondary">建立時間:</span>
               <span className="text-morandi-secondary text-sm">
-                {tour.created_at ? new Date(tour.created_at as any).toLocaleDateString() : '-'}
+                {tour.created_at ? new Date(tour.created_at).toLocaleDateString() : '-'}
               </span>
             </div>
           </div>
@@ -271,7 +287,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
               </tr>
             </thead>
             <tbody>
-              {actualExpenses.map((expense: any, index: number) => {
+              {actualExpenses.map((expense, index: number) => {
                 const varianceRate =
                   expense.budgetTotal > 0 ? (expense.variance / expense.budgetTotal) * 100 : 0
                 return (
@@ -356,35 +372,35 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
                 <td className="py-4 px-4 text-right text-morandi-secondary">
                   NT${' '}
                   {actualExpenses
-                    .reduce((sum: number, exp: any) => sum + exp.budgetPerPerson, 0)
+                    .reduce((sum, exp) => sum + exp.budgetPerPerson, 0)
                     .toLocaleString()}
                 </td>
                 <td className="py-4 px-4 text-right text-morandi-primary">
                   NT${' '}
-                  {actualExpenses.reduce((sum: number, exp: any) => sum + exp.budgetTotal, 0).toLocaleString()}
+                  {actualExpenses.reduce((sum, exp) => sum + exp.budgetTotal, 0).toLocaleString()}
                 </td>
                 <td className="py-4 px-4 text-right text-morandi-primary">
                   NT${' '}
-                  {actualExpenses.reduce((sum: number, exp: any) => sum + ((exp as any).actualTotal || 0), 0).toLocaleString()}
+                  {actualExpenses.reduce((sum, exp) => sum + (exp.actualTotal || 0), 0).toLocaleString()}
                 </td>
                 <td className="py-4 px-4 text-right">
                   <span
                     className={cn(
                       'font-bold',
-                      actualExpenses.reduce((sum: number, exp: any) => sum + exp.variance, 0) > 0
+                      actualExpenses.reduce((sum, exp) => sum + exp.variance, 0) > 0
                         ? 'text-morandi-red'
                         : 'text-morandi-green'
                     )}
                   >
-                    {actualExpenses.reduce((sum: number, exp: any) => sum + exp.variance, 0) > 0 ? '+' : ''}
+                    {actualExpenses.reduce((sum, exp) => sum + exp.variance, 0) > 0 ? '+' : ''}
                     NT${' '}
-                    {actualExpenses.reduce((sum: number, exp: any) => sum + exp.variance, 0).toLocaleString()}
+                    {actualExpenses.reduce((sum, exp) => sum + exp.variance, 0).toLocaleString()}
                   </span>
                 </td>
                 <td className="py-4 px-4 text-right">
                   <span className="text-morandi-primary font-bold">
-                    {actualExpenses.reduce((sum: number, exp: any) => sum + exp.budgetTotal, 0) > 0
-                      ? `${((actualExpenses.reduce((sum: number, exp: any) => sum + exp.variance, 0) / actualExpenses.reduce((sum: number, exp: any) => sum + exp.budgetTotal, 0)) * 100).toFixed(1)}%`
+                    {actualExpenses.reduce((sum, exp) => sum + exp.budgetTotal, 0) > 0
+                      ? `${((actualExpenses.reduce((sum, exp) => sum + exp.variance, 0) / actualExpenses.reduce((sum, exp) => sum + exp.budgetTotal, 0)) * 100).toFixed(1)}%`
                       : '0%'}
                   </span>
                 </td>

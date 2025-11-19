@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useTimeboxStore } from '@/stores/timebox-store'
+import { useAuthStore } from '@/stores/auth-store'
 import DayTimeGrid from './day-time-grid'
 
 interface DayViewProps {
@@ -11,6 +12,7 @@ interface DayViewProps {
 
 export default function DayView({ selectedDay, timeInterval }: DayViewProps) {
   const { currentWeek, initializeCurrentWeek } = useTimeboxStore()
+  const user = useAuthStore(state => state.user)
 
   // 計算週的開始日期（週一）
   const getWeekStart = (date: Date) => {
@@ -26,11 +28,10 @@ export default function DayView({ selectedDay, timeInterval }: DayViewProps) {
       !currentWeek ||
       new Date(currentWeek.week_start).getTime() !== getWeekStart(selectedDay).getTime()
     ) {
-      // TODO: Get userId from auth context
-      const userId = 'temp-user-id' // Placeholder
+      const userId = user?.id || 'temp-user-id'
       initializeCurrentWeek(selectedDay, userId)
     }
-  }, [selectedDay, currentWeek, initializeCurrentWeek])
+  }, [selectedDay, currentWeek, initializeCurrentWeek, user])
 
   const dayLabels = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
   const isToday = selectedDay.toDateString() === new Date().toDateString()

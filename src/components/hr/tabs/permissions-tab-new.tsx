@@ -53,7 +53,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         // 更新 roles（單一角色） 和 permissions（角色預設權限）
         await updateUser(employee.id, {
           roles: [role] as any,
-          permissions: defaultPermissions,
+          permissions: defaultPermissions as any,
         })
 
         // 同步更新 IndexedDB
@@ -65,10 +65,10 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              roles: [role],
-              permissions: defaultPermissions,
+              roles: [role] as any,
+              permissions: defaultPermissions as any,
               updated_at: new Date().toISOString(),
-            } as any)
+            })
           }
         } catch (error) {
           // Ignore error
@@ -78,9 +78,9 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         if (user && user.id === employee.id) {
           login({
             ...user,
-            roles: [role],
-            permissions: defaultPermissions,
-          } as any)
+            roles: [role] as any,
+            permissions: defaultPermissions as any,
+          })
 
           // 同步更新 LocalProfile
           try {
@@ -88,9 +88,9 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             const localAuthStore = useLocalAuthStore.getState()
             const currentProfile = localAuthStore.currentProfile
 
-            if (currentProfile && currentProfile.id === employee.id) {
-              ;(localAuthStore as any).updateProfile(employee.id, {
-                roles: [role],
+            if (currentProfile && currentProfile.id === employee.id && 'updateProfile' in localAuthStore) {
+              (localAuthStore.updateProfile as (id: string, data: Partial<Employee>) => void)(employee.id, {
+                roles: [role] as any,
               })
             }
           } catch (error) {
@@ -123,7 +123,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
     const saveExtraPermissions = async (permissions: string[]) => {
       setIsSaving(true)
       try {
-        await updateUser(employee.id, { permissions: permissions as any })
+        await updateUser(employee.id, { permissions })
 
         // 同步更新 IndexedDB
         try {
@@ -134,9 +134,9 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              permissions: permissions,
+              permissions: permissions as any,
               updated_at: new Date().toISOString(),
-            } as any)
+            })
           }
         } catch (error) {}
 
@@ -144,8 +144,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         if (user && user.id === employee.id) {
           login({
             ...user,
-            permissions: permissions,
-          } as any)
+            permissions: permissions as any,
+          })
         }
 
         setShowSavedMessage(true)

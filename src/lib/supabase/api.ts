@@ -4,12 +4,13 @@ import { supabase } from './client'
  * 將 camelCase 轉換為 snake_case
  * 並清理空字串（轉換為 null）
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toSnakeCase(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (Array.isArray(obj)) return obj.map(toSnakeCase)
   if (typeof obj !== 'object') return obj
 
-  const result: Record<string, any> = {}
+  const result: Record<string, unknown> = {}
   for (const key in obj) {
     const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase()
     const value = obj[key]
@@ -22,12 +23,13 @@ function toSnakeCase(obj: any): any {
 /**
  * 將 snake_case 轉換為 camelCase
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toCamelCase(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (Array.isArray(obj)) return obj.map(toCamelCase)
   if (typeof obj !== 'object') return obj
 
-  const result: Record<string, any> = {}
+  const result: Record<string, unknown> = {}
   for (const key in obj) {
     const camelKey = key.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase())
     result[camelKey] = toCamelCase(obj[key])
@@ -51,11 +53,13 @@ export class VenturoAPI {
   /**
    * 創建新記錄
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async create<T = any>(table: string, data: Record<string, unknown>): Promise<T> {
     try {
       // 將 camelCase 轉換為 snake_case
       const snakeData = toSnakeCase(data)
 
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: result, error } = await (supabase.from as any)(table).insert(snakeData).select().single()
 
@@ -73,11 +77,13 @@ export class VenturoAPI {
   /**
    * 批量創建記錄
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async createMany<T = any>(table: string, data: unknown[]): Promise<T[]> {
     try {
       // 將 camelCase 轉換為 snake_case
       const snakeData = data.map(toSnakeCase)
 
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: result, error } = await (supabase.from as any)(table).insert(snakeData).select()
 
@@ -95,8 +101,10 @@ export class VenturoAPI {
   /**
    * 查詢記錄
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async read<T = any>(table: string, options: QueryOptions = {}): Promise<T[]> {
     try {
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = (supabase.from as any)(table).select(options.select || '*')
 
@@ -144,8 +152,10 @@ export class VenturoAPI {
   /**
    * 根據 ID 查詢單筆記錄
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async readById<T = any>(table: string, id: string): Promise<T | null> {
     try {
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.from as any)(table).select('*').eq('id', id).single()
 
@@ -166,6 +176,7 @@ export class VenturoAPI {
   /**
    * 更新記錄
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async update<T = any>(
     table: string,
     id: string,
@@ -180,6 +191,7 @@ export class VenturoAPI {
         updated_at: new Date().toISOString(),
       }
 
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: result, error } = await (supabase.from as any)(table)
         .update(updateData)
@@ -201,10 +213,11 @@ export class VenturoAPI {
   /**
    * 條件更新記錄
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async updateWhere<T = any>(
     table: string,
     filters: Record<string, unknown>,
-    data: any
+    data: Record<string, unknown>
   ): Promise<T[]> {
     try {
       // 將 camelCase 轉換為 snake_case
@@ -214,6 +227,7 @@ export class VenturoAPI {
         updated_at: new Date().toISOString(),
       }
 
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = (supabase.from as any)(table)
       query = query.update(updateData)
@@ -242,6 +256,7 @@ export class VenturoAPI {
    */
   static async delete(table: string, id: string): Promise<boolean> {
     try {
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from as any)(table).delete().eq('id', id)
 
@@ -260,6 +275,7 @@ export class VenturoAPI {
    */
   static async deleteWhere(table: string, filters: Record<string, unknown>): Promise<boolean> {
     try {
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = (supabase.from as any)(table).delete()
 
@@ -284,6 +300,7 @@ export class VenturoAPI {
    */
   static async count(table: string, filters?: Record<string, unknown>): Promise<number> {
     try {
+      // Dynamic table name - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = (supabase.from as any)(table).select('*', { count: 'exact', head: true })
 
@@ -308,8 +325,10 @@ export class VenturoAPI {
   /**
    * 執行原生 SQL 查詢
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async query<T = any>(sql: string, params?: unknown[]): Promise<T[]> {
     try {
+      // Dynamic RPC function - requires type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.rpc as any)('execute_sql', {
         query: sql,
@@ -329,8 +348,8 @@ export class VenturoAPI {
   /**
    * 事務處理
    */
-  static async transaction(operations: (() => Promise<unknown>)[]): Promise<any[]> {
-    const results = []
+  static async transaction(operations: (() => Promise<unknown>)[]): Promise<unknown[]> {
+    const results: unknown[] = []
 
     for (const operation of operations) {
       try {

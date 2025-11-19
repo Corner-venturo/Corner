@@ -129,12 +129,10 @@ class CategoryService extends BaseService<TransactionCategory & { updated_at: st
         return category
       },
       update: async (id: string, data: Partial<TransactionCategory>) => {
-        // TODO: Implement updateCategory in accounting-store
-        console.warn('updateCategory not implemented')
+        await store.updateCategory(id, data)
       },
       delete: async (id: string) => {
-        // TODO: Implement deleteCategory in accounting-store
-        console.warn('deleteCategory not implemented')
+        await store.deleteCategory(id)
       },
     }
   }

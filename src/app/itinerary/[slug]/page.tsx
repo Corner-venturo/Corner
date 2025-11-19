@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 
 // Icon mapping
-const iconMap: any = {
+const iconMap: Record<string, React.ElementType> = {
   IconBuilding: Building2,
   IconToolsKitchen2: UtensilsCrossed,
   IconSparkles: Sparkles,
@@ -38,7 +38,7 @@ export default function EditItineraryPage() {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
   const [scale, setScale] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [itineraryData, setItineraryData] = useState<unknown>(null)
+  const [itineraryData, setItineraryData] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
 
@@ -56,20 +56,20 @@ export default function EditItineraryPage() {
 
         // 2. 找不到行程，嘗試從旅遊團載入
         const { useTourStore } = await import('@/stores')
-        const tourStore = useTourStore.getState() as any
+        const tourStore = useTourStore.getState()
         await tourStore.fetchAll()
-        const tour = tourStore.items.find((t: any) => t.id === slug)
+        const tour = tourStore.items.find(t => t.id === slug)
 
         if (tour) {
           // 從旅遊團建立行程資料
           const { useRegionsStore } = await import('@/stores')
-          const regionsStore = (useRegionsStore as any).getState()
+          const regionsStore = useRegionsStore.getState()
           await regionsStore.fetchAll()
-          const { countries, cities } = regionsStore as any
+          const { countries, cities } = regionsStore
 
           // 找到國家和城市名稱
-          const country = tour.country_id ? countries.find((c: any) => c.id === tour.country_id) : null
-          const city = tour.main_city_id ? cities.find((c: any) => c.id === tour.main_city_id) : null
+          const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
+          const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
 
           // 計算天數
           const departureDate = new Date(tour.departure_date)
@@ -88,7 +88,7 @@ export default function EditItineraryPage() {
             departureDate: departureDate.toLocaleDateString('zh-TW'),
             tourCode: tour.code,
             coverImage:
-              (city as any)?.background_image_url ||
+              (city as { background_image_url?: string })?.background_image_url ||
               'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop',
             country: country?.name || tour.location || '',
             city: city?.name || tour.location || '',
@@ -102,14 +102,14 @@ export default function EditItineraryPage() {
                 month: '2-digit',
                 day: '2-digit',
               }),
-              arrivalAirport: (city as any)?.airport_code || '',
+              arrivalAirport: (city as { airport_code?: string })?.airport_code || '',
               arrivalTime: '',
               duration: '',
             },
             returnFlight: {
               airline: '',
               flightNumber: '',
-              departureAirport: (city as any)?.airport_code || '',
+              departureAirport: (city as { airport_code?: string })?.airport_code || '',
               departureTime: '',
               departureDate: returnDate.toLocaleDateString('zh-TW', {
                 month: '2-digit',
@@ -177,36 +177,37 @@ export default function EditItineraryPage() {
   // Convert icon strings to components for preview
   const processedData = itineraryData
     ? {
-        ...(itineraryData as any),
+        ...itineraryData,
         features:
-          (itineraryData as any).features?.map((f: { icon: string }) => ({
+          (itineraryData.features as Array<{ icon: string }> | undefined)?.map(f => ({
             ...f,
             iconComponent: iconMap[f.icon] || Sparkles,
           })) || [],
       }
     : null
 
-  const typedItinerary = useMemo(() => itineraryData as any, [itineraryData])
+  const typedItinerary = useMemo(() => itineraryData as Record<string, unknown> | null, [itineraryData])
   const totalDays = useMemo(
     () =>
-      Array.isArray(typedItinerary?.dailyItinerary) ? typedItinerary.dailyItinerary.length : 0,
+      Array.isArray(typedItinerary?.dailyItinerary) ? (typedItinerary.dailyItinerary as unknown[]).length : 0,
     [typedItinerary]
   )
   const featureCount = useMemo(
-    () => (Array.isArray(typedItinerary?.features) ? typedItinerary.features.length : 0),
+    () => (Array.isArray(typedItinerary?.features) ? (typedItinerary.features as unknown[]).length : 0),
     [typedItinerary]
   )
   const travelRange = useMemo(() => {
-    if (!typedItinerary?.departureDate || !typedItinerary?.returnFlight?.departureDate) return null
-    return `${typedItinerary.departureDate} - ${typedItinerary.returnFlight.departureDate}`
+    const returnFlight = typedItinerary?.returnFlight as { departureDate?: string } | undefined
+    if (!typedItinerary?.departureDate || !returnFlight?.departureDate) return null
+    return `${typedItinerary.departureDate} - ${returnFlight.departureDate}`
   }, [typedItinerary])
   const locationLabel = useMemo(
-    () => typedItinerary?.city || typedItinerary?.country || '',
+    () => (typedItinerary?.city as string) || (typedItinerary?.country as string) || '',
     [typedItinerary]
   )
-  const statusLabel = typedItinerary?.status ?? '草稿'
+  const statusLabel = (typedItinerary?.status as string) ?? '草稿'
   const previewSubtitle =
-    typedItinerary?.subtitle || typedItinerary?.tagline || '隨時查看最新行程預覽'
+    (typedItinerary?.subtitle as string) || (typedItinerary?.tagline as string) || '隨時查看最新行程預覽'
 
   // 計算縮放比例
   useEffect(() => {
@@ -333,7 +334,7 @@ export default function EditItineraryPage() {
                       Itinerary overview
                     </p>
                     <h1 className="mt-3 text-2xl font-semibold text-morandi-primary">
-                      {typedItinerary?.title || '尚未命名的旅程'}
+                      {(typedItinerary?.title as string) || '尚未命名的旅程'}
                     </h1>
                     <p className="mt-1 text-sm text-morandi-secondary">{previewSubtitle}</p>
                   </div>
@@ -346,7 +347,7 @@ export default function EditItineraryPage() {
                   {typedItinerary?.tourCode && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-[#0f6eea]/10 px-3 py-1 font-medium text-[#0f3d5c]">
                       <Sparkles size={16} strokeWidth={1.6} />
-                      {typedItinerary.tourCode}
+                      {typedItinerary.tourCode as string}
                     </span>
                   )}
                   {locationLabel && (
@@ -412,7 +413,7 @@ export default function EditItineraryPage() {
                   </div>
                 </div>
                 <div className="scrollable-content flex-1 overflow-y-auto px-6 py-6">
-                  <TourForm data={itineraryData as any} onChange={setItineraryData} />
+                  <TourForm data={itineraryData} onChange={setItineraryData} />
                 </div>
               </div>
 

@@ -13,17 +13,10 @@ import { Input } from '@/components/ui/input'
 import { Search, MapPin } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { TourCountry } from './tour-form/types'
+import { Attraction } from '@/features/attractions/types'
 
-interface Attraction {
-  id: string
-  name: string
-  name_en: string | null
-  category: string | null
-  description: string | null
-  thumbnail: string | null
-  country_id: string
-  region_id: string | null
-  city_id: string
+// 擴展型別（加入 join 查詢的欄位）
+interface AttractionWithCity extends Attraction {
   city_name?: string
   region_name?: string
 }
@@ -32,7 +25,7 @@ interface AttractionSelectorProps {
   isOpen: boolean
   onClose: () => void
   tourCountries?: TourCountry[] // 行程涵蓋的國家
-  onSelect: (attractions: Attraction[]) => void
+  onSelect: (attractions: AttractionWithCity[]) => void
 }
 
 export function AttractionSelector({
@@ -43,7 +36,7 @@ export function AttractionSelector({
 }: AttractionSelectorProps) {
   const [selectedCountryId, setSelectedCountryId] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [attractions, setAttractions] = useState<Attraction[]>([])
+  const [attractions, setAttractions] = useState<AttractionWithCity[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
 
@@ -107,7 +100,7 @@ export function AttractionSelector({
           city_name: item.cities?.name || '',
         }))
 
-        setAttractions(formatted)
+        setAttractions(formatted as any)
       } catch (error) {
         // 靜默失敗，使用空陣列
       } finally {

@@ -39,8 +39,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   fetchAllPermissions: async () => {
     set({ loading: true, error: null })
     try {
-      // @ts-ignore - Supabase select with joins
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_workspace_permissions')
         .select(`
           *,
@@ -53,18 +52,26 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
 
       if (error) throw error
 
+      interface JoinedPermission {
+        workspace?: { id: string; name: string }
+        user?: { id: string; name: string; user_id: string }
+        granted_by_employee?: { id: string; name: string }
+        [key: string]: unknown
+      }
+
       const permissions: WorkspacePermissionWithDetails[] =
-        data?.map((p: any) => ({
-          ...p,
-          workspace_name: p.workspace?.name || p.workspace_id,
+        data?.map((p: JoinedPermission) => ({
+          ...(p as unknown as WorkspacePermission),
+          workspace_name: p.workspace?.name || (p.workspace_id as string),
           user_name: p.user?.name || 'Unknown User',
           granted_by_name: p.granted_by_employee?.name || null,
         })) || []
 
       set({ permissions, loading: false })
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       logger.error('[Workspace Permission] Fetch all failed:', error)
-      set({ error: error.message, loading: false })
+      set({ error: errorMessage, loading: false })
     }
   },
 
@@ -72,17 +79,17 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   fetchUserAccess: async (userId: string) => {
     set({ loading: true, error: null })
     try {
-      // @ts-ignore - Supabase RPC function
       const { data, error } = await supabase.rpc('get_user_workspace_permissions', {
         p_user_id: userId,
       })
 
       if (error) throw error
 
-      set({ userAccess: data || [], loading: false })
-    } catch (error: any) {
+      set({ userAccess: (data as UserWorkspaceAccess[]) || [], loading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       logger.error('[Workspace Permission] Fetch user access failed:', error)
-      set({ error: error.message, loading: false })
+      set({ error: errorMessage, loading: false })
     }
   },
 
@@ -90,7 +97,7 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   grantAccess: async (params: GrantWorkspaceAccessParams) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.rpc('grant_workspace_access' as any, {
+      const { data, error } = await supabase.rpc('grant_workspace_access', {
         p_target_user_id: params.target_user_id,
         p_workspace_id: params.workspace_id,
         p_can_view: params.can_view ?? true,
@@ -107,10 +114,11 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
       await get().fetchAllPermissions()
 
       set({ loading: false })
-      return (data as any) as string
-    } catch (error: any) {
+      return data as string
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       logger.error('[Workspace Permission] Grant access failed:', error)
-      set({ error: error.message, loading: false })
+      set({ error: errorMessage, loading: false })
       return null
     }
   },
@@ -119,10 +127,10 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
   revokeAccess: async (userId: string, workspaceId: string) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.rpc('revoke_workspace_access' as any, {
+      const { data, error } = await supabase.rpc('revoke_workspace_access', {
         p_target_user_id: userId,
         p_workspace_id: workspaceId,
-      }) as any
+      })
 
       if (error) throw error
 
@@ -130,10 +138,11 @@ export const useWorkspacePermissionStore = create<WorkspacePermissionStore>((set
       await get().fetchAllPermissions()
 
       set({ loading: false })
-      return (data as any) as boolean
-    } catch (error: any) {
+      return data as boolean
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       logger.error('[Workspace Permission] Revoke access failed:', error)
-      set({ error: error.message, loading: false })
+      set({ error: errorMessage, loading: false })
       return false
     }
   },

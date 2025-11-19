@@ -1,23 +1,24 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { useOrderStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
+import { Order, PaymentStatus } from '@/types/order.types'
+import { BaseEntity } from '@/core/types/common'
 
-// Use any to bypass type constraint
-class OrderService extends BaseService<any> {
+class OrderService extends BaseService<Order & BaseEntity> {
   protected resourceName = 'orders'
 
-  protected getStore = (): StoreOperations<any> => {
+  protected getStore = (): StoreOperations<Order & BaseEntity> => {
     const store = useOrderStore.getState()
     return {
-      getAll: () => store.items as any,
-      getById: (id: string) => store.items.find((o: any) => o.id === id) as any,
-      add: async (order: any) => {
+      getAll: () => store.items as (Order & BaseEntity)[],
+      getById: (id: string) => store.items.find(o => o.id === id) as (Order & BaseEntity) | undefined,
+      add: async (order: Order & BaseEntity) => {
         // 移除系統自動生成的欄位
         const { id, created_at, updated_at, ...createData } = order
         const result = await store.create(createData as any)
-        return result as any
+        return result as unknown as Order & BaseEntity
       },
-      update: async (id: string, data: any) => {
+      update: async (id: string, data: Partial<Order>) => {
         await store.update(id, data)
       },
       delete: async (id: string) => {
@@ -26,8 +27,8 @@ class OrderService extends BaseService<any> {
     }
   }
 
-  protected validate(data: any): void {
-    if (data.tour_id && !(data.tour_id as string).trim()) {
+  protected validate(data: Partial<Order>): void {
+    if (data.tour_id && !data.tour_id.trim()) {
       throw new ValidationError('tour_id', '必須關聯旅遊團')
     }
 
@@ -38,33 +39,33 @@ class OrderService extends BaseService<any> {
 
   // ========== 業務邏輯方法 ==========
 
-  getOrdersByTour(tour_id: string): any[] {
+  getOrdersByTour(tour_id: string): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter((o: any) => o.tour_id === tour_id) as any
+    return store.items.filter(o => o.tour_id === tour_id) as unknown as Order[]
   }
 
-  getOrdersByStatus(status: 'unpaid' | 'partial' | 'paid'): any[] {
+  getOrdersByStatus(status: PaymentStatus): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter((o: any) => o.payment_status === status) as any
+    return store.items.filter(o => o.payment_status === status) as unknown as Order[]
   }
 
-  getOrdersByCustomer(customer_id: string): any[] {
+  getOrdersByCustomer(customer_id: string): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter((o: any) => o.customer_id === customer_id) as any
+    return store.items.filter(o => o.customer_id === customer_id) as unknown as Order[]
   }
 
   calculateTotalRevenue(): number {
     const store = useOrderStore.getState()
     return store.items
-      .filter((o: any) => o.payment_status === 'paid')
-      .reduce((sum: number, o: any) => sum + (o.total_amount || 0), 0)
+      .filter(o => o.payment_status === 'paid')
+      .reduce((sum, o) => sum + (o.total_amount || 0), 0)
   }
 
-  getPendingOrders(): any[] {
+  getPendingOrders(): Order[] {
     return this.getOrdersByStatus('unpaid')
   }
 
-  getConfirmedOrders(): any[] {
+  getConfirmedOrders(): Order[] {
     return this.getOrdersByStatus('paid')
   }
 }

@@ -62,6 +62,7 @@ async function syncFromSupabase(): Promise<boolean> {
     const { supabase } = await import('@/lib/supabase/client')
 
     // 下載 employees 資料
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: employees, error } = await (supabase as any)
       .from('employees')
       .select('*')
@@ -76,6 +77,7 @@ async function syncFromSupabase(): Promise<boolean> {
     }
 
     // 寫入到 IndexedDB（使用 put 允許更新現有資料）
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     for (const employee of employees as any[]) {
       await localDB.put('employees', employee)
     }
@@ -132,6 +134,7 @@ export async function clearAllData(): Promise<void> {
 
   for (const table of tables) {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await localDB.clear(table as any)
     } catch (error) {}
   }

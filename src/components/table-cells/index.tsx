@@ -186,12 +186,12 @@ export function StatusCell({
   showIcon = false,
   className,
 }: StatusCellProps) {
-  const color = getStatusColor(type as any, status)
-  const label = getStatusLabel(type as any, status)
-  const IconComponent = getStatusIcon(type as any, status)
+  const color = getStatusColor(type, status)
+  const label = getStatusLabel(type, status)
+  const IconComponent = getStatusIcon(type, status)
 
   if (variant === 'badge') {
-    const bgColor = getStatusBgColor(type as any, status)
+    const bgColor = getStatusBgColor(type, status)
     return (
       <Badge className={cn('text-white', bgColor, className)}>
         {showIcon && IconComponent && <IconComponent className="w-3 h-3 mr-1" />}

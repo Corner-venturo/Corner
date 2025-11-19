@@ -17,7 +17,10 @@ export class OfflineAuthService {
       // 從 IndexedDB 讀取真實使用者
       await localDB.init() // 確保資料庫已初始化
       const users = await localDB.getAll(TABLES.EMPLOYEES)
-      const employee = users.find((u: any) => u.employee_number === email) as any
+      const employee = users.find((u) => {
+        const user = u as { employee_number?: string }
+        return user.employee_number === email
+      }) as { id: string; employee_number: string; password_hash?: string; display_name?: string; chinese_name?: string; english_name?: string; permissions?: string[]; personal_info?: unknown; job_info?: unknown; salary_info?: unknown; contracts?: unknown; attendance?: unknown; created_at?: string; status?: string } | undefined
 
       if (!employee) {
         return {
@@ -35,7 +38,7 @@ export class OfflineAuthService {
         }
       }
 
-      const isValidPassword = await bcrypt.compare(password, password_hash)
+      const isValidPassword = await bcrypt.compare(password, password_hash as string)
       if (!isValidPassword) {
         return {
           success: false,
@@ -52,13 +55,14 @@ export class OfflineAuthService {
       }
 
       // 從 employee 建立 profile
+      const personalInfo = employee.personal_info as { email?: string } | undefined
       const profile: LocalProfile = {
         id: employee.id,
-        email: employee.personal_info?.email || employee.employee_number + '@venturo.local',
+        email: personalInfo?.email || employee.employee_number + '@venturo.local',
         employee_number: employee.employee_number,
         display_name: employee.display_name || employee.chinese_name || employee.english_name || '',
         english_name: employee.english_name || '',
-        role: this.determineRole(employee.permissions || []),
+        role: this.determineRole(employee.permissions),
         permissions: employee.permissions || [],
         cachedPassword: encryptedPassword,
         personal_info: employee.personal_info,
@@ -68,7 +72,7 @@ export class OfflineAuthService {
         attendance: employee.attendance,
         lastLoginAt: new Date().toISOString(),
         created_at: employee.created_at || new Date().toISOString(),
-        status: employee.status || 'active',
+        status: (employee.status as 'active' | 'inactive' | 'suspended') || 'active',
       }
 
       // 4. 儲存到本地

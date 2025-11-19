@@ -61,6 +61,7 @@ export async function syncData<T extends { id: string; updated_at?: string }>(
 
   // 📍 步驟 2：背景同步遠端資料
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query = (supabase as any).from(config.supabaseTable).select(config.select || '*')
 
     const { data: remoteData, error } = await query
@@ -77,6 +78,7 @@ export async function syncData<T extends { id: string; updated_at?: string }>(
 
     // 📍 步驟 4：更新本地快取
     for (const item of merged) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await localDB.put(config.tableName as any, item)
     }
 
@@ -185,6 +187,7 @@ export async function pushToRemote<T extends { id: string }>(
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from(supabaseTable).upsert(data)
 
     if (error) throw error

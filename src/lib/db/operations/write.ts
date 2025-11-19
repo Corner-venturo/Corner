@@ -43,13 +43,17 @@ export async function put<T extends { id: string }>(
       request.onerror = () => {
         const errorMsg = request.error?.message || request.error?.name || '未知錯誤'
         const error = new Error(`Put 資料失敗 (${tableName}): ${errorMsg}`)
+        interface RecordWithCode {
+          id: string
+          code?: string
+        }
         logger.error('[LocalDB] ❌ Put 失敗詳情:', {
           tableName,
           errorName: request.error?.name,
           errorMessage: request.error?.message,
-          errorCode: (request.error as any)?.code,
+          errorCode: request.error ? (request.error as unknown as { code?: string }).code : undefined,
           dataId: data?.id,
-          dataCode: (data as any)?.code, // 🔥 加入：顯示重複的 code
+          dataCode: (data as RecordWithCode)?.code, // 🔥 加入：顯示重複的 code
           dataKeys: data ? Object.keys(data) : [],
           fullData: data, // 🔥 改名：更清楚
         })
@@ -128,6 +132,7 @@ export async function update<T extends { id: string }>(
 
     // 清理 todos 表格的過時欄位（description 不存在於資料庫中）
     if (tableName === 'todos' && 'description' in updated) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (updated as any).description
     }
 

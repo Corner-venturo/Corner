@@ -103,8 +103,11 @@ export async function create<T extends BaseEntity>(
 
   // 🔥 最早期的 debug：檢查傳入的 data
   if (tableName === 'quotes') {
+    interface QuoteData {
+      quote_type?: string
+    }
     logger.log('🔍 [create.ts] 一開始收到的 data:', {
-      quote_type: (data as any).quote_type,
+      quote_type: (data as QuoteData).quote_type,
       codePrefix,
       tableName,
     })
@@ -176,8 +179,15 @@ export async function create<T extends BaseEntity>(
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
         // 🔥 修正：從 IndexedDB 讀取所有資料以生成編號（避免重複）
         const allItemsFromDB = await indexedDB.getAll()
+        interface ItemWithDeleted extends BaseEntity {
+          _deleted?: boolean
+          workspace_id?: string
+        }
         const itemsForCodeGeneration = allItemsFromDB.filter(
-          item => !(item as any)._deleted && (item as any).workspace_id === workspaceId
+          (item): item is ItemWithDeleted => {
+            const itemWithMeta = item as ItemWithDeleted
+            return !itemWithMeta._deleted && itemWithMeta.workspace_id === workspaceId
+          }
         )
 
         // 延遲取得 workspace code（避免循環依賴）
@@ -186,24 +196,31 @@ export async function create<T extends BaseEntity>(
           // 🔥 傳遞 quote_type 給 generateCode（用於區分快速報價單和標準報價單）
           const quoteType = (data as Record<string, unknown>).quote_type as string | undefined
 
+          interface QuoteData {
+            quote_type?: string
+          }
           logger.log('🔍 [create.ts] generateCode 參數:', {
             workspaceCode,
             codePrefix,
             quoteType,
-            dataQuoteType: (data as any).quote_type,
+            dataQuoteType: (data as QuoteData).quote_type,
           })
 
+          interface CodeConfig {
+            prefix: string
+            quoteType?: string
+          }
           const code = generateCode(
             workspaceCode,
-            { prefix: codePrefix, quoteType } as any,
-            itemsForCodeGeneration as BaseEntity[] // 🔥 使用 IndexedDB 資料
+            { prefix: codePrefix, quoteType } as CodeConfig,
+            itemsForCodeGeneration // 🔥 使用 IndexedDB 資料
           )
 
           logger.log('✅ [create.ts] 生成編號:', code)
           recordData = { ...recordData, code } as T
         } else {
           // 沒有 workspace code，使用傳統編號（無前綴）
-          const code = generateCode('', { prefix: codePrefix }, itemsForCodeGeneration as BaseEntity[])
+          const code = generateCode('', { prefix: codePrefix } as CodeConfig, itemsForCodeGeneration)
           recordData = { ...recordData, code } as T
         }
       }

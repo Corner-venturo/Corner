@@ -1,14 +1,10 @@
 import React, { useState } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
+import { Attraction } from '@/features/attractions/types'
 
-interface Attraction {
-  id: string
-  name: string
-  name_en: string | null
-  category: string | null
-  description: string | null
-  thumbnail: string | null
+// 擴展型別（與 AttractionSelector 一致）
+interface AttractionWithCity extends Attraction {
   city_name?: string
 }
 
@@ -55,7 +51,7 @@ export function DailyItinerarySection({
   }
 
   // 處理景點選擇
-  const handleSelectAttractions = (attractions: Attraction[]) => {
+  const handleSelectAttractions = (attractions: AttractionWithCity[]) => {
     if (currentDayIndex === -1) return
 
     // 將選擇的景點轉換為活動
@@ -67,7 +63,8 @@ export function DailyItinerarySection({
       // 再新增活動
       addActivity(currentDayIndex)
 
-      // 設定活動資料
+      // ✅ 設定活動資料（包含 attraction_id）
+      updateActivity(currentDayIndex, newActivityIndex, 'attraction_id', attraction.id) // 保留景點關聯
       updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍')
       updateActivity(currentDayIndex, newActivityIndex, 'title', attraction.name)
       updateActivity(currentDayIndex, newActivityIndex, 'description', attraction.description || '')

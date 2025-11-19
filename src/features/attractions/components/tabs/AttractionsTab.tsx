@@ -40,6 +40,8 @@ export default function AttractionsTab({
   const { attractions, loading, addAttraction, updateAttraction, deleteAttraction, toggleStatus } =
     useAttractionsData()
 
+  const { isEditOpen, editingAttraction, openEdit, closeEdit } = useAttractionsDialog()
+
   // 當景點載入後，取得所有用到的國家和城市 ID，然後查詢這些資料
   useEffect(() => {
     if (attractions.length > 0) {
@@ -48,26 +50,32 @@ export default function AttractionsTab({
 
       // 載入這些國家
       if (countryIds.length > 0) {
-        (supabase
+        supabase
           .from('countries')
           .select('*')
-          .in('id', countryIds) as any)
-          .then(({ data }: any) => {
-            if (data) setDisplayCountries(data as any)
+          .in('id', countryIds)
+          .then(({ data, error }) => {
+            if (error) {
+              logger.error('載入國家失敗:', error)
+              return
+            }
+            if (data) setDisplayCountries(data as Country[])
           })
-          .catch((err: any) => logger.error('載入國家失敗:', err))
       }
 
       // 載入這些城市
       if (cityIds.length > 0) {
-        (supabase
+        supabase
           .from('cities')
           .select('*')
-          .in('id', cityIds) as any)
-          .then(({ data }: any) => {
-            if (data) setDisplayCities(data as any)
+          .in('id', cityIds)
+          .then(({ data, error }) => {
+            if (error) {
+              logger.error('載入城市失敗:', error)
+              return
+            }
+            if (data) setDisplayCities(data as City[])
           })
-          .catch((err: any) => logger.error('載入城市失敗:', err))
       }
     }
   }, [attractions])
@@ -82,8 +90,35 @@ export default function AttractionsTab({
     selectedCity: '', // 不再使用城市篩選
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { openEdit } = useAttractionsDialog()
+  const { countries, regions, cities } = useRegionsStore()
+
+  const getRegionsByCountry = (countryId: string) => {
+    return regions.filter(r => r.country_id === countryId)
+  }
+
+  const getCitiesByCountry = (countryId: string) => {
+    return cities.filter(c => c.country_id === countryId)
+  }
+
+  const getCitiesByRegion = (regionId: string) => {
+    return cities.filter(c => c.region_id === regionId)
+  }
+
+  const handleEditSubmit = async (formData: any) => {
+    if (!editingAttraction) return { success: false }
+
+    const result = await updateAttraction(editingAttraction.id, {
+      ...formData,
+      tags: formData.tags ? formData.tags.split(',').map((t: string) => t.trim()) : [],
+      images: formData.images ? formData.images.split(',').map((i: string) => i.trim()) : [],
+    })
+
+    if (result) {
+      closeEdit()
+      return { success: true }
+    }
+    return { success: false }
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -94,14 +129,45 @@ export default function AttractionsTab({
           sortedAttractions={sortedAttractions}
           countries={displayCountries}
           cities={displayCities}
-          onEdit={() => {}} // TODO: Implement edit functionality
+          onEdit={openEdit}
           onToggleStatus={toggleStatus}
           onDelete={deleteAttraction}
           onAddNew={openAdd}
         />
       </div>
 
-      {/* TODO: 新增和編輯對話框需要重新實作 */}
+      {/* 編輯對話框 */}
+      {editingAttraction && (
+        <AttractionsDialog
+          open={isEditOpen}
+          onClose={closeEdit}
+          onSubmit={handleEditSubmit}
+          attraction={editingAttraction}
+          countries={countries}
+          regions={regions}
+          cities={cities}
+          getRegionsByCountry={getRegionsByCountry}
+          getCitiesByCountry={getCitiesByCountry}
+          getCitiesByRegion={getCitiesByRegion}
+          initialFormData={{
+            name: '',
+            name_en: '',
+            description: '',
+            country_id: '',
+            region_id: '',
+            city_id: '',
+            category: '景點',
+            tags: '',
+            duration_minutes: 60,
+            address: '',
+            phone: '',
+            website: '',
+            images: '',
+            notes: '',
+            is_active: true,
+          }}
+        />
+      )}
     </div>
   )
 }

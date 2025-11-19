@@ -71,7 +71,7 @@ interface CategorySectionProps {
     categoryId: string,
     itemId: string,
     field: keyof CostItem,
-    value: any
+    value: string | number | boolean
   ) => void
   handleRemoveItem: (categoryId: string, itemId: string) => void
 }
@@ -96,7 +96,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   // 對話框狀態
   const [isCountryDialogOpen, setIsCountryDialogOpen] = useState(false)
   const [isRatesDialogOpen, setIsRatesDialogOpen] = useState(false)
-  const [countries, setCountries] = useState<{ name: string }[]>([])
+  const [countries, setCountries] = useState<Array<{ name: string }>>([])
   const [selectedCountry, setSelectedCountry] = useState<string>('')
   const [transportRates, setTransportRates] = useState<CategoryTransportationRate[]>([])
   const [loading, setLoading] = useState(false)
@@ -108,18 +108,17 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       return
     }
 
-    // @ts-ignore - Supabase type inference issue
-    const result: any = await (supabase as any)
+    const { data } = await supabase
       .from('transportation_rates')
       .select('country_name')
       .eq('is_active', true)
 
-    const data = result.data
     if (data) {
+      const ratesData = data as Array<{ country_name: string }>
       const uniqueCountries = Array.from(
-        new Set((data as any).map((item: any) => item.country_name))
-      ).map((name: any) => ({ name }))
-      setCountries(uniqueCountries as any)
+        new Set(ratesData.map(item => item.country_name))
+      ).map(name => ({ name }))
+      setCountries(uniqueCountries)
       setIsCountryDialogOpen(true)
     }
   }
@@ -129,17 +128,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     setSelectedCountry(countryName)
     setLoading(true)
 
-    // @ts-ignore - Supabase type inference issue
-    const result: any = await (supabase as any)
+    const { data } = await supabase
       .from('transportation_rates')
       .select('*')
       .eq('country_name', countryName)
       .eq('is_active', true)
       .order('display_order')
 
-    const data = result.data
     if (data) {
-      setTransportRates(data as any)
+      setTransportRates(data as CategoryTransportationRate[])
       setIsCountryDialogOpen(false)
       setIsRatesDialogOpen(true)
     }
@@ -150,16 +147,14 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   const refreshRates = async () => {
     if (!selectedCountry) return
 
-    // @ts-ignore - Supabase type inference issue
-    const result: any = await (supabase as any)
+    const { data } = await supabase
       .from('transportation_rates')
       .select('*')
       .eq('country_name', selectedCountry)
       .eq('is_active', true)
       .order('display_order')
 
-    const data = result.data
-    if (data) setTransportRates(data as any)
+    if (data) setTransportRates(data as CategoryTransportationRate[])
   }
 
   // 插入車資到團體分攤
@@ -178,7 +173,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       total: rate.price_twd || 0,
       note: rate.notes || '',
       is_group_cost: true, // 標記為團體費用
-    } as any
+    }
 
     logger.log('📝 [CategorySection] 插入項目:', newItem)
 
@@ -462,9 +457,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           isOpen={isRatesDialogOpen}
           onClose={() => setIsRatesDialogOpen(false)}
           countryName={selectedCountry}
-          rates={transportRates as any}
+          rates={transportRates as unknown as TransportationRate[]}
           onUpdate={refreshRates}
-          onInsert={handleInsertRate as any}
+          onInsert={handleInsertRate as unknown as (rate: TransportationRate) => void}
           isEditMode={false}
         />
       )}

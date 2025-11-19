@@ -14,7 +14,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       add: async (order: DisbursementOrder) => {
         // 移除系統自動生成的欄位
         const { id, created_at, updated_at, ...createData } = order
-        const result = await store.create(createData as any)
+        const result = await store.create(createData)
         return result as DisbursementOrder
       },
       update: async (id: string, data: Partial<DisbursementOrder>) => {
@@ -88,7 +88,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     // 計算總金額
     const paymentRequestStore = usePaymentRequestStore.getState()
     const totalAmount = paymentRequestIds.reduce((sum, requestId) => {
-      const request = paymentRequestStore.items.find((r: any) => r.id === requestId)
+      const request = paymentRequestStore.items.find(r => r.id === requestId)
       return sum + (request?.amount ?? 0)
     }, 0)
 
@@ -99,7 +99,10 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       status: 'pending' as const,
       note,
       created_by: '1', // 使用實際用戶ID
-    } as any
+      id: '',
+      created_at: this.now(),
+      updated_at: this.now(),
+    } as DisbursementOrder
 
     const order = await this.create(orderData)
 
@@ -157,7 +160,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     const paymentRequestStore = usePaymentRequestStore.getState()
     const newRequestIds = [...order.payment_request_ids, ...requestIds]
     const newTotalAmount = newRequestIds.reduce((sum, requestId) => {
-      const request = paymentRequestStore.items.find((r: any) => r.id === requestId)
+      const request = paymentRequestStore.items.find(r => r.id === requestId)
       return sum + (request?.amount ?? 0)
     }, 0)
 
@@ -166,7 +169,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       payment_request_ids: newRequestIds,
       total_amount: newTotalAmount,
       updated_at: this.now(),
-    } as any)
+    })
 
     // 更新請款單狀態
     for (const requestId of requestIds) {
@@ -191,7 +194,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     const paymentRequestStore = usePaymentRequestStore.getState()
     const newRequestIds = order.payment_request_ids.filter(id => id !== requestId)
     const newTotalAmount = newRequestIds.reduce((sum, reqId) => {
-      const request = paymentRequestStore.items.find((r: any) => r.id === reqId)
+      const request = paymentRequestStore.items.find(r => r.id === reqId)
       return sum + (request?.amount ?? 0)
     }, 0)
 
@@ -200,7 +203,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       payment_request_ids: newRequestIds,
       total_amount: newTotalAmount,
       updated_at: this.now(),
-    } as any)
+    })
 
     // 將請款單狀態改回 pending
     await this.updatePaymentRequestStatus(requestId, 'pending')
