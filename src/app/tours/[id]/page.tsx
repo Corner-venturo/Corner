@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
-import { useTourStore } from '@/stores'
+import { useTourStore, useEmployeeStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
+import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { addChannelMembers } from '@/services/workspace-members'
 import { TourOverview } from '@/components/tours/tour-overview'
@@ -18,6 +19,7 @@ import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourAddOns } from '@/components/tours/tour-add-ons'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
+import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
 import { MessageSquare, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -46,29 +48,76 @@ export default function TourDetailPage() {
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showDepartureDialog, setShowDepartureDialog] = useState(false)
 
+  // 建立頻道對話框狀態
+  const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
+  const [channelName, setChannelName] = useState('')
+  const [channelDescription, setChannelDescription] = useState('')
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([])
+
   const tour = tours.find(t => t.id === params.id)
 
   // 檢查是否已有工作頻道
   const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour?.id)
 
-  // 建立工作頻道
-  const handleCreateWorkChannel = async () => {
-    if (!tour || !currentWorkspace || !user) return
+  // 開啟建立頻道對話框時，預設頻道資訊
+  useEffect(() => {
+    if (showCreateChannelDialog && tour) {
+      setChannelName(tour.name)
+      setChannelDescription(`${tour.code} - ${tour.name} 的工作頻道`)
+      if (user?.id && !selectedMembers.includes(user.id)) {
+        setSelectedMembers([user.id])
+      }
+    }
+  }, [showCreateChannelDialog, tour, user?.id])
+
+  // 點擊建立頻道按鈕
+  const handleCreateWorkChannel = () => {
+    if (!tour) return
+    setShowCreateChannelDialog(true)
+  }
+
+  // 確認建立頻道
+  const handleConfirmCreateChannel = async () => {
+    if (!tour || !currentWorkspace || !user || selectedMembers.length === 0) return
 
     setIsCreatingChannel(true)
     try {
+      // 建立頻道
       const newChannel = await createChannel({
         workspace_id: currentWorkspace.id,
-        name: tour.name, // 只顯示團名
-        description: `${tour.code} - ${tour.name} 的工作頻道`,
-        type: 'public',
+        name: channelName.trim(),
+        description: channelDescription.trim() || undefined,
+        type: 'private', // 統一為私密頻道
         tour_id: tour.id,
-        created_by: user.id, // 設定創建者
+        created_by: user.id,
       })
 
-      if (newChannel) {
-        toast.success('工作頻道已建立！')
-        // 跳轉到 workspace 並選擇該頻道
+      // 批次加入選中的成員
+      if (newChannel?.id) {
+        const channelMemberStore = useChannelMemberStore.getState()
+
+        const memberPromises = selectedMembers.map(async (employeeId) => {
+          return channelMemberStore.create({
+            workspace_id: currentWorkspace.id,
+            channel_id: newChannel.id,
+            employee_id: employeeId,
+            role: employeeId === user.id ? 'owner' : 'member',
+            status: 'active',
+          })
+        })
+
+        await Promise.all(memberPromises)
+        await channelMemberStore.fetchAll()
+
+        toast.success(`工作頻道已建立！已邀請 ${selectedMembers.length} 位成員`)
+
+        // 關閉對話框並重置狀態
+        setShowCreateChannelDialog(false)
+        setChannelName('')
+        setChannelDescription('')
+        setSelectedMembers([])
+
+        // 跳轉到工作空間並選中新頻道
         router.push(`/workspace?channel=${newChannel.id}`)
       }
     } catch (error) {
@@ -76,6 +125,14 @@ export default function TourDetailPage() {
     } finally {
       setIsCreatingChannel(false)
     }
+  }
+
+  // 關閉對話框
+  const handleCloseChannelDialog = () => {
+    setShowCreateChannelDialog(false)
+    setChannelName('')
+    setChannelDescription('')
+    setSelectedMembers([])
   }
 
   // 載入中
@@ -266,6 +323,21 @@ export default function TourDetailPage() {
         tour={tour}
         open={showDepartureDialog}
         onOpenChange={setShowDepartureDialog}
+      />
+
+      {/* 建立頻道對話框 */}
+      <CreateChannelDialog
+        isOpen={showCreateChannelDialog}
+        channelName={channelName}
+        channelDescription={channelDescription}
+        channelType="private"
+        selectedMembers={selectedMembers}
+        onChannelNameChange={setChannelName}
+        onChannelDescriptionChange={setChannelDescription}
+        onChannelTypeChange={() => {}} // 不允許修改類型
+        onMembersChange={setSelectedMembers}
+        onClose={handleCloseChannelDialog}
+        onCreate={handleConfirmCreateChannel}
       />
     </>
   )

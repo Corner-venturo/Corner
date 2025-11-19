@@ -7,6 +7,7 @@ import type { DragEndEvent } from '@dnd-kit/core'
 import { useAuthStore } from '@/stores/auth-store'
 import { removeChannelMember } from '@/services/workspace-members'
 import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
+import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import type { Channel } from '@/stores/workspace-store'
 import type { ChannelSidebarProps } from './types'
 import { useChannelSidebar } from './useChannelSidebar'
@@ -47,6 +48,9 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
   const { user } = useAuthStore()
 
+  // 🔥 載入所有頻道成員資料（用於檢查是否已加入頻道）
+  const allChannelMembers = useChannelMemberStore(state => state.items)
+
   // Use the new state hook
   const {
     showNewGroupDialog,
@@ -79,6 +83,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     setNewChannelDescription,
     newChannelType,
     setNewChannelType,
+    selectedMembers,
+    setSelectedMembers,
     resetCreateChannelDialog,
     showEditChannelDialog,
     channelToEdit,
@@ -95,6 +101,21 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     searchQuery,
     channelFilter
   )
+
+  // 🔥 載入所有頻道成員資料（用於檢查是否已加入）
+  useEffect(() => {
+    if (!currentWorkspace) return
+
+    // 載入 channel_members store（包含所有頻道的成員資料）
+    useChannelMemberStore.getState().fetchAll()
+  }, [currentWorkspace?.id])
+
+  // 🔥 開啟建立頻道對話框時，自動選中建立者
+  useEffect(() => {
+    if (showCreateChannelDialog && user?.id && !selectedMembers.includes(user.id)) {
+      setSelectedMembers([user.id])
+    }
+  }, [showCreateChannelDialog, user?.id])
 
   // Load channel members when selectedChannelId changes
   useEffect(() => {
@@ -171,7 +192,16 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     try {
       const { addChannelMembers } = await import('@/services/workspace-members')
       await addChannelMembers(currentWorkspace.id, channelId, [user.id], 'member')
+
+      // 🔥 重新載入頻道成員列表
       await loadChannelMembers(currentWorkspace.id, channelId)
+
+      // 🔥 重新載入 channel_members store（更新成員數量）
+      const { useChannelMemberStore } = await import('@/stores/workspace/channel-member-store')
+      await useChannelMemberStore.getState().fetchAll()
+
+      // 🔥 重新載入頻道列表（更新側邊欄的「未加入」狀態）
+      await loadChannels(currentWorkspace.id)
     } catch (error) {
       logger.error('Failed to join channel:', error)
     }
@@ -192,7 +222,16 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
       if (currentMember) {
         await removeChannelMember(currentWorkspace.id, channelId, currentMember.id)
+
+        // 🔥 重新載入頻道成員列表
         await loadChannelMembers(currentWorkspace.id, channelId)
+
+        // 🔥 重新載入 channel_members store（更新成員數量）
+        const { useChannelMemberStore } = await import('@/stores/workspace/channel-member-store')
+        await useChannelMemberStore.getState().fetchAll()
+
+        // 🔥 重新載入頻道列表（更新側邊欄的「未加入」狀態）
+        await loadChannels(currentWorkspace.id)
       }
     } catch (error) {
       logger.error('Failed to leave channel:', error)
@@ -302,6 +341,14 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const isAdmin = user?.permissions?.includes('admin') ?? false
 
   const checkIsMember = (channelId: string): boolean => {
+    // 🔥 優先使用 channel_members store（包含所有頻道的成員資料）
+    if (allChannelMembers.length > 0) {
+      return allChannelMembers.some(
+        m => m.channel_id === channelId && m.employee_id === user?.id
+      )
+    }
+
+    // Fallback: 使用當前載入的頻道成員列表
     const members = channelMembers[channelId] || []
     return members.some(m => m.employeeId === user?.id)
   }
@@ -370,39 +417,43 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   }
 
   const handleCreateChannel = async () => {
-    if (!newChannelName.trim() || !currentWorkspace || !user) {
+    if (!newChannelName.trim() || !currentWorkspace || !user || selectedMembers.length === 0) {
       return
     }
 
     try {
-      // 建立頻道
+      // 建立頻道（統一為 private，只有被邀請的人看得到）
       const newChannel = await createChannel({
         workspace_id: currentWorkspace.id,
         name: newChannelName.trim(),
         description: newChannelDescription.trim() || undefined,
-        type: newChannelType,
+        type: 'private', // 🔥 統一為私密頻道
         created_by: user.id,
       })
 
-      // 🔥 自動將建立者加入頻道（作為 owner）
-      // 直接操作 channel_members store，不透過 API
+      // 🔥 批次加入選中的成員
       if (newChannel?.id) {
         try {
-          const { useChannelMemberStore } = await import('@/stores/workspace/channel-member-store')
           const channelMemberStore = useChannelMemberStore.getState()
 
-          await channelMemberStore.create({
-            workspace_id: currentWorkspace.id,
-            channel_id: newChannel.id,
-            employee_id: user.id,
-            role: 'owner',
-            status: 'active',
+          // 批次建立成員
+          const memberPromises = selectedMembers.map(async (employeeId) => {
+            return channelMemberStore.create({
+              workspace_id: currentWorkspace.id,
+              channel_id: newChannel.id,
+              employee_id: employeeId,
+              role: employeeId === user.id ? 'owner' : 'member', // 建立者是 owner
+              status: 'active',
+            })
           })
 
-          logger.log('✅ Creator added as owner')
+          await Promise.all(memberPromises)
+          logger.log(`✅ Added ${selectedMembers.length} members to channel`)
+
+          // 🔥 重新載入 channel_members store
+          await channelMemberStore.fetchAll()
         } catch (memberError) {
-          logger.warn('⚠️ Failed to add creator as member:', memberError)
-          // 不顯示錯誤，因為用戶可以手動加入
+          logger.warn('⚠️ Failed to add members:', memberError)
         }
       }
 
@@ -479,9 +530,11 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         channelName={newChannelName}
         channelDescription={newChannelDescription}
         channelType={newChannelType}
+        selectedMembers={selectedMembers}
         onChannelNameChange={setNewChannelName}
         onChannelDescriptionChange={setNewChannelDescription}
         onChannelTypeChange={setNewChannelType}
+        onMembersChange={setSelectedMembers}
         onClose={resetCreateChannelDialog}
         onCreate={handleCreateChannel}
       />

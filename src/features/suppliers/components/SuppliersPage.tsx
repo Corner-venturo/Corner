@@ -19,8 +19,10 @@ export const SuppliersPage: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingSupplier, setEditingSupplier] = useState<any>(null)
 
-  const { items: suppliers, create, fetchAll: fetchSuppliers } = useSupplierStore()
+  const { items: suppliers, create, update, delete: deleteSupplier, fetchAll: fetchSuppliers } = useSupplierStore()
 
   // 載入資料
   useEffect(() => {
@@ -45,11 +47,39 @@ export const SuppliersPage: React.FC = () => {
   )
 
   const handleOpenAddDialog = useCallback(() => {
+    setIsEditMode(false)
+    setEditingSupplier(null)
     setIsAddDialogOpen(true)
   }, [])
 
+  const handleEdit = useCallback((supplier: any) => {
+    setIsEditMode(true)
+    setEditingSupplier(supplier)
+    setFormData({
+      name: supplier.name || '',
+      bank_name: supplier.bank_name || '',
+      bank_account: supplier.bank_account || '',
+      note: supplier.notes || '',
+    })
+    setIsAddDialogOpen(true)
+  }, [])
+
+  const handleDelete = useCallback(async (supplier: any) => {
+    if (!confirm(`確定要刪除供應商「${supplier.name}」嗎？`)) return
+
+    try {
+      await deleteSupplier(supplier.id)
+      alert('✅ 供應商已刪除')
+    } catch (error) {
+      logger.error('❌ Delete Supplier Error:', error)
+      alert('❌ 刪除失敗，請稍後再試')
+    }
+  }, [deleteSupplier])
+
   const handleCloseDialog = useCallback(() => {
     setIsAddDialogOpen(false)
+    setIsEditMode(false)
+    setEditingSupplier(null)
     setFormData({
       name: '',
       bank_name: '',
@@ -67,19 +97,31 @@ export const SuppliersPage: React.FC = () => {
 
   const handleSubmit = useCallback(async () => {
     try {
-      await create({
-        name: formData.name,
-        bank_name: formData.bank_name,
-        bank_account: formData.bank_account,
-        notes: formData.note,
-      } as any)
+      if (isEditMode && editingSupplier) {
+        // 更新模式
+        await update(editingSupplier.id, {
+          name: formData.name,
+          bank_name: formData.bank_name,
+          bank_account: formData.bank_account,
+          notes: formData.note,
+        } as any)
+        alert('✅ 供應商更新成功')
+      } else {
+        // 新增模式
+        await create({
+          name: formData.name,
+          bank_name: formData.bank_name,
+          bank_account: formData.bank_account,
+          notes: formData.note,
+        } as any)
+        alert('✅ 供應商建立成功')
+      }
       handleCloseDialog()
-      alert('✅ 供應商建立成功')
     } catch (error) {
-      logger.error('❌ Create Supplier Error:', error)
-      alert('❌ 建立失敗，請稍後再試')
+      logger.error('❌ Save Supplier Error:', error)
+      alert('❌ 儲存失敗，請稍後再試')
     }
-  }, [formData, create, handleCloseDialog])
+  }, [formData, isEditMode, editingSupplier, create, update, handleCloseDialog])
 
   return (
     <div className="h-full flex flex-col">
@@ -100,7 +142,11 @@ export const SuppliersPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-auto">
-        <SuppliersList suppliers={filteredSuppliers} />
+        <SuppliersList
+          suppliers={filteredSuppliers}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </div>
 
       {/* 新增供應商對話框 */}

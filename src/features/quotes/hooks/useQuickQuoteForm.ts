@@ -29,16 +29,16 @@ export interface QuickQuoteFormData {
   received_amount: number | ''
 }
 
-const initialFormData: QuickQuoteFormData = {
+const getInitialFormData = (): QuickQuoteFormData => ({
   customer_name: '',
   contact_phone: '',
   contact_address: '',
   tour_code: '',
-  handler_name: 'William',
+  handler_name: '', // 由 useEffect 自動填入當前登入者名稱
   issue_date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
   items: [],
   received_amount: '',
-}
+})
 
 const STORAGE_KEY = 'venturo_quick_quote_draft'
 
@@ -54,7 +54,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
 
   // 初始化時從 localStorage 載入草稿
   const [formData, setFormData] = useState<QuickQuoteFormData>(() => {
-    if (typeof window === 'undefined') return initialFormData
+    if (typeof window === 'undefined') return getInitialFormData()
 
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -67,8 +67,16 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
     } catch (error) {
       logger.error('Failed to load quick quote draft:', error)
     }
-    return initialFormData
+    return getInitialFormData()
   })
+
+  // 當 user 載入後，自動填入 handler_name（如果目前是空的）
+  useEffect(() => {
+    if (user && !formData.handler_name) {
+      const defaultName = user.display_name || user.chinese_name || user.email || ''
+      setFormData(prev => ({ ...prev, handler_name: defaultName }))
+    }
+  }, [user, formData.handler_name])
 
   // 每次 formData 變更時自動存到 localStorage
   useEffect(() => {
@@ -82,7 +90,12 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
   }, [formData])
 
   const resetForm = () => {
-    setFormData(initialFormData)
+    const resetData = getInitialFormData()
+    // 保留當前登入者的名稱
+    if (user) {
+      resetData.handler_name = user.display_name || user.chinese_name || user.email || ''
+    }
+    setFormData(resetData)
     if (typeof window !== 'undefined') {
       localStorage.removeItem(STORAGE_KEY)
     }

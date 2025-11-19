@@ -29,6 +29,7 @@ export function useChannelState() {
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelDescription, setNewChannelDescription] = useState('')
   const [newChannelType, setNewChannelType] = useState<'public' | 'private'>('public')
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([])
 
   // Edit channel dialog state
   const [showEditChannelDialog, setShowEditChannelDialog] = useState(false)
@@ -42,6 +43,7 @@ export function useChannelState() {
     setNewChannelName('')
     setNewChannelDescription('')
     setNewChannelType('public')
+    setSelectedMembers([])
   }, [])
 
   // Reset edit channel dialog
@@ -132,6 +134,8 @@ export function useChannelState() {
     setNewChannelDescription,
     newChannelType,
     setNewChannelType,
+    selectedMembers,
+    setSelectedMembers,
     resetCreateChannelDialog,
     // Edit channel
     showEditChannelDialog,
