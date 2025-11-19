@@ -220,22 +220,22 @@ export function Calendar({
   return (
     <div className={cn('p-3', className)}>
       {/* 月份導航 */}
-      <div className="flex items-center text-gray-900 dark:text-white mb-6">
+      <div className="flex items-center mb-6">
         <button
           type="button"
           onClick={() => navigateMonth('prev')}
-          className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-white transition-colors"
+          className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-morandi-secondary hover:text-morandi-primary transition-colors"
         >
           <span className="sr-only">上個月</span>
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="flex-auto text-sm font-semibold text-center">
+        <div className="flex-auto text-base font-semibold text-center text-morandi-primary">
           {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
         </div>
         <button
           type="button"
           onClick={() => navigateMonth('next')}
-          className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-white transition-colors"
+          className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-morandi-secondary hover:text-morandi-primary transition-colors"
         >
           <span className="sr-only">下個月</span>
           <ChevronRight className="h-5 w-5" />
@@ -243,7 +243,7 @@ export function Calendar({
       </div>
 
       {/* 星期標題 */}
-      <div className="mt-6 grid grid-cols-7 text-xs leading-6 text-gray-500 dark:text-gray-400">
+      <div className="mt-6 grid grid-cols-7 text-xs leading-6 text-morandi-secondary">
         {WEEKDAYS.map(day => (
           <div key={day} className="text-center">
             {day}
@@ -252,7 +252,7 @@ export function Calendar({
       </div>
 
       {/* 日期網格 */}
-      <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 text-sm shadow ring-1 ring-gray-200 dark:bg-white/5 dark:ring-white/10">
+      <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-morandi-container/30 text-sm shadow-sm ring-1 ring-morandi-container/20">
         {days.map((day, index) => {
           const isDisabled = isDateDisabled(day.date)
           const isFirstInRow = index % 7 === 0
@@ -270,23 +270,23 @@ export function Calendar({
                 'py-1.5 focus:z-10',
                 // 背景色
                 day.isCurrentMonth
-                  ? 'bg-white dark:bg-gray-900/90'
-                  : 'bg-gray-50 dark:bg-gray-900/50',
+                  ? 'bg-white'
+                  : 'bg-morandi-light/30',
                 // Hover 效果
-                !isDisabled && 'hover:bg-gray-100 dark:hover:bg-gray-900/75',
+                !isDisabled && 'hover:bg-morandi-light/50',
                 // 文字顏色
                 day.isCurrentMonth && !day.isSelected && !day.isToday
-                  ? 'text-gray-900 dark:text-white'
+                  ? 'text-morandi-primary'
                   : '',
                 !day.isCurrentMonth && !day.isSelected && !day.isToday
-                  ? 'text-gray-400 dark:text-gray-600'
+                  ? 'text-morandi-secondary/40'
                   : '',
                 // 選中狀態
                 day.isSelected && 'font-semibold text-white',
                 // 今天
                 day.isToday && !day.isSelected && 'font-semibold text-morandi-gold',
                 // 範圍內
-                day.isInRange && 'bg-morandi-gold/10 dark:bg-morandi-gold/20',
+                day.isInRange && 'bg-morandi-gold/10',
                 // 禁用狀態
                 isDisabled && 'opacity-50 cursor-not-allowed',
                 // 圓角（第一個和最後一個）
@@ -301,8 +301,8 @@ export function Calendar({
                 className={cn(
                   'mx-auto flex h-7 w-7 items-center justify-center rounded-full',
                   // 選中狀態的背景
-                  day.isSelected && !day.isToday && 'bg-gray-900 dark:bg-white dark:text-gray-900',
-                  day.isSelected && day.isToday && 'bg-morandi-gold dark:bg-morandi-gold',
+                  day.isSelected && !day.isToday && 'bg-morandi-primary text-white',
+                  day.isSelected && day.isToday && 'bg-morandi-gold text-white',
                   // 範圍起點/終點
                   day.isRangeStart && 'bg-morandi-gold text-white',
                   day.isRangeEnd && 'bg-morandi-gold text-white'
@@ -316,11 +316,11 @@ export function Calendar({
       </div>
 
       {/* 今天按鈕 */}
-      <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-4 pt-3 border-t border-morandi-container/20">
         <button
           type="button"
           onClick={goToToday}
-          className="w-full rounded-md bg-morandi-gold px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-morandi-gold-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-morandi-gold transition-colors"
+          className="w-full rounded-md bg-morandi-gold px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-morandi-gold/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-morandi-gold transition-colors"
         >
           今天
         </button>
