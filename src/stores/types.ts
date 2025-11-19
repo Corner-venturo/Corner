@@ -529,7 +529,7 @@ export interface PaymentRequest {
   supplier_name?: string | null
   status?: string | null // pending, approved, paid
   is_special_billing?: boolean | null // 是否為特殊出帳
-  notes?: string | null
+  note?: string | null // 備註（使用 note 單數形式，與資料庫一致）
   items?: PaymentRequestItem[] // 請款項目列表
   approved_at?: string | null
   approved_by?: string | null

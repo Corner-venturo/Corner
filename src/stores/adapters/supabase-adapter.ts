@@ -116,6 +116,27 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
   }
 
   /**
+   * 清理資料物件，移除未知的欄位
+   */
+  private cleanDataForTable(data: any): any {
+    const cleaned = { ...data }
+
+    // payment_requests: 移除 items 欄位（應使用 payment_request_items 關聯表）
+    if (this.tableName === 'payment_requests' && 'items' in cleaned) {
+      delete cleaned.items
+      logger.log(`🧹 [${this.tableName}] 移除未知欄位: items`)
+    }
+
+    // todos: 移除過時的 description 欄位
+    if (this.tableName === 'todos' && 'description' in cleaned) {
+      delete cleaned.description
+      logger.log(`🧹 [${this.tableName}] 移除過時欄位: description`)
+    }
+
+    return cleaned
+  }
+
+  /**
    * 新增或更新資料
    */
   async put(item: T): Promise<void> {
@@ -126,9 +147,13 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
+
+      // 清理資料，移除未知欄位
+      const cleanedItem = this.cleanDataForTable(item)
+
       // Dynamic table name - using TableName type from schemas
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await supabase.from(this.tableName as any).upsert(item)
+      const { error } = await supabase.from(this.tableName as any).upsert(cleanedItem)
 
       if (error) {
         logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
@@ -163,11 +188,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
-      // 清理過時欄位（特別是 todos 的 description）
-      const cleanedData = { ...data }
-      if (this.tableName === 'todos' && 'description' in cleanedData) {
-        delete cleanedData.description
-      }
+      // 清理資料，移除未知欄位
+      const cleanedData = this.cleanDataForTable(data)
 
       const { supabase } = await import('@/lib/supabase/client')
       // Dynamic table name - using TableName type from schemas

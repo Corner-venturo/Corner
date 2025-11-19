@@ -45,18 +45,23 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         await initLocalDatabase()
         logger.log('✅ IndexedDB initialized')
 
-        // 載入 workspaces 資料（用於編號生成等核心功能）
-        const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
-        logger.log('📦 Loading workspaces...')
+        // ⚠️ 只在登入後才載入 workspaces（避免登入頁面卡住）
+        if (authStore.user) {
+          // 載入 workspaces 資料（用於編號生成等核心功能）
+          const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
+          logger.log('📦 Loading workspaces...')
 
-        // 確保 workspaces 完全載入
-        await useWorkspaceStoreData.getState().fetchAll()
+          // 確保 workspaces 完全載入
+          await useWorkspaceStoreData.getState().fetchAll()
 
-        const workspaces = useWorkspaceStoreData.getState().items
-        logger.log(`✅ Workspaces loaded: ${workspaces?.length || 0} items`)
+          const workspaces = useWorkspaceStoreData.getState().items
+          logger.log(`✅ Workspaces loaded: ${workspaces?.length || 0} items`)
 
-        if (!workspaces || workspaces.length === 0) {
-          logger.warn('⚠️  No workspaces found! This may cause issues with tour code generation.')
+          if (!workspaces || workspaces.length === 0) {
+            logger.warn('⚠️  No workspaces found! This may cause issues with tour code generation.')
+          }
+        } else {
+          logger.log('⏭️ User not logged in, skipping workspaces loading')
         }
       } catch (error) {
         logger.error('❌ AppInitializer error:', error)

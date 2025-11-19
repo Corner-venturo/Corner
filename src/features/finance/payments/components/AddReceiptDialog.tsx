@@ -78,10 +78,61 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
     }
 
     try {
-      // TODO: 實作儲存邏輯
-      // 1. 建立收款單
-      // 2. 建立收款項目
-      // 3. 更新訂單收款狀態
+      // 實作儲存邏輯
+      const { useReceiptStore, useAuthStore } = await import('@/stores')
+      const { generateReceiptNumber } = await import('@/lib/utils/receipt-number-generator')
+      const { getCurrentWorkspaceCode } = await import('@/lib/workspace-helpers')
+
+      const receiptStore = useReceiptStore.getState()
+      const authStore = useAuthStore.getState()
+      const user = authStore.user
+
+      if (!user?.workspace_id) {
+        throw new Error('無法取得 workspace ID')
+      }
+
+      const workspaceCode = getCurrentWorkspaceCode()
+      if (!workspaceCode) {
+        throw new Error('無法取得 workspace code')
+      }
+
+      // 為每個收款項目建立收款單
+      for (const item of paymentItems) {
+        // 生成收款單號
+        const receiptNumber = generateReceiptNumber(
+          workspaceCode,
+          item.transaction_date,
+          receiptStore.items
+        )
+
+        // 建立收款單
+        await receiptStore.create({
+          receipt_number: receiptNumber,
+          workspace_id: user.workspace_id,
+          order_id: formData.order_id,
+          order_number: selectedOrder?.order_number || '',
+          tour_name: selectedOrder?.tour_name || '',
+          receipt_date: item.transaction_date,
+          receipt_type: item.receipt_type,
+          receipt_amount: item.amount,
+          actual_amount: 0, // 待會計確認
+          status: 0, // 待確認
+          receipt_account: item.receipt_account || null,
+          email: item.email || null,
+          payment_name: item.payment_name || null,
+          pay_dateline: item.pay_dateline || null,
+          handler_name: item.handler_name || null,
+          account_info: item.account_info || null,
+          fees: item.fees || null,
+          card_last_four: item.card_last_four || null,
+          auth_code: item.auth_code || null,
+          check_number: item.check_number || null,
+          check_bank: item.check_bank || null,
+          note: item.note || null,
+          created_by: user.id,
+          updated_by: user.id,
+        } as any)
+      }
 
       toast({
         title: '✅ 收款單建立成功',
@@ -95,7 +146,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
       logger.error('❌ Create Receipt Error:', error)
       toast({
         title: '❌ 建立失敗',
-        description: '請稍後再試',
+        description: error instanceof Error ? error.message : '請稍後再試',
         variant: 'destructive',
       })
     }

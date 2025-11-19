@@ -21,8 +21,10 @@ export interface IndexSchema {
  * v1: 完整的 Offline-First 架構，包含所有資料表（含 regions 和 workspace）
  * v2: 新增 countries 和 cities 表（不刪除任何資料）
  * v3: 新增 cost_templates 和 supplier_categories 表（供應商管理系統）
+ * v4: 新增 receipts 和 linkpay_logs 表格
+ * v5: 修復昨天優化後缺失的表格（channel_members, personal_canvases, rich_documents, attractions）
  */
-export const DB_VERSION = 3
+export const DB_VERSION = 5
 
 /**
  * 資料庫名稱
@@ -611,6 +613,21 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     ],
   },
 
+  // 頻道成員
+  {
+    name: 'channel_members',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'channel_id', keyPath: 'channel_id', unique: false },
+      { name: 'user_id', keyPath: 'user_id', unique: false },
+      { name: 'role', keyPath: 'role', unique: false },
+      { name: 'joined_at', keyPath: 'joined_at', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
   // 訊息
   {
     name: 'messages',
@@ -708,6 +725,91 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'employee_id', keyPath: 'employee_id', unique: false },
       { name: 'ticketing_deadline', keyPath: 'ticketing_deadline', unique: false },
       { name: 'status', keyPath: 'status', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 收款單（Receipts）
+  {
+    name: 'receipts',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'receipt_number', keyPath: 'receipt_number', unique: false },
+      { name: 'order_id', keyPath: 'order_id', unique: false },
+      { name: 'payment_method', keyPath: 'payment_method', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // LinkPay 日誌
+  {
+    name: 'linkpay_logs',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'receipt_id', keyPath: 'receipt_id', unique: false },
+      { name: 'link_id', keyPath: 'link_id', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 個人畫布（Personal Canvases）
+  {
+    name: 'personal_canvases',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'user_id', keyPath: 'user_id', unique: false },
+      { name: 'title', keyPath: 'title', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 富文本文件（Rich Documents）
+  {
+    name: 'rich_documents',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'channel_id', keyPath: 'channel_id', unique: false },
+      { name: 'created_by', keyPath: 'created_by', unique: false },
+      { name: 'title', keyPath: 'title', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 景點（Attractions）
+  {
+    name: 'attractions',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'city_id', keyPath: 'city_id', unique: false },
+      { name: 'category', keyPath: 'category', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
       { name: 'created_at', keyPath: 'created_at', unique: false },
       { name: 'updated_at', keyPath: 'updated_at', unique: false },
       // Offline-First 同步欄位
