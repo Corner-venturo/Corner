@@ -29,7 +29,7 @@ export function PublishButton({ data }: { data: any }) {
     features: data.features?.map(({ iconComponent, ...rest }: any) => rest),
     focus_cards: data.focusCards,
     leader: data.leader,
-    meeting_points: data.meetingPoints,
+    meeting_info: data.meetingInfo,  // ✅ 修正：使用 meeting_info 而非 meeting_points
     hotels: data.hotels,
     show_features: data.showFeatures,
     show_leader_meeting: data.showLeaderMeeting,
