@@ -3,7 +3,8 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-// import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { MapPin, Eye, Copy, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -21,6 +22,24 @@ export default function ItineraryPage() {
     useItineraryStore()
   const [statusFilter, setStatusFilter] = useState<string>('全部')
   const [searchTerm, setSearchTerm] = useState('')
+  const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
+
+  // 打開類型選擇對話框
+  const handleOpenTypeSelect = useCallback(() => {
+    setIsTypeSelectOpen(true)
+  }, [])
+
+  // 選擇網頁版行程表
+  const handleSelectWeb = () => {
+    setIsTypeSelectOpen(false)
+    router.push('/itinerary/new')
+  }
+
+  // 選擇紙本行程表
+  const handleSelectPrint = () => {
+    setIsTypeSelectOpen(false)
+    router.push('/itinerary/new?type=print')
+  }
 
   // 載入資料
   React.useEffect(() => {
@@ -208,7 +227,7 @@ export default function ItineraryPage() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋行程..."
-        onAdd={() => router.push('/itinerary/new')}
+        onAdd={handleOpenTypeSelect}
         addLabel="新增行程"
       >
         {/* 狀態篩選 */}
@@ -229,6 +248,31 @@ export default function ItineraryPage() {
           ))}
         </div>
       </ResponsiveHeader>
+
+      {/* 類型選擇對話框 */}
+      <Dialog open={isTypeSelectOpen} onOpenChange={setIsTypeSelectOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>選擇行程表類型</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <Button
+              onClick={handleSelectWeb}
+              className="w-full h-20 flex-col bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <div className="text-lg font-bold">網頁版行程表</div>
+              <div className="text-xs opacity-80">可編輯的動態行程表（適合線上分享）</div>
+            </Button>
+            <Button
+              onClick={handleSelectPrint}
+              className="w-full h-20 flex-col bg-morandi-green hover:bg-morandi-green/90 text-white"
+            >
+              <div className="text-lg font-bold">紙本行程表</div>
+              <div className="text-xs opacity-80">精美列印版本（適合印刷給客戶）</div>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="flex-1 overflow-hidden">
         <div className="h-full">

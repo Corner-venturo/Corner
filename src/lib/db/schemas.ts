@@ -23,8 +23,9 @@ export interface IndexSchema {
  * v3: 新增 cost_templates 和 supplier_categories 表（供應商管理系統）
  * v4: 新增 receipts 和 linkpay_logs 表格
  * v5: 修復昨天優化後缺失的表格（channel_members, personal_canvases, rich_documents, attractions）
+ * v6: 緊急修復 - 重建所有缺失的表格（包含 todos）
  */
-export const DB_VERSION = 5
+export const DB_VERSION = 6
 
 /**
  * 資料庫名稱

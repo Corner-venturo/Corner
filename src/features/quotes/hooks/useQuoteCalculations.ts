@@ -159,12 +159,32 @@ export const useQuoteCalculations = ({
               // 嬰兒：只加給嬰兒
               costs.infant += item.infant_price || 0
             } else {
-              // 其他交通費用（遊覽車等統一價）：成人、小孩佔床、單人房
-              const itemCost = item.unit_price || 0
-              costs.adult += itemCost
-              costs.child_with_bed += itemCost
-              costs.single_room += itemCost
-              // 不佔床和嬰兒不含一般交通
+              // 其他交通費用（如機票、遊覽車等）
+              // 成人價格
+              if (item.adult_price !== undefined && item.adult_price > 0) {
+                costs.adult += item.adult_price
+                costs.single_room += item.adult_price
+              } else {
+                // 如果沒有 adult_price，使用 unit_price
+                const itemCost = item.unit_price || 0
+                costs.adult += itemCost
+                costs.single_room += itemCost
+              }
+
+              // 兒童價格（只有填寫時才加）
+              if (item.child_price !== undefined && item.child_price > 0) {
+                costs.child_with_bed += item.child_price
+                costs.child_no_bed += item.child_price
+              } else if (item.unit_price && item.unit_price > 0) {
+                // 如果沒填兒童價格，但有 unit_price（統一價，如遊覽車）
+                costs.child_with_bed += item.unit_price
+                // 不佔床不含一般交通
+              }
+
+              // 嬰兒價格（只有填寫時才加）
+              if (item.infant_price !== undefined && item.infant_price > 0) {
+                costs.infant += item.infant_price
+              }
             }
           } else if (
             category.id === 'meals' ||

@@ -3,7 +3,7 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { InputIME } from '@/components/ui/input-ime'
 import { StarRating } from '@/components/ui/star-rating'
 import { Check, Calendar, X } from 'lucide-react'
 import { TodoExpandedViewProps } from './types'
@@ -46,9 +46,9 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
               <div className="flex items-center justify-between gap-4">
                 {/* 左邊：標題 */}
                 <div className="flex-1">
-                  <Input
+                  <InputIME
                     value={todo.title}
-                    onChange={e => onUpdate({ title: e.target.value })}
+                    onChange={value => onUpdate({ title: value })}
                     className="text-lg font-bold border-none shadow-none p-0 h-auto focus-visible:ring-0 bg-transparent"
                     placeholder="輸入任務標題..."
                   />

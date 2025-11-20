@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
+import { ArrowRight, Minus, Sparkles } from 'lucide-react'
 
 // 擴展型別（與 AttractionSelector 一致）
 interface AttractionWithCity extends Attraction {
@@ -91,49 +92,101 @@ export function DailyItinerarySection({
           key={dayIndex}
           className="p-6 border border-morandi-container rounded-2xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-white to-morandi-container/10 shadow-sm"
         >
-          <div className="flex justify-between items-start">
-            <div className="flex items-center gap-3">
-              <span className="bg-morandi-gold text-white px-3 py-1.5 rounded-full font-semibold text-sm tracking-wide">
-                {day.dayLabel}
-              </span>
-              <span className="text-morandi-secondary text-sm">{day.date}</span>
-            </div>
-            <button
-              onClick={() => removeDailyItinerary(dayIndex)}
-              className="text-red-500 hover:text-red-700 text-sm font-medium"
-            >
-              刪除此天
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">
-                Day 標籤
-              </label>
-              <input
-                type="text"
-                value={day.dayLabel}
-                onChange={e => updateDailyItinerary(dayIndex, 'dayLabel', e.target.value)}
-                className="w-full px-2 py-1 border rounded text-sm"
-                placeholder="Day 1"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">日期</label>
-              <input
-                type="text"
-                value={day.date}
-                onChange={e => updateDailyItinerary(dayIndex, 'date', e.target.value)}
-                className="w-full px-2 py-1 border rounded text-sm"
-                placeholder="10/21 (二)"
-              />
-            </div>
+          <div className="flex justify-end items-start">
+            {dayIndex === data.dailyItinerary.length - 1 && (
+              <button
+                onClick={() => removeDailyItinerary(dayIndex)}
+                className="text-red-500 hover:text-red-700 text-sm font-medium"
+              >
+                刪除此天
+              </button>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">行程標題</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-morandi-primary">行程標題</label>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    if (input) {
+                      const cursorPos = input.selectionStart || day.title.length
+                      const newValue = day.title.slice(0, cursorPos) + ' → ' + day.title.slice(cursorPos)
+                      updateDailyItinerary(dayIndex, 'title', newValue)
+                      setTimeout(() => {
+                        input.focus()
+                        input.setSelectionRange(cursorPos + 3, cursorPos + 3)
+                      }, 0)
+                    }
+                  }}
+                  className="p-1 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入箭頭"
+                >
+                  <ArrowRight size={14} className="text-morandi-primary" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    if (input) {
+                      const cursorPos = input.selectionStart || day.title.length
+                      const newValue = day.title.slice(0, cursorPos) + ' · ' + day.title.slice(cursorPos)
+                      updateDailyItinerary(dayIndex, 'title', newValue)
+                      setTimeout(() => {
+                        input.focus()
+                        input.setSelectionRange(cursorPos + 3, cursorPos + 3)
+                      }, 0)
+                    }
+                  }}
+                  className="px-2 py-0.5 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入間隔點"
+                >
+                  ·
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    if (input) {
+                      const cursorPos = input.selectionStart || day.title.length
+                      const newValue = day.title.slice(0, cursorPos) + ' | ' + day.title.slice(cursorPos)
+                      updateDailyItinerary(dayIndex, 'title', newValue)
+                      setTimeout(() => {
+                        input.focus()
+                        input.setSelectionRange(cursorPos + 3, cursorPos + 3)
+                      }, 0)
+                    }
+                  }}
+                  className="p-1 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入直線"
+                >
+                  <Minus size={14} className="text-morandi-primary" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    if (input) {
+                      const cursorPos = input.selectionStart || day.title.length
+                      const newValue = day.title.slice(0, cursorPos) + ' ⭐ ' + day.title.slice(cursorPos)
+                      updateDailyItinerary(dayIndex, 'title', newValue)
+                      setTimeout(() => {
+                        input.focus()
+                        input.setSelectionRange(cursorPos + 3, cursorPos + 3)
+                      }, 0)
+                    }
+                  }}
+                  className="p-1 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入星號"
+                >
+                  <Sparkles size={14} className="text-morandi-gold" />
+                </button>
+              </div>
+            </div>
             <input
+              id={`title-input-${dayIndex}`}
               type="text"
               value={day.title}
               onChange={e => updateDailyItinerary(dayIndex, 'title', e.target.value)}
@@ -232,21 +285,12 @@ export function DailyItinerarySection({
                 key={actIndex}
                 className="space-y-2 bg-white/90 p-3 rounded-lg border border-blue-100"
               >
-                <div className="flex flex-wrap items-center gap-2">
-                  <input
-                    type="text"
-                    value={activity.icon}
-                    onChange={e => updateActivity(dayIndex, actIndex, 'icon', e.target.value)}
-                    className="px-2 py-1 border rounded text-sm"
-                    style={{ width: `${Math.max(3, activity.icon.length + 1)}ch` }}
-                    placeholder="🌋"
-                  />
+                <div>
                   <input
                     type="text"
                     value={activity.title}
                     onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
-                    className="px-2 py-1 border rounded text-sm"
-                    style={{ width: `${Math.max(8, activity.title.length + 2)}ch` }}
+                    className="w-full px-3 py-2 border rounded-lg text-sm"
                     placeholder="阿蘇火山"
                   />
                 </div>

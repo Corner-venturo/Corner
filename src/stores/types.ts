@@ -301,34 +301,34 @@ export interface Itinerary {
   title: string
   subtitle: string
   description: string
-  departureDate: string
-  tourCode: string
-  coverImage: string
+  departure_date: string
+  tour_code: string
+  cover_image: string
   country: string
   city: string
   status: 'draft' | 'published'
 
   // 航班資訊
-  outboundFlight?: FlightInfo
-  returnFlight?: FlightInfo
+  outbound_flight?: FlightInfo
+  return_flight?: FlightInfo
 
   // 行程特色
   features: ItineraryFeature[]
 
   // 精選景點
-  focusCards: FocusCard[]
+  focus_cards: FocusCard[]
 
   // 領隊資訊
   leader?: LeaderInfo
 
   // 集合資訊
-  meetingInfo?: MeetingInfo
+  meeting_info?: MeetingInfo
 
   // 行程副標題
-  itinerarySubtitle?: string
+  itinerary_subtitle?: string
 
   // 逐日行程
-  dailyItinerary: DailyItineraryDay[]
+  daily_itinerary: DailyItineraryDay[]
 
   created_at: string
   updated_at: string

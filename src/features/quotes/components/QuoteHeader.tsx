@@ -196,7 +196,14 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           <div className="h-4 w-px bg-morandi-container" />
 
           <Button
-            onClick={handleSave}
+            onClick={() => {
+              // 如果沒有版本記錄，第一次儲存要跳出對話框問版本名稱
+              if (!quote?.versions || quote.versions.length === 0) {
+                setIsSaveDialogOpen(true)
+              } else {
+                handleSave()
+              }
+            }}
             disabled={isReadOnly}
             className={cn(
               'h-8 px-3 text-sm transition-all duration-200',

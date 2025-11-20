@@ -21,16 +21,32 @@ export function handleUpgrade(
     // v0 -> v1: 建立所有資料表（包含 regions 和 workspace）
     if (oldVersion === 0) {
       createAllTables(db)
+      return // 新資料庫，不需要後續升級
     }
 
     // v1 -> v2: 地區系統重構（Countries > Regions > Cities）
-    if (oldVersion === 1 && (newVersion === null || newVersion >= 2)) {
+    if (oldVersion < 2 && (newVersion === null || newVersion >= 2)) {
       upgradeToV2(db)
     }
 
     // v2 -> v3: 新增供應商管理相關表格
-    if (oldVersion === 2 && (newVersion === null || newVersion >= 3)) {
+    if (oldVersion < 3 && (newVersion === null || newVersion >= 3)) {
       upgradeToV3(db)
+    }
+
+    // v3 -> v4: 新增 receipts 和 linkpay_logs 表格
+    if (oldVersion < 4 && (newVersion === null || newVersion >= 4)) {
+      upgradeToV4(db)
+    }
+
+    // v4 -> v5: 修復缺失的表格
+    if (oldVersion < 5 && (newVersion === null || newVersion >= 5)) {
+      upgradeToV5(db)
+    }
+
+    // v5 -> v6: 緊急修復 - 確保所有表格都存在
+    if (oldVersion < 6 && (newVersion === null || newVersion >= 6)) {
+      upgradeToV6(db)
     }
   } catch (error) {
     throw error
@@ -148,6 +164,102 @@ function upgradeToV3(db: IDBDatabase): void {
   }
 
   logger.log('✅ [IndexedDB] v3 升級完成（所有現有資料保留）')
+}
+
+/**
+ * 升級到 v4：新增 receipts 和 linkpay_logs 表格
+ */
+function upgradeToV4(db: IDBDatabase): void {
+  logger.log('🔄 [IndexedDB] 開始升級到 v4（新增 receipts 和 linkpay_logs 表）')
+
+  const receiptsSchema = TABLE_SCHEMAS.find(s => s.name === 'receipts')
+  const linkpayLogsSchema = TABLE_SCHEMAS.find(s => s.name === 'linkpay_logs')
+
+  if (receiptsSchema && !db.objectStoreNames.contains('receipts')) {
+    logger.log('📦 建立 receipts 表')
+    const store = db.createObjectStore(receiptsSchema.name, {
+      keyPath: receiptsSchema.keyPath,
+      autoIncrement: receiptsSchema.autoIncrement,
+    })
+    receiptsSchema.indexes.forEach(index => {
+      store.createIndex(index.name, index.keyPath, { unique: index.unique })
+    })
+  }
+
+  if (linkpayLogsSchema && !db.objectStoreNames.contains('linkpay_logs')) {
+    logger.log('📦 建立 linkpay_logs 表')
+    const store = db.createObjectStore(linkpayLogsSchema.name, {
+      keyPath: linkpayLogsSchema.keyPath,
+      autoIncrement: linkpayLogsSchema.autoIncrement,
+    })
+    linkpayLogsSchema.indexes.forEach(index => {
+      store.createIndex(index.name, index.keyPath, { unique: index.unique })
+    })
+  }
+
+  logger.log('✅ [IndexedDB] v4 升級完成')
+}
+
+/**
+ * 升級到 v5：修復缺失的表格
+ */
+function upgradeToV5(db: IDBDatabase): void {
+  logger.log('🔄 [IndexedDB] 開始升級到 v5（修復缺失的表格）')
+
+  const missingTables = [
+    'channel_members',
+    'personal_canvases',
+    'rich_documents',
+    'attractions',
+    'todos', // ⭐ 重要！加入 todos 表
+  ]
+
+  missingTables.forEach(tableName => {
+    if (!db.objectStoreNames.contains(tableName)) {
+      const schema = TABLE_SCHEMAS.find(s => s.name === tableName)
+      if (schema) {
+        logger.log(`📦 建立 ${tableName} 表`)
+        const store = db.createObjectStore(schema.name, {
+          keyPath: schema.keyPath,
+          autoIncrement: schema.autoIncrement,
+        })
+        schema.indexes.forEach(index => {
+          store.createIndex(index.name, index.keyPath, { unique: index.unique })
+        })
+      }
+    }
+  })
+
+  logger.log('✅ [IndexedDB] v5 升級完成')
+}
+
+/**
+ * 升級到 v6：緊急修復 - 確保所有 schema 中的表格都存在
+ */
+function upgradeToV6(db: IDBDatabase): void {
+  logger.log('🔄 [IndexedDB] 開始升級到 v6（緊急修復 - 確保所有表格存在）')
+
+  let createdCount = 0
+
+  TABLE_SCHEMAS.forEach(schema => {
+    if (!db.objectStoreNames.contains(schema.name)) {
+      logger.log(`📦 建立缺失的表格: ${schema.name}`)
+      const store = db.createObjectStore(schema.name, {
+        keyPath: schema.keyPath,
+        autoIncrement: schema.autoIncrement,
+      })
+      schema.indexes.forEach(index => {
+        store.createIndex(index.name, index.keyPath, { unique: index.unique })
+      })
+      createdCount++
+    }
+  })
+
+  if (createdCount > 0) {
+    logger.log(`✅ [IndexedDB] v6 升級完成（新增 ${createdCount} 個表格）`)
+  } else {
+    logger.log('✅ [IndexedDB] v6 升級完成（所有表格已存在）')
+  }
 }
 
 /**

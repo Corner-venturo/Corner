@@ -587,6 +587,10 @@ export const useAuthStore = create<AuthState>(
               updated_at: new Date().toISOString(),
             }
 
+            // 🔐 設定認證 cookie（快速登入也需要）
+            const token = `quick-login-${profile.id}-${Date.now()}`
+            setSecureCookie(token, false)
+
             set({
               currentProfile: profile,
               user,

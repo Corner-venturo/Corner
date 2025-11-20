@@ -35,16 +35,53 @@ export function AttractionSelector({
   onSelect,
 }: AttractionSelectorProps) {
   const [selectedCountryId, setSelectedCountryId] = useState<string>('')
+  const [selectedCityId, setSelectedCityId] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
   const [attractions, setAttractions] = useState<AttractionWithCity[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+  const [cities, setCities] = useState<{ id: string; name: string }[]>([])
 
   // 序列化 tourCountries 避免無限迴圈
   const tourCountryIds = useMemo(
     () => tourCountries.map(c => c.country_id).filter(Boolean),
     [tourCountries]
   )
+
+  // 打開對話框時清空選擇
+  React.useEffect(() => {
+    if (isOpen) {
+      setSelectedIds(new Set())
+      setSearchQuery('')
+      setSelectedCityId('')
+    }
+  }, [isOpen])
+
+  // 載入城市列表（根據選擇的國家）
+  React.useEffect(() => {
+    if (!isOpen || !selectedCountryId) {
+      setCities([])
+      return
+    }
+
+    const loadCities = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cities')
+          .select('id, name')
+          .eq('country_id', selectedCountryId)
+          .eq('is_active', true)
+          .order('name')
+
+        if (error) throw error
+        setCities(data || [])
+      } catch (error) {
+        setCities([])
+      }
+    }
+
+    loadCities()
+  }, [isOpen, selectedCountryId])
 
   // 載入景點資料
   React.useEffect(() => {
@@ -74,8 +111,11 @@ export function AttractionSelector({
           .eq('is_active', true)
           .order('name')
 
-        // 如果有選擇國家，篩選該國家的景點
-        if (selectedCountryId) {
+        // 如果有選擇城市，篩選該城市的景點
+        if (selectedCityId) {
+          query = query.eq('city_id', selectedCityId)
+        } else if (selectedCountryId) {
+          // 如果有選擇國家，篩選該國家的景點
           query = query.eq('country_id', selectedCountryId)
         } else if (tourCountryIds.length > 0) {
           // 如果沒選擇國家，但行程有設定國家，就篩選這些國家的景點
@@ -110,7 +150,7 @@ export function AttractionSelector({
 
     loadAttractions()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, selectedCountryId, tourCountryIds.join(',')])
+  }, [isOpen, selectedCountryId, selectedCityId, tourCountryIds.join(',')])
 
   // 搜尋過濾
   const filteredAttractions = useMemo(() => {
@@ -172,6 +212,7 @@ export function AttractionSelector({
                 value={selectedCountryId}
                 onChange={e => {
                   setSelectedCountryId(e.target.value)
+                  setSelectedCityId('')
                   setSearchQuery('')
                 }}
                 className="px-3 py-2 border rounded-lg text-sm bg-white min-w-[150px]"
@@ -180,6 +221,25 @@ export function AttractionSelector({
                 {tourCountries.map(country => (
                   <option key={country.country_id} value={country.country_id}>
                     {country.country_name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* 城市選擇 */}
+            {selectedCountryId && cities.length > 0 && (
+              <select
+                value={selectedCityId}
+                onChange={e => {
+                  setSelectedCityId(e.target.value)
+                  setSearchQuery('')
+                }}
+                className="px-3 py-2 border rounded-lg text-sm bg-white min-w-[150px]"
+              >
+                <option value="">全部城市</option>
+                {cities.map(city => (
+                  <option key={city.id} value={city.id}>
+                    {city.name}
                   </option>
                 ))}
               </select>

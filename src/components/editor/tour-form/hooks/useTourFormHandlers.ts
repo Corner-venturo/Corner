@@ -60,7 +60,9 @@ export function useTourFormHandlers(
     const updatedFlight = { ...data[flightType], [field]: value }
 
     // 自動計算飛行時間
-    const timeDiff = timezoneOffset[selectedCountry] || 0
+    const baseTimeDiff = timezoneOffset[selectedCountry] || 0
+    // 回程時差方向相反（從目的地飛回台灣，要減去時差）
+    const timeDiff = flightType === 'returnFlight' ? -baseTimeDiff : baseTimeDiff
     if (field === 'departureTime' || field === 'arrivalTime') {
       const depTime = field === 'departureTime' ? value : updatedFlight.departureTime
       const arrTime = field === 'arrivalTime' ? value : updatedFlight.arrivalTime

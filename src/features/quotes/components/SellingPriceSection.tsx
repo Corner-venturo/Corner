@@ -90,9 +90,9 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
     // 計算新的成本（傳入原始人數用於還原團體費用）
     const newCosts = calculateTierPricingCosts(categories, newCounts, participantCounts)
 
-    // 建立新的檻次表
+    // 建立新的檻次表（使用更可靠的 ID 生成方式）
     const newTier: TierPricing = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       participant_count: count,
       participant_counts: newCounts,
       identity_costs: newCosts,

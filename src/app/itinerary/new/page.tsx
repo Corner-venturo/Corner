@@ -6,6 +6,9 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TourForm } from '@/components/editor/TourForm'
 import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
+import { PrintItineraryForm } from '@/features/itinerary/components/PrintItineraryForm'
+import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
+import { Button } from '@/components/ui/button'
 import { useTourStore, useRegionsStore } from '@/stores'
 import {
   Building2,
@@ -14,6 +17,7 @@ import {
   Calendar,
   Plane,
   MapPin,
+  Printer,
 } from 'lucide-react'
 
 // Icon mapping
@@ -255,6 +259,7 @@ function NewItineraryPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tourId = searchParams.get('tour_id')
+  const type = searchParams.get('type') // 'print' or null (web)
   const { items: tours } = useTourStore()
   const { countries, cities } = useRegionsStore()
 
@@ -262,8 +267,157 @@ function NewItineraryPageContent() {
   const [scale, setScale] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
   const mobileContentRef = useRef<HTMLDivElement>(null)
-  const [tourData, setTourData] = useState(getDefaultTourData())
+  const [tourData, setTourData] = useState({
+    tagline: 'Corner Travel 2025',
+    title: '',
+    subtitle: '',
+    description: '',
+    departureDate: '',
+    tourCode: '',
+    coverImage: '',
+    country: '',
+    city: '',
+    status: '草稿',
+    outboundFlight: {
+      airline: '',
+      flightNumber: '',
+      departureAirport: 'TPE',
+      departureTime: '',
+      departureDate: '',
+      arrivalAirport: '',
+      arrivalTime: '',
+      duration: '',
+    },
+    returnFlight: {
+      airline: '',
+      flightNumber: '',
+      departureAirport: '',
+      departureTime: '',
+      departureDate: '',
+      arrivalAirport: 'TPE',
+      arrivalTime: '',
+      duration: '',
+    },
+    features: [],
+    focusCards: [],
+    leader: {
+      name: '',
+      domesticPhone: '',
+      overseasPhone: '',
+    },
+    meetingInfo: {
+      time: '',
+      location: '',
+    },
+    itinerarySubtitle: '',
+    dailyItinerary: [],
+  })
   const [loading, setLoading] = useState(true)
+
+  // Print itinerary data
+  const [printData, setPrintData] = useState({
+    // 封面
+    coverImage: '',
+    tagline: '角落嚴選行程',
+    taglineEn: 'EXPLORE EVERY CORNER OF THE WORLD',
+    title: '越南峴港經典五日',
+    subtitle: '峴港的晨曦喚醒沉睡的古城，海風捎來遠方的故事\n在黃牆老屋與法式城堡之間，找到屬於自己的越式慢時光',
+    price: '35,500',
+    priceNote: '8人包團',
+    country: '越南',
+    city: '峴港',
+
+    // 每日行程
+    dailySchedule: [
+      {
+        day: 'D1',
+        route: '桃園國際機場 > 峴港國際機場 > 五行山（含上下電梯）> 會安古鎮 > 飯店休憩',
+        meals: { breakfast: '機上餐食', lunch: 'Bep Cuon', dinner: 'HOME Hoi An' },
+        accommodation: '日出大宮殿飯店 Grand Sunrise Palace Hoi An 或 同級',
+      },
+      {
+        day: 'D2',
+        route: '晨喚 > 迦南島（竹筏體驗）> 美山聖地 > 越式按摩（2hrs）> 飯店休憩',
+        meals: { breakfast: '飯店用餐', lunch: '海鮮火鍋', dinner: 'Morning Glory Original' },
+        accommodation: '日出大宮殿飯店 Grand Sunrise Palace Hoi An 或 同級',
+      },
+      {
+        day: 'D3',
+        route: '晨喚 > 南會安珍珠奇幻樂園 > 會安印象主題公園 > 會安印象秀 > 飯店休憩',
+        meals: { breakfast: '飯店用餐', lunch: '敬請自理', dinner: 'Non La 斗笠餐廳' },
+        accommodation: '日出大宮殿飯店 Grand Sunrise Palace Hoi An 或 同級',
+      },
+      {
+        day: 'D4',
+        route: '晨喚 > 巴拿山（登山纜車、黃金佛手橋、法式莊園、奇幻樂園）> 飯店休憩 > 山茶夜市（自由前往）',
+        meals: { breakfast: '飯店用餐', lunch: '園區自助餐', dinner: 'All Seasons 四季餐廳' },
+        accommodation: '峴港M飯店 M Hotel Danang 或 同級',
+      },
+      {
+        day: 'D5',
+        route: '晨喚 > 美溪沙灘（自由前往）> 峴港大教堂（外觀不入內）> 峴港國際機場 > 桃園國際機場',
+        meals: { breakfast: '飯店用餐', lunch: '法國麵包+飲品', dinner: '機上餐食' },
+        accommodation: '',
+      },
+    ],
+
+    // 航班
+    flightOptions: [
+      {
+        airline: '長榮航空',
+        outbound: { code: 'BR-383', from: '桃園國際機場', fromCode: 'TPE', time: '09:45', to: '峴港國際機場', toCode: 'DAD', arrivalTime: '11:40' },
+        return: { code: 'BR-384', from: '峴港國際機場', fromCode: 'DAD', time: '13:30', to: '桃園國際機場', toCode: 'TPE', arrivalTime: '16:50' },
+      },
+      {
+        airline: '中華航空',
+        outbound: { code: 'CI-787', from: '桃園國際機場', fromCode: 'TPE', time: '07:15', to: '峴港國際機場', toCode: 'DAD', arrivalTime: '09:10' },
+        return: { code: 'CI-790', from: '峴港國際機場', fromCode: 'DAD', time: '17:35', to: '桃園國際機場', toCode: 'TPE', arrivalTime: '21:20' },
+      },
+    ],
+
+    // 行程特色
+    highlightImages: ['', '', ''],
+    highlightSpots: [
+      {
+        name: '會安古鎮',
+        nameEn: 'Hoi An Ancient Town',
+        tags: ['特色景點', '必訪景點'],
+        description: '會安古鎮是越南世界文化遺產，黃牆古厝與絲綢燈籠交織，夜晚倒映河面如夢似幻，是體驗越南古典韻味的絕佳去處。',
+      },
+      {
+        name: '美山聖地',
+        nameEn: 'My Son Sanctuary',
+        tags: ['必訪景點', '特色景點'],
+        description: '美山聖地是占婆王國遺址，紅磚聖殿群見證4至13世紀文明，精緻雕刻展現印度教文化影響，是越南的吳哥窟世界遺產。',
+      },
+      {
+        name: '美溪沙灘',
+        nameEn: 'My Khe Beach',
+        tags: ['必訪景點', '特色景點'],
+        description: '美溪沙灘綿延10公里潔白細沙，2005年獲選世界六大最美海灘，碧藍海水柔軟沙灘，適合衝浪戲水品嚐海鮮的度假天堂。',
+      },
+    ],
+
+    // 景點介紹
+    sights: [
+      {
+        name: '五行山',
+        nameEn: 'Marble Mountains',
+        description: '五行山是峴港最具靈性的自然奇景，由五座石灰岩山峰組成，分別代表金、木、水、火、土五行元素。山中遍布神秘洞穴、古老佛寺與精緻石雕，其中華嚴洞和玄空洞最為壯觀，陽光從洞頂灑落的景象令人屏息。登上山頂可俯瞰峴港市區與美溪沙灘的絕美全景。這裡不僅是重要的佛教聖地，山腳下的石雕村更展現精湛的大理石工藝，是感受越南文化與自然之美的必訪之地。',
+      },
+      {
+        name: '迦南島',
+        nameEn: 'Cam Thanh',
+        description: '迦南島是會安近郊的水椰林秘境，這片原始生態村落以茂密的水椰樹林聞名，搭乘傳統竹籃船穿梭其間，是最受歡迎的體驗。船夫會展示精湛的划船技巧，讓竹籃船在水道中旋轉，充滿歡樂與驚喜。島上居民世代以捕魚為生，遊客可親自體驗撒網捕魚、製作椰葉工藝品，感受純樸的鄉村生活。這裡遠離都市喧囂，是探索越南田園風光的絕佳去處。',
+      },
+      {
+        name: '南會安珍珠奇幻樂園',
+        nameEn: 'VinWonders Nam Hoi An',
+        description: '南會安珍珠奇幻樂園是越南最大的主題樂園之一，結合陸地遊樂設施與水上樂園雙重體驗。園區擁有刺激的雲霄飛車、夢幻旋轉木馬等多樣設施，水上樂園更設有巨型滑水道與漂漂河。特色越南文化表演與河內水上木偶戲讓遊客深度認識越南傳統。',
+        note: '圖片取自VinWonders Nam Hoi An官方網站，僅作為行程示意使用，版權歸原網站所有',
+      },
+    ],
+  })
 
   // 使用 ref 追蹤是否已初始化，避免使用者編輯被覆蓋
   const hasInitializedRef = useRef(false)
@@ -473,15 +627,71 @@ function NewItineraryPageContent() {
     )
   }
 
+  // 列印版行程表
+  if (type === 'print') {
+    return (
+      <div className="h-full flex flex-col">
+        {/* 頁面頂部區域 */}
+        <ResponsiveHeader
+          title="新增紙本行程表"
+          breadcrumb={[
+            { label: '首頁', href: '/' },
+            { label: '行程管理', href: '/itinerary' },
+            { label: '新增紙本行程表', href: '#' },
+          ]}
+          showBackButton={true}
+          onBack={() => router.push('/itinerary')}
+          actions={
+            <Button
+              onClick={() => window.print()}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <Printer size={16} className="mr-2" />
+              列印
+            </Button>
+          }
+        />
+
+        {/* 主要內容區域 */}
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full flex">
+            {/* 左側：輸入表單 */}
+            <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col print:hidden">
+              <div className="h-14 bg-morandi-green/90 text-white px-6 flex items-center border-b border-morandi-container">
+                <h2 className="text-lg font-semibold">編輯表單</h2>
+              </div>
+              <div className="flex-1 overflow-y-auto bg-white">
+                <PrintItineraryForm data={printData} onChange={setPrintData} />
+              </div>
+            </div>
+
+            {/* 右側：即時預覽 */}
+            <div className="w-1/2 bg-gray-100 flex flex-col print:w-full">
+              <div className="h-14 bg-white border-b px-6 flex items-center justify-between print:hidden">
+                <h2 className="text-lg font-semibold text-morandi-primary">列印預覽</h2>
+                <div className="text-sm text-gray-600">A4 尺寸 (210mm × 297mm)</div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 print:p-0">
+                <PrintItineraryPreview data={printData} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // 網頁版行程表（原本的）
   return (
     <div className="h-full flex flex-col">
       {/* ========== 頁面頂部區域 ========== */}
       <ResponsiveHeader
-        title="新增行程"
+        title="新增網頁行程"
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '行程管理', href: '/itinerary' },
-          { label: '新增行程', href: '#' },
+          { label: '新增網頁行程', href: '#' },
         ]}
         showBackButton={true}
         onBack={() => router.push('/itinerary')}
@@ -492,8 +702,8 @@ function NewItineraryPageContent() {
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
           {/* 左側：輸入表單 */}
-          <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col">
-            <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center border-b border-morandi-container">
+          <div className="w-1/2 bg-white border-r border-gray-200 flex flex-col">
+            <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center border-b border-gray-200">
               <h2 className="text-lg font-semibold">編輯表單</h2>
             </div>
             <div className="flex-1 overflow-y-auto bg-white">
@@ -502,7 +712,7 @@ function NewItineraryPageContent() {
           </div>
 
           {/* 右側：即時預覽 */}
-          <div className="w-1/2 bg-gray-100 flex flex-col">
+          <div className="w-1/2 bg-white flex flex-col">
             {/* 標題列 */}
             <div className="h-14 bg-white border-b px-6 flex items-center justify-between">
               <div className="flex items-center gap-4">

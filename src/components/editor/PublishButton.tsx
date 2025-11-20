@@ -11,30 +11,98 @@ export function PublishButton({ data }: { data: any }) {
   const { user } = useAuthStore()
   const router = useRouter()
 
+  // 轉換資料格式（camelCase → snake_case）
+  const convertData = () => ({
+    tour_id: data.tourId || undefined,
+    tagline: data.tagline,
+    title: data.title,
+    subtitle: data.subtitle,
+    description: data.description,
+    departure_date: data.departureDate,
+    tour_code: data.tourCode,
+    cover_image: data.coverImage,
+    country: data.country,
+    city: data.city,
+    status: data.status || 'draft',
+    outbound_flight: data.outboundFlight,
+    return_flight: data.returnFlight,
+    features: data.features?.map(({ iconComponent, ...rest }: any) => rest),
+    focus_cards: data.focusCards,
+    leader: data.leader,
+    meeting_points: data.meetingPoints,
+    hotels: data.hotels,
+    show_features: data.showFeatures,
+    show_leader_meeting: data.showLeaderMeeting,
+    show_hotels: data.showHotels,
+    itinerary_subtitle: data.itinerarySubtitle,
+    daily_itinerary: data.dailyItinerary,
+  })
+
+  // 儲存（覆蓋目前版本）
   const saveItinerary = async () => {
     setSaving(true)
-
     try {
-      // 清理資料：移除 React 組件（iconComponent）避免序列化錯誤
-      const cleanedData = {
-        ...data,
-        features: data.features?.map(({ iconComponent, ...rest }: any) => rest),
-      }
+      const convertedData = convertData()
 
-      // 如果有 ID 就更新，沒有就新增
       if (data.id) {
-        await update(data.id, cleanedData)
-        alert('✅ 更新行程表成功！')
+        // 更新目前版本
+        await update(data.id, convertedData)
+        alert('✅ 儲存成功！')
       } else {
-        const newItinerary = await create(cleanedData)
+        // 第一次建立
+        const newItinerary = await create({
+          ...convertedData,
+          version: 1,
+          is_latest: true,
+        })
         alert('✅ 儲存行程表成功！')
-        // 新增後跳轉到編輯頁面
-        if (newItinerary && newItinerary.id) {
+
+        if (newItinerary?.id) {
           router.replace(`/itinerary/${newItinerary.id}`)
         }
       }
     } catch (error) {
-      alert('❌ 儲存失敗，請稍後再試')
+      console.error('儲存失敗:', error)
+      alert('❌ 儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // 另存新版本
+  const saveAsNewVersion = async () => {
+    if (!data.id) {
+      alert('⚠️ 請先儲存行程表才能另存新版本')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const baseData = convertData()
+      const currentVersion = data.version || 1
+
+      // 建立新版本
+      const newVersionData = {
+        ...baseData,
+        parent_id: data.id,
+        version: currentVersion + 1,
+        is_latest: true,
+      }
+
+      // 先將舊版本的 is_latest 設為 false
+      await update(data.id, { is_latest: false })
+
+      // 建立新版本
+      const newVersion = await create(newVersionData)
+      alert(`✅ 已另存為新版本 v${currentVersion + 1}`)
+
+      // 跳轉到新版本
+      if (newVersion?.id) {
+        router.replace(`/itinerary/${newVersion.id}`)
+      }
+    } catch (error) {
+      console.error('另存新版本失敗:', error)
+      alert('❌ 另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
     } finally {
       setSaving(false)
     }
@@ -66,21 +134,50 @@ export function PublishButton({ data }: { data: any }) {
 
   return (
     <div className="flex items-center gap-2">
+      {/* 版本號顯示 */}
+      {isEditMode && data.version && (
+        <span className="text-sm text-morandi-secondary font-medium">
+          v{data.version}
+        </span>
+      )}
+
+      {/* 儲存按鈕 */}
       <button
         onClick={saveItinerary}
         disabled={saving}
         className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
       >
-        {saving ? '儲存中...' : isEditMode ? '💾 更新行程表' : '💾 存檔行程表'}
+        {saving ? '儲存中...' : isEditMode ? '💾 儲存' : '💾 儲存行程表'}
       </button>
 
+      {/* 另存新版本按鈕（僅編輯模式顯示） */}
       {isEditMode && (
-        <button
-          onClick={generateShareLink}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-        >
-          🔗 產生連結
-        </button>
+        <>
+          <button
+            onClick={saveAsNewVersion}
+            disabled={saving}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+          >
+            📋 另存為 v{(data.version || 1) + 1}
+          </button>
+
+          <button
+            onClick={generateShareLink}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            🔗 產生連結
+          </button>
+
+          <button
+            onClick={() => {
+              // TODO: 實作歷史版本查看功能
+              alert('📜 歷史版本功能開發中...')
+            }}
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            📜 歷史版本
+          </button>
+        </>
       )}
     </div>
   )

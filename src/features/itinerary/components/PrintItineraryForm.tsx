@@ -1,0 +1,513 @@
+'use client'
+
+import React, { useEffect } from 'react'
+import { InputIME } from '@/components/ui/input-ime'
+import { Button } from '@/components/ui/button'
+import { Plus, Trash2 } from 'lucide-react'
+import { useRegionsStore } from '@/stores'
+
+// 使用與 Preview 相同的型別定義
+interface DailyScheduleItem {
+  day: string
+  route: string
+  meals: { breakfast: string; lunch: string; dinner: string }
+  accommodation: string
+}
+
+interface FlightOption {
+  airline: string
+  outbound: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
+  return: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
+}
+
+interface HighlightSpot {
+  name: string
+  nameEn: string
+  tags: string[]
+  description: string
+}
+
+interface SightDetail {
+  name: string
+  nameEn: string
+  description: string
+  note?: string
+}
+
+interface PrintItineraryData {
+  coverImage: string
+  tagline: string
+  taglineEn: string
+  title: string
+  subtitle: string
+  price: string
+  priceNote: string
+  country: string
+  city: string
+  dailySchedule: DailyScheduleItem[]
+  flightOptions: FlightOption[]
+  highlightImages: string[]
+  highlightSpots: HighlightSpot[]
+  sights: SightDetail[]
+}
+
+interface PrintItineraryFormProps {
+  data: PrintItineraryData
+  onChange: (data: PrintItineraryData) => void
+}
+
+export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) {
+  const { countries, cities, fetchCountries, fetchCitiesByCountry } = useRegionsStore()
+
+  // 載入國家和城市資料
+  useEffect(() => {
+    fetchCountries()
+  }, [fetchCountries])
+
+  useEffect(() => {
+    if (data.country) {
+      const country = countries.find(c => c.name === data.country)
+      if (country) {
+        fetchCitiesByCountry(country.id)
+      }
+    }
+  }, [data.country, countries, fetchCitiesByCountry])
+
+  const updateField = <K extends keyof PrintItineraryData>(field: K, value: PrintItineraryData[K]) => {
+    onChange({ ...data, [field]: value })
+  }
+
+  // 當選擇城市時，自動設定封面圖片
+  const handleCityChange = (cityName: string) => {
+    updateField('city', cityName)
+
+    const selectedCity = cities.find(c => c.name === cityName)
+    if (selectedCity) {
+      // 使用 primary_image 來決定使用哪張圖片
+      const primaryImage = selectedCity.primary_image === 2
+        ? selectedCity.background_image_url_2
+        : selectedCity.background_image_url
+
+      if (primaryImage) {
+        updateField('coverImage', primaryImage)
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-6 p-6">
+      {/* 封面資訊 */}
+      <section>
+        <h3 className="text-base font-bold text-morandi-primary mb-3 pb-2 border-b border-morandi-container">
+          封面資訊
+        </h3>
+        <div className="space-y-3">
+          {/* 國家和城市選擇 */}
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
+              <select
+                value={data.country}
+                onChange={e => updateField('country', e.target.value)}
+                className="w-full text-sm border border-gray-300 rounded-md p-2 h-9 bg-white relative z-10"
+              >
+                <option value="">選擇國家</option>
+                {countries
+                  .filter(c => c.is_active)
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map(country => (
+                    <option key={country.id} value={country.name}>
+                      {country.emoji ? `${country.emoji} ` : ''}{country.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">城市</label>
+              <select
+                value={data.city}
+                onChange={e => handleCityChange(e.target.value)}
+                className="w-full text-sm border border-gray-300 rounded-md p-2 h-9 bg-white relative z-10"
+                disabled={!data.country}
+              >
+                <option value="">選擇城市</option>
+                {cities
+                  .filter(c => {
+                    const country = countries.find(co => co.name === data.country)
+                    return country && c.country_id === country.id && c.is_active
+                  })
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map(city => (
+                    <option key={city.id} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">標題</label>
+            <InputIME
+              value={data.title}
+              onChange={value => updateField('title', value)}
+              placeholder="例如：越南峴港經典五日"
+              className="w-full text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">副標題 (詩意文案，用換行分隔)</label>
+            <textarea
+              value={data.subtitle}
+              onChange={e => updateField('subtitle', e.target.value)}
+              placeholder="第一行文案&#10;第二行文案"
+              className="w-full text-sm border border-gray-300 rounded-md p-2 min-h-[60px]"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">價格 (不含NT$和起)</label>
+              <InputIME
+                value={data.price}
+                onChange={value => updateField('price', value)}
+                placeholder="35,500"
+                className="w-full text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">價格備註</label>
+              <InputIME
+                value={data.priceNote}
+                onChange={value => updateField('priceNote', value)}
+                placeholder="8人包團"
+                className="w-full text-sm"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 每日行程 */}
+      <section>
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
+          <h3 className="text-base font-bold text-morandi-primary">每日行程</h3>
+          <Button
+            onClick={() => {
+              updateField('dailySchedule', [
+                ...data.dailySchedule,
+                {
+                  day: `D${data.dailySchedule.length + 1}`,
+                  route: '',
+                  meals: { breakfast: '', lunch: '', dinner: '' },
+                  accommodation: '',
+                },
+              ])
+            }}
+            size="sm"
+            className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
+          >
+            <Plus size={14} className="mr-1" />
+            新增天數
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {data.dailySchedule.map((day, idx) => (
+            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#F89520]">{day.day}</span>
+                <Button
+                  onClick={() => {
+                    updateField(
+                      'dailySchedule',
+                      data.dailySchedule.filter((_, i) => i !== idx)
+                    )
+                  }}
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 size={12} />
+                </Button>
+              </div>
+              <div className="space-y-2">
+                <InputIME
+                  value={day.route}
+                  onChange={value => {
+                    const newSchedule = [...data.dailySchedule]
+                    newSchedule[idx].route = value
+                    updateField('dailySchedule', newSchedule)
+                  }}
+                  placeholder="路線 (用 > 分隔景點)"
+                  className="w-full text-xs"
+                />
+                <div className="grid grid-cols-3 gap-1">
+                  <InputIME
+                    value={day.meals.breakfast}
+                    onChange={value => {
+                      const newSchedule = [...data.dailySchedule]
+                      newSchedule[idx].meals.breakfast = value
+                      updateField('dailySchedule', newSchedule)
+                    }}
+                    placeholder="早餐"
+                    className="text-xs h-8"
+                  />
+                  <InputIME
+                    value={day.meals.lunch}
+                    onChange={value => {
+                      const newSchedule = [...data.dailySchedule]
+                      newSchedule[idx].meals.lunch = value
+                      updateField('dailySchedule', newSchedule)
+                    }}
+                    placeholder="午餐"
+                    className="text-xs h-8"
+                  />
+                  <InputIME
+                    value={day.meals.dinner}
+                    onChange={value => {
+                      const newSchedule = [...data.dailySchedule]
+                      newSchedule[idx].meals.dinner = value
+                      updateField('dailySchedule', newSchedule)
+                    }}
+                    placeholder="晚餐"
+                    className="text-xs h-8"
+                  />
+                </div>
+                <InputIME
+                  value={day.accommodation}
+                  onChange={value => {
+                    const newSchedule = [...data.dailySchedule]
+                    newSchedule[idx].accommodation = value
+                    updateField('dailySchedule', newSchedule)
+                  }}
+                  placeholder="住宿飯店"
+                  className="w-full text-xs"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 航班資訊 */}
+      <section>
+        <h3 className="text-base font-bold text-morandi-primary mb-3 pb-2 border-b border-morandi-container">
+          參考航班
+        </h3>
+        <div className="space-y-4 text-xs">
+          {data.flightOptions.map((option, idx) => (
+            <div key={idx} className="bg-orange-50 p-3 rounded border border-orange-200">
+              <div className="font-semibold text-gray-700 mb-2">{option.airline}</div>
+              <div className="space-y-2">
+                <div className="grid grid-cols-3 gap-1">
+                  <InputIME
+                    value={option.outbound.code}
+                    onChange={value => {
+                      const newOptions = [...data.flightOptions]
+                      newOptions[idx].outbound.code = value
+                      updateField('flightOptions', newOptions)
+                    }}
+                    placeholder="航班號"
+                    className="text-xs h-7"
+                  />
+                  <InputIME
+                    value={option.outbound.time}
+                    onChange={value => {
+                      const newOptions = [...data.flightOptions]
+                      newOptions[idx].outbound.time = value
+                      updateField('flightOptions', newOptions)
+                    }}
+                    placeholder="出發"
+                    className="text-xs h-7"
+                  />
+                  <InputIME
+                    value={option.outbound.arrivalTime}
+                    onChange={value => {
+                      const newOptions = [...data.flightOptions]
+                      newOptions[idx].outbound.arrivalTime = value
+                      updateField('flightOptions', newOptions)
+                    }}
+                    placeholder="抵達"
+                    className="text-xs h-7"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-1">
+                  <InputIME
+                    value={option.return.code}
+                    onChange={value => {
+                      const newOptions = [...data.flightOptions]
+                      newOptions[idx].return.code = value
+                      updateField('flightOptions', newOptions)
+                    }}
+                    placeholder="航班號"
+                    className="text-xs h-7"
+                  />
+                  <InputIME
+                    value={option.return.time}
+                    onChange={value => {
+                      const newOptions = [...data.flightOptions]
+                      newOptions[idx].return.time = value
+                      updateField('flightOptions', newOptions)
+                    }}
+                    placeholder="出發"
+                    className="text-xs h-7"
+                  />
+                  <InputIME
+                    value={option.return.arrivalTime}
+                    onChange={value => {
+                      const newOptions = [...data.flightOptions]
+                      newOptions[idx].return.arrivalTime = value
+                      updateField('flightOptions', newOptions)
+                    }}
+                    placeholder="抵達"
+                    className="text-xs h-7"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 行程特色 */}
+      <section>
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
+          <h3 className="text-base font-bold text-morandi-primary">行程特色</h3>
+          <Button
+            onClick={() => {
+              updateField('highlightSpots', [
+                ...data.highlightSpots,
+                { name: '', nameEn: '', tags: ['特色景點'], description: '' },
+              ])
+            }}
+            size="sm"
+            className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
+          >
+            <Plus size={14} className="mr-1" />
+            新增
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {data.highlightSpots.map((spot, idx) => (
+            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+              <div className="flex items-start justify-between mb-2">
+                <InputIME
+                  value={spot.name}
+                  onChange={value => {
+                    const newSpots = [...data.highlightSpots]
+                    newSpots[idx].name = value
+                    updateField('highlightSpots', newSpots)
+                  }}
+                  placeholder="景點名稱"
+                  className="flex-1 text-xs h-7 font-semibold"
+                />
+                <Button
+                  onClick={() => {
+                    updateField(
+                      'highlightSpots',
+                      data.highlightSpots.filter((_, i) => i !== idx)
+                    )
+                  }}
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-red-600"
+                >
+                  <Trash2 size={12} />
+                </Button>
+              </div>
+              <InputIME
+                value={spot.nameEn}
+                onChange={value => {
+                  const newSpots = [...data.highlightSpots]
+                  newSpots[idx].nameEn = value
+                  updateField('highlightSpots', newSpots)
+                }}
+                placeholder="英文名稱"
+                className="w-full text-xs h-7 mb-2"
+              />
+              <textarea
+                value={spot.description}
+                onChange={e => {
+                  const newSpots = [...data.highlightSpots]
+                  newSpots[idx].description = e.target.value
+                  updateField('highlightSpots', newSpots)
+                }}
+                placeholder="景點描述"
+                className="w-full text-xs border border-gray-300 rounded-md p-2 min-h-[50px]"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 景點介紹 */}
+      <section>
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
+          <h3 className="text-base font-bold text-morandi-primary">景點介紹</h3>
+          <Button
+            onClick={() => {
+              updateField('sights', [
+                ...data.sights,
+                { name: '', nameEn: '', description: '' },
+              ])
+            }}
+            size="sm"
+            className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
+          >
+            <Plus size={14} className="mr-1" />
+            新增
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {data.sights.map((sight, idx) => (
+            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+              <div className="flex items-start justify-between mb-2">
+                <InputIME
+                  value={sight.name}
+                  onChange={value => {
+                    const newSights = [...data.sights]
+                    newSights[idx].name = value
+                    updateField('sights', newSights)
+                  }}
+                  placeholder="景點名稱"
+                  className="flex-1 text-xs h-7 font-semibold"
+                />
+                <Button
+                  onClick={() => {
+                    updateField(
+                      'sights',
+                      data.sights.filter((_, i) => i !== idx)
+                    )
+                  }}
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-red-600"
+                >
+                  <Trash2 size={12} />
+                </Button>
+              </div>
+              <InputIME
+                value={sight.nameEn}
+                onChange={value => {
+                  const newSights = [...data.sights]
+                  newSights[idx].nameEn = value
+                  updateField('sights', newSights)
+                }}
+                placeholder="英文名稱"
+                className="w-full text-xs h-7 mb-2"
+              />
+              <textarea
+                value={sight.description}
+                onChange={e => {
+                  const newSights = [...data.sights]
+                  newSights[idx].description = e.target.value
+                  updateField('sights', newSights)
+                }}
+                placeholder="詳細描述"
+                className="w-full text-xs border border-gray-300 rounded-md p-2 min-h-[60px]"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}

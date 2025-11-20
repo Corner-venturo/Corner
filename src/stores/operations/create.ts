@@ -130,6 +130,7 @@ export async function create<T extends BaseEntity>(
       'tour_participants',
       'itinerary_days',
       'itinerary_activities',
+      'itineraries', // ✅ 新增：行程表（會從 tour_id 關聯取得 workspace_id）
     ]
     const shouldAddWorkspaceId = !tablesWithoutWorkspaceId.includes(tableName)
 

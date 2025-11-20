@@ -15,7 +15,7 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
   /**
    * 取得所有資料（帶超時保護）
    */
-  async getAll(timeout = 3000): Promise<T[]> {
+  async getAll(timeout = 10000): Promise<T[]> {
     try {
       const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('IndexedDB_TIMEOUT')), timeout)
@@ -27,7 +27,7 @@ export class IndexedDBAdapter<T extends BaseEntity> implements StorageAdapter<T>
       return data.filter(item => !('_deleted' in item && item._deleted))
     } catch (error) {
       if (error instanceof Error && error.message === 'IndexedDB_TIMEOUT') {
-        logger.warn(`⏱️ [${this.tableName}] IndexedDB 初始化超時`)
+        logger.warn(`⏱️ [${this.tableName}] IndexedDB 初始化超時，返回空陣列`)
         return []
       }
       throw error

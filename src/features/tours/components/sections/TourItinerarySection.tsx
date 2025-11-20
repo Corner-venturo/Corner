@@ -8,6 +8,7 @@ import {
   AttractionCard,
   DecorativeDivider,
 } from '@/components/tour-preview'
+import { ArrowRight, Sparkles } from 'lucide-react'
 
 interface TourItinerarySectionProps {
   data: any
@@ -15,6 +16,37 @@ interface TourItinerarySectionProps {
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
+}
+
+// 將標題中的文字符號轉換成 SVG 圖標
+function renderTitleWithIcons(title: string) {
+  const parts = title.split(/(\s→\s|\s·\s|\s\|\s|\s⭐\s)/g)
+
+  return parts.map((part, index) => {
+    if (part === ' → ') {
+      return (
+        <ArrowRight
+          key={index}
+          size={16}
+          className="inline-block mx-1 text-morandi-primary align-middle"
+          style={{ verticalAlign: 'middle', marginTop: '-2px' }}
+        />
+      )
+    } else if (part === ' ⭐ ') {
+      return (
+        <Sparkles
+          key={index}
+          size={16}
+          className="inline-block mx-1 text-morandi-gold align-middle"
+          style={{ verticalAlign: 'middle', marginTop: '-2px' }}
+        />
+      )
+    } else if (part === ' · ' || part === ' | ') {
+      return <span key={index} className="mx-1 text-morandi-secondary">{part.trim()}</span>
+    } else {
+      return <span key={index}>{part}</span>
+    }
+  })
 }
 
 export function TourItinerarySection({
@@ -51,33 +83,6 @@ export function TourItinerarySection({
 
         <div>
           <div>
-            {/* Mobile horizontal navigation */}
-            {viewMode === 'mobile' && dailyItinerary.length > 0 && (
-              <div className="-mx-4 mb-6 flex gap-3 overflow-x-auto px-4">
-                {dailyItinerary.map((day: any, index: number) => (
-                  <button
-                    key={`mobile-day-${day.dayLabel || index}`}
-                    type="button"
-                    onClick={() => handleDayNavigate(index)}
-                    className={cn(
-                      'flex min-w-[160px] flex-col rounded-2xl border border-morandi-border/40 px-4 py-3 text-left transition',
-                      activeDayIndex === index
-                        ? 'bg-morandi-primary text-white'
-                        : 'bg-white/80 text-morandi-primary/80'
-                    )}
-                  >
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.4em]">
-                      {day.dayLabel || `Day ${index + 1}`}
-                    </span>
-                    <span className="mt-2 line-clamp-2 text-sm font-medium leading-snug">
-                      {day.title || `行程第 ${index + 1} 天`}
-                    </span>
-                    {day.date && <span className="mt-1 text-xs text-white/80">{day.date}</span>}
-                  </button>
-                ))}
-              </div>
-            )}
-
             <div className="space-y-12">
               {dailyItinerary.map((day: any, index: number) => (
                 <article
@@ -93,9 +98,11 @@ export function TourItinerarySection({
                     {day.date && <DateSubtitle date={day.date} />}
                   </div>
 
-                  <h3 className="text-2xl font-bold leading-snug text-morandi-primary md:text-3xl">
-                    {day.title || `行程第 ${index + 1} 天`}
-                  </h3>
+                  {day.title && (
+                    <h3 className="text-lg font-bold leading-relaxed text-morandi-primary md:text-xl mb-6 flex items-center flex-wrap">
+                      {renderTitleWithIcons(day.title)}
+                    </h3>
+                  )}
 
                   {day.highlight && (
                     <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50/80 p-5 text-amber-900 shadow-inner">
@@ -121,7 +128,7 @@ export function TourItinerarySection({
                         {day.activities.map((activity: any, actIndex: number) => (
                           <AttractionCard
                             key={`activity-${index}-${actIndex}`}
-                            title={activity.icon ? `${activity.icon} ${activity.title}` : activity.title}
+                            title={activity.title}
                             description={activity.description || ''}
                             image={activity.image}
                             layout={activity.image ? 'vertical' : 'horizontal'}
@@ -151,24 +158,24 @@ export function TourItinerarySection({
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 p-5">
-                      <p className="text-sm text-morandi-secondary/80">早餐</p>
-                      <p className="mt-2 font-semibold text-morandi-primary">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 px-4 py-3 flex items-center gap-3">
+                      <span className="text-sm text-morandi-secondary/80 whitespace-nowrap">早餐</span>
+                      <span className="font-semibold text-morandi-primary text-sm flex-1 text-center">
                         {day.meals?.breakfast || '敬請自理'}
-                      </p>
+                      </span>
                     </div>
-                    <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 p-5">
-                      <p className="text-sm text-morandi-secondary/80">午餐</p>
-                      <p className="mt-2 font-semibold text-morandi-primary">
+                    <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 px-4 py-3 flex items-center gap-3">
+                      <span className="text-sm text-morandi-secondary/80 whitespace-nowrap">午餐</span>
+                      <span className="font-semibold text-morandi-primary text-sm flex-1 text-center">
                         {day.meals?.lunch || '敬請自理'}
-                      </p>
+                      </span>
                     </div>
-                    <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 p-5">
-                      <p className="text-sm text-morandi-secondary/80">晚餐</p>
-                      <p className="mt-2 font-semibold text-morandi-primary">
+                    <div className="rounded-2xl border border-morandi-gold/30 bg-morandi-gold/5 px-4 py-3 flex items-center gap-3">
+                      <span className="text-sm text-morandi-secondary/80 whitespace-nowrap">晚餐</span>
+                      <span className="font-semibold text-morandi-primary text-sm flex-1 text-center">
                         {day.meals?.dinner || '敬請自理'}
-                      </p>
+                      </span>
                     </div>
                   </div>
 

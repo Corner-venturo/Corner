@@ -20,15 +20,22 @@ class RealtimeManager {
   private config: Required<RealtimeManagerConfig>
 
   constructor(config: RealtimeManagerConfig = {}) {
+    // 檢查環境變數是否禁用 Realtime
+    const isRealtimeDisabled = process.env.NEXT_PUBLIC_DISABLE_REALTIME === 'true'
+
     this.config = {
-      enabled: config.enabled ?? true,
+      enabled: isRealtimeDisabled ? false : (config.enabled ?? true),
       autoReconnect: config.autoReconnect ?? true,
       maxRetries: config.maxRetries ?? 5,
       retryDelay: config.retryDelay ?? 1000,
       debug: config.debug ?? false,
     }
 
-    this.log('Realtime Manager initialized', this.config)
+    if (isRealtimeDisabled) {
+      console.log('[Realtime] Disabled by environment variable')
+    } else {
+      this.log('Realtime Manager initialized', this.config)
+    }
   }
 
   /**

@@ -110,11 +110,13 @@ export const useQuoteActions = ({
           selling_prices: sellingPrices,
         }
 
+        const existingVersions = quote.versions || []
+
         // 如果正在編輯某個版本，更新該版本
-        if (currentEditingVersion !== null && quote.versions) {
-          const existingVersions = [...quote.versions]
-          existingVersions[currentEditingVersion] = {
-            ...existingVersions[currentEditingVersion],
+        if (currentEditingVersion !== null && existingVersions.length > 0) {
+          const updatedVersions = [...existingVersions]
+          updatedVersions[currentEditingVersion] = {
+            ...updatedVersions[currentEditingVersion],
             categories: updatedCategories,
             total_cost,
             group_size: groupSize,
@@ -126,10 +128,29 @@ export const useQuoteActions = ({
 
           updateQuote(quote.id, {
             ...baseUpdate,
-            versions: existingVersions,
+            versions: updatedVersions,
+          })
+        } else if (existingVersions.length === 0) {
+          // 第一次儲存：沒有版本記錄，自動創建版本 1
+          const firstVersion = {
+            id: Date.now().toString(),
+            version: 1,
+            categories: updatedCategories,
+            total_cost,
+            group_size: groupSize,
+            accommodation_days: accommodationDays,
+            participant_counts: participantCounts,
+            selling_prices: sellingPrices,
+            note: '版本 1',
+            created_at: new Date().toISOString(),
+          }
+
+          updateQuote(quote.id, {
+            ...baseUpdate,
+            versions: [firstVersion],
           })
         } else {
-          // 沒有編輯版本，只更新主資料
+          // 有版本記錄但沒有編輯特定版本，只更新主資料
           updateQuote(quote.id, baseUpdate)
         }
 
