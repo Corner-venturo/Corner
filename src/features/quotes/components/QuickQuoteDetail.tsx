@@ -9,7 +9,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Save, Trash2, Plus, Printer, FilePlus, History } from 'lucide-react'
+import { Save, Trash2, Plus, Printer, FilePlus, History, ChevronDown } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -18,13 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +38,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [showPrintPreview, setShowPrintPreview] = useState(false)
+  const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null)
 
   // 表單狀態
   const [formData, setFormData] = useState({
@@ -72,7 +66,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     setIsLoadingItems(false)
   }, [quote.quick_quote_items])
 
-  const setFormField = (field: string, value: any) => {
+  const setFormField = <K extends keyof typeof formData>(field: K, value: typeof formData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -89,6 +83,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       id: `item-${Date.now()}`,
       description: '',
       quantity: 1,
+      cost: 0,
       unit_price: 0,
       amount: 0,
       notes: '',
@@ -97,18 +92,22 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     setIsEditing(true)
   }
 
+  // 計算總成本
+  const totalCost = items.reduce((sum, item) => sum + (item.cost || 0) * item.quantity, 0)
+
+  // 計算利潤
+  const totalProfit = totalAmount - totalCost
+
   // 刪除項目
   const removeItem = (id: string) => {
     setItems(items.filter(item => item.id !== id))
   }
 
-  // 更新項目
-  const updateItem = (id: string, field: keyof QuickQuoteItem, value: any) => {
+  const updateItem = <K extends keyof QuickQuoteItem>(id: string, field: K, value: QuickQuoteItem[K]) => {
     setItems(
       items.map(item => {
         if (item.id === id) {
           const updated = { ...item, [field]: value }
-          // 自動計算金額
           if (field === 'quantity' || field === 'unit_price') {
             updated.amount = updated.quantity * updated.unit_price
           }
@@ -119,11 +118,31 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     )
   }
 
+  // 準備版本資料的通用函數
+  const prepareVersionData = (versionNumber: number, versionName: string) => ({
+    id: Date.now().toString(),
+    quote_id: quote.id,
+    version: versionNumber,
+    version_name: versionName,
+    customer_name: formData.customer_name,
+    contact_phone: formData.contact_phone,
+    contact_address: formData.contact_address,
+    tour_code: formData.tour_code,
+    handler_name: formData.handler_name,
+    issue_date: formData.issue_date,
+    total_amount: totalAmount,
+    total_cost: totalCost,
+    received_amount: formData.received_amount,
+    balance_amount: totalAmount - formData.received_amount,
+    items: items,
+    created_at: new Date().toISOString(),
+  })
+
   // 儲存變更
   const handleSave = async (showAlert = false) => {
     setIsSaving(true)
     try {
-      const updateData = {
+      const baseUpdate = {
         customer_name: formData.customer_name,
         contact_phone: formData.contact_phone,
         contact_address: formData.contact_address,
@@ -131,24 +150,49 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         handler_name: formData.handler_name,
         issue_date: formData.issue_date,
         total_amount: totalAmount,
+        total_cost: totalCost,
         received_amount: formData.received_amount,
         balance_amount: totalAmount - formData.received_amount,
-        quick_quote_items: items, // ✅ 儲存 items 到 quick_quote_items 欄位
+        quick_quote_items: items,
       }
 
-      logger.log('🔄 [QuickQuote] 準備儲存:', {
-        quoteId: quote.id,
-        itemsCount: items.length,
-        totalAmount,
-        updateData
-      })
+      const existingVersions = quote.versions || []
 
-      await onUpdate(updateData)
+      // 如果正在編輯某個版本，更新該版本
+      if (currentEditingVersion !== null && existingVersions.length > 0) {
+        const updatedVersions = [...existingVersions]
+        updatedVersions[currentEditingVersion] = {
+          ...updatedVersions[currentEditingVersion],
+          ...prepareVersionData(
+            updatedVersions[currentEditingVersion].version,
+            updatedVersions[currentEditingVersion].version_name || `版本 ${updatedVersions[currentEditingVersion].version}`
+          ),
+          updated_at: new Date().toISOString(),
+        }
+
+        await onUpdate({
+          ...baseUpdate,
+          versions: updatedVersions,
+        })
+      } else if (existingVersions.length === 0) {
+        // 第一次儲存：自動建立版本 1，版本名稱使用客戶名稱
+        const versionName = formData.customer_name || '版本 1'
+        const firstVersion = prepareVersionData(1, versionName)
+
+        await onUpdate({
+          ...baseUpdate,
+          version: 1,
+          versions: [firstVersion],
+        })
+        setCurrentEditingVersion(0)
+      } else {
+        // 有版本記錄但沒有編輯特定版本，只更新主資料
+        await onUpdate(baseUpdate)
+      }
 
       logger.log('✅ [QuickQuote] 儲存成功')
       if (showAlert) {
         setIsEditing(false)
-        alert('儲存成功！')
       }
     } catch (error) {
       logger.error('❌ [QuickQuote] 儲存失敗:', error)
@@ -160,12 +204,12 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     }
   }
 
-
-  // 儲存版本
+  // 儲存版本對話框狀態
   const [isSaveVersionDialogOpen, setIsSaveVersionDialogOpen] = useState(false)
   const [versionName, setVersionName] = useState('')
 
-  const handleSaveVersion = async () => {
+  // 另存新版本
+  const handleSaveAsNewVersion = async () => {
     if (!versionName.trim()) {
       alert('請輸入版本名稱')
       return
@@ -173,15 +217,16 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
     setIsSaving(true)
     try {
-      // 獲取當前報價單的最大版本號
-      const currentVersion = quote.version || 1
-      const newVersion = currentVersion + 1
+      const existingVersions = quote.versions || []
+      const maxVersion = existingVersions.reduce((max, v) =>
+        Math.max(max, v.version || 0), 0
+      )
+      const newVersionNumber = maxVersion + 1
 
-      // 準備版本資料
-      const versionData = {
-        quote_id: quote.id,
-        version: newVersion,
-        version_name: versionName.trim(),
+      const newVersionData = prepareVersionData(newVersionNumber, versionName.trim())
+      const newVersions = [...existingVersions, newVersionData]
+
+      await onUpdate({
         customer_name: formData.customer_name,
         contact_phone: formData.contact_phone,
         contact_address: formData.contact_address,
@@ -189,22 +234,19 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         handler_name: formData.handler_name,
         issue_date: formData.issue_date,
         total_amount: totalAmount,
+        total_cost: totalCost,
         received_amount: formData.received_amount,
         balance_amount: totalAmount - formData.received_amount,
-        items: items, // 儲存當前的項目
-        created_at: new Date().toISOString(),
-      }
-
-      // 更新報價單的版本號和版本資料
-      await onUpdate({
-        version: newVersion,
-        versions: [...(quote.versions || []), versionData],
+        quick_quote_items: items,
+        version: newVersionNumber,
+        versions: newVersions,
       })
 
-      logger.log('✅ [QuickQuote] 儲存版本成功:', versionData)
+      // 設定當前編輯版本為新版本
+      setCurrentEditingVersion(newVersions.length - 1)
       setIsSaveVersionDialogOpen(false)
       setVersionName('')
-      alert('版本儲存成功！')
+      logger.log('✅ [QuickQuote] 新版本儲存成功')
     } catch (error) {
       logger.error('❌ [QuickQuote] 儲存版本失敗:', error)
       alert('版本儲存失敗：' + (error as Error).message)
@@ -213,14 +255,43 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     }
   }
 
-  // 載入版本
-  const handleLoadVersion = (versionIndex: string) => {
+  // 刪除版本
+  const handleDeleteVersion = async (versionIndex: number) => {
     const versions = quote.versions || []
-    const index = parseInt(versionIndex)
+    if (versions.length <= 1) {
+      alert('至少需要保留一個版本')
+      return
+    }
 
-    if (index < 0 || index >= versions.length) return
+    if (!confirm(`確定要刪除「${versions[versionIndex].version_name || `版本 ${versions[versionIndex].version}`}」嗎？`)) {
+      return
+    }
 
-    const versionData = versions[index]
+    try {
+      const newVersions = versions.filter((_, idx) => idx !== versionIndex)
+      await onUpdate({ versions: newVersions })
+
+      // 如果刪除的是當前編輯版本，重設
+      if (currentEditingVersion === versionIndex) {
+        setCurrentEditingVersion(null)
+      } else if (currentEditingVersion !== null && currentEditingVersion > versionIndex) {
+        setCurrentEditingVersion(currentEditingVersion - 1)
+      }
+
+      logger.log('✅ [QuickQuote] 版本刪除成功')
+    } catch (error) {
+      logger.error('❌ [QuickQuote] 刪除版本失敗:', error)
+      alert('刪除版本失敗')
+    }
+  }
+
+  // 載入版本
+  const handleLoadVersion = (versionIndex: number) => {
+    const versions = quote.versions || []
+
+    if (versionIndex < 0 || versionIndex >= versions.length) return
+
+    const versionData = versions[versionIndex]
 
     // 更新表單資料
     setFormData({
@@ -238,8 +309,25 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       setItems(versionData.items)
     }
 
-    alert(`已載入版本：${versionData.version_name}`)
+    // 設定當前編輯版本
+    setCurrentEditingVersion(versionIndex)
   }
+
+  // 格式化日期時間
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  // 版本歷史 hover 狀態
+  const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
 
   // 列印預覽
   const handlePrintPreview = () => {
@@ -267,27 +355,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         onBack={() => router.push('/quotes')}
         actions={
           <div className="flex items-center gap-2">
-            {/* 版本選擇下拉選單 */}
-            {!isEditing && (quote.versions?.length || 0) > 0 && (
-              <Select onValueChange={handleLoadVersion}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="選擇版本" />
-                </SelectTrigger>
-                <SelectContent>
-                  {quote.versions?.map((version, index) => (
-                    <SelectItem key={index} value={index.toString()}>
-                      <div className="flex items-center gap-2">
-                        <History className="h-4 w-4" />
-                        <span>{version.version_name}</span>
-                        <span className="text-xs text-gray-500">
-                          (v{version.version})
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            {/* 非編輯模式 */}
             {!isEditing && (
               <>
                 <Button onClick={handlePrintPreview} variant="outline" className="gap-2">
@@ -299,11 +367,79 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                 </Button>
               </>
             )}
+            {/* 編輯模式 */}
             {isEditing && (
               <>
                 <Button onClick={() => setIsEditing(false)} variant="outline">
                   取消
                 </Button>
+                {/* 版本歷史下拉選單 */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <History className="h-4 w-4" />
+                      版本歷史
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-72" align="end">
+                    <div className="px-2 py-1.5 text-sm font-medium text-morandi-primary border-b border-border">
+                      版本歷史
+                    </div>
+                    {quote.versions && quote.versions.length > 0 ? (
+                      <>
+                        {[...quote.versions]
+                          .sort((a, b) => b.version - a.version)
+                          .map((version, sortedIndex) => {
+                            const originalIndex = quote.versions!.findIndex(v => v.id === version.id)
+                            const isCurrentEditing = currentEditingVersion === originalIndex
+                            return (
+                              <DropdownMenuItem
+                                key={version.id || sortedIndex}
+                                className="flex items-center justify-between py-2 cursor-pointer hover:bg-morandi-container/30 relative"
+                                onMouseEnter={() => setHoveredVersionIndex(originalIndex)}
+                                onMouseLeave={() => setHoveredVersionIndex(null)}
+                                onClick={() => handleLoadVersion(originalIndex)}
+                              >
+                                <div className="flex flex-col flex-1">
+                                  <span className="font-medium">
+                                    {version.version_name || `版本 ${version.version}`}
+                                  </span>
+                                  <span className="text-xs text-morandi-secondary">
+                                    {formatDateTime(version.created_at)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="text-xs text-morandi-secondary">
+                                    NT$ {(version.total_amount || 0).toLocaleString()}
+                                  </div>
+                                  {isCurrentEditing && (
+                                    <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
+                                  )}
+                                  {hoveredVersionIndex === originalIndex && quote.versions!.length > 1 && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleDeleteVersion(originalIndex)
+                                      }}
+                                      className="p-1 hover:bg-red-100 rounded transition-colors"
+                                      title="刪除版本"
+                                    >
+                                      <Trash2 className="h-4 w-4 text-red-500" />
+                                    </button>
+                                  )}
+                                </div>
+                              </DropdownMenuItem>
+                            )
+                          })}
+                      </>
+                    ) : (
+                      <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
+                        尚無版本，點擊「儲存」創建第一個版本
+                      </div>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button
                   onClick={() => setIsSaveVersionDialogOpen(true)}
                   disabled={isSaving}
@@ -311,7 +447,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   className="gap-2"
                 >
                   <FilePlus className="h-4 w-4" />
-                  儲存版本
+                  另存新版本
                 </Button>
                 <Button
                   onClick={() => handleSave(true)}
@@ -437,8 +573,10 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
               <tr>
                 <th className="px-3 py-2 text-left">摘要</th>
                 <th className="px-3 py-2 text-center w-20">人數</th>
+                {isEditing && <th className="px-3 py-2 text-center w-24">成本</th>}
                 <th className="px-3 py-2 text-center w-28">單價</th>
                 <th className="px-3 py-2 text-center w-28">金額</th>
+                {isEditing && <th className="px-3 py-2 text-center w-24">利潤</th>}
                 <th className="px-3 py-2 text-left w-32">備註</th>
                 {isEditing && <th className="px-3 py-2 text-center w-16"></th>}
               </tr>
@@ -495,6 +633,39 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                       placeholder=""
                     />
                   </td>
+                  {isEditing && (
+                    <td className="px-3 py-2">
+                      <Input
+                        type="text"
+                        value={item.cost === 0 || item.cost === undefined ? '' : item.cost}
+                        onChange={e => {
+                          let val = e.target.value
+                          val = val.replace(/[０-９]/g, s =>
+                            String.fromCharCode(s.charCodeAt(0) - 0xfee0)
+                          )
+                          val = val.replace(/[．]/g, '.')
+                          val = val.replace(/[－]/g, '-')
+
+                          if (val === '' || val === '-') {
+                            updateItem(item.id, 'cost', 0)
+                          } else {
+                            const num = parseFloat(val)
+                            if (!isNaN(num)) {
+                              updateItem(item.id, 'cost', num)
+                            }
+                          }
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            e.currentTarget.blur()
+                          }
+                        }}
+                        className="h-8 text-right"
+                        placeholder=""
+                      />
+                    </td>
+                  )}
                   <td className="px-3 py-2">
                     <Input
                       type="text"
@@ -532,6 +703,13 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   <td className="px-3 py-2 text-right font-medium">
                     {item.amount.toLocaleString()}
                   </td>
+                  {isEditing && (
+                    <td className="px-3 py-2 text-right font-medium">
+                      <span className={((item.unit_price - (item.cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
+                        {((item.unit_price - (item.cost || 0)) * item.quantity).toLocaleString()}
+                      </span>
+                    </td>
+                  )}
                   <td className="px-3 py-2">
                     <Input
                       value={item.notes}
@@ -563,7 +741,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
               {items.length === 0 && (
                 <tr>
                   <td
-                    colSpan={isEditing ? 6 : 5}
+                    colSpan={isEditing ? 8 : 5}
                     className="px-3 py-8 text-center text-morandi-secondary"
                   >
                     尚無項目
@@ -579,13 +757,29 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       {/* 金額統計 */}
       <div className="bg-card border border-border rounded-xl p-6">
         <h2 className="text-lg font-semibold text-morandi-primary mb-4">金額統計</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div className={`grid gap-4 ${isEditing ? 'grid-cols-5' : 'grid-cols-3'}`}>
+          {isEditing && (
+            <div className="p-4 bg-morandi-container/10 rounded-lg">
+              <label className="text-sm font-medium text-morandi-secondary">總成本</label>
+              <div className="mt-1 text-2xl font-bold text-morandi-primary">
+                NT$ {totalCost.toLocaleString()}
+              </div>
+            </div>
+          )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
             <label className="text-sm font-medium text-morandi-secondary">應收金額</label>
             <div className="mt-1 text-2xl font-bold text-morandi-primary">
               NT$ {totalAmount.toLocaleString()}
             </div>
           </div>
+          {isEditing && (
+            <div className="p-4 bg-morandi-container/10 rounded-lg">
+              <label className="text-sm font-medium text-morandi-secondary">總利潤</label>
+              <div className={`mt-1 text-2xl font-bold ${totalProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
+                NT$ {totalProfit.toLocaleString()}
+              </div>
+            </div>
+          )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
             <label className="text-sm font-medium text-morandi-secondary">已收金額</label>
             {isEditing ? (
@@ -638,11 +832,11 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         </div>
       </div>
 
-        {/* 儲存版本對話框 */}
+        {/* 另存新版本對話框 */}
         <Dialog open={isSaveVersionDialogOpen} onOpenChange={setIsSaveVersionDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>儲存新版本</DialogTitle>
+              <DialogTitle>另存新版本</DialogTitle>
               <DialogDescription>
                 請輸入版本名稱，例如：「初稿」「修訂版」「最終版」
               </DialogDescription>
@@ -654,7 +848,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                 onChange={(e) => setVersionName(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                    handleSaveVersion()
+                    handleSaveAsNewVersion()
                   }
                 }}
               />
@@ -664,7 +858,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                 取消
               </Button>
               <Button
-                onClick={handleSaveVersion}
+                onClick={handleSaveAsNewVersion}
                 disabled={isSaving || !versionName.trim()}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover"
               >

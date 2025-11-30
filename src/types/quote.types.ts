@@ -53,11 +53,11 @@ export interface Quote extends BaseEntity {
   balance_amount?: number // 應收餘額（自動計算）
   quick_quote_items?: QuickQuoteItem[] // 快速報價單的收費明細項目
 
-  // 擴展欄位（用於詳細頁）- 使用 any 暫時相容舊結構
-  categories?: any[] // 報價分類（複雜的前端結構，使用 CostCategory[] 或 any[]）
-  versions?: any[] // 歷史版本（使用 VersionRecord[] 或 QuoteVersion[]）
-  participant_counts?: any // 參與人數統計
-  selling_prices?: any // 銷售價格
+  // 擴展欄位（用於詳細頁）
+  categories?: QuoteCategory[] // 報價分類
+  versions?: QuoteVersion[] // 歷史版本
+  participant_counts?: Record<string, number> // 參與人數統計
+  selling_prices?: Record<string, number> // 銷售價格
 }
 
 /**
@@ -67,6 +67,7 @@ export interface QuickQuoteItem {
   id: string
   description: string // 摘要
   quantity: number // 數量
+  cost?: number // 成本（編輯時可選填，列印時隱藏）
   unit_price: number // 單價
   amount: number // 金額（quantity * unit_price）
   notes: string // 備註
