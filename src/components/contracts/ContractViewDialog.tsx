@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Tour } from '@/types/tour.types'
 import { ContractData } from '@/lib/contract-utils'
+import DOMPurify from 'dompurify'
 
 interface ContractViewDialogProps {
   isOpen: boolean
@@ -63,13 +64,37 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
         let template = await response.text()
 
-        // 替換所有變數
+        // 替換所有變數（對插入的值進行 HTML 轉義，防止 XSS）
         Object.entries(contractData).forEach(([key, value]) => {
           const regex = new RegExp(`{{${key}}}`, 'g')
-          template = template.replace(regex, value || '')
+          // 將特殊字符轉義，防止 HTML/JS 注入
+          const safeValue = String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+          template = template.replace(regex, safeValue)
         })
 
-        setContractHtml(template)
+        // 使用 DOMPurify 清理最終的 HTML，移除任何潛在的惡意腳本
+        const sanitizedHtml = DOMPurify.sanitize(template, {
+          ALLOWED_TAGS: [
+            'html', 'head', 'body', 'style', 'title',
+            'div', 'span', 'p', 'br', 'hr',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'table', 'thead', 'tbody', 'tr', 'th', 'td',
+            'ul', 'ol', 'li',
+            'strong', 'em', 'b', 'i', 'u',
+            'a', 'img',
+            'header', 'footer', 'section', 'article',
+          ],
+          ALLOWED_ATTR: ['class', 'id', 'style', 'src', 'alt', 'href', 'target', 'colspan', 'rowspan', 'width', 'height'],
+          FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input'],
+          FORBID_ATTR: ['onclick', 'onerror', 'onload', 'onmouseover'],
+        })
+
+        setContractHtml(sanitizedHtml)
       } catch (error) {
         logger.error('載入合約失敗:', error)
         setContractHtml('<p class="text-red-500">載入合約範本失敗，請稍後再試</p>')

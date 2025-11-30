@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import DOMPurify from 'dompurify'
 
 interface RichTextEditorProps {
   initialTitle?: string
@@ -381,6 +382,23 @@ export function RichTextViewer({
   content: string
   className?: string
 }) {
+  // 使用 DOMPurify 清理 HTML，防止 XSS 攻擊
+  const sanitizedContent = useMemo(() => {
+    return DOMPurify.sanitize(content, {
+      ALLOWED_TAGS: [
+        'div', 'span', 'p', 'br', 'hr',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li',
+        'strong', 'em', 'b', 'i', 'u',
+        'a', 'img',
+        'blockquote', 'pre', 'code',
+      ],
+      ALLOWED_ATTR: ['class', 'id', 'style', 'src', 'alt', 'href', 'target'],
+      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input'],
+      FORBID_ATTR: ['onclick', 'onerror', 'onload', 'onmouseover'],
+    })
+  }, [content])
+
   return (
     <div className={cn('bg-white border border-border rounded-lg', className)}>
       <div className="p-4 border-b border-border">
@@ -388,7 +406,7 @@ export function RichTextViewer({
       </div>
       <div
         className="p-6 prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         style={{ lineHeight: '1.6' }}
       />
     </div>

@@ -310,23 +310,30 @@ export function createStore<T extends BaseEntity>(
     },
   }))
 
-  // 註冊同步完成監聽器
+  // 註冊同步完成監聽器（確保不重複註冊）
   if (typeof window !== 'undefined') {
-    storeEventBus.onSyncCompleted(tableName, () => {
-      store.getState().fetchAll()
-    })
+    // 使用全局標記追蹤已註冊的表格，防止 HMR 時重複註冊
+    const registeredKey = `__store_registered_${tableName}`
+    if (!(window as unknown as Record<string, boolean>)[registeredKey]) {
+      (window as unknown as Record<string, boolean>)[registeredKey] = true
 
-    // ⚠️ Realtime 訂閱已改為「按需訂閱」
-    // 不再自動訂閱，需在各頁面使用 useRealtimeFor[Table]() Hook
-    // 範例：useRealtimeForTours()
+      storeEventBus.onSyncCompleted(tableName, () => {
+        store.getState().fetchAll()
+      })
 
-    // 監聽背景更新完成事件（Stale-While-Revalidate 策略）
-    // @ts-ignore - Custom event listener
-    window.addEventListener(`${tableName}:updated`, ((event: Event) => {
-      const customEvent = event as CustomEvent
-      const { items } = customEvent.detail
-      store.setState({ items })
-    }) as EventListener)
+      // ⚠️ Realtime 訂閱已改為「按需訂閱」
+      // 不再自動訂閱，需在各頁面使用 useRealtimeFor[Table]() Hook
+      // 範例：useRealtimeForTours()
+
+      // 監聯背景更新完成事件（Stale-While-Revalidate 策略）
+      const handleUpdated = ((event: Event) => {
+        const customEvent = event as CustomEvent
+        const { items } = customEvent.detail
+        store.setState({ items })
+      }) as EventListener
+
+      window.addEventListener(`${tableName}:updated`, handleUpdated)
+    }
   }
 
   return store

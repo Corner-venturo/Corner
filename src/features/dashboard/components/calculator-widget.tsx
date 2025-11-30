@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Calculator } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { evaluateExpression } from '@/components/widgets/calculator/calculatorUtils'
 
 export function CalculatorWidget() {
   const [inputValue, setInputValue] = useState('')
@@ -115,8 +116,8 @@ export function CalculatorWidget() {
         // 順序計算模式
         calculationResult = calculateSequential(sanitized)
       } else {
-        // 數學優先模式
-        calculationResult = Function('"use strict"; return (' + sanitized + ')')()
+        // 數學優先模式（使用安全的解析器，不使用 Function/eval）
+        calculationResult = evaluateExpression(sanitized, NaN)
       }
 
       if (typeof calculationResult === 'number' && !isNaN(calculationResult)) {

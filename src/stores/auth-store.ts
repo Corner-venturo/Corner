@@ -6,6 +6,7 @@ import { generateToken, type AuthPayload } from '@/lib/auth'
 import { useLocalAuthStore, LocalProfile } from '@/lib/auth/local-auth-manager'
 import { OfflineAuthService } from '@/services/offline-auth.service'
 import { logger } from '@/lib/utils/logger'
+import { generateQuickLoginToken } from '@/lib/auth/quick-login-token'
 
 interface AuthState {
   // 保持向下相容的屬性
@@ -29,7 +30,7 @@ interface AuthState {
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
   checkPermission: (permission: string) => boolean
-  switchProfile: (profileId: string) => boolean
+  switchProfile: (profileId: string) => Promise<boolean>
   setHasHydrated: (hasHydrated: boolean) => void
 }
 
@@ -363,7 +364,7 @@ export const useAuthStore = create<AuthState>(
           logger.log('✅ Supabase 驗證成功，建立角色卡...')
           recordLoginAttempt(username, true)
 
-          // 🔐 建立 Supabase Auth session（用於 RLS）
+          // 🔐 建立 Supabase Auth session（用於 Realtime 和認證）
           try {
             const email = `${username}@venturo.com` // 使用員工編號作為 email
             logger.log('🔐 嘗試建立 Supabase Auth session...', email)
@@ -547,7 +548,7 @@ export const useAuthStore = create<AuthState>(
         return profile.permissions.includes(permission) || profile.permissions.includes('admin')
       },
 
-      switchProfile: (profileId: string) => {
+      switchProfile: async (profileId: string) => {
         const success = OfflineAuthService.switchProfile(profileId)
         if (success) {
           const profile = useLocalAuthStore.getState().getProfileById(profileId)
@@ -587,8 +588,8 @@ export const useAuthStore = create<AuthState>(
               updated_at: new Date().toISOString(),
             }
 
-            // 🔐 設定認證 cookie（快速登入也需要）
-            const token = `quick-login-${profile.id}-${Date.now()}`
+            // 🔐 設定認證 cookie（快速登入也需要，使用帶簽名的 token）
+            const token = await generateQuickLoginToken(profile.id)
             setSecureCookie(token, false)
 
             set({
@@ -615,10 +616,38 @@ export const useAuthStore = create<AuthState>(
         sidebarCollapsed: state.sidebarCollapsed,
         isOfflineMode: state.isOfflineMode,
       }),
-      onRehydrateStorage: () => state => {
+      onRehydrateStorage: () => async state => {
         // Hydration 完成後設置標記
         if (state) {
           state._hasHydrated = true
+
+          // 🔧 自動修復：如果 user 缺少 workspace_id，從 Supabase 即時查詢補上
+          if (state.user && !state.user.workspace_id) {
+            logger.warn('⚠️ [onRehydrate] user 缺少 workspace_id，從 Supabase 查詢...')
+            try {
+              const { supabase } = await import('@/lib/supabase/client')
+              const { data: employee, error } = await supabase
+                .from('employees')
+                .select('workspace_id')
+                .eq('id', state.user.id)
+                .single()
+
+              if (!error && employee?.workspace_id) {
+                // 直接更新 store 狀態
+                useAuthStore.setState({
+                  user: {
+                    ...state.user,
+                    workspace_id: employee.workspace_id,
+                  },
+                })
+                logger.log('✅ [onRehydrate] 已從 Supabase 補上 workspace_id:', employee.workspace_id)
+              } else {
+                logger.error('❌ [onRehydrate] 無法從 Supabase 取得 workspace_id:', error?.message)
+              }
+            } catch (err) {
+              logger.error('❌ [onRehydrate] 查詢 workspace_id 失敗:', err)
+            }
+          }
         }
       },
     }
@@ -626,50 +655,8 @@ export const useAuthStore = create<AuthState>(
 )
 
 // 🔄 客戶端自動 hydrate（恢復登入狀態）
+// workspace_id 的自動修復已移至 onRehydrateStorage 中處理
 if (typeof window !== 'undefined') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(useAuthStore as any).persist.rehydrate()
-
-  // 🔧 自動修復：如果 user 缺少 workspace_id，從 IndexedDB 補上
-  setTimeout(async () => {
-    const state = useAuthStore.getState()
-    if (state.user && !state.user.workspace_id) {
-      logger.warn('⚠️ 偵測到 user 缺少 workspace_id，嘗試自動修復...')
-
-      try {
-        const { openDB } = await import('idb')
-        const db = await openDB('VenturoOfflineDB')
-        const tx = db.transaction('employees', 'readonly')
-        const store = tx.objectStore('employees')
-        const allEmployees = await store.getAll()
-        // 修正：employees 表的主鍵是 id，不是 user_id
-        const employee = allEmployees.find((emp: any) => emp.id === state.user?.id)
-
-        if (employee?.workspace_id) {
-          // 更新 user 物件
-          useAuthStore.setState({
-            user: {
-              ...state.user,
-              workspace_id: employee.workspace_id,
-            },
-          })
-          logger.log('✅ 已自動補上 workspace_id:', employee.workspace_id)
-        } else {
-          logger.error('❌ 無法從 IndexedDB 找到 workspace_id，嘗試使用第一個員工的 workspace')
-          // 備用方案：使用第一個員工的 workspace_id
-          if (allEmployees.length > 0 && allEmployees[0].workspace_id) {
-            useAuthStore.setState({
-              user: {
-                ...state.user,
-                workspace_id: allEmployees[0].workspace_id,
-              },
-            })
-            logger.log('✅ 使用第一個員工的 workspace_id:', allEmployees[0].workspace_id)
-          }
-        }
-      } catch (error) {
-        logger.error('❌ 自動修復失敗:', error)
-      }
-    }
-  }, 1000)
 }

@@ -1,11 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLocalAuthStore } from '@/lib/auth/local-auth-manager'
 import { useAuthStore } from '@/stores/auth-store'
-// ⚠️ Supabase 已停用 - 純本地模式
-// import { supabase } from '@/lib/supabase/client';
 import { hasPermissionForRoute } from '@/lib/permissions'
 import { logger } from '@/lib/utils/logger'
 
@@ -18,29 +16,24 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { currentProfile, setCurrentProfile, profiles } = useLocalAuthStore()
-  const { user } = useAuthStore()
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  )
-
-  // 監聽網路狀態變化
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
-    }
-  }, [])
+  const { user, _hasHydrated } = useAuthStore()
+  const redirectingRef = useRef(false) // 防止重複跳轉
 
   useEffect(() => {
     const checkAuth = async () => {
-      // 如果在登入頁面，跳過檢查
-      if (pathname === '/login') {
+      // 等待 Zustand 完成 hydration
+      if (!_hasHydrated) {
+        return
+      }
+
+      // 如果在登入頁面或 unauthorized 頁面，跳過檢查
+      if (pathname === '/login' || pathname === '/unauthorized') {
+        redirectingRef.current = false
+        return
+      }
+
+      // 防止重複跳轉
+      if (redirectingRef.current) {
         return
       }
 
@@ -48,6 +41,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
         hasCurrentProfile: !!currentProfile,
         hasUser: !!user,
         pathname,
+        _hasHydrated,
       })
 
       // 1. 優先檢查 auth-store 的 user（持久化的）
@@ -60,41 +54,39 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
             setCurrentProfile(profile)
           }
         }
+        // 繼續檢查權限
+      } else if (!currentProfile) {
+        // 沒有登入，跳轉到登入頁
+        logger.warn('沒有 currentProfile 和 user，跳轉登入頁')
+        redirectingRef.current = true
+        router.push('/login')
         return
       }
 
-      // 2. 檢查本地是否有登入的角色
-      if (!currentProfile) {
-        // 📦 純本地模式 - 沒有登入就導向登入頁
-        logger.warn('沒有 currentProfile，應該跳轉登入')
-        // 暫時停用自動跳轉，避免無限循環
-        // router.push('/login');
-        return
-      }
+      // 取得當前用戶的權限
+      const permissions = currentProfile?.permissions || user?.permissions || []
 
-      // 2. 檢查權限
+      // 2. 檢查指定權限
       if (requiredPermission) {
-        const hasPermission = currentProfile.permissions.includes(requiredPermission)
+        const hasPermission = permissions.includes(requiredPermission) ||
+                             permissions.includes('admin') ||
+                             permissions.includes('super_admin')
 
         if (!hasPermission) {
-          logger.warn(`用戶 ${currentProfile.display_name} 無權限訪問 ${pathname}`)
+          logger.warn(`用戶無權限訪問 ${pathname}（需要 ${requiredPermission}）`)
+          redirectingRef.current = true
           router.push('/unauthorized')
           return
         }
       }
 
-      // 2.1 檢查路由權限
-      const hasRoutePermission = hasPermissionForRoute(currentProfile.permissions, pathname)
+      // 3. 檢查路由權限
+      const hasRoutePermission = hasPermissionForRoute(permissions, pathname)
       if (!hasRoutePermission && pathname !== '/') {
-        logger.warn(`用戶 ${currentProfile.display_name} 無權限訪問路由 ${pathname}`)
-        // 暫時停用路由權限檢查
-        // router.push('/');
+        logger.warn(`用戶無權限訪問路由 ${pathname}`)
+        redirectingRef.current = true
+        router.push('/unauthorized')
         return
-      }
-
-      // 3. 如果在線，嘗試刷新 Supabase session（背景執行）
-      if (isOnline && currentProfile.cachedPassword) {
-        refreshSupabaseSession(currentProfile)
       }
     }
 
@@ -102,7 +94,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   }, [
     currentProfile,
     user,
-    isOnline,
+    _hasHydrated,
     requiredPermission,
     pathname,
     router,
@@ -110,10 +102,6 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
     profiles,
   ])
 
-  // 📦 純本地模式 - 無需刷新 session
-  const refreshSupabaseSession = async (profile: any) => {
-    logger.debug('本地模式：無需刷新 session')
-  }
 
   // 登入頁面不顯示載入畫面，直接渲染
   if (pathname === '/login') {
