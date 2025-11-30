@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Attraction, SortField, SortDirection } from '../types'
+import type { City } from '@/stores/region-store'
 
 // ============================================
 // Hook: 篩選和排序邏輯
@@ -7,7 +8,7 @@ import { Attraction, SortField, SortDirection } from '../types'
 
 interface UseAttractionsFiltersProps {
   attractions: Attraction[]
-  cities: any[]
+  cities: City[]
   searchTerm: string
   selectedCategory: string
   selectedCountry: string
@@ -76,8 +77,8 @@ export function useAttractionsFilters({
     return [...filteredAttractions].sort((a, b) => {
       if (!sortField || !sortDirection) return 0
 
-      let compareA: any
-      let compareB: any
+      let compareA: string | number
+      let compareB: string | number
 
       switch (sortField) {
         case 'name':

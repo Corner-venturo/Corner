@@ -27,7 +27,7 @@ export { useCanvasStore } from './canvas-store'
  * Use this when component only needs channels, groups, and channel management
  */
 export const useWorkspaceChannels = () => {
-  const channelsStore = useChannelsStore() as any
+  const channelsStore = useChannelsStore()
   return {
     // State
     workspaces: channelsStore.workspaces,
@@ -167,7 +167,7 @@ export const useWorkspaceCanvas = () => {
  * This combines all workspace stores into a single interface
  */
 export const useWorkspaceStore = () => {
-  const channelsStore = useChannelsStore() as any
+  const channelsStore = useChannelsStore()
   const chatStore = useChatStore()
   const membersStore = useMembersStore()
   const widgetsStore = useWidgetsStore()

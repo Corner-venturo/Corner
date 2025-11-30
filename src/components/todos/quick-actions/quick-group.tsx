@@ -74,7 +74,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
     setSubmitting(true)
     try {
-      const tourData: any = {
+      const tourData = {
         name: newTour.name,
         country_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.countryCode,
         city_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.cityCode,
@@ -95,7 +95,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
       // 如果有填寫聯絡人，同時建立訂單
       if (newOrder.contact_person.trim()) {
-        const orderData: any = {
+        const orderData = {
           tour_id: createdTour.id,
           code: createdTour.code,
           tour_name: createdTour.name,

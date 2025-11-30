@@ -78,12 +78,12 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
         (assigneeInfo ? `**指派給：** ${assigneeInfo.display_name}\n` : '') +
         `\n👉 [查看詳細](#/todos/${selectedTodo.id})`
 
-      // 3. 分享到聊天室
       await sendMessage({
         channel_id: channelId,
-        user_id: user.id,
+        author_id: user.id,
         content: message,
-      } as any)
+        reactions: {},
+      })
 
       onSuccess()
     } catch (error) {

@@ -13,16 +13,16 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { ChevronUp, ChevronDown, ChevronsUpDown, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { TableColumn, SelectionConfig } from './types'
+import { TableColumn, SelectionConfig, RowData } from './types'
 
-interface TableHeaderProps {
-  columns: TableColumn[]
+interface TableHeaderProps<T extends RowData = RowData> {
+  columns: TableColumn<T>[]
   sortColumn: string | null
   sortDirection: 'asc' | 'desc'
   filters: Record<string, string>
   showFilters: boolean
-  selection?: SelectionConfig
-  actions?: (row: any) => React.ReactNode
+  selection?: SelectionConfig<T>
+  actions?: (row: T) => React.ReactNode
   allVisibleSelected: boolean
   someVisibleSelected: boolean
   onSort: (columnKey: string) => void

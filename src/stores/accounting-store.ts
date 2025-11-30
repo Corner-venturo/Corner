@@ -321,7 +321,8 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       set(state => ({ transactions: [transaction, ...state.transactions] }))
 
       // 更新帳戶餘額
-      await (get() as any).updateAccountBalance(transaction)
+      const store = get() as AccountingStore & { updateAccountBalance: (t: Transaction) => Promise<void> }
+      await store.updateAccountBalance(transaction)
 
       // 重新載入帳戶資料
       await get().fetchAccounts()

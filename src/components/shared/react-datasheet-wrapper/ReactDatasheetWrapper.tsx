@@ -87,8 +87,8 @@ export function ReactDatasheetWrapper({
 
         // Calculate formulas
         if (typeof value === 'string' && value.startsWith('=')) {
-          const context = getMemberContext((cell as any).rowData || {}, tour_add_ons, tourPrice)
-          displayValue = calculateFormula(value, context) as any
+          const context = getMemberContext(cell.rowData || {}, tour_add_ons, tourPrice)
+          displayValue = calculateFormula(value, context)
           className = cn(className, 'datasheet-formula')
         }
 
@@ -143,7 +143,7 @@ export function ReactDatasheetWrapper({
 
   // Row renderer with drag support
   const rowRenderer = useCallback(
-    (props: any) => {
+    (props: React.HTMLAttributes<HTMLTableRowElement> & { 'data-row': number }) => {
       const rowIndex = props['data-row']
       const isDraggable = enableRowDrag && rowIndex > 0
       const isDragging = draggedRow === rowIndex - 1
@@ -177,7 +177,17 @@ export function ReactDatasheetWrapper({
   )
 
   // Cell renderer with width support
-  const cellRenderer = useCallback((props: any) => {
+  const cellRenderer = useCallback((props: React.TdHTMLAttributes<HTMLTableCellElement> & {
+    editing?: boolean
+    selected?: boolean
+    updated?: boolean
+    width?: number
+    columnKey?: string
+    rowIndex?: number
+    attributesRenderer?: unknown
+    valueRenderer?: unknown
+    dataRenderer?: unknown
+  }) => {
     const {
       editing: _editing,
       selected: _selected,
@@ -226,7 +236,7 @@ export function ReactDatasheetWrapper({
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
           dataRenderer={cell => cell.value}
-          onContextMenu={(e: any, _cell: any, _i: any, _j: any) => e.preventDefault()}
+          onContextMenu={(e: React.MouseEvent, _cell: CellData, _i: number, _j: number) => e.preventDefault()}
           onSelect={handleSelect}
           parsePaste={parsePaste}
           tabBehaviour="default"

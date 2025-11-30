@@ -24,13 +24,8 @@ type SharedOrderListEntity = SharedOrderList & Pick<BaseEntity, 'updated_at'>
  * - 歷史共享可以按需載入
  */
 export const useSharedOrderListStore = createStore<SharedOrderListEntity>({
-  tableName: 'shared_order_lists' as any,
-  cacheStrategy: 'time_range',
-  cacheConfig: {
-    months: 3,
-  },
-  enableRealtime: true,
-} as any)
+  tableName: 'shared_order_lists',
+})
 
 /**
  * Hook 型別（方便使用）

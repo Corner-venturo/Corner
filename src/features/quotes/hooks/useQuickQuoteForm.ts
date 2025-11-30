@@ -8,6 +8,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
+import { Quote } from '@/types/quote.types'
 
 interface QuickQuoteItem {
   id: string
@@ -43,7 +44,7 @@ const getInitialFormData = (): QuickQuoteFormData => ({
 const STORAGE_KEY = 'venturo_quick_quote_draft'
 
 interface UseQuickQuoteFormParams {
-  addQuote: (data: any) => Promise<any>
+  addQuote: (data: Partial<Quote>) => Promise<Quote | null>
 }
 
 export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
@@ -122,9 +123,8 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
         const tx = db.transaction('employees', 'readonly')
         const store = tx.objectStore('employees')
 
-        // 嘗試找到當前用戶的員工記錄
         const allEmployees = await store.getAll()
-        const employee = allEmployees.find((emp: any) => emp.user_id === user.id)
+        const employee = allEmployees.find((emp: { user_id?: string; workspace_id?: string }) => emp.user_id === user.id)
 
         if (employee?.workspace_id) {
           finalWorkspaceId = employee.workspace_id

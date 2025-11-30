@@ -7,7 +7,7 @@ import { FileSignature, Save, Edit2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTourStore } from '@/stores'
 
-const CONTRACT_TEMPLATE_LABELS = {
+const CONTRACT_TEMPLATE_LABELS: Record<string, string> = {
   template_a: '範本 A',
   template_b: '範本 B',
   template_c: '範本 C',
@@ -132,7 +132,7 @@ export default function ContractDetailPage() {
               <div>
                 <div className="text-sm text-morandi-secondary">合約範本</div>
                 <div className="text-morandi-primary font-medium">
-                  {(CONTRACT_TEMPLATE_LABELS as any)[tour.contract_template]}
+                  {tour.contract_template ? CONTRACT_TEMPLATE_LABELS[tour.contract_template] : '-'}
                 </div>
               </div>
               <div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
 import { useLocalAuthStore } from '@/lib/auth/local-auth-manager'
 import { User, Lock, AlertCircle, Eye, EyeOff, LogIn, X } from 'lucide-react'
@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [profileCards, setProfileCards] = useState<any[]>([])
   const [selectedProfile, setSelectedProfile] = useState<any | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { validateLogin, switchProfile } = useAuthStore()
   const localAuthStore = useLocalAuthStore()
 
@@ -31,13 +32,17 @@ export default function LoginPage() {
 
   // 取得登入後要跳轉的頁面
   const getRedirectPath = (): string => {
-    // 從 localStorage 讀取最後訪問的頁面
+    // 1. 優先從 URL 參數讀取（middleware 設定的）
+    const redirectParam = searchParams.get('redirect')
+    if (redirectParam && redirectParam !== '/login') {
+      return redirectParam
+    }
+    // 2. 從 localStorage 讀取最後訪問的頁面
     const lastPath = localStorage.getItem('last-visited-path')
-    // 排除登入頁面
     if (lastPath && lastPath !== '/login') {
       return lastPath
     }
-    // 預設跳到首頁
+    // 3. 預設跳到首頁
     return '/'
   }
 
@@ -74,16 +79,22 @@ export default function LoginPage() {
 
     try {
       // 直接切換角色（使用 switchProfile）
-      const success = switchProfile(profileId)
+      console.log('🔄 [Login] 開始 switchProfile...')
+      const success = await switchProfile(profileId)
+      console.log('🔄 [Login] switchProfile 結果:', success)
 
       if (success) {
         const redirectPath = getRedirectPath()
-        router.push(redirectPath)
+        console.log('🔄 [Login] 準備跳轉到:', redirectPath)
+
+        // 🔧 使用 window.location 強制跳轉（避免 Next.js router 問題）
+        window.location.href = redirectPath
       } else {
         setError('切換角色失敗，請使用密碼登入')
         setShowProfileCards(false)
       }
     } catch (error) {
+      console.error('❌ [Login] 快速登入錯誤:', error)
       setError('快速登入失敗，請使用密碼登入')
       setShowProfileCards(false)
     } finally {

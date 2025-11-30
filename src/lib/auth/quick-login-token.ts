@@ -3,7 +3,9 @@
  * 使用 HMAC-SHA256 簽名防止偽造
  */
 
-const QUICK_LOGIN_SECRET = process.env.QUICK_LOGIN_SECRET || 'venturo_quick_login_secret_2024_change_in_production'
+// 🔧 使用固定 secret（內部系統，不需要從環境變數讀取）
+// 這確保瀏覽器和 middleware 使用相同的 secret
+const QUICK_LOGIN_SECRET = 'venturo_quick_login_secret_2024_internal_system'
 const TOKEN_EXPIRY_MS = 8 * 60 * 60 * 1000 // 8 小時
 
 /**
@@ -50,19 +52,28 @@ export async function verifyQuickLoginToken(token: string): Promise<boolean> {
   }
 
   // 新版格式：quick-login-v2-{profileId}-{timestamp}-{signature}
+  // profileId 是 UUID 格式（包含 4 個 -），所以需要特殊處理
   if (!token.startsWith('quick-login-v2-')) {
     return false
   }
 
-  const parts = token.split('-')
-  // 應該是 ['quick', 'login', 'v2', profileId, timestamp, signature]
-  if (parts.length < 6) {
-    return false
-  }
+  // 移除前綴 "quick-login-v2-"
+  const payload = token.substring('quick-login-v2-'.length)
 
-  const profileId = parts[3]
-  const timestamp = parseInt(parts[4])
-  const providedSignature = parts.slice(5).join('-') // 處理 signature 可能包含 - 的情況
+  // 從後面找 signature（64 字元的 hex）和 timestamp（13 位數字）
+  // 格式：{uuid}-{timestamp}-{signature}
+  // 範例：35880209-77eb-4827-84e3-c4e2bc013825-1732952000000-abc123...
+  const lastDashIndex = payload.lastIndexOf('-')
+  if (lastDashIndex === -1) return false
+
+  const providedSignature = payload.substring(lastDashIndex + 1)
+  const remainingPayload = payload.substring(0, lastDashIndex)
+
+  const secondLastDashIndex = remainingPayload.lastIndexOf('-')
+  if (secondLastDashIndex === -1) return false
+
+  const timestamp = parseInt(remainingPayload.substring(secondLastDashIndex + 1))
+  const profileId = remainingPayload.substring(0, secondLastDashIndex)
 
   // 檢查時間戳有效性
   if (isNaN(timestamp)) {

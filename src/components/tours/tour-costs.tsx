@@ -77,7 +77,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
       // 建立請款單
       const paymentRequestData = {
-        allocation_mode: 'single' as any,
+        allocation_mode: 'single' as const,
         tour_id: data.tour_id,
         code: tour.code,
         tour_name: tour.name,
@@ -86,7 +86,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         total_amount: data.amount,
         status: data.status === '已確認' ? 'confirmed' : 'pending',
         note: data.description,
-        created_by: '', // 會由 store 自動填入
+        created_by: '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
@@ -156,8 +156,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         )
       })
       .flatMap(request =>
-        // 將每個請款單的項目展開成 CostPayment 格式
-        (request.items || []).map((item: any) => ({
+        (request.items || []).map((item: PaymentRequestItem) => ({
           id: item.id,
           type: 'request' as const,
           tour_id: request.tour_id || tour.id,
@@ -173,7 +172,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   }, [paymentRequests, tourOrders, tour.id, orderFilter])
 
   const getCategoryIcon = (category: string) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
       transport: Truck,
       accommodation: Hotel,
       food: Utensils,

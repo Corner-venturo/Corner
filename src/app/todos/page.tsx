@@ -39,6 +39,7 @@ import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { TodoExpandedView } from '@/components/todos/todo-expanded-view'
 import { StarRating } from '@/components/ui/star-rating'
 import { Todo } from '@/stores/types'
+import type { CreateInput } from '@/stores/core/types'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { TodoCard } from '@/components/todos/todo-card'
@@ -303,7 +304,13 @@ export default function TodosPage() {
   )
 
   const handleAddTodo = useCallback(
-    async (formData: any) => {
+    async (formData: {
+      title: string
+      priority: 1 | 2 | 3 | 4 | 5
+      deadline: string
+      assignee: string
+      enabled_quick_actions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
+    }) => {
       const auth = useRequireAuthSync()
 
       if (!auth.isAuthenticated) {
@@ -318,22 +325,22 @@ export default function TodosPage() {
           visibilityList.push(formData.assignee)
         }
 
-        const newTodoData = {
+        const newTodoData: CreateInput<Todo> = {
           title: formData.title,
           priority: formData.priority,
-          deadline: formData.deadline || null, // ✅ 空字串轉 null
-          status: 'pending' as const,
+          deadline: formData.deadline || undefined,
+          status: 'pending',
           completed: false,
-          creator: auth.user!.id, // ✅ 使用當前登入用戶
-          assignee: formData.assignee || null,
-          visibility: visibilityList, // ✅ 包含建立者和被指派者
+          creator: auth.user!.id,
+          assignee: formData.assignee || undefined,
+          visibility: visibilityList,
           related_items: [],
           sub_tasks: [],
           notes: [],
           enabled_quick_actions: formData.enabled_quick_actions || ['receipt', 'quote'],
         }
 
-        await addTodo(newTodoData as any)
+        await addTodo(newTodoData)
         setIsAddDialogOpen(false)
       } catch (error) {
         logger.error('新增待辦事項失敗:', error)
@@ -377,23 +384,21 @@ export default function TodosPage() {
                 setQuickAddValue('') // 清空受控組件的值
                 setIsSubmitting(true)
 
-                const newTodoData = {
+                const newTodoData: CreateInput<Todo> = {
                   title,
-                  priority: 1 as 1 | 2 | 3 | 4 | 5,
-                  deadline: null, // ✅ 使用 null 而非空字串
-                  status: 'pending' as const,
+                  priority: 1,
+                  status: 'pending',
                   completed: false,
                   creator: auth.user!.id,
-                  assignee: null,
                   visibility: [auth.user!.id],
                   related_items: [],
                   sub_tasks: [],
                   notes: [],
-                  enabled_quick_actions: ['receipt', 'quote'] as ('receipt' | 'quote')[],
+                  enabled_quick_actions: ['receipt', 'quote'],
                 }
 
                 try {
-                  await addTodo(newTodoData as any)
+                  await addTodo(newTodoData)
                   logger.log('✅ 待辦事項新增成功')
                 } catch (error) {
                   logger.error('快速新增失敗:', error)
@@ -430,12 +435,12 @@ export default function TodosPage() {
       <div className="flex-1 overflow-hidden">
         <div className="h-full">
           <EnhancedTable
-            columns={columns}
-            data={filteredTodos}
-            onRowClick={handleRowClick}
+            columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
+            data={filteredTodos as unknown as Parameters<typeof EnhancedTable>[0]['data']}
+            onRowClick={handleRowClick as unknown as Parameters<typeof EnhancedTable>[0]['onRowClick']}
             striped
-            rowClassName={getPriorityRowClass}
-            actions={(todo: Todo) => (
+            rowClassName={getPriorityRowClass as unknown as Parameters<typeof EnhancedTable>[0]['rowClassName']}
+            actions={((todo: Todo) => (
               <div className="flex items-center gap-1">
                 <button
                   onClick={e => {
@@ -474,7 +479,7 @@ export default function TodosPage() {
                   <Trash2 size={14} />
                 </button>
               </div>
-            )}
+            )) as unknown as Parameters<typeof EnhancedTable>[0]['actions']}
             searchableFields={['title']}
             searchTerm={searchTerm}
             showFilters={false}
@@ -515,7 +520,19 @@ export default function TodosPage() {
 }
 
 // 新增待辦事項表單組件
-function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: { title: string; priority: 1 | 2 | 3 | 4 | 5; deadline: string; assigned_user_id: string; description: string; tags: string[] }) => void; onCancel: () => void }) {
+function AddTodoForm({
+  onSubmit,
+  onCancel,
+}: {
+  onSubmit: (data: {
+    title: string
+    priority: 1 | 2 | 3 | 4 | 5
+    deadline: string
+    assignee: string
+    enabled_quick_actions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
+  }) => void
+  onCancel: () => void
+}) {
   const { items: users, fetchAll: loadUsersFromDatabase } = useUserStore()
   const [isLoadingUsers, _setIsLoadingUsers] = useState(false)
   const [formData, setFormData] = useState({
@@ -549,7 +566,7 @@ function AddTodoForm({ onSubmit, onCancel }: { onSubmit: (data: { title: string;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) return
-    onSubmit(formData as any)
+    onSubmit(formData)
   }
 
   return (

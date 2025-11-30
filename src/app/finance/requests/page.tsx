@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, FileText } from 'lucide-react'
 import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
@@ -44,7 +44,7 @@ export default function RequestsPage() {
       <div className="flex-1 overflow-auto">
         <EnhancedTable
           className="min-h-full"
-          columns={tableColumns}
+          columns={tableColumns as TableColumn[]}
           data={filteredAndSortedRequests}
           onSort={handleSort}
           onFilter={handleFilter}

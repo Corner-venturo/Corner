@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { ParticipantCounts } from '../../../types'
+import { ParticipantCounts, CostCategory, AccommodationSummaryItem, SellingPrices } from '../../../types'
 import { PrintHeader } from '../shared/PrintHeader'
 import { PrintFooter } from '../shared/PrintFooter'
 import { PrintControls } from '../shared/PrintControls'
@@ -16,42 +16,32 @@ import { QuotationInfo } from './QuotationInfo'
 import { QuotationPricingTable } from './QuotationPricingTable'
 import { QuotationInclusions } from './QuotationInclusions'
 import { QuotationTerms } from './QuotationTerms'
+import { Quote } from '@/types/models'
 
-interface PrintableQuotationProps {
-  quote: any
-  quoteName: string
-  participantCounts: ParticipantCounts
-  sellingPrices: {
+interface TierPricingForPrint {
+  participant_count: number
+  selling_prices: {
     adult: number
     child_with_bed: number
     child_no_bed: number
     single_room: number
     infant: number
-    room_types?: Record<string, { adult: number; child: number }>
   }
-  categories: any[]
+}
+
+interface PrintableQuotationProps {
+  quote: Quote
+  quoteName: string
+  participantCounts: ParticipantCounts
+  sellingPrices: SellingPrices
+  categories: CostCategory[]
   totalCost: number
   isOpen: boolean
   onClose: () => void
   onPrint: () => void
-  accommodationSummary?: Array<{
-    name: string
-    total_cost: number
-    averageCost: number
-    days: number
-    capacity: number
-  }>
+  accommodationSummary?: AccommodationSummaryItem[]
   tierLabel?: string
-  tierPricings?: Array<{
-    participant_count: number
-    selling_prices: {
-      adult: number
-      child_with_bed: number
-      child_no_bed: number
-      single_room: number
-      infant: number
-    }
-  }>
+  tierPricings?: TierPricingForPrint[]
 }
 
 export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({

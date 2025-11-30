@@ -39,8 +39,8 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   // 更新單筆資料
   const handleUpdate = async (id: string, updates: Partial<TransportationRate>) => {
-    // @ts-ignore - Supabase type inference issue
-    const result: any = await supabase.from('transportation_rates').update(updates).eq('id', id)
+    // @ts-expect-error - transportation_rates table not in generated Supabase types
+    const result = await supabase.from('transportation_rates').update(updates).eq('id', id)
     const error = result.error
 
     if (error) {
@@ -57,8 +57,8 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   const handleDelete = async (id: string) => {
     if (!confirm('確定要刪除這筆車資資料嗎？')) return
 
-    // @ts-ignore - Supabase type inference issue
-    const result: any = await supabase.from('transportation_rates').delete().eq('id', id)
+    // @ts-expect-error - transportation_rates table not in generated Supabase types
+    const result = await supabase.from('transportation_rates').delete().eq('id', id)
     const error = result.error
 
     if (error) {
@@ -73,9 +73,14 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   // 新增資料
   const handleCreate = async (data: Partial<TransportationRate>) => {
-    const dataWithCategory = data as any
-    // @ts-ignore - Supabase type inference issue
-    const result: any = await supabase.from('transportation_rates').insert({
+    interface CreateRateData extends Partial<TransportationRate> {
+      category?: string
+      price_twd?: number
+    }
+    const dataWithCategory = data as CreateRateData
+
+    // @ts-expect-error - transportation_rates table not in generated Supabase types
+    const result = await supabase.from('transportation_rates').insert({
       ...data,
       workspace_id: user?.workspace_id || null,
       country_id: data.country_id || '',
@@ -86,7 +91,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
       unit: 'trip',
       is_active: true,
       display_order: 0,
-    } as any)
+    })
     const error = result.error
 
     if (error) {

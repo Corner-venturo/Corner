@@ -7,18 +7,34 @@ import { tourService } from '@/features/tours/services/tour.service'
 import { logger } from '@/lib/utils/logger'
 import { NewTourData } from '../types'
 import { OrderFormData } from '@/components/orders/add-order-form'
+import type { CreateInput, UpdateInput } from '@/stores/core/types'
+import type { Order } from '@/types'
+import type { Quote } from '@/types/quote.types'
+
+interface TourActions {
+  create: (data: CreateInput<Tour>) => Promise<Tour>
+  update: (id: string, data: UpdateInput<Tour>) => Promise<Tour>
+  delete: (id: string) => Promise<void>
+}
+
+interface CityOption {
+  id: string
+  code: string
+  name: string
+  country_id: string
+}
 
 interface UseTourOperationsParams {
-  actions: any
-  addOrder: any
-  updateQuote: any
-  availableCities: any[]
+  actions: TourActions
+  addOrder: (data: CreateInput<Order>) => Promise<Order>
+  updateQuote: (id: string, data: UpdateInput<Quote>) => Promise<Quote>
+  availableCities: CityOption[]
   resetForm: () => void
   closeDialog: () => void
   setSubmitting: (value: boolean) => void
   setFormError: (error: string | null) => void
   dialogType: string
-  dialogData: any
+  dialogData: Tour | null
 }
 
 export function useTourOperations(params: UseTourOperationsParams) {
@@ -78,8 +94,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         // Edit mode: update existing tour
         if (dialogType === 'edit' && dialogData) {
-          const existingTour = dialogData as Tour
-
           const tourData = {
             name: newTour.name,
             location: cityName,
@@ -91,7 +105,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
             description: newTour.description,
           }
 
-          await actions.update(existingTour.id, tourData)
+          await actions.update(dialogData.id, tourData)
           resetForm()
           closeDialog()
           return

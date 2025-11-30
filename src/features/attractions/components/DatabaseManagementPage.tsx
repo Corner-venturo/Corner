@@ -133,7 +133,7 @@ export default function DatabaseManagementPage() {
             )}
           </>
         }
-        showClearFilters={hasActiveFilters as any}
+        showClearFilters={Boolean(hasActiveFilters)}
         onClearFilters={clearFilters}
         onAdd={activeTab === 'attractions' ? openAdd : undefined}
         addLabel="新增景點"

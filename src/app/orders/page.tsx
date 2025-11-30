@@ -3,9 +3,6 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Combobox } from '@/components/ui/combobox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useOrderStore, useTourStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
@@ -14,6 +11,7 @@ import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
 import { cn } from '@/lib/utils'
 import { useRealtimeForOrders } from '@/hooks/use-realtime-hooks'
+import type { Order } from '@/types/order.types'
 
 export default function OrdersPage() {
   // ✅ Realtime 訂閱（只訂閱 Orders）
@@ -147,8 +145,8 @@ export default function OrdersPage() {
       paid_amount: 0,
       payment_status: 'unpaid',
       remaining_amount: orderData.total_amount,
-      workspace_id: currentWorkspace.id, // 🔥 設定 workspace_id
-    } as any)
+      workspace_id: currentWorkspace.id,
+    } satisfies Partial<Order>)
 
     setIsAddDialogOpen(false)
   }
@@ -196,7 +194,7 @@ export default function OrdersPage() {
                 <h3 className="font-semibold text-morandi-primary">待辦事項</h3>
               </div>
               <div className="space-y-2">
-                {todos.map((todo: TodoItem, index) => (
+                {todos.map((todo, index) => (
                   <div
                     key={index}
                     className="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-morandi-container/20 transition-colors cursor-pointer"
@@ -229,7 +227,7 @@ export default function OrdersPage() {
         )}
 
         {/* 訂單列表 */}
-        <SimpleOrderTable className="min-h-full" orders={filteredOrders as any} showTourInfo={true} />
+        <SimpleOrderTable className="min-h-full" orders={filteredOrders} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { MoreLinkArg } from '@fullcalendar/core'
 import { MoreEventsDialogState, FullCalendarEvent } from '../types'
 
 export function useMoreEventsDialog() {
@@ -33,11 +34,10 @@ export function useMoreEventsDialog() {
     [getEventDuration]
   )
 
-  // 處理 "更多" 連結點擊
   const handleMoreLinkClick = useCallback(
-    (info: any, filteredEvents: FullCalendarEvent[]) => {
+    (info: MoreLinkArg, filteredEvents: FullCalendarEvent[]) => {
       info.jsEvent.preventDefault()
-      const clickedDate = info.dateStr
+      const clickedDate = info.date.toISOString().split('T')[0]
 
       const dayEvents = (filteredEvents || []).filter((event: FullCalendarEvent) => {
         if (!event?.start) return false

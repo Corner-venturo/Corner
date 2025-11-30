@@ -29,17 +29,15 @@ export async function update<T extends BaseEntity>(
 
   try {
     // 取得當前使用者 ID（用於自動填入 updated_by）
-    const getUserId = () => {
+    const getUserId = (): string | null => {
       try {
-        // @ts-ignore - Dynamic import for auth store
-        const { useAuthStore } = require('@/stores/auth-store')
+        const { useAuthStore } = require('@/stores/auth-store') as { useAuthStore: { getState: () => { user?: { id?: string } | null } } }
         const { user } = useAuthStore.getState()
         return user?.id || null
       } catch {
         return null
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _userId = getUserId()
 
     // 清理資料：將空字串的時間欄位轉為 null（PostgreSQL 不接受空字串）
@@ -58,11 +56,11 @@ export async function update<T extends BaseEntity>(
     }
 
     // ✅ 步驟 1：更新 IndexedDB（本地快取）⚡ 立即反映
-    await indexedDB.update(id, cleanedData as any)
+    await indexedDB.update(id, cleanedData as Partial<T>)
 
     // ✅ 步驟 2：背景同步到 Supabase（不阻塞 UI）
     if (enableSupabase && typeof window !== 'undefined') {
-      supabase.update(id, cleanedData as any).catch((error: any) => {
+      supabase.update(id, cleanedData as Partial<T>).catch((error: unknown) => {
         logger.warn(`⚠️ [${tableName}] Supabase 背景同步失敗（已保存到本地）:`, error)
       })
     }

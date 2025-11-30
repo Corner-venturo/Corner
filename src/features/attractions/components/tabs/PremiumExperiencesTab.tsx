@@ -48,8 +48,9 @@ interface PremiumExperiencesTabProps {
 export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperiencesTabProps) {
   const [experiences, setExperiences] = useState<PremiumExperience[]>([])
   const [loading, setLoading] = useState(true)
-  const [countries, setCountries] = useState<any[]>([])
-  const [cities, setCities] = useState<any[]>([])
+  const [countries, setCountries] = useState<Array<{ id: string; name: string; emoji?: string }>>([])
+  const [cities, setCities] = useState<Array<{ id: string; name: string }>>([])
+
   const [editingExperience, setEditingExperience] = useState<PremiumExperience | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
@@ -67,7 +68,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         .order('name')
 
       if (error) throw error
-      setExperiences(data as any || [])
+      setExperiences((data as PremiumExperience[]) || [])
 
       // 載入用到的國家和城市資料
       if (data && data.length > 0) {
@@ -94,9 +95,10 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             })
         }
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
       logger.error('載入頂級體驗失敗:', error)
-      toast.error('載入失敗：' + error.message)
+      toast.error('載入失敗：' + errorMessage)
     } finally {
       setLoading(false)
     }
@@ -231,7 +233,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'name',
         label: '體驗名稱',
         sortable: true,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <div className="min-w-[180px]">
             <div className="font-medium text-morandi-primary line-clamp-1">{experience.name}</div>
             {experience.name_en && (
@@ -244,7 +246,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'exclusivity_level',
         label: '獨特性',
         sortable: true,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <span
             className={`px-2 py-1 text-xs font-medium rounded border ${getExclusivityColor(
               experience.exclusivity_level
@@ -258,7 +260,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'category',
         label: '類別',
         sortable: true,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-morandi-gold/10 text-morandi-gold">
             {getCategoryLabel(experience.category)}
           </span>
@@ -268,7 +270,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'city',
         label: '地點',
         sortable: false,
-        render: (_: any, experience: PremiumExperience) => {
+        render: (_: unknown, experience: PremiumExperience) => {
           const country = countries.find(c => c.id === experience.country_id)
           const city = cities.find(c => c.id === experience.city_id)
           return (
@@ -282,7 +284,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'expert_name',
         label: '專家',
         sortable: true,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <div className="min-w-[120px]">
             {experience.expert_name ? (
               <>
@@ -305,7 +307,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'duration',
         label: '時長',
         sortable: false,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <div className="flex items-center gap-1 text-sm text-morandi-secondary">
             {experience.duration_hours ? (
               <>
@@ -322,7 +324,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'participants',
         label: '人數',
         sortable: false,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <div className="flex items-center gap-1 text-sm text-morandi-secondary">
             {experience.min_participants || experience.max_participants ? (
               <>
@@ -341,7 +343,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'price',
         label: '價格',
         sortable: false,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <div className="text-sm text-morandi-gold font-medium min-w-[100px]">
             {experience.price_per_person_min
               ? `${experience.price_per_person_min.toLocaleString()}${
@@ -358,7 +360,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         key: 'is_active',
         label: '狀態',
         sortable: true,
-        render: (_: any, experience: PremiumExperience) => (
+        render: (_: unknown, experience: PremiumExperience) => (
           <span
             className={cn(
               'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',

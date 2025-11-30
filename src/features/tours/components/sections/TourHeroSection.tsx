@@ -1,7 +1,17 @@
 import { motion } from 'framer-motion'
 
+interface TourDisplayData {
+  coverImage?: string | null
+  tagline?: string | null
+  title: string
+  subtitle?: string | null
+  description?: string | null
+  departureDate: string
+  tourCode: string
+}
+
 interface TourHeroSectionProps {
-  data: any
+  data: TourDisplayData
   viewMode: 'desktop' | 'mobile'
 }
 

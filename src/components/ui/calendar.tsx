@@ -9,7 +9,7 @@ export interface CalendarProps {
   selected?: Date | { from: Date; to?: Date }
   onSelect?: (date: Date | { from: Date; to?: Date } | undefined) => void
   disabled?: ((date: Date) => boolean) | { before?: Date; after?: Date }
-  locale?: any
+  locale?: Intl.Locale | string
   initialFocus?: boolean
   className?: string
   defaultMonth?: Date
@@ -119,11 +119,11 @@ export function Calendar({
   const checkIfInRange = (
     date: Date
   ): { isInRange: boolean; isRangeStart: boolean; isRangeEnd: boolean } => {
-    if (mode !== 'range' || !selected || !(selected as any).from) {
+    if (mode !== 'range' || !selected || selected instanceof Date || !('from' in selected)) {
       return { isInRange: false, isRangeStart: false, isRangeEnd: false }
     }
 
-    const range = selected as { from: Date; to?: Date }
+    const range = selected
     const fromDate = new Date(range.from)
     fromDate.setHours(0, 0, 0, 0)
 
@@ -178,12 +178,15 @@ export function Calendar({
     if (mode === 'single') {
       onSelect?.(date)
     } else if (mode === 'range') {
-      if (!selected || !(selected as any).from || (selected as any).to) {
+      const isRangeSelected = selected && !((selected as Date) instanceof Date) && 'from' in selected
+      const rangeHasTo = isRangeSelected && 'to' in selected && selected.to !== undefined
+
+      if (!isRangeSelected || rangeHasTo) {
         // 開始新的範圍選擇
         onSelect?.({ from: date })
       } else {
         // 完成範圍選擇
-        const from = (selected as any).from
+        const from = selected.from
         if (date < from) {
           onSelect?.({ from: date, to: from })
         } else {

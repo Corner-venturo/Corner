@@ -9,9 +9,10 @@ import {
   DecorativeDivider,
 } from '@/components/tour-preview'
 import { ArrowRight, Sparkles } from 'lucide-react'
+import { TourFormData } from '@/components/editor/tour-form/types'
 
 interface TourItinerarySectionProps {
-  data: any
+  data: TourFormData
   viewMode: 'desktop' | 'mobile'
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
@@ -84,7 +85,7 @@ export function TourItinerarySection({
         <div>
           <div>
             <div className="space-y-12">
-              {dailyItinerary.map((day: any, index: number) => (
+              {dailyItinerary.map((day, index: number) => (
                 <article
                   key={`day-section-${index}`}
                   id={`day-${index + 1}`}
@@ -125,7 +126,7 @@ export function TourItinerarySection({
                     <div className="mb-8 space-y-4">
                       <DecorativeDivider variant="simple" />
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        {day.activities.map((activity: any, actIndex: number) => (
+                        {day.activities.map((activity, actIndex: number) => (
                           <AttractionCard
                             key={`activity-${index}-${actIndex}`}
                             title={activity.title}

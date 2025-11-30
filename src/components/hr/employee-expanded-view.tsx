@@ -12,7 +12,7 @@ import { BasicInfoTab } from './tabs/basic-info'
 import { SalaryTab } from './tabs/salary-tab'
 import { PermissionsTabNew } from './tabs/permissions-tab-new'
 import { SYSTEM_PERMISSIONS } from '@/stores/types'
-import { getRoleConfig } from '@/lib/rbac-config'
+import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
 
 interface EmployeeExpandedViewProps {
   employee_id: string
@@ -58,9 +58,8 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
           </div>
         )
       case 'permissions':
-        // 使用新的 RBAC 系統顯示角色資訊
         const userRole = employee.roles?.[0]
-        const roleConfig = userRole ? getRoleConfig(userRole as any) : null
+        const roleConfig = userRole ? getRoleConfig(userRole as UserRole) : null
         const roleLabel = roleConfig?.label || '未設定'
         const permissionCount = roleConfig?.permissions.includes('*')
           ? SYSTEM_PERMISSIONS.length
@@ -117,7 +116,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
           />
         )
       case 'permissions':
-        return <PermissionsTabNew ref={null as any} employee={employee} />
+        return <PermissionsTabNew ref={null} employee={employee} />
       default:
         return null
     }
@@ -142,7 +141,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
             </div>
             <div>
               <h2 className="text-xl font-bold text-morandi-primary">
-                {employee.display_name || (employee as any).chinese_name || '未命名員工'}
+                {employee.display_name || employee.chinese_name || '未命名員工'}
               </h2>
               <p className="text-morandi-secondary">{employee.employee_number}</p>
             </div>

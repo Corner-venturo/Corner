@@ -17,7 +17,13 @@ interface VisaApplicant {
  * 簽證對話框邏輯 Hook
  * 負責對話框狀態、表單資料、辦理人管理
  */
-export function useVisasDialog(tours: any[]) {
+interface Tour {
+  id: string
+  code: string
+  name: string
+}
+
+export function useVisasDialog(tours: Tour[]) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // 聯絡人資訊

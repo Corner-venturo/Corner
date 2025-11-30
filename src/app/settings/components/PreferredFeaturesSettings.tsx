@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/user-store'
 import { Check, Star, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import type { User } from '@/stores/types'
 
 // 定義所有可選功能
 interface FeatureOption {
@@ -86,30 +87,32 @@ export function PreferredFeaturesSettings() {
     setIsSaving(true)
     try {
       // 更新資料庫
-      await updateUser(user.id, { preferred_features: features as any })
+      await updateUser(user.id, { preferred_features: features })
 
       // 同步更新 IndexedDB
       try {
         const { localDB } = await import('@/lib/db')
         const { TABLES } = await import('@/lib/db/schemas')
 
-        const existingEmployee = await localDB.read(TABLES.EMPLOYEES, user.id)
+        const existingEmployee = await localDB.read(TABLES.EMPLOYEES, user.id) as User | undefined
         if (existingEmployee) {
-          await localDB.put(TABLES.EMPLOYEES, {
+          const updatedEmployee: User = {
             ...existingEmployee,
             preferred_features: features,
             updated_at: new Date().toISOString(),
-          } as any)
+          }
+          await localDB.put(TABLES.EMPLOYEES, updatedEmployee)
         }
       } catch (error) {
         // Ignore error
       }
 
       // 更新 auth-store 中的 user
-      login({
+      const updatedUser: User = {
         ...user,
         preferred_features: features,
-      } as any)
+      }
+      login(updatedUser)
 
       // 顯示儲存成功訊息
       setShowSavedMessage(true)
@@ -125,11 +128,10 @@ export function PreferredFeaturesSettings() {
     if (!user) return
 
     // 根據角色重置為預設功能
-    const role = user.roles?.[0] as any
+    const role = user.roles?.[0]
     let defaultFeatures: string[] = []
 
     switch (role) {
-      case 'super_admin':
       case 'admin':
         defaultFeatures = ['tours', 'orders', 'quotes', 'customers', 'calendar', 'hr']
         break
@@ -145,11 +147,8 @@ export function PreferredFeaturesSettings() {
       case 'assistant':
         defaultFeatures = ['orders', 'customers', 'calendar', 'todos']
         break
-      case 'staff':
-        defaultFeatures = ['calendar', 'todos', 'workspace']
-        break
       default:
-        defaultFeatures = ['calendar', 'workspace']
+        defaultFeatures = ['calendar', 'todos', 'workspace']
     }
 
     setSelectedFeatures(defaultFeatures)

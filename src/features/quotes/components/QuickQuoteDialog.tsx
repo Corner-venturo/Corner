@@ -34,7 +34,7 @@ interface QuickQuoteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   formData: QuickQuoteFormData
-  setFormField: (field: string, value: any) => void
+  setFormField: (field: string, value: string | number | QuickQuoteItem[]) => void
   onSubmit: () => Promise<boolean>
   onClose: () => void
 }
@@ -85,7 +85,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
   }
 
   // 更新項目
-  const updateItem = (id: string, field: keyof QuickQuoteItem, value: any) => {
+  const updateItem = (id: string, field: keyof QuickQuoteItem, value: string | number) => {
     setFormField(
       'items',
       formData.items.map(item => {

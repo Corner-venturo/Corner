@@ -23,7 +23,6 @@ export function useRequestOperations() {
     ) => {
       if (!formData.tour_id || items.length === 0) return null
 
-      // Create payment request
       const request = await createPaymentRequest({
         tour_id: formData.tour_id,
         code: tourCode,
@@ -36,7 +35,9 @@ export function useRequestOperations() {
         status: 'pending',
         note: formData.note,
         budget_warning: false,
-      } as any)
+        request_type: 'standard',
+        amount: 0,
+      })
 
       // Add all items sequentially
       for (let i = 0; i < items.length; i++) {
@@ -85,7 +86,6 @@ export function useRequestOperations() {
         // Calculate adjustment ratio
         const adjustmentRatio = tourAmount / totalItemsAmount
 
-        // Create payment request
         const request = await createPaymentRequest({
           tour_id: tourId,
           code: selectedTour.code,
@@ -96,7 +96,9 @@ export function useRequestOperations() {
           status: 'pending',
           note: formData.note,
           budget_warning: false,
-        } as any)
+          request_type: 'standard',
+          amount: 0,
+        })
 
         // Add all items with adjusted amounts
         for (let i = 0; i < items.length; i++) {

@@ -6,6 +6,7 @@ import { alert, alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-di
 import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
+import type { Employee } from '@/types/models'
 
 interface AccountSettingsProps {
   user: {
@@ -39,7 +40,7 @@ export function AccountSettings({
   setPasswordUpdateLoading,
 }: AccountSettingsProps) {
   const handlePasswordUpdate = async () => {
-    const auth = useRequireAuthSync() as any
+    const auth = useRequireAuthSync()
 
     if (!auth.isAuthenticated) {
       auth.showLoginRequired()
@@ -139,14 +140,14 @@ export function AccountSettings({
         const { localDB } = await import('@/lib/db')
         const { TABLES } = await import('@/lib/db/schemas')
 
-        const employee = await localDB.read(TABLES.EMPLOYEES, user.id)
+        const employee = await localDB.read<Employee>(TABLES.EMPLOYEES, user.id)
         if (employee) {
           await localDB.put(TABLES.EMPLOYEES, {
             ...employee,
             password_hash: hashedPassword,
             last_password_change: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-          } as any)
+          })
           logger.log('✅ IndexedDB 密碼已更新')
         }
       } catch (dbError) {

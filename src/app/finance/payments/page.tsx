@@ -15,7 +15,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Plus, Search, FileDown, Layers, Eye } from 'lucide-react'
 
 // Realtime Hooks
@@ -37,6 +37,7 @@ import { exportReceiptsToExcel } from '@/lib/excel/receipt-excel'
 // Types
 import type { Receipt } from '@/stores'
 import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
+import type { ReceiptItem } from '@/stores'
 
 export default function PaymentsPage() {
   // ✅ Realtime 訂閱（只訂閱 Receipts）
@@ -102,7 +103,7 @@ export default function PaymentsPage() {
     window.location.href = `/finance/payments/${receipt.id}`
   }
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: { selectedOrderId: string; paymentItems: ReceiptItem[] }) => {
     try {
       await handleCreateReceipt(data)
       setIsDialogOpen(false)
@@ -122,15 +123,15 @@ export default function PaymentsPage() {
   }
 
   // 表格欄位
-  const columns = [
+  const columns: TableColumn<Receipt>[] = [
     { key: 'receipt_number', label: '收款單號', sortable: true },
-    { key: 'receipt_date', label: '收款日期', sortable: true, render: (value: unknown) => <DateCell date={String(value)} /> },
+    { key: 'receipt_date', label: '收款日期', sortable: true, render: (value) => <DateCell date={String(value)} /> },
     { key: 'order_number', label: '訂單編號', sortable: true },
     { key: 'tour_name', label: '團名', sortable: true },
-    { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value: unknown) => `NT$ ${Number(value).toLocaleString()}` },
+    { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value) => `NT$ ${Number(value).toLocaleString()}` },
     { key: 'receipt_type', label: '收款方式', sortable: true },
-    { key: 'status', label: '狀態', render: (value: unknown) => <StatusCell type="receipt" status={String(value)} /> },
-    { key: 'actions', label: '操作', render: (_: unknown, row: Receipt) => <ActionCell actions={[{ icon: Eye as any, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
+    { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
+    { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
   ]
 
   return (
@@ -199,7 +200,7 @@ export default function PaymentsPage() {
         <EnhancedTable
           className="min-h-full"
           data={filteredReceipts}
-          columns={columns}
+          columns={columns as TableColumn[]}
           defaultSort={{ key: 'receipt_date', direction: 'desc' }}
           searchable
           searchPlaceholder="搜尋收款單號或訂單編號..."

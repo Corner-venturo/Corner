@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { AccountingSubject } from '@/types/accounting-pro.types'
+import type { AccountingSubject, CreateVoucherEntryData } from '@/types/accounting-pro.types'
 import { cn } from '@/lib/utils'
 
 interface VoucherEntryRow {
@@ -147,7 +147,6 @@ export default function NewVoucherPage() {
         .padStart(3, '0')
       const voucherNo = `V${dateStr}${random}`
 
-      // 建立傳票
       const voucher = await createVoucher({
         workspace_id: user.workspace_id,
         voucher_no: voucherNo,
@@ -165,9 +164,8 @@ export default function NewVoucherPage() {
         voided_by: null,
         voided_at: null,
         void_reason: null,
-      } as any)
+      })
 
-      // 建立分錄
       let entryNo = 1
       for (const entry of entries) {
         const debit = parseFloat(entry.debit) || 0
@@ -175,14 +173,16 @@ export default function NewVoucherPage() {
 
         if (debit === 0 && credit === 0) continue
 
-        await createEntry({
+        const entryData: CreateVoucherEntryData = {
           voucher_id: voucher.id,
           entry_no: entryNo++,
           subject_id: entry.subject_id,
           debit,
           credit,
           description: entry.description || null,
-        } as any)
+        }
+
+        await createEntry(entryData)
       }
 
       alert('傳票儲存成功')

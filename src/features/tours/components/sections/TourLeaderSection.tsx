@@ -1,7 +1,19 @@
 import { motion } from 'framer-motion'
 
+interface TourDisplayData {
+  leader?: {
+    name?: string | null
+    domesticPhone?: string | null
+    overseasPhone?: string | null
+  } | null
+  meetingInfo?: {
+    time?: string | null
+    location?: string | null
+  } | null
+}
+
 interface TourLeaderSectionProps {
-  data: any
+  data: TourDisplayData
   viewMode: 'desktop' | 'mobile'
 }
 

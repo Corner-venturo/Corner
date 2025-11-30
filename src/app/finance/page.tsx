@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useMemo } from 'react'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Card } from '@/components/ui/card'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -42,22 +42,27 @@ export default function FinancePage() {
   // 最近交易表格配置
   const recentPayments = payments.slice(0, 10) // 顯示最近10筆
 
-  const transactionColumns: TableColumn[] = useMemo(
+  const transactionColumns: TableColumn<Payment>[] = useMemo(
     () => [
       {
         key: 'type',
         label: '類型',
         sortable: true,
-        render: (value, payment) => {
-          const typeIcons = {
-            收款: <TrendingUp size={16} className="text-morandi-green" />,
-            請款: <TrendingDown size={16} className="text-morandi-red" />,
-            出納: <DollarSign size={16} className="text-morandi-gold" />,
+        render: (_value, payment) => {
+          const typeIcons: Record<string, React.ReactNode> = {
+            receipt: <TrendingUp size={16} className="text-morandi-green" />,
+            request: <TrendingDown size={16} className="text-morandi-red" />,
+            disbursement: <DollarSign size={16} className="text-morandi-gold" />,
+          }
+          const typeLabels: Record<string, string> = {
+            receipt: '收款',
+            request: '請款',
+            disbursement: '出納',
           }
           return (
             <div className="flex items-center space-x-2">
-              {typeIcons[payment.type as keyof typeof typeIcons]}
-              <span className="text-sm">{payment.type}</span>
+              {typeIcons[payment.type]}
+              <span className="text-sm">{typeLabels[payment.type] || payment.type}</span>
             </div>
           )
         },
@@ -66,7 +71,7 @@ export default function FinancePage() {
         key: 'description',
         label: '說明',
         sortable: true,
-        render: (value, payment) => (
+        render: (_value, payment) => (
           <span className="text-sm text-morandi-primary">{payment.description}</span>
         ),
       },
@@ -74,8 +79,8 @@ export default function FinancePage() {
         key: 'amount',
         label: '金額',
         sortable: true,
-        render: (value, payment) => {
-          const isIncome = payment.type === '收款'
+        render: (_value, payment) => {
+          const isIncome = payment.type === 'receipt'
           return (
             <span
               className={cn(
@@ -92,17 +97,20 @@ export default function FinancePage() {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (value, payment) => {
-          const statusColors = {
-            已確認: 'text-morandi-green',
-            待確認: 'text-morandi-gold',
-            已完成: 'text-morandi-primary',
+        render: (_value, payment) => {
+          const statusColors: Record<string, string> = {
+            confirmed: 'text-morandi-green',
+            pending: 'text-morandi-gold',
+            completed: 'text-morandi-primary',
+          }
+          const statusLabels: Record<string, string> = {
+            confirmed: '已確認',
+            pending: '待確認',
+            completed: '已完成',
           }
           return (
-            <span
-              className={cn('text-sm', statusColors[payment.status as keyof typeof statusColors])}
-            >
-              {payment.status}
+            <span className={cn('text-sm', statusColors[payment.status])}>
+              {statusLabels[payment.status] || payment.status}
             </span>
           )
         },
@@ -111,7 +119,7 @@ export default function FinancePage() {
         key: 'created_at',
         label: '日期',
         sortable: true,
-        render: (value, payment) => (
+        render: (_value, payment) => (
           <span className="text-sm text-morandi-secondary">
             {new Date(payment.created_at).toLocaleDateString()}
           </span>
@@ -240,7 +248,7 @@ export default function FinancePage() {
           {/* 最近交易 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-morandi-primary">最近交易</h3>
-            <EnhancedTable columns={transactionColumns} data={recentPayments} />
+            <EnhancedTable columns={transactionColumns as TableColumn[]} data={recentPayments} />
           </div>
         </div>
       </div>

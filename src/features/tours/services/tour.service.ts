@@ -19,14 +19,14 @@ class TourService extends BaseService<Tour & BaseEntity> {
   protected getStore = (): StoreOperations<Tour & BaseEntity> => {
     const store = useTourStore.getState()
     return {
-      getAll: () => store.items as (Tour & BaseEntity)[],
-      getById: (id: string) => store.items.find(t => t.id === id) as (Tour & BaseEntity) | undefined,
+      getAll: () => store.items as unknown as (Tour & BaseEntity)[],
+      getById: (id: string) => store.items.find(t => t.id === id) as unknown as (Tour & BaseEntity) | undefined,
       add: async (tour: Tour & BaseEntity) => {
-        const result = await store.create(tour as any)
+        const result = await store.create(tour)
         return (result || tour) as unknown as Tour & BaseEntity
       },
       update: async (id: string, data: Partial<Tour>) => {
-        await store.update(id, data as any)
+        await store.update(id, data)
       },
       delete: async (id: string) => {
         await store.delete(id)
@@ -35,7 +35,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
   }
 
   protected validate(data: Partial<Tour & BaseEntity>): void {
-    super.validate(data as Partial<Tour & BaseEntity>)
+    super.validate(data)
 
     if (data.name && data.name.trim().length < 2) {
       throw new ValidationError('name', '旅遊團名稱至少需要 2 個字符')
@@ -239,7 +239,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
           }
         }
       }
-    } catch (error) {}
+    } catch (_error) {}
 
     // 檢查本地 Store 是否有（未刪除的）
     const allTours = await this.list()
@@ -314,7 +314,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
           }
         }
       }
-    } catch (error) {}
+    } catch (_error) {}
 
     // 檢查本地 Store 是否有（未刪除的）
     const allTours = await this.list()

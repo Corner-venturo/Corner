@@ -10,6 +10,14 @@ import { PrintItineraryForm } from '@/features/itinerary/components/PrintItinera
 import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
 import { Button } from '@/components/ui/button'
 import { useTourStore, useRegionsStore } from '@/stores'
+import type {
+  FlightInfo,
+  Feature,
+  FocusCard,
+  LeaderInfo,
+  MeetingPoint,
+  DailyItinerary,
+} from '@/components/editor/tour-form/types'
 import {
   Building2,
   UtensilsCrossed,
@@ -20,8 +28,30 @@ import {
   Printer,
 } from 'lucide-react'
 
+// Local tour data interface (uses meetingInfo instead of meetingPoints array)
+interface LocalTourData {
+  tagline: string
+  title: string
+  subtitle: string
+  description: string
+  departureDate: string
+  tourCode: string
+  coverImage?: string
+  country: string
+  city: string
+  status: string
+  outboundFlight: FlightInfo
+  returnFlight: FlightInfo
+  features: Feature[]
+  focusCards: FocusCard[]
+  leader: LeaderInfo
+  meetingInfo: MeetingPoint
+  itinerarySubtitle: string
+  dailyItinerary: DailyItinerary[]
+}
+
 // Icon mapping
-const iconMap: any = {
+const iconMap: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
   IconBuilding: Building2,
   IconToolsKitchen2: UtensilsCrossed,
   IconSparkles: Sparkles,
@@ -267,7 +297,7 @@ function NewItineraryPageContent() {
   const [scale, setScale] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
   const mobileContentRef = useRef<HTMLDivElement>(null)
-  const [tourData, setTourData] = useState({
+  const [tourData, setTourData] = useState<LocalTourData>({
     tagline: 'Corner Travel 2025',
     title: '',
     subtitle: '',
@@ -486,15 +516,15 @@ function NewItineraryPageContent() {
       }
 
       // 有 tour_id,從旅遊團載入資料
-      const tour = tours.find((t: any) => t.id === tourId)
+      const tour = tours.find((t) => t.id === tourId)
       if (!tour) {
         setLoading(false)
         return
       }
 
       // 找到國家和城市名稱
-      const country = tour.country_id ? countries.find((c: any) => c.id === tour.country_id) : null
-      const city = tour.main_city_id ? cities.find((c: any) => c.id === tour.main_city_id) : null
+      const country = tour.country_id ? countries.find((c) => c.id === tour.country_id) : null
+      const city = tour.main_city_id ? cities.find((c) => c.id === tour.main_city_id) : null
 
       // 計算天數
       const departureDate = new Date(tour.departure_date)
@@ -611,7 +641,7 @@ function NewItineraryPageContent() {
   const processedData = React.useMemo(
     () => ({
       ...tourData,
-      features: (tourData.features || []).map((f: any) => ({
+      features: (tourData.features || []).map((f) => ({
         ...f,
         iconComponent: iconMap[f.icon] || Sparkles,
       })),
@@ -707,7 +737,25 @@ function NewItineraryPageContent() {
               <h2 className="text-lg font-semibold">編輯表單</h2>
             </div>
             <div className="flex-1 overflow-y-auto bg-white">
-              <TourForm data={tourData as any} onChange={setTourData as any} />
+              <TourForm
+                data={{
+                  ...tourData,
+                  meetingPoints: tourData.meetingInfo ? [tourData.meetingInfo] : [],
+                  hotels: [],
+                  countries: [],
+                  showFeatures: true,
+                  showLeaderMeeting: true,
+                  showHotels: false,
+                }}
+                onChange={(newData) => {
+                  const { meetingPoints, hotels, countries, showFeatures, showLeaderMeeting, showHotels, ...restData } = newData;
+                  setTourData({
+                    ...restData,
+                    status: tourData.status,
+                    meetingInfo: meetingPoints?.[0] || { time: '', location: '' },
+                  });
+                }}
+              />
             </div>
           </div>
 

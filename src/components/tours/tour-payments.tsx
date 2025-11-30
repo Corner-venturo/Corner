@@ -76,7 +76,7 @@ export const TourPayments = React.memo(function TourPayments({
         description: '收款單建立成功',
       })
     } catch (error) {
-      logger.error('建立收款單失敗:', error as any)
+      logger.error('建立收款單失敗:', error instanceof Error ? error.message : String(error))
       toast({
         title: '錯誤',
         description: '建立收款單失敗',
@@ -96,11 +96,16 @@ export const TourPayments = React.memo(function TourPayments({
     }
   }, [triggerAdd, onTriggerAddComplete])
   const [selectedOrderId, setSelectedOrderId] = useState<string>('')
-  const [newPayment, setNewPayment] = useState({
+  const [newPayment, setNewPayment] = useState<{
+    amount: number
+    description: string
+    method: string
+    status: '已確認' | '待確認'
+  }>({
     amount: 0,
     description: '',
     method: 'bank_transfer',
-    status: '已確認' as const,
+    status: '已確認',
   })
 
   // 獲取屬於這個旅遊團的所有訂單（如果有 orderFilter，則只取該訂單）
@@ -409,7 +414,7 @@ export const TourPayments = React.memo(function TourPayments({
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
               <select
                 value={newPayment.status}
-                onChange={e => setNewPayment(prev => ({ ...prev, status: e.target.value } as any))}
+                onChange={e => setNewPayment(prev => ({ ...prev, status: e.target.value as '已確認' | '待確認' }))}
                 className="mt-1 w-full p-2 border border-border rounded-md bg-background"
               >
                 <option value="已確認">已確認</option>

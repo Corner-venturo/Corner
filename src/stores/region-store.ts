@@ -66,6 +66,16 @@ export interface RegionStats {
   updated_at: string
 }
 
+// CRUD 操作的輸入型別
+export type CountryInput = Omit<Country, 'id' | 'created_at' | 'updated_at'>
+export type CountryUpdate = Partial<CountryInput>
+
+export type RegionInput = Omit<Region, 'id' | 'created_at' | 'updated_at'>
+export type RegionUpdate = Partial<RegionInput>
+
+export type CityInput = Omit<City, 'id' | 'created_at' | 'updated_at'>
+export type CityUpdate = Partial<CityInput>
+
 // ============================================
 // 內部 Stores（使用 createStore 工廠）
 // ============================================
@@ -103,7 +113,7 @@ const useStatsStore = create<StatsState>(set => ({
       // 轉換為 Record
       const statsMap: Record<string, RegionStats> = {}
       data?.forEach(stat => {
-        statsMap[stat.city_id] = stat as any
+        statsMap[stat.city_id] = stat as RegionStats
       })
 
       set({ stats: statsMap, loading: false })
@@ -200,9 +210,9 @@ export const useRegionsStore = () => {
   // ============================================
   // Countries CRUD
   // ============================================
-  const createCountry = useCallback((data: any) => countryStore.create(data), [countryStore.create])
+  const createCountry = useCallback((data: CountryInput) => countryStore.create(data), [countryStore.create])
   const updateCountry = useCallback(
-    (id: string, data: any) => countryStore.update(id, data),
+    (id: string, data: CountryUpdate) => countryStore.update(id, data),
     [countryStore.update]
   )
   const deleteCountry = useCallback((id: string) => countryStore.delete(id), [countryStore.delete])
@@ -210,9 +220,9 @@ export const useRegionsStore = () => {
   // ============================================
   // Regions CRUD
   // ============================================
-  const createRegion = useCallback((data: any) => regionStore.create(data), [regionStore.create])
+  const createRegion = useCallback((data: RegionInput) => regionStore.create(data), [regionStore.create])
   const updateRegion = useCallback(
-    (id: string, data: any) => regionStore.update(id, data),
+    (id: string, data: RegionUpdate) => regionStore.update(id, data),
     [regionStore.update]
   )
   const deleteRegion = useCallback((id: string) => regionStore.delete(id), [regionStore.delete])
@@ -220,9 +230,9 @@ export const useRegionsStore = () => {
   // ============================================
   // Cities CRUD
   // ============================================
-  const createCity = useCallback((data: any) => cityStore.create(data), [cityStore.create])
+  const createCity = useCallback((data: CityInput) => cityStore.create(data), [cityStore.create])
   const updateCity = useCallback(
-    (id: string, data: any) => cityStore.update(id, data),
+    (id: string, data: CityUpdate) => cityStore.update(id, data),
     [cityStore.update]
   )
   const deleteCity = useCallback((id: string) => cityStore.delete(id), [cityStore.delete])

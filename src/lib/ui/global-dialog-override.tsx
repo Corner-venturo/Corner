@@ -14,8 +14,7 @@ export function GlobalDialogOverride() {
     const originalConfirm = window.confirm
 
     // 覆蓋 window.alert
-    window.alert = (message?: any): void => {
-      // 轉換為字符串（與原生行為一致）
+    window.alert = (message?: unknown): void => {
       const msg = message === undefined ? '' : String(message)
 
       // 判斷訊息類型
@@ -42,8 +41,7 @@ export function GlobalDialogOverride() {
 
     // 提示開發者使用自訂 confirm
     const originalConfirmFunc = window.confirm.bind(window)
-    window.confirm = (message?: any): boolean => {
-      // For better UI, use: import { confirm } from "@/lib/ui/alert-dialog"
+    window.confirm = (message?: unknown): boolean => {
       return originalConfirmFunc(message)
     }
 

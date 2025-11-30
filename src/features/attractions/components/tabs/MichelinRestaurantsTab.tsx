@@ -41,8 +41,9 @@ interface MichelinRestaurantsTabProps {
 export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRestaurantsTabProps) {
   const [restaurants, setRestaurants] = useState<MichelinRestaurant[]>([])
   const [loading, setLoading] = useState(true)
-  const [countries, setCountries] = useState<any[]>([])
-  const [cities, setCities] = useState<any[]>([])
+  const [countries, setCountries] = useState<Array<{ id: string; name: string; emoji?: string }>>([])
+  const [cities, setCities] = useState<Array<{ id: string; name: string }>>([])
+
   const [editingRestaurant, setEditingRestaurant] = useState<MichelinRestaurant | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
@@ -60,7 +61,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         .order('name')
 
       if (error) throw error
-      setRestaurants(data as any || [])
+      setRestaurants((data as MichelinRestaurant[]) || [])
 
       // 載入用到的國家和城市資料
       if (data && data.length > 0) {
@@ -87,9 +88,10 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             })
         }
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
       logger.error('載入米其林餐廳失敗:', error)
-      toast.error('載入失敗：' + error.message)
+      toast.error('載入失敗：' + errorMessage)
     } finally {
       setLoading(false)
     }
@@ -189,7 +191,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'name',
         label: '餐廳名稱',
         sortable: true,
-        render: (_: any, restaurant: MichelinRestaurant) => (
+        render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="min-w-[180px]">
             <div className="font-medium text-morandi-primary line-clamp-1">{restaurant.name}</div>
             {restaurant.name_en && (
@@ -202,13 +204,13 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'michelin_stars',
         label: '星級',
         sortable: true,
-        render: (_: any, restaurant: MichelinRestaurant) => renderStars(restaurant.michelin_stars),
+        render: (_: unknown, restaurant: MichelinRestaurant) => renderStars(restaurant.michelin_stars),
       },
       {
         key: 'city',
         label: '地點',
         sortable: false,
-        render: (_: any, restaurant: MichelinRestaurant) => {
+        render: (_: unknown, restaurant: MichelinRestaurant) => {
           const country = countries.find(c => c.id === restaurant.country_id)
           const city = cities.find(c => c.id === restaurant.city_id)
           return (
@@ -222,7 +224,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'chef_name',
         label: '主廚',
         sortable: true,
-        render: (_: any, restaurant: MichelinRestaurant) => (
+        render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="text-sm text-morandi-secondary">{restaurant.chef_name || '-'}</div>
         ),
       },
@@ -230,7 +232,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'cuisine_type',
         label: '料理類型',
         sortable: false,
-        render: (_: any, restaurant: MichelinRestaurant) => (
+        render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="flex flex-wrap gap-1 min-w-[120px]">
             {restaurant.cuisine_type?.slice(0, 2).map((cuisine, idx) => (
               <span
@@ -252,7 +254,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'price',
         label: '價格',
         sortable: false,
-        render: (_: any, restaurant: MichelinRestaurant) => (
+        render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="text-sm text-morandi-gold font-medium">
             {restaurant.avg_price_dinner
               ? `${restaurant.avg_price_dinner.toLocaleString()} ${restaurant.currency || 'TWD'}`
@@ -264,7 +266,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'phone',
         label: '電話',
         sortable: false,
-        render: (_: any, restaurant: MichelinRestaurant) => (
+        render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="text-sm text-morandi-secondary">{restaurant.phone || '-'}</div>
         ),
       },
@@ -272,7 +274,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'is_active',
         label: '狀態',
         sortable: true,
-        render: (_: any, restaurant: MichelinRestaurant) => (
+        render: (_: unknown, restaurant: MichelinRestaurant) => (
           <span
             className={cn(
               'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',

@@ -95,8 +95,7 @@ export class BackgroundSyncService {
           const { code, _needs_sync, _synced_at, _deleted, ...itemData } = item
 
           // 上傳到 Supabase（會自動生成正式編號）
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: supabaseData, error } = await (supabase.from as any)(tableName)
+          const { data: supabaseData, error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>)
             .insert([itemData])
             .select()
             .single()
@@ -108,7 +107,7 @@ export class BackgroundSyncService {
           await localDB.delete(tableName, item.id)
 
           // 將 Supabase 回傳的資料加上同步欄位
-          const baseEntity = supabaseData as BaseEntity
+          const baseEntity = supabaseData as unknown as BaseEntity
           const syncedData: SyncableEntity = {
             ...baseEntity,
             _needs_sync: false,
@@ -118,7 +117,7 @@ export class BackgroundSyncService {
           await localDB.put(tableName, syncedData)
 
           // 型別安全的 code 存取
-          const codedEntity = supabaseData as CodedEntity
+          const codedEntity = supabaseData as unknown as CodedEntity
           const newCode = codedEntity.code || 'unknown'
           logger.log(`✅ [${tableName}] TBC 編號已轉換: ${code} → ${newCode}`)
         } catch (error) {
@@ -222,16 +221,14 @@ export class BackgroundSyncService {
           }
 
           // 檢查是否已存在（update）或新建（insert）
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: existing } = await (supabase.from as any)(tableName)
+          const { data: existing } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>)
             .select('id')
             .eq('id', item.id)
             .maybeSingle() // ✅ 使用 maybeSingle() 避免 406 錯誤
 
           if (existing) {
             // 更新
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.from as any)(tableName).update(syncData).eq('id', item.id)
+            const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>).update(syncData).eq('id', item.id)
 
             if (error) throw error
             logger.log(`✅ [${tableName}] 更新成功: ${item.id}`)
@@ -252,8 +249,7 @@ export class BackgroundSyncService {
             }
 
             // 真的是新資料，執行插入
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase.from as any)(tableName).insert([syncData])
+            const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>).insert([syncData])
 
             if (error) throw error
             logger.log(`✅ [${tableName}] 新增成功: ${item.id}`)
@@ -277,14 +273,11 @@ export class BackgroundSyncService {
           } else if (typeof error === 'object' && error !== null) {
             // Supabase 錯誤物件
             logger.error('Supabase 錯誤:', JSON.stringify(error, null, 2))
-            // @ts-ignore - Supabase error 可能有 message, code, details
-            if (error.message) logger.error('訊息:', error.message)
-            // @ts-ignore
-            if (error.code) logger.error('錯誤代碼:', error.code)
-            // @ts-ignore
-            if (error.details) logger.error('詳細資訊:', error.details)
-            // @ts-ignore
-            if (error.hint) logger.error('提示:', error.hint)
+            const errorObj = error as Record<string, unknown>
+            if ('message' in errorObj && errorObj.message) logger.error('訊息:', errorObj.message)
+            if ('code' in errorObj && errorObj.code) logger.error('錯誤代碼:', errorObj.code)
+            if ('details' in errorObj && errorObj.details) logger.error('詳細資訊:', errorObj.details)
+            if ('hint' in errorObj && errorObj.hint) logger.error('提示:', errorObj.hint)
           } else {
             logger.error('錯誤內容:', String(error))
           }
@@ -321,8 +314,7 @@ export class BackgroundSyncService {
       for (const queueItem of pendingDeletes) {
         try {
           // 從 Supabase 刪除
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error } = await (supabase.from as any)(tableName).delete().eq('id', queueItem.record_id)
+          const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>).delete().eq('id', queueItem.record_id)
 
           // 刪除成功或資料已不存在，清除隊列記錄
           await localDB.delete(TABLES.SYNC_QUEUE, queueItem.id)

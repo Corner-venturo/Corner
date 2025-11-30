@@ -10,10 +10,19 @@ import {
   Calendar,
   Plane,
   MapPin,
+  LucideIcon,
 } from 'lucide-react'
+import type { Itinerary, ItineraryFeature } from '@/stores/types'
 
-// Icon mapping
-const iconMap: any = {
+interface ItineraryFeatureWithIcon extends ItineraryFeature {
+  iconComponent: LucideIcon
+}
+
+interface ProcessedItinerary extends Omit<Itinerary, 'features'> {
+  features: ItineraryFeatureWithIcon[]
+}
+
+const iconMap: Record<string, LucideIcon> = {
   IconBuilding: Building2,
   IconToolsKitchen2: UtensilsCrossed,
   IconSparkles: Sparkles,
@@ -26,7 +35,7 @@ export default function ViewItineraryPage() {
   const params = useParams()
   const id = params.id as string
 
-  const [tourData, setTourData] = useState<unknown>(null)
+  const [tourData, setTourData] = useState<ProcessedItinerary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,14 +59,13 @@ export default function ViewItineraryPage() {
           return
         }
 
-        const itinerary = await response.json()
+        const itinerary: Itinerary = await response.json()
 
         if (itinerary) {
-          // Convert icon strings to components
-          const processedData = {
+          const processedData: ProcessedItinerary = {
             ...itinerary,
             features:
-              itinerary.features?.map((f: any) => ({
+              itinerary.features?.map((f) => ({
                 ...f,
                 iconComponent: iconMap[f.icon] || Sparkles,
               })) || [],

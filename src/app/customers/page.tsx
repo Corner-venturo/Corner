@@ -177,20 +177,22 @@ export default function CustomersPage() {
     setSearchParams({})
   }
 
-  const handleRowClick = (customer: Customer) => {
-    router.push(`/customers/${customer.id}`)
+  const handleRowClick = (row: { id?: string }) => {
+    if (row.id) {
+      router.push(`/customers/${row.id}`)
+    }
   }
 
   const hasActiveFilters = Object.keys(searchParams).length > 0
 
   // 表格欄位定義
-  const tableColumns: TableColumn[] = useMemo(
+  const tableColumns: TableColumn<Customer>[] = useMemo(
     () => [
       {
         key: 'name',
         label: '基本資訊',
         sortable: true,
-        render: (_value, customer: Customer) => (
+        render: (_value, customer) => (
           <div>
             <div className="text-sm font-medium text-morandi-primary">{customer.name}</div>
             {customer.english_name && (
@@ -204,7 +206,7 @@ export default function CustomersPage() {
         key: 'contact',
         label: '聯絡方式',
         sortable: false,
-        render: (_value, customer: Customer) => (
+        render: (_value, customer) => (
           <div className="space-y-1">
             {customer.phone && (
               <div className="flex items-center text-xs text-morandi-primary">
@@ -231,7 +233,7 @@ export default function CustomersPage() {
         key: 'passport',
         label: '護照資訊',
         sortable: false,
-        render: (_value, customer: Customer) => (
+        render: (_value, customer) => (
           <div className="space-y-1">
             {customer.passport_romanization && (
               <div className="text-xs text-morandi-primary font-mono">
@@ -258,7 +260,7 @@ export default function CustomersPage() {
         key: 'identity',
         label: '身份證號 / 生日',
         sortable: false,
-        render: (_value, customer: Customer) => (
+        render: (_value, customer) => (
           <div className="space-y-1">
             {customer.national_id && (
               <div className="text-xs text-morandi-primary font-mono">{customer.national_id}</div>
@@ -275,7 +277,7 @@ export default function CustomersPage() {
         key: 'vip',
         label: 'VIP 狀態',
         sortable: true,
-        render: (_value, customer: Customer) => (
+        render: (_value, customer) => (
           <div className="space-y-1">
             {customer.is_vip ? (
               <>
@@ -302,7 +304,7 @@ export default function CustomersPage() {
         key: 'stats',
         label: '消費統計',
         sortable: true,
-        render: (_value, customer: Customer) => (
+        render: (_value, customer) => (
           <div className="space-y-1">
             <div className="text-xs text-morandi-primary font-medium">
               NT$ {(customer.total_spent || 0).toLocaleString()}
@@ -369,16 +371,16 @@ export default function CustomersPage() {
       <div className="flex-1 overflow-hidden">
         <div className="h-full">
           <EnhancedTable
-            columns={tableColumns}
+            columns={tableColumns as TableColumn[]}
             data={filteredCustomers}
             onRowClick={handleRowClick}
-            actions={(customer: Customer) => (
+            actions={(customer) => (
               <Button
                 variant="outline"
                 size="sm"
                 className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
                 title="編輯顧客"
-                onClick={() => router.push(`/customers/${customer.id}`)}
+                onClick={() => router.push(`/customers/${(customer as Customer).id}`)}
               >
                 <Edit size={14} className="text-morandi-gold" />
               </Button>

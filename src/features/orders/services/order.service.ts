@@ -13,10 +13,9 @@ class OrderService extends BaseService<Order & BaseEntity> {
       getAll: () => store.items as (Order & BaseEntity)[],
       getById: (id: string) => store.items.find(o => o.id === id) as (Order & BaseEntity) | undefined,
       add: async (order: Order & BaseEntity) => {
-        // 移除系統自動生成的欄位
         const { id, created_at, updated_at, ...createData } = order
-        const result = await store.create(createData as any)
-        return result as unknown as Order & BaseEntity
+        const result = await store.create(createData)
+        return result
       },
       update: async (id: string, data: Partial<Order>) => {
         await store.update(id, data)
@@ -41,17 +40,17 @@ class OrderService extends BaseService<Order & BaseEntity> {
 
   getOrdersByTour(tour_id: string): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter(o => o.tour_id === tour_id) as unknown as Order[]
+    return store.items.filter(o => o.tour_id === tour_id)
   }
 
   getOrdersByStatus(status: PaymentStatus): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter(o => o.payment_status === status) as unknown as Order[]
+    return store.items.filter(o => o.payment_status === status)
   }
 
   getOrdersByCustomer(customer_id: string): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter(o => o.customer_id === customer_id) as unknown as Order[]
+    return store.items.filter(o => o.customer_id === customer_id)
   }
 
   calculateTotalRevenue(): number {

@@ -1,8 +1,24 @@
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
 
+interface FlightInfo {
+  airline?: string | null
+  flightNumber?: string | null
+  departureAirport?: string | null
+  departureTime?: string | null
+  departureDate?: string | null
+  arrivalAirport?: string | null
+  arrivalTime?: string | null
+  duration?: string | null
+}
+
+interface TourDisplayData {
+  outboundFlight?: FlightInfo | null
+  returnFlight?: FlightInfo | null
+}
+
 interface TourFlightSectionProps {
-  data: any
+  data: TourDisplayData
   viewMode: 'desktop' | 'mobile'
 }
 

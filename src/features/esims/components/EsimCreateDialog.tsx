@@ -15,7 +15,8 @@ import { tourService } from '@/features/tours/services/tour.service'
 import { fastMoveService } from '@/services/fastmove.service'
 import { RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
-import type { FastMoveProduct } from '@/types/esim.types'
+import type { FastMoveProduct, Esim } from '@/types/esim.types'
+import type { Order } from '@/types'
 
 // 產品地區選項
 const PRODUCT_REGIONS = [
@@ -55,7 +56,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
   const [products, setProducts] = useState<FastMoveProduct[]>([])
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [hasInitialized, setHasInitialized] = useState(false)
-  const [tourOrders, setTourOrders] = useState<any[]>([])
+  const [tourOrders, setTourOrders] = useState<Order[]>([])
 
   const [esimItems, setEsimItems] = useState<EsimItem[]>([
     {
@@ -268,11 +269,11 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           sales_person: user.display_name || '系統',
           assistant: user.display_name || '系統',
           member_count: esimItems.reduce((sum, item) => sum + item.quantity, 0),
-          total_amount: 0, // 網卡費用待計算
+          total_amount: 0,
           paid_amount: 0,
           remaining_amount: 0,
           payment_status: 'unpaid' as const,
-        } as any)
+        } as Partial<Order>)
 
         targetOrderNumber = newOrderNumber
         toast.success(`已建立訂單：${newOrderNumber}`)
@@ -282,8 +283,8 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
       for (const item of esimItems) {
         const prefix = `E${finalGroupCode}`
         const existingNumbers = (esims || [])
-          .filter((e: any) => e.esim_number?.startsWith(prefix))
-          .map((e: any) => {
+          .filter((e: Esim) => e.esim_number?.startsWith(prefix))
+          .map((e: Esim) => {
             const num = e.esim_number.slice(prefix.length)
             return parseInt(num, 10)
           })
@@ -307,11 +308,11 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           product_id: item.product_id,
           product_region: item.product_region,
           quantity: item.quantity,
-          price: productPrice, // 儲存產品價格
+          price: productPrice,
           email: item.email,
           note: item.note || '',
-          status: 0, // 待確認
-        } as any)
+          status: 0,
+        } as Partial<Esim>)
 
         // TODO: 調用 FastMove API 下單，並傳入 invoiceNumber
         // FastMove API 會自動產生請款單，請款日期為「下個月第一個週四」

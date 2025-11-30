@@ -21,21 +21,20 @@ export function WishWall() {
 
   const fetchWishes = async () => {
     try {
-      const result: any = await (supabase
-        // @ts-ignore - manifestation_entries table type issue
+      const result = await supabase
         .from('manifestation_entries')
         .select('id, shared_wish, created_at')
         .not('shared_wish', 'is', null)
         .neq('shared_wish', '')
         .order('created_at', { ascending: false })
-        .limit(50) as any)
+        .limit(50)
 
       const { data, error } = result
 
       if (error) throw error
 
-      setWishes((data || []) as any)
-    } catch (error) {
+      setWishes((data || []) as Wish[])
+    } catch (_error) {
       // Ignore error
     } finally {
       setIsLoading(false)

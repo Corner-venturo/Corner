@@ -4,7 +4,7 @@ import React from 'react'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
+import { DndContext, closestCenter, DragEndEvent, SensorDescriptor } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ItemRow } from './item-row'
 
@@ -23,10 +23,10 @@ interface CategoryGroupRowProps {
   editValue: string
   setEditValue: (value: string) => void
   inputRef: React.RefObject<HTMLInputElement>
-  startEdit: (rowId: string, field: keyof TransportationRate, currentValue: any) => void
+  startEdit: (rowId: string, field: keyof TransportationRate, currentValue: unknown) => void
   saveEdit: () => Promise<void>
   handleKeyDown: (e: React.KeyboardEvent, rowId: string, field: keyof TransportationRate) => Promise<void>
-  renderEditableCell: (rate: TransportationRate, field: keyof TransportationRate, value: any, type?: 'text' | 'number') => React.ReactNode
+  renderEditableCell: (rate: TransportationRate, field: keyof TransportationRate, value: unknown, type?: 'text' | 'number') => React.ReactNode
   onUpdate: (id: string, updates: Partial<TransportationRate>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onInsert?: (rate: TransportationRate) => void
@@ -34,7 +34,7 @@ interface CategoryGroupRowProps {
   setIsAdding: (isAdding: boolean) => void
   setNewRow: (row: Partial<TransportationRate>) => void
   handleItemDragEnd: (categoryKey: string, event: DragEndEvent) => Promise<void>
-  sensors: any
+  sensors: SensorDescriptor<unknown>[]
 }
 
 export function CategoryGroupRow({

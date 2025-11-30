@@ -30,7 +30,7 @@ interface SharedOrderList {
 interface OrderListCardProps {
   orderList: SharedOrderList
   userName?: string
-  onCreateReceipt: (orderId: string, order: any) => void
+  onCreateReceipt: (orderId: string, order: SharedOrderList['orders'][number]) => void
   currentUserId?: string
   userRole?: 'admin' | 'finance' | 'member'
 }

@@ -30,7 +30,7 @@ export const TourOverview = React.memo(function TourOverview({
   const { items: orders } = useOrderStore()
 
   // 如果有 orderFilter，取得該訂單的資料
-  const order = (orderFilter ? orders.find(o => o.id === orderFilter) : null) as any
+  const order = orderFilter ? orders.find(o => o.id === orderFilter) : null
 
   // 根據是否為訂單視圖，顯示不同的卡片資料
   const overviewCards = order

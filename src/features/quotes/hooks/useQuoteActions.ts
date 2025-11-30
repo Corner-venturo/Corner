@@ -1,16 +1,18 @@
 import { useCallback, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { logger } from '@/lib/utils/logger'
-import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
+import { CostCategory, ParticipantCounts, SellingPrices, VersionRecord } from '../types'
 import { useTourStore } from '@/stores'
+import type { Quote, Tour } from '@/stores/types'
 
 interface UseQuoteActionsProps {
-  quote: any
-  updateQuote: (id: string, data: any) => void
-  addTour: (data: any) => Promise<any>
-  router: any
+  quote: Quote | null
+  updateQuote: (id: string, data: Partial<Quote>) => void
+  addTour: (data: Partial<Tour>) => Promise<Tour | undefined>
+  router: ReturnType<typeof useRouter>
   updatedCategories: CostCategory[]
   total_cost: number
   groupSize: number
@@ -183,7 +185,7 @@ export const useQuoteActions = ({
       try {
         // 計算新的版本號（取得版本歷史中的最大版本號 + 1）
         const existingVersions = quote.versions || []
-        const maxVersion = existingVersions.reduce((max: number, v: any) =>
+        const maxVersion = existingVersions.reduce((max: number, v: VersionRecord) =>
           Math.max(max, v.version || 0), 0
         )
         const newVersion = maxVersion + 1
@@ -260,7 +262,7 @@ export const useQuoteActions = ({
 
     // 先保存當前版本為新版本
     const existingVersions = quote.versions || []
-    const maxVersion = existingVersions.reduce((max: number, v: any) =>
+    const maxVersion = existingVersions.reduce((max: number, v: VersionRecord) =>
       Math.max(max, v.version || 0), 0
     )
     const newVersion = maxVersion + 1
@@ -312,7 +314,7 @@ export const useQuoteActions = ({
 
     // 先保存目前的報價單狀態為新版本
     const existingVersions = quote.versions || []
-    const maxVersion = existingVersions.reduce((max: number, v: any) =>
+    const maxVersion = existingVersions.reduce((max: number, v: VersionRecord) =>
       Math.max(max, v.version || 0), 0
     )
     const newVersion = maxVersion + 1

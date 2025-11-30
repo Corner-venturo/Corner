@@ -28,10 +28,8 @@ type PersonalCanvasEntity = PersonalCanvas &
  * - 全量快取提升使用體驗
  */
 export const usePersonalCanvasStore = createStore<PersonalCanvasEntity>({
-  tableName: 'personal_canvases' as any,
-  cacheStrategy: 'full',
-  enableRealtime: true,
-} as any)
+  tableName: 'personal_canvases',
+})
 
 /**
  * Hook 型別（方便使用）

@@ -2,8 +2,20 @@ import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 
+interface TourFeature {
+  icon: string
+  title: string
+  description: string
+  iconComponent?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+}
+
+interface TourData {
+  features?: TourFeature[]
+  [key: string]: unknown
+}
+
 interface TourFeaturesSectionProps {
-  data: any
+  data: TourData
   viewMode: 'desktop' | 'mobile'
 }
 
@@ -30,7 +42,7 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
         <div
           className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-2 md:grid-cols-3 gap-7'}
         >
-          {features.map((feature: any, index: number) => {
+          {features.map((feature: TourFeature, index: number) => {
             const FeatureIcon = feature.iconComponent || Sparkles
             return (
               <motion.div

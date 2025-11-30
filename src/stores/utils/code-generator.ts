@@ -81,13 +81,13 @@ export function generateCode(
 ): string {
   const prefix = `${workspaceCode}-`
 
-  // 檢查是否為快速報價單（優先從 config 判斷，而非 existingItems）
-  const isQuickQuote = (config as any)?.quoteType === 'quick'
+  const configWithQuoteType = config as CodeConfig & { quoteType?: 'quick' | 'standard' }
+  const isQuickQuote = configWithQuoteType.quoteType === 'quick'
 
   logger.log('🔍 [code-generator] generateCode 參數:', {
     workspaceCode,
     config,
-    configQuoteType: (config as any)?.quoteType,
+    configQuoteType: configWithQuoteType.quoteType,
     isQuickQuote,
     existingItemsCount: existingItems.length,
   })

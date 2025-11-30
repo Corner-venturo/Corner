@@ -37,7 +37,7 @@ export interface StoreState<T extends BaseEntity> {
   _abortController?: AbortController
 
   // CRUD 操作
-  fetchAll: () => Promise<void>
+  fetchAll: () => Promise<T[]>
   fetchById: (id: string) => Promise<T | null>
   create: (data: CreateInput<T>) => Promise<T>
   update: (id: string, data: UpdateInput<T>) => Promise<T>

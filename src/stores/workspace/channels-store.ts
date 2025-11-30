@@ -107,7 +107,7 @@ export const useChannelsStore = () => {
     // Workspace 操作
     // ============================================
     loadWorkspaces: async () => {
-      const workspaces = await workspaceStore.fetchAll() as any
+      const workspaces = await workspaceStore.fetchAll()
 
       // 🔥 使用 fetchAll 的返回值，而不是 items (避免競爭條件)
       if (workspaces && workspaces.length > 0 && !uiStore.currentWorkspace) {

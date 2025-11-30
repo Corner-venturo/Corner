@@ -4,8 +4,17 @@ import { useState } from 'react'
 import { useItineraryStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useRouter } from 'next/navigation'
+import type { TourFormData } from './tour-form/types'
 
-export function PublishButton({ data }: { data: any }) {
+interface PublishButtonData extends Partial<TourFormData> {
+  id?: string
+  version?: number
+  status?: string
+  tourId?: string
+  meetingInfo?: unknown
+}
+
+export function PublishButton({ data }: { data: PublishButtonData }) {
   const [saving, setSaving] = useState(false)
   const { create, update } = useItineraryStore()
   const { user } = useAuthStore()
@@ -26,7 +35,7 @@ export function PublishButton({ data }: { data: any }) {
     status: data.status || 'draft',
     outbound_flight: data.outboundFlight,
     return_flight: data.returnFlight,
-    features: data.features?.map(({ iconComponent, ...rest }: any) => rest),
+    features: data.features?.map(({ iconComponent, ...rest }: { iconComponent?: unknown; [key: string]: unknown }) => rest),
     focus_cards: data.focusCards,
     leader: data.leader,
     meeting_info: data.meetingInfo,  // ✅ 修正：使用 meeting_info 而非 meeting_points

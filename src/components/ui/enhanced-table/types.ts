@@ -1,42 +1,45 @@
 import React from 'react'
 
-export interface TableColumn<T = any> {
+// 基礎行資料型別 - 允許任何物件類型
+export type RowData = { [key: string]: unknown } | object
+
+export interface TableColumn<T extends RowData = RowData> {
   key: keyof T | string
   label: string | React.ReactNode
   sortable?: boolean
   filterable?: boolean
   filterType?: 'text' | 'number' | 'date' | 'select'
   filterOptions?: Array<{ value: string; label: string }>
-  render?: (value: T[keyof T] | unknown, row: T) => React.ReactNode
+  render?: (value: unknown, row: T) => React.ReactNode
   width?: string
   align?: 'left' | 'center' | 'right'
   className?: string
 }
 
-export interface SelectionConfig {
+export interface SelectionConfig<T extends RowData = RowData> {
   selected: string[]
   onChange: (selected: string[]) => void
-  disabled?: (row: any) => boolean
-  getRowId?: (row: any, index: number) => string
+  disabled?: (row: T) => boolean
+  getRowId?: (row: T, index: number) => string
 }
 
-export interface ExpandableConfig {
+export interface ExpandableConfig<T extends RowData = RowData> {
   expanded: string[]
   onExpand: (id: string) => void
-  renderExpanded: (row: any) => React.ReactNode
+  renderExpanded: (row: T) => React.ReactNode
   expandIcon?: (expanded: boolean) => React.ReactNode
-  getRowId?: (row: any, index: number) => string
+  getRowId?: (row: T, index: number) => string
 }
 
-export interface EnhancedTableProps {
-  columns: TableColumn[]
-  data: any[]
+export interface EnhancedTableProps<T extends RowData = RowData> {
+  columns: TableColumn<T>[]
+  data: T[]
   loading?: boolean
   error?: string | null
   onSort?: (column: string, direction: 'asc' | 'desc') => void
   onFilter?: (filters: Record<string, string>) => void
-  onRowClick?: (row: any, rowIndex?: number) => void
-  onRowDoubleClick?: (row: any, rowIndex: number) => void
+  onRowClick?: (row: T, rowIndex?: number) => void
+  onRowDoubleClick?: (row: T, rowIndex: number) => void
   className?: string
   showFilters?: boolean
   searchableFields?: readonly string[]
@@ -47,10 +50,10 @@ export interface EnhancedTableProps {
   defaultSort?: { key: string; direction: 'asc' | 'desc' }
   searchable?: boolean
   searchPlaceholder?: string
-  selection?: SelectionConfig
-  expandable?: ExpandableConfig
-  actions?: (row: any) => React.ReactNode
-  rowClassName?: (row: any) => string
+  selection?: SelectionConfig<T>
+  expandable?: ExpandableConfig<T>
+  actions?: (row: T) => React.ReactNode
+  rowClassName?: (row: T) => string
   _bordered?: boolean
   bordered?: boolean
   striped?: boolean

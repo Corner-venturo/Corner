@@ -115,8 +115,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
           receipt_date: item.transaction_date,
           receipt_type: item.receipt_type,
           receipt_amount: item.amount,
-          actual_amount: 0, // 待會計確認
-          status: 0, // 待確認
+          actual_amount: 0,
+          status: 0,
           receipt_account: item.receipt_account || null,
           email: item.email || null,
           payment_name: item.payment_name || null,
@@ -131,7 +131,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
           note: item.note || null,
           created_by: user.id,
           updated_by: user.id,
-        } as any)
+        })
       }
 
       toast({

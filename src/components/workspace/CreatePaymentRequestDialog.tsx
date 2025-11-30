@@ -61,17 +61,16 @@ export function CreatePaymentRequestDialog({
     }
 
     try {
-      // 建立請款單（簡化版 - 符合現有資料庫結構）
       const paymentRequest = await createPaymentRequest({
         tour_id: selectedTourId,
         request_type: category || '員工代墊',
         amount: totalAmount,
         supplier_name: supplier,
         status: 'pending',
-        notes: itemsArray.map((item, i) =>
+        note: itemsArray.map((item, i) =>
           `${i + 1}. ${item.name} - ${item.description} ($${item.amount.toLocaleString()})`
         ).join('\n'),
-      } as any)
+      })
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {

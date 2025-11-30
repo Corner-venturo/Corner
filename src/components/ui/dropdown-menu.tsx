@@ -28,8 +28,7 @@ const DropdownMenu = React.forwardRef<
     <div ref={ref} className={cn('relative', className)} {...props}>
       {React.Children.map(children, child =>
         React.isValidElement(child)
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            React.cloneElement(child as any, {
+          ? React.cloneElement(child as React.ReactElement<{ isOpen?: boolean; onOpenChange?: (open: boolean) => void }>, {
               isOpen,
               onOpenChange: handleOpenChange,
             })
@@ -49,10 +48,11 @@ const DropdownMenuTrigger = React.forwardRef<
   }
 >(({ className, children, isOpen, onOpenChange, asChild, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as any, {
+    return React.cloneElement(children as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>, {
       onClick: (e: React.MouseEvent) => {
         onOpenChange?.(!isOpen)
-        ;(children.props as any).onClick?.(e)
+        const childProps = children.props as { onClick?: (e: React.MouseEvent) => void }
+        childProps.onClick?.(e)
       },
       ...props,
     })

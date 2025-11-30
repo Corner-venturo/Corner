@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Tour } from '@/types/tour.types'
 
 interface QuoteDialogProps {
   open: boolean
@@ -28,8 +29,8 @@ interface QuoteDialogProps {
     is_pinned: boolean
     code: string
   }
-  setFormField: (field: string, value: any) => void
-  tours: any[]
+  setFormField: (field: string, value: string | number | boolean | null) => void
+  tours: Tour[]
   onSubmit: () => Promise<boolean>
   onClose: () => void
 }

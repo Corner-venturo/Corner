@@ -127,7 +127,7 @@ export function ChannelChat() {
               onCreatePayment={(itemId, item) => {
                 setSelectedAdvanceItem(item)
                 setSelectedAdvanceListId(
-                  advanceLists.find(al => al.items?.some((i: any) => i.id === itemId))?.id || ''
+                  advanceLists.find(al => al.items?.some(i => i.id === itemId))?.id || ''
                 )
                 setShowCreatePaymentDialog(true)
               }}

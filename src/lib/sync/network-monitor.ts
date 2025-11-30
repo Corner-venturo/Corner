@@ -160,12 +160,13 @@ export class NetworkMonitor {
       for (const tableName of Object.values(TABLES)) {
         try {
           const items = await localDB.getAll(tableName)
-          // 檢查是否有待同步的項目（包含 TBC、_needs_sync、_deleted）
-          const hasPending = items.some((item: any) => {
+          const hasPending = items.some((item: unknown) => {
+            if (typeof item !== 'object' || item === null) return false
+            const record = item as Record<string, unknown>
             return (
-              item._needs_sync === true ||
-              (item.code && String(item.code).startsWith('TBC')) ||
-              item._deleted === true
+              record._needs_sync === true ||
+              (record.code && String(record.code).startsWith('TBC')) ||
+              record._deleted === true
             )
           })
           if (hasPending) {

@@ -41,7 +41,7 @@ export async function fetchAll<T extends BaseEntity>(
   // 篩選函數（用於 IndexedDB 快取資料）
   const applyWorkspaceFilter = (items: T[]): T[] => {
     if (!workspaceId) return items
-    return items.filter((item: any) => item.workspace_id === workspaceId)
+    return items.filter((item) => 'workspace_id' in item && (item as T & { workspace_id: string }).workspace_id === workspaceId)
   }
 
   try {
@@ -64,7 +64,7 @@ export async function fetchAll<T extends BaseEntity>(
         // 說明：保留 _needs_sync: true 的本地資料，避免重新整理時丟失
         const allCachedItems = await indexedDB.getAll()
         const pendingSyncItems = allCachedItems.filter(
-          (item: any) => item._needs_sync === true
+          (item): item is T & { _needs_sync: boolean } => '_needs_sync' in item && (item as { _needs_sync?: boolean })._needs_sync === true
         )
 
         // 建立已同步資料的 ID 集合（用於快速查找）

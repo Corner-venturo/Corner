@@ -15,11 +15,25 @@ import {
   AlertCircle,
   Clock,
   Plus,
+  LucideIcon,
 } from 'lucide-react'
+
+interface MockDocument {
+  id: string
+  name: string
+  type: string
+  description: string
+  status: string
+  format: string
+  size: string
+  uploadDate: string
+  signedBy?: string
+  order_id?: string
+}
 
 interface TourDocumentsProps {
   tour: Tour
-  orderFilter?: string // 選填：只顯示特定訂單的文件
+  orderFilter?: string
 }
 
 export function TourDocuments({ orderFilter }: TourDocumentsProps) {
@@ -31,11 +45,8 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
     description: '',
   })
 
-  // TODO: 實作文件管理功能後，從 store 取得實際的文件資料
-  // 目前暫時使用空陣列，避免顯示假資料
-  const allMockDocuments: any[] = []
+  const allMockDocuments: MockDocument[] = []
 
-  // 根據 orderFilter 過濾文件
   const mockDocuments = orderFilter
     ? allMockDocuments.filter(doc => doc.order_id === orderFilter)
     : allMockDocuments
@@ -51,8 +62,8 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
     setIsUploadDialogOpen(false)
   }
 
-  const getStatusIcon = (status: string) => {
-    const icons: Record<string, any> = {
+  const getStatusIcon = (status: string): LucideIcon => {
+    const icons: Record<string, LucideIcon> = {
       已簽署: CheckCircle,
       已確認: CheckCircle,
       待確認: Clock,
@@ -88,7 +99,7 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
       acc[doc.type].push(doc)
       return acc
     },
-    {} as Record<string, typeof mockDocuments>
+    {} as Record<string, MockDocument[]>
   )
 
   return (
@@ -146,13 +157,13 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
                 <FileText size={20} className={`mr-2 ${getTypeColor(type)}`} />
                 {type}文件
                 <span className="ml-2 text-sm text-morandi-secondary">
-                  ({(documents as any).length} 個文件)
+                  ({documents.length} 個文件)
                 </span>
               </h4>
             </div>
 
             <div className="space-y-2">
-              {(documents as any).map((doc: any) => {
+              {documents.map((doc) => {
                 const StatusIcon = getStatusIcon(doc.status)
                 return (
                   <div

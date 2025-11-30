@@ -104,7 +104,7 @@ export default function AttractionsTab({
     return cities.filter(c => c.region_id === regionId)
   }
 
-  const handleEditSubmit = async (formData: any) => {
+  const handleEditSubmit = async (formData: import('../../types').AttractionFormData) => {
     if (!editingAttraction) return { success: false }
 
     const result = await updateAttraction(editingAttraction.id, {

@@ -657,6 +657,6 @@ export const useAuthStore = create<AuthState>(
 // 🔄 客戶端自動 hydrate（恢復登入狀態）
 // workspace_id 的自動修復已移至 onRehydrateStorage 中處理
 if (typeof window !== 'undefined') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(useAuthStore as any).persist.rehydrate()
+  const store = useAuthStore as typeof useAuthStore & { persist: { rehydrate: () => void } }
+  store.persist.rehydrate()
 }

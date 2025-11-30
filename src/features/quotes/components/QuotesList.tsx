@@ -8,6 +8,7 @@ import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Quote } from '@/stores/types'
+import { Tour } from '@/types/tour.types'
 import { Calculator, Copy, Eye, Pin, Trash2, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
@@ -15,7 +16,7 @@ import { STATUS_COLORS } from '../constants'
 
 interface QuotesListProps {
   quotes: Quote[]
-  tours: any[]
+  tours: Tour[]
   searchTerm: string
   onQuoteClick: (quoteId: string) => void
   onPreview: (quoteId: string, e: React.MouseEvent) => void

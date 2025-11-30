@@ -8,7 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { removeChannelMember } from '@/services/workspace-members'
 import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
-import type { Channel } from '@/stores/workspace-store'
+import type { Channel, ChannelGroup } from '@/stores/workspace/types'
 import type { ChannelSidebarProps } from './types'
 import { useChannelSidebar } from './useChannelSidebar'
 import { useChannelState } from './hooks/useChannelState'
@@ -173,14 +173,14 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   }
 
   const handleDeleteGroupClick = (groupId: string) => {
-    const group = channelGroups.find((g: any) => g.id === groupId)
+    const group = channelGroups.find((g: ChannelGroup) => g.id === groupId)
     if (group) {
       openDeleteGroupDialog(group)
     }
   }
 
   const handleDeleteClick = (channelId: string) => {
-    const channel = channels.find((ch: any) => ch.id === channelId)
+    const channel = channels.find((ch: Channel) => ch.id === channelId)
     if (channel) {
       openDeleteChannelDialog(channel)
     }
@@ -210,7 +210,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const handleLeaveChannel = async (channelId: string) => {
     if (!user || !currentWorkspace) return
 
-    const channel = channels.find((ch: any) => ch.id === channelId)
+    const channel = channels.find((ch: Channel) => ch.id === channelId)
     if (!channel) return
 
     const confirmed = confirm(`確定要離開 #${channel.name} 頻道嗎？`)
@@ -239,7 +239,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   }
 
   const toggleChannelPin = async (channelId: string) => {
-    const channel = channels.find((ch: any) => ch.id === channelId)
+    const channel = channels.find((ch: Channel) => ch.id === channelId)
     if (!channel) return
 
     try {
@@ -252,7 +252,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   }
 
   const handleEditClick = (channelId: string) => {
-    const channel = channels.find((ch: any) => ch.id === channelId)
+    const channel = channels.find((ch: Channel) => ch.id === channelId)
     if (channel) {
       openEditChannelDialog(channel)
     }
@@ -280,13 +280,13 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
 
     const draggedChannelId = active.id as string
-    const draggedChannel = channels.find((ch: any) => ch.id === draggedChannelId)
+    const draggedChannel = channels.find((ch: Channel) => ch.id === draggedChannelId)
 
     if (!draggedChannel) {
       return
     }
 
-    const targetGroup = channelGroups.find((g: any) => g.id === over.id)
+    const targetGroup = channelGroups.find((g: ChannelGroup) => g.id === over.id)
 
     if (targetGroup) {
       await updateChannel(draggedChannelId, {
@@ -296,7 +296,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
       return
     }
 
-    const targetChannel = channels.find((ch: any) => ch.id === over.id)
+    const targetChannel = channels.find((ch: Channel) => ch.id === over.id)
 
     if (targetChannel) {
       const bothHaveNoGroup = !draggedChannel.group_id && !targetChannel.group_id
@@ -309,7 +309,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
             is_favorite: false,
           })
         } else {
-          const targetGroupExists = channelGroups.find((g: any) => g.id === targetChannel.group_id)
+          const targetGroupExists = channelGroups.find((g: ChannelGroup) => g.id === targetChannel.group_id)
           if (targetGroupExists) {
             await updateChannel(draggedChannelId, {
               group_id: targetChannel.group_id,
@@ -319,19 +319,19 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         }
       } else {
         const groupChannels = channels.filter(
-          (ch: any) =>
+          (ch: Channel) =>
             (bothHaveNoGroup ? !ch.group_id : ch.group_id === draggedChannel.group_id) &&
             ch.is_favorite === draggedChannel.is_favorite
         )
 
-        const oldIndex = groupChannels.findIndex((ch: any) => ch.id === draggedChannelId)
-        const newIndex = groupChannels.findIndex((ch: any) => ch.id === over.id)
+        const oldIndex = groupChannels.findIndex((ch: Channel) => ch.id === draggedChannelId)
+        const newIndex = groupChannels.findIndex((ch: Channel) => ch.id === over.id)
 
         if (oldIndex !== -1 && newIndex !== -1) {
           const reorderedChannels = arrayMove(groupChannels, oldIndex, newIndex)
 
           for (let i = 0; i < reorderedChannels.length; i++) {
-            await updateChannelOrder((reorderedChannels[i] as any).id, i)
+            await updateChannelOrder(reorderedChannels[i].id, i)
           }
         }
       }
@@ -355,7 +355,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
   // Helper function: sort channels by pinned and name
   const sortChannels = (channels: Channel[]) => {
-    return [...channels].sort((a: any, b: any) => {
+    return [...channels].sort((a: Channel, b: Channel) => {
       if (a.is_pinned && !b.is_pinned) return -1
       if (!a.is_pinned && b.is_pinned) return 1
       return a.name.localeCompare(b.name, 'zh-TW')
@@ -364,19 +364,19 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
   // 1. Company announcements (system group, fixed at top)
   const announcementGroup = channelGroups.find(
-    (g: any) => g.is_system && g.system_type === 'company_announcements'
+    (g: ChannelGroup) => g.is_system && g.system_type === 'company_announcements'
   )
   const announcementChannels = announcementGroup
     ? sortChannels(
-        filteredChannels.filter((ch: any) => ch.group_id === announcementGroup.id && !ch.is_archived)
+        filteredChannels.filter((ch: Channel) => ch.group_id === announcementGroup.id && !ch.is_archived)
       )
     : []
 
   // 2. User-defined groups (exclude archived)
   const userGroups = channelGroups
-    .filter((g: any) => !g.is_system)
-    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-  const userGroupedChannels = userGroups.map((group: any) => ({
+    .filter((g: ChannelGroup) => !g.is_system)
+    .sort((a: ChannelGroup, b: ChannelGroup) => (a.order || 0) - (b.order || 0))
+  const userGroupedChannels = userGroups.map((group: ChannelGroup) => ({
     group,
     channels: sortChannels(
       filteredChannels.filter(
@@ -387,19 +387,19 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
   // 3. Ungrouped channels (joined but not grouped, exclude archived)
   const ungroupedChannels = sortChannels(
-    filteredChannels.filter((ch: any) => !ch.group_id && !ch.is_archived && checkIsMember(ch.id))
+    filteredChannels.filter((ch: Channel) => !ch.group_id && !ch.is_archived && checkIsMember(ch.id))
   )
 
   // 4. Unjoined channels (public + not joined, exclude archived)
   const unjoinedChannels = sortChannels(
-    filteredChannels.filter((ch: any) => ch.type === 'public' && !ch.is_archived && !checkIsMember(ch.id))
+    filteredChannels.filter((ch: Channel) => ch.type === 'public' && !ch.is_archived && !checkIsMember(ch.id))
   )
 
   // 5. Archived (system group, fixed at bottom)
-  const archivedGroup = channelGroups.find((g: any) => g.is_system && g.system_type === 'archived')
+  const archivedGroup = channelGroups.find((g: ChannelGroup) => g.is_system && g.system_type === 'archived')
   const archivedChannels = archivedGroup
     ? sortChannels(
-        filteredChannels.filter((ch: any) => ch.is_archived || ch.group_id === archivedGroup.id)
+        filteredChannels.filter((ch: Channel) => ch.is_archived || ch.group_id === archivedGroup.id)
       )
     : []
 
@@ -510,7 +510,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         checkIsMember={checkIsMember}
         toggleGroupCollapse={toggleGroupCollapse}
         handleDeleteGroupClick={handleDeleteGroupClick}
-        onToggleExpanded={(section: any, expanded: any) => {
+        onToggleExpanded={(section: string, expanded: boolean) => {
           setExpandedSections(prev => ({ ...prev, [section]: expanded }))
         }}
         onDragEnd={handleDragEnd}

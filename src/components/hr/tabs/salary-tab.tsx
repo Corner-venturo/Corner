@@ -14,13 +14,13 @@ interface SalaryTabProps {
 
 export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
   ({ employee, isEditing }, ref) => {
-    const [monthlySalary, setMonthlySalary] = useState((employee as any).monthly_salary ?? 30000)
+    const employeeWithSalary = employee as Employee & { monthly_salary?: number }
+    const [monthlySalary, setMonthlySalary] = useState(employeeWithSalary.monthly_salary ?? 30000)
     const { update } = useUserStore()
 
     useImperativeHandle(ref, () => ({
       handleSave: async () => {
-        // 儲存月薪
-        await update(employee.id, { monthly_salary: monthlySalary } as any)
+        await update(employee.id, { monthly_salary: monthlySalary } as Partial<Employee & { monthly_salary: number }>)
       },
     }))
 
@@ -102,7 +102,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
             薪資調整歷史
           </h4>
           <div className="space-y-3">
-            {salaryHistory.map((record: any, index: number) => (
+            {salaryHistory.map((record, index: number) => (
               <div
                 key={index}
                 className="flex justify-between items-center p-3 bg-white rounded border"

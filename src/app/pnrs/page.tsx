@@ -105,7 +105,7 @@ export default function PNRsPage() {
                 <div className="space-y-2">
                   <h4 className="text-xs font-medium text-morandi-secondary">航班資訊</h4>
                   <div className="space-y-1">
-                    {pnr.segments.map((seg: any, idx: number) => (
+                    {pnr.segments.map((seg: unknown, idx: number) => (
                       <div
                         key={idx}
                         className="flex items-center gap-2 text-sm text-morandi-primary bg-morandi-container/10 px-3 py-2 rounded-lg"

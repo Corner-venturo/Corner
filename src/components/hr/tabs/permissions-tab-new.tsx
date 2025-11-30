@@ -52,8 +52,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
         // 更新 roles（單一角色） 和 permissions（角色預設權限）
         await updateUser(employee.id, {
-          roles: [role] as any,
-          permissions: defaultPermissions as any,
+          roles: [role] as string[],
+          permissions: defaultPermissions as string[],
         })
 
         // 同步更新 IndexedDB
@@ -65,12 +65,12 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              roles: [role] as any,
-              permissions: defaultPermissions as any,
+              roles: [role] as string[],
+              permissions: defaultPermissions as string[],
               updated_at: new Date().toISOString(),
             })
           }
-        } catch (error) {
+        } catch (_error) {
           // Ignore error
         }
 
@@ -78,8 +78,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         if (user && user.id === employee.id) {
           login({
             ...user,
-            roles: [role] as any,
-            permissions: defaultPermissions as any,
+            roles: [role] as string[],
+            permissions: defaultPermissions as string[],
           })
 
           // 同步更新 LocalProfile
@@ -90,10 +90,10 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
             if (currentProfile && currentProfile.id === employee.id && 'updateProfile' in localAuthStore) {
               (localAuthStore.updateProfile as (id: string, data: Partial<Employee>) => void)(employee.id, {
-                roles: [role] as any,
+                roles: [role] as string[],
               })
             }
-          } catch (error) {
+          } catch (_error) {
             // Ignore error
           }
         }
@@ -134,17 +134,17 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              permissions: permissions as any,
+              permissions: permissions as string[],
               updated_at: new Date().toISOString(),
             })
           }
-        } catch (error) {}
+        } catch (_error) {}
 
         // 如果修改的是當前登入用戶，更新 auth-store
         if (user && user.id === employee.id) {
           login({
             ...user,
-            permissions: permissions as any,
+            permissions: permissions as string[],
           })
         }
 

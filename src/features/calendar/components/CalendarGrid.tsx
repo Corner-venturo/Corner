@@ -4,15 +4,16 @@ import { RefObject } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { EventClickArg } from '@fullcalendar/core'
+import { EventClickArg, MoreLinkAction } from '@fullcalendar/core'
+import { DateClickArg } from '@fullcalendar/interaction'
 import { FullCalendarEvent } from '../types'
 
 interface CalendarGridProps {
   calendarRef: RefObject<FullCalendar | null>
   events: FullCalendarEvent[]
-  onDateClick: (info: any) => void
+  onDateClick: (info: DateClickArg) => void
   onEventClick: (info: EventClickArg) => void
-  onMoreLinkClick: (info: any) => any
+  onMoreLinkClick: MoreLinkAction
 }
 
 export function CalendarGrid({

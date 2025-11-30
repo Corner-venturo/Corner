@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EventClickArg } from '@fullcalendar/core'
+import { DateClickArg } from '@fullcalendar/interaction'
 import { useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
@@ -37,7 +38,7 @@ export function useEventOperations() {
   const [newEvent, setNewEvent] = useState<NewEventForm>(initialNewEventState)
 
   // 處理日期點擊 - 直接開啟新增個人事項
-  const handleDateClick = (info: any) => {
+  const handleDateClick = (info: DateClickArg) => {
     setAddEventDialog({
       open: true,
       selectedDate: info.dateStr,
@@ -91,13 +92,12 @@ export function useEventOperations() {
       const member_id = info.event.extendedProps.memberId
       router.push(`/orders?member=${member_id}`)
     } else if (eventType === 'personal' || eventType === 'company') {
-      // 直接傳遞 FullCalendarEvent
-      const fullCalendarEvent: any = {
+      const fullCalendarEvent: FullCalendarEvent = {
         id: info.event.id,
         title: info.event.title,
         start: info.event.startStr,
         end: info.event.endStr,
-        allDay: info.event.allDay, // 🔥 傳遞 allDay 屬性（從 FullCalendar 事件取得）
+        allDay: info.event.allDay,
         backgroundColor: info.event.backgroundColor || '',
         borderColor: info.event.borderColor || '',
         extendedProps: info.event.extendedProps,

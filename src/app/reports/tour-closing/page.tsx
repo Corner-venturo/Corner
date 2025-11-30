@@ -74,7 +74,7 @@ export default function TourClosingReportPage() {
             .select('id, paid_amount')
             .eq('tour_id', tour.id)
 
-          const totalRevenue = orders?.reduce((sum: any, o: any) => sum + (o.paid_amount || 0), 0) || 0
+          const totalRevenue = orders?.reduce((sum: number, o: { paid_amount?: number }) => sum + (o.paid_amount || 0), 0) || 0
 
           // 2. 計算總成本（排除 bonus）
           const orderIds = orders?.map(o => o.id) || []
@@ -88,7 +88,7 @@ export default function TourClosingReportPage() {
               .eq('status', 'paid')
               .neq('supplier_type', 'bonus')
 
-            totalCost = paymentRequests?.reduce((sum: any, pr: any) => sum + (pr.amount || 0), 0) || 0
+            totalCost = paymentRequests?.reduce((sum: number, pr: { amount?: number }) => sum + (pr.amount || 0), 0) || 0
           }
 
           // 3. 計算團員人數
@@ -208,8 +208,8 @@ export default function TourClosingReportPage() {
       '行政費(人數×10)': report.misc_expense,
       '扣稅12%': report.tax,
       團體獎金: report.team_bonus,
-      業務獎金: report.sales_bonuses.reduce((sum: any, s: any) => sum + s.amount, 0),
-      'OP獎金': report.op_bonuses.reduce((sum: any, o: any) => sum + o.amount, 0),
+      業務獎金: report.sales_bonuses.reduce((sum: number, s: { amount: number }) => sum + s.amount, 0),
+      'OP獎金': report.op_bonuses.reduce((sum: number, o: { amount: number }) => sum + o.amount, 0),
       毛利: report.gross_profit,
       淨利: report.net_profit,
     }))

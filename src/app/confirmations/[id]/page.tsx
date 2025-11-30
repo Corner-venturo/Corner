@@ -151,10 +151,10 @@ export default function EditConfirmationPage() {
     const flightData: FlightData = {
       passengers,
       segments,
-      baggage: [], // HTML 格式沒有行李資訊
+      baggage: [],
       importantNotes: [],
-      ...((parsed as any).airlineContacts && {
-        airlineContacts: (parsed as any).airlineContacts,
+      ...(('airlineContacts' in parsed && parsed.airlineContacts) && {
+        airlineContacts: parsed.airlineContacts,
       }),
     }
 

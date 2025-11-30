@@ -1,7 +1,18 @@
 import { motion } from 'framer-motion'
 
+interface HotelData {
+  image?: string
+  name?: string
+  description?: string
+}
+
+interface TourData {
+  showHotels?: boolean
+  hotels?: HotelData[]
+}
+
 interface TourHotelsSectionProps {
-  data: any
+  data: TourData
   viewMode: 'desktop' | 'mobile'
 }
 
@@ -33,7 +44,7 @@ export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {hotels.map((hotel: any, index: number) => (
+          {hotels.map((hotel, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}

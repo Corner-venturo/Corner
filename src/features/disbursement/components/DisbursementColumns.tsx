@@ -15,7 +15,17 @@ import {
   DISBURSEMENT_STATUS_LABELS,
   DISBURSEMENT_STATUS_COLORS,
 } from '../constants'
-import { DisbursementOrder } from '../types'
+import { DisbursementOrder, PaymentRequest } from '../types'
+
+type PendingTableRow = PaymentRequest & {
+  tour_name?: string
+}
+
+type CurrentOrderTableRow = PaymentRequest & {
+  tour_name?: string
+}
+
+type HistoryTableRow = DisbursementOrder
 
 interface UsePendingColumnsProps {
   selectedRequests: string[]
@@ -29,14 +39,17 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         key: 'select',
         label: '',
         width: '50px',
-        render: (_value: unknown, row: any) => (
-          <input
-            type="checkbox"
-            checked={selectedRequests.includes(row.id)}
-            onChange={() => onSelectRequest(row.id)}
-            className="rounded border-morandi-secondary"
-          />
-        ),
+        render: (_value: unknown, row: unknown) => {
+          const typedRow = row as PendingTableRow
+          return (
+            <input
+              type="checkbox"
+              checked={selectedRequests.includes(typedRow.id)}
+              onChange={() => onSelectRequest(typedRow.id)}
+              className="rounded border-morandi-secondary"
+            />
+          )
+        },
       },
       {
         key: 'request_number',
@@ -128,16 +141,19 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
         key: 'actions',
         label: '操作',
         width: '80px',
-        render: (_value: unknown, row: any) => (
-          <button
-            onClick={() => onRemove(row.id)}
-            disabled={currentOrder?.status !== 'pending'}
-            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="移除"
-          >
-            <X size={14} />
-          </button>
-        ),
+        render: (_value: unknown, row: unknown) => {
+          const typedRow = row as CurrentOrderTableRow
+          return (
+            <button
+              onClick={() => onRemove(typedRow.id)}
+              disabled={currentOrder?.status !== 'pending'}
+              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="移除"
+            >
+              <X size={14} />
+            </button>
+          )
+        },
       },
     ],
     [currentOrder, onRemove]
@@ -202,17 +218,20 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         key: 'actions',
         label: '操作',
         width: '100px',
-        render: (_value: unknown, row: any) => (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPrintPDF(row as DisbursementOrder)}
-            className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
-          >
-            <FileText size={14} className="mr-1" />
-            PDF
-          </Button>
-        ),
+        render: (_value: unknown, row: unknown) => {
+          const typedRow = row as HistoryTableRow
+          return (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPrintPDF(typedRow)}
+              className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+            >
+              <FileText size={14} className="mr-1" />
+              PDF
+            </Button>
+          )
+        },
       },
     ],
     [onPrintPDF]

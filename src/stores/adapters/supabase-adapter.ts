@@ -26,9 +26,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     try {
       const { supabase } = await import('@/lib/supabase/client')
       // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .select('*')
         .order('created_at', { ascending: true })
 
@@ -68,9 +67,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     try {
       const { supabase } = await import('@/lib/supabase/client')
       // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: insertedData, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .insert(data)
         .select()
         .single()
@@ -96,8 +94,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     try {
       const { supabase } = await import('@/lib/supabase/client')
       // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await supabase.from(this.tableName as any).select('*').eq('id', id).single()
+      const { data, error } = await supabase.from(this.tableName).select('*').eq('id', id).single()
 
       if (error) throw error
 
@@ -118,8 +115,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
   /**
    * 清理資料物件，移除未知的欄位
    */
-  private cleanDataForTable(data: any): any {
-    const cleaned = { ...data }
+  private cleanDataForTable<D extends Record<string, unknown>>(data: D): Partial<T> {
+    const cleaned = { ...data } as Record<string, unknown>
 
     // payment_requests: 移除 items 欄位（應使用 payment_request_items 關聯表）
     if (this.tableName === 'payment_requests' && 'items' in cleaned) {
@@ -133,7 +130,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       logger.log(`🧹 [${this.tableName}] 移除過時欄位: description`)
     }
 
-    return cleaned
+    return cleaned as Partial<T>
   }
 
   /**
@@ -152,8 +149,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       const cleanedItem = this.cleanDataForTable(item)
 
       // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await supabase.from(this.tableName as any).upsert(cleanedItem)
+      const { error } = await supabase.from(this.tableName).upsert(cleanedItem)
 
       if (error) {
         logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
@@ -193,8 +189,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
       const { supabase } = await import('@/lib/supabase/client')
       // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await supabase.from(this.tableName as any).update(cleanedData).eq('id', id)
+      const { error } = await supabase.from(this.tableName).update(cleanedData).eq('id', id)
 
       if (error) throw error
 
@@ -216,8 +211,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     try {
       const { supabase } = await import('@/lib/supabase/client')
       // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await supabase.from(this.tableName as any).delete().eq('id', id)
+      const { error } = await supabase.from(this.tableName).delete().eq('id', id)
 
       if (error) throw error
 

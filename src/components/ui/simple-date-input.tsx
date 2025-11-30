@@ -40,7 +40,7 @@ export function SimpleDateInput({
   const minDate = min ? parse(min, 'yyyy-MM-dd', new Date()) : undefined
 
   // 格式化顯示文字
-  const displayText = value && isValid(dateValue as any) ? format(dateValue as any, 'yyyy/MM/dd') : ''
+  const displayText = value && dateValue && isValid(dateValue) ? format(dateValue, 'yyyy/MM/dd') : ''
 
   // 從日曆選擇
   const handleCalendarSelect = (date: Date | { from: Date; to?: Date } | undefined) => {

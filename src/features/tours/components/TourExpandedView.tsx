@@ -1,6 +1,6 @@
 import { logger } from '@/lib/utils/logger'
 import React from 'react'
-import { Tour } from '@/stores/types'
+import { Tour, Order } from '@/stores/types'
 import {
   Calendar,
   FileText,
@@ -42,14 +42,18 @@ const tourTabs = [
   { id: 'tasks', label: '指派任務', icon: Edit2 },
 ]
 
+interface TourExtraFields {
+  [tourId: string]: Record<string, unknown>
+}
+
 interface TourExpandedViewProps {
   tour: Tour
-  orders: any[]
+  orders: Order[]
   activeTabs: Record<string, string>
   setActiveTab: (tourId: string, tabId: string) => void
-  openDialog: (type: string, data?: any) => void
-  tourExtraFields: Record<string, any>
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
+  openDialog: (type: string, data?: Tour) => void
+  tourExtraFields: TourExtraFields
+  setTourExtraFields: React.Dispatch<React.SetStateAction<TourExtraFields>>
   triggerAddOnAdd: Record<string, boolean>
   setTriggerAddOnAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   triggerPaymentAdd: Record<string, boolean>

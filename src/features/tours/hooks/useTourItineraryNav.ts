@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 
-export function useTourItineraryNav(dailyItinerary: any[]) {
+interface DailyItineraryItem {
+  [key: string]: unknown
+}
+
+export function useTourItineraryNav(dailyItinerary: DailyItineraryItem[]) {
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const dayRefs = useRef<(HTMLDivElement | null)[]>([])
 

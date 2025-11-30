@@ -9,8 +9,12 @@ import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
+interface TourStoreActions {
+  fetchAll: () => Promise<void>
+}
+
 interface UseTourChannelOperationsParams {
-  actions: any
+  actions: TourStoreActions
 }
 
 export function useTourChannelOperations({ actions }: UseTourChannelOperationsParams) {
@@ -119,10 +123,11 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
 
       toast.dismiss(loadingToast)
       toast.success(`已建立頻道：${channelName}`)
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
       logger.error('❌ [建立頻道] 發生錯誤:', error)
       toast.dismiss(loadingToast)
-      toast.error(`建立頻道失敗：${error.message || '未知錯誤'}`)
+      toast.error(`建立頻道失敗：${errorMessage}`)
     }
   }, [])
 
@@ -142,7 +147,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
         .from('tours')
         .update({
           closing_status: 'open',
-        } as any)
+        })
         .eq('id', tour.id)
 
       if (error) throw error
@@ -152,9 +157,10 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
       if ('fetchAll' in actions && typeof actions.fetchAll === 'function') {
         await actions.fetchAll()
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
       logger.error('解鎖失敗:', error)
-      toast.error(`解鎖失敗：${error.message || '未知錯誤'}`)
+      toast.error(`解鎖失敗：${errorMessage}`)
     }
   }, [actions])
 

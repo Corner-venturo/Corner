@@ -10,6 +10,15 @@ import { useOrderStore } from '@/stores'
 import { ArrowLeft, FileText, Upload, Download, Eye, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+interface Document {
+  id: string
+  name: string
+  _type: string
+  size: string
+  uploadDate: string
+  category: string
+}
+
 export default function DocumentsDetailPage() {
   const router = useRouter()
   const params = useParams()
@@ -19,7 +28,7 @@ export default function DocumentsDetailPage() {
   const order = orders.find(o => o.id === order_id)
 
   // 模擬文件數據
-  const documents = [
+  const documents: Document[] = [
     {
       id: '1',
       name: '行程確認書.pdf',
@@ -58,12 +67,15 @@ export default function DocumentsDetailPage() {
         label: '文件名稱',
         sortable: true,
         filterable: true,
-        render: (value, row: any) => (
-          <div className="flex items-center space-x-2">
-            {getFileIcon(row._type)}
-            <span className="font-medium text-morandi-primary">{String(value || '')}</span>
-          </div>
-        ),
+        render: (value, row: unknown) => {
+          const document = row as Document
+          return (
+            <div className="flex items-center space-x-2">
+              {getFileIcon(document._type)}
+              <span className="font-medium text-morandi-primary">{String(value || '')}</span>
+            </div>
+          )
+        },
       },
       {
         key: 'category',
@@ -142,10 +154,10 @@ export default function DocumentsDetailPage() {
   )
 
   // 排序和篩選函數
-  const sortFunction = (data: any[], column: string, direction: 'asc' | 'desc') => {
-    return [...data].sort((a: any, b: any) => {
-      let aValue: string | number | Date = a[column as keyof typeof a]
-      let bValue: string | number | Date = b[column as keyof typeof b]
+  const sortFunction = (data: Document[], column: string, direction: 'asc' | 'desc') => {
+    return [...data].sort((a, b) => {
+      let aValue: string | number | Date = a[column as keyof Document]
+      let bValue: string | number | Date = b[column as keyof Document]
 
       if (column === 'uploadDate') {
         aValue = new Date(aValue)
@@ -158,8 +170,8 @@ export default function DocumentsDetailPage() {
     })
   }
 
-  const filterFunction = (data: any[], filters: Record<string, string>) => {
-    return data.filter((doc: any) => {
+  const filterFunction = (data: Document[], filters: Record<string, string>) => {
+    return data.filter((doc) => {
       return (
         (!filters.name || doc.name.toLowerCase().includes(filters.name.toLowerCase())) &&
         (!filters.category || doc.category === filters.category) &&

@@ -41,7 +41,7 @@ class RealtimeManager {
   /**
    * 訂閱資料表變更
    */
-  subscribe<T = unknown>(config: RealtimeSubscriptionConfig<T>): string {
+  subscribe<T extends Record<string, unknown> = Record<string, unknown>>(config: RealtimeSubscriptionConfig<T>): string {
     if (!this.config.enabled) {
       this.log('Realtime is disabled, skipping subscription')
       return ''
@@ -125,17 +125,30 @@ class RealtimeManager {
   /**
    * 創建 Realtime Channel
    */
-  private createChannel<T>(subscriptionId: string, config: RealtimeSubscriptionConfig<T>): void {
+  private createChannel<T extends Record<string, unknown> = Record<string, unknown>>(subscriptionId: string, config: RealtimeSubscriptionConfig<T>): void {
     const state = this.subscriptions.get(subscriptionId)
     if (!state) return
 
     try {
       // 創建唯一的 channel 名稱
       const channelName = `realtime:${config.table}:${subscriptionId}`
-      const channel: any = supabase.channel(channelName)
+      const channel = supabase.channel(channelName)
 
       // 設定 Postgres 變更監聽
-      channel.on(
+      type ChannelWithOn = typeof channel & {
+        on: (
+          event: 'postgres_changes',
+          config: {
+            event?: string
+            schema?: string
+            table: string
+            filter?: string
+          },
+          callback: (payload: unknown) => void
+        ) => typeof channel
+      }
+
+      (channel as ChannelWithOn).on(
         'postgres_changes',
         {
           event: config.event || '*',
@@ -143,8 +156,8 @@ class RealtimeManager {
           table: config.table,
           filter: config.filter,
         },
-        (payload: any) => {
-          this.handleRealtimeChange(subscriptionId, config, payload as any)
+        (payload: unknown) => {
+          this.handleRealtimeChange(subscriptionId, config, payload as PostgresChangesPayload<T>)
         }
       )
 
@@ -164,10 +177,10 @@ class RealtimeManager {
   /**
    * 處理 Realtime 變更事件
    */
-  private handleRealtimeChange<T = any>(
+  private handleRealtimeChange<T extends Record<string, unknown> = Record<string, unknown>>(
     subscriptionId: string,
     config: RealtimeSubscriptionConfig<T>,
-    payload: any
+    payload: PostgresChangesPayload<T>
   ): void {
     this.log(`Realtime change [${subscriptionId}]:`, payload)
 
@@ -331,7 +344,7 @@ export const realtimeManager = new RealtimeManager({
 
 // 在瀏覽器中暴露給開發者工具
 if (typeof window !== 'undefined') {
-  ;(window as any).realtimeManager = realtimeManager
+  (window as unknown as Window & { realtimeManager: RealtimeManager }).realtimeManager = realtimeManager
   logger.log('✅ RealtimeManager 已載入，可使用 window.realtimeManager 查看狀態')
   logger.log('📊 使用 window.realtimeManager.getAllSubscriptions() 查看所有訂閱')
 }

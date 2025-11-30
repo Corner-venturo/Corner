@@ -13,7 +13,7 @@ export interface Attraction {
   category?: string
   tags?: string[]
   duration_minutes?: number
-  opening_hours?: any
+  opening_hours?: Record<string, string> | string
   address?: string
   phone?: string
   website?: string

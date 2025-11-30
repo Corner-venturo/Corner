@@ -107,7 +107,7 @@ export const ToursPage: React.FC = () => {
 
   // Lazy load: only load regions and employees when opening create dialog
   const handleOpenCreateDialog = useCallback(
-    async (tour: any = null, fromQuoteId?: string) => {
+    async (tour: Tour | null = null, fromQuoteId?: string) => {
       if (countries.length === 0) {
         await fetchRegions()
       }
@@ -344,7 +344,7 @@ export const ToursPage: React.FC = () => {
   }, [operations, deleteConfirm.tour, setDeleteConfirm])
 
   // Use extracted hooks for table columns, channel operations, and action buttons
-  const columns = useTourTableColumns({ orders: orders as any, getStatusColor })
+  const columns = useTourTableColumns({ orders, getStatusColor })
 
   const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions })
 
@@ -363,23 +363,21 @@ export const ToursPage: React.FC = () => {
   const renderExpanded = useCallback(
     (tour: Tour) => (
       <TourExpandedView
-        {...({
-          tour,
-          orders,
-          activeTabs,
-          setActiveTab,
-          openDialog,
-          tourExtraFields,
-          setTourExtraFields,
-          triggerAddOnAdd,
-          setTriggerAddOnAdd,
-          triggerRefundAdd,
-          setTriggerRefundAdd,
-          triggerPaymentAdd,
-          setTriggerPaymentAdd,
-          triggerCostAdd,
-          setTriggerCostAdd,
-        } as any)}
+        tour={tour}
+        orders={orders}
+        activeTabs={activeTabs}
+        setActiveTab={setActiveTab}
+        openDialog={openDialog}
+        tourExtraFields={tourExtraFields}
+        setTourExtraFields={setTourExtraFields}
+        triggerAddOnAdd={triggerAddOnAdd}
+        setTriggerAddOnAdd={setTriggerAddOnAdd}
+        triggerRefundAdd={triggerRefundAdd}
+        setTriggerRefundAdd={setTriggerRefundAdd}
+        triggerPaymentAdd={triggerPaymentAdd}
+        setTriggerPaymentAdd={setTriggerPaymentAdd}
+        triggerCostAdd={triggerCostAdd}
+        setTriggerCostAdd={setTriggerCostAdd}
       />
     ),
     [

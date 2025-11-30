@@ -19,10 +19,10 @@ interface ItemRowProps {
   editValue: string
   setEditValue: (value: string) => void
   inputRef: React.RefObject<HTMLInputElement>
-  startEdit: (rowId: string, field: keyof TransportationRate, currentValue: any) => void
+  startEdit: (rowId: string, field: keyof TransportationRate, currentValue: string | number | boolean | null | undefined) => void
   saveEdit: () => Promise<void>
   handleKeyDown: (e: React.KeyboardEvent, rowId: string, field: keyof TransportationRate) => Promise<void>
-  renderEditableCell: (rate: TransportationRate, field: keyof TransportationRate, value: any, type?: 'text' | 'number') => React.ReactNode
+  renderEditableCell: (rate: TransportationRate, field: keyof TransportationRate, value: string | number | boolean | null | undefined, type?: 'text' | 'number') => React.ReactNode
   onUpdate: (id: string, updates: Partial<TransportationRate>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onInsert?: (rate: TransportationRate) => void
@@ -34,8 +34,8 @@ interface ItemRowProps {
   isBackup: boolean
   categoryDragRef?: (node: HTMLElement | null) => void
   categoryDragStyle?: React.CSSProperties
-  categoryDragAttributes?: any
-  categoryDragListeners?: any
+  categoryDragAttributes?: Record<string, unknown>
+  categoryDragListeners?: Record<string, unknown>
 }
 
 export function ItemRow({

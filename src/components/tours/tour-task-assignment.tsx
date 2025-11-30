@@ -30,7 +30,7 @@ const employees = [
 ]
 
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
-  const { items: todos, create: addTodo, update: _updateTodo } = useTodoStore()
+  const { items: todos, create: addTodo } = useTodoStore()
   const [selectedTemplate, setSelectedTemplate] = useState('')
   const [taskForm, setTaskForm] = useState({
     title: '',
@@ -104,12 +104,12 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
         done: false,
       }))
 
-    const newTodo: any = {
+    const newTodo: Partial<Todo> = {
       title: taskForm.title,
       priority: taskForm.priority,
       deadline: taskForm.deadline,
       status: 'pending' as const,
-      creator: '1', // 當前用戶
+      creator: '1',
       assignee: taskForm.assignee,
       visibility: ['1', taskForm.assignee],
       related_items: [
@@ -124,8 +124,11 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
         {
           timestamp: new Date().toISOString(),
           content: `從旅遊團「${tour.name}」指派的任務`,
+          author_id: '1',
+          author_name: '系統',
         },
       ],
+      enabled_quick_actions: [],
     }
 
     addTodo(newTodo)
@@ -177,10 +180,10 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       key: 'title',
       label: '任務標題',
       sortable: true,
-      render: (value: unknown, todo: Todo) => (
+      render: (_value: unknown, todo: Todo) => (
         <div className="flex items-center gap-2">
           <StarRating value={todo.priority} readonly size="sm" />
-          <span className="font-medium text-morandi-primary">{String(value)}</span>
+          <span className="font-medium text-morandi-primary">{todo.title}</span>
         </div>
       ),
     },
@@ -210,7 +213,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     {
       key: 'progress',
       label: '進度',
-      render: (value: unknown, todo: Todo) => {
+      render: (_value: unknown, todo: Todo) => {
         const { completed, total, percentage } = getProgressInfo(todo)
         return (
           <div className="flex items-center gap-2">
@@ -246,12 +249,11 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     {
       key: 'actions',
       label: '操作',
-      render: (value: unknown, todo: Todo) => (
+      render: (_value: unknown, todo: Todo) => (
         <Button
           size="sm"
           variant="outline"
           onClick={() => {
-            // 這裡可以實現跳轉到待辦事項詳細頁面
             window.location.href = `/todos?expand=${todo.id}`
           }}
         >

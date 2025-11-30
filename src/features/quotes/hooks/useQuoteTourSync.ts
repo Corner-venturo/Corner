@@ -8,10 +8,11 @@
 import { useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Quote } from '@/stores/types'
+import { Tour } from '@/types/tour.types'
 
 interface UseTourSyncParams {
   quotes: Quote[]
-  tours: any[]
+  tours: Tour[]
   isAddDialogOpen: boolean
   onOpenDialog: (tourId: string) => void
   onNavigateToQuote: (quoteId: string) => void

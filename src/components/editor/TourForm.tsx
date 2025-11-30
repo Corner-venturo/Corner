@@ -3,7 +3,7 @@
 import React from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useRegionsStore } from '@/stores'
-import { TourFormData } from './tour-form/types'
+import { TourFormData, CityOption } from './tour-form/types'
 import { useRegionData } from './tour-form/hooks/useRegionData'
 import { useTourFormHandlers } from './tour-form/hooks/useTourFormHandlers'
 import { CoverInfoSection } from './tour-form/sections/CoverInfoSection'
@@ -60,8 +60,8 @@ export function TourForm({ data, onChange }: TourFormProps) {
         selectedCountry={selectedCountry}
         setSelectedCountry={setSelectedCountry}
         setSelectedCountryCode={setSelectedCountryCode}
-        allDestinations={allDestinations as any}
-        availableCities={availableCities as any}
+        allDestinations={allDestinations}
+        availableCities={availableCities}
         countryNameToCode={countryNameToCode}
         updateField={handlers.updateField}
         updateCity={handlers.updateCity}
@@ -72,7 +72,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
         data={data}
         allCountries={allCountries}
         availableCities={availableCities}
-        getCitiesByCountryId={getCitiesByCountryId as any}
+        getCitiesByCountryId={getCitiesByCountryId}
         onChange={onChange}
       />
 

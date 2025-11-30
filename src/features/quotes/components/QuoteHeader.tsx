@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2 } from 'lucide-react'
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,12 +12,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord } from '../types'
+import { Quote } from '@/types/quote.types'
+import { Tour } from '@/types/tour.types'
+
+interface QuoteWithVersions extends Omit<Quote, 'versions'> {
+  versions?: VersionRecord[]
+}
 
 interface QuoteHeaderProps {
   isSpecialTour: boolean
   isReadOnly: boolean
-  relatedTour: any
-  quote: any
+  relatedTour: Tour | null
+  quote: QuoteWithVersions | null
   quoteName: string
   setQuoteName: (name: string) => void
   participantCounts: ParticipantCounts
@@ -24,7 +31,7 @@ interface QuoteHeaderProps {
   saveSuccess: boolean
   setIsSaveDialogOpen: (open: boolean) => void
   formatDateTime: (dateString: string) => string
-  handleLoadVersion: (versionIndex: number, versionData: any) => void
+  handleLoadVersion: (versionIndex: number, versionData: VersionRecord) => void
   handleSave: () => void
   handleSaveAsNewVersion: () => void
   handleFinalize: () => void
@@ -32,7 +39,7 @@ interface QuoteHeaderProps {
   handleGenerateQuotation: () => void
   handleDeleteVersion: (versionIndex: number) => void
   currentEditingVersion: number | null
-  router: any
+  router: AppRouterInstance
 }
 
 function History({ size, className }: { size: number; className?: string }) {
@@ -278,7 +285,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                             )}
                             {hoveredVersionIndex === index && (
                               <button
-                                onClick={(e) => {
+                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                   e.stopPropagation()
                                   handleDeleteVersion(index)
                                 }}

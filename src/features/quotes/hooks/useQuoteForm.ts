@@ -8,6 +8,7 @@ import { useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { logger } from '@/lib/utils/logger'
 import { DEFAULT_CATEGORIES } from '../constants'
+import { Quote } from '@/stores/types'
 
 interface QuoteFormData {
   name: string
@@ -28,7 +29,7 @@ const initialFormData: QuoteFormData = {
 }
 
 interface UseQuoteFormParams {
-  addQuote: (data: any) => Promise<any>
+  addQuote: (data: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>) => Promise<Quote>
 }
 
 export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
@@ -44,7 +45,7 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const initFormWithTour = (tour: any) => {
+  const initFormWithTour = (tour: { id: string; name: string; max_participants?: number | null }) => {
     setFormData({
       name: tour.name,
       status: 'proposed',

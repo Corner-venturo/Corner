@@ -1,28 +1,44 @@
 'use client'
 
 import { MessageList, MessageInput, MemberSidebar } from '../chat'
+import type { Message, AdvanceList, SharedOrderList, AdvanceItem } from '@/stores/workspace'
 
-// @ts-ignore - Theme placeholder
-const theme = {}
+interface MessageListTheme {
+  colors: {
+    surface: string
+  }
+  spacing: {
+    lg: string
+  }
+}
+
+const theme: MessageListTheme = {
+  colors: {
+    surface: 'bg-white'
+  },
+  spacing: {
+    lg: '1rem'
+  }
+}
 
 interface ChannelChatMessagesProps {
-  messages: any[]
-  advanceLists: any[]
-  sharedOrderLists: any[]
+  messages: Message[]
+  advanceLists: AdvanceList[]
+  sharedOrderLists: SharedOrderList[]
   channelName: string
   currentUserId?: string
   isLoading: boolean
   showMemberSidebar: boolean
   messageText: string
   attachedFiles: File[]
-  uploadingFiles: string[]
-  uploadProgress: Record<string, number>
+  uploadingFiles: boolean
+  uploadProgress: number
   messagesEndRef: React.RefObject<HTMLDivElement>
   onReaction: (messageId: string, emoji: string) => void
   onDeleteMessage: (messageId: string) => Promise<void>
-  onCreatePayment: (itemId: string, item: any) => void
+  onCreatePayment: (itemId: string, item: unknown) => void
   onDeleteAdvanceList: (listId: string) => Promise<void>
-  onCreateReceipt: (orderId: string, order: any) => void
+  onCreateReceipt: (orderId: string, order: unknown) => void
   onMessageChange: (text: string) => void
   onSubmit: (e: React.FormEvent) => Promise<void>
   onFilesChange: (files: File[]) => void
@@ -65,7 +81,6 @@ export function ChatMessages({
   return (
     <>
       <div className="flex-1 flex min-h-0">
-        {/* @ts-ignore - MessageList props compatibility */}
         <MessageList
           messages={messages}
           advanceLists={advanceLists}

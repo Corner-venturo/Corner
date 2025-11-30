@@ -12,6 +12,7 @@ import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
 import { useSupplierStore } from '@/stores'
 import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks'
+import type { Supplier } from '@/types/supplier.types'
 
 export const SuppliersPage: React.FC = () => {
   // ✅ Realtime 訂閱
@@ -20,7 +21,7 @@ export const SuppliersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
-  const [editingSupplier, setEditingSupplier] = useState<any>(null)
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
 
   const { items: suppliers, create, update, delete: deleteSupplier, fetchAll: fetchSuppliers } = useSupplierStore()
 
@@ -52,7 +53,7 @@ export const SuppliersPage: React.FC = () => {
     setIsAddDialogOpen(true)
   }, [])
 
-  const handleEdit = useCallback((supplier: any) => {
+  const handleEdit = useCallback((supplier: Supplier) => {
     setIsEditMode(true)
     setEditingSupplier(supplier)
     setFormData({
@@ -64,7 +65,7 @@ export const SuppliersPage: React.FC = () => {
     setIsAddDialogOpen(true)
   }, [])
 
-  const handleDelete = useCallback(async (supplier: any) => {
+  const handleDelete = useCallback(async (supplier: Supplier) => {
     if (!confirm(`確定要刪除供應商「${supplier.name}」嗎？`)) return
 
     try {
@@ -104,7 +105,7 @@ export const SuppliersPage: React.FC = () => {
           bank_name: formData.bank_name,
           bank_account: formData.bank_account,
           notes: formData.note,
-        } as any)
+        })
         alert('✅ 供應商更新成功')
       } else {
         // 新增模式
@@ -113,7 +114,8 @@ export const SuppliersPage: React.FC = () => {
           bank_name: formData.bank_name,
           bank_account: formData.bank_account,
           notes: formData.note,
-        } as any)
+          type: 'other', // 預設型別
+        })
         alert('✅ 供應商建立成功')
       }
       handleCloseDialog()

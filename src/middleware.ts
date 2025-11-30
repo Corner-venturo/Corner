@@ -20,9 +20,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_
  * 支援 JWT 格式、base64 編碼格式和 Quick-Login Token
  */
 async function verifyAuthToken(token: string): Promise<boolean> {
+  console.log('[Middleware] 驗證 token:', token.substring(0, 50) + '...')
+
   // 處理 quick-login token 格式（帶 HMAC 簽名驗證）
   if (token.startsWith('quick-login-')) {
-    return verifyQuickLoginToken(token)
+    const result = await verifyQuickLoginToken(token)
+    console.log('[Middleware] quick-login 驗證結果:', result)
+    return result
   }
 
   // 嘗試 JWT 驗證

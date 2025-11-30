@@ -203,15 +203,38 @@ function evaluateExpression(expression: string): number | string {
   }
 }
 
+// 團員介面
+interface Member {
+  name?: string
+  nameEn?: string
+  birthday?: string
+  age?: number
+  gender?: string
+  idNumber?: string
+  passport_number?: string
+  passportExpiry?: string
+  reservationCode?: string
+  assignedRoom?: string
+  basePrice?: number
+  addOns?: string[]
+  customFields?: Record<string, string | number>
+}
+
+// 加購項目介面
+interface TourAddOn {
+  id: string
+  price: number
+}
+
 // 獲取團員的計算上下文
 export function getMemberContext(
-  member: any,
-  tour_add_ons: any[] = [],
+  member: Member,
+  tour_add_ons: TourAddOn[] = [],
   tourPrice = 0
 ): FormulaContext {
   // 計算加購總金額
   const addOnTotal = (member.addOns || []).reduce((sum: number, addOnId: string) => {
-    const addOn = tour_add_ons.find((a: any) => a.id === addOnId)
+    const addOn = tour_add_ons.find((a: TourAddOn) => a.id === addOnId)
     return sum + (addOn?.price || 0)
   }, 0)
 
@@ -237,10 +260,10 @@ export function getMemberContext(
       (acc, [fieldId, value]) => {
         // 如果值是數字，轉換為數字類型
         const numValue = Number(value)
-        acc[fieldId] = isNaN(numValue) ? (value as any) : numValue
+        acc[fieldId] = isNaN(numValue) ? value : numValue
         return acc
       },
-      {} as Record<string, any>
+      {} as Record<string, number | string>
     ),
   }
 }

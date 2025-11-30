@@ -43,7 +43,7 @@ export interface ListPageLayoutProps<T extends Record<string, any>> {
 
   // ========== 表格配置 ==========
   /** 表格列定義 */
-  columns: TableColumn[]
+  columns: TableColumn<T>[]
   /** 行點擊事件 */
   onRowClick?: (item: T) => void
   /** 操作按鈕渲染函數 */
@@ -194,7 +194,7 @@ export function ListPageLayout<T extends Record<string, any>>({
       <div className="flex-1 overflow-hidden">
         <div className="h-full">
           <EnhancedTable
-            columns={columns}
+            columns={columns as TableColumn[]}
             data={filteredData}
             loading={loading}
             onRowClick={onRowClick}

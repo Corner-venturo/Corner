@@ -141,7 +141,7 @@ export const useChatStore = () => {
         if (error) throw error
 
         // 更新 store 中該頻道的訊息（不影響其他頻道）
-        const channelMessages = (data || []) as any
+        const channelMessages = (data || []) as Message[]
         uiStore.setCurrentChannelMessages(channelId, channelMessages)
         uiStore.setMessagesLoading(channelId, false)
       } catch (error) {

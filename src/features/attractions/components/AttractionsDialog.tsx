@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Attraction, AttractionFormData } from '../types'
+import type { Country, Region, City } from '@/stores/region-store'
 
 // ============================================
 // 景點對話框組件（新增/編輯共用）
@@ -12,12 +13,12 @@ interface AttractionsDialogProps {
   onClose: () => void
   onSubmit: (formData: AttractionFormData) => Promise<{ success: boolean }>
   attraction?: Attraction | null
-  countries: any[]
-  regions: any[]
-  cities: any[]
-  getRegionsByCountry: (countryId: string) => any[]
-  getCitiesByCountry: (countryId: string) => any[]
-  getCitiesByRegion: (regionId: string) => any[]
+  countries: Country[]
+  regions: Region[]
+  cities: City[]
+  getRegionsByCountry: (countryId: string) => Region[]
+  getCitiesByCountry: (countryId: string) => City[]
+  getCitiesByRegion: (regionId: string) => City[]
   initialFormData: AttractionFormData
 }
 
@@ -142,7 +143,7 @@ export function AttractionsDialog({
             required
           >
             <option value="">請選擇</option>
-            {countries.map((c: any) => (
+            {countries.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.emoji} {c.name}
               </option>
@@ -165,7 +166,7 @@ export function AttractionsDialog({
               className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
             >
               <option value="">請選擇</option>
-              {availableRegions.map((r: any) => (
+              {availableRegions.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
                 </option>
@@ -183,7 +184,7 @@ export function AttractionsDialog({
             required
           >
             <option value="">請選擇</option>
-            {availableCities.map((c: any) => (
+            {availableCities.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>

@@ -96,7 +96,7 @@ export const costCategories: CostCategory[] = [
   { id: 'guide', name: '領隊導遊', items: [], total: 0 },
 ]
 
-export const categoryIcons: Record<string, any> = {
+export const categoryIcons: Record<string, string> = {
   transport: 'Car',
   'group-transport': 'Users',
   accommodation: 'Home',

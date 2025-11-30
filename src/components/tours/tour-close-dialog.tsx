@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tour } from '@/types/tour.types'
+import { PaymentRequest } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Plus, X } from 'lucide-react'
@@ -116,9 +117,9 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
           .from('payment_requests')
           .select('amount')
           .in('order_id', orderIds)
-          .eq('status', 'paid') as any
+          .eq('status', 'paid')
 
-        const cost = paymentRequests?.reduce((sum: number, pr: any) => sum + (pr.amount || 0), 0) || 0
+        const cost = paymentRequests?.reduce((sum: number, pr: Pick<PaymentRequest, 'amount'>) => sum + (pr.amount || 0), 0) || 0
         setTotalCost(cost)
       }
 
@@ -210,9 +211,9 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             order_id: orderId,
             supplier_name: '業務業績',
             amount,
-            description: `業務業績 ${recipient.percentage}%`,
+            note: `業務業績 ${recipient.percentage}%`,
             status: 'pending'
-          } as any)
+          })
         }
       }
 
@@ -224,9 +225,9 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             order_id: orderId,
             supplier_name: 'OP 獎金',
             amount,
-            description: `OP 獎金 ${recipient.percentage}%`,
+            note: `OP 獎金 ${recipient.percentage}%`,
             status: 'pending'
-          } as any)
+          })
         }
       }
 

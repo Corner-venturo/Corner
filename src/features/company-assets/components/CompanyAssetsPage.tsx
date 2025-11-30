@@ -35,7 +35,7 @@ export const CompanyAssetsPage: React.FC = () => {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setAssets(data as any || [])
+      setAssets(data || [])
     } catch (error) {
       logger.error('載入公司資源失敗:', error)
     }
@@ -84,9 +84,9 @@ export const CompanyAssetsPage: React.FC = () => {
 
       alert('上傳成功！')
       fetchAssets()
-    } catch (error: any) {
+    } catch (error) {
       logger.error('上傳失敗:', error)
-      alert(`上傳失敗: ${error.message || '未知錯誤'}`)
+      alert(`上傳失敗: ${error instanceof Error ? error.message : '未知錯誤'}`)
     } finally {
       setIsUploading(false)
     }

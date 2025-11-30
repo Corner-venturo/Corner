@@ -18,20 +18,35 @@ interface VisaApplicant {
   cost: number
 }
 
+interface ContactInfo {
+  tour_id: string
+  order_id: string
+  applicant_name: string
+  contact_person: string
+  contact_phone: string
+}
+
+interface TourOption {
+  value: string
+  label: string
+}
+
+interface OrderData {
+  id: string
+  order_number: string
+  contact_person: string
+  tour_id: string
+  created_at: string
+}
+
 interface AddVisaDialogProps {
   open: boolean
   onClose: () => void
   onSubmit: () => Promise<void>
-  contact_info: {
-    tour_id: string
-    order_id: string
-    applicant_name: string
-    contact_person: string
-    contact_phone: string
-  }
-  setContactInfo: React.Dispatch<React.SetStateAction<any>>
+  contact_info: ContactInfo
+  setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>
   applicants: VisaApplicant[]
-  tourOptions: any[]
+  tourOptions: TourOption[]
   calculateFee: (country: string) => number
   addApplicant: () => void
   removeApplicant: (id: string) => void
@@ -55,7 +70,7 @@ export function AddVisaDialog({
   canSubmit,
   isSubmitting,
 }: AddVisaDialogProps) {
-  const [tourOrders, setTourOrders] = React.useState<any[]>([])
+  const [tourOrders, setTourOrders] = React.useState<OrderData[]>([])
   const [hasInitialized, setHasInitialized] = React.useState(false)
 
   // ✅ 當對話框打開時，載入團號資料並自動選擇簽證專用團
@@ -75,10 +90,10 @@ export function AddVisaDialog({
           // 2. 取得或建立簽證專用團
           const visaTour = await tourService.getOrCreateVisaTour()
           if (visaTour && !contact_info.tour_id) {
-            setContactInfo((prev: any) => ({ ...prev, tour_id: visaTour.id }))
+            setContactInfo((prev) => ({ ...prev, tour_id: visaTour.id }))
             setHasInitialized(true)
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to initialize visa dialog:', error)
         }
       }
@@ -108,7 +123,7 @@ export function AddVisaDialog({
           } else {
             setTourOrders([])
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to fetch tour orders:', error)
           setTourOrders([])
         }
@@ -163,7 +178,7 @@ export function AddVisaDialog({
             <Combobox
               value={contact_info.tour_id}
               onChange={value => {
-                setContactInfo((prev: any) => ({ ...prev, tour_id: value, order_id: '' }))
+                setContactInfo((prev) => ({ ...prev, tour_id: value, order_id: '' }))
               }}
               options={tourOptions}
               placeholder="請輸入或選擇團號（例如：0810）"
@@ -179,7 +194,7 @@ export function AddVisaDialog({
             </label>
             <Combobox
               value={contact_info.order_id}
-              onChange={value => setContactInfo((prev: any) => ({ ...prev, order_id: value }))}
+              onChange={value => setContactInfo((prev) => ({ ...prev, order_id: value }))}
               options={orderOptions}
               placeholder={contact_info.tour_id ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
               className="mt-1"
@@ -195,8 +210,8 @@ export function AddVisaDialog({
             <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
             <Input
               value={contact_info.contact_person}
-              onChange={e =>
-                setContactInfo((prev: any) => ({ ...prev, contact_person: e.target.value }))
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setContactInfo((prev) => ({ ...prev, contact_person: e.target.value }))
               }
               className="mt-1"
               placeholder="請輸入聯絡人"
@@ -206,8 +221,8 @@ export function AddVisaDialog({
             <label className="text-sm font-medium text-morandi-primary">申請人</label>
             <Input
               value={contact_info.applicant_name}
-              onChange={e =>
-                setContactInfo((prev: any) => ({ ...prev, applicant_name: e.target.value }))
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setContactInfo((prev) => ({ ...prev, applicant_name: e.target.value }))
               }
               className="mt-1"
               placeholder="請輸入申請人姓名"
@@ -217,8 +232,8 @@ export function AddVisaDialog({
             <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
             <Input
               value={contact_info.contact_phone}
-              onChange={e =>
-                setContactInfo((prev: any) => ({ ...prev, contact_phone: e.target.value }))
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setContactInfo((prev) => ({ ...prev, contact_phone: e.target.value }))
               }
               className="mt-1"
               placeholder="請輸入聯絡電話"
@@ -236,14 +251,14 @@ export function AddVisaDialog({
           <div key={applicant.id} className="flex gap-2 items-center">
             <Input
               value={applicant.name}
-              onChange={e => updateApplicant(applicant.id, 'name', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'name', e.target.value)}
               placeholder={index === 0 ? '辦理人（自動帶入）' : '辦理人'}
               className="w-40"
             />
 
             <select
               value={applicant.country}
-              onChange={e => updateApplicant(applicant.id, 'country', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateApplicant(applicant.id, 'country', e.target.value)}
               className="w-56 p-2 border border-border rounded-md bg-background h-10 text-sm"
             >
               <option value="護照 成人">護照 成人</option>
@@ -258,7 +273,7 @@ export function AddVisaDialog({
             <Input
               type="date"
               value={applicant.submission_date}
-              onChange={e => updateApplicant(applicant.id, 'submission_date', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'submission_date', e.target.value)}
               className="w-32"
             />
 
@@ -274,7 +289,7 @@ export function AddVisaDialog({
             <Input
               type="number"
               value={applicant.cost}
-              onChange={e => updateApplicant(applicant.id, 'cost', Number(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'cost', Number(e.target.value))}
               placeholder="成本"
               className="w-12 text-xs"
             />
@@ -283,7 +298,7 @@ export function AddVisaDialog({
               <input
                 type="checkbox"
                 checked={applicant.is_urgent}
-                onChange={e => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
                 className="w-4 h-4 flex-shrink-0"
               />
               <span className="text-xs whitespace-nowrap">急件</span>

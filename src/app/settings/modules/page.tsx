@@ -30,6 +30,7 @@ import {
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import type { Workspace } from '@/types/models'
 
 const MODULE_INFO = {
   accounting: {
@@ -85,7 +86,7 @@ export default function ModulesManagementPage() {
     loadWorkspaces()
   }, [])
 
-  const currentWorkspace = workspaces.find((w: any) => w.id === user?.workspace_id)
+  const currentWorkspace = workspaces.find((w: Workspace) => w.id === user?.workspace_id)
 
   const getModuleStatus = (moduleName: ModuleName) => {
     const module = modules.find(
@@ -135,7 +136,7 @@ export default function ModulesManagementPage() {
           is_enabled: true,
           enabled_at: new Date().toISOString(),
           expires_at: expiresDate || null,
-        } as any)
+        })
       }
 
       toast.success(`${MODULE_INFO[selectedModule].name} 已啟用`)

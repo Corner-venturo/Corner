@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Attraction } from '../types'
+import type { Country, City } from '@/stores/region-store'
 
 // ============================================
 // 景點列表組件（使用 EnhancedTable）
@@ -11,8 +12,8 @@ import { Attraction } from '../types'
 interface AttractionsListProps {
   loading: boolean
   sortedAttractions: Attraction[]
-  countries: any[]
-  cities: any[]
+  countries: Country[]
+  cities: City[]
   onEdit: (attraction: Attraction) => void
   onToggleStatus: (attraction: Attraction) => void
   onDelete: (id: string) => void
@@ -34,7 +35,7 @@ export function AttractionsList({
       key: 'image',
       label: '圖片',
       sortable: false,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <div className="w-20">
           {(attraction.images && attraction.images.length > 0) || attraction.thumbnail ? (
             <img
@@ -58,7 +59,7 @@ export function AttractionsList({
       key: 'name',
       label: '景點名稱',
       sortable: true,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <div className="min-w-[180px]">
           <div className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</div>
           {attraction.name_en && (
@@ -71,7 +72,7 @@ export function AttractionsList({
       key: 'city',
       label: '地點',
       sortable: true,
-      render: (_: any, attraction: Attraction) => {
+      render: (_: unknown, attraction: Attraction) => {
         const country = countries.find(c => c.id === attraction.country_id)
         const city = cities.find(c => c.id === attraction.city_id)
         return (
@@ -85,7 +86,7 @@ export function AttractionsList({
       key: 'category',
       label: '類別',
       sortable: true,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-morandi-blue/10 text-morandi-blue">
           {attraction.category || '-'}
         </span>
@@ -95,7 +96,7 @@ export function AttractionsList({
       key: 'description',
       label: '簡介',
       sortable: false,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <div className="min-w-[200px] text-sm text-morandi-secondary">
           <p className="line-clamp-2 leading-relaxed">{attraction.description || '暫無簡介'}</p>
         </div>
@@ -105,7 +106,7 @@ export function AttractionsList({
       key: 'duration_minutes',
       label: '時長',
       sortable: true,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <div className="text-center text-sm text-morandi-secondary">
           {attraction.duration_minutes ? `${Math.floor(attraction.duration_minutes / 60)}h` : '-'}
         </div>
@@ -115,7 +116,7 @@ export function AttractionsList({
       key: 'tags',
       label: '標籤',
       sortable: false,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <div className="flex flex-wrap gap-1 min-w-[120px]">
           {attraction.tags?.slice(0, 2).map((tag, idx) => (
             <span
@@ -137,7 +138,7 @@ export function AttractionsList({
       key: 'is_active',
       label: '狀態',
       sortable: true,
-      render: (_: any, attraction: Attraction) => (
+      render: (_: unknown, attraction: Attraction) => (
         <span
           className={cn(
             'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',

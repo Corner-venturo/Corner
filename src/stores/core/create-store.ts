@@ -115,7 +115,7 @@ export function createStore<T extends BaseEntity>(
 
         set({ loading: true, error: null })
 
-        const items = (await fetchAll(config, indexedDB, supabase, sync, controller)) as any
+        const items = await fetchAll(config, indexedDB, supabase, sync, controller)
 
         set({ items, loading: false })
 
@@ -181,13 +181,11 @@ export function createStore<T extends BaseEntity>(
       }
     },
 
-    // 更新資料
-    // @ts-ignore - Type compatibility
     update: async (id: string, data: Partial<T>) => {
       try {
         set({ loading: true, error: null })
 
-        const updatedItem = await updateItem(id, data as any, config, indexedDB, supabase, sync)
+        const updatedItem = await updateItem(id, data, config, indexedDB, supabase, sync)
 
         // 樂觀更新 UI
         set(state => ({

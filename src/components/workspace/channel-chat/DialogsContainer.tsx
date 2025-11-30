@@ -17,13 +17,31 @@ import { ShareTodoDialog } from '../ShareTodoDialog'
 import { CreateReceiptDialog } from '../CreateReceiptDialog'
 import { CreatePaymentRequestDialog } from '../CreatePaymentRequestDialog'
 import { PLACEHOLDER_TEXT } from './constants'
+import type { Channel } from '@/stores/workspace/types'
+import type { AdvanceItem } from '@/stores/workspace/types'
+
+interface User {
+  id: string
+  display_name: string
+  email: string
+  avatar?: string
+}
+
+interface OrderForReceipt {
+  id: string
+  order_number: string
+  contact_person: string
+  total_amount: number
+  paid_amount: number
+  gap: number
+}
 
 interface DialogsContainerProps {
   // Share Advance Dialog
   showShareAdvanceDialog: boolean
   setShowShareAdvanceDialog: (show: boolean) => void
-  selectedChannel: any
-  user: any
+  selectedChannel: Channel | null
+  user: User | null
 
   // Share Orders Dialog
   showShareOrdersDialog: boolean
@@ -33,14 +51,14 @@ interface DialogsContainerProps {
   // Create Receipt Dialog
   showCreateReceiptDialog: boolean
   setShowCreateReceiptDialog: (show: boolean) => void
-  selectedOrder: any
-  setSelectedOrder: (order: any) => void
+  selectedOrder: OrderForReceipt | null
+  setSelectedOrder: (order: OrderForReceipt | null) => void
 
   // Create Payment Dialog
   showCreatePaymentDialog: boolean
   setShowCreatePaymentDialog: (show: boolean) => void
-  selectedAdvanceItem: any
-  setSelectedAdvanceItem: (item: any) => void
+  selectedAdvanceItem: AdvanceItem[] | null
+  setSelectedAdvanceItem: (item: AdvanceItem[] | null) => void
   selectedAdvanceListId: string
   setSelectedAdvanceListId: (id: string) => void
   onCreatePaymentSuccess: () => void

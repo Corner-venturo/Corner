@@ -25,7 +25,7 @@ interface SellingPriceSectionProps {
   isReadOnly: boolean
   handleGenerateQuotation: (
     tierParticipantCounts?: ParticipantCounts,
-    tierSellingPrices?: any,
+    tierSellingPrices?: SellingPrices,
     tierLabel?: string,
     allTierPricings?: Array<{
       participant_count: number
@@ -39,7 +39,7 @@ interface SellingPriceSectionProps {
     }>
   ) => void
   accommodationSummary: AccommodationSummaryItem[]
-  categories: CostCategory[] // 用於計算檻次表成本
+  categories: CostCategory[]
 }
 
 export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({

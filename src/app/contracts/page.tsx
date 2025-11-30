@@ -81,7 +81,7 @@ export default function ContractsPage() {
   }, [])
 
   // 定義表格欄位
-  const columns: TableColumn[] = useMemo(
+  const columns: TableColumn<Tour>[] = useMemo(
     () => [
       {
         key: 'code',

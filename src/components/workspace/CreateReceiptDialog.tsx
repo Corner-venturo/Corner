@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { X, DollarSign, Calendar } from 'lucide-react'
 import { useReceiptOrderStore } from '@/stores'
+import type { CreateInput } from '@/stores/core/types'
+import type { ReceiptOrder } from '@/types'
 
 interface CreateReceiptDialogProps {
   order: {
@@ -27,35 +29,29 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
 
   const handleCreate = async () => {
     try {
-      const receiptData = {
-        order_id: order.id,
-        order_number: order.order_number,
-        tour_id: '', // 從訂單取得 tour_id
-        code: '', // 從訂單取得 code
-        tour_name: '', // 從訂單取得 tour_name
-        contact_person: order.contact_person,
-        receipt_date: receiptDate,
-        payment_items: [
-          {
-            payment_method: paymentMethod,
-            amount: parseFloat(amount),
-            transaction_date: receiptDate,
-            note,
-          },
-        ],
-        total_amount: parseFloat(amount),
-        status: '已收款' as const,
-        note,
-        created_by: 'current-user', // 從 auth store 取得
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+      const paymentMethodMap: Record<string, string> = {
+        現金: 'cash',
+        匯款: 'transfer',
+        刷卡: 'card',
+        支票: 'check',
       }
 
-      const receipt = await createReceipt(receiptData as any)
+      const receiptData: CreateInput<ReceiptOrder> = {
+        code: '',
+        order_id: order.id,
+        receipt_date: receiptDate,
+        payment_method: paymentMethodMap[paymentMethod] || 'transfer',
+        amount: parseFloat(amount),
+        notes: note,
+        handled_by: null,
+      }
+
+      const receipt = await createReceipt(receiptData)
       onSuccess(receipt.id)
       onClose()
     } catch (error) {
-      alert('建立收款單失敗，請稍後再試')
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      alert(`建立收款單失敗：${errorMessage}`)
     }
   }
 
@@ -133,7 +129,12 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
             </label>
             <select
               value={paymentMethod}
-              onChange={e => setPaymentMethod(e.target.value as any)}
+              onChange={e => {
+                const value = e.target.value
+                if (value === '現金' || value === '匯款' || value === '刷卡' || value === '支票') {
+                  setPaymentMethod(value)
+                }
+              }}
             >
               <option value="現金">現金</option>
               <option value="匯款">匯款</option>

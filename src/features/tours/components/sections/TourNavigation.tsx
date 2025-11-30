@@ -1,8 +1,18 @@
-import { Home } from 'lucide-react'
+import { Home, type LucideIcon } from 'lucide-react'
 import { FloatingDock } from '@/components/ui/floating-dock'
 
+interface NavLink {
+  title: string
+  icon: LucideIcon
+  href: string
+}
+
+interface TourNavigationData {
+  navLinks?: NavLink[]
+}
+
 interface TourNavigationProps {
-  data: any
+  data: TourNavigationData
   scrollOpacity: number
   isPreview: boolean
   viewMode: 'desktop' | 'mobile'
@@ -34,7 +44,7 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
                 Corner Travel
               </div>
               <div className="flex items-center gap-8">
-                {navLinks.map((link: any) => {
+                {navLinks.map((link) => {
                   const IconComponent = link.icon || Home
                   return (
                     <a
@@ -62,7 +72,7 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
       {/* 手機版底部導航 */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 md:hidden">
         <FloatingDock
-          items={navLinks.map((link: any) => ({
+          items={navLinks.map((link) => ({
             title: link.title,
             icon: <link.icon className="w-5 h-5" />,
             href: link.href,

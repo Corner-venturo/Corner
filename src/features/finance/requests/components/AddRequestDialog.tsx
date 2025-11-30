@@ -68,7 +68,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
           await employeeStore.fetchAll()
         }
       }
-      loadData().catch((err: any) => logger.error('載入資料失敗:', err))
+      loadData().catch((err: unknown) => logger.error('載入資料失敗:', err))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -454,7 +454,6 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                       <td className="py-3 px-3 w-32">
                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                           {item.payment_method === 'transfer' && '轉帳'}
-                          {(item.payment_method as any) === 'deposit' && '甲存'}
                           {item.payment_method === 'cash' && '現金'}
                           {item.payment_method === 'check' && '支票'}
                           {!item.payment_method && '轉帳'}

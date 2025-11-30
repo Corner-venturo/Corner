@@ -16,15 +16,15 @@ export default function PaymentDetailPage() {
   const orderId = params.orderId as string
   const orderStore = useOrderStore()
 
-  const paymentStore: any = null
+  const paymentStore = null as { payment_requests?: Record<string, unknown>[] } | null
 
   // 等待 store 載入
   const orders = orderStore?.items || []
-  const paymentRequests = paymentStore?.payment_requests || []
+  const paymentRequests: Record<string, unknown>[] = paymentStore?.payment_requests || []
 
-  const order = orders.find((o: any) => o.id === orderId)
+  const order = orders.find((o) => o.id === orderId)
   // 找出此訂單相關的請款單
-  const orderPayments = paymentRequests.filter((p: any) => p.order_id === orderId)
+  const orderPayments = paymentRequests.filter((p: Record<string, unknown>) => p.order_id === orderId)
 
   const _getPaymentStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
@@ -118,10 +118,10 @@ export default function PaymentDetailPage() {
   )
 
   // 排序和篩選函數
-  const sortFunction = (data: any[], column: string, direction: 'asc' | 'desc') => {
-    return [...data].sort((a: any, b: any) => {
-      let aValue: string | number | Date = a[column as keyof typeof a]
-      let bValue: string | number | Date = b[column as keyof typeof b]
+  const sortFunction = (data: Record<string, unknown>[], column: string, direction: 'asc' | 'desc') => {
+    return [...data].sort((a, b) => {
+      let aValue: string | number | Date = a[column] as string | number | Date
+      let bValue: string | number | Date = b[column] as string | number | Date
 
       if (column === 'request_date') {
         aValue = new Date(aValue)
@@ -134,15 +134,15 @@ export default function PaymentDetailPage() {
     })
   }
 
-  const filterFunction = (data: any[], filters: Record<string, string>) => {
-    return data.filter((payment: any) => {
+  const filterFunction = (data: Record<string, unknown>[], filters: Record<string, string>) => {
+    return data.filter((payment) => {
       return (
-        (!filters.request_number || payment.request_number.includes(filters.request_number)) &&
+        (!filters.request_number || String(payment.request_number || '').includes(filters.request_number)) &&
         (!filters.request_date ||
-          new Date(payment.request_date).toLocaleDateString().includes(filters.request_date)) &&
+          new Date(String(payment.request_date || '')).toLocaleDateString().includes(filters.request_date)) &&
         (!filters.tour_name ||
-          payment.tour_name.toLowerCase().includes(filters.tour_name.toLowerCase())) &&
-        (!filters.total_amount || payment.total_amount.toString().includes(filters.total_amount)) &&
+          String(payment.tour_name || '').toLowerCase().includes(filters.tour_name.toLowerCase())) &&
+        (!filters.total_amount || String(payment.total_amount || '').includes(filters.total_amount)) &&
         (!filters.status || payment.status === filters.status)
       )
     })

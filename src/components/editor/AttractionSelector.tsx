@@ -126,21 +126,35 @@ export function AttractionSelector({
 
         if (error) throw error
 
-        // 轉換資料格式
-        const formatted = (data || []).map((item: any) => ({
+        const formatted = (data || []).map((item: {
+          id: string
+          name: string
+          name_en: string | null
+          category: string | null
+          description: string | null
+          thumbnail: string | null
+          country_id: string
+          region_id: string | null
+          city_id: string
+          cities: { name: string }
+        }): AttractionWithCity => ({
           id: item.id,
           name: item.name,
-          name_en: item.name_en,
-          category: item.category,
-          description: item.description,
-          thumbnail: item.thumbnail,
+          name_en: item.name_en ?? undefined,
+          category: item.category ?? undefined,
+          description: item.description ?? undefined,
+          thumbnail: item.thumbnail ?? undefined,
           country_id: item.country_id,
-          region_id: item.region_id,
+          region_id: item.region_id ?? undefined,
           city_id: item.city_id,
           city_name: item.cities?.name || '',
+          is_active: true,
+          display_order: 0,
+          created_at: '',
+          updated_at: '',
         }))
 
-        setAttractions(formatted as any)
+        setAttractions(formatted)
       } catch (error) {
         // 靜默失敗，使用空陣列
       } finally {

@@ -7,6 +7,7 @@ interface FlightPreviewProps {
 
 export function FlightPreview({ formData }: FlightPreviewProps) {
   const data = formData.data as Partial<FlightData>
+  const extendedData = data as Partial<FlightData> & { airlineContacts?: string[] }
 
   return (
     <div className="p-8 space-y-4" style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>
@@ -68,7 +69,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
                   {segment.departureTime} 出發: {segment.departureAirport}
                 </div>
                 <div className="col-span-4" style={{ color: '#6B7280' }}>
-                  {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{(segment as any).cabin || '經濟'} /OK
+                  {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{data.passengers?.[0]?.cabin || '經濟'} /OK
                 </div>
               </div>
 
@@ -108,13 +109,13 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       )}
 
       {/* 航空公司確認電話 */}
-      {(data as any).airlineContacts && (data as any).airlineContacts.length > 0 && (
+      {extendedData.airlineContacts && extendedData.airlineContacts.length > 0 && (
         <div>
           <div className="font-medium mb-1" style={{ color: '#374151' }}>
             航空公司確認電話:
           </div>
           <div className="space-y-1 pl-4" style={{ color: '#6B7280' }}>
-            {(data as any).airlineContacts.map((contact: string, idx: number) => (
+            {extendedData.airlineContacts.map((contact, idx) => (
               <div key={idx}>{contact}</div>
             ))}
           </div>

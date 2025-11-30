@@ -209,7 +209,7 @@ export const TourOperations = React.memo(function TourOperations({
           // 保留現有的分房數據，不要覆蓋
           assigned_room: member.assigned_room,
           is_child_no_bed: member.is_child_no_bed,
-        } as any as EditingMember
+        } as EditingMember
       })
 
     setTableMembers(allTourMembers)
@@ -221,12 +221,12 @@ export const TourOperations = React.memo(function TourOperations({
     const roomOptions: RoomOption[] = []
 
     tourPaymentRequests.forEach(request => {
-      (request.items || []).forEach((item: { category: string; description: string }) => {
+      (request.items || []).forEach((item) => {
         if (item.category === '住宿' && item.description) {
           // 解析房型和數量（例如：雙人房 x5, 三人房 x2）
           const roomMatches = item.description.match(/(\S+房)\s*[x×]\s*(\d+)/g)
           if (roomMatches) {
-            roomMatches.forEach((match: any) => {
+            roomMatches.forEach((match: string) => {
               const [, room_type, quantity] = match.match(/(\S+房)\s*[x×]\s*(\d+)/) || []
               if (room_type && quantity) {
                 const capacity = getRoomCapacity(room_type)
@@ -264,7 +264,16 @@ export const TourOperations = React.memo(function TourOperations({
       // 更新到 store
       typedData.forEach(member => {
         if (member.id) {
-          updateMember(member.id, member as any)
+          updateMember(member.id, {
+            name: member.name,
+            name_en: member.nameEn,
+            birthday: member.birthday,
+            passport_number: member.passportNumber,
+            passport_expiry: member.passportExpiry,
+            id_number: member.idNumber,
+            assigned_room: member.assigned_room,
+            is_child_no_bed: member.is_child_no_bed,
+          })
         }
       })
     },
@@ -396,7 +405,7 @@ export const TourOperations = React.memo(function TourOperations({
               ? `不佔床${member.assigned_room ? ` - ${member.assigned_room}` : ''}`
               : member.assigned_room || '未分配',
           }))}
-          tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id) as any}
+          tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id)}
           onDataUpdate={handleDataUpdate}
           onColumnHide={handleColumnHide}
           onColumnDelete={handleColumnDelete}

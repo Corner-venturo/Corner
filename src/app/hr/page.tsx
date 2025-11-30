@@ -163,7 +163,7 @@ export default function HRPage() {
         label: '職位',
         sortable: false,
         render: (_value, employee: Employee) => (
-          <span className="text-sm">{(employee.job_info as any)?.position || '未設定'}</span>
+          <span className="text-sm">{employee.job_info?.position || '未設定'}</span>
         ),
       },
       {
@@ -188,9 +188,9 @@ export default function HRPage() {
         sortable: true,
         render: (_value, employee: Employee) => (
           <span
-            className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(employee.status as any)}`}
+            className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(employee.status)}`}
           >
-            {getStatusLabel(employee.status as any)}
+            {getStatusLabel(employee.status)}
           </span>
         ),
       },

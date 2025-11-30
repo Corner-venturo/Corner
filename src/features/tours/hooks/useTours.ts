@@ -18,23 +18,13 @@ export const useTours = () => {
     tours: tourStore.items,
 
     // ========== Tour CRUD 操作 ==========
-    // @ts-ignore - Store create type compatibility
-    createTour: async (data: Omit<Tour, 'id' | 'created_at' | 'updated_at'>) => {
-      return await tourStore.create(data as any)
-    },
+    createTour: tourStore.create,
 
-    // @ts-ignore - Store update type compatibility
-    updateTour: async (id: string, data: Partial<Tour>) => {
-      return await tourStore.update(id, data as any)
-    },
+    updateTour: tourStore.update,
 
-    deleteTour: async (id: string) => {
-      return await tourStore.delete(id)
-    },
+    deleteTour: tourStore.delete,
 
-    loadTours: async () => {
-      return await tourStore.fetchAll()
-    },
+    loadTours: tourStore.fetchAll,
 
     // ========== 業務方法（來自 Service） ==========
     generateTourCode: async (location: string, date: Date, isSpecial?: boolean) => {

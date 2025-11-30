@@ -3,7 +3,7 @@
 import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EnhancedTableProps } from './types'
+import { EnhancedTableProps, RowData } from './types'
 import { useTableState } from './useTableState'
 import { TableHeader } from './TableHeader'
 import { TableBody } from './TableBody'
@@ -51,33 +51,33 @@ export function EnhancedTable({
     startIndex,
     handleSort,
     updateFilter,
-  } = useTableState({
+  } = useTableState<RowData>({
     data,
     searchTerm: externalSearchTerm,
-    searchableFields: searchableFields as any,
+    searchableFields: searchableFields as (keyof RowData)[],
     initialPageSize,
   })
 
   // Helper functions for selection and expandable
-  const getRowId = (row: any, index: number): string => {
+  const getRowId = (row: RowData, index: number): string => {
     if (selection?.getRowId) return selection.getRowId(row, index)
     if (expandable?.getRowId) return expandable.getRowId(row, index)
-    return row.id || row._id || index.toString()
+    return (row.id as string) || (row._id as string) || index.toString()
   }
 
-  const isRowSelected = (row: any, index: number): boolean => {
+  const isRowSelected = (row: RowData, index: number): boolean => {
     if (!selection) return false
     const rowId = getRowId(row, index)
     return selection.selected.includes(rowId)
   }
 
-  const isRowExpanded = (row: any, index: number): boolean => {
+  const isRowExpanded = (row: RowData, index: number): boolean => {
     if (!expandable) return false
     const rowId = getRowId(row, index)
     return expandable.expanded.includes(rowId)
   }
 
-  const toggleSelection = (row: any, index: number) => {
+  const toggleSelection = (row: RowData, index: number) => {
     if (!selection) return
     const rowId = getRowId(row, index)
     const isSelected = selection.selected.includes(rowId)

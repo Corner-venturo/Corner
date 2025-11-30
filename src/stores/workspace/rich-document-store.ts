@@ -28,10 +28,10 @@ type RichDocumentEntity = RichDocument &
  * - 全量快取提升使用體驗
  */
 export const useRichDocumentStore = createStore<RichDocumentEntity>({
-  tableName: 'rich_documents' as any,
-  cacheStrategy: 'full',
-  enableRealtime: true,
-} as any)
+  tableName: 'rich_documents',
+  enableSupabase: true,
+  fastInsert: true,
+})
 
 /**
  * Hook 型別（方便使用）

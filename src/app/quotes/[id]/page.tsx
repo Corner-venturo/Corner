@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { ParticipantCounts } from '@/features/quotes/types'
+import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
 import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
@@ -109,7 +109,7 @@ export default function QuoteDetailPage() {
 
   // 載入特定版本
   const handleLoadVersion = useCallback(
-    (versionIndex: number, versionData: any) => {
+    (versionIndex: number, versionData: VersionRecord) => {
       setCategories(versionData.categories || [])
       setAccommodationDays(versionData.accommodation_days || 0)
       if (versionData.participant_counts) {
@@ -129,35 +129,23 @@ export default function QuoteDetailPage() {
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
   const [previewParticipantCounts, setPreviewParticipantCounts] =
     React.useState<ParticipantCounts | null>(null)
-  const [previewSellingPrices, setPreviewSellingPrices] = React.useState<any>(null)
+  const [previewSellingPrices, setPreviewSellingPrices] = React.useState<SellingPrices | null>(null)
   const [previewTierLabel, setPreviewTierLabel] = React.useState<string | undefined>(undefined)
   const [previewTierPricings, setPreviewTierPricings] = React.useState<
     Array<{
       participant_count: number
-      selling_prices: {
-        adult: number
-        child_with_bed: number
-        child_no_bed: number
-        single_room: number
-        infant: number
-      }
+      selling_prices: SellingPrices
     }>
   >([])
 
   const handleGenerateQuotation = useCallback(
     (
       tierParticipantCounts?: ParticipantCounts,
-      tierSellingPrices?: any,
+      tierSellingPrices?: SellingPrices,
       tierLabel?: string,
       allTierPricings?: Array<{
         participant_count: number
-        selling_prices: {
-          adult: number
-          child_with_bed: number
-          child_no_bed: number
-          single_room: number
-          infant: number
-        }
+        selling_prices: SellingPrices
       }>
     ) => {
       // 如果有傳入檻次表數據，使用檻次表數據；否則使用原始數據
@@ -192,7 +180,7 @@ export default function QuoteDetailPage() {
           if (scrollRef.current) {
             scrollRef.current.classList.remove('scrolling')
           }
-        }, 1000) as any
+        }, 1000)
       }
     }
 
@@ -217,7 +205,7 @@ export default function QuoteDetailPage() {
 
   // ✅ 如果是快速報價單，顯示快速報價單介面
   if (quote.quote_type === 'quick') {
-    return <QuickQuoteDetail quote={quote as any} onUpdate={(data: any) => updateQuote(quote.id, data as any) as any} />
+    return <QuickQuoteDetail quote={quote} onUpdate={(data) => updateQuote(quote.id, data)} />
   }
 
   return (

@@ -11,7 +11,7 @@ export const useOrders = () => {
 
     // ========== CRUD 操作 ==========
     createOrder: async (data: Omit<Order, 'id' | 'created_at' | 'updated_at'>) => {
-      return await store.create(data as any)
+      return await store.create(data)
     },
 
     updateOrder: async (id: string, data: Partial<Order>) => {

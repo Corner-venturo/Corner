@@ -51,7 +51,7 @@ export function PaymentItemRow({
         <td className="py-2 px-3 w-28">
           <Select
             value={item.receipt_type.toString()}
-            onValueChange={value => onUpdate(item.id, { receipt_type: Number(value) as any })}
+            onValueChange={value => onUpdate(item.id, { receipt_type: Number(value) as ReceiptType })}
           >
             <SelectTrigger className="h-9 border-morandi-container/30">
               <SelectValue />

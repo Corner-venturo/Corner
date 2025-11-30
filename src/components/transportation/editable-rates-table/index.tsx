@@ -94,7 +94,7 @@ export function EditableRatesTable({
   }, [editingCell])
 
   // 開始編輯
-  const startEdit = (rowId: string, field: keyof TransportationRate, currentValue: any) => {
+  const startEdit = (rowId: string, field: keyof TransportationRate, currentValue: unknown) => {
     if (!isEditMode) return
     if (field === 'kkday_profit') return // 利潤欄位不可編輯
     setEditingCell({ rowId, field })
@@ -106,7 +106,7 @@ export function EditableRatesTable({
     if (!editingCell) return
 
     const { rowId, field } = editingCell
-    let value: any = editValue
+    let value: string | number | boolean = editValue
 
     // 型別轉換
     if (['cost_vnd', 'price_twd', 'kkday_selling_price', 'kkday_cost', 'kkday_profit', 'price'].includes(field)) {
@@ -121,8 +121,8 @@ export function EditableRatesTable({
     if (field === 'kkday_selling_price' || field === 'kkday_cost') {
       const rate = rates.find(r => r.id === rowId)
       if (rate) {
-        const selling = field === 'kkday_selling_price' ? value : (rate.kkday_selling_price || 0)
-        const cost = field === 'kkday_cost' ? value : (rate.kkday_cost || 0)
+        const selling = field === 'kkday_selling_price' ? (typeof value === 'number' ? value : 0) : (rate.kkday_selling_price || 0)
+        const cost = field === 'kkday_cost' ? (typeof value === 'number' ? value : 0) : (rate.kkday_cost || 0)
         updates.kkday_profit = selling - cost
       }
     }
@@ -175,7 +175,7 @@ export function EditableRatesTable({
   const renderEditableCell = (
     rate: TransportationRate,
     field: keyof TransportationRate,
-    value: any,
+    value: unknown,
     type: 'text' | 'number' = 'text'
   ) => {
     const isEditing = editingCell?.rowId === rate.id && editingCell?.field === field
@@ -373,7 +373,7 @@ export function EditableRatesTable({
                         editingCell={editingCell}
                         editValue={editValue}
                         setEditValue={setEditValue}
-                        inputRef={inputRef as any}
+                        inputRef={inputRef as React.RefObject<HTMLInputElement>}
                         startEdit={startEdit}
                         saveEdit={saveEdit}
                         handleKeyDown={handleKeyDown}

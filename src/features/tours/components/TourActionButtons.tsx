@@ -19,16 +19,16 @@ import {
   Calculator,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Tour, Quote } from '@/stores/types'
+import { Tour, Quote, User } from '@/stores/types'
 
 interface UseTourActionButtonsParams {
   quotes: Quote[]
   activeStatusTab: string
-  user: any
+  user: User | null
   operations: {
     handleArchiveTour: (tour: Tour) => Promise<void>
   }
-  openDialog: (type: string, data?: any) => void
+  openDialog: (type: string, data?: Tour) => void
   setSelectedTour: (tour: Tour) => void
   setDeleteConfirm: (state: { isOpen: boolean; tour: Tour | null }) => void
   handleCreateChannel: (tour: Tour) => Promise<void>

@@ -5,6 +5,7 @@ import { Plus, Trash2, X } from 'lucide-react'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useUserStore } from '@/stores/user-store'
 import { Combobox } from '@/components/ui/combobox'
+import type { Employee } from '@/types/models'
 
 interface AdvanceRow {
   name: string
@@ -45,8 +46,9 @@ export function ShareAdvanceDialog({
   // 篩選活躍員工
   const activeEmployees = useMemo(() => {
     return employees.filter(emp => {
-      const notDeleted = !(emp as any)._deleted
-      const isActive = (emp as any).status === 'active'
+      const empWithMeta = emp as Employee & { _deleted?: boolean }
+      const notDeleted = !empWithMeta._deleted
+      const isActive = empWithMeta.status === 'active'
       return notDeleted && isActive
     })
   }, [employees])

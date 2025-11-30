@@ -3,25 +3,25 @@
 import React from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
-import { TableColumn, SelectionConfig, ExpandableConfig } from './types'
+import { TableColumn, SelectionConfig, ExpandableConfig, RowData } from './types'
 
-interface TableBodyProps {
-  columns: TableColumn[]
-  paginatedData: unknown[]
+interface TableBodyProps<T extends RowData = RowData> {
+  columns: TableColumn<T>[]
+  paginatedData: T[]
   startIndex: number
   emptyState?: React.ReactNode
-  selection?: SelectionConfig
-  expandable?: ExpandableConfig
-  actions?: (row: any) => React.ReactNode
-  rowClassName?: (row: any) => string
+  selection?: SelectionConfig<T>
+  expandable?: ExpandableConfig<T>
+  actions?: (row: T) => React.ReactNode
+  rowClassName?: (row: T) => string
   striped?: boolean
   hoverable?: boolean
-  onRowClick?: (row: any, rowIndex: number) => void
-  onRowDoubleClick?: (row: any, rowIndex: number) => void
-  getRowId: (row: any, index: number) => string
-  isRowSelected: (row: any, index: number) => boolean
-  isRowExpanded: (row: any, index: number) => boolean
-  toggleSelection: (row: any, index: number) => void
+  onRowClick?: (row: T, rowIndex: number) => void
+  onRowDoubleClick?: (row: T, rowIndex: number) => void
+  getRowId: (row: T, index: number) => string
+  isRowSelected: (row: T, index: number) => boolean
+  isRowExpanded: (row: T, index: number) => boolean
+  toggleSelection: (row: T, index: number) => void
 }
 
 export function TableBody({
@@ -129,9 +129,9 @@ export function TableBody({
                   style={{ width: column.width }}
                 >
                   {column.render ? (
-                    column.render((row as any)[column.key as keyof typeof row], row)
+                    column.render(row[column.key as keyof typeof row], row)
                   ) : (
-                    <span>{String((row as any)[column.key as keyof typeof row] ?? '')}</span>
+                    <span>{String(row[column.key as keyof typeof row] ?? '')}</span>
                   )}
                 </td>
               ))}
@@ -139,7 +139,7 @@ export function TableBody({
               {/* Actions column */}
               {actions && (
                 <td className="py-3 px-4">
-                  <div onClick={(e: any) => e.stopPropagation()}>{actions(row)}</div>
+                  <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>{actions(row)}</div>
                 </td>
               )}
             </tr>

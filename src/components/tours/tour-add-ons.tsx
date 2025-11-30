@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Tour } from '@/stores/types'
+import { Tour, TourAddOn } from '@/stores/types'
 import { useTourAddOnStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,7 +41,7 @@ export const TourAddOns = React.memo(function TourAddOns({
   }, [triggerAdd, onTriggerAddComplete])
 
   // 獲取此旅遊團的加購項目
-  const addOns = tour_add_ons.filter((addOn: any) => addOn.tour_id === tour.id)
+  const addOns = tour_add_ons.filter((addOn: TourAddOn) => addOn.tour_id === tour.id)
 
   const handleAddNew = () => {
     if (!newAddOn.name.trim()) return
@@ -159,7 +159,7 @@ export const TourAddOns = React.memo(function TourAddOns({
                 )}
 
                 {/* 現有項目列表 */}
-                {addOns.map((addOn: any) => (
+                {addOns.map((addOn: TourAddOn) => (
                   <tr key={addOn.id} className="border-b border-border">
                     <td className="py-3 px-4 font-medium text-morandi-primary">{addOn.name}</td>
                     <td className="py-3 px-4 text-morandi-primary">

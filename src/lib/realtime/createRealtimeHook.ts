@@ -9,15 +9,23 @@ import { useEffect } from 'react'
 import { realtimeManager } from './realtime-manager'
 import { logger } from '@/lib/utils/logger'
 
+// Zustand store 的最小介面需求
+// 使用 unknown 而非 any，並在內部進行型別斷言
+interface MinimalZustandStore {
+  setState: (updater: unknown) => void
+  getState: () => { items: unknown[] }
+}
+
+// IndexedDB 介面
+interface IndexedDBAdapter<T> {
+  put: (record: T) => Promise<void>
+  delete: (id: string) => Promise<void>
+}
+
 interface CreateRealtimeHookOptions<T> {
   tableName: string
-  indexedDB: {
-    put: (record: T) => Promise<void>
-    delete: (id: string) => Promise<void>
-  }
-  store: {
-    setState: (updater: (state: { items: T[] }) => { items: T[] }) => void
-  }
+  indexedDB: IndexedDBAdapter<T>
+  store: MinimalZustandStore
 }
 
 /**
@@ -44,6 +52,16 @@ export function createRealtimeHook<T extends { id: string }>(
 ) {
   const { tableName, indexedDB, store } = options
 
+  // 型別安全的 setState 包裝器
+  const setStoreState = (updater: (state: { items: T[] }) => { items: T[] }) => {
+    store.setState(updater as unknown)
+  }
+
+  // 型別安全的 getState 包裝器
+  const getStoreState = (): { items: T[] } => {
+    return store.getState() as { items: T[] }
+  }
+
   return function useRealtimeForTable() {
     useEffect(() => {
       const subscriptionId = `${tableName}-realtime`
@@ -59,17 +77,16 @@ export function createRealtimeHook<T extends { id: string }>(
             logger.log(`➕ [${tableName}] Realtime INSERT:`, record)
             await indexedDB.put(record)
 
-            store.setState(state => {
-              const exists = state.items.some(item => item.id === record.id)
-              if (exists) {
-                logger.log(`⚠️ [${tableName}] 記錄已存在，跳過:`, record.id)
-                return state
-              }
-              logger.log(`✅ [${tableName}] 新增到 Store`)
-              return {
-                items: [...state.items, record],
-              }
-            })
+            const currentState = getStoreState()
+            const exists = currentState.items.some(item => item.id === record.id)
+            if (exists) {
+              logger.log(`⚠️ [${tableName}] 記錄已存在，跳過:`, record.id)
+              return
+            }
+            logger.log(`✅ [${tableName}] 新增到 Store`)
+            setStoreState(state => ({
+              items: [...state.items, record],
+            }))
           },
 
           // 更新資料
@@ -77,7 +94,7 @@ export function createRealtimeHook<T extends { id: string }>(
             logger.log(`✏️ [${tableName}] Realtime UPDATE:`, record)
             await indexedDB.put(record)
 
-            store.setState(state => ({
+            setStoreState(state => ({
               items: state.items.map(item => (item.id === record.id ? record : item)),
             }))
           },
@@ -87,7 +104,7 @@ export function createRealtimeHook<T extends { id: string }>(
             logger.log(`🗑️ [${tableName}] Realtime DELETE:`, oldRecord)
             await indexedDB.delete(oldRecord.id)
 
-            store.setState(state => ({
+            setStoreState(state => ({
               items: state.items.filter(item => item.id !== oldRecord.id),
             }))
           },

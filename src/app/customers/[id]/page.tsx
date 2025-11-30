@@ -11,7 +11,7 @@ import { useCustomerStore } from '@/stores'
 import { useRealtimeForCustomers } from '@/hooks/use-realtime-hooks'
 import { BasicInfoTab } from './tabs/BasicInfoTab'
 import { GroupHistoryTab } from './tabs/GroupHistoryTab'
-import type { Customer } from '@/types/customer.types'
+import type { Customer, UpdateCustomerData } from '@/types/customer.types'
 import { toast } from 'sonner'
 
 export default function CustomerDetailPage() {
@@ -26,7 +26,7 @@ export default function CustomerDetailPage() {
   const [activeTab, setActiveTab] = useState('basic-info')
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState<Partial<Customer>>({})
+  const [formData, setFormData] = useState<UpdateCustomerData>({})
 
   // 載入資料
   useEffect(() => {
@@ -37,9 +37,9 @@ export default function CustomerDetailPage() {
   useEffect(() => {
     const found = customers.find(c => c.id === customerId)
     if (found) {
-      setCustomer(found as any)
-      const { id, created_at, ...editableData } = found
-      setFormData(editableData as any)
+      setCustomer(found as Customer)
+      const { id, created_at, updated_at, code, total_orders, total_spent, last_order_date, ...editableData } = found
+      setFormData(editableData as UpdateCustomerData)
     }
   }, [customers, customerId])
 

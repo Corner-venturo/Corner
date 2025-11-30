@@ -81,7 +81,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
           prevData.map(tour => (tour.id === id ? { ...tour, ...tourData } : tour))
         )
 
-        const updated = await tourService.update(id, tourData as any)
+        const updated = await tourService.update(id, tourData)
 
         // 成功後用真實資料更新
         setData(prevData => prevData.map(tour => (tour.id === id ? updated : tour)))

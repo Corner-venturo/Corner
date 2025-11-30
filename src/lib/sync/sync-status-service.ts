@@ -16,7 +16,11 @@ export async function checkPendingCount(tableName: TableName): Promise<number> {
   try {
     const items = await localDB.getAll(tableName)
     const pending = items.filter(
-      (item: any) => item._needs_sync === true || (item.code && String(item.code).endsWith('TBC'))
+      (item: unknown) => {
+        if (typeof item !== 'object' || item === null) return false
+        const record = item as Record<string, unknown>
+        return record._needs_sync === true || (record.code && String(record.code).endsWith('TBC'))
+      }
     )
     return pending.length
   } catch (_error) {

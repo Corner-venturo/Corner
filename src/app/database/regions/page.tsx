@@ -24,6 +24,7 @@ interface Country {
   is_active: boolean | null
   created_at: string | null
   updated_at: string | null
+  [key: string]: unknown
 }
 
 interface Region {
@@ -36,6 +37,7 @@ interface Region {
   is_active: boolean | null
   created_at: string | null
   updated_at: string | null
+  [key: string]: unknown
 }
 
 interface City {
@@ -54,6 +56,7 @@ interface City {
   airport_code: string | null
   created_at: string | null
   updated_at: string | null
+  [key: string]: unknown
 }
 
 export default function RegionsPage() {
@@ -173,7 +176,7 @@ export default function RegionsPage() {
         label: '國家名稱',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: any) => (
+        render: (value: unknown, row: unknown) => (
           <div>
             <div className="font-medium text-morandi-primary">{value as string}</div>
             <div className="text-xs text-morandi-secondary">{(row as Country).name_en}</div>
@@ -223,7 +226,7 @@ export default function RegionsPage() {
         label: '地區名稱',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: any) => (
+        render: (value: unknown, row: unknown) => (
           <div>
             <div className="font-medium text-morandi-primary">{value as string}</div>
             <div className="text-xs text-morandi-secondary">{(row as Region).name_en}</div>
@@ -251,7 +254,7 @@ export default function RegionsPage() {
       {
         key: 'actions',
         label: '操作',
-        render: (_value: unknown, row: any) => (
+        render: (_value: unknown, row: unknown) => (
           <div className="flex gap-2">
             <Button
               variant="ghost"
@@ -313,7 +316,7 @@ export default function RegionsPage() {
         label: '城市名稱',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: any) => (
+        render: (value: unknown, row: unknown) => (
           <div>
             <div className="font-medium text-morandi-primary">{value as string}</div>
             <div className="text-xs text-morandi-secondary">{(row as City).name_en}</div>
@@ -352,7 +355,7 @@ export default function RegionsPage() {
       {
         key: 'actions',
         label: '操作',
-        render: (_value: unknown, row: any) => (
+        render: (_value: unknown, row: unknown) => (
           <Button
             variant="ghost"
             size="sm"

@@ -16,19 +16,27 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { currentProfile, setCurrentProfile, profiles } = useLocalAuthStore()
-  const { user, _hasHydrated } = useAuthStore()
+  const { user, _hasHydrated, isAuthenticated } = useAuthStore()
   const redirectingRef = useRef(false) // 防止重複跳轉
 
   useEffect(() => {
     const checkAuth = async () => {
-      // 等待 Zustand 完成 hydration
-      if (!_hasHydrated) {
-        return
-      }
-
       // 如果在登入頁面或 unauthorized 頁面，跳過檢查
       if (pathname === '/login' || pathname === '/unauthorized') {
         redirectingRef.current = false
+        return
+      }
+
+      // 🔧 修正：如果已認證（剛登入），不需要等待 hydration
+      // isAuthenticated 在 switchProfile/login 中會立即設定
+      if (isAuthenticated && user?.id) {
+        logger.debug('AuthGuard: 已認證，跳過 hydration 等待')
+        redirectingRef.current = false
+        return
+      }
+
+      // 等待 Zustand 完成 hydration（只有未認證時才需要等待）
+      if (!_hasHydrated) {
         return
       }
 
@@ -42,6 +50,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
         hasUser: !!user,
         pathname,
         _hasHydrated,
+        isAuthenticated,
       })
 
       // 1. 優先檢查 auth-store 的 user（持久化的）
@@ -95,6 +104,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
     currentProfile,
     user,
     _hasHydrated,
+    isAuthenticated,
     requiredPermission,
     pathname,
     router,
@@ -105,6 +115,11 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
 
   // 登入頁面不顯示載入畫面，直接渲染
   if (pathname === '/login') {
+    return <>{children}</>
+  }
+
+  // 🔧 如果已認證，直接渲染（優先檢查，避免閃爍）
+  if (isAuthenticated && user?.id) {
     return <>{children}</>
   }
 
