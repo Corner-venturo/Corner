@@ -530,7 +530,6 @@ export interface PaymentRequest {
   status?: string | null // pending, approved, paid
   is_special_billing?: boolean | null // 是否為特殊出帳
   note?: string | null // 備註（使用 note 單數形式，與資料庫一致）
-  items?: PaymentRequestItem[] // 請款項目列表
   approved_at?: string | null
   approved_by?: string | null
   paid_at?: string | null
@@ -540,13 +539,9 @@ export interface PaymentRequest {
   updated_at: string
 }
 
-// === 請款單（完整版 - 未來升級版）===
-// 升級後將包含：
-// - request_date: string (請款日期)
-// - items: PaymentRequestItem[] (請款項目)
-// - total_amount: number (自動加總)
-// - allocation_mode: 'single' | 'multiple'
-// 升級 SQL: supabase/migrations/20251117122000_update_payment_requests_structure.sql
+// 注意：PaymentRequestItem 使用獨立的關聯表 payment_request_items
+// 透過 request_id 關聯到 PaymentRequest
+// 使用 paymentRequestService.getItemsByRequestId() 取得項目
 
 export interface PaymentRequestItem {
   id: string

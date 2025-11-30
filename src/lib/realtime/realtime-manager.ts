@@ -32,7 +32,7 @@ class RealtimeManager {
     }
 
     if (isRealtimeDisabled) {
-      console.log('[Realtime] Disabled by environment variable')
+      this.log('Realtime disabled by environment variable')
     } else {
       this.log('Realtime Manager initialized', this.config)
     }

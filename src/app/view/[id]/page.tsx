@@ -30,7 +30,7 @@ export default function ViewItineraryPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // 載入行程資料（使用 API route 來繞過 RLS）
+  // 載入行程資料（使用 API route 公開存取）
   useEffect(() => {
     const loadItinerary = async () => {
       try {

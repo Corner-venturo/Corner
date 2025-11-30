@@ -14,16 +14,6 @@ export function TourOrders({ tour }: TourOrdersProps) {
   // 過濾出屬於這個旅遊團的訂單
   const tourOrders = orders.filter(order => order.tour_id === tour.id) as any
 
-  // Debug logging
-  console.log('[TourOrders Debug]', {
-    tourId: tour.id,
-    tourName: tour.name,
-    totalOrders: orders.length,
-    filteredOrders: tourOrders.length,
-    allOrderTourIds: orders.map(o => ({ id: o.id, tour_id: o.tour_id })),
-    tourOrders: tourOrders,
-  })
-
   return (
     <div className="space-y-6">
       {/* 直接使用現有的 ExpandableOrderTable 組件 */}

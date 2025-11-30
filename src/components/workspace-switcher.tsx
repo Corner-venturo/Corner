@@ -1,10 +1,9 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
-import { useWorkspaceStore } from '@/stores'
-import { switchWorkspace } from '@/hooks/use-workspace-rls'
 import { Building2, Check } from 'lucide-react'
+import { logger } from '@/lib/utils/logger'
+import { useWorkspaceStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,6 +11,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+
+/**
+ * 切換 Workspace
+ * 更新 store 並重新載入頁面
+ */
+async function switchWorkspace(workspaceId: string) {
+  const store = useWorkspaceStore.getState()
+  store.setCurrentWorkspace(workspaceId)
+  logger.log('[Workspace Switch] 已切換到:', workspaceId)
+  // 重新載入頁面以刷新資料
+  window.location.reload()
+}
 
 /**
  * Workspace 切換器

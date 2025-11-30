@@ -11,7 +11,7 @@ import { Plus, Building2, Users, Shield } from 'lucide-react'
 /**
  * Workspace 管理頁面
  * 用於管理多分公司設定（台北、台中等）
- * 支援 RLS (Row Level Security) 資料隔離
+ * 使用前端過濾實現資料隔離
  */
 export default function WorkspacesPage() {
   const workspaceStore = useWorkspaceStoreData()
@@ -61,7 +61,7 @@ export default function WorkspacesPage() {
         <div>
           <h1 className="text-3xl font-bold text-morandi-primary mb-2">工作空間管理</h1>
           <p className="text-morandi-secondary">
-            管理多分公司設定，啟用 RLS 資料隔離（台北公司 vs 台中分公司）
+            管理多分公司設定，實現資料隔離（台北公司 vs 台中分公司）
           </p>
         </div>
         <Button
@@ -73,18 +73,18 @@ export default function WorkspacesPage() {
         </Button>
       </div>
 
-      {/* RLS 說明卡片 */}
+      {/* 資料隔離說明卡片 */}
       <Card className="bg-morandi-container/10 border-morandi-container/30 p-6 mb-6">
         <div className="flex items-start gap-4">
           <Shield className="text-morandi-gold mt-1" size={24} />
           <div>
-            <h3 className="font-semibold text-morandi-primary mb-2">什麼是 RLS 資料隔離？</h3>
+            <h3 className="font-semibold text-morandi-primary mb-2">什麼是資料隔離？</h3>
             <p className="text-sm text-morandi-secondary mb-3">
-              Row Level Security (RLS) 可以確保不同分公司的資料完全隔離：
+              工作空間可以確保不同分公司的資料獨立管理：
             </p>
             <ul className="text-sm text-morandi-secondary space-y-1 ml-4">
-              <li>• 台北員工只能看到台北的旅遊團、訂單、客戶</li>
-              <li>• 台中員工只能看到台中的旅遊團、訂單、客戶</li>
+              <li>• 台北員工預設看到台北的旅遊團、訂單、客戶</li>
+              <li>• 台中員工預設看到台中的旅遊團、訂單、客戶</li>
               <li>• 系統管理員可以切換工作空間查看所有資料</li>
               <li>• 員工資料、航空公司、飯店等主檔仍然全公司共享</li>
             </ul>

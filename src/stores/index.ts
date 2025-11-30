@@ -69,8 +69,7 @@ export const usePaymentRequestStore = createStore<PaymentRequest>('payment_reque
  * 請款項目 Store
  * 無獨立編號，依附於請款單
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items' as any)
+export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items')
 
 /**
  * 出納單 Store
@@ -91,8 +90,9 @@ export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 
 /**
  * 團員 Store
  * 無獨立編號，依附於訂單
+ * 注意：資料庫表格名稱是 order_members
  */
-export const useMemberStore = createStore<Member>('members')
+export const useMemberStore = createStore<Member>('order_members')
 
 /**
  * 報價項目 Store
@@ -136,15 +136,13 @@ export { useSupplierCategoryStore } from './supplier-category-store'
 export { useCostTemplateStore } from './cost-template-store'
 
 // 企業客戶 Store
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useCompanyStore = createStore<import('./types').Company>('companies' as any)
+export const useCompanyStore = createStore<import('./types').Company>('companies')
 
 // 企業聯絡人 Store
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts' as any)
+export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts')
 
 // 地區 Store（舊版，保留向後相容）
-export const useRegionStore = createStore<any>('regions')
+export const useRegionStore = createStore<import('./region-store').Region>('regions')
 
 // 地區 Store（新版，三層架構）
 // 支援 Countries > Regions > Cities 三層架構

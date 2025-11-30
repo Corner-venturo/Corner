@@ -833,11 +833,13 @@ export const TABLES = {
   TOURS: 'tours',
   ITINERARIES: 'itineraries',
   ORDERS: 'orders',
-  MEMBERS: 'members',
+  ORDER_MEMBERS: 'order_members',
+  MEMBERS: 'members', // 向後相容
   TOUR_ADDONS: 'tour_addons',
   CUSTOMERS: 'customers',
   PAYMENTS: 'payments',
   PAYMENT_REQUESTS: 'payment_requests',
+  PAYMENT_REQUEST_ITEMS: 'payment_request_items',
   DISBURSEMENT_ORDERS: 'disbursement_orders',
   RECEIPT_ORDERS: 'receipt_orders',
   QUOTES: 'quotes',
@@ -847,6 +849,10 @@ export const TABLES = {
   SUPPLIERS: 'suppliers',
   COST_TEMPLATES: 'cost_templates',
   SUPPLIER_CATEGORIES: 'supplier_categories',
+  // 企業客戶系統
+  COMPANIES: 'companies',
+  COMPANY_CONTACTS: 'company_contacts',
+  COMPANY_ANNOUNCEMENTS: 'company_announcements',
   // 地區管理系統（三層架構）
   COUNTRIES: 'countries',
   REGIONS: 'regions',

@@ -21,7 +21,7 @@ interface ChannelsUIState {
   selectedChannel: Channel | null
   currentChannel: Channel | null
   currentWorkspace: Workspace | null
-  currentWorkspaceId: string | null // For RLS
+  currentWorkspaceId: string | null // 用於資料過濾
 
   // 搜尋與過濾
   searchQuery: string

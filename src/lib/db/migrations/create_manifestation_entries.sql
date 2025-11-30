@@ -55,18 +55,8 @@ SELECT
 FROM manifestation_entries
 GROUP BY user_id;
 
--- 添加行級安全性 (RLS)
-ALTER TABLE manifestation_entries ENABLE ROW LEVEL SECURITY;
-
--- 用戶只能查看和修改自己的記錄
-CREATE POLICY manifestation_user_policy ON manifestation_entries
-  FOR ALL
-  USING (user_id = auth.uid());
-
--- 允許用戶插入自己的記錄
-CREATE POLICY manifestation_insert_policy ON manifestation_entries
-  FOR INSERT
-  WITH CHECK (user_id = auth.uid());
+-- 禁用 RLS（Venturo 不使用 RLS，改用前端過濾）
+ALTER TABLE manifestation_entries DISABLE ROW LEVEL SECURITY;
 
 -- 註釋說明
 COMMENT ON TABLE manifestation_entries IS '顯化魔法練習記錄表';

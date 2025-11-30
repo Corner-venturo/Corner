@@ -2,7 +2,7 @@ import { logger } from '@/lib/utils/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// 使用 service role key 繞過 RLS（server-side only）
+// 使用 service role key 作為 admin client（server-side only）
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseServiceKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Supabase not configured' }, { status: 503 })
     }
 
-    // 使用 admin client 查詢（跳過 RLS）
+    // 使用 admin client 查詢
     const { data, error } = await supabaseAdmin
       .from('itineraries')
       .select('*')

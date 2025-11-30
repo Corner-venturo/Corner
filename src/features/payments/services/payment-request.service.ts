@@ -1,6 +1,6 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
-import { usePaymentRequestStore } from '@/stores'
+import { usePaymentRequestStore, usePaymentRequestItemStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateId } from '@/lib/data/create-data-store'
 import { generateVoucherFromPaymentRequest } from '@/services/voucher-auto-generator'
@@ -50,6 +50,14 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   // ========== PaymentRequestItem 管理 ==========
 
   /**
+   * 取得請款單的所有項目
+   */
+  getItemsByRequestId(requestId: string): PaymentRequestItem[] {
+    const itemStore = usePaymentRequestItemStore.getState()
+    return itemStore.items.filter(item => item.request_id === requestId)
+  }
+
+  /**
    * 新增請款項目
    */
   async addItem(
@@ -64,31 +72,32 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const id = generateId()
-    const now = this.now()
-    const itemNumber = `${request.request_number}-${String((request.items || []).length + 1).padStart(3, '0')}`
+    const itemStore = usePaymentRequestItemStore.getState()
+    const existingItems = this.getItemsByRequestId(requestId)
 
-    const item: PaymentRequestItem = {
+    const now = this.now()
+    const itemNumber = `${request.request_number}-${String(existingItems.length + 1).padStart(3, '0')}`
+
+    const item: Partial<PaymentRequestItem> = {
       ...itemData,
-      id,
       request_id: requestId,
       item_number: itemNumber,
       subtotal: itemData.unit_price * itemData.quantity,
-      created_at: now,
-      updated_at: now,
     }
 
-    // 更新 request 的 items 和 amount
-    const updatedItems = [...(request.items || []), item]
-    const totalAmount = updatedItems.reduce((sum, i) => sum + i.subtotal, 0)
+    // 使用 itemStore 新增項目
+    const createdItem = await itemStore.create(item)
+
+    // 更新 request 的總金額
+    const allItems = [...existingItems, createdItem as PaymentRequestItem]
+    const totalAmount = allItems.reduce((sum, i) => sum + (i.subtotal || 0), 0)
 
     await this.update(requestId, {
-      items: updatedItems,
       amount: totalAmount,
       updated_at: now,
     })
 
-    return item
+    return createdItem as PaymentRequestItem
   }
 
   /**
@@ -104,20 +113,32 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
+    const itemStore = usePaymentRequestItemStore.getState()
     const now = this.now()
-    const updatedItems = (request.items || []).map((item: PaymentRequestItem) => {
-      if (item.id === itemId) {
-        const updated = { ...item, ...itemData, updated_at: now }
-        updated.subtotal = updated.unit_price * updated.quantity
-        return updated
-      }
-      return item
+
+    // 計算新的 subtotal
+    const existingItem = itemStore.items.find(i => i.id === itemId)
+    const unitPrice = itemData.unit_price ?? existingItem?.unit_price ?? 0
+    const quantity = itemData.quantity ?? existingItem?.quantity ?? 0
+    const subtotal = unitPrice * quantity
+
+    // 使用 itemStore 更新項目
+    await itemStore.update(itemId, {
+      ...itemData,
+      subtotal,
+      updated_at: now,
     })
 
-    const totalAmount = updatedItems.reduce((sum: number, i: PaymentRequestItem) => sum + i.subtotal, 0)
+    // 更新 request 的總金額
+    const allItems = this.getItemsByRequestId(requestId)
+    const totalAmount = allItems.reduce((sum, i) => {
+      if (i.id === itemId) {
+        return sum + subtotal
+      }
+      return sum + (i.subtotal || 0)
+    }, 0)
 
     await this.update(requestId, {
-      items: updatedItems,
       amount: totalAmount,
       updated_at: now,
     })
@@ -132,12 +153,17 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
+    const itemStore = usePaymentRequestItemStore.getState()
     const now = this.now()
-    const updatedItems = (request.items || []).filter((item: PaymentRequestItem) => item.id !== itemId)
-    const totalAmount = updatedItems.reduce((sum: number, i: PaymentRequestItem) => sum + i.subtotal, 0)
+
+    // 使用 itemStore 刪除項目
+    await itemStore.delete(itemId)
+
+    // 更新 request 的總金額
+    const remainingItems = this.getItemsByRequestId(requestId).filter(i => i.id !== itemId)
+    const totalAmount = remainingItems.reduce((sum, i) => sum + (i.subtotal || 0), 0)
 
     await this.update(requestId, {
-      items: updatedItems,
       amount: totalAmount,
       updated_at: now,
     })
@@ -154,7 +180,8 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const totalAmount = (request.items || []).reduce((sum: number, item: PaymentRequestItem) => sum + item.subtotal, 0)
+    const items = this.getItemsByRequestId(requestId)
+    const totalAmount = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
 
     await this.update(requestId, {
       amount: totalAmount,
@@ -171,9 +198,8 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     requestId: string,
     category: PaymentRequestItem['category']
   ): PaymentRequestItem[] {
-    const store = usePaymentRequestStore.getState()
-    const request = store.items.find((r: PaymentRequest) => r.id === requestId)
-    return request?.items?.filter((item: PaymentRequestItem) => item.category === category) || []
+    const items = this.getItemsByRequestId(requestId)
+    return items.filter(item => item.category === category)
   }
 
   /**
@@ -193,8 +219,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       request_type: '從報價單自動生成',
       amount: 0,
       status: 'pending' as const,
-      notes: '從報價單自動生成',
-      items: [],
+      note: '從報價單自動生成',
     }
 
     return await this.create(requestData)
@@ -267,7 +292,8 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     if (options?.hasAccounting && !options?.isExpired && options?.workspaceId) {
       try {
         // 判斷供應商類型（從第一個項目）
-        const firstItem = (request.items || [])[0]
+        const items = this.getItemsByRequestId(requestId)
+        const firstItem = items[0]
         const supplierType = firstItem?.category || 'other'
 
         await generateVoucherFromPaymentRequest({
