@@ -208,7 +208,7 @@ export const TourMembers = React.memo(function TourMembers({
         assigned_room: assignedRoom,
       }
 
-      const newMember = await addMember(convertedData)
+      const newMember = await addMember(convertedData as unknown as Parameters<typeof addMember>[0])
 
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }

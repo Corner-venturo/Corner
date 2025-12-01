@@ -86,7 +86,7 @@ function setSecureCookie(token: string, rememberMe: boolean = false): void {
   }
 }
 
-export const useAuthStore = create<AuthState>(
+export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
@@ -303,7 +303,7 @@ export const useAuthStore = create<AuthState>(
             updated_at?: string
           }
 
-          const employeeData = employees as EmployeeData
+          const employeeData = employees as unknown as EmployeeData
           logger.log('✅ 找到員工資料:', employeeData.display_name)
 
           // 將 snake_case 轉換為 camelCase（前端統一格式）
@@ -430,14 +430,14 @@ export const useAuthStore = create<AuthState>(
             english_name: employee.english_name,
             display_name: employee.display_name,
             chinese_name: employee.chinese_name || employee.display_name,
-            personal_info: employee.personal_info,
-            job_info: employee.job_info,
-            salary_info: employee.salary_info,
+            personal_info: employee.personal_info as any,
+            job_info: employee.job_info as any,
+            salary_info: employee.salary_info as any,
             permissions: employee.permissions,
-            roles: employee.roles || [], // 附加身份標籤
-            attendance: employee.attendance,
-            contracts: employee.contracts,
-            status: employee.status,
+            roles: (employee.roles || []) as User['roles'], // 附加身份標籤
+            attendance: employee.attendance as any,
+            contracts: employee.contracts as any,
+            status: employee.status as User['status'],
             workspace_id: employee.workspace_id, // ✅ 從資料庫讀取 workspace_id
             created_at: employee.created_at || new Date().toISOString(),
             updated_at: employee.updated_at || new Date().toISOString(),
@@ -453,12 +453,12 @@ export const useAuthStore = create<AuthState>(
             english_name: employee.english_name,
             role: employee.permissions?.includes('admin') ? 'ADMIN' : 'EMPLOYEE',
             permissions: employee.permissions || [],
-            roles: employee.roles || [], // 附加身份標籤（支援多重角色）
-            personal_info: employee.personal_info,
-            job_info: employee.job_info,
-            salary_info: employee.salary_info,
-            contracts: employee.contracts,
-            attendance: employee.attendance,
+            roles: (employee.roles || []) as User['roles'], // 附加身份標籤（支援多重角色）
+            personal_info: employee.personal_info as any,
+            job_info: employee.job_info as any,
+            salary_info: employee.salary_info as any,
+            contracts: employee.contracts as any,
+            attendance: employee.attendance as any,
             lastLoginAt: new Date().toISOString(),
             created_at: employee.created_at || new Date().toISOString(),
             status: employee.status === 'active' ? 'active' : 'inactive',
@@ -626,7 +626,8 @@ export const useAuthStore = create<AuthState>(
             logger.warn('⚠️ [onRehydrate] user 缺少 workspace_id，從 Supabase 查詢...')
             try {
               const { supabase } = await import('@/lib/supabase/client')
-              const { data: employee, error } = await supabase
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: employee, error } = await (supabase as any)
                 .from('employees')
                 .select('workspace_id')
                 .eq('id', state.user.id)

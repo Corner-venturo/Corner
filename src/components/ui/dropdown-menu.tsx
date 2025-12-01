@@ -48,10 +48,12 @@ const DropdownMenuTrigger = React.forwardRef<
   }
 >(({ className, children, isOpen, onOpenChange, asChild, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>, {
-      onClick: (e: React.MouseEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return React.cloneElement(children as React.ReactElement<any>, {
+      onClick: (e: React.MouseEvent<Element>) => {
         onOpenChange?.(!isOpen)
-        const childProps = children.props as { onClick?: (e: React.MouseEvent) => void }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const childProps = children.props as any
         childProps.onClick?.(e)
       },
       ...props,

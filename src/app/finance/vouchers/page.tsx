@@ -41,7 +41,7 @@ export default function VouchersPage() {
       key: 'voucher_no',
       label: '傳票編號',
       sortable: true,
-      render: (value: unknown) => (
+      render: (value) => (
         <div className="font-mono text-sm">{String(value)}</div>
       ),
     },
@@ -49,12 +49,12 @@ export default function VouchersPage() {
       key: 'voucher_date',
       label: '傳票日期',
       sortable: true,
-      render: (value: unknown) => <DateCell date={String(value)} />,
+      render: (value) => <DateCell date={String(value)} />,
     },
     {
       key: 'type',
       label: '類型',
-      render: (value: unknown) => (
+      render: (value) => (
         <span
           className={cn(
             'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
@@ -68,7 +68,7 @@ export default function VouchersPage() {
     {
       key: 'description',
       label: '摘要',
-      render: (value: unknown) => (
+      render: (value) => (
         <div className="truncate max-w-xs">{String(value || '-')}</div>
       ),
     },
@@ -76,7 +76,7 @@ export default function VouchersPage() {
       key: 'total_debit',
       label: '借方',
       sortable: true,
-      render: (value: unknown) => (
+      render: (value) => (
         <div className="text-right font-medium">NT$ {Number(value).toLocaleString()}</div>
       ),
     },
@@ -84,19 +84,19 @@ export default function VouchersPage() {
       key: 'total_credit',
       label: '貸方',
       sortable: true,
-      render: (value: unknown) => (
+      render: (value) => (
         <div className="text-right font-medium">NT$ {Number(value).toLocaleString()}</div>
       ),
     },
     {
       key: 'status',
       label: '狀態',
-      render: (value: unknown) => <StatusCell type="voucher" status={String(value)} />,
+      render: (value) => <StatusCell type="voucher" status={String(value)} />,
     },
     {
       key: 'actions',
       label: '操作',
-      render: (_: unknown, row: Voucher) => (
+      render: (_, row) => (
         <ActionCell
           actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]}
         />
@@ -124,7 +124,7 @@ export default function VouchersPage() {
         <EnhancedTable<Voucher>
           className="min-h-full"
           data={vouchers}
-          columns={columns}
+          columns={columns as TableColumn[]}
           defaultSort={{ key: 'voucher_date', direction: 'desc' }}
           searchable
           searchPlaceholder="搜尋傳票編號或摘要..."

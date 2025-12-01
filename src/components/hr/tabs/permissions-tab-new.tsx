@@ -52,8 +52,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
         // 更新 roles（單一角色） 和 permissions（角色預設權限）
         await updateUser(employee.id, {
-          roles: [role] as string[],
-          permissions: defaultPermissions as string[],
+          roles: [role] as unknown as typeof employee.roles,
+          permissions: defaultPermissions as unknown as typeof employee.permissions,
         })
 
         // 同步更新 IndexedDB
@@ -65,10 +65,10 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              roles: [role] as string[],
-              permissions: defaultPermissions as string[],
+              roles: [role],
+              permissions: defaultPermissions,
               updated_at: new Date().toISOString(),
-            })
+            } as unknown as Parameters<typeof localDB.put>[1])
           }
         } catch (_error) {
           // Ignore error
@@ -78,8 +78,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         if (user && user.id === employee.id) {
           login({
             ...user,
-            roles: [role] as string[],
-            permissions: defaultPermissions as string[],
+            roles: [role] as unknown as typeof user.roles,
+            permissions: defaultPermissions as unknown as typeof user.permissions,
           })
 
           // 同步更新 LocalProfile
@@ -89,8 +89,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             const currentProfile = localAuthStore.currentProfile
 
             if (currentProfile && currentProfile.id === employee.id && 'updateProfile' in localAuthStore) {
-              (localAuthStore.updateProfile as (id: string, data: Partial<Employee>) => void)(employee.id, {
-                roles: [role] as string[],
+              (localAuthStore.updateProfile as (id: string, data: Record<string, unknown>) => void)(employee.id, {
+                roles: [role],
               })
             }
           } catch (_error) {
@@ -134,9 +134,9 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           if (existingEmployee) {
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
-              permissions: permissions as string[],
+              permissions: permissions,
               updated_at: new Date().toISOString(),
-            })
+            } as unknown as Parameters<typeof localDB.put>[1])
           }
         } catch (_error) {}
 
@@ -144,7 +144,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         if (user && user.id === employee.id) {
           login({
             ...user,
-            permissions: permissions as string[],
+            permissions: permissions as unknown as typeof user.permissions,
           })
         }
 

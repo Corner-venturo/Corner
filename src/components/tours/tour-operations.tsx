@@ -3,6 +3,15 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Tour } from '@/stores/types'
 import { useOrderStore, useMemberStore, useTourAddOnStore, usePaymentRequestStore } from '@/stores'
+import type { PaymentRequestItem } from '@/stores/types'
+
+// 擴展 PaymentRequest 型別以包含 items
+interface PaymentRequestWithItems {
+  id: string
+  tour_id?: string | null
+  items?: PaymentRequestItem[]
+  [key: string]: unknown
+}
 import { Button } from '@/components/ui/button'
 import { _Input } from '@/components/ui/input'
 import { Eye } from 'lucide-react'
@@ -209,7 +218,7 @@ export const TourOperations = React.memo(function TourOperations({
           // 保留現有的分房數據，不要覆蓋
           assigned_room: member.assigned_room,
           is_child_no_bed: member.is_child_no_bed,
-        } as EditingMember
+        } as unknown as EditingMember
       })
 
     setTableMembers(allTourMembers)
@@ -217,7 +226,7 @@ export const TourOperations = React.memo(function TourOperations({
 
   // 單獨處理房間選項
   useEffect(() => {
-    const tourPaymentRequests = paymentRequests.filter(request => request.tour_id === tour.id)
+    const tourPaymentRequests = (paymentRequests as unknown as PaymentRequestWithItems[]).filter(request => request.tour_id === tour.id)
     const roomOptions: RoomOption[] = []
 
     tourPaymentRequests.forEach(request => {
@@ -405,7 +414,7 @@ export const TourOperations = React.memo(function TourOperations({
               ? `不佔床${member.assigned_room ? ` - ${member.assigned_room}` : ''}`
               : member.assigned_room || '未分配',
           }))}
-          tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id)}
+          tour_add_ons={tourAddOns.filter(a => a.tour_id === tour.id) as unknown as Record<string, unknown>[]}
           onDataUpdate={handleDataUpdate}
           onColumnHide={handleColumnHide}
           onColumnDelete={handleColumnDelete}

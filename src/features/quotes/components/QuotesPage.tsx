@@ -171,7 +171,7 @@ export const QuotesPage: React.FC = () => {
         .order('created_at', { ascending: true })
 
       logger.log('📦 Quick quote items:', items, 'Error:', error)
-      setPreviewQuoteItems(items || [])
+      setPreviewQuoteItems((items || []) as any)
     } else {
       setPreviewQuoteItems([])
     }
@@ -284,7 +284,7 @@ export const QuotesPage: React.FC = () => {
           setIsAddDialogOpen(open)
         }}
         formData={formData}
-        setFormField={setFormField}
+        setFormField={setFormField as any}
         tours={tours}
         onSubmit={handleSubmit}
         onClose={handleDialogClose}
@@ -297,7 +297,7 @@ export const QuotesPage: React.FC = () => {
           setIsQuickDialogOpen(open)
         }}
         formData={quickFormData}
-        setFormField={setQuickFormField}
+        setFormField={setQuickFormField as any}
         onSubmit={handleQuickSubmit}
         onClose={handleQuickDialogClose}
       />
@@ -312,8 +312,8 @@ export const QuotesPage: React.FC = () => {
             {/* 快速報價單 */}
             {isQuickQuote && previewQuoteItems.length > 0 && (
               <PrintableQuickQuote
-                quote={previewQuoteWithType}
-                items={previewQuoteItems}
+                quote={previewQuoteWithType as any}
+                items={previewQuoteItems as any}
                 isOpen={!!previewQuoteId}
                 onClose={() => setPreviewQuoteId(null)}
                 onPrint={() => window.print()}
@@ -325,7 +325,7 @@ export const QuotesPage: React.FC = () => {
               previewQuote.categories &&
               previewQuote.categories.length > 0 && (
                 <PrintableQuotation
-                  quote={previewQuoteWithType}
+                  quote={previewQuoteWithType as any}
                   quoteName={previewQuote.name || ''}
                   participantCounts={
                     previewQuote.participant_counts || {

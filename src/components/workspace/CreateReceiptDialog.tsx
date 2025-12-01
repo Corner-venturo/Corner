@@ -9,7 +9,7 @@ import type { ReceiptOrder } from '@/types'
 interface CreateReceiptDialogProps {
   order: {
     id: string
-    order_number: string
+    order_number: string | null
     contact_person: string
     total_amount: number
     paid_amount: number
@@ -80,7 +80,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-morandi-secondary">訂單號：</span>
-                <span className="font-medium text-morandi-primary">{order.order_number}</span>
+                <span className="font-medium text-morandi-primary">{order.order_number || '-'}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-morandi-secondary">客戶：</span>

@@ -181,7 +181,7 @@ export function createStore<T extends BaseEntity>(
       }
     },
 
-    update: async (id: string, data: Partial<T>) => {
+    update: async (id: string, data: Partial<Omit<T, 'id' | 'created_at'>>) => {
       try {
         set({ loading: true, error: null })
 

@@ -115,7 +115,7 @@ export const SuppliersPage: React.FC = () => {
           bank_account: formData.bank_account,
           notes: formData.note,
           type: 'other', // 預設型別
-        })
+        } as Parameters<typeof create>[0])
         alert('✅ 供應商建立成功')
       }
       handleCloseDialog()

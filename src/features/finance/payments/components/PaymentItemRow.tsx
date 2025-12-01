@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import type { PaymentItem } from '../types'
+import type { PaymentItem, ReceiptType } from '../types'
 import { RECEIPT_TYPES, RECEIPT_TYPE_OPTIONS, BANK_ACCOUNTS } from '../types'
 
 interface PaymentItemRowProps {

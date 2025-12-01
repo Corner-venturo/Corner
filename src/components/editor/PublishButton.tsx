@@ -32,13 +32,13 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
     cover_image: data.coverImage,
     country: data.country,
     city: data.city,
-    status: data.status || 'draft',
+    status: (data.status || 'draft') as 'draft' | 'published',
     outbound_flight: data.outboundFlight,
     return_flight: data.returnFlight,
-    features: data.features?.map(({ iconComponent, ...rest }: { iconComponent?: unknown; [key: string]: unknown }) => rest),
+    features: data.features,
     focus_cards: data.focusCards,
     leader: data.leader,
-    meeting_info: data.meetingInfo,  // ✅ 修正：使用 meeting_info 而非 meeting_points
+    meeting_info: data.meetingInfo as { time: string; location: string } | undefined,  // ✅ 修正：使用 meeting_info 而非 meeting_points
     hotels: data.hotels,
     show_features: data.showFeatures,
     show_leader_meeting: data.showLeaderMeeting,
@@ -63,7 +63,7 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
           ...convertedData,
           version: 1,
           is_latest: true,
-        })
+        } as Parameters<typeof create>[0])
         alert('✅ 儲存行程表成功！')
 
         if (newItinerary?.id) {
@@ -99,10 +99,10 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
       }
 
       // 先將舊版本的 is_latest 設為 false
-      await update(data.id, { is_latest: false })
+      await update(data.id, { is_latest: false } as Parameters<typeof update>[1])
 
       // 建立新版本
-      const newVersion = await create(newVersionData)
+      const newVersion = await create(newVersionData as Parameters<typeof create>[0])
       alert(`✅ 已另存為新版本 v${currentVersion + 1}`)
 
       // 跳轉到新版本

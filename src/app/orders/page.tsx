@@ -138,15 +138,23 @@ export default function OrdersPage() {
       code: selectedTour.code,
       tour_name: selectedTour.name,
       contact_person: orderData.contact_person,
+      contact_phone: null,
+      contact_email: null,
       sales_person: orderData.sales_person,
       assistant: orderData.assistant,
       member_count: orderData.member_count,
+      adult_count: null,
+      child_count: null,
+      infant_count: null,
+      total_people: orderData.member_count,
       total_amount: orderData.total_amount,
       paid_amount: 0,
       payment_status: 'unpaid',
       remaining_amount: orderData.total_amount,
-      workspace_id: currentWorkspace.id,
-    } satisfies Partial<Order>)
+      status: null,
+      notes: null,
+      customer_id: null,
+    })
 
     setIsAddDialogOpen(false)
   }
@@ -227,7 +235,7 @@ export default function OrdersPage() {
         )}
 
         {/* 訂單列表 */}
-        <SimpleOrderTable className="min-h-full" orders={filteredOrders} showTourInfo={true} />
+        <SimpleOrderTable className="min-h-full" orders={filteredOrders as Order[]} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}

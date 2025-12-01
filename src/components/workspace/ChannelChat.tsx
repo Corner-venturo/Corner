@@ -121,11 +121,11 @@ export function ChannelChat() {
               attachedFiles={attachedFiles}
               uploadingFiles={uploadingFiles}
               uploadProgress={uploadProgress}
-              messagesEndRef={messagesEndRef}
+              messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
               onReaction={handleReactionClick}
               onDeleteMessage={handleDeleteMessageClick}
               onCreatePayment={(itemId, item) => {
-                setSelectedAdvanceItem(item)
+                setSelectedAdvanceItem(item as Parameters<typeof setSelectedAdvanceItem>[0])
                 setSelectedAdvanceListId(
                   advanceLists.find(al => al.items?.some(i => i.id === itemId))?.id || ''
                 )
@@ -133,7 +133,7 @@ export function ChannelChat() {
               }}
               onDeleteAdvanceList={deleteAdvanceList}
               onCreateReceipt={(_orderId, order) => {
-                setSelectedOrder(order)
+                setSelectedOrder(order as Parameters<typeof setSelectedOrder>[0])
                 setShowCreateReceiptDialog(true)
               }}
               onMessageChange={setMessageText}

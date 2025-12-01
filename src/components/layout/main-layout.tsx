@@ -74,10 +74,10 @@ export function MainLayout({ children }: MainLayoutProps) {
     const loadInitialData = async () => {
       try {
         // 載入工作空間（全域需要）
-        const { useChannelsStore } = await import('@/stores/workspace/channels-store')
-        const workspaceState = useChannelsStore.getState()
-        if (!workspaceState.currentWorkspace) {
-          await workspaceState.loadWorkspaces()
+        const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
+        const workspaceState = useWorkspaceStoreData.getState()
+        if (workspaceState.items.length === 0) {
+          await workspaceState.fetchAll()
         }
       } catch (_error) {}
     }

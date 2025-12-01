@@ -53,20 +53,23 @@ export function VisasList({
     {
       key: 'status',
       label: '狀態',
-      render: (value, visa) => (
-        <span
-          className={cn(
-            'text-sm font-medium',
-            visa.status === 'submitted'
-              ? 'text-morandi-gold'
-              : visa.status === 'issued'
-                ? 'text-morandi-green'
-                : 'text-morandi-secondary'
-          )}
-        >
-          {getVisaStatusLabel(visa.status)}
-        </span>
-      ),
+      render: (value, rowData) => {
+        const visa = rowData as Visa
+        return (
+          <span
+            className={cn(
+              'text-sm font-medium',
+              visa.status === 'submitted'
+                ? 'text-morandi-gold'
+                : visa.status === 'issued'
+                  ? 'text-morandi-green'
+                  : 'text-morandi-secondary'
+            )}
+          >
+            {getVisaStatusLabel(visa.status)}
+          </span>
+        )
+      },
     },
     {
       key: 'submission_date',
@@ -95,7 +98,8 @@ export function VisasList({
     },
   ]
 
-  const renderActions = (visa: Visa) => {
+  const renderActions = (rowData: unknown) => {
+    const visa = rowData as Visa
     if (!canManageVisas) return null
 
     return (

@@ -85,13 +85,6 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
         total_cost: 0,
         // 補充必填欄位的預設值
         customer_name: '待指定',
-        destination: '待指定',
-        start_date: new Date().toISOString().split('T')[0],
-        end_date: new Date().toISOString().split('T')[0],
-        days: 1,
-        nights: 0,
-        number_of_people: groupSize,
-        total_amount: 0,
         is_pinned: formData.is_pinned || false,
         // 根據 group_size 初始化 participant_counts（預設全部為成人）
         participant_counts: {
@@ -101,7 +94,7 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
           single_room: 0,
           infant: 0,
         },
-      })
+      } as any)
 
       // 重置表單
       resetForm()

@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
+import type { Tour } from '@/types/tour.types'
 import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
@@ -213,8 +214,8 @@ export default function QuoteDetailPage() {
       <QuoteHeader
         isSpecialTour={isSpecialTour}
         isReadOnly={isReadOnly}
-        relatedTour={relatedTour}
-        quote={quote}
+        relatedTour={relatedTour as Tour | null}
+        quote={quote as Parameters<typeof QuoteHeader>[0]['quote']}
         quoteName={quoteName}
         setQuoteName={setQuoteName}
         participantCounts={participantCounts}
@@ -318,7 +319,7 @@ export default function QuoteDetailPage() {
 
       {/* 可列印的報價單 */}
       <PrintableQuotation
-        quote={quote}
+        quote={quote as unknown as Parameters<typeof PrintableQuotation>[0]['quote']}
         quoteName={quoteName}
         participantCounts={previewParticipantCounts || participantCounts}
         sellingPrices={previewSellingPrices || sellingPrices}

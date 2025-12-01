@@ -79,10 +79,12 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
 
   // 訂單選項（使用當前團號的訂單 + 新增選項）
   const orderOptions = useMemo(() => {
-    const options = tourOrders.map(order => ({
-      value: order.order_number,
-      label: `${order.order_number} - ${order.contact_person || ''}`,
-    }))
+    const options = tourOrders
+      .filter(order => order.order_number)
+      .map(order => ({
+        value: order.order_number!,
+        label: `${order.order_number} - ${order.contact_person || ''}`,
+      }))
     // 加入「新增訂單」選項
     if (selectedTourId) {
       options.push({
@@ -273,7 +275,8 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           paid_amount: 0,
           remaining_amount: 0,
           payment_status: 'unpaid' as const,
-        } as Partial<Order>)
+          status: 'confirmed',
+        } as unknown as Parameters<typeof createOrder>[0])
 
         targetOrderNumber = newOrderNumber
         toast.success(`已建立訂單：${newOrderNumber}`)
@@ -312,7 +315,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           email: item.email,
           note: item.note || '',
           status: 0,
-        } as Partial<Esim>)
+        } as unknown as Parameters<typeof create>[0])
 
         // TODO: 調用 FastMove API 下單，並傳入 invoiceNumber
         // FastMove API 會自動產生請款單，請款日期為「下個月第一個週四」

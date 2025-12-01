@@ -74,7 +74,7 @@ export default function TourClosingReportPage() {
             .select('id, paid_amount')
             .eq('tour_id', tour.id)
 
-          const totalRevenue = orders?.reduce((sum: number, o: { paid_amount?: number }) => sum + (o.paid_amount || 0), 0) || 0
+          const totalRevenue = orders?.reduce((sum: number, o: { paid_amount: number | null }) => sum + (o.paid_amount || 0), 0) || 0
 
           // 2. 計算總成本（排除 bonus）
           const orderIds = orders?.map(o => o.id) || []

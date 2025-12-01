@@ -25,12 +25,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { Quote, QuickQuoteItem } from '@/types/quote.types'
+import { Quote, QuickQuoteItem, QuoteVersion } from '@/stores/types'
 import { PrintableQuickQuote } from './PrintableQuickQuote'
 
 interface QuickQuoteDetailProps {
   quote: Quote
-  onUpdate: (data: Partial<Quote>) => Promise<void>
+  onUpdate: (data: Partial<Quote>) => Promise<void> | Promise<Quote>
 }
 
 export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpdate }) => {
@@ -83,7 +83,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       id: `item-${Date.now()}`,
       description: '',
       quantity: 1,
-      cost: 0,
       unit_price: 0,
       amount: 0,
       notes: '',
@@ -93,7 +92,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   }
 
   // 計算總成本
-  const totalCost = items.reduce((sum, item) => sum + (item.cost || 0) * item.quantity, 0)
+  const totalCost = items.reduce((sum, item) => sum + ((item as any).cost || 0) * item.quantity, 0)
 
   // 計算利潤
   const totalProfit = totalAmount - totalCost
@@ -165,10 +164,9 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           ...updatedVersions[currentEditingVersion],
           ...prepareVersionData(
             updatedVersions[currentEditingVersion].version,
-            updatedVersions[currentEditingVersion].version_name || `版本 ${updatedVersions[currentEditingVersion].version}`
+            (updatedVersions[currentEditingVersion] as any).version_name || `版本 ${updatedVersions[currentEditingVersion].version}`
           ),
-          updated_at: new Date().toISOString(),
-        }
+        } as QuoteVersion
 
         await onUpdate({
           ...baseUpdate,
@@ -182,7 +180,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         await onUpdate({
           ...baseUpdate,
           version: 1,
-          versions: [firstVersion],
+          versions: [firstVersion as unknown as QuoteVersion],
         })
         setCurrentEditingVersion(0)
       } else {
@@ -239,7 +237,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         balance_amount: totalAmount - formData.received_amount,
         quick_quote_items: items,
         version: newVersionNumber,
-        versions: newVersions,
+        versions: newVersions as unknown as QuoteVersion[],
       })
 
       // 設定當前編輯版本為新版本
@@ -263,7 +261,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       return
     }
 
-    if (!confirm(`確定要刪除「${versions[versionIndex].version_name || `版本 ${versions[versionIndex].version}`}」嗎？`)) {
+    if (!confirm(`確定要刪除「${(versions[versionIndex] as any).version_name || `版本 ${versions[versionIndex].version}`}」嗎？`)) {
       return
     }
 
@@ -291,7 +289,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
     if (versionIndex < 0 || versionIndex >= versions.length) return
 
-    const versionData = versions[versionIndex]
+    const versionData = versions[versionIndex] as any
 
     // 更新表單資料
     setFormData({
@@ -340,7 +338,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
     // 列印後自動更新狀態為「已請款」
     try {
-      await onUpdate({ status: 'billed' })
+      await onUpdate({ status: 'billed' as any })
       setShowPrintPreview(false)
     } catch (error) {
       logger.error('更新狀態失敗:', error)
@@ -403,7 +401,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                               >
                                 <div className="flex flex-col flex-1">
                                   <span className="font-medium">
-                                    {version.version_name || `版本 ${version.version}`}
+                                    {(version as any).version_name || `版本 ${version.version}`}
                                   </span>
                                   <span className="text-xs text-morandi-secondary">
                                     {formatDateTime(version.created_at)}
@@ -411,7 +409,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <div className="text-xs text-morandi-secondary">
-                                    NT$ {(version.total_amount || 0).toLocaleString()}
+                                    NT$ {((version as any).total_amount || 0).toLocaleString()}
                                   </div>
                                   {isCurrentEditing && (
                                     <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
@@ -637,7 +635,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                     <td className="px-3 py-2">
                       <Input
                         type="text"
-                        value={item.cost === 0 || item.cost === undefined ? '' : item.cost}
+                        value={(item as any).cost === 0 || (item as any).cost === undefined ? '' : (item as any).cost}
                         onChange={e => {
                           let val = e.target.value
                           val = val.replace(/[０-９]/g, s =>
@@ -647,11 +645,11 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                           val = val.replace(/[－]/g, '-')
 
                           if (val === '' || val === '-') {
-                            updateItem(item.id, 'cost', 0)
+                            updateItem(item.id, 'cost' as any, 0)
                           } else {
                             const num = parseFloat(val)
                             if (!isNaN(num)) {
-                              updateItem(item.id, 'cost', num)
+                              updateItem(item.id, 'cost' as any, num)
                             }
                           }
                         }}
@@ -705,8 +703,8 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   </td>
                   {isEditing && (
                     <td className="px-3 py-2 text-right font-medium">
-                      <span className={((item.unit_price - (item.cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
-                        {((item.unit_price - (item.cost || 0)) * item.quantity).toLocaleString()}
+                      <span className={((item.unit_price - ((item as any).cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
+                        {((item.unit_price - ((item as any).cost || 0)) * item.quantity).toLocaleString()}
                       </span>
                     </td>
                   )}
@@ -870,7 +868,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
         {/* 列印預覽對話框 */}
         <PrintableQuickQuote
-          quote={quote}
+          quote={quote as any}
           items={items}
           isOpen={showPrintPreview}
           onClose={() => setShowPrintPreview(false)}

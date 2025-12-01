@@ -44,7 +44,7 @@ const getInitialFormData = (): QuickQuoteFormData => ({
 const STORAGE_KEY = 'venturo_quick_quote_draft'
 
 interface UseQuickQuoteFormParams {
-  addQuote: (data: Partial<Quote>) => Promise<Quote | null>
+  addQuote: (data: any) => Promise<any>
 }
 
 export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
@@ -74,7 +74,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
   // 當 user 載入後，自動填入 handler_name（如果目前是空的）
   useEffect(() => {
     if (user && !formData.handler_name) {
-      const defaultName = user.display_name || user.chinese_name || user.email || ''
+      const defaultName = user.display_name || user.chinese_name || (user as any).email || ''
       setFormData(prev => ({ ...prev, handler_name: defaultName }))
     }
   }, [user, formData.handler_name])
@@ -94,7 +94,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
     const resetData = getInitialFormData()
     // 保留當前登入者的名稱
     if (user) {
-      resetData.handler_name = user.display_name || user.chinese_name || user.email || ''
+      resetData.handler_name = user.display_name || user.chinese_name || (user as any).email || ''
     }
     setFormData(resetData)
     if (typeof window !== 'undefined') {

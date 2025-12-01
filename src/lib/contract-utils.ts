@@ -98,8 +98,8 @@ export function prepareContractData(
   let gatherDay = ''
 
   // 如果有行程表且有航班資訊
-  if (itinerary?.outboundFlight?.departureTime) {
-    const gatherTime = calculateGatherTime(itinerary.outboundFlight.departureTime)
+  if (itinerary?.outbound_flight?.departureTime) {
+    const gatherTime = calculateGatherTime(itinerary.outbound_flight.departureTime)
     gatherHour = gatherTime.hour
     gatherMinute = gatherTime.minute
 
@@ -144,7 +144,7 @@ export function prepareContractData(
     gatherDay,
     gatherHour,
     gatherMinute,
-    gatherLocation: itinerary?.outboundFlight?.departureAirport
+    gatherLocation: itinerary?.outbound_flight?.departureAirport
       ? `桃園國際機場` // 可根據機場代碼決定
       : '',
 

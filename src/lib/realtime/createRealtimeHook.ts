@@ -10,11 +10,8 @@ import { realtimeManager } from './realtime-manager'
 import { logger } from '@/lib/utils/logger'
 
 // Zustand store 的最小介面需求
-// 使用 unknown 而非 any，並在內部進行型別斷言
-interface MinimalZustandStore {
-  setState: (updater: unknown) => void
-  getState: () => { items: unknown[] }
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MinimalZustandStore = any
 
 // IndexedDB 介面
 interface IndexedDBAdapter<T> {

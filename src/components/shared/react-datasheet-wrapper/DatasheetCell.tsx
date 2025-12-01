@@ -115,16 +115,49 @@ export function DatasheetCell({
     const column = visibleColumns[col]
     if (column.key === 'assigned_room' && orderFilter && cell.rowData?.id) {
       const member = cell.rowData
-      const selectValue = member.is_child_no_bed
-        ? member.assigned_room
-          ? `no-bed-${String(member.assigned_room)}`
+      const memberId = String(member.id || '')
+      const memberAssignedRoom = member.assigned_room as string | null
+      const isChildNoBed = Boolean(member.is_child_no_bed)
+      const selectValue = isChildNoBed
+        ? memberAssignedRoom
+          ? `no-bed-${memberAssignedRoom}`
           : 'no-bed'
-        : String(member.assigned_room || '')
+        : String(memberAssignedRoom || '')
+
+      // Build room options list
+      const regularRoomOptions: React.ReactElement[] = []
+      for (const roomOption of roomOptions) {
+        const usage = getRoomUsage
+          ? getRoomUsage(roomOption.value)
+          : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
+        const isFull = isRoomFull ? isRoomFull(roomOption.value, memberId) : false
+        const isCurrentRoom = memberAssignedRoom === roomOption.value && !isChildNoBed
+
+        if (isFull && !isCurrentRoom) {
+          continue
+        }
+
+        regularRoomOptions.push(
+          <option key={roomOption.value} value={roomOption.value}>
+            {roomOption.value} ({usage.bedCount}/{usage.capacity}床
+            {usage.noBedCount > 0 ? ` +${usage.noBedCount}不佔床` : ''})
+          </option>
+        )
+      }
+
+      // Build no-bed room options
+      const noBedRoomOptions: React.ReactElement[] = isChildNoBed
+        ? roomOptions.map(roomOption => (
+            <option key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
+              不佔床 - {roomOption.value}
+            </option>
+          ))
+        : []
 
       return (
         <select
           value={selectValue}
-          onChange={e => {
+          onChange={() => {
             // Handler should be passed as prop if needed
           }}
           className="w-full h-8 px-2 border border-gray-300 rounded text-xs bg-white focus:outline-none focus:ring-2 focus:ring-morandi-gold"
@@ -132,36 +165,8 @@ export function DatasheetCell({
         >
           <option value="">未分配</option>
           <option value="no-bed">不佔床</option>
-
-          {/* Regular room options */}
-          {roomOptions
-            .map((roomOption) => {
-              const usage = getRoomUsage
-                ? getRoomUsage(roomOption.value)
-                : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
-              const isFull = isRoomFull ? isRoomFull(roomOption.value, member.id as string) : false
-              const isCurrentRoom = member.assigned_room === roomOption.value && !member.is_child_no_bed
-
-              if (isFull && !isCurrentRoom) {
-                return null
-              }
-
-              return (
-                <option key={roomOption.value} value={roomOption.value}>
-                  {roomOption.value} ({usage.bedCount}/{usage.capacity}床
-                  {usage.noBedCount > 0 ? ` +${usage.noBedCount}不佔床` : ''})
-                </option>
-              )
-            })
-            .filter((option): option is React.ReactElement => option !== null)}
-
-          {/* No-bed room options */}
-          {member.is_child_no_bed &&
-            roomOptions.map(roomOption => (
-              <option key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
-                不佔床 - {roomOption.value}
-              </option>
-            ))}
+          {regularRoomOptions}
+          {noBedRoomOptions}
         </select>
       )
     }

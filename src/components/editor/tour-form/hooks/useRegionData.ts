@@ -20,7 +20,7 @@ export function useRegionData(data: { country?: string }) {
 
   // 從 countries 取得所有國家列表
   const allDestinations = React.useMemo(() => {
-    return countries.filter(c => c.is_active).map(c => ({ code: c.code || '', name: c.name }))
+    return countries.filter(c => c.is_active).map(c => ({ id: c.id, code: c.code || '', name: c.name }))
   }, [countries])
 
   // 建立國家名稱到代碼的對照

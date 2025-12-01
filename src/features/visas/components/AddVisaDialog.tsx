@@ -119,7 +119,7 @@ export function AddVisaDialog({
             .order('created_at', { ascending: false })
 
           if (!error && data) {
-            setTourOrders(data)
+            setTourOrders(data as OrderData[])
           } else {
             setTourOrders([])
           }

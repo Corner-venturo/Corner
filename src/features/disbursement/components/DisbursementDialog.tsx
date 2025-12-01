@@ -58,14 +58,17 @@ export function DisbursementDialog({
           />
         ),
         width: '50px',
-        render: (_value, row) => (
-          <input
-            type="checkbox"
-            checked={selectedRequests.includes(row.id)}
-            onChange={() => onSelectRequest(row.id)}
-            className="rounded border-morandi-secondary"
-          />
-        ),
+        render: (_value, row) => {
+          const request = row as PaymentRequest
+          return (
+            <input
+              type="checkbox"
+              checked={selectedRequests.includes(request.id)}
+              onChange={() => onSelectRequest(request.id)}
+              className="rounded border-morandi-secondary"
+            />
+          )
+        },
       },
       {
         key: 'request_number',

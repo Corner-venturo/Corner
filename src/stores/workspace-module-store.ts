@@ -27,7 +27,8 @@ import type { WorkspaceModule } from '@/types/accounting-pro.types'
  * ```
  */
 export const useWorkspaceModuleStore = createStore<WorkspaceModule>({
-  tableName: 'workspace_modules' as 'workspace_modules',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tableName: 'workspace_modules' as any,
   enableSupabase: true,
   fastInsert: true,
 })

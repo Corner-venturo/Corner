@@ -89,38 +89,41 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
       columns={columns}
       data={suppliers}
       loading={loading}
-      actions={(supplier: Supplier) => (
-        <div className="flex items-center gap-1">
-          {onEdit && (
-            <Button
-              variant="ghost"
-              size="iconSm"
-              onClick={(e) => {
-                e.stopPropagation()
-                onEdit(supplier)
-              }}
-              className="text-morandi-blue hover:bg-morandi-blue/10"
-              title="編輯"
-            >
-              <Pencil size={16} />
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="ghost"
-              size="iconSm"
-              onClick={(e) => {
-                e.stopPropagation()
-                onDelete(supplier)
-              }}
-              className="text-morandi-red hover:bg-morandi-red/10"
-              title="刪除"
-            >
-              <Trash2 size={16} />
-            </Button>
-          )}
-        </div>
-      )}
+      actions={(row) => {
+        const supplier = row as Supplier
+        return (
+          <div className="flex items-center gap-1">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="iconSm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit(supplier)
+                }}
+                className="text-morandi-blue hover:bg-morandi-blue/10"
+                title="編輯"
+              >
+                <Pencil size={16} />
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="iconSm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(supplier)
+                }}
+                className="text-morandi-red hover:bg-morandi-red/10"
+                title="刪除"
+              >
+                <Trash2 size={16} />
+              </Button>
+            )}
+          </div>
+        )
+      }}
     />
   )
 }

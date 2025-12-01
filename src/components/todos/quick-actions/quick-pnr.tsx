@@ -97,8 +97,6 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           other_info: parsedData.otherInfo ?? [],
           status: 'active' as const,
           notes: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
           created_by: user.id,
           updated_by: null,
         })
@@ -138,8 +136,6 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           visibility: 'company' as const,
           owner_id: user.id,
           workspace_id: currentWorkspace.id,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
           created_by: user.id,
         })
       }
@@ -159,8 +155,6 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
           other_info: parsedData.otherInfo ?? [],
           status: 'active' as const,
           notes: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
           created_by: user.id,
           updated_by: null,
         })

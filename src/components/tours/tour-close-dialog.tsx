@@ -207,7 +207,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       for (const recipient of salesRecipients) {
         if (recipient.percentage > 0) {
           const amount = Math.round(netProfit * (recipient.percentage / 100))
-          await supabase.from('payment_requests').insert({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any).from('payment_requests').insert({
             order_id: orderId,
             supplier_name: '業務業績',
             amount,
@@ -221,7 +222,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       for (const recipient of opRecipients) {
         if (recipient.percentage > 0) {
           const amount = Math.round(netProfit * (recipient.percentage / 100))
-          await supabase.from('payment_requests').insert({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any).from('payment_requests').insert({
             order_id: orderId,
             supplier_name: 'OP 獎金',
             amount,

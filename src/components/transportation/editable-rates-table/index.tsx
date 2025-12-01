@@ -199,7 +199,7 @@ export function EditableRatesTable({
         className="h-8 px-2 flex items-center cursor-pointer hover:bg-morandi-cream/30 rounded"
         onDoubleClick={() => startEdit(rate.id, field, value)}
       >
-        {value || '-'}
+        {(value as React.ReactNode) || '-'}
       </div>
     )
   }

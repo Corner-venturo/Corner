@@ -24,6 +24,7 @@ interface UserRole {
   role: string
   permissions: string[]
   updated_at: string
+  [key: string]: unknown
 }
 
 interface Workspace {
@@ -31,10 +32,13 @@ interface Workspace {
   name: string
   owner_id: string
   updated_at: string
+  [key: string]: unknown
 }
 
 interface Employee {
   id: string
+  created_at: string
+  updated_at: string
   [key: string]: unknown
 }
 
@@ -138,7 +142,7 @@ export function PermanentRealtimeSubscriptions() {
             const exists = state.items.some(item => item.id === employee.id)
             if (exists) return state
             return {
-              items: [...state.items, employee],
+              items: [...state.items, employee as unknown as typeof state.items[0]],
             }
           })
         },
@@ -150,7 +154,7 @@ export function PermanentRealtimeSubscriptions() {
           await indexedDB.put(employee)
 
           useEmployeeStore.setState(state => ({
-            items: state.items.map(item => (item.id === employee.id ? employee : item)),
+            items: state.items.map(item => (item.id === employee.id ? (employee as unknown as typeof item) : item)),
           }))
         },
         onDelete: async (employee: Employee) => {

@@ -46,7 +46,7 @@ export function CreateChannelDialog({
   }, [isOpen, employees.length])
 
   // 當前 workspace 的員工
-  const workspaceEmployees = employees.filter(emp => emp.workspace_id === user?.workspace_id)
+  const workspaceEmployees = employees.filter(emp => (emp as unknown as { workspace_id?: string }).workspace_id === user?.workspace_id)
 
   // 切換成員選擇
   const toggleMember = (employeeId: string) => {

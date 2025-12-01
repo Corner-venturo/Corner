@@ -50,7 +50,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
   } = params
 
   const renderActions = useCallback(
-    (tour: Tour) => {
+    (row: unknown) => {
+      const tour = row as Tour
       const tourQuote = quotes.find(q => q.tour_id === tour.id)
       const hasQuote = !!tourQuote
 

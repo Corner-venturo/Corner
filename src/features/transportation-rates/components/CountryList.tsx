@@ -42,23 +42,27 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
       key: 'country',
       label: '國家',
       sortable: true,
-      render: (_value, row: CountryGroup) => (
-        <div
-          className="flex items-center cursor-pointer hover:text-morandi-gold transition-colors"
-          onClick={() => onOpenCountry(row.country, false)}
-        >
-          <Bus size={18} className="mr-3 text-morandi-gold" />
-          <span className="font-medium text-morandi-primary text-base">{row.country}</span>
-        </div>
-      ),
+      render: (_value, rowData) => {
+        const row = rowData as CountryGroup
+        return (
+          <div
+            className="flex items-center cursor-pointer hover:text-morandi-gold transition-colors"
+            onClick={() => onOpenCountry(row.country, false)}
+          >
+            <Bus size={18} className="mr-3 text-morandi-gold" />
+            <span className="font-medium text-morandi-primary text-base">{row.country}</span>
+          </div>
+        )
+      },
     },
     {
       key: 'count',
       label: '車資筆數',
       sortable: true,
-      render: (_value, row: CountryGroup) => (
-        <span className="text-morandi-secondary text-sm">{row.count} 筆</span>
-      ),
+      render: (_value, rowData) => {
+        const row = rowData as CountryGroup
+        return <span className="text-morandi-secondary text-sm">{row.count} 筆</span>
+      },
     },
   ]
 
@@ -69,21 +73,27 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
       data={countryGroups}
       loading={loading}
       emptyMessage="尚無車資資料"
-      onRowClick={(row: CountryGroup) => onOpenCountry(row.country, false)}
-      actions={(row: CountryGroup) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation()
-            onOpenCountry(row.country, true)
-          }}
-          className="h-8 w-8 p-0 text-morandi-blue hover:bg-morandi-blue/10"
-          title="編輯車資"
-        >
-          <Edit2 size={16} />
-        </Button>
-      )}
+      onRowClick={(rowData) => {
+        const row = rowData as CountryGroup
+        onOpenCountry(row.country, false)
+      }}
+      actions={(rowData) => {
+        const row = rowData as CountryGroup
+        return (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenCountry(row.country, true)
+            }}
+            className="h-8 w-8 p-0 text-morandi-blue hover:bg-morandi-blue/10"
+            title="編輯車資"
+          >
+            <Edit2 size={16} />
+          </Button>
+        )
+      }}
     />
   )
 }

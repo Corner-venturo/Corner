@@ -58,6 +58,8 @@ export interface ChannelGroup {
   name: string
   is_collapsed: boolean | null
   order: number | null
+  is_system?: boolean | null
+  system_type?: string | null
   created_at: string | null
   updated_at?: string | null
   _deleted?: boolean | null

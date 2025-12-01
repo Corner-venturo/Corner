@@ -48,7 +48,7 @@ interface UseRealtimeSubscriptionReturn {
  * }
  * ```
  */
-export function useRealtimeSubscription<T = unknown>(
+export function useRealtimeSubscription<T extends Record<string, unknown> = Record<string, unknown>>(
   options: UseRealtimeSubscriptionOptions<T>
 ): UseRealtimeSubscriptionReturn {
   const { enabled = true, ...config } = options
@@ -126,10 +126,11 @@ export function useRealtimeSubscription<T = unknown>(
  * }
  * ```
  */
-export function useMultipleRealtimeSubscriptions<T = unknown>(
+export function useMultipleRealtimeSubscriptions<T extends Record<string, unknown> = Record<string, unknown>>(
   subscriptions: UseRealtimeSubscriptionOptions<T>[]
 ): UseRealtimeSubscriptionReturn[] {
-  const results = subscriptions.map(config => useRealtimeSubscription(config))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const results = subscriptions.map(config => useRealtimeSubscription(config as any))
 
   return results
 }

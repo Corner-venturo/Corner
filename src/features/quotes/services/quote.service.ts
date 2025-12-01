@@ -99,7 +99,7 @@ class QuoteService extends BaseService<Quote> {
 
     return await store.update(id, {
       version: (current.version || 1) + 1,
-      versions: [...(current.versions || []), newVersion],
+      versions: [...(current.versions || []), newVersion] as any,
       ...updates,
     })
   }

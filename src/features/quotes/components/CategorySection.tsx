@@ -71,7 +71,7 @@ interface CategorySectionProps {
     categoryId: string,
     itemId: string,
     field: keyof CostItem,
-    value: string | number | boolean
+    value: unknown
   ) => void
   handleRemoveItem: (categoryId: string, itemId: string) => void
 }
@@ -108,7 +108,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       return
     }
 
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('transportation_rates')
       .select('country_name')
       .eq('is_active', true)
@@ -128,7 +128,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     setSelectedCountry(countryName)
     setLoading(true)
 
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('transportation_rates')
       .select('*')
       .eq('country_name', countryName)
@@ -147,7 +147,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   const refreshRates = async () => {
     if (!selectedCountry) return
 
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('transportation_rates')
       .select('*')
       .eq('country_name', selectedCountry)

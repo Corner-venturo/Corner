@@ -8,7 +8,7 @@
  */
 
 import type { BaseEntity } from '@/types'
-import type { StoreConfig, CreateInput } from '../core/types'
+import type { StoreConfig, CreateInput, CodeConfig } from '../core/types'
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
 import { SupabaseAdapter } from '../adapters/supabase-adapter'
 import { SyncCoordinator } from '../sync/coordinator'
@@ -180,16 +180,14 @@ export async function create<T extends BaseEntity>(
       if (!existingCode || (typeof existingCode === 'string' && existingCode.trim() === '')) {
         // 🔥 修正：從 IndexedDB 讀取所有資料以生成編號（避免重複）
         const allItemsFromDB = await indexedDB.getAll()
-        interface ItemWithDeleted extends BaseEntity {
+        interface ItemWithDeleted {
           _deleted?: boolean
           workspace_id?: string
         }
-        const itemsForCodeGeneration = allItemsFromDB.filter(
-          (item): item is ItemWithDeleted => {
-            const itemWithMeta = item as ItemWithDeleted
-            return !itemWithMeta._deleted && itemWithMeta.workspace_id === workspaceId
-          }
-        )
+        const itemsForCodeGeneration = allItemsFromDB.filter(item => {
+          const itemWithMeta = item as unknown as ItemWithDeleted
+          return !itemWithMeta._deleted && itemWithMeta.workspace_id === workspaceId
+        })
 
         // 延遲取得 workspace code（避免循環依賴）
         const workspaceCode = await getWorkspaceCodeLazy()

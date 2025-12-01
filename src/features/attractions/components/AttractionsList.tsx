@@ -155,12 +155,14 @@ export function AttractionsList({
 
   return (
     <EnhancedTable
-      columns={columns}
+      columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
       data={sortedAttractions}
       loading={loading}
-      onRowClick={onEdit}
+      onRowClick={onEdit as (row: unknown) => void}
       initialPageSize={20}
-      actions={(attraction: Attraction) => (
+      actions={(row: unknown) => {
+        const attraction = row as Attraction
+        return (
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -202,7 +204,7 @@ export function AttractionsList({
             <Trash2 size={14} />
           </Button>
         </div>
-      )}
+      )}}
     />
   )
 }

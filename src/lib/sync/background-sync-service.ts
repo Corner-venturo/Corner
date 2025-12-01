@@ -95,7 +95,9 @@ export class BackgroundSyncService {
           const { code, _needs_sync, _synced_at, _deleted, ...itemData } = item
 
           // 上傳到 Supabase（會自動生成正式編號）
-          const { data: supabaseData, error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: supabaseData, error } = await (supabase as any)
+            .from(tableName)
             .insert([itemData])
             .select()
             .single()
@@ -221,14 +223,17 @@ export class BackgroundSyncService {
           }
 
           // 檢查是否已存在（update）或新建（insert）
-          const { data: existing } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: existing } = await (supabase as any)
+            .from(tableName)
             .select('id')
             .eq('id', item.id)
             .maybeSingle() // ✅ 使用 maybeSingle() 避免 406 錯誤
 
           if (existing) {
             // 更新
-            const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>).update(syncData).eq('id', item.id)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any).from(tableName).update(syncData).eq('id', item.id)
 
             if (error) throw error
             logger.log(`✅ [${tableName}] 更新成功: ${item.id}`)
@@ -249,7 +254,8 @@ export class BackgroundSyncService {
             }
 
             // 真的是新資料，執行插入
-            const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>).insert([syncData])
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any).from(tableName).insert([syncData])
 
             if (error) throw error
             logger.log(`✅ [${tableName}] 新增成功: ${item.id}`)
@@ -314,7 +320,8 @@ export class BackgroundSyncService {
       for (const queueItem of pendingDeletes) {
         try {
           // 從 Supabase 刪除
-          const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from<Record<string, unknown>>>).delete().eq('id', queueItem.record_id)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (supabase as any).from(tableName).delete().eq('id', queueItem.record_id)
 
           // 刪除成功或資料已不存在，清除隊列記錄
           await localDB.delete(TABLES.SYNC_QUEUE, queueItem.id)

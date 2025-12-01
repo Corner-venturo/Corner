@@ -8,7 +8,18 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tour, Payment } from '@/stores/types'
 import { useOrderStore, usePaymentRequestStore, useSupplierStore } from '@/stores'
-import type { PaymentRequest, PaymentRequestItem } from '@/stores/types'
+import type { PaymentRequestItem } from '@/stores/types'
+
+// 擴展 PaymentRequest 型別以包含 items
+interface PaymentRequestWithItems {
+  id: string
+  tour_id?: string | null
+  order_id?: string | null
+  status: string
+  created_at?: string | null
+  items?: PaymentRequestItem[]
+  [key: string]: unknown
+}
 import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { generateUUID } from '@/lib/utils/uuid'
@@ -91,7 +102,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
         updated_at: new Date().toISOString(),
       }
 
-      await createPaymentRequest(paymentRequestData as unknown as PaymentRequest)
+      await createPaymentRequest(paymentRequestData as unknown as Parameters<typeof createPaymentRequest>[0])
       await fetchPaymentRequests()
 
       toast({
@@ -143,7 +154,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   const costPayments = React.useMemo(() => {
     const tourOrderIds = new Set(tourOrders.map(o => o.id))
 
-    return paymentRequests
+    return (paymentRequests as unknown as PaymentRequestWithItems[])
       .filter(request => {
         // 如果有 orderFilter，只顯示該訂單的請款
         if (orderFilter) {

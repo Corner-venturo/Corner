@@ -100,7 +100,7 @@ export function useEventOperations() {
         allDay: info.event.allDay,
         backgroundColor: info.event.backgroundColor || '',
         borderColor: info.event.borderColor || '',
-        extendedProps: info.event.extendedProps,
+        extendedProps: info.event.extendedProps as unknown as FullCalendarEvent['extendedProps'],
       }
       setEventDetailDialog({
         open: true,

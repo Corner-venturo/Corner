@@ -222,7 +222,7 @@ export function TourExpandedView({
         )}
         {activeTabs[tour.id] === 'members' && <TourMembers tour={tour} />}
         {activeTabs[tour.id] === 'operations' && (
-          <TourOperations tour={tour} extraFields={tourExtraFields[tour.id]} />
+          <TourOperations tour={tour} extraFields={tourExtraFields[tour.id] as any} />
         )}
         {activeTabs[tour.id] === 'addons' && (
           <TourAddOns

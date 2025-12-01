@@ -38,7 +38,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
   const netProfit = grossProfit - grossProfit * 0.05
 
   // Budget vs actual expenses
-  const paymentRequests = paymentStore.payment_requests
+  const paymentRequests = paymentStore.payment_requests as Array<{ tour_id?: string; items?: Array<{ category: string; unit_price?: number; quantity?: number }> }>
   const tourPaymentRequests = paymentRequests.filter(req => req?.tour_id === tour.id)
   const quoteBudget = tourQuote?.categories || []
 

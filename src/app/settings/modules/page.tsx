@@ -86,7 +86,7 @@ export default function ModulesManagementPage() {
     loadWorkspaces()
   }, [])
 
-  const currentWorkspace = workspaces.find((w: Workspace) => w.id === user?.workspace_id)
+  const currentWorkspace = workspaces.find(w => w.id === user?.workspace_id)
 
   const getModuleStatus = (moduleName: ModuleName) => {
     const module = modules.find(

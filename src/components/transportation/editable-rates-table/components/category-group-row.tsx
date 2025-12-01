@@ -34,7 +34,8 @@ interface CategoryGroupRowProps {
   setIsAdding: (isAdding: boolean) => void
   setNewRow: (row: Partial<TransportationRate>) => void
   handleItemDragEnd: (categoryKey: string, event: DragEndEvent) => Promise<void>
-  sensors: SensorDescriptor<unknown>[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sensors: SensorDescriptor<any>[]
 }
 
 export function CategoryGroupRow({
@@ -98,7 +99,7 @@ export function CategoryGroupRow({
       isBackup={rate.is_backup || false}
       categoryDragRef={index === 0 ? setNodeRef : undefined}
       categoryDragStyle={index === 0 ? style : undefined}
-      categoryDragAttributes={index === 0 ? attributes : undefined}
+      categoryDragAttributes={index === 0 ? attributes as unknown as Record<string, unknown> : undefined}
       categoryDragListeners={index === 0 ? listeners : undefined}
     />
   ))

@@ -131,7 +131,9 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
           note: item.note || null,
           created_by: user.id,
           updated_by: user.id,
-        })
+          deleted_at: null,
+          check_date: null,
+        } as Parameters<typeof receiptStore.create>[0])
       }
 
       toast({

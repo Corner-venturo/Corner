@@ -54,7 +54,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     ]
 
     useEffect(() => {
-      const existingMembers: EditingMember[] = orderMembers.map(member => ({ ...member }))
+      const existingMembers: EditingMember[] = orderMembers.map(member => ({ ...member })) as unknown as EditingMember[]
 
       // 確保至少有member_count行
       while (existingMembers.length < member_count) {
@@ -71,7 +71,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           add_ons: [],
           refunds: [],
           isNew: true,
-        })
+        } as unknown as EditingMember)
       }
 
       setTableMembers(existingMembers)
@@ -82,7 +82,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       async (member: EditingMember, index: number) => {
         if (member.isNew && member.name?.trim()) {
           const { isNew, ...memberData } = member
-          const created = await memberStore.create(memberData as Omit<Member, 'id' | 'created_at' | 'updated_at'>)
+          const created = await memberStore.create(memberData as unknown as Parameters<typeof memberStore.create>[0])
           const newId = created?.id
 
           const updatedMembers = [...tableMembers]
@@ -134,7 +134,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
     // 新增行
     const addRow = () => {
-      const newMember: EditingMember = {
+      const newMember = {
         order_id,
         name: '',
         name_en: '',
@@ -147,7 +147,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         add_ons: [],
         refunds: [],
         isNew: true,
-      }
+      } as unknown as EditingMember
       setTableMembers([...tableMembers, newMember])
     }
 

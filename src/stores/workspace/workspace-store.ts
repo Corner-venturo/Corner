@@ -20,7 +20,6 @@ type WorkspaceEntity = Workspace & BaseEntity
  */
 export const useWorkspaceStoreData = createStore<WorkspaceEntity>({
   tableName: 'workspaces',
-  enableRealtime: true,
 })
 
 /**

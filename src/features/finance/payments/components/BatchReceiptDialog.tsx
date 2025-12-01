@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useOrderStore, useReceiptOrderStore } from '@/stores'
-import { OrderAllocation, ReceiptPaymentItem } from '@/stores/types'
+import { OrderAllocation, ReceiptPaymentItem, PaymentMethod } from '@/stores/types'
 import { Plus, Trash2, DollarSign, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -205,7 +205,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         status: '已收款',
         note,
         created_by: '1',
-      })
+      } as unknown as Parameters<typeof createReceiptOrder>[0])
 
       alert('✅ 批量收款單建立成功')
       onOpenChange(false)

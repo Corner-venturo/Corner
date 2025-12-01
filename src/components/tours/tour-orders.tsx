@@ -16,7 +16,7 @@ export function TourOrders({ tour }: TourOrdersProps) {
   return (
     <div className="space-y-6">
       <ExpandableOrderTable
-        orders={tourOrders}
+        orders={tourOrders as Parameters<typeof ExpandableOrderTable>[0]['orders']}
         showTourInfo={false}
         tourDepartureDate={tour.departure_date}
       />

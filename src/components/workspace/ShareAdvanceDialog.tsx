@@ -46,7 +46,7 @@ export function ShareAdvanceDialog({
   // 篩選活躍員工
   const activeEmployees = useMemo(() => {
     return employees.filter(emp => {
-      const empWithMeta = emp as Employee & { _deleted?: boolean }
+      const empWithMeta = emp as unknown as Employee & { _deleted?: boolean }
       const notDeleted = !empWithMeta._deleted
       const isActive = empWithMeta.status === 'active'
       return notDeleted && isActive

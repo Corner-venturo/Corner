@@ -111,7 +111,7 @@ export default function AttractionsTab({
       ...formData,
       tags: formData.tags ? formData.tags.split(',').map((t: string) => t.trim()) : [],
       images: formData.images ? formData.images.split(',').map((i: string) => i.trim()) : [],
-    })
+    } as unknown as Parameters<typeof updateAttraction>[1])
 
     if (result) {
       closeEdit()

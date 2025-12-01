@@ -62,7 +62,7 @@ export function EnhancedTable({
   const getRowId = (row: RowData, index: number): string => {
     if (selection?.getRowId) return selection.getRowId(row, index)
     if (expandable?.getRowId) return expandable.getRowId(row, index)
-    return (row.id as string) || (row._id as string) || index.toString()
+    return ((row as Record<string, unknown>).id as string) || ((row as Record<string, unknown>)._id as string) || index.toString()
   }
 
   const isRowSelected = (row: RowData, index: number): boolean => {

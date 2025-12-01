@@ -91,7 +91,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         profit: 0,
       }
 
-      const createdTour = await tourStore.create(tourData)
+      const createdTour = await tourStore.create(tourData as unknown as Parameters<typeof tourStore.create>[0])
 
       // 如果有填寫聯絡人，同時建立訂單
       if (newOrder.contact_person.trim()) {
@@ -109,7 +109,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           payment_status: 'unpaid' as const,
         }
 
-        await orderStore.create(orderData)
+        await orderStore.create(orderData as unknown as Parameters<typeof orderStore.create>[0])
       }
 
       // 重置表單

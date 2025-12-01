@@ -43,11 +43,11 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
               <div
                 key={widget.id}
                 className="flex items-center space-x-3 p-4 rounded-xl border border-morandi-gold/20 bg-white hover:border-morandi-gold cursor-pointer transition-all shadow-sm"
-                onClick={() => onToggleWidget(widget.id)}
+                onClick={() => onToggleWidget(widget.id as WidgetType)}
               >
                 <Checkbox
-                  checked={activeWidgets.includes(widget.id)}
-                  onCheckedChange={() => onToggleWidget(widget.id)}
+                  checked={activeWidgets.includes(widget.id as WidgetType)}
+                  onCheckedChange={() => onToggleWidget(widget.id as WidgetType)}
                 />
                 <div className="flex items-center gap-3 flex-1">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center shadow-sm">

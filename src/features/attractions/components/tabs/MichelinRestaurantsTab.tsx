@@ -74,7 +74,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             .select('*')
             .in('id', countryIds)
             .then(({ data }) => {
-              if (data) setCountries(data)
+              if (data) setCountries(data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined })))
             })
         }
 
@@ -84,7 +84,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             .select('*')
             .in('id', cityIds)
             .then(({ data }) => {
-              if (data) setCities(data)
+              if (data) setCities(data.map(c => ({ id: c.id, name: c.name })))
             })
         }
       }
@@ -296,12 +296,14 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       <div className="h-full flex flex-col">
         <div className="flex-1 overflow-auto">
           <EnhancedTable
-            columns={columns}
+            columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
             data={filteredRestaurants}
             loading={loading}
             initialPageSize={20}
-            onRowClick={handleEdit}
-            actions={(restaurant: MichelinRestaurant) => (
+            onRowClick={handleEdit as (row: unknown) => void}
+            actions={(row: unknown) => {
+              const restaurant = row as MichelinRestaurant
+              return (
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
@@ -343,7 +345,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   <Trash2 size={14} />
                 </Button>
               </div>
-            )}
+            )}}
           />
         </div>
       </div>

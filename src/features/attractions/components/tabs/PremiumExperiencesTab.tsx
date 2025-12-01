@@ -68,7 +68,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         .order('name')
 
       if (error) throw error
-      setExperiences((data as PremiumExperience[]) || [])
+      setExperiences((data as unknown as PremiumExperience[]) || [])
 
       // 載入用到的國家和城市資料
       if (data && data.length > 0) {
@@ -81,7 +81,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             .select('*')
             .in('id', countryIds)
             .then(({ data }) => {
-              if (data) setCountries(data)
+              if (data) setCountries(data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined })))
             })
         }
 
@@ -91,7 +91,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             .select('*')
             .in('id', cityIds)
             .then(({ data }) => {
-              if (data) setCities(data)
+              if (data) setCities(data.map(c => ({ id: c.id, name: c.name })))
             })
         }
       }
@@ -135,7 +135,8 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
     if (!editingExperience) return
 
     try {
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('premium_experiences')
         .update(updatedData)
         .eq('id', editingExperience.id)
@@ -382,12 +383,14 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       <div className="h-full flex flex-col">
         <div className="flex-1 overflow-auto">
           <EnhancedTable
-            columns={columns}
+            columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
             data={filteredExperiences}
             loading={loading}
             initialPageSize={20}
-            onRowClick={handleEdit}
-            actions={(experience: PremiumExperience) => (
+            onRowClick={handleEdit as (row: unknown) => void}
+            actions={(row: unknown) => {
+              const experience = row as PremiumExperience
+              return (
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
@@ -429,7 +432,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                   <Trash2 size={14} />
                 </Button>
               </div>
-            )}
+            )}}
           />
         </div>
       </div>

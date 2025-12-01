@@ -163,7 +163,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
             remaining_amount: totalAmount,
           }
 
-          addOrder(orderData)
+          addOrder(orderData as Parameters<typeof addOrder>[0])
         }
 
         // If created from quote, update quote's tourId

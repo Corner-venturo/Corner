@@ -40,6 +40,7 @@ type StatusType =
   | 'visa'
   | 'esim'
   | 'voucher'
+  | 'receipt'
 
 /**
  * 所有狀態配置的中央存儲
@@ -359,6 +360,33 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       icon: XCircle,
       bgColor: 'bg-morandi-red/10',
       borderColor: 'border-morandi-red',
+    },
+    default: {
+      color: 'text-morandi-secondary',
+      label: '未知',
+      icon: AlertCircle,
+    },
+  },
+
+  // 收據狀態
+  receipt: {
+    pending: {
+      color: 'text-morandi-gold',
+      label: '待確認',
+      icon: Clock,
+      bgColor: 'bg-morandi-gold/10',
+    },
+    confirmed: {
+      color: 'text-morandi-green',
+      label: '已確認',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+    },
+    cancelled: {
+      color: 'text-morandi-red',
+      label: '已取消',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
     },
     default: {
       color: 'text-morandi-secondary',

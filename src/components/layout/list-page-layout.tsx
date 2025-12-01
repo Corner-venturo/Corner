@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { ResponsiveHeader } from './responsive-header'
-import { EnhancedTable, TableColumn } from '../ui/enhanced-table'
+import { EnhancedTable, TableColumn, RowData } from '../ui/enhanced-table'
 import { useDataFiltering } from '@/hooks'
 import type { LucideIcon } from 'lucide-react'
 
@@ -197,14 +197,14 @@ export function ListPageLayout<T extends Record<string, any>>({
             columns={columns as TableColumn[]}
             data={filteredData}
             loading={loading}
-            onRowClick={onRowClick}
-            actions={renderActions}
+            onRowClick={onRowClick as ((row: RowData, rowIndex?: number) => void) | undefined}
+            actions={renderActions as ((row: RowData) => React.ReactNode) | undefined}
             expandable={
               renderExpanded && expandedRows && onToggleExpand
                 ? {
                     expanded: expandedRows,
                     onExpand: onToggleExpand,
-                    renderExpanded,
+                    renderExpanded: renderExpanded as (row: RowData) => React.ReactNode,
                   }
                 : undefined
             }

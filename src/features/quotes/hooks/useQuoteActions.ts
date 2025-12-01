@@ -7,11 +7,13 @@ import { logger } from '@/lib/utils/logger'
 import { CostCategory, ParticipantCounts, SellingPrices, VersionRecord } from '../types'
 import { useTourStore } from '@/stores'
 import type { Quote, Tour } from '@/stores/types'
+import type { CreateInput } from '@/stores/core/types'
 
 interface UseQuoteActionsProps {
-  quote: Quote | null
+  quote: Quote | null | undefined
   updateQuote: (id: string, data: Partial<Quote>) => void
-  addTour: (data: Partial<Tour>) => Promise<Tour | undefined>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addTour: (data: any) => Promise<Tour | undefined>
   router: ReturnType<typeof useRouter>
   updatedCategories: CostCategory[]
   total_cost: number
@@ -103,7 +105,7 @@ export const useQuoteActions = ({
 
       try {
         const baseUpdate = {
-          categories: updatedCategories,
+          categories: updatedCategories as any,
           total_cost,
           group_size: groupSize,
           name: quoteName,
@@ -116,7 +118,7 @@ export const useQuoteActions = ({
 
         // 如果正在編輯某個版本，更新該版本
         if (currentEditingVersion !== null && existingVersions.length > 0) {
-          const updatedVersions = [...existingVersions]
+          const updatedVersions = [...existingVersions] as any[]
           updatedVersions[currentEditingVersion] = {
             ...updatedVersions[currentEditingVersion],
             categories: updatedCategories,
@@ -149,7 +151,7 @@ export const useQuoteActions = ({
 
           updateQuote(quote.id, {
             ...baseUpdate,
-            versions: [firstVersion],
+            versions: [firstVersion] as any,
           })
         } else {
           // 有版本記錄但沒有編輯特定版本，只更新主資料
@@ -184,8 +186,8 @@ export const useQuoteActions = ({
 
       try {
         // 計算新的版本號（取得版本歷史中的最大版本號 + 1）
-        const existingVersions = quote.versions || []
-        const maxVersion = existingVersions.reduce((max: number, v: VersionRecord) =>
+        const existingVersions = (quote.versions || []) as any[]
+        const maxVersion = existingVersions.reduce((max: number, v: any) =>
           Math.max(max, v.version || 0), 0
         )
         const newVersion = maxVersion + 1
@@ -207,14 +209,14 @@ export const useQuoteActions = ({
         // 更新報價單：將新版本加入版本歷史
         const newVersions = [...existingVersions, newVersionRecord]
         updateQuote(quote.id, {
-          categories: updatedCategories,
+          categories: updatedCategories as any,
           total_cost,
           group_size: groupSize,
           name: quoteName,
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          versions: newVersions,
+          versions: newVersions as any,
         })
 
         // 自動切換到新創建的版本（新版本的索引是 length - 1）
@@ -261,8 +263,8 @@ export const useQuoteActions = ({
     if (!quote) return
 
     // 先保存當前版本為新版本
-    const existingVersions = quote.versions || []
-    const maxVersion = existingVersions.reduce((max: number, v: VersionRecord) =>
+    const existingVersions = (quote.versions || []) as any[]
+    const maxVersion = existingVersions.reduce((max: number, v: any) =>
       Math.max(max, v.version || 0), 0
     )
     const newVersion = maxVersion + 1
@@ -283,14 +285,14 @@ export const useQuoteActions = ({
     // 更新狀態為最終版本
     updateQuote(quote.id, {
       status: 'approved',
-      categories: updatedCategories,
+      categories: updatedCategories as any,
       total_cost,
       group_size: groupSize,
       name: quoteName,
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices,
-      versions: [...existingVersions, finalizeVersionRecord],
+      versions: [...existingVersions, finalizeVersionRecord] as any,
     })
 
     // 自動跳轉到旅遊團新增頁面，並帶上報價單ID
@@ -313,8 +315,8 @@ export const useQuoteActions = ({
     if (!quote) return
 
     // 先保存目前的報價單狀態為新版本
-    const existingVersions = quote.versions || []
-    const maxVersion = existingVersions.reduce((max: number, v: VersionRecord) =>
+    const existingVersions = (quote.versions || []) as any[]
+    const maxVersion = existingVersions.reduce((max: number, v: any) =>
       Math.max(max, v.version || 0), 0
     )
     const newVersion = maxVersion + 1
@@ -335,7 +337,7 @@ export const useQuoteActions = ({
     // 更新報價單狀態為最終版本
     updateQuote(quote.id, {
       status: 'approved',
-      versions: [...existingVersions, createTourVersionRecord],
+      versions: [...existingVersions, createTourVersionRecord] as any,
     })
 
     // 創建旅遊團

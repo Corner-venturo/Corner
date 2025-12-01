@@ -143,7 +143,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('tours')
         .update({
           closing_status: 'open',

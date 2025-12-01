@@ -62,6 +62,8 @@ export function CreatePaymentRequestDialog({
 
     try {
       const paymentRequest = await createPaymentRequest({
+        code: '',
+        request_number: '',
         tour_id: selectedTourId,
         request_type: category || '員工代墊',
         amount: totalAmount,
@@ -70,7 +72,7 @@ export function CreatePaymentRequestDialog({
         note: itemsArray.map((item, i) =>
           `${i + 1}. ${item.name} - ${item.description} ($${item.amount.toLocaleString()})`
         ).join('\n'),
-      })
+      } as Parameters<typeof createPaymentRequest>[0])
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {

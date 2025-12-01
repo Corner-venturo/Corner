@@ -131,7 +131,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       enabled_quick_actions: [],
     }
 
-    addTodo(newTodo)
+    addTodo(newTodo as unknown as Parameters<typeof addTodo>[0])
 
     // 重置表單
     setTaskForm({
@@ -404,7 +404,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
 
         {tourTasks.length > 0 ? (
           <EnhancedTable
-            columns={taskColumns}
+            columns={taskColumns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
             data={tourTasks}
             initialPageSize={10}
             showFilters={false}

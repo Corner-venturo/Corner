@@ -41,7 +41,8 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'quote_number',
         label: '編號',
         sortable: true,
-        render: (value, quote) => {
+        render: (value, row) => {
+          const quote = row as Quote
           let displayCode = '-'
           let codeColor = 'text-morandi-secondary'
 
@@ -80,7 +81,8 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'name',
         label: '團體名稱',
         sortable: true,
-        render: (value, quote) => {
+        render: (value, row) => {
+          const quote = row as Quote
           // 快速報價單顯示 customer_name，團體報價單顯示 name
           const displayName = quote.quote_type === 'quick' ? quote.customer_name : quote.name
           return (
@@ -92,7 +94,8 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'quote_type',
         label: '類型',
         sortable: true,
-        render: (value, quote) => {
+        render: (value, row) => {
+          const quote = row as Quote
           const isQuick = quote.quote_type === 'quick'
           return (
             <span
@@ -112,32 +115,39 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'created_by_name',
         label: '作者',
         sortable: true,
-        render: (value, quote) => (
-          <span className="text-sm text-morandi-secondary">
-            {quote.created_by_name || quote.handler_name || '-'}
-          </span>
-        ),
+        render: (value, row) => {
+          const quote = row as Quote
+          return (
+            <span className="text-sm text-morandi-secondary">
+              {(quote as any).created_by_name || quote.handler_name || '-'}
+            </span>
+          )
+        },
       },
       {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (value, quote) => (
-          <span
-            className={cn(
-              'text-sm font-medium',
-              STATUS_COLORS[quote.status || ''] || 'text-morandi-secondary'
-            )}
-          >
-            {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] || quote.status}
-          </span>
-        ),
+        render: (value, row) => {
+          const quote = row as Quote
+          return (
+            <span
+              className={cn(
+                'text-sm font-medium',
+                STATUS_COLORS[quote.status || ''] || 'text-morandi-secondary'
+              )}
+            >
+              {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] || quote.status}
+            </span>
+          )
+        },
       },
       {
         key: 'group_size',
         label: '人數',
         sortable: true,
-        render: (value, quote) => {
+        render: (value, row) => {
+          const quote = row as Quote
           // 快速報價單不顯示人數，顯示 -
           if (quote.quote_type === 'quick') {
             return <span className="text-sm text-morandi-secondary">-</span>
@@ -154,21 +164,27 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         key: 'total_cost',
         label: '總成本',
         sortable: true,
-        render: (value, quote) => (
-          <span className="text-sm text-morandi-secondary">
-            NT$ {quote.total_cost?.toLocaleString() || 0}
-          </span>
-        ),
+        render: (value, row) => {
+          const quote = row as Quote
+          return (
+            <span className="text-sm text-morandi-secondary">
+              NT$ {quote.total_cost?.toLocaleString() || 0}
+            </span>
+          )
+        },
       },
       {
         key: 'created_at',
         label: '建立時間',
         sortable: true,
-        render: (value, quote) => (
-          <span className="text-sm text-morandi-secondary">
-            {new Date(quote.created_at).toLocaleDateString()}
-          </span>
-        ),
+        render: (value, row) => {
+          const quote = row as Quote
+          return (
+            <span className="text-sm text-morandi-secondary">
+              {new Date(quote.created_at).toLocaleDateString()}
+            </span>
+          )
+        },
       },
     ],
     [tours, quotes]
@@ -180,69 +196,72 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       data={quotes}
       searchableFields={['name']}
       searchTerm={searchTerm}
-      onRowClick={quote => onQuoteClick(quote.id)}
+      onRowClick={row => onQuoteClick((row as Quote).id)}
       bordered={true}
-      actions={quote => (
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => onTogglePin(quote.id, quote.is_pinned || false, e)}
-            className={cn(
-              quote.is_pinned
-                ? 'text-morandi-gold hover:bg-morandi-gold/10'
-                : 'text-morandi-secondary hover:bg-morandi-secondary/10'
-            )}
-            title={quote.is_pinned ? '取消置頂' : '設為置頂範本'}
-          >
-            <Pin size={16} />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => onPreview(quote.id, e)}
-            className="text-morandi-green hover:bg-morandi-green/10"
-            title="預覽報價單"
-          >
-            <Eye size={16} />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => {
-              e.stopPropagation()
-              onQuoteClick(quote.id)
-            }}
-            className="text-morandi-gold hover:bg-morandi-gold/10"
-            title="編輯報價單"
-          >
-            <Calculator size={16} />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => onDuplicate(quote.id, e)}
-            className="text-morandi-blue hover:bg-morandi-blue/10"
-            title="複製報價單"
-          >
-            <Copy size={16} />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => onDelete(quote.id, e)}
-            className="text-morandi-red hover:bg-morandi-red/10"
-            title="刪除報價單"
-          >
-            <Trash2 size={16} />
-          </Button>
-        </div>
-      )}
+      actions={row => {
+        const quote = row as Quote
+        return (
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => onTogglePin(quote.id, quote.is_pinned || false, e)}
+              className={cn(
+                quote.is_pinned
+                  ? 'text-morandi-gold hover:bg-morandi-gold/10'
+                  : 'text-morandi-secondary hover:bg-morandi-secondary/10'
+              )}
+              title={quote.is_pinned ? '取消置頂' : '設為置頂範本'}
+            >
+              <Pin size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => onPreview(quote.id, e)}
+              className="text-morandi-green hover:bg-morandi-green/10"
+              title="預覽報價單"
+            >
+              <Eye size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => {
+                e.stopPropagation()
+                onQuoteClick(quote.id)
+              }}
+              className="text-morandi-gold hover:bg-morandi-gold/10"
+              title="編輯報價單"
+            >
+              <Calculator size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => onDuplicate(quote.id, e)}
+              className="text-morandi-blue hover:bg-morandi-blue/10"
+              title="複製報價單"
+            >
+              <Copy size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => onDelete(quote.id, e)}
+              className="text-morandi-red hover:bg-morandi-red/10"
+              title="刪除報價單"
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        )
+      }}
     />
   )
 }

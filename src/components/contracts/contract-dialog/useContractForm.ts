@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Tour, ContractTemplate } from '@/types/tour.types'
+import { Order, Member } from '@/types/order.types'
 import { useTourStore, useOrderStore, useMemberStore, useItineraryStore } from '@/stores'
 import { prepareContractData, ContractData } from '@/lib/contract-utils'
 
@@ -63,13 +64,13 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             // 如果 contract_content 不是 JSON,就重新準備資料
             if (selectedOrder) {
               const firstMember = selectedOrderMembers[0]
-              const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary)
+              const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as Member, itinerary)
               setContractData(autoData)
             }
           }
         } else if (selectedOrder) {
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary)
+          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as Member, itinerary)
           setContractData(autoData)
         }
       } else {
@@ -82,7 +83,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         if (selectedOrder) {
           // 有訂單資料，自動帶入
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder, firstMember, itinerary)
+          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as Member, itinerary)
           setContractData(autoData)
         } else {
           // 沒有訂單資料，初始化空白欄位

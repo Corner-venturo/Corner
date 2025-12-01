@@ -33,7 +33,8 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         key: 'departure_date',
         label: '出發日期',
         sortable: true,
-        render: (value, tour) => {
+        render: (value, row) => {
+          const tour = row as Tour
           if (!tour.departure_date) return <span className="text-sm text-morandi-red">未設定</span>
           const date = new Date(tour.departure_date)
           return (
@@ -47,7 +48,8 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         key: 'return_date',
         label: '回程日期',
         sortable: true,
-        render: (value, tour) => {
+        render: (value, row) => {
+          const tour = row as Tour
           if (!tour.return_date) return <span className="text-sm text-morandi-secondary">-</span>
           const date = new Date(tour.return_date)
           return (
@@ -60,7 +62,8 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
       {
         key: 'participants',
         label: '人數',
-        render: (value, tour) => {
+        render: (value, row) => {
+          const tour = row as Tour
           const tourOrders = orders.filter(order => order.tour_id === tour.id)
           // 計算預計人數：訂單的 member_count 加總
           const plannedCount = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
@@ -71,11 +74,15 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (value, tour) => (
-          <span className={cn('text-sm font-medium', getStatusColor(tour.status))}>
-            {tour.status}
-          </span>
-        ),
+        render: (value, row) => {
+          const tour = row as Tour
+          const status = tour.status || ''
+          return (
+            <span className={cn('text-sm font-medium', getStatusColor(status))}>
+              {status}
+            </span>
+          )
+        },
       },
     ],
     [orders, getStatusColor]

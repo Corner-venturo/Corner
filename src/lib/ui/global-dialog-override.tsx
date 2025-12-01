@@ -42,7 +42,7 @@ export function GlobalDialogOverride() {
     // 提示開發者使用自訂 confirm
     const originalConfirmFunc = window.confirm.bind(window)
     window.confirm = (message?: unknown): boolean => {
-      return originalConfirmFunc(message)
+      return originalConfirmFunc(String(message ?? ''))
     }
 
     // 在組件卸載時恢復原始函數（雖然不太可能發生）

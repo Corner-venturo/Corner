@@ -2,7 +2,10 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { supabase as supabaseClient } from '@/lib/supabase/client'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabase = supabaseClient as any
 import { Tour } from '@/types/tour.types'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -158,7 +161,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       if (ordersError) throw ordersError
 
-      const orderIds = orders?.map(o => o.id) || []
+      const orderIds = orders?.map((o: { id: string }) => o.id) || []
 
       if (orderIds.length === 0) {
         setMembers([])
@@ -175,7 +178,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
       if (membersError) throw membersError
 
-      setMembers((membersData || []) as OrderMember[])
+      setMembers((membersData || []) as unknown as OrderMember[])
 
       // 3. 載入已建立的動態欄位
       await loadCustomFields()
@@ -520,7 +523,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
           </div>
           <TourHandoverPrint
             tour={tour}
-            members={members}
+            members={members as unknown as Parameters<typeof TourHandoverPrint>[0]['members']}
             customFields={customFields}
             fieldValues={fieldValues}
           />

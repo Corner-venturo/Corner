@@ -37,7 +37,7 @@ export function useRequestOperations() {
         budget_warning: false,
         request_type: 'standard',
         amount: 0,
-      })
+      } as Parameters<typeof createPaymentRequest>[0])
 
       // Add all items sequentially
       for (let i = 0; i < items.length; i++) {
@@ -98,7 +98,7 @@ export function useRequestOperations() {
           budget_warning: false,
           request_type: 'standard',
           amount: 0,
-        })
+        } as Parameters<typeof createPaymentRequest>[0])
 
         // Add all items with adjusted amounts
         for (let i = 0; i < items.length; i++) {

@@ -26,13 +26,14 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const tableColumns: TableColumn[] = useMemo(
+  const tableColumns = useMemo(
     () => [
       {
         key: 'type',
         label: '類型',
         sortable: true,
-        render: (value, conf: Confirmation) => {
+        render: (_: unknown, row: unknown) => {
+          const conf = row as Confirmation
           const typeConfig = {
             flight: { label: '航班', icon: '✈️', colorClass: 'text-purple-600' },
             accommodation: { label: '住宿', icon: '🏨', colorClass: 'text-orange-600' },
@@ -50,25 +51,30 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
         key: 'booking_number',
         label: '訂單編號',
         sortable: true,
-        render: (value, conf: Confirmation) => (
-          <span className="text-sm font-mono text-morandi-primary">{conf.booking_number}</span>
-        ),
+        render: (_: unknown, row: unknown) => {
+          const conf = row as Confirmation
+          return <span className="text-sm font-mono text-morandi-primary">{conf.booking_number}</span>
+        },
       },
       {
         key: 'confirmation_number',
         label: '確認單號碼',
         sortable: true,
-        render: (value, conf: Confirmation) => (
-          <span className="text-sm font-mono text-morandi-secondary">
-            {conf.confirmation_number || '-'}
-          </span>
-        ),
+        render: (_: unknown, row: unknown) => {
+          const conf = row as Confirmation
+          return (
+            <span className="text-sm font-mono text-morandi-secondary">
+              {conf.confirmation_number || '-'}
+            </span>
+          )
+        },
       },
       {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (value, conf: Confirmation) => {
+        render: (_: unknown, row: unknown) => {
+          const conf = row as Confirmation
           const statusConfig = {
             draft: { label: '草稿', colorClass: 'text-morandi-secondary' },
             confirmed: { label: '已確認', colorClass: 'text-blue-600' },
@@ -85,21 +91,27 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
         key: 'notes',
         label: '備註',
         sortable: false,
-        render: (value, conf: Confirmation) => (
-          <span className="text-sm text-morandi-secondary truncate max-w-xs">
-            {conf.notes || '-'}
-          </span>
-        ),
+        render: (_: unknown, row: unknown) => {
+          const conf = row as Confirmation
+          return (
+            <span className="text-sm text-morandi-secondary truncate max-w-xs">
+              {conf.notes || '-'}
+            </span>
+          )
+        },
       },
       {
         key: 'created_at',
         label: '建立時間',
         sortable: true,
-        render: (value, conf: Confirmation) => (
-          <span className="text-sm text-morandi-secondary">
-            {new Date(conf.created_at).toLocaleDateString('zh-TW')}
-          </span>
-        ),
+        render: (_: unknown, row: unknown) => {
+          const conf = row as Confirmation
+          return (
+            <span className="text-sm text-morandi-secondary">
+              {new Date(conf.created_at).toLocaleDateString('zh-TW')}
+            </span>
+          )
+        },
       },
     ],
     []
@@ -108,13 +120,15 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
   return (
     <EnhancedTable
       className="min-h-full"
-      columns={tableColumns}
+      columns={tableColumns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
       data={confirmations}
       searchableFields={['booking_number', 'confirmation_number']}
       searchTerm={searchTerm}
-      onRowClick={conf => onConfirmationClick(conf.id)}
+      onRowClick={(row: unknown) => onConfirmationClick((row as Confirmation).id)}
       bordered={true}
-      actions={(conf: Confirmation) => (
+      actions={(row: unknown) => {
+        const conf = row as Confirmation
+        return (
         <div className="flex items-center gap-1">
           <Button
             type="button"
@@ -143,7 +157,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
             <Trash2 size={16} />
           </Button>
         </div>
-      )}
+      )}}
     />
   )
 }

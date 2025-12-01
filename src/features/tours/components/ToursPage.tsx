@@ -304,16 +304,16 @@ export const ToursPage: React.FC = () => {
 
   // Use tour operations hook
   const operations = useTourOperations({
-    actions,
+    actions: actions as any,
     addOrder,
-    updateQuote,
+    updateQuote: updateQuote as any,
     availableCities,
     resetForm,
     closeDialog,
     setSubmitting,
     setFormError,
     dialogType: dialog.type || 'create',
-    dialogData: dialog.data,
+    dialogData: dialog.data as any,
   })
 
   const handleAddTour = useCallback(() => {
@@ -331,7 +331,8 @@ export const ToursPage: React.FC = () => {
   )
 
   const handleRowClick = useCallback(
-    (tour: Tour) => {
+    (row: unknown) => {
+      const tour = row as Tour
       setSelectedTour(tour)
       router.push(`/tours/${tour.id}`)
     },
@@ -344,9 +345,9 @@ export const ToursPage: React.FC = () => {
   }, [operations, deleteConfirm.tour, setDeleteConfirm])
 
   // Use extracted hooks for table columns, channel operations, and action buttons
-  const columns = useTourTableColumns({ orders, getStatusColor })
+  const columns = useTourTableColumns({ orders: orders as any, getStatusColor })
 
-  const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions })
+  const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions: actions as any })
 
   const { renderActions } = useTourActionButtons({
     quotes,
@@ -361,25 +362,26 @@ export const ToursPage: React.FC = () => {
   })
 
   const renderExpanded = useCallback(
-    (tour: Tour) => (
+    (row: unknown) => {
+      const tour = row as Tour
+      return (
       <TourExpandedView
         tour={tour}
-        orders={orders}
+        orders={orders as any}
         activeTabs={activeTabs}
         setActiveTab={setActiveTab}
         openDialog={openDialog}
-        tourExtraFields={tourExtraFields}
-        setTourExtraFields={setTourExtraFields}
+        tourExtraFields={tourExtraFields as any}
+        setTourExtraFields={setTourExtraFields as any}
         triggerAddOnAdd={triggerAddOnAdd}
         setTriggerAddOnAdd={setTriggerAddOnAdd}
-        triggerRefundAdd={triggerRefundAdd}
-        setTriggerRefundAdd={setTriggerRefundAdd}
         triggerPaymentAdd={triggerPaymentAdd}
         setTriggerPaymentAdd={setTriggerPaymentAdd}
         triggerCostAdd={triggerCostAdd}
         setTriggerCostAdd={setTriggerCostAdd}
       />
-    ),
+      )
+    },
     [
       orders,
       activeTabs,

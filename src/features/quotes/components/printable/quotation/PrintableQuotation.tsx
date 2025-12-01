@@ -140,9 +140,9 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                 <td>
                   <QuotationInfo
                     quoteName={quoteName}
-                    quoteCode={quote?.code}
+                    quoteCode={quote?.code ?? undefined}
                     totalParticipants={totalParticipants}
-                    validUntil={quote?.valid_until}
+                    validUntil={quote?.valid_until ?? undefined}
                     tierLabel={tierLabel}
                   />
                   <QuotationPricingTable
@@ -150,7 +150,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
                     tierPricings={tierPricings}
                   />
                   <QuotationInclusions />
-                  <QuotationTerms validUntil={quote?.valid_until} />
+                  <QuotationTerms validUntil={quote?.valid_until ?? undefined} />
                 </td>
               </tr>
             </tbody>
@@ -161,14 +161,14 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
             <PrintHeader logoUrl={logoUrl} title="旅遊報價單" subtitle="QUOTATION" />
             <QuotationInfo
               quoteName={quoteName}
-              quoteCode={quote?.code}
+              quoteCode={quote?.code ?? undefined}
               totalParticipants={totalParticipants}
-              validUntil={quote?.valid_until}
+              validUntil={quote?.valid_until ?? undefined}
               tierLabel={tierLabel}
             />
             <QuotationPricingTable sellingPrices={sellingPrices} tierPricings={tierPricings} />
             <QuotationInclusions />
-            <QuotationTerms validUntil={quote?.valid_until} />
+            <QuotationTerms validUntil={quote?.valid_until ?? undefined} />
 
             <div className="text-center mt-8 pt-4">
               <PrintFooter />

@@ -22,8 +22,8 @@ interface QuoteWithVersions extends Omit<Quote, 'versions'> {
 interface QuoteHeaderProps {
   isSpecialTour: boolean
   isReadOnly: boolean
-  relatedTour: Tour | null
-  quote: QuoteWithVersions | null
+  relatedTour: Tour | null | undefined
+  quote: QuoteWithVersions | null | undefined
   quoteName: string
   setQuoteName: (name: string) => void
   participantCounts: ParticipantCounts

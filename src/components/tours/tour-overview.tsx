@@ -37,7 +37,7 @@ export const TourOverview = React.memo(function TourOverview({
     ? [
         {
           title: '訂單金額',
-          value: `NT$ ${order.total_amount.toLocaleString()}`,
+          value: `NT$ ${(order.total_amount ?? 0).toLocaleString()}`,
           icon: DollarSign,
           color: 'text-morandi-gold',
         },
@@ -54,19 +54,19 @@ export const TourOverview = React.memo(function TourOverview({
         },
         {
           title: '已付金額',
-          value: `NT$ ${order.paid_amount.toLocaleString()}`,
+          value: `NT$ ${(order.paid_amount ?? 0).toLocaleString()}`,
           icon: TrendingUp,
           color: 'text-morandi-green',
         },
         {
           title: '未付金額',
-          value: `NT$ ${order.remaining_amount.toLocaleString()}`,
+          value: `NT$ ${(order.remaining_amount ?? 0).toLocaleString()}`,
           icon: TrendingUp,
           color: 'text-morandi-red',
         },
         {
           title: '訂單人數',
-          value: `${order.member_count} 人`,
+          value: `${order.member_count ?? 0} 人`,
           icon: Users,
           color: 'text-morandi-gold',
         },

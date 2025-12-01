@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plane, Search, Calendar, AlertCircle } from 'lucide-react'
-import { formatSegment } from '@/lib/pnr-parser'
+import { formatSegment, FlightSegment } from '@/lib/pnr-parser'
 
 export default function PNRsPage() {
   const { items: pnrs, fetchAll, loading } = usePNRStore()
@@ -105,7 +105,7 @@ export default function PNRsPage() {
                 <div className="space-y-2">
                   <h4 className="text-xs font-medium text-morandi-secondary">航班資訊</h4>
                   <div className="space-y-1">
-                    {pnr.segments.map((seg: unknown, idx: number) => (
+                    {pnr.segments.map((seg: FlightSegment, idx: number) => (
                       <div
                         key={idx}
                         className="flex items-center gap-2 text-sm text-morandi-primary bg-morandi-container/10 px-3 py-2 rounded-lg"

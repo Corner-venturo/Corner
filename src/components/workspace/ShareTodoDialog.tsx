@@ -82,8 +82,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
         channel_id: channelId,
         author_id: user.id,
         content: message,
-        reactions: {},
-      })
+      } as Parameters<typeof sendMessage>[0])
 
       onSuccess()
     } catch (error) {

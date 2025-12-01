@@ -29,7 +29,7 @@ interface User {
 
 interface OrderForReceipt {
   id: string
-  order_number: string
+  order_number: string | null
   contact_person: string
   total_amount: number
   paid_amount: number

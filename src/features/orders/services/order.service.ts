@@ -14,8 +14,8 @@ class OrderService extends BaseService<Order & BaseEntity> {
       getById: (id: string) => store.items.find(o => o.id === id) as (Order & BaseEntity) | undefined,
       add: async (order: Order & BaseEntity) => {
         const { id, created_at, updated_at, ...createData } = order
-        const result = await store.create(createData)
-        return result
+        const result = await store.create(createData as Parameters<typeof store.create>[0])
+        return result as Order & BaseEntity
       },
       update: async (id: string, data: Partial<Order>) => {
         await store.update(id, data)
@@ -40,17 +40,17 @@ class OrderService extends BaseService<Order & BaseEntity> {
 
   getOrdersByTour(tour_id: string): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter(o => o.tour_id === tour_id)
+    return store.items.filter(o => o.tour_id === tour_id) as Order[]
   }
 
   getOrdersByStatus(status: PaymentStatus): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter(o => o.payment_status === status)
+    return store.items.filter(o => o.payment_status === status) as Order[]
   }
 
   getOrdersByCustomer(customer_id: string): Order[] {
     const store = useOrderStore.getState()
-    return store.items.filter(o => o.customer_id === customer_id)
+    return store.items.filter(o => o.customer_id === customer_id) as Order[]
   }
 
   calculateTotalRevenue(): number {
