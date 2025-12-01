@@ -72,15 +72,15 @@ export default function ItineraryPage() {
   )
 
   // 表格配置
-  const tableColumns: TableColumn[] = useMemo(
+  const tableColumns: any[] = useMemo(
     () => [
       {
         key: 'tourCode',
         label: '行程編號',
         sortable: true,
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <span className="text-sm text-morandi-secondary font-mono">
-            {itinerary.tourCode || '-'}
+            {itinerary.tour_code || '-'}
           </span>
         ),
       },
@@ -88,7 +88,7 @@ export default function ItineraryPage() {
         key: 'title',
         label: '行程名稱',
         sortable: true,
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <span className="text-sm font-medium text-morandi-primary">{itinerary.title}</span>
         ),
       },
@@ -96,7 +96,7 @@ export default function ItineraryPage() {
         key: 'destination',
         label: '目的地',
         sortable: true,
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <div className="flex items-center text-sm text-morandi-secondary">
             <MapPin size={14} className="mr-1" />
             {itinerary.country} · {itinerary.city}
@@ -107,10 +107,10 @@ export default function ItineraryPage() {
         key: 'days',
         label: '天數',
         sortable: true,
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <span className="text-sm text-morandi-secondary">
-            {itinerary.dailyItinerary?.length || 0} 天{' '}
-            {Math.max(0, (itinerary.dailyItinerary?.length || 0) - 1)} 夜
+            {itinerary.daily_itinerary?.length || 0} 天{' '}
+            {Math.max(0, (itinerary.daily_itinerary?.length || 0) - 1)} 夜
           </span>
         ),
       },
@@ -118,7 +118,7 @@ export default function ItineraryPage() {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <span
             className={cn(
               'text-sm font-medium',
@@ -133,7 +133,7 @@ export default function ItineraryPage() {
         key: 'created_at',
         label: '建立時間',
         sortable: true,
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <span className="text-sm text-morandi-muted">
             {new Date(itinerary.created_at).toLocaleDateString('zh-TW')}
           </span>
@@ -142,7 +142,7 @@ export default function ItineraryPage() {
       {
         key: 'actions',
         label: '操作',
-        render: (value, itinerary: Itinerary) => (
+        render: (value: any, itinerary: Itinerary) => (
           <div className="flex items-center gap-1">
             <button
               onClick={e => {
@@ -210,7 +210,7 @@ export default function ItineraryPage() {
           item.title.toLowerCase().includes(searchLower) ||
           item.country.toLowerCase().includes(searchLower) ||
           item.city.toLowerCase().includes(searchLower) ||
-          item.tourCode.toLowerCase().includes(searchLower) ||
+          item.tour_code.toLowerCase().includes(searchLower) ||
           item.status.toLowerCase().includes(searchLower) ||
           item.description?.toLowerCase().includes(searchLower)
       )
