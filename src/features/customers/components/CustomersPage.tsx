@@ -94,17 +94,15 @@ export function CustomersPage() {
     <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="客戶管理"
-        description="管理所有客戶資料"
         tabs={STATUS_TABS.map(tab => ({
-          key: tab.key,
-          label: tab.label,
-          count: tabStats[tab.key as keyof typeof tabStats],
+          value: tab.key,
+          label: `${tab.label} (${tabStats[tab.key as keyof typeof tabStats]})`,
           icon: tab.icon,
         }))}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        searchPlaceholder="搜尋客戶姓名、編號、電話..."
-        searchValue={searchQuery}
+        showSearch={true}
+        searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
         actions={
           <Button onClick={handleAdd}>
