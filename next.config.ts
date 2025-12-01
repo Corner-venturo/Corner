@@ -1,27 +1,27 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // ✅ 啟用圖片優化（Next.js 15 內建優化）
   images: {
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+
   eslint: {
-    // Phase 1: 暫時忽略 ESLint 錯誤讓 build 成功
-    // 已修正所有 TypeScript 類型錯誤，剩餘為 import/order 和 quotes 規範問題
+    // 暫時忽略 ESLint 錯誤（主要是 import/order 和 quotes）
     ignoreDuringBuilds: true,
   },
+
   typescript: {
-    ignoreBuildErrors: true, // 暫時停用以讓建置通過，待修正所有型別問題後再啟用
+    // 暫時停用以讓建置通過，待修正所有型別問題後再啟用
+    ignoreBuildErrors: true,
   },
-  // 停用所有自動靜態優化（修復 Html 組件錯誤）
-  onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: 5,
-  },
+
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
-    isrFlushToDisk: false,
     // 優化常用套件的 tree-shaking
     optimizePackageImports: [
       'lucide-react',
@@ -42,18 +42,13 @@ const nextConfig: NextConfig = {
       'framer-motion',
     ],
   },
-  // 跳過預渲染錯誤頁面以避免 Html 組件錯誤
-  skipMiddlewareUrlNormalize: true,
+
   // 允許 ngrok 等開發工具的跨域請求
   allowedDevOrigins: ['frisky-masonic-mellissa.ngrok-free.dev'],
-  // 禁用靜態生成以避免 Html 組件錯誤
-  generateBuildId: async () => {
-    return 'build-' + Date.now()
-  },
-  // 跳過靜態頁面優化
-  skipTrailingSlashRedirect: true,
-  // 完全停用靜態生成以修復建置錯誤
+
+  // ✅ 啟用 standalone 輸出模式（適合 Docker/Vercel 部署）
   output: 'standalone',
+
   // 修復 WebSocket HMR 連接問題
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {

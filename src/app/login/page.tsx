@@ -88,7 +88,9 @@ export default function LoginPage() {
         console.log('🔄 [Login] 準備跳轉到:', redirectPath)
 
         // 🔧 使用 window.location 強制跳轉（避免 Next.js router 問題）
-        window.location.href = redirectPath
+        if (typeof window !== 'undefined') {
+          window.location.href = redirectPath
+        }
       } else {
         setError('切換角色失敗，請使用密碼登入')
         setShowProfileCards(false)
