@@ -27,8 +27,8 @@ export default function TransportationRatesPage() {
   // 載入車資資料
   const fetchRates = async () => {
     setLoading(true)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from as any)('transportation_rates')
+    const { data, error } = await supabase
+      .from('transportation_rates')
       .select('*')
       .order('category')
       .order('supplier')

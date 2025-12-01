@@ -38,11 +38,20 @@ export interface Customer extends BaseEntity {
   total_orders?: number // 總訂單數（統計用）
   total_spent?: number // 總消費金額（統計用）
   last_order_date?: string // 最後訂單日期（統計用）
+  verification_status: VerificationStatus // 人工驗證狀態
 }
 
 // ============================================
 // 客戶分類
 // ============================================
+
+/**
+ * VerificationStatus - 人工驗證狀態
+ */
+export type VerificationStatus =
+  | 'verified' // 已驗證
+  | 'unverified' // 待驗證
+  | 'rejected' // 已拒絕
 
 /**
  * VipLevel - VIP 等級
@@ -98,6 +107,7 @@ export interface CreateCustomerData {
   referred_by?: string
   notes?: string
   is_active: boolean
+  verification_status?: VerificationStatus
 }
 
 /**
@@ -126,6 +136,7 @@ export interface UpdateCustomerData {
   referred_by?: string
   notes?: string
   is_active?: boolean
+  verification_status?: VerificationStatus
 }
 
 // ============================================
@@ -143,6 +154,7 @@ export interface CustomerFilter {
   country?: string
   is_active?: boolean
   search_term?: string // 搜尋客戶編號、姓名、電話、Email
+  verification_status?: VerificationStatus | VerificationStatus[]
 }
 
 /**

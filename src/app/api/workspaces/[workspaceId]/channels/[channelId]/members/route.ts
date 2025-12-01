@@ -19,8 +19,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const supabase = getSupabaseAdminClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from as any)('channel_members')
+    const { data, error } = await supabase.from('channel_members')
       .select(
         `
           id,
@@ -121,8 +120,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     // 只插入新成員
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from as any)('channel_members').insert(newMembers).select()
+    const { data, error } = await supabase.from('channel_members').insert(newMembers).select()
 
     if (error) {
       logger.error('Failed to add channel members:', error)
@@ -151,8 +149,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const supabase = getSupabaseAdminClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from as any)('channel_members')
+    const { error } = await supabase
+      .from('channel_members')
       .delete()
       .eq('workspace_id', workspaceId)
       .eq('channel_id', channelId)

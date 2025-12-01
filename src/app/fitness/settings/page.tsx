@@ -24,16 +24,15 @@ export default function FitnessSettingsPage() {
       )
     ) {
       try {
-        // 清除健身相關的 IndexedDB 資料表
-        // 根據健身模組可能使用的表格，這裡列出常見的健身資料表
-        // 如果有其他健身相關表格，可在此添加
-        // 使用 try-catch 避免表格不存在時報錯
-        try {
-          await localDB.clear('fitness_records' as any)
-        } catch (error) {
-          // 表格不存在或其他錯誤，忽略
-          console.warn('清除健身資料時發生錯誤:', error)
-        }
+        // 清除健身相關的 localStorage 資料
+        // 健身模組目前使用 localStorage 儲存資料，未來可能會改用 IndexedDB
+        const fitnessKeys = Object.keys(localStorage).filter(key =>
+          key.startsWith('fitness_') || key.startsWith('workout_')
+        )
+
+        fitnessKeys.forEach(key => {
+          localStorage.removeItem(key)
+        })
 
         alert('本地資料已清除')
         router.push('/fitness')
