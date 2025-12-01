@@ -6196,6 +6196,365 @@ export type Database = {
           },
         ]
       }
+      usa_esta: {
+        Row: {
+          applicant_name_zh: string
+          application_code: string
+          application_number: string | null
+          birth_city: string | null
+          birth_country: string | null
+          cbp_membership_number: string | null
+          company_address_en: string | null
+          company_address_zh: string | null
+          company_name_en: string | null
+          company_name_zh: string | null
+          company_phone: string | null
+          contact_address_en: string | null
+          contact_address_zh: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          customer_id: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          emergency_contact_country_code: string | null
+          emergency_contact_email: string | null
+          emergency_contact_firstname_en: string | null
+          emergency_contact_firstname_zh: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_surname_en: string | null
+          emergency_contact_surname_zh: string | null
+          employment_status: string | null
+          esta_validity_end: string | null
+          esta_validity_start: string | null
+          father_firstname_en: string | null
+          father_firstname_zh: string | null
+          father_surname_en: string | null
+          father_surname_zh: string | null
+          had_citizenship_acquired_date: string | null
+          had_citizenship_renounced_date: string | null
+          had_other_citizenship: boolean | null
+          had_other_citizenship_country: string | null
+          has_other_citizenship: boolean | null
+          has_other_names: boolean | null
+          has_other_passport_or_id: boolean | null
+          id: string
+          is_cbp_global_entry_member: boolean | null
+          is_transit_to_another_country: boolean | null
+          job_title_en: string | null
+          job_title_zh: string | null
+          mother_firstname_en: string | null
+          mother_firstname_zh: string | null
+          mother_surname_en: string | null
+          mother_surname_zh: string | null
+          no_social_media: boolean | null
+          order_id: string | null
+          other_citizenship_country: string | null
+          other_citizenship_method: string | null
+          other_citizenship_method_detail: string | null
+          other_document_country: string | null
+          other_document_expiry_year: number | null
+          other_document_number: string | null
+          other_document_type: string | null
+          other_name_firstname_en: string | null
+          other_name_firstname_zh: string | null
+          other_name_surname_en: string | null
+          other_name_surname_zh: string | null
+          passport_validity_over_2_years: boolean
+          provides_social_media: boolean | null
+          q1_has_health_issues: boolean | null
+          q2_has_criminal_record: boolean | null
+          q3_has_drug_violation: boolean | null
+          q4_involved_in_terrorism: boolean | null
+          q5_committed_fraud: boolean | null
+          q6_illegal_employment: boolean | null
+          q7_denied_when: string | null
+          q7_denied_where: string | null
+          q7_visa_denied: boolean | null
+          q8_overstayed: boolean | null
+          q9_countries_visited: string[] | null
+          q9_visit_end_month: number | null
+          q9_visit_end_year: number | null
+          q9_visit_purpose: string | null
+          q9_visit_purpose_detail: string | null
+          q9_visit_start_month: number | null
+          q9_visit_start_year: number | null
+          q9_visited_restricted_countries: boolean | null
+          social_media_id_1: string | null
+          social_media_id_2: string | null
+          social_media_platform_1: string | null
+          social_media_platform_2: string | null
+          status: string | null
+          tour_id: string | null
+          transit_destination_country: string | null
+          updated_at: string | null
+          updated_by: string | null
+          us_contact_address_en: string | null
+          us_contact_city_en: string | null
+          us_contact_name_en: string | null
+          us_contact_phone: string | null
+          us_contact_state_en: string | null
+          us_stay_address_en: string | null
+          us_stay_city_en: string | null
+          us_stay_state_en: string | null
+          workspace_id: string
+        }
+        Insert: {
+          applicant_name_zh: string
+          application_code: string
+          application_number?: string | null
+          birth_city?: string | null
+          birth_country?: string | null
+          cbp_membership_number?: string | null
+          company_address_en?: string | null
+          company_address_zh?: string | null
+          company_name_en?: string | null
+          company_name_zh?: string | null
+          company_phone?: string | null
+          contact_address_en?: string | null
+          contact_address_zh?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          emergency_contact_country_code?: string | null
+          emergency_contact_email?: string | null
+          emergency_contact_firstname_en?: string | null
+          emergency_contact_firstname_zh?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_surname_en?: string | null
+          emergency_contact_surname_zh?: string | null
+          employment_status?: string | null
+          esta_validity_end?: string | null
+          esta_validity_start?: string | null
+          father_firstname_en?: string | null
+          father_firstname_zh?: string | null
+          father_surname_en?: string | null
+          father_surname_zh?: string | null
+          had_citizenship_acquired_date?: string | null
+          had_citizenship_renounced_date?: string | null
+          had_other_citizenship?: boolean | null
+          had_other_citizenship_country?: string | null
+          has_other_citizenship?: boolean | null
+          has_other_names?: boolean | null
+          has_other_passport_or_id?: boolean | null
+          id?: string
+          is_cbp_global_entry_member?: boolean | null
+          is_transit_to_another_country?: boolean | null
+          job_title_en?: string | null
+          job_title_zh?: string | null
+          mother_firstname_en?: string | null
+          mother_firstname_zh?: string | null
+          mother_surname_en?: string | null
+          mother_surname_zh?: string | null
+          no_social_media?: boolean | null
+          order_id?: string | null
+          other_citizenship_country?: string | null
+          other_citizenship_method?: string | null
+          other_citizenship_method_detail?: string | null
+          other_document_country?: string | null
+          other_document_expiry_year?: number | null
+          other_document_number?: string | null
+          other_document_type?: string | null
+          other_name_firstname_en?: string | null
+          other_name_firstname_zh?: string | null
+          other_name_surname_en?: string | null
+          other_name_surname_zh?: string | null
+          passport_validity_over_2_years: boolean
+          provides_social_media?: boolean | null
+          q1_has_health_issues?: boolean | null
+          q2_has_criminal_record?: boolean | null
+          q3_has_drug_violation?: boolean | null
+          q4_involved_in_terrorism?: boolean | null
+          q5_committed_fraud?: boolean | null
+          q6_illegal_employment?: boolean | null
+          q7_denied_when?: string | null
+          q7_denied_where?: string | null
+          q7_visa_denied?: boolean | null
+          q8_overstayed?: boolean | null
+          q9_countries_visited?: string[] | null
+          q9_visit_end_month?: number | null
+          q9_visit_end_year?: number | null
+          q9_visit_purpose?: string | null
+          q9_visit_purpose_detail?: string | null
+          q9_visit_start_month?: number | null
+          q9_visit_start_year?: number | null
+          q9_visited_restricted_countries?: boolean | null
+          social_media_id_1?: string | null
+          social_media_id_2?: string | null
+          social_media_platform_1?: string | null
+          social_media_platform_2?: string | null
+          status?: string | null
+          tour_id?: string | null
+          transit_destination_country?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          us_contact_address_en?: string | null
+          us_contact_city_en?: string | null
+          us_contact_name_en?: string | null
+          us_contact_phone?: string | null
+          us_contact_state_en?: string | null
+          us_stay_address_en?: string | null
+          us_stay_city_en?: string | null
+          us_stay_state_en?: string | null
+          workspace_id: string
+        }
+        Update: {
+          applicant_name_zh?: string
+          application_code?: string
+          application_number?: string | null
+          birth_city?: string | null
+          birth_country?: string | null
+          cbp_membership_number?: string | null
+          company_address_en?: string | null
+          company_address_zh?: string | null
+          company_name_en?: string | null
+          company_name_zh?: string | null
+          company_phone?: string | null
+          contact_address_en?: string | null
+          contact_address_zh?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          emergency_contact_country_code?: string | null
+          emergency_contact_email?: string | null
+          emergency_contact_firstname_en?: string | null
+          emergency_contact_firstname_zh?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_surname_en?: string | null
+          emergency_contact_surname_zh?: string | null
+          employment_status?: string | null
+          esta_validity_end?: string | null
+          esta_validity_start?: string | null
+          father_firstname_en?: string | null
+          father_firstname_zh?: string | null
+          father_surname_en?: string | null
+          father_surname_zh?: string | null
+          had_citizenship_acquired_date?: string | null
+          had_citizenship_renounced_date?: string | null
+          had_other_citizenship?: boolean | null
+          had_other_citizenship_country?: string | null
+          has_other_citizenship?: boolean | null
+          has_other_names?: boolean | null
+          has_other_passport_or_id?: boolean | null
+          id?: string
+          is_cbp_global_entry_member?: boolean | null
+          is_transit_to_another_country?: boolean | null
+          job_title_en?: string | null
+          job_title_zh?: string | null
+          mother_firstname_en?: string | null
+          mother_firstname_zh?: string | null
+          mother_surname_en?: string | null
+          mother_surname_zh?: string | null
+          no_social_media?: boolean | null
+          order_id?: string | null
+          other_citizenship_country?: string | null
+          other_citizenship_method?: string | null
+          other_citizenship_method_detail?: string | null
+          other_document_country?: string | null
+          other_document_expiry_year?: number | null
+          other_document_number?: string | null
+          other_document_type?: string | null
+          other_name_firstname_en?: string | null
+          other_name_firstname_zh?: string | null
+          other_name_surname_en?: string | null
+          other_name_surname_zh?: string | null
+          passport_validity_over_2_years?: boolean
+          provides_social_media?: boolean | null
+          q1_has_health_issues?: boolean | null
+          q2_has_criminal_record?: boolean | null
+          q3_has_drug_violation?: boolean | null
+          q4_involved_in_terrorism?: boolean | null
+          q5_committed_fraud?: boolean | null
+          q6_illegal_employment?: boolean | null
+          q7_denied_when?: string | null
+          q7_denied_where?: string | null
+          q7_visa_denied?: boolean | null
+          q8_overstayed?: boolean | null
+          q9_countries_visited?: string[] | null
+          q9_visit_end_month?: number | null
+          q9_visit_end_year?: number | null
+          q9_visit_purpose?: string | null
+          q9_visit_purpose_detail?: string | null
+          q9_visit_start_month?: number | null
+          q9_visit_start_year?: number | null
+          q9_visited_restricted_countries?: boolean | null
+          social_media_id_1?: string | null
+          social_media_id_2?: string | null
+          social_media_platform_1?: string | null
+          social_media_platform_2?: string | null
+          status?: string | null
+          tour_id?: string | null
+          transit_destination_country?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          us_contact_address_en?: string | null
+          us_contact_city_en?: string | null
+          us_contact_name_en?: string | null
+          us_contact_phone?: string | null
+          us_contact_state_en?: string | null
+          us_stay_address_en?: string | null
+          us_stay_city_en?: string | null
+          us_stay_state_en?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usa_esta_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           created_at: string | null
