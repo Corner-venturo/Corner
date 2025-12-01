@@ -97,8 +97,11 @@ export default function TodosPage() {
         const isAssignee = todo.assignee === currentUserId
         const inVisibility = todo.visibility?.includes(currentUserId)
 
-        // 必須是建立者、被指派者或在可見列表中
-        if (!isCreator && !isAssignee && !inVisibility) {
+        // 建立者一定能看到自己的待辦（不受 visibility 限制）
+        if (isCreator) {
+          // 繼續執行後續篩選（狀態、搜尋等）
+        } else if (!isAssignee && !inVisibility) {
+          // 不是建立者，也不是被指派者，也不在可見清單中 → 過濾掉
           return false
         }
       }
@@ -342,6 +345,7 @@ export default function TodosPage() {
 
         await addTodo(newTodoData)
         setIsAddDialogOpen(false)
+        logger.log('✅ 待辦事項新增成功:', formData.title)
       } catch (error) {
         logger.error('新增待辦事項失敗:', error)
         await alertError('新增失敗，請稍後再試')
@@ -381,7 +385,6 @@ export default function TodosPage() {
                   return
                 }
                 const title = quickAddValue.trim()
-                setQuickAddValue('') // 清空受控組件的值
                 setIsSubmitting(true)
 
                 const newTodoData: CreateInput<Todo> = {
@@ -390,6 +393,7 @@ export default function TodosPage() {
                   status: 'pending',
                   completed: false,
                   creator: auth.user!.id,
+                  assignee: undefined, // 快速新增時不指派
                   visibility: [auth.user!.id],
                   related_items: [],
                   sub_tasks: [],
@@ -399,10 +403,10 @@ export default function TodosPage() {
 
                 try {
                   await addTodo(newTodoData)
-                  logger.log('✅ 待辦事項新增成功')
+                  setQuickAddValue('') // ✅ 修正：成功後才清空輸入框
+                  logger.log('✅ 待辦事項新增成功:', title)
                 } catch (error) {
                   logger.error('快速新增失敗:', error)
-                  setQuickAddValue(title) // 失敗時恢復輸入內容
                   await alertError('新增失敗，請稍後再試')
                 } finally {
                   setIsSubmitting(false)
