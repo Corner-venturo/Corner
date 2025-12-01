@@ -6,6 +6,7 @@ import { Plus, FileText, Eye } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
+import type { TableColumn } from '@/components/ui/enhanced-table/types'
 import { useVoucherStore } from '@/stores/voucher-store'
 import { useVoucherEntryStore } from '@/stores/voucher-entry-store'
 import { useAccountingSubjectStore } from '@/stores/accounting-subject-store'
@@ -35,7 +36,7 @@ export default function VouchersPage() {
   }
 
   // 表格欄位定義
-  const columns = [
+  const columns: TableColumn<Voucher>[] = [
     {
       key: 'voucher_no',
       label: '傳票編號',
@@ -123,7 +124,7 @@ export default function VouchersPage() {
         <EnhancedTable
           className="min-h-full"
           data={vouchers}
-          columns={columns}
+          columns={columns as any}
           defaultSort={{ key: 'voucher_date', direction: 'desc' }}
           searchable
           searchPlaceholder="搜尋傳票編號或摘要..."
