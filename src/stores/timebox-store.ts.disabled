@@ -114,26 +114,27 @@ export const morandiColors = [
 // 基礎 Stores（使用 createStore）
 // ============================================
 
+// ⚠️ Timebox 功能已停用（表格已從 schemas.ts 移除）
 // 箱子 Store
-export const useBoxesStore = createStore<BaseBox>(
-  TABLES.TIMEBOX_BOXES,
-  undefined,
-  true // enableSupabase
-)
+// export const useBoxesStore = createStore<BaseBox>(
+//   TABLES.TIMEBOX_BOXES,
+//   undefined,
+//   true // enableSupabase
+// )
 
 // 週記錄 Store
-export const useWeeksStore = createStore<WeekRecord>(
-  TABLES.TIMEBOX_WEEKS,
-  undefined,
-  true // enableSupabase
-)
+// export const useWeeksStore = createStore<WeekRecord>(
+//   TABLES.TIMEBOX_WEEKS,
+//   undefined,
+//   true // enableSupabase
+// )
 
 // 排程箱子 Store
-export const useScheduledBoxesStore = createStore<ScheduledBox>(
-  TABLES.TIMEBOX_SCHEDULED_BOXES,
-  undefined,
-  true // enableSupabase
-)
+// export const useScheduledBoxesStore = createStore<ScheduledBox>(
+//   TABLES.TIMEBOX_SCHEDULED_BOXES,
+//   undefined,
+//   true // enableSupabase
+// )
 
 // ============================================
 // 組合 Store（高階 API）

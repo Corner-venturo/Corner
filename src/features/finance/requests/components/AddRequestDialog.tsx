@@ -287,7 +287,58 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                   </tr>
                 </thead>
                 <tbody>
-                  {/* New Item Row */}
+                  {/* Existing Items */}
+                  {requestItems.map((item, index) => (
+                    <tr
+                      key={item.id}
+                      className={cn(
+                        'border-b border-border/40 hover:bg-morandi-container/10 transition-colors',
+                        index % 2 === 1 && 'bg-morandi-container/5'
+                      )}
+                    >
+                      <td className="py-3 px-3 w-32">
+                        <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded font-medium">
+                          {categoryOptions.find(c => c.value === item.category)?.label}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 w-64 text-sm text-morandi-primary font-medium">
+                        {item.supplierName}
+                      </td>
+                      <td className="py-3 px-3 w-28 text-sm text-morandi-secondary">
+                        {item.unit_price.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 w-24 text-sm text-morandi-secondary">{item.quantity}</td>
+                      <td className="py-3 px-3 w-28 text-sm font-bold text-morandi-gold">
+                        {(item.unit_price * item.quantity).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 w-32">
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                          {item.payment_method === 'transfer' && '轉帳'}
+                          {item.payment_method === 'cash' && '現金'}
+                          {item.payment_method === 'check' && '支票'}
+                          {!item.payment_method && '轉帳'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 w-32 text-xs text-morandi-secondary">
+                        {item.payment_method === 'check' && item.custom_request_date
+                          ? new Date(item.custom_request_date).toLocaleDateString('zh-TW')
+                          : '-'}
+                      </td>
+                      <td className="py-3 px-3 w-48 text-sm text-morandi-secondary">{item.description || '-'}</td>
+                      <td className="py-3 px-3 w-32 text-center">
+                        <Button
+                          onClick={() => removeItem(item.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {/* New Item Row - 放在最後 */}
                   <tr className="bg-morandi-gold/5 border-b-2 border-morandi-gold/30">
                     <td className="py-2 px-3 w-32">
                       <Select
@@ -418,7 +469,11 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                     </td>
                     <td className="py-2 px-3 w-32 text-center">
                       <Button
-                        onClick={addItemToList}
+                        onClick={(e) => {
+                          addItemToList()
+                          // 保持 focus 在按鈕上，方便連續按
+                          e.currentTarget.focus()
+                        }}
                         size="sm"
                         className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                       >
@@ -426,57 +481,6 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                       </Button>
                     </td>
                   </tr>
-
-                  {/* Existing Items */}
-                  {requestItems.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className={cn(
-                        'border-b border-border/40 hover:bg-morandi-container/10 transition-colors',
-                        index % 2 === 1 && 'bg-morandi-container/5'
-                      )}
-                    >
-                      <td className="py-3 px-3 w-32">
-                        <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded font-medium">
-                          {categoryOptions.find(c => c.value === item.category)?.label}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 w-64 text-sm text-morandi-primary font-medium">
-                        {item.supplierName}
-                      </td>
-                      <td className="py-3 px-3 w-28 text-sm text-morandi-secondary">
-                        {item.unit_price.toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 w-24 text-sm text-morandi-secondary">{item.quantity}</td>
-                      <td className="py-3 px-3 w-28 text-sm font-bold text-morandi-gold">
-                        {(item.unit_price * item.quantity).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 w-32">
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                          {item.payment_method === 'transfer' && '轉帳'}
-                          {item.payment_method === 'cash' && '現金'}
-                          {item.payment_method === 'check' && '支票'}
-                          {!item.payment_method && '轉帳'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 w-32 text-sm text-morandi-secondary">
-                        {item.custom_request_date && (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                            {new Date(item.custom_request_date).toLocaleDateString('zh-TW')}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 px-3 w-48 text-sm text-morandi-secondary">{item.description}</td>
-                      <td className="py-3 px-3 w-32 text-center">
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-morandi-red hover:bg-morandi-red/10 p-2 rounded-lg transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
 

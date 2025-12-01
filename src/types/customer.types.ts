@@ -25,6 +25,7 @@ export interface Customer extends BaseEntity {
   passport_number?: string // 護照號碼
   passport_romanization?: string // 護照拼音（格式：姓氏/名字，例如：WANG/XIAOMING）
   passport_expiry_date?: string // 護照效期 (ISO 8601)
+  passport_image_url?: string // 護照圖片（base64 或 URL）
   date_of_birth?: string // 出生日期 (ISO 8601)
   gender?: string // 性別
   company?: string // 公司名稱

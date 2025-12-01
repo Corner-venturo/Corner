@@ -44,6 +44,8 @@ export const useWorkspaceChannels = () => {
 
     // Actions
     loadWorkspaces: channelsStore.loadWorkspaces,
+    createWorkspace: channelsStore.createWorkspace,
+    updateWorkspace: channelsStore.updateWorkspace,
     setCurrentWorkspace: channelsStore.setCurrentWorkspace,
     loadChannels: channelsStore.loadChannels,
     createChannel: channelsStore.createChannel,

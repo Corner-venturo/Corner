@@ -64,27 +64,26 @@ export function MainLayout({ children }: MainLayoutProps) {
     return () => clearTimeout(checkTimeout)
   }, [isClient, pathname, currentProfile, router])
 
-  // 初始化離線資料庫和基礎資料
-  useEffect(() => {
-    if (!isClient) return
-
-    // 離線資料庫會在 sync-manager 中自動初始化
-
-    // 載入基礎資料（只載入全域需要的資料）
-    const loadInitialData = async () => {
-      try {
-        // 載入工作空間（全域需要）
-        const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
-        const workspaceState = useWorkspaceStoreData.getState()
-        if (workspaceState.items.length === 0) {
-          await workspaceState.fetchAll()
+      // 初始化離線資料庫和基礎資料
+      useEffect(() => {
+        if (!isClient) return
+  
+        // 離線資料庫會在 sync-manager 中自動初始化
+  
+        // 載入基礎資料（只載入全域需要的資料）
+        const loadInitialData = async () => {
+          try {
+            // 載入工作空間（全域需要）
+            const { useChannelsStore } = await import('@/stores/workspace')
+            const workspaceState = useChannelsStore.getState()
+            if (workspaceState.workspaces.length === 0) {
+              await workspaceState.loadWorkspaces()
+            }
+          } catch (_error) {}
         }
-      } catch (_error) {}
-    }
-
-    loadInitialData()
-  }, [isClient])
-
+  
+        loadInitialData()
+      }, [isClient])
   // 不需要側邊欄的頁面（支援完全匹配和前綴匹配）
   const shouldShowSidebar = !NO_SIDEBAR_PAGES.some(
     page => pathname === page || pathname.startsWith(page + '/')

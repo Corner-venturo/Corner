@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
 import { useTourStore, useOrderStore } from '@/stores'
-import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types'
 
 export const useQuoteState = () => {
@@ -11,15 +11,15 @@ export const useQuoteState = () => {
   const { quotes, updateQuote, loadQuotes } = useQuotes()
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
-  const workspaceStore = useWorkspaceStoreData()
+  const { workspaces, loadWorkspaces } = useWorkspaceChannels()
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
 
   // 自動載入 workspaces（如果還沒載入）
   useEffect(() => {
-    if (workspaceStore.items.length === 0) {
-      workspaceStore.fetchAll()
+    if (workspaces.length === 0) {
+      loadWorkspaces()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

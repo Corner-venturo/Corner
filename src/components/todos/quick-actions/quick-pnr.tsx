@@ -9,7 +9,7 @@ import { parseAmadeusPNR, formatSegment, extractImportantDates, isUrgent } from 
 import { usePNRStore } from '@/stores/pnrs-store'
 import { useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace'
 import { toast } from 'sonner'
 import type { Todo } from '@/stores/types'
 
@@ -26,7 +26,7 @@ export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
   const { create: createPNR } = usePNRStore()
   const { create: createCalendarEvent } = useCalendarEventStore()
   const { user } = useAuthStore()
-  const { currentWorkspace } = useWorkspaceStore()
+  const { currentWorkspace } = useWorkspaceChannels()
 
   // 解析電報
   const handleParse = () => {

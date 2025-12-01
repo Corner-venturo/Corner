@@ -90,9 +90,9 @@ export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 
 /**
  * 團員 Store
  * 無獨立編號，依附於訂單
- * 注意：資料庫表格名稱是 order_members
+ * 注意：資料庫表格名稱是 members（不是 order_members）
  */
-export const useMemberStore = createStore<Member>('order_members')
+export const useMemberStore = createStore<Member>('members')
 
 /**
  * 報價項目 Store
@@ -203,7 +203,8 @@ export { useAccountingStore } from './accounting-store'
 export { useCalendarStore } from './calendar-store'
 
 // 移到 hooks/use-timebox.ts
-export { useTimeboxStore } from './timebox-store'
+// ⚠️ Timebox 功能已停用（表格已從 schemas.ts 移除）
+// export { useTimeboxStore } from './timebox-store'
 
 // 已有 useWorkspaceItemStore，檢查是否重複
 export { useWorkspaceStore } from './workspace-store'

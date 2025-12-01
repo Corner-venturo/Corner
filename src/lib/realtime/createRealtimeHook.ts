@@ -5,9 +5,8 @@
 
 'use client'
 
-import { useEffect } from 'react'
-import { realtimeManager } from './realtime-manager'
 import { logger } from '@/lib/utils/logger'
+import { useRealtimeSubscription } from './hooks/useRealtimeSubscription'
 
 // Zustand store 的最小介面需求
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,61 +59,47 @@ export function createRealtimeHook<T extends { id: string }>(
   }
 
   return function useRealtimeForTable() {
-    useEffect(() => {
-      const subscriptionId = `${tableName}-realtime`
+    useRealtimeSubscription<T>({
+      table: tableName,
+      subscriptionId: `${tableName}-realtime`,
+      handlers: {
+        // 新增資料
+        onInsert: async record => {
+          logger.log(`➕ [${tableName}] Realtime INSERT:`, record)
+          await indexedDB.put(record)
 
-      logger.log(`🔄 [${tableName}] 開始訂閱 Realtime`, { subscriptionId })
-
-      realtimeManager.subscribe<T>({
-        table: tableName,
-        subscriptionId,
-        handlers: {
-          // 新增資料
-          onInsert: async record => {
-            logger.log(`➕ [${tableName}] Realtime INSERT:`, record)
-            await indexedDB.put(record)
-
-            const currentState = getStoreState()
-            const exists = currentState.items.some(item => item.id === record.id)
-            if (exists) {
-              logger.log(`⚠️ [${tableName}] 記錄已存在，跳過:`, record.id)
-              return
-            }
-            logger.log(`✅ [${tableName}] 新增到 Store`)
-            setStoreState(state => ({
-              items: [...state.items, record],
-            }))
-          },
-
-          // 更新資料
-          onUpdate: async record => {
-            logger.log(`✏️ [${tableName}] Realtime UPDATE:`, record)
-            await indexedDB.put(record)
-
-            setStoreState(state => ({
-              items: state.items.map(item => (item.id === record.id ? record : item)),
-            }))
-          },
-
-          // 刪除資料
-          onDelete: async oldRecord => {
-            logger.log(`🗑️ [${tableName}] Realtime DELETE:`, oldRecord)
-            await indexedDB.delete(oldRecord.id)
-
-            setStoreState(state => ({
-              items: state.items.filter(item => item.id !== oldRecord.id),
-            }))
-          },
+          const currentState = getStoreState()
+          const exists = currentState.items.some(item => item.id === record.id)
+          if (exists) {
+            logger.log(`⚠️ [${tableName}] 記錄已存在，跳過:`, record.id)
+            return
+          }
+          logger.log(`✅ [${tableName}] 新增到 Store`)
+          setStoreState(state => ({
+            items: [...state.items, record],
+          }))
         },
-      })
 
-      logger.log(`✅ [${tableName}] Realtime 訂閱已建立`)
+        // 更新資料
+        onUpdate: async record => {
+          logger.log(`✏️ [${tableName}] Realtime UPDATE:`, record)
+          await indexedDB.put(record)
 
-      // 清理：離開頁面時取消訂閱
-      return () => {
-        logger.log(`🛑 [${tableName}] 取消 Realtime 訂閱`)
-        realtimeManager.unsubscribe(subscriptionId)
-      }
-    }, []) // 只在組件掛載時訂閱一次
+          setStoreState(state => ({
+            items: state.items.map(item => (item.id === record.id ? record : item)),
+          }))
+        },
+
+        // 刪除資料
+        onDelete: async oldRecord => {
+          logger.log(`🗑️ [${tableName}] Realtime DELETE:`, oldRecord)
+          await indexedDB.delete(oldRecord.id)
+
+          setStoreState(state => ({
+            items: state.items.filter(item => item.id !== oldRecord.id),
+          }))
+        },
+      },
+    })
   }
 }

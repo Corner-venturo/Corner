@@ -166,6 +166,55 @@ export function generateCode(
 }
 
 /**
+ * 生成客戶編號（字母循環系統 C-A001 ~ C-Z999）
+ *
+ * @param existingCustomers - 現有客戶列表
+ * @returns 客戶編號（如 C-A001）
+ *
+ * @example
+ * generateCustomerCode(existingCustomers)
+ * // => 'C-A001', 'C-A002'...'C-A999', 'C-B001'...
+ */
+export function generateCustomerCode(existingCustomers: BaseEntity[]): string {
+  let maxLetter = ''
+  let maxNumber = 0
+
+  existingCustomers.forEach(customer => {
+    if ('code' in customer) {
+      const code = (customer as { code?: string }).code
+      // 匹配格式：C-A001, C-B999 等
+      if (code && /^C-[A-Z]\d{3}$/.test(code)) {
+        const codePart = code.substring(2) // 移除 "C-"
+        const letter = codePart[0]
+        const number = parseInt(codePart.substring(1), 10)
+
+        // 比較字母和數字
+        if (letter > maxLetter || (letter === maxLetter && number > maxNumber)) {
+          maxLetter = letter
+          maxNumber = number
+        }
+      }
+    }
+  })
+
+  // 如果沒有現有編號，從 C-A001 開始
+  if (!maxLetter) {
+    return 'C-A001'
+  }
+
+  // 計算下一個編號
+  if (maxNumber < 999) {
+    // 同字母，數字 +1
+    const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
+    return `C-${maxLetter}${nextNumber}`
+  } else {
+    // 數字已達 999，字母進位
+    const nextLetter = String.fromCharCode(maxLetter.charCodeAt(0) + 1)
+    return `C-${nextLetter}001`
+  }
+}
+
+/**
  * 生成員工編號
  *
  * @param workspaceCode - 辦公室代碼（如 TP, TC）

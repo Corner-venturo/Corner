@@ -24,8 +24,10 @@ export interface IndexSchema {
  * v4: 新增 receipts 和 linkpay_logs 表格
  * v5: 修復昨天優化後缺失的表格（channel_members, personal_canvases, rich_documents, attractions）
  * v6: 緊急修復 - 重建所有缺失的表格（包含 todos）
+ * v7: 新增 payment_request_items, companies, company_contacts, company_announcements 表格
+ * v8: 移除 timebox 相關表格（timebox_boxes, timebox_weeks, timebox_scheduled_boxes）
  */
-export const DB_VERSION = 6
+export const DB_VERSION = 8
 
 /**
  * 資料庫名稱
@@ -517,54 +519,6 @@ export const TABLE_SCHEMAS: TableSchema[] = [
     ],
   },
 
-  // 時間箱 - 箱子定義表
-  {
-    name: 'timebox_boxes',
-    keyPath: 'id',
-    autoIncrement: false,
-    indexes: [
-      { name: 'user_id', keyPath: 'user_id', unique: false },
-      { name: 'type', keyPath: 'type', unique: false },
-      { name: 'created_at', keyPath: 'created_at', unique: false },
-      { name: 'updated_at', keyPath: 'updated_at', unique: false },
-      // Offline-First 同步欄位
-      { name: 'sync_status', keyPath: 'sync_status', unique: false },
-    ],
-  },
-
-  // 時間箱 - 週記錄表
-  {
-    name: 'timebox_weeks',
-    keyPath: 'id',
-    autoIncrement: false,
-    indexes: [
-      { name: 'user_id', keyPath: 'user_id', unique: false },
-      { name: 'week_start', keyPath: 'week_start', unique: false },
-      { name: 'archived', keyPath: 'archived', unique: false },
-      { name: 'created_at', keyPath: 'created_at', unique: false },
-      { name: 'updated_at', keyPath: 'updated_at', unique: false },
-      // Offline-First 同步欄位
-      { name: 'sync_status', keyPath: 'sync_status', unique: false },
-    ],
-  },
-
-  // 時間箱 - 排程箱子實例表
-  {
-    name: 'timebox_scheduled_boxes',
-    keyPath: 'id',
-    autoIncrement: false,
-    indexes: [
-      { name: 'box_id', keyPath: 'box_id', unique: false },
-      { name: 'week_id', keyPath: 'week_id', unique: false },
-      { name: 'day_of_week', keyPath: 'day_of_week', unique: false },
-      { name: 'completed', keyPath: 'completed', unique: false },
-      { name: 'created_at', keyPath: 'created_at', unique: false },
-      { name: 'updated_at', keyPath: 'updated_at', unique: false },
-      // Offline-First 同步欄位
-      { name: 'sync_status', keyPath: 'sync_status', unique: false },
-    ],
-  },
-
   // ============================================
   // Workspace 相關表格（v2 新增）
   // ============================================
@@ -817,6 +771,80 @@ export const TABLE_SCHEMAS: TableSchema[] = [
       { name: 'sync_status', keyPath: 'sync_status', unique: false },
     ],
   },
+
+  // 請款項目（Payment Request Items）
+  {
+    name: 'payment_request_items',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'payment_request_id', keyPath: 'payment_request_id', unique: false },
+      { name: 'category', keyPath: 'category', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 企業客戶（Companies）
+  {
+    name: 'companies',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'tax_id', keyPath: 'tax_id', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 企業聯絡人（Company Contacts）
+  {
+    name: 'company_contacts',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'company_id', keyPath: 'company_id', unique: false },
+      { name: 'name', keyPath: 'name', unique: false },
+      { name: 'email', keyPath: 'email', unique: false },
+      { name: 'phone', keyPath: 'phone', unique: false },
+      { name: 'is_primary', keyPath: 'is_primary', unique: false },
+      { name: 'is_active', keyPath: 'is_active', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
+
+  // 企業公告（Company Announcements）
+  {
+    name: 'company_announcements',
+    keyPath: 'id',
+    autoIncrement: false,
+    indexes: [
+      { name: 'workspace_id', keyPath: 'workspace_id', unique: false },
+      { name: 'title', keyPath: 'title', unique: false },
+      { name: 'type', keyPath: 'type', unique: false },
+      { name: 'status', keyPath: 'status', unique: false },
+      { name: 'priority', keyPath: 'priority', unique: false },
+      { name: 'is_pinned', keyPath: 'is_pinned', unique: false },
+      { name: 'publish_date', keyPath: 'publish_date', unique: false },
+      { name: 'expire_date', keyPath: 'expire_date', unique: false },
+      { name: 'created_by', keyPath: 'created_by', unique: false },
+      { name: 'created_at', keyPath: 'created_at', unique: false },
+      { name: 'updated_at', keyPath: 'updated_at', unique: false },
+      // Offline-First 同步欄位
+      { name: 'sync_status', keyPath: 'sync_status', unique: false },
+    ],
+  },
 ]
 
 /**
@@ -833,8 +861,7 @@ export const TABLES = {
   TOURS: 'tours',
   ITINERARIES: 'itineraries',
   ORDERS: 'orders',
-  ORDER_MEMBERS: 'order_members',
-  MEMBERS: 'members', // 向後相容
+  MEMBERS: 'members', // IndexedDB 表名（Supabase 用 order_members）
   TOUR_ADDONS: 'tour_addons',
   CUSTOMERS: 'customers',
   PAYMENTS: 'payments',
@@ -862,9 +889,6 @@ export const TABLES = {
   CATEGORIES: 'categories',
   TRANSACTIONS: 'transactions',
   WORKSPACE_ITEMS: 'workspace_items',
-  TIMEBOX_BOXES: 'timebox_boxes',
-  TIMEBOX_WEEKS: 'timebox_weeks',
-  TIMEBOX_SCHEDULED_BOXES: 'timebox_scheduled_boxes',
   // Workspace 相關（v2 新增）
   WORKSPACES: 'workspaces',
   CHANNELS: 'channels',

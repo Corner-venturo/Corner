@@ -12,7 +12,7 @@ import type { StoreConfig, CreateInput, CodeConfig } from '../core/types'
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
 import { SupabaseAdapter } from '../adapters/supabase-adapter'
 import { SyncCoordinator } from '../sync/coordinator'
-import { generateCode } from '../utils/code-generator'
+import { generateCode, generateCustomerCode } from '../utils/code-generator'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
 import { useAuthStore } from '@/stores/auth-store'
@@ -124,8 +124,7 @@ export async function create<T extends BaseEntity>(
     // 某些表格不需要 workspace_id（例如：子項目表格，已透過外鍵關聯）
     const tablesWithoutWorkspaceId = [
       'quote_items',
-      'order_members',
-      'members', // ✅ 新增：團員表
+      'members', // ✅ 團員表（IndexedDB 用 members，Supabase 用 order_members）
       'payment_request_items', // ✅ 新增：請款項目
       'tour_participants',
       'itinerary_days',
@@ -189,38 +188,45 @@ export async function create<T extends BaseEntity>(
           return !itemWithMeta._deleted && itemWithMeta.workspace_id === workspaceId
         })
 
-        // 延遲取得 workspace code（避免循環依賴）
-        const workspaceCode = await getWorkspaceCodeLazy()
-        if (workspaceCode) {
-          // 🔥 傳遞 quote_type 給 generateCode（用於區分快速報價單和標準報價單）
-          const quoteType = (data as Record<string, unknown>).quote_type as string | undefined
-
-          interface QuoteData {
-            quote_type?: string
-          }
-          logger.log('🔍 [create.ts] generateCode 參數:', {
-            workspaceCode,
-            codePrefix,
-            quoteType,
-            dataQuoteType: (data as QuoteData).quote_type,
-          })
-
-          interface CodeConfig {
-            prefix: string
-            quoteType?: string
-          }
-          const code = generateCode(
-            workspaceCode,
-            { prefix: codePrefix, quoteType } as CodeConfig,
-            itemsForCodeGeneration // 🔥 使用 IndexedDB 資料
-          )
-
-          logger.log('✅ [create.ts] 生成編號:', code)
+        // 🔥 客戶編號特殊處理：使用 C-A001 格式（不需要 workspace code）
+        if (tableName === 'customers' && codePrefix === 'C') {
+          const code = generateCustomerCode(itemsForCodeGeneration)
+          logger.log('✅ [create.ts] 生成客戶編號:', code)
           recordData = { ...recordData, code } as T
         } else {
-          // 沒有 workspace code，使用傳統編號（無前綴）
-          const code = generateCode('', { prefix: codePrefix } as CodeConfig, itemsForCodeGeneration)
-          recordData = { ...recordData, code } as T
+          // 延遲取得 workspace code（避免循環依賴）
+          const workspaceCode = await getWorkspaceCodeLazy()
+          if (workspaceCode) {
+            // 🔥 傳遞 quote_type 給 generateCode（用於區分快速報價單和標準報價單）
+            const quoteType = (data as Record<string, unknown>).quote_type as string | undefined
+
+            interface QuoteData {
+              quote_type?: string
+            }
+            logger.log('🔍 [create.ts] generateCode 參數:', {
+              workspaceCode,
+              codePrefix,
+              quoteType,
+              dataQuoteType: (data as QuoteData).quote_type,
+            })
+
+            interface CodeConfig {
+              prefix: string
+              quoteType?: string
+            }
+            const code = generateCode(
+              workspaceCode,
+              { prefix: codePrefix, quoteType } as CodeConfig,
+              itemsForCodeGeneration // 🔥 使用 IndexedDB 資料
+            )
+
+            logger.log('✅ [create.ts] 生成編號:', code)
+            recordData = { ...recordData, code } as T
+          } else {
+            // 沒有 workspace code，使用傳統編號（無前綴）
+            const code = generateCode('', { prefix: codePrefix } as CodeConfig, itemsForCodeGeneration)
+            recordData = { ...recordData, code } as T
+          }
         }
       }
     }

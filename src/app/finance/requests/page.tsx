@@ -47,7 +47,6 @@ export default function RequestsPage() {
           columns={tableColumns as TableColumn[]}
           data={filteredAndSortedRequests}
           onSort={handleSort}
-          onFilter={handleFilter}
           selection={undefined}
         />
       </div>

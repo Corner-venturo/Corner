@@ -9,9 +9,17 @@ import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
 import { useChannelStore } from './channel-store'
 import { useChannelGroupStore } from './channel-group-store'
-import { useWorkspaceStoreData } from './workspace-store'
+import { createStore } from '../core/create-store'
 import type { Workspace, Channel, ChannelGroup } from './types'
+import type { BaseEntity } from '@/types'
 import { setCurrentWorkspaceFilter } from '@/lib/workspace-filter'
+
+type WorkspaceEntity = Workspace & BaseEntity
+
+// Define the workspace store locally instead of importing it
+const useWorkspaceStore = createStore<WorkspaceEntity>({
+  tableName: 'workspaces',
+})
 
 /**
  * 額外狀態 (不需要同步到 Supabase 的 UI 狀態)
@@ -74,7 +82,7 @@ export const useChannelsStore = () => {
   // 使用 createStore 的 stores
   const channelStore = useChannelStore()
   const channelGroupStore = useChannelGroupStore()
-  const workspaceStore = useWorkspaceStoreData()
+  const workspaceStore = useWorkspaceStore()
 
   // UI 狀態
   const uiStore = useChannelsUIStore()
@@ -135,6 +143,9 @@ export const useChannelsStore = () => {
         setCurrentWorkspaceFilter(workspaceId)
       }
     },
+
+    createWorkspace: workspaceStore.create,
+    updateWorkspace: workspaceStore.update,
 
     // ============================================
     // Channel 操作 (使用 createStore 的方法)

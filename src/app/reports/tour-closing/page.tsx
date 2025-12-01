@@ -114,33 +114,40 @@ export default function TourClosingReportPage() {
           let teamBonus = 0
 
           if (orderIds.length > 0) {
-            const { data: bonusRequests } = await supabase
+            const { data: bonusRequests, error: bonusError } = await supabase
               .from('payment_requests')
               .select('supplier_name, amount, notes')
               .in('order_id', orderIds)
               .eq('supplier_type', 'bonus')
 
-            bonusRequests?.forEach(bonus => {
-              // 從 notes 解析百分比（如果有）
-              const percentageMatch = bonus.notes?.match(/(\d+\.?\d*)%/)
-              const percentage = percentageMatch ? parseFloat(percentageMatch[1]) : 0
+            if (!bonusError && bonusRequests) {
+              bonusRequests.forEach(bonus => {
+                // 確保 bonus 有正確的屬性（避免存取錯誤物件）
+                if (!bonus.supplier_name || bonus.amount === undefined) {
+                  return
+                }
 
-              if (bonus.supplier_name === '業務業績') {
-                salesBonuses.push({
-                  employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
-                  percentage,
-                  amount: bonus.amount || 0,
-                })
-              } else if (bonus.supplier_name === 'OP 獎金') {
-                opBonuses.push({
-                  employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
-                  percentage,
-                  amount: bonus.amount || 0,
-                })
-              } else if (bonus.supplier_name === '團體獎金') {
-                teamBonus = bonus.amount || 0
-              }
-            })
+                // 從 notes 解析百分比（如果有）
+                const percentageMatch = bonus.notes?.match(/(\d+\.?\d*)%/)
+                const percentage = percentageMatch ? parseFloat(percentageMatch[1]) : 0
+
+                if (bonus.supplier_name === '業務業績') {
+                  salesBonuses.push({
+                    employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
+                    percentage,
+                    amount: bonus.amount || 0,
+                  })
+                } else if (bonus.supplier_name === 'OP 獎金') {
+                  opBonuses.push({
+                    employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
+                    percentage,
+                    amount: bonus.amount || 0,
+                  })
+                } else if (bonus.supplier_name === '團體獎金') {
+                  teamBonus = bonus.amount || 0
+                }
+              })
+            }
           }
 
           return {

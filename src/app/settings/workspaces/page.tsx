@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace'
 import { useEmployeeStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,7 @@ import { Plus, Building2, Users, Shield } from 'lucide-react'
  * 使用前端過濾實現資料隔離
  */
 export default function WorkspacesPage() {
-  const workspaceStore = useWorkspaceStoreData()
+  const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace } = useWorkspaceChannels()
   const employeeStore = useEmployeeStore()
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newWorkspace, setNewWorkspace] = useState({
@@ -24,7 +24,7 @@ export default function WorkspacesPage() {
 
   // 載入 workspaces 和 employees 資料
   useEffect(() => {
-    workspaceStore.fetchAll()
+    loadWorkspaces()
     employeeStore.fetchAll()
   }, [])
 
@@ -40,7 +40,7 @@ export default function WorkspacesPage() {
       return
     }
 
-    await workspaceStore.create({
+    await createWorkspace({
       name: newWorkspace.name,
       description: newWorkspace.description,
       is_active: true,
@@ -51,7 +51,7 @@ export default function WorkspacesPage() {
   }
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
-    await workspaceStore.update(id, { is_active: !currentStatus })
+    await updateWorkspace(id, { is_active: !currentStatus })
   }
 
   return (
@@ -94,7 +94,7 @@ export default function WorkspacesPage() {
 
       {/* 工作空間列表 */}
       <div className="grid gap-4 md:grid-cols-2">
-        {workspaceStore.items?.map(workspace => (
+        {workspaces?.map(workspace => (
           <Card
             key={workspace.id}
             className="border-morandi-container/30 p-6 hover:shadow-lg transition-shadow"
@@ -215,7 +215,7 @@ export default function WorkspacesPage() {
       )}
 
       {/* Empty State */}
-      {workspaceStore.items?.length === 0 && !showAddDialog && (
+      {workspaces?.length === 0 && !showAddDialog && (
         <Card className="border-dashed border-2 border-morandi-container/30 p-12 text-center">
           <Building2 size={48} className="text-morandi-muted mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-morandi-primary mb-2">尚未建立工作空間</h3>

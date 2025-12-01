@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useWorkspaceModuleStore } from '@/stores/workspace-module-store'
-import { useWorkspaceStore } from '@/stores/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace'
 import { useAuthStore } from '@/stores/auth-store'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -74,7 +74,7 @@ type ModuleName = keyof typeof MODULE_INFO
 export default function ModulesManagementPage() {
   const user = useAuthStore(state => state.user)
   const { items: modules, create, update, fetchAll } = useWorkspaceModuleStore()
-  const { workspaces, loadWorkspaces } = useWorkspaceStore()
+  const { workspaces, loadWorkspaces } = useWorkspaceChannels()
 
   const [selectedModule, setSelectedModule] = useState<ModuleName | null>(null)
   const [showEnableDialog, setShowEnableDialog] = useState(false)

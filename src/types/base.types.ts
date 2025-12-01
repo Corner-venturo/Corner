@@ -13,7 +13,7 @@
  */
 export interface BaseEntity {
   id: string
-  workspace_id?: string // 工作空間 ID（業務表格必填，系統表格選填）
+  workspace_id?: string | null // 工作空間 ID（業務表格必填，系統表格選填，Supabase 可能回傳 null）
   created_at: string | null // ISO 8601 格式（Supabase 可能回傳 null）
   updated_at: string | null // ISO 8601 格式（Supabase 可能回傳 null）
   created_by?: string | null

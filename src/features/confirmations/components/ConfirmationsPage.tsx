@@ -12,7 +12,6 @@ import { FileCheck, FileText, CheckCircle, Send, XCircle } from 'lucide-react'
 import { ConfirmationsList } from './ConfirmationsList'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useRealtimeForConfirmations } from '@/hooks/use-realtime-hooks'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 

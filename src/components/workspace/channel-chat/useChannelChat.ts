@@ -3,7 +3,7 @@ import {
   useWorkspaceChannels,
   useWorkspaceChat,
   useWorkspaceWidgets,
-} from '@/stores/workspace-store'
+} from '@/stores/workspace'
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
 import { useChatRealtime } from '@/hooks/useChatRealtime'
 import {

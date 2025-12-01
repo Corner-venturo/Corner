@@ -1,12 +1,12 @@
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Building2, Eye, Check } from 'lucide-react'
-import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace'
 import { useAuthStore } from '@/stores/auth-store'
 import { useState, useEffect } from 'react'
 
 export function WorkspaceSwitcher() {
-  const workspaceStore = useWorkspaceStoreData()
+  const { workspaces, loadWorkspaces } = useWorkspaceChannels()
   const { user } = useAuthStore()
   const [currentWorkspace, setCurrentWorkspace] = useState<string | null>(null)
 
@@ -18,12 +18,12 @@ export function WorkspaceSwitcher() {
     if (!isSuperAdmin) return
 
     // 載入 workspaces 資料
-    workspaceStore.fetchAll()
+    loadWorkspaces()
 
     // 從 localStorage 讀取當前選擇的 workspace
     const saved = localStorage.getItem('current_workspace_filter')
     setCurrentWorkspace(saved)
-  }, [isSuperAdmin])
+  }, [isSuperAdmin, loadWorkspaces])
 
   // 如果不是 super_admin，不顯示切換器
   if (!isSuperAdmin) {
@@ -69,7 +69,7 @@ export function WorkspaceSwitcher() {
         </Button>
 
         {/* 各個 workspace */}
-        {workspaceStore.items?.map(workspace => (
+        {workspaces?.map(workspace => (
           <Button
             key={workspace.id}
             variant={currentWorkspace === workspace.id ? 'default' : 'outline'}

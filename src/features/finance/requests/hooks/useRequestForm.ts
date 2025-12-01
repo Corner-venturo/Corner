@@ -114,10 +114,9 @@ export function useRequestForm() {
 
   // Add item to list
   const addItemToList = useCallback(() => {
-    if (!newItem.supplier_id || !newItem.description) return
-
+    // 允許新增空白列，不驗證必填
     const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id)
-    if (!selected) return
+    const supplierName = selected?.name || ''
 
     const itemId = Math.random().toString(36).substr(2, 9)
     setRequestItems(prev => [
@@ -125,10 +124,11 @@ export function useRequestForm() {
       {
         id: itemId,
         ...newItem,
-        supplierName: selected.name,
+        supplierName,
       },
     ])
 
+    // 清空表單，準備下一個項目
     setNewItem({
       category: '住宿',
       supplier_id: '',

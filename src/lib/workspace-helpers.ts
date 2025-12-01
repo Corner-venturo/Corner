@@ -5,7 +5,7 @@
  */
 
 import { useAuthStore } from '@/stores/auth-store'
-import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { useWorkspaceStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import { canCrossWorkspace, canManageWorkspace as canManageWorkspaceByRole, type UserRole } from './rbac-config'
 
@@ -39,7 +39,7 @@ export function getCurrentWorkspaceId(): string | null {
  */
 export function getCurrentWorkspaceCode(): string | null {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaceStore = useWorkspaceStore.getState()
   const workspaces = workspaceStore.items || []
 
   if (!user) {
@@ -127,7 +127,7 @@ export function getCurrentWorkspaceCode(): string | null {
  */
 export function getCurrentWorkspace() {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaceStore = useWorkspaceStore.getState()
   const workspaces = workspaceStore.items || []
 
   if (!user) {
@@ -222,7 +222,7 @@ export function canManageWorkspace(targetWorkspaceId: string): boolean {
  */
 export function getAvailableWorkspaces() {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaceStore = useWorkspaceStore.getState()
   const workspaces = workspaceStore.items || []
 
   if (!user) {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useOrderStore, useTourStore } from '@/stores'
 import { ArrowLeft } from 'lucide-react'
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
+import { MemberQuickAdd } from '@/components/members/member-quick-add'
 
 export default function MemberDetailPage() {
   const router = useRouter()
@@ -64,6 +65,18 @@ export default function MemberDetailPage() {
           </Button>
         </div>
       </ResponsiveHeader>
+
+      {/* 快速新增成員 */}
+      <div className="px-6">
+        <MemberQuickAdd
+          orderId={orderId}
+          departureDate={tour?.departure_date || ''}
+          onMembersAdded={() => {
+            // 重新載入表格
+            window.location.reload()
+          }}
+        />
+      </div>
 
       {/* 成員管理表格 */}
       <div className="px-6 pb-6">

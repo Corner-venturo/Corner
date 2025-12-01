@@ -6,7 +6,7 @@ import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
-import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { useWorkspaceChannels } from '@/stores/workspace'
 import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
@@ -19,7 +19,7 @@ import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
-  const { items: workspaces, fetchAll: fetchWorkspaces } = useWorkspaceStoreData()
+  const { workspaces, loadWorkspaces: fetchWorkspaces } = useWorkspaceChannels()
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isSalaryPaymentDialogOpen, setIsSalaryPaymentDialogOpen] = useState(false)
