@@ -1,4 +1,7 @@
 import { CustomerBulkUploadForm } from '@/components/customers/customer-bulk-upload-form'
+import { updateCustomerStatus } from '../verify/actions'
+import { toast } from 'sonner'
+import { ImageUploadDropzone } from '@/components/customers/image-upload-dropzone'
 
 export default function CustomersPage() {
   return (

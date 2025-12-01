@@ -13,6 +13,9 @@ import {
   TAIWAN_COMPATRIOT_DELIVERY_OPTIONS,
   TAIWAN_COMPATRIOT_REQUIREMENTS,
   TAIWAN_COMPATRIOT_NOTES,
+  USA_ESTA_DELIVERY_OPTIONS,
+  USA_ESTA_REQUIREMENTS,
+  USA_ESTA_NOTES,
   formatCurrency,
   type DeliveryOption,
   type RequirementSection,
@@ -193,9 +196,10 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
           </p>
         )}
         <Tabs defaultValue="passport" className="mt-4">
-          <TabsList className="grid h-12 grid-cols-2 rounded-lg bg-morandi-container text-sm text-morandi-secondary">
+          <TabsList className="grid h-12 grid-cols-3 rounded-lg bg-morandi-container text-sm text-morandi-secondary">
             <TabsTrigger value="passport">護照</TabsTrigger>
             <TabsTrigger value="taiwan">台胞證</TabsTrigger>
+            <TabsTrigger value="usa-esta">美國 ESTA</TabsTrigger>
           </TabsList>
           <TabsContent value="passport" className="mt-4">
             {renderVisaInfoContent(
@@ -209,6 +213,13 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
               TAIWAN_COMPATRIOT_DELIVERY_OPTIONS,
               TAIWAN_COMPATRIOT_REQUIREMENTS,
               TAIWAN_COMPATRIOT_NOTES
+            )}
+          </TabsContent>
+          <TabsContent value="usa-esta" className="mt-4">
+            {renderVisaInfoContent(
+              USA_ESTA_DELIVERY_OPTIONS,
+              USA_ESTA_REQUIREMENTS,
+              USA_ESTA_NOTES
             )}
           </TabsContent>
         </Tabs>
