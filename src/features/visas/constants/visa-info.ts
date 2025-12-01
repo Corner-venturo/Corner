@@ -106,6 +106,39 @@ export const TAIWAN_COMPATRIOT_NOTES: string[] = [
   '＊若台胞證遺失但效期未逾期，請先至警局備案，並提供相關證明文件，另需支付罰金1,100元。',
 ]
 
+export const USA_ESTA_DELIVERY_OPTIONS: DeliveryOption[] = [
+  { method: '電子申請（ESTA）', adult: 2000, child: 2000 },
+]
+
+export const USA_ESTA_REQUIREMENTS: RequirementSection[] = [
+  {
+    title: '美國 ESTA 電子簽證申辦所需資料',
+    fee: 2000,
+    items: [
+      '護照正本（效期需兩年以上，ESTA 有效期通常為兩年）',
+      '如護照不足兩年效期，ESTA 效期到護照到期日為止',
+      '出生城市、出生國家',
+      '中英文連絡地址',
+      '連絡電話號碼',
+      '父母中英文姓名（包含親生父母、養父母、繼父母）',
+      '就業資訊（職稱、公司名稱、地址、電話）',
+      '美國聯絡人或飯店資訊（英文名字、地址、城市、州別、電話）',
+      '緊急聯絡人資訊（中英文姓名、電話、Email）',
+      '社群媒體資訊（選填，但建議提供以加速審核）',
+    ],
+  },
+]
+
+export const USA_ESTA_NOTES: string[] = [
+  '＊ESTA 的有效期通常為兩年或到護照到期日為止（取較短者）',
+  '＊申請 ESTA 需提供完整且正確的資料，任何錯誤可能導致拒絕入境',
+  '＊曾經被拒簽或拒絕入境者，申請 ESTA 被拒絕的可能性較大',
+  '＊ESTA 核准不代表一定能入境美國，最終決定權在入境海關',
+  '＊需回答 9 大符合資格問題（健康、犯罪記錄、毒品、恐怖活動等）',
+  '＊曾前往伊朗、伊拉克、利比亞、北韓、索馬利亞、蘇丹、敘利亞、葉門或古巴者需特別說明',
+  '＊正常 ESTA 代辦時程為 3-5 個工作天（不含例假日）',
+]
+
 export function formatCurrency(amount: number): string {
   return `NT$${amount.toLocaleString()}`
 }
@@ -123,6 +156,12 @@ export function buildVisaInfoText(): string {
       options: TAIWAN_COMPATRIOT_DELIVERY_OPTIONS,
       requirements: TAIWAN_COMPATRIOT_REQUIREMENTS,
       notes: TAIWAN_COMPATRIOT_NOTES,
+    },
+    {
+      title: '美國 ESTA',
+      options: USA_ESTA_DELIVERY_OPTIONS,
+      requirements: USA_ESTA_REQUIREMENTS,
+      notes: USA_ESTA_NOTES,
     },
   ]
 
