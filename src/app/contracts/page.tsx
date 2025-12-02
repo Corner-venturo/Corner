@@ -4,7 +4,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { FileSignature, Edit2, Trash2, Eye, Mail } from 'lucide-react'
-import { useTourStore, useOrderStore, useMemberStore } from '@/stores'
+import { useTours, useOrders, useMembers } from '@/hooks/cloud-hooks'
 import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { Tour } from '@/stores/types'
@@ -13,20 +13,14 @@ import { DateCell, ActionCell, NumberCell } from '@/components/table-cells'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { ContractViewDialog } from '@/components/contracts/ContractViewDialog'
 import { EnvelopeDialog } from '@/components/contracts/EnvelopeDialog'
-import {
-  useRealtimeForTours,
-} from '@/hooks/use-realtime-hooks'
 
 export default function ContractsPage() {
-  // ✅ Realtime 訂閱（只訂閱 Tours）
-  // Orders 和 Members 只用來計算人數，不需要即時訂閱
-  useRealtimeForTours()
   const router = useRouter()
   const searchParams = useSearchParams()
   const tourIdParam = searchParams?.get('tour_id')
-  const { items: tours, update: updateTour } = useTourStore()
-  const { items: orders } = useOrderStore()
-  const { items: members } = useMemberStore()
+  const { items: tours, update: updateTour } = useTours()
+  const { items: orders } = useOrders()
+  const { items: members } = useMembers()
   const { toast } = useToast()
   const [contractDialog, setContractDialog] = useState<{
     isOpen: boolean

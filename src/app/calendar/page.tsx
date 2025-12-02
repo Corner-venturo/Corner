@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import { Plus } from 'lucide-react'
 import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -18,45 +17,8 @@ import {
   useEventOperations,
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
-import {
-  useTourStore,
-  useOrderStore,
-  useMemberStore,
-  useCustomerStore,
-  useCalendarEventStore,
-  useEmployeeStore,
-} from '@/stores'
-import {
-  useRealtimeForCalendarEvents,
-} from '@/hooks/use-realtime-hooks'
 
 export default function CalendarPage() {
-  // ✅ Realtime 訂閱（只訂閱行事曆事件）
-  // Tours, Orders, Members, Customers 只用來顯示名稱，重新整理即可更新，不需要即時訂閱
-  useRealtimeForCalendarEvents()
-
-  // Stores
-  const { fetchAll: fetchTours } = useTourStore()
-  const { fetchAll: fetchOrders } = useOrderStore()
-  const { fetchAll: fetchMembers } = useMemberStore()
-  const { fetchAll: fetchCustomers } = useCustomerStore()
-  const { fetchAll: fetchCalendarEvents } = useCalendarEventStore()
-  const { fetchAll: fetchEmployees } = useEmployeeStore()
-
-  // 初始載入所有資料
-  useEffect(() => {
-    const loadData = async () => {
-      await Promise.all([
-        fetchTours(),
-        fetchOrders(),
-        fetchMembers(),
-        fetchCustomers(),
-        fetchCalendarEvents(),
-        fetchEmployees(),
-      ])
-    }
-    loadData()
-  }, [fetchTours, fetchOrders, fetchMembers, fetchCustomers, fetchCalendarEvents, fetchEmployees])
 
   // Custom hooks for calendar logic
   const { filteredEvents } = useCalendarEvents()

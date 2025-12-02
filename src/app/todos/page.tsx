@@ -12,10 +12,10 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { useTodoStore } from '@/stores'
+import { useTodos } from '@/hooks/useTodos'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { alertError, alertWarning } from '@/lib/ui/alert-dialog'
+import { alertError } from '@/lib/ui/alert-dialog'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import {
   CheckCircle,
@@ -39,11 +39,9 @@ import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { TodoExpandedView } from '@/components/todos/todo-expanded-view'
 import { StarRating } from '@/components/ui/star-rating'
 import { Todo } from '@/stores/types'
-import type { CreateInput } from '@/stores/core/types'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { TodoCard } from '@/components/todos/todo-card'
-import { useRealtimeForTodos } from '@/hooks/use-realtime-hooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,27 +53,17 @@ const statusFilters = [
 ]
 
 export default function TodosPage() {
-  // ✅ Realtime 訂閱
-  useRealtimeForTodos()
-
-  const todoStore = useTodoStore()
-  const todos = todoStore.items
-  const { create: addTodo, update: updateTodo, delete: deleteTodo, fetchAll } = todoStore
+  // ✅ 使用純雲端 SWR hook（不再使用 IndexedDB）
+  const { todos, create: addTodo, update: updateTodo, delete: deleteTodo, isLoading: isTodosLoading } = useTodos()
   const { user } = useAuthStore() // 取得當前登入用戶
   const searchParams = useSearchParams()
   const [statusFilter, setStatusFilter] = useState('active')
   const [expandedTodo, setExpandedTodo] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [isLoading, _setIsLoading] = useState(false) // 使用快取資料，不需要載入
   const [isSubmitting, setIsSubmitting] = useState(false) // 防止重複提交
   const [quickAddValue, setQuickAddValue] = useState('') // 快速新增輸入框的值
   const { confirm, confirmDialogProps } = useConfirmDialog()
-
-  // 載入待辦事項資料
-  useEffect(() => {
-    fetchAll()
-  }, [fetchAll])
 
   // 處理從其他頁面跳轉來的情況
   useEffect(() => {
@@ -328,19 +316,19 @@ export default function TodosPage() {
           visibilityList.push(formData.assignee)
         }
 
-        const newTodoData: CreateInput<Todo> = {
+        const newTodoData = {
           title: formData.title,
           priority: formData.priority,
           deadline: formData.deadline || undefined,
-          status: 'pending',
+          status: 'pending' as const,
           completed: false,
           creator: auth.user!.id,
           assignee: formData.assignee || undefined,
           visibility: visibilityList,
-          related_items: [],
-          sub_tasks: [],
-          notes: [],
-          enabled_quick_actions: formData.enabled_quick_actions || ['receipt', 'quote'],
+          related_items: [] as Todo['related_items'],
+          sub_tasks: [] as Todo['sub_tasks'],
+          notes: [] as Todo['notes'],
+          enabled_quick_actions: (formData.enabled_quick_actions || ['receipt', 'quote']) as Todo['enabled_quick_actions'],
         }
 
         await addTodo(newTodoData)
@@ -387,18 +375,18 @@ export default function TodosPage() {
                 const title = quickAddValue.trim()
                 setIsSubmitting(true)
 
-                const newTodoData: CreateInput<Todo> = {
+                const newTodoData = {
                   title,
-                  priority: 1,
-                  status: 'pending',
+                  priority: 1 as const,
+                  status: 'pending' as const,
                   completed: false,
                   creator: auth.user!.id,
-                  assignee: undefined, // 快速新增時不指派
+                  assignee: undefined,
                   visibility: [auth.user!.id],
-                  related_items: [],
-                  sub_tasks: [],
-                  notes: [],
-                  enabled_quick_actions: ['receipt', 'quote'],
+                  related_items: [] as Todo['related_items'],
+                  sub_tasks: [] as Todo['sub_tasks'],
+                  notes: [] as Todo['notes'],
+                  enabled_quick_actions: ['receipt', 'quote'] as Todo['enabled_quick_actions'],
                 }
 
                 try {

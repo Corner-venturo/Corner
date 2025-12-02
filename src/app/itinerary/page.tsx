@@ -8,18 +8,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { MapPin, Eye, Copy, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useItineraryStore, type Itinerary } from '@/stores'
+import { useItineraries } from '@/hooks/cloud-hooks'
+import type { Itinerary } from '@/stores/types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
-import { useRealtimeForItineraries } from '@/hooks/use-realtime-hooks'
 
 const statusFilters = ['全部', '草稿', '已發布']
 
 export default function ItineraryPage() {
-  // ✅ Realtime 訂閱
-  useRealtimeForItineraries()
   const router = useRouter()
-  const { items: itineraries, delete: deleteItinerary, fetchAll: fetchItineraries } =
-    useItineraryStore()
+  const { items: itineraries, delete: deleteItinerary } = useItineraries()
   const [statusFilter, setStatusFilter] = useState<string>('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
@@ -40,11 +37,6 @@ export default function ItineraryPage() {
     setIsTypeSelectOpen(false)
     router.push('/itinerary/new?type=print')
   }
-
-  // 載入資料
-  React.useEffect(() => {
-    fetchItineraries()
-  }, [])
 
   // 複製行程
   const handleDuplicate = useCallback(async (id: string) => {

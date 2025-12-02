@@ -4,33 +4,27 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { useOrderStore, useTourStore } from '@/stores'
+import { useOrders, useTours } from '@/hooks/cloud-hooks'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
 import { cn } from '@/lib/utils'
-import { useRealtimeForOrders } from '@/hooks/use-realtime-hooks'
 import type { Order } from '@/types/order.types'
 
 export default function OrdersPage() {
-  // ✅ Realtime 訂閱（只訂閱 Orders）
-  // Tours 只用來顯示團名，不需要即時訂閱
-  useRealtimeForOrders()
   const router = useRouter()
-  const { items: orders, create: addOrder, fetchAll: fetchOrders } = useOrderStore()
-  const { items: tours, fetchAll: fetchTours } = useTourStore()
+  const { items: orders, create: addOrder } = useOrders()
+  const { items: tours } = useTours()
   const { currentWorkspace, loadWorkspaces } = useWorkspaceChannels()
   const [statusFilter, setStatusFilter] = useState('all')
   const [tourFilter, _setTourFilter] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  // 🔥 載入資料
+  // 🔥 載入 workspace
   React.useEffect(() => {
-    loadWorkspaces() // 載入 workspace
-    fetchOrders()
-    fetchTours()
+    loadWorkspaces()
   }, [])
 
   const filteredOrders = orders.filter(order => {

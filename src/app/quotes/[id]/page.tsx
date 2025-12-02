@@ -16,15 +16,8 @@ import {
   PrintableQuotation,
   QuickQuoteDetail,
 } from '@/features/quotes/components'
-import {
-  useRealtimeForQuotes,
-  useRealtimeForQuoteItems,
-} from '@/hooks/use-realtime-hooks'
 
 export default function QuoteDetailPage() {
-  // ✅ Realtime 訂閱（Tours 只用來顯示名稱，不需要即時訂閱）
-  useRealtimeForQuotes()
-  useRealtimeForQuoteItems()
 
   // Scroll handling refs (必須在任何條件判斷之前宣告)
   const scrollRef = useRef<HTMLDivElement>(null)

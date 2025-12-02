@@ -23,23 +23,14 @@ import {
   CustomerSearchDialog,
   CustomerSearchParams,
 } from '@/components/customers/customer-search-dialog'
-import { useCustomerStore } from '@/stores'
-import { useRealtimeForCustomers } from '@/hooks/use-realtime-hooks'
+import { useCustomers } from '@/hooks/cloud-hooks'
 import type { Customer } from '@/types/customer.types'
 
 const STORAGE_KEY = 'customerSearchParams'
 
 export default function CustomersPage() {
-  // ✅ Realtime 訂閱
-  useRealtimeForCustomers()
-
   const router = useRouter()
-  const { items: customers, create: addCustomer, delete: deleteCustomer, fetchAll: fetchCustomers } = useCustomerStore()
-
-  // 載入資料
-  useEffect(() => {
-    fetchCustomers()
-  }, [])
+  const { items: customers, create: addCustomer, delete: deleteCustomer } = useCustomers()
 
   // 搜尋狀態
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false)

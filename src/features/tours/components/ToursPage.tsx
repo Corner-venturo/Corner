@@ -18,14 +18,10 @@ import {
   AlertCircle,
   Archive,
 } from 'lucide-react'
-import {
-  useOrderStore,
-  useEmployeeStore,
-  useRegionsStore,
-  useMemberStore,
-} from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
+import { useOrders, useEmployees, useMembers } from '@/hooks/cloud-hooks'
+import { useRegionsStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { useDialog } from '@/hooks/useDialog'
@@ -38,25 +34,14 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { useTourTableColumns } from './TourTableColumns'
 import { useTourChannelOperations } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
-import {
-  useRealtimeForTours,
-} from '@/hooks/use-realtime-hooks'
-
 export const ToursPage: React.FC = () => {
-  // ✅ Realtime 訂閱（只訂閱 Tours）
-  // Orders, Members, Quotes 只用來顯示統計數字，不需要即時訂閱
-  // 展開時的詳細資料會在 TourExpandedView 中按需訂閱
-  useRealtimeForTours()
 
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user } = useAuthStore()
-  const orderStore = useOrderStore()
-  const { items: orders } = orderStore
-  const addOrder = orderStore.create
-  const { items: members } = useMemberStore()
-  const employeeStore = useEmployeeStore()
-  const { items: employees } = employeeStore
+  const { items: orders, create: addOrder } = useOrders()
+  const { items: members } = useMembers()
+  const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
   const { quotes, updateQuote } = useQuotes()
   const { dialog, openDialog, closeDialog } = useDialog()
@@ -112,11 +97,11 @@ export const ToursPage: React.FC = () => {
         await fetchRegions()
       }
       if (employees.length === 0) {
-        await employeeStore.fetchAll()
+        await fetchEmployees()
       }
       openDialog('create', tour, fromQuoteId)
     },
-    [countries.length, employees.length, fetchRegions, employeeStore, openDialog]
+    [countries.length, employees.length, fetchRegions, fetchEmployees, openDialog]
   )
 
   // Build PageRequest parameters

@@ -7,31 +7,22 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useCustomerStore } from '@/stores'
-import { useRealtimeForCustomers } from '@/hooks/use-realtime-hooks'
+import { useCustomers } from '@/hooks/cloud-hooks'
 import { BasicInfoTab } from './tabs/BasicInfoTab'
 import { GroupHistoryTab } from './tabs/GroupHistoryTab'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
 import { toast } from 'sonner'
 
 export default function CustomerDetailPage() {
-  // Realtime 訂閱
-  useRealtimeForCustomers()
-
   const router = useRouter()
   const params = useParams()
   const customerId = params.id as string
 
-  const { items: customers, update, fetchAll } = useCustomerStore()
+  const { items: customers, update } = useCustomers()
   const [activeTab, setActiveTab] = useState('basic-info')
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<UpdateCustomerData>({})
-
-  // 載入資料
-  useEffect(() => {
-    fetchAll()
-  }, [fetchAll])
 
   // 找到當前客戶
   useEffect(() => {

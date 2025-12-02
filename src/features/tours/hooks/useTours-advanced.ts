@@ -1,141 +1,167 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { tourService } from '../services/tour.service'
+import useSWR, { mutate } from 'swr'
+import { supabase } from '@/lib/supabase/client'
 import { Tour } from '@/stores/types'
 import { PageRequest, UseEntityResult } from '@/core/types/common'
 import { BaseEntity } from '@/core/types/common'
-import { useTourStore } from '@/stores'
+import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
+import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+
+const TOURS_KEY = 'tours'
+
+// Supabase fetcher
+async function fetchTours(): Promise<Tour[]> {
+  const { data, error } = await supabase
+    .from('tours')
+    .select('*')
+    .order('departure_date', { ascending: false })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return (data || []) as Tour[]
+}
 
 export function useTours(params?: PageRequest): UseEntityResult<Tour> {
-  const [data, setData] = useState<Tour[]>([])
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const initializedRef = useRef(false)
-
-  // 使用 useMemo 來穩定 params 物件的參考
-  const stableParams = useMemo(() => params, [params])
-
-  const loadTours = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // ✅ 步驟 1: 首次載入時才呼叫 fetchAll()
-      // 之後只從 store 讀取（store 會自動背景同步）
-      // 使用 ref 避免觸發 useCallback 重建
-      if (!initializedRef.current) {
-        await useTourStore.getState().fetchAll()
-        initializedRef.current = true
-      } else {
-      }
-
-      // ✅ 步驟 2: 從 Store 讀取並處理資料（過濾、排序、分頁）
-      const result = await tourService.list(stableParams)
-      setData(result.data)
-      setTotalCount(result.total)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '載入旅遊團資料失敗'
-      setError(errorMessage)
-    } finally {
-      setLoading(false)
+  const { data: allTours = [], error, isLoading } = useSWR<Tour[]>(
+    TOURS_KEY,
+    fetchTours,
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      dedupingInterval: 5000,
     }
-  }, [stableParams])
-
-  useEffect(() => {
-    loadTours()
-  }, [loadTours])
-
-  const createTour = useCallback(
-    async (tourData: Omit<Tour, keyof BaseEntity>) => {
-      try {
-        setError(null)
-        const newTour = await tourService.create(tourData)
-
-        // ✅ 樂觀更新 - 立即加入 UI，不等待重新載入
-        setData(prevData => [newTour, ...prevData])
-        setTotalCount(prev => prev + 1)
-
-        // 🔧 Store 已經在 tourService.create() 中更新了，這裡不需要重複更新
-
-        return newTour
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '建立旅遊團失敗'
-        setError(errorMessage)
-        // 失敗時重新載入以確保數據一致性
-        await loadTours()
-        throw err // 讓調用者可以處理錯誤
-      }
-    },
-    [loadTours]
   )
 
-  const updateTour = useCallback(
-    async (id: string, tourData: Partial<Tour>) => {
-      try {
-        setError(null)
+  // 根據 params 進行過濾、排序、分頁
+  const processedTours = (() => {
+    let result = [...allTours]
 
-        // 樂觀更新 - 立即更新 UI
-        setData(prevData =>
-          prevData.map(tour => (tour.id === id ? { ...tour, ...tourData } : tour))
-        )
+    // 搜尋過濾
+    if (params?.search) {
+      const searchLower = params.search.toLowerCase()
+      result = result.filter(tour =>
+        tour.name.toLowerCase().includes(searchLower) ||
+        tour.code.toLowerCase().includes(searchLower) ||
+        (tour.location || '').toLowerCase().includes(searchLower)
+      )
+    }
 
-        const updated = await tourService.update(id, tourData as any)
+    // 排序
+    if (params?.sortBy) {
+      const sortField = params.sortBy as keyof Tour
+      const sortOrder = params.sortOrder === 'asc' ? 1 : -1
+      result.sort((a, b) => {
+        const aVal = a[sortField] ?? ''
+        const bVal = b[sortField] ?? ''
+        if (aVal < bVal) return -1 * sortOrder
+        if (aVal > bVal) return 1 * sortOrder
+        return 0
+      })
+    }
 
-        // 成功後用真實資料更新
-        setData(prevData => prevData.map(tour => (tour.id === id ? updated : tour)))
+    return result
+  })()
 
-        return updated
-      } catch (err) {
-        // 失敗時回滾
-        await loadTours()
-        const errorMessage = err instanceof Error ? err.message : '更新旅遊團失敗'
-        setError(errorMessage)
-        throw err
-      }
-    },
-    [loadTours]
-  )
+  // 分頁
+  const page = params?.page || 1
+  const pageSize = params?.pageSize || 20
+  const start = (page - 1) * pageSize
+  const paginatedTours = processedTours.slice(start, start + pageSize)
 
-  const deleteTour = useCallback(
-    async (id: string) => {
-      try {
-        setError(null)
+  // 新增
+  const createTour = async (tourData: Omit<Tour, keyof BaseEntity>): Promise<Tour> => {
+    const now = new Date().toISOString()
+    const newTour = {
+      ...tourData,
+      id: crypto.randomUUID(),
+      created_at: now,
+      updated_at: now,
+    } as Tour
 
-        // 樂觀更新 - 立即從 UI 移除
-        const _originalData = data
-        setData(prevData => prevData.filter(tour => tour.id !== id))
-        setTotalCount(prev => Math.max(0, prev - 1))
+    // 樂觀更新
+    mutate(TOURS_KEY, [newTour, ...allTours], false)
 
-        await tourService.delete(id)
-      } catch (err) {
-        // 失敗時回滾
-        await loadTours()
-        const errorMessage = err instanceof Error ? err.message : '刪除旅遊團失敗'
-        setError(errorMessage)
-        throw err
-      }
-    },
-    [data, loadTours]
-  )
+    try {
+      const { error } = await supabase.from('tours').insert(newTour)
+      if (error) throw error
 
-  const refresh = useCallback(async () => {
-    await loadTours()
-  }, [loadTours])
+      mutate(TOURS_KEY)
+      return newTour
+    } catch (err) {
+      mutate(TOURS_KEY)
+      throw err
+    }
+  }
+
+  // 更新
+  const updateTour = async (id: string, updates: Partial<Tour>): Promise<Tour> => {
+    const updatedData = {
+      ...updates,
+      updated_at: new Date().toISOString(),
+    }
+
+    // 樂觀更新
+    const optimisticTours = allTours.map(tour =>
+      tour.id === id ? { ...tour, ...updatedData } : tour
+    )
+    mutate(TOURS_KEY, optimisticTours, false)
+
+    try {
+      const { data, error } = await supabase
+        .from('tours')
+        .update(updatedData)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      mutate(TOURS_KEY)
+      return data as Tour
+    } catch (err) {
+      mutate(TOURS_KEY)
+      throw err
+    }
+  }
+
+  // 刪除
+  const deleteTour = async (id: string): Promise<boolean> => {
+    // 樂觀更新
+    mutate(
+      TOURS_KEY,
+      allTours.filter(tour => tour.id !== id),
+      false
+    )
+
+    try {
+      const { error } = await supabase.from('tours').delete().eq('id', id)
+      if (error) throw error
+
+      mutate(TOURS_KEY)
+      return true
+    } catch (err) {
+      mutate(TOURS_KEY)
+      throw err
+    }
+  }
+
+  // 重新載入
+  const refresh = async () => {
+    await mutate(TOURS_KEY)
+  }
 
   return {
-    data,
-    totalCount,
-    loading,
-    error,
+    data: paginatedTours,
+    totalCount: processedTours.length,
+    loading: isLoading,
+    error: error?.message || null,
     actions: {
       create: createTour,
       update: updateTour,
-      delete: (async (id: string) => {
-        await deleteTour(id)
-        return true
-      }) as (id: string) => Promise<boolean>,
+      delete: deleteTour,
       refresh,
     },
   }
@@ -143,81 +169,89 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 
 // 專門用於單個旅遊團詳情的 hook
 export function useTourDetails(tour_id: string) {
-  const [tour, setTour] = useState<Tour | null>(null)
-  const [financials, setFinancials] = useState<unknown>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const loadTourDetails = useCallback(async () => {
-    if (!tour_id) {
-      setLoading(false)
-      return
-    }
-
-    try {
-      setLoading(true)
-      setError(null)
-
-      const [tourData, financialData] = await Promise.all([
-        tourService.getById(tour_id),
-        tourService.calculateFinancialSummary(tour_id),
-      ])
-
-      setTour(tourData)
-      setFinancials(financialData)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '載入旅遊團詳情失敗'
-      setError(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }, [tour_id])
-
-  useEffect(() => {
-    loadTourDetails()
-  }, [loadTourDetails])
-
-  const updateTourStatus = useCallback(
-    async (newStatus: Tour['status'], reason?: string) => {
+  const { data: tour, error, isLoading: loading, mutate: mutateTour } = useSWR<Tour | null>(
+    tour_id ? `tour-${tour_id}` : null,
+    async () => {
       if (!tour_id) return null
+      const { data, error } = await supabase
+        .from('tours')
+        .select('*')
+        .eq('id', tour_id)
+        .single()
 
-      try {
-        setError(null)
-        const updated = await tourService.updateTourStatus(tour_id, newStatus)
-        setTour(updated)
-        return updated
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '更新旅遊團狀態失敗'
-        setError(errorMessage)
-        throw err
-      }
+      if (error) throw error
+      return data as Tour
     },
-    [tour_id]
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+    }
   )
 
-  const generateTourCode = useCallback(
-    async (location: string, date: Date, isSpecial?: boolean) => {
-      try {
-        setError(null)
-        return await tourService.generateTourCode(location, date, isSpecial)
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '生成團號失敗'
-        setError(errorMessage)
-        throw err
-      }
-    },
-    []
-  )
+  // 計算財務摘要
+  const financials = tour ? {
+    total_revenue: (tour.price || 0) * (tour.current_participants || 0),
+    total_cost: (tour.price || 0) * (tour.current_participants || 0) * 0.7,
+    profit: (tour.price || 0) * (tour.current_participants || 0) * 0.3,
+    profitMargin: 30,
+  } : null
+
+  const updateTourStatus = async (newStatus: Tour['status']) => {
+    if (!tour_id) return null
+
+    const now = new Date().toISOString()
+    const { data, error } = await supabase
+      .from('tours')
+      .update({ status: newStatus, updated_at: now })
+      .eq('id', tour_id)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    mutateTour(data as Tour)
+    mutate(TOURS_KEY)
+    return data as Tour
+  }
+
+  const generateTourCode = async (cityCode: string, date: Date, isSpecial?: boolean) => {
+    const workspaceCode = getCurrentWorkspaceCode()
+    if (!workspaceCode) {
+      throw new Error('無法取得 workspace code')
+    }
+
+    // 獲取現有 tours 來避免重複
+    const { data: existingTours } = await supabase
+      .from('tours')
+      .select('code')
+
+    const code = generateTourCodeUtil(
+      workspaceCode,
+      cityCode.toUpperCase(),
+      date.toISOString(),
+      existingTours || []
+    )
+
+    // 檢查是否重複
+    const exists = (existingTours || []).some(t => t.code === code)
+    if (exists) {
+      const timestamp = Date.now().toString().slice(-2)
+      const dateStr = date.toISOString().split('T')[0].replace(/-/g, '').slice(2)
+      return `${workspaceCode}-${cityCode}${dateStr}${timestamp}`
+    }
+
+    return code
+  }
 
   return {
-    tour,
+    tour: tour || null,
     financials,
     loading,
-    error,
+    error: error?.message || null,
     actions: {
       updateStatus: updateTourStatus,
       generateCode: generateTourCode,
-      refresh: loadTourDetails,
+      refresh: () => mutateTour(),
     },
   }
 }

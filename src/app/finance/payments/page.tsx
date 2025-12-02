@@ -18,11 +18,6 @@ import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Plus, Search, FileDown, Layers, Eye } from 'lucide-react'
 
-// Realtime Hooks
-import {
-  useRealtimeForReceipts,
-} from '@/hooks/use-realtime-hooks'
-
 // Components
 import { ReceiptSearchDialog } from './components'
 import { AddReceiptDialog, BatchReceiptDialog } from '@/features/finance/payments'
@@ -40,10 +35,6 @@ import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
 import type { ReceiptItem } from '@/stores'
 
 export default function PaymentsPage() {
-  // ✅ Realtime 訂閱（只訂閱 Receipts）
-  // Orders 只用來顯示團名和訂單號，不需要即時訂閱
-  // LinkPayLogs 只在詳情頁才需要，不需要在列表頁訂閱
-  useRealtimeForReceipts()
 
   // 資料與業務邏輯
   const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
