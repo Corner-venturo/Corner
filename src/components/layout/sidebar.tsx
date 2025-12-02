@@ -34,7 +34,6 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
-import { SyncStatusIndicator } from './sync-status-indicator'
 import { isMenuItemHidden } from '@/constants/menu-items'
 
 interface MenuItem {
@@ -697,10 +696,6 @@ export function Sidebar() {
               </Link>
             </li>
 
-            {/* 同步狀態指示器 */}
-            <li>
-              <SyncStatusIndicator isDropdownHovered={isSidebarHovered || isDropdownHovered} />
-            </li>
           </ul>
         </div>
       </div>
