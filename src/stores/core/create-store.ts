@@ -1,42 +1,22 @@
 /**
- * Zustand Store 工廠函數
- * 支援 Supabase 雲端同步 + IndexedDB 快取層
+ * Zustand Store 工廠函數（簡化版）
+ * 純雲端架構：直接使用 Supabase，不再使用 IndexedDB 快取
  *
  * 架構：
  * - Supabase: 雲端資料庫（唯一的 Source of Truth）
- * - IndexedDB: 快取層（Cache，加速載入，可隨時清空）
  * - Zustand: UI 狀態管理
  *
- * 重要：
- * - 無離線編輯功能（所有變更都直接寫入 Supabase）
- * - IndexedDB 純粹作為快取，不儲存未同步的變更
- * - 斷網時只能查看快取資料（唯讀模式）
+ * 注意：此 Store 已改為向後相容用途，新功能請使用 cloud-hooks
  */
 
 import { create } from 'zustand'
 import { BaseEntity } from '@/types'
 import { TableName } from '@/lib/db/schemas'
 import { memoryCache } from '@/lib/cache/memory-cache'
-import { realtimeManager } from '@/lib/realtime'
+import { supabase } from '@/lib/supabase/client'
 
 // 型別定義
 import type { StoreState, StoreConfig } from './types'
-
-// 適配器
-import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
-import { SupabaseAdapter } from '../adapters/supabase-adapter'
-
-// 同步邏輯
-import { SyncCoordinator } from '../sync/coordinator'
-import { storeEventBus } from '../sync/event-bus'
-import { networkMonitor } from '@/lib/sync/network-monitor'
-
-// 操作
-import { fetchAll, fetchById } from '../operations/fetch'
-import { create as createItem, createMany as createManyItems } from '../operations/create'
-import { update as updateItem } from '../operations/update'
-import { deleteItem, deleteMany as deleteManyItems } from '../operations/delete'
-import { findByField, filter, count, clear } from '../operations/query'
 
 // 工具
 import { AbortManager } from '../utils/abort-manager'
@@ -55,7 +35,7 @@ import { logger } from '@/lib/utils/logger'
 export function createStore<T extends BaseEntity>(
   tableNameOrConfig: TableName | StoreConfig,
   codePrefixParam?: string,
-  enableSupabaseParam = process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true'
+  _enableSupabaseParam = true
 ) {
   // 支援兩種調用方式：1. 舊版參數 2. 配置物件
   let config: StoreConfig
@@ -64,34 +44,24 @@ export function createStore<T extends BaseEntity>(
     config = {
       tableName: tableNameOrConfig,
       codePrefix: codePrefixParam,
-      enableSupabase: enableSupabaseParam,
+      enableSupabase: true,
       fastInsert: true,
     }
   } else {
     // 新版配置物件
     config = {
       ...tableNameOrConfig,
-      enableSupabase:
-        tableNameOrConfig.enableSupabase ?? process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true',
-      fastInsert: tableNameOrConfig.fastInsert ?? true, // 預設啟用 FastIn
+      enableSupabase: true,
+      fastInsert: tableNameOrConfig.fastInsert ?? true,
     }
   }
 
-  const { tableName, enableSupabase } = config
-
-  // 建立適配器
-  const indexedDB = new IndexedDBAdapter<T>(tableName)
-  const supabase = new SupabaseAdapter<T>(tableName, enableSupabase || false)
-
-  // 建立同步協調器
-  const sync = new SyncCoordinator<T>(tableName, indexedDB, supabase)
+  const { tableName, codePrefix } = config
 
   // 建立 AbortController 管理器
   const abortManager = new AbortManager()
 
   // 建立 Zustand Store
-  // ⚠️ 不使用 persist middleware（避免跨裝置同步問題）
-  // 資料持久化完全由 IndexedDB 負責
   const store = create<StoreState<T>>()((set, get) => ({
     // 初始狀態
     items: [],
@@ -104,42 +74,29 @@ export function createStore<T extends BaseEntity>(
     // 設定錯誤
     setError: (error: string | null) => set({ error }),
 
-    // 取得所有資料（IndexedDB 優先顯示，背景同步 Supabase）
+    // 取得所有資料（直接從 Supabase）
     fetchAll: async () => {
       try {
         // 取消前一個請求
         abortManager.abort()
 
-        // 建立新的 AbortController
-        const controller = abortManager.create()
-
         set({ loading: true, error: null })
 
-        const items = await fetchAll(config, indexedDB, supabase, sync, controller)
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('*')
+          .order('created_at', { ascending: false })
 
+        if (error) throw error
+
+        const items = (data || []) as T[]
         set({ items, loading: false })
-
-        // 🔥 返回資料，讓呼叫者可以立即使用
         return items
       } catch (error) {
-        // 忽略 AbortError
-        if (error instanceof Error && error.name === 'AbortError') {
-          set({ loading: false })
-          return []
-        }
-
-        // 其他錯誤：靜默切換到本地模式
-        try {
-          const items = await indexedDB.getAll()
-          set({ items, loading: false, error: null })
-          return items
-        } catch (localError) {
-          const errorMessage = localError instanceof Error ? localError.message : '無法載入資料'
-          set({ error: errorMessage, loading: false })
-          return []
-        }
-      } finally {
-        abortManager.abort() // 清理
+        const errorMessage = error instanceof Error ? error.message : '無法載入資料'
+        logger.error(`[${tableName}] fetchAll 失敗:`, error)
+        set({ error: errorMessage, loading: false })
+        return []
       }
     },
 
@@ -147,9 +104,17 @@ export function createStore<T extends BaseEntity>(
     fetchById: async (id: string) => {
       try {
         set({ loading: true, error: null })
-        const item = await fetchById(id, config, indexedDB, supabase)
+
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('*')
+          .eq('id', id)
+          .single()
+
+        if (error) throw error
+
         set({ loading: false })
-        return item
+        return data as T
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '讀取失敗'
         set({ error: errorMessage, loading: false })
@@ -162,18 +127,33 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        const newItem = await createItem(data, get().items, config, indexedDB, supabase, sync)
+        // 生成 code（如果有 prefix）
+        const insertData = {
+          ...data,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+
+        if (codePrefix && !(data as Record<string, unknown>).code) {
+          const count = get().items.length
+          ;(insertData as Record<string, unknown>).code = `${codePrefix}${String(count + 1).padStart(6, '0')}`
+        }
+
+        const { data: newItem, error } = await supabase
+          .from(tableName)
+          .insert(insertData)
+          .select()
+          .single()
+
+        if (error) throw error
 
         // 樂觀更新 UI
         set(state => ({
-          items: [...state.items, newItem],
+          items: [newItem as T, ...state.items],
           loading: false,
         }))
 
-        // 通知 NetworkMonitor 資料已變更
-        networkMonitor?.markDataChanged()
-
-        return newItem
+        return newItem as T
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '建立失敗'
         set({ error: errorMessage, loading: false })
@@ -185,18 +165,27 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        const updatedItem = await updateItem(id, data, config, indexedDB, supabase, sync)
+        const updateData = {
+          ...data,
+          updated_at: new Date().toISOString(),
+        }
+
+        const { data: updatedItem, error } = await supabase
+          .from(tableName)
+          .update(updateData)
+          .eq('id', id)
+          .select()
+          .single()
+
+        if (error) throw error
 
         // 樂觀更新 UI
         set(state => ({
-          items: state.items.map(item => (item.id === id ? updatedItem : item)),
+          items: state.items.map(item => (item.id === id ? updatedItem as T : item)),
           loading: false,
         }))
 
-        // 通知 NetworkMonitor 資料已變更
-        networkMonitor?.markDataChanged()
-
-        return updatedItem
+        return updatedItem as T
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '更新失敗'
         set({ error: errorMessage, loading: false })
@@ -209,18 +198,20 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        await deleteItem(id, config, indexedDB, supabase, sync)
+        const { error } = await supabase
+          .from(tableName)
+          .delete()
+          .eq('id', id)
+
+        if (error) throw error
 
         // 樂觀更新 UI
         set(state => ({
           items: state.items.filter(item => item.id !== id),
           loading: false,
         }))
-
-        // 通知 NetworkMonitor 資料已變更
-        networkMonitor?.markDataChanged()
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '更新失敗'
+        const errorMessage = error instanceof Error ? error.message : '刪除失敗'
         set({ error: errorMessage, loading: false })
         throw error
       }
@@ -228,76 +219,55 @@ export function createStore<T extends BaseEntity>(
 
     // 批次建立
     createMany: async dataArray => {
-      const results = await createManyItems(
-        dataArray,
-        get().items,
-        config,
-        indexedDB,
-        supabase,
-        sync
-      )
+      const results: T[] = []
 
-      // 樂觀更新 UI
-      set(state => ({
-        items: [...state.items, ...results],
-      }))
-
-      // 通知 NetworkMonitor 資料已變更
-      networkMonitor?.markDataChanged()
+      for (const data of dataArray) {
+        const newItem = await get().create(data)
+        results.push(newItem)
+      }
 
       return results
     },
 
     // 批次刪除
     deleteMany: async (ids: string[]) => {
-      await deleteManyItems(ids, config, indexedDB, supabase, sync)
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .in('id', ids)
+
+      if (error) throw error
 
       // 樂觀更新 UI
       set(state => ({
         items: state.items.filter(item => !ids.includes(item.id)),
       }))
-
-      // 通知 NetworkMonitor 資料已變更
-      networkMonitor?.markDataChanged()
     },
 
     // 根據欄位查詢
     findByField: (field: keyof T, value: unknown) => {
-      return findByField(get().items, field, value)
+      return get().items.filter(item => item[field] === value)
     },
 
     // 自訂過濾
     filter: (predicate: (item: T) => boolean) => {
-      return filter(get().items, predicate)
+      return get().items.filter(predicate)
     },
 
     // 計數
     count: () => {
-      return count(get().items)
+      return get().items.length
     },
 
     // 清空資料
     clear: async () => {
-      set({ items: clear<T>(), error: null })
+      set({ items: [], error: null })
       memoryCache.invalidatePattern(`${tableName}:`)
     },
 
-    // 同步待處理資料到 Supabase（手動觸發）
+    // 同步待處理資料（純雲端架構，此方法已無作用）
     syncPending: async () => {
-      if (!enableSupabase || typeof window === 'undefined') {
-        logger.log(`⏭️ [${tableName}] 跳過同步（Supabase 未啟用或非瀏覽器環境）`)
-        return
-      }
-
-      try {
-        logger.log(`🔄 [${tableName}] 開始手動同步...`)
-        await sync.syncPending()
-        await get().fetchAll() // 同步完成後重新載入
-        logger.log(`✅ [${tableName}] 同步完成`)
-      } catch (error) {
-        logger.error(`❌ [${tableName}] 同步失敗:`, error)
-        throw error
-      }
+      logger.log(`⏭️ [${tableName}] 純雲端模式，無需同步`)
     },
 
     // 取消進行中的請求
@@ -308,22 +278,12 @@ export function createStore<T extends BaseEntity>(
     },
   }))
 
-  // 註冊同步完成監聽器（確保不重複註冊）
+  // 監聽背景更新完成事件
   if (typeof window !== 'undefined') {
-    // 使用全局標記追蹤已註冊的表格，防止 HMR 時重複註冊
     const registeredKey = `__store_registered_${tableName}`
     if (!(window as unknown as Record<string, boolean>)[registeredKey]) {
       (window as unknown as Record<string, boolean>)[registeredKey] = true
 
-      storeEventBus.onSyncCompleted(tableName, () => {
-        store.getState().fetchAll()
-      })
-
-      // ⚠️ Realtime 訂閱已改為「按需訂閱」
-      // 不再自動訂閱，需在各頁面使用 useRealtimeFor[Table]() Hook
-      // 範例：useRealtimeForTours()
-
-      // 監聯背景更新完成事件（Stale-While-Revalidate 策略）
       const handleUpdated = ((event: Event) => {
         const customEvent = event as CustomEvent
         const { items } = customEvent.detail

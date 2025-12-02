@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { MainLayout } from '@/components/layout/main-layout'
 import { ThemeProvider } from '@/components/layout/theme-provider'
-import { NetworkMonitorInitializer } from '@/components/network-monitor-initializer'
 import { ErrorLogger } from '@/components/ErrorLogger'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AppInitializer } from '@/components/AppInitializer'
@@ -39,7 +38,6 @@ export default function RootLayout({
     <html lang="zh-TW">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorLogger />
-        <NetworkMonitorInitializer />
         <GlobalDialogs />
         <GlobalDialogOverride />
         <AppInitializer>

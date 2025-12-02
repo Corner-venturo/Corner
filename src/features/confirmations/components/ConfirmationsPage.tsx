@@ -12,7 +12,6 @@ import { FileCheck, FileText, CheckCircle, Send, XCircle } from 'lucide-react'
 import { ConfirmationsList } from './ConfirmationsList'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { useRealtimeForConfirmations } from '@/hooks/use-realtime-hooks'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 
 // 狀態篩選器
@@ -25,9 +24,6 @@ const STATUS_FILTERS = [
 ]
 
 export const ConfirmationsPage: React.FC = () => {
-  // ✅ Realtime 訂閱
-  useRealtimeForConfirmations()
-
   const router = useRouter()
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')

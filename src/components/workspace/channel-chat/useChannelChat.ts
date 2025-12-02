@@ -5,7 +5,6 @@ import {
   useWorkspaceWidgets,
 } from '@/stores/workspace'
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
-import { useChatRealtime } from '@/hooks/useChatRealtime'
 import {
   useDialogStates,
   useSelectionState,
@@ -102,9 +101,6 @@ export function useChannelChat() {
     handleReaction,
     handleDeleteMessage
   )
-
-  // Realtime subscription for messages
-  useChatRealtime()
 
   // Effects (拆分到 useChannelEffects)
   useChannelEffects(

@@ -20,10 +20,6 @@ import { useQuoteForm } from '../hooks/useQuoteForm'
 import { useQuickQuoteForm } from '../hooks/useQuickQuoteForm'
 import { useQuoteTourSync } from '../hooks/useQuoteTourSync'
 import { STATUS_FILTERS, TYPE_FILTERS } from '../constants'
-import {
-  useRealtimeForQuotes,
-  useRealtimeForQuoteItems,
-} from '@/hooks/use-realtime-hooks'
 import { useRegionsStore } from '@/stores'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -36,9 +32,6 @@ import {
 } from '@/components/ui/select'
 
 export const QuotesPage: React.FC = () => {
-  // ✅ Realtime 訂閱（Tours 只用來顯示名稱，不需要即時訂閱）
-  useRealtimeForQuotes()
-  useRealtimeForQuoteItems()
   const router = useRouter()
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [authorFilter, setAuthorFilter] = useState<string>('all')

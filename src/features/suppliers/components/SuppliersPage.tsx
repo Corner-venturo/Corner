@@ -11,13 +11,9 @@ import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
 import { useSupplierStore } from '@/stores'
-import { useRealtimeForSuppliers } from '@/hooks/use-realtime-hooks'
 import type { Supplier } from '@/types/supplier.types'
 
 export const SuppliersPage: React.FC = () => {
-  // ✅ Realtime 訂閱
-  useRealtimeForSuppliers()
-
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
