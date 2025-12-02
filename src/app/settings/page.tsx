@@ -16,6 +16,7 @@ import {
   ModuleManagementSettings,
   PreferredFeaturesSettings,
   ApiSettings,
+  DevToolsSettings,
 } from './components'
 
 // 強制客戶端渲染，不預取伺服器資料
@@ -92,6 +93,9 @@ export default function SettingsPage() {
 
           {/* API 設定 */}
           <ApiSettings />
+
+          {/* 開發者工具 */}
+          <DevToolsSettings />
 
           {/* 帳號安全設定 */}
           <AccountSettings
