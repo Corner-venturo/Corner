@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUserStore } from '@/stores/user-store'
-import { Check, Star, Info } from 'lucide-react'
+import { Check, Star, Info, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import type { User } from '@/stores/types'
@@ -28,7 +28,7 @@ const AVAILABLE_FEATURES: FeatureOption[] = [
   { id: 'orders', label: '訂單', description: '客戶訂單管理', category: '業務功能' },
   { id: 'quotes', label: '報價單', description: '報價單製作與管理', category: '業務功能' },
   { id: 'customers', label: '顧客管理', description: '客戶資料維護', category: '業務功能' },
-  { id: 'itinerary', label: '行程管理', description: '旅遊行程規劃', category: '業務功能' },
+  { id: 'business', label: '行程管理', description: '旅遊行程規劃', category: '業務功能' },
   { id: 'confirmations', label: '確認單管理', description: '確認單製作與管理', category: '業務功能' },
   { id: 'contracts', label: '合約管理', description: '合約簽署與管理', category: '業務功能' },
   { id: 'visas', label: '簽證管理', description: '簽證申請追蹤', category: '業務功能' },
@@ -57,31 +57,42 @@ export function PreferredFeaturesSettings() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [showSavedMessage, setShowSavedMessage] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  // 用於 debounce 的 ref
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const pendingFeaturesRef = useRef<string[]>([])
 
   // 初始化：載入使用者的 preferred_features
   useEffect(() => {
     if (user?.preferred_features) {
       setSelectedFeatures(user.preferred_features)
     } else {
-      // 沒有設定時，使用所有有權限的功能
+      // 沒有設定時，預設全部顯示（管理員）
       const userPermissions = user?.permissions || []
-      const defaultFeatures = AVAILABLE_FEATURES
-        .filter(f => userPermissions.includes(f.id) || userPermissions.includes('*'))
-        .map(f => f.id)
-      setSelectedFeatures(defaultFeatures)
+      const isAdmin = userPermissions.includes('admin') || userPermissions.includes('super_admin') || userPermissions.includes('*')
+      if (isAdmin) {
+        setSelectedFeatures(AVAILABLE_FEATURES.map(f => f.id))
+      } else {
+        const defaultFeatures = AVAILABLE_FEATURES
+          .filter(f => userPermissions.includes(f.id))
+          .map(f => f.id)
+        setSelectedFeatures(defaultFeatures)
+      }
     }
   }, [user])
 
-  const handleToggleFeature = async (featureId: string) => {
-    const newFeatures = selectedFeatures.includes(featureId)
-      ? selectedFeatures.filter(id => id !== featureId)
-      : [...selectedFeatures, featureId]
+  // 清理 timeout
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [])
 
-    setSelectedFeatures(newFeatures)
-    await savePreferences(newFeatures)
-  }
-
-  const savePreferences = async (features: string[]) => {
+  // 實際儲存到資料庫（延遲執行）
+  const saveToDatabase = useCallback(async (features: string[]) => {
     if (!user) return
 
     setIsSaving(true)
@@ -89,42 +100,47 @@ export function PreferredFeaturesSettings() {
       // 更新資料庫
       await updateUser(user.id, { preferred_features: features })
 
-      // 同步更新 IndexedDB
-      try {
-        const { localDB } = await import('@/lib/db')
-        const { TABLES } = await import('@/lib/db/schemas')
-
-        const existingEmployee = await localDB.read(TABLES.EMPLOYEES, user.id) as User | undefined
-        if (existingEmployee) {
-          const updatedEmployee: User = {
-            ...existingEmployee,
-            preferred_features: features,
-            updated_at: new Date().toISOString(),
-          }
-          await localDB.put(TABLES.EMPLOYEES, updatedEmployee)
-        }
-      } catch (error) {
-        // Ignore error
-      }
-
-      // 更新 auth-store 中的 user
-      const updatedUser: User = {
-        ...user,
-        preferred_features: features,
-      }
-      login(updatedUser)
-
       // 顯示儲存成功訊息
       setShowSavedMessage(true)
+      setHasUnsavedChanges(false)
       setTimeout(() => setShowSavedMessage(false), 2000)
     } catch (error) {
-      alert('儲存失敗，請稍後再試')
+      console.error('儲存失敗:', error)
     } finally {
       setIsSaving(false)
     }
+  }, [user, updateUser])
+
+  // 處理點擊（立即更新 UI，延遲儲存資料庫）
+  const handleToggleFeature = (featureId: string) => {
+    const newFeatures = selectedFeatures.includes(featureId)
+      ? selectedFeatures.filter(id => id !== featureId)
+      : [...selectedFeatures, featureId]
+
+    // 1. 立即更新本地狀態
+    setSelectedFeatures(newFeatures)
+    setHasUnsavedChanges(true)
+    pendingFeaturesRef.current = newFeatures
+
+    // 2. 立即更新 auth-store（讓側邊欄即時反應）
+    if (user) {
+      const updatedUser: User = {
+        ...user,
+        preferred_features: newFeatures,
+      }
+      login(updatedUser)
+    }
+
+    // 3. 延遲儲存到資料庫（debounce 1 秒）
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      saveToDatabase(pendingFeaturesRef.current)
+    }, 1000)
   }
 
-  const handleResetToDefaults = async () => {
+  const handleResetToDefaults = () => {
     if (!user) return
 
     // 根據角色重置為預設功能
@@ -133,7 +149,7 @@ export function PreferredFeaturesSettings() {
 
     switch (role) {
       case 'admin':
-        defaultFeatures = ['tours', 'orders', 'quotes', 'customers', 'calendar', 'hr']
+        defaultFeatures = AVAILABLE_FEATURES.map(f => f.id)
         break
       case 'tour_leader':
         defaultFeatures = ['tours', 'orders', 'calendar']
@@ -151,8 +167,26 @@ export function PreferredFeaturesSettings() {
         defaultFeatures = ['calendar', 'todos', 'workspace']
     }
 
+    // 更新本地狀態和 auth-store
     setSelectedFeatures(defaultFeatures)
-    await savePreferences(defaultFeatures)
+    setHasUnsavedChanges(true)
+    pendingFeaturesRef.current = defaultFeatures
+
+    if (user) {
+      const updatedUser: User = {
+        ...user,
+        preferred_features: defaultFeatures,
+      }
+      login(updatedUser)
+    }
+
+    // 延遲儲存
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      saveToDatabase(pendingFeaturesRef.current)
+    }, 1000)
   }
 
   // 按類別分組功能
@@ -193,12 +227,25 @@ export function PreferredFeaturesSettings() {
               選擇你常用的功能，側邊欄將只顯示這些項目，讓介面更簡潔
             </p>
           </div>
-          {showSavedMessage && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-green-700">
-              <Check size={14} />
-              <span className="text-sm font-medium">已儲存</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {isSaving && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+                <Loader2 size={14} className="animate-spin" />
+                <span className="text-sm font-medium">儲存中...</span>
+              </div>
+            )}
+            {showSavedMessage && !isSaving && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                <Check size={14} />
+                <span className="text-sm font-medium">已儲存</span>
+              </div>
+            )}
+            {hasUnsavedChanges && !isSaving && !showSavedMessage && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-700">
+                <span className="text-sm font-medium">變更待儲存...</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -212,7 +259,7 @@ export function PreferredFeaturesSettings() {
               <li>選擇的功能會顯示在側邊欄，未選擇的會被隱藏</li>
               <li>此設定不影響你的實際權限，只是個人化介面顯示</li>
               <li>你只能選擇有權限的功能</li>
-              <li>變更會立即儲存並生效</li>
+              <li>變更會在停止操作後自動儲存</li>
             </ul>
           </div>
         </div>
