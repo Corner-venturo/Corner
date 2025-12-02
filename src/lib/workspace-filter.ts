@@ -78,7 +78,7 @@ export function isWorkspaceFilterEnabled(tableName: string): boolean {
  * @param tableName - 表格名稱
  * @returns workspace_id 或 null（不篩選）
  */
-export function getWorkspaceFilterForQuery(tableName: string): string | null {
+export async function getWorkspaceFilterForQuery(tableName: string): Promise<string | null> {
   // 檢查表格是否支援 workspace 篩選
   if (!isWorkspaceFilterEnabled(tableName)) {
     return null
@@ -88,7 +88,7 @@ export function getWorkspaceFilterForQuery(tableName: string): string | null {
   // 只有具有跨 workspace 權限的角色可以透過 localStorage 手動切換 workspace
   try {
     // 動態引入避免循環依賴
-    const { useAuthStore } = require('@/stores/auth-store')
+    const { useAuthStore } = await import('@/stores/auth-store')
     const user = useAuthStore.getState().user
 
     if (!user) {

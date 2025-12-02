@@ -52,7 +52,7 @@ export const statusColors: Record<string, string> = {
   paid: 'bg-morandi-primary',
 }
 
-// @ts-ignore - Const assertion compatibility
+// @ts-expect-error - Const assertion compatibility
 export const categoryOptions: Array<{ value: string; label: string }> = [
   { value: '住宿', label: '🏨 住宿' },
   { value: '交通', label: '🚌 交通' },

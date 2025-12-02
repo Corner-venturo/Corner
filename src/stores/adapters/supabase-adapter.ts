@@ -33,7 +33,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
         .order('created_at', { ascending: true })
 
       // 套用 workspace 篩選（如果有的話）
-      const workspaceId = getWorkspaceFilterForQuery(this.tableName)
+      const workspaceId = await getWorkspaceFilterForQuery(this.tableName)
       if (workspaceId) {
         query = query.eq('workspace_id', workspaceId)
         logger.log(`🔍 [${this.tableName}] 套用 workspace 篩選:`, workspaceId)

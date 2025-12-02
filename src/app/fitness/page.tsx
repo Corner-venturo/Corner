@@ -13,6 +13,9 @@ import {
 } from 'lucide-react'
 import { EXERCISES, MUSCLE_GROUPS } from '@/data/fitness/exercises'
 import { ExerciseIcon, MuscleGroupIcon } from './components/ExerciseIcons'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface WorkoutSet {
   setNumber: number
@@ -107,10 +110,10 @@ export default function FitnessPage() {
   return (
     <FitnessLayout activeTab="workout">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#FEFEFE] border-b border-[#EDE8E0] px-4 py-4">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border px-4 py-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-[#3D2914]">Corner Fitness</h1>
-          <div className="text-sm text-[#6B5D52]">
+          <h1 className="text-xl font-bold text-foreground">Corner Fitness</h1>
+          <div className="text-sm text-muted-foreground">
             {new Date().toLocaleDateString('zh-TW', {
               month: '2-digit',
               day: '2-digit',
@@ -122,27 +125,27 @@ export default function FitnessPage() {
       <div className="px-4 pt-6 space-y-6">
         {/* 訓練部位選擇 */}
         <div>
-          <h2 className="text-sm font-medium text-[#6B5D52] mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <ClipboardList className="w-4 h-4" />
             選擇訓練部位
           </h2>
           <div className="grid grid-cols-3 gap-2">
-            {MUSCLE_GROUPS.map((group) => (
-              <button
+            {MUSCLE_GROUPS.map(group => (
+              <Button
                 key={group.id}
+                variant="outline"
                 onClick={() => {
                   setSelectedCategory(group.id)
                   setShowExercisePicker(true)
                 }}
-                className="flex flex-col items-center justify-center p-4 bg-[#FEFEFE] border border-[#EDE8E0] rounded-xl hover:border-[#C9A961] transition-colors"
-                style={{
-                  backgroundColor:
-                    selectedCategory === group.id ? `${group.color}20` : '#FEFEFE',
-                }}
+                className={cn(
+                  'flex flex-col items-center justify-center p-4 h-auto hover:border-primary transition-colors',
+                  selectedCategory === group.id && 'border-primary bg-primary/10'
+                )}
               >
                 <MuscleGroupIcon groupId={group.id} className="w-6 h-6 mb-1" />
-                <span className="text-xs text-[#6B5D52]">{group.name}</span>
-              </button>
+                <span className="text-xs text-muted-foreground">{group.name}</span>
+              </Button>
             ))}
           </div>
         </div>
@@ -150,41 +153,38 @@ export default function FitnessPage() {
         {/* 今日訓練 */}
         {workoutExercises.length > 0 && (
           <div>
-            <h2 className="text-sm font-medium text-[#6B5D52] mb-3">
+            <h2 className="text-sm font-medium text-muted-foreground mb-3">
               ━━━ 今日訓練 ━━━
             </h2>
 
             <div className="space-y-4">
               {workoutExercises.map((exercise, exerciseIndex) => (
-                <div
-                  key={exerciseIndex}
-                  className="bg-[#FEFEFE] border border-[#EDE8E0] rounded-2xl p-4 shadow-[0_2px_8px_rgba(61,41,20,0.08)]"
-                >
+                <Card key={exerciseIndex} className="p-4 shadow-sm">
                   {/* 動作標題 */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <ExerciseIcon
                         iconName={
-                          EXERCISES.find((ex) => ex.id === exercise.exerciseId)
-                            ?.icon || 'dumbbell'
+                          EXERCISES.find(ex => ex.id === exercise.exerciseId)?.icon ||
+                          'dumbbell'
                         }
                         className="w-5 h-5"
                       />
-                      <h3 className="font-medium text-[#3D2914]">
-                        {exercise.exerciseName}
-                      </h3>
+                      <h3 className="font-medium text-foreground">{exercise.exerciseName}</h3>
                     </div>
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="iconSm"
                       onClick={() => removeExercise(exerciseIndex)}
-                      className="text-[#9E8F81] hover:text-[#C9A961]"
+                      className="text-muted-foreground hover:text-primary"
                     >
                       <X className="w-5 h-5" />
-                    </button>
+                    </Button>
                   </div>
 
                   {/* 組數表格 */}
                   <div className="space-y-2">
-                    <div className="grid grid-cols-4 gap-2 text-xs text-[#9E8F81] font-medium">
+                    <div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground font-medium">
                       <div className="text-center">組數</div>
                       <div className="text-center">重量</div>
                       <div className="text-center">次數</div>
@@ -192,14 +192,14 @@ export default function FitnessPage() {
                     </div>
 
                     {exercise.sets.map((set, setIndex) => (
-                      <div key={setIndex} className="grid grid-cols-4 gap-2">
-                        <div className="flex items-center justify-center text-sm text-[#6B5D52] font-medium">
+                      <div key={setIndex} className="grid grid-cols-4 gap-2 items-center">
+                        <div className="flex items-center justify-center text-sm text-foreground font-medium">
                           {set.setNumber}
                         </div>
                         <input
                           type="number"
                           value={set.weight || ''}
-                          onChange={(e) =>
+                          onChange={e =>
                             updateSet(
                               exerciseIndex,
                               setIndex,
@@ -207,13 +207,13 @@ export default function FitnessPage() {
                               parseFloat(e.target.value) || 0
                             )
                           }
-                          className="bg-[#FAF8F5] border border-[#E0D8CC] rounded-lg px-2 py-1.5 text-sm text-center text-[#3D2914] focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20"
+                          className="w-full bg-background border border-input rounded-lg px-2 py-1.5 text-sm text-center text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                           placeholder="kg"
                         />
                         <input
                           type="number"
                           value={set.reps || ''}
-                          onChange={(e) =>
+                          onChange={e =>
                             updateSet(
                               exerciseIndex,
                               setIndex,
@@ -221,153 +221,152 @@ export default function FitnessPage() {
                               parseInt(e.target.value) || 0
                             )
                           }
-                          className="bg-[#FAF8F5] border border-[#E0D8CC] rounded-lg px-2 py-1.5 text-sm text-center text-[#3D2914] focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20"
+                          className="w-full bg-background border border-input rounded-lg px-2 py-1.5 text-sm text-center text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                           placeholder="次"
                         />
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() =>
-                            updateSet(
-                              exerciseIndex,
-                              setIndex,
-                              'completed',
-                              !set.completed
-                            )
+                            updateSet(exerciseIndex, setIndex, 'completed', !set.completed)
                           }
                           className="flex items-center justify-center"
                         >
                           {set.completed ? (
-                            <CheckCircle className="w-5 h-5 text-[#A8B4A5]" />
+                            <CheckCircle className="w-5 h-5 text-morandi-green" />
                           ) : (
-                            <Circle className="w-5 h-5 text-[#E0D8CC]" />
+                            <Circle className="w-5 h-5 text-border" />
                           )}
-                        </button>
+                        </Button>
                       </div>
                     ))}
                   </div>
 
                   {/* 新增組數按鈕 */}
-                  <button
+                  <Button
+                    variant="outline"
                     onClick={() => addSet(exerciseIndex)}
-                    className="w-full mt-3 py-2 text-sm text-[#6B5D52] hover:text-[#C9A961] border border-[#E0D8CC] rounded-lg hover:bg-[#FAF8F5] transition-colors"
+                    className="w-full mt-3 py-2 text-sm"
                   >
                     + 新增組數
-                  </button>
-                </div>
+                  </Button>
+                </Card>
               ))}
             </div>
           </div>
         )}
 
         {/* 新增動作按鈕 */}
-        <button
+        <Button
+          variant="outline"
           onClick={() => setShowExercisePicker(true)}
-          className="w-full py-3 text-sm text-[#6B5D52] border border-[#E0D8CC] rounded-xl hover:bg-[#FAF8F5] transition-colors flex items-center justify-center gap-2"
+          className="w-full py-3 text-sm flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
           新增動作
-        </button>
+        </Button>
 
         {/* 訓練統計 */}
         {workoutExercises.length > 0 && (
-          <div className="bg-[#FEFEFE] border border-[#EDE8E0] rounded-2xl p-4">
-            <h3 className="text-sm font-medium text-[#6B5D52] mb-3 flex items-center gap-2">
+          <Card className="p-4">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               訓練統計
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-[#9E8F81]">總容量</span>
-                <span className="font-bold text-[#3D2914]">
+                <span className="text-muted-foreground">總容量</span>
+                <span className="font-bold text-foreground">
                   {calculateTotalVolume().toLocaleString()} kg
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#9E8F81]">完成組數</span>
-                <span className="font-medium text-[#3D2914]">
+                <span className="text-muted-foreground">完成組數</span>
+                <span className="font-medium text-foreground">
                   {workoutExercises.reduce(
-                    (total, ex) =>
-                      total + ex.sets.filter((s) => s.completed).length,
+                    (total, ex) => total + ex.sets.filter(s => s.completed).length,
                     0
                   )}{' '}
                   組
                 </span>
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* 完成訓練按鈕 */}
         {workoutExercises.length > 0 && (
-          <button className="w-full bg-[#C9A961] text-white px-6 py-4 rounded-xl shadow-md hover:bg-[#B89850] active:scale-95 transition-all font-medium flex items-center justify-center gap-2">
+          <Button
+            variant="default"
+            size="lg"
+            className="w-full shadow-md active:scale-95 transition-all font-medium flex items-center justify-center gap-2"
+          >
             <Save className="w-5 h-5" />
             完成訓練
-          </button>
+          </Button>
         )}
       </div>
 
       {/* 動作選擇對話框 */}
       {showExercisePicker && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-[#FAF8F5] rounded-t-3xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[#FEFEFE] border-b border-[#EDE8E0] px-4 py-4 rounded-t-3xl">
+          <div className="bg-background rounded-t-3xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4 rounded-t-3xl">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-[#3D2914]">
-                  選擇訓練動作
-                </h2>
-                <button
+                <h2 className="text-lg font-bold text-foreground">選擇訓練動作</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => {
                     setShowExercisePicker(false)
                     setSelectedCategory(null)
                   }}
-                  className="text-[#9E8F81]"
+                  className="text-muted-foreground"
                 >
                   <X className="w-6 h-6" />
-                </button>
+                </Button>
               </div>
 
               {/* 部位篩選 */}
-              <div className="mt-3 flex gap-2 overflow-x-auto">
-                <button
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+                <Button
                   onClick={() => setSelectedCategory(null)}
-                  className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap ${
-                    selectedCategory === null
-                      ? 'bg-[#C9A961] text-white'
-                      : 'bg-[#FEFEFE] text-[#6B5D52] border border-[#E0D8CC]'
-                  }`}
+                  variant={selectedCategory === null ? 'default' : 'outline'}
+                  size="sm"
+                  className="rounded-full text-xs whitespace-nowrap"
                 >
                   全部
-                </button>
-                {MUSCLE_GROUPS.map((group) => (
-                  <button
+                </Button>
+                {MUSCLE_GROUPS.map(group => (
+                  <Button
                     key={group.id}
                     onClick={() => setSelectedCategory(group.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1.5 ${
-                      selectedCategory === group.id
-                        ? 'bg-[#C9A961] text-white'
-                        : 'bg-[#FEFEFE] text-[#6B5D52] border border-[#E0D8CC]'
-                    }`}
+                    variant={selectedCategory === group.id ? 'default' : 'outline'}
+                    size="sm"
+                    className="rounded-full text-xs whitespace-nowrap flex items-center gap-1.5"
                   >
                     <MuscleGroupIcon groupId={group.id} className="w-3.5 h-3.5" />
                     {group.name}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
 
             <div className="p-4 space-y-2">
-              {filteredExercises.map((exercise) => (
-                <button
+              {filteredExercises.map(exercise => (
+                <Button
                   key={exercise.id}
+                  variant="outline"
                   onClick={() => addExercise(exercise.id, exercise.name)}
-                  className="w-full bg-[#FEFEFE] border border-[#EDE8E0] rounded-xl p-4 text-left hover:border-[#C9A961] transition-colors"
+                  className="w-full justify-start h-auto p-4 text-left transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <ExerciseIcon iconName={exercise.icon} className="w-6 h-6" />
-                    <span className="text-sm font-medium text-[#3D2914]">
+                    <span className="text-sm font-medium text-foreground">
                       {exercise.name}
                     </span>
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           </div>

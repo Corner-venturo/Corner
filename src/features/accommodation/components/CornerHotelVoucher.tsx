@@ -54,6 +54,8 @@ interface CornerHotelVoucherProps {
   language?: 'zh' | 'ja'
 }
 
+
+
 export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, language = 'zh' }) => {
   const labels = {
     zh: {
@@ -98,325 +100,125 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
 
   const t = labels[language]
   return (
-    <div style={{
-      padding: '0',
-      backgroundColor: 'white',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif',
-      fontSize: '11pt',
-      color: CORNER_COLORS.gray,
-      lineHeight: 1.6,
-    }}>
+    <div className="p-0 bg-white text-[#4B5563] text-[11pt] leading-relaxed">
       {/* 頁首 - Corner Logo + 標題 */}
-      <div style={{
-        borderBottom: `2px solid ${CORNER_COLORS.orange}`,
-        paddingBottom: '12px',
-        marginBottom: '20px',
-        position: 'relative',
-      }}>
+      <div className="relative border-b-2 border-[#F89A1E] pb-3 mb-5">
         {/* Logo - 左上角 */}
-        <div style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-        }}>
-          <img
-            src="/corner-logo.png"
-            alt="Corner Travel"
-            style={{
-              height: '35px',
-              width: 'auto',
-            }}
-          />
+        <div className="absolute left-0 top-0">
+          <img src="/corner-logo.png" alt="Corner Travel" className="h-[35px] w-auto" />
         </div>
 
         {/* 標題 - 右側 */}
-        <div style={{ textAlign: 'right' }}>
-          <div style={{
-            fontSize: '18pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.brown,
-            marginBottom: '4px',
-          }}>
-            {t.title}
-          </div>
-          <div style={{
-            fontSize: '9pt',
-            color: CORNER_COLORS.lightGray,
-            letterSpacing: '2px',
-          }}>
-            {t.subtitle}
-          </div>
+        <div className="text-right">
+          <div className="text-[18pt] font-bold text-[#6B5B4F] mb-1">{t.title}</div>
+          <div className="text-[9pt] text-[#9CA3AF] tracking-[2px]">{t.subtitle}</div>
         </div>
       </div>
 
       {/* 確認資訊 */}
-      <div style={{
-        backgroundColor: CORNER_COLORS.lightBrown,
-        padding: '12px 16px',
-        borderRadius: '8px',
-        marginBottom: '20px',
-        borderLeft: `4px solid ${CORNER_COLORS.orange}`,
-      }}>
-        <div style={{ marginBottom: '6px' }}>
-          <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.confirmation}</span>
-          <span style={{ color: CORNER_COLORS.orange, fontWeight: 'bold', fontSize: '12pt' }}>
+      <div className="bg-[#FAF7F2] p-3 px-4 rounded-lg mb-5 border-l-4 border-[#F89A1E]">
+        <div className="mb-1.5">
+          <span className="text-[#6B5B4F] font-semibold">{t.confirmation}</span>
+          <span className="text-[#F89A1E] font-bold text-[12pt]">
             {data.confirmation_number}
           </span>
         </div>
-        <div style={{ marginBottom: '6px' }}>
-          <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.pin}</span>
-          <span style={{ fontWeight: 'bold' }}>{data.pin_code}</span>
-          <span style={{ color: CORNER_COLORS.lightGray, fontSize: '9pt', marginLeft: '8px' }}>
-            {t.pinNote}
-          </span>
+        <div className="mb-1.5">
+          <span className="text-[#6B5B4F] font-semibold">{t.pin}</span>
+          <span className="font-bold">{data.pin_code}</span>
+          <span className="text-[#9CA3AF] text-[9pt] ml-2">{t.pinNote}</span>
         </div>
         <div>
-          <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.order}</span>
+          <span className="text-[#6B5B4F] font-semibold">{t.order}</span>
           <span>{data.order_number}</span>
         </div>
       </div>
 
       {/* 酒店資訊 */}
-      <div style={{
-        display: 'flex',
-        gap: '16px',
-        marginBottom: '24px',
-        padding: '16px',
-        border: `1px solid ${CORNER_COLORS.border}`,
-        borderRadius: '8px',
-      }}>
+      <div className="flex gap-4 mb-6 p-4 border border-[#E5E7EB] rounded-lg">
         {data.hotel_image && (
-          <div style={{ flexShrink: 0 }}>
+          <div className="flex-shrink-0">
             <img
               src={data.hotel_image}
               alt={data.hotel_name}
-              style={{
-                width: '120px',
-                height: '90px',
-                objectFit: 'cover',
-                borderRadius: '6px',
-              }}
+              className="w-[120px] h-[90px] object-cover rounded-md"
             />
           </div>
         )}
-        <div style={{ flex: 1 }}>
-          <h2 style={{
-            margin: '0 0 8px 0',
-            fontSize: '14pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.brown,
-          }}>
-            {data.hotel_name}
-          </h2>
-          <div style={{ fontSize: '10pt', color: CORNER_COLORS.gray, marginBottom: '4px' }}>
-            📍 {data.hotel_address}
-          </div>
-          <div style={{ fontSize: '10pt', color: CORNER_COLORS.gray }}>
-            📞 {data.hotel_phone}
-          </div>
+        <div className="flex-1">
+          <h2 className="m-0 mb-2 text-[14pt] font-bold text-[#6B5B4F]">{data.hotel_name}</h2>
+          <div className="text-[10pt] text-[#4B5563] mb-1">📍 {data.hotel_address}</div>
+          <div className="text-[10pt] text-[#4B5563]">📞 {data.hotel_phone}</div>
         </div>
       </div>
 
       {/* 入住資訊表格 */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-        gap: '16px',
-        marginBottom: '24px',
-      }}>
+      <div className="grid grid-cols-3 gap-4 mb-6">
         {/* 入住時間 */}
-        <div style={{
-          padding: '16px',
-          backgroundColor: CORNER_COLORS.lightBrown,
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{
-            fontSize: '9pt',
-            color: CORNER_COLORS.lightGray,
-            marginBottom: '8px',
-            fontWeight: '600',
-          }}>
-            {t.checkIn}
-          </div>
-          <div style={{
-            fontSize: '15pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.brown,
-            marginBottom: '4px',
-          }}>
-            {data.check_in_date}
-          </div>
-          <div style={{ fontSize: '9pt', color: CORNER_COLORS.gray, marginBottom: '4px' }}>
-            {data.check_in_day}
-          </div>
-          <div style={{ fontSize: '10pt', color: CORNER_COLORS.orange, fontWeight: '600' }}>
-            {data.check_in_time}
-          </div>
-          <div style={{ fontSize: '8pt', color: CORNER_COLORS.lightGray, marginTop: '2px' }}>
-            {t.hotelTime}
-          </div>
+        <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
+          <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.checkIn}</div>
+          <div className="text-[15pt] font-bold text-[#6B5B4F] mb-1">{data.check_in_date}</div>
+          <div className="text-[9pt] text-[#4B5563] mb-1">{data.check_in_day}</div>
+          <div className="text-[10pt] text-[#F89A1E] font-semibold">{data.check_in_time}</div>
+          <div className="text-[8pt] text-[#9CA3AF] mt-0.5">{t.hotelTime}</div>
         </div>
 
         {/* 退房時間 */}
-        <div style={{
-          padding: '16px',
-          backgroundColor: CORNER_COLORS.lightBrown,
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{
-            fontSize: '9pt',
-            color: CORNER_COLORS.lightGray,
-            marginBottom: '8px',
-            fontWeight: '600',
-          }}>
-            {t.checkOut}
-          </div>
-          <div style={{
-            fontSize: '15pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.brown,
-            marginBottom: '4px',
-          }}>
-            {data.check_out_date}
-          </div>
-          <div style={{ fontSize: '9pt', color: CORNER_COLORS.gray, marginBottom: '4px' }}>
-            {data.check_out_day}
-          </div>
-          <div style={{ fontSize: '10pt', color: CORNER_COLORS.orange, fontWeight: '600' }}>
-            {data.check_out_time}
-          </div>
-          <div style={{ fontSize: '8pt', color: CORNER_COLORS.lightGray, marginTop: '2px' }}>
-            {t.hotelTime}
-          </div>
+        <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
+          <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.checkOut}</div>
+          <div className="text-[15pt] font-bold text-[#6B5B4F] mb-1">{data.check_out_date}</div>
+          <div className="text-[9pt] text-[#4B5563] mb-1">{data.check_out_day}</div>
+          <div className="text-[10pt] text-[#F89A1E] font-semibold">{data.check_out_time}</div>
+          <div className="text-[8pt] text-[#9CA3AF] mt-0.5">{t.hotelTime}</div>
         </div>
 
         {/* 房間數量 / 晚數 */}
-        <div style={{
-          padding: '16px',
-          backgroundColor: CORNER_COLORS.lightBrown,
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{
-            fontSize: '9pt',
-            color: CORNER_COLORS.lightGray,
-            marginBottom: '8px',
-            fontWeight: '600',
-          }}>
-            {t.rooms}
-          </div>
-          <div style={{
-            fontSize: '28pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.orange,
-            lineHeight: 1,
-          }}>
-            {data.rooms} <span style={{ fontSize: '16pt', color: CORNER_COLORS.lightGray }}>/</span> {data.nights}
+        <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
+          <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.rooms}</div>
+          <div className="text-[28pt] font-bold text-[#F89A1E] leading-none">
+            {data.rooms} <span className="text-[16pt] text-[#9CA3AF]">/</span> {data.nights}
           </div>
         </div>
       </div>
 
       {/* 房型與旅客資訊 */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gap: '16px',
-        marginBottom: '24px',
-      }}>
+      <div className="grid grid-cols-1 gap-4 mb-6">
         {/* 房型 */}
-        <div style={{
-          padding: '16px',
-          border: `1px solid ${CORNER_COLORS.border}`,
-          borderRadius: '8px',
-        }}>
-          <h3 style={{
-            margin: '0 0 12px 0',
-            fontSize: '12pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.brown,
-            borderBottom: `1px solid ${CORNER_COLORS.orange}`,
-            paddingBottom: '8px',
-          }}>
+        <div className="p-4 border border-[#E5E7EB] rounded-lg">
+          <h3 className="m-0 mb-3 text-[12pt] font-bold text-[#6B5B4F] border-b border-[#F89A1E] pb-2">
             {data.room_type}
           </h3>
 
           {/* 旅客姓名 */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
-              {t.guestName}
-            </div>
-            <div style={{ fontSize: '11pt', fontWeight: '600', color: CORNER_COLORS.brown }}>
+          <div className="mb-3">
+            <div className="text-[9pt] text-[#9CA3AF] mb-1 font-semibold">{t.guestName}</div>
+            <div className="text-[11pt] font-semibold text-[#6B5B4F]">
               {data.guest_names.join(', ')}
             </div>
           </div>
 
           {/* 可入住人數 */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
-              {t.maxOccupancy}
-            </div>
-            <div style={{ fontSize: '10pt', color: CORNER_COLORS.gray }}>
-              {data.max_occupancy}
-            </div>
+          <div className="mb-3">
+            <div className="text-[9pt] text-[#9CA3AF] mb-1 font-semibold">{t.maxOccupancy}</div>
+            <div className="text-[10pt] text-[#4B5563]">{data.max_occupancy}</div>
           </div>
 
           {/* 房間資訊 */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
-              {t.roomInfo}
-            </div>
-            <div style={{ fontSize: '10pt', color: CORNER_COLORS.gray }}>
-              {data.bed_type}
-            </div>
+          <div className="mb-3">
+            <div className="text-[9pt] text-[#9CA3AF] mb-1 font-semibold">{t.roomInfo}</div>
+            <div className="text-[10pt] text-[#4B5563]">{data.bed_type}</div>
           </div>
 
           {/* 餐膳 */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
-              {t.meal}
-            </div>
-            <div style={{ fontSize: '10pt', color: CORNER_COLORS.gray }}>
-              {data.meal_plan}
-            </div>
+          <div className="mb-3">
+            <div className="text-[9pt] text-[#9CA3AF] mb-1 font-semibold">{t.meal}</div>
+            <div className="text-[10pt] text-[#4B5563]">{data.meal_plan}</div>
           </div>
 
           {/* 房間設施 */}
           <div>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
-              {t.facilities}
-            </div>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.gray,
-              lineHeight: 1.8,
-            }}>
+            <div className="text-[9pt] text-[#9CA3AF] mb-1 font-semibold">{t.facilities}</div>
+            <div className="text-[9pt] text-[#4B5563] leading-loose">
               {data.room_facilities.join('・')}
             </div>
           </div>
@@ -424,29 +226,16 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       </div>
 
       {/* 頁尾 - Corner 資訊 */}
-      <div style={{
-        marginTop: '40px',
-        paddingTop: '16px',
-        borderTop: `1px solid ${CORNER_COLORS.border}`,
-        textAlign: 'center',
-      }}>
-        <div style={{
-          fontSize: '9pt',
-          color: CORNER_COLORS.gray,
-          fontStyle: 'italic',
-          marginBottom: '12px',
-        }}>
-          {t.slogan}
-        </div>
-        <div style={{
-          fontSize: '8pt',
-          color: CORNER_COLORS.lightGray,
-        }}>
+      <div className="mt-10 pt-4 border-t border-[#E5E7EB] text-center">
+        <div className="text-[9pt] text-[#4B5563] italic mb-3">{t.slogan}</div>
+        <div className="text-[8pt] text-[#9CA3AF]">
           {t.company} © {new Date().getFullYear()}
         </div>
       </div>
     </div>
   )
 }
+
+export default CornerHotelVoucher
 
 export default CornerHotelVoucher

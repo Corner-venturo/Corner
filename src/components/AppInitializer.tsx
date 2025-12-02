@@ -48,13 +48,13 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         // ⚠️ 只在登入後才載入 workspaces（避免登入頁面卡住）
         if (authStore.user) {
           // 載入 workspaces 資料（用於編號生成等核心功能）
-          const { useWorkspaceStore } = await import('@/stores')
+          const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
           logger.log('📦 Loading workspaces...')
 
           // 確保 workspaces 完全載入
-          await useWorkspaceStore.getState().fetchAll()
+          await useWorkspaceStoreData.getState().fetchAll()
 
-          const workspaces = useWorkspaceStore.getState().items
+          const workspaces = useWorkspaceStoreData.getState().items
           logger.log(`✅ Workspaces loaded: ${workspaces?.length || 0} items`)
 
           if (!workspaces || workspaces.length === 0) {

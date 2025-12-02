@@ -33,12 +33,12 @@ export function SuccessDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-green-600">✅ 員工創建成功</DialogTitle>
+          <DialogTitle className="text-morandi-gold">✅ 員工創建成功</DialogTitle>
           <DialogDescription>員工資料已成功建立，請記錄以下登入資訊</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+          <div className="bg-morandi-gold/5 border border-morandi-gold/20 rounded-xl p-6">
             <p className="text-sm text-morandi-primary mb-4">
               員工{' '}
               <span className="font-bold text-morandi-gold">{createdEmployee?.display_name}</span>{' '}
@@ -61,7 +61,7 @@ export function SuccessDialog({
                     title="複製員工編號"
                   >
                     {copiedField === 'number' ? (
-                      <Check size={20} className="text-green-600" />
+                      <Check size={20} className="text-morandi-gold" />
                     ) : (
                       <Copy size={20} className="text-gray-600" />
                     )}
@@ -84,7 +84,7 @@ export function SuccessDialog({
                     title="複製密碼"
                   >
                     {copiedField === 'password' ? (
-                      <Check size={20} className="text-green-600" />
+                      <Check size={20} className="text-morandi-gold" />
                     ) : (
                       <Copy size={20} className="text-gray-600" />
                     )}
@@ -93,7 +93,7 @@ export function SuccessDialog({
               </div>
             </div>
 
-            <div className="mt-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+            <div className="mt-4 text-sm text-morandi-primary bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg p-3 flex items-start gap-2">
               <span className="text-base">💡</span>
               <span>請提醒員工首次登入後更改密碼</span>
             </div>

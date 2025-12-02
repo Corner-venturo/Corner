@@ -112,7 +112,7 @@ export function SystemSettings({
                     <div
                       className={cn(
                         'w-2 h-2 rounded-full',
-                        cacheInfo.dbExists ? 'bg-green-500' : 'bg-gray-400'
+                        cacheInfo.dbExists ? 'bg-morandi-gold' : 'bg-morandi-secondary/50'
                       )}
                     />
                     <span className="font-medium">
@@ -149,8 +149,8 @@ export function SystemSettings({
           </div>
 
           {/* 警告提示 */}
-          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <p className="text-xs text-yellow-800 dark:text-yellow-200">
+          <div className="mt-4 p-3 bg-morandi-gold/5 dark:bg-morandi-gold/20 border border-morandi-gold/20 dark:border-morandi-gold/40 rounded-lg">
+            <p className="text-xs text-morandi-gold dark:text-morandi-gold/80">
               <strong>⚠️ 注意：</strong>
               清除快取會刪除所有本地儲存的資料，但不會影響 Supabase 雲端資料庫。
               如果遇到資料同步問題或顯示異常時，可以使用此功能重置本地快取。

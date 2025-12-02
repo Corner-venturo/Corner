@@ -135,7 +135,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
             <button
               type="button"
               onClick={() => removeHotel(index)}
-              className="absolute top-3 right-3 p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+              className="absolute top-3 right-3 p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
               title="移除此飯店"
             >
               <X size={16} />

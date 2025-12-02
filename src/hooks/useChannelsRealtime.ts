@@ -11,7 +11,7 @@ import { useChannelStore } from '@/stores/workspace/channel-store'
 import { IndexedDBAdapter } from '@/stores/adapters/indexeddb-adapter'
 import type { Channel } from '@/stores/workspace/types'
 
-// @ts-ignore - Type compatibility with createRealtimeHook
+// @ts-expect-error - Type compatibility with createRealtimeHook
 const channelIndexedDB = new IndexedDBAdapter<Channel>('channels')
 
 /**

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
@@ -8,10 +8,13 @@ import { useOrderStore, useTourStore } from '@/stores'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
+import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
+import { MemberQuickAdd } from '@/components/members/member-quick-add'
 
 // 訂單詳細頁面的分頁配置
 const tabs = [
   { value: 'overview', label: '總覽' },
+  { value: 'members', label: '成員' },
   { value: 'payments', label: '收款紀錄' },
   { value: 'costs', label: '成本支出' },
 ]
@@ -22,6 +25,8 @@ export default function OrderDetailPage() {
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore()
   const [activeTab, setActiveTab] = useState('overview')
+  const memberTableRef = useRef<MemberTableRef | null>(null)
+  const [memberKey, setMemberKey] = useState(0) // 用於強制刷新成員表格
 
   const orderId = params.orderId as string
   const order = orders.find(o => o.id === orderId)
@@ -56,6 +61,31 @@ export default function OrderDetailPage() {
     switch (activeTab) {
       case 'overview':
         return <TourOverview tour={tour} orderFilter={order.id} />
+      case 'members':
+        return (
+          <div className="space-y-6 p-6">
+            {/* 快速新增成員（含 OCR 辨識） */}
+            <MemberQuickAdd
+              orderId={orderId}
+              departureDate={tour?.departure_date || ''}
+              onMembersAdded={() => {
+                // 刷新成員表格
+                setMemberKey(prev => prev + 1)
+              }}
+            />
+
+            {/* 成員管理表格 */}
+            <div className="border border-border rounded-lg overflow-hidden bg-card">
+              <ExcelMemberTable
+                key={memberKey}
+                ref={memberTableRef}
+                order_id={orderId}
+                departure_date={tour?.departure_date || ''}
+                member_count={order.member_count ?? 0}
+              />
+            </div>
+          </div>
+        )
       case 'payments':
         return <TourPayments tour={tour} orderFilter={order.id} />
       case 'costs':

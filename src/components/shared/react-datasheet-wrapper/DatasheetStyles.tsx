@@ -13,7 +13,7 @@ export function DatasheetStyles() {
       }
 
       :global(.excel-datasheet-wrapper .data-grid) {
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border);
         border-radius: 8px;
         overflow: hidden;
         width: 100%;
@@ -26,10 +26,10 @@ export function DatasheetStyles() {
       }
 
       :global(.excel-datasheet-wrapper .data-grid ._cell) {
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border);
         padding: 8px;
         min-height: 32px;
-        background: white;
+        background: var(--card);
         text-align: left;
         vertical-align: middle;
         white-space: nowrap;
@@ -37,7 +37,7 @@ export function DatasheetStyles() {
 
       :global(.excel-datasheet-wrapper .data-grid td) {
         padding: 4px 8px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border);
         min-width: 80px;
         max-width: 200px;
         overflow: hidden;
@@ -46,23 +46,23 @@ export function DatasheetStyles() {
 
       :global(.excel-datasheet-wrapper .data-grid th) {
         padding: 8px;
-        border: 1px solid #e5e7eb;
-        background: #f3f4f6;
+        border: 1px solid var(--border);
+        background: var(--accent);
         font-weight: 600;
-        color: #374151;
+        color: var(--foreground);
         text-align: center;
         min-width: 80px;
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell.selected) {
-        border: 2px solid #d97706;
-        background: #fef3c7;
+        border: 2px solid var(--morandi-gold);
+        background: var(--accent);
         outline: none;
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell.editing) {
-        border: 2px solid #d97706;
-        background: white;
+        border: 2px solid var(--morandi-gold);
+        background: var(--card);
         padding: 0;
       }
 
@@ -76,45 +76,46 @@ export function DatasheetStyles() {
         background: transparent;
         font-family: inherit;
         line-height: 1.4;
+        color: var(--foreground);
       }
 
       :global(.excel-datasheet-wrapper .datasheet-header) {
-        background: #f3f4f6;
+        background: var(--accent);
         font-weight: 600;
-        color: #374151;
+        color: var(--foreground);
         text-align: center;
       }
 
       :global(.excel-datasheet-wrapper .datasheet-readonly) {
-        background: #fafafa;
-        color: #6b7280;
+        background: var(--morandi-container);
+        color: var(--muted-foreground);
       }
 
       :global(.excel-datasheet-wrapper .datasheet-formula) {
-        background: #ecfdf5;
+        background: rgba(var(--morandi-green-rgb), 0.1); /* Assuming morandi-green-rgb is defined */
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell:hover) {
-        background: #f9fafb;
+        background: var(--accent);
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell.read-only:hover) {
-        background: #f3f4f6;
+        background: var(--morandi-container);
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell.selected) {
-        background: rgba(217, 119, 6, 0.1);
-        border: 1px solid #d97706;
+        background: rgba(var(--morandi-gold-rgb), 0.1); /* Assuming morandi-gold-rgb is defined */
+        border: 1px solid var(--morandi-gold);
       }
 
       :global(.excel-datasheet-wrapper .data-grid:focus-within .cell.selected) {
-        outline: 2px solid #d97706;
+        outline: 2px solid var(--morandi-gold);
         outline-offset: -2px;
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell.copying) {
-        border: 2px dashed #059669;
-        background: rgba(5, 150, 105, 0.1);
+        border: 2px dashed var(--morandi-green);
+        background: rgba(var(--morandi-green-rgb), 0.1);
       }
 
       :global(.excel-datasheet-wrapper .data-grid .cell.selected::after) {
@@ -124,9 +125,9 @@ export function DatasheetStyles() {
         right: -2px;
         width: 6px;
         height: 6px;
-        background: #d97706;
+        background: var(--morandi-gold);
         cursor: crosshair;
-        border: 1px solid white;
+        border: 1px solid var(--card);
       }
 
       /* Column resize handle styles */
@@ -142,7 +143,7 @@ export function DatasheetStyles() {
       }
 
       :global(.excel-datasheet-wrapper .resize-handle:hover) {
-        background: #d97706;
+        background: var(--morandi-gold);
       }
 
       /* Row drag styles */
@@ -151,13 +152,13 @@ export function DatasheetStyles() {
       }
 
       :global(.excel-datasheet-wrapper .data-grid tr.draggable:hover) {
-        background: rgba(217, 119, 6, 0.05);
+        background: rgba(var(--morandi-gold-rgb), 0.05);
       }
 
       :global(.excel-datasheet-wrapper .data-grid tr.dragging) {
         opacity: 0.5;
-        background: rgba(217, 119, 6, 0.1);
-        border-left: 3px solid #d97706;
+        background: rgba(var(--morandi-gold-rgb), 0.1);
+        border-left: 3px solid var(--morandi-gold);
       }
 
       /* Optimized table layout */
@@ -171,15 +172,15 @@ export function DatasheetStyles() {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        border-right: 1px solid #e5e7eb;
-        border-bottom: 1px solid #e5e7eb;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
       }
 
       :global(.excel-datasheet-wrapper .data-grid th) {
         position: relative;
-        border-right: 1px solid #e5e7eb;
-        border-bottom: 1px solid #e5e7eb;
-        background: #f9fafb;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: var(--accent);
         user-select: none;
       }
     `}</style>

@@ -100,9 +100,9 @@ export function PasswordManagementSection({
           {passwordData.newPassword && passwordData.confirmPassword && (
             <div className="text-sm">
               {passwordData.newPassword === passwordData.confirmPassword ? (
-                <span className="text-green-600">✓ 密碼確認一致</span>
+                <span className="text-morandi-gold">✓ 密碼確認一致</span>
               ) : (
-                <span className="text-red-600">✗ 密碼確認不一致</span>
+                <span className="text-morandi-red">✗ 密碼確認不一致</span>
               )}
             </div>
           )}

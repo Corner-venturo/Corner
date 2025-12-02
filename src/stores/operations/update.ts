@@ -29,16 +29,16 @@ export async function update<T extends BaseEntity>(
 
   try {
     // 取得當前使用者 ID（用於自動填入 updated_by）
-    const getUserId = (): string | null => {
+    const getUserId = async (): Promise<string | null> => {
       try {
-        const { useAuthStore } = require('@/stores/auth-store') as { useAuthStore: { getState: () => { user?: { id?: string } | null } } }
+        const { useAuthStore } = await import('@/stores/auth-store')
         const { user } = useAuthStore.getState()
         return user?.id || null
       } catch {
         return null
       }
     }
-    const _userId = getUserId()
+    const _userId = await getUserId()
 
     // 清理資料：將空字串的時間欄位轉為 null（PostgreSQL 不接受空字串）
     const cleanedData = { ...data } as Record<string, unknown>

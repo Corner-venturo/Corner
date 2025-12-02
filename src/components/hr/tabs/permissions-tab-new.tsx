@@ -192,8 +192,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
         {/* 儲存中提示 */}
         {isSaving && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2 text-blue-700">
-            <div className="animate-spin w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full"></div>
+          <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3 flex items-center gap-2 text-morandi-primary">
+            <div className="animate-spin w-4 h-4 border-2 border-morandi-primary border-t-transparent rounded-full"></div>
             <span className="text-sm font-medium">儲存中...</span>
           </div>
         )}
@@ -256,19 +256,19 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
         {/* 角色預設權限（唯讀顯示） */}
         {roleConfig && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-4">
             <div className="flex items-start gap-2 mb-3">
-              <AlertCircle size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <AlertCircle size={18} className="text-morandi-primary mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <h5 className="font-medium text-blue-900 mb-1">
+                <h5 className="font-medium text-morandi-primary mb-1">
                   {roleConfig.label} 擁有以下功能權限
                 </h5>
-                <p className="text-sm text-blue-700 mb-3">
+                <p className="text-sm text-morandi-secondary mb-3">
                   這些權限由角色自動配置，如需調整請變更角色或在下方新增額外權限
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {rolePermissions.includes('*') ? (
-                    <span className="px-3 py-1 bg-blue-100 border border-blue-300 rounded-full text-sm text-blue-900 font-medium">
+                    <span className="px-3 py-1 bg-morandi-primary/10 border border-morandi-primary/20 rounded-full text-sm text-morandi-primary font-medium">
                       ⭐ 所有權限
                     </span>
                   ) : (
@@ -277,7 +277,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                       return (
                         <span
                           key={perm}
-                          className="px-3 py-1 bg-blue-100 border border-blue-300 rounded-full text-sm text-blue-900"
+                          className="px-3 py-1 bg-morandi-primary/10 border border-morandi-primary/20 rounded-full text-sm text-morandi-primary"
                         >
                           {permConfig?.label || perm}
                         </span>
@@ -319,7 +319,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                         className={cn(
                           'flex items-center gap-2 p-2.5 rounded-lg border transition-all',
                           isDefault
-                            ? 'border-blue-300 bg-blue-50 cursor-not-allowed opacity-60'
+                            ? 'border-morandi-secondary/30 bg-morandi-secondary/5 cursor-not-allowed opacity-60'
                             : isExtra
                               ? 'border-morandi-gold bg-morandi-gold/10 cursor-pointer'
                               : 'border-border bg-white cursor-pointer hover:bg-morandi-container/20'
@@ -330,7 +330,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                             'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0',
                             isSelected
                               ? isDefault
-                                ? 'border-blue-500 bg-blue-500 text-white'
+                                ? 'border-morandi-secondary/50 bg-morandi-secondary/50 text-white'
                                 : 'border-morandi-gold bg-morandi-gold text-white'
                               : 'border-morandi-muted'
                           )}

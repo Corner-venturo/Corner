@@ -261,13 +261,20 @@ export function AddVisaDialog({
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateApplicant(applicant.id, 'country', e.target.value)}
               className="w-56 p-2 border border-border rounded-md bg-background h-10 text-sm"
             >
-              <option value="護照 成人">護照 成人</option>
-              <option value="護照 兒童">護照 兒童</option>
-              <option value="護照 成人 遺失件">護照 成人 遺失件</option>
-              <option value="護照 兒童 遺失件">護照 兒童 遺失件</option>
-              <option value="台胞證">台胞證</option>
-              <option value="台胞證 遺失件">台胞證 遺失件</option>
-              <option value="台胞證 首辦">台胞證 首辦</option>
+              <optgroup label="護照">
+                <option value="護照 成人">護照 成人</option>
+                <option value="護照 兒童">護照 兒童</option>
+                <option value="護照 成人 遺失件">護照 成人 遺失件</option>
+                <option value="護照 兒童 遺失件">護照 兒童 遺失件</option>
+              </optgroup>
+              <optgroup label="台胞證">
+                <option value="台胞證">台胞證</option>
+                <option value="台胞證 遺失件">台胞證 遺失件</option>
+                <option value="台胞證 首辦">台胞證 首辦</option>
+              </optgroup>
+              <optgroup label="美國簽證">
+                <option value="美國 ESTA">美國 ESTA</option>
+              </optgroup>
             </select>
 
             <Input

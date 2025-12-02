@@ -92,10 +92,10 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       bgColor: 'bg-morandi-gold/10',
     },
     processing: {
-      color: 'text-morandi-blue',
+      color: 'text-morandi-primary',
       label: '處理中',
       icon: Package,
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-morandi-primary/10',
     },
     completed: {
       color: 'text-morandi-green',
@@ -125,10 +125,10 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       bgColor: 'bg-morandi-gold/10',
     },
     in_progress: {
-      color: 'text-morandi-blue',
+      color: 'text-morandi-primary',
       label: '進行中',
       icon: Package,
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-morandi-primary/10',
     },
     completed: {
       color: 'text-morandi-green',
@@ -140,7 +140,7 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       color: 'text-morandi-secondary',
       label: '已取消',
       icon: XCircle,
-      bgColor: 'bg-gray-50',
+      bgColor: 'bg-morandi-secondary/10',
     },
     default: {
       color: 'text-morandi-secondary',
@@ -155,7 +155,7 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       color: 'text-morandi-secondary',
       label: '草稿',
       icon: FileText,
-      bgColor: 'bg-gray-50',
+      bgColor: 'bg-morandi-secondary/10',
     },
     pending: {
       color: 'text-morandi-gold',
@@ -194,13 +194,13 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       color: 'text-morandi-secondary',
       label: '規劃中',
       icon: FileText,
-      bgColor: 'bg-gray-50',
+      bgColor: 'bg-morandi-secondary/10',
     },
     confirmed: {
-      color: 'text-morandi-blue',
+      color: 'text-morandi-primary',
       label: '已確認',
       icon: CheckCircle,
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-morandi-primary/10',
     },
     in_progress: {
       color: 'text-morandi-gold',
@@ -233,7 +233,7 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       color: 'text-morandi-secondary',
       label: '草稿',
       icon: FileText,
-      bgColor: 'bg-gray-50',
+      bgColor: 'bg-morandi-secondary/10',
     },
     pending: {
       color: 'text-morandi-gold',
@@ -242,10 +242,10 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       bgColor: 'bg-morandi-gold/10',
     },
     confirmed: {
-      color: 'text-morandi-blue',
+      color: 'text-morandi-primary',
       label: '已確認',
       icon: CheckCircle,
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-morandi-primary/10',
     },
     processing: {
       color: 'text-morandi-gold',
@@ -281,10 +281,10 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       bgColor: 'bg-morandi-gold/10',
     },
     submitted: {
-      color: 'text-morandi-blue',
+      color: 'text-morandi-primary',
       label: '已送件',
       icon: Package,
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-morandi-primary/10',
     },
     issued: {
       color: 'text-morandi-green',

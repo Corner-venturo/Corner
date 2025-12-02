@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Upload, FileImage, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -18,6 +18,7 @@ export function PassportUploadZone({
   className = '',
 }: PassportUploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false)
+  const dragCounter = useRef(0)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = e.target.files
@@ -28,22 +29,34 @@ export function PassportUploadZone({
     }
   }
 
+  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current++
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true)
+    }
+  }
+
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsDragging(true)
   }
 
   const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsDragging(false)
+    dragCounter.current--
+    if (dragCounter.current === 0) {
+      setIsDragging(false)
+    }
   }
 
   const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragging(false)
+    dragCounter.current = 0
 
     const droppedFiles = e.dataTransfer.files
     if (droppedFiles) {
@@ -62,12 +75,13 @@ export function PassportUploadZone({
       {/* 上傳區域 */}
       <label
         htmlFor="passport-upload"
+        onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 ${
           isDragging
-            ? 'border-primary bg-primary/5'
+            ? 'border-primary bg-primary/10 scale-[1.02] shadow-lg'
             : 'border-morandi-border hover:border-primary/50 bg-morandi-background'
         }`}
       >

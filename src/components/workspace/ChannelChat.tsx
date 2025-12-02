@@ -185,7 +185,7 @@ export function ChannelChat() {
           setSelectedAdvanceItem(null)
           setSelectedAdvanceListId('')
           if (selectedChannel?.id) {
-            advanceLists
+            // advanceLists; // This was an unused expression
           }
         }}
         showSettingsDialog={showSettingsDialog}

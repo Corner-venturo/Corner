@@ -114,23 +114,23 @@ const useDialogStore = create<DialogStore>((set, get) => ({
 const typeConfig: Record<AlertType, { icon: React.ReactNode; color: string; bgColor: string }> = {
   info: {
     icon: <Info className="h-6 w-6" />,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
+    color: 'text-morandi-primary',
+    bgColor: 'bg-morandi-primary/10',
   },
   success: {
     icon: <CheckCircle className="h-6 w-6" />,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
+    color: 'text-morandi-gold',
+    bgColor: 'bg-morandi-gold/10',
   },
   warning: {
     icon: <AlertTriangle className="h-6 w-6" />,
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
+    color: 'text-morandi-gold',
+    bgColor: 'bg-morandi-gold/10',
   },
   error: {
     icon: <XCircle className="h-6 w-6" />,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
+    color: 'text-morandi-red',
+    bgColor: 'bg-morandi-red/10',
   },
 }
 

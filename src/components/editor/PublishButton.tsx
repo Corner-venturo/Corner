@@ -5,6 +5,7 @@ import { useItineraryStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useRouter } from 'next/navigation'
 import type { TourFormData } from './tour-form/types'
+import { Button } from '@/components/ui/button'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
@@ -151,41 +152,41 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
       )}
 
       {/* 儲存按鈕 */}
-      <button
+      <Button
         onClick={saveItinerary}
         disabled={saving}
         className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
       >
         {saving ? '儲存中...' : isEditMode ? '💾 儲存' : '💾 儲存行程表'}
-      </button>
+      </Button>
 
       {/* 另存新版本按鈕（僅編輯模式顯示） */}
       {isEditMode && (
         <>
-          <button
+          <Button
             onClick={saveAsNewVersion}
             disabled={saving}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+            variant="default"
           >
             📋 另存為 v{(data.version || 1) + 1}
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={generateShareLink}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            variant="secondary"
           >
             🔗 產生連結
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => {
               // TODO: 實作歷史版本查看功能
               alert('📜 歷史版本功能開發中...')
             }}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            variant="secondary"
           >
             📜 歷史版本
-          </button>
+          </Button>
         </>
       )}
     </div>

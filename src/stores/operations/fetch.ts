@@ -36,7 +36,7 @@ export async function fetchAll<T extends BaseEntity>(
   const { tableName, enableSupabase } = config
 
   // 取得 workspace 篩選設定
-  const workspaceId = getWorkspaceFilterForQuery(tableName)
+  const workspaceId = await getWorkspaceFilterForQuery(tableName)
 
   // 篩選函數（用於 IndexedDB 快取資料）
   const applyWorkspaceFilter = (items: T[]): T[] => {

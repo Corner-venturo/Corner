@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -45,43 +46,44 @@ export class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-red-50">
-          <div className="max-w-2xl w-full mx-4 p-6 bg-white rounded-lg shadow-lg">
+        <div className="min-h-screen flex items-center justify-center bg-morandi-red/5">
+          <div className="max-w-2xl w-full mx-4 p-6 bg-background rounded-lg shadow-lg border border-morandi-red/10">
             <div className="flex items-center gap-3 mb-4">
-              <AlertCircle className="w-8 h-8 text-red-500" />
-              <h1 className="text-2xl font-bold text-red-700">發生錯誤</h1>
+              <AlertCircle className="w-8 h-8 text-morandi-red" />
+              <h1 className="text-2xl font-bold text-morandi-red">發生錯誤</h1>
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-red-100 rounded-md">
-                <p className="text-red-800 font-semibold mb-2">錯誤訊息：</p>
-                <code className="text-sm text-red-700">{this.state.error?.message}</code>
+              <div className="p-4 bg-morandi-red/10 rounded-md">
+                <p className="text-morandi-red font-semibold mb-2">錯誤訊息：</p>
+                <code className="text-sm text-morandi-red">{this.state.error?.message}</code>
               </div>
 
               {process.env.NODE_ENV === 'development' && (
                 <>
-                  <div className="p-4 bg-gray-100 rounded-md">
-                    <p className="text-morandi-primary font-semibold mb-2">錯誤堆疊：</p>
-                    <pre className="text-xs text-morandi-primary overflow-auto max-h-48">
+                  <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-md">
+                    <p className="text-foreground font-semibold mb-2">錯誤堆疊：</p>
+                    <pre className="text-xs text-foreground overflow-auto max-h-48">
                       {this.state.error?.stack}
                     </pre>
                   </div>
 
-                  <div className="p-4 bg-gray-100 rounded-md">
-                    <p className="text-morandi-primary font-semibold mb-2">組件堆疊：</p>
-                    <pre className="text-xs text-morandi-primary overflow-auto max-h-48">
+                  <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-md">
+                    <p className="text-foreground font-semibold mb-2">組件堆疊：</p>
+                    <pre className="text-xs text-foreground overflow-auto max-h-48">
                       {this.state.errorInfo?.componentStack}
                     </pre>
                   </div>
                 </>
               )}
 
-              <button
+              <Button
                 onClick={() => window.location.reload()}
-                className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                variant="secondary"
+                className="w-full"
               >
                 重新載入頁面
-              </button>
+              </Button>
             </div>
           </div>
         </div>

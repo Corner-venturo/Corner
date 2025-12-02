@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const https = require('https')
-const fs = require('fs')
+import https from 'https'
+import fs from 'fs'
 
 const SUPABASE_ACCESS_TOKEN = 'sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0'
 const PROJECT_REF = 'pfqvdacxowpgfamuvnsn'

@@ -36,7 +36,7 @@ export function FeaturesSection({
             <span className="text-sm font-medium text-morandi-secondary">特色 {index + 1}</span>
             <button
               onClick={() => removeFeature(index)}
-              className="text-red-500 hover:text-red-700 text-sm"
+              className="text-morandi-red hover:text-morandi-red/80 text-sm transition-colors"
             >
               刪除
             </button>

@@ -15,6 +15,7 @@ import {
   WorkspaceSwitcher,
   ModuleManagementSettings,
   PreferredFeaturesSettings,
+  ApiSettings,
 } from './components'
 
 // 強制客戶端渲染，不預取伺服器資料
@@ -88,6 +89,9 @@ export default function SettingsPage() {
 
           {/* 常用功能設定 */}
           <PreferredFeaturesSettings />
+
+          {/* API 設定 */}
+          <ApiSettings />
 
           {/* 帳號安全設定 */}
           <AccountSettings

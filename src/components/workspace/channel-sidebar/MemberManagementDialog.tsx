@@ -101,7 +101,6 @@ export function ChannelDeleteDialog({
             variant="destructive"
             onClick={onDelete}
             disabled={isDeletingChannel}
-            className="bg-red-600 hover:bg-red-700 text-white"
           >
             {isDeletingChannel ? '刪除中...' : '刪除'}
           </Button>

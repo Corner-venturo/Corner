@@ -63,7 +63,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               e.stopPropagation()
               router.push(`/tours/${tour.id}`)
             }}
-            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            className="p-1 text-morandi-primary/80 hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
             title="查看詳情"
           >
             <Eye size={14} />
@@ -87,7 +87,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               e.stopPropagation()
               handleCreateChannel(tour)
             }}
-            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
             title="建立工作空間頻道"
           >
             <MessageSquare size={14} />
@@ -160,7 +160,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   e.stopPropagation()
                   handleUnlockTour(tour)
                 }}
-                className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+                className="p-1 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors"
                 title="解鎖結團"
               >
                 <LockOpen size={14} />

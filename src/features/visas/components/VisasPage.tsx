@@ -249,7 +249,7 @@ export default function VisasPage() {
                     setSelectedRows([])
                   }}
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  variant="secondary"
                 >
                   送
                 </Button>
@@ -259,7 +259,7 @@ export default function VisasPage() {
                     setSelectedRows([])
                   }}
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  variant="default"
                 >
                   取
                 </Button>
@@ -269,7 +269,7 @@ export default function VisasPage() {
                     setSelectedRows([])
                   }}
                   size="sm"
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  variant="destructive"
                 >
                   退
                 </Button>

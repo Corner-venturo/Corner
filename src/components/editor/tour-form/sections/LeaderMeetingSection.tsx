@@ -113,7 +113,7 @@ export function LeaderMeetingSection({
             <button
               type="button"
               onClick={() => removeMeetingPoint(index)}
-              className="absolute top-2 right-2 p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+              className="absolute top-2 right-2 p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
               title="移除此集合地點"
             >
               <X size={16} />

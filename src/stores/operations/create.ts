@@ -24,7 +24,7 @@ import { useAuthStore } from '@/stores/auth-store'
 async function getWorkspaceCodeLazy(): Promise<string | null> {
   try {
     // 方法 1：從 workspace-helpers 取得（如果 store 已載入）
-    const { getCurrentWorkspaceCode } = require('@/lib/workspace-helpers')
+    const { getCurrentWorkspaceCode } = await import('@/lib/workspace-helpers')
     const codeFromStore = getCurrentWorkspaceCode()
     if (codeFromStore) {
       return codeFromStore
@@ -32,7 +32,7 @@ async function getWorkspaceCodeLazy(): Promise<string | null> {
 
     // 方法 2：直接從 IndexedDB 查詢（fallback）
     logger.log('📦 Workspace store 未載入，從 IndexedDB 查詢...')
-    const { useAuthStore } = require('@/stores/auth-store')
+    const { useAuthStore } = await import('@/stores/auth-store')
     const user = useAuthStore.getState().user
     const workspaceId = user?.workspace_id
 
@@ -64,10 +64,10 @@ async function getWorkspaceCodeLazy(): Promise<string | null> {
  * Lazy get workspace ID to avoid circular dependency
  * 延遲取得 workspace ID，避免在模組載入時觸發循環依賴
  */
-function getWorkspaceIdLazy(): string | null {
+async function getWorkspaceIdLazy(): Promise<string | null> {
   try {
-    // 動態 require auth-store 避免頂層循環依賴
-    const { useAuthStore } = require('@/stores/auth-store')
+    // 動態 import auth-store 避免頂層循環依賴
+    const { useAuthStore } = await import('@/stores/auth-store')
     const user = useAuthStore.getState().user
     const workspaceId = user?.workspace_id || null
 
@@ -119,7 +119,7 @@ export async function create<T extends BaseEntity>(
     const now = new Date().toISOString()
 
     // 取得 workspace_id（如果資料中沒有提供）
-    const workspaceId = getWorkspaceIdLazy()
+    const workspaceId = await getWorkspaceIdLazy()
 
     // 某些表格不需要 workspace_id（例如：子項目表格，已透過外鍵關聯）
     const tablesWithoutWorkspaceId = [

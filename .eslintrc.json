@@ -27,8 +27,8 @@
     ],
 
     // TypeScript 規則
-    "@typescript-eslint/no-explicit-any": "warn", // Phase 1: 警告即可，Phase 3 改 error
-    "@typescript-eslint/no-non-null-assertion": "warn",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-non-null-assertion": "error",
 
     // 引號規則
     "quotes": [

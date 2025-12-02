@@ -7,8 +7,10 @@
   --morandi-primary: #3a3633;
   --morandi-secondary: #8b8680;
   --morandi-gold: #c9aa7c;
+  --morandi-gold-rgb: 201, 170, 124;
   --morandi-gold-hover: #b8996b;
   --morandi-green: #9fa68f;
+  --morandi-green-rgb: 159, 166, 143;
   --morandi-red: #c08374;
   --morandi-container: #e8e5e0;
   --morandi-muted: #b8b2aa;
@@ -42,8 +44,10 @@
   --morandi-primary: #dcddde; /* 主要文字 - 柔和白 */
   --morandi-secondary: #b9bbbe; /* 次要文字 - 灰白 */
   --morandi-gold: #5865f2; /* 主要強調色 - Discord 紫藍 */
+  --morandi-gold-rgb: 88, 101, 242;
   --morandi-gold-hover: #4752c4; /* hover 狀態 - 深紫藍 */
   --morandi-green: #3ba55d; /* 成功/正面 - 柔和綠 */
+  --morandi-green-rgb: 59, 165, 93;
   --morandi-red: #ed4245; /* 錯誤/負面 - 柔和紅 */
   --morandi-container: #2f3136; /* 容器背景 - 次要背景 */
   --morandi-muted: #72767d; /* 淡化文字 - 深灰 */
@@ -457,6 +461,24 @@ body {
 /* ============================================
    🎨 統一美學系統 - 莫蘭迪精緻按鈕與元件
    ============================================ */
+
+/* 佈局與裝飾分離的組合式樣式 */
+.btn-gradient-primary {
+  background: linear-gradient(to right, #b5986a, #d4c4a8);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(181, 152, 106, 0.15);
+  transition: all 0.2s ease;
+}
+.btn-gradient-primary:hover {
+  background: linear-gradient(to right, #a08968, #c4b89a);
+  box-shadow: 0 4px 12px rgba(181, 152, 106, 0.25);
+  transform: scale(1.02);
+}
+.btn-gradient-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(181, 152, 106, 0.2);
+}
 
 /* 主要按鈕 - 柔和漸層（參考記帳頁面） */
 .btn-morandi-primary {

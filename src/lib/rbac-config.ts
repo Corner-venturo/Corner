@@ -34,7 +34,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'super_admin',
     label: '超級管理員',
     description: '擁有所有權限，可跨 workspace 管理所有資料',
-    color: 'text-red-600 bg-red-50 border-red-200',
+    color: 'text-morandi-red bg-morandi-red/10 border-morandi-red/20',
     permissions: ['*'], // 所有權限
     canManageWorkspace: true,
     canCrossWorkspace: true,
@@ -44,7 +44,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'admin',
     label: '管理員',
     description: '擁有 workspace 內所有管理權限，包含人資和設定',
-    color: 'text-purple-600 bg-purple-50 border-purple-200',
+    color: 'text-morandi-secondary bg-morandi-secondary/10 border-morandi-secondary/20',
     permissions: [
       'tours', 'orders', 'quotes', 'customers',
       'finance', 'payments', 'hr', 'settings',
@@ -58,7 +58,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'tour_leader',
     label: '領隊',
     description: '可管理自己帶的旅遊團和相關訂單',
-    color: 'text-blue-600 bg-blue-50 border-blue-200',
+    color: 'text-morandi-primary bg-morandi-primary/10 border-morandi-primary/20',
     permissions: [
       'tours',           // 查看旅遊團（限自己的）
       'orders',          // 管理訂單（限自己的團）
@@ -74,7 +74,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'sales',
     label: '業務',
     description: '可建立報價單、管理客戶和訂單',
-    color: 'text-green-600 bg-green-50 border-green-200',
+    color: 'text-morandi-gold bg-morandi-gold/10 border-morandi-gold/20',
     permissions: [
       'quotes',          // 報價管理
       'customers',       // 客戶管理
@@ -91,7 +91,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'accountant',
     label: '會計',
     description: '可管理財務、付款和會計相關功能',
-    color: 'text-orange-600 bg-orange-50 border-orange-200',
+    color: 'text-morandi-primary bg-morandi-primary/10 border-morandi-primary/20',
     permissions: [
       'finance',         // 財務管理
       'payments',        // 付款管理
@@ -109,7 +109,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'assistant',
     label: '助理',
     description: '可協助處理訂單、客戶和一般行政工作',
-    color: 'text-cyan-600 bg-cyan-50 border-cyan-200',
+    color: 'text-morandi-secondary bg-morandi-secondary/10 border-morandi-secondary/20',
     permissions: [
       'orders',          // 訂單管理
       'customers',       // 客戶管理
@@ -136,7 +136,6 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     canCrossWorkspace: false,
   },
 }
-
 /**
  * 取得角色配置
  */

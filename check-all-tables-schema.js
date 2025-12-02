@@ -3,7 +3,7 @@
  * 檢查所有表格的 created_by 和 updated_by 欄位
  */
 
-const https = require('https')
+import https from 'https'
 
 const SUPABASE_ACCESS_TOKEN = 'sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0'
 const PROJECT_REF = 'pfqvdacxowpgfamuvnsn'

@@ -3,12 +3,12 @@ import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
 import { ArrowRight, Minus, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 // 擴展型別（與 AttractionSelector 一致）
 interface AttractionWithCity extends Attraction {
   city_name?: string
 }
-
 interface DailyItinerarySectionProps {
   data: TourFormData
   updateField: (field: string, value: unknown) => void
@@ -25,7 +25,6 @@ interface DailyItinerarySectionProps {
   updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void
   removeRecommendation: (dayIndex: number, recIndex: number) => void
 }
-
 export function DailyItinerarySection({
   data,
   updateField,
@@ -44,35 +43,34 @@ export function DailyItinerarySection({
 }: DailyItinerarySectionProps) {
   const [showAttractionSelector, setShowAttractionSelector] = useState(false)
   const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1)
-
   // 開啟景點選擇器
   const handleOpenAttractionSelector = (dayIndex: number) => {
     setCurrentDayIndex(dayIndex)
     setShowAttractionSelector(true)
   }
-
   // 處理景點選擇
   const handleSelectAttractions = (attractions: AttractionWithCity[]) => {
     if (currentDayIndex === -1) return
-
     // 將選擇的景點轉換為活動
     attractions.forEach(attraction => {
       // 先取得當前索引（新增前的長度）
       const day = data.dailyItinerary[currentDayIndex]
       const newActivityIndex = day.activities.length
-
       // 再新增活動
       addActivity(currentDayIndex)
-
       // ✅ 設定活動資料（包含 attraction_id）
       updateActivity(currentDayIndex, newActivityIndex, 'attraction_id', attraction.id) // 保留景點關聯
       updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍')
       updateActivity(currentDayIndex, newActivityIndex, 'title', attraction.name)
-      updateActivity(currentDayIndex, newActivityIndex, 'description', attraction.description || '')
+      updateActivity(
+        currentDayIndex,
+        newActivityIndex,
+        'description',
+        attraction.description || ''
+      )
       // 設定圖片（如果有的話）
       updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail || '')
     })
-
     setCurrentDayIndex(-1)
   }
   return (
@@ -96,7 +94,7 @@ export function DailyItinerarySection({
             {dayIndex === data.dailyItinerary.length - 1 && (
               <button
                 onClick={() => removeDailyItinerary(dayIndex)}
-                className="text-red-500 hover:text-red-700 text-sm font-medium"
+                className="text-morandi-red hover:text-morandi-red/80 text-sm font-medium transition-colors"
               >
                 刪除此天
               </button>
@@ -110,10 +108,13 @@ export function DailyItinerarySection({
                 <button
                   type="button"
                   onClick={() => {
-                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    const input = document.querySelector(
+                      `#title-input-${dayIndex}`
+                    ) as HTMLInputElement
                     if (input) {
                       const cursorPos = input.selectionStart || day.title.length
-                      const newValue = day.title.slice(0, cursorPos) + ' → ' + day.title.slice(cursorPos)
+                      const newValue =
+                        day.title.slice(0, cursorPos) + ' → ' + day.title.slice(cursorPos)
                       updateDailyItinerary(dayIndex, 'title', newValue)
                       setTimeout(() => {
                         input.focus()
@@ -129,10 +130,13 @@ export function DailyItinerarySection({
                 <button
                   type="button"
                   onClick={() => {
-                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    const input = document.querySelector(
+                      `#title-input-${dayIndex}`
+                    ) as HTMLInputElement
                     if (input) {
                       const cursorPos = input.selectionStart || day.title.length
-                      const newValue = day.title.slice(0, cursorPos) + ' · ' + day.title.slice(cursorPos)
+                      const newValue =
+                        day.title.slice(0, cursorPos) + ' · ' + day.title.slice(cursorPos)
                       updateDailyItinerary(dayIndex, 'title', newValue)
                       setTimeout(() => {
                         input.focus()
@@ -148,10 +152,13 @@ export function DailyItinerarySection({
                 <button
                   type="button"
                   onClick={() => {
-                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    const input = document.querySelector(
+                      `#title-input-${dayIndex}`
+                    ) as HTMLInputElement
                     if (input) {
                       const cursorPos = input.selectionStart || day.title.length
-                      const newValue = day.title.slice(0, cursorPos) + ' | ' + day.title.slice(cursorPos)
+                      const newValue =
+                        day.title.slice(0, cursorPos) + ' | ' + day.title.slice(cursorPos)
                       updateDailyItinerary(dayIndex, 'title', newValue)
                       setTimeout(() => {
                         input.focus()
@@ -167,10 +174,13 @@ export function DailyItinerarySection({
                 <button
                   type="button"
                   onClick={() => {
-                    const input = document.querySelector(`#title-input-${dayIndex}`) as HTMLInputElement
+                    const input = document.querySelector(
+                      `#title-input-${dayIndex}`
+                    ) as HTMLInputElement
                     if (input) {
                       const cursorPos = input.selectionStart || day.title.length
-                      const newValue = day.title.slice(0, cursorPos) + ' ⭐ ' + day.title.slice(cursorPos)
+                      const newValue =
+                        day.title.slice(0, cursorPos) + ' ⭐ ' + day.title.slice(cursorPos)
                       updateDailyItinerary(dayIndex, 'title', newValue)
                       setTimeout(() => {
                         input.focus()
@@ -247,7 +257,7 @@ export function DailyItinerarySection({
                   />
                   <button
                     onClick={() => removeDayImage(dayIndex, imageIndex)}
-                    className="px-2 py-1 text-red-500 hover:text-red-700 text-xs"
+                    className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
                   >
                     ✕
                   </button>
@@ -266,24 +276,27 @@ export function DailyItinerarySection({
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-morandi-primary">景點活動</label>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={() => handleOpenAttractionSelector(dayIndex)}
-                  className="px-2.5 py-1 bg-morandi-gold text-white rounded text-xs shadow hover:bg-morandi-gold-hover"
+                  size="xs"
+                  variant="default"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                 >
                   從景點庫選擇
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => addActivity(dayIndex)}
-                  className="px-2.5 py-1 bg-blue-500 text-white rounded text-xs shadow hover:bg-blue-600"
+                  size="xs"
+                  variant="secondary"
                 >
                   + 手動新增
-                </button>
+                </Button>
               </div>
             </div>
             {day.activities?.map((activity: Activity, actIndex: number) => (
               <div
                 key={actIndex}
-                className="space-y-2 bg-white/90 p-3 rounded-lg border border-blue-100"
+                className="space-y-2 bg-white/90 p-3 rounded-lg border border-morandi-container"
               >
                 <div>
                   <input
@@ -315,7 +328,7 @@ export function DailyItinerarySection({
                 <div className="flex justify-end">
                   <button
                     onClick={() => removeActivity(dayIndex, actIndex)}
-                    className="px-2 py-1 text-red-500 hover:text-red-700 text-xs"
+                    className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
                   >
                     ✕ 刪除活動
                   </button>
@@ -328,12 +341,13 @@ export function DailyItinerarySection({
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-morandi-primary">推薦行程</label>
-              <button
+              <Button
                 onClick={() => addRecommendation(dayIndex)}
-                className="px-2 py-1 bg-green-500 text-white rounded text-xs"
+                size="xs"
+                variant="secondary"
               >
                 + 新增推薦
-              </button>
+              </Button>
             </div>
             {day.recommendations?.map((rec: string, recIndex: number) => (
               <div key={recIndex} className="flex gap-2">
@@ -346,7 +360,7 @@ export function DailyItinerarySection({
                 />
                 <button
                   onClick={() => removeRecommendation(dayIndex, recIndex)}
-                  className="px-2 text-red-500 hover:text-red-700"
+                  className="px-2 text-morandi-red hover:text-morandi-red/80 transition-colors"
                 >
                   ✕
                 </button>

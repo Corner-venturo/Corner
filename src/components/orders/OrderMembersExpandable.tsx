@@ -2,11 +2,12 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
-import { Users, Plus, Trash2, X } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { useCustomerStore } from '@/stores'
 
 interface OrderMember {
   id: string
@@ -62,6 +63,12 @@ export function OrderMembersExpandable({
   const [memberCountToAdd, setMemberCountToAdd] = useState<number | ''>(1)
   const [showIdentityColumn, setShowIdentityColumn] = useState(false) // 控制身份欄位顯示
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
+
+  // 護照上傳相關狀態
+  const [passportFiles, setPassportFiles] = useState<File[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
 
   // 定義可編輯欄位的順序（用於方向鍵導航）
   const editableFields = showIdentityColumn
@@ -340,6 +347,212 @@ export function OrderMembersExpandable({
     updateField(memberId, field, processedValue ? parseFloat(processedValue) : 0)
   }
 
+  // ========== 護照上傳相關函數 ==========
+  const handlePassportFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      setPassportFiles(prev => [...prev, ...Array.from(files)])
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const files = e.dataTransfer.files
+    if (files) {
+      const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
+      if (imageFiles.length > 0) {
+        setPassportFiles(prev => [...prev, ...imageFiles])
+      }
+    }
+  }
+
+  const handleRemovePassportFile = (index: number) => {
+    setPassportFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  // 壓縮圖片（確保小於 800KB）
+  const compressImage = async (file: File, quality = 0.6): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (e) => {
+        const img = new Image()
+        img.src = e.target?.result as string
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+
+          const maxDimension = 1200
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = (height / width) * maxDimension
+              width = maxDimension
+            } else {
+              width = (width / height) * maxDimension
+              height = maxDimension
+            }
+          }
+
+          canvas.width = width
+          canvas.height = height
+
+          const ctx = canvas.getContext('2d')
+          ctx?.drawImage(img, 0, 0, width, height)
+
+          canvas.toBlob(
+            async (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                })
+
+                if (compressedFile.size > 800 * 1024 && quality > 0.2) {
+                  resolve(await compressImage(file, quality - 0.1))
+                } else {
+                  resolve(compressedFile)
+                }
+              } else {
+                reject(new Error('壓縮失敗'))
+              }
+            },
+            'image/jpeg',
+            quality
+          )
+        }
+        img.onerror = reject
+      }
+      reader.onerror = reject
+    })
+  }
+
+  // 批次上傳護照並建立成員
+  const handleBatchUpload = async () => {
+    if (passportFiles.length === 0) return
+
+    setIsUploading(true)
+    try {
+      // 壓縮所有圖片
+      const compressedFiles = await Promise.all(
+        passportFiles.map(async (file) => {
+          return await compressImage(file)
+        })
+      )
+
+      // 建立 FormData
+      const formData = new FormData()
+      compressedFiles.forEach(file => {
+        formData.append('files', file)
+      })
+
+      // 呼叫 OCR API
+      const response = await fetch('/api/ocr/passport', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('OCR 辨識失敗')
+      }
+
+      const result = await response.json()
+
+      // 批次建立成員和顧客
+      let successCount = 0
+      const failedItems: string[] = []
+      const customerStore = useCustomerStore.getState()
+
+      for (const item of result.results) {
+        if (item.success && item.customer) {
+          try {
+            // 1. 建立顧客（如果有姓名）
+            let customerId: string | null = null
+            if (item.customer.name && item.customer.name.trim()) {
+              const newCustomer = await customerStore.create({
+                name: item.customer.name,
+                english_name: item.customer.english_name || '',
+                passport_number: item.customer.passport_number || '',
+                passport_romanization: item.customer.passport_romanization || '',
+                passport_expiry_date: item.customer.passport_expiry_date || null,
+                national_id: item.customer.national_id || '',
+                date_of_birth: item.customer.date_of_birth || null,
+                sex: item.customer.sex || '',
+                phone: item.customer.phone || '',
+                code: '',
+                is_vip: false,
+                is_active: true,
+                total_spent: 0,
+                total_orders: 0,
+                verification_status: 'unverified',
+              } as any)
+              customerId = newCustomer?.id || null
+            }
+
+            // 2. 建立訂單成員
+            const memberData = {
+              order_id: orderId,
+              workspace_id: workspaceId,
+              customer_id: customerId,
+              chinese_name: item.customer.name || '',
+              passport_name: item.customer.passport_romanization || item.customer.english_name || '',
+              passport_number: item.customer.passport_number || '',
+              passport_expiry: item.customer.passport_expiry_date || null,
+              birth_date: item.customer.date_of_birth || null,
+              id_number: item.customer.national_id || '',
+              gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : '',
+              identity: '大人',
+            }
+
+            const { error } = await supabase
+              .from('order_members')
+              .insert(memberData)
+
+            if (error) throw error
+            successCount++
+          } catch (error) {
+            logger.error(`建立成員失敗 (${item.fileName}):`, error)
+            failedItems.push(`${item.fileName} (建立失敗)`)
+          }
+        } else {
+          failedItems.push(`${item.fileName} (辨識失敗)`)
+        }
+      }
+
+      // 顯示結果
+      let message = `✅ 成功辨識 ${result.successful}/${result.total} 張護照\n✅ 成功建立 ${successCount} 位成員\n\n⚠️ 重要提醒：\n• OCR 辨識的資料已標記為「待驗證」\n• 請務必人工檢查護照資訊是否正確`
+      if (failedItems.length > 0) {
+        message += `\n\n❌ 失敗項目：\n${failedItems.join('\n')}`
+      }
+      alert(message)
+
+      // 清空檔案並重新載入成員
+      setPassportFiles([])
+      await loadMembers()
+      setIsAddDialogOpen(false)
+    } catch (error) {
+      logger.error('批次上傳失敗:', error)
+      alert('批次上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   return (
     <div className="p-4">
       {/* 標題列 */}
@@ -431,6 +644,9 @@ export function OrderMembersExpandable({
                 </th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   備註
+                </th>
+                <th className="px-2 py-1.5 text-center font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 w-12">
+                  操作
                 </th>
               </tr>
             </thead>
@@ -679,31 +895,33 @@ export function OrderMembersExpandable({
                     {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
                   </td>
 
-                  {/* 備註 + 刪除按鈕 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white relative">
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        value={member.remarks || ''}
-                        onChange={e => updateField(member.id, 'remarks', e.target.value)}
-                        onCompositionStart={() => setIsComposing(true)}
-                        onCompositionEnd={(e) => {
-                          setIsComposing(false)
-                          setTimeout(() => {
-                            updateField(member.id, 'remarks', e.currentTarget.value)
-                          }, 0)
-                        }}
-                        className="flex-1 bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                      />
-                      <button
-                        onClick={() => handleDeleteMember(member.id)}
-                        className="opacity-0 group-hover:opacity-100 absolute right-1 text-morandi-secondary/50 hover:text-red-500 transition-all duration-200 p-1"
-                        title="刪除"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
+                  {/* 備註 */}
+                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+                    <input
+                      type="text"
+                      value={member.remarks || ''}
+                      onChange={e => updateField(member.id, 'remarks', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        setTimeout(() => {
+                          updateField(member.id, 'remarks', e.currentTarget.value)
+                        }, 0)
+                      }}
+                      className="w-full bg-transparent text-xs"
+                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                    />
+                  </td>
+
+                  {/* 操作 - 刪除按鈕 */}
+                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white text-center">
+                    <button
+                      onClick={() => handleDeleteMember(member.id)}
+                      className="text-morandi-secondary/50 hover:text-red-500 transition-colors p-1"
+                      title="刪除成員"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -712,57 +930,178 @@ export function OrderMembersExpandable({
         </div>
       )}
 
-      {/* 新增成員對話框 */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-sm">
+      {/* 新增成員對話框 - 左右兩半 */}
+      <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+        setIsAddDialogOpen(open)
+        if (!open) {
+          setMemberCountToAdd(1)
+        }
+      }}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>新增成員</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <label className="block text-sm font-medium mb-2">請輸入要新增的成員數量：</label>
-            <input
-              type="number"
-              min="1"
-              max="50"
-              value={memberCountToAdd}
-              onChange={e => {
-                let value = e.target.value
 
-                // 全形轉半形
-                value = value.replace(/[\uff10-\uff19]/g, ch =>
-                  String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
-                )
+          <div className="grid grid-cols-2 gap-6 py-4">
+            {/* 左邊：輸入人數 */}
+            <div className="space-y-4 border-r border-border pr-6">
+              <div className="flex items-center gap-2 text-morandi-primary font-medium">
+                <Hash size={18} />
+                <span>依人數新增</span>
+              </div>
+              <p className="text-sm text-morandi-secondary">
+                快速新增空白成員列，之後手動填寫資料
+              </p>
+              <div>
+                <label className="block text-sm font-medium mb-2">新增數量：</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={memberCountToAdd}
+                  onChange={e => {
+                    let value = e.target.value
+                    value = value.replace(/[\uff10-\uff19]/g, ch =>
+                      String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+                    )
+                    if (value === '') {
+                      setMemberCountToAdd('')
+                      return
+                    }
+                    const num = parseInt(value, 10)
+                    if (!isNaN(num)) {
+                      setMemberCountToAdd(Math.min(50, Math.max(1, num)))
+                    }
+                  }}
+                  onFocus={e => e.target.select()}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      confirmAddMembers()
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                  autoFocus
+                />
+              </div>
+              <Button
+                onClick={confirmAddMembers}
+                className="w-full bg-morandi-gold hover:bg-morandi-gold/90"
+              >
+                新增 {memberCountToAdd || 1} 位成員
+              </Button>
+            </div>
 
-                // 允許空白（使用者刪除時）
-                if (value === '') {
-                  setMemberCountToAdd('')
-                  return
-                }
+            {/* 右邊：上傳護照 OCR 辨識（和顧客管理一樣） */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-morandi-primary font-medium">
+                <Upload size={18} />
+                <span>上傳護照辨識</span>
+              </div>
+              <p className="text-sm text-morandi-secondary">
+                上傳護照圖片，自動辨識並建立成員資料
+              </p>
 
-                // 轉換數字並限制範圍
-                const num = parseInt(value, 10)
-                if (!isNaN(num)) {
-                  setMemberCountToAdd(Math.min(50, Math.max(1, num)))
-                }
-              }}
-              onFocus={e => e.target.select()}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  confirmAddMembers()
-                }
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-              autoFocus
-            />
+              {/* 重要提醒 */}
+              <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3">
+                <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ 重要提醒</h4>
+                <ul className="text-xs text-morandi-secondary space-y-1">
+                  <li>• OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
+                  <li>• 請務必<strong>人工檢查護照資訊</strong></li>
+                  <li>• 支援所有國家護照（TWN、USA、JPN 等）</li>
+                </ul>
+              </div>
+
+              {/* 拍攝提示 */}
+              <div className="bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg p-3">
+                <h4 className="text-xs font-semibold text-morandi-gold mb-2">📸 拍攝建議</h4>
+                <ul className="text-xs text-morandi-gold space-y-1">
+                  <li>✓ 確保護照<strong>最下方兩排文字</strong>清晰可見</li>
+                  <li>✓ 光線充足，避免反光或陰影</li>
+                  <li>✓ 拍攝角度正面，避免傾斜</li>
+                </ul>
+              </div>
+
+              {/* 上傳區域 */}
+              <label
+                htmlFor="member-passport-upload"
+                className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-all ${
+                  isDragging
+                    ? 'border-morandi-gold bg-morandi-gold/20 scale-105'
+                    : 'border-morandi-secondary/30 bg-morandi-container/20 hover:bg-morandi-container/40'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <div className="flex flex-col items-center justify-center py-4">
+                  <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
+                  <p className="text-sm text-morandi-primary">
+                    <span className="font-semibold">點擊上傳</span> 或拖曳檔案
+                  </p>
+                  <p className="text-xs text-morandi-secondary">支援 JPG, PNG（可多選）</p>
+                </div>
+                <input
+                  id="member-passport-upload"
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePassportFileChange}
+                  disabled={isUploading}
+                />
+              </label>
+
+              {/* 已選檔案列表 */}
+              {passportFiles.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-morandi-secondary mb-2">
+                    已選擇 {passportFiles.length} 個檔案：
+                  </div>
+                  <div className="max-h-32 overflow-y-auto space-y-2">
+                    {passportFiles.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-morandi-container/20 rounded"
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileImage size={14} className="text-morandi-gold flex-shrink-0" />
+                          <span className="text-xs text-morandi-primary truncate">
+                            {file.name}
+                          </span>
+                          <span className="text-xs text-morandi-secondary flex-shrink-0">
+                            ({(file.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemovePassportFile(index)}
+                          className="h-6 w-6 p-0 hover:bg-red-100"
+                          disabled={isUploading}
+                        >
+                          <Trash2 size={12} className="text-morandi-red" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button
+                    onClick={handleBatchUpload}
+                    disabled={isUploading}
+                    className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+                  >
+                    {isUploading ? '辨識中...' : `辨識並建立 ${passportFiles.length} 位成員`}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-          <DialogFooter>
+
+          <div className="flex justify-end pt-2 border-t">
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               取消
             </Button>
-            <Button onClick={confirmAddMembers} className="bg-morandi-gold hover:bg-morandi-gold/90">
-              確認新增
-            </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

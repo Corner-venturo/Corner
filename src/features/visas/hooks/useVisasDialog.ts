@@ -63,7 +63,9 @@ export function useVisasDialog(tours: Tour[]) {
     const date = new Date(submissionDate)
     let days = 21
 
-    if (visaType.includes('台胞證') && visaType.includes('急件')) {
+    if (visaType.includes('ESTA')) {
+      days = 3 // 美國 ESTA 通常 72 小時內
+    } else if (visaType.includes('台胞證') && visaType.includes('急件')) {
       days = 6
     } else if (visaType.includes('護照') && visaType.includes('急件')) {
       days = 3
@@ -79,6 +81,7 @@ export function useVisasDialog(tours: Tour[]) {
 
   // 計算代辦費
   const calculateFee = useCallback((country: string): number => {
+    if (country.includes('ESTA')) return 1000 // 美國 ESTA 代辦費
     if (country.includes('兒童')) return 1500
     if (country.includes('首辦')) return 800
     if (country.includes('台胞證') && country.includes('遺失件')) return 2900

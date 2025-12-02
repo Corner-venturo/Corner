@@ -235,7 +235,7 @@ export function ReactDatasheetWrapper({
         }}
         tabIndex={0}
       >
-        {/* @ts-ignore - ReactDataSheet type definitions are incomplete */}
+        {/* @ts-expect-error - ReactDataSheet type definitions are incomplete */}
         <ReactDataSheet
           data={sheetData}
           onCellsChanged={handleCellsChanged}
