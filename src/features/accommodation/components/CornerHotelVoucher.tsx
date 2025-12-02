@@ -237,5 +237,3 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
 }
 
 export default CornerHotelVoucher
-
-export default CornerHotelVoucher
