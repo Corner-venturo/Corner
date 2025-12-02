@@ -166,10 +166,19 @@ export function PreferredFeaturesSettings() {
 
   const categories = Object.keys(featuresByCategory)
 
-  // 檢查使用者是否有該功能的權限
+  // 檢查使用者是否有該功能的權限（與側邊欄邏輯一致）
   const hasPermission = (featureId: string) => {
     const userPermissions = user?.permissions || []
-    return userPermissions.includes('*') || userPermissions.includes(featureId)
+    // 1. 超級管理員（有 admin 或 super_admin）→ 全部權限
+    if (userPermissions.includes('admin') || userPermissions.includes('super_admin')) {
+      return true
+    }
+    // 2. 萬用權限
+    if (userPermissions.includes('*')) {
+      return true
+    }
+    // 3. 個別功能權限
+    return userPermissions.includes(featureId)
   }
 
   return (
