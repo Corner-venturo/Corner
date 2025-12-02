@@ -214,11 +214,12 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     const parts = namePart.split('<<')
     if (parts.length >= 2) {
       const surname = parts[0].replace(/</g, '')
-      const givenNames = parts[1].replace(/</g, ' ').trim()
+      const givenNames = parts[1].replace(/</g, '').trim() // 移除空格
 
-      customerData.passport_romanization = `${surname}/${givenNames}`
-      customerData.english_name = `${surname} ${givenNames}`
-      customerData.name = `${surname} ${givenNames}`
+      // 護照拼音：姓/名，不含空格和連字號
+      customerData.passport_romanization = `${surname}/${givenNames.replace(/-/g, '')}`
+      customerData.english_name = `${surname} ${givenNames.replace(/-/g, '')}`
+      customerData.name = `${surname} ${givenNames.replace(/-/g, '')}`
     } else if (parts.length === 1) {
       // 只有姓氏
       const surname = parts[0].replace(/</g, '')
@@ -325,17 +326,88 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   let chineseName = ''
   if (googleVisionText) {
     // Google Vision 對中文辨識較好，優先從這裡抓中文名
-    // 找 2-4 個連續中文字（排除常見非姓名詞彙）
-    const excludeWords = ['護照', '中華', '民國', '姓名', '國籍', '性別', '出生', '日期', '效期', '機關', '外交部', '台灣', '發照', '截止']
-    const chineseNames = googleVisionText.match(/[\u4e00-\u9fff]{2,4}/g)
-    if (chineseNames) {
-      const validName = chineseNames.find(name =>
-        !excludeWords.some(word => name.includes(word)) &&
-        name.length >= 2 && name.length <= 4
-      )
-      if (validName) {
-        chineseName = validName
-        console.log('✅ Google Vision 找到中文名:', validName)
+    // 排除詞彙清單
+    const excludeWords = ['護照', '中華', '民國', '姓名', '國籍', '性別', '出生', '日期', '效期', '機關', '外交部', '台灣', '發照', '截止', '型式', '代碼', '持照', '簽名', '身分', '證號', '地址', '地點', '機關', '有效']
+
+    // 策略 1: 找 Name/姓名 區塊後面緊鄰的中文名
+    // 護照格式通常是: /Name (Surname, Given names)\n中文名\n英文名
+    const lines = googleVisionText.split('\n')
+    let foundNameSection = false
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim()
+
+      // 偵測 Name 區塊的開始
+      if (/Name|姓名|Given names/i.test(line)) {
+        foundNameSection = true
+        continue
+      }
+
+      // 在 Name 區塊後，找第一個有效的中文名
+      if (foundNameSection) {
+        const chineseMatch = line.match(/^([\u4e00-\u9fff]{2,4})$/)
+        if (chineseMatch) {
+          const candidate = chineseMatch[1]
+          if (!excludeWords.some(word => candidate.includes(word))) {
+            chineseName = candidate
+            console.log('✅ Google Vision 找到中文名 (Name區塊後):', candidate)
+            break
+          }
+        }
+
+        // 如果遇到英文名（大寫字母開頭，含逗號），表示中文名應該在這之前或這一行
+        if (/^[A-Z]+,\s*[A-Z-]+/.test(line)) {
+          // 檢查同一行是否有中文
+          const inlineChineseMatch = line.match(/([\u4e00-\u9fff]{2,4})/)
+          if (inlineChineseMatch && !excludeWords.some(word => inlineChineseMatch[1].includes(word))) {
+            chineseName = inlineChineseMatch[1]
+            console.log('✅ Google Vision 找到中文名 (與英文同行):', chineseName)
+          }
+          break // 已經過了中文名的位置
+        }
+      }
+    }
+
+    // 策略 2: 如果策略1沒找到，找英文名附近的中文
+    if (!chineseName && customerData.passport_romanization) {
+      // 從護照拼音取得姓氏 (例如 "LIN/LI-HUI" -> "LIN")
+      const surname = customerData.passport_romanization.split('/')[0]?.toUpperCase()
+      if (surname) {
+        // 找英文姓氏在文字中的位置
+        const surnameIndex = googleVisionText.toUpperCase().indexOf(surname)
+        if (surnameIndex > 0) {
+          // 取英文姓氏前面 50 個字元，找中文名
+          const beforeSurname = googleVisionText.substring(Math.max(0, surnameIndex - 50), surnameIndex)
+          const chineseMatches = beforeSurname.match(/[\u4e00-\u9fff]{2,4}/g)
+          if (chineseMatches) {
+            // 取最後一個（最接近英文名的）
+            const candidate = chineseMatches[chineseMatches.length - 1]
+            if (!excludeWords.some(word => candidate.includes(word))) {
+              chineseName = candidate
+              console.log('✅ Google Vision 找到中文名 (英文名前):', candidate)
+            }
+          }
+        }
+      }
+    }
+
+    // 策略 3: 備用方案 - 找所有中文字，排除常見詞彙後取第一個看起來像人名的
+    if (!chineseName) {
+      const chineseNames = googleVisionText.match(/[\u4e00-\u9fff]{2,4}/g)
+      if (chineseNames) {
+        // 過濾掉排除詞彙
+        const validNames = chineseNames.filter(name =>
+          !excludeWords.some(word => name.includes(word)) &&
+          name.length >= 2 && name.length <= 4
+        )
+        // 跳過前幾個可能是標題的詞，取後面的
+        if (validNames.length > 2) {
+          chineseName = validNames[2] // 跳過可能的標題詞
+          console.log('✅ Google Vision 找到中文名 (備用-跳過標題):', chineseName)
+        } else if (validNames.length > 0) {
+          chineseName = validNames[0]
+          console.log('✅ Google Vision 找到中文名 (備用):', chineseName)
+        }
       }
     }
   }

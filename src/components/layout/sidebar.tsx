@@ -368,17 +368,18 @@ export function Sidebar() {
     return item?.children || []
   }
 
+  // 提取需要的屬性，避免 user 物件變化時不必要的重新渲染
+  const userPermissions = user?.permissions || []
+  const hiddenMenuItems = user?.hidden_menu_items || []
+  const preferredFeatures = user?.preferred_features || []
+  const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
+
   // 使用 useMemo 優化權限過濾和個人化隱藏
   const visibleMenuItems = useMemo(() => {
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
       if (!user) {
         return items.filter(item => !item.requiredPermission)
       }
-
-      const userPermissions = user.permissions || []
-      const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
-      const hiddenMenuItems = user.hidden_menu_items || []
-      const preferredFeatures = user.preferred_features || []
 
       return items
         .map(item => {
@@ -387,7 +388,7 @@ export function Sidebar() {
             return null
           }
 
-          // ⭐ 新增：檢查是否在常用功能列表中
+          // ⭐ 檢查是否在常用功能列表中
           // 如果使用者有設定 preferred_features，且該功能不在列表中，則隱藏
           if (preferredFeatures.length > 0 && item.requiredPermission) {
             if (!preferredFeatures.includes(item.requiredPermission)) {
@@ -419,17 +420,14 @@ export function Sidebar() {
     }
 
     return filterMenuByPermissions(menuItems)
-  }, [user])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   const visiblePersonalToolItems = useMemo(() => {
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
       if (!user) {
         return items.filter(item => !item.requiredPermission)
       }
-
-      const userPermissions = user.permissions || []
-      const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
-      const hiddenMenuItems = user.hidden_menu_items || []
 
       return items
         .map(item => {
@@ -446,7 +444,8 @@ export function Sidebar() {
     }
 
     return filterMenuByPermissions(personalToolItems)
-  }, [user])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   return (
     <>
