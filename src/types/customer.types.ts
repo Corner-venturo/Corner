@@ -14,31 +14,31 @@ import { BaseEntity } from './base.types'
 export interface Customer extends BaseEntity {
   code: string // 客戶編號
   name: string // 客戶姓名
-  english_name?: string // 英文姓名
-  phone: string // 主要電話
-  alternative_phone?: string // 備用電話
-  email?: string // Email
-  address?: string // 地址
-  city?: string // 城市
-  country?: string // 國家
-  national_id?: string // 身分證字號
-  passport_number?: string // 護照號碼
-  passport_romanization?: string // 護照拼音（格式：姓氏/名字，例如：WANG/XIAOMING）
-  passport_expiry_date?: string // 護照效期 (ISO 8601)
-  passport_image_url?: string // 護照圖片（base64 或 URL）
-  date_of_birth?: string // 出生日期 (ISO 8601)
-  gender?: string // 性別
-  company?: string // 公司名稱
-  tax_id?: string // 統編
-  is_vip: boolean // 是否為 VIP
-  vip_level?: VipLevel // VIP 等級
-  source?: CustomerSource // 客戶來源
-  referred_by?: string // 推薦人
-  notes?: string // 備註
-  is_active: boolean // 是否啟用
-  total_orders?: number // 總訂單數（統計用）
-  total_spent?: number // 總消費金額（統計用）
-  last_order_date?: string // 最後訂單日期（統計用）
+  english_name?: string | null // 英文姓名
+  phone: string | null // 主要電話
+  alternative_phone?: string | null // 備用電話
+  email?: string | null // Email
+  address?: string | null // 地址
+  city?: string | null // 城市
+  country?: string | null // 國家
+  national_id?: string | null // 身分證字號
+  passport_number?: string | null // 護照號碼
+  passport_romanization?: string | null // 護照拼音（格式：姓氏/名字，例如：WANG/XIAOMING）
+  passport_expiry_date?: string | null // 護照效期 (ISO 8601)
+  passport_image_url?: string | null // 護照圖片（base64 或 URL）
+  date_of_birth?: string | null // 出生日期 (ISO 8601)
+  gender?: string | null // 性別
+  company?: string | null // 公司名稱
+  tax_id?: string | null // 統編
+  is_vip: boolean | null // 是否為 VIP
+  vip_level?: VipLevel | string | null // VIP 等級
+  source?: CustomerSource | string | null // 客戶來源
+  referred_by?: string | null // 推薦人
+  notes?: string | null // 備註
+  is_active: boolean | null // 是否啟用
+  total_orders?: number | null // 總訂單數（統計用）
+  total_spent?: number | null // 總消費金額（統計用）
+  last_order_date?: string | null // 最後訂單日期（統計用）
   verification_status: VerificationStatus // 人工驗證狀態
 }
 
@@ -116,27 +116,27 @@ export interface CreateCustomerData {
  */
 export interface UpdateCustomerData {
   name?: string
-  english_name?: string
-  phone?: string
-  alternative_phone?: string
-  email?: string
-  address?: string
-  city?: string
-  country?: string
-  national_id?: string
-  passport_number?: string
-  passport_romanization?: string
-  passport_expiry_date?: string
-  date_of_birth?: string
-  gender?: string
-  company?: string
-  tax_id?: string
-  is_vip?: boolean
-  vip_level?: VipLevel
-  source?: CustomerSource
-  referred_by?: string
-  notes?: string
-  is_active?: boolean
+  english_name?: string | null
+  phone?: string | null
+  alternative_phone?: string | null
+  email?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  national_id?: string | null
+  passport_number?: string | null
+  passport_romanization?: string | null
+  passport_expiry_date?: string | null
+  date_of_birth?: string | null
+  gender?: string | null
+  company?: string | null
+  tax_id?: string | null
+  is_vip?: boolean | null
+  vip_level?: VipLevel | string | null
+  source?: CustomerSource | string | null
+  referred_by?: string | null
+  notes?: string | null
+  is_active?: boolean | null
   verification_status?: VerificationStatus
 }
 

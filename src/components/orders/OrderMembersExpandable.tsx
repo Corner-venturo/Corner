@@ -12,35 +12,35 @@ import { useCustomerStore } from '@/stores'
 interface OrderMember {
   id: string
   order_id: string
-  identity?: string
-  chinese_name?: string
-  passport_name?: string
-  birth_date?: string
-  age?: number
-  id_number?: string
-  gender?: string
-  passport_number?: string
-  passport_expiry?: string
-  special_meal?: string
-  pnr?: string
-  flight_cost?: number
-  hotel_1_name?: string
-  hotel_1_checkin?: string
-  hotel_1_checkout?: string
-  hotel_2_name?: string
-  hotel_2_checkin?: string
-  hotel_2_checkout?: string
-  transport_cost?: number
-  misc_cost?: number
-  total_payable?: number
-  deposit_amount?: number
-  balance_amount?: number
-  deposit_receipt_no?: string
-  balance_receipt_no?: string
-  remarks?: string
-  cost_price?: number
-  selling_price?: number
-  profit?: number
+  identity?: string | null
+  chinese_name?: string | null
+  passport_name?: string | null
+  birth_date?: string | null
+  age?: number | null
+  id_number?: string | null
+  gender?: string | null
+  passport_number?: string | null
+  passport_expiry?: string | null
+  special_meal?: string | null
+  pnr?: string | null
+  flight_cost?: number | null
+  hotel_1_name?: string | null
+  hotel_1_checkin?: string | null
+  hotel_1_checkout?: string | null
+  hotel_2_name?: string | null
+  hotel_2_checkin?: string | null
+  hotel_2_checkout?: string | null
+  transport_cost?: number | null
+  misc_cost?: number | null
+  total_payable?: number | null
+  deposit_amount?: number | null
+  balance_amount?: number | null
+  deposit_receipt_no?: string | null
+  balance_receipt_no?: string | null
+  remarks?: string | null
+  cost_price?: number | null
+  selling_price?: number | null
+  profit?: number | null
 }
 
 interface OrderMembersExpandableProps {
@@ -517,6 +517,7 @@ export function OrderMembersExpandable({
               id_number: item.customer.national_id || '',
               gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : '',
               identity: '大人',
+              member_type: 'adult', // 必要欄位
             }
 
             const { error } = await supabase

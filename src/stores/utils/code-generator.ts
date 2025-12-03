@@ -32,7 +32,7 @@ export function generateTourCode(
   workspaceCode: string,
   cityCode: string,
   departureDate: string,
-  existingTours: BaseEntity[]
+  existingTours: { code?: string }[]
 ): string {
   const date = new Date(departureDate)
   const year = date.getFullYear().toString().slice(-2) // 後兩碼
@@ -45,15 +45,13 @@ export function generateTourCode(
   // 找出同日期同城市同辦公室的最大流水號
   let maxSequence = 0
   existingTours.forEach(tour => {
-    if ('code' in tour) {
-      const code = (tour as { code?: string }).code
-      if (code?.startsWith(datePrefix)) {
-        // 提取最後兩碼流水號（例如 TP-CNX25012801 → 01）
-        const sequencePart = code.slice(-2)
-        const sequence = parseInt(sequencePart, 10)
-        if (!isNaN(sequence) && sequence > maxSequence) {
-          maxSequence = sequence
-        }
+    const code = tour.code
+    if (code?.startsWith(datePrefix)) {
+      // 提取最後兩碼流水號（例如 TP-CNX25012801 → 01）
+      const sequencePart = code.slice(-2)
+      const sequence = parseInt(sequencePart, 10)
+      if (!isNaN(sequence) && sequence > maxSequence) {
+        maxSequence = sequence
       }
     }
   })

@@ -121,10 +121,10 @@ export default function VouchersPage() {
       />
 
       <div className="flex-1 overflow-auto">
-        <EnhancedTable<Voucher>
+        <EnhancedTable
           className="min-h-full"
           data={vouchers}
-          columns={columns as TableColumn[]}
+          columns={columns}
           defaultSort={{ key: 'voucher_date', direction: 'desc' }}
           searchable
           searchPlaceholder="搜尋傳票編號或摘要..."

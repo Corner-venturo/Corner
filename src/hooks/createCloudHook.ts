@@ -4,11 +4,11 @@
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 
-// 基礎實體型別
+// 基礎實體型別（與 @/types/base.types.ts 的 BaseEntity 一致）
 interface BaseEntity {
   id: string
-  created_at: string
-  updated_at: string
+  created_at: string | null
+  updated_at: string | null
 }
 
 // Hook 回傳型別
@@ -36,9 +36,10 @@ export function createCloudHook<T extends BaseEntity>(
 
   // Supabase fetcher
   async function fetcher(): Promise<T[]> {
-    let query = supabase
-      .from(tableName)
-      .select(options?.select || '*')
+    // 使用類型斷言處理動態表格名稱
+    let query = (supabase.from(tableName) as ReturnType<typeof supabase.from>).select(
+      options?.select || '*'
+    )
 
     if (options?.orderBy) {
       query = query.order(options.orderBy.column, {
@@ -54,7 +55,7 @@ export function createCloudHook<T extends BaseEntity>(
       throw new Error(error.message)
     }
 
-    return (data || []) as T[]
+    return (data || []) as unknown as T[]
   }
 
   // 回傳 Hook 函數
@@ -83,7 +84,9 @@ export function createCloudHook<T extends BaseEntity>(
       mutate(SWR_KEY, [...items, newItem], false)
 
       try {
-        const { error } = await supabase.from(tableName).insert(newItem)
+        const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from>).insert(
+          newItem as Record<string, unknown>
+        )
         if (error) throw error
 
         mutate(SWR_KEY)
@@ -109,9 +112,8 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await supabase
-          .from(tableName)
-          .update(updatedData)
+        const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from>)
+          .update(updatedData as Record<string, unknown>)
           .eq('id', id)
         if (error) throw error
 
@@ -132,7 +134,9 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await supabase.from(tableName).delete().eq('id', id)
+        const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from>)
+          .delete()
+          .eq('id', id)
         if (error) throw error
 
         mutate(SWR_KEY)

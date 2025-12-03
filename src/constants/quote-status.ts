@@ -28,7 +28,6 @@ export const QUOTE_STATUS_COLORS = {
 } as any
 
 // 狀態篩選選項
-// @ts-expect-error - Const assertion compatibility
 export const QUOTE_STATUS_FILTERS = [
   { value: 'all', label: '全部' },
   { value: 'draft', label: '草稿' },

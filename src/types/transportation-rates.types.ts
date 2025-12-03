@@ -2,7 +2,7 @@
 
 export interface TransportationRate {
   id: string
-  country_id: string
+  country_id: string | null
   country_name: string
   vehicle_type: string
   category: string | null          // 品項大分類（如：4座車、7座車）

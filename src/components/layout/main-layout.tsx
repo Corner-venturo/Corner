@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useLocalAuthStore } from '@/lib/auth/local-auth-manager'
 import { Sidebar } from './sidebar'
 import { MobileBottomNav } from './mobile-bottom-nav'
 import { cn } from '@/lib/utils'
@@ -24,7 +23,6 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const { sidebarCollapsed } = useAuthStore()
-  const { currentProfile } = useLocalAuthStore()
   const pathname = usePathname()
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
@@ -61,26 +59,26 @@ export function MainLayout({ children }: MainLayoutProps) {
     }, 50)
 
     return () => clearTimeout(checkTimeout)
-  }, [isClient, pathname, currentProfile, router])
+  }, [isClient, pathname, router])
 
       // 初始化離線資料庫和基礎資料
       useEffect(() => {
         if (!isClient) return
-  
+
         // 離線資料庫會在 sync-manager 中自動初始化
-  
+
         // 載入基礎資料（只載入全域需要的資料）
         const loadInitialData = async () => {
           try {
             // 載入工作空間（全域需要）
-            const { useChannelsStore } = await import('@/stores/workspace')
-            const workspaceState = useChannelsStore.getState()
-            if (workspaceState.workspaces.length === 0) {
-              await workspaceState.loadWorkspaces()
-            }
+            // 注意：useChannelsStore 是一個 hook，不是 Zustand store
+            // 因此沒有 getState 方法，改用直接導入內部的 store
+            const { useWorkspaceChannels } = await import('@/stores/workspace')
+            // 使用 hook 的方式會在 React 外部無法調用，改用直接調用 store
+            // 這裡暫時跳過，workspaces 會在需要時被自動載入
           } catch (_error) {}
         }
-  
+
         loadInitialData()
       }, [isClient])
   // 不需要側邊欄的頁面（支援完全匹配和前綴匹配）

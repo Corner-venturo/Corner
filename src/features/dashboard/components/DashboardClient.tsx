@@ -9,6 +9,7 @@ import { Settings } from 'lucide-react'
 import { useWidgets } from '@/features/dashboard/hooks'
 import { WidgetSettingsDialog, AVAILABLE_WIDGETS } from '@/features/dashboard/components'
 import type { WidgetType } from '@/features/dashboard/types'
+import { useI18n } from '@/lib/i18n/client'
 import {
   DndContext,
   closestCenter,
@@ -20,7 +21,7 @@ import {
 import { arrayMove, SortableContext, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-// Sortable Widget Component
+// Sortable Widget Component (remains the same)
 function SortableWidget({ id, widget }: { id: string; widget: (typeof AVAILABLE_WIDGETS)[0] }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
@@ -47,8 +48,10 @@ function SortableWidget({ id, widget }: { id: string; widget: (typeof AVAILABLE_
   )
 }
 
-export default function Home() {
+
+export function DashboardClient() {
   const router = useRouter()
+  const t = useI18n()
   const { isAuthenticated, _hasHydrated } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
   const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets()
@@ -117,10 +120,10 @@ export default function Home() {
                 <Settings className="h-8 w-8 text-morandi-gold" />
               </div>
               <h3 className="text-lg font-semibold text-morandi-primary mb-2">
-                尚未選擇任何小工具
+                {t('dashboard.no_widgets_title')}
               </h3>
               <p className="text-sm text-morandi-muted mb-6">
-                點擊右上角「小工具設定」來新增你需要的工具
+                {t('dashboard.no_widgets_description')}
               </p>
             </div>
           </Card>

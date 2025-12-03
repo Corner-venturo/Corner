@@ -3,13 +3,13 @@
 import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EnhancedTableProps, RowData } from './types'
+import { EnhancedTableProps, RowData, TableColumn, SelectionConfig, ExpandableConfig } from './types'
 import { useTableState } from './useTableState'
 import { TableHeader } from './TableHeader'
 import { TableBody } from './TableBody'
 import { TablePagination } from './TablePagination'
 
-export function EnhancedTable({
+export function EnhancedTable<T extends RowData = RowData>({
   columns,
   data,
   loading = false,
@@ -32,7 +32,16 @@ export function EnhancedTable({
   striped = false,
   hoverable = true,
   isLoading,
-}: EnhancedTableProps) {
+}: EnhancedTableProps<T>) {
+  // 將泛型 props 轉換為 RowData 類型以便內部使用
+  const typedColumns = columns as unknown as TableColumn<RowData>[]
+  const typedData = data as unknown as RowData[]
+  const typedSelection = selection as unknown as SelectionConfig<RowData> | undefined
+  const typedExpandable = expandable as unknown as ExpandableConfig<RowData> | undefined
+  const typedActions = actions as unknown as ((row: RowData) => React.ReactNode) | undefined
+  const typedRowClassName = rowClassName as unknown as ((row: RowData) => string) | undefined
+  const typedOnRowClick = onRowClick as unknown as ((row: RowData, rowIndex?: number) => void) | undefined
+  const typedOnRowDoubleClick = onRowDoubleClick as unknown as ((row: RowData, rowIndex: number) => void) | undefined
   // Handle loading aliases
   const actualLoading = loading || isLoading || false
   const {
@@ -52,7 +61,7 @@ export function EnhancedTable({
     handleSort,
     updateFilter,
   } = useTableState<RowData>({
-    data,
+    data: typedData,
     searchTerm: externalSearchTerm,
     searchableFields: searchableFields as (keyof RowData)[],
     initialPageSize,
@@ -60,61 +69,61 @@ export function EnhancedTable({
 
   // Helper functions for selection and expandable
   const getRowId = (row: RowData, index: number): string => {
-    if (selection?.getRowId) return selection.getRowId(row, index)
-    if (expandable?.getRowId) return expandable.getRowId(row, index)
+    if (typedSelection?.getRowId) return typedSelection.getRowId(row, index)
+    if (typedExpandable?.getRowId) return typedExpandable.getRowId(row, index)
     return ((row as Record<string, unknown>).id as string) || ((row as Record<string, unknown>)._id as string) || index.toString()
   }
 
   const isRowSelected = (row: RowData, index: number): boolean => {
-    if (!selection) return false
+    if (!typedSelection) return false
     const rowId = getRowId(row, index)
-    return selection.selected.includes(rowId)
+    return typedSelection.selected.includes(rowId)
   }
 
   const isRowExpanded = (row: RowData, index: number): boolean => {
-    if (!expandable) return false
+    if (!typedExpandable) return false
     const rowId = getRowId(row, index)
-    return expandable.expanded.includes(rowId)
+    return typedExpandable.expanded.includes(rowId)
   }
 
   const toggleSelection = (row: RowData, index: number) => {
-    if (!selection) return
+    if (!typedSelection) return
     const rowId = getRowId(row, index)
-    const isSelected = selection.selected.includes(rowId)
+    const isSelected = typedSelection.selected.includes(rowId)
 
     if (isSelected) {
-      selection.onChange(selection.selected.filter(id => id !== rowId))
+      typedSelection.onChange(typedSelection.selected.filter(id => id !== rowId))
     } else {
-      selection.onChange([...selection.selected, rowId])
+      typedSelection.onChange([...typedSelection.selected, rowId])
     }
   }
 
   const toggleSelectAll = () => {
-    if (!selection) return
+    if (!typedSelection) return
     const allRowIds = paginatedData.map((row, index) => getRowId(row, startIndex + index))
-    const allSelected = allRowIds.every(id => selection.selected.includes(id))
+    const allSelected = allRowIds.every(id => typedSelection.selected.includes(id))
 
     if (allSelected) {
       // Deselect all visible rows
-      selection.onChange(selection.selected.filter(id => !allRowIds.includes(id)))
+      typedSelection.onChange(typedSelection.selected.filter(id => !allRowIds.includes(id)))
     } else {
       // Select all visible rows
-      const newSelected = [...selection.selected]
+      const newSelected = [...typedSelection.selected]
       allRowIds.forEach(id => {
         if (!newSelected.includes(id)) {
           newSelected.push(id)
         }
       })
-      selection.onChange(newSelected)
+      typedSelection.onChange(newSelected)
     }
   }
 
   // Calculate if all visible rows are selected
-  const allVisibleSelected = selection
+  const allVisibleSelected = typedSelection
     ? paginatedData.length > 0 &&
       paginatedData.every((row, index) => isRowSelected(row, startIndex + index))
     : false
-  const someVisibleSelected = selection
+  const someVisibleSelected = typedSelection
     ? paginatedData.some((row, index) => isRowSelected(row, startIndex + index))
     : false
 
@@ -171,13 +180,13 @@ export function EnhancedTable({
       <div className="overflow-auto flex-1">
         <table className="w-full">
           <TableHeader
-            columns={columns}
+            columns={typedColumns}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             filters={filters}
             showFilters={showFilters}
-            selection={selection}
-            actions={actions}
+            selection={typedSelection}
+            actions={typedActions}
             allVisibleSelected={allVisibleSelected}
             someVisibleSelected={someVisibleSelected}
             onSort={handleSortWrapper}
@@ -186,18 +195,18 @@ export function EnhancedTable({
             onToggleSelectAll={toggleSelectAll}
           />
           <TableBody
-            columns={columns}
+            columns={typedColumns}
             paginatedData={paginatedData}
             startIndex={startIndex}
             emptyState={emptyState}
-            selection={selection}
-            expandable={expandable}
-            actions={actions}
-            rowClassName={rowClassName}
+            selection={typedSelection}
+            expandable={typedExpandable}
+            actions={typedActions}
+            rowClassName={typedRowClassName}
             striped={striped}
             hoverable={hoverable}
-            onRowClick={onRowClick}
-            onRowDoubleClick={onRowDoubleClick}
+            onRowClick={typedOnRowClick}
+            onRowDoubleClick={typedOnRowDoubleClick}
             getRowId={getRowId}
             isRowSelected={isRowSelected}
             isRowExpanded={isRowExpanded}

@@ -124,6 +124,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           // 只有一個匹配，自動帶入
           const customer = nameMatches[0]
           const updatedMembers = [...tableMembers]
+          const customerGender = customer.gender as 'M' | 'F' | '' | null
           updatedMembers[index] = {
             ...memberData,
             name_en: customer.passport_romanization || memberData.name_en,
@@ -131,7 +132,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
             passport_expiry: customer.passport_expiry_date || memberData.passport_expiry,
             id_number: customer.national_id || memberData.id_number,
             birthday: customer.date_of_birth || memberData.birthday,
-            gender: customer.gender || memberData.gender,
+            gender: customerGender || memberData.gender,
             customer_id: customer.id,
           }
           setTableMembers(updatedMembers)
@@ -154,6 +155,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         if (pendingMemberIndex === null || !pendingMemberData) return
 
         const updatedMembers = [...tableMembers]
+        const customerGender = customer.gender as 'M' | 'F' | '' | null
         updatedMembers[pendingMemberIndex] = {
           ...pendingMemberData,
           name_en: customer.passport_romanization || pendingMemberData.name_en,
@@ -161,7 +163,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           passport_expiry: customer.passport_expiry_date || pendingMemberData.passport_expiry,
           id_number: customer.national_id || pendingMemberData.id_number,
           birthday: customer.date_of_birth || pendingMemberData.birthday,
-          gender: customer.gender || pendingMemberData.gender,
+          gender: customerGender || pendingMemberData.gender,
           customer_id: customer.id,
         }
         setTableMembers(updatedMembers)

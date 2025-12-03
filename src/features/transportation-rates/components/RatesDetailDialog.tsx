@@ -57,8 +57,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   const handleDelete = async (id: string) => {
     if (!confirm('確定要刪除這筆車資資料嗎？')) return
 
-    // @ts-expect-error - transportation_rates table not in generated Supabase types
-    const result = await supabase.from('transportation_rates').delete().eq('id', id)
+    const result = await (supabase.from('transportation_rates') as ReturnType<typeof supabase.from>).delete().eq('id', id)
     const error = result.error
 
     if (error) {
@@ -79,8 +78,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     }
     const dataWithCategory = data as CreateRateData
 
-    // @ts-expect-error - transportation_rates table not in generated Supabase types
-    const result = await supabase.from('transportation_rates').insert({
+    const result = await (supabase.from('transportation_rates') as ReturnType<typeof supabase.from>).insert({
       ...data,
       workspace_id: user?.workspace_id || null,
       country_id: data.country_id || '',

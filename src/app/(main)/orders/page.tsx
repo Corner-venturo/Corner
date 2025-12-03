@@ -133,14 +133,9 @@ export default function OrdersPage() {
       tour_name: selectedTour.name,
       contact_person: orderData.contact_person,
       contact_phone: null,
-      contact_email: null,
       sales_person: orderData.sales_person,
       assistant: orderData.assistant,
       member_count: orderData.member_count,
-      adult_count: null,
-      child_count: null,
-      infant_count: null,
-      total_people: orderData.member_count,
       total_amount: orderData.total_amount,
       paid_amount: 0,
       payment_status: 'unpaid',
@@ -148,7 +143,7 @@ export default function OrdersPage() {
       status: null,
       notes: null,
       customer_id: null,
-    })
+    } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
 
     setIsAddDialogOpen(false)
   }

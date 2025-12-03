@@ -31,9 +31,9 @@ export interface Tour extends BaseEntity {
   description?: string | null // 團體說明/描述
   archived?: boolean | null // 是否已封存
   is_active?: boolean | null // 是否啟用
-  features?: unknown // 行程特色（用於展示頁面）
+  features?: unknown // 行程特色（用於展示頁面，對應 Supabase Json）
   quote_id?: string | null // 關聯的報價單ID
-  quote_cost_structure?: unknown // 報價成本結構快照
+  quote_cost_structure?: unknown // 報價成本結構快照（對應 Supabase Json）
 
   // 合約相關欄位
   contract_template?: string | null // 合約範本
@@ -118,7 +118,7 @@ export interface CreateTourData {
   total_cost: number
   profit: number
   quote_id?: string
-  quote_cost_structure?: unknown[]
+  quote_cost_structure?: unknown
 }
 
 /**
@@ -138,7 +138,7 @@ export interface UpdateTourData {
   total_cost?: number
   profit?: number
   quote_id?: string
-  quote_cost_structure?: unknown[]
+  quote_cost_structure?: unknown
 }
 
 // ============================================

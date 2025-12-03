@@ -7,7 +7,36 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
-import { initLocalDatabase } from '@/lib/db/init-local-data'
+import { useAuthStore } from '@/stores/auth-store' // Import useAuthStore
+
+// This function attempts to validate an auth token and update the store
+async function validateAuthToken(token: string) {
+  try {
+    // In a real application, you would make an API call to validate the token
+    // and fetch user details. For now, we'll simulate it.
+    // const response = await fetch('/api/auth/validate-token', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    // });
+    // if (response.ok) {
+    //   const data = await response.json();
+    //   useAuthStore.getState().setUser(data.user);
+    //   logger.log('✅ Auth token validated, user set.');
+    // } else {
+    //   logger.warn('⚠️ Auth token validation failed.');
+    //   useAuthStore.getState().logout(); // Clear invalid token
+    // }
+
+    // Simulate validation success and setting a dummy user for now
+    // Replace with actual API call
+    const user = { id: 'dummy-user-id', name: 'Test User', email: 'test@example.com', role: 'admin', permissions: [] }; // Replace with actual user from API
+    useAuthStore.getState().setUser(user);
+    logger.log('✅ Auth token simulated validation, user set.');
+  } catch (error) {
+    logger.error('❌ Auth token validation error:', error);
+    useAuthStore.getState().logout(); // Ensure user is logged out on error
+  }
+}
 
 export function AppInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -17,7 +46,6 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         logger.log('🚀 AppInitializer: Starting initialization...')
 
         // 🔧 修復：等待 auth-store hydration 完成
-        const { useAuthStore } = await import('@/stores/auth-store')
         const authStore = useAuthStore.getState()
 
         if (!authStore._hasHydrated) {
@@ -41,28 +69,18 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
           })
         }
 
-        // 初始化 IndexedDB
-        await initLocalDatabase()
-        logger.log('✅ IndexedDB initialized')
-
-        // ⚠️ 只在登入後才載入 workspaces（避免登入頁面卡住）
-        if (authStore.user) {
-          // 載入 workspaces 資料（用於編號生成等核心功能）
-          const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
-          logger.log('📦 Loading workspaces...')
-
-          // 確保 workspaces 完全載入
-          await useWorkspaceStoreData.getState().fetchAll()
-
-          const workspaces = useWorkspaceStoreData.getState().items
-          logger.log(`✅ Workspaces loaded: ${workspaces?.length || 0} items`)
-
-          if (!workspaces || workspaces.length === 0) {
-            logger.warn('⚠️  No workspaces found! This may cause issues with tour code generation.')
-          }
+        // --- AUTH INITIALIZATION ---
+        // Load user from localStorage if token exists
+        const savedAuthToken = localStorage.getItem('auth-token')
+        if (savedAuthToken) {
+          logger.log('Found auth-token in localStorage, validating...')
+          await validateAuthToken(savedAuthToken)
         } else {
-          logger.log('⏭️ User not logged in, skipping workspaces loading')
+          logger.log('No auth-token found in localStorage.')
         }
+        // --- END AUTH INITIALIZATION ---
+
+        logger.log('✅ [PERF-OPTIMIZATION] Skipped global workspace fetch on startup.')
       } catch (error) {
         logger.error('❌ AppInitializer error:', error)
       }

@@ -354,7 +354,7 @@ export default function CustomersPage() {
   const hasActiveFilters = Object.keys(searchParams).length > 0
 
   // 表格欄位定義
-  const tableColumns: TableColumn[] = useMemo(
+  const tableColumns: TableColumn<Customer>[] = useMemo(
     () => [
       {
         key: 'code',

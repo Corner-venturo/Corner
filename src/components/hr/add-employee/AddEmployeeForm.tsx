@@ -55,7 +55,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
                 <SelectValue placeholder="選擇辦公室" />
               </SelectTrigger>
               <SelectContent>
-                {availableWorkspaces.map(workspace => (
+                {availableWorkspaces.map((workspace: { id: string; name: string }) => (
                   <SelectItem key={workspace.id} value={workspace.id}>
                     {workspace.name}
                   </SelectItem>

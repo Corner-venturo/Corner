@@ -272,35 +272,52 @@ SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
 
 ### 🔐 RLS (Row Level Security) 規範
 
-**❌ Venturo 完全不使用 RLS（2025-11-15 最終決定）**
+**Venturo 原則上不使用 RLS，但有例外（2025-12-03 更新）**
 
-#### 決策理由
+#### 基本原則
 
+大部分表格禁用 RLS，原因如下：
 1. **內部管理系統** - 員工都是信任的，不需要資料庫層強制隔離
 2. **簡化架構** - 避免 RLS 帶來的複雜度和 Debug 困難
 3. **提升效能** - 減少每次查詢的權限檢查開銷
 4. **彈性需求** - 主管可能需要跨 workspace 查詢資料
-5. **開發效率** - 專注於業務邏輯，不用處理 RLS 相關問題
+
+#### ⚠️ 啟用 RLS 的例外表格
+
+以下表格因為包含用戶個人敏感資料，**必須啟用 RLS**：
+
+| 表格 | 原因 | Policy |
+|------|------|--------|
+| `user_preferences` | 用戶個人偏好設定 | 用戶只能存取自己的資料 |
 
 #### Venturo 權限控制架構
 
 ```typescript
 Layer 1: Supabase Auth (登入驗證)
          ↓
-Layer 2: employees.permissions (功能權限控制)
+Layer 2: RLS (敏感個人資料表 - user_preferences 等)
          ↓
-Layer 3: employees.workspace_id (資料隔離 - 前端 filter)
+Layer 3: employees.permissions (功能權限控制)
          ↓
-Layer 4: user.roles (角色標籤 - admin, tour_leader 等)
+Layer 4: employees.workspace_id (資料隔離 - 前端 filter)
+         ↓
+Layer 5: user.roles (角色標籤 - admin, tour_leader 等)
 ```
 
 #### 創建新表時的標準模板
 
 ```sql
+-- 一般業務表格：禁用 RLS
 CREATE TABLE public.new_table (...);
-
--- 確保禁用 RLS
 ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
+
+-- 用戶個人資料表格：啟用 RLS
+CREATE TABLE public.user_xxx (...);
+ALTER TABLE public.user_xxx ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage their own data"
+ON public.user_xxx FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 ```
 
 #### 權限處理範例
@@ -320,11 +337,10 @@ if (user.permissions.includes('super_admin')) {
 }
 ```
 
-**Migration**: `supabase/migrations/20251115060000_final_disable_all_rls.sql`
-
 ### Migration 記錄（自動更新）
 | 日期 | Migration 檔案 | 目的 | 狀態 |
 |------|---------------|------|------|
+| 2025-12-03 | `20251203122651_fix_user_preferences_rls.sql` | user_preferences 啟用 RLS | ✅ 已執行 |
 | 2025-11-12 | `20251112080525_complete_rls_implementation.sql` | 完整 RLS 權限控制系統 | ✅ 已執行 |
 | 2025-10-27 | `20251027000000_add_channel_order.sql` | 新增 channels.order 欄位用於拖曳排序 | ✅ 已執行 |
 

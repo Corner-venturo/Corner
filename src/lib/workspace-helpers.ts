@@ -5,9 +5,15 @@
  */
 
 import { useAuthStore } from '@/stores/auth-store'
-import { useWorkspaceStore } from '@/stores'
+import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import type { Workspace } from '@/stores/workspace/types'
 import { logger } from '@/lib/utils/logger'
 import { canCrossWorkspace, canManageWorkspace as canManageWorkspaceByRole, type UserRole } from './rbac-config'
+
+// 定義 Workspace 擴展型別（包含 code 欄位）
+interface WorkspaceWithCode extends Workspace {
+  code?: string
+}
 
 /**
  * 取得當前使用者的 workspace_id
@@ -39,8 +45,8 @@ export function getCurrentWorkspaceId(): string | null {
  */
 export function getCurrentWorkspaceCode(): string | null {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStore.getState()
-  const workspaces = workspaceStore.items || []
+  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaces = (workspaceStore.items || []) as WorkspaceWithCode[]
 
   if (!user) {
     logger.warn('[getCurrentWorkspaceCode] No user found')
@@ -68,15 +74,10 @@ export function getCurrentWorkspaceCode(): string | null {
     // 如果有選擇的 workspace，從 store 取得
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
-      const workspace = workspaces.find(w => w.id === selectedWorkspaceId)
+      const workspace = workspaces.find((w: WorkspaceWithCode) => w.id === selectedWorkspaceId)
       if (workspace) {
         // ✅ 使用 workspace.code 欄位（如 TP, TC）
-        interface WorkspaceWithCode {
-          id: string
-          name: string
-          code?: string
-        }
-        return (workspace as WorkspaceWithCode).code || workspace.name.substring(0, 2).toUpperCase()
+        return workspace.code || workspace.name.substring(0, 2).toUpperCase()
       }
       logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user selected workspace ${selectedWorkspaceId} not found`)
     }
@@ -86,12 +87,7 @@ export function getCurrentWorkspaceCode(): string | null {
       const defaultWorkspace = workspaces[0]
       logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user has no selected workspace, using default: ${defaultWorkspace.name}`)
       // ✅ 使用 workspace.code 欄位（如 TP, TC）
-      interface WorkspaceWithCode {
-        id: string
-        name: string
-        code?: string
-      }
-      return (defaultWorkspace as WorkspaceWithCode).code || defaultWorkspace.name.substring(0, 2).toUpperCase()
+      return defaultWorkspace.code || defaultWorkspace.name.substring(0, 2).toUpperCase()
     }
 
     logger.warn('[getCurrentWorkspaceCode] Cross-workspace user has no workspace available')
@@ -105,15 +101,10 @@ export function getCurrentWorkspaceCode(): string | null {
     return null
   }
 
-  const workspace = workspaces.find(w => w.id === workspaceId)
+  const workspace = workspaces.find((w: WorkspaceWithCode) => w.id === workspaceId)
   if (workspace) {
     // ✅ 使用 workspace.code 欄位（如 TP, TC）
-    interface WorkspaceWithCode {
-      id: string
-      name: string
-      code?: string
-    }
-    return (workspace as WorkspaceWithCode).code || workspace.name.substring(0, 2).toUpperCase()
+    return workspace.code || workspace.name.substring(0, 2).toUpperCase()
   }
 
   logger.warn(`[getCurrentWorkspaceCode] Workspace ${workspaceId} not found in store`)
@@ -127,8 +118,8 @@ export function getCurrentWorkspaceCode(): string | null {
  */
 export function getCurrentWorkspace() {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStore.getState()
-  const workspaces = workspaceStore.items || []
+  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaces = (workspaceStore.items || []) as WorkspaceWithCode[]
 
   if (!user) {
     return null
@@ -146,7 +137,7 @@ export function getCurrentWorkspace() {
   if (canCrossWorkspace(userRole)) {
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
-      return workspaces.find(w => w.id === selectedWorkspaceId) || null
+      return workspaces.find((w: WorkspaceWithCode) => w.id === selectedWorkspaceId) || null
     }
     return null
   }
@@ -157,7 +148,7 @@ export function getCurrentWorkspace() {
     return null
   }
 
-  return workspaces.find(w => w.id === workspaceId) || null
+  return workspaces.find((w: WorkspaceWithCode) => w.id === workspaceId) || null
 }
 
 /**
@@ -222,8 +213,8 @@ export function canManageWorkspace(targetWorkspaceId: string): boolean {
  */
 export function getAvailableWorkspaces() {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStore.getState()
-  const workspaces = workspaceStore.items || []
+  const workspaceStore = useWorkspaceStoreData.getState()
+  const workspaces = (workspaceStore.items || []) as WorkspaceWithCode[]
 
   if (!user) {
     return []
@@ -242,5 +233,5 @@ export function getAvailableWorkspaces() {
     return []
   }
 
-  return workspaces.filter(w => w.id === workspaceId)
+  return workspaces.filter((w: WorkspaceWithCode) => w.id === workspaceId)
 }

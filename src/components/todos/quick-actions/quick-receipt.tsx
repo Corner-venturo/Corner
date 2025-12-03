@@ -16,7 +16,7 @@ import {
 import { DateInput } from '@/components/ui/date-input'
 import { useOrderStore, useTourStore } from '@/stores'
 import { Combobox } from '@/components/ui/combobox'
-import { usePaymentData } from '@/app/finance/payments/hooks/usePaymentData'
+import { usePaymentData } from '@/app/(main)/finance/payments/hooks/usePaymentData'
 import type { ReceiptItem } from '@/stores'
 
 interface QuickReceiptProps {
