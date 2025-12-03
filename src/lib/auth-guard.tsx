@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { useLocalAuthStore } from '@/lib/auth/local-auth-manager'
 import { useAuthStore } from '@/stores/auth-store'
 import { hasPermissionForRoute } from '@/lib/permissions'
 import { logger } from '@/lib/utils/logger'
@@ -15,7 +14,6 @@ interface AuthGuardProps {
 export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { currentProfile, setCurrentProfile, profiles } = useLocalAuthStore()
   const { user, _hasHydrated, isAuthenticated } = useAuthStore()
   const redirectingRef = useRef(false) // 防止重複跳轉
 
@@ -27,8 +25,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
         return
       }
 
-      // 🔧 修正：如果已認證（剛登入），不需要等待 hydration
-      // isAuthenticated 在 switchProfile/login 中會立即設定
+      // 如果已認證（剛登入），不需要等待 hydration
       if (isAuthenticated && user?.id) {
         logger.debug('AuthGuard: 已認證，跳過 hydration 等待')
         redirectingRef.current = false
@@ -46,34 +43,23 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
       }
 
       logger.debug('AuthGuard 檢查', {
-        hasCurrentProfile: !!currentProfile,
         hasUser: !!user,
         pathname,
         _hasHydrated,
         isAuthenticated,
       })
 
-      // 1. 優先檢查 auth-store 的 user（持久化的）
-      if (user && user.id) {
-        logger.info(`從 auth-store 找到用戶: ${user.display_name}`)
-        // 如果 currentProfile 沒有，同步一下
-        if (!currentProfile) {
-          const profile = profiles.find(p => p.id === user.id)
-          if (profile) {
-            setCurrentProfile(profile)
-          }
-        }
-        // 繼續檢查權限
-      } else if (!currentProfile) {
+      // 1. 檢查 auth-store 的 user
+      if (!user || !user.id) {
         // 沒有登入，跳轉到登入頁
-        logger.warn('沒有 currentProfile 和 user，跳轉登入頁')
+        logger.warn('沒有 user，跳轉登入頁')
         redirectingRef.current = true
         router.push('/login')
         return
       }
 
       // 取得當前用戶的權限
-      const permissions = currentProfile?.permissions || user?.permissions || []
+      const permissions = user?.permissions || []
 
       // 2. 檢查指定權限
       if (requiredPermission) {
@@ -101,15 +87,12 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
 
     checkAuth()
   }, [
-    currentProfile,
     user,
     _hasHydrated,
     isAuthenticated,
     requiredPermission,
     pathname,
     router,
-    setCurrentProfile,
-    profiles,
   ])
 
 
@@ -118,18 +101,13 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
     return <>{children}</>
   }
 
-  // 🔧 如果已認證，直接渲染（優先檢查，避免閃爍）
+  // 如果已認證，直接渲染（優先檢查，避免閃爍）
   if (isAuthenticated && user?.id) {
     return <>{children}</>
   }
 
   // 如果有 user（持久化的狀態），直接渲染
   if (user && user.id) {
-    return <>{children}</>
-  }
-
-  // 如果有 currentProfile，直接渲染
-  if (currentProfile) {
     return <>{children}</>
   }
 
@@ -149,19 +127,19 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
  */
 export function usePermissionCheck(requiredRoute?: string) {
   const pathname = usePathname()
-  const { currentProfile } = useLocalAuthStore()
+  const { user } = useAuthStore()
 
   const checkRoute = requiredRoute || pathname
-  const hasPermission = currentProfile
-    ? hasPermissionForRoute(currentProfile.permissions, checkRoute)
+  const hasPermission = user
+    ? hasPermissionForRoute(user.permissions || [], checkRoute)
     : false
 
   return {
     hasPermission,
-    userPermissions: currentProfile?.permissions || [],
+    userPermissions: user?.permissions || [],
     isAdmin:
-      currentProfile?.permissions.includes('admin') ||
-      currentProfile?.permissions.includes('super_admin'),
-    isSuperAdmin: currentProfile?.permissions.includes('super_admin'),
+      user?.permissions?.includes('admin') ||
+      user?.permissions?.includes('super_admin'),
+    isSuperAdmin: user?.permissions?.includes('super_admin'),
   }
 }

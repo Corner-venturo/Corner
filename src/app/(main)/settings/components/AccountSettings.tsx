@@ -123,19 +123,7 @@ export function AccountSettings({
         return
       }
 
-      // 3. 清除角色卡（重要！否則舊密碼還能登入）
-      try {
-        const { useLocalAuthStore } = await import('@/lib/auth/local-auth-manager')
-        const localAuthStore = useLocalAuthStore.getState()
-
-        // 刪除當前用戶的角色卡
-        localAuthStore.removeProfile(user.id)
-        logger.log('🗑️ 已刪除角色卡，下次登入需從網路驗證')
-      } catch (profileError) {
-        logger.warn('⚠️ 清除角色卡失敗（不影響密碼更新）:', profileError)
-      }
-
-      // 4. 同步更新 IndexedDB 的密碼
+      // 3. 同步更新 IndexedDB 的密碼
       try {
         const { localDB } = await import('@/lib/db')
         const { TABLES } = await import('@/lib/db/schemas')

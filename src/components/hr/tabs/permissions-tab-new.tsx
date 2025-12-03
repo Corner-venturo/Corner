@@ -82,20 +82,6 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             permissions: defaultPermissions as unknown as typeof user.permissions,
           })
 
-          // 同步更新 LocalProfile
-          try {
-            const { useLocalAuthStore } = await import('@/lib/auth/local-auth-manager')
-            const localAuthStore = useLocalAuthStore.getState()
-            const currentProfile = localAuthStore.currentProfile
-
-            if (currentProfile && currentProfile.id === employee.id && 'updateProfile' in localAuthStore) {
-              (localAuthStore.updateProfile as (id: string, data: Record<string, unknown>) => void)(employee.id, {
-                roles: [role],
-              })
-            }
-          } catch (_error) {
-            // Ignore error
-          }
         }
 
         // 重置額外權限
