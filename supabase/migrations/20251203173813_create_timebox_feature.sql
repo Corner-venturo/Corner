@@ -1,7 +1,7 @@
 -- MIGRATION: Create tables for the Timebox feature with a cloud-native architecture.
 
 -- Table for 'Base Boxes' - these are the templates for schedule items.
-CREATE TABLE public.timebox_boxes (
+CREATE TABLE IF NOT EXISTS public.timebox_boxes (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at timestamptz DEFAULT now() NOT NULL,
     updated_at timestamptz DEFAULT now() NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE public.timebox_boxes (
 COMMENT ON TABLE public.timebox_boxes IS 'Stores user-defined templates for timebox items.';
 
 -- Table for 'Week Records' - represents a specific week in the calendar.
-CREATE TABLE public.timebox_weeks (
+CREATE TABLE IF NOT EXISTS public.timebox_weeks (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at timestamptz DEFAULT now() NOT NULL,
     updated_at timestamptz DEFAULT now() NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE public.timebox_weeks (
 COMMENT ON TABLE public.timebox_weeks IS 'Represents a single week for a user to schedule boxes in.';
 
 -- Table for 'Scheduled Boxes' - an instance of a Base Box placed on the calendar.
-CREATE TABLE public.timebox_scheduled_boxes (
+CREATE TABLE IF NOT EXISTS public.timebox_scheduled_boxes (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at timestamptz DEFAULT now() NOT NULL,
     updated_at timestamptz DEFAULT now() NOT NULL,
@@ -44,13 +44,14 @@ CREATE TABLE public.timebox_scheduled_boxes (
 COMMENT ON TABLE public.timebox_scheduled_boxes IS 'An instance of a timebox placed onto a specific week and day.';
 
 -- Add indexes for performance
-CREATE INDEX ON public.timebox_boxes (user_id);
-CREATE INDEX ON public.timebox_weeks (user_id, week_start);
-CREATE INDEX ON public.timebox_scheduled_boxes (user_id, week_id);
+CREATE INDEX IF NOT EXISTS timebox_boxes_user_id_idx ON public.timebox_boxes (user_id);
+CREATE INDEX IF NOT EXISTS timebox_weeks_user_id_week_start_idx ON public.timebox_weeks (user_id, week_start);
+CREATE INDEX IF NOT EXISTS timebox_scheduled_boxes_user_id_week_id_idx ON public.timebox_scheduled_boxes (user_id, week_id);
 
 -- Enable RLS and define policies for all new tables
 -- timebox_boxes
 ALTER TABLE public.timebox_boxes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can manage their own timebox_boxes" ON public.timebox_boxes;
 CREATE POLICY "Users can manage their own timebox_boxes"
 ON public.timebox_boxes FOR ALL
 USING (auth.uid() = user_id)
@@ -58,6 +59,7 @@ WITH CHECK (auth.uid() = user_id);
 
 -- timebox_weeks
 ALTER TABLE public.timebox_weeks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can manage their own timebox_weeks" ON public.timebox_weeks;
 CREATE POLICY "Users can manage their own timebox_weeks"
 ON public.timebox_weeks FOR ALL
 USING (auth.uid() = user_id)
@@ -65,6 +67,7 @@ WITH CHECK (auth.uid() = user_id);
 
 -- timebox_scheduled_boxes
 ALTER TABLE public.timebox_scheduled_boxes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can manage their own scheduled boxes" ON public.timebox_scheduled_boxes;
 CREATE POLICY "Users can manage their own scheduled boxes"
 ON public.timebox_scheduled_boxes FOR ALL
 USING (auth.uid() = user_id)
