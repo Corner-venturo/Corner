@@ -1,183 +1,293 @@
 /**
  * DisbursementPage
  * 出納單管理主頁面
+ *
+ * 設計理念（參考 cornerERP）：
+ * - 列表顯示「出納單」，不是請款單
+ * - 點「新增」進入選擇請款單的流程
+ * - 出納單包含多張請款單
  */
 
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { FileText, Calendar, Wallet } from 'lucide-react'
-import { useDisbursementData } from '../hooks/useDisbursementData'
-import { useDisbursementFilters } from '../hooks/useDisbursementFilters'
-import { useDisbursementForm } from '../hooks/useDisbursementForm'
-import { useDisbursementPDF } from '../hooks/useDisbursementPDF'
-import { PendingList, CurrentOrderList, EmptyCurrentOrder, HistoryList } from './DisbursementList'
-import { DisbursementDialog } from './DisbursementDialog'
+import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { FileText, Eye, Trash2 } from 'lucide-react'
+import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
+import { DisbursementOrder, PaymentRequest } from '@/stores/types'
+import { cn } from '@/lib/utils'
+import { CreateDisbursementDialog } from './CreateDisbursementDialog'
+import { DisbursementDetailDialog } from './DisbursementDetailDialog'
+import { DisbursementPrintDialog } from './DisbursementPrintDialog'
+
+// 出納單狀態
+const DISBURSEMENT_STATUS = {
+  pending: { label: '待出帳', color: 'bg-morandi-gold' },
+  confirmed: { label: '已確認', color: 'bg-blue-500' },
+  paid: { label: '已出帳', color: 'bg-morandi-green' },
+}
 
 export function DisbursementPage() {
-  // 獲取數據
+  // Stores
   const {
-    disbursement_orders,
-    pendingRequests,
-    currentOrder,
-    currentOrderRequests,
-    nextThursday,
-    addToCurrentDisbursementOrder,
-    removeFromDisbursementOrder,
-    confirmDisbursementOrder,
-    createDisbursementOrder,
-    generateDisbursementNumber,
-  } = useDisbursementData()
+    items: disbursement_orders,
+    fetchAll: fetchDisbursementOrders,
+    delete: deleteDisbursementOrder,
+  } = useDisbursementOrderStore()
 
-  // 篩選和搜尋
   const {
-    activeTab,
-    setActiveTab,
-    searchTerm,
-    setSearchTerm,
-    dialogSearchTerm,
-    setDialogSearchTerm,
-  } = useDisbursementFilters()
+    items: payment_requests,
+    fetchAll: fetchPaymentRequests,
+  } = usePaymentRequestStore()
 
-  // 表單狀態
-  const {
-    selectedRequests,
-    selectedRequestsForNew,
-    isAddDialogOpen,
-    selectedAmount,
-    selectedAmountForNew,
-    setIsAddDialogOpen,
-    handleSelectRequest,
-    handleSelectRequestForNew,
-    handleSelectAllForNew,
-    resetForm,
-    clearSelections,
-  } = useDisbursementForm(pendingRequests)
+  const { fetchAll: fetchRequestItems } = usePaymentRequestItemStore()
 
-  // PDF 生成
-  const { handlePrintPDF } = useDisbursementPDF()
+  // 狀態
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<DisbursementOrder | null>(null)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  const [printOrder, setPrintOrder] = useState<DisbursementOrder | null>(null)
 
-  // 加入出納單
-  const handleAddToDisbursement = useCallback(() => {
-    if (selectedRequests.length === 0) return
-    addToCurrentDisbursementOrder(selectedRequests)
-    clearSelections()
-  }, [selectedRequests, addToCurrentDisbursementOrder, clearSelections])
+  // 初始化載入資料
+  useEffect(() => {
+    fetchDisbursementOrders()
+    fetchPaymentRequests()
+    fetchRequestItems()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  // 從出納單移除
-  const handleRemoveFromDisbursement = useCallback(
-    (paymentRequestId: string) => {
-      if (!currentOrder) return
-      removeFromDisbursementOrder(currentOrder.id, paymentRequestId)
+  // 取得待出帳的請款單（狀態為 approved，且尚未加入任何出納單）
+  const pendingRequests = useMemo(() => {
+    // 收集所有已在出納單中的請款單 ID
+    const usedRequestIds = new Set<string>()
+    disbursement_orders.forEach(order => {
+      order.payment_request_ids?.forEach(id => usedRequestIds.add(id))
+    })
+
+    // 只顯示「已核准」且「尚未加入出納單」的請款單
+    return payment_requests.filter(r =>
+      r.status === 'approved' && !usedRequestIds.has(r.id)
+    )
+  }, [payment_requests, disbursement_orders])
+
+  // 表格欄位
+  const columns: TableColumn<DisbursementOrder>[] = useMemo(() => [
+    {
+      key: 'order_number',
+      label: '出納單號',
+      sortable: true,
+      render: (value) => (
+        <div className="font-medium text-morandi-primary">{String(value || '自動產生')}</div>
+      ),
     },
-    [currentOrder, removeFromDisbursementOrder]
-  )
+    {
+      key: 'disbursement_date',
+      label: '出帳日期',
+      sortable: true,
+      render: (value) => (
+        <div className="text-sm text-morandi-secondary">
+          {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'}
+        </div>
+      ),
+    },
+    {
+      key: 'payment_request_ids',
+      label: '請款單數',
+      render: (value) => (
+        <div className="text-center">
+          {Array.isArray(value) ? value.length : 0} 筆
+        </div>
+      ),
+    },
+    {
+      key: 'amount',
+      label: '總金額',
+      sortable: true,
+      render: (value) => (
+        <div className="font-semibold text-morandi-gold text-right">
+          NT$ {(Number(value) || 0).toLocaleString()}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: '狀態',
+      sortable: true,
+      render: (value) => {
+        const status = DISBURSEMENT_STATUS[value as keyof typeof DISBURSEMENT_STATUS] || DISBURSEMENT_STATUS.pending
+        return (
+          <Badge className={cn('text-white', status.color)}>
+            {status.label}
+          </Badge>
+        )
+      },
+    },
+    {
+      key: 'created_at',
+      label: '建立時間',
+      sortable: true,
+      render: (value) => (
+        <div className="text-sm text-morandi-secondary">
+          {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'}
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      label: '操作',
+      width: '120px',
+      render: (_value, row) => (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleViewDetail(row)
+            }}
+            className="h-8 w-8 p-0"
+          >
+            <Eye size={16} className="text-morandi-secondary" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              handlePrintPDF(row)
+            }}
+            className="h-8 w-8 p-0"
+          >
+            <FileText size={16} className="text-morandi-gold" />
+          </Button>
+          {row.status === 'pending' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleDelete(row)
+              }}
+              className="h-8 w-8 p-0"
+            >
+              <Trash2 size={16} className="text-red-500" />
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ], [])
 
-  // 確認出納單
-  const handleConfirmDisbursement = useCallback(() => {
-    if (!currentOrder) return
-    confirmDisbursementOrder(currentOrder.id, '1') // 使用實際用戶ID
-  }, [currentOrder, confirmDisbursementOrder])
+  // 查看詳情
+  const handleViewDetail = useCallback((order: DisbursementOrder) => {
+    setSelectedOrder(order)
+    setIsDetailDialogOpen(true)
+  }, [])
 
-  // 新增出納單
-  const handleCreateDisbursement = useCallback(() => {
-    if (selectedRequestsForNew.length === 0) return
-    createDisbursementOrder(selectedRequestsForNew)
-    setDialogSearchTerm('')
-    resetForm()
-    setActiveTab('current') // 切換到本週出帳查看新建的出納單
-  }, [
-    selectedRequestsForNew,
-    createDisbursementOrder,
-    resetForm,
-    setActiveTab,
-    setDialogSearchTerm,
-  ])
+  // 列印 PDF - 開啟預覽對話框
+  const handlePrintPDF = useCallback((order: DisbursementOrder) => {
+    setPrintOrder(order)
+    setIsPrintDialogOpen(true)
+  }, [])
 
-  // 取消新增對話框
-  const handleCancelDialog = useCallback(() => {
-    setIsAddDialogOpen(false)
-    resetForm()
-    setDialogSearchTerm('')
-  }, [resetForm, setIsAddDialogOpen, setDialogSearchTerm])
+  // 刪除出納單
+  const handleDelete = useCallback(async (order: DisbursementOrder) => {
+    if (!confirm(`確定要刪除出納單 ${order.order_number} 嗎？`)) return
+
+    try {
+      await deleteDisbursementOrder(order.id)
+      alert('✅ 出納單已刪除')
+    } catch (error) {
+      console.error('刪除出納單失敗:', error)
+      alert('❌ 刪除出納單失敗')
+    }
+  }, [deleteDisbursementOrder])
+
+  // 新增出納單成功後
+  const handleCreateSuccess = useCallback(() => {
+    setIsCreateDialogOpen(false)
+    fetchDisbursementOrders()
+    fetchPaymentRequests()
+  }, [fetchDisbursementOrders, fetchPaymentRequests])
+
+  // 計算統計數據
+  const thisMonthOrders = useMemo(() => {
+    return disbursement_orders.filter(o => {
+      const date = new Date(o.created_at || '')
+      const now = new Date()
+      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+    })
+  }, [disbursement_orders])
+
+  const thisMonthAmount = useMemo(() => {
+    return thisMonthOrders.reduce((sum, o) => sum + (o.amount || 0), 0)
+  }, [thisMonthOrders])
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="出納單管理"
-        tabs={[
-          { value: 'pending', label: '待出帳', icon: FileText },
-          { value: 'current', label: '本週出帳', icon: Calendar },
-          { value: 'all', label: '出納單列表', icon: Wallet },
-        ]}
-        activeTab={activeTab}
-        onTabChange={tab => setActiveTab(tab as 'pending' | 'current' | 'all')}
-        onAdd={() => setIsAddDialogOpen(true)}
+        onAdd={() => setIsCreateDialogOpen(true)}
         addLabel="新增出納單"
         showSearch={true}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋請款單號、團號或團名..."
-      />
+        searchPlaceholder="搜尋出納單號..."
+      >
+        {/* 統計資訊 */}
+        <div className="flex items-center gap-6 text-sm">
+          <div className="text-right">
+            <span className="text-morandi-muted">待出帳</span>
+            <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length} 筆</span>
+          </div>
+          <div className="text-right">
+            <span className="text-morandi-muted">本月</span>
+            <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length} 筆</span>
+          </div>
+          <div className="text-right">
+            <span className="text-morandi-muted">本月金額</span>
+            <span className="ml-2 font-semibold text-morandi-green">NT$ {thisMonthAmount.toLocaleString()}</span>
+          </div>
+        </div>
+      </ResponsiveHeader>
 
-      <div className="flex-1 overflow-auto">
-        {/* 待出帳頁面 */}
-        {activeTab === 'pending' && (
-          <PendingList
-            data={pendingRequests}
-            selectedRequests={selectedRequests}
-            selectedAmount={selectedAmount}
-            searchTerm={searchTerm}
-            nextThursday={nextThursday}
-            onSelectRequest={handleSelectRequest}
-            onAddToDisbursement={handleAddToDisbursement}
-          />
-        )}
-
-        {/* 本週出帳頁面 */}
-        {activeTab === 'current' && (
-          <>
-            {currentOrder ? (
-              <CurrentOrderList
-                currentOrder={currentOrder}
-                requests={currentOrderRequests}
-                searchTerm={searchTerm}
-                onRemove={handleRemoveFromDisbursement}
-                onConfirm={handleConfirmDisbursement}
-                onPrintPDF={handlePrintPDF}
-              />
-            ) : (
-              <EmptyCurrentOrder onNavigate={() => setActiveTab('pending')} />
-            )}
-          </>
-        )}
-
-        {/* 出納單列表頁面 */}
-        {activeTab === 'all' && (
-          <HistoryList
-            data={disbursement_orders}
-            searchTerm={searchTerm}
-            onPrintPDF={handlePrintPDF}
-          />
-        )}
+      <div className="flex-1 overflow-hidden">
+        {/* 出納單列表 */}
+        <EnhancedTable
+          data={disbursement_orders}
+          columns={columns}
+          searchableFields={['order_number']}
+          initialPageSize={20}
+          searchTerm={searchTerm}
+          onRowClick={handleViewDetail}
+        />
       </div>
 
       {/* 新增出納單對話框 */}
-      <DisbursementDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
+      <CreateDisbursementDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
         pendingRequests={pendingRequests}
-        selectedRequests={selectedRequestsForNew}
-        selectedAmount={selectedAmountForNew}
-        searchTerm={dialogSearchTerm}
-        orderNumber={generateDisbursementNumber()}
-        nextThursday={nextThursday}
-        onSearchChange={setDialogSearchTerm}
-        onSelectRequest={handleSelectRequestForNew}
-        onSelectAll={handleSelectAllForNew}
-        onCreate={handleCreateDisbursement}
-        onCancel={handleCancelDialog}
+        onSuccess={handleCreateSuccess}
+      />
+
+      {/* 出納單詳情對話框 */}
+      <DisbursementDetailDialog
+        order={selectedOrder}
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+      />
+
+      {/* 出納單列印預覽對話框 */}
+      <DisbursementPrintDialog
+        order={printOrder}
+        open={isPrintDialogOpen}
+        onOpenChange={setIsPrintDialogOpen}
       />
     </div>
   )

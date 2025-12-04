@@ -1,21 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, FileText } from 'lucide-react'
 import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
 import { BatchRequestDialog } from '@/features/finance/requests/components/BatchRequestDialog'
+import { RequestDetailDialog } from '@/features/finance/requests/components/RequestDetailDialog'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
+import { PaymentRequest } from '@/stores/types'
 
 export default function RequestsPage() {
-  const { payment_requests } = usePayments()
+  const { payment_requests, loadPaymentRequests } = usePayments()
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
+  const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null)
+
+  // 載入資料（只執行一次）
+  useEffect(() => {
+    loadPaymentRequests()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { tableColumns, filteredAndSortedRequests, handleSort, handleFilter } =
     useRequestTable(payment_requests)
+
+  // 點擊行打開詳細對話框
+  const handleRowClick = (request: PaymentRequest) => {
+    setSelectedRequest(request)
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -47,6 +61,7 @@ export default function RequestsPage() {
           columns={tableColumns as TableColumn[]}
           data={filteredAndSortedRequests}
           onSort={handleSort}
+          onRowClick={handleRowClick}
           selection={undefined}
         />
       </div>
@@ -54,6 +69,12 @@ export default function RequestsPage() {
       <AddRequestDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
 
       <BatchRequestDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
+
+      <RequestDetailDialog
+        request={selectedRequest}
+        open={!!selectedRequest}
+        onOpenChange={(open) => !open && setSelectedRequest(null)}
+      />
     </div>
   )
 }

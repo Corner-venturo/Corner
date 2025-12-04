@@ -76,13 +76,21 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     const existingItems = this.getItemsByRequestId(requestId)
 
     const now = this.now()
-    const itemNumber = `${request.request_number}-${String(existingItems.length + 1).padStart(3, '0')}`
+    const itemNumber = `${request.code}-${String(existingItems.length + 1).padStart(3, '0')}`
 
-    const item: Partial<PaymentRequestItem> = {
-      ...itemData,
+    // 資料庫欄位是 unitprice（無底線），轉換欄位名稱
+    const item = {
       request_id: requestId,
       item_number: itemNumber,
+      category: itemData.category,
+      supplier_id: itemData.supplier_id,
+      supplier_name: itemData.supplier_name,
+      description: itemData.description,
+      unitprice: itemData.unit_price, // 資料庫欄位名稱
+      quantity: itemData.quantity,
       subtotal: itemData.unit_price * itemData.quantity,
+      note: itemData.note,
+      sort_order: itemData.sort_order,
     }
 
     // 使用 itemStore 新增項目

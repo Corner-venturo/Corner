@@ -5,11 +5,15 @@
 
 'use client'
 
+import { useMemo, useState } from 'react'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
-import { Calendar, FileText } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Calendar, FileText, ChevronDown, ChevronRight } from 'lucide-react'
 import { PaymentRequest, DisbursementOrder } from '../types'
+import { PaymentRequestItem } from '@/stores/types'
 import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
+import { cn } from '@/lib/utils'
 
 interface PendingListProps {
   data: PaymentRequest[]
@@ -176,5 +180,167 @@ export function HistoryList({ data, searchTerm, onPrintPDF }: HistoryListProps) 
       initialPageSize={20}
       searchTerm={searchTerm}
     />
+  )
+}
+
+// 供應商分組資料類型
+interface SupplierGroup {
+  supplier_id: string
+  supplier_name: string
+  items: Array<{
+    request: PaymentRequest
+    item: PaymentRequestItem
+  }>
+  total: number
+}
+
+interface SupplierGroupListProps {
+  groups: SupplierGroup[]
+  searchTerm: string
+}
+
+export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps) {
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+
+  // 篩選符合搜尋條件的供應商
+  const filteredGroups = useMemo(() => {
+    if (!searchTerm) return groups
+    const lowerSearch = searchTerm.toLowerCase()
+    return groups.filter(group =>
+      group.supplier_name.toLowerCase().includes(lowerSearch) ||
+      group.items.some(
+        item =>
+          item.request.code?.toLowerCase().includes(lowerSearch) ||
+          item.request.tour_name?.toLowerCase().includes(lowerSearch) ||
+          item.item.description?.toLowerCase().includes(lowerSearch)
+      )
+    )
+  }, [groups, searchTerm])
+
+  const toggleGroup = (supplierId: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [supplierId]: !prev[supplierId],
+    }))
+  }
+
+  // 計算總金額
+  const totalAmount = useMemo(
+    () => filteredGroups.reduce((sum, group) => sum + group.total, 0),
+    [filteredGroups]
+  )
+
+  if (filteredGroups.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <FileText className="h-16 w-16 text-morandi-secondary mx-auto mb-4 opacity-50" />
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">無符合條件的供應商</h3>
+        <p className="text-morandi-secondary">目前沒有待出帳的請款項目</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* 統計摘要 */}
+      <div className="flex items-center justify-between p-4 bg-morandi-background/50 rounded-lg">
+        <div className="text-sm text-morandi-secondary">
+          共 {filteredGroups.length} 個供應商
+        </div>
+        <div className="text-lg font-bold text-morandi-gold">
+          總計 NT$ {totalAmount.toLocaleString()}
+        </div>
+      </div>
+
+      {/* 供應商卡片列表 */}
+      <div className="space-y-3">
+        {filteredGroups.map(group => (
+          <div
+            key={group.supplier_id}
+            className="border border-morandi-container/20 rounded-lg overflow-hidden"
+          >
+            {/* 供應商標題列 */}
+            <div
+              className="flex items-center justify-between p-4 bg-morandi-background/30 cursor-pointer hover:bg-morandi-background/50 transition-colors"
+              onClick={() => toggleGroup(group.supplier_id)}
+            >
+              <div className="flex items-center gap-3">
+                <button className="text-morandi-secondary">
+                  {expandedGroups[group.supplier_id] ? (
+                    <ChevronDown size={20} />
+                  ) : (
+                    <ChevronRight size={20} />
+                  )}
+                </button>
+                <div>
+                  <h3 className="font-semibold text-morandi-primary">{group.supplier_name}</h3>
+                  <p className="text-xs text-morandi-secondary">{group.items.length} 筆項目</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-morandi-gold">
+                  NT$ {group.total.toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            {/* 展開的項目列表 */}
+            {expandedGroups[group.supplier_id] && (
+              <div className="border-t border-morandi-container/20">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-morandi-background/20">
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">請款單號</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">團號</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">類別</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">說明</th>
+                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">單價</th>
+                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">數量</th>
+                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">小計</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.items.map(({ request, item }, index) => (
+                      <tr
+                        key={`${item.id}-${index}`}
+                        className="border-b border-morandi-container/10 hover:bg-morandi-background/10"
+                      >
+                        <td className="py-2 px-4 text-morandi-primary">{request.code}</td>
+                        <td className="py-2 px-4 text-morandi-secondary">{request.tour_code || '-'}</td>
+                        <td className="py-2 px-4">
+                          <Badge variant="outline" className="text-xs">
+                            {item.category}
+                          </Badge>
+                        </td>
+                        <td className="py-2 px-4 text-morandi-secondary max-w-[200px] truncate">
+                          {item.description || '-'}
+                        </td>
+                        <td className="py-2 px-4 text-right">
+                          NT$ {(item.unit_price || 0).toLocaleString()}
+                        </td>
+                        <td className="py-2 px-4 text-right">{item.quantity}</td>
+                        <td className="py-2 px-4 text-right font-medium text-morandi-gold">
+                          NT$ {(item.subtotal || 0).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-morandi-background/30">
+                      <td colSpan={6} className="py-2 px-4 text-right font-semibold">
+                        小計
+                      </td>
+                      <td className="py-2 px-4 text-right font-bold text-morandi-gold">
+                        NT$ {group.total.toLocaleString()}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

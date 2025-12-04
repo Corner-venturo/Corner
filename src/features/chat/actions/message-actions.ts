@@ -10,7 +10,7 @@ export async function sendMessageAction({
   channelId: string
   content: string
 }) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {

@@ -17,15 +17,17 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
   },
   global: {
-    fetch: (url, options = {}) => {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), POLLING_INTERVALS.OCCASIONAL)
+    fetch: typeof window !== 'undefined'
+      ? (url, options = {}) => {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), POLLING_INTERVALS.OCCASIONAL)
 
-      return fetch(url, {
-        ...options,
-        signal: controller.signal,
-      }).finally(() => clearTimeout(timeoutId))
-    },
+          return fetch(url, {
+            ...options,
+            signal: controller.signal,
+          }).finally(() => clearTimeout(timeoutId))
+        }
+      : undefined,
   },
 })
 

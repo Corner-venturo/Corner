@@ -37,6 +37,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     total_amount,
     addItemToList,
     removeItem,
+    updateItem,
     resetForm,
     suppliers,
     tours,
@@ -95,9 +96,12 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     return thursdays
   }, [])
 
+  // 過濾有效的項目（有 unit_price > 0 的項目）
+  const validItems = requestItems.filter(item => item.unit_price > 0)
+
   const handleSubmit = async () => {
-    if (!formData.tour_id || requestItems.length === 0 || !formData.request_date) {
-      alert('請填寫必填欄位（團體、請款日期、至少一項請款項目）')
+    if (!formData.tour_id || validItems.length === 0 || !formData.request_date) {
+      alert('請填寫必填欄位（團體、請款日期、至少一項有效請款項目）')
       return
     }
 
@@ -112,7 +116,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     try {
       await createRequest(
         formData,
-        requestItems,
+        validItems,
         selectedTour.name || '',
         selectedTour.code || '',
         selectedOrder?.order_number || undefined
@@ -122,8 +126,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       resetForm()
       onOpenChange(false)
     } catch (error) {
-      logger.error('❌ Create Request Error:', error)
-      alert('❌ 建立失敗，請稍後再試')
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
+      logger.error('❌ Create Request Error:', errorMessage, error)
+      alert(`❌ 建立失敗: ${errorMessage}`)
     }
   }
 
@@ -287,7 +292,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Existing Items */}
+                  {/* 所有項目 - 統一可編輯 */}
                   {requestItems.map((item, index) => (
                     <tr
                       key={item.id}
@@ -296,202 +301,145 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                         index % 2 === 1 && 'bg-morandi-container/5'
                       )}
                     >
-                      <td className="py-3 px-3 w-32">
-                        <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded font-medium">
-                          {categoryOptions.find(c => c.value === item.category)?.label}
-                        </span>
+                      <td className="py-2 px-3 w-32">
+                        <Select
+                          value={item.category}
+                          onValueChange={value =>
+                            updateItem(item.id, { category: value as typeof item.category })
+                          }
+                        >
+                          <SelectTrigger className="h-9 border-morandi-container/30">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categoryOptions.map(option => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </td>
-                      <td className="py-3 px-3 w-64 text-sm text-morandi-primary font-medium">
-                        {item.supplierName}
+                      <td className="py-2 px-3 w-64">
+                        <Combobox
+                          options={suppliers.map(supplier => ({
+                            value: supplier.id,
+                            label: `${supplier.name} (${supplier.group})`,
+                          }))}
+                          value={item.supplier_id}
+                          onChange={value => updateItem(item.id, { supplier_id: value })}
+                          placeholder="搜尋供應商..."
+                          emptyMessage="找不到供應商"
+                          className="h-9"
+                        />
                       </td>
-                      <td className="py-3 px-3 w-28 text-sm text-morandi-secondary">
-                        {item.unit_price.toLocaleString()}
+                      <td className="py-2 px-3 w-28">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={item.unit_price || ''}
+                          onChange={e => {
+                            let value = e.target.value
+                              .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+                              .replace(/[^\d]/g, '')
+                            updateItem(item.id, { unit_price: value ? Number(value) : 0 })
+                          }}
+                          placeholder="0"
+                          className="h-9 border-morandi-container/30"
+                        />
                       </td>
-                      <td className="py-3 px-3 w-24 text-sm text-morandi-secondary">{item.quantity}</td>
-                      <td className="py-3 px-3 w-28 text-sm font-bold text-morandi-gold">
+                      <td className="py-2 px-3 w-24">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={item.quantity || ''}
+                          onChange={e => {
+                            let value = e.target.value
+                              .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+                              .replace(/[^\d]/g, '')
+                            updateItem(item.id, { quantity: value ? Number(value) : 1 })
+                          }}
+                          placeholder="1"
+                          className="h-9 border-morandi-container/30"
+                        />
+                      </td>
+                      <td className="py-2 px-3 w-28 text-sm font-bold text-morandi-gold">
                         {(item.unit_price * item.quantity).toLocaleString()}
                       </td>
-                      <td className="py-3 px-3 w-32">
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                          {item.payment_method === 'transfer' && '轉帳'}
-                          {item.payment_method === 'cash' && '現金'}
-                          {item.payment_method === 'check' && '支票'}
-                          {!item.payment_method && '轉帳'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 w-32 text-xs text-morandi-secondary">
-                        {item.payment_method === 'check' && item.custom_request_date
-                          ? new Date(item.custom_request_date).toLocaleDateString('zh-TW')
-                          : '-'}
-                      </td>
-                      <td className="py-3 px-3 w-48 text-sm text-morandi-secondary">{item.description || '-'}</td>
-                      <td className="py-3 px-3 w-32 text-center">
-                        <Button
-                          onClick={() => removeItem(item.id)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
+                      <td className="py-2 px-3 w-32">
+                        <Select
+                          value={item.payment_method || 'transfer'}
+                          onValueChange={value => {
+                            const paymentMethod = value as 'transfer' | 'check' | 'cash'
+                            updateItem(item.id, {
+                              payment_method: paymentMethod,
+                              custom_request_date: paymentMethod === 'check' ? item.custom_request_date : undefined,
+                            })
+                          }}
                         >
-                          <Trash2 size={14} />
-                        </Button>
+                          <SelectTrigger className="h-9 border-morandi-container/30">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="transfer">轉帳</SelectItem>
+                            <SelectItem value="check">支票</SelectItem>
+                            <SelectItem value="cash">現金</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="py-2 px-3 w-32">
+                        {item.payment_method === 'check' ? (
+                          <Input
+                            type="date"
+                            value={item.custom_request_date || ''}
+                            onChange={e => updateItem(item.id, { custom_request_date: e.target.value })}
+                            className="h-9 border-morandi-container/30"
+                          />
+                        ) : (
+                          <span className="text-xs text-morandi-secondary">-</span>
+                        )}
+                      </td>
+                      <td className="py-2 px-3 w-48">
+                        <Input
+                          value={item.description || ''}
+                          onChange={e => updateItem(item.id, { description: e.target.value })}
+                          placeholder="輸入項目描述"
+                          className="h-9 border-morandi-container/30"
+                        />
+                      </td>
+                      <td className="py-2 px-3 w-32 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Button
+                            onClick={addItemToList}
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 text-morandi-gold hover:text-morandi-gold hover:bg-morandi-gold/10"
+                          >
+                            <Plus size={14} />
+                          </Button>
+                          {requestItems.length > 1 && (
+                            <Button
+                              onClick={() => removeItem(item.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
-
-                  {/* New Item Row - 放在最後 */}
-                  <tr className="bg-morandi-gold/5 border-b-2 border-morandi-gold/30">
-                    <td className="py-2 px-3 w-32">
-                      <Select
-                        value={newItem.category}
-                        onValueChange={value =>
-                          setNewItem(prev => ({ ...prev, category: value as typeof newItem.category }))
-                        }
-                      >
-                        <SelectTrigger className="h-9 border-morandi-container/30">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categoryOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </td>
-                    <td className="py-2 px-3 w-64">
-                      <Combobox
-                        options={suppliers.map(supplier => ({
-                          value: supplier.id,
-                          label: `${supplier.name} (${supplier.group})`,
-                        }))}
-                        value={newItem.supplier_id}
-                        onChange={value => setNewItem(prev => ({ ...prev, supplier_id: value }))}
-                        placeholder="搜尋供應商..."
-                        emptyMessage="找不到供應商"
-                        className="h-9"
-                      />
-                    </td>
-                    <td className="py-2 px-3 w-28">
-                      <Input
-                        type="text"
-                        inputMode="numeric"
-                        value={newItem.unit_price || ''}
-                        onChange={e => {
-                          // 全形轉半形並只保留數字
-                          let value = e.target.value
-                            .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-                            .replace(/[^\d]/g, '')
-                          setNewItem(prev => ({ ...prev, unit_price: value ? Number(value) : 0 }))
-                        }}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                            e.preventDefault()
-                          }
-                        }}
-                        placeholder="0"
-                        className="h-9 border-morandi-container/30"
-                      />
-                    </td>
-                    <td className="py-2 px-3 w-24">
-                      <Input
-                        type="text"
-                        inputMode="numeric"
-                        value={newItem.quantity || ''}
-                        onChange={e => {
-                          // 全形轉半形並只保留數字
-                          let value = e.target.value
-                            .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-                            .replace(/[^\d]/g, '')
-                          setNewItem(prev => ({ ...prev, quantity: value ? Number(value) : 1 }))
-                        }}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                            e.preventDefault()
-                          }
-                        }}
-                        placeholder="1"
-                        className="h-9 border-morandi-container/30"
-                      />
-                    </td>
-                    <td className="py-2 px-3 w-28 text-sm font-bold text-morandi-gold">
-                      {(newItem.unit_price * newItem.quantity).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3 w-32">
-                      <Select
-                        value={newItem.payment_method || 'transfer'}
-                        onValueChange={value => {
-                          const paymentMethod = value as 'transfer' | 'check' | 'cash'
-                          setNewItem(prev => ({
-                            ...prev,
-                            payment_method: paymentMethod,
-                            // 清空支票日期（如果不是支票）
-                            custom_request_date: paymentMethod === 'check' ? prev.custom_request_date : undefined,
-                          }))
-                        }}
-                      >
-                        <SelectTrigger className="h-9 border-morandi-container/30">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="transfer">轉帳</SelectItem>
-                          <SelectItem value="check">支票</SelectItem>
-                          <SelectItem value="cash">現金</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </td>
-                    <td className="py-2 px-3 w-32">
-                      {newItem.payment_method === 'check' && (
-                        <Input
-                          type="date"
-                          value={newItem.custom_request_date || ''}
-                          onChange={e => setNewItem(prev => ({ ...prev, custom_request_date: e.target.value }))}
-                          className="h-9 border-morandi-container/30"
-                        />
-                      )}
-                    </td>
-                    <td className="py-2 px-3 w-48">
-                      <Input
-                        value={newItem.description}
-                        onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault()
-                            // 只有在不是輸入法組合中時才新增
-                            if (!e.nativeEvent.isComposing) {
-                              addItemToList()
-                            }
-                          }
-                        }}
-                        placeholder="輸入項目描述"
-                        className="h-9 border-morandi-container/30"
-                      />
-                    </td>
-                    <td className="py-2 px-3 w-32 text-center">
-                      <Button
-                        onClick={(e) => {
-                          addItemToList()
-                          // 保持 focus 在按鈕上，方便連續按
-                          e.currentTarget.focus()
-                        }}
-                        size="sm"
-                        className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                      >
-                        <Plus size={14} />
-                      </Button>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
 
-              {requestItems.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-border flex justify-end items-center">
-                  <span className="text-base font-semibold text-morandi-primary mr-4">總金額:</span>
-                  <span className="text-xl font-bold text-morandi-gold">
-                    NT$ {total_amount.toLocaleString()}
-                  </span>
-                </div>
-              )}
+              <div className="mt-4 pt-4 border-t border-border flex justify-end items-center">
+                <span className="text-base font-semibold text-morandi-primary mr-4">總金額:</span>
+                <span className="text-xl font-bold text-morandi-gold">
+                  NT$ {total_amount.toLocaleString()}
+                </span>
+              </div>
             </div>
         </div>
 
@@ -502,10 +450,10 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!formData.tour_id || requestItems.length === 0 || !formData.request_date}
+            disabled={!formData.tour_id || validItems.length === 0 || !formData.request_date}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md"
           >
-            新增請款單 (共 {requestItems.length} 項，NT$ {total_amount.toLocaleString()})
+            新增請款單 (共 {validItems.length} 項，NT$ {total_amount.toLocaleString()})
           </Button>
         </div>
       </DialogContent>

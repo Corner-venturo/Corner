@@ -522,7 +522,10 @@ export interface PaymentRequest {
   code: string // 請款單編號（由 store 自動生成）
   request_number: string // 請款單號（與 code 同義，向下相容）
   order_id?: string | null // 關聯的訂單ID
+  order_number?: string | null // 訂單編號（快照）
   tour_id?: string | null
+  tour_code?: string | null // 團號（快照）
+  tour_name?: string | null // 團名（快照）
   request_type: string // 請款類型（例：員工代墊、供應商支出）
   amount: number // 總金額
   supplier_id?: string | null
@@ -534,6 +537,8 @@ export interface PaymentRequest {
   approved_by?: string | null
   paid_at?: string | null
   paid_by?: string | null
+  created_by?: string | null // 請款人 ID
+  created_by_name?: string | null // 請款人姓名（快照）
   workspace_id?: string
   created_at: string
   updated_at: string
@@ -543,11 +548,26 @@ export interface PaymentRequest {
 // 透過 request_id 關聯到 PaymentRequest
 // 使用 paymentRequestService.getItemsByRequestId() 取得項目
 
+// 請款項目類型（參考 cornerERP 的 INVOICE_ITEM_TYPES）
+export type PaymentItemCategory =
+  | '住宿'      // 飯店住宿
+  | '交通'      // 機票、巴士、高鐵等
+  | '餐食'      // 餐廳、用餐
+  | '門票'      // 景點門票、活動
+  | '導遊'      // 導遊小費、領隊費用
+  | '保險'      // 旅遊平安險
+  | '出團款'    // 出團預支款項
+  | '回團款'    // 回團結算款項
+  | '員工代墊'  // 員工墊付費用
+  | 'ESIM'      // eSIM 網卡
+  | '同業'      // 同業分潤
+  | '其他'      // 其他雜支
+
 export interface PaymentRequestItem {
   id: string
   request_id: string // 所屬請款單ID
   item_number: string // REQ-2024001-001
-  category: '住宿' | '交通' | '餐食' | '門票' | '導遊' | '其他'
+  category: PaymentItemCategory
   supplier_id: string
   supplier_name: string // 供應商名稱快照
   description: string

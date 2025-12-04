@@ -3,52 +3,232 @@
  * 處理出納單的數據獲取和操作
  */
 
-import { useMemo } from 'react'
+import { useMemo, useCallback, useEffect } from 'react'
+import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
 import { PaymentRequest, DisbursementOrder } from '../types'
 
+// 計算下一個週四
+function getNextThursday(): Date {
+  const today = new Date()
+  const dayOfWeek = today.getDay()
+  const daysUntilThursday = (4 - dayOfWeek + 7) % 7 || 7 // 如果今天是週四，取下週四
+  const nextThursday = new Date(today)
+  nextThursday.setDate(today.getDate() + daysUntilThursday)
+  return nextThursday
+}
+
+// 生成出納單號: DO + YMMDD + 序號
+function generateDisbursementNumber(existingOrders: DisbursementOrder[]): string {
+  const now = new Date()
+  const year = String(now.getFullYear()).slice(-1)
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const dateStr = `${year}${month}${day}`
+  const prefix = `DO${dateStr}`
+
+  // 找到今天最大的序號
+  const todayOrders = existingOrders.filter(o => o.order_number?.startsWith(prefix))
+  let nextNum = 1
+  if (todayOrders.length > 0) {
+    const lastOrder = todayOrders.sort((a, b) =>
+      (b.order_number || '').localeCompare(a.order_number || '')
+    )[0]
+    const match = lastOrder.order_number?.match(/-(\d+)$/)
+    if (match) {
+      nextNum = parseInt(match[1], 10) + 1
+    }
+  }
+
+  return `${prefix}-${String(nextNum).padStart(3, '0')}`
+}
+
 export function useDisbursementData() {
-  // 注意: 暫時使用空資料，等待 payment store 完整實作
+  // 連接真實的 stores
   const {
-    payment_requests = [],
-    disbursement_orders = [],
-    addToCurrentDisbursementOrder = () => {},
-    removeFromDisbursementOrder = () => {},
-    confirmDisbursementOrder = () => {},
-    getCurrentWeekDisbursementOrder = () => null,
-    getPendingPaymentRequests = () => [],
-    getProcessingPaymentRequests = () => [],
-    getNextThursday = () => new Date().toLocaleDateString('zh-TW'),
-    createDisbursementOrder = () => {},
-    generateDisbursementNumber = () => 'DISB-000001',
-  } = {} as any
+    items: payment_requests,
+    fetchAll: fetchPaymentRequests,
+    update: updatePaymentRequest
+  } = usePaymentRequestStore()
 
+  const {
+    items: disbursement_orders,
+    fetchAll: fetchDisbursementOrders,
+    create: createOrder,
+    update: updateOrder,
+    delete: deleteOrder
+  } = useDisbursementOrderStore()
+
+  const { items: requestItems, fetchAll: fetchRequestItems } = usePaymentRequestItemStore()
+
+  // 初始化載入資料
+  useEffect(() => {
+    fetchPaymentRequests()
+    fetchDisbursementOrders()
+    fetchRequestItems()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 待出帳的請款單 (status = pending 或 approved)
   const pendingRequests = useMemo(
-    () => (getPendingPaymentRequests ? getPendingPaymentRequests() : []),
-    [getPendingPaymentRequests]
+    () => payment_requests.filter(r => r.status === 'pending' || r.status === 'approved'),
+    [payment_requests]
   )
 
+  // 處理中的請款單 (status = processing)
   const processingRequests = useMemo(
-    () => (getProcessingPaymentRequests ? getProcessingPaymentRequests() : []),
-    [getProcessingPaymentRequests]
+    () => payment_requests.filter(r => r.status === 'processing'),
+    [payment_requests]
   )
 
-  const currentOrder = useMemo(
-    () => (getCurrentWeekDisbursementOrder ? getCurrentWeekDisbursementOrder() : null),
-    [getCurrentWeekDisbursementOrder]
-  )
+  // 本週的出納單 (status = pending)
+  const currentOrder = useMemo(() => {
+    return disbursement_orders.find(o => o.status === 'pending') || null
+  }, [disbursement_orders])
 
-  const nextThursday = useMemo(
-    () => (getNextThursday ? getNextThursday() : new Date()),
-    [getNextThursday]
-  )
+  // 下一個週四日期
+  const nextThursday = useMemo(() => getNextThursday(), [])
 
-  // 獲取本週出帳的請款單詳情
+  // 本週出帳的請款單詳情
   const currentOrderRequests = useMemo(() => {
-    if (!currentOrder) return []
+    if (!currentOrder || !currentOrder.payment_request_ids) return []
     return currentOrder.payment_request_ids
-      .map((id: string) => payment_requests.find((r: PaymentRequest) => r.id === id))
+      .map(id => payment_requests.find(r => r.id === id))
       .filter(Boolean) as PaymentRequest[]
   }, [currentOrder, payment_requests])
+
+  // 按供應商分組的請款項目
+  const groupedBySupplier = useMemo(() => {
+    const groups: Record<string, {
+      supplier_id: string
+      supplier_name: string
+      items: Array<{
+        request: PaymentRequest
+        item: typeof requestItems[0]
+      }>
+      total: number
+    }> = {}
+
+    // 遍歷待出帳的請款單
+    pendingRequests.forEach(request => {
+      const items = requestItems.filter(item => item.request_id === request.id)
+      items.forEach(item => {
+        const supplierId = item.supplier_id || 'unknown'
+        const supplierName = item.supplier_name || '無供應商'
+
+        if (!groups[supplierId]) {
+          groups[supplierId] = {
+            supplier_id: supplierId,
+            supplier_name: supplierName,
+            items: [],
+            total: 0,
+          }
+        }
+
+        groups[supplierId].items.push({ request, item })
+        groups[supplierId].total += item.subtotal || 0
+      })
+    })
+
+    return Object.values(groups).sort((a, b) => b.total - a.total)
+  }, [pendingRequests, requestItems])
+
+  // 加入本週出帳
+  const addToCurrentDisbursementOrder = useCallback(async (requestIds: string[]) => {
+    if (currentOrder) {
+      // 已有本週出納單，更新它
+      const newIds = [...new Set([...currentOrder.payment_request_ids, ...requestIds])]
+      const newAmount = payment_requests
+        .filter(r => newIds.includes(r.id))
+        .reduce((sum, r) => sum + (r.amount || 0), 0)
+
+      await updateOrder(currentOrder.id, {
+        payment_request_ids: newIds,
+        amount: newAmount,
+      })
+    } else {
+      // 沒有本週出納單，建立新的
+      const amount = payment_requests
+        .filter(r => requestIds.includes(r.id))
+        .reduce((sum, r) => sum + (r.amount || 0), 0)
+
+      await createOrder({
+        order_number: generateDisbursementNumber(disbursement_orders),
+        disbursement_date: nextThursday.toISOString().split('T')[0],
+        payment_request_ids: requestIds,
+        amount,
+        status: 'pending',
+      } as Omit<DisbursementOrder, 'id' | 'created_at' | 'updated_at'>)
+    }
+
+    // 更新請款單狀態為 processing
+    for (const id of requestIds) {
+      await updatePaymentRequest(id, { status: 'processing' })
+    }
+  }, [currentOrder, payment_requests, disbursement_orders, nextThursday, createOrder, updateOrder, updatePaymentRequest])
+
+  // 從出納單移除請款單
+  const removeFromDisbursementOrder = useCallback(async (orderId: string, requestId: string) => {
+    const order = disbursement_orders.find(o => o.id === orderId)
+    if (!order) return
+
+    const newIds = order.payment_request_ids.filter(id => id !== requestId)
+    const newAmount = payment_requests
+      .filter(r => newIds.includes(r.id))
+      .reduce((sum, r) => sum + (r.amount || 0), 0)
+
+    if (newIds.length === 0) {
+      // 沒有請款單了，刪除出納單
+      await deleteOrder(orderId)
+    } else {
+      await updateOrder(orderId, {
+        payment_request_ids: newIds,
+        amount: newAmount,
+      })
+    }
+
+    // 將請款單狀態改回 pending
+    await updatePaymentRequest(requestId, { status: 'pending' })
+  }, [disbursement_orders, payment_requests, updateOrder, deleteOrder, updatePaymentRequest])
+
+  // 確認出帳
+  const confirmDisbursementOrder = useCallback(async (orderId: string, confirmedBy: string) => {
+    const order = disbursement_orders.find(o => o.id === orderId)
+    if (!order) return
+
+    await updateOrder(orderId, {
+      status: 'confirmed',
+      confirmed_by: confirmedBy,
+      confirmed_at: new Date().toISOString(),
+    })
+
+    // 更新所有請款單狀態為 paid
+    for (const requestId of order.payment_request_ids) {
+      await updatePaymentRequest(requestId, {
+        status: 'paid',
+        paid_at: new Date().toISOString(),
+      })
+    }
+  }, [disbursement_orders, updateOrder, updatePaymentRequest])
+
+  // 建立新出納單
+  const createDisbursementOrder = useCallback(async (requestIds: string[]) => {
+    const amount = payment_requests
+      .filter(r => requestIds.includes(r.id))
+      .reduce((sum, r) => sum + (r.amount || 0), 0)
+
+    await createOrder({
+      order_number: generateDisbursementNumber(disbursement_orders),
+      disbursement_date: nextThursday.toISOString().split('T')[0],
+      payment_request_ids: requestIds,
+      amount,
+      status: 'pending',
+    } as Omit<DisbursementOrder, 'id' | 'created_at' | 'updated_at'>)
+
+    // 更新請款單狀態為 processing
+    for (const id of requestIds) {
+      await updatePaymentRequest(id, { status: 'processing' })
+    }
+  }, [payment_requests, disbursement_orders, nextThursday, createOrder, updatePaymentRequest])
 
   return {
     payment_requests,
@@ -58,10 +238,11 @@ export function useDisbursementData() {
     currentOrder,
     currentOrderRequests,
     nextThursday,
+    groupedBySupplier, // 新增: 按供應商分組
     addToCurrentDisbursementOrder,
     removeFromDisbursementOrder,
     confirmDisbursementOrder,
     createDisbursementOrder,
-    generateDisbursementNumber,
+    generateDisbursementNumber: () => generateDisbursementNumber(disbursement_orders),
   }
 }
