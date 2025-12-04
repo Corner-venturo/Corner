@@ -4,6 +4,8 @@ import { useMessages } from '../hooks/useMessages'
 import { Loader2, AlertCircle } from 'lucide-react'
 
 export function MessageView({ channel }) {
+  const { messages, loading, error } = useMessages(channel?.id)
+
   if (!channel) {
     return (
       <div className="flex-1 flex items-center justify-center text-gray-500 bg-gray-50">
@@ -11,8 +13,6 @@ export function MessageView({ channel }) {
       </div>
     )
   }
-
-  const { messages, loading, error } = useMessages(channel.id)
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">

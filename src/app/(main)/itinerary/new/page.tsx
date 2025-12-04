@@ -8,6 +8,8 @@ import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
 import { PrintItineraryForm } from '@/features/itinerary/components/PrintItineraryForm'
 import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
+import { GeminiItineraryForm, type GeminiItineraryData } from '@/features/itinerary/components/GeminiItineraryForm'
+import { GeminiItineraryPreview } from '@/features/itinerary/components/GeminiItineraryPreview'
 import { Button } from '@/components/ui/button'
 import { useTourStore, useRegionsStore } from '@/stores'
 import type {
@@ -26,6 +28,7 @@ import {
   Plane,
   MapPin,
   Printer,
+  Wand2,
 } from 'lucide-react'
 
 // Local tour data interface (uses meetingInfo instead of meetingPoints array)
@@ -449,6 +452,24 @@ function NewItineraryPageContent() {
     ],
   })
 
+  // Gemini AI 行程資料
+  const [geminiData, setGeminiData] = useState<GeminiItineraryData>({
+    coverImage: '',
+    tagline: '角落嚴選行程',
+    taglineEn: 'EXPLORE EVERY CORNER OF THE WORLD',
+    title: '',
+    subtitle: '',
+    price: '',
+    priceNote: '',
+    country: '',
+    city: '',
+    dailySchedule: [],
+    flightOptions: [],
+    highlightImages: [],
+    highlightSpots: [],
+    sights: [],
+  })
+
   // 使用 ref 追蹤是否已初始化，避免使用者編輯被覆蓋
   const hasInitializedRef = useRef(false)
   const lastTourIdRef = useRef<string | null>(null)
@@ -704,6 +725,62 @@ function NewItineraryPageContent() {
 
               <div className="flex-1 overflow-y-auto p-8 print:p-0">
                 <PrintItineraryPreview data={printData} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Gemini AI 行程表
+  if (type === 'gemini') {
+    return (
+      <div className="h-full flex flex-col">
+        {/* 頁面頂部區域 */}
+        <ResponsiveHeader
+          title="Gemini AI 行程表"
+          breadcrumb={[
+            { label: '首頁', href: '/' },
+            { label: '行程管理', href: '/itinerary' },
+            { label: 'Gemini AI 行程表', href: '#' },
+          ]}
+          showBackButton={true}
+          onBack={() => router.push('/itinerary')}
+          actions={
+            <Button
+              onClick={() => window.print()}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+            >
+              <Wand2 size={16} className="mr-2" />
+              儲存行程
+            </Button>
+          }
+        />
+
+        {/* 主要內容區域 */}
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full flex">
+            {/* 左側：輸入表單 */}
+            <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col print:hidden">
+              <div className="h-14 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 flex items-center border-b border-morandi-container">
+                <Sparkles size={18} className="mr-2" />
+                <h2 className="text-lg font-semibold">AI 智慧編輯</h2>
+              </div>
+              <div className="flex-1 overflow-y-auto bg-white">
+                <GeminiItineraryForm data={geminiData} onChange={setGeminiData} />
+              </div>
+            </div>
+
+            {/* 右側：即時預覽 */}
+            <div className="w-1/2 bg-gray-100 flex flex-col print:w-full">
+              <div className="h-14 bg-white border-b px-6 flex items-center justify-between print:hidden">
+                <h2 className="text-lg font-semibold text-morandi-primary">即時預覽</h2>
+                <div className="text-sm text-gray-500">AI 生成內容會即時顯示</div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 print:p-0">
+                <GeminiItineraryPreview data={geminiData} />
               </div>
             </div>
           </div>

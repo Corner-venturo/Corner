@@ -5,6 +5,7 @@
  * 功能：
  * - 顯示出納單即時預覽
  * - 提供列印和下載 PDF 功能
+ * - 使用 iframe 列印確保穩定
  */
 
 'use client'
@@ -76,10 +77,86 @@ export function DisbursementPrintDialog({
     fetchData()
   }, [open, order])
 
-  // 瀏覽器列印
+  // 使用 iframe 列印（最可靠的方式）
   const handlePrint = useCallback(() => {
-    window.print()
-  }, [])
+    if (!printRef.current) return
+
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'absolute'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = 'none'
+    iframe.style.left = '-9999px'
+    document.body.appendChild(iframe)
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+    if (!iframeDoc) {
+      document.body.removeChild(iframe)
+      return
+    }
+
+    // 寫入列印內容（橫向 A4）
+    iframeDoc.open()
+    iframeDoc.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>出納單 - ${order?.order_number}</title>
+        <style>
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
+          }
+
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #4B5563;
+            background: white;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          /* 不設定全局 border，讓 inline style 控制 */
+          th, td {
+            vertical-align: middle;
+          }
+
+          .tour-name {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        </style>
+      </head>
+      <body>
+        ${printRef.current.innerHTML}
+      </body>
+      </html>
+    `)
+    iframeDoc.close()
+
+    setTimeout(() => {
+      iframe.contentWindow?.print()
+      setTimeout(() => {
+        document.body.removeChild(iframe)
+      }, 1000)
+    }, 100)
+  }, [order?.order_number])
 
   // 下載 PDF
   const handleDownloadPDF = useCallback(async () => {

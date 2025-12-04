@@ -38,6 +38,12 @@ export default function ItineraryPage() {
     router.push('/itinerary/new?type=print')
   }
 
+  // 選擇 Gemini AI 行程表
+  const handleSelectGemini = () => {
+    setIsTypeSelectOpen(false)
+    router.push('/itinerary/new?type=gemini')
+  }
+
   // 複製行程
   const handleDuplicate = useCallback(async (id: string) => {
     // 待實作: 複製邏輯
@@ -261,6 +267,13 @@ export default function ItineraryPage() {
             >
               <div className="text-lg font-bold">紙本行程表</div>
               <div className="text-xs opacity-80">精美列印版本（適合印刷給客戶）</div>
+            </Button>
+            <Button
+              onClick={handleSelectGemini}
+              className="w-full h-20 flex-col bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+            >
+              <div className="text-lg font-bold">✨ Gemini AI 行程表</div>
+              <div className="text-xs opacity-80">AI 智慧生成內容與插圖（實驗功能）</div>
             </Button>
           </div>
         </DialogContent>

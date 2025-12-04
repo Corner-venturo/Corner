@@ -868,7 +868,10 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
         {/* 列印預覽對話框 */}
         <PrintableQuickQuote
-          quote={quote as any}
+          quote={{
+            ...quote,
+            ...formData,
+          } as any}
           items={items}
           isOpen={showPrintPreview}
           onClose={() => setShowPrintPreview(false)}

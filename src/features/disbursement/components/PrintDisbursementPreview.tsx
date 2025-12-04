@@ -2,12 +2,12 @@
  * PrintDisbursementPreview
  * 出納單列印預覽組件
  *
- * 配合 cornerERP 舊版設計：
+ * 設計風格：
+ * - 使用 Morandi 色系配合公司品牌
  * - 橫向 (landscape) A4 格式
- * - 按「付款對象 (供應商)」分組
- * - 跨請款單合併同一供應商
- * - 欄位: 付款對象 | 請款編號 | 請款人員 | 團名 | 項目 | 應付金額 | 小計
- * - 自動分頁處理
+ * - 極簡線條設計
+ * - 付款對象和小計用 rowSpan 合併並垂直置中
+ * - 每組最多 5 筆，超過自動拆分（避免跨頁問題）
  */
 
 'use client'
@@ -15,7 +15,15 @@
 import React, { forwardRef, useMemo } from 'react'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
-import styles from './PrintDisbursementPreview.module.css'
+
+// Morandi 色系
+const COLORS = {
+  gold: '#D4AF37',
+  brown: '#6B5B4F',
+  lightBrown: '#FAF7F2',
+  gray: '#4B5563',
+  lightGray: '#9CA3AF',
+}
 
 interface PrintDisbursementPreviewProps {
   order: DisbursementOrder
@@ -36,12 +44,9 @@ interface PayForGroup {
   payFor: string
   items: ProcessedItem[]
   total: number
-  hiddenTotal?: boolean
+  showTotal: boolean  // 是否顯示小計（只在該供應商最後一個區塊顯示）
 }
 
-/**
- * 處理請款項目，轉換為出納單格式
- */
 function processItems(
   paymentRequests: PaymentRequest[],
   paymentRequestItems: PaymentRequestItem[]
@@ -61,9 +66,6 @@ function processItems(
   })
 }
 
-/**
- * 按付款對象分組（跨請款單合併同一供應商）
- */
 function groupByPayFor(items: ProcessedItem[]): PayForGroup[] {
   const grouped = new Map<string, ProcessedItem[]>()
 
@@ -78,6 +80,7 @@ function groupByPayFor(items: ProcessedItem[]): PayForGroup[] {
     payFor,
     items: groupItems,
     total: groupItems.reduce((sum, item) => sum + item.amount, 0),
+    showTotal: true,
   }))
 
   groups.sort((a, b) => a.payFor.localeCompare(b.payFor, 'zh-TW'))
@@ -86,7 +89,9 @@ function groupByPayFor(items: ProcessedItem[]): PayForGroup[] {
 }
 
 /**
- * 分割大型群組（超過 maxSize 行分割）
+ * 分割大型群組（超過 maxSize 筆拆分）
+ * - 每個區塊都顯示供應商名稱
+ * - 小計只在該供應商的最後一個區塊顯示
  */
 function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
   const result: PayForGroup[] = []
@@ -95,13 +100,18 @@ function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
     if (group.items.length <= maxSize) {
       result.push(group)
     } else {
+      // 拆成多個區塊
+      const totalChunks = Math.ceil(group.items.length / maxSize)
       for (let i = 0; i < group.items.length; i += maxSize) {
         const chunk = group.items.slice(i, i + maxSize)
+        const chunkIndex = Math.floor(i / maxSize)
+        const isLastChunk = chunkIndex === totalChunks - 1
+
         result.push({
           payFor: group.payFor,
           items: chunk,
-          total: i === 0 ? group.total : 0,
-          hiddenTotal: i !== 0,
+          total: group.total,
+          showTotal: isLastChunk,  // 只在最後一個區塊顯示小計
         })
       }
     }
@@ -118,79 +128,255 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
     )
 
     const payForGroups = useMemo(
-      () => splitLargeGroups(groupByPayFor(processedItems)),
+      () => splitLargeGroups(groupByPayFor(processedItems), 5),
       [processedItems]
     )
 
     const totalAmount = order.amount || order.total_amount || 0
 
     return (
-      <div ref={ref} id="disbursement-print-container" className={styles.printPreview}>
-        {/* 列印樣式已在 globals.css 中定義 */}
+      <div
+        ref={ref}
+        style={{
+          width: '100%',
+          maxWidth: '950px',
+          minHeight: '400px',
+          padding: '40px',
+          margin: '0 auto',
+          background: 'white',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif',
+          fontSize: '12px',
+          color: COLORS.gray,
+          boxSizing: 'border-box',
+        }}
+      >
+        {/* 頁首 */}
+        <div style={{
+          position: 'relative',
+          paddingBottom: '16px',
+          marginBottom: '28px',
+          borderBottom: `1px solid ${COLORS.gold}`,
+        }}>
+          {/* Logo 區域 - 左上 */}
+          <div style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+          }}>
+            <img
+              src="/corner-logo.png"
+              alt="角落旅行社"
+              style={{
+                height: '36px',
+                width: 'auto',
+                objectFit: 'contain',
+              }}
+            />
+          </div>
 
-        {/* 標題區 */}
-        <div className={styles.header}>
-          <h1 className={styles.title}>出納單號 {order.order_number || '-'}</h1>
-          <p className={styles.date}>出帳日期: {order.disbursement_date ? formatDate(order.disbursement_date) : '-'}</p>
+          {/* 標題 - 置中 */}
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{
+              fontSize: '11px',
+              letterSpacing: '3px',
+              color: COLORS.gold,
+              fontWeight: 500,
+              marginBottom: '4px',
+            }}>
+              DISBURSEMENT
+            </div>
+            <h1 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              color: COLORS.brown,
+              margin: 0,
+            }}>
+              出納單
+            </h1>
+          </div>
+
+          {/* 單號和日期 - 右上 */}
+          <div style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            textAlign: 'right',
+            fontSize: '11px',
+            color: COLORS.gray,
+          }}>
+            <div style={{ fontWeight: 600 }}>{order.order_number || '-'}</div>
+            <div style={{ color: COLORS.lightGray, marginTop: '2px' }}>
+              {order.disbursement_date ? formatDate(order.disbursement_date) : '-'}
+            </div>
+          </div>
         </div>
 
         {/* 主表格 */}
-        <table className={styles.table}>
-          <colgroup><col style={{ width: '14%' }} /><col style={{ width: '12%' }} /><col style={{ width: '10%' }} /><col style={{ width: '18%' }} /><col style={{ width: '22%' }} /><col style={{ width: '12%' }} /><col style={{ width: '12%' }} /></colgroup>
+        <table style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          marginBottom: '28px',
+        }}>
+          <colgroup>
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '20%' }} />
+            <col style={{ width: '26%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '12%' }} />
+          </colgroup>
           <thead>
-            <tr>
-              <th>付款對象</th>
-              <th>請款編號</th>
-              <th>請款人員</th>
-              <th>團名</th>
-              <th>項目</th>
-              <th style={{ textAlign: 'right' }}>應付金額</th>
-              <th style={{ textAlign: 'right' }}>小計</th>
+            <tr style={{ borderBottom: `2px solid ${COLORS.brown}` }}>
+              <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>付款對象</th>
+              <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>請款編號</th>
+              <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>團名</th>
+              <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>項目說明</th>
+              <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>金額</th>
+              <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>小計</th>
             </tr>
           </thead>
           <tbody>
             {payForGroups.length === 0 ? (
               <tr>
-                <td colSpan={7} className={styles.empty}>
+                <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: COLORS.lightGray }}>
                   無請款項目資料
                 </td>
               </tr>
             ) : (
               payForGroups.map((group, groupIdx) =>
-                group.items.map((item, itemIdx) => (
-                  <tr key={`${groupIdx}-${itemIdx}`}>
-                    {itemIdx === 0 && (
-                      <td rowSpan={group.items.length} className={styles.payFor}>
-                        {group.payFor}
+                group.items.map((item, itemIdx) => {
+                  const isFirstInGroup = itemIdx === 0
+                  const isLastGroup = groupIdx === payForGroups.length - 1
+
+                  return (
+                    <tr key={`${groupIdx}-${itemIdx}`}>
+                      {/* 付款對象 - 合併儲存格，垂直置中 */}
+                      {isFirstInGroup && (
+                        <td
+                          rowSpan={group.items.length}
+                          style={{
+                            padding: '8px',
+                            verticalAlign: 'middle',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: COLORS.brown,
+                            borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none',
+                          }}
+                        >
+                          {group.payFor}
+                        </td>
+                      )}
+                      <td style={{
+                        padding: '8px',
+                        verticalAlign: 'middle',
+                        fontSize: '11px',
+                        color: COLORS.gray,
+                        borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none',
+                      }}>
+                        {item.requestCode}
                       </td>
-                    )}
-                    <td>{item.requestCode}</td>
-                    <td>{item.createdBy}</td>
-                    <td className={styles.tourName}>{item.tourName}</td>
-                    <td>{item.description}</td>
-                    <td className={styles.amount}>{item.amount.toLocaleString()}</td>
-                    {itemIdx === 0 && (
-                      <td rowSpan={group.items.length} className={styles.subtotal}>
-                        {group.hiddenTotal ? '' : group.total.toLocaleString()}
+                      <td style={{
+                        padding: '8px',
+                        verticalAlign: 'middle',
+                        fontSize: '11px',
+                        maxWidth: '140px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        color: COLORS.gray,
+                        borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none',
+                      }}>
+                        {item.tourName}
                       </td>
-                    )}
-                  </tr>
-                ))
+                      <td style={{
+                        padding: '8px',
+                        verticalAlign: 'middle',
+                        fontSize: '11px',
+                        color: COLORS.gray,
+                        borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none',
+                      }}>
+                        {item.description}
+                      </td>
+                      <td style={{
+                        padding: '8px',
+                        verticalAlign: 'middle',
+                        fontSize: '11px',
+                        textAlign: 'right',
+                        color: COLORS.gray,
+                        borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none',
+                      }}>
+                        {item.amount.toLocaleString()}
+                      </td>
+                      {/* 小計 - 合併儲存格，垂直置中 */}
+                      {isFirstInGroup && (
+                        <td
+                          rowSpan={group.items.length}
+                          style={{
+                            padding: '8px',
+                            verticalAlign: 'middle',
+                            fontSize: '11px',
+                            textAlign: 'right',
+                            fontWeight: 600,
+                            color: COLORS.brown,
+                            borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none',
+                          }}
+                        >
+                          {group.showTotal ? group.total.toLocaleString() : ''}
+                        </td>
+                      )}
+                    </tr>
+                  )
+                })
               )
             )}
           </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={5} className={styles.totalLabel}>TOTAL</td>
-              <td colSpan={2} className={styles.totalAmount}>{totalAmount.toLocaleString()}</td>
-            </tr>
-          </tfoot>
         </table>
 
+        {/* 總計 - 獨立區塊，不放在 tfoot 避免每頁重複 */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderTop: `2px solid ${COLORS.brown}`,
+          padding: '14px 8px',
+          marginBottom: '28px',
+        }}>
+          <span style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            color: COLORS.brown,
+          }}>
+            總計 TOTAL
+          </span>
+          <span style={{
+            fontSize: '15px',
+            fontWeight: 700,
+            color: COLORS.gold,
+          }}>
+            NT$ {totalAmount.toLocaleString()}
+          </span>
+        </div>
+
         {/* 頁尾 */}
-        <div className={styles.footer}>
-          <p>─ 如果可以，讓我們一起探索世界的每個角落 ─</p>
-          <p>Generated on {formatDate(new Date().toISOString())} | Venturo ERP</p>
+        <div style={{
+          marginTop: '40px',
+          textAlign: 'center',
+        }}>
+          <p style={{
+            fontSize: '11px',
+            fontStyle: 'italic',
+            color: COLORS.lightGray,
+            margin: '0 0 8px 0',
+          }}>
+            ─ 如果可以，讓我們一起探索世界的每個角落 ─
+          </p>
+          <p style={{
+            fontSize: '10px',
+            color: COLORS.lightGray,
+            margin: 0,
+          }}>
+            角落旅行社股份有限公司 © {new Date().getFullYear()}
+          </p>
         </div>
       </div>
     )

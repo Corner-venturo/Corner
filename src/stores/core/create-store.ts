@@ -23,6 +23,24 @@ import { AbortManager } from '../utils/abort-manager'
 import { logger } from '@/lib/utils/logger'
 
 /**
+ * 取得當前使用者的 workspace_id
+ * 從 localStorage 讀取 auth-store 的值，避免循環依賴
+ */
+function getCurrentWorkspaceId(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const authData = localStorage.getItem('auth-storage')
+    if (authData) {
+      const parsed = JSON.parse(authData)
+      return parsed?.state?.user?.workspace_id || null
+    }
+  } catch {
+    // 忽略解析錯誤
+  }
+  return null
+}
+
+/**
  * 建立 Store 工廠函數
  *
  * @example
@@ -127,9 +145,17 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
+        // 生成 UUID（如果未提供）
+        const id = (data as Record<string, unknown>).id || crypto.randomUUID()
+
+        // 自動注入 workspace_id（如果未提供）
+        const workspace_id = (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()
+
         // 生成 code（如果有 prefix）
         const insertData = {
           ...data,
+          id,
+          ...(workspace_id && { workspace_id }),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }

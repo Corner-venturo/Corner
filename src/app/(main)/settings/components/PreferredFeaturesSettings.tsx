@@ -51,7 +51,7 @@ const AVAILABLE_FEATURES: FeatureOption[] = [
 ]
 
 export function PreferredFeaturesSettings() {
-  const { user, login } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const { update: updateUser } = useUserStore()
 
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
@@ -128,7 +128,7 @@ export function PreferredFeaturesSettings() {
         ...user,
         preferred_features: newFeatures,
       }
-      login(updatedUser)
+      setUser(updatedUser)
     }
 
     // 3. 延遲儲存到資料庫（debounce 1 秒）
@@ -177,7 +177,7 @@ export function PreferredFeaturesSettings() {
         ...user,
         preferred_features: defaultFeatures,
       }
-      login(updatedUser)
+      setUser(updatedUser)
     }
 
     // 延遲儲存
