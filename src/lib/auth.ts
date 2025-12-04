@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_in_production_2024'
@@ -10,45 +9,38 @@ export interface AuthPayload {
   role: string
 }
 
-// 生成 JWT token
+// 生成 token（瀏覽器相容版本，使用 base64 編碼）
+// 注意：jsonwebtoken 只能在 Node.js 環境使用，這裡改用簡單的 base64 編碼
 export function generateToken(payload: AuthPayload): string {
-  try {
-    return jwt.sign(payload, JWT_SECRET, {
-      expiresIn: '8h',
-      issuer: 'venturo-app',
+  // 在瀏覽器環境使用 base64 編碼
+  return btoa(
+    JSON.stringify({
+      ...payload,
+      exp: Date.now() + 8 * 60 * 60 * 1000, // 8小時
+      iss: 'venturo-app',
     })
-  } catch (error) {
-    // 如果 JWT 失敗，使用簡單的編碼方案
-    return btoa(
-      JSON.stringify({
-        ...payload,
-        exp: Date.now() + 8 * 60 * 60 * 1000, // 8小時
-        iss: 'venturo-app',
-      })
-    )
-  }
+  )
 }
 
-// 驗證 JWT token
+// 驗證 token（瀏覽器相容版本）
 export function verifyToken(token: string): AuthPayload | null {
   try {
-    // 嘗試 JWT 驗證
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload
-    return decoded
-  } catch (_jwtError) {
-    try {
-      // 如果 JWT 失敗，嘗試簡單解碼
-      const decoded = JSON.parse(atob(token))
+    // 使用 base64 解碼
+    const decoded = JSON.parse(atob(token))
 
-      // 檢查是否過期
-      if (decoded.exp && Date.now() > decoded.exp) {
-        return null
-      }
-
-      return decoded as AuthPayload
-    } catch (fallbackError) {
+    // 檢查是否過期
+    if (decoded.exp && Date.now() > decoded.exp) {
       return null
     }
+
+    // 檢查 issuer
+    if (decoded.iss !== 'venturo-app') {
+      return null
+    }
+
+    return decoded as AuthPayload
+  } catch {
+    return null
   }
 }
 
