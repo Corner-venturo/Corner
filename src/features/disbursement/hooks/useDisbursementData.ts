@@ -155,7 +155,7 @@ export function useDisbursementData() {
         order_number: generateDisbursementNumber(disbursement_orders),
         disbursement_date: nextThursday.toISOString().split('T')[0],
         payment_request_ids: requestIds,
-        amount,
+        amount: amount,
         status: 'pending',
       } as Omit<DisbursementOrder, 'id' | 'created_at' | 'updated_at'>)
     }
@@ -220,7 +220,7 @@ export function useDisbursementData() {
       order_number: generateDisbursementNumber(disbursement_orders),
       disbursement_date: nextThursday.toISOString().split('T')[0],
       payment_request_ids: requestIds,
-      amount,
+      amount: amount,
       status: 'pending',
     } as Omit<DisbursementOrder, 'id' | 'created_at' | 'updated_at'>)
 

@@ -2,15 +2,14 @@
 
 /**
  * 開立代轉發票頁面
+ * 仿藍新金流介面風格
  */
 
 import { useState } from 'react'
-
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
-import { Plus, Trash2, ArrowLeft } from 'lucide-react'
-
+import { Plus, Trash2, FileText } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -25,6 +24,8 @@ export default function CreateInvoicePage() {
   // 基本資訊
   const [invoice_date, setInvoiceDate] = useState(new Date().toISOString().split('T')[0])
   const [tax_type, setTaxType] = useState<'dutiable' | 'zero' | 'free'>('dutiable')
+  const [reportStatus, setReportStatus] = useState<'unreported' | 'reported'>('unreported')
+  const [remark, setRemark] = useState('')
 
   // 買受人資訊
   const [buyerInfo, setBuyerInfo] = useState<BuyerInfo>({
@@ -110,7 +111,7 @@ export default function CreateInvoicePage() {
         tax_type,
         buyerInfo,
         items,
-        created_by: 'current_user', // 注意: 需從登入狀態取得用戶ID
+        created_by: 'current_user',
       })
 
       router.push('/finance/travel-invoice')
@@ -120,206 +121,277 @@ export default function CreateInvoicePage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* 標題列 */}
-      <div className="flex items-center gap-4">
-        <Link href="/finance/travel-invoice">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold">開立新發票</h1>
-          <p className="text-muted-foreground mt-1">填寫發票資訊並送出開立</p>
-        </div>
-      </div>
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="開立新發票"
+        icon={FileText}
+        showBackButton={true}
+        onBack={() => router.push('/finance/travel-invoice')}
+      />
 
-      {/* 錯誤訊息 */}
-      {error && (
-        <Card className="border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-destructive">{error}</p>
-          </CardContent>
-        </Card>
-      )}
+      <ContentContainer className="flex-1 overflow-auto">
+        <form onSubmit={handleSubmit} className="space-y-6 pb-6 max-w-4xl mx-auto">
+          {/* 錯誤訊息 */}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 基本資訊 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>基本資訊</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="invoice_date">開立日期</Label>
-                <Input
-                  id="invoice_date"
-                  type="date"
-                  value={invoice_date}
-                  onChange={e => setInvoiceDate(e.target.value)}
-                  required
-                />
+          {/* 基本資訊 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">基本資訊</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="invoice_date">開立日期</Label>
+                  <Input
+                    id="invoice_date"
+                    type="date"
+                    value={invoice_date}
+                    onChange={e => setInvoiceDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="tax_type">課稅別</Label>
+                  <select
+                    id="tax_type"
+                    value={tax_type}
+                    onChange={e => setTaxType(e.target.value as 'dutiable' | 'zero' | 'free')}
+                    className="w-full h-10 px-3 border rounded-md bg-background text-sm"
+                  >
+                    <option value="dutiable">應稅</option>
+                    <option value="zero">零稅率</option>
+                    <option value="free">免稅</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>申報註記</Label>
+                  <div className="flex items-center gap-4 h-10">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="reportStatus"
+                        value="unreported"
+                        checked={reportStatus === 'unreported'}
+                        onChange={() => setReportStatus('unreported')}
+                        className="w-4 h-4 accent-primary"
+                      />
+                      <span className="text-sm">未申報</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="reportStatus"
+                        value="reported"
+                        checked={reportStatus === 'reported'}
+                        onChange={() => setReportStatus('reported')}
+                        className="w-4 h-4 accent-primary"
+                      />
+                      <span className="text-sm">已申報</span>
+                    </label>
+                  </div>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="tax_type">課稅別</Label>
-                <select
-                  id="tax_type"
-                  value={tax_type}
-                  onChange={e => setTaxType(e.target.value as 'dutiable' | 'zero' | 'free')}
-                  className="w-full px-3 py-2 border rounded-md"
+            </CardContent>
+          </Card>
+
+          {/* 買受人資訊 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">買受人資訊</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="buyerName">買受人名稱 *</Label>
+                  <Input
+                    id="buyerName"
+                    value={buyerInfo.buyerName}
+                    onChange={e => setBuyerInfo({ ...buyerInfo, buyerName: e.target.value })}
+                    placeholder="請輸入買受人名稱"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="buyerUBN">統一編號</Label>
+                  <Input
+                    id="buyerUBN"
+                    value={buyerInfo.buyerUBN}
+                    onChange={e => setBuyerInfo({ ...buyerInfo, buyerUBN: e.target.value })}
+                    placeholder="8 碼數字"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="buyerEmail">Email</Label>
+                  <Input
+                    id="buyerEmail"
+                    type="email"
+                    value={buyerInfo.buyerEmail}
+                    onChange={e => setBuyerInfo({ ...buyerInfo, buyerEmail: e.target.value })}
+                    placeholder="用於寄送電子收據"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="buyerMobile">手機號碼</Label>
+                  <Input
+                    id="buyerMobile"
+                    value={buyerInfo.buyerMobile}
+                    onChange={e => setBuyerInfo({ ...buyerInfo, buyerMobile: e.target.value })}
+                    placeholder="09xxxxxxxx"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 商品明細 - 表格式 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">商品明細</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {/* 表格標題 */}
+              <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-muted/50 border-y text-sm font-medium text-muted-foreground">
+                <div className="col-span-4">摘要</div>
+                <div className="col-span-1 text-center">數量</div>
+                <div className="col-span-2 text-right">單價</div>
+                <div className="col-span-2 text-center">單位</div>
+                <div className="col-span-2 text-right">金額</div>
+                <div className="col-span-1 text-center">處理</div>
+              </div>
+
+              {/* 項目列表 */}
+              <div className="divide-y">
+                {items.map((item, index) => (
+                  <div key={index} className="grid grid-cols-12 gap-2 px-4 py-3 items-center">
+                    <div className="col-span-4">
+                      <Input
+                        value={item.item_name}
+                        onChange={e => updateItem(index, 'item_name', e.target.value)}
+                        placeholder="商品名稱"
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <Input
+                        type="number"
+                        min="1"
+                        value={item.item_count}
+                        onChange={e => updateItem(index, 'item_count', parseInt(e.target.value) || 1)}
+                        className="h-9 text-center"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Input
+                        type="number"
+                        min="0"
+                        value={item.item_price || ''}
+                        onChange={e => updateItem(index, 'item_price', parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="h-9 text-right"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Input
+                        value={item.item_unit}
+                        onChange={e => updateItem(index, 'item_unit', e.target.value)}
+                        className="h-9 text-center"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <div className="h-9 flex items-center justify-end px-3 bg-muted/30 rounded-md text-sm font-medium">
+                        {item.itemAmt.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="col-span-1 flex justify-center">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeItem(index)}
+                        disabled={items.length <= 1}
+                        className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 新增一列按鈕 */}
+              <div className="px-4 py-3 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addItem}
+                  className="text-primary"
                 >
-                  <option value="dutiable">應稅</option>
-                  <option value="zero">零稅率</option>
-                  <option value="free">免稅</option>
-                </select>
+                  <Plus className="mr-1 h-4 w-4" />
+                  新增一列
+                </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* 買受人資訊 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>買受人資訊</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="buyerName">買受人名稱 *</Label>
-                <Input
-                  id="buyerName"
-                  value={buyerInfo.buyerName}
-                  onChange={e => setBuyerInfo({ ...buyerInfo, buyerName: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="buyerUBN">統一編號</Label>
-                <Input
-                  id="buyerUBN"
-                  value={buyerInfo.buyerUBN}
-                  onChange={e => setBuyerInfo({ ...buyerInfo, buyerUBN: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="buyerEmail">Email</Label>
-                <Input
-                  id="buyerEmail"
-                  type="email"
-                  value={buyerInfo.buyerEmail}
-                  onChange={e => setBuyerInfo({ ...buyerInfo, buyerEmail: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="buyerMobile">手機號碼</Label>
-                <Input
-                  id="buyerMobile"
-                  value={buyerInfo.buyerMobile}
-                  onChange={e => setBuyerInfo({ ...buyerInfo, buyerMobile: e.target.value })}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 商品明細 */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>商品明細</CardTitle>
-              <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                <Plus className="mr-2 h-4 w-4" />
-                新增項目
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {items.map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg space-y-3">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium">項目 {index + 1}</h4>
-                  {items.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeItem(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="col-span-2">
-                    <Label>商品名稱 *</Label>
+              {/* 備註欄位 */}
+              <div className="px-4 py-3 border-t">
+                <div className="flex items-start gap-4">
+                  <Label className="pt-2 shrink-0">備註</Label>
+                  <div className="flex-1">
                     <Input
-                      value={item.item_name}
-                      onChange={e => updateItem(index, 'item_name', e.target.value)}
-                      required
+                      value={remark}
+                      onChange={e => setRemark(e.target.value.slice(0, 50))}
+                      placeholder="請輸入備註（限 50 字）"
+                      maxLength={50}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      可輸入大小寫英文、中文（限 50 字，不可輸入符號，例如：/ , - = 等）
+                    </p>
                   </div>
-                  <div>
-                    <Label>數量</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.item_count}
-                      onChange={e => updateItem(index, 'item_count', parseInt(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <Label>單位</Label>
-                    <Input
-                      value={item.item_unit}
-                      onChange={e => updateItem(index, 'item_unit', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label>單價</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={item.item_price}
-                      onChange={e => updateItem(index, 'item_price', parseFloat(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <Label>金額</Label>
-                    <Input value={item.itemAmt} readOnly className="bg-muted" />
-                  </div>
-                  <div className="col-span-2">
-                    <Label>備註</Label>
-                    <Input
-                      value={item.itemWord}
-                      onChange={e => updateItem(index, 'itemWord', e.target.value)}
-                    />
-                  </div>
+                  <span className="text-sm text-muted-foreground pt-2">
+                    {remark.length}/50
+                  </span>
                 </div>
               </div>
-            ))}
 
-            <div className="flex justify-end items-center pt-4 border-t">
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">總金額</p>
-                <p className="text-2xl font-bold">NT$ {total_amount.toLocaleString()}</p>
+              {/* 總計 */}
+              <div className="px-4 py-4 border-t bg-muted/30">
+                <div className="flex justify-end items-center gap-4">
+                  <span className="text-sm font-medium">總計</span>
+                  <span className="text-xl font-bold text-primary min-w-[120px] text-right">
+                    NT$ {total_amount.toLocaleString()}
+                  </span>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* 送出按鈕 */}
-        <div className="flex justify-end gap-4">
-          <Link href="/finance/travel-invoice">
-            <Button type="button" variant="outline">
+          {/* 送出按鈕 */}
+          <div className="flex justify-center gap-4 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => router.push('/finance/travel-invoice')}
+              className="min-w-[120px]"
+            >
               取消
             </Button>
-          </Link>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? '開立中...' : '開立發票'}
-          </Button>
-        </div>
-      </form>
+            <Button
+              type="submit"
+              size="lg"
+              disabled={isLoading}
+              className="min-w-[120px]"
+            >
+              {isLoading ? '開立中...' : '確定開立'}
+            </Button>
+          </div>
+        </form>
+      </ContentContainer>
     </div>
   )
 }

@@ -11,7 +11,6 @@ import type { BaseEntity } from '@/types'
 import type { StoreConfig, UpdateInput } from '../core/types'
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
 import { SupabaseAdapter } from '../adapters/supabase-adapter'
-import { SyncCoordinator } from '../sync/coordinator'
 import { logger } from '@/lib/utils/logger'
 
 /**
@@ -22,8 +21,7 @@ export async function update<T extends BaseEntity>(
   data: UpdateInput<T>,
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
-  supabase: SupabaseAdapter<T>,
-  sync: SyncCoordinator<T>
+  supabase: SupabaseAdapter<T>
 ): Promise<T> {
   const { tableName, enableSupabase } = config
 

@@ -7,7 +7,6 @@ import type { BaseEntity } from '@/types'
 import type { StoreConfig } from '../core/types'
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
 import { SupabaseAdapter } from '../adapters/supabase-adapter'
-import { SyncCoordinator } from '../sync/coordinator'
 import { generateUUID } from '@/lib/utils/uuid'
 import { localDB } from '@/lib/db'
 import { logger } from '@/lib/utils/logger'
@@ -19,8 +18,7 @@ export async function deleteItem<T extends BaseEntity>(
   id: string,
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
-  supabase: SupabaseAdapter<T>,
-  sync: SyncCoordinator<T>
+  supabase: SupabaseAdapter<T>
 ): Promise<void> {
   const { tableName, enableSupabase } = config
 
@@ -46,11 +44,10 @@ export async function deleteMany<T extends BaseEntity>(
   ids: string[],
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
-  supabase: SupabaseAdapter<T>,
-  sync: SyncCoordinator<T>
+  supabase: SupabaseAdapter<T>
 ): Promise<void> {
   for (const id of ids) {
-    await deleteItem(id, config, indexedDB, supabase, sync)
+    await deleteItem(id, config, indexedDB, supabase)
   }
 
   logger.log(`✅ [${config.tableName}] deleteMany: 已刪除 ${ids.length} 筆`)

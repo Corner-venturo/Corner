@@ -5,9 +5,7 @@ import { ThemeProvider } from '@/components/layout/theme-provider'
 import { ErrorLogger } from '@/components/ErrorLogger'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AppInitializer } from '@/components/AppInitializer'
-// import { GlobalDialogs } from '@/lib/ui/alert-dialog' // Removed
-// import { GlobalDialogOverride } = '@/lib/ui/global-dialog-override' // Removed
-// import { LayoutRouter } = '@/components/layout/layout-router' // Removed
+import { GlobalDialogs } from '@/lib/ui/alert-dialog'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
@@ -45,8 +43,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansTC.variable} antialiased`}
       >
         <ErrorLogger />
-        {/* <GlobalDialogs /> */}
-        {/* <GlobalDialogOverride /> */}
+        <GlobalDialogs />
         <AppInitializer>
           <ErrorBoundary>
             <ThemeProvider>

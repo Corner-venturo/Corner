@@ -80,8 +80,8 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* Flight Section */}
       <TourFlightSection data={data} viewMode={viewMode} />
 
-      {/* Features Section */}
-      {data.showFeatures !== false && (
+      {/* Features Section - 只有當 features 有資料時才顯示 */}
+      {data.showFeatures !== false && data.features?.length > 0 && (
         <>
           {/* Divider */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

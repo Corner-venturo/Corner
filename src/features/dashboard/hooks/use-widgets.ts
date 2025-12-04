@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { WidgetType } from '../types'
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 
 const STORAGE_KEY = 'homepage-widgets'
@@ -28,8 +28,6 @@ export function useWidgets() {
       }
 
       try {
-        const supabase = getSupabaseClient()
-
         // 從 Supabase 讀取用戶偏好
         const { data, error } = await supabase
           .from('user_preferences')
@@ -78,8 +76,6 @@ export function useWidgets() {
     // 如果有登入用戶，保存到 Supabase
     if (user?.id) {
       try {
-        const supabase = getSupabaseClient()
-
         const { error } = await supabase.from('user_preferences').upsert(
           {
             user_id: user.id,

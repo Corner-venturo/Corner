@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import type { Message } from '@/stores/workspace/types'
 
 export function useMessages(channelId: string) {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
@@ -34,7 +35,7 @@ export function useMessages(channelId: string) {
 
         if (error) throw error
 
-        setMessages(data || [])
+        setMessages(data as Message[] || [])
       } catch (err) {
         logger.error('Error fetching initial messages:', err)
         setError('Failed to load messages.')
@@ -62,7 +63,7 @@ export function useMessages(channelId: string) {
           const { data: author, error } = await supabase
             .from('employees')
             .select('id, display_name')
-            .eq('id', payload.new.user_id)
+            .eq('id', payload.new.author_id)
             .single()
             
           if (error) {
@@ -71,8 +72,8 @@ export function useMessages(channelId: string) {
 
           const newMessage = {
             ...payload.new,
-            author: author || { id: payload.new.user_id, display_name: 'Unknown User' }
-          }
+            author: author || { id: payload.new.author_id, display_name: 'Unknown User' }
+          } as Message
           setMessages(currentMessages => [...currentMessages, newMessage])
         }
       )
@@ -82,7 +83,7 @@ export function useMessages(channelId: string) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [channelId])
+  }, [channelId, supabase])
 
   return { messages, loading, error }
 }

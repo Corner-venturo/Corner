@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { NoteTab } from '../types'
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 
 const STORAGE_KEY = 'homepage-notes-tabs'
@@ -27,8 +27,6 @@ export function useNotes() {
       }
 
       try {
-        const supabase = getSupabaseClient()
-
         // 從 Supabase 讀取用戶筆記
         const { data, error } = await supabase
           .from('notes')
@@ -79,8 +77,6 @@ export function useNotes() {
       // 如果有登入用戶，保存到 Supabase
       if (user?.id) {
         try {
-          const supabase = getSupabaseClient()
-
           // 先刪除所有現有筆記（簡單的同步策略）
           await supabase.from('notes').delete().eq('user_id', user.id)
 

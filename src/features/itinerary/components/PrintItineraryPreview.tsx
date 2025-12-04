@@ -43,11 +43,11 @@ interface PrintItineraryData {
 }
 
 interface PrintItineraryPreviewProps {
-  data: PrintItineraryData
+  data: Partial<PrintItineraryData>
 }
 
 // --- Reusable Helper Components ---
-const SectionHeader = ({ title, subtitle }) => (
+const SectionHeader = ({ title, subtitle }: { title: string; subtitle: string }) => (
   <div className={styles.sectionHeader}>
     <h2 className={styles.sectionTitle}>{title}</h2>
     <p className={styles.sectionSubtitle}>{subtitle}</p>
@@ -57,9 +57,11 @@ const SectionHeader = ({ title, subtitle }) => (
 export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
   // Fallback for missing data to prevent errors
   const safeData = {
-    highlightSpots: [],
-    flightOptions: [],
-    dailySchedule: [],
+    ...{
+      highlightSpots: [],
+      flightOptions: [],
+      dailySchedule: [],
+    },
     ...data,
   }
 

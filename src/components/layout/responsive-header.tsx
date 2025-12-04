@@ -39,6 +39,8 @@ interface ResponsiveHeaderProps {
   // 清除篩選按鈕
   showClearFilters?: boolean
   onClearFilters?: () => void
+  // 自訂操作按鈕（顯示在 tabs 右邊）
+  customActions?: React.ReactNode
 }
 
 export const ResponsiveHeader = memo(function ResponsiveHeader(props: ResponsiveHeaderProps) {
@@ -200,6 +202,11 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
               </button>
             ))}
           </div>
+        )}
+
+        {/* 自訂操作按鈕 */}
+        {props.customActions && (
+          <div className="flex items-center mr-4">{props.customActions}</div>
         )}
 
         {/* 操作按鈕 */}

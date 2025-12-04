@@ -115,7 +115,7 @@ export function CreateDisbursementDialog({
 
       // 日期篩選
       if (dateFilter) {
-        if (r.request_date !== dateFilter) return false
+        if (!r.created_at || !r.created_at.startsWith(dateFilter)) return false
       }
 
       // 狀態篩選
@@ -183,8 +183,9 @@ export function CreateDisbursementDialog({
           order_number: orderNumber,
           disbursement_date: disbursementDate,
           payment_request_ids: selectedRequestIds,
-          amount: selectedAmount,
+          total_amount: selectedAmount,
           status: 'pending',
+          created_by: user.id,
           workspace_id: user?.workspace_id || null,
         })
         .select()
@@ -405,7 +406,7 @@ export function CreateDisbursementDialog({
                         {request.tour_name || '-'}
                       </td>
                       <td className="py-3 px-4 text-morandi-secondary">
-                        {request.request_date || '-'}
+                        {request.created_at?.split('T')[0] || '-'}
                       </td>
                       <td className="py-3 px-4 text-morandi-secondary">
                         {request.created_by_name || '-'}

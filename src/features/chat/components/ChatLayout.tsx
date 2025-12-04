@@ -4,11 +4,21 @@ import { useState, useEffect } from 'react'
 import { ChannelSidebar } from './ChannelSidebar'
 import { MessageView } from './MessageView'
 import { MessageInput } from './MessageInput'
+import type { User } from '@/stores/types'
+import type { Workspace, Channel } from '@/stores/workspace/types'
 
-export function ChatLayout({ initialData }) {
+interface ChatLayoutProps {
+  initialData: {
+    workspaces: Workspace[];
+    channels: Channel[];
+    user: User | null;
+  };
+}
+
+export function ChatLayout({ initialData }: ChatLayoutProps) {
   const { workspaces, channels, user } = initialData
-  const [currentWorkspace, setCurrentWorkspace] = useState(workspaces?.[0])
-  const [currentChannel, setCurrentChannel] = useState(channels?.[0])
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(workspaces?.[0] || null)
+  const [currentChannel, setCurrentChannel] = useState<Channel | null>(channels?.[0] || null)
 
   useEffect(() => {
     // Set initial state from server-fetched data
@@ -20,7 +30,7 @@ export function ChatLayout({ initialData }) {
     }
   }, [workspaces, channels, currentWorkspace, currentChannel])
 
-  const handleChannelSelect = (channel) => {
+  const handleChannelSelect = (channel: Channel) => {
     setCurrentChannel(channel)
   }
 

@@ -2,14 +2,17 @@
 
 import { useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { FileText } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
+import { Button } from '@/components/ui/button'
 import { useOrderStore, useTourStore } from '@/stores'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
 import { MemberQuickAdd } from '@/components/members/member-quick-add'
+import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 
 // 訂單詳細頁面的分頁配置
 const tabs = [
@@ -27,6 +30,7 @@ export default function OrderDetailPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const memberTableRef = useRef<MemberTableRef | null>(null)
   const [memberKey, setMemberKey] = useState(0) // 用於強制刷新成員表格
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
 
   const orderId = params.orderId as string
   const order = orders.find(o => o.id === orderId)
@@ -104,9 +108,28 @@ export default function OrderDetailPage() {
         onTabChange={setActiveTab}
         showBackButton={true}
         onBack={() => router.push('/orders')}
+        customActions={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsInvoiceDialogOpen(true)}
+            className="gap-1"
+          >
+            <FileText size={16} />
+            開代轉
+          </Button>
+        }
       />
 
       <div>{renderTabContent()}</div>
+
+      {/* 開立代轉發票懸浮視窗 */}
+      <InvoiceDialog
+        open={isInvoiceDialogOpen}
+        onOpenChange={setIsInvoiceDialogOpen}
+        fixedOrder={order}
+        fixedTour={tour}
+      />
     </>
   )
 }

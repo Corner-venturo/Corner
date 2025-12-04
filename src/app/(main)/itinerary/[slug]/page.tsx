@@ -9,8 +9,8 @@ export default function ItineraryEditPage() {
   const slug = params.slug as string
 
   useEffect(() => {
-    // 重新導向到新增頁面，但帶上 tour_id 參數來載入既有資料
-    router.replace(`/itinerary/new?tour_id=${slug}`)
+    // 重新導向到新增頁面，帶上 itinerary_id 參數來載入既有的行程資料
+    router.replace(`/itinerary/new?itinerary_id=${slug}`)
   }, [slug, router])
 
   return (

@@ -171,7 +171,7 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
     startY: 28,
     head: [['付款對象', '請款編號', '請款人員', '團名', '項目', '應付金額', '小計']],
     body: tableBody,
-    foot: [['TOTAL', '', '', '', '', '', (order.amount || order.total_amount || 0).toLocaleString()]],
+    foot: [['TOTAL', '', '', '', '', '', (order.amount || 0).toLocaleString()]],
     theme: 'grid',
     styles: {
       font: 'helvetica',

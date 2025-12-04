@@ -15,7 +15,7 @@ interface PermissionsTabProps {
 
 export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, PermissionsTabProps>(
   ({ employee }, ref) => {
-    const { user, login } = useAuthStore()
+    const { user, setUser } = useAuthStore()
     const { update: updateUser } = useUserStore()
 
     // 主要角色（單選）
@@ -76,7 +76,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
         // 如果修改的是當前登入用戶，更新 auth-store
         if (user && user.id === employee.id) {
-          login({
+          setUser({
             ...user,
             roles: [role] as unknown as typeof user.roles,
             permissions: defaultPermissions as unknown as typeof user.permissions,
@@ -128,7 +128,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
         // 如果修改的是當前登入用戶，更新 auth-store
         if (user && user.id === employee.id) {
-          login({
+          setUser({
             ...user,
             permissions: permissions as unknown as typeof user.permissions,
           })

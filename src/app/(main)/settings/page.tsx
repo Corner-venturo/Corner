@@ -17,6 +17,7 @@ import {
   PreferredFeaturesSettings,
   ApiSettings,
   DevToolsSettings,
+  NewebPaySettings,
 } from './components'
 
 // 強制客戶端渲染，不預取伺服器資料
@@ -93,6 +94,9 @@ export default function SettingsPage() {
 
           {/* API 設定 */}
           <ApiSettings />
+
+          {/* 藍新金流設定 */}
+          <NewebPaySettings />
 
           {/* 開發者工具 */}
           <DevToolsSettings />

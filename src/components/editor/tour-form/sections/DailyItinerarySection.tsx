@@ -90,7 +90,16 @@ export function DailyItinerarySection({
           key={dayIndex}
           className="p-6 border border-morandi-container rounded-2xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-white to-morandi-container/10 shadow-sm"
         >
-          <div className="flex justify-end items-start">
+          {/* Day 標籤與刪除按鈕 */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-morandi-gold text-white text-sm font-bold rounded-full">
+                Day {dayIndex + 1}
+              </span>
+              <span className="text-sm text-morandi-secondary">
+                {day.title || '尚未設定行程標題'}
+              </span>
+            </div>
             {dayIndex === data.dailyItinerary.length - 1 && (
               <button
                 onClick={() => removeDailyItinerary(dayIndex)}

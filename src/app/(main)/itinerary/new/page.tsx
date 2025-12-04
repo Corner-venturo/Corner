@@ -12,6 +12,7 @@ import { GeminiItineraryForm, type GeminiItineraryData } from '@/features/itiner
 import { GeminiItineraryPreview } from '@/features/itinerary/components/GeminiItineraryPreview'
 import { Button } from '@/components/ui/button'
 import { useTourStore, useRegionsStore } from '@/stores'
+import { useItineraries } from '@/hooks/cloud-hooks'
 import type {
   FlightInfo,
   Feature,
@@ -292,8 +293,10 @@ function NewItineraryPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tourId = searchParams.get('tour_id')
+  const itineraryId = searchParams.get('itinerary_id') // 編輯現有行程
   const type = searchParams.get('type') // 'print' or null (web)
   const { items: tours } = useTourStore()
+  const { items: itineraries } = useItineraries()
   const { countries, cities } = useRegionsStore()
 
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
@@ -472,19 +475,81 @@ function NewItineraryPageContent() {
 
   // 使用 ref 追蹤是否已初始化，避免使用者編輯被覆蓋
   const hasInitializedRef = useRef(false)
-  const lastTourIdRef = useRef<string | null>(null)
+  const lastIdRef = useRef<string | null>(null)
 
-  // 從旅遊團載入資料（如果有 tour_id）
-  // 只在首次載入或 tourId 改變時執行，避免覆蓋使用者編輯
+  // 從行程或旅遊團載入資料
   useEffect(() => {
     const initializeTourData = () => {
-      // 如果 tourId 沒變，且已經初始化過，就不要重新載入
-      if (hasInitializedRef.current && lastTourIdRef.current === tourId) {
+      const currentId = itineraryId || tourId
+
+      // 如果 ID 沒變，且已經初始化過，就不要重新載入
+      if (hasInitializedRef.current && lastIdRef.current === currentId) {
         return
       }
 
+      // 優先從 itineraries 載入（編輯現有行程）
+      if (itineraryId) {
+        const itinerary = itineraries.find((i) => i.id === itineraryId)
+        if (itinerary) {
+          // 從 itinerary 載入完整資料
+          setTourData({
+            tagline: itinerary.tagline || 'Corner Travel 2025',
+            title: itinerary.title || '',
+            subtitle: itinerary.subtitle || '',
+            description: itinerary.description || '',
+            departureDate: itinerary.departure_date || '',
+            tourCode: itinerary.tour_code || '',
+            coverImage: itinerary.cover_image || '',
+            country: itinerary.country || '',
+            city: itinerary.city || '',
+            status: itinerary.status || '草稿',
+            outboundFlight: itinerary.outbound_flight || {
+              airline: '',
+              flightNumber: '',
+              departureAirport: 'TPE',
+              departureTime: '',
+              departureDate: '',
+              arrivalAirport: '',
+              arrivalTime: '',
+              duration: '',
+            },
+            returnFlight: itinerary.return_flight || {
+              airline: '',
+              flightNumber: '',
+              departureAirport: '',
+              departureTime: '',
+              departureDate: '',
+              arrivalAirport: 'TPE',
+              arrivalTime: '',
+              duration: '',
+            },
+            features: itinerary.features || [],
+            focusCards: itinerary.focus_cards || [],
+            leader: itinerary.leader || {
+              name: '',
+              domesticPhone: '',
+              overseasPhone: '',
+            },
+            meetingInfo: itinerary.meeting_info || {
+              time: '',
+              location: '',
+            },
+            itinerarySubtitle: itinerary.itinerary_subtitle || '',
+            dailyItinerary: itinerary.daily_itinerary || [],
+          })
+          setLoading(false)
+          hasInitializedRef.current = true
+          lastIdRef.current = currentId
+          return
+        } else {
+          // 有 itineraryId 但找不到資料，可能 store 還沒載入完成，繼續等待
+          // 不要跳到空白表單
+          return
+        }
+      }
+
       if (!tourId) {
-        // 沒有 tour_id，使用空白資料
+        // 沒有任何 ID，使用空白資料
         setTourData({
           tagline: 'Corner Travel 2025',
           title: '',
@@ -532,11 +597,11 @@ function NewItineraryPageContent() {
         })
         setLoading(false)
         hasInitializedRef.current = true
-        lastTourIdRef.current = tourId
+        lastIdRef.current = currentId
         return
       }
 
-      // 有 tour_id,從旅遊團載入資料
+      // 有 tour_id，從旅遊團載入基本資料
       const tour = tours.find((t) => t.id === tourId)
       if (!tour) {
         setLoading(false)
@@ -610,11 +675,11 @@ function NewItineraryPageContent() {
 
       setLoading(false)
       hasInitializedRef.current = true
-      lastTourIdRef.current = tourId
+      lastIdRef.current = currentId
     }
 
     initializeTourData()
-  }, [tourId, tours, countries, cities])
+  }, [tourId, itineraryId, tours, itineraries, countries, cities])
 
   // 計算縮放比例（必須在 early return 之前）
   useEffect(() => {
@@ -802,7 +867,7 @@ function NewItineraryPageContent() {
         ]}
         showBackButton={true}
         onBack={() => router.push('/itinerary')}
-        actions={<PublishButton data={tourData} />}
+        actions={<PublishButton data={{ ...tourData, id: itineraryId || undefined }} />}
       />
 
       {/* ========== 主要內容區域 ========== */}

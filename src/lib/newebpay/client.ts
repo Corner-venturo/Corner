@@ -1,0 +1,458 @@
+/**
+ * 藍新金流 旅行業代收轉付電子收據 API 客戶端
+ *
+ * 正式環境：https://api.travelinvoice.com.tw
+ * 測試環境：https://capi.travelinvoice.com.tw
+ *
+ * 資料交換方式：
+ * - HTTP Method: POST
+ * - Content-Type: application/x-www-form-urlencoded
+ * - 編碼格式: UTF-8
+ * - 欄位連接符號: &
+ */
+
+import { aesEncrypt, aesDecrypt, generateTransactionNo, convertTaxType, formatInvoiceDate } from './crypto'
+import { createClient } from '@supabase/supabase-js'
+
+// API 端點
+const API_ENDPOINTS = {
+  production: 'https://api.travelinvoice.com.tw',
+  test: 'https://capi.travelinvoice.com.tw',
+}
+
+// API 路徑（注意：沒有 /Api 前綴）
+const API_PATHS = {
+  issue: '/invoice_issue',       // 開立收據
+  void: '/invoice_invalid',      // 作廢收據
+  allowance: '/allowance_issue', // 開立折讓
+  query: '/invoice_search',      // 查詢收據
+}
+
+interface NewebPayConfig {
+  merchantId: string
+  hashKey: string
+  hashIV: string
+  isProduction: boolean
+}
+
+interface BuyerInfo {
+  buyerName: string
+  buyerUBN?: string
+  buyerAddress?: string
+  buyerEmail?: string
+  buyerMobileCode?: string
+  buyerMobile?: string
+  carrierType?: string
+  carrierNum?: string
+  loveCode?: string
+  printFlag?: 'Y' | 'N'
+}
+
+interface InvoiceItem {
+  item_name: string
+  item_count: number
+  item_unit: string
+  item_price: number
+  itemAmt: number
+  itemTaxType?: string
+  itemWord?: string
+}
+
+interface IssueInvoiceParams {
+  invoiceDate: string
+  totalAmount: number
+  taxType: string
+  buyerInfo: BuyerInfo
+  items: InvoiceItem[]
+}
+
+interface VoidInvoiceParams {
+  invoiceNumber: string
+  invoiceDate: string
+  voidReason: string
+}
+
+interface AllowanceParams {
+  invoiceNumber: string
+  invoiceDate: string
+  allowanceAmount: number
+  items: InvoiceItem[]
+}
+
+interface QueryParams {
+  invoiceNumber?: string
+  transactionNo?: string
+  startDate?: string
+  endDate?: string
+}
+
+/**
+ * 從 Supabase 獲取藍新金流設定
+ */
+async function getNewebPayConfig(): Promise<NewebPayConfig> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase 設定不完整')
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  // 從 system_settings 表獲取設定
+  const { data, error } = await supabase
+    .from('system_settings')
+    .select('*')
+    .eq('category', 'newebpay')
+    .single()
+
+  if (error || !data) {
+    throw new Error('無法獲取藍新金流設定，請先在系統設定中配置')
+  }
+
+  const settings = data.settings as Record<string, string | boolean>
+
+  if (!settings.merchantId || !settings.hashKey || !settings.hashIV) {
+    throw new Error('藍新金流設定不完整，請確認 MerchantID、HashKey、HashIV')
+  }
+
+  return {
+    merchantId: settings.merchantId as string,
+    hashKey: settings.hashKey as string,
+    hashIV: settings.hashIV as string,
+    isProduction: settings.isProduction === true,
+  }
+}
+
+/**
+ * 將物件轉為 URL encoded 字串
+ * 注意：欄位內容不可包含 & 字元
+ */
+function toUrlEncoded(data: Record<string, unknown>): string {
+  const params: string[] = []
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined && value !== null && value !== '') {
+      // 確保值是字串，並進行 URL encode
+      const strValue = String(value)
+      params.push(`${encodeURIComponent(key)}=${encodeURIComponent(strValue)}`)
+    }
+  }
+  return params.join('&')
+}
+
+/**
+ * 解析 URL encoded 回應
+ * 回應格式：key=value&key=value&EndStr=##
+ */
+function parseUrlEncodedResponse(responseText: string): Record<string, string> {
+  const result: Record<string, string> = {}
+  const pairs = responseText.split('&')
+  for (const pair of pairs) {
+    const [key, ...valueParts] = pair.split('=')
+    if (key) {
+      result[decodeURIComponent(key)] = decodeURIComponent(valueParts.join('='))
+    }
+  }
+  return result
+}
+
+/**
+ * 發送請求到藍新 API
+ */
+async function sendRequest(path: string, postData: Record<string, unknown>): Promise<Record<string, string>> {
+  const config = await getNewebPayConfig()
+  const baseUrl = config.isProduction ? API_ENDPOINTS.production : API_ENDPOINTS.test
+
+  // 將資料轉為 URL encoded 字串，然後加密
+  const urlEncodedData = toUrlEncoded(postData)
+  const encryptedData = aesEncrypt(urlEncodedData, config.hashKey, config.hashIV)
+
+  console.log('[NewebPay] 發送請求:', {
+    url: `${baseUrl}${path}`,
+    merchantId: config.merchantId,
+    isProduction: config.isProduction,
+    postDataKeys: Object.keys(postData),
+  })
+
+  // 發送請求
+  const response = await fetch(`${baseUrl}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      MerchantID_: config.merchantId,
+      PostData_: encryptedData,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`API 請求失敗: ${response.status}`)
+  }
+
+  const responseText = await response.text()
+  console.log('[NewebPay] 原始回應:', responseText.substring(0, 200))
+
+  // 解析回應（URL encoded 格式）
+  // 回應結尾會有 EndStr=## 用於確認資料完整性
+  const parsed = parseUrlEncodedResponse(responseText)
+
+  // 檢查是否有加密的回應資料需要解密
+  if (parsed.Result) {
+    try {
+      const decrypted = aesDecrypt(parsed.Result, config.hashKey, config.hashIV)
+      const decryptedParsed = parseUrlEncodedResponse(decrypted)
+      return { ...parsed, ...decryptedParsed }
+    } catch (e) {
+      console.log('[NewebPay] Result 解密失敗，可能是明文:', e)
+    }
+  }
+
+  return parsed
+}
+
+/**
+ * 開立收據
+ *
+ * 必填欄位：
+ * - Version: 串接版本，固定 "1.1"
+ * - TimeStamp: Unix 時間戳記
+ * - MerchantOrderNo: 自訂編號（最多30字，英數字和底線）
+ * - Status: 開立方式（1=即時, 2=預約）
+ * - Category: 收據種類（B2B 或 B2C）
+ * - BuyerName: 買受人名稱（B2B必填）
+ * - BuyerEmail: 買受人信箱
+ * - SellerName: 經辦人名稱
+ * - TotalAmt: 收據金額
+ * - ItemName/ItemCount/ItemUnit/ItemPrice/ItemAmt: 商品資訊（多項用 | 分隔）
+ */
+export async function issueInvoice(params: IssueInvoiceParams): Promise<{
+  success: boolean
+  message: string
+  data?: {
+    transactionNo: string
+    invoiceNumber: string
+    randomNum: string
+    barcode?: string
+    qrcodeL?: string
+    qrcodeR?: string
+  }
+}> {
+  const transactionNo = generateTransactionNo()
+
+  // 組裝商品明細（多項用 | 分隔）
+  const itemNames = params.items.map(item => item.item_name).join('|')
+  const itemCounts = params.items.map(item => item.item_count).join('|')
+  const itemUnits = params.items.map(item => item.item_unit).join('|')
+  const itemPrices = params.items.map(item => item.item_price).join('|')
+  const itemAmts = params.items.map(item => item.itemAmt).join('|')
+
+  // 判斷是 B2B 還是 B2C
+  const category = params.buyerInfo.buyerUBN ? 'B2B' : 'B2C'
+
+  const postData: Record<string, unknown> = {
+    Version: '1.1',
+    TimeStamp: Math.floor(Date.now() / 1000),
+    MerchantOrderNo: transactionNo,
+    Status: 1, // 1: 即時開立
+    Category: category,
+    BuyerName: params.buyerInfo.buyerName,
+    BuyerEmail: params.buyerInfo.buyerEmail || 'no-reply@example.com', // 必填
+    SellerName: '系統管理員', // 經辦人名稱（必填）
+    TotalAmt: params.totalAmount,
+    ItemName: itemNames,
+    ItemCount: itemCounts,
+    ItemUnit: itemUnits,
+    ItemPrice: itemPrices,
+    ItemAmt: itemAmts,
+  }
+
+  // B2B 必填統編
+  if (category === 'B2B' && params.buyerInfo.buyerUBN) {
+    postData.BuyerUBN = params.buyerInfo.buyerUBN
+  }
+
+  // 選填欄位
+  if (params.buyerInfo.buyerAddress) {
+    postData.BuyerAddress = params.buyerInfo.buyerAddress
+  }
+  if (params.buyerInfo.buyerMobile) {
+    postData.BuyerPhone = params.buyerInfo.buyerMobile
+  }
+
+  console.log('[NewebPay] 開立收據 PostData:', postData)
+
+  try {
+    const result = await sendRequest(API_PATHS.issue, postData)
+
+    console.log('[NewebPay] 開立收據回應:', result)
+
+    // 檢查回應狀態
+    if (result.Status === 'SUCCESS' || result.Status === '1') {
+      return {
+        success: true,
+        message: '開立成功',
+        data: {
+          transactionNo,
+          invoiceNumber: result.InvoiceNumber || result.InvoiceNo || '',
+          randomNum: result.RandomNum || '',
+          barcode: result.Barcode,
+          qrcodeL: result.QRcodeL,
+          qrcodeR: result.QRcodeR,
+        },
+      }
+    } else {
+      return {
+        success: false,
+        message: result.Message || result.Msg || '開立失敗',
+      }
+    }
+  } catch (error) {
+    console.error('[NewebPay] 開立收據錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '開立失敗',
+    }
+  }
+}
+
+/**
+ * 作廢收據
+ */
+export async function voidInvoice(params: VoidInvoiceParams): Promise<{
+  success: boolean
+  message: string
+}> {
+  const postData = {
+    Version: '1.1',
+    TimeStamp: Math.floor(Date.now() / 1000),
+    InvoiceNumber: params.invoiceNumber,
+    InvoiceDate: formatInvoiceDate(params.invoiceDate),
+    InvalidReason: params.voidReason,
+  }
+
+  try {
+    const result = await sendRequest(API_PATHS.void, postData)
+
+    if (result.Status === 'SUCCESS' || result.Status === '1') {
+      return {
+        success: true,
+        message: '作廢成功',
+      }
+    } else {
+      return {
+        success: false,
+        message: result.Message || result.Msg || '作廢失敗',
+      }
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '作廢失敗',
+    }
+  }
+}
+
+/**
+ * 開立折讓
+ */
+export async function issueAllowance(params: AllowanceParams): Promise<{
+  success: boolean
+  message: string
+  data?: {
+    allowanceNo: string
+  }
+}> {
+  // 組裝商品明細（多項用 | 分隔）
+  const itemNames = params.items.map(item => item.item_name).join('|')
+  const itemCounts = params.items.map(item => item.item_count).join('|')
+  const itemUnits = params.items.map(item => item.item_unit).join('|')
+  const itemPrices = params.items.map(item => item.item_price).join('|')
+  const itemAmts = params.items.map(item => item.itemAmt).join('|')
+
+  const postData = {
+    Version: '1.1',
+    TimeStamp: Math.floor(Date.now() / 1000),
+    InvoiceNumber: params.invoiceNumber,
+    InvoiceDate: formatInvoiceDate(params.invoiceDate),
+    AllowanceAmt: params.allowanceAmount,
+    ItemName: itemNames,
+    ItemCount: itemCounts,
+    ItemUnit: itemUnits,
+    ItemPrice: itemPrices,
+    ItemAmt: itemAmts,
+  }
+
+  try {
+    const result = await sendRequest(API_PATHS.allowance, postData)
+
+    if (result.Status === 'SUCCESS' || result.Status === '1') {
+      return {
+        success: true,
+        message: '折讓開立成功',
+        data: {
+          allowanceNo: result.AllowanceNo || '',
+        },
+      }
+    } else {
+      return {
+        success: false,
+        message: result.Message || result.Msg || '折讓開立失敗',
+      }
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '折讓開立失敗',
+    }
+  }
+}
+
+/**
+ * 查詢收據
+ */
+export async function queryInvoice(params: QueryParams): Promise<{
+  success: boolean
+  message: string
+  data?: Record<string, string>
+}> {
+  const postData: Record<string, unknown> = {
+    Version: '1.1',
+    TimeStamp: Math.floor(Date.now() / 1000),
+  }
+
+  if (params.invoiceNumber) {
+    postData.InvoiceNumber = params.invoiceNumber
+  }
+  if (params.transactionNo) {
+    postData.MerchantOrderNo = params.transactionNo
+  }
+  if (params.startDate) {
+    postData.BeginDate = formatInvoiceDate(params.startDate)
+  }
+  if (params.endDate) {
+    postData.EndDate = formatInvoiceDate(params.endDate)
+  }
+
+  try {
+    const result = await sendRequest(API_PATHS.query, postData)
+
+    if (result.Status === 'SUCCESS' || result.Status === '1') {
+      return {
+        success: true,
+        message: '查詢成功',
+        data: result,
+      }
+    } else {
+      return {
+        success: false,
+        message: result.Message || result.Msg || '查詢失敗',
+      }
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢失敗',
+    }
+  }
+}

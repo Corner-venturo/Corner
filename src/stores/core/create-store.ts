@@ -16,7 +16,7 @@ import { memoryCache } from '@/lib/cache/memory-cache'
 import { supabase } from '@/lib/supabase/client'
 
 // 型別定義
-import type { StoreState, StoreConfig } from './types'
+import type { StoreState, StoreConfig, CreateInput, UpdateInput } from './types'
 
 // 工具
 import { AbortManager } from '../utils/abort-manager'
@@ -101,7 +101,7 @@ export function createStore<T extends BaseEntity>(
         set({ loading: true, error: null })
 
         const { data, error } = await supabase
-          .from(tableName)
+          .from(tableName as any)
           .select('*')
           .order('created_at', { ascending: false })
 
@@ -124,7 +124,7 @@ export function createStore<T extends BaseEntity>(
         set({ loading: true, error: null })
 
         const { data, error } = await supabase
-          .from(tableName)
+          .from(tableName as any)
           .select('*')
           .eq('id', id)
           .single()
@@ -141,7 +141,7 @@ export function createStore<T extends BaseEntity>(
     },
 
     // 建立資料
-    create: async data => {
+    create: async (data: CreateInput<T>) => {
       try {
         set({ loading: true, error: null })
 
@@ -166,8 +166,8 @@ export function createStore<T extends BaseEntity>(
         }
 
         const { data: newItem, error } = await supabase
-          .from(tableName)
-          .insert(insertData)
+          .from(tableName as any)
+          .insert(insertData as any)
           .select()
           .single()
 
@@ -187,7 +187,7 @@ export function createStore<T extends BaseEntity>(
       }
     },
 
-    update: async (id: string, data: Partial<Omit<T, 'id' | 'created_at'>>) => {
+    update: async (id: string, data: UpdateInput<T>) => {
       try {
         set({ loading: true, error: null })
 
@@ -197,8 +197,8 @@ export function createStore<T extends BaseEntity>(
         }
 
         const { data: updatedItem, error } = await supabase
-          .from(tableName)
-          .update(updateData)
+          .from(tableName as any)
+          .update(updateData as any)
           .eq('id', id)
           .select()
           .single()
@@ -225,7 +225,7 @@ export function createStore<T extends BaseEntity>(
         set({ loading: true, error: null })
 
         const { error } = await supabase
-          .from(tableName)
+          .from(tableName as any)
           .delete()
           .eq('id', id)
 
@@ -244,7 +244,7 @@ export function createStore<T extends BaseEntity>(
     },
 
     // 批次建立
-    createMany: async dataArray => {
+    createMany: async (dataArray: CreateInput<T>[]) => {
       const results: T[] = []
 
       for (const data of dataArray) {
@@ -258,7 +258,7 @@ export function createStore<T extends BaseEntity>(
     // 批次刪除
     deleteMany: async (ids: string[]) => {
       const { error } = await supabase
-        .from(tableName)
+        .from(tableName as any)
         .delete()
         .in('id', ids)
 
@@ -303,22 +303,6 @@ export function createStore<T extends BaseEntity>(
       logger.log(`🛑 [${tableName}] 已取消進行中的請求`)
     },
   }))
-
-  // 監聽背景更新完成事件
-  if (typeof window !== 'undefined') {
-    const registeredKey = `__store_registered_${tableName}`
-    if (!(window as unknown as Record<string, boolean>)[registeredKey]) {
-      (window as unknown as Record<string, boolean>)[registeredKey] = true
-
-      const handleUpdated = ((event: Event) => {
-        const customEvent = event as CustomEvent
-        const { items } = customEvent.detail
-        store.setState({ items })
-      }) as EventListener
-
-      window.addEventListener(`${tableName}:updated`, handleUpdated)
-    }
-  }
 
   return store
 }

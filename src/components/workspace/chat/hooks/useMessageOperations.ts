@@ -5,7 +5,7 @@ import type { MessageAttachment } from '@/stores/workspace-store'
 
 export function useMessageOperations() {
   const { sendMessage, updateMessageReactions, deleteMessage } = useWorkspaceChat()
-  const { user, currentProfile } = useAuthStore()
+  const { user } = useAuthStore()
 
   const handleSendMessage = useCallback(
     async (channelId: string, content: string, attachments?: MessageAttachment[]) => {
@@ -19,13 +19,13 @@ export function useMessageOperations() {
         content: content.trim() || '（傳送了附件）',
         author: {
           id: user.id,
-          display_name: currentProfile?.display_name || user.display_name || '未知用戶',
+          display_name: user.display_name || '未知用戶',
           avatar: undefined,
         },
         attachments,
       })
     },
-    [user, currentProfile, sendMessage]
+    [user, sendMessage]
   )
 
   const handleReaction = useCallback(
@@ -67,6 +67,5 @@ export function useMessageOperations() {
     handleReaction,
     handleDeleteMessage,
     user,
-    currentProfile,
   }
 }

@@ -594,7 +594,7 @@ export interface DisbursementOrder {
   order_number: string // CD-2024001
   disbursement_date: string // 出帳日期 (預設本週四)
   payment_request_ids: string[] // 關聯的請款單ID陣列
-  total_amount: number // 總金額 (自動加總)
+  amount: number // 總金額 (自動加總)
   status: 'pending' | 'confirmed' | 'paid' | 'cancelled' // 待確認、已確認、已付款、已取消
   note?: string // 出納備註
   created_by: string // 建立者ID

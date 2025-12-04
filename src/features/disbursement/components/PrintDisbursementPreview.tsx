@@ -132,7 +132,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
       [processedItems]
     )
 
-    const totalAmount = order.amount || order.total_amount || 0
+    const totalAmount = order.amount || 0
 
     return (
       <div

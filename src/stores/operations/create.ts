@@ -11,7 +11,6 @@ import type { BaseEntity } from '@/types'
 import type { StoreConfig, CreateInput, CodeConfig } from '../core/types'
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
 import { SupabaseAdapter } from '../adapters/supabase-adapter'
-import { SyncCoordinator } from '../sync/coordinator'
 import { generateCode, generateCustomerCode } from '../utils/code-generator'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
@@ -96,8 +95,7 @@ export async function create<T extends BaseEntity>(
   existingItems: T[],
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
-  supabase: SupabaseAdapter<T>,
-  sync: SyncCoordinator<T>
+  supabase: SupabaseAdapter<T>
 ): Promise<T> {
   const { tableName, codePrefix, enableSupabase } = config
 
@@ -297,13 +295,12 @@ export async function createMany<T extends BaseEntity>(
   existingItems: T[],
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
-  supabase: SupabaseAdapter<T>,
-  sync: SyncCoordinator<T>
+  supabase: SupabaseAdapter<T>
 ): Promise<T[]> {
   const results: T[] = []
 
   for (const data of dataArray) {
-    const created = await create(data, existingItems, config, indexedDB, supabase, sync)
+    const created = await create(data, existingItems, config, indexedDB, supabase)
     results.push(created)
   }
 

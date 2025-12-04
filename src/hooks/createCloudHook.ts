@@ -37,7 +37,7 @@ export function createCloudHook<T extends BaseEntity>(
   // Supabase fetcher
   async function fetcher(): Promise<T[]> {
     // 使用類型斷言處理動態表格名稱
-    let query = (supabase.from(tableName) as ReturnType<typeof supabase.from>).select(
+    let query = supabase.from(tableName as any).select(
       options?.select || '*'
     )
 
@@ -84,7 +84,7 @@ export function createCloudHook<T extends BaseEntity>(
       mutate(SWR_KEY, [...items, newItem], false)
 
       try {
-        const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from>).insert(
+        const { error } = await supabase.from(tableName as any).insert(
           newItem as Record<string, unknown>
         )
         if (error) throw error
@@ -112,7 +112,7 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from>)
+        const { error } = await supabase.from(tableName as any)
           .update(updatedData as Record<string, unknown>)
           .eq('id', id)
         if (error) throw error
@@ -134,7 +134,7 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await (supabase.from(tableName) as ReturnType<typeof supabase.from>)
+        const { error } = await supabase.from(tableName as any)
           .delete()
           .eq('id', id)
         if (error) throw error

@@ -2,9 +2,14 @@
 
 import { useMessages } from '../hooks/useMessages'
 import { Loader2, AlertCircle } from 'lucide-react'
+import type { Channel } from '@/stores/workspace/types'
 
-export function MessageView({ channel }) {
-  const { messages, loading, error } = useMessages(channel?.id)
+interface MessageViewProps {
+  channel: Channel | null;
+}
+
+export function MessageView({ channel }: MessageViewProps) {
+  const { messages, loading, error } = useMessages(channel?.id || '')
 
   if (!channel) {
     return (

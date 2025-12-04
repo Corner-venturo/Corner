@@ -68,7 +68,8 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
         alert('✅ 儲存行程表成功！')
 
         if (newItinerary?.id) {
-          router.replace(`/itinerary/${newItinerary.id}`)
+          // 直接導向到編輯頁面，避免多次跳轉
+          router.replace(`/itinerary/new?itinerary_id=${newItinerary.id}`)
         }
       }
     } catch (error) {
@@ -108,7 +109,7 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
 
       // 跳轉到新版本
       if (newVersion?.id) {
-        router.replace(`/itinerary/${newVersion.id}`)
+        router.replace(`/itinerary/new?itinerary_id=${newVersion.id}`)
       }
     } catch (error) {
       console.error('另存新版本失敗:', error)

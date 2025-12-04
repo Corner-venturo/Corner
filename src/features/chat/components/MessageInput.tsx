@@ -3,8 +3,13 @@
 import { useState, useTransition } from 'react'
 import { sendMessageAction } from '../actions/message-actions'
 import { Send } from 'lucide-react'
+import type { Channel } from '@/stores/workspace/types'
 
-export function MessageInput({ channel }) {
+interface MessageInputProps {
+  channel: Channel | null;
+}
+
+export function MessageInput({ channel }: MessageInputProps) {
   const [content, setContent] = useState('')
   const [isPending, startTransition] = useTransition()
 

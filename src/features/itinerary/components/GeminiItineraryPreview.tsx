@@ -56,7 +56,7 @@ interface GeminiItineraryData {
 }
 
 interface GeminiItineraryPreviewProps {
-  data: GeminiItineraryData
+  data: Partial<GeminiItineraryData>
 }
 
 // 亮點卡片子組件
@@ -130,10 +130,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
 
   // Fallback for missing data
   const safeData = {
-    highlightSpots: [],
-    flightOptions: [],
-    dailySchedule: [],
-    sights: [],
+    ...{
+      highlightSpots: [],
+      flightOptions: [],
+      dailySchedule: [],
+      sights: [],
+    },
     ...data,
   }
 

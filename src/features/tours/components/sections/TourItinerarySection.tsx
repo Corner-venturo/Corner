@@ -106,8 +106,9 @@ export function TourItinerarySection({
                   )}
 
                   {day.highlight && (
-                    <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50/80 p-5 text-amber-900 shadow-inner">
-                      <p className="text-base font-semibold leading-relaxed">{day.highlight}</p>
+                    <div className="mb-6 flex items-center gap-3 text-amber-700">
+                      <Sparkles size={18} className="text-amber-500 flex-shrink-0" />
+                      <p className="text-base font-medium leading-relaxed">{day.highlight}</p>
                     </div>
                   )}
 
@@ -125,7 +126,14 @@ export function TourItinerarySection({
                   {day.activities && day.activities.length > 0 && (
                     <div className="mb-8 space-y-4">
                       <DecorativeDivider variant="simple" />
-                      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                      <div className={cn(
+                        "grid gap-5",
+                        // 動態調整欄數：1個=1欄, 2個=2欄, 3個=3欄, 4個以上=2欄
+                        day.activities.length === 1 && "grid-cols-1",
+                        day.activities.length === 2 && "grid-cols-1 md:grid-cols-2",
+                        day.activities.length === 3 && "grid-cols-1 md:grid-cols-3",
+                        day.activities.length >= 4 && "grid-cols-1 md:grid-cols-2"
+                      )}>
                         {day.activities.map((activity, actIndex: number) => (
                           <AttractionCard
                             key={`activity-${index}-${actIndex}`}

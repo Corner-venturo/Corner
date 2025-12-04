@@ -2,173 +2,214 @@
 
 /**
  * 代轉發票管理頁面
+ * 改用統一的 ResponsiveHeader + EnhancedTable 佈局
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { FileText, Eye } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { EnhancedTable, TableColumn as Column } from '@/components/ui/enhanced-table'
+import { ContentContainer } from '@/components/layout/content-container'
+import { useTravelInvoiceStore, TravelInvoice } from '@/stores/useTravelInvoiceStore'
+import { StatusCell, DateCell, CurrencyCell, ActionCell } from '@/components/table-cells'
+import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 
-import Link from 'next/link'
+// 狀態標籤定義
+const statusTabs = [
+  { value: 'all', label: '全部' },
+  { value: 'pending', label: '待處理' },
+  { value: 'issued', label: '已開立' },
+  { value: 'voided', label: '已作廢' },
+  { value: 'allowance', label: '已折讓' },
+  { value: 'failed', label: '失敗' },
+]
 
-import { Plus, Search, FileText, Eye } from 'lucide-react'
+// 狀態配色
+const getStatusVariant = (status: string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
+  switch (status) {
+    case 'issued':
+      return 'success'
+    case 'pending':
+      return 'warning'
+    case 'voided':
+    case 'failed':
+      return 'error'
+    case 'allowance':
+      return 'info'
+    default:
+      return 'default'
+  }
+}
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { useTravelInvoiceStore } from '@/stores/useTravelInvoiceStore'
+// 狀態文字
+const getStatusLabel = (status: string): string => {
+  switch (status) {
+    case 'pending':
+      return '待處理'
+    case 'issued':
+      return '已開立'
+    case 'voided':
+      return '已作廢'
+    case 'allowance':
+      return '已折讓'
+    case 'failed':
+      return '失敗'
+    default:
+      return status
+  }
+}
 
 export default function TravelInvoicePage() {
+  const router = useRouter()
   const { invoices, isLoading, error, fetchInvoices } = useTravelInvoiceStore()
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [activeTab, setActiveTab] = useState('all')
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchInvoices()
   }, [fetchInvoices])
 
-  const filteredInvoices = (invoices || []).filter(invoice => {
-    const matchesSearch =
-      invoice.transactionNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.buyerInfo.buyerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  // 篩選發票
+  const filteredInvoices = useMemo(() => {
+    return (invoices || []).filter(invoice => {
+      // 狀態篩選
+      const matchesStatus = activeTab === 'all' || invoice.status === activeTab
 
-    const matchesStatus = statusFilter ? invoice.status === statusFilter : true
+      // 搜尋篩選
+      const searchLower = searchTerm.toLowerCase()
+      const matchesSearch =
+        !searchTerm ||
+        invoice.transactionNo.toLowerCase().includes(searchLower) ||
+        invoice.invoice_number?.toLowerCase().includes(searchLower) ||
+        invoice.buyerInfo.buyerName?.toLowerCase().includes(searchLower)
 
-    return matchesSearch && matchesStatus
-  })
+      return matchesStatus && matchesSearch
+    })
+  }, [invoices, activeTab, searchTerm])
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: any }> = {
-      pending: { label: '待處理', variant: 'secondary' },
-      issued: { label: '已開立', variant: 'default' },
-      voided: { label: '已作廢', variant: 'destructive' },
-      allowance: { label: '已折讓', variant: 'outline' },
-      failed: { label: '失敗', variant: 'destructive' },
-    }
-    const config = statusMap[status] || { label: status, variant: 'secondary' }
-    return <Badge variant={config.variant}>{config.label}</Badge>
+  // 表格欄位定義
+  const columns: Column<TravelInvoice>[] = [
+    {
+      key: 'transactionNo',
+      label: '交易編號',
+      width: '160px',
+      render: (value: unknown, row: TravelInvoice) => (
+        <div>
+          <div className="font-medium text-morandi-primary">{String(value)}</div>
+          <div className="text-xs text-morandi-secondary">
+            {row.invoice_number || '尚未取得發票號碼'}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'invoice_date',
+      label: '開立日期',
+      width: '120px',
+      render: (value: unknown) => <DateCell date={value as string} />,
+    },
+    {
+      key: 'buyerInfo',
+      label: '買受人',
+      width: '150px',
+      render: (value: unknown) => (
+        <span className="text-morandi-primary">{(value as { buyerName?: string })?.buyerName || '-'}</span>
+      ),
+    },
+    {
+      key: 'total_amount',
+      label: '金額',
+      width: '120px',
+      align: 'right',
+      render: (value: unknown) => <CurrencyCell amount={value as number} />,
+    },
+    {
+      key: 'status',
+      label: '狀態',
+      width: '100px',
+      render: (value: unknown) => (
+        <StatusCell
+          type="invoice"
+          status={String(value)}
+        />
+      ),
+    },
+  ]
+
+  // 操作按鈕
+  const renderActions = (row: TravelInvoice) => (
+    <ActionCell
+      actions={[
+        {
+          icon: Eye,
+          label: '查看',
+          onClick: () => router.push(`/finance/travel-invoice/${row.id}`),
+        },
+      ]}
+    />
+  )
+
+  // 點擊行跳轉
+  const handleRowClick = (row: TravelInvoice) => {
+    router.push(`/finance/travel-invoice/${row.id}`)
+  }
+
+  // 新增發票 - 改用懸浮視窗
+  const handleAdd = () => {
+    setIsDialogOpen(true)
+  }
+
+  if (error) {
+    return (
+      <div className="h-full flex flex-col">
+        <ResponsiveHeader
+          title="代轉發票管理"
+          icon={FileText}
+        />
+        <ContentContainer>
+          <div className="text-center py-12">
+            <p className="text-red-500">{error}</p>
+          </div>
+        </ContentContainer>
+      </div>
+    )
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* 標題列 */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">代轉發票管理</h1>
-          <p className="text-muted-foreground mt-1">藍新旅行業電子發票系統</p>
-        </div>
-        <Link href="/finance/travel-invoice/create">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            開立新發票
-          </Button>
-        </Link>
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="代轉發票管理"
+        icon={FileText}
+        showSearch={true}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="搜尋交易編號、發票號碼、買受人..."
+        onAdd={handleAdd}
+        addLabel="開立新發票"
+        tabs={statusTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+
+      <div className="flex-1 overflow-hidden">
+        <EnhancedTable
+          columns={columns}
+          data={filteredInvoices}
+          loading={isLoading}
+          actions={renderActions}
+          onRowClick={handleRowClick}
+          bordered={true}
+          emptyMessage="尚無發票資料"
+        />
       </div>
 
-      {/* 篩選區 */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="搜尋交易編號、發票號碼、買受人..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <select
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border rounded-md"
-            >
-              <option value="">全部狀態</option>
-              <option value="pending">待處理</option>
-              <option value="issued">已開立</option>
-              <option value="voided">已作廢</option>
-              <option value="allowance">已折讓</option>
-              <option value="failed">失敗</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 錯誤訊息 */}
-      {error && (
-        <Card className="border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-destructive">{error}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* 發票列表 */}
-      <div className="grid gap-4">
-        {isLoading ? (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <p className="text-muted-foreground">載入中...</p>
-            </CardContent>
-          </Card>
-        ) : filteredInvoices.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">尚無發票資料</p>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredInvoices.map(invoice => (
-            <Card key={invoice.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg">{invoice.transactionNo}</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {invoice.invoice_number || '尚未取得發票號碼'}
-                    </p>
-                  </div>
-                  <div className="text-right space-y-2">{getStatusBadge(invoice.status)}</div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">開立日期</p>
-                    <p className="font-medium">{invoice.invoice_date}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">買受人</p>
-                    <p className="font-medium">{invoice.buyerInfo.buyerName || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">金額</p>
-                    <p className="font-medium">NT$ {invoice.total_amount.toLocaleString()}</p>
-                  </div>
-                  <div className="flex justify-end items-end">
-                    <Link href={`/finance/travel-invoice/${invoice.id}`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="mr-2 h-4 w-4" />
-                        查看詳情
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-                {invoice.voidReason && (
-                  <div className="mt-4 p-3 bg-muted rounded-md">
-                    <p className="text-sm">
-                      <span className="font-medium">作廢原因：</span>
-                      {invoice.voidReason}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+      {/* 開立發票懸浮視窗 */}
+      <InvoiceDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
     </div>
   )
 }

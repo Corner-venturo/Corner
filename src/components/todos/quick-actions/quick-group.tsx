@@ -21,7 +21,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const tourStore = useTourStore()
   const orderStore = useOrderStore()
   const { items: employees } = useUserStore()
-  const { currentProfile } = useAuthStore()
+  const { user } = useAuthStore()
   const [submitting, setSubmitting] = useState(false)
 
   const [newTour, setNewTour] = useState({
@@ -37,7 +37,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
     isSpecial: false,
   })
 
-  const currentUserName = currentProfile?.display_name || currentProfile?.english_name || ''
+  const currentUserName = user?.display_name || user?.english_name || ''
 
   const [newOrder, setNewOrder] = useState({
     contact_person: '',

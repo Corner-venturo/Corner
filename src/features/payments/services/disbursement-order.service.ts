@@ -31,8 +31,8 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       throw new ValidationError('payment_request_ids', '出納單必須包含至少一個請款單')
     }
 
-    if (data.total_amount !== undefined && data.total_amount < 0) {
-      throw new ValidationError('total_amount', '總金額不能為負數')
+    if (data.amount !== undefined && data.amount < 0) {
+      throw new ValidationError('amount', '總金額不能為負數')
     }
 
     if (data.disbursement_date) {
@@ -95,7 +95,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     const orderData = {
       disbursement_date: this.getNextThursday(),
       payment_request_ids: [...paymentRequestIds],
-      total_amount: totalAmount,
+      amount: totalAmount,
       status: 'pending' as const,
       note,
       created_by: '1', // 使用實際用戶ID
@@ -167,7 +167,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     // 更新出納單
     await this.update(orderId, {
       payment_request_ids: newRequestIds,
-      total_amount: newTotalAmount,
+      amount: newTotalAmount,
       updated_at: this.now(),
     })
 
@@ -201,7 +201,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     // 更新出納單
     await this.update(orderId, {
       payment_request_ids: newRequestIds,
-      total_amount: newTotalAmount,
+      amount: newTotalAmount,
       updated_at: this.now(),
     })
 

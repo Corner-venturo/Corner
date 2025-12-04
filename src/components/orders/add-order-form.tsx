@@ -37,7 +37,7 @@ interface AddOrderFormProps {
 export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: AddOrderFormProps) {
   const { items: tours } = useTourStore()
   const { items: employees, fetchAll: fetchEmployees } = useUserStore()
-  const { currentProfile } = useAuthStore()
+  const { user } = useAuthStore()
 
   // 判斷是否為嵌入模式
   const isEmbedded = !!onChange
@@ -46,7 +46,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
   React.useEffect(() => {}, [employees])
 
   // 取得當前登入使用者的顯示名稱
-  const currentUserName = currentProfile?.display_name || currentProfile?.english_name || ''
+  const currentUserName = user?.display_name || user?.english_name || ''
 
   // 內部 state（獨立模式使用）
   const [internalFormData, setInternalFormData] = useState<Partial<OrderFormData>>({

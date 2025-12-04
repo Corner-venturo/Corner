@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { Attraction, AttractionFormData } from '../types'
 import type { Country, Region, City } from '@/stores/region-store'
+import { supabase } from '@/lib/supabase/client'
+import { Upload, X, Loader2 } from 'lucide-react'
 
 // ============================================
 // 景點對話框組件（新增/編輯共用）
@@ -36,6 +39,9 @@ export function AttractionsDialog({
   initialFormData,
 }: AttractionsDialogProps) {
   const [formData, setFormData] = useState<AttractionFormData>(initialFormData)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 編輯模式：載入景點資料
   useEffect(() => {
@@ -57,10 +63,86 @@ export function AttractionsDialog({
         notes: attraction.notes || '',
         is_active: attraction.is_active,
       })
+      // 載入已有的圖片
+      setUploadedImages(attraction.images || [])
     } else {
       setFormData(initialFormData)
+      setUploadedImages([])
     }
   }, [attraction, initialFormData])
+
+  // 上傳圖片
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    try {
+      const newUrls: string[] = []
+
+      for (const file of Array.from(files)) {
+        // 檢查檔案類型
+        if (!file.type.startsWith('image/')) {
+          alert(`${file.name} 不是圖片檔案`)
+          continue
+        }
+
+        // 生成唯一檔名
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+        const filePath = `attractions/${fileName}`
+
+        // 上傳到 Supabase Storage
+        const { error: uploadError } = await supabase.storage
+          .from('workspace-files')
+          .upload(filePath, file)
+
+        if (uploadError) {
+          console.error('上傳失敗:', uploadError)
+          alert(`${file.name} 上傳失敗`)
+          continue
+        }
+
+        // 取得公開 URL
+        const { data } = supabase.storage
+          .from('workspace-files')
+          .getPublicUrl(filePath)
+
+        newUrls.push(data.publicUrl)
+      }
+
+      // 更新圖片列表
+      const allImages = [...uploadedImages, ...newUrls]
+      setUploadedImages(allImages)
+      setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
+    } catch (error) {
+      console.error('上傳錯誤:', error)
+      alert('上傳過程發生錯誤')
+    } finally {
+      setIsUploading(false)
+      // 清空 input，讓同一檔案可以再次上傳
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  // 移除圖片
+  const handleRemoveImage = (indexToRemove: number) => {
+    const newImages = uploadedImages.filter((_, index) => index !== indexToRemove)
+    setUploadedImages(newImages)
+    setFormData(prev => ({ ...prev, images: newImages.join(', ') }))
+  }
+
+  // 新增網址圖片
+  const handleAddUrlImage = () => {
+    const url = prompt('請輸入圖片網址：')
+    if (url && url.trim()) {
+      const allImages = [...uploadedImages, url.trim()]
+      setUploadedImages(allImages)
+      setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
+    }
+  }
 
   const handleSubmit = async () => {
     const result = await onSubmit(formData)
@@ -264,16 +346,79 @@ export function AttractionsDialog({
         />
       </div>
 
-      {/* 圖片 URL */}
+      {/* 圖片上傳 */}
       <div>
-        <label className="text-sm font-medium">圖片 URL（逗號分隔）</label>
-        <textarea
-          value={formData.images}
-          onChange={e => setFormData(prev => ({ ...prev, images: e.target.value }))}
-          placeholder="https://images.unsplash.com/photo-xxx, https://..."
-          className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm min-h-[80px]"
-        />
-        <p className="text-xs text-morandi-muted mt-1">建議使用 Unsplash 圖片 (1920x1080)</p>
+        <label className="text-sm font-medium">景點圖片</label>
+
+        {/* 上傳按鈕區 */}
+        <div className="flex gap-2 mt-2 mb-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              <>
+                <Loader2 size={16} className="mr-2 animate-spin" />
+                上傳中...
+              </>
+            ) : (
+              <>
+                <Upload size={16} className="mr-2" />
+                上傳圖片
+              </>
+            )}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleAddUrlImage}
+          >
+            貼上網址
+          </Button>
+        </div>
+
+        {/* 已上傳圖片預覽 */}
+        {uploadedImages.length > 0 ? (
+          <div className="grid grid-cols-3 gap-2">
+            {uploadedImages.map((url, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={url}
+                  alt={`圖片 ${index + 1}`}
+                  className="w-full h-20 object-cover rounded-md border border-border"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Error'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border-2 border-dashed border-border rounded-md p-6 text-center text-morandi-muted">
+            <Upload size={24} className="mx-auto mb-2 opacity-50" />
+            <p className="text-sm">尚無圖片，點擊上方按鈕上傳或貼上網址</p>
+          </div>
+        )}
+        <p className="text-xs text-morandi-muted mt-2">建議尺寸 1920x1080，支援 JPG、PNG 格式</p>
       </div>
 
       {/* 備註 */}

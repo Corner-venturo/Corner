@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 
 export const MANIFESTATION_LAST_DATE_KEY = 'manifestation_last_date'
 export const MANIFESTATION_STREAK_KEY = 'manifestation_streak'
@@ -47,8 +47,6 @@ export const loadManifestationFromSupabase = async (
   userId: string
 ): Promise<ManifestationReminderSnapshot | null> => {
   try {
-    const supabase = getSupabaseClient()
-
     // 從 manifestation_records 載入所有記錄
     const { data, error } = await supabase
       .from('manifestation_records')
@@ -109,8 +107,6 @@ export const saveManifestationToSupabase = async (
   content: string = ''
 ): Promise<boolean> => {
   try {
-    const supabase = getSupabaseClient()
-
     const { error } = await supabase.from('manifestation_records').upsert(
       {
         user_id: userId,

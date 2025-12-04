@@ -12,8 +12,6 @@ import type { BaseEntity } from '@/types'
 import type { StoreConfig } from '../core/types'
 import { IndexedDBAdapter } from '../adapters/indexeddb-adapter'
 import { SupabaseAdapter } from '../adapters/supabase-adapter'
-import { SyncCoordinator } from '../sync/coordinator'
-import { MergeStrategy } from '../sync/merge-strategy'
 import { logger } from '@/lib/utils/logger'
 import { getWorkspaceFilterForQuery } from '@/lib/workspace-filter'
 
@@ -30,7 +28,6 @@ export async function fetchAll<T extends BaseEntity>(
   config: StoreConfig,
   indexedDB: IndexedDBAdapter<T>,
   supabase: SupabaseAdapter<T>,
-  sync: SyncCoordinator<T>,
   controller?: AbortController
 ): Promise<T[]> {
   const { tableName, enableSupabase } = config
