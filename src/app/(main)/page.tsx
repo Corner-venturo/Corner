@@ -6,18 +6,35 @@ import { jwtVerify } from 'jose'
 import type { User } from '@/stores/types'
 import type { Workspace, Channel } from '@/stores/workspace/types'
 
-// 驗證JWT token並獲取用戶ID
+// 驗證 token 並獲取用戶ID（支援 base64 和 JWT 格式）
 async function getUserFromToken(): Promise<string | null> {
   const cookieStore = await cookies()
   const authCookie = cookieStore.get('auth-token')
-  
+
   if (!authCookie?.value) {
     return null
   }
 
+  const token = authCookie.value
+
+  // 優先嘗試 base64 解碼（主要的 token 格式）
+  try {
+    const decoded = JSON.parse(atob(token))
+    if (decoded.iss === 'venturo-app' && decoded.id) {
+      // 檢查是否過期
+      if (decoded.exp && Date.now() > decoded.exp) {
+        return null
+      }
+      return decoded.id as string
+    }
+  } catch {
+    // base64 解碼失敗，嘗試 JWT
+  }
+
+  // 嘗試 JWT 驗證
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_in_production_2024')
-    const { payload } = await jwtVerify(authCookie.value, secret, {
+    const { payload } = await jwtVerify(token, secret, {
       issuer: 'venturo-app',
     })
     return payload.id as string
