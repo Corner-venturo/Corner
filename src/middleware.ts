@@ -67,6 +67,7 @@ export async function middleware(request: NextRequest) {
     '/api/health',
     '/api/linkpay', // Webhook 回調
     '/api/gemini', // AI 圖片生成 API
+    '/api/itineraries', // 公開行程 API（給 /view 頁面使用）
     '/view', // 公開行程檢視頁面
     '/_next',
     '/favicon.ico',

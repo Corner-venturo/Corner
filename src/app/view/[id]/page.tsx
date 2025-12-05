@@ -5,6 +5,12 @@ import { useParams } from 'next/navigation'
 import TourPage from '@/components/TourPage'
 import { Loader2 } from 'lucide-react'
 
+interface ItineraryData {
+  title?: string
+  tourCode?: string
+  [key: string]: unknown
+}
+
 /**
  * 公開分享頁面
  * 讓客戶可以不用登入直接查看行程表
@@ -13,7 +19,7 @@ export default function PublicViewPage() {
   const params = useParams()
   const id = params.id as string
 
-  const [data, setData] = useState<unknown>(null)
+  const [data, setData] = useState<ItineraryData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,7 +32,7 @@ export default function PublicViewPage() {
       }
 
       try {
-        const response = await fetch(`/api/itineraries/${id}`)
+        const response = await fetch(`/api/itineraries/${encodeURIComponent(id)}`)
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
@@ -35,6 +41,10 @@ export default function PublicViewPage() {
 
         const itineraryData = await response.json()
         setData(itineraryData)
+
+        // 更新 Chrome 分頁標題
+        const pageTitle = itineraryData.tourCode || itineraryData.title || '行程表'
+        document.title = pageTitle
       } catch (err) {
         console.error('載入行程失敗:', err)
         setError(err instanceof Error ? err.message : '載入行程時發生錯誤')
