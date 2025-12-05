@@ -20,43 +20,32 @@ const JWT_SECRET = process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_
  * 支援 JWT 格式、base64 編碼格式和 Quick-Login Token
  */
 async function verifyAuthToken(token: string): Promise<boolean> {
-  console.log('[Middleware] 驗證 token:', token.substring(0, 50) + '...')
-  console.log('[Middleware] JWT_SECRET configured:', !!process.env.JWT_SECRET)
-
   // 處理 quick-login token 格式（帶 HMAC 簽名驗證）
   if (token.startsWith('quick-login-')) {
-    const result = await verifyQuickLoginToken(token)
-    console.log('[Middleware] quick-login 驗證結果:', result)
-    return result
+    return await verifyQuickLoginToken(token)
   }
 
-  // 嘗試 JWT 驗證
+  // 優先嘗試 base64 解碼（這是主要的 token 格式）
   try {
-    const secret = new TextEncoder().encode(JWT_SECRET)
-    await jwtVerify(token, secret, {
-      issuer: 'venturo-app',
-    })
-    console.log('[Middleware] JWT 驗證成功')
+    const decoded = JSON.parse(atob(token))
+    // 檢查 issuer
+    if (decoded.iss !== 'venturo-app') {
+      return false
+    }
+    // 檢查是否過期
+    if (decoded.exp && Date.now() > decoded.exp) {
+      return false
+    }
     return true
-  } catch (jwtError) {
-    console.log('[Middleware] JWT 驗證失敗，嘗試 base64:', jwtError instanceof Error ? jwtError.message : 'unknown')
-    // JWT 驗證失敗，嘗試 base64 解碼
+  } catch {
+    // base64 失敗，嘗試 JWT 驗證
     try {
-      const decoded = JSON.parse(atob(token))
-      console.log('[Middleware] Base64 解碼成功, iss:', decoded.iss)
-      // 檢查是否過期 (暫時跳過，用於開發測試)
-      if (decoded.exp && Date.now() > decoded.exp * 1000) {
-        console.log('[Middleware] Token expired, but allowing for development')
-        // return false  // 暫時註解掉
-      }
-      // 檢查 issuer
-      if (decoded.iss !== 'venturo-app') {
-        console.log('[Middleware] issuer 不符:', decoded.iss)
-        return false
-      }
+      const secret = new TextEncoder().encode(JWT_SECRET)
+      await jwtVerify(token, secret, {
+        issuer: 'venturo-app',
+      })
       return true
-    } catch (base64Error) {
-      console.log('[Middleware] Base64 解碼也失敗:', base64Error instanceof Error ? base64Error.message : 'unknown')
+    } catch {
       return false
     }
   }
