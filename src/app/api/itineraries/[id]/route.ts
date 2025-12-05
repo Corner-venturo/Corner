@@ -44,11 +44,14 @@ export async function GET(
       )
     }
 
-    // 查詢行程資料
+    // 判斷是 UUID 還是 tourCode
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+
+    // 查詢行程資料（支援 id 或 tour_code）
     const { data: itinerary, error } = await supabaseAdmin
       .from('itineraries')
       .select('*')
-      .eq('id', id)
+      .eq(isUUID ? 'id' : 'tour_code', id)
       .single()
 
     if (error) {
