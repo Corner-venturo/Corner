@@ -50,10 +50,9 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
   const versionRecords = data.version_records || []
   const isEditMode = !!data.id
 
-  // 分享連結（優先使用 tourCode，更友善的 URL）
-  const shareSlug = data.tourCode || data.id
-  const shareUrl = shareSlug
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/view/${shareSlug}`
+  // 分享連結（使用 ID，永久有效）
+  const shareUrl = data.id
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/view/${data.id}`
     : null
 
   // 轉換資料格式（camelCase → snake_case）
