@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Save, GitBranch, Link2, Check, Copy, ExternalLink } from 'lucide-react'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
@@ -42,11 +43,17 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
   const [saving, setSaving] = useState(false)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [versionNote, setVersionNote] = useState('')
+  const [copied, setCopied] = useState(false)
   const { create, update } = useItineraryStore()
   const router = useRouter()
 
   const versionRecords = data.version_records || []
   const isEditMode = !!data.id
+
+  // 分享連結（基於 ID，永久有效）
+  const shareUrl = data.id
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/view/${data.id}`
+    : null
 
   // 轉換資料格式（camelCase → snake_case）
   const convertData = () => ({
@@ -99,14 +106,12 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
           }
           await update(data.id, { version_records: updatedRecords })
         }
-        alert('儲存成功！')
       } else {
         // 第一次建立
         const newItinerary = await create({
           ...convertedData,
           version_records: [],
         } as Parameters<typeof create>[0])
-        alert('儲存行程表成功！')
 
         if (newItinerary?.id) {
           router.replace(`/itinerary/new?itinerary_id=${newItinerary.id}`)
@@ -145,7 +150,6 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       const updatedRecords = [...versionRecords, newVersion]
       await update(data.id, { version_records: updatedRecords })
 
-      alert(`已另存為「${newVersion.note}」`)
       setShowSaveDialog(false)
       setVersionNote('')
 
@@ -163,53 +167,32 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
   const handleVersionSelect = (value: string) => {
     const index = parseInt(value, 10)
     if (index === -1) {
-      // 主版本
       onVersionChange(-1)
     } else {
-      // 其他版本
       const versionData = versionRecords[index]
       onVersionChange(index, versionData)
     }
   }
 
-  // 產生分享連結
-  const generateShareLink = () => {
-    if (!data.id) {
-      alert('請先儲存行程表才能產生連結！')
-      return
-    }
-
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-    const shareUrl = `${baseUrl}/view/${data.id}`
-
-    navigator.clipboard
-      .writeText(shareUrl)
-      .then(() => {
-        alert('分享連結已複製！\n\n' + shareUrl)
-      })
-      .catch(() => {
-        alert('複製失敗，請手動複製：\n' + shareUrl)
-      })
-  }
-
-  // 取得目前版本名稱
-  const getCurrentVersionLabel = () => {
-    if (currentVersionIndex === -1) {
-      return '主版本'
-    }
-    return versionRecords[currentVersionIndex]?.note || `版本 ${currentVersionIndex + 1}`
+  // 複製連結
+  const copyShareLink = () => {
+    if (!shareUrl) return
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
   }
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         {/* 版本選擇器 */}
         {isEditMode && versionRecords.length > 0 && (
           <Select
             value={currentVersionIndex.toString()}
             onValueChange={handleVersionSelect}
           >
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[130px] h-9 text-sm border-morandi-container bg-white">
               <SelectValue placeholder="選擇版本" />
             </SelectTrigger>
             <SelectContent>
@@ -223,71 +206,99 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
           </Select>
         )}
 
-        {/* 目前版本標籤（沒有其他版本時顯示） */}
-        {isEditMode && versionRecords.length === 0 && (
-          <span className="text-sm text-morandi-secondary font-medium">
-            主版本
-          </span>
-        )}
+        {/* 按鈕群組 */}
+        <div className="flex items-center rounded-lg border border-morandi-container overflow-hidden bg-white shadow-sm">
+          {/* 儲存按鈕 */}
+          <button
+            onClick={saveItinerary}
+            disabled={saving}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-morandi-primary hover:bg-morandi-container/50 disabled:opacity-50 transition-colors"
+          >
+            <Save size={15} />
+            {saving ? '儲存中...' : '儲存'}
+          </button>
 
-        {/* 儲存按鈕 */}
-        <Button
-          onClick={saveItinerary}
-          disabled={saving}
-          className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-        >
-          {saving ? '儲存中...' : isEditMode ? '儲存' : '儲存行程表'}
-        </Button>
+          {/* 分隔線 */}
+          {isEditMode && <div className="w-px h-6 bg-morandi-container" />}
 
-        {/* 另存新版本按鈕（僅編輯模式顯示） */}
-        {isEditMode && (
-          <>
-            <Button
+          {/* 另存新版本按鈕 */}
+          {isEditMode && (
+            <button
               onClick={() => setShowSaveDialog(true)}
               disabled={saving}
-              variant="default"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-morandi-secondary hover:bg-morandi-container/50 hover:text-morandi-primary disabled:opacity-50 transition-colors"
+              title="另存新版本"
             >
-              另存新版本
-            </Button>
+              <GitBranch size={15} />
+              <span className="hidden sm:inline">新版本</span>
+            </button>
+          )}
+        </div>
 
-            <Button
-              onClick={generateShareLink}
-              variant="secondary"
+        {/* 分享連結區塊 */}
+        {isEditMode && shareUrl && (
+          <div className="flex items-center gap-1 px-2 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
+            <Link2 size={14} className="text-emerald-600 flex-shrink-0" />
+            <span className="text-xs text-emerald-700 max-w-[120px] truncate hidden sm:block">
+              {shareUrl.replace(/^https?:\/\//, '').split('/view/')[0]}/...
+            </span>
+            <button
+              onClick={copyShareLink}
+              className="p-1 hover:bg-emerald-100 rounded transition-colors"
+              title="複製連結"
             >
-              產生連結
-            </Button>
-          </>
+              {copied ? (
+                <Check size={14} className="text-emerald-600" />
+              ) : (
+                <Copy size={14} className="text-emerald-600" />
+              )}
+            </button>
+            <a
+              href={shareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1 hover:bg-emerald-100 rounded transition-colors"
+              title="在新分頁開啟"
+            >
+              <ExternalLink size={14} className="text-emerald-600" />
+            </a>
+          </div>
         )}
       </div>
 
       {/* 另存新版本 Dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>另存新版本</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <GitBranch size={18} />
+              另存新版本
+            </DialogTitle>
             <DialogDescription>
               為這個版本取一個名稱，方便之後辨識。
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="version-note" className="text-right">
-                版本名稱
-              </Label>
-              <Input
-                id="version-note"
-                value={versionNote}
-                onChange={(e) => setVersionNote(e.target.value)}
-                placeholder={`版本 ${versionRecords.length + 1}`}
-                className="col-span-3"
-              />
-            </div>
+          <div className="py-4">
+            <Label htmlFor="version-note" className="text-sm font-medium">
+              版本名稱
+            </Label>
+            <Input
+              id="version-note"
+              value={versionNote}
+              onChange={(e) => setVersionNote(e.target.value)}
+              placeholder={`版本 ${versionRecords.length + 1}`}
+              className="mt-2"
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
               取消
             </Button>
-            <Button onClick={saveAsNewVersion} disabled={saving}>
+            <Button
+              onClick={saveAsNewVersion}
+              disabled={saving}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            >
               {saving ? '儲存中...' : '確認另存'}
             </Button>
           </DialogFooter>
