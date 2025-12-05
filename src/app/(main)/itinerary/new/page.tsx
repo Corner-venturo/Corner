@@ -919,11 +919,11 @@ function NewItineraryPageContent() {
     <div className="h-full flex flex-col">
       {/* ========== 頁面頂部區域 ========== */}
       <ResponsiveHeader
-        title="新增網頁行程"
+        title={tourData.tourCode ? `編輯行程 - ${tourData.tourCode}` : "新增網頁行程"}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '行程管理', href: '/itinerary' },
-          { label: '新增網頁行程', href: '#' },
+          { label: tourData.tourCode ? `編輯 - ${tourData.tourCode}` : '新增網頁行程', href: '#' },
         ]}
         showBackButton={true}
         onBack={() => router.push('/itinerary')}
