@@ -360,6 +360,8 @@ export interface Itinerary {
 
   created_at: string
   updated_at: string
+  created_by?: string
+  archived_at?: string | null
 }
 
 // Order 類型已移至 @/types/order.types.ts

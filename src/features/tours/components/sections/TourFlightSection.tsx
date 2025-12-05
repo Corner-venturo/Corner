@@ -73,10 +73,12 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
 
                 <div className="flex-1 flex flex-col items-center px-3">
                   <div className="text-xs text-morandi-secondary mb-3">飛行時間</div>
-                  <div className="w-full border-t-2 border-dashed border-morandi-container relative my-2">
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-morandi-gold/10 px-1.5 py-0.5 rounded-full">
+                  <div className="w-full flex items-center justify-center gap-2 my-2">
+                    <div className="flex-1 border-t-2 border-dashed border-morandi-container" />
+                    <div className="bg-morandi-gold/10 px-2 py-1 rounded-full">
                       <Plane className="w-3 h-3 text-morandi-gold" />
                     </div>
+                    <div className="flex-1 border-t-2 border-dashed border-morandi-container" />
                   </div>
                   <div className="text-xs font-semibold text-morandi-primary mt-3">
                     {data.outboundFlight?.duration || '2小時5分'}
@@ -107,7 +109,7 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-morandi-secondary to-morandi-secondary/80 rounded-xl flex items-center justify-center shadow-lg">
-                <Plane className="w-6 h-6 text-white rotate-180" />
+                <Plane className="w-6 h-6 text-white -scale-x-100" />
               </div>
               <div>
                 <div className="text-xs text-morandi-secondary">回程航班</div>
@@ -135,10 +137,12 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
 
                 <div className="flex-1 flex flex-col items-center px-3">
                   <div className="text-xs text-morandi-secondary mb-3">飛行時間</div>
-                  <div className="w-full border-t-2 border-dashed border-morandi-container relative my-2">
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-morandi-secondary/10 px-1.5 py-0.5 rounded-full">
-                      <Plane className="w-3 h-3 text-morandi-secondary rotate-180" />
+                  <div className="w-full flex items-center justify-center gap-2 my-2">
+                    <div className="flex-1 border-t-2 border-dashed border-morandi-container" />
+                    <div className="bg-morandi-secondary/10 px-2 py-1 rounded-full">
+                      <Plane className="w-3 h-3 text-morandi-secondary -scale-x-100" />
                     </div>
+                    <div className="flex-1 border-t-2 border-dashed border-morandi-container" />
                   </div>
                   <div className="text-xs font-semibold text-morandi-primary mt-3">
                     {data.returnFlight?.duration || '2小時30分'}

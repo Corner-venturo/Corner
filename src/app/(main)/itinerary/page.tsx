@@ -6,18 +6,26 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { MapPin, Eye, Copy, Trash2 } from 'lucide-react'
+import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useItineraries } from '@/hooks/cloud-hooks'
+import { useItineraries, useEmployees } from '@/hooks/cloud-hooks'
 import type { Itinerary } from '@/stores/types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 
-const statusFilters = ['全部', '草稿', '已發布']
+const statusFilters = ['全部', '草稿', '已發布', '封存']
 
 export default function ItineraryPage() {
   const router = useRouter()
-  const { items: itineraries, delete: deleteItinerary } = useItineraries()
+  const { items: itineraries, delete: deleteItinerary, update: updateItinerary } = useItineraries()
+  const { items: employees } = useEmployees()
   const [statusFilter, setStatusFilter] = useState<string>('全部')
+
+  // 根據 created_by ID 查找員工名稱
+  const getEmployeeName = useCallback((employeeId?: string) => {
+    if (!employeeId) return '-'
+    const employee = employees.find(e => e.id === employeeId)
+    return employee?.name || '-'
+  }, [employees])
   const [searchTerm, setSearchTerm] = useState('')
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
 
@@ -49,18 +57,49 @@ export default function ItineraryPage() {
     // 待實作: 複製邏輯
   }, [])
 
-  // 刪除行程
+  // 封存行程
+  const handleArchive = useCallback(
+    async (id: string) => {
+      const confirmed = await confirm('確定要封存這個行程嗎？封存後可在「封存」分頁中找到。', {
+        type: 'warning',
+        title: '封存行程',
+      })
+      if (confirmed) {
+        try {
+          await updateItinerary(id, { archived_at: new Date().toISOString() })
+          await alertSuccess('已封存！')
+        } catch (error) {
+          await alertError('封存失敗，請稍後再試')
+        }
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 取消封存
+  const handleUnarchive = useCallback(
+    async (id: string) => {
+      try {
+        await updateItinerary(id, { archived_at: null })
+        await alertSuccess('已取消封存！')
+      } catch (error) {
+        await alertError('操作失敗，請稍後再試')
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 刪除行程（僅封存列表可用）
   const handleDelete = useCallback(
     async (id: string) => {
-      const confirmed = await confirm('確定要刪除這個行程嗎？', {
+      const confirmed = await confirm('確定要永久刪除這個行程嗎？此操作無法復原！', {
         type: 'warning',
-        title: '刪除行程',
+        title: '永久刪除行程',
       })
       if (confirmed) {
         try {
           await deleteItinerary(id)
-          await alertSuccess('刪除成功！')
-          // Store 會自動更新，不需要重新載入
+          await alertSuccess('已永久刪除！')
         } catch (error) {
           await alertError('刪除失敗，請稍後再試')
         }
@@ -128,6 +167,16 @@ export default function ItineraryPage() {
         ),
       },
       {
+        key: 'created_by',
+        label: '作者',
+        sortable: true,
+        render: (_value, itinerary) => (
+          <span className="text-sm text-morandi-secondary">
+            {getEmployeeName(itinerary.created_by)}
+          </span>
+        ),
+      },
+      {
         key: 'created_at',
         label: '建立時間',
         sortable: true,
@@ -140,55 +189,80 @@ export default function ItineraryPage() {
       {
         key: 'actions',
         label: '操作',
-        render: (_value, itinerary) => (
-          <div className="flex items-center gap-1">
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                // 使用當前網站的網址（會自動適配 localhost / Vercel 等環境）
-                const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-                const shareUrl = `${baseUrl}/view/${itinerary.id}`
-
-                // 複製到剪貼簿
-                navigator.clipboard
-                  .writeText(shareUrl)
-                  .then(() => {
-                    alertSuccess('分享連結已複製！\n\n' + shareUrl)
-                  })
-                  .catch(err => {
-                    alertError('複製失敗，請手動複製：\n' + shareUrl)
-                  })
-              }}
-              className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-              title="產生分享連結"
-            >
-              <Eye size={14} />
-            </button>
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                handleDuplicate(itinerary.id)
-              }}
-              className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-              title="複製行程"
-            >
-              <Copy size={14} />
-            </button>
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                handleDelete(itinerary.id)
-              }}
-              className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-              title="刪除行程"
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
-        ),
+        render: (_value, itinerary) => {
+          const isArchived = !!itinerary.archived_at
+          return (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+                  const shareUrl = `${baseUrl}/view/${itinerary.id}`
+                  navigator.clipboard
+                    .writeText(shareUrl)
+                    .then(() => {
+                      alertSuccess('分享連結已複製！\n\n' + shareUrl)
+                    })
+                    .catch(() => {
+                      alertError('複製失敗，請手動複製：\n' + shareUrl)
+                    })
+                }}
+                className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
+                title="產生分享連結"
+              >
+                <Eye size={14} />
+              </button>
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  handleDuplicate(itinerary.id)
+                }}
+                className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
+                title="複製行程"
+              >
+                <Copy size={14} />
+              </button>
+              {isArchived ? (
+                <>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleUnarchive(itinerary.id)
+                    }}
+                    className="p-1 text-morandi-green/60 hover:text-morandi-green hover:bg-morandi-green/10 rounded transition-colors"
+                    title="取消封存"
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleDelete(itinerary.id)
+                    }}
+                    className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+                    title="永久刪除"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleArchive(itinerary.id)
+                  }}
+                  className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
+                  title="封存"
+                >
+                  <Archive size={14} />
+                </button>
+              )}
+            </div>
+          )
+        },
       },
     ],
-    [handleDelete, handleDuplicate]
+    [handleDelete, handleDuplicate, handleArchive, handleUnarchive, getEmployeeName]
   )
 
   // 過濾資料
@@ -196,8 +270,18 @@ export default function ItineraryPage() {
     let filtered = itineraries
 
     // 狀態篩選
-    if (statusFilter !== '全部') {
-      filtered = filtered.filter(item => item.status === statusFilter)
+    if (statusFilter === '封存') {
+      // 顯示已封存的項目
+      filtered = filtered.filter(item => !!item.archived_at)
+    } else {
+      // 其他分頁：只顯示未封存的項目
+      filtered = filtered.filter(item => !item.archived_at)
+
+      if (statusFilter === '草稿') {
+        filtered = filtered.filter(item => item.status === 'draft')
+      } else if (statusFilter === '已發布') {
+        filtered = filtered.filter(item => item.status === 'published')
+      }
     }
 
     // 搜尋 - 搜尋所有文字欄位

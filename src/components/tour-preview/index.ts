@@ -14,3 +14,5 @@ export type { DecorativeDividerProps } from './DecorativeDivider'
 
 export { AttractionCard } from './AttractionCard'
 export type { AttractionCardProps } from './AttractionCard'
+
+export { MobileActivityCarousel } from './MobileActivityCarousel'

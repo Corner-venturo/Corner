@@ -4,7 +4,7 @@
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
 
 -- 2. Drop any existing policies for a clean slate.
-DROP POLICY IF EXISTS "Users can manage their own preferences" ON public.user_prefernces;
+DROP POLICY IF EXISTS "Users can manage their own preferences" ON public.user_preferences;
 DROP POLICY IF EXISTS "Users can view their own preferences" ON public.user_preferences;
 DROP POLICY IF EXISTS "Users can insert their own preferences" ON public.user_preferences;
 DROP POLICY IF EXISTS "Users can update their own preferences" ON public.user_preferences;

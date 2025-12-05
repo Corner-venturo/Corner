@@ -8,6 +8,7 @@ export interface AttractionCardProps {
   image?: string
   layout?: 'horizontal' | 'vertical' | 'fullwidth' | 'hero'
   className?: string
+  onClick?: () => void
 }
 
 /**
@@ -20,6 +21,7 @@ export function AttractionCard({
   image,
   layout = 'horizontal',
   className = '',
+  onClick,
 }: AttractionCardProps) {
   const hasImage = image && image.length > 0
 
@@ -27,11 +29,12 @@ export function AttractionCard({
   if (layout === 'hero') {
     return (
       <div
-        className={`relative h-[400px] rounded-[24px] overflow-hidden ${className}`}
+        className={`relative h-[400px] rounded-[24px] overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
         style={{
           backgroundColor: morandiColors.background.cream,
           boxShadow: `0 4px 20px ${morandiColors.shadow.medium}`,
         }}
+        onClick={onClick}
       >
         {hasImage && (
           <Image
@@ -63,12 +66,13 @@ export function AttractionCard({
   if (layout === 'fullwidth') {
     return (
       <div
-        className={`rounded-[24px] overflow-hidden ${className}`}
+        className={`rounded-[24px] overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
         style={{
           backgroundColor: morandiColors.background.white,
           border: `1px solid ${morandiColors.border.light}`,
           boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`,
         }}
+        onClick={onClick}
       >
         {hasImage && (
           <div className="relative w-full h-72">
@@ -97,12 +101,13 @@ export function AttractionCard({
   if (layout === 'vertical') {
     return (
       <div
-        className={`rounded-[24px] overflow-hidden ${className}`}
+        className={`rounded-[24px] overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
         style={{
           backgroundColor: morandiColors.background.white,
           border: `1px solid ${morandiColors.border.light}`,
           boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`,
         }}
+        onClick={onClick}
       >
         {hasImage && (
           <div className="relative w-full h-56">
@@ -133,12 +138,13 @@ export function AttractionCard({
   // Horizontal layout - 預設佈局（無圖片時為緊湊文字卡片）
   return (
     <div
-      className={`rounded-[16px] overflow-hidden flex flex-col ${hasImage ? 'p-5' : 'p-4'} ${className}`}
+      className={`rounded-[16px] overflow-hidden flex flex-col ${hasImage ? 'p-5' : 'p-4'} ${className} ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
       style={{
         backgroundColor: hasImage ? morandiColors.background.white : morandiColors.background.cream,
         border: `1px solid ${morandiColors.border.light}`,
         boxShadow: `0 1px 8px ${morandiColors.shadow.soft}`,
       }}
+      onClick={onClick}
     >
       {hasImage ? (
         <div className="flex gap-5">

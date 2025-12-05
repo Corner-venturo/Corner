@@ -21,9 +21,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Save, GitBranch, Link2, Check, Copy, ExternalLink } from 'lucide-react'
+import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink } from 'lucide-react'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
@@ -183,20 +188,53 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     })
   }
 
+  // 取得目前版本名稱
+  const getCurrentVersionName = () => {
+    if (currentVersionIndex === -1) return '主版本'
+    const record = versionRecords[currentVersionIndex]
+    return record?.note || `版本 ${record?.version || currentVersionIndex + 1}`
+  }
+
   return (
     <>
-      <div className="flex items-center gap-3">
-        {/* 版本選擇器 */}
-        {isEditMode && versionRecords.length > 0 && (
+      <div className="flex items-center gap-2">
+        {/* 1. 存檔按鈕 */}
+        <Button
+          onClick={saveItinerary}
+          disabled={saving}
+          size="sm"
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white h-8 px-3"
+        >
+          <Save size={14} className="mr-1.5" />
+          {saving ? '儲存中...' : '存檔'}
+        </Button>
+
+        {/* 2. 另存按鈕（編輯模式才顯示）*/}
+        {isEditMode && (
+          <Button
+            onClick={() => setShowSaveDialog(true)}
+            disabled={saving}
+            size="sm"
+            variant="outline"
+            className="h-8 px-3 border-morandi-container hover:bg-morandi-container/30"
+          >
+            <FilePlus size={14} className="mr-1.5" />
+            另存
+          </Button>
+        )}
+
+        {/* 3. 版本選擇器（編輯模式就顯示）*/}
+        {isEditMode && (
           <Select
             value={currentVersionIndex.toString()}
             onValueChange={handleVersionSelect}
           >
-            <SelectTrigger className="w-[130px] h-9 text-sm border-morandi-container bg-white">
-              <SelectValue placeholder="選擇版本" />
+            <SelectTrigger className="w-auto min-w-[100px] h-8 text-xs border-morandi-container bg-white">
+              <History size={14} className="mr-1.5 text-morandi-secondary" />
+              <SelectValue placeholder="版本" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="-1">主版本</SelectItem>
+              <SelectItem value="-1">{data.tourCode || '原始版本'}</SelectItem>
               {versionRecords.map((record, index) => (
                 <SelectItem key={record.id} value={index.toString()}>
                   {record.note || `版本 ${record.version}`}
@@ -206,63 +244,53 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
           </Select>
         )}
 
-        {/* 按鈕群組 */}
-        <div className="flex items-center rounded-lg border border-morandi-container overflow-hidden bg-white shadow-sm">
-          {/* 儲存按鈕 */}
-          <button
-            onClick={saveItinerary}
-            disabled={saving}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-morandi-primary hover:bg-morandi-container/50 disabled:opacity-50 transition-colors"
-          >
-            <Save size={15} />
-            {saving ? '儲存中...' : '儲存'}
-          </button>
-
-          {/* 分隔線 */}
-          {isEditMode && <div className="w-px h-6 bg-morandi-container" />}
-
-          {/* 另存新版本按鈕 */}
-          {isEditMode && (
-            <button
-              onClick={() => setShowSaveDialog(true)}
-              disabled={saving}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-morandi-secondary hover:bg-morandi-container/50 hover:text-morandi-primary disabled:opacity-50 transition-colors"
-              title="另存新版本"
-            >
-              <GitBranch size={15} />
-              <span className="hidden sm:inline">新版本</span>
-            </button>
-          )}
-        </div>
-
-        {/* 分享連結區塊 */}
+        {/* 4. 連結按鈕（編輯模式且有 shareUrl 才顯示）*/}
         {isEditMode && shareUrl && (
-          <div className="flex items-center gap-1 px-2 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
-            <Link2 size={14} className="text-emerald-600 flex-shrink-0" />
-            <span className="text-xs text-emerald-700 max-w-[120px] truncate hidden sm:block">
-              {shareUrl.replace(/^https?:\/\//, '').split('/view/')[0]}/...
-            </span>
-            <button
-              onClick={copyShareLink}
-              className="p-1 hover:bg-emerald-100 rounded transition-colors"
-              title="複製連結"
-            >
-              {copied ? (
-                <Check size={14} className="text-emerald-600" />
-              ) : (
-                <Copy size={14} className="text-emerald-600" />
-              )}
-            </button>
-            <a
-              href={shareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1 hover:bg-emerald-100 rounded transition-colors"
-              title="在新分頁開啟"
-            >
-              <ExternalLink size={14} className="text-emerald-600" />
-            </a>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-3 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+              >
+                <Link2 size={14} className="mr-1.5" />
+                連結
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-3" align="end">
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-morandi-primary">分享連結</div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={shareUrl}
+                    readOnly
+                    className="text-xs h-8 bg-gray-50"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-2 flex-shrink-0"
+                    onClick={copyShareLink}
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-2 flex-shrink-0"
+                    asChild
+                  >
+                    <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink size={14} />
+                    </a>
+                  </Button>
+                </div>
+                <p className="text-xs text-morandi-secondary">
+                  此連結可分享給客戶，無需登入即可查看行程
+                </p>
+              </div>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
 
@@ -271,7 +299,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <GitBranch size={18} />
+              <FilePlus size={18} />
               另存新版本
             </DialogTitle>
             <DialogDescription>

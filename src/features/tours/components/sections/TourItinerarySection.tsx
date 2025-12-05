@@ -1,14 +1,16 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { DailyImageCarousel } from './DailyImageCarousel'
-import { MutableRefObject } from 'react'
+import { MutableRefObject, useState } from 'react'
 import {
   DayLabel,
   DateSubtitle,
   AttractionCard,
   DecorativeDivider,
+  MobileActivityCarousel,
 } from '@/components/tour-preview'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Sparkles, X } from 'lucide-react'
+import Image from 'next/image'
 import { TourFormData } from '@/components/editor/tour-form/types'
 
 interface TourItinerarySectionProps {
@@ -30,8 +32,8 @@ function renderTitleWithIcons(title: string, viewMode: 'desktop' | 'mobile') {
         <ArrowRight
           key={index}
           size={iconSize}
-          className="inline-block mx-0.5 text-morandi-primary align-middle"
-          style={{ verticalAlign: 'middle', marginTop: '-1px' }}
+          className="inline-block text-morandi-primary align-middle"
+          style={{ verticalAlign: 'middle', marginTop: '-1px', margin: viewMode === 'mobile' ? '0 1px' : '0 2px' }}
         />
       )
     } else if (part === ' ⭐ ') {
@@ -39,12 +41,12 @@ function renderTitleWithIcons(title: string, viewMode: 'desktop' | 'mobile') {
         <Sparkles
           key={index}
           size={iconSize}
-          className="inline-block mx-0.5 text-morandi-gold align-middle"
-          style={{ verticalAlign: 'middle', marginTop: '-1px' }}
+          className="inline-block text-morandi-gold align-middle"
+          style={{ verticalAlign: 'middle', marginTop: '-1px', margin: viewMode === 'mobile' ? '0 1px' : '0 2px' }}
         />
       )
     } else if (part === ' · ' || part === ' | ') {
-      return <span key={index} className="mx-0.5 text-morandi-secondary">{part.trim()}</span>
+      return <span key={index} className="text-morandi-secondary" style={{ margin: viewMode === 'mobile' ? '0 1px' : '0 2px' }}>{part.trim()}</span>
     } else {
       return <span key={index}>{part}</span>
     }
@@ -59,6 +61,20 @@ export function TourItinerarySection({
   handleDayNavigate,
 }: TourItinerarySectionProps) {
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
+  const [selectedActivity, setSelectedActivity] = useState<{
+    title: string
+    description?: string
+    image?: string
+  } | null>(null)
+
+  // 創建點擊處理函數
+  const handleActivityClick = (activity: any) => {
+    setSelectedActivity({
+      title: activity.title,
+      description: activity.description,
+      image: activity.image
+    })
+  }
 
   return (
     <section
@@ -70,12 +86,12 @@ export function TourItinerarySection({
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className={viewMode === 'mobile' ? 'text-center mb-4' : 'text-center mb-12'}
         >
           <h2
             className={
               viewMode === 'mobile'
-                ? 'text-2xl font-bold text-morandi-primary mb-4'
+                ? 'text-2xl font-bold text-morandi-primary'
                 : 'text-4xl font-bold text-morandi-primary mb-4'
             }
           >
@@ -85,7 +101,7 @@ export function TourItinerarySection({
 
         <div>
           <div>
-            <div className="space-y-12">
+            <div className={viewMode === 'mobile' ? 'space-y-2' : 'space-y-12'}>
               {dailyItinerary.map((day, index: number) => (
                 <article
                   key={`day-section-${index}`}
@@ -104,19 +120,30 @@ export function TourItinerarySection({
                     viewMode === 'mobile' ? 'mb-4' : 'mb-6'
                   )}>
                     <div className="absolute -top-4 -left-4 w-24 h-24 bg-morandi-gold/20 rounded-full blur-2xl" />
-                    <div className="relative flex flex-wrap items-center gap-3 md:gap-4 mb-2 md:mb-3">
-                      <DayLabel dayNumber={index + 1} variant={viewMode === 'mobile' ? 'small' : 'default'} />
-                      {day.date && <DateSubtitle date={day.date} />}
-                    </div>
-                    {day.title && (
-                      <h3 className={cn(
-                        "relative leading-relaxed text-morandi-primary flex items-center flex-wrap",
-                        viewMode === 'mobile'
-                          ? 'text-xs font-semibold'
-                          : 'text-xl font-bold'
-                      )}>
-                        {renderTitleWithIcons(day.title, viewMode)}
-                      </h3>
+                    {viewMode === 'mobile' ? (
+                      <div className="relative flex items-center gap-3">
+                        <DayLabel dayNumber={index + 1} variant="small" />
+                        <div className="flex-1 min-w-0">
+                          {day.date && <DateSubtitle date={day.date} />}
+                          {day.title && (
+                            <h3 className="text-[10px] font-semibold leading-relaxed text-morandi-primary flex items-center flex-wrap mt-1">
+                              {renderTitleWithIcons(day.title, viewMode)}
+                            </h3>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="relative flex items-center gap-3 md:gap-4 mb-2 md:mb-3">
+                          <DayLabel dayNumber={index + 1} variant="default" />
+                          {day.date && <DateSubtitle date={day.date} />}
+                        </div>
+                        {day.title && (
+                          <h3 className="relative text-xl font-bold leading-relaxed text-morandi-primary">
+                            {renderTitleWithIcons(day.title, viewMode)}
+                          </h3>
+                        )}
+                      </>
                     )}
                   </div>
 
@@ -147,126 +174,167 @@ export function TourItinerarySection({
                     <div className="mb-6 space-y-3 overflow-hidden">
                       <DecorativeDivider variant="simple" />
                       {viewMode === 'mobile' ? (
-                        // 手機版：智能排版
-                        <div className="space-y-3 px-4">
-                          {(() => {
-                            const withImage = day.activities.filter(a => a.image)
-                            const withoutImage = day.activities.filter(a => !a.image)
-
-                            // 如果有圖片的活動存在，顯示為大卡片
-                            // 無圖片的活動顯示為小卡片列表
-                            return (
-                              <>
-                                {withImage.map((activity, actIndex) => (
-                                  <AttractionCard
-                                    key={`activity-img-${index}-${actIndex}`}
-                                    title={activity.title}
-                                    description={activity.description || ''}
-                                    image={activity.image}
-                                    layout="vertical"
-                                    className="w-full"
-                                  />
-                                ))}
-                                {withoutImage.length > 0 && (
-                                  <div className="space-y-2">
-                                    {withoutImage.map((activity, actIndex) => (
-                                      <AttractionCard
-                                        key={`activity-noimg-${index}-${actIndex}`}
-                                        title={activity.title}
-                                        description={activity.description || ''}
-                                        layout="horizontal"
-                                        className="w-full"
-                                      />
-                                    ))}
-                                  </div>
-                                )}
-                              </>
-                            )
-                          })()}
-                        </div>
+                        // 手機版：使用滿版滑動輪播組件，沒圖片的也用大卡片
+                        <MobileActivityCarousel
+                          activities={day.activities.map(a => ({
+                            title: a.title,
+                            description: a.description,
+                            image: a.image || '', // 空字串讓組件知道沒圖片，但仍顯示大卡片
+                          }))}
+                        />
                       ) : (
-                        // 桌面版：智能混合排版
+                        // 桌面版：智能排版 - 根據圖片數量自動調整
                         (() => {
-                          const withImage = day.activities.filter(a => a.image)
-                          const withoutImage = day.activities.filter(a => !a.image)
-
-                          // 情境1：全部都有圖片 → 等寬 Grid
+                          const withImage = day.activities.filter(a => a.image && a.image.trim() !== '')
+                          const withoutImage = day.activities.filter(a => !a.image || a.image.trim() === '')
+                          
+                          // 情況1：都有圖片 - 標準網格
                           if (withoutImage.length === 0) {
                             return (
                               <div className={cn(
-                                "grid gap-5",
+                                "grid gap-4",
                                 withImage.length === 1 && "grid-cols-1",
-                                withImage.length === 2 && "grid-cols-2",
-                                withImage.length >= 3 && "grid-cols-3"
+                                withImage.length === 2 && "grid-cols-1 md:grid-cols-2", 
+                                withImage.length === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+                                withImage.length >= 4 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                               )}>
                                 {withImage.map((activity, actIndex) => (
                                   <AttractionCard
-                                    key={`activity-${index}-${actIndex}`}
+                                    key={`activity-${actIndex}`}
                                     title={activity.title}
                                     description={activity.description || ''}
                                     image={activity.image}
                                     layout="vertical"
                                     className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                    onClick={() => handleActivityClick(activity)}
                                   />
                                 ))}
                               </div>
                             )
                           }
-
-                          // 情境2：全部都沒圖片 → 橫向小卡片
+                          
+                          // 情況2：都沒圖片 - 標準網格，用 horizontal layout
                           if (withImage.length === 0) {
                             return (
                               <div className={cn(
                                 "grid gap-4",
                                 withoutImage.length === 1 && "grid-cols-1",
-                                withoutImage.length === 2 && "grid-cols-2",
-                                withoutImage.length >= 3 && "grid-cols-3"
+                                withoutImage.length === 2 && "grid-cols-1 md:grid-cols-2", 
+                                withoutImage.length === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+                                withoutImage.length >= 4 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                               )}>
                                 {withoutImage.map((activity, actIndex) => (
                                   <AttractionCard
-                                    key={`activity-${index}-${actIndex}`}
+                                    key={`activity-${actIndex}`}
                                     title={activity.title}
                                     description={activity.description || ''}
+                                    image={activity.image}
                                     layout="horizontal"
-                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                    onClick={() => handleActivityClick(activity)}
                                   />
                                 ))}
                               </div>
                             )
                           }
-
-                          // 情境3：混合（有圖 + 無圖）→ 左大右小佈局
-                          return (
-                            <div className="flex gap-5 items-stretch">
-                              {/* 左側：有圖片的大卡片 */}
-                              <div className={cn(
-                                "flex-1 grid gap-5 content-start",
-                                withImage.length === 1 && "grid-cols-1",
-                                withImage.length >= 2 && "grid-cols-2"
-                              )}>
-                                {withImage.map((activity, actIndex) => (
+                          
+                          // 情況3：1張有圖 + 其他沒圖 - 左一右多
+                          if (withImage.length === 1) {
+                            return (
+                              <div className="flex flex-col md:flex-row gap-4">
+                                {/* 左側：有圖片的景點 */}
+                                <div className="flex-1 md:flex-[2]">
                                   <AttractionCard
-                                    key={`activity-img-${index}-${actIndex}`}
-                                    title={activity.title}
-                                    description={activity.description || ''}
-                                    image={activity.image}
-                                    layout="vertical"
+                                    title={withImage[0].title}
+                                    description={withImage[0].description || ''}
+                                    image={withImage[0].image}
+                                    layout="fullwidth"
                                     className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                    onClick={() => handleActivityClick(withImage[0])}
                                   />
-                                ))}
+                                </div>
+                                
+                                {/* 右側：沒圖片的景點，垂直排列 */}
+                                <div className="flex-1 flex flex-col gap-4">
+                                  {withoutImage.map((activity, actIndex) => (
+                                    <div key={`without-image-${actIndex}`} className="flex-1">
+                                      <AttractionCard
+                                        title={activity.title}
+                                        description={activity.description || ''}
+                                        image={activity.image}
+                                        layout="horizontal"
+                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full"
+                                        onClick={() => handleActivityClick(activity)}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                              {/* 右側：無圖片的小卡片堆疊（均勻分配高度） */}
-                              <div className="w-72 flex-shrink-0 flex flex-col gap-3">
-                                {withoutImage.map((activity, actIndex) => (
-                                  <AttractionCard
-                                    key={`activity-noimg-${index}-${actIndex}`}
-                                    title={activity.title}
-                                    description={activity.description || ''}
-                                    layout="horizontal"
-                                    className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                                  />
-                                ))}
+                            )
+                          }
+                          
+                          // 情況4：多張有圖 + 少數沒圖 - 先排有圖的，沒圖的補在後面
+                          if (withImage.length >= 2 && withoutImage.length <= 2) {
+                            return (
+                              <div className="space-y-4">
+                                {/* 有圖片的景點 - 網格排列 */}
+                                <div className={cn(
+                                  "grid gap-4",
+                                  withImage.length === 2 && "grid-cols-1 md:grid-cols-2",
+                                  withImage.length === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+                                  withImage.length >= 4 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                                )}>
+                                  {withImage.map((activity, actIndex) => (
+                                    <AttractionCard
+                                      key={`with-image-${actIndex}`}
+                                      title={activity.title}
+                                      description={activity.description || ''}
+                                      image={activity.image}
+                                      layout="vertical"
+                                      className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                      onClick={() => handleActivityClick(activity)}
+                                    />
+                                  ))}
+                                </div>
+                                
+                                {/* 沒圖片的景點 - 水平排列 */}
+                                {withoutImage.length > 0 && (
+                                  <div className={cn(
+                                    "grid gap-4",
+                                    withoutImage.length === 1 && "grid-cols-1",
+                                    withoutImage.length >= 2 && "grid-cols-1 md:grid-cols-2"
+                                  )}>
+                                    {withoutImage.map((activity, actIndex) => (
+                                      <AttractionCard
+                                        key={`without-image-${actIndex}`}
+                                        title={activity.title}
+                                        description={activity.description || ''}
+                                        image={activity.image}
+                                        layout="horizontal"
+                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                        onClick={() => handleActivityClick(activity)}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
                               </div>
+                            )
+                          }
+                          
+                          // 情況5：太多景點 - 統一網格
+                          return (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                              {day.activities.map((activity, actIndex) => (
+                                <AttractionCard
+                                  key={`activity-${actIndex}`}
+                                  title={activity.title}
+                                  description={activity.description || ''}
+                                  image={activity.image}
+                                  layout={activity.image ? "vertical" : "horizontal"}
+                                  className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                  onClick={() => handleActivityClick(activity)}
+                                />
+                              ))}
                             </div>
                           )
                         })()
@@ -294,56 +362,58 @@ export function TourItinerarySection({
                   )}
 
                   <div className={cn(
-                    "grid grid-cols-3",
-                    viewMode === 'mobile' ? 'gap-2' : 'gap-3'
+                    "grid",
+                    viewMode === 'mobile' 
+                      ? 'grid-cols-3 gap-1' 
+                      : 'grid-cols-1 md:grid-cols-3 gap-4'
                   )}>
                     <div className={cn(
-                      "border border-morandi-gold/30 bg-morandi-gold/5",
+                      "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
                       viewMode === 'mobile'
-                        ? 'rounded-xl px-2 py-2 flex flex-col'
-                        : 'rounded-2xl px-4 py-3 flex flex-row items-center gap-3'
+                        ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
+                        : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
                     )}>
                       <p className={cn(
-                        "text-morandi-secondary/80",
-                        viewMode === 'mobile' ? 'text-xs text-center' : 'text-sm text-left whitespace-nowrap'
+                        "text-morandi-secondary/80 mb-1",
+                        viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
                       )}>早餐</p>
                       <p className={cn(
-                        "font-semibold text-morandi-primary line-clamp-2",
-                        viewMode === 'mobile' ? 'text-xs text-center' : 'text-sm flex-1 text-center'
+                        "font-semibold text-morandi-primary",
+                        viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
                       )}>
                         {day.meals?.breakfast || '敬請自理'}
                       </p>
                     </div>
                     <div className={cn(
-                      "border border-morandi-gold/30 bg-morandi-gold/5",
+                      "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
                       viewMode === 'mobile'
-                        ? 'rounded-xl px-2 py-2 flex flex-col'
-                        : 'rounded-2xl px-4 py-3 flex flex-row items-center gap-3'
+                        ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
+                        : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
                     )}>
                       <p className={cn(
-                        "text-morandi-secondary/80",
-                        viewMode === 'mobile' ? 'text-xs text-center' : 'text-sm text-left whitespace-nowrap'
+                        "text-morandi-secondary/80 mb-1",
+                        viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
                       )}>午餐</p>
                       <p className={cn(
-                        "font-semibold text-morandi-primary line-clamp-2",
-                        viewMode === 'mobile' ? 'text-xs text-center' : 'text-sm flex-1 text-center'
+                        "font-semibold text-morandi-primary",
+                        viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
                       )}>
                         {day.meals?.lunch || '敬請自理'}
                       </p>
                     </div>
                     <div className={cn(
-                      "border border-morandi-gold/30 bg-morandi-gold/5",
+                      "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
                       viewMode === 'mobile'
-                        ? 'rounded-xl px-2 py-2 flex flex-col'
-                        : 'rounded-2xl px-4 py-3 flex flex-row items-center gap-3'
+                        ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
+                        : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
                     )}>
                       <p className={cn(
-                        "text-morandi-secondary/80",
-                        viewMode === 'mobile' ? 'text-xs text-center' : 'text-sm text-left whitespace-nowrap'
+                        "text-morandi-secondary/80 mb-1",
+                        viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
                       )}>晚餐</p>
                       <p className={cn(
-                        "font-semibold text-morandi-primary line-clamp-2",
-                        viewMode === 'mobile' ? 'text-xs text-center' : 'text-sm flex-1 text-center'
+                        "font-semibold text-morandi-primary",
+                        viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
                       )}>
                         {day.meals?.dinner || '敬請自理'}
                       </p>
@@ -353,16 +423,18 @@ export function TourItinerarySection({
                   {day.accommodation && (
                     <div className={cn(
                       "mt-6 border border-morandi-gold/30 bg-morandi-gold/10 text-morandi-primary shadow-inner",
-                      viewMode === 'mobile' ? 'rounded-xl p-3' : 'rounded-3xl p-5'
+                      viewMode === 'mobile' ? 'rounded-xl p-3' : 'rounded-2xl px-4 py-3'
                     )}>
-                      <p className={cn(
-                        "font-medium tracking-wide text-morandi-secondary",
+                      <div className={cn(
+                        "flex items-baseline gap-x-3",
                         viewMode === 'mobile' ? 'text-xs' : 'text-sm'
-                      )}>住宿</p>
-                      <p className={cn(
-                        "mt-1 font-semibold",
-                        viewMode === 'mobile' ? 'text-sm' : 'text-lg'
-                      )}>{day.accommodation}</p>
+                      )}>
+                        <span className="font-medium tracking-wide text-morandi-secondary flex-shrink-0">住宿</span>
+                        <span className={cn(
+                          "font-semibold flex-1 text-center",
+                          viewMode === 'mobile' ? '' : 'text-base'
+                        )}>{day.accommodation}</span>
+                      </div>
                     </div>
                   )}
                 </article>
@@ -371,6 +443,71 @@ export function TourItinerarySection({
           </div>
         </div>
       </div>
+
+      {/* 懸浮視窗 Modal - 桌面版景點詳情 */}
+      <AnimatePresence>
+        {selectedActivity !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+            onClick={() => setSelectedActivity(null)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100vw',
+              height: '100vh'
+            }}
+          >
+            {/* 懸浮卡片 */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative bg-white rounded-2xl overflow-hidden max-w-[85vw] max-h-[70vh] w-auto shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* 圖片 - 有圖片才顯示 */}
+              {selectedActivity?.image && selectedActivity.image.trim() !== '' && (
+                <div className="relative w-full aspect-[3/2] max-h-[40vh]">
+                  <Image
+                    src={selectedActivity.image}
+                    alt={selectedActivity.title}
+                    fill
+                    className="object-cover"
+                    sizes="85vw"
+                  />
+                </div>
+              )}
+
+              {/* 關閉按鈕 - 固定在右上角 */}
+              <button
+                onClick={() => setSelectedActivity(null)}
+                className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white z-30 transition-all"
+              >
+                <X size={20} />
+              </button>
+
+              {/* 內容區 */}
+              <div className="p-6">
+                <h3 className="font-bold text-xl mb-3 text-morandi-primary">
+                  {selectedActivity?.title}
+                </h3>
+                {selectedActivity?.description && (
+                  <p className="text-sm leading-relaxed text-morandi-secondary">
+                    {selectedActivity.description}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

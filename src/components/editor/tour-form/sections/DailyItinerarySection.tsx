@@ -2,9 +2,21 @@ import React, { useState, useRef } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores/auth-store'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { toast } from 'sonner'
+import { RelatedImagesPreviewer } from '../../RelatedImagesPreviewer'
 
 // 擴展型別（與 AttractionSelector 一致）
 interface AttractionWithCity extends Attraction {
@@ -50,6 +62,19 @@ export function DailyItinerarySection({
   const [activityDragOver, setActivityDragOver] = useState<{ dayIndex: number; actIndex: number } | null>(null)
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const activityFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+
+  // 圖庫儲存狀態
+  const [saveToLibraryDialog, setSaveToLibraryDialog] = useState<{
+    isOpen: boolean
+    filePath: string
+    publicUrl: string
+    activityTitle: string
+  } | null>(null)
+  const [libraryImageName, setLibraryImageName] = useState('')
+  const [isSavingToLibrary, setIsSavingToLibrary] = useState(false)
+
+
+  const workspaceId = useAuthStore(state => state.user?.workspace_id)
 
   // 上傳每日圖片
   const handleImageUpload = async (
@@ -120,11 +145,22 @@ export function DailyItinerarySection({
         return
       }
 
-      const { data } = supabase.storage
+      const { data: urlData } = supabase.storage
         .from('workspace-files')
         .getPublicUrl(filePath)
 
-      updateActivity(dayIndex, actIndex, 'image', data.publicUrl)
+      updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
+
+      // 上傳成功後詢問是否存到圖庫
+      const currentActivity = data.dailyItinerary?.[dayIndex]?.activities?.[actIndex]
+      const activityTitle = currentActivity?.title || '景點圖片'
+      setSaveToLibraryDialog({
+        isOpen: true,
+        filePath,
+        publicUrl: urlData.publicUrl,
+        activityTitle,
+      })
+      setLibraryImageName(activityTitle)
     } catch (error) {
       console.error('上傳錯誤:', error)
       alert('上傳過程發生錯誤')
@@ -133,16 +169,65 @@ export function DailyItinerarySection({
     }
   }
 
+  // 儲存到圖庫
+  const handleSaveToLibrary = async () => {
+    if (!saveToLibraryDialog || !workspaceId) {
+      toast.error('缺少必要資料，無法儲存')
+      return
+    }
+
+    setIsSavingToLibrary(true)
+    try {
+      // 檢查圖庫表格是否存在
+      const { error: checkError } = await supabase
+        .from('image_library')
+        .select('id')
+        .limit(1)
+
+      if (checkError) {
+        console.error('圖庫表格不存在或無權限:', checkError)
+        toast.error('圖庫功能暫時無法使用，表格可能尚未建立')
+        return
+      }
+
+      const { error } = await supabase.from('image_library').insert({
+        workspace_id: workspaceId,
+        name: libraryImageName || '未命名圖片',
+        file_path: saveToLibraryDialog.filePath,
+        public_url: saveToLibraryDialog.publicUrl,
+        category: 'activity',
+        tags: ['景點', '活動'],
+      })
+
+      if (error) {
+        console.error('儲存到圖庫失敗:', error)
+        toast.error(`儲存失敗: ${error.message}`)
+      } else {
+        toast.success('已儲存到圖庫')
+      }
+    } catch (error) {
+      console.error('儲存錯誤:', error)
+      toast.error(`儲存過程發生錯誤: ${error.message}`)
+    } finally {
+      setIsSavingToLibrary(false)
+      setSaveToLibraryDialog(null)
+      setLibraryImageName('')
+    }
+  }
+
+
   // 開啟景點選擇器
   const handleOpenAttractionSelector = (dayIndex: number) => {
     setCurrentDayIndex(dayIndex)
     setShowAttractionSelector(true)
   }
   // 處理景點選擇
-  const handleSelectAttractions = (attractions: AttractionWithCity[]) => {
+  const handleSelectAttractions = async (attractions: AttractionWithCity[]) => {
     if (currentDayIndex === -1) return
+    const workspaceId = useAuthStore.getState().user?.workspace_id
+
     // 將選擇的景點轉換為活動
-    attractions.forEach(attraction => {
+    for (const attraction of attractions) {
       // 先取得當前索引（新增前的長度）
       const day = data.dailyItinerary[currentDayIndex]
       const newActivityIndex = day.activities.length
@@ -158,16 +243,52 @@ export function DailyItinerarySection({
         'description',
         attraction.description || ''
       )
-      // 設定圖片（優先使用 thumbnail，沒有則取 images 第一張）
-      const imageUrl = attraction.thumbnail || (attraction.images && attraction.images.length > 0 ? attraction.images[0] : '')
+
+      // 智能圖片選擇邏輯
+      let imageUrl = ''
+      
+      // 1. 優先使用景點庫的 thumbnail
+      if (attraction.thumbnail) {
+        imageUrl = attraction.thumbnail
+      }
+      // 2. 其次使用景點庫的 images[0]
+      else if (attraction.images && attraction.images.length > 0) {
+        imageUrl = attraction.images[0]
+      }
+      // 3. 最後搜尋圖庫中同名的圖片
+      else if (workspaceId) {
+        try {
+          const { data: libraryImages, error } = await supabase
+            .from('image_library')
+            .select('public_url')
+            .eq('workspace_id', workspaceId)
+            .eq('category', 'activity')
+            .eq('name', attraction.name)
+            .order('created_at', { ascending: false })
+            .limit(1)
+
+          if (!error && libraryImages && libraryImages.length > 0) {
+            imageUrl = libraryImages[0].public_url
+            console.log(`✅ 自動為 "${attraction.name}" 帶入圖庫圖片`)
+          }
+        } catch (error) {
+          console.error('搜尋圖庫圖片失敗:', error)
+        }
+      }
+
       updateActivity(currentDayIndex, newActivityIndex, 'image', imageUrl)
-    })
+    }
     setCurrentDayIndex(-1)
   }
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
-        <h2 className="text-lg font-bold text-morandi-primary">逐日行程</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-morandi-primary">逐日行程</h2>
+          <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+            {data.dailyItinerary?.length || 0} 天
+          </span>
+        </div>
         <button
           onClick={addDailyItinerary}
           className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
@@ -575,9 +696,18 @@ export function DailyItinerarySection({
                         type="text"
                         value={activity.image || ''}
                         onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
-                        className="w-48 px-2 py-1 border border-morandi-container rounded text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold/50"
+                        className="w-32 px-2 py-1 border border-morandi-container rounded text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold/50"
                         placeholder="或貼上圖片網址..."
                       />
+                      {/* 相關圖片預覽 - 在同一排 */}
+                      {activity.title && (
+                        <RelatedImagesPreviewer
+                          activityTitle={activity.title}
+                          currentImageUrl={activity.image}
+                          onSelectImage={(imageUrl) => updateActivity(dayIndex, actIndex, 'image', imageUrl)}
+                          className="flex-1"
+                        />
+                      )}
                     </div>
                     <button
                       onClick={() => removeActivity(dayIndex, actIndex)}
@@ -689,6 +819,85 @@ export function DailyItinerarySection({
         tourCountries={data.countries}
         onSelect={handleSelectAttractions}
       />
+
+      {/* 儲存到圖庫確認對話框 */}
+      <Dialog
+        open={saveToLibraryDialog?.isOpen ?? false}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSaveToLibraryDialog(null)
+            setLibraryImageName('')
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FolderPlus size={20} className="text-morandi-gold" />
+              儲存到圖庫
+            </DialogTitle>
+            <DialogDescription>
+              是否要將這張圖片儲存到圖庫，以便日後重複使用？
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* 預覽圖片 */}
+            {saveToLibraryDialog?.publicUrl && (
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-morandi-container">
+                <img
+                  src={saveToLibraryDialog.publicUrl}
+                  alt="預覽"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            {/* 圖片名稱 */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-morandi-primary">
+                圖片名稱
+              </label>
+              <Input
+                value={libraryImageName}
+                onChange={(e) => setLibraryImageName(e.target.value)}
+                placeholder="輸入圖片名稱..."
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setSaveToLibraryDialog(null)
+                setLibraryImageName('')
+              }}
+              disabled={isSavingToLibrary}
+            >
+              不用了
+            </Button>
+            <Button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleSaveToLibrary()
+              }}
+              disabled={isSavingToLibrary}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white cursor-pointer"
+            >
+              {isSavingToLibrary ? (
+                <>
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                  儲存中...
+                </>
+              ) : (
+                '儲存到圖庫'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }

@@ -6,9 +6,13 @@ import { useRegionsStore } from '@/stores'
 import { useAttractionsData } from '../../hooks/useAttractionsData'
 import { useAttractionsFilters } from '../../hooks/useAttractionsFilters'
 import { useAttractionsDialog } from '../../hooks/useAttractionsDialog'
+import { useAttractionsReorder } from '../../hooks/useAttractionsReorder'
 import { AttractionsList } from '../AttractionsList'
+import { SortableAttractionsList } from '../SortableAttractionsList'
 import { AttractionsDialog } from '../AttractionsDialog'
 import { supabase } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { ArrowUpDown, List } from 'lucide-react'
 import type { Country, City } from '@/stores/region-store'
 
 // ============================================
@@ -36,11 +40,14 @@ export default function AttractionsTab({
   // 用於顯示的國家和城市資料（從景點載入後，按需從資料庫查詢）
   const [displayCountries, setDisplayCountries] = useState<Country[]>([])
   const [displayCities, setDisplayCities] = useState<City[]>([])
+  // 排序模式控制
+  const [isReorderMode, setIsReorderMode] = useState(false)
 
   const { attractions, loading, addAttraction, updateAttraction, deleteAttraction, toggleStatus } =
     useAttractionsData()
 
   const { isEditOpen, editingAttraction, openEdit, closeEdit } = useAttractionsDialog()
+  const { reorderAttractions } = useAttractionsReorder()
 
   // 當景點載入後，取得所有用到的國家和城市 ID，然後查詢這些資料
   useEffect(() => {
@@ -122,18 +129,55 @@ export default function AttractionsTab({
 
   return (
     <div className="h-full flex flex-col">
+      {/* 視圖切換按鈕 */}
+      <div className="flex justify-end mb-4">
+        <div className="flex items-center gap-2">
+          <Button
+            variant={isReorderMode ? "outline" : "default"}
+            size="sm"
+            onClick={() => setIsReorderMode(false)}
+            className="h-8"
+          >
+            <List size={14} className="mr-1.5" />
+            列表檢視
+          </Button>
+          <Button
+            variant={isReorderMode ? "default" : "outline"}
+            size="sm"
+            onClick={() => setIsReorderMode(true)}
+            className="h-8"
+          >
+            <ArrowUpDown size={14} className="mr-1.5" />
+            拖拽排序
+          </Button>
+        </div>
+      </div>
+
       <div className="flex-1 overflow-auto">
-        {/* 景點列表 */}
-        <AttractionsList
-          loading={loading}
-          sortedAttractions={sortedAttractions}
-          countries={displayCountries}
-          cities={displayCities}
-          onEdit={openEdit}
-          onToggleStatus={toggleStatus}
-          onDelete={deleteAttraction}
-          onAddNew={openAdd}
-        />
+        {/* 根據模式顯示不同的列表 */}
+        {isReorderMode ? (
+          <SortableAttractionsList
+            loading={loading}
+            attractions={sortedAttractions}
+            countries={displayCountries}
+            cities={displayCities}
+            onEdit={openEdit}
+            onToggleStatus={toggleStatus}
+            onDelete={deleteAttraction}
+            onReorder={reorderAttractions}
+          />
+        ) : (
+          <AttractionsList
+            loading={loading}
+            sortedAttractions={sortedAttractions}
+            countries={displayCountries}
+            cities={displayCities}
+            onEdit={openEdit}
+            onToggleStatus={toggleStatus}
+            onDelete={deleteAttraction}
+            onAddNew={openAdd}
+          />
+        )}
       </div>
 
       {/* 編輯對話框 */}

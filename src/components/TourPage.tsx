@@ -142,10 +142,14 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
                 <img
                   src={companyLogoUrl}
                   alt="Company Logo"
-                  className="h-8 w-auto object-contain"
+                  className={`w-auto object-contain ${
+                    viewMode === 'mobile' ? 'h-6' : 'h-8'
+                  }`}
                 />
               ) : (
-                <h3 className="text-2xl font-bold text-morandi-gold">
+                <h3 className={`font-bold text-morandi-gold ${
+                  viewMode === 'mobile' ? 'text-lg' : 'text-2xl'
+                }`}>
                   {COMPANY.name}
                 </h3>
               )}

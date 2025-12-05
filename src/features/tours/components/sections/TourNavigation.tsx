@@ -1,4 +1,4 @@
-import { Home, type LucideIcon } from 'lucide-react'
+import { Home, Plane, MapPin, Phone, type LucideIcon } from 'lucide-react'
 import { FloatingDock } from '@/components/ui/floating-dock'
 
 interface NavLink {
@@ -18,8 +18,16 @@ interface TourNavigationProps {
   viewMode: 'desktop' | 'mobile'
 }
 
+// 預設的導航連結
+const defaultNavLinks: NavLink[] = [
+  { title: '首頁', icon: Home, href: '#top' },
+  { title: '航班', icon: Plane, href: '#flight' },
+  { title: '行程', icon: MapPin, href: '#itinerary' },
+  { title: '聯絡我們', icon: Phone, href: '#contact' },
+]
+
 export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: TourNavigationProps) {
-  const navLinks = data.navLinks || [{ title: '首頁', icon: Home, href: '#top' }]
+  const navLinks = data.navLinks || defaultNavLinks
 
   return (
     <>

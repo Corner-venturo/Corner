@@ -1,5 +1,5 @@
 -- Create the api_usage_log table
-CREATE TABLE public.api_usage_log (
+CREATE TABLE IF NOT EXISTS public.api_usage_log (
     id bigserial PRIMARY KEY,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     api_service text NOT NULL,
@@ -15,7 +15,25 @@ COMMENT ON COLUMN public.api_usage_log.notes IS '其他備註';
 ALTER TABLE public.api_usage_log ENABLE ROW LEVEL SECURITY;
 
 -- This policy allows service_role users (like backend functions) to insert into the log.
-CREATE POLICY "Allow service_role to insert" ON public.api_usage_log FOR INSERT WITH CHECK (auth.role() = 'service_role');
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'api_usage_log' 
+        AND policyname = 'Allow service_role to insert'
+    ) THEN
+        CREATE POLICY "Allow service_role to insert" ON public.api_usage_log FOR INSERT WITH CHECK (auth.role() = 'service_role');
+    END IF;
+END $$;
+
 -- This policy allows authenticated users to read the log (for the dashboard).
--- You might want to restrict this further depending on who can see the dashboard.
-CREATE POLICY "Allow authenticated users to read" ON public.api_usage_log FOR SELECT USING (auth.role() = 'authenticated');
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'api_usage_log' 
+        AND policyname = 'Allow authenticated users to read'
+    ) THEN
+        CREATE POLICY "Allow authenticated users to read" ON public.api_usage_log FOR SELECT USING (auth.role() = 'authenticated');
+    END IF;
+END $$;

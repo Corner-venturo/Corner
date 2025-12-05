@@ -179,62 +179,20 @@ CREATE INDEX IF NOT EXISTS idx_usa_esta_status ON public.usa_esta(status) WHERE 
 CREATE INDEX IF NOT EXISTS idx_usa_esta_applicant_name ON public.usa_esta(applicant_name_zh) WHERE deleted_at IS NULL;
 
 -- ============================================================================
--- Enable RLS (Row Level Security)
+-- Disable RLS (根據專案規範)
 -- ============================================================================
-ALTER TABLE public.usa_esta ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.usa_esta DISABLE ROW LEVEL SECURITY;
 
--- ============================================================================
--- RLS Policies
--- ============================================================================
-
--- Policy: Users can view their workspace ESTA applications
-CREATE POLICY "Users can view their workspace usa_esta"
-  ON public.usa_esta
-  FOR SELECT
-  USING (
-    workspace_id IN (
-      SELECT workspace_id FROM public.employees WHERE id = auth.uid()
-    )
-  );
-
--- Policy: Users can insert ESTA applications in their workspace
-CREATE POLICY "Users can insert their workspace usa_esta"
-  ON public.usa_esta
-  FOR INSERT
-  WITH CHECK (
-    workspace_id IN (
-      SELECT workspace_id FROM public.employees WHERE id = auth.uid()
-    )
-  );
-
--- Policy: Users can update ESTA applications in their workspace
-CREATE POLICY "Users can update their workspace usa_esta"
-  ON public.usa_esta
-  FOR UPDATE
-  USING (
-    workspace_id IN (
-      SELECT workspace_id FROM public.employees WHERE id = auth.uid()
-    )
-  )
-  WITH CHECK (
-    workspace_id IN (
-      SELECT workspace_id FROM public.employees WHERE id = auth.uid()
-    )
-  );
-
--- Policy: Users can soft delete ESTA applications in their workspace
-CREATE POLICY "Users can delete their workspace usa_esta"
-  ON public.usa_esta
-  FOR DELETE
-  USING (
-    workspace_id IN (
-      SELECT workspace_id FROM public.employees WHERE id = auth.uid()
-    )
-  );
+-- 刪除舊的 RLS Policies（如果存在）
+DROP POLICY IF EXISTS "Users can view their workspace usa_esta" ON public.usa_esta;
+DROP POLICY IF EXISTS "Users can insert their workspace usa_esta" ON public.usa_esta;
+DROP POLICY IF EXISTS "Users can update their workspace usa_esta" ON public.usa_esta;
+DROP POLICY IF EXISTS "Users can delete their workspace usa_esta" ON public.usa_esta;
 
 -- ============================================================================
 -- Trigger for updated_at
 -- ============================================================================
+DROP TRIGGER IF EXISTS set_usa_esta_updated_at ON public.usa_esta;
 CREATE TRIGGER set_usa_esta_updated_at
   BEFORE UPDATE ON public.usa_esta
   FOR EACH ROW

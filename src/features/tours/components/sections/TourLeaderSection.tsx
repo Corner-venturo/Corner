@@ -19,7 +19,7 @@ interface TourLeaderSectionProps {
 
 export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
   return (
-    <section className={viewMode === 'mobile' ? 'bg-white pt-6 pb-8' : 'bg-white pt-8 pb-16'}>
+    <section id="contact" className={viewMode === 'mobile' ? 'bg-white pt-6 pb-8' : 'bg-white pt-8 pb-16'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

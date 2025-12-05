@@ -21,6 +21,18 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
   const [data, setData] = useState<ItineraryData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
+
+  // 偵測螢幕寬度自動切換 mobile/desktop
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setViewMode(window.innerWidth < 768 ? 'mobile' : 'desktop')
+    }
+
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   useEffect(() => {
     async function fetchItinerary() {
@@ -86,5 +98,5 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
     )
   }
 
-  return <TourPage data={data} isPreview={false} viewMode="desktop" />
+  return <TourPage data={data} isPreview={false} viewMode={viewMode} />
 }
