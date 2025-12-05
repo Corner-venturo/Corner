@@ -21,7 +21,6 @@ export const NO_SIDEBAR_PAGES = [
   '/login',
   '/unauthorized',
   '/view', // 分享的行程預覽頁面（無需登入、無側邊欄）
-  '/', // 暫時跳過首頁的 MainLayout（測試用）
 ]
 
 // Pages with custom layout

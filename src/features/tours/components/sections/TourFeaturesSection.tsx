@@ -6,8 +6,7 @@ interface TourFeature {
   icon: string
   title: string
   description: string
-  template?: string // 模板 PNG（有透明區域）
-  images?: [string, string] // 左右兩張圖片（放在模板下層）
+  images?: string[] // 圖片陣列（支援任意數量）
   iconComponent?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
 }
 
@@ -42,12 +41,20 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
         </motion.div>
 
         <div
-          className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-2 md:grid-cols-3 gap-7'}
+          className={
+            viewMode === 'mobile'
+              ? 'space-y-4'
+              : features.length === 1
+                ? 'grid grid-cols-1 max-w-4xl mx-auto gap-7'
+                : features.length === 2
+                  ? 'grid grid-cols-2 gap-7'
+                  : 'grid grid-cols-2 md:grid-cols-3 gap-7'
+          }
         >
           {features.map((feature: TourFeature, index: number) => {
             const FeatureIcon = feature.iconComponent || Sparkles
-            const hasTemplate = !!feature.template
-            const hasImages = feature.images && (feature.images[0] || feature.images[1])
+            const validImages = feature.images?.filter(img => img && img.trim() !== '') || []
+            const hasImages = validImages.length > 0
 
             return (
               <motion.div
@@ -68,59 +75,77 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
                   boxShadow: `0 2px 12px ${morandiColors.shadow.soft}`,
                 }}
               >
-                {/* 如果有模板，顯示模板+底圖疊加效果 */}
-                {hasTemplate ? (
-                  <div className={`relative overflow-hidden rounded-lg ${viewMode === 'mobile' ? 'aspect-[16/9] mb-2' : 'aspect-[16/9] mb-4'}`}>
-                    {/* 底層圖片 */}
-                    <div className="absolute inset-0 grid grid-cols-2">
-                      {feature.images?.map((imgUrl, imgIndex) => (
-                        imgUrl ? (
-                          <img
-                            key={imgIndex}
-                            src={imgUrl}
-                            alt={`${feature.title} ${imgIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div key={imgIndex} className="w-full h-full bg-gray-100" />
-                        )
-                      )) || (
-                        <>
-                          <div className="w-full h-full bg-gray-100" />
-                          <div className="w-full h-full bg-gray-100" />
-                        </>
-                      )}
-                    </div>
-                    {/* 模板 PNG 覆蓋在上面 */}
-                    <img
-                      src={feature.template}
-                      alt="模板"
-                      className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-                    />
-                  </div>
-                ) : hasImages ? (
-                  /* 沒有模板但有圖片，顯示左右兩張圖片 */
-                  <div className={viewMode === 'mobile' ? 'grid grid-cols-2 gap-2' : 'grid grid-cols-2 gap-3 mb-4'}>
-                    {feature.images?.map((imgUrl, imgIndex) => (
-                      imgUrl ? (
-                        <div
-                          key={imgIndex}
-                          className={`overflow-hidden rounded-lg ${viewMode === 'mobile' ? 'aspect-[4/3]' : 'aspect-[4/3]'}`}
-                        >
-                          <img
-                            src={imgUrl}
-                            alt={`${feature.title} ${imgIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
+                {/* 根據圖片數量自動調整版面 */}
+                {hasImages ? (
+                  (() => {
+                    const imageCount = validImages.length
+
+                    if (imageCount === 0) return null
+
+                    // 1 張圖：滿版 16:9
+                    if (imageCount === 1) {
+                      return (
+                        <div className={viewMode === 'mobile' ? 'mb-2' : 'mb-4'}>
+                          <div className="overflow-hidden rounded-lg aspect-[16/9]">
+                            <img
+                              src={validImages[0]}
+                              alt={feature.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         </div>
-                      ) : (
-                        <div
-                          key={imgIndex}
-                          className={`rounded-lg bg-gray-100 ${viewMode === 'mobile' ? 'aspect-[4/3]' : 'aspect-[4/3]'}`}
-                        />
                       )
-                    ))}
-                  </div>
+                    }
+
+                    // 2 張圖：左右並排
+                    if (imageCount === 2) {
+                      return (
+                        <div className={viewMode === 'mobile' ? 'grid grid-cols-2 gap-2 mb-2' : 'grid grid-cols-2 gap-3 mb-4'}>
+                          {validImages.map((imgUrl, imgIndex) => (
+                            <div key={imgIndex} className="overflow-hidden rounded-lg aspect-[4/3]">
+                              <img
+                                src={imgUrl}
+                                alt={`${feature.title} ${imgIndex + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    }
+
+                    // 3 張圖：橫排一列
+                    if (imageCount === 3) {
+                      return (
+                        <div className={viewMode === 'mobile' ? 'grid grid-cols-3 gap-2 mb-2' : 'grid grid-cols-3 gap-3 mb-4'}>
+                          {validImages.map((imgUrl, imgIndex) => (
+                            <div key={imgIndex} className="overflow-hidden rounded-lg aspect-[4/3]">
+                              <img
+                                src={imgUrl}
+                                alt={`${feature.title} ${imgIndex + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    }
+
+                    // 4 張以上：2x2 網格
+                    return (
+                      <div className={viewMode === 'mobile' ? 'grid grid-cols-2 gap-2 mb-2' : 'grid grid-cols-2 gap-3 mb-4'}>
+                        {validImages.slice(0, 4).map((imgUrl, imgIndex) => (
+                          <div key={imgIndex} className="overflow-hidden rounded-lg aspect-[4/3]">
+                            <img
+                              src={imgUrl}
+                              alt={`${feature.title} ${imgIndex + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })()
                 ) : (
                   /* 沒有模板也沒有圖片時顯示原本的圖標 */
                   <div
@@ -140,7 +165,7 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
                     />
                   </div>
                 )}
-                <div className={viewMode === 'mobile' && !hasImages && !hasTemplate ? 'flex-1 min-w-0' : ''}>
+                <div className={viewMode === 'mobile' && !hasImages ? 'flex-1 min-w-0' : ''}>
                   <h3
                     className={
                       viewMode === 'mobile' ? 'font-bold text-base mb-1' : 'font-bold text-lg mb-2'

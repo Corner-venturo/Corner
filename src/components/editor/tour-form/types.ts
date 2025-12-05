@@ -13,8 +13,7 @@ export interface Feature {
   icon: string
   title: string
   description: string
-  template?: string // 模板 PNG（有透明區域）
-  images?: [string, string] // 左右兩張圖片（放在模板下層）
+  images?: string[] // 圖片陣列（支援任意數量）
 }
 
 export interface FocusCard {
