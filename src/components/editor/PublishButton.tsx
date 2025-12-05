@@ -2,24 +2,51 @@
 
 import { useState } from 'react'
 import { useItineraryStore } from '@/stores'
-import { useAuthStore } from '@/stores/auth-store'
 import { useRouter } from 'next/navigation'
 import type { TourFormData } from './tour-form/types'
+import type { ItineraryVersionRecord } from '@/stores/types'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
-  version?: number
   status?: string
   tourId?: string
   meetingInfo?: unknown
+  version_records?: ItineraryVersionRecord[]
 }
 
-export function PublishButton({ data }: { data: PublishButtonData }) {
+interface PublishButtonProps {
+  data: PublishButtonData
+  currentVersionIndex: number // -1 表示主版本, 0+ 表示 version_records 的索引
+  onVersionChange: (index: number, versionData?: ItineraryVersionRecord) => void
+}
+
+export function PublishButton({ data, currentVersionIndex, onVersionChange }: PublishButtonProps) {
   const [saving, setSaving] = useState(false)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [versionNote, setVersionNote] = useState('')
   const { create, update } = useItineraryStore()
-  const { user } = useAuthStore()
   const router = useRouter()
+
+  const versionRecords = data.version_records || []
+  const isEditMode = !!data.id
 
   // 轉換資料格式（camelCase → snake_case）
   const convertData = () => ({
@@ -39,7 +66,7 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
     features: data.features,
     focus_cards: data.focusCards,
     leader: data.leader,
-    meeting_info: data.meetingInfo as { time: string; location: string } | undefined,  // ✅ 修正：使用 meeting_info 而非 meeting_points
+    meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
     hotels: data.hotels,
     show_features: data.showFeatures,
     show_leader_meeting: data.showLeaderMeeting,
@@ -55,26 +82,39 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
       const convertedData = convertData()
 
       if (data.id) {
-        // 更新目前版本
-        await update(data.id, convertedData)
-        alert('✅ 儲存成功！')
+        if (currentVersionIndex === -1) {
+          // 更新主版本
+          await update(data.id, convertedData)
+        } else {
+          // 更新特定版本記錄
+          const updatedRecords = [...versionRecords]
+          updatedRecords[currentVersionIndex] = {
+            ...updatedRecords[currentVersionIndex],
+            daily_itinerary: data.dailyItinerary || [],
+            features: data.features,
+            focus_cards: data.focusCards,
+            leader: data.leader,
+            meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
+            hotels: data.hotels,
+          }
+          await update(data.id, { version_records: updatedRecords })
+        }
+        alert('儲存成功！')
       } else {
         // 第一次建立
         const newItinerary = await create({
           ...convertedData,
-          version: 1,
-          is_latest: true,
+          version_records: [],
         } as Parameters<typeof create>[0])
-        alert('✅ 儲存行程表成功！')
+        alert('儲存行程表成功！')
 
         if (newItinerary?.id) {
-          // 直接導向到編輯頁面，避免多次跳轉
           router.replace(`/itinerary/new?itinerary_id=${newItinerary.id}`)
         }
       }
     } catch (error) {
       console.error('儲存失敗:', error)
-      alert('❌ 儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
     } finally {
       setSaving(false)
     }
@@ -83,113 +123,176 @@ export function PublishButton({ data }: { data: PublishButtonData }) {
   // 另存新版本
   const saveAsNewVersion = async () => {
     if (!data.id) {
-      alert('⚠️ 請先儲存行程表才能另存新版本')
+      alert('請先儲存行程表才能另存新版本')
       return
     }
 
     setSaving(true)
     try {
-      const baseData = convertData()
-      const currentVersion = data.version || 1
-
-      // 建立新版本
-      const newVersionData = {
-        ...baseData,
-        parent_id: data.id,
-        version: currentVersion + 1,
-        is_latest: true,
+      const newVersion: ItineraryVersionRecord = {
+        id: crypto.randomUUID(),
+        version: versionRecords.length + 1,
+        note: versionNote || `版本 ${versionRecords.length + 1}`,
+        daily_itinerary: data.dailyItinerary || [],
+        features: data.features,
+        focus_cards: data.focusCards,
+        leader: data.leader,
+        meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
+        hotels: data.hotels,
+        created_at: new Date().toISOString(),
       }
 
-      // 先將舊版本的 is_latest 設為 false
-      await update(data.id, { is_latest: false } as Parameters<typeof update>[1])
+      const updatedRecords = [...versionRecords, newVersion]
+      await update(data.id, { version_records: updatedRecords })
 
-      // 建立新版本
-      const newVersion = await create(newVersionData as Parameters<typeof create>[0])
-      alert(`✅ 已另存為新版本 v${currentVersion + 1}`)
+      alert(`已另存為「${newVersion.note}」`)
+      setShowSaveDialog(false)
+      setVersionNote('')
 
-      // 跳轉到新版本
-      if (newVersion?.id) {
-        router.replace(`/itinerary/new?itinerary_id=${newVersion.id}`)
-      }
+      // 切換到新版本
+      onVersionChange(updatedRecords.length - 1, newVersion)
     } catch (error) {
       console.error('另存新版本失敗:', error)
-      alert('❌ 另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      alert('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
     } finally {
       setSaving(false)
     }
   }
 
-  const isEditMode = !!data.id
+  // 載入版本
+  const handleVersionSelect = (value: string) => {
+    const index = parseInt(value, 10)
+    if (index === -1) {
+      // 主版本
+      onVersionChange(-1)
+    } else {
+      // 其他版本
+      const versionData = versionRecords[index]
+      onVersionChange(index, versionData)
+    }
+  }
 
   // 產生分享連結
   const generateShareLink = () => {
     if (!data.id) {
-      alert('⚠️ 請先儲存行程表才能產生連結！')
+      alert('請先儲存行程表才能產生連結！')
       return
     }
 
-    // 使用當前網站的網址（會自動適配 localhost / Vercel 等環境）
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
     const shareUrl = `${baseUrl}/view/${data.id}`
 
-    // 複製到剪貼簿
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => {
-        alert('✅ 分享連結已複製！\n\n' + shareUrl)
+        alert('分享連結已複製！\n\n' + shareUrl)
       })
-      .catch(err => {
-        alert('❌ 複製失敗，請手動複製：\n' + shareUrl)
+      .catch(() => {
+        alert('複製失敗，請手動複製：\n' + shareUrl)
       })
   }
 
+  // 取得目前版本名稱
+  const getCurrentVersionLabel = () => {
+    if (currentVersionIndex === -1) {
+      return '主版本'
+    }
+    return versionRecords[currentVersionIndex]?.note || `版本 ${currentVersionIndex + 1}`
+  }
+
   return (
-    <div className="flex items-center gap-2">
-      {/* 版本號顯示 */}
-      {isEditMode && data.version && (
-        <span className="text-sm text-morandi-secondary font-medium">
-          v{data.version}
-        </span>
-      )}
-
-      {/* 儲存按鈕 */}
-      <Button
-        onClick={saveItinerary}
-        disabled={saving}
-        className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-      >
-        {saving ? '儲存中...' : isEditMode ? '💾 儲存' : '💾 儲存行程表'}
-      </Button>
-
-      {/* 另存新版本按鈕（僅編輯模式顯示） */}
-      {isEditMode && (
-        <>
-          <Button
-            onClick={saveAsNewVersion}
-            disabled={saving}
-            variant="default"
+    <>
+      <div className="flex items-center gap-2">
+        {/* 版本選擇器 */}
+        {isEditMode && versionRecords.length > 0 && (
+          <Select
+            value={currentVersionIndex.toString()}
+            onValueChange={handleVersionSelect}
           >
-            📋 另存為 v{(data.version || 1) + 1}
-          </Button>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="選擇版本" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="-1">主版本</SelectItem>
+              {versionRecords.map((record, index) => (
+                <SelectItem key={record.id} value={index.toString()}>
+                  {record.note || `版本 ${record.version}`}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
-          <Button
-            onClick={generateShareLink}
-            variant="secondary"
-          >
-            🔗 產生連結
-          </Button>
+        {/* 目前版本標籤（沒有其他版本時顯示） */}
+        {isEditMode && versionRecords.length === 0 && (
+          <span className="text-sm text-morandi-secondary font-medium">
+            主版本
+          </span>
+        )}
 
-          <Button
-            onClick={() => {
-              // TODO: 實作歷史版本查看功能
-              alert('📜 歷史版本功能開發中...')
-            }}
-            variant="secondary"
-          >
-            📜 歷史版本
-          </Button>
-        </>
-      )}
-    </div>
+        {/* 儲存按鈕 */}
+        <Button
+          onClick={saveItinerary}
+          disabled={saving}
+          className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+        >
+          {saving ? '儲存中...' : isEditMode ? '儲存' : '儲存行程表'}
+        </Button>
+
+        {/* 另存新版本按鈕（僅編輯模式顯示） */}
+        {isEditMode && (
+          <>
+            <Button
+              onClick={() => setShowSaveDialog(true)}
+              disabled={saving}
+              variant="default"
+            >
+              另存新版本
+            </Button>
+
+            <Button
+              onClick={generateShareLink}
+              variant="secondary"
+            >
+              產生連結
+            </Button>
+          </>
+        )}
+      </div>
+
+      {/* 另存新版本 Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>另存新版本</DialogTitle>
+            <DialogDescription>
+              為這個版本取一個名稱，方便之後辨識。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="version-note" className="text-right">
+                版本名稱
+              </Label>
+              <Input
+                id="version-note"
+                value={versionNote}
+                onChange={(e) => setVersionNote(e.target.value)}
+                placeholder={`版本 ${versionRecords.length + 1}`}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={saveAsNewVersion} disabled={saving}>
+              {saving ? '儲存中...' : '確認另存'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

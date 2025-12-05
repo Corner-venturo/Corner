@@ -21,6 +21,7 @@ import type {
   MeetingPoint,
   DailyItinerary,
 } from '@/components/editor/tour-form/types'
+import type { ItineraryVersionRecord } from '@/stores/types'
 import {
   Building2,
   UtensilsCrossed,
@@ -52,6 +53,10 @@ interface LocalTourData {
   meetingInfo: MeetingPoint
   itinerarySubtitle: string
   dailyItinerary: DailyItinerary[]
+  showFeatures?: boolean
+  showLeaderMeeting?: boolean
+  showHotels?: boolean
+  version_records?: ItineraryVersionRecord[]
 }
 
 // Icon mapping
@@ -303,6 +308,8 @@ function NewItineraryPageContent() {
   const [scale, setScale] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
   const mobileContentRef = useRef<HTMLDivElement>(null)
+  // 版本控制：-1 表示主版本，0+ 表示 version_records 的索引
+  const [currentVersionIndex, setCurrentVersionIndex] = useState(-1)
   const [tourData, setTourData] = useState<LocalTourData>({
     tagline: 'Corner Travel 2025',
     title: '',
@@ -536,7 +543,10 @@ function NewItineraryPageContent() {
             },
             itinerarySubtitle: itinerary.itinerary_subtitle || '',
             dailyItinerary: itinerary.daily_itinerary || [],
+            version_records: itinerary.version_records || [],
           })
+          // 重置版本索引到主版本
+          setCurrentVersionIndex(-1)
           setLoading(false)
           hasInitializedRef.current = true
           lastIdRef.current = currentId
@@ -690,6 +700,9 @@ function NewItineraryPageContent() {
       const containerWidth = container.clientWidth
       const containerHeight = container.clientHeight
 
+      // 容器尺寸還沒準備好時跳過
+      if (containerWidth === 0 || containerHeight === 0) return
+
       // 調整目標尺寸（含手機框架）
       const targetWidth = viewMode === 'mobile' ? 410 : 1200 // 390 + 邊框
       const targetHeight = viewMode === 'mobile' ? 880 : 800 // 844 + 邊框
@@ -703,9 +716,24 @@ function NewItineraryPageContent() {
       setScale(finalScale)
     }
 
-    calculateScale()
+    // 使用 ResizeObserver 監聽容器尺寸變化
+    const resizeObserver = new ResizeObserver(() => {
+      calculateScale()
+    })
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current)
+    }
+
+    // 初次計算延遲執行，確保 DOM 已渲染
+    const timer = setTimeout(calculateScale, 100)
+
     window.addEventListener('resize', calculateScale)
-    return () => window.removeEventListener('resize', calculateScale)
+    return () => {
+      clearTimeout(timer)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', calculateScale)
+    }
   }, [viewMode])
 
   // 切換到手機模式時，滾動到標題區域
@@ -721,6 +749,38 @@ function NewItineraryPageContent() {
       }, 100)
     }
   }, [viewMode])
+
+  // 版本切換處理：從 version_records 載入資料到表單
+  const handleVersionChange = (index: number, versionData?: ItineraryVersionRecord) => {
+    setCurrentVersionIndex(index)
+
+    if (index === -1) {
+      // 切回主版本：從 store 重新載入原始資料
+      if (itineraryId) {
+        const itinerary = itineraries.find((i) => i.id === itineraryId)
+        if (itinerary) {
+          setTourData(prev => ({
+            ...prev,
+            dailyItinerary: itinerary.daily_itinerary || [],
+            features: itinerary.features || [],
+            focusCards: itinerary.focus_cards || [],
+            leader: itinerary.leader || { name: '', domesticPhone: '', overseasPhone: '' },
+            meetingInfo: itinerary.meeting_info || { time: '', location: '' },
+          }))
+        }
+      }
+    } else if (versionData) {
+      // 切換到特定版本：載入該版本的資料
+      setTourData(prev => ({
+        ...prev,
+        dailyItinerary: versionData.daily_itinerary || [],
+        features: versionData.features || [],
+        focusCards: versionData.focus_cards || [],
+        leader: versionData.leader || { name: '', domesticPhone: '', overseasPhone: '' },
+        meetingInfo: versionData.meeting_info || { time: '', location: '' },
+      }))
+    }
+  }
 
   // Convert icon strings to components for preview
   // 使用 useMemo 穩定 processedData 引用，避免無限循環
@@ -867,7 +927,13 @@ function NewItineraryPageContent() {
         ]}
         showBackButton={true}
         onBack={() => router.push('/itinerary')}
-        actions={<PublishButton data={{ ...tourData, id: itineraryId || undefined }} />}
+        actions={
+          <PublishButton
+            data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
+            currentVersionIndex={currentVersionIndex}
+            onVersionChange={handleVersionChange}
+          />
+        }
       />
 
       {/* ========== 主要內容區域 ========== */}
@@ -890,7 +956,7 @@ function NewItineraryPageContent() {
                   showHotels: false,
                 }}
                 onChange={(newData) => {
-                  const { meetingPoints, hotels, countries, showFeatures, showLeaderMeeting, showHotels, ...restData } = newData;
+                  const { meetingPoints, hotels, countries, ...restData } = newData;
                   setTourData({
                     ...restData,
                     status: tourData.status,

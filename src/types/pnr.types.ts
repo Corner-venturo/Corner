@@ -19,9 +19,9 @@ export interface PNR {
   // 航班資訊
   segments: PNRSegment[];
 
-  // SSR/OSI
-  special_requests: string[] | null;
-  other_info: string[] | null;
+  // SSR/OSI (JSON格式儲存)
+  special_requests: any[] | null;  // 實際為 EnhancedSSR[]
+  other_info: any[] | null;        // 實際為 EnhancedOSI[]
 
   // 狀態
   status: 'active' | 'ticketed' | 'cancelled' | 'completed';
@@ -60,10 +60,12 @@ export interface CreatePNRInput {
   ticketing_deadline?: Date | null;
   cancellation_deadline?: Date | null;
   segments: PNRSegment[];
-  special_requests?: string[];
-  other_info?: string[];
+  special_requests?: any[];  // EnhancedSSR[]
+  other_info?: any[];        // EnhancedOSI[]
   status?: PNR['status'];
   notes?: string;
+  created_by?: string;
+  updated_by?: string | null;
 }
 
 export interface UpdatePNRInput {

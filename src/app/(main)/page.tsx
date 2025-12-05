@@ -1,29 +1,50 @@
 import { ChatLayout } from '@/features/chat/components/ChatLayout'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
 import type { User } from '@/stores/types'
 import type { Workspace, Channel } from '@/stores/workspace/types'
+
+// 驗證JWT token並獲取用戶ID
+async function getUserFromToken(): Promise<string | null> {
+  const cookieStore = await cookies()
+  const authCookie = cookieStore.get('auth-token')
+  
+  if (!authCookie?.value) {
+    return null
+  }
+
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_in_production_2024')
+    const { payload } = await jwtVerify(authCookie.value, secret, {
+      issuer: 'venturo-app',
+    })
+    return payload.id as string
+  } catch {
+    return null
+  }
+}
 
 async function getInitialChatData(): Promise<{
   workspaces: Workspace[]
   channels: Channel[]
   user: User
 }> {
-  const supabase = await createSupabaseServerClient()
-
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser()
-
-  if (!authUser) {
+  // 先從JWT token獲取用戶ID
+  const userId = await getUserFromToken()
+  
+  if (!userId) {
     return redirect('/login')
   }
 
-  // Fetch the full user profile from the employees table
+  const supabase = await createSupabaseServerClient()
+
+  // Fetch the full user profile from the employees table using JWT token user ID
   const { data: user, error: userError } = await supabase
     .from('employees')
     .select('*')
-    .eq('id', authUser.id)
+    .eq('id', userId)
     .single()
 
   if (userError || !user) {

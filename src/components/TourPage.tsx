@@ -109,14 +109,16 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       />
 
       {/* Divider */}
-      {data.showLeaderMeeting !== false && (
+      {(data.leader?.name || data.leader?.phone || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)) && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
         </div>
       )}
 
-      {/* Leader and Meeting Section */}
-      {data.showLeaderMeeting !== false && <TourLeaderSection data={data} viewMode={viewMode} />}
+      {/* Leader and Meeting Section - 有資料才顯示 */}
+      {(data.leader?.name || data.leader?.phone || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)) && (
+        <TourLeaderSection data={data} viewMode={viewMode} />
+      )}
 
       {/* Divider */}
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (

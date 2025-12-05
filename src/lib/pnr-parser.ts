@@ -22,9 +22,50 @@ export interface ParsedPNR {
   segments: FlightSegment[];
   ticketingDeadline: Date | null;
   cancellationDeadline: Date | null;
-  specialRequests: string[];
-  otherInfo: string[];
+  specialRequests: EnhancedSSR[];
+  otherInfo: EnhancedOSI[];
   contactInfo: string[];
+  validation: ValidationResult;
+}
+
+export interface EnhancedSSR {
+  code: string;          // VGML, WCHR, SPML 等
+  description?: string;  // 自由文字部分
+  segments?: number[];   // 指定航段
+  passenger?: number;    // 指定旅客
+  airline?: string;      // 指定航空公司
+  raw: string;          // 原始文字
+  category: SSRCategory;
+}
+
+export interface EnhancedOSI {
+  airline: string;       // 航空公司代碼 (YY=通用)
+  message: string;       // OSI內容
+  raw: string;          // 原始文字
+  category: OSICategory;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  suggestions: string[];
+}
+
+export enum SSRCategory {
+  MEAL = 'MEAL',        // 餐食相關
+  MEDICAL = 'MEDICAL',  // 醫療相關
+  SEAT = 'SEAT',        // 座位相關
+  BAGGAGE = 'BAGGAGE',  // 行李相關
+  FREQUENT = 'FREQUENT', // 會員相關
+  OTHER = 'OTHER'       // 其他
+}
+
+export enum OSICategory {
+  CONTACT = 'CONTACT',   // 聯絡資訊
+  MEDICAL = 'MEDICAL',   // 醫療資訊
+  VIP = 'VIP',          // VIP服務
+  GENERAL = 'GENERAL'    // 一般資訊
 }
 
 export interface FlightSegment {
@@ -43,6 +84,158 @@ export interface FlightSegment {
 }
 
 /**
+ * SSR代碼分類映射
+ */
+const SSR_CATEGORIES: Record<string, SSRCategory> = {
+  // 餐食類
+  'VGML': SSRCategory.MEAL, 'AVML': SSRCategory.MEAL, 'HNML': SSRCategory.MEAL,
+  'KOSV': SSRCategory.MEAL, 'MOML': SSRCategory.MEAL, 'SPML': SSRCategory.MEAL,
+  'BBML': SSRCategory.MEAL, 'CHML': SSRCategory.MEAL, 'GFML': SSRCategory.MEAL,
+  // 醫療類
+  'WCHR': SSRCategory.MEDICAL, 'WCHS': SSRCategory.MEDICAL, 'WCHC': SSRCategory.MEDICAL,
+  'MAAS': SSRCategory.MEDICAL, 'MEDA': SSRCategory.MEDICAL, 'OXRG': SSRCategory.MEDICAL,
+  'DEAF': SSRCategory.MEDICAL, 'BLND': SSRCategory.MEDICAL, 'DPNA': SSRCategory.MEDICAL,
+  // 座位類
+  'RQST': SSRCategory.SEAT, 'NSSA': SSRCategory.SEAT, 'NSST': SSRCategory.SEAT,
+  'EXST': SSRCategory.SEAT, 'BULK': SSRCategory.SEAT, 'ADIR': SSRCategory.SEAT,
+  // 行李類
+  'CBBG': SSRCategory.BAGGAGE, 'BIKE': SSRCategory.BAGGAGE, 'GOLF': SSRCategory.BAGGAGE,
+  'SURF': SSRCategory.BAGGAGE, 'SKIS': SSRCategory.BAGGAGE, 'OOXY': SSRCategory.BAGGAGE,
+  // 會員類
+  'FQTV': SSRCategory.FREQUENT, 'FQTU': SSRCategory.FREQUENT, 'FQTR': SSRCategory.FREQUENT,
+};
+
+/**
+ * OSI關鍵字分類映射
+ */
+const OSI_KEYWORDS: Array<{ keywords: string[], category: OSICategory }> = [
+  { keywords: ['CONTACT', 'PHONE', 'EMAIL', 'MOBILE'], category: OSICategory.CONTACT },
+  { keywords: ['MEDICAL', 'DOCTOR', 'OXYGEN', 'MEDICATION'], category: OSICategory.MEDICAL },
+  { keywords: ['VIP', 'PRIORITY', 'SPECIAL', 'CELEBRITY'], category: OSICategory.VIP },
+];
+
+/**
+ * 驗證AMADEUS PNR格式
+ */
+export function validateAmadeusPNR(rawPNR: string): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const suggestions: string[] = [];
+  
+  const lines = rawPNR.split('\n').map(line => line.trim()).filter(Boolean);
+  
+  if (lines.length === 0) {
+    errors.push('電報內容不能為空');
+    return { isValid: false, errors, warnings, suggestions };
+  }
+  
+  // 檢查Header (RP/開頭)
+  const hasHeader = lines.some(line => line.startsWith('RP/'));
+  if (!hasHeader) {
+    warnings.push('建議包含Header資訊 (RP/...)');
+  }
+  
+  // 檢查旅客姓名格式
+  const hasValidNames = lines.some(line => /\d+\.[A-Z]+\/[A-Z]+/g.test(line));
+  if (!hasValidNames) {
+    errors.push('未找到有效的旅客姓名格式 (例: 1.SMITH/JOHN)');
+  }
+  
+  // 檢查航班資訊
+  const hasFlightSegments = lines.some(line => 
+    /^\d+\s+[A-Z0-9]{2}\s+\d{1,4}\s+[A-Z]\s+\d{2}[A-Z]{3}/i.test(line));
+  if (!hasFlightSegments) {
+    warnings.push('未找到航班資訊');
+  }
+  
+  // 檢查出票期限
+  const hasTicketingDeadline = lines.some(line => 
+    /(?:ON OR BEFORE|BEFORE)\s+\d{2}[A-Z]{3}/i.test(line));
+  if (!hasTicketingDeadline) {
+    suggestions.push('建議包含出票期限資訊');
+  }
+  
+  // 檢查SSR格式
+  lines.forEach((line, idx) => {
+    if (line.match(/^SR[A-Z]{4}/i)) {
+      const match = line.match(/^SR([A-Z]{4})(?:-(.+?))?(?:\/S(\d+(?:-\d+)?))?(?:\/P(\d+))?/i);
+      if (!match) {
+        warnings.push(`第${idx + 1}行SSR格式可能不正確: ${line}`);
+      }
+    }
+  });
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+    suggestions
+  };
+}
+
+/**
+ * 解析增強型SSR
+ */
+function parseEnhancedSSR(line: string): EnhancedSSR | null {
+  const match = line.match(/^SR([A-Z]{4})(?:-(.+?))?(?:\/S(\d+(?:-\d+)?))?(?:\/P(\d+))?(?:\/([A-Z]{2}))?/i);
+  if (!match) return null;
+  
+  const code = match[1].toUpperCase();
+  const description = match[2]?.trim();
+  const segmentStr = match[3];
+  const passenger = match[4] ? parseInt(match[4]) : undefined;
+  const airline = match[5];
+  
+  // 解析航段範圍
+  let segments: number[] | undefined;
+  if (segmentStr) {
+    if (segmentStr.includes('-')) {
+      const [start, end] = segmentStr.split('-').map(Number);
+      segments = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    } else {
+      segments = [parseInt(segmentStr)];
+    }
+  }
+  
+  return {
+    code,
+    description,
+    segments,
+    passenger,
+    airline,
+    raw: line,
+    category: SSR_CATEGORIES[code] || SSRCategory.OTHER
+  };
+}
+
+/**
+ * 解析增強型OSI
+ */
+function parseEnhancedOSI(line: string): EnhancedOSI | null {
+  const match = line.match(/^OS([A-Z]{2})\s+(.+)/i);
+  if (!match) return null;
+  
+  const airline = match[1].toUpperCase();
+  const message = match[2].trim();
+  
+  // 根據關鍵字分類
+  let category = OSICategory.GENERAL;
+  for (const { keywords, category: cat } of OSI_KEYWORDS) {
+    if (keywords.some(keyword => message.toUpperCase().includes(keyword))) {
+      category = cat;
+      break;
+    }
+  }
+  
+  return {
+    airline,
+    message,
+    raw: line,
+    category
+  };
+}
+
+/**
  * 解析 Amadeus PNR 電報
  */
 export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
@@ -50,6 +243,9 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
 
   logger.log('📋 開始解析電報，共', lines.length, '行');
 
+  // 先驗證格式
+  const validation = validateAmadeusPNR(rawPNR);
+  
   const result: ParsedPNR = {
     recordLocator: '',
     passengerNames: [],
@@ -59,6 +255,7 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     specialRequests: [],
     otherInfo: [],
     contactInfo: [],
+    validation
   };
 
   for (const line of lines) {
@@ -126,15 +323,45 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
       continue;
     }
 
-    // 4. 解析 SSR (Special Service Requests)
+    // 4. 解析增強型 SSR (Special Service Requests)
+    if (line.match(/^SR[A-Z]{4}/i)) {
+      const ssr = parseEnhancedSSR(line);
+      if (ssr) {
+        result.specialRequests.push(ssr);
+        continue;
+      }
+    }
+    
+    // 舊格式SSR兼容
     if (line.match(/^SR\s+/i) || line.match(/^SSR\s+/i)) {
-      result.specialRequests.push(line.replace(/^S{1,2}R\s+/i, '').trim());
+      const rawText = line.replace(/^S{1,2}R\s+/i, '').trim();
+      result.specialRequests.push({
+        code: 'UNKN',
+        description: rawText,
+        raw: line,
+        category: SSRCategory.OTHER
+      });
       continue;
     }
 
-    // 5. 解析 OSI (Other Service Information)
+    // 5. 解析增強型 OSI (Other Service Information)
+    if (line.match(/^OS[A-Z]{2}\s+/i)) {
+      const osi = parseEnhancedOSI(line);
+      if (osi) {
+        result.otherInfo.push(osi);
+        continue;
+      }
+    }
+    
+    // 舊格式OSI兼容
     if (line.match(/^OSI\s+/i)) {
-      result.otherInfo.push(line.replace(/^OSI\s+/i, '').trim());
+      const message = line.replace(/^OSI\s+/i, '').trim();
+      result.otherInfo.push({
+        airline: 'YY',
+        message,
+        raw: line,
+        category: OSICategory.GENERAL
+      });
       continue;
     }
 

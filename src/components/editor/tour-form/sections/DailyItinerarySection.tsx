@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase/client'
 
 // 擴展型別（與 AttractionSelector 一致）
 interface AttractionWithCity extends Attraction {
@@ -43,6 +44,95 @@ export function DailyItinerarySection({
 }: DailyItinerarySectionProps) {
   const [showAttractionSelector, setShowAttractionSelector] = useState(false)
   const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1)
+  const [uploadingImage, setUploadingImage] = useState<{ dayIndex: number; imageIndex: number } | null>(null)
+  const [uploadingActivityImage, setUploadingActivityImage] = useState<{ dayIndex: number; actIndex: number } | null>(null)
+  const [dragOver, setDragOver] = useState<{ dayIndex: number; imageIndex: number } | null>(null)
+  const [activityDragOver, setActivityDragOver] = useState<{ dayIndex: number; actIndex: number } | null>(null)
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+  const activityFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+
+  // 上傳每日圖片
+  const handleImageUpload = async (
+    dayIndex: number,
+    imageIndex: number,
+    file: File
+  ) => {
+    if (!file.type.startsWith('image/')) {
+      alert('請選擇圖片檔案')
+      return
+    }
+
+    setUploadingImage({ dayIndex, imageIndex })
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `day-${dayIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+      const filePath = `tour-daily-images/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-files')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('上傳失敗:', uploadError)
+        alert('圖片上傳失敗')
+        return
+      }
+
+      const { data } = supabase.storage
+        .from('workspace-files')
+        .getPublicUrl(filePath)
+
+      updateDayImage(dayIndex, imageIndex, data.publicUrl)
+    } catch (error) {
+      console.error('上傳錯誤:', error)
+      alert('上傳過程發生錯誤')
+    } finally {
+      setUploadingImage(null)
+    }
+  }
+
+  // 上傳活動圖片
+  const handleActivityImageUpload = async (
+    dayIndex: number,
+    actIndex: number,
+    file: File
+  ) => {
+    if (!file.type.startsWith('image/')) {
+      alert('請選擇圖片檔案')
+      return
+    }
+
+    setUploadingActivityImage({ dayIndex, actIndex })
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `activity-${dayIndex + 1}-${actIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+      const filePath = `tour-activity-images/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-files')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('上傳失敗:', uploadError)
+        alert('圖片上傳失敗')
+        return
+      }
+
+      const { data } = supabase.storage
+        .from('workspace-files')
+        .getPublicUrl(filePath)
+
+      updateActivity(dayIndex, actIndex, 'image', data.publicUrl)
+    } catch (error) {
+      console.error('上傳錯誤:', error)
+      alert('上傳過程發生錯誤')
+    } finally {
+      setUploadingActivityImage(null)
+    }
+  }
+
   // 開啟景點選擇器
   const handleOpenAttractionSelector = (dayIndex: number) => {
     setCurrentDayIndex(dayIndex)
@@ -68,8 +158,9 @@ export function DailyItinerarySection({
         'description',
         attraction.description || ''
       )
-      // 設定圖片（如果有的話）
-      updateActivity(currentDayIndex, newActivityIndex, 'image', attraction.thumbnail || '')
+      // 設定圖片（優先使用 thumbnail，沒有則取 images 第一張）
+      const imageUrl = attraction.thumbnail || (attraction.images && attraction.images.length > 0 ? attraction.images[0] : '')
+      updateActivity(currentDayIndex, newActivityIndex, 'image', imageUrl)
     })
     setCurrentDayIndex(-1)
   }
@@ -255,26 +346,84 @@ export function DailyItinerarySection({
               </button>
             </div>
             <div className="space-y-2">
-              {(day.images || []).map((image: string, imageIndex: number) => (
-                <div key={imageIndex} className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={image}
-                    onChange={e => updateDayImage(dayIndex, imageIndex, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-morandi-container rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-                    placeholder="https://images.unsplash.com/..."
-                  />
-                  <button
-                    onClick={() => removeDayImage(dayIndex, imageIndex)}
-                    className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
+              {(day.images || []).map((image: string, imageIndex: number) => {
+                const inputKey = `${dayIndex}-${imageIndex}`
+                const isUploading = uploadingImage?.dayIndex === dayIndex && uploadingImage?.imageIndex === imageIndex
+                const isDragOver = dragOver?.dayIndex === dayIndex && dragOver?.imageIndex === imageIndex
+
+                return (
+                  <div
+                    key={imageIndex}
+                    className={`flex items-center gap-2 p-2 rounded-lg border-2 border-dashed transition-colors ${
+                      isDragOver
+                        ? 'border-morandi-gold bg-morandi-gold/10'
+                        : 'border-transparent'
+                    }`}
+                    onDragOver={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setDragOver({ dayIndex, imageIndex })
+                    }}
+                    onDragLeave={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setDragOver(null)
+                    }}
+                    onDrop={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setDragOver(null)
+                      const file = e.dataTransfer.files?.[0]
+                      if (file && file.type.startsWith('image/')) {
+                        handleImageUpload(dayIndex, imageIndex, file)
+                      }
+                    }}
                   >
-                    ✕
-                  </button>
-                </div>
-              ))}
+                    <input
+                      type="text"
+                      value={image}
+                      onChange={e => updateDayImage(dayIndex, imageIndex, e.target.value)}
+                      className="flex-1 px-3 py-2 border border-morandi-container rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
+                      placeholder={isUploading ? '上傳中...' : '貼上網址或拖曳圖片到此...'}
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={el => { fileInputRefs.current[inputKey] = el }}
+                      onChange={e => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          handleImageUpload(dayIndex, imageIndex, file)
+                        }
+                        e.target.value = ''
+                      }}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRefs.current[inputKey]?.click()}
+                      disabled={isUploading}
+                      className="px-2 py-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded-lg text-morandi-primary transition-colors disabled:opacity-50"
+                      title="上傳圖片"
+                    >
+                      {isUploading ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Upload size={16} />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => removeDayImage(dayIndex, imageIndex)}
+                      className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )
+              })}
               {(!day.images || day.images.length === 0) && (
                 <p className="text-xs text-gray-400">
-                  暫無圖片，點擊「新增圖片」填入第一張每日精選照片網址。
+                  暫無圖片，點擊「新增圖片」可填入網址、拖曳或上傳照片。
                 </p>
               )}
             </div>
@@ -302,48 +451,144 @@ export function DailyItinerarySection({
                 </Button>
               </div>
             </div>
-            {day.activities?.map((activity: Activity, actIndex: number) => (
-              <div
-                key={actIndex}
-                className="space-y-2 bg-white/90 p-3 rounded-lg border border-morandi-container"
-              >
-                <div>
-                  <input
-                    type="text"
-                    value={activity.title}
-                    onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg text-sm"
-                    placeholder="阿蘇火山"
-                  />
+            {day.activities?.map((activity: Activity, actIndex: number) => {
+              const activityInputKey = `activity-${dayIndex}-${actIndex}`
+              const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
+              const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
+
+              return (
+                <div
+                  key={actIndex}
+                  className="bg-white/90 p-3 rounded-lg border border-morandi-container"
+                >
+                  <div className="flex gap-3">
+                    {/* 圖片區域 */}
+                    <div
+                      className={`relative w-24 h-24 flex-shrink-0 rounded-lg border-2 border-dashed overflow-hidden transition-colors ${
+                        isActivityDragOver
+                          ? 'border-morandi-gold bg-morandi-gold/10'
+                          : activity.image
+                            ? 'border-transparent'
+                            : 'border-morandi-container bg-morandi-container/20'
+                      }`}
+                      onDragOver={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setActivityDragOver({ dayIndex, actIndex })
+                      }}
+                      onDragLeave={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setActivityDragOver(null)
+                      }}
+                      onDrop={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setActivityDragOver(null)
+                        const file = e.dataTransfer.files?.[0]
+                        if (file && file.type.startsWith('image/')) {
+                          handleActivityImageUpload(dayIndex, actIndex, file)
+                        }
+                      }}
+                    >
+                      {activity.image ? (
+                        <>
+                          <img
+                            src={activity.image}
+                            alt={activity.title || '活動圖片'}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => updateActivity(dayIndex, actIndex, 'image', '')}
+                            className="absolute top-1 right-1 w-5 h-5 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                            title="移除圖片"
+                          >
+                            <X size={12} />
+                          </button>
+                        </>
+                      ) : (
+                        <label
+                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-morandi-container/30 transition-colors"
+                        >
+                          {isActivityUploading ? (
+                            <Loader2 size={20} className="text-morandi-secondary animate-spin" />
+                          ) : (
+                            <>
+                              <ImageIcon size={20} className="text-morandi-secondary/50 mb-1" />
+                              <span className="text-[10px] text-morandi-secondary/50">點擊或拖曳</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={el => { activityFileInputRefs.current[activityInputKey] = el }}
+                            onChange={e => {
+                              const file = e.target.files?.[0]
+                              if (file) {
+                                handleActivityImageUpload(dayIndex, actIndex, file)
+                              }
+                              e.target.value = ''
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+
+                    {/* 文字區域 */}
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="text"
+                        value={activity.title}
+                        onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg text-sm"
+                        placeholder="景點名稱"
+                      />
+                      <textarea
+                        value={activity.description}
+                        onChange={e =>
+                          updateActivity(dayIndex, actIndex, 'description', e.target.value)
+                        }
+                        className="w-full px-3 py-2 border rounded-lg text-sm resize-none"
+                        rows={2}
+                        placeholder="描述（選填）"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 底部操作區 */}
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-container/50">
+                    <div className="flex items-center gap-2">
+                      {!activity.image && (
+                        <button
+                          type="button"
+                          onClick={() => activityFileInputRefs.current[activityInputKey]?.click()}
+                          disabled={isActivityUploading}
+                          className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors disabled:opacity-50"
+                        >
+                          <Upload size={12} />
+                          上傳圖片
+                        </button>
+                      )}
+                      <input
+                        type="text"
+                        value={activity.image || ''}
+                        onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
+                        className="w-48 px-2 py-1 border border-morandi-container rounded text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold/50"
+                        placeholder="或貼上圖片網址..."
+                      />
+                    </div>
+                    <button
+                      onClick={() => removeActivity(dayIndex, actIndex)}
+                      className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
+                    >
+                      ✕ 刪除
+                    </button>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2">
-                  <input
-                    type="text"
-                    value={activity.description}
-                    onChange={e =>
-                      updateActivity(dayIndex, actIndex, 'description', e.target.value)
-                    }
-                    className="px-3 py-2 border rounded text-sm"
-                    placeholder="描述"
-                  />
-                  <input
-                    type="text"
-                    value={activity.image || ''}
-                    onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
-                    className="px-3 py-2 border rounded text-sm"
-                    placeholder="圖片網址（選填）"
-                  />
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => removeActivity(dayIndex, actIndex)}
-                    className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
-                  >
-                    ✕ 刪除活動
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* 推薦行程 */}

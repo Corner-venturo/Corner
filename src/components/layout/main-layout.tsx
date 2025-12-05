@@ -8,14 +8,15 @@ import { cn } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation'
 import {
-  STORAGE_KEY_LAST_VISITED,
   NO_SIDEBAR_PAGES,
   CUSTOM_LAYOUT_PAGES,
   HEADER_HEIGHT_PX,
   SIDEBAR_WIDTH_EXPANDED_PX,
   SIDEBAR_WIDTH_COLLAPSED_PX,
   LAYOUT_TRANSITION_DURATION,
-} from '@/lib/constants'
+} from '@/lib/constants/layout'
+
+const STORAGE_KEY_LAST_VISITED = 'last-visited-path'
 
 interface MainLayoutProps {
   children: React.ReactNode

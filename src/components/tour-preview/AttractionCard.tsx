@@ -130,29 +130,40 @@ export function AttractionCard({
     )
   }
 
-  // Horizontal layout - 預設佈局
+  // Horizontal layout - 預設佈局（無圖片時為緊湊文字卡片）
   return (
     <div
-      className={`flex gap-5 rounded-[20px] overflow-hidden p-6 ${className}`}
+      className={`rounded-[16px] overflow-hidden flex flex-col ${hasImage ? 'p-5' : 'p-4'} ${className}`}
       style={{
-        backgroundColor: morandiColors.background.white,
+        backgroundColor: hasImage ? morandiColors.background.white : morandiColors.background.cream,
         border: `1px solid ${morandiColors.border.light}`,
         boxShadow: `0 1px 8px ${morandiColors.shadow.soft}`,
       }}
     >
-      {hasImage && (
-        <div className="relative w-36 h-36 flex-shrink-0 rounded-[16px] overflow-hidden">
-          <Image src={image} alt={title} fill className="object-cover" sizes="144px" />
+      {hasImage ? (
+        <div className="flex gap-5">
+          <div className="relative w-32 h-32 flex-shrink-0 rounded-[12px] overflow-hidden">
+            <Image src={image} alt={title} fill className="object-cover" sizes="128px" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-bold text-base mb-2" style={{ color: morandiColors.text.primary }}>
+              {title}
+            </h4>
+            <p className="text-sm leading-relaxed" style={{ color: morandiColors.text.secondary }}>
+              {description}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col justify-center">
+          <h4 className="font-bold text-base mb-2" style={{ color: morandiColors.text.primary }}>
+            {title}
+          </h4>
+          <p className="text-sm leading-relaxed line-clamp-4" style={{ color: morandiColors.text.secondary }}>
+            {description}
+          </p>
         </div>
       )}
-      <div className="flex-1 min-w-0">
-        <h4 className="text-lg font-bold mb-2" style={{ color: morandiColors.text.primary }}>
-          {title}
-        </h4>
-        <p className="text-sm leading-relaxed" style={{ color: morandiColors.text.secondary }}>
-          {description}
-        </p>
-      </div>
     </div>
   )
 }

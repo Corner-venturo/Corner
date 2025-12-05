@@ -266,6 +266,12 @@ export interface MeetingInfo {
   location: string
 }
 
+export interface HotelInfo {
+  name: string
+  description: string
+  image?: string
+}
+
 export interface DailyActivity {
   icon: string // emoji 或 icon
   title: string
@@ -290,6 +296,22 @@ export interface DailyItineraryDay {
   meals: DailyMeals
   accommodation: string
   images?: string[]
+}
+
+// 行程表版本記錄（存在同一筆資料的 JSON 陣列裡）
+export interface ItineraryVersionRecord {
+  id: string // UUID
+  version: number // 版本號
+  note: string // 版本備註（如：原始版、客戶修改版）
+  // 可變動的內容
+  daily_itinerary: DailyItineraryDay[]
+  features?: ItineraryFeature[]
+  focus_cards?: FocusCard[]
+  leader?: LeaderInfo
+  meeting_info?: MeetingInfo
+  hotels?: HotelInfo[]
+  // 時間戳記
+  created_at: string
 }
 
 export interface Itinerary {
@@ -324,11 +346,17 @@ export interface Itinerary {
   // 集合資訊
   meeting_info?: MeetingInfo
 
+  // 飯店資訊
+  hotels?: HotelInfo[]
+
   // 行程副標題
   itinerary_subtitle?: string
 
   // 逐日行程
   daily_itinerary: DailyItineraryDay[]
+
+  // 版本記錄（像 Excel 分頁）
+  version_records?: ItineraryVersionRecord[]
 
   created_at: string
   updated_at: string

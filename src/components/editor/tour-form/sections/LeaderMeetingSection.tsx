@@ -39,15 +39,7 @@ export function LeaderMeetingSection({
         <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2 flex-1">
           領隊與集合資訊
         </h2>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={data.showLeaderMeeting !== false}
-            onChange={e => updateField('showLeaderMeeting', e.target.checked)}
-            className="w-4 h-4 text-morandi-gold rounded focus:ring-morandi-gold/50"
-          />
-          <span className="text-morandi-primary">顯示此區塊</span>
-        </label>
+        <span className="text-xs text-morandi-secondary">有填寫資料時自動顯示</span>
       </div>
 
       <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
