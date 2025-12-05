@@ -35,6 +35,12 @@ export interface Meals {
   dinner: string
 }
 
+// 每日圖片（支援位置調整）
+export interface DailyImage {
+  url: string
+  position?: string // object-position 值，如 "center", "center top", "center 30%"
+}
+
 export interface DailyItinerary {
   dayLabel: string
   date: string
@@ -45,7 +51,7 @@ export interface DailyItinerary {
   recommendations: string[]
   meals: Meals
   accommodation: string
-  images?: string[]
+  images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
 }
 
 export interface LeaderInfo {

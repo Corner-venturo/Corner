@@ -67,6 +67,13 @@ export function TourItinerarySection({
     image?: string
   } | null>(null)
 
+  // 收集整個行程的所有每日照片
+  const allTourImages = dailyItinerary.flatMap(day =>
+    (day.images || []).map(img =>
+      typeof img === 'string' ? img : img.url
+    ).filter(url => url && url.trim() !== '')
+  )
+
   // 創建點擊處理函數
   const handleActivityClick = (activity: any) => {
     setSelectedActivity({
@@ -437,6 +444,7 @@ export function TourItinerarySection({
                   <DailyImageCarousel
                     images={day.images || []}
                     title={day.title || day.dayLabel || `Day ${index + 1}`}
+                    allTourImages={allTourImages}
                   />
                 </article>
               ))}

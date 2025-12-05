@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid } from 'lucide-react'
+import { DailyImagesUploader } from './DailyImagesUploader'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
@@ -32,6 +33,7 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
+  rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
@@ -253,6 +255,72 @@ function SortableActivityItem({
     </div>
   )
 }
+
+// 網格模式的縮圖組件
+interface SortableActivityGridItemProps {
+  activity: Activity
+  actIndex: number
+  dayIndex: number
+}
+
+function SortableActivityGridItem({
+  activity,
+  actIndex,
+  dayIndex,
+}: SortableActivityGridItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `activity-${dayIndex}-${actIndex}` })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : 'auto',
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="relative aspect-square rounded-lg overflow-hidden border border-morandi-container bg-morandi-container/20 cursor-grab active:cursor-grabbing group"
+    >
+      {activity.image ? (
+        <img
+          src={activity.image}
+          alt={activity.title || '活動圖片'}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-morandi-container/30">
+          <ImageIcon size={24} className="text-morandi-secondary/40" />
+        </div>
+      )}
+      {/* 序號標籤 */}
+      <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/60 rounded text-white text-xs font-bold">
+        {actIndex + 1}
+      </div>
+      {/* 標題 */}
+      <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-gradient-to-t from-black/70 to-transparent">
+        <p className="text-white text-xs font-medium truncate">
+          {activity.title || '未命名景點'}
+        </p>
+      </div>
+      {/* 拖曳提示 */}
+      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <GripVertical size={20} className="text-white" />
+      </div>
+    </div>
+  )
+}
+
 export function DailyItinerarySection({
   data,
   updateField,
@@ -304,12 +372,11 @@ export function DailyItinerarySection({
   }
   const [showAttractionSelector, setShowAttractionSelector] = useState(false)
   const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1)
-  const [uploadingImage, setUploadingImage] = useState<{ dayIndex: number; imageIndex: number } | null>(null)
   const [uploadingActivityImage, setUploadingActivityImage] = useState<{ dayIndex: number; actIndex: number } | null>(null)
-  const [dragOver, setDragOver] = useState<{ dayIndex: number; imageIndex: number } | null>(null)
   const [activityDragOver, setActivityDragOver] = useState<{ dayIndex: number; actIndex: number } | null>(null)
-  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const activityFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+  // 每天的活動視圖模式（列表 or 網格）
+  const [activityViewMode, setActivityViewMode] = useState<Record<number, 'list' | 'grid'>>({})
 
   // 圖庫儲存狀態
   const [saveToLibraryDialog, setSaveToLibraryDialog] = useState<{
@@ -323,47 +390,6 @@ export function DailyItinerarySection({
 
 
   const workspaceId = useAuthStore(state => state.user?.workspace_id)
-
-  // 上傳每日圖片
-  const handleImageUpload = async (
-    dayIndex: number,
-    imageIndex: number,
-    file: File
-  ) => {
-    if (!file.type.startsWith('image/')) {
-      alert('請選擇圖片檔案')
-      return
-    }
-
-    setUploadingImage({ dayIndex, imageIndex })
-
-    try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `day-${dayIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
-      const filePath = `tour-daily-images/${fileName}`
-
-      const { error: uploadError } = await supabase.storage
-        .from('workspace-files')
-        .upload(filePath, file)
-
-      if (uploadError) {
-        console.error('上傳失敗:', uploadError)
-        alert('圖片上傳失敗')
-        return
-      }
-
-      const { data } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
-
-      updateDayImage(dayIndex, imageIndex, data.publicUrl)
-    } catch (error) {
-      console.error('上傳錯誤:', error)
-      alert('上傳過程發生錯誤')
-    } finally {
-      setUploadingImage(null)
-    }
-  }
 
   // 上傳活動圖片
   const handleActivityImageUpload = async (
@@ -703,7 +729,36 @@ export function DailyItinerarySection({
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-morandi-primary">景點活動</label>
-                <span className="text-xs text-morandi-secondary">（拖曳 ⋮⋮ 可調整順序）</span>
+                {/* 視圖切換按鈕 */}
+                <div className="flex items-center bg-morandi-container/50 rounded-lg p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setActivityViewMode(prev => ({ ...prev, [dayIndex]: 'list' }))}
+                    className={`p-1.5 rounded transition-colors ${
+                      (activityViewMode[dayIndex] || 'list') === 'list'
+                        ? 'bg-white shadow-sm text-morandi-primary'
+                        : 'text-morandi-secondary hover:text-morandi-primary'
+                    }`}
+                    title="列表模式"
+                  >
+                    <List size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActivityViewMode(prev => ({ ...prev, [dayIndex]: 'grid' }))}
+                    className={`p-1.5 rounded transition-colors ${
+                      activityViewMode[dayIndex] === 'grid'
+                        ? 'bg-white shadow-sm text-morandi-primary'
+                        : 'text-morandi-secondary hover:text-morandi-primary'
+                    }`}
+                    title="網格預覽（快速排序）"
+                  >
+                    <LayoutGrid size={14} />
+                  </button>
+                </div>
+                <span className="text-xs text-morandi-secondary">
+                  {activityViewMode[dayIndex] === 'grid' ? '（拖曳調整順序）' : '（拖曳 ⋮⋮ 可調整順序）'}
+                </span>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -730,28 +785,43 @@ export function DailyItinerarySection({
             >
               <SortableContext
                 items={day.activities?.map((_, i) => `activity-${dayIndex}-${i}`) || []}
-                strategy={verticalListSortingStrategy}
+                strategy={activityViewMode[dayIndex] === 'grid' ? rectSortingStrategy : verticalListSortingStrategy}
               >
-                {day.activities?.map((activity: Activity, actIndex: number) => {
-                  const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
-                  const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
+                {activityViewMode[dayIndex] === 'grid' ? (
+                  /* 網格預覽模式 */
+                  <div className="grid grid-cols-5 gap-3 p-3 bg-morandi-container/20 rounded-xl">
+                    {day.activities?.map((activity: Activity, actIndex: number) => (
+                      <SortableActivityGridItem
+                        key={`activity-${dayIndex}-${actIndex}`}
+                        activity={activity}
+                        actIndex={actIndex}
+                        dayIndex={dayIndex}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* 列表編輯模式 */
+                  day.activities?.map((activity: Activity, actIndex: number) => {
+                    const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
+                    const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
 
-                  return (
-                    <SortableActivityItem
-                      key={`activity-${dayIndex}-${actIndex}`}
-                      activity={activity}
-                      actIndex={actIndex}
-                      dayIndex={dayIndex}
-                      updateActivity={updateActivity}
-                      removeActivity={removeActivity}
-                      handleActivityImageUpload={handleActivityImageUpload}
-                      isActivityUploading={isActivityUploading}
-                      isActivityDragOver={isActivityDragOver}
-                      setActivityDragOver={setActivityDragOver}
-                      activityFileInputRefs={activityFileInputRefs}
-                    />
-                  )
-                })}
+                    return (
+                      <SortableActivityItem
+                        key={`activity-${dayIndex}-${actIndex}`}
+                        activity={activity}
+                        actIndex={actIndex}
+                        dayIndex={dayIndex}
+                        updateActivity={updateActivity}
+                        removeActivity={removeActivity}
+                        handleActivityImageUpload={handleActivityImageUpload}
+                        isActivityUploading={isActivityUploading}
+                        isActivityDragOver={isActivityDragOver}
+                        setActivityDragOver={setActivityDragOver}
+                        activityFileInputRefs={activityFileInputRefs}
+                      />
+                    )
+                  })
+                )}
               </SortableContext>
             </DndContext>
           </div>
@@ -843,104 +913,21 @@ export function DailyItinerarySection({
           </div>
 
           {/* 每日圖片 */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">每日圖片</label>
-                <p className="text-xs text-morandi-secondary mt-1">
-                  建議尺寸 1600 × 900 以上，可依序新增多張照片
-                </p>
-              </div>
-              <button
-                onClick={() => addDayImage(dayIndex)}
-                className="px-2.5 py-1 bg-morandi-gold text-white rounded text-xs shadow hover:bg-morandi-gold/90"
-              >
-                + 新增圖片
-              </button>
-            </div>
-            <div className="space-y-2">
-              {(day.images || []).map((image: string, imageIndex: number) => {
-                const inputKey = `${dayIndex}-${imageIndex}`
-                const isUploading = uploadingImage?.dayIndex === dayIndex && uploadingImage?.imageIndex === imageIndex
-                const isDragOver = dragOver?.dayIndex === dayIndex && dragOver?.imageIndex === imageIndex
-
-                return (
-                  <div
-                    key={imageIndex}
-                    className={`flex items-center gap-2 p-2 rounded-lg border-2 border-dashed transition-colors ${
-                      isDragOver
-                        ? 'border-morandi-gold bg-morandi-gold/10'
-                        : 'border-transparent'
-                    }`}
-                    onDragOver={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setDragOver({ dayIndex, imageIndex })
-                    }}
-                    onDragLeave={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setDragOver(null)
-                    }}
-                    onDrop={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setDragOver(null)
-                      const file = e.dataTransfer.files?.[0]
-                      if (file && file.type.startsWith('image/')) {
-                        handleImageUpload(dayIndex, imageIndex, file)
-                      }
-                    }}
-                  >
-                    <input
-                      type="text"
-                      value={image}
-                      onChange={e => updateDayImage(dayIndex, imageIndex, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-morandi-container rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-                      placeholder={isUploading ? '上傳中...' : '貼上網址或拖曳圖片到此...'}
-                    />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={el => { fileInputRefs.current[inputKey] = el }}
-                      onChange={e => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          handleImageUpload(dayIndex, imageIndex, file)
-                        }
-                        e.target.value = ''
-                      }}
-                      className="hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => fileInputRefs.current[inputKey]?.click()}
-                      disabled={isUploading}
-                      className="px-2 py-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded-lg text-morandi-primary transition-colors disabled:opacity-50"
-                      title="上傳圖片"
-                    >
-                      {isUploading ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Upload size={16} />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => removeDayImage(dayIndex, imageIndex)}
-                      className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
+          <DailyImagesUploader
+            dayIndex={dayIndex}
+            images={day.images || []}
+            onImagesChange={(newImages) => {
+              updateDailyItinerary(dayIndex, 'images', newImages)
+            }}
+            allTourImages={
+              // 收集整個行程的所有每日照片
+              data.dailyItinerary?.flatMap(d =>
+                (d.images || []).map(img =>
+                  typeof img === 'string' ? img : img.url
                 )
-              })}
-              {(!day.images || day.images.length === 0) && (
-                <p className="text-xs text-gray-400">
-                  暫無圖片，點擊「新增圖片」可填入網址、拖曳或上傳照片。
-                </p>
-              )}
-            </div>
-          </div>
+              ) || []
+            }
+          />
         </div>
       ))}
 
