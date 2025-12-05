@@ -1,95 +1,57 @@
-'use client'
+import { Metadata } from 'next'
+import { createClient } from '@supabase/supabase-js'
+import PublicViewClient from './client'
 
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import TourPage from '@/components/TourPage'
-import { Loader2 } from 'lucide-react'
+// Supabase Admin Client（繞過 RLS）
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey)
 
-interface ItineraryData {
-  title?: string
-  tourCode?: string
-  [key: string]: unknown
+interface PageProps {
+  params: Promise<{ id: string }>
+}
+
+// 動態生成 metadata（Open Graph for LINE/Facebook 預覽）
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+
+  try {
+    const { data: itinerary } = await supabase
+      .from('itineraries')
+      .select('title, tour_code, description, cover_image')
+      .eq('id', id)
+      .single()
+
+    if (itinerary) {
+      const title = itinerary.tour_code || itinerary.title || '行程表'
+      const description = itinerary.description || `${itinerary.title} - 詳細行程資訊`
+
+      return {
+        title,
+        description,
+        openGraph: {
+          title,
+          description,
+          images: itinerary.cover_image ? [itinerary.cover_image] : [],
+          type: 'website',
+        },
+      }
+    }
+  } catch (error) {
+    console.error('generateMetadata error:', error)
+  }
+
+  return {
+    title: '行程表',
+    description: '查看詳細行程資訊',
+  }
 }
 
 /**
  * 公開分享頁面
  * 讓客戶可以不用登入直接查看行程表
  */
-export default function PublicViewPage() {
-  const params = useParams()
-  const id = params.id as string
-
-  const [data, setData] = useState<ItineraryData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchItinerary() {
-      if (!id) {
-        setError('缺少行程 ID')
-        setLoading(false)
-        return
-      }
-
-      try {
-        const response = await fetch(`/api/itineraries/${encodeURIComponent(id)}`)
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error || '無法載入行程')
-        }
-
-        const itineraryData = await response.json()
-        setData(itineraryData)
-
-        // 更新 Chrome 分頁標題
-        const pageTitle = itineraryData.tourCode || itineraryData.title || '行程表'
-        document.title = pageTitle
-      } catch (err) {
-        console.error('載入行程失敗:', err)
-        setError(err instanceof Error ? err.message : '載入行程時發生錯誤')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchItinerary()
-  }, [id])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-morandi-background">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-morandi-primary mx-auto mb-4" />
-          <p className="text-morandi-secondary">載入行程中...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-morandi-background">
-        <div className="text-center max-w-md px-4">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
-            <span className="text-2xl">!</span>
-          </div>
-          <h1 className="text-xl font-semibold text-morandi-primary mb-2">無法載入行程</h1>
-          <p className="text-morandi-secondary">{error}</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!data) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-morandi-background">
-        <div className="text-center">
-          <p className="text-morandi-secondary">找不到此行程</p>
-        </div>
-      </div>
-    )
-  }
-
-  return <TourPage data={data} isPreview={false} viewMode="desktop" />
+export default async function PublicViewPage({ params }: PageProps) {
+  const { id } = await params
+  return <PublicViewClient id={id} />
 }
