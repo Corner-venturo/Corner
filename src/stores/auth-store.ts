@@ -70,16 +70,21 @@ export const useAuthStore = create<AuthState>()(
       validateLogin: async (username: string, password: string) => {
         try {
           logger.log('🌐 Authenticating via Supabase...', username)
+          logger.log('🔧 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...')
 
           const { supabase } = await import('@/lib/supabase/client')
+          logger.log('📡 Querying employees table...')
+
           const { data: employees, error: queryError } = await supabase
             .from('employees')
             .select('*')
             .eq('employee_number', username)
             .single()
 
+          logger.log('📥 Query result:', { hasData: !!employees, error: queryError?.message })
+
           if (queryError || !employees) {
-            logger.error('❌ Supabase query failed:', queryError?.message)
+            logger.error('❌ Supabase query failed:', queryError?.message, queryError?.code)
             return { success: false, message: '帳號或密碼錯誤' }
           }
           
