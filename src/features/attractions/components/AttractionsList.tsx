@@ -1,4 +1,4 @@
-import { MapPin, Trash2, Power, Edit2 } from 'lucide-react'
+import { MapPin, Trash2, Power, Edit2, ChevronUp, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
@@ -18,6 +18,8 @@ interface AttractionsListProps {
   onToggleStatus: (attraction: Attraction) => void
   onDelete: (id: string) => void
   onAddNew: () => void
+  onMoveUp?: (attraction: Attraction) => void
+  onMoveDown?: (attraction: Attraction) => void
 }
 
 export function AttractionsList({
@@ -28,6 +30,8 @@ export function AttractionsList({
   onEdit,
   onToggleStatus,
   onDelete,
+  onMoveUp,
+  onMoveDown,
 }: AttractionsListProps) {
   // 定義表格欄位
   const columns = [
@@ -160,10 +164,44 @@ export function AttractionsList({
       loading={loading}
       onRowClick={onEdit as (row: unknown) => void}
       initialPageSize={20}
-      actions={(row: unknown) => {
+      actions={(row: unknown, index: number) => {
         const attraction = row as Attraction
+        const isFirst = index === 0
+        const isLast = index === sortedAttractions.length - 1
         return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
+          {/* 上移/下移按鈕 */}
+          {onMoveUp && onMoveDown && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={e => {
+                  e.stopPropagation()
+                  onMoveUp(attraction)
+                }}
+                disabled={isFirst}
+                className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
+                title="上移"
+              >
+                <ChevronUp size={14} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={e => {
+                  e.stopPropagation()
+                  onMoveDown(attraction)
+                }}
+                disabled={isLast}
+                className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
+                title="下移"
+              >
+                <ChevronDown size={14} />
+              </Button>
+              <div className="w-px h-4 bg-border mx-1" />
+            </>
+          )}
           <Button
             variant="ghost"
             size="sm"

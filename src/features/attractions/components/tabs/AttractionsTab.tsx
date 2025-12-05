@@ -47,7 +47,7 @@ export default function AttractionsTab({
     useAttractionsData()
 
   const { isEditOpen, editingAttraction, openEdit, closeEdit } = useAttractionsDialog()
-  const { reorderAttractions } = useAttractionsReorder()
+  const { reorderAttractions, moveUp, moveDown } = useAttractionsReorder()
 
   // 當景點載入後，取得所有用到的國家和城市 ID，然後查詢這些資料
   useEffect(() => {
@@ -176,6 +176,8 @@ export default function AttractionsTab({
             onToggleStatus={toggleStatus}
             onDelete={deleteAttraction}
             onAddNew={openAdd}
+            onMoveUp={(attraction) => moveUp(attraction, sortedAttractions)}
+            onMoveDown={(attraction) => moveDown(attraction, sortedAttractions)}
           />
         )}
       </div>

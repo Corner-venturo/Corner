@@ -66,8 +66,9 @@ export interface StoreState<T extends BaseEntity> {
  * 編號生成配置
  */
 export interface CodeConfig {
-  prefix: string // 前綴（如 'T', 'O', 'C'）
+  prefix?: string // 前綴（如 'T', 'O', 'C'）
   year?: number // 年份（預設當前年份）
+  quoteType?: 'quick' | 'standard' // 報價單類型（快速 Q 系列或標準 A-Z 系列）
 }
 
 /**

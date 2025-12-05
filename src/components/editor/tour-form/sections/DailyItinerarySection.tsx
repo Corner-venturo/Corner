@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
@@ -17,6 +17,23 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { RelatedImagesPreviewer } from '../../RelatedImagesPreviewer'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // 擴展型別（與 AttractionSelector 一致）
 interface AttractionWithCity extends Attraction {
@@ -31,12 +48,210 @@ interface DailyItinerarySectionProps {
   addActivity: (dayIndex: number) => void
   updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
   removeActivity: (dayIndex: number, actIndex: number) => void
+  reorderActivities?: (dayIndex: number, activities: Activity[]) => void
   addDayImage: (dayIndex: number) => void
   updateDayImage: (dayIndex: number, imageIndex: number, value: string) => void
   removeDayImage: (dayIndex: number, imageIndex: number) => void
   addRecommendation: (dayIndex: number) => void
   updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void
   removeRecommendation: (dayIndex: number, recIndex: number) => void
+}
+
+// 可拖曳的活動項目組件
+interface SortableActivityItemProps {
+  activity: Activity
+  actIndex: number
+  dayIndex: number
+  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
+  removeActivity: (dayIndex: number, actIndex: number) => void
+  handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
+  isActivityUploading: boolean
+  isActivityDragOver: boolean
+  setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
+  activityFileInputRefs: React.MutableRefObject<{ [key: string]: HTMLInputElement | null }>
+}
+
+function SortableActivityItem({
+  activity,
+  actIndex,
+  dayIndex,
+  updateActivity,
+  removeActivity,
+  handleActivityImageUpload,
+  isActivityUploading,
+  isActivityDragOver,
+  setActivityDragOver,
+  activityFileInputRefs,
+}: SortableActivityItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `activity-${dayIndex}-${actIndex}` })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : 'auto',
+  }
+
+  const activityInputKey = `activity-${dayIndex}-${actIndex}`
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white/90 p-3 rounded-lg border border-morandi-container"
+    >
+      <div className="flex gap-3">
+        {/* 拖曳把手 */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="flex items-center justify-center w-6 cursor-grab active:cursor-grabbing text-morandi-secondary/50 hover:text-morandi-secondary flex-shrink-0"
+        >
+          <GripVertical size={18} />
+        </div>
+
+        {/* 圖片區域 */}
+        <div
+          className={`relative w-24 h-24 flex-shrink-0 rounded-lg border-2 border-dashed overflow-hidden transition-colors ${
+            isActivityDragOver
+              ? 'border-morandi-gold bg-morandi-gold/10'
+              : activity.image
+                ? 'border-transparent'
+                : 'border-morandi-container bg-morandi-container/20'
+          }`}
+          onDragOver={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            setActivityDragOver({ dayIndex, actIndex })
+          }}
+          onDragLeave={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            setActivityDragOver(null)
+          }}
+          onDrop={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            setActivityDragOver(null)
+            const file = e.dataTransfer.files?.[0]
+            if (file && file.type.startsWith('image/')) {
+              handleActivityImageUpload(dayIndex, actIndex, file)
+            }
+          }}
+        >
+          {activity.image ? (
+            <>
+              <img
+                src={activity.image}
+                alt={activity.title || '活動圖片'}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => updateActivity(dayIndex, actIndex, 'image', '')}
+                className="absolute top-1 right-1 w-5 h-5 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                title="移除圖片"
+              >
+                <X size={12} />
+              </button>
+            </>
+          ) : (
+            <label
+              className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-morandi-container/30 transition-colors"
+            >
+              {isActivityUploading ? (
+                <Loader2 size={20} className="text-morandi-secondary animate-spin" />
+              ) : (
+                <>
+                  <ImageIcon size={20} className="text-morandi-secondary/50 mb-1" />
+                  <span className="text-[10px] text-morandi-secondary/50">點擊或拖曳</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                ref={el => { activityFileInputRefs.current[activityInputKey] = el }}
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    handleActivityImageUpload(dayIndex, actIndex, file)
+                  }
+                  e.target.value = ''
+                }}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
+
+        {/* 文字區域 */}
+        <div className="flex-1 space-y-2">
+          <input
+            type="text"
+            value={activity.title}
+            onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
+            className="w-full px-3 py-2 border rounded-lg text-sm"
+            placeholder="景點名稱"
+          />
+          <textarea
+            value={activity.description}
+            onChange={e =>
+              updateActivity(dayIndex, actIndex, 'description', e.target.value)
+            }
+            className="w-full px-3 py-2 border rounded-lg text-sm resize-none"
+            rows={2}
+            placeholder="描述（選填）"
+          />
+        </div>
+      </div>
+
+      {/* 底部操作區 */}
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-container/50">
+        <div className="flex items-center gap-2">
+          {!activity.image && (
+            <button
+              type="button"
+              onClick={() => activityFileInputRefs.current[activityInputKey]?.click()}
+              disabled={isActivityUploading}
+              className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors disabled:opacity-50"
+            >
+              <Upload size={12} />
+              上傳圖片
+            </button>
+          )}
+          <input
+            type="text"
+            value={activity.image || ''}
+            onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
+            className="w-32 px-2 py-1 border border-morandi-container rounded text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold/50"
+            placeholder="或貼上圖片網址..."
+          />
+          {/* 相關圖片預覽 - 在同一排 */}
+          {activity.title && (
+            <RelatedImagesPreviewer
+              activityTitle={activity.title}
+              currentImageUrl={activity.image}
+              onSelectImage={(imageUrl) => updateActivity(dayIndex, actIndex, 'image', imageUrl)}
+              className="flex-1"
+            />
+          )}
+        </div>
+        <button
+          onClick={() => removeActivity(dayIndex, actIndex)}
+          className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
+        >
+          ✕ 刪除
+        </button>
+      </div>
+    </div>
+  )
 }
 export function DailyItinerarySection({
   data,
@@ -47,6 +262,7 @@ export function DailyItinerarySection({
   addActivity,
   updateActivity,
   removeActivity,
+  reorderActivities,
   addDayImage,
   updateDayImage,
   removeDayImage,
@@ -54,6 +270,38 @@ export function DailyItinerarySection({
   updateRecommendation,
   removeRecommendation,
 }: DailyItinerarySectionProps) {
+  // DnD Kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // 處理拖曳結束
+  const handleDragEnd = (dayIndex: number) => (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) return
+
+    const activities = data.dailyItinerary[dayIndex].activities
+    const oldIndex = activities.findIndex((_, i) => `activity-${dayIndex}-${i}` === active.id)
+    const newIndex = activities.findIndex((_, i) => `activity-${dayIndex}-${i}` === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newActivities = arrayMove(activities, oldIndex, newIndex)
+      if (reorderActivities) {
+        reorderActivities(dayIndex, newActivities)
+      } else {
+        // 如果沒有 reorderActivities，就直接更新 dailyItinerary
+        updateDailyItinerary(dayIndex, 'activities', newActivities)
+      }
+    }
+  }
   const [showAttractionSelector, setShowAttractionSelector] = useState(false)
   const [currentDayIndex, setCurrentDayIndex] = useState<number>(-1)
   const [uploadingImage, setUploadingImage] = useState<{ dayIndex: number; imageIndex: number } | null>(null)
@@ -450,6 +698,150 @@ export function DailyItinerarySection({
             />
           </div>
 
+          {/* 活動 */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-morandi-primary">景點活動</label>
+                <span className="text-xs text-morandi-secondary">（拖曳 ⋮⋮ 可調整順序）</span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleOpenAttractionSelector(dayIndex)}
+                  size="xs"
+                  variant="default"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                >
+                  從景點庫選擇
+                </Button>
+                <Button
+                  onClick={() => addActivity(dayIndex)}
+                  size="xs"
+                  variant="secondary"
+                >
+                  + 手動新增
+                </Button>
+              </div>
+            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd(dayIndex)}
+            >
+              <SortableContext
+                items={day.activities?.map((_, i) => `activity-${dayIndex}-${i}`) || []}
+                strategy={verticalListSortingStrategy}
+              >
+                {day.activities?.map((activity: Activity, actIndex: number) => {
+                  const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
+                  const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
+
+                  return (
+                    <SortableActivityItem
+                      key={`activity-${dayIndex}-${actIndex}`}
+                      activity={activity}
+                      actIndex={actIndex}
+                      dayIndex={dayIndex}
+                      updateActivity={updateActivity}
+                      removeActivity={removeActivity}
+                      handleActivityImageUpload={handleActivityImageUpload}
+                      isActivityUploading={isActivityUploading}
+                      isActivityDragOver={isActivityDragOver}
+                      setActivityDragOver={setActivityDragOver}
+                      activityFileInputRefs={activityFileInputRefs}
+                    />
+                  )
+                })}
+              </SortableContext>
+            </DndContext>
+          </div>
+
+          {/* 推薦行程 */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-medium text-morandi-primary">推薦行程</label>
+              <Button
+                onClick={() => addRecommendation(dayIndex)}
+                size="xs"
+                variant="secondary"
+              >
+                + 新增推薦
+              </Button>
+            </div>
+            {day.recommendations?.map((rec: string, recIndex: number) => (
+              <div key={recIndex} className="flex gap-2">
+                <input
+                  type="text"
+                  value={rec}
+                  onChange={e => updateRecommendation(dayIndex, recIndex, e.target.value)}
+                  className="flex-1 px-2 py-1 border rounded text-sm bg-white"
+                  placeholder="天神商圈購物"
+                />
+                <button
+                  onClick={() => removeRecommendation(dayIndex, recIndex)}
+                  className="px-2 text-morandi-red hover:text-morandi-red/80 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* 餐食 */}
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">早餐</label>
+              <input
+                type="text"
+                value={day.meals?.breakfast || ''}
+                onChange={e =>
+                  updateDailyItinerary(dayIndex, 'meals', {
+                    ...day.meals,
+                    breakfast: e.target.value,
+                  })
+                }
+                className="w-full px-2 py-1 border rounded text-sm"
+                placeholder="飯店內早餐"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">午餐</label>
+              <input
+                type="text"
+                value={day.meals?.lunch || ''}
+                onChange={e =>
+                  updateDailyItinerary(dayIndex, 'meals', { ...day.meals, lunch: e.target.value })
+                }
+                className="w-full px-2 py-1 border rounded text-sm"
+                placeholder="博多拉麵 (¥1000)"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">晚餐</label>
+              <input
+                type="text"
+                value={day.meals?.dinner || ''}
+                onChange={e =>
+                  updateDailyItinerary(dayIndex, 'meals', { ...day.meals, dinner: e.target.value })
+                }
+                className="w-full px-2 py-1 border rounded text-sm"
+                placeholder="長腳蟹自助餐"
+              />
+            </div>
+          </div>
+
+          {/* 住宿 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">住宿</label>
+            <input
+              type="text"
+              value={day.accommodation || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg"
+              placeholder="ASO RESORT GRANDVRIO HOTEL"
+            />
+          </div>
+
           {/* 每日圖片 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -548,263 +940,6 @@ export function DailyItinerarySection({
                 </p>
               )}
             </div>
-          </div>
-
-          {/* 活動 */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-morandi-primary">景點活動</label>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handleOpenAttractionSelector(dayIndex)}
-                  size="xs"
-                  variant="default"
-                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                >
-                  從景點庫選擇
-                </Button>
-                <Button
-                  onClick={() => addActivity(dayIndex)}
-                  size="xs"
-                  variant="secondary"
-                >
-                  + 手動新增
-                </Button>
-              </div>
-            </div>
-            {day.activities?.map((activity: Activity, actIndex: number) => {
-              const activityInputKey = `activity-${dayIndex}-${actIndex}`
-              const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
-              const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
-
-              return (
-                <div
-                  key={actIndex}
-                  className="bg-white/90 p-3 rounded-lg border border-morandi-container"
-                >
-                  <div className="flex gap-3">
-                    {/* 圖片區域 */}
-                    <div
-                      className={`relative w-24 h-24 flex-shrink-0 rounded-lg border-2 border-dashed overflow-hidden transition-colors ${
-                        isActivityDragOver
-                          ? 'border-morandi-gold bg-morandi-gold/10'
-                          : activity.image
-                            ? 'border-transparent'
-                            : 'border-morandi-container bg-morandi-container/20'
-                      }`}
-                      onDragOver={e => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setActivityDragOver({ dayIndex, actIndex })
-                      }}
-                      onDragLeave={e => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setActivityDragOver(null)
-                      }}
-                      onDrop={e => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setActivityDragOver(null)
-                        const file = e.dataTransfer.files?.[0]
-                        if (file && file.type.startsWith('image/')) {
-                          handleActivityImageUpload(dayIndex, actIndex, file)
-                        }
-                      }}
-                    >
-                      {activity.image ? (
-                        <>
-                          <img
-                            src={activity.image}
-                            alt={activity.title || '活動圖片'}
-                            className="w-full h-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => updateActivity(dayIndex, actIndex, 'image', '')}
-                            className="absolute top-1 right-1 w-5 h-5 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-                            title="移除圖片"
-                          >
-                            <X size={12} />
-                          </button>
-                        </>
-                      ) : (
-                        <label
-                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-morandi-container/30 transition-colors"
-                        >
-                          {isActivityUploading ? (
-                            <Loader2 size={20} className="text-morandi-secondary animate-spin" />
-                          ) : (
-                            <>
-                              <ImageIcon size={20} className="text-morandi-secondary/50 mb-1" />
-                              <span className="text-[10px] text-morandi-secondary/50">點擊或拖曳</span>
-                            </>
-                          )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            ref={el => { activityFileInputRefs.current[activityInputKey] = el }}
-                            onChange={e => {
-                              const file = e.target.files?.[0]
-                              if (file) {
-                                handleActivityImageUpload(dayIndex, actIndex, file)
-                              }
-                              e.target.value = ''
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                      )}
-                    </div>
-
-                    {/* 文字區域 */}
-                    <div className="flex-1 space-y-2">
-                      <input
-                        type="text"
-                        value={activity.title}
-                        onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
-                        className="w-full px-3 py-2 border rounded-lg text-sm"
-                        placeholder="景點名稱"
-                      />
-                      <textarea
-                        value={activity.description}
-                        onChange={e =>
-                          updateActivity(dayIndex, actIndex, 'description', e.target.value)
-                        }
-                        className="w-full px-3 py-2 border rounded-lg text-sm resize-none"
-                        rows={2}
-                        placeholder="描述（選填）"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 底部操作區 */}
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-container/50">
-                    <div className="flex items-center gap-2">
-                      {!activity.image && (
-                        <button
-                          type="button"
-                          onClick={() => activityFileInputRefs.current[activityInputKey]?.click()}
-                          disabled={isActivityUploading}
-                          className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors disabled:opacity-50"
-                        >
-                          <Upload size={12} />
-                          上傳圖片
-                        </button>
-                      )}
-                      <input
-                        type="text"
-                        value={activity.image || ''}
-                        onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
-                        className="w-32 px-2 py-1 border border-morandi-container rounded text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold/50"
-                        placeholder="或貼上圖片網址..."
-                      />
-                      {/* 相關圖片預覽 - 在同一排 */}
-                      {activity.title && (
-                        <RelatedImagesPreviewer
-                          activityTitle={activity.title}
-                          currentImageUrl={activity.image}
-                          onSelectImage={(imageUrl) => updateActivity(dayIndex, actIndex, 'image', imageUrl)}
-                          className="flex-1"
-                        />
-                      )}
-                    </div>
-                    <button
-                      onClick={() => removeActivity(dayIndex, actIndex)}
-                      className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
-                    >
-                      ✕ 刪除
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* 推薦行程 */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-morandi-primary">推薦行程</label>
-              <Button
-                onClick={() => addRecommendation(dayIndex)}
-                size="xs"
-                variant="secondary"
-              >
-                + 新增推薦
-              </Button>
-            </div>
-            {day.recommendations?.map((rec: string, recIndex: number) => (
-              <div key={recIndex} className="flex gap-2">
-                <input
-                  type="text"
-                  value={rec}
-                  onChange={e => updateRecommendation(dayIndex, recIndex, e.target.value)}
-                  className="flex-1 px-2 py-1 border rounded text-sm bg-white"
-                  placeholder="天神商圈購物"
-                />
-                <button
-                  onClick={() => removeRecommendation(dayIndex, recIndex)}
-                  className="px-2 text-morandi-red hover:text-morandi-red/80 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* 餐食 */}
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">早餐</label>
-              <input
-                type="text"
-                value={day.meals?.breakfast || ''}
-                onChange={e =>
-                  updateDailyItinerary(dayIndex, 'meals', {
-                    ...day.meals,
-                    breakfast: e.target.value,
-                  })
-                }
-                className="w-full px-2 py-1 border rounded text-sm"
-                placeholder="飯店內早餐"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">午餐</label>
-              <input
-                type="text"
-                value={day.meals?.lunch || ''}
-                onChange={e =>
-                  updateDailyItinerary(dayIndex, 'meals', { ...day.meals, lunch: e.target.value })
-                }
-                className="w-full px-2 py-1 border rounded text-sm"
-                placeholder="博多拉麵 (¥1000)"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">晚餐</label>
-              <input
-                type="text"
-                value={day.meals?.dinner || ''}
-                onChange={e =>
-                  updateDailyItinerary(dayIndex, 'meals', { ...day.meals, dinner: e.target.value })
-                }
-                className="w-full px-2 py-1 border rounded text-sm"
-                placeholder="長腳蟹自助餐"
-              />
-            </div>
-          </div>
-
-          {/* 住宿 */}
-          <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">住宿</label>
-            <input
-              type="text"
-              value={day.accommodation || ''}
-              onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
-              placeholder="ASO RESORT GRANDVRIO HOTEL"
-            />
           </div>
         </div>
       ))}

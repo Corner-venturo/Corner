@@ -50,8 +50,60 @@ export function useAttractionsReorder() {
     }
   }, [updateAttraction])
 
+  /**
+   * 上移景點
+   * @param attraction 要上移的景點
+   * @param attractions 當前景點列表（已排序）
+   */
+  const moveUp = useCallback(async (attraction: Attraction, attractions: Attraction[]) => {
+    const currentIndex = attractions.findIndex(a => a.id === attraction.id)
+    if (currentIndex <= 0) return // 已經是第一個
+
+    const targetAttraction = attractions[currentIndex - 1]
+    const currentOrder = attraction.display_order
+    const targetOrder = targetAttraction.display_order
+
+    try {
+      // 交換兩個景點的順序
+      await Promise.all([
+        updateAttraction(attraction.id, { display_order: targetOrder }),
+        updateAttraction(targetAttraction.id, { display_order: currentOrder }),
+      ])
+    } catch (error) {
+      console.error('上移景點失敗:', error)
+      throw error
+    }
+  }, [updateAttraction])
+
+  /**
+   * 下移景點
+   * @param attraction 要下移的景點
+   * @param attractions 當前景點列表（已排序）
+   */
+  const moveDown = useCallback(async (attraction: Attraction, attractions: Attraction[]) => {
+    const currentIndex = attractions.findIndex(a => a.id === attraction.id)
+    if (currentIndex === -1 || currentIndex >= attractions.length - 1) return // 已經是最後一個
+
+    const targetAttraction = attractions[currentIndex + 1]
+    const currentOrder = attraction.display_order
+    const targetOrder = targetAttraction.display_order
+
+    try {
+      // 交換兩個景點的順序
+      await Promise.all([
+        updateAttraction(attraction.id, { display_order: targetOrder }),
+        updateAttraction(targetAttraction.id, { display_order: currentOrder }),
+      ])
+    } catch (error) {
+      console.error('下移景點失敗:', error)
+      throw error
+    }
+  }, [updateAttraction])
+
   return {
     reorderAttractions,
     updateAttractionOrder,
+    moveUp,
+    moveDown,
   }
 }

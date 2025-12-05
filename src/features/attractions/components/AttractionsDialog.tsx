@@ -5,7 +5,77 @@ import { Button } from '@/components/ui/button'
 import { Attraction, AttractionFormData } from '../types'
 import type { Country, Region, City } from '@/stores/region-store'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, X, Loader2 } from 'lucide-react'
+import { Upload, X, Loader2, ChevronUp, ChevronDown, Minus } from 'lucide-react'
+
+// 圖片位置類型
+type ImagePosition = 'top' | 'center' | 'bottom'
+
+// 圖片位置調整組件
+function ImagePositionAdjuster({
+  url,
+  position,
+  onPositionChange,
+  onRemove,
+}: {
+  url: string
+  position: ImagePosition
+  onPositionChange: (pos: ImagePosition) => void
+  onRemove: () => void
+}) {
+  const positionStyles: Record<ImagePosition, string> = {
+    top: 'object-top',
+    center: 'object-center',
+    bottom: 'object-bottom',
+  }
+
+  return (
+    <div className="relative group">
+      <img
+        src={url}
+        alt="景點圖片"
+        className={`w-full h-24 object-cover rounded-md border border-border ${positionStyles[position]}`}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Error'
+        }}
+      />
+      {/* 位置調整按鈕 */}
+      <div className="absolute left-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          type="button"
+          onClick={() => onPositionChange('top')}
+          className={`p-1 rounded ${position === 'top' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
+          title="顯示頂部"
+        >
+          <ChevronUp size={12} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onPositionChange('center')}
+          className={`p-1 rounded ${position === 'center' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
+          title="顯示中間"
+        >
+          <Minus size={12} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onPositionChange('bottom')}
+          className={`p-1 rounded ${position === 'bottom' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
+          title="顯示底部"
+        >
+          <ChevronDown size={12} />
+        </button>
+      </div>
+      {/* 刪除按鈕 */}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <X size={12} />
+      </button>
+    </div>
+  )
+}
 
 // ============================================
 // 景點對話框組件（新增/編輯共用）
@@ -41,7 +111,29 @@ export function AttractionsDialog({
   const [formData, setFormData] = useState<AttractionFormData>(initialFormData)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const [imagePositions, setImagePositions] = useState<Record<string, ImagePosition>>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 解析 notes 中儲存的圖片位置資訊
+  const parseImagePositions = (notes: string | undefined): Record<string, ImagePosition> => {
+    if (!notes) return {}
+    const match = notes.match(/\[IMAGE_POSITIONS:(.*?)\]/)
+    if (!match) return {}
+    try {
+      return JSON.parse(match[1])
+    } catch {
+      return {}
+    }
+  }
+
+  // 將圖片位置資訊合併到 notes
+  const mergePositionsToNotes = (notes: string, positions: Record<string, ImagePosition>): string => {
+    // 移除舊的位置資訊
+    const cleanNotes = notes.replace(/\[IMAGE_POSITIONS:.*?\]/g, '').trim()
+    if (Object.keys(positions).length === 0) return cleanNotes
+    const positionStr = `[IMAGE_POSITIONS:${JSON.stringify(positions)}]`
+    return cleanNotes ? `${cleanNotes}\n${positionStr}` : positionStr
+  }
 
   // 編輯模式：載入景點資料
   useEffect(() => {
@@ -65,9 +157,12 @@ export function AttractionsDialog({
       })
       // 載入已有的圖片
       setUploadedImages(attraction.images || [])
+      // 載入圖片位置設定
+      setImagePositions(parseImagePositions(attraction.notes))
     } else {
       setFormData(initialFormData)
       setUploadedImages([])
+      setImagePositions({})
     }
   }, [attraction, initialFormData])
 
@@ -129,9 +224,26 @@ export function AttractionsDialog({
 
   // 移除圖片
   const handleRemoveImage = (indexToRemove: number) => {
+    const removedUrl = uploadedImages[indexToRemove]
     const newImages = uploadedImages.filter((_, index) => index !== indexToRemove)
     setUploadedImages(newImages)
     setFormData(prev => ({ ...prev, images: newImages.join(', ') }))
+    // 同時移除該圖片的位置設定
+    if (removedUrl) {
+      setImagePositions(prev => {
+        const newPositions = { ...prev }
+        delete newPositions[removedUrl]
+        return newPositions
+      })
+    }
+  }
+
+  // 更新圖片位置
+  const handlePositionChange = (url: string, position: ImagePosition) => {
+    setImagePositions(prev => ({
+      ...prev,
+      [url]: position
+    }))
   }
 
   // 新增網址圖片
@@ -145,12 +257,15 @@ export function AttractionsDialog({
   }
 
   const handleSubmit = async () => {
-    const result = await onSubmit(formData)
+    // 將圖片位置資訊合併到 notes 中儲存
+    const updatedNotes = mergePositionsToNotes(formData.notes, imagePositions)
+    const result = await onSubmit({ ...formData, notes: updatedNotes })
     if (result.success) {
       onClose()
       if (!attraction) {
         // 只在新增模式重置表單
         setFormData(initialFormData)
+        setImagePositions({})
       }
     }
   }
@@ -391,25 +506,15 @@ export function AttractionsDialog({
 
         {/* 已上傳圖片預覽 */}
         {uploadedImages.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-3">
             {uploadedImages.map((url, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={url}
-                  alt={`圖片 ${index + 1}`}
-                  className="w-full h-20 object-cover rounded-md border border-border"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Error'
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X size={12} />
-                </button>
-              </div>
+              <ImagePositionAdjuster
+                key={`${url}-${index}`}
+                url={url}
+                position={imagePositions[url] || 'center'}
+                onPositionChange={(pos) => handlePositionChange(url, pos)}
+                onRemove={() => handleRemoveImage(index)}
+              />
             ))}
           </div>
         ) : (
@@ -418,7 +523,9 @@ export function AttractionsDialog({
             <p className="text-sm">尚無圖片，點擊上方按鈕上傳或貼上網址</p>
           </div>
         )}
-        <p className="text-xs text-morandi-muted mt-2">建議尺寸 1920x1080，支援 JPG、PNG 格式</p>
+        <p className="text-xs text-morandi-muted mt-2">
+          滑鼠移到圖片上可調整顯示位置（頂部/中間/底部）。建議尺寸 1920x1080，支援 JPG、PNG 格式
+        </p>
       </div>
 
       {/* 備註 */}

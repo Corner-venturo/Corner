@@ -156,11 +156,6 @@ export function TourItinerarySection({
                     </div>
                   )}
 
-                  <DailyImageCarousel
-                    images={day.images || []}
-                    title={day.title || day.dayLabel || `Day ${index + 1}`}
-                  />
-
                   {day.description && (
                     <p className={cn(
                       "text-sm md:text-base leading-relaxed md:leading-7 text-morandi-secondary",
@@ -437,6 +432,12 @@ export function TourItinerarySection({
                       </div>
                     </div>
                   )}
+
+                  {/* 每日圖片輪播 - 放在住宿下方 */}
+                  <DailyImageCarousel
+                    images={day.images || []}
+                    title={day.title || day.dayLabel || `Day ${index + 1}`}
+                  />
                 </article>
               ))}
             </div>

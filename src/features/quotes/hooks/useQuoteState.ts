@@ -4,6 +4,7 @@ import { useQuotes } from './useQuotes'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types'
+import { useItineraryImport } from './useItineraryImport'
 
 export const useQuoteState = () => {
   const params = useParams()
@@ -12,6 +13,7 @@ export const useQuoteState = () => {
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
+  const { importDataToCategories, isFromItinerary } = useItineraryImport()
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
@@ -48,10 +50,17 @@ export const useQuoteState = () => {
   const [categories, setCategories] = useState<CostCategory[]>(() => {
     const initialCategories = quote?.categories || costCategories
     // 確保每個分類的總計都正確計算
-    return initialCategories.map(cat => ({
+    let processedCategories = initialCategories.map(cat => ({
       ...cat,
       total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
     }))
+    
+    // 如果是從行程頁面來的，自動匯入行程資料
+    if (isFromItinerary) {
+      processedCategories = importDataToCategories(processedCategories)
+    }
+    
+    return processedCategories
   })
 
   const [accommodationDays, setAccommodationDays] = useState<number>(quote?.accommodation_days || 0)

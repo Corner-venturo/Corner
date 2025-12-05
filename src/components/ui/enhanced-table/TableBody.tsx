@@ -12,7 +12,7 @@ interface TableBodyProps<T extends RowData = RowData> {
   emptyState?: React.ReactNode
   selection?: SelectionConfig<T>
   expandable?: ExpandableConfig<T>
-  actions?: (row: T) => React.ReactNode
+  actions?: (row: T, index: number) => React.ReactNode
   rowClassName?: (row: T) => string
   striped?: boolean
   hoverable?: boolean
@@ -139,7 +139,7 @@ export function TableBody({
               {/* Actions column */}
               {actions && (
                 <td className="py-3 px-4">
-                  <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>{actions(row)}</div>
+                  <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>{actions(row, actualRowIndex)}</div>
                 </td>
               )}
             </tr>

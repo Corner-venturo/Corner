@@ -212,23 +212,31 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                     unoptimized={activities[selectedIndex].image!.startsWith('data:')}
                   />
 
-                  {/* 左右切換按鈕 - 放在圖片上 */}
+                  {/* 左右切換按鈕 - 更柔和的設計，放在圖片兩側邊緣 */}
                   {activities.length > 1 && (
                     <>
                       {selectedIndex > 0 && (
                         <button
                           onClick={goToPrev}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white rounded-full text-gray-700 shadow-lg transition-all"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-black/40 text-white transition-all duration-200"
+                          style={{
+                            background: 'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
+                            borderRadius: '0 8px 8px 0'
+                          }}
                         >
-                          <ChevronLeft size={24} />
+                          <ChevronLeft size={20} />
                         </button>
                       )}
                       {selectedIndex < activities.length - 1 && (
                         <button
                           onClick={goToNext}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white rounded-full text-gray-700 shadow-lg transition-all"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-black/40 text-white transition-all duration-200"
+                          style={{
+                            background: 'linear-gradient(270deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
+                            borderRadius: '8px 0 0 8px'
+                          }}
                         >
-                          <ChevronRight size={24} />
+                          <ChevronRight size={20} />
                         </button>
                       )}
                     </>
@@ -261,7 +269,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
 
               {/* 內容區 - 支援觸控滑動關閉 */}
               <div
-                className="p-5 max-h-[35vh] overflow-y-auto"
+                className="px-5 py-6 max-h-[35vh] overflow-y-auto flex flex-col items-center text-center"
                 onTouchStart={(e) => {
                   const touch = e.touches[0]
                   // 記錄初始觸摸位置
@@ -279,20 +287,22 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                   }
                 }}
               >
-                <h3
-                  className="font-bold text-xl mb-2"
-                  style={{ color: morandiColors.text.primary }}
-                >
-                  {activities[selectedIndex]?.title}
-                </h3>
-                {activities[selectedIndex]?.description && (
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: morandiColors.text.secondary }}
+                <div className="w-full max-w-sm mx-auto">
+                  <h3
+                    className="font-bold text-xl mb-3"
+                    style={{ color: morandiColors.text.primary }}
                   >
-                    {activities[selectedIndex].description}
-                  </p>
-                )}
+                    {activities[selectedIndex]?.title}
+                  </h3>
+                  {activities[selectedIndex]?.description && (
+                    <p
+                      className="text-sm leading-relaxed"
+                      style={{ color: morandiColors.text.secondary }}
+                    >
+                      {activities[selectedIndex].description}
+                    </p>
+                  )}
+                </div>
                 {/* 底部額外空間，讓滾動關閉更容易觸發 */}
                 <div className="h-16" />
               </div>

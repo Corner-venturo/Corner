@@ -17,6 +17,11 @@ export const iconOptions: IconOption[] = [
   { value: 'IconMapPin', label: '景點', component: MapPin },
 ]
 
+// 圖標對應的預設模板 PNG
+export const iconTemplates: Record<string, string> = {
+  IconToolsKitchen2: 'https://pfqvdacxowpgfamuvnsn.supabase.co/storage/v1/object/public/workspace-files/feature-templates/japanese-cuisine-template.png',
+}
+
 // 城市圖片對照表（擴充版）
 export const cityImages: Record<string, string> = {
   // 日本

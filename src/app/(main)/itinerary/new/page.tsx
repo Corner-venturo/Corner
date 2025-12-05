@@ -6,6 +6,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TourForm } from '@/components/editor/TourForm'
 import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
+import { CreateQuoteFromItineraryButton } from '@/components/editor/CreateQuoteFromItineraryButton'
 import { PrintItineraryForm } from '@/features/itinerary/components/PrintItineraryForm'
 import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
 import { GeminiItineraryForm, type GeminiItineraryData } from '@/features/itinerary/components/GeminiItineraryForm'
@@ -928,11 +929,17 @@ function NewItineraryPageContent() {
         showBackButton={true}
         onBack={() => router.push('/itinerary')}
         actions={
-          <PublishButton
-            data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
-            currentVersionIndex={currentVersionIndex}
-            onVersionChange={handleVersionChange}
-          />
+          <div className="flex items-center gap-3">
+            <CreateQuoteFromItineraryButton
+              tourData={tourData}
+              itineraryId={itineraryId}
+            />
+            <PublishButton
+              data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
+              currentVersionIndex={currentVersionIndex}
+              onVersionChange={handleVersionChange}
+            />
+          </div>
         }
       />
 

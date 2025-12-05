@@ -52,7 +52,7 @@ export interface EnhancedTableProps<T extends RowData = RowData> {
   searchPlaceholder?: string
   selection?: SelectionConfig<T>
   expandable?: ExpandableConfig<T>
-  actions?: (row: T) => React.ReactNode
+  actions?: (row: T, index: number) => React.ReactNode
   rowClassName?: (row: T) => string
   _bordered?: boolean
   bordered?: boolean
