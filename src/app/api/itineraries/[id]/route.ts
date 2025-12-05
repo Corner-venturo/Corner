@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// 使用 service role key 來繞過 RLS（公開分享連結不需要認證）
+// 檢查環境變數
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+// 優先使用 service role key，fallback 到 anon key
+// 注意：RLS 已在 Venturo 專案中禁用，所以 anon key 也可以查詢
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  supabaseUrl || '',
+  supabaseServiceKey || supabaseAnonKey || ''
 )
 
 export async function GET(
@@ -12,6 +18,23 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 檢查 Supabase 配置
+    if (!supabaseUrl) {
+      console.error('缺少 NEXT_PUBLIC_SUPABASE_URL 環境變數')
+      return NextResponse.json(
+        { error: '伺服器配置錯誤' },
+        { status: 500 }
+      )
+    }
+
+    if (!supabaseServiceKey && !supabaseAnonKey) {
+      console.error('缺少 Supabase API key 環境變數')
+      return NextResponse.json(
+        { error: '伺服器配置錯誤' },
+        { status: 500 }
+      )
+    }
+
     const { id } = await params
 
     if (!id) {
