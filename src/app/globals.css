@@ -1,41 +1,47 @@
 @import 'tailwindcss';
 
-/* 莫蘭迪主題（預設） */
+/* 莫蘭迪主題（預設）- ERP Design System */
 :root,
 [data-theme='morandi'] {
-  /* 主色系 */
-  --morandi-primary: #3a3633;
-  --morandi-secondary: #8b8680;
-  --morandi-gold: #c9aa7c;
-  --morandi-gold-rgb: 201, 170, 124;
-  --morandi-gold-hover: #b8996b;
-  --morandi-green: #9fa68f;
-  --morandi-green-rgb: 159, 166, 143;
-  --morandi-red: #c08374;
-  --morandi-container: #e8e5e0;
-  --morandi-muted: #b8b2aa;
+  /* 主色系 - Design System */
+  --morandi-primary: #3D2914;           /* Dark Text - 深色文字/主要色 */
+  --morandi-secondary: #A8B4A5;         /* Gray-Green - 灰綠色 */
+  --morandi-accent: #C3B5A7;            /* Milk Tea - 奶茶色 */
+  --morandi-gold: #C9A961;              /* Soft Gold - 柔和金色 */
+  --morandi-gold-rgb: 201, 169, 97;
+  --morandi-gold-hover: #B89850;        /* Gold hover 狀態 */
+  --morandi-green: #A8B4A5;             /* 成功/正面 - 灰綠 */
+  --morandi-green-rgb: 168, 180, 165;
+  --morandi-red: #C47D7D;               /* 錯誤/負面 - 柔紅 */
+  --morandi-container: #F5F0EB;         /* Secondary Background */
+  --morandi-muted: #9E8F81;             /* Light Text - 淺色文字 */
 
   /* 背景色 */
-  --background: #f6f4f1;
-  --card: #ffffff;
-  --border: #d4c4b0;
-  --popover: #ffffff;
-  --popover-foreground: #3a3633;
-  --accent: #e8e5e0;
-  --accent-foreground: #3a3633;
+  --background: #FAF8F5;                /* Main Background - 主背景 */
+  --card: #FEFEFE;                      /* Background White - 白色背景 */
+  --border: #EDE8E0;                    /* Light Border - 淺邊框 */
+  --popover: #FEFEFE;
+  --popover-foreground: #3D2914;
+  --accent: #E8D5C4;                    /* Primary Beige - 米色強調 */
+  --accent-foreground: #3D2914;
 
   /* 設定對應變數 */
   --foreground: var(--morandi-primary);
   --card-foreground: var(--morandi-primary);
   --border-muted: var(--morandi-container);
 
+  /* 文字色系 */
+  --text-dark: #3D2914;                 /* Dark Text */
+  --text-medium: #8B5D52;               /* Medium Text */
+  --text-light: #9E8F81;                /* Light Text */
+
   /* 表單元素專用變數 */
-  --input-border: #d4c4b0;
-  --input-border-hover: #c4a572;
-  --input-border-focus: #c4a572;
-  --input-bg: #ffffff;
-  --input-text: #3a3633;
-  --input-placeholder: #b8b2aa;
+  --input-border: #E0D8CC;              /* Medium Border */
+  --input-border-hover: #C9A961;
+  --input-border-focus: #C9A961;
+  --input-bg: #FEFEFE;
+  --input-text: #3D2914;
+  --input-placeholder: #9E8F81;
 }
 
 /* Discord 風格深色主題 */
