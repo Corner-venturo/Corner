@@ -45,7 +45,7 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
             viewMode === 'mobile'
               ? 'space-y-4'
               : features.length === 1
-                ? 'grid grid-cols-1 max-w-4xl mx-auto gap-7'
+                ? 'grid grid-cols-1 gap-7'
                 : features.length === 2
                   ? 'grid grid-cols-2 gap-7'
                   : 'grid grid-cols-2 md:grid-cols-3 gap-7'
