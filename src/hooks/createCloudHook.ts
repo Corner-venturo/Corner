@@ -52,7 +52,11 @@ export function createCloudHook<T extends BaseEntity>(
     const { data, error } = await query
 
     if (error) {
-      throw new Error(error.message)
+      const errorMessage = typeof error === 'object' && error !== null
+        ? (error as { message?: string }).message || JSON.stringify(error)
+        : String(error)
+      console.error(`[${tableName}] Supabase error:`, error)
+      throw new Error(errorMessage)
     }
 
     return (data || []) as unknown as T[]

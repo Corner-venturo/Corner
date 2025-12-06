@@ -963,6 +963,7 @@ function NewItineraryPageContent() {
                   showHotels: false,
                 }}
                 onChange={(newData) => {
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const { meetingPoints, hotels, countries, ...restData } = newData;
                   setTourData({
                     ...restData,

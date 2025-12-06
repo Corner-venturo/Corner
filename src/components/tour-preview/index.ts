@@ -16,3 +16,5 @@ export { AttractionCard } from './AttractionCard'
 export type { AttractionCardProps } from './AttractionCard'
 
 export { MobileActivityCarousel } from './MobileActivityCarousel'
+
+export { DesktopActivityCarousel } from './DesktopActivityCarousel'

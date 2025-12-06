@@ -162,7 +162,7 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
             </div>
           ) : (
             <table className="w-full">
-              <thead className="sticky top-0 bg-morandi-container/5 border-b border-morandi-gold/20">
+              <thead className="sticky top-0 bg-card border-b border-morandi-gold/20">
                 <tr>
                   <th className="w-10 py-2.5 px-4 text-xs"></th>
                   <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">

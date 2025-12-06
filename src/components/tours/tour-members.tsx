@@ -468,7 +468,7 @@ export const TourMembers = React.memo(function TourMembers({
       <div className="overflow-hidden bg-card">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-sm border-collapse min-w-[1200px] bg-white rounded-lg overflow-hidden shadow-sm">
-            <thead className="bg-morandi-container/10 sticky top-0 border-b-2 border-morandi-gold/20">
+            <thead className="bg-card sticky top-0 border-b-2 border-morandi-gold/20">
               <tr>
                 <th className="w-[30px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20"></th>
                 <th className="w-[40px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20">

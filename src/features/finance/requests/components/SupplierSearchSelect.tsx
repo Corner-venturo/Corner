@@ -62,7 +62,7 @@ export function SupplierSearchSelect({
               <>
                 {Object.entries(groupedSuppliers).map(([groupName, items]) => (
                   <div key={groupName}>
-                    <div className="px-3 py-2 text-xs font-semibold text-morandi-secondary bg-morandi-container/10 sticky top-0">
+                    <div className="px-3 py-2 text-xs font-semibold text-morandi-secondary bg-card sticky top-0">
                       {groupName}
                     </div>
                     {items.map(supplier => (

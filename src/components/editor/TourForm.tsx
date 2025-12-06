@@ -2,12 +2,11 @@
 
 import React from 'react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useRegionsStore } from '@/stores'
-import { TourFormData, CityOption } from './tour-form/types'
+import { TourFormData } from './tour-form/types'
 import { useRegionData } from './tour-form/hooks/useRegionData'
 import { useTourFormHandlers } from './tour-form/hooks/useTourFormHandlers'
 import { CoverInfoSection } from './tour-form/sections/CoverInfoSection'
-import { CountriesSection } from './tour-form/sections/CountriesSection'
+// CountriesSection 已移除 - 景點選擇器現在可以直接選所有國家
 import { FlightInfoSection } from './tour-form/sections/FlightInfoSection'
 import { FeaturesSection } from './tour-form/sections/FeaturesSection'
 import { LeaderMeetingSection } from './tour-form/sections/LeaderMeetingSection'
@@ -21,12 +20,10 @@ interface TourFormProps {
 
 export function TourForm({ data, onChange }: TourFormProps) {
   const { user } = useAuthStore()
-  const { countries, cities } = useRegionsStore()
 
   const {
     selectedCountry,
     setSelectedCountry,
-    selectedCountryCode,
     setSelectedCountryCode,
     allDestinations,
     availableCities,
@@ -34,23 +31,6 @@ export function TourForm({ data, onChange }: TourFormProps) {
   } = useRegionData(data)
 
   const handlers = useTourFormHandlers(data, onChange, selectedCountry)
-
-  // 根據 country_id 取得城市列表的輔助函數（穩定引用）
-  const getCitiesByCountryId = React.useCallback(
-    (countryId: string) => {
-      return cities
-        .filter(c => c.country_id === countryId && c.is_active)
-        .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name }))
-    },
-    [cities]
-  )
-
-  // 取得所有國家列表（穩定引用，避免無限循環）
-  const allCountries = React.useMemo(
-    () =>
-      countries.filter(c => c.is_active).map(c => ({ id: c.id, code: c.code || '', name: c.name })),
-    [countries]
-  )
 
   return (
     <div className="p-6 space-y-8">
@@ -68,13 +48,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
         onChange={onChange}
       />
 
-      <CountriesSection
-        data={data}
-        allCountries={allCountries}
-        availableCities={availableCities}
-        getCitiesByCountryId={getCitiesByCountryId}
-        onChange={onChange}
-      />
+{/* CountriesSection 已移除 - 景點選擇器現在可以直接選所有國家 */}
 
       <FlightInfoSection data={data} updateFlightField={handlers.updateFlightField} />
 
@@ -98,6 +72,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
             addFeature={handlers.addFeature}
             updateFeature={handlers.updateFeature}
             removeFeature={handlers.removeFeature}
+            reorderFeature={handlers.reorderFeature}
           />
         )}
       </div>

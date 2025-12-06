@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { InputIME } from '@/components/ui/input-ime'
+import { TimeInput } from '@/components/ui/time-input'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2 } from 'lucide-react'
 import { useRegionsStore } from '@/stores'
@@ -308,24 +309,24 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                     placeholder="航班號"
                     className="text-xs h-7"
                   />
-                  <InputIME
+                  <TimeInput
                     value={option.outbound.time}
                     onChange={value => {
                       const newOptions = [...data.flightOptions]
                       newOptions[idx].outbound.time = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="出發"
+                    placeholder="出發時間"
                     className="text-xs h-7"
                   />
-                  <InputIME
+                  <TimeInput
                     value={option.outbound.arrivalTime}
                     onChange={value => {
                       const newOptions = [...data.flightOptions]
                       newOptions[idx].outbound.arrivalTime = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="抵達"
+                    placeholder="抵達時間"
                     className="text-xs h-7"
                   />
                 </div>
@@ -340,24 +341,24 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                     placeholder="航班號"
                     className="text-xs h-7"
                   />
-                  <InputIME
+                  <TimeInput
                     value={option.return.time}
                     onChange={value => {
                       const newOptions = [...data.flightOptions]
                       newOptions[idx].return.time = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="出發"
+                    placeholder="出發時間"
                     className="text-xs h-7"
                   />
-                  <InputIME
+                  <TimeInput
                     value={option.return.arrivalTime}
                     onChange={value => {
                       const newOptions = [...data.flightOptions]
                       newOptions[idx].return.arrivalTime = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="抵達"
+                    placeholder="抵達時間"
                     className="text-xs h-7"
                   />
                 </div>

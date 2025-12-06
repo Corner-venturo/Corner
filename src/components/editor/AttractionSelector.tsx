@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, MapPin, ImageIcon, Loader2 } from 'lucide-react'
+import { Search, MapPin, ImageIcon, Loader2, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { TourCountry } from './tour-form/types'
 import { Attraction } from '@/features/attractions/types'
@@ -24,19 +24,59 @@ interface AttractionWithCity extends Attraction {
 interface AttractionSelectorProps {
   isOpen: boolean
   onClose: () => void
-  tourCountries?: TourCountry[] // 行程涵蓋的國家
+  tourCountries?: TourCountry[] // 用於預設選擇第一個國家（舊版）
+  tourCountryName?: string // 行程的國家名稱（新版，來自 CoverInfo）
   onSelect: (attractions: AttractionWithCity[]) => void
+  dayTitle?: string // 當天的行程標題，用於智能建議
 }
 
 // 使用 module-level 變數保存篩選狀態（半永久記憶）
 let savedCountryId = ''
 let savedCityId = ''
 
+// 解析行程標題，取得可能的景點名稱
+function parseDayTitleForAttractions(title: string): string[] {
+  if (!title) return []
+
+  // 分割符號：→、·、|、、、-、/
+  const separators = /[→·|、\-/]/g
+  const parts = title.split(separators)
+
+  // 過濾掉常見的非景點關鍵字
+  const excludePatterns = [
+    /機場/,
+    /飯店/,
+    /酒店/,
+    /入住/,
+    /check.?in/i,
+    /check.?out/i,
+    /自由活動/,
+    /午餐/,
+    /晚餐/,
+    /早餐/,
+    /用餐/,
+    /休息/,
+    /^台北$/,
+    /^桃園$/,
+    /^國際$/,
+    /^\s*$/,
+    /✈/,
+    /⭐/,
+  ]
+
+  return parts
+    .map(p => p.trim())
+    .filter(p => p.length >= 2) // 至少 2 個字
+    .filter(p => !excludePatterns.some(pattern => pattern.test(p)))
+}
+
 export function AttractionSelector({
   isOpen,
   onClose,
   tourCountries = [],
+  tourCountryName = '',
   onSelect,
+  dayTitle = '',
 }: AttractionSelectorProps) {
   // 從記憶中載入初始值
   const [selectedCountryId, setSelectedCountryId] = useState<string>(savedCountryId)
@@ -46,26 +86,60 @@ export function AttractionSelector({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [cities, setCities] = useState<{ id: string; name: string }[]>([])
+  const [countries, setCountries] = useState<{ id: string; name: string }[]>([])
   const initialLoadDone = useRef(false)
 
-  // 序列化 tourCountries 避免無限迴圈
-  const tourCountryIds = useMemo(
-    () => tourCountries.map(c => c.country_id).filter(Boolean),
-    [tourCountries]
-  )
-
-  // 打開對話框時只清空勾選，保留篩選條件
+  // 載入所有國家
   React.useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return
+
+    const loadCountries = async () => {
+      const { data } = await supabase
+        .from('countries')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name')
+      setCountries(data || [])
+    }
+    loadCountries()
+  }, [isOpen])
+
+  // 打開對話框時只清空勾選，並自動選擇行程的國家
+  React.useEffect(() => {
+    if (isOpen && countries.length > 0) {
       setSelectedIds(new Set())
-      // 從記憶中恢復篩選狀態
-      if (!initialLoadDone.current) {
+
+      // 優先使用 tourCountryName（從 CoverInfo 來的國家名稱）
+      if (tourCountryName) {
+        const matchedCountry = countries.find(c => c.name === tourCountryName)
+        if (matchedCountry && matchedCountry.id !== savedCountryId) {
+          setSelectedCountryId(matchedCountry.id)
+          savedCountryId = matchedCountry.id
+          setSelectedCityId('')
+          savedCityId = ''
+          return
+        }
+      }
+
+      // 其次使用 tourCountries（舊版，陣列格式）
+      if (tourCountries.length > 0) {
+        const firstCountryId = tourCountries[0].country_id
+        if (!savedCountryId || !tourCountries.some(c => c.country_id === savedCountryId)) {
+          setSelectedCountryId(firstCountryId)
+          savedCountryId = firstCountryId
+          setSelectedCityId('')
+          savedCityId = ''
+          return
+        }
+      }
+
+      // 最後使用記憶的國家
+      if (savedCountryId) {
         setSelectedCountryId(savedCountryId)
         setSelectedCityId(savedCityId)
-        initialLoadDone.current = true
       }
     }
-  }, [isOpen])
+  }, [isOpen, tourCountries, tourCountryName, countries])
 
   // 更新國家時同步保存
   const handleCountryChange = (countryId: string) => {
@@ -112,6 +186,12 @@ export function AttractionSelector({
     if (!isOpen) return
 
     const loadAttractions = async () => {
+      // 必須選擇國家才載入，否則資料太多（1600+筆）
+      if (!selectedCountryId) {
+        setAttractions([])
+        return
+      }
+
       setLoading(true)
       try {
         let query = supabase
@@ -134,17 +214,12 @@ export function AttractionSelector({
           `
           )
           .eq('is_active', true)
+          .eq('country_id', selectedCountryId)
           .order('name')
 
-        // 如果有選擇城市，篩選該城市的景點
+        // 如果有選擇城市，進一步篩選
         if (selectedCityId) {
           query = query.eq('city_id', selectedCityId)
-        } else if (selectedCountryId) {
-          // 如果有選擇國家，篩選該國家的景點
-          query = query.eq('country_id', selectedCountryId)
-        } else if (tourCountryIds.length > 0) {
-          // 如果沒選擇國家，但行程有設定國家，就篩選這些國家的景點
-          query = query.in('country_id', tourCountryIds)
         }
 
         const { data, error } = await query
@@ -190,22 +265,64 @@ export function AttractionSelector({
     }
 
     loadAttractions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, selectedCountryId, selectedCityId, tourCountryIds.join(',')])
+  }, [isOpen, selectedCountryId, selectedCityId])
 
-  // 搜尋過濾
+  // 解析行程標題，找出可能的景點關鍵字
+  const titleKeywords = useMemo(() => parseDayTitleForAttractions(dayTitle), [dayTitle])
+
+  // 根據標題關鍵字匹配建議景點
+  const suggestedAttractions = useMemo(() => {
+    if (titleKeywords.length === 0 || attractions.length === 0) return []
+
+    const suggestions: AttractionWithCity[] = []
+
+    for (const keyword of titleKeywords) {
+      const keywordLower = keyword.toLowerCase()
+      // 找完全匹配或包含關鍵字的景點
+      const matches = attractions.filter(a => {
+        const nameLower = a.name.toLowerCase()
+        // 完全匹配優先，其次包含
+        return nameLower === keywordLower ||
+               nameLower.includes(keywordLower) ||
+               keywordLower.includes(nameLower)
+      })
+
+      for (const match of matches) {
+        if (!suggestions.some(s => s.id === match.id)) {
+          suggestions.push(match)
+        }
+      }
+    }
+
+    return suggestions
+  }, [titleKeywords, attractions])
+
+  // 搜尋過濾 + 建議景點優先排序
   const filteredAttractions = useMemo(() => {
-    if (!searchQuery) return attractions
+    let results = attractions
 
-    const query = searchQuery.toLowerCase()
-    return attractions.filter(
-      a =>
-        a.name.toLowerCase().includes(query) ||
-        a.name_en?.toLowerCase().includes(query) ||
-        a.city_name?.toLowerCase().includes(query) ||
-        a.category?.toLowerCase().includes(query)
-    )
-  }, [attractions, searchQuery])
+    // 如果有搜尋，先過濾
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      results = results.filter(
+        a =>
+          a.name.toLowerCase().includes(query) ||
+          a.name_en?.toLowerCase().includes(query) ||
+          a.city_name?.toLowerCase().includes(query) ||
+          a.category?.toLowerCase().includes(query)
+      )
+    }
+
+    // 沒有搜尋時，把建議的景點排在最前面
+    if (!searchQuery && suggestedAttractions.length > 0) {
+      const suggestedIds = new Set(suggestedAttractions.map(s => s.id))
+      const suggested = results.filter(a => suggestedIds.has(a.id))
+      const others = results.filter(a => !suggestedIds.has(a.id))
+      return [...suggested, ...others]
+    }
+
+    return results
+  }, [attractions, searchQuery, suggestedAttractions])
 
   // 切換選擇
   const toggleSelection = (id: string) => {
@@ -253,20 +370,18 @@ export function AttractionSelector({
           {/* 篩選區 */}
           <div className="flex gap-3 flex-wrap">
             {/* 國家選擇 */}
-            {tourCountries.length > 0 && (
-              <select
-                value={selectedCountryId}
-                onChange={e => handleCountryChange(e.target.value)}
-                className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold transition-all"
-              >
-                <option value="">全部國家</option>
-                {tourCountries.map(country => (
-                  <option key={country.country_id} value={country.country_id}>
-                    {country.country_name}
-                  </option>
-                ))}
-              </select>
-            )}
+            <select
+              value={selectedCountryId}
+              onChange={e => handleCountryChange(e.target.value)}
+              className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold transition-all"
+            >
+              <option value="">全部國家</option>
+              {countries.map(country => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
 
             {/* 城市選擇 */}
             {selectedCountryId && cities.length > 0 && (
@@ -308,13 +423,14 @@ export function AttractionSelector({
               </div>
             ) : filteredAttractions.length === 0 ? (
               <div className="h-full flex items-center justify-center text-morandi-secondary">
-                {searchQuery ? '找不到符合的景點' : '沒有可選擇的景點'}
+                {!selectedCountryId ? '請先選擇國家' : searchQuery ? '找不到符合的景點' : '沒有可選擇的景點'}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 p-3">
                 {filteredAttractions.map(attraction => {
                   const image = getAttractionImage(attraction)
                   const isSelected = selectedIds.has(attraction.id)
+                  const isSuggested = suggestedAttractions.some(s => s.id === attraction.id)
 
                   return (
                     <label
@@ -324,7 +440,9 @@ export function AttractionSelector({
                         border-2 hover:shadow-md
                         ${isSelected
                           ? 'border-morandi-gold bg-morandi-gold/5 shadow-sm'
-                          : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+                          : isSuggested
+                            ? 'border-amber-300 bg-amber-50/50 hover:bg-amber-50'
+                            : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
                         }
                       `}
                     >
@@ -352,7 +470,10 @@ export function AttractionSelector({
 
                       {/* 資訊 */}
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-2">
+                        <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-2 flex items-center gap-1">
+                          {isSuggested && (
+                            <Sparkles size={12} className="text-amber-500 flex-shrink-0" />
+                          )}
                           {attraction.name}
                         </div>
                         {attraction.name_en && (

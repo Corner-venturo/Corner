@@ -2,17 +2,22 @@ import React from 'react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 
 export interface DayLabelProps {
-  dayNumber: number
+  dayNumber?: number
+  dayLabel?: string // 自定義標籤（如 "Day 3-B"），優先於 dayNumber
+  isAlternative?: boolean // 是否為建議方案
   variant?: 'default' | 'large' | 'small'
   className?: string
 }
 
 /**
  * Day 標籤組件
- * 用於顯示「Day 01」「Day 02」等日期標識
+ * 用於顯示「Day 01」「Day 02」或「Day 03-B」等日期標識
  */
-export function DayLabel({ dayNumber, variant = 'default', className = '' }: DayLabelProps) {
-  const paddedDay = String(dayNumber).padStart(2, '0')
+export function DayLabel({ dayNumber, dayLabel, isAlternative = false, variant = 'default', className = '' }: DayLabelProps) {
+  // 優先使用 dayLabel，否則用 dayNumber 生成
+  const displayLabel = dayLabel || `Day ${String(dayNumber || 1).padStart(2, '0')}`
+  // 轉換為全大寫的 "DAY XX" 格式
+  const formattedLabel = displayLabel.toUpperCase().replace('DAY ', 'DAY ')
 
   const sizeClasses = {
     small: 'px-3 py-1 text-sm',
@@ -29,12 +34,14 @@ export function DayLabel({ dayNumber, variant = 'default', className = '' }: Day
         ${className}
       `}
       style={{
-        backgroundColor: morandiColors.gold,
+        backgroundColor: isAlternative ? morandiColors.text.secondary : morandiColors.gold,
         color: '#FFFFFF',
-        boxShadow: '0 2px 8px rgba(212, 175, 55, 0.3)',
+        boxShadow: isAlternative
+          ? '0 2px 8px rgba(150, 140, 130, 0.3)'
+          : '0 2px 8px rgba(212, 175, 55, 0.3)',
       }}
     >
-      DAY {paddedDay}
+      {formattedLabel}
     </div>
   )
 }

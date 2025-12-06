@@ -5,11 +5,12 @@ import { CityOption } from '../types'
 export function useRegionData(data: { country?: string }) {
   const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || '')
   const [selectedCountryCode, setSelectedCountryCode] = React.useState<string>('')
-  const [initialized, setInitialized] = React.useState<boolean>(false)
   const { countries, cities, fetchAll } = useRegionsStore()
 
   // 懶載入：進入表單時載入 regions（只執行一次）
   const hasFetchedRef = React.useRef(false)
+  // 追蹤是否已經初始化過 country code
+  const hasInitializedCodeRef = React.useRef(false)
 
   React.useEffect(() => {
     if (countries.length === 0 && !hasFetchedRef.current) {
@@ -44,35 +45,39 @@ export function useRegionData(data: { country?: string }) {
       .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name }))
   }, [selectedCountryCode, countries, cities])
 
-  // 初始化和同步 data.country
+  // 初始化：當 countries 載入完成後，設定初始的 country code
   React.useEffect(() => {
-    // 等待 countries 載入完成
+    if (countries.length === 0) return
+    if (hasInitializedCodeRef.current) return
+    if (!data.country) return
+
+    // 初始化 selectedCountry（如果 state 和 data 不同）
+    if (selectedCountry !== data.country) {
+      setSelectedCountry(data.country)
+    }
+
+    // 查找對應的 country code
+    const matchedCountry = countries.find(c => c.name === data.country)
+    if (matchedCountry?.code) {
+      setSelectedCountryCode(matchedCountry.code)
+      hasInitializedCodeRef.current = true
+    }
+  }, [countries, data.country, selectedCountry])
+
+  // 同步：當 data.country 從外部改變時同步（例如用戶選擇了新國家）
+  React.useEffect(() => {
     if (countries.length === 0) return
 
-    // 當 data.country 改變時，更新 selectedCountry 和 selectedCountryCode
-    if (data.country) {
-      // 如果 selectedCountry 和 data.country 不同，需要同步
-      if (selectedCountry !== data.country) {
-        setSelectedCountry(data.country)
-      }
-
-      // 查找對應的 country code
-      const code = countryNameToCode[data.country]
-      if (code && code !== selectedCountryCode) {
-        setSelectedCountryCode(code)
-      }
-
-      // 標記已初始化
-      if (!initialized) {
-        setInitialized(true)
+    // 當 selectedCountry 與 data.country 不同時，可能是外部更新
+    // 但我們要避免初始化時的重複設定
+    if (data.country && selectedCountry !== data.country && hasInitializedCodeRef.current) {
+      setSelectedCountry(data.country)
+      const matchedCountry = countries.find(c => c.name === data.country)
+      if (matchedCountry?.code) {
+        setSelectedCountryCode(matchedCountry.code)
       }
     }
-  }, [
-    data.country,
-    // 移除 countryNameToCode（已在 useMemo 中穩定）
-    // 移除 selectedCountry 和 selectedCountryCode（避免循環）
-    countries.length,
-  ])
+  }, [data.country, countries, selectedCountry])
 
   return {
     selectedCountry,

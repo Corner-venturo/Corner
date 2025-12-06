@@ -321,6 +321,31 @@ function SortableActivityGridItem({
   )
 }
 
+// 計算 dayLabel 的函數 - 處理建議方案編號
+function calculateDayLabels(itinerary: DailyItinerary[]): string[] {
+  const labels: string[] = []
+  let currentDayNumber = 0
+  let alternativeCount = 0 // 當前建議方案的計數 (B=1, C=2, ...)
+
+  for (let i = 0; i < itinerary.length; i++) {
+    const day = itinerary[i]
+
+    if (day.isAlternative) {
+      // 這是建議方案，使用前一個正規天數的編號 + 字母
+      alternativeCount++
+      const suffix = String.fromCharCode(65 + alternativeCount) // B, C, D...
+      labels.push(`Day ${currentDayNumber}-${suffix}`)
+    } else {
+      // 這是正規天數
+      currentDayNumber++
+      alternativeCount = 0 // 重置建議方案計數
+      labels.push(`Day ${currentDayNumber}`)
+    }
+  }
+
+  return labels
+}
+
 export function DailyItinerarySection({
   data,
   updateField,
@@ -338,6 +363,9 @@ export function DailyItinerarySection({
   updateRecommendation,
   removeRecommendation,
 }: DailyItinerarySectionProps) {
+  // 計算所有天的標籤
+  const dayLabels = calculateDayLabels(data.dailyItinerary || [])
+
   // DnD Kit sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -559,9 +587,24 @@ export function DailyItinerarySection({
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-morandi-primary">逐日行程</h2>
-          <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
-            {data.dailyItinerary?.length || 0} 天
-          </span>
+          {(() => {
+            const total = data.dailyItinerary?.length || 0
+            const mainDays = data.dailyItinerary?.filter(d => !d.isAlternative).length || 0
+            const alternatives = total - mainDays
+
+            if (alternatives > 0) {
+              return (
+                <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+                  {mainDays} 天 + {alternatives} 建議方案
+                </span>
+              )
+            }
+            return (
+              <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+                {total} 天
+              </span>
+            )
+          })()}
         </div>
         <button
           onClick={addDailyItinerary}
@@ -576,24 +619,45 @@ export function DailyItinerarySection({
           key={dayIndex}
           className="p-6 border border-morandi-container rounded-2xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-white to-morandi-container/10 shadow-sm"
         >
-          {/* Day 標籤與刪除按鈕 */}
+          {/* Day 標籤與控制按鈕 */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-morandi-gold text-white text-sm font-bold rounded-full">
-                Day {dayIndex + 1}
+              <span className={`px-3 py-1 text-white text-sm font-bold rounded-full ${
+                day.isAlternative ? 'bg-morandi-secondary' : 'bg-morandi-gold'
+              }`}>
+                {dayLabels[dayIndex]}
               </span>
+              {day.isAlternative && (
+                <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+                  建議方案
+                </span>
+              )}
               <span className="text-sm text-morandi-secondary">
                 {day.title || '尚未設定行程標題'}
               </span>
             </div>
-            {dayIndex === data.dailyItinerary.length - 1 && (
-              <button
-                onClick={() => removeDailyItinerary(dayIndex)}
-                className="text-morandi-red hover:text-morandi-red/80 text-sm font-medium transition-colors"
-              >
-                刪除此天
-              </button>
-            )}
+            <div className="flex items-center gap-4">
+              {/* 建議方案 checkbox - 不顯示在第一天 */}
+              {dayIndex > 0 && (
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={day.isAlternative || false}
+                    onChange={e => updateDailyItinerary(dayIndex, 'isAlternative', e.target.checked)}
+                    className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
+                  />
+                  <span className="text-sm text-morandi-secondary">建議方案</span>
+                </label>
+              )}
+              {dayIndex === data.dailyItinerary.length - 1 && (
+                <button
+                  onClick={() => removeDailyItinerary(dayIndex)}
+                  className="text-morandi-red hover:text-morandi-red/80 text-sm font-medium transition-colors"
+                >
+                  刪除此天
+                </button>
+              )}
+            </div>
           </div>
 
           <div>
@@ -939,7 +1003,9 @@ export function DailyItinerarySection({
           setCurrentDayIndex(-1)
         }}
         tourCountries={data.countries}
+        tourCountryName={data.country}
         onSelect={handleSelectAttractions}
+        dayTitle={currentDayIndex >= 0 ? data.dailyItinerary[currentDayIndex]?.title : ''}
       />
 
       {/* 儲存到圖庫確認對話框 */}

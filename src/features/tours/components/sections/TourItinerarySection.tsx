@@ -8,6 +8,7 @@ import {
   AttractionCard,
   DecorativeDivider,
   MobileActivityCarousel,
+  DesktopActivityCarousel,
 } from '@/components/tour-preview'
 import { ArrowRight, Sparkles, X } from 'lucide-react'
 import Image from 'next/image'
@@ -53,6 +54,31 @@ function renderTitleWithIcons(title: string, viewMode: 'desktop' | 'mobile') {
   })
 }
 
+// 計算 dayLabel 的函數 - 處理建議方案編號
+function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[] {
+  const labels: string[] = []
+  let currentDayNumber = 0
+  let alternativeCount = 0 // 當前建議方案的計數 (B=1, C=2, ...)
+
+  for (let i = 0; i < itinerary.length; i++) {
+    const day = itinerary[i]
+
+    if (day.isAlternative) {
+      // 這是建議方案，使用前一個正規天數的編號 + 字母
+      alternativeCount++
+      const suffix = String.fromCharCode(65 + alternativeCount) // B, C, D...
+      labels.push(`Day ${currentDayNumber}-${suffix}`)
+    } else {
+      // 這是正規天數
+      currentDayNumber++
+      alternativeCount = 0 // 重置建議方案計數
+      labels.push(`Day ${currentDayNumber}`)
+    }
+  }
+
+  return labels
+}
+
 export function TourItinerarySection({
   data,
   viewMode,
@@ -61,6 +87,7 @@ export function TourItinerarySection({
   handleDayNavigate,
 }: TourItinerarySectionProps) {
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
+  const dayLabels = calculateDayLabels(dailyItinerary)
   const [selectedActivity, setSelectedActivity] = useState<{
     title: string
     description?: string
@@ -129,7 +156,12 @@ export function TourItinerarySection({
                     <div className="absolute -top-4 -left-4 w-24 h-24 bg-morandi-gold/20 rounded-full blur-2xl" />
                     {viewMode === 'mobile' ? (
                       <div className="relative flex items-center gap-3">
-                        <DayLabel dayNumber={index + 1} variant="small" />
+                        <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="small" />
+                        {day.isAlternative && (
+                          <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-[10px] rounded-full">
+                            建議方案
+                          </span>
+                        )}
                         <div className="flex-1 min-w-0">
                           {day.date && <DateSubtitle date={day.date} />}
                           {day.title && (
@@ -142,7 +174,12 @@ export function TourItinerarySection({
                     ) : (
                       <>
                         <div className="relative flex items-center gap-3 md:gap-4 mb-2 md:mb-3">
-                          <DayLabel dayNumber={index + 1} variant="default" />
+                          <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="default" />
+                          {day.isAlternative && (
+                            <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+                              建議方案
+                            </span>
+                          )}
                           {day.date && <DateSubtitle date={day.date} />}
                         </div>
                         {day.title && (
@@ -176,12 +213,12 @@ export function TourItinerarySection({
                     <div className="mb-6 space-y-3 overflow-hidden">
                       <DecorativeDivider variant="simple" />
                       {viewMode === 'mobile' ? (
-                        // 手機版：使用滿版滑動輪播組件，沒圖片的也用大卡片
+                        // 手機版：使用滿版滑動輪播組件
                         <MobileActivityCarousel
                           activities={day.activities.map(a => ({
                             title: a.title,
                             description: a.description,
-                            image: a.image || '', // 空字串讓組件知道沒圖片，但仍顯示大卡片
+                            image: a.image || '',
                           }))}
                         />
                       ) : (
@@ -189,16 +226,15 @@ export function TourItinerarySection({
                         (() => {
                           const withImage = day.activities.filter(a => a.image && a.image.trim() !== '')
                           const withoutImage = day.activities.filter(a => !a.image || a.image.trim() === '')
-                          
-                          // 情況1：都有圖片 - 標準網格
+
+                          // 情況1：都有圖片 - 標準網格排列
                           if (withoutImage.length === 0) {
                             return (
                               <div className={cn(
                                 "grid gap-4",
                                 withImage.length === 1 && "grid-cols-1",
-                                withImage.length === 2 && "grid-cols-1 md:grid-cols-2", 
-                                withImage.length === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-                                withImage.length >= 4 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                                withImage.length === 2 && "grid-cols-1 md:grid-cols-2",
+                                withImage.length >= 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                               )}>
                                 {withImage.map((activity, actIndex) => (
                                   <AttractionCard
@@ -279,26 +315,35 @@ export function TourItinerarySection({
                           if (withImage.length >= 2 && withoutImage.length <= 2) {
                             return (
                               <div className="space-y-4">
-                                {/* 有圖片的景點 - 網格排列 */}
-                                <div className={cn(
-                                  "grid gap-4",
-                                  withImage.length === 2 && "grid-cols-1 md:grid-cols-2",
-                                  withImage.length === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-                                  withImage.length >= 4 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                                )}>
-                                  {withImage.map((activity, actIndex) => (
-                                    <AttractionCard
-                                      key={`with-image-${actIndex}`}
-                                      title={activity.title}
-                                      description={activity.description || ''}
-                                      image={activity.image}
-                                      layout="vertical"
-                                      className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                                      onClick={() => handleActivityClick(activity)}
-                                    />
-                                  ))}
-                                </div>
-                                
+                                {/* 有圖片的景點 - 3 張以上用輪播，否則網格 */}
+                                {withImage.length >= 3 ? (
+                                  <DesktopActivityCarousel
+                                    activities={withImage.map(a => ({
+                                      title: a.title,
+                                      description: a.description,
+                                      image: a.image,
+                                    }))}
+                                    onActivityClick={(activity) => handleActivityClick(activity as typeof withImage[0])}
+                                  />
+                                ) : (
+                                  <div className={cn(
+                                    "grid gap-4",
+                                    withImage.length === 2 && "grid-cols-1 md:grid-cols-2"
+                                  )}>
+                                    {withImage.map((activity, actIndex) => (
+                                      <AttractionCard
+                                        key={`with-image-${actIndex}`}
+                                        title={activity.title}
+                                        description={activity.description || ''}
+                                        image={activity.image}
+                                        layout="vertical"
+                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                        onClick={() => handleActivityClick(activity)}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+
                                 {/* 沒圖片的景點 - 水平排列 */}
                                 {withoutImage.length > 0 && (
                                   <div className={cn(

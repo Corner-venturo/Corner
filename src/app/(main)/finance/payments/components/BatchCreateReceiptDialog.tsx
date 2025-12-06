@@ -199,7 +199,7 @@ export function BatchCreateReceiptDialog({
             <div className="border border-morandi-container/20 rounded-lg overflow-hidden">
               <div className="overflow-x-auto max-h-64">
                 <table className="w-full text-xs">
-                  <thead className="bg-morandi-container/10 sticky top-0">
+                  <thead className="bg-card sticky top-0">
                     <tr>
                       <th className="px-2 py-1 text-left">#</th>
                       <th className="px-2 py-1 text-left">訂單編號</th>

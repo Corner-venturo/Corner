@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { TourFormData, Feature } from '../types'
 import { iconOptions } from '../constants'
-import { ImageIcon, Loader2, X, Plus } from 'lucide-react'
+import { ImageIcon, Loader2, X, Plus, GripVertical } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 
 interface FeaturesSectionProps {
@@ -9,6 +9,7 @@ interface FeaturesSectionProps {
   addFeature: () => void
   updateFeature: (index: number, field: string, value: string | string[]) => void
   removeFeature: (index: number) => void
+  reorderFeature: (fromIndex: number, toIndex: number) => void
 }
 
 export function FeaturesSection({
@@ -16,11 +17,17 @@ export function FeaturesSection({
   addFeature,
   updateFeature,
   removeFeature,
+  reorderFeature,
 }: FeaturesSectionProps) {
   const [uploadingImage, setUploadingImage] = useState<{ featureIndex: number; imageIndex: number } | null>(null)
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+  const [draggedImage, setDraggedImage] = useState<{ featureIndex: number; imageIndex: number } | null>(null)
+  const [dragOverImage, setDragOverImage] = useState<{ featureIndex: number; imageIndex: number } | null>(null)
+  // 特色卡片拖曳排序
+  const [draggedFeature, setDraggedFeature] = useState<number | null>(null)
+  const [dragOverFeature, setDragOverFeature] = useState<number | null>(null)
 
-  // 上傳特色圖片
+  // 上傳特色圖片（單張）
   const handleImageUpload = async (
     featureIndex: number,
     imageIndex: number,
@@ -72,6 +79,84 @@ export function FeaturesSection({
     }
   }
 
+  // 上傳多張特色圖片
+  const handleMultipleImageUpload = async (
+    featureIndex: number,
+    files: FileList
+  ) => {
+    const feature = data.features?.[featureIndex]
+    const currentImages = [...(feature?.images || [])]
+    const remainingSlots = 4 - currentImages.length
+
+    if (remainingSlots <= 0) {
+      alert('已達到最大圖片數量（4 張）')
+      return
+    }
+
+    // 過濾出圖片檔案，並限制數量
+    const imageFiles = Array.from(files)
+      .filter(file => file.type.startsWith('image/'))
+      .slice(0, remainingSlots)
+
+    if (imageFiles.length === 0) {
+      alert('請選擇圖片檔案')
+      return
+    }
+
+    if (imageFiles.length < files.length) {
+      const skipped = files.length - imageFiles.length
+      if (skipped > 0) {
+        // 有些檔案被跳過（非圖片或超過數量限制）
+      }
+    }
+
+    // 設定上傳狀態（顯示第一張的位置）
+    setUploadingImage({ featureIndex, imageIndex: currentImages.length })
+
+    try {
+      const uploadedUrls: string[] = []
+
+      // 並行上傳所有圖片
+      await Promise.all(
+        imageFiles.map(async (file, idx) => {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `feature-${featureIndex}-${currentImages.length + idx}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+          const filePath = `tour-feature-images/${fileName}`
+
+          const { error: uploadError } = await supabase.storage
+            .from('workspace-files')
+            .upload(filePath, file)
+
+          if (uploadError) {
+            console.error(`上傳第 ${idx + 1} 張失敗:`, uploadError)
+            return
+          }
+
+          const { data: urlData } = supabase.storage
+            .from('workspace-files')
+            .getPublicUrl(filePath)
+
+          uploadedUrls[idx] = urlData.publicUrl
+        })
+      )
+
+      // 過濾掉失敗的（undefined）並更新
+      const successfulUrls = uploadedUrls.filter(Boolean)
+      if (successfulUrls.length > 0) {
+        updateFeature(featureIndex, 'images', [...currentImages, ...successfulUrls])
+      }
+
+      if (successfulUrls.length < imageFiles.length) {
+        alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`)
+      }
+    } catch (error) {
+      console.error('批量上傳錯誤:', error)
+      alert('上傳過程發生錯誤')
+    } finally {
+      setUploadingImage(null)
+    }
+  }
+
   // 移除圖片
   const handleRemoveImage = (featureIndex: number, imageIndex: number) => {
     const feature = data.features?.[featureIndex]
@@ -84,6 +169,81 @@ export function FeaturesSection({
   const handleAddImageSlot = (featureIndex: number) => {
     const inputKey = `feature-${featureIndex}-new`
     fileInputRefs.current[inputKey]?.click()
+  }
+
+  // 拖曳圖片開始
+  const handleImageDragStart = (featureIndex: number, imageIndex: number) => {
+    setDraggedImage({ featureIndex, imageIndex })
+  }
+
+  // 拖曳到目標位置
+  const handleImageDragOver = (e: React.DragEvent, featureIndex: number, imageIndex: number) => {
+    e.preventDefault()
+    // 只允許同一個 feature 內拖曳
+    if (draggedImage && draggedImage.featureIndex === featureIndex) {
+      setDragOverImage({ featureIndex, imageIndex })
+    }
+  }
+
+  // 放下圖片 - 重新排序
+  const handleImageDrop = (featureIndex: number, targetIndex: number) => {
+    if (!draggedImage || draggedImage.featureIndex !== featureIndex) {
+      setDraggedImage(null)
+      setDragOverImage(null)
+      return
+    }
+
+    const sourceIndex = draggedImage.imageIndex
+    if (sourceIndex === targetIndex) {
+      setDraggedImage(null)
+      setDragOverImage(null)
+      return
+    }
+
+    const feature = data.features?.[featureIndex]
+    const currentImages = [...(feature?.images || [])]
+
+    // 移動圖片
+    const [movedImage] = currentImages.splice(sourceIndex, 1)
+    currentImages.splice(targetIndex, 0, movedImage)
+
+    updateFeature(featureIndex, 'images', currentImages)
+    setDraggedImage(null)
+    setDragOverImage(null)
+  }
+
+  // 拖曳結束
+  const handleImageDragEnd = () => {
+    setDraggedImage(null)
+    setDragOverImage(null)
+  }
+
+  // 特色卡片拖曳開始
+  const handleFeatureDragStart = (index: number) => {
+    setDraggedFeature(index)
+  }
+
+  // 特色卡片拖曳到目標
+  const handleFeatureDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    if (draggedFeature !== null && draggedFeature !== index) {
+      setDragOverFeature(index)
+    }
+  }
+
+  // 特色卡片放下
+  const handleFeatureDrop = (targetIndex: number) => {
+    if (draggedFeature !== null && draggedFeature !== targetIndex) {
+      reorderFeature(draggedFeature, targetIndex)
+    }
+    setDraggedFeature(null)
+    setDragOverFeature(null)
+  }
+
+  // 特色卡片拖曳結束
+  const handleFeatureDragEnd = () => {
+    setDraggedFeature(null)
+    setDragOverFeature(null)
   }
 
   return (
@@ -100,14 +260,36 @@ export function FeaturesSection({
 
       {data.features?.map((feature: Feature, index: number) => {
         const images = feature.images || []
+        const isDraggingFeature = draggedFeature === index
+        const isDragOverFeature = dragOverFeature === index
 
         return (
           <div
             key={index}
-            className="p-4 border-2 border-morandi-container rounded-lg space-y-3 bg-morandi-container/20"
+            onDragOver={(e) => handleFeatureDragOver(e, index)}
+            onDrop={() => handleFeatureDrop(index)}
+            className={`p-4 border-2 rounded-lg space-y-3 transition-all ${
+              isDraggingFeature
+                ? 'opacity-50 scale-[0.98] border-morandi-gold bg-morandi-gold/10'
+                : isDragOverFeature
+                  ? 'border-morandi-gold bg-morandi-gold/5'
+                  : 'border-morandi-container bg-morandi-container/20'
+            }`}
           >
             <div className="flex justify-between items-start">
-              <span className="text-sm font-medium text-morandi-secondary">特色 {index + 1}</span>
+              <div className="flex items-center gap-2">
+                {/* 只有這個把手可以拖曳 */}
+                <div
+                  draggable
+                  onDragStart={() => handleFeatureDragStart(index)}
+                  onDragEnd={handleFeatureDragEnd}
+                  className="cursor-move text-morandi-secondary hover:text-morandi-primary transition-colors p-1 -m-1 rounded hover:bg-morandi-container/50"
+                  title="拖曳排序"
+                >
+                  <GripVertical size={18} />
+                </div>
+                <span className="text-sm font-medium text-morandi-secondary">特色 {index + 1}</span>
+              </div>
               <button
                 onClick={() => removeFeature(index)}
                 className="text-morandi-red hover:text-morandi-red/80 text-sm transition-colors"
@@ -153,21 +335,30 @@ export function FeaturesSection({
             {/* 特色圖片（支援多張） */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                特色圖片（最多 4 張）
+                特色圖片（可一次選擇多張，最多 4 張，可拖曳排序）
               </label>
-              <div className="grid grid-cols-2 gap-3">
-                {/* 已上傳的圖片 */}
+              <div className="flex flex-wrap gap-2">
+                {/* 已上傳的圖片 - 縮圖顯示 */}
                 {images.map((imageUrl, imgIndex) => {
                   const isUploading = uploadingImage?.featureIndex === index && uploadingImage?.imageIndex === imgIndex
+                  const isDragging = draggedImage?.featureIndex === index && draggedImage?.imageIndex === imgIndex
+                  const isDragOver = dragOverImage?.featureIndex === index && dragOverImage?.imageIndex === imgIndex
 
                   return (
                     <div
                       key={imgIndex}
-                      className="relative aspect-[4/3] rounded-lg border-2 border-transparent overflow-hidden"
+                      draggable={!isUploading}
+                      onDragStart={() => handleImageDragStart(index, imgIndex)}
+                      onDragOver={(e) => handleImageDragOver(e, index, imgIndex)}
+                      onDrop={() => handleImageDrop(index, imgIndex)}
+                      onDragEnd={handleImageDragEnd}
+                      className={`relative w-16 h-16 rounded-lg overflow-hidden cursor-move group transition-all ${
+                        isDragging ? 'opacity-50 scale-95' : ''
+                      } ${isDragOver ? 'ring-2 ring-morandi-gold ring-offset-2' : ''}`}
                     >
                       {isUploading ? (
                         <div className="w-full h-full flex items-center justify-center bg-morandi-container/30">
-                          <Loader2 size={24} className="text-morandi-secondary animate-spin" />
+                          <Loader2 size={16} className="text-morandi-secondary animate-spin" />
                         </div>
                       ) : (
                         <>
@@ -176,13 +367,25 @@ export function FeaturesSection({
                             alt={`特色圖片 ${imgIndex + 1}`}
                             className="w-full h-full object-cover"
                           />
+                          {/* 拖曳提示 */}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                            <GripVertical size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                          {/* 序號標籤 */}
+                          <span className="absolute bottom-0.5 left-0.5 bg-black/60 text-white text-[10px] px-1 rounded">
+                            {imgIndex + 1}
+                          </span>
+                          {/* 刪除按鈕 */}
                           <button
                             type="button"
-                            onClick={() => handleRemoveImage(index, imgIndex)}
-                            className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleRemoveImage(index, imgIndex)
+                            }}
+                            className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
                             title="移除圖片"
                           >
-                            <X size={14} />
+                            <X size={10} />
                           </button>
                         </>
                       )}
@@ -190,39 +393,50 @@ export function FeaturesSection({
                   )
                 })}
 
-                {/* 新增圖片按鈕（限制最多 4 張） */}
+                {/* 新增圖片按鈕（限制最多 4 張）- 縮圖尺寸 */}
                 {images.length < 4 && (
                   <div
-                    className="relative aspect-[4/3] rounded-lg border-2 border-dashed border-morandi-container bg-morandi-container/20 hover:border-morandi-gold/50 overflow-hidden transition-colors"
+                    className="relative w-16 h-16 rounded-lg border-2 border-dashed border-morandi-container bg-morandi-container/20 hover:border-morandi-gold/50 overflow-hidden transition-colors"
                     onDragOver={e => { e.preventDefault(); e.stopPropagation() }}
                     onDrop={e => {
                       e.preventDefault()
                       e.stopPropagation()
-                      const file = e.dataTransfer.files?.[0]
-                      if (file && file.type.startsWith('image/')) {
-                        handleImageUpload(index, images.length, file)
+                      // 確保不是圖片排序的拖曳
+                      if (draggedImage) return
+                      const files = e.dataTransfer.files
+                      if (files && files.length > 0) {
+                        if (files.length === 1) {
+                          const file = files[0]
+                          if (file.type.startsWith('image/')) {
+                            handleImageUpload(index, images.length, file)
+                          }
+                        } else {
+                          // 多張圖片
+                          handleMultipleImageUpload(index, files)
+                        }
                       }
                     }}
                   >
                     <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-morandi-container/30 transition-colors">
-                      {uploadingImage?.featureIndex === index && uploadingImage?.imageIndex === images.length ? (
-                        <Loader2 size={24} className="text-morandi-secondary animate-spin" />
+                      {uploadingImage?.featureIndex === index && uploadingImage?.imageIndex >= images.length ? (
+                        <Loader2 size={16} className="text-morandi-secondary animate-spin" />
                       ) : (
-                        <>
-                          <Plus size={24} className="text-morandi-secondary/50 mb-2" />
-                          <span className="text-xs text-morandi-secondary/70">新增圖片</span>
-                          <span className="text-[10px] text-morandi-secondary/50 mt-1">
-                            點擊或拖曳上傳
-                          </span>
-                        </>
+                        <Plus size={20} className="text-morandi-secondary/50" />
                       )}
                       <input
                         type="file"
                         accept="image/*"
+                        multiple
                         ref={el => { fileInputRefs.current[`feature-${index}-new`] = el }}
                         onChange={e => {
-                          const file = e.target.files?.[0]
-                          if (file) handleImageUpload(index, images.length, file)
+                          const files = e.target.files
+                          if (files && files.length > 0) {
+                            if (files.length === 1) {
+                              handleImageUpload(index, images.length, files[0])
+                            } else {
+                              handleMultipleImageUpload(index, files)
+                            }
+                          }
                           e.target.value = ''
                         }}
                         className="hidden"

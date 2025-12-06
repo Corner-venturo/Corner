@@ -269,7 +269,7 @@ export function EditableRatesTable({
       <div className="rounded-lg overflow-hidden bg-white shadow-sm border border-border">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
-            <thead className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/30 sticky top-0 z-10 backdrop-blur-sm">
+            <thead className="bg-card border-b-2 border-morandi-gold/30 sticky top-0 z-10">
               <tr>
                 {isEditMode && (
                   <th className="px-2 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '40px' }}>

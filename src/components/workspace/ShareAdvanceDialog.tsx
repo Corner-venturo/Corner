@@ -122,7 +122,7 @@ export function ShareAdvanceDialog({
         {/* 表格區域 */}
         <div className="flex-1 overflow-y-auto my-4">
           <table className="w-full">
-            <thead className="sticky top-0 bg-morandi-container/5 border-b border-morandi-gold/20">
+            <thead className="sticky top-0 bg-card border-b border-morandi-gold/20">
               <tr>
                 <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[30%]">
                   品項

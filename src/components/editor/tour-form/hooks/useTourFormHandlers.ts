@@ -94,6 +94,13 @@ export function useTourFormHandlers(
     onChange({ ...data, features: newFeatures })
   }
 
+  const reorderFeature = (fromIndex: number, toIndex: number) => {
+    const newFeatures = [...data.features]
+    const [movedFeature] = newFeatures.splice(fromIndex, 1)
+    newFeatures.splice(toIndex, 0, movedFeature)
+    onChange({ ...data, features: newFeatures })
+  }
+
   // 景點管理
   const addFocusCard = () => {
     onChange({
@@ -254,6 +261,7 @@ export function useTourFormHandlers(
     addFeature,
     updateFeature,
     removeFeature,
+    reorderFeature,
     addFocusCard,
     updateFocusCard,
     removeFocusCard,

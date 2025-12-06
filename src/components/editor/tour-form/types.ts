@@ -52,6 +52,7 @@ export interface DailyItinerary {
   meals: Meals
   accommodation: string
   images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
+  isAlternative?: boolean // 是否為建議方案（替代行程），如 Day 3-B, Day 3-C
 }
 
 export interface LeaderInfo {

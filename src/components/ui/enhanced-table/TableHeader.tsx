@@ -58,7 +58,7 @@ export function TableHeader({
   }
 
   return (
-    <thead className="sticky top-0 z-10 bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 backdrop-blur-sm">
+    <thead className="sticky top-0 z-10 bg-card border-b-2 border-morandi-gold/20">
       {/* 主標題行 */}
       <tr className="relative" data-enhanced-table-header-row>
         {/* Selection checkbox column */}
