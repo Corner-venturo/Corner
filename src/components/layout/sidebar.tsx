@@ -304,7 +304,7 @@ export function Sidebar() {
       if (!isDropdownHovered) {
         setHoveredItem(null)
       }
-    }, 100)
+    }, 150) // 增加延遲時間，讓滑鼠有足夠時間移到子選單
   }
 
   const handleClick = (item: MenuItem, element: HTMLElement) => {
@@ -342,11 +342,14 @@ export function Sidebar() {
     // 如果是點擊固定的項目，不要關閉
     if (clickedItem) return
 
-    setHoveredItem(null)
-    // 同時收起側邊欄（如果是摺疊模式）
-    if (sidebarCollapsed) {
-      setIsSidebarHovered(false)
-    }
+    // 延遲關閉，讓使用者有機會移回側邊欄
+    timeoutRef.current = setTimeout(() => {
+      setHoveredItem(null)
+      // 同時收起側邊欄（如果是摺疊模式）
+      if (sidebarCollapsed) {
+        setIsSidebarHovered(false)
+      }
+    }, 150)
   }
 
   const is_active = (href: string) => {
@@ -369,9 +372,17 @@ export function Sidebar() {
 
   // 提取需要的屬性，避免 user 物件變化時不必要的重新渲染
   const userPermissions = user?.permissions || []
+  const userRoles = user?.roles || []
   const hiddenMenuItems = user?.hidden_menu_items || []
   const preferredFeatures = user?.preferred_features || []
-  const isSuperAdmin = userPermissions.includes('super_admin') || userPermissions.includes('admin')
+
+  // 檢查是否為超級管理員
+  // 支援：permissions 包含 'super_admin', 'admin', '*' 或 roles 包含 'super_admin'
+  const isSuperAdmin =
+    userPermissions.includes('super_admin') ||
+    userPermissions.includes('admin') ||
+    userPermissions.includes('*') ||
+    userRoles.includes('super_admin')
 
   // 使用 useMemo 優化權限過濾和個人化隱藏
   const visibleMenuItems = useMemo(() => {
@@ -388,8 +399,9 @@ export function Sidebar() {
           }
 
           // ⭐ 檢查是否在常用功能列表中
+          // 超級管理員不受 preferred_features 限制
           // 如果使用者有設定 preferred_features，且該功能不在列表中，則隱藏
-          if (preferredFeatures.length > 0 && item.requiredPermission) {
+          if (!isSuperAdmin && preferredFeatures.length > 0 && item.requiredPermission) {
             if (!preferredFeatures.includes(item.requiredPermission)) {
               return null
             }
@@ -420,7 +432,7 @@ export function Sidebar() {
 
     return filterMenuByPermissions(menuItems)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+  }, [user?.id, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   const visiblePersonalToolItems = useMemo(() => {
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
@@ -444,7 +456,7 @@ export function Sidebar() {
 
     return filterMenuByPermissions(personalToolItems)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+  }, [user?.id, isSuperAdmin, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   return (
     <>
@@ -473,10 +485,16 @@ export function Sidebar() {
           }
         }}
         onMouseLeave={() => {
-          // 只有當沒有下拉選單時才收起
-          if (!hoveredItem && !isDropdownHovered) {
-            setIsSidebarHovered(false)
-          }
+          // 如果有點擊固定的項目，不要收起
+          if (clickedItem) return
+
+          // 延遲收起，讓使用者有機會移到子選單
+          timeoutRef.current = setTimeout(() => {
+            if (!isDropdownHovered) {
+              setIsSidebarHovered(false)
+              setHoveredItem(null)
+            }
+          }, 150)
         }}
         className={cn(
           'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-30 group transition-[width] duration-300 flex flex-col',

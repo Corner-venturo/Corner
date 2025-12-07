@@ -17,6 +17,7 @@ export interface QuickActionTabConfig {
 export interface SubTasksSectionProps {
   todo: Todo
   onUpdate: (updates: Partial<Todo>) => void
+  readOnly?: boolean
 }
 
 export interface NotesSectionProps {
@@ -27,6 +28,7 @@ export interface NotesSectionProps {
 export interface AssignmentSectionProps {
   todo: Todo
   onUpdate: (updates: Partial<Todo>) => void
+  readOnly?: boolean
 }
 
 export interface QuickActionsSectionProps {

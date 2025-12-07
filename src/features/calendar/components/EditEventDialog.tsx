@@ -3,13 +3,11 @@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AddEventDialogState, NewEventForm } from '../types'
+import { EditEventDialogState } from '../types'
 
-interface AddEventDialogProps {
-  dialog: AddEventDialogState
-  newEvent: NewEventForm
-  onNewEventChange: (event: NewEventForm) => void
-  onDialogChange: (dialog: AddEventDialogState) => void
+interface EditEventDialogProps {
+  dialog: EditEventDialogState
+  onDialogChange: (dialog: EditEventDialogState) => void
   onSubmit: () => void
   onClose: () => void
 }
@@ -53,7 +51,6 @@ const formatSingleTime = (value: string): string => {
 // 解析時間範圍（0800-1400 → { start: '08:00', end: '14:00' }）
 const parseTimeRange = (value: string): { start: string; end: string | null } => {
   const normalized = toHalfWidth(value)
-  // 檢查是否包含分隔符號（- 或 ~）
   const separatorMatch = normalized.match(/[-~]/)
   if (separatorMatch) {
     const parts = normalized.split(/[-~]/)
@@ -63,31 +60,27 @@ const parseTimeRange = (value: string): { start: string; end: string | null } =>
       return { start, end: end || null }
     }
   }
-
-  // 沒有分隔符號，只處理開始時間
   return { start: formatSingleTime(normalized), end: null }
 }
 
-export function AddEventDialog({
+export function EditEventDialog({
   dialog,
-  newEvent,
-  onNewEventChange,
   onDialogChange,
   onSubmit,
   onClose,
-}: AddEventDialogProps) {
+}: EditEventDialogProps) {
 
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>新增行事曆事項</DialogTitle>
+          <DialogTitle>編輯行事曆事項</DialogTitle>
         </DialogHeader>
 
         <form
           onSubmit={e => {
             e.preventDefault()
-            if (newEvent.title.trim()) {
+            if (dialog.title.trim()) {
               onSubmit()
             }
           }}
@@ -98,8 +91,8 @@ export function AddEventDialog({
               <label className="text-sm font-medium text-morandi-primary">開始日期</label>
               <Input
                 type="date"
-                value={dialog.selectedDate}
-                onChange={e => onDialogChange({ ...dialog, selectedDate: e.target.value })}
+                value={dialog.startDate}
+                onChange={e => onDialogChange({ ...dialog, startDate: e.target.value })}
                 className="mt-1"
               />
             </div>
@@ -107,11 +100,10 @@ export function AddEventDialog({
               <label className="text-sm font-medium text-morandi-primary">結束日期（選填）</label>
               <Input
                 type="date"
-                value={newEvent.end_date}
-                onChange={e => onNewEventChange({ ...newEvent, end_date: e.target.value })}
-                min={dialog.selectedDate}
+                value={dialog.endDate}
+                onChange={e => onDialogChange({ ...dialog, endDate: e.target.value })}
+                min={dialog.startDate}
                 className="mt-1"
-                placeholder="跨天活動請選擇"
               />
             </div>
           </div>
@@ -119,8 +111,8 @@ export function AddEventDialog({
           <div>
             <label className="text-sm font-medium text-morandi-primary">標題</label>
             <Input
-              value={newEvent.title}
-              onChange={e => onNewEventChange({ ...newEvent, title: e.target.value })}
+              value={dialog.title}
+              onChange={e => onDialogChange({ ...dialog, title: e.target.value })}
               placeholder="輸入事項標題"
               className="mt-1"
             />
@@ -130,10 +122,10 @@ export function AddEventDialog({
             <div>
               <label className="text-sm font-medium text-morandi-primary">事件類型</label>
               <select
-                value={newEvent.visibility}
+                value={dialog.visibility}
                 onChange={e =>
-                  onNewEventChange({
-                    ...newEvent,
+                  onDialogChange({
+                    ...dialog,
                     visibility: e.target.value as 'personal' | 'company',
                   })
                 }
@@ -147,14 +139,14 @@ export function AddEventDialog({
             <div>
               <label className="text-sm font-medium text-morandi-primary">開始時間（選填）</label>
               <Input
-                value={newEvent.start_time}
-                onChange={e => onNewEventChange({ ...newEvent, start_time: e.target.value })}
+                value={dialog.startTime}
+                onChange={e => onDialogChange({ ...dialog, startTime: e.target.value })}
                 onBlur={e => {
                   const { start, end } = parseTimeRange(e.target.value)
-                  onNewEventChange({
-                    ...newEvent,
-                    start_time: start,
-                    end_time: end || newEvent.end_time
+                  onDialogChange({
+                    ...dialog,
+                    startTime: start,
+                    endTime: end || dialog.endTime
                   })
                 }}
                 placeholder="如 0800-1400 或 14:30"
@@ -164,13 +156,13 @@ export function AddEventDialog({
           </div>
 
           {/* 結束時間 - 有開始時間才顯示 */}
-          {newEvent.start_time && (
+          {dialog.startTime && (
             <div>
               <label className="text-sm font-medium text-morandi-primary">結束時間（選填）</label>
               <Input
-                value={newEvent.end_time}
-                onChange={e => onNewEventChange({ ...newEvent, end_time: e.target.value })}
-                onBlur={e => onNewEventChange({ ...newEvent, end_time: formatSingleTime(e.target.value) })}
+                value={dialog.endTime}
+                onChange={e => onDialogChange({ ...dialog, endTime: e.target.value })}
+                onBlur={e => onDialogChange({ ...dialog, endTime: formatSingleTime(e.target.value) })}
                 placeholder="如 1200 或 18:00"
                 className="mt-1"
               />
@@ -180,8 +172,8 @@ export function AddEventDialog({
           <div>
             <label className="text-sm font-medium text-morandi-primary">說明（選填）</label>
             <Input
-              value={newEvent.description}
-              onChange={e => onNewEventChange({ ...newEvent, description: e.target.value })}
+              value={dialog.description}
+              onChange={e => onDialogChange({ ...dialog, description: e.target.value })}
               placeholder="輸入說明"
               className="mt-1"
             />
@@ -193,10 +185,10 @@ export function AddEventDialog({
             </Button>
             <Button
               type="submit"
-              disabled={!newEvent.title.trim()}
+              disabled={!dialog.title.trim()}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              新增 <span className="ml-1 text-xs opacity-70">(Enter)</span>
+              儲存變更
             </Button>
           </div>
         </form>

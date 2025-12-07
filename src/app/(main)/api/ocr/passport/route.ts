@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// Google Vision 每月免費額度限制
-const GOOGLE_VISION_MONTHLY_LIMIT = 980
+// Google Vision 每月免費額度限制（每個 Key 980 次）
+const GOOGLE_VISION_LIMIT_PER_KEY = 980
+
+/**
+ * 取得 Google Vision API Keys（支援多 Key 輪換）
+ */
+function getGoogleVisionKeys(): string[] {
+  // 優先使用多 Key 設定
+  const multiKeys = process.env.GOOGLE_VISION_API_KEYS
+  if (multiKeys) {
+    return multiKeys.split(',').map(k => k.trim()).filter(Boolean)
+  }
+  // 向後相容：使用單一 Key
+  const singleKey = process.env.GOOGLE_VISION_API_KEY
+  if (singleKey) {
+    return [singleKey]
+  }
+  return []
+}
 
 /**
  * 護照 OCR 辨識 API
@@ -43,14 +60,17 @@ export async function POST(request: NextRequest) {
     }
 
     const ocrSpaceKey = process.env.OCR_SPACE_API_KEY
-    const googleVisionKey = process.env.GOOGLE_VISION_API_KEY
+    const googleVisionKeys = getGoogleVisionKeys()
 
     if (!ocrSpaceKey) {
       return NextResponse.json({ error: 'OCR API Key 未設定' }, { status: 500 })
     }
 
-    // 檢查 Google Vision 使用量
-    const { canUseGoogleVision, currentUsage, warning } = await checkGoogleVisionUsage(base64Images.length)
+    // 檢查 Google Vision 使用量並取得可用的 Key
+    const { canUseGoogleVision, availableKey, currentUsage, totalLimit, warning } = await checkGoogleVisionUsage(
+      base64Images.length,
+      googleVisionKeys
+    )
 
     // 批次辨識所有護照
     const results = await Promise.all(
@@ -60,8 +80,8 @@ export async function POST(request: NextRequest) {
           const [ocrSpaceResult, googleVisionResult] = await Promise.all([
             // OCR.space - MRZ 辨識
             callOcrSpace(img.data, ocrSpaceKey),
-            // Google Vision - 中文辨識（如果有 key 且未超過限制）
-            (googleVisionKey && canUseGoogleVision) ? callGoogleVision(img.data, googleVisionKey) : Promise.resolve(null),
+            // Google Vision - 中文辨識（如果有可用的 key）
+            (availableKey && canUseGoogleVision) ? callGoogleVision(img.data, availableKey) : Promise.resolve(null),
           ])
 
           console.log('🔍 OCR.space 原始文字:', ocrSpaceResult)
@@ -90,8 +110,8 @@ export async function POST(request: NextRequest) {
     )
 
     // 更新使用量（只有成功使用 Google Vision 才計算）
-    if (canUseGoogleVision && googleVisionKey) {
-      await updateGoogleVisionUsage(base64Images.length)
+    if (canUseGoogleVision && availableKey) {
+      await updateGoogleVisionUsage(base64Images.length, availableKey)
     }
 
     return NextResponse.json({
@@ -103,8 +123,9 @@ export async function POST(request: NextRequest) {
       usageWarning: warning,
       googleVisionUsage: {
         current: currentUsage + (canUseGoogleVision ? base64Images.length : 0),
-        limit: GOOGLE_VISION_MONTHLY_LIMIT,
+        limit: totalLimit,
         enabled: canUseGoogleVision,
+        keysAvailable: googleVisionKeys.length,
       },
     })
   } catch (error) {
@@ -453,70 +474,120 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
 }
 
 /**
- * 檢查 Google Vision API 使用量
+ * 檢查 Google Vision API 使用量（支援多 Key 輪換）
  */
-async function checkGoogleVisionUsage(requestCount: number): Promise<{
+async function checkGoogleVisionUsage(
+  requestCount: number,
+  apiKeys: string[]
+): Promise<{
   canUseGoogleVision: boolean
+  availableKey: string | null
   currentUsage: number
+  totalLimit: number
   warning: string | null
 }> {
+  // 沒有設定任何 Key
+  if (apiKeys.length === 0) {
+    return {
+      canUseGoogleVision: false,
+      availableKey: null,
+      currentUsage: 0,
+      totalLimit: 0,
+      warning: '⚠️ Google Vision API Key 未設定，中文名辨識已停用。',
+    }
+  }
+
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
 
-    // 取得當月使用量
     const currentMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
-    const { data, error } = await supabase
+    const totalLimit = GOOGLE_VISION_LIMIT_PER_KEY * apiKeys.length
+
+    // 查詢所有 Key 的使用量
+    const { data: usageData } = await supabase
       .from('api_usage')
-      .select('usage_count')
-      .eq('api_name', 'google_vision')
+      .select('api_name, usage_count')
+      .like('api_name', 'google_vision_%')
       .eq('month', currentMonth)
-      .single()
 
-    const currentUsage = data?.usage_count || 0
-    const newUsage = currentUsage + requestCount
+    // 建立 Key -> 使用量 的對照表
+    const usageByKey: Record<string, number> = {}
+    let totalUsage = 0
 
-    // 判斷是否可以使用
-    if (newUsage > GOOGLE_VISION_MONTHLY_LIMIT) {
-      return {
-        canUseGoogleVision: false,
-        currentUsage,
-        warning: `⚠️ Google Vision API 本月已達上限 (${currentUsage}/${GOOGLE_VISION_MONTHLY_LIMIT})，中文名辨識已停用。護照其他資訊仍可正常辨識。`,
+    for (let i = 0; i < apiKeys.length; i++) {
+      const keyId = `google_vision_${i}` // 用索引來識別 Key
+      const usage = usageData?.find(d => d.api_name === keyId)?.usage_count || 0
+      usageByKey[keyId] = usage
+      totalUsage += usage
+    }
+
+    // 找出可用的 Key（額度未滿的第一個）
+    let availableKey: string | null = null
+    let availableKeyId: string | null = null
+
+    for (let i = 0; i < apiKeys.length; i++) {
+      const keyId = `google_vision_${i}`
+      const usage = usageByKey[keyId] || 0
+      const newUsage = usage + requestCount
+
+      if (newUsage <= GOOGLE_VISION_LIMIT_PER_KEY) {
+        availableKey = apiKeys[i]
+        availableKeyId = keyId
+        console.log(`✅ 使用 Google Vision Key ${i + 1} (${apiKeys[i].slice(0, 12)}...) - 使用量: ${usage}/${GOOGLE_VISION_LIMIT_PER_KEY}`)
+        break
+      } else {
+        console.log(`⚠️ Google Vision Key ${i + 1} 額度已滿 (${usage}/${GOOGLE_VISION_LIMIT_PER_KEY})，嘗試下一個...`)
       }
     }
 
-    // 使用量警告（超過 80%）
-    const usagePercent = (newUsage / GOOGLE_VISION_MONTHLY_LIMIT) * 100
+    // 所有 Key 都用完了
+    if (!availableKey) {
+      return {
+        canUseGoogleVision: false,
+        availableKey: null,
+        currentUsage: totalUsage,
+        totalLimit,
+        warning: `⚠️ Google Vision API 本月所有 Key 額度都已用完 (${totalUsage}/${totalLimit})，中文名辨識已停用。護照其他資訊仍可正常辨識。`,
+      }
+    }
+
+    // 計算使用量警告
+    const usagePercent = (totalUsage / totalLimit) * 100
     let warning: string | null = null
 
     if (usagePercent >= 95) {
-      warning = `🔴 Google Vision API 使用量已達 ${usagePercent.toFixed(0)}% (${newUsage}/${GOOGLE_VISION_MONTHLY_LIMIT})，即將達到上限！`
+      warning = `🔴 Google Vision API 使用量已達 ${usagePercent.toFixed(0)}% (${totalUsage}/${totalLimit})，即將達到上限！`
     } else if (usagePercent >= 80) {
-      warning = `🟡 Google Vision API 使用量已達 ${usagePercent.toFixed(0)}% (${newUsage}/${GOOGLE_VISION_MONTHLY_LIMIT})`
+      warning = `🟡 Google Vision API 使用量已達 ${usagePercent.toFixed(0)}% (${totalUsage}/${totalLimit})`
     }
 
     return {
       canUseGoogleVision: true,
-      currentUsage,
+      availableKey,
+      currentUsage: totalUsage,
+      totalLimit,
       warning,
     }
   } catch (error) {
     console.error('檢查 API 使用量失敗:', error)
-    // 發生錯誤時仍允許使用（避免因為 DB 問題影響正常功能）
+    // 發生錯誤時使用第一個 Key（避免因為 DB 問題影響正常功能）
     return {
       canUseGoogleVision: true,
+      availableKey: apiKeys[0],
       currentUsage: 0,
+      totalLimit: GOOGLE_VISION_LIMIT_PER_KEY * apiKeys.length,
       warning: null,
     }
   }
 }
 
 /**
- * 更新 Google Vision API 使用量
+ * 更新 Google Vision API 使用量（支援多 Key 追蹤）
  */
-async function updateGoogleVisionUsage(count: number): Promise<void> {
+async function updateGoogleVisionUsage(count: number, usedKey: string): Promise<void> {
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -524,12 +595,17 @@ async function updateGoogleVisionUsage(count: number): Promise<void> {
     )
 
     const currentMonth = new Date().toISOString().slice(0, 7)
+    const apiKeys = getGoogleVisionKeys()
+
+    // 找出使用的 Key 對應的索引
+    const keyIndex = apiKeys.findIndex(k => k === usedKey)
+    const keyId = keyIndex >= 0 ? `google_vision_${keyIndex}` : 'google_vision_0'
 
     // 先查詢當前使用量
     const { data: existing } = await supabase
       .from('api_usage')
       .select('usage_count')
-      .eq('api_name', 'google_vision')
+      .eq('api_name', keyId)
       .eq('month', currentMonth)
       .single()
 
@@ -540,7 +616,7 @@ async function updateGoogleVisionUsage(count: number): Promise<void> {
       .from('api_usage')
       .upsert(
         {
-          api_name: 'google_vision',
+          api_name: keyId,
           month: currentMonth,
           usage_count: newCount,
           updated_at: new Date().toISOString(),
@@ -553,7 +629,7 @@ async function updateGoogleVisionUsage(count: number): Promise<void> {
     if (error) {
       console.error('upsert 失敗:', error)
     } else {
-      console.log(`📊 Google Vision 使用量更新: ${newCount}/${GOOGLE_VISION_MONTHLY_LIMIT}`)
+      console.log(`📊 Google Vision Key ${keyIndex + 1} 使用量更新: ${newCount}/${GOOGLE_VISION_LIMIT_PER_KEY}`)
     }
   } catch (error) {
     console.error('更新 API 使用量失敗:', error)

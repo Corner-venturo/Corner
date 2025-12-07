@@ -6,19 +6,20 @@ import { Button } from '@/components/ui/button'
 import { Terminal, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react'
 
 // 環境設定指令 - 給 Claude Code 用
+// ⚠️ 注意：真實的 API Key 請存放在 .env.local，不要硬編碼在程式碼中
 const ENV_SETUP_PROMPT = `請幫我在 .env.local 設定以下環境變數：
 
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://pfqvdacxowpgfamuvnsn.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAyNzg0MTksImV4cCI6MjA0NTg1NDQxOX0.2rrwNVNMjpKIvjObDqG6psWAMDKmEFCUpX4ze0K4KZ0
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMDI3ODQxOSwiZXhwIjoyMDQ1ODU0NDE5fQ.VKlPLCbJqNfHqOj0F9dIbfvNDzUQdZqLbJvqF9PMQGI
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # OCR
-OCR_SPACE_API_KEY=K85217444288957
-GOOGLE_VISION_API_KEY=AIzaSyAfPvuMgQ-0pJJbhxPxfO4qvWMIPkKCj9I
+OCR_SPACE_API_KEY=your-ocr-space-key
+GOOGLE_VISION_API_KEY=your-google-vision-key
 
 # AI
-GEMINI_API_KEY=AIzaSyB63zZ390rlAlOatnP8h1Yu6fe2erfqfKc
+GEMINI_API_KEY=your-gemini-key
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -26,20 +27,22 @@ NEXT_PUBLIC_APP_NAME=Venturo
 NEXT_PUBLIC_ENABLE_SUPABASE=true
 NEXT_PUBLIC_DEBUG_MODE=false
 
-請確認檔案建立在專案根目錄 /Users/william/Projects/venturo-new/.env.local`
+請確認檔案建立在專案根目錄，並從安全的地方取得實際的 API Key 值`
 
 // Vercel 環境變數清單
 const VERCEL_ENV_LIST = `Vercel 環境變數設定：
 
-1. NEXT_PUBLIC_SUPABASE_URL = https://pfqvdacxowpgfamuvnsn.supabase.co
-2. NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAyNzg0MTksImV4cCI6MjA0NTg1NDQxOX0.2rrwNVNMjpKIvjObDqG6psWAMDKmEFCUpX4ze0K4KZ0
-3. SUPABASE_SERVICE_ROLE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMDI3ODQxOSwiZXhwIjoyMDQ1ODU0NDE5fQ.VKlPLCbJqNfHqOj0F9dIbfvNDzUQdZqLbJvqF9PMQGI
-4. OCR_SPACE_API_KEY = K85217444288957
-5. GOOGLE_VISION_API_KEY = AIzaSyAfPvuMgQ-0pJJbhxPxfO4qvWMIPkKCj9I
-6. GEMINI_API_KEY = AIzaSyB63zZ390rlAlOatnP8h1Yu6fe2erfqfKc
+1. NEXT_PUBLIC_SUPABASE_URL = (從 Supabase Dashboard 取得)
+2. NEXT_PUBLIC_SUPABASE_ANON_KEY = (從 Supabase Dashboard 取得)
+3. SUPABASE_SERVICE_ROLE_KEY = (從 Supabase Dashboard 取得)
+4. OCR_SPACE_API_KEY = (從 OCR.space 取得)
+5. GOOGLE_VISION_API_KEY = (從 Google Cloud Console 取得)
+6. GEMINI_API_KEY = (從 Google AI Studio 取得)
 7. NEXT_PUBLIC_APP_URL = https://venturo.vercel.app (改成你的 Vercel 網址)
 8. NEXT_PUBLIC_APP_NAME = Venturo
-9. NEXT_PUBLIC_ENABLE_SUPABASE = true`
+9. NEXT_PUBLIC_ENABLE_SUPABASE = true
+
+⚠️ 請從安全的地方取得實際的 API Key 值，不要將真實 Key 存放在程式碼中`
 
 export function DevToolsSettings() {
   const [copiedEnv, setCopiedEnv] = useState(false)

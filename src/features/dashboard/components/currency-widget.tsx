@@ -180,49 +180,52 @@ export function CurrencyWidget() {
           {/* Currency Conversion - Side by Side */}
           <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40">
             <div className="flex items-end gap-2">
-              {/* TWD Input */}
+              {/* Left Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  台幣 (TWD)
+                  {direction === 'twd-to-foreign' ? '台幣 (TWD)' : `${currencyInfo.name} (${selectedCurrency})`}
                 </label>
                 <div className="relative group">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-morandi-secondary/70 text-xs font-semibold">
-                    NT$
+                    {direction === 'twd-to-foreign' ? 'NT$' : currencyInfo.symbol}
                   </span>
                   <input
                     type="number"
-                    value={twdAmount}
-                    onChange={e => handleTwdChange(e.target.value)}
+                    value={direction === 'twd-to-foreign' ? twdAmount : foreignAmount}
+                    onChange={e => direction === 'twd-to-foreign' ? handleTwdChange(e.target.value) : handleForeignChange(e.target.value)}
                     className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                    placeholder="10000"
+                    placeholder={direction === 'twd-to-foreign' ? '10000' : '0.00'}
                   />
                 </div>
               </div>
 
-              {/* Arrow Button */}
+              {/* Arrow Button - 交換左右位置 */}
               <button
                 onClick={swapDirection}
                 className="p-2.5 hover:bg-white/80 rounded-xl transition-all group mb-0.5 shadow-sm hover:shadow-md border border-transparent hover:border-white/60"
-                title="切換方向"
+                title="交換左右位置"
               >
-                <ArrowRightLeft className="h-4 w-4 text-morandi-gold group-hover:scale-110 group-hover:rotate-180 transition-all duration-300" />
+                <ArrowRightLeft className={cn(
+                  "h-4 w-4 text-morandi-gold group-hover:scale-110 transition-all duration-300",
+                  direction === 'foreign-to-twd' && "rotate-180"
+                )} />
               </button>
 
-              {/* Foreign Currency Input */}
+              {/* Right Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  {currencyInfo.name} ({selectedCurrency})
+                  {direction === 'twd-to-foreign' ? `${currencyInfo.name} (${selectedCurrency})` : '台幣 (TWD)'}
                 </label>
                 <div className="relative group">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-morandi-secondary/70 text-xs font-semibold">
-                    {currencyInfo.symbol}
+                    {direction === 'twd-to-foreign' ? currencyInfo.symbol : 'NT$'}
                   </span>
                   <input
                     type="number"
-                    value={foreignAmount}
-                    onChange={e => handleForeignChange(e.target.value)}
+                    value={direction === 'twd-to-foreign' ? foreignAmount : twdAmount}
+                    onChange={e => direction === 'twd-to-foreign' ? handleForeignChange(e.target.value) : handleTwdChange(e.target.value)}
                     className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                    placeholder="0.00"
+                    placeholder={direction === 'twd-to-foreign' ? '0.00' : '10000'}
                   />
                 </div>
               </div>

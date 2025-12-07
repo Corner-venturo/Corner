@@ -29,6 +29,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink } from 'lucide-react'
+import { generateUUID } from '@/lib/utils/uuid'
 
 
 interface PublishButtonData extends Partial<TourFormData> {
@@ -160,7 +161,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     setSaving(true)
     try {
       const newVersion: ItineraryVersionRecord = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         version: versionRecords.length + 1,
         note: versionNote || `版本 ${versionRecords.length + 1}`,
         daily_itinerary: data.dailyItinerary || [],

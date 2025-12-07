@@ -8,6 +8,7 @@ import {
   CalendarGrid,
   CalendarStyles,
   AddEventDialog,
+  EditEventDialog,
   EventDetailDialog,
   MoreEventsDialog,
 } from '@/features/calendar/components'
@@ -32,10 +33,15 @@ export default function CalendarPage() {
     setAddEventDialog,
     newEvent,
     setNewEvent,
+    editEventDialog,
+    setEditEventDialog,
     handleDateClick,
     handleAddEvent,
     handleEventClick,
     handleDeleteEvent,
+    openEditDialog,
+    handleUpdateEvent,
+    resetEditEventForm,
     resetAddEventForm,
   } = useEventOperations()
 
@@ -128,6 +134,7 @@ export default function CalendarPage() {
         dialog={addEventDialog}
         newEvent={newEvent}
         onNewEventChange={setNewEvent}
+        onDialogChange={setAddEventDialog}
         onSubmit={handleAddEvent}
         onClose={resetAddEventForm}
       />
@@ -137,7 +144,16 @@ export default function CalendarPage() {
         open={eventDetailDialog.open}
         event={eventDetailDialog.event}
         onClose={() => setEventDetailDialog({ open: false, event: null })}
+        onEdit={openEditDialog}
         onDelete={handleDeleteEvent}
+      />
+
+      {/* 編輯行事曆事項對話框 */}
+      <EditEventDialog
+        dialog={editEventDialog}
+        onDialogChange={setEditEventDialog}
+        onSubmit={handleUpdateEvent}
+        onClose={resetEditEventForm}
       />
 
       {/* 更多事件對話框 */}

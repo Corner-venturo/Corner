@@ -6,11 +6,13 @@
  * - 簡化資料處理
  */
 
+import { generateUUID } from '@/lib/utils/uuid'
+
 /**
  * 生成唯一 ID
  */
 export const generateId = (): string => {
-  return crypto.randomUUID()
+  return generateUUID()
 }
 
 /**

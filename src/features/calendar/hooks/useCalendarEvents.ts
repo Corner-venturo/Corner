@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useEffect, useRef } from 'react'
 import {
   useTourStore,
   useOrderStore,
@@ -11,6 +11,25 @@ import {
 } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
+import { logger } from '@/lib/utils/logger'
+import { supabase } from '@/lib/supabase/client'
+
+// 從 ISO 時間字串取得顯示用的本地時間（HH:MM）
+const getDisplayTime = (isoString: string, allDay?: boolean): string => {
+  if (allDay) return ''
+  if (!isoString) return ''
+
+  const date = new Date(isoString)
+  if (isNaN(date.getTime())) return ''
+
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+
+  // 如果是 00:00 就不顯示（全天事件）
+  if (hour === 0 && minute === 0) return ''
+
+  return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+}
 
 export function useCalendarEvents() {
   const { items: tours } = useTourStore()
@@ -18,9 +37,40 @@ export function useCalendarEvents() {
   const { items: members } = useMemberStore()
   const { items: customers } = useCustomerStore()
   const { settings } = useCalendarStore()
-  const { items: calendarEvents } = useCalendarEventStore()
+  const { items: calendarEvents, fetchAll: fetchCalendarEvents } = useCalendarEventStore()
   const { user } = useAuthStore()
-  const { items: employees } = useEmployeeStore()
+  const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
+
+  // 確保資料已載入
+  const initializedRef = useRef(false)
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true
+      logger.log('[Calendar] 載入行事曆事件和員工資料...')
+      fetchCalendarEvents()
+      fetchEmployees()
+    }
+  }, [fetchCalendarEvents, fetchEmployees])
+
+  // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
+  useEffect(() => {
+    const channel = supabase
+      .channel('calendar_events_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'calendar_events' },
+        (payload) => {
+          logger.log('[Calendar] Realtime 收到更新:', payload.eventType)
+          // 重新抓取資料
+          fetchCalendarEvents()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [fetchCalendarEvents])
 
   // 根據類型取得顏色 - 使用莫蘭迪配色
   const getEventColor = useCallback((type: string, status?: string) => {
@@ -92,12 +142,15 @@ export function useCalendarEvents() {
       .filter(event => event.visibility === 'personal' && event.created_by === user.id)
       .map(event => {
         const color = getEventColor('personal')
+        const timeStr = getDisplayTime(event.start, event.all_day)
+        const displayTitle = timeStr ? `${timeStr} ${event.title}` : event.title
+
         return {
           id: event.id,
-          title: event.title,
+          title: displayTitle,
           start: event.start,
           end: event.end,
-          allDay: event.all_day, // 🔥 傳遞 all_day 屬性
+          allDay: event.all_day,
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {
@@ -134,12 +187,17 @@ export function useCalendarEvents() {
             '未知使用者'
         }
 
+        const timeStr = getDisplayTime(event.start, event.all_day)
+        const displayTitle = timeStr
+          ? `${timeStr} 公司｜${event.title}`
+          : `公司｜${event.title}`
+
         return {
           id: event.id,
-          title: event.title, // 行事曆上不顯示建立者
+          title: displayTitle,
           start: event.start,
-          end: event.end, // 🔥 不再手動加 1 天
-          allDay: event.all_day, // 🔥 傳遞 all_day 屬性
+          end: event.end,
+          allDay: event.all_day,
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {

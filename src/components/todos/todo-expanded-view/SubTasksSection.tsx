@@ -5,14 +5,80 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
-import { Check, X, CheckCircle, Edit2 } from 'lucide-react'
+import { Check, X, CheckCircle, Edit2, Calendar, CalendarCheck } from 'lucide-react'
 import { generateUUID } from '@/lib/utils/uuid'
 import { SubTasksSectionProps } from './types'
+import { useCalendarEventStore } from '@/stores'
+import { useAuthStore } from '@/stores/auth-store'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { logger } from '@/lib/utils/logger'
 
-export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
+export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSectionProps) {
   const [newSubTask, setNewSubTask] = useState('')
   const [editingSubTaskId, setEditingSubTaskId] = useState<string | null>(null)
   const [editingSubTaskContent, setEditingSubTaskContent] = useState('')
+
+  // 行事曆相關
+  const [calendarDialog, setCalendarDialog] = useState<{
+    open: boolean
+    subTaskId: string
+    subTaskTitle: string
+  }>({ open: false, subTaskId: '', subTaskTitle: '' })
+  const [calendarDate, setCalendarDate] = useState('')
+  const [calendarTime, setCalendarTime] = useState('')
+  const { create: createCalendarEvent } = useCalendarEventStore()
+  const { user } = useAuthStore()
+
+  // 新增行事曆事件
+  const handleAddToCalendar = async () => {
+    if (!calendarDate || !user?.id) return
+
+    try {
+      const tzOffset = '+08:00'
+      const startDateTime = calendarTime
+        ? `${calendarDate}T${calendarTime}:00${tzOffset}`
+        : `${calendarDate}T09:00:00${tzOffset}`
+
+      // 結束時間預設 1 小時後
+      const endHour = calendarTime ? parseInt(calendarTime.split(':')[0]) + 1 : 10
+      const endTime = `${String(endHour).padStart(2, '0')}:${calendarTime?.split(':')[1] || '00'}`
+      const endDateTime = `${calendarDate}T${endTime}:00${tzOffset}`
+
+      const newEvent = await createCalendarEvent({
+        title: calendarDialog.subTaskTitle,
+        description: `來自待辦事項：${todo.title}`,
+        start: startDateTime,
+        end: endDateTime,
+        all_day: !calendarTime,
+        type: 'task',
+        visibility: 'company',
+        owner_id: user.id,
+        created_by: user.id,
+      })
+
+      // 更新子任務的 calendar_event_id
+      if (newEvent?.id) {
+        const updatedSubTasks = (todo.sub_tasks || []).map(task =>
+          task.id === calendarDialog.subTaskId
+            ? { ...task, calendar_event_id: newEvent.id }
+            : task
+        )
+        onUpdate({ sub_tasks: updatedSubTasks })
+      }
+
+      logger.log('[SubTask] 已新增行事曆事件:', newEvent?.id)
+      setCalendarDialog({ open: false, subTaskId: '', subTaskTitle: '' })
+      setCalendarDate('')
+      setCalendarTime('')
+    } catch (error) {
+      logger.error('[SubTask] 新增行事曆失敗:', error)
+    }
+  }
 
   const addSubTask = () => {
     if (!newSubTask.trim()) return
@@ -138,26 +204,51 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
                   {task.title}
                 </span>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  <button
-                    onClick={() => {
-                      setEditingSubTaskId(task.id)
-                      setEditingSubTaskContent(task.title)
-                    }}
-                    className="p-1 hover:bg-morandi-gold/10 rounded text-morandi-secondary hover:text-morandi-gold"
-                    title="編輯子任務"
-                  >
-                    <Edit2 size={12} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      const updatedSubTasks = (todo.sub_tasks || []).filter(t => t.id !== task.id)
-                      onUpdate({ sub_tasks: updatedSubTasks })
-                    }}
-                    className="p-1 hover:bg-morandi-red/10 rounded text-morandi-red"
-                    title="刪除子任務"
-                  >
-                    <X size={12} />
-                  </button>
+                  {/* 行事曆按鈕 */}
+                  {task.calendar_event_id ? (
+                    <span
+                      className="p-1 text-emerald-600"
+                      title="已加入行事曆"
+                    >
+                      <CalendarCheck size={12} />
+                    </span>
+                  ) : !readOnly && (
+                    <button
+                      onClick={() => setCalendarDialog({
+                        open: true,
+                        subTaskId: task.id,
+                        subTaskTitle: task.title,
+                      })}
+                      className="p-1 hover:bg-blue-100 rounded text-morandi-secondary hover:text-blue-600"
+                      title="加入行事曆"
+                    >
+                      <Calendar size={12} />
+                    </button>
+                  )}
+                  {!readOnly && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setEditingSubTaskId(task.id)
+                          setEditingSubTaskContent(task.title)
+                        }}
+                        className="p-1 hover:bg-morandi-gold/10 rounded text-morandi-secondary hover:text-morandi-gold"
+                        title="編輯子任務"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          const updatedSubTasks = (todo.sub_tasks || []).filter(t => t.id !== task.id)
+                          onUpdate({ sub_tasks: updatedSubTasks })
+                        }}
+                        className="p-1 hover:bg-morandi-red/10 rounded text-morandi-red"
+                        title="刪除子任務"
+                      >
+                        <X size={12} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </>
             )}
@@ -165,19 +256,89 @@ export function SubTasksSection({ todo, onUpdate }: SubTasksSectionProps) {
         ))}
       </div>
 
-      <div className="flex gap-2">
-        <Input
-          placeholder="新增子任務... (Enter)"
-          value={newSubTask}
-          onChange={e => setNewSubTask(e.target.value)}
-          onKeyDown={handleSubTaskKeyDown}
-          {...subTaskCompositionProps}
-          className="text-sm border-morandi-container/30 focus-visible:ring-morandi-gold"
-        />
-        <Button size="sm" onClick={addSubTask} className="bg-morandi-gold hover:bg-morandi-gold/90">
-          新增
-        </Button>
-      </div>
+      {/* 新增子任務區域 - 唯讀模式隱藏 */}
+      {!readOnly && (
+        <div className="flex gap-1.5">
+          <Input
+            placeholder="新增子任務..."
+            value={newSubTask}
+            onChange={e => setNewSubTask(e.target.value)}
+            onKeyDown={handleSubTaskKeyDown}
+            {...subTaskCompositionProps}
+            className="text-xs h-8 border-morandi-container/30 focus-visible:ring-morandi-gold"
+          />
+          <Button size="sm" onClick={addSubTask} className="bg-morandi-gold hover:bg-morandi-gold/90 h-8 px-2.5 text-xs">
+            新增
+          </Button>
+        </div>
+      )}
+
+      {/* 行事曆 Dialog */}
+      <Dialog open={calendarDialog.open} onOpenChange={(open) => {
+        if (!open) {
+          setCalendarDialog({ open: false, subTaskId: '', subTaskTitle: '' })
+          setCalendarDate('')
+          setCalendarTime('')
+        }
+      }}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-sm">
+              <Calendar size={16} className="text-blue-600" />
+              加入行事曆
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-morandi-secondary mb-1 block">任務名稱</label>
+              <div className="text-sm font-medium text-morandi-primary bg-morandi-container/10 px-3 py-2 rounded-lg">
+                {calendarDialog.subTaskTitle}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-morandi-secondary mb-1 block">日期 *</label>
+              <Input
+                type="date"
+                value={calendarDate}
+                onChange={e => setCalendarDate(e.target.value)}
+                className="h-9 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-morandi-secondary mb-1 block">時間（可選）</label>
+              <Input
+                type="time"
+                value={calendarTime}
+                onChange={e => setCalendarTime(e.target.value)}
+                className="h-9 text-sm"
+                placeholder="不填則為全天"
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 h-8"
+                onClick={() => {
+                  setCalendarDialog({ open: false, subTaskId: '', subTaskTitle: '' })
+                  setCalendarDate('')
+                  setCalendarTime('')
+                }}
+              >
+                取消
+              </Button>
+              <Button
+                size="sm"
+                className="flex-1 h-8 bg-blue-600 hover:bg-blue-700"
+                onClick={handleAddToCalendar}
+                disabled={!calendarDate}
+              >
+                建立
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

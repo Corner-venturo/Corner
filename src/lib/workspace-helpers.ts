@@ -153,6 +153,7 @@ export function getCurrentWorkspace() {
 
 /**
  * 檢查當前使用者是否為 super_admin
+ * 同時檢查 roles 和 permissions 陣列
  *
  * @returns boolean
  */
@@ -160,12 +161,19 @@ export function isSuperAdmin(): boolean {
   const { user } = useAuthStore.getState()
   if (!user) return false
 
+  // 檢查 permissions 陣列（主要使用）
+  if (user.permissions?.includes('super_admin')) {
+    return true
+  }
+
+  // 也檢查 roles 陣列（備用）
   const userRole = user.roles?.[0] as UserRole
   return userRole === 'super_admin'
 }
 
 /**
  * 檢查當前使用者是否為 admin（包含 super_admin）
+ * 同時檢查 roles 和 permissions 陣列
  *
  * @returns boolean
  */
@@ -173,6 +181,12 @@ export function isAdmin(): boolean {
   const { user } = useAuthStore.getState()
   if (!user) return false
 
+  // 檢查 permissions 陣列（主要使用）
+  if (user.permissions?.includes('super_admin') || user.permissions?.includes('admin')) {
+    return true
+  }
+
+  // 也檢查 roles 陣列（備用）
   const userRole = user.roles?.[0] as UserRole
   return userRole === 'super_admin' || userRole === 'admin'
 }

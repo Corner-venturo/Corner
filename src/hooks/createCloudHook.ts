@@ -3,6 +3,7 @@
 
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
+import { generateUUID } from '@/lib/utils/uuid'
 
 // 基礎實體型別（與 @/types/base.types.ts 的 BaseEntity 一致）
 interface BaseEntity {
@@ -79,7 +80,7 @@ export function createCloudHook<T extends BaseEntity>(
       const now = new Date().toISOString()
       const newItem = {
         ...data,
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         created_at: now,
         updated_at: now,
       } as T

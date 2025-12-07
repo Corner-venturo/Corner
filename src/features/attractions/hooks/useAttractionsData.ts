@@ -1,6 +1,7 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useAttractionStore } from '@/stores'
 import { Attraction, AttractionFormData } from '../types'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // Hook: 景點資料管理（使用 Store 架構）
@@ -15,6 +16,16 @@ import { Attraction, AttractionFormData } from '../types'
  */
 export function useAttractionsData() {
   const store = useAttractionStore()
+  const initializedRef = useRef(false)
+
+  // 自動載入景點資料
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true
+      logger.log('[Attractions] 載入景點資料...')
+      store.fetchAll()
+    }
+  }, [store.fetchAll])
 
   // 新增景點（處理表單資料轉換）
   const addAttraction = useCallback(

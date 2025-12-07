@@ -110,6 +110,7 @@ export interface Todo {
   creator: string // 建立者
   assignee?: string // 被指派者（可選）
   visibility: string[] // 可見人員ID列表 = [creator, assignee]
+  is_public?: boolean // 是否公開給全公司（只有建立者+共享者可編輯，其他人只能查看）
 
   // 關聯資料
   related_items: {
@@ -124,14 +125,17 @@ export interface Todo {
     title: string
     done: boolean
     completed_at?: string
+    calendar_event_id?: string // 關聯的行事曆事件 ID
   }[]
 
   // 簡單備註（非留言板）
   notes: {
+    id?: string // 留言 ID
     timestamp: string
     content: string
     author_id: string // 留言者 ID
     author_name: string // 留言者名稱
+    read_by?: string[] // 已讀的使用者 ID 列表
   }[]
 
   // 快速功能設定

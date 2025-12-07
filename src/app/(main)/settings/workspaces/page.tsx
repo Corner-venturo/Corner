@@ -29,9 +29,8 @@ export default function WorkspacesPage() {
   }, [])
 
   // 計算每個 workspace 的員工數
-  // Note: employees 表沒有 workspace_id 欄位，暫時回傳 0
   const getEmployeeCount = (workspaceId: string) => {
-    return 0 // TODO: 如果需要顯示員工數，需在資料庫新增 workspace_id 欄位
+    return employeeStore.items.filter(emp => emp.workspace_id === workspaceId).length
   }
 
   const handleCreate = async () => {

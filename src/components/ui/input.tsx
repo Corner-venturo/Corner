@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
-  ({ className, type, onChange, onKeyDown, style, ...props }, ref) => {
+  ({ className, type, onChange, onKeyDown, onCompositionStart, onCompositionEnd, style, ...props }, ref) => {
     const isComposingRef = React.useRef(false)
     const justFinishedComposingRef = React.useRef(false)
 
@@ -80,8 +80,20 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         ref={ref}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        onCompositionStart={() => { isComposingRef.current = true }}
-        onCompositionEnd={handleCompositionEnd}
+        onCompositionStart={(e) => {
+          isComposingRef.current = true
+          // 調用外部的 onCompositionStart
+          if (onCompositionStart) {
+            onCompositionStart(e)
+          }
+        }}
+        onCompositionEnd={(e) => {
+          handleCompositionEnd(e)
+          // 調用外部的 onCompositionEnd
+          if (onCompositionEnd) {
+            onCompositionEnd(e)
+          }
+        }}
         {...props}
       />
     )

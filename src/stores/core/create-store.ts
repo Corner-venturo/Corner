@@ -23,6 +23,28 @@ import { AbortManager } from '../utils/abort-manager'
 import { logger } from '@/lib/utils/logger'
 
 /**
+ * 生成 UUID（相容不支援 crypto.randomUUID 的瀏覽器）
+ */
+function generateUUID(): string {
+  // 優先使用原生 crypto.randomUUID
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  // Fallback: 使用 crypto.getRandomValues
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
+      (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+    )
+  }
+  // 最後手段：Math.random（不推薦，但能用）
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
+/**
  * 取得當前使用者的 workspace_id
  * 從 localStorage 讀取 auth-store 的值，避免循環依賴
  */
@@ -146,7 +168,7 @@ export function createStore<T extends BaseEntity>(
         set({ loading: true, error: null })
 
         // 生成 UUID（如果未提供）
-        const id = (data as Record<string, unknown>).id || crypto.randomUUID()
+        const id = (data as Record<string, unknown>).id || generateUUID()
 
         // 自動注入 workspace_id（如果未提供）
         const workspace_id = (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()

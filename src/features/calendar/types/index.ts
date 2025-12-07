@@ -48,3 +48,15 @@ export interface NewEventForm {
   start_time: string
   end_time: string
 }
+
+export interface EditEventDialogState {
+  open: boolean
+  eventId: string
+  startDate: string
+  endDate: string
+  startTime: string
+  endTime: string
+  title: string
+  description: string
+  visibility: 'personal' | 'company'
+}

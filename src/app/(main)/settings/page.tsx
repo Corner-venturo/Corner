@@ -28,6 +28,9 @@ export default function SettingsPage() {
   const { currentTheme, setTheme } = useThemeStore()
   const { user, logout } = useAuthStore()
 
+  // 判斷是否為管理員（super_admin 或 admin）
+  const isAdmin = user?.permissions?.includes('super_admin') || user?.permissions?.includes('admin')
+
   const {
     showPasswordSection,
     setShowPasswordSection,
@@ -86,20 +89,13 @@ export default function SettingsPage() {
 
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto space-y-8 p-6">
+          {/* ===== 一般使用者可見 ===== */}
+
           {/* 主題設定 */}
           <AppearanceSettings currentTheme={currentTheme} onThemeChange={setTheme} />
 
           {/* 常用功能設定 */}
           <PreferredFeaturesSettings />
-
-          {/* API 設定 */}
-          <ApiSettings />
-
-          {/* 藍新金流設定 */}
-          <NewebPaySettings />
-
-          {/* 開發者工具 */}
-          <DevToolsSettings />
 
           {/* 帳號安全設定 */}
           <AccountSettings
@@ -114,24 +110,38 @@ export default function SettingsPage() {
             setPasswordUpdateLoading={setPasswordUpdateLoading}
           />
 
-          {/* 權限管理 */}
-          <PermissionManagementSettings />
+          {/* ===== 以下僅管理員可見 ===== */}
+          {isAdmin && (
+            <>
+              {/* API 設定 */}
+              <ApiSettings />
 
-          {/* 模組管理 */}
-          <ModuleManagementSettings />
+              {/* 藍新金流設定 */}
+              <NewebPaySettings />
 
-          {/* 工作空間切換 */}
-          <WorkspaceSwitcher />
+              {/* 開發者工具 */}
+              <DevToolsSettings />
 
-          {/* 系統維護 */}
-          <SystemSettings
-            cacheInfo={cacheInfo}
-            clearingCache={clearingCache}
-            setClearingCache={setClearingCache}
-          />
+              {/* 權限管理 */}
+              <PermissionManagementSettings />
 
-          {/* 其他設定 */}
-          <OtherSettings />
+              {/* 模組管理 */}
+              <ModuleManagementSettings />
+
+              {/* 工作空間切換 */}
+              <WorkspaceSwitcher />
+
+              {/* 系統維護 */}
+              <SystemSettings
+                cacheInfo={cacheInfo}
+                clearingCache={clearingCache}
+                setClearingCache={setClearingCache}
+              />
+
+              {/* 其他設定 */}
+              <OtherSettings />
+            </>
+          )}
         </div>
       </div>
     </div>

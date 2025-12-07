@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useEnterSubmitWithShift } from '@/hooks/useEnterSubmit'
 import { MessageSquare, Edit2, X } from 'lucide-react'
 import { NotesSectionProps } from './types'
 import { useAuthStore } from '@/stores/auth-store'
+import { generateUUID } from '@/lib/utils/uuid'
 
 export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const [newNote, setNewNote] = useState('')
@@ -14,10 +15,34 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const [editingNoteContent, setEditingNoteContent] = useState('')
   const { user } = useAuthStore()
 
+  // 進入備註區時，自動標記所有未讀留言為已讀
+  useEffect(() => {
+    if (!user?.id || !todo.notes?.length) return
+
+    const unreadNotes = todo.notes.filter(
+      note => note.author_id !== user.id && !note.read_by?.includes(user.id)
+    )
+
+    if (unreadNotes.length > 0) {
+      // 更新所有未讀留言的 read_by
+      const updatedNotes = todo.notes.map(note => {
+        if (note.author_id !== user.id && !note.read_by?.includes(user.id)) {
+          return {
+            ...note,
+            read_by: [...(note.read_by || []), user.id],
+          }
+        }
+        return note
+      })
+      onUpdate({ notes: updatedNotes })
+    }
+  }, [todo.id]) // 只在打開待辦時執行一次
+
   const addNote = () => {
     if (!newNote.trim() || !user) return
 
     const note = {
+      id: generateUUID(),
       timestamp: new Date().toISOString(),
       content: newNote,
       author_id: user.id,
@@ -27,6 +52,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
         user.english_name ||
         user.personal_info?.email ||
         '未知使用者',
+      read_by: [user.id], // 發送者自己已讀
     }
 
     // 如果目前狀態是「待辦」，自動切換到「進行中」

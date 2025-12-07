@@ -79,17 +79,20 @@ export default function TodosPage() {
     const currentUserId = user?.id
 
     return todos.filter(todo => {
-      // ✅ 可見性篩選 - 只顯示當前用戶相關的待辦
+      // ✅ 可見性篩選 - 只顯示當前用戶相關的待辦 或 公開待辦
       if (currentUserId) {
         const isCreator = todo.creator === currentUserId
         const isAssignee = todo.assignee === currentUserId
         const inVisibility = todo.visibility?.includes(currentUserId)
+        const isPublic = todo.is_public === true
 
         // 建立者一定能看到自己的待辦（不受 visibility 限制）
         if (isCreator) {
           // 繼續執行後續篩選（狀態、搜尋等）
+        } else if (isPublic) {
+          // 公開的待辦所有人都能看到（繼續執行後續篩選）
         } else if (!isAssignee && !inVisibility) {
-          // 不是建立者，也不是被指派者，也不在可見清單中 → 過濾掉
+          // 不是建立者，也不是被指派者，也不在可見清單中，也不是公開 → 過濾掉
           return false
         }
       }
@@ -151,36 +154,57 @@ export default function TodosPage() {
       key: 'title',
       label: '任務標題',
       sortable: true,
-      render: (value: unknown, todo: Todo) => (
-        <div>
-          <div className="text-sm font-medium text-morandi-primary">{String(value)}</div>
-          {todo.related_items && todo.related_items.length > 0 && (
-            <div className="flex gap-1 mt-1">
-              {todo.related_items.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={e => {
-                    e.stopPropagation()
-                    const basePath = {
-                      group: '/tours',
-                      quote: '/quotes',
-                      order: '/orders',
-                      invoice: '/finance/treasury/disbursement',
-                      receipt: '/finance/payments',
-                    }[item.type]
-                    if (basePath) {
-                      window.location.href = `${basePath}?highlight=${item.id}`
-                    }
-                  }}
-                  className="text-xs bg-morandi-gold/20 text-morandi-primary px-2 py-0.5 rounded hover:bg-morandi-gold/30 transition-colors"
-                >
-                  {item.title}
-                </button>
-              ))}
+      render: (value: unknown, todo: Todo) => {
+        // 計算未讀留言數
+        const unreadCount = (todo.notes || []).filter(
+          note => note.author_id !== user?.id && !note.read_by?.includes(user?.id || '')
+        ).length
+
+        return (
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-morandi-primary">{String(value)}</span>
+              {/* 未讀留言紅點 */}
+              {unreadCount > 0 && (
+                <span className="flex items-center justify-center min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full px-1 animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
+              {/* 公開標記 */}
+              {todo.is_public && (
+                <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">
+                  公開
+                </span>
+              )}
             </div>
-          )}
-        </div>
-      ),
+            {todo.related_items && todo.related_items.length > 0 && (
+              <div className="flex gap-1 mt-1">
+                {todo.related_items.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={e => {
+                      e.stopPropagation()
+                      const basePath = {
+                        group: '/tours',
+                        quote: '/quotes',
+                        order: '/orders',
+                        invoice: '/finance/treasury/disbursement',
+                        receipt: '/finance/payments',
+                      }[item.type]
+                      if (basePath) {
+                        window.location.href = `${basePath}?highlight=${item.id}`
+                      }
+                    }}
+                    className="text-xs bg-morandi-gold/20 text-morandi-primary px-2 py-0.5 rounded hover:bg-morandi-gold/30 transition-colors"
+                  >
+                    {item.title}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      },
     },
     {
       key: 'priority',
@@ -301,6 +325,7 @@ export default function TodosPage() {
       deadline: string
       assignee: string
       enabled_quick_actions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
+      is_public: boolean
     }) => {
       const auth = useRequireAuthSync()
 
@@ -325,6 +350,7 @@ export default function TodosPage() {
           creator: auth.user!.id,
           assignee: formData.assignee || undefined,
           visibility: visibilityList,
+          is_public: formData.is_public,
           related_items: [] as Todo['related_items'],
           sub_tasks: [] as Todo['sub_tasks'],
           notes: [] as Todo['notes'],
@@ -522,6 +548,7 @@ function AddTodoForm({
     deadline: string
     assignee: string
     enabled_quick_actions: ('receipt' | 'invoice' | 'group' | 'quote' | 'assign')[]
+    is_public: boolean
   }) => void
   onCancel: () => void
 }) {
@@ -539,6 +566,7 @@ function AddTodoForm({
       | 'quote'
       | 'assign'
     )[],
+    is_public: false,
   })
 
   // 當點擊或聚焦指派選單時，才載入員工資料
@@ -609,6 +637,21 @@ function AddTodoForm({
               </option>
             ))}
         </select>
+      </div>
+
+      <div>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={formData.is_public}
+            onChange={e => setFormData({ ...formData, is_public: e.target.checked })}
+            className="w-4 h-4 rounded border-morandi-container text-morandi-gold focus:ring-morandi-gold"
+          />
+          <span className="text-sm font-medium text-morandi-primary">公開給全公司</span>
+        </label>
+        <p className="text-xs text-morandi-secondary mt-1 ml-6">
+          其他同事可以查看此待辦，但只有你和共享者可以編輯
+        </p>
       </div>
 
       <div className="flex gap-2 pt-4">

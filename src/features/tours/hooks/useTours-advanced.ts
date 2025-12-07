@@ -7,6 +7,7 @@ import { PageRequest, UseEntityResult } from '@/core/types/common'
 import { BaseEntity } from '@/core/types/common'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+import { generateUUID } from '@/lib/utils/uuid'
 
 const TOURS_KEY = 'tours'
 
@@ -76,7 +77,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     const now = new Date().toISOString()
     const newTour = {
       ...tourData,
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       created_at: now,
       updated_at: now,
     } as Tour

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check, Dumbbell, Plus, X, Edit2, Trash2 } from 'lucide-react'
+import { generateUUID } from '@/lib/utils/uuid'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -54,7 +55,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
     setIsAdding(true)
 
     const newExercise: WorkoutExercise = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       equipment: exerciseForm.equipment,
       weight: exerciseForm.weight,
       reps: exerciseForm.reps,
