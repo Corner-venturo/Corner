@@ -1,4 +1,4 @@
-import { Home, Plane, MapPin, Phone, Users, HelpCircle, DollarSign, Hotel, Sparkles, type LucideIcon } from 'lucide-react'
+import { Home, Plane, MapPin, Phone, Users, HelpCircle, DollarSign, Hotel, Sparkles, AlertCircle, type LucideIcon } from 'lucide-react'
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { useMemo } from 'react'
 
@@ -25,6 +25,10 @@ interface TourNavigationData {
   showPricingDetails?: boolean
   faqs?: unknown[]
   showFaqs?: boolean
+  notices?: unknown[]
+  showNotices?: boolean
+  cancellationPolicy?: unknown[]
+  showCancellationPolicy?: boolean
 }
 
 interface TourNavigationProps {
@@ -76,6 +80,13 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
     // 常見問題
     if (data.showFaqs && data.faqs && data.faqs.length > 0) {
       links.push({ title: 'FAQ', icon: HelpCircle, href: '#faq' })
+    }
+
+    // 提醒事項/取消政策
+    const hasNotices = (data.showNotices && data.notices && data.notices.length > 0) ||
+                       (data.showCancellationPolicy && data.cancellationPolicy && data.cancellationPolicy.length > 0)
+    if (hasNotices) {
+      links.push({ title: '須知', icon: AlertCircle, href: '#notices' })
     }
 
     return links

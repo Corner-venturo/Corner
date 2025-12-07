@@ -95,6 +95,12 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     // 常見問題
     faqs: data.faqs || null,
     show_faqs: data.showFaqs || false,
+    // 提醒事項
+    notices: data.notices || null,
+    show_notices: data.showNotices || false,
+    // 取消政策
+    cancellation_policy: data.cancellationPolicy || null,
+    show_cancellation_policy: data.showCancellationPolicy || false,
     itinerary_subtitle: data.itinerarySubtitle,
     daily_itinerary: data.dailyItinerary,
   })

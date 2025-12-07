@@ -15,6 +15,7 @@ import { TourHotelsSection } from '@/features/tours/components/sections/TourHote
 import { TourPricingSection } from '@/features/tours/components/sections/TourPricingSection'
 import { TourPriceTiersSection } from '@/features/tours/components/sections/TourPriceTiersSection'
 import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSection'
+import { TourNoticesSection } from '@/features/tours/components/sections/TourNoticesSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
 import { COMPANY } from '@/lib/constants/company'
 
@@ -186,6 +187,19 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* FAQ Section */}
       <div id="faq">
         <TourFAQSection data={data} viewMode={viewMode} />
+      </div>
+
+      {/* Divider - Notices */}
+      {((data.showNotices && data.notices && data.notices.length > 0) ||
+        (data.showCancellationPolicy && data.cancellationPolicy && data.cancellationPolicy.length > 0)) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-border"></div>
+        </div>
+      )}
+
+      {/* Notices & Cancellation Section */}
+      <div id="notices">
+        <TourNoticesSection data={data} viewMode={viewMode} />
       </div>
 
       {/* Footer */}

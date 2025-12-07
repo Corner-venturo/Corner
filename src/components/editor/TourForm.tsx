@@ -15,7 +15,8 @@ import { DailyItinerarySection } from './tour-form/sections/DailyItinerarySectio
 import { PricingDetailsSection } from './tour-form/sections/PricingDetailsSection'
 import { PriceTiersSection } from './tour-form/sections/PriceTiersSection'
 import { FAQSection } from './tour-form/sections/FAQSection'
-import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle } from 'lucide-react'
+import { NoticesPolicySection } from './tour-form/sections/NoticesPolicySection'
+import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface TourFormProps {
@@ -33,6 +34,7 @@ const navItems = [
   { id: 'section-hotel', label: '飯店', icon: Building2 },
   { id: 'section-pricing', label: '團費', icon: DollarSign },
   { id: 'section-faq', label: '問答', icon: HelpCircle },
+  { id: 'section-notices', label: '須知', icon: AlertCircle },
 ]
 
 export function TourForm({ data, onChange }: TourFormProps) {
@@ -221,6 +223,11 @@ export function TourForm({ data, onChange }: TourFormProps) {
         {/* 常見問題 */}
         <div id="section-faq">
           <FAQSection data={data} onChange={onChange} />
+        </div>
+
+        {/* 提醒事項與取消政策 */}
+        <div id="section-notices">
+          <NoticesPolicySection data={data} onChange={onChange} />
         </div>
       </div>
     </div>

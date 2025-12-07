@@ -143,6 +143,10 @@ export interface TourFormData {
   showPriceTiers?: boolean // 是否顯示價格方案區塊
   faqs?: FAQ[] // 常見問題
   showFaqs?: boolean // 是否顯示常見問題區塊
+  notices?: string[] // 提醒事項
+  showNotices?: boolean // 是否顯示提醒事項區塊
+  cancellationPolicy?: string[] // 取消政策
+  showCancellationPolicy?: boolean // 是否顯示取消政策區塊
   itinerarySubtitle: string
   dailyItinerary: DailyItinerary[]
 }

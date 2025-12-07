@@ -68,6 +68,12 @@ interface LocalTourData {
   // 常見問題
   faqs?: FAQ[]
   showFaqs?: boolean
+  // 提醒事項
+  notices?: string[]
+  showNotices?: boolean
+  // 取消政策
+  cancellationPolicy?: string[]
+  showCancellationPolicy?: boolean
   version_records?: ItineraryVersionRecord[]
 }
 
@@ -620,6 +626,12 @@ function NewItineraryPageContent() {
             // 常見問題
             faqs: itinerary.faqs || [],
             showFaqs: itinerary.show_faqs || false,
+            // 提醒事項
+            notices: itinerary.notices || [],
+            showNotices: itinerary.show_notices || false,
+            // 取消政策
+            cancellationPolicy: itinerary.cancellation_policy || [],
+            showCancellationPolicy: itinerary.show_cancellation_policy || false,
             version_records: itinerary.version_records || [],
           })
           // 重置版本索引到主版本
@@ -1045,6 +1057,12 @@ function NewItineraryPageContent() {
                   // 常見問題
                   faqs: tourData.faqs,
                   showFaqs: tourData.showFaqs || false,
+                  // 提醒事項
+                  notices: tourData.notices,
+                  showNotices: tourData.showNotices || false,
+                  // 取消政策
+                  cancellationPolicy: tourData.cancellationPolicy,
+                  showCancellationPolicy: tourData.showCancellationPolicy || false,
                 }}
                 onChange={(newData) => {
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1061,6 +1079,12 @@ function NewItineraryPageContent() {
                     // 常見問題
                     faqs: newData.faqs,
                     showFaqs: newData.showFaqs,
+                    // 提醒事項
+                    notices: newData.notices,
+                    showNotices: newData.showNotices,
+                    // 取消政策
+                    cancellationPolicy: newData.cancellationPolicy,
+                    showCancellationPolicy: newData.showCancellationPolicy,
                   });
                 }}
               />

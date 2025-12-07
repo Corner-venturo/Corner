@@ -392,6 +392,14 @@ export interface Itinerary {
   faqs?: FAQ[]
   show_faqs?: boolean
 
+  // 提醒事項
+  notices?: string[]
+  show_notices?: boolean
+
+  // 取消政策
+  cancellation_policy?: string[]
+  show_cancellation_policy?: boolean
+
   created_at: string
   updated_at: string
   created_by?: string
