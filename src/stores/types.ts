@@ -382,11 +382,35 @@ export interface Itinerary {
 
   // 詳細團費
   pricing_details?: PricingDetails
+  show_pricing_details?: boolean
+
+  // 價格方案（多種人數價格）
+  price_tiers?: PriceTier[]
+  show_price_tiers?: boolean
+
+  // 常見問題
+  faqs?: FAQ[]
+  show_faqs?: boolean
 
   created_at: string
   updated_at: string
   created_by?: string
   archived_at?: string | null
+}
+
+// 價格方案（如 4人包團、6人包團、8人包團）
+export interface PriceTier {
+  label: string // 如「4人包團」、「6人包團」
+  sublabel?: string // 如「每人」
+  price: string // 如「34,500」
+  priceNote?: string // 如「起」
+  addon?: string // 如「加購1日包車 / 每人+NT$900」
+}
+
+// 常見問題
+export interface FAQ {
+  question: string // 問題
+  answer: string // 答案
 }
 
 // Order 類型已移至 @/types/order.types.ts

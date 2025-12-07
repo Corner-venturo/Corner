@@ -175,11 +175,18 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm text-morandi-secondary">NT$</span>
                     <Input
-                      value={formatPrice(tier.price)}
+                      value={tier.price}
                       onChange={(e) => {
-                        // 儲存時移除逗號，只保留數字
-                        const rawValue = parsePrice(e.target.value)
-                        updatePriceTier(index, { price: rawValue })
+                        // 只允許數字和逗號
+                        const value = e.target.value.replace(/[^\d,]/g, '')
+                        updatePriceTier(index, { price: value })
+                      }}
+                      onBlur={(e) => {
+                        // 失去焦點時格式化
+                        const formatted = formatPrice(tier.price)
+                        if (formatted !== tier.price) {
+                          updatePriceTier(index, { price: formatted })
+                        }
                       }}
                       placeholder="34,500"
                       className="flex-1"

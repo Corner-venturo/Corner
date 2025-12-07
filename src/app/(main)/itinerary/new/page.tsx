@@ -22,7 +22,7 @@ import type {
   MeetingPoint,
   DailyItinerary,
 } from '@/components/editor/tour-form/types'
-import type { ItineraryVersionRecord, PricingDetails } from '@/stores/types'
+import type { ItineraryVersionRecord, PricingDetails, PriceTier, FAQ } from '@/stores/types'
 import {
   Building2,
   UtensilsCrossed,
@@ -62,6 +62,12 @@ interface LocalTourData {
   showHotels?: boolean
   showPricingDetails?: boolean // 是否顯示詳細團費
   pricingDetails?: PricingDetails // 詳細團費
+  // 價格方案
+  priceTiers?: PriceTier[]
+  showPriceTiers?: boolean
+  // 常見問題
+  faqs?: FAQ[]
+  showFaqs?: boolean
   version_records?: ItineraryVersionRecord[]
 }
 
@@ -608,6 +614,12 @@ function NewItineraryPageContent() {
                 '出發前 7 天內取消，需支付團費 100% 作為取消費。',
               ],
             },
+            // 價格方案
+            priceTiers: itinerary.price_tiers || [],
+            showPriceTiers: itinerary.show_price_tiers || false,
+            // 常見問題
+            faqs: itinerary.faqs || [],
+            showFaqs: itinerary.show_faqs || false,
             version_records: itinerary.version_records || [],
           })
           // 重置版本索引到主版本
@@ -1027,6 +1039,12 @@ function NewItineraryPageContent() {
                   showHotels: tourData.showHotels || false,
                   showPricingDetails: tourData.showPricingDetails || false,
                   pricingDetails: tourData.pricingDetails,
+                  // 價格方案
+                  priceTiers: tourData.priceTiers,
+                  showPriceTiers: tourData.showPriceTiers || false,
+                  // 常見問題
+                  faqs: tourData.faqs,
+                  showFaqs: tourData.showFaqs || false,
                 }}
                 onChange={(newData) => {
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1037,6 +1055,12 @@ function NewItineraryPageContent() {
                     meetingInfo: meetingPoints?.[0] || { time: '', location: '' },
                     showPricingDetails: newData.showPricingDetails,
                     pricingDetails: newData.pricingDetails,
+                    // 價格方案
+                    priceTiers: newData.priceTiers,
+                    showPriceTiers: newData.showPriceTiers,
+                    // 常見問題
+                    faqs: newData.faqs,
+                    showFaqs: newData.showFaqs,
                   });
                 }}
               />

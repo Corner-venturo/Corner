@@ -89,6 +89,12 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     show_hotels: data.showHotels,
     show_pricing_details: data.showPricingDetails,
     pricing_details: data.pricingDetails,
+    // 價格方案
+    price_tiers: data.priceTiers || null,
+    show_price_tiers: data.showPriceTiers || false,
+    // 常見問題
+    faqs: data.faqs || null,
+    show_faqs: data.showFaqs || false,
     itinerary_subtitle: data.itinerarySubtitle,
     daily_itinerary: data.dailyItinerary,
   })
