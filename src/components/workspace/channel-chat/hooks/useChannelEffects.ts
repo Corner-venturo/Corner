@@ -1,5 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { Channel, Workspace } from '@/stores/workspace-store'
+import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
+import { useAuthStore } from '@/stores/auth-store'
 import { DEFAULT_CHANNEL_NAME } from '../constants'
 
 /**
@@ -16,6 +18,21 @@ export function useChannelEffects(
   loadAdvanceLists: (channelId: string) => Promise<void>,
   loadSharedOrderLists: (channelId: string) => Promise<void>
 ) {
+  const { user } = useAuthStore()
+  const allChannelMembers = useChannelMemberStore(state => state.items)
+
+  // 取得已加入的頻道
+  const joinedChannels = useMemo(() => {
+    if (!user?.id) return []
+    return channels.filter(ch => {
+      // 檢查是否為頻道成員
+      const isMember = allChannelMembers.some(
+        m => m.channel_id === ch.id && m.employee_id === user.id
+      )
+      return isMember && !ch.is_archived
+    })
+  }, [channels, allChannelMembers, user?.id])
+
   // 載入頻道列表
   useEffect(() => {
     if (currentWorkspace?.id) {
@@ -24,14 +41,15 @@ export function useChannelEffects(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWorkspace?.id])
 
-  // 選擇預設頻道
+  // 選擇預設頻道（只從已加入的頻道中選擇）
   useEffect(() => {
-    if (channels.length > 0 && !selectedChannel) {
-      const defaultChannel = channels.find(c => c.name === DEFAULT_CHANNEL_NAME) || channels[0]
+    if (joinedChannels.length > 0 && !selectedChannel) {
+      // 優先選擇「一般討論」，否則選第一個已加入的頻道
+      const defaultChannel = joinedChannels.find(c => c.name === DEFAULT_CHANNEL_NAME) || joinedChannels[0]
       selectChannel(defaultChannel)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channels.length, selectedChannel?.id])
+  }, [joinedChannels.length, selectedChannel?.id])
 
   // 載入頻道資料（訊息、代墊清單、訂單清單）
   useEffect(() => {

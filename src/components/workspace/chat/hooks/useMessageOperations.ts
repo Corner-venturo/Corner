@@ -8,7 +8,7 @@ export function useMessageOperations() {
   const { user } = useAuthStore()
 
   const handleSendMessage = useCallback(
-    async (channelId: string, content: string, attachments?: MessageAttachment[]) => {
+    async (channelId: string, content: string, attachments?: MessageAttachment[], threadId?: string) => {
       if (!user) {
         throw new Error('用戶未登入')
       }
@@ -23,6 +23,7 @@ export function useMessageOperations() {
           avatar: undefined,
         },
         attachments,
+        thread_id: threadId || null,
       })
     },
     [user, sendMessage]

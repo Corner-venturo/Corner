@@ -501,6 +501,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         selectedChannelId={selectedChannelId}
         isAdmin={isAdmin}
         expandedSections={expandedSections}
+        searchQuery={searchQuery}
         onSelectChannel={onSelectChannel}
         toggleChannelFavorite={toggleChannelPin}
         onDelete={handleDeleteClick}

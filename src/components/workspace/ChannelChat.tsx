@@ -7,6 +7,7 @@ import { useChannelChat } from './channel-chat/useChannelChat'
 import { ChatHeader } from './channel-chat/ChatHeader'
 import { ChatMessages } from './channel-chat/ChatMessages'
 import { DialogsContainer } from './channel-chat/DialogsContainer'
+import { ThreadList } from './chat/ThreadList'
 
 export function ChannelChat() {
   const {
@@ -52,6 +53,14 @@ export function ChannelChat() {
     setEditChannelName,
     editChannelDescription,
     setEditChannelDescription,
+
+    // Thread state
+    threads,
+    selectedThread,
+    setSelectedThread,
+    isThreadsLoading,
+    createThread,
+    deleteThread,
 
     // Store data
     channels,
@@ -109,6 +118,14 @@ export function ChannelChat() {
               />
             }
           >
+            <ThreadList
+              threads={threads}
+              selectedThreadId={selectedThread?.id || null}
+              onSelectThread={setSelectedThread}
+              onCreateThread={createThread}
+              onDeleteThread={deleteThread}
+              isLoading={isThreadsLoading}
+            />
             <ChatMessages
               messages={currentMessages || []}
               advanceLists={advanceLists}

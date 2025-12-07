@@ -29,6 +29,7 @@ interface ChannelListProps {
   selectedChannelId: string | null
   isAdmin: boolean
   expandedSections: Record<string, boolean>
+  searchQuery?: string
   // Callbacks
   onSelectChannel: (channel: Channel | null) => void
   toggleChannelFavorite: (id: string) => void
@@ -54,6 +55,7 @@ export function ChannelList({
   selectedChannelId,
   isAdmin,
   expandedSections,
+  searchQuery = '',
   onSelectChannel,
   toggleChannelFavorite,
   onDelete,
@@ -66,6 +68,8 @@ export function ChannelList({
   onToggleExpanded,
   onDragEnd,
 }: ChannelListProps) {
+  // 搜尋時顯示未加入的頻道
+  const isSearching = searchQuery.trim().length > 0
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -153,23 +157,23 @@ export function ChannelList({
             />
           )}
 
-          {/* 4. 未加入的頻道 */}
-          {unjoinedChannels.length > 0 && (
+          {/* 4. 搜尋結果：未加入的頻道（只在搜尋時顯示） */}
+          {isSearching && unjoinedChannels.length > 0 && (
             <ChannelListSection
               channels={unjoinedChannels}
               selectedChannelId={selectedChannelId}
               onSelectChannel={onSelectChannel}
               toggleChannelFavorite={toggleChannelFavorite}
-              onDelete={() => {}} // 未加入的頻道不能刪除
-              onEdit={() => {}} // 未加入的頻道不能編輯
+              onDelete={onDelete}
+              onEdit={onEdit}
               onJoinChannel={onJoinChannel}
-              onLeaveChannel={() => {}} // 未加入的頻道不能離開
+              onLeaveChannel={onLeaveChannel}
               isAdmin={isAdmin}
               checkIsMember={checkIsMember}
-              isExpanded={expandedSections.unjoined || false}
-              onToggleExpanded={() => onToggleExpanded('unjoined', !expandedSections.unjoined)}
-              title="未加入的頻道"
-              icon="hash"
+              isExpanded={true}
+              onToggleExpanded={() => {}}
+              title="可加入的頻道"
+              icon="userPlus"
             />
           )}
 

@@ -541,7 +541,7 @@ function NewItineraryPageContent() {
       }
 
       // 優先從 itineraries 載入（編輯現有行程）
-      if (itineraryId) {
+      if (itineraryId && !tourId) {
         const itinerary = itineraries.find((i) => i.id === itineraryId)
         if (itinerary) {
           // 從 itinerary 載入完整資料

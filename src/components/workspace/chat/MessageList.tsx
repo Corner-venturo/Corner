@@ -129,7 +129,9 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
             }
           })()
 
-          return <div className="mb-4">{itemElement}</div>
+          // 訊息間距較小，卡片間距較大
+          const spacing = item.type === 'message' ? 'mb-px' : 'mb-4'
+          return <div className={spacing}>{itemElement}</div>
         }}
         components={{
           Footer: () => <div ref={messagesEndRef} />,

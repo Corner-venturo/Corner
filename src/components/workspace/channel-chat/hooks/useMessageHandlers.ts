@@ -1,4 +1,4 @@
-import type { Message } from '@/stores/workspace-store'
+import type { Message, ChannelThread } from '@/stores/workspace-store'
 import { ALERT_MESSAGES } from '../constants'
 
 /**
@@ -14,9 +14,10 @@ export function useMessageHandlers(
   currentMessages: Message[],
   uploadFiles: (channelId: string) => Promise<unknown>,
   clearFiles: () => void,
-  handleSendMessage: (channelId: string, text: string, attachments?: unknown) => Promise<void>,
+  handleSendMessage: (channelId: string, text: string, attachments?: unknown, threadId?: string) => Promise<void>,
   handleReaction: (messageId: string, emoji: string, messages: Message[]) => void,
-  handleDeleteMessage: (messageId: string) => Promise<void>
+  handleDeleteMessage: (messageId: string) => Promise<void>,
+  selectedThread?: ChannelThread | null
 ) {
   const handleSubmitMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,7 +39,7 @@ export function useMessageHandlers(
       const uploadedAttachments =
         attachedFiles.length > 0 ? await uploadFiles(selectedChannel.id) : undefined
 
-      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments)
+      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments, selectedThread?.id)
 
       setMessageText('')
       clearFiles()

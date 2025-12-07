@@ -12,6 +12,7 @@ import {
   useChannelOperations,
   useChannelEffects,
   useMessageHandlers,
+  useThreadState,
 } from './hooks'
 
 /**
@@ -53,11 +54,16 @@ export function useChannelChat() {
     deleteAdvanceList,
   } = useWorkspaceWidgets()
 
+  // Thread state (拆分到 useThreadState)
+  const threadState = useThreadState(selectedChannel?.id || null)
+
   // Derived state
-  const currentMessages =
+  const allMessages =
     selectedChannel?.id && channelMessages?.[selectedChannel.id]
       ? channelMessages[selectedChannel.id]
       : []
+  // 根據選中的討論串過濾訊息
+  const currentMessages = threadState.filterMessagesByThread(allMessages)
   const isMessagesLoading = selectedChannel?.id
     ? (messagesLoading?.[selectedChannel.id] ?? false)
     : false
@@ -99,7 +105,8 @@ export function useChannelChat() {
     clearFiles,
     handleSendMessage,
     handleReaction,
-    handleDeleteMessage
+    handleDeleteMessage,
+    threadState.selectedThread
   )
 
   // Effects (拆分到 useChannelEffects)
@@ -130,6 +137,9 @@ export function useChannelChat() {
 
     // Edit state (從 useChannelEditState)
     ...editState,
+
+    // Thread state (從 useThreadState)
+    ...threadState,
 
     // Store data
     channels,

@@ -92,7 +92,28 @@ export interface Message {
   created_at: string
   edited_at?: string
   is_pinned?: boolean
+  thread_id?: string | null
   author?: {
+    id: string
+    display_name: string
+    avatar?: string
+  }
+  _deleted?: boolean | null
+  _needs_sync?: boolean | null
+  _synced_at?: string | null
+}
+
+export interface ChannelThread {
+  id: string
+  channel_id: string
+  name: string
+  created_by: string
+  is_archived?: boolean
+  reply_count?: number
+  last_reply_at?: string | null
+  created_at: string
+  updated_at?: string
+  creator?: {
     id: string
     display_name: string
     avatar?: string

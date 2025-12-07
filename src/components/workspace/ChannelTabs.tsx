@@ -1,64 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { MessageSquare, FileText, Plus } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { MessageSquare, Plus, FileText, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CanvasEditor } from './CanvasEditor'
 import { Channel } from '@/stores/workspace-store'
-import { Button } from '@/components/ui/button'
 
-// 畫布操作按鈕組件
-function CanvasActions({ channelId }: { channelId: string }) {
-  const [canvases, setCanvases] = useState<string[]>(() => {
-    // 從 localStorage 讀取該頻道的畫布列表
-    const stored = localStorage.getItem(`canvases-${channelId}`)
-    return stored ? JSON.parse(stored) : ['default']
-  })
-
-  const [activeCanvas, setActiveCanvas] = useState('default')
-
-  const handleAddCanvas = () => {
-    const name = prompt('請輸入畫布名稱：')
-    if (!name || !name.trim()) return
-
-    const newCanvasId = `canvas-${Date.now()}`
-    const updatedCanvases = [...canvases, newCanvasId]
-    setCanvases(updatedCanvases)
-    localStorage.setItem(`canvases-${channelId}`, JSON.stringify(updatedCanvases))
-    localStorage.setItem(`canvas-name-${newCanvasId}`, name.trim())
-    setActiveCanvas(newCanvasId)
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      {/* 畫布切換下拉選單 */}
-      {canvases.length > 1 && (
-        <select
-          value={activeCanvas}
-          onChange={e => setActiveCanvas(e.target.value)}
-          className="h-8 px-3 text-sm border border-border rounded-md bg-white hover:bg-morandi-container/5 transition-colors"
-        >
-          {canvases.map(canvasId => {
-            const name =
-              canvasId === 'default'
-                ? '預設畫布'
-                : localStorage.getItem(`canvas-name-${canvasId}`) || '未命名'
-            return (
-              <option key={canvasId} value={canvasId}>
-                {name}
-              </option>
-            )
-          })}
-        </select>
-      )}
-
-      {/* 新增畫布按鈕 */}
-      <Button variant="outline" size="sm" onClick={handleAddCanvas} className="h-8 gap-1.5 text-xs">
-        <Plus size={14} />
-        <span>新增空白畫布</span>
-      </Button>
-    </div>
-  )
+interface Canvas {
+  id: string
+  name: string
+  createdAt: number
 }
 
 interface ChannelTabsProps {
@@ -68,14 +19,74 @@ interface ChannelTabsProps {
 }
 
 export function ChannelTabs({ channel, children, headerActions }: ChannelTabsProps) {
-  const [activeTab, setActiveTab] = useState<'chat' | 'canvas'>('chat')
+  const [activeTab, setActiveTab] = useState<'chat' | string>('chat') // 'chat' 或 canvas id
+  const [canvases, setCanvases] = useState<Canvas[]>([])
+
+  // 載入畫布列表
+  useEffect(() => {
+    const stored = localStorage.getItem(`canvases-${channel.id}`)
+    if (stored) {
+      try {
+        setCanvases(JSON.parse(stored))
+      } catch {
+        setCanvases([])
+      }
+    }
+  }, [channel.id])
+
+  // 儲存畫布列表
+  const saveCanvases = useCallback(
+    (newCanvases: Canvas[]) => {
+      setCanvases(newCanvases)
+      localStorage.setItem(`canvases-${channel.id}`, JSON.stringify(newCanvases))
+    },
+    [channel.id]
+  )
+
+  // 新增畫布
+  const handleAddCanvas = () => {
+    const name = prompt('請輸入畫布名稱：')
+    if (!name || !name.trim()) return
+
+    const newCanvas: Canvas = {
+      id: `canvas-${Date.now()}`,
+      name: name.trim(),
+      createdAt: Date.now(),
+    }
+    const newCanvases = [...canvases, newCanvas]
+    saveCanvases(newCanvases)
+    setActiveTab(newCanvas.id)
+  }
+
+  // 刪除畫布
+  const handleDeleteCanvas = (canvasId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const canvas = canvases.find(c => c.id === canvasId)
+    if (!canvas) return
+
+    if (!confirm(`確定要刪除畫布「${canvas.name}」嗎？`)) return
+
+    const newCanvases = canvases.filter(c => c.id !== canvasId)
+    saveCanvases(newCanvases)
+
+    // 刪除畫布內容
+    localStorage.removeItem(`canvas-${channel.id}-${canvasId}`)
+
+    // 如果刪除的是當前顯示的畫布，切換到對話
+    if (activeTab === canvasId) {
+      setActiveTab('chat')
+    }
+  }
+
+  const activeCanvas = canvases.find(c => c.id === activeTab)
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* 分頁標籤 */}
       <div className="h-[52px] border-b border-border bg-white px-6 flex items-center shrink-0">
         <div className="flex items-center justify-between w-full">
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center">
+            {/* 對話 Tab */}
             <button
               onClick={() => setActiveTab('chat')}
               className={cn(
@@ -92,34 +103,51 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
               )}
             </button>
 
+            {/* 畫布 Tabs */}
+            {canvases.map(canvas => (
+              <button
+                key={canvas.id}
+                onClick={() => setActiveTab(canvas.id)}
+                className={cn(
+                  'group flex items-center gap-2 px-4 h-[52px] text-sm font-medium transition-colors relative',
+                  activeTab === canvas.id
+                    ? 'text-morandi-primary'
+                    : 'text-morandi-secondary hover:text-morandi-primary'
+                )}
+              >
+                <FileText size={16} />
+                <span className="max-w-[100px] truncate">{canvas.name}</span>
+                <button
+                  onClick={e => handleDeleteCanvas(canvas.id, e)}
+                  className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-red-100 rounded transition-opacity"
+                  title="刪除畫布"
+                >
+                  <Trash2 size={12} className="text-red-500" />
+                </button>
+                {activeTab === canvas.id && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-morandi-gold transition-all"></div>
+                )}
+              </button>
+            ))}
+
+            {/* 新增畫布按鈕 */}
             <button
-              onClick={() => setActiveTab('canvas')}
-              className={cn(
-                'flex items-center gap-2 px-4 h-[52px] text-sm font-medium transition-colors relative',
-                activeTab === 'canvas'
-                  ? 'text-morandi-primary'
-                  : 'text-morandi-secondary hover:text-morandi-primary'
-              )}
+              onClick={handleAddCanvas}
+              className="flex items-center justify-center w-8 h-8 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/10 rounded transition-colors"
+              title="新增畫布"
             >
-              <FileText size={16} />
-              <span>畫布</span>
-              {activeTab === 'canvas' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-morandi-gold transition-all"></div>
-              )}
+              <Plus size={18} />
             </button>
           </div>
 
-          {/* 右側操作按鈕（包含畫布按鈕） */}
-          <div className="flex items-center gap-1">
-            {activeTab === 'canvas' && <CanvasActions channelId={channel.id} />}
-            {headerActions}
-          </div>
+          {/* 右側操作按鈕 */}
+          <div className="flex items-center gap-1">{headerActions}</div>
         </div>
       </div>
 
       {/* 分頁內容 */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        {/* 對話分頁 - 使用絕對定位並根據 activeTab 控制顯示 */}
+        {/* 對話分頁 */}
         <div
           className={cn(
             'absolute inset-0 flex flex-col transition-opacity duration-150',
@@ -131,79 +159,22 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
           {children}
         </div>
 
-        {/* 畫布分頁 - 使用絕對定位並根據 activeTab 控制顯示 */}
-        <div
-          className={cn(
-            'absolute inset-0 flex flex-col transition-opacity duration-150',
-            activeTab === 'canvas'
-              ? 'opacity-100 pointer-events-auto'
-              : 'opacity-0 pointer-events-none'
-          )}
-        >
-          {activeTab === 'canvas' && <CanvasView channelId={channel.id} />}
-        </div>
+        {/* 畫布分頁 */}
+        {activeCanvas && (
+          <div
+            className={cn(
+              'absolute inset-0 flex flex-col transition-opacity duration-150',
+              activeTab !== 'chat' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            )}
+          >
+            <CanvasEditor
+              key={activeCanvas.id}
+              channelId={channel.id}
+              canvasId={`canvas-${channel.id}-${activeCanvas.id}`}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
-}
-
-// 畫布視圖（支援多畫布切換）
-function CanvasView({ channelId }: { channelId: string }) {
-  const [canvases, setCanvases] = useState<string[]>(() => {
-    const stored = localStorage.getItem(`canvases-${channelId}`)
-    return stored ? JSON.parse(stored) : ['default']
-  })
-
-  const [activeCanvas, setActiveCanvas] = useState(() => {
-    const stored = localStorage.getItem(`active-canvas-${channelId}`)
-    return stored || 'default'
-  })
-
-  // 監聽新增畫布事件（通過 localStorage 變化）
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const stored = localStorage.getItem(`canvases-${channelId}`)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        setCanvases(parsed)
-
-        // 如果當前活動畫布不在列表中，切換到最後一個
-        if (!parsed.includes(activeCanvas)) {
-          const newActive = parsed[parsed.length - 1]
-          setActiveCanvas(newActive)
-          localStorage.setItem(`active-canvas-${channelId}`, newActive)
-        }
-      }
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-
-    // 定期檢查（因為同一標籤頁的 storage 事件不會觸發）
-    const interval = setInterval(() => {
-      const stored = localStorage.getItem(`canvases-${channelId}`)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        const currentStr = JSON.stringify(canvases)
-        const newStr = JSON.stringify(parsed)
-        if (currentStr !== newStr) {
-          setCanvases(parsed)
-        }
-      }
-    }, 500)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      clearInterval(interval)
-    }
-  }, [channelId, canvases, activeCanvas])
-
-  // 切換畫布時更新 localStorage
-  useEffect(() => {
-    localStorage.setItem(`active-canvas-${channelId}`, activeCanvas)
-  }, [activeCanvas, channelId])
-
-  const storageKey =
-    activeCanvas === 'default' ? `canvas-${channelId}` : `canvas-${channelId}-${activeCanvas}`
-
-  return <CanvasEditor key={storageKey} channelId={channelId} canvasId={storageKey} />
 }

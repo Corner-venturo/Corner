@@ -32,6 +32,11 @@ export function SortableChannelItem({
   // 判斷是否為旅遊團頻道
   const isTourChannel = !!channel.tour_id
 
+  // 取得顯示名稱：旅遊團頻道只顯示團名（移除團號）
+  const displayName = isTourChannel
+    ? channel.name.replace(/^[A-Z]{2}-[A-Z0-9]+\s+/, '') // 移除 "TP-OKA25122301 " 這樣的前綴
+    : channel.name
+
   return (
     <div
       ref={setNodeRef}
@@ -54,7 +59,7 @@ export function SortableChannelItem({
         ) : (
           <Hash size={14} className="shrink-0" />
         )}
-        <span className="flex-1 truncate">{channel.name}</span>
+        <span className="flex-1 truncate">{displayName}</span>
       </div>
       <div className="flex items-center gap-1" onPointerDown={e => e.stopPropagation()}>
         {/* 🔥 未加入頻道：顯示「加入」按鈕 */}
