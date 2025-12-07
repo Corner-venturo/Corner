@@ -36,6 +36,8 @@ interface ChannelChatMessagesProps {
   messagesEndRef: React.RefObject<HTMLDivElement>
   onReaction: (messageId: string, emoji: string) => void
   onDeleteMessage: (messageId: string) => Promise<void>
+  onReply?: (message: Message) => void
+  getReplyCount?: (messageId: string) => number
   onCreatePayment: (itemId: string, item: unknown) => void
   onDeleteAdvanceList: (listId: string) => Promise<void>
   onCreateReceipt: (orderId: string, order: unknown) => void
@@ -65,6 +67,8 @@ export function ChatMessages({
   messagesEndRef,
   onReaction,
   onDeleteMessage,
+  onReply,
+  getReplyCount,
   onCreatePayment,
   onDeleteAdvanceList,
   onCreateReceipt,
@@ -90,6 +94,8 @@ export function ChatMessages({
           isLoading={isLoading}
           onReaction={onReaction}
           onDeleteMessage={onDeleteMessage}
+          onReply={onReply}
+          getReplyCount={getReplyCount}
           onCreatePayment={onCreatePayment}
           onDeleteAdvanceList={onDeleteAdvanceList}
           onCreateReceipt={onCreateReceipt}

@@ -1,83 +1,63 @@
--- 建立討論串 (channel_threads) 資料表
--- 讓頻道可以有多個獨立的討論串
+-- Slack 風格討論串：訊息可以回覆訊息
+-- 不需要獨立的 channel_threads 資料表
 
 BEGIN;
 
--- 建立 channel_threads 資料表
-CREATE TABLE IF NOT EXISTS public.channel_threads (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  channel_id uuid NOT NULL REFERENCES public.channels(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  created_by uuid NOT NULL REFERENCES public.employees(id),
-  is_archived boolean DEFAULT false,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-
-  -- 軟刪除欄位
-  _deleted boolean DEFAULT false,
-  _needs_sync boolean DEFAULT false,
-  _synced_at timestamptz
-);
-
--- 建立索引
-CREATE INDEX IF NOT EXISTS idx_channel_threads_channel_id ON public.channel_threads(channel_id);
-CREATE INDEX IF NOT EXISTS idx_channel_threads_created_by ON public.channel_threads(created_by);
-CREATE INDEX IF NOT EXISTS idx_channel_threads_created_at ON public.channel_threads(created_at DESC);
-
--- 新增 thread_id 欄位到 messages 資料表
+-- 移除舊的 thread_id 欄位（如果存在）
 ALTER TABLE public.messages
-ADD COLUMN IF NOT EXISTS thread_id uuid REFERENCES public.channel_threads(id) ON DELETE CASCADE;
+DROP COLUMN IF EXISTS thread_id;
 
--- 建立 thread_id 索引
-CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON public.messages(thread_id);
+-- 新增 parent_message_id 欄位：指向被回覆的訊息
+ALTER TABLE public.messages
+ADD COLUMN IF NOT EXISTS parent_message_id uuid REFERENCES public.messages(id) ON DELETE CASCADE;
 
--- 新增 reply_count 到 channel_threads（方便顯示回覆數）
-ALTER TABLE public.channel_threads
+-- 新增 reply_count 欄位：該訊息有多少回覆（僅父訊息有值）
+ALTER TABLE public.messages
 ADD COLUMN IF NOT EXISTS reply_count integer DEFAULT 0;
 
--- 新增 last_reply_at 到 channel_threads（方便排序）
-ALTER TABLE public.channel_threads
+-- 新增 last_reply_at 欄位：最後回覆時間（用於排序）
+ALTER TABLE public.messages
 ADD COLUMN IF NOT EXISTS last_reply_at timestamptz;
 
--- 建立觸發器：更新討論串的回覆數和最後回覆時間
-CREATE OR REPLACE FUNCTION update_thread_stats()
+-- 建立索引
+CREATE INDEX IF NOT EXISTS idx_messages_parent_message_id ON public.messages(parent_message_id);
+CREATE INDEX IF NOT EXISTS idx_messages_reply_count ON public.messages(reply_count) WHERE reply_count > 0;
+
+-- 建立觸發器：更新父訊息的回覆統計
+CREATE OR REPLACE FUNCTION update_message_reply_stats()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF TG_OP = 'INSERT' AND NEW.thread_id IS NOT NULL THEN
-    UPDATE public.channel_threads
+  IF TG_OP = 'INSERT' AND NEW.parent_message_id IS NOT NULL THEN
+    -- 新增回覆時，更新父訊息的統計
+    UPDATE public.messages
     SET
-      reply_count = reply_count + 1,
-      last_reply_at = NEW.created_at,
-      updated_at = now()
-    WHERE id = NEW.thread_id;
-  ELSIF TG_OP = 'DELETE' AND OLD.thread_id IS NOT NULL THEN
-    UPDATE public.channel_threads
+      reply_count = COALESCE(reply_count, 0) + 1,
+      last_reply_at = NEW.created_at
+    WHERE id = NEW.parent_message_id;
+  ELSIF TG_OP = 'DELETE' AND OLD.parent_message_id IS NOT NULL THEN
+    -- 刪除回覆時，更新父訊息的統計
+    UPDATE public.messages
     SET
-      reply_count = GREATEST(reply_count - 1, 0),
-      updated_at = now()
-    WHERE id = OLD.thread_id;
+      reply_count = GREATEST(COALESCE(reply_count, 0) - 1, 0)
+    WHERE id = OLD.parent_message_id;
   END IF;
   RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_update_thread_stats ON public.messages;
-CREATE TRIGGER trigger_update_thread_stats
+DROP TRIGGER IF EXISTS trigger_update_message_reply_stats ON public.messages;
+CREATE TRIGGER trigger_update_message_reply_stats
 AFTER INSERT OR DELETE ON public.messages
 FOR EACH ROW
-EXECUTE FUNCTION update_thread_stats();
+EXECUTE FUNCTION update_message_reply_stats();
+
+-- 移除舊的 channel_threads 相關觸發器和函數（如果存在）
+DROP TRIGGER IF EXISTS trigger_update_thread_stats ON public.messages;
+DROP FUNCTION IF EXISTS update_thread_stats();
 
 -- 新增欄位註解
-COMMENT ON TABLE public.channel_threads IS '頻道討論串';
-COMMENT ON COLUMN public.channel_threads.id IS '討論串 ID';
-COMMENT ON COLUMN public.channel_threads.channel_id IS '所屬頻道 ID';
-COMMENT ON COLUMN public.channel_threads.name IS '討論串名稱';
-COMMENT ON COLUMN public.channel_threads.created_by IS '建立者 ID';
-COMMENT ON COLUMN public.channel_threads.reply_count IS '回覆數量';
-COMMENT ON COLUMN public.channel_threads.last_reply_at IS '最後回覆時間';
-COMMENT ON COLUMN public.messages.thread_id IS '所屬討論串 ID（null 表示主頻道訊息）';
-
--- RLS: 禁用（依照 Venturo 規範）
-ALTER TABLE public.channel_threads DISABLE ROW LEVEL SECURITY;
+COMMENT ON COLUMN public.messages.parent_message_id IS '父訊息 ID（Slack 風格討論串，null 表示主訊息）';
+COMMENT ON COLUMN public.messages.reply_count IS '回覆數量（僅父訊息有值）';
+COMMENT ON COLUMN public.messages.last_reply_at IS '最後回覆時間（用於排序）';
 
 COMMIT;

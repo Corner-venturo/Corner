@@ -7,13 +7,15 @@ import { useChannelChat } from './channel-chat/useChannelChat'
 import { ChatHeader } from './channel-chat/ChatHeader'
 import { ChatMessages } from './channel-chat/ChatMessages'
 import { DialogsContainer } from './channel-chat/DialogsContainer'
-import { ThreadList } from './chat/ThreadList'
+import { ThreadPanel } from './channel-chat/ThreadPanel'
 
 export function ChannelChat() {
   const {
     // State
     messageText,
     setMessageText,
+    threadMessageText,
+    setThreadMessageText,
     showMemberSidebar,
     setShowMemberSidebar,
     isSwitching,
@@ -54,13 +56,13 @@ export function ChannelChat() {
     editChannelDescription,
     setEditChannelDescription,
 
-    // Thread state
-    threads,
-    selectedThread,
-    setSelectedThread,
-    isThreadsLoading,
-    createThread,
-    deleteThread,
+    // Slack 風格討論串狀態
+    activeThreadMessage,
+    threadReplies,
+    isThreadPanelOpen,
+    openThread,
+    closeThread,
+    getReplyCount,
 
     // Store data
     channels,
@@ -87,6 +89,7 @@ export function ChannelChat() {
     handleSubmitMessage,
     handleReactionClick,
     handleDeleteMessageClick,
+    handleThreadSubmitMessage,
     handleChannelSwitch,
     handleDeleteChannel,
     handleUpdateChannel,
@@ -118,14 +121,6 @@ export function ChannelChat() {
               />
             }
           >
-            <ThreadList
-              threads={threads}
-              selectedThreadId={selectedThread?.id || null}
-              onSelectThread={setSelectedThread}
-              onCreateThread={createThread}
-              onDeleteThread={deleteThread}
-              isLoading={isThreadsLoading}
-            />
             <ChatMessages
               messages={currentMessages || []}
               advanceLists={advanceLists}
@@ -141,6 +136,8 @@ export function ChannelChat() {
               messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
               onReaction={handleReactionClick}
               onDeleteMessage={handleDeleteMessageClick}
+              onReply={openThread}
+              getReplyCount={getReplyCount}
               onCreatePayment={(itemId, item) => {
                 setSelectedAdvanceItem(item as Parameters<typeof setSelectedAdvanceItem>[0])
                 setSelectedAdvanceListId(
@@ -173,6 +170,19 @@ export function ChannelChat() {
           </div>
         )}
       </div>
+
+      {/* Slack 風格討論串側邊面板 */}
+      {isThreadPanelOpen && activeThreadMessage && (
+        <ThreadPanel
+          parentMessage={activeThreadMessage}
+          replies={threadReplies}
+          onClose={closeThread}
+          onSubmit={handleThreadSubmitMessage}
+          messageText={threadMessageText}
+          onMessageChange={setThreadMessageText}
+          currentUserId={user?.id}
+        />
+      )}
 
       <DialogsContainer
         showShareAdvanceDialog={showShareAdvanceDialog}

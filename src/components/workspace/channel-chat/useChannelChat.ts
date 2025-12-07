@@ -19,11 +19,12 @@ import {
  * Channel Chat 主 Hook
  *
  * 整合多個子 hooks 來管理頻道聊天的所有狀態和操作
- * 已重構為更小的、可重用的子 hooks
+ * 支援 Slack 風格討論串：點擊訊息回覆，開啟右側面板
  */
 export function useChannelChat() {
   // Basic state
   const [messageText, setMessageText] = useState('')
+  const [threadMessageText, setThreadMessageText] = useState('')
   const [showMemberSidebar, setShowMemberSidebar] = useState(false)
 
   // Dialog states (拆分到 useDialogStates)
@@ -54,16 +55,17 @@ export function useChannelChat() {
     deleteAdvanceList,
   } = useWorkspaceWidgets()
 
-  // Thread state (拆分到 useThreadState)
-  const threadState = useThreadState(selectedChannel?.id || null)
-
-  // Derived state
+  // 取得頻道的所有訊息
   const allMessages =
     selectedChannel?.id && channelMessages?.[selectedChannel.id]
       ? channelMessages[selectedChannel.id]
       : []
-  // 根據選中的討論串過濾訊息
-  const currentMessages = threadState.filterMessagesByThread(allMessages)
+
+  // Slack 風格討論串狀態
+  const threadState = useThreadState(allMessages)
+
+  // 主頻道顯示的訊息（只有主訊息，沒有 parent_message_id）
+  const currentMessages = threadState.mainChannelMessages
   const isMessagesLoading = selectedChannel?.id
     ? (messagesLoading?.[selectedChannel.id] ?? false)
     : false
@@ -93,8 +95,8 @@ export function useChannelChat() {
   } = useFileUpload()
   const { messagesEndRef } = useScrollToBottom(currentMessages?.length || 0)
 
-  // Message handlers (拆分到 useMessageHandlers)
-  const messageHandlers = useMessageHandlers(
+  // 主頻道的訊息處理（不帶 parentMessageId）
+  const mainMessageHandlers = useMessageHandlers(
     messageText,
     setMessageText,
     selectedChannel,
@@ -106,7 +108,23 @@ export function useChannelChat() {
     handleSendMessage,
     handleReaction,
     handleDeleteMessage,
-    threadState.selectedThread
+    undefined // 主頻道不帶 parentMessageId
+  )
+
+  // 討論串的訊息處理（帶 parentMessageId）
+  const threadMessageHandlers = useMessageHandlers(
+    threadMessageText,
+    setThreadMessageText,
+    selectedChannel,
+    user,
+    [], // 討論串暫不支援附件
+    threadState.threadReplies,
+    uploadFiles,
+    clearFiles,
+    handleSendMessage,
+    handleReaction,
+    handleDeleteMessage,
+    threadState.activeThreadMessage?.id // 討論串帶 parentMessageId
   )
 
   // Effects (拆分到 useChannelEffects)
@@ -125,6 +143,8 @@ export function useChannelChat() {
     // State
     messageText,
     setMessageText,
+    threadMessageText,
+    setThreadMessageText,
     showMemberSidebar,
     setShowMemberSidebar,
     isSwitching: channelOps.isSwitching,
@@ -138,8 +158,15 @@ export function useChannelChat() {
     // Edit state (從 useChannelEditState)
     ...editState,
 
-    // Thread state (從 useThreadState)
-    ...threadState,
+    // Slack 風格討論串狀態
+    activeThreadMessage: threadState.activeThreadMessage,
+    threadReplies: threadState.threadReplies,
+    isThreadPanelOpen: threadState.isThreadPanelOpen,
+    openThread: threadState.openThread,
+    closeThread: threadState.closeThread,
+    getReplyCount: threadState.getReplyCount,
+    getLastReplyAt: threadState.getLastReplyAt,
+    getReplyUsers: threadState.getReplyUsers,
 
     // Store data
     channels,
@@ -163,10 +190,11 @@ export function useChannelChat() {
     uploadProgress,
     messagesEndRef,
 
-    // Handlers (從 useMessageHandlers 和 useChannelOperations)
-    handleSubmitMessage: messageHandlers.handleSubmitMessage,
-    handleReactionClick: messageHandlers.handleReactionClick,
-    handleDeleteMessageClick: messageHandlers.handleDeleteMessageClick,
+    // Handlers
+    handleSubmitMessage: mainMessageHandlers.handleSubmitMessage,
+    handleReactionClick: mainMessageHandlers.handleReactionClick,
+    handleDeleteMessageClick: mainMessageHandlers.handleDeleteMessageClick,
+    handleThreadSubmitMessage: threadMessageHandlers.handleSubmitMessage,
     handleChannelSwitch: channelOps.handleChannelSwitch,
     handleDeleteChannel: channelOps.handleDeleteChannel,
     handleUpdateChannel: () =>

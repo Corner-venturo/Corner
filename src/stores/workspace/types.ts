@@ -92,7 +92,13 @@ export interface Message {
   created_at: string
   edited_at?: string
   is_pinned?: boolean
-  thread_id?: string | null
+  // Slack 風格討論串：回覆訊息指向父訊息
+  parent_message_id?: string | null
+  // 討論串統計（僅父訊息有值）
+  reply_count?: number
+  last_reply_at?: string | null
+  // 討論串中最後幾位回覆者的頭像（用於顯示）
+  reply_users?: string[]
   author?: {
     id: string
     display_name: string
@@ -103,25 +109,6 @@ export interface Message {
   _synced_at?: string | null
 }
 
-export interface ChannelThread {
-  id: string
-  channel_id: string
-  name: string
-  created_by: string
-  is_archived?: boolean
-  reply_count?: number
-  last_reply_at?: string | null
-  created_at: string
-  updated_at?: string
-  creator?: {
-    id: string
-    display_name: string
-    avatar?: string
-  }
-  _deleted?: boolean | null
-  _needs_sync?: boolean | null
-  _synced_at?: string | null
-}
 
 export type RawMessage = Omit<Message, 'attachments' | 'created_at'> & {
   attachments?: unknown

@@ -1,91 +1,90 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useChannelThreadStore } from '@/stores/workspace/channel-thread-store'
-import { useAuthStore } from '@/stores/auth-store'
-import type { ChannelThread, Message } from '@/stores/workspace/types'
+import { useState, useCallback, useMemo } from 'react'
+import type { Message } from '@/stores/workspace/types'
 
 /**
- * 管理討論串狀態
+ * Slack 風格討論串狀態管理
+ * - 點擊訊息的「回覆」按鈕，開啟右側討論串面板
+ * - 討論串面板顯示父訊息 + 所有回覆
+ * - parent_message_id 指向被回覆的訊息
  */
-export function useThreadState(channelId: string | null) {
-  const { user } = useAuthStore()
-  const threadStore = useChannelThreadStore()
-  const [selectedThread, setSelectedThread] = useState<ChannelThread | null>(null)
-  const [isThreadsLoading, setIsThreadsLoading] = useState(false)
+export function useThreadState(allMessages: Message[]) {
+  // 當前開啟的討論串（父訊息）
+  const [activeThreadMessage, setActiveThreadMessage] = useState<Message | null>(null)
 
-  // 取得頻道的討論串
-  const threads = useMemo(() => {
-    if (!channelId) return []
-    return threadStore.items
-      .filter(t => t.channel_id === channelId && !t._deleted)
+  // 開啟討論串面板
+  const openThread = useCallback((parentMessage: Message) => {
+    setActiveThreadMessage(parentMessage)
+  }, [])
+
+  // 關閉討論串面板
+  const closeThread = useCallback(() => {
+    setActiveThreadMessage(null)
+  }, [])
+
+  // 取得討論串中的回覆訊息
+  const threadReplies = useMemo(() => {
+    if (!activeThreadMessage) return []
+    return allMessages
+      .filter(m => m.parent_message_id === activeThreadMessage.id && !m._deleted)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+  }, [allMessages, activeThreadMessage])
+
+  // 主頻道顯示的訊息（只顯示沒有 parent_message_id 的主訊息）
+  const mainChannelMessages = useMemo(() => {
+    return allMessages
+      .filter(m => !m.parent_message_id && !m._deleted)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+  }, [allMessages])
+
+  // 取得特定訊息的回覆數量（用於 UI 顯示「X 則回覆」）
+  const getReplyCount = useCallback((messageId: string): number => {
+    // 優先使用 reply_count 欄位（資料庫觸發器維護）
+    const message = allMessages.find(m => m.id === messageId)
+    if (message?.reply_count !== undefined) {
+      return message.reply_count
+    }
+    // 備用：手動計算
+    return allMessages.filter(m => m.parent_message_id === messageId && !m._deleted).length
+  }, [allMessages])
+
+  // 取得特定訊息的最後回覆時間
+  const getLastReplyAt = useCallback((messageId: string): string | null => {
+    const message = allMessages.find(m => m.id === messageId)
+    return message?.last_reply_at || null
+  }, [allMessages])
+
+  // 取得特定訊息的回覆者（用於顯示頭像）
+  const getReplyUsers = useCallback((messageId: string): string[] => {
+    const replies = allMessages
+      .filter(m => m.parent_message_id === messageId && !m._deleted)
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-  }, [channelId, threadStore.items])
 
-  // 載入討論串
-  useEffect(() => {
-    if (!channelId) return
-
-    const loadThreads = async () => {
-      setIsThreadsLoading(true)
-      try {
-        await threadStore.fetchAll({ channel_id: channelId })
-      } finally {
-        setIsThreadsLoading(false)
+    // 取得最近 3 位不重複的回覆者
+    const uniqueUsers: string[] = []
+    for (const reply of replies) {
+      if (!uniqueUsers.includes(reply.author_id) && uniqueUsers.length < 3) {
+        uniqueUsers.push(reply.author_id)
       }
     }
-
-    loadThreads()
-  }, [channelId])
-
-  // 切換頻道時清除選中的討論串
-  useEffect(() => {
-    setSelectedThread(null)
-  }, [channelId])
-
-  // 建立討論串
-  const createThread = useCallback(async (name: string) => {
-    if (!channelId || !user?.id) return null
-
-    const newThread = await threadStore.create({
-      channel_id: channelId,
-      name,
-      created_by: user.id,
-      is_archived: false,
-      reply_count: 0,
-      last_reply_at: null,
-    })
-
-    if (newThread) {
-      setSelectedThread(newThread as ChannelThread)
-    }
-
-    return newThread
-  }, [channelId, user?.id, threadStore])
-
-  // 刪除討論串
-  const deleteThread = useCallback(async (threadId: string) => {
-    await threadStore.delete(threadId)
-    if (selectedThread?.id === threadId) {
-      setSelectedThread(null)
-    }
-  }, [threadStore, selectedThread])
-
-  // 過濾訊息（根據選中的討論串）
-  const filterMessagesByThread = useCallback((messages: Message[]) => {
-    if (selectedThread) {
-      // 只顯示該討論串的訊息
-      return messages.filter(m => m.thread_id === selectedThread.id)
-    }
-    // 主頻道：只顯示沒有 thread_id 的訊息
-    return messages.filter(m => !m.thread_id)
-  }, [selectedThread])
+    return uniqueUsers
+  }, [allMessages])
 
   return {
-    threads,
-    selectedThread,
-    setSelectedThread,
-    isThreadsLoading,
-    createThread,
-    deleteThread,
-    filterMessagesByThread,
+    // 討論串面板狀態
+    activeThreadMessage,
+    threadReplies,
+    isThreadPanelOpen: !!activeThreadMessage,
+
+    // 主頻道訊息
+    mainChannelMessages,
+
+    // 操作
+    openThread,
+    closeThread,
+
+    // 工具函數
+    getReplyCount,
+    getLastReplyAt,
+    getReplyUsers,
   }
 }

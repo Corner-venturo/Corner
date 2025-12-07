@@ -1,6 +1,6 @@
 'use client'
 
-import { Trash2, Download, FileText, Image as ImageIcon } from 'lucide-react'
+import { Trash2, Download, FileText, Image as ImageIcon, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Message, MessageAttachment } from '@/stores/workspace-store'
 import { formatMessageTime, formatFileSize, resolveAttachmentUrl } from './utils'
@@ -12,9 +12,11 @@ interface MessageItemProps {
   currentUserId?: string
   onReaction: (messageId: string, emoji: string) => void
   onDelete: (messageId: string) => void
+  onReply?: (message: Message) => void
+  replyCount?: number
 }
 
-export function MessageItem({ message, currentUserId, onReaction, onDelete }: MessageItemProps) {
+export function MessageItem({ message, currentUserId, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
   const handleDownloadAttachment = async (attachment: MessageAttachment) => {
     const fileName = attachment.fileName || attachment.name || '未命名檔案'
     const targetUrl = resolveAttachmentUrl(attachment)
@@ -123,7 +125,18 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
           </div>
         )}
 
-        {/* 反應按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
+        {/* 討論串回覆指示器 - 有回覆時固定顯示 */}
+        {replyCount > 0 && (
+          <button
+            onClick={() => onReply?.(message)}
+            className="flex items-center gap-1.5 mt-2 text-xs text-morandi-gold hover:text-morandi-gold/80 hover:underline transition-colors"
+          >
+            <MessageSquare size={14} />
+            <span>{replyCount} 則回覆</span>
+          </button>
+        )}
+
+        {/* 反應按鈕 & 回覆按鈕 & 刪除按鈕 - hover 訊息時顯示 */}
         <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="flex gap-0.5">
             {QUICK_REACTIONS.map(emoji => (
@@ -137,6 +150,16 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete }: Me
               </button>
             ))}
           </div>
+          {/* 回覆按鈕 */}
+          {onReply && (
+            <button
+              onClick={() => onReply(message)}
+              className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-gold/10 rounded border border-morandi-container hover:border-morandi-gold/40 transition-all hover:scale-110"
+              title="回覆討論串"
+            >
+              <MessageSquare size={12} className="text-morandi-gold" />
+            </button>
+          )}
           {/* 刪除按鈕 - 只有作者可以刪除 */}
           {currentUserId === message.author_id && (
             <button

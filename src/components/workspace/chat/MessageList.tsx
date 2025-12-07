@@ -22,6 +22,8 @@ interface MessageListProps {
   isLoading: boolean
   onReaction: (messageId: string, emoji: string) => void
   onDeleteMessage: (messageId: string) => void
+  onReply?: (message: Message) => void
+  getReplyCount?: (messageId: string) => number
   onCreatePayment?: (itemId: string, item: unknown) => void
   onDeleteAdvanceList?: (listId: string) => void
   onCreateReceipt?: (orderId: string, order: unknown) => void
@@ -46,6 +48,8 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
     isLoading,
     onReaction,
     onDeleteMessage,
+    onReply,
+    getReplyCount,
     onCreatePayment,
     onDeleteAdvanceList,
     onCreateReceipt,
@@ -101,6 +105,8 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                     currentUserId={currentUserId}
                     onReaction={onReaction}
                     onDelete={onDeleteMessage}
+                    onReply={onReply}
+                    replyCount={getReplyCount?.(item.data.id) ?? 0}
                   />
                 )
               case 'advanceList':

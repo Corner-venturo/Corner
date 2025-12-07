@@ -1,9 +1,10 @@
-import type { Message, ChannelThread } from '@/stores/workspace-store'
+import type { Message } from '@/stores/workspace/types'
 import { ALERT_MESSAGES } from '../constants'
 
 /**
  * 管理訊息相關的處理函數
  * 包括發送訊息、反應、刪除訊息等
+ * 支援 Slack 風格討論串：可指定 parentMessageId 來發送回覆
  */
 export function useMessageHandlers(
   messageText: string,
@@ -14,10 +15,10 @@ export function useMessageHandlers(
   currentMessages: Message[],
   uploadFiles: (channelId: string) => Promise<unknown>,
   clearFiles: () => void,
-  handleSendMessage: (channelId: string, text: string, attachments?: unknown, threadId?: string) => Promise<void>,
+  handleSendMessage: (channelId: string, text: string, attachments?: unknown, parentMessageId?: string) => Promise<void>,
   handleReaction: (messageId: string, emoji: string, messages: Message[]) => void,
   handleDeleteMessage: (messageId: string) => Promise<void>,
-  selectedThread?: ChannelThread | null
+  parentMessageId?: string | null
 ) {
   const handleSubmitMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,7 +40,13 @@ export function useMessageHandlers(
       const uploadedAttachments =
         attachedFiles.length > 0 ? await uploadFiles(selectedChannel.id) : undefined
 
-      await handleSendMessage(selectedChannel.id, messageText, uploadedAttachments, selectedThread?.id)
+      // 傳入 parentMessageId 來發送回覆訊息
+      await handleSendMessage(
+        selectedChannel.id,
+        messageText,
+        uploadedAttachments,
+        parentMessageId || undefined
+      )
 
       setMessageText('')
       clearFiles()
