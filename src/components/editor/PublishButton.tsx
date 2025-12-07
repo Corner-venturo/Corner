@@ -30,6 +30,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink } from 'lucide-react'
 
+
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
   status?: string
@@ -70,6 +71,9 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     departure_date: data.departureDate,
     tour_code: data.tourCode,
     cover_image: data.coverImage,
+    cover_style: data.coverStyle || 'original',
+    price: data.price || null,
+    price_note: data.priceNote || null,
     country: data.country,
     city: data.city,
     status: (data.status || 'draft') as 'draft' | 'published',
@@ -83,6 +87,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     show_features: data.showFeatures,
     show_leader_meeting: data.showLeaderMeeting,
     show_hotels: data.showHotels,
+    show_pricing_details: data.showPricingDetails,
+    pricing_details: data.pricingDetails,
     itinerary_subtitle: data.itinerarySubtitle,
     daily_itinerary: data.dailyItinerary,
   })

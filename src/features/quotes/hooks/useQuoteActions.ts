@@ -99,63 +99,77 @@ export const useQuoteActions = ({
   }, [participantCounts, groupSize, groupSizeForGuide, setCategories]) // 監聽人數變化
 
   // 儲存當前版本（覆蓋）
+  // 新邏輯：所有版本都存在 versions[] 陣列，current_version_index 追蹤當前編輯的版本
   const handleSave = useCallback(
-    () => {
+    (setCurrentEditingVersion?: (index: number) => void) => {
       if (!quote) return
 
       try {
-        const baseUpdate = {
-          categories: updatedCategories as any,
-          total_cost,
-          group_size: groupSize,
-          name: quoteName,
-          accommodation_days: accommodationDays,
-          participant_counts: participantCounts,
-          selling_prices: sellingPrices,
-        }
-
         const existingVersions = quote.versions || []
 
-        // 如果正在編輯某個版本，更新該版本
-        if (currentEditingVersion !== null && existingVersions.length > 0) {
-          const updatedVersions = [...existingVersions] as any[]
-          updatedVersions[currentEditingVersion] = {
-            ...updatedVersions[currentEditingVersion],
-            categories: updatedCategories,
-            total_cost,
-            group_size: groupSize,
-            accommodation_days: accommodationDays,
-            participant_counts: participantCounts,
-            selling_prices: sellingPrices,
-            updated_at: new Date().toISOString(),
-          }
-
-          updateQuote(quote.id, {
-            ...baseUpdate,
-            versions: updatedVersions,
-          })
-        } else if (existingVersions.length === 0) {
-          // 第一次儲存：沒有版本記錄，自動創建版本 1
+        // 第一次儲存：沒有版本記錄，自動創建 versions[0]
+        if (existingVersions.length === 0) {
           const firstVersion = {
             id: Date.now().toString(),
             version: 1,
+            name: quote.customer_name || quoteName || '版本 1', // 優先使用客戶名稱
             categories: updatedCategories,
             total_cost,
             group_size: groupSize,
             accommodation_days: accommodationDays,
             participant_counts: participantCounts,
             selling_prices: sellingPrices,
-            note: '版本 1',
+            note: '初始版本',
             created_at: new Date().toISOString(),
           }
 
           updateQuote(quote.id, {
-            ...baseUpdate,
+            name: quoteName,
             versions: [firstVersion] as any,
+            current_version_index: 0,
+            // categories 作為臨時編輯狀態，同步更新
+            categories: updatedCategories as any,
+            total_cost,
+            group_size: groupSize,
+            accommodation_days: accommodationDays,
+            participant_counts: participantCounts,
+            selling_prices: sellingPrices,
           })
+
+          // 設定當前編輯版本為 0
+          if (setCurrentEditingVersion) {
+            setCurrentEditingVersion(0)
+          }
         } else {
-          // 有版本記錄但沒有編輯特定版本，只更新主資料
-          updateQuote(quote.id, baseUpdate)
+          // 已有版本：更新 currentEditingVersion 對應的版本
+          const versionIndex = currentEditingVersion ?? (quote.current_version_index ?? 0)
+          const updatedVersions = [...existingVersions] as any[]
+
+          if (versionIndex >= 0 && versionIndex < updatedVersions.length) {
+            updatedVersions[versionIndex] = {
+              ...updatedVersions[versionIndex],
+              categories: updatedCategories,
+              total_cost,
+              group_size: groupSize,
+              accommodation_days: accommodationDays,
+              participant_counts: participantCounts,
+              selling_prices: sellingPrices,
+              updated_at: new Date().toISOString(),
+            }
+          }
+
+          updateQuote(quote.id, {
+            name: quoteName,
+            versions: updatedVersions,
+            current_version_index: versionIndex,
+            // categories 作為臨時編輯狀態，同步更新
+            categories: updatedCategories as any,
+            total_cost,
+            group_size: groupSize,
+            accommodation_days: accommodationDays,
+            participant_counts: participantCounts,
+            selling_prices: sellingPrices,
+          })
         }
 
         setSaveSuccess(true)
@@ -196,17 +210,19 @@ export const useQuoteActions = ({
         const newVersionRecord = {
           id: Date.now().toString(),
           version: newVersion,
+          name: versionName || `版本 ${newVersion}`, // 版本名稱
           categories: updatedCategories,
           total_cost,
           group_size: groupSize,
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          note: note || versionName || `版本 ${newVersion}`,
+          note: note || '', // 版本備註
           created_at: new Date().toISOString(),
         }
 
         // 更新報價單：將新版本加入版本歷史
+        const newVersionIndex = existingVersions.length
         const newVersions = [...existingVersions, newVersionRecord]
         updateQuote(quote.id, {
           categories: updatedCategories as any,
@@ -217,11 +233,12 @@ export const useQuoteActions = ({
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
           versions: newVersions as any,
+          current_version_index: newVersionIndex, // 自動切換到新版本
         })
 
         // 自動切換到新創建的版本（新版本的索引是 length - 1）
         if (setCurrentEditingVersion) {
-          setCurrentEditingVersion(newVersions.length - 1)
+          setCurrentEditingVersion(newVersionIndex)
         }
 
         // 顯示成功提示
@@ -272,6 +289,7 @@ export const useQuoteActions = ({
     const finalizeVersionRecord = {
       id: Date.now().toString(),
       version: newVersion,
+      name: `最終版本 ${newVersion}`,
       categories: updatedCategories,
       total_cost,
       group_size: groupSize,
@@ -324,6 +342,7 @@ export const useQuoteActions = ({
     const createTourVersionRecord = {
       id: Date.now().toString(),
       version: newVersion,
+      name: `開團版本 ${newVersion}`,
       categories: updatedCategories,
       total_cost,
       group_size: groupSize,

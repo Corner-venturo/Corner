@@ -6,11 +6,15 @@ import { supabase } from '@/lib/supabase/client'
 import { useTourScrollEffects } from '@/features/tours/hooks/useTourScrollEffects'
 import { useTourItineraryNav } from '@/features/tours/hooks/useTourItineraryNav'
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
+import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
 import { TourLeaderSection } from '@/features/tours/components/sections/TourLeaderSection'
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
+import { TourPricingSection } from '@/features/tours/components/sections/TourPricingSection'
+import { TourPriceTiersSection } from '@/features/tours/components/sections/TourPriceTiersSection'
+import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
 import { COMPANY } from '@/lib/constants/company'
 
@@ -69,8 +73,12 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         viewMode={viewMode}
       />
 
-      {/* Hero Section */}
-      <TourHeroSection data={data} viewMode={viewMode} />
+      {/* Hero Section - 根據 coverStyle 切換 */}
+      {data.coverStyle === 'gemini' ? (
+        <TourHeroGemini data={data} viewMode={viewMode} />
+      ) : (
+        <TourHeroSection data={data} viewMode={viewMode} />
+      )}
 
       {/* Divider */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,6 +139,36 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
         <TourHotelsSection data={data} viewMode={viewMode} />
       )}
+
+      {/* Divider - Price Tiers */}
+      {data.showPriceTiers && data.priceTiers && data.priceTiers.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-border"></div>
+        </div>
+      )}
+
+      {/* Price Tiers Section (4人、6人、8人包團) */}
+      <TourPriceTiersSection data={data} viewMode={viewMode} />
+
+      {/* Divider - Pricing Details */}
+      {data.showPricingDetails && data.pricingDetails && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-border"></div>
+        </div>
+      )}
+
+      {/* Pricing Details Section (費用包含/不含) */}
+      <TourPricingSection data={data} viewMode={viewMode} />
+
+      {/* Divider - FAQ */}
+      {data.showFaqs && data.faqs && data.faqs.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-border"></div>
+        </div>
+      )}
+
+      {/* FAQ Section */}
+      <TourFAQSection data={data} viewMode={viewMode} />
 
       {/* Footer */}
       <footer className="bg-slate-900 py-12">

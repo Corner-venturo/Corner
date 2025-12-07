@@ -36,6 +36,7 @@ interface UseItineraryImportResult {
   hasImportedData: boolean
   isLinkingItinerary: boolean
   linkItineraryId: string | null
+  shouldCreateNewVersion: boolean
   importDataToCategories: (categories: CostCategory[]) => CostCategory[]
 }
 
@@ -46,6 +47,7 @@ export const useItineraryImport = (): UseItineraryImportResult => {
   const isFromItinerary = searchParams.get('from_itinerary') === 'true'
   const isLinkingItinerary = searchParams.get('link_itinerary') !== null
   const linkItineraryId = searchParams.get('link_itinerary')
+  const shouldCreateNewVersion = searchParams.get('create_new_version') === 'true'
   
   const mealsData: MealData[] = searchParams.get('meals') 
     ? JSON.parse(searchParams.get('meals') || '[]') 
@@ -154,6 +156,7 @@ export const useItineraryImport = (): UseItineraryImportResult => {
     hasImportedData,
     isLinkingItinerary,
     linkItineraryId,
+    shouldCreateNewVersion,
     importDataToCategories
   }
 }

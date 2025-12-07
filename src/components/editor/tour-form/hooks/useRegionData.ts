@@ -48,17 +48,17 @@ export function useRegionData(data: { country?: string }) {
   // 初始化：當 countries 載入完成後，設定初始的 country code
   React.useEffect(() => {
     if (countries.length === 0) return
-    if (hasInitializedCodeRef.current) return
     if (!data.country) return
 
     // 初始化 selectedCountry（如果 state 和 data 不同）
+    // 移除 hasInitializedCodeRef 限制，確保資料變更時能正確同步
     if (selectedCountry !== data.country) {
       setSelectedCountry(data.country)
     }
 
     // 查找對應的 country code
     const matchedCountry = countries.find(c => c.name === data.country)
-    if (matchedCountry?.code) {
+    if (matchedCountry?.code && !hasInitializedCodeRef.current) {
       setSelectedCountryCode(matchedCountry.code)
       hasInitializedCodeRef.current = true
     }

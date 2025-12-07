@@ -8,6 +8,8 @@ interface TourDisplayData {
   description?: string | null
   departureDate: string
   tourCode: string
+  price?: string
+  priceNote?: string
 }
 
 interface TourHeroSectionProps {
@@ -153,6 +155,34 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                 {data.tourCode}
               </div>
             </div>
+            {data.price && (
+              <div
+                className={
+                  viewMode === 'mobile'
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 rounded-full text-center'
+                    : 'bg-gradient-to-r from-amber-400 to-orange-500 px-6 sm:px-8 py-4 rounded-full text-center'
+                }
+              >
+                <div
+                  className={
+                    viewMode === 'mobile'
+                      ? 'text-xs text-white/90'
+                      : 'text-xs sm:text-sm text-white/90'
+                  }
+                >
+                  售價
+                </div>
+                <div
+                  className={
+                    viewMode === 'mobile'
+                      ? 'font-bold text-sm text-white'
+                      : 'font-bold text-base sm:text-xl text-white'
+                  }
+                >
+                  NT$ {data.price}{data.priceNote ? ` ${data.priceNote}` : ''}
+                </div>
+              </div>
+            )}
           </motion.div>
         </motion.div>
 

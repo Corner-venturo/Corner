@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { CostCategory, ParticipantCounts, SellingPrices, costCategories } from '../types'
+import { CostCategory, ParticipantCounts, SellingPrices, costCategories, VersionRecord } from '../types'
 import { useItineraryImport } from './useItineraryImport'
 
 export const useQuoteState = () => {
@@ -13,7 +13,10 @@ export const useQuoteState = () => {
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
-  const { importDataToCategories, isFromItinerary } = useItineraryImport()
+  const { importDataToCategories, isFromItinerary, shouldCreateNewVersion, mealsData, hotelsData, activitiesData } = useItineraryImport()
+
+  // 追蹤是否已經建立過新版本，避免重複建立
+  const hasCreatedNewVersion = useRef(false)
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
@@ -188,6 +191,64 @@ export const useQuoteState = () => {
       router.push('/quotes')
     }
   }, [quote, quotes.length, router])
+
+  // 自動建立新版本（從行程頁面帶入資料時）
+  useEffect(() => {
+    if (
+      shouldCreateNewVersion &&
+      quote &&
+      !hasCreatedNewVersion.current &&
+      (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)
+    ) {
+      hasCreatedNewVersion.current = true
+
+      // 先匯入行程資料到 categories
+      const importedCategories = importDataToCategories(categories)
+
+      // 計算新版本號
+      const existingVersions = quote.versions || []
+      const maxVersion = existingVersions.reduce((max: number, v: { version?: number }) =>
+        Math.max(max, v.version || 0), 0
+      )
+      const newVersionNum = maxVersion + 1
+
+      // 建立新版本
+      const newVersion: VersionRecord = {
+        id: Date.now().toString(),
+        version: newVersionNum,
+        name: `從行程帶入 - ${new Date().toLocaleDateString('zh-TW')}`,
+        created_at: new Date().toISOString(),
+        note: '自動從行程資料建立',
+        categories: importedCategories,
+        accommodation_days: accommodationDays,
+        participant_counts: participantCounts,
+        selling_prices: sellingPrices,
+        total_cost: importedCategories.reduce((sum, cat) => sum + (cat.total || 0), 0),
+      }
+
+      // 更新到資料庫
+      const newVersionIndex = existingVersions.length
+      updateQuote(quote.id, {
+        current_version_index: newVersionIndex,
+        versions: [...existingVersions, newVersion],
+      }).then(() => {
+        // 更新本地 state
+        setCategories(importedCategories)
+        // 設定當前編輯版本為新建立的版本
+        setCurrentEditingVersion(existingVersions.length)
+
+        // 清除 URL 參數
+        const url = new URL(window.location.href)
+        url.searchParams.delete('create_new_version')
+        url.searchParams.delete('from_itinerary')
+        url.searchParams.delete('meals')
+        url.searchParams.delete('hotels')
+        url.searchParams.delete('activities')
+        url.searchParams.delete('link_itinerary')
+        window.history.replaceState({}, '', url.pathname)
+      })
+    }
+  }, [shouldCreateNewVersion, quote, mealsData, hotelsData, activitiesData])
 
   return {
     quote_id,

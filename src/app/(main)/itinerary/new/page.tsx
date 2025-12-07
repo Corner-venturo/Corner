@@ -22,7 +22,7 @@ import type {
   MeetingPoint,
   DailyItinerary,
 } from '@/components/editor/tour-form/types'
-import type { ItineraryVersionRecord } from '@/stores/types'
+import type { ItineraryVersionRecord, PricingDetails } from '@/stores/types'
 import {
   Building2,
   UtensilsCrossed,
@@ -43,6 +43,9 @@ interface LocalTourData {
   departureDate: string
   tourCode: string
   coverImage?: string
+  coverStyle?: 'original' | 'gemini' // 封面風格
+  price?: string // 價格
+  priceNote?: string // 價格備註
   country: string
   city: string
   status: string
@@ -57,6 +60,8 @@ interface LocalTourData {
   showFeatures?: boolean
   showLeaderMeeting?: boolean
   showHotels?: boolean
+  showPricingDetails?: boolean // 是否顯示詳細團費
+  pricingDetails?: PricingDetails // 詳細團費
   version_records?: ItineraryVersionRecord[]
 }
 
@@ -355,6 +360,34 @@ function NewItineraryPageContent() {
     },
     itinerarySubtitle: '',
     dailyItinerary: [],
+    showPricingDetails: false,
+    pricingDetails: {
+      show_pricing_details: false,
+      insurance_amount: '500',
+      included_items: [
+        { text: '行程表所列之交通費用', included: true },
+        { text: '行程表所列之住宿費用', included: true },
+        { text: '行程表所列之餐食費用', included: true },
+        { text: '行程表所列之門票費用', included: true },
+        { text: '專業導遊服務', included: true },
+        { text: '旅遊責任險 500 萬元', included: true },
+      ],
+      excluded_items: [
+        { text: '個人護照及簽證費用', included: false },
+        { text: '行程外之自費行程', included: false },
+        { text: '個人消費及小費', included: false },
+        { text: '行李超重費用', included: false },
+        { text: '單人房差價', included: false },
+      ],
+      notes: [
+        '本報價單有效期限至 2026/1/6，逾期請重新報價。',
+        '最終價格以確認訂單時之匯率及費用為準。',
+        '如遇旺季或特殊節日，價格可能會有調整。',
+        '出發前 30 天內取消，需支付團費 30% 作為取消費。',
+        '出發前 14 天內取消，需支付團費 50% 作為取消費。',
+        '出發前 7 天內取消，需支付團費 100% 作為取消費。',
+      ],
+    },
   })
   const [loading, setLoading] = useState(true)
 
@@ -508,6 +541,9 @@ function NewItineraryPageContent() {
             departureDate: itinerary.departure_date || '',
             tourCode: itinerary.tour_code || '',
             coverImage: itinerary.cover_image || '',
+            coverStyle: itinerary.cover_style || 'original',
+            price: itinerary.price || '',
+            priceNote: itinerary.price_note || '',
             country: itinerary.country || '',
             city: itinerary.city || '',
             status: itinerary.status || '草稿',
@@ -544,6 +580,34 @@ function NewItineraryPageContent() {
             },
             itinerarySubtitle: itinerary.itinerary_subtitle || '',
             dailyItinerary: itinerary.daily_itinerary || [],
+            showPricingDetails: itinerary.pricing_details?.show_pricing_details || false,
+            pricingDetails: itinerary.pricing_details || {
+              show_pricing_details: false,
+              insurance_amount: '500',
+              included_items: [
+                { text: '行程表所列之交通費用', included: true },
+                { text: '行程表所列之住宿費用', included: true },
+                { text: '行程表所列之餐食費用', included: true },
+                { text: '行程表所列之門票費用', included: true },
+                { text: '專業導遊服務', included: true },
+                { text: '旅遊責任險 500 萬元', included: true },
+              ],
+              excluded_items: [
+                { text: '個人護照及簽證費用', included: false },
+                { text: '行程外之自費行程', included: false },
+                { text: '個人消費及小費', included: false },
+                { text: '行李超重費用', included: false },
+                { text: '單人房差價', included: false },
+              ],
+              notes: [
+                '本報價單有效期限至 2026/1/6，逾期請重新報價。',
+                '最終價格以確認訂單時之匯率及費用為準。',
+                '如遇旺季或特殊節日，價格可能會有調整。',
+                '出發前 30 天內取消，需支付團費 30% 作為取消費。',
+                '出發前 14 天內取消，需支付團費 50% 作為取消費。',
+                '出發前 7 天內取消，需支付團費 100% 作為取消費。',
+              ],
+            },
             version_records: itinerary.version_records || [],
           })
           // 重置版本索引到主版本
@@ -958,9 +1022,11 @@ function NewItineraryPageContent() {
                   meetingPoints: tourData.meetingInfo ? [tourData.meetingInfo] : [],
                   hotels: [],
                   countries: [],
-                  showFeatures: true,
-                  showLeaderMeeting: true,
-                  showHotels: false,
+                  showFeatures: tourData.showFeatures !== false,
+                  showLeaderMeeting: tourData.showLeaderMeeting !== false,
+                  showHotels: tourData.showHotels || false,
+                  showPricingDetails: tourData.showPricingDetails || false,
+                  pricingDetails: tourData.pricingDetails,
                 }}
                 onChange={(newData) => {
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -969,6 +1035,8 @@ function NewItineraryPageContent() {
                     ...restData,
                     status: tourData.status,
                     meetingInfo: meetingPoints?.[0] || { time: '', location: '' },
+                    showPricingDetails: newData.showPricingDetails,
+                    pricingDetails: newData.pricingDetails,
                   });
                 }}
               />

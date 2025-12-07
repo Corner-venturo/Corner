@@ -54,8 +54,9 @@ export interface Quote extends BaseEntity {
   quick_quote_items?: QuickQuoteItem[] // 快速報價單的收費明細項目
 
   // 擴展欄位（用於詳細頁）
-  categories?: QuoteCategory[] // 報價分類
-  versions?: QuoteVersion[] // 歷史版本
+  categories?: QuoteCategory[] // 報價分類（臨時編輯狀態）
+  versions?: QuoteVersion[] // 歷史版本（所有版本都存在這裡）
+  current_version_index?: number // 當前編輯的版本索引（對應 versions 陣列）
   participant_counts?: Record<string, number> // 參與人數統計
   selling_prices?: Record<string, number> // 銷售價格
 }
@@ -79,7 +80,9 @@ export interface QuickQuoteItem {
 export interface QuoteVersion extends BaseEntity {
   quote_id: string // 報價單 ID
   version: number // 版本號
+  name: string // 版本名稱（如：客戶名稱、報價單名稱）
   total_amount: number // 總金額
+  total_cost?: number // 總成本
   changes?: string // 變更說明
   note?: string // 備註說明
   created_by?: string // 建立人 ID

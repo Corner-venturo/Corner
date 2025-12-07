@@ -4,30 +4,63 @@ import React, { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw } from 'lucide-react'
+import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useItineraries, useEmployees } from '@/hooks/cloud-hooks'
+import { useRegionsStore } from '@/stores/region-store'
 import type { Itinerary } from '@/stores/types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 
-const statusFilters = ['全部', '草稿', '已發布', '封存']
+const statusFilters = ['全部', '草稿', '已發布', '公司範例', '結案']
+
+// 公司密碼（統編）
+const COMPANY_PASSWORD = '83212711'
 
 export default function ItineraryPage() {
   const router = useRouter()
   const { items: itineraries, delete: deleteItinerary, update: updateItinerary } = useItineraries()
   const { items: employees } = useEmployees()
+  const regionsStore = useRegionsStore()
+  const countries = regionsStore.countries
+  const cities = regionsStore.cities
   const [statusFilter, setStatusFilter] = useState<string>('全部')
+
+  // 載入地區資料（只執行一次）
+  React.useEffect(() => {
+    regionsStore.fetchAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 根據 ID 取得國家名稱
+  const getCountryName = useCallback((countryId?: string) => {
+    if (!countryId) return '-'
+    const country = countries.find(c => c.id === countryId)
+    return country?.name || countryId
+  }, [countries])
+
+  // 根據 ID 取得城市名稱
+  const getCityName = useCallback((cityId?: string) => {
+    if (!cityId) return '-'
+    const city = cities.find(c => c.id === cityId)
+    return city?.name || cityId
+  }, [cities])
 
   // 根據 created_by ID 查找員工名稱
   const getEmployeeName = useCallback((employeeId?: string) => {
     if (!employeeId) return '-'
     const employee = employees.find(e => e.id === employeeId)
-    return employee?.name || '-'
+    return employee?.chinese_name || employee?.display_name || '-'
   }, [employees])
   const [searchTerm, setSearchTerm] = useState('')
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
+
+  // 密碼解鎖對話框狀態
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
+  const [passwordInput, setPasswordInput] = useState('')
+  const [pendingEditId, setPendingEditId] = useState<string | null>(null)
 
   // 打開類型選擇對話框
   const handleOpenTypeSelect = useCallback(() => {
@@ -108,6 +141,130 @@ export default function ItineraryPage() {
     [deleteItinerary]
   )
 
+  // 設為公司範例
+  const handleSetTemplate = useCallback(
+    async (id: string, isTemplate: boolean) => {
+      try {
+        await updateItinerary(id, { is_template: isTemplate })
+        await alertSuccess(isTemplate ? '已設為公司範例！' : '已取消公司範例！')
+      } catch (error) {
+        await alertError('操作失敗，請稍後再試')
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 手動結案
+  const handleClose = useCallback(
+    async (id: string) => {
+      const confirmed = await confirm('確定要結案這個行程嗎？結案後仍可在「結案」分頁中查看。', {
+        type: 'warning',
+        title: '結案行程',
+      })
+      if (confirmed) {
+        try {
+          await updateItinerary(id, { closed_at: new Date().toISOString() })
+          await alertSuccess('已結案！')
+        } catch (error) {
+          await alertError('結案失敗，請稍後再試')
+        }
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 取消結案
+  const handleReopen = useCallback(
+    async (id: string) => {
+      try {
+        await updateItinerary(id, { closed_at: null })
+        await alertSuccess('已重新開啟！')
+      } catch (error) {
+        await alertError('操作失敗，請稍後再試')
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 發布行程
+  const handlePublish = useCallback(
+    async (id: string) => {
+      const confirmed = await confirm('確定要發布這個行程嗎？發布後需要密碼才能編輯。', {
+        type: 'warning',
+        title: '發布行程',
+      })
+      if (confirmed) {
+        try {
+          await updateItinerary(id, { status: 'published' })
+          await alertSuccess('已發布！')
+        } catch (error) {
+          await alertError('發布失敗，請稍後再試')
+        }
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 取消發布（改回草稿）
+  const handleUnpublish = useCallback(
+    async (id: string) => {
+      const confirmed = await confirm('確定要取消發布嗎？行程將變回草稿狀態。', {
+        type: 'warning',
+        title: '取消發布',
+      })
+      if (confirmed) {
+        try {
+          await updateItinerary(id, { status: 'draft' })
+          await alertSuccess('已改回草稿！')
+        } catch (error) {
+          await alertError('操作失敗，請稍後再試')
+        }
+      }
+    },
+    [updateItinerary]
+  )
+
+  // 處理行程點擊（已發布需密碼解鎖）
+  const handleRowClick = useCallback(
+    (itinerary: Itinerary) => {
+      // 如果是已發布狀態，需要密碼解鎖
+      if (itinerary.status === 'published') {
+        setPendingEditId(itinerary.id)
+        setPasswordInput('')
+        setIsPasswordDialogOpen(true)
+      } else {
+        router.push(`/itinerary/${itinerary.id}`)
+      }
+    },
+    [router]
+  )
+
+  // 密碼驗證
+  const handlePasswordSubmit = useCallback(() => {
+    if (passwordInput === COMPANY_PASSWORD) {
+      setIsPasswordDialogOpen(false)
+      if (pendingEditId) {
+        router.push(`/itinerary/${pendingEditId}`)
+      }
+    } else {
+      alertError('密碼錯誤！')
+    }
+  }, [passwordInput, pendingEditId, router])
+
+  // 判斷行程是否已結案（手動結案或日期過期）
+  const isItineraryClosed = useCallback((itinerary: Itinerary) => {
+    // 手動結案
+    if (itinerary.closed_at) return true
+    // 日期過期自動結案
+    if (itinerary.departure_date) {
+      const departureDate = new Date(itinerary.departure_date)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return departureDate < today
+    }
+    return false
+  }, [])
+
   // 表格配置
   const tableColumns: TableColumn<Itinerary>[] = useMemo(
     () => [
@@ -136,7 +293,7 @@ export default function ItineraryPage() {
         render: (_value, itinerary) => (
           <div className="flex items-center text-sm text-morandi-secondary">
             <MapPin size={14} className="mr-1" />
-            {itinerary.country} · {itinerary.city}
+            {getCountryName(itinerary.country)} · {getCityName(itinerary.city)}
           </div>
         ),
       },
@@ -155,16 +312,41 @@ export default function ItineraryPage() {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (_value, itinerary) => (
-          <span
-            className={cn(
-              'text-sm font-medium',
-              itinerary.status === 'published' ? 'text-green-600' : 'text-gray-600'
-            )}
-          >
-            {itinerary.status === 'published' ? '已發布' : '草稿'}
-          </span>
-        ),
+        render: (_value, itinerary) => {
+          const isClosed = isItineraryClosed(itinerary)
+          const isTemplate = itinerary.is_template
+
+          // 優先顯示結案狀態
+          if (isClosed) {
+            return (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                結案
+              </span>
+            )
+          }
+          // 公司範例顯示特殊標籤
+          if (isTemplate) {
+            return (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-gold/10 text-morandi-gold">
+                <Building2 size={10} />
+                公司範例
+              </span>
+            )
+          }
+          // 一般狀態（支援中英文 status）
+          if (itinerary.status === 'published' || itinerary.status === '已發布') {
+            return (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-green/10 text-morandi-green">
+                已發布
+              </span>
+            )
+          }
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-muted/20 text-morandi-secondary">
+              草稿
+            </span>
+          )
+        },
       },
       {
         key: 'created_by',
@@ -191,8 +373,41 @@ export default function ItineraryPage() {
         label: '操作',
         render: (_value, itinerary) => {
           const isArchived = !!itinerary.archived_at
+          const isClosed = isItineraryClosed(itinerary)
+          const isTemplate = itinerary.is_template
+          const isPublished = itinerary.status === 'published' || itinerary.status === '已發布'
+          const isDraft = itinerary.status === 'draft' || itinerary.status === '草稿' || !itinerary.status
+
           return (
             <div className="flex items-center gap-1">
+              {/* 發布/取消發布 - 只有非公司範例才顯示 */}
+              {!isTemplate && !isClosed && !isArchived && (
+                isPublished ? (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleUnpublish(itinerary.id)
+                    }}
+                    className="p-1 text-morandi-green hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                    title="取消發布（改回草稿）"
+                  >
+                    <FileEdit size={14} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handlePublish(itinerary.id)
+                    }}
+                    className="p-1 text-morandi-secondary hover:text-morandi-green hover:bg-morandi-green/10 rounded transition-colors"
+                    title="發布行程"
+                  >
+                    <Globe size={14} />
+                  </button>
+                )
+              )}
+
+              {/* 產生分享連結 */}
               <button
                 onClick={e => {
                   e.stopPropagation()
@@ -212,6 +427,8 @@ export default function ItineraryPage() {
               >
                 <Eye size={14} />
               </button>
+
+              {/* 複製行程 */}
               <button
                 onClick={e => {
                   e.stopPropagation()
@@ -222,6 +439,53 @@ export default function ItineraryPage() {
               >
                 <Copy size={14} />
               </button>
+
+              {/* 結案相關操作 */}
+              {isClosed ? (
+                <button
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleReopen(itinerary.id)
+                  }}
+                  className="p-1 text-blue-500/60 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  title="重新開啟"
+                >
+                  <RotateCcw size={14} />
+                </button>
+              ) : (
+                <>
+                  {/* 設為/取消公司範例 */}
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleSetTemplate(itinerary.id, !isTemplate)
+                    }}
+                    className={cn(
+                      'p-1 rounded transition-colors',
+                      isTemplate
+                        ? 'text-purple-600 hover:text-purple-700 hover:bg-purple-50'
+                        : 'text-morandi-secondary hover:text-purple-600 hover:bg-purple-50'
+                    )}
+                    title={isTemplate ? '取消公司範例' : '設為公司範例'}
+                  >
+                    <Building2 size={14} />
+                  </button>
+
+                  {/* 結案按鈕 */}
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleClose(itinerary.id)
+                    }}
+                    className="p-1 text-morandi-secondary hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                    title="結案"
+                  >
+                    <CheckCircle2 size={14} />
+                  </button>
+                </>
+              )}
+
+              {/* 封存操作 */}
               {isArchived ? (
                 <>
                   <button
@@ -262,26 +526,38 @@ export default function ItineraryPage() {
         },
       },
     ],
-    [handleDelete, handleDuplicate, handleArchive, handleUnarchive, getEmployeeName]
+    [handleDelete, handleDuplicate, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getCountryName, getCityName]
   )
 
   // 過濾資料
   const filteredItineraries = useMemo(() => {
     let filtered = itineraries
 
-    // 狀態篩選
-    if (statusFilter === '封存') {
-      // 顯示已封存的項目
-      filtered = filtered.filter(item => !!item.archived_at)
-    } else {
-      // 其他分頁：只顯示未封存的項目
-      filtered = filtered.filter(item => !item.archived_at)
-
-      if (statusFilter === '草稿') {
-        filtered = filtered.filter(item => item.status === 'draft')
-      } else if (statusFilter === '已發布') {
-        filtered = filtered.filter(item => item.status === 'published')
-      }
+    // 狀態篩選（移除封存分頁，改用新的五種分頁）
+    switch (statusFilter) {
+      case '草稿':
+        // 草稿：未發布、未結案、未封存（支援中英文 status）
+        filtered = filtered.filter(
+          item => (item.status === 'draft' || item.status === '草稿') && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+        )
+        break
+      case '已發布':
+        // 已發布：已發布、未結案、未封存、非公司範例（支援中英文 status）
+        filtered = filtered.filter(
+          item => (item.status === 'published' || item.status === '已發布') && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+        )
+        break
+      case '公司範例':
+        // 公司範例：is_template = true、未封存
+        filtered = filtered.filter(item => item.is_template && !item.archived_at)
+        break
+      case '結案':
+        // 結案：手動結案或日期過期、未封存
+        filtered = filtered.filter(item => isItineraryClosed(item) && !item.archived_at)
+        break
+      default:
+        // 全部：排除封存的和公司範例
+        filtered = filtered.filter(item => !item.archived_at && !item.is_template)
     }
 
     // 搜尋 - 搜尋所有文字欄位
@@ -299,7 +575,7 @@ export default function ItineraryPage() {
     }
 
     return filtered
-  }, [itineraries, statusFilter, searchTerm])
+  }, [itineraries, statusFilter, searchTerm, isItineraryClosed])
 
   return (
     <div className="h-full flex flex-col">
@@ -363,12 +639,48 @@ export default function ItineraryPage() {
         </DialogContent>
       </Dialog>
 
+      {/* 密碼解鎖對話框 */}
+      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>編輯已發布行程</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-morandi-secondary mb-4">
+              此行程已發布，為避免誤觸修改，請輸入公司密碼以解鎖編輯。
+            </p>
+            <Input
+              type="password"
+              placeholder="請輸入公司密碼"
+              value={passwordInput}
+              onChange={e => setPasswordInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handlePasswordSubmit()
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPasswordDialogOpen(false)}
+            >
+              取消
+            </Button>
+            <Button onClick={handlePasswordSubmit}>
+              確認
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="flex-1 overflow-hidden">
         <div className="h-full">
           <EnhancedTable
             columns={tableColumns as TableColumn[]}
             data={filteredItineraries}
-            onRowClick={(itinerary) => router.push(`/itinerary/${(itinerary as Itinerary).id}`)}
+            onRowClick={(itinerary) => handleRowClick(itinerary as Itinerary)}
           />
         </div>
       </div>

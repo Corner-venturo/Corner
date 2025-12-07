@@ -72,6 +72,36 @@ export interface HotelInfo {
   image?: string
 }
 
+// 費用包含/不含項目
+export interface PricingItem {
+  text: string // 項目文字
+  included: boolean // 是否包含
+}
+
+// 詳細團費資訊
+export interface PricingDetails {
+  show_pricing_details?: boolean // 是否顯示詳細團費
+  insurance_amount?: '250' | '300' | '500' | string // 旅遊責任險金額（萬元），可選擇或自訂
+  included_items: PricingItem[] // 費用包含項目
+  excluded_items: PricingItem[] // 費用不含項目
+  notes: string[] // 注意事項
+}
+
+// 價格方案（如 4人包團、6人包團、8人包團）
+export interface PriceTier {
+  label: string // 如「4人包團」、「6人包團」
+  sublabel?: string // 如「每人」
+  price: string // 如「34,500」
+  priceNote?: string // 如「起」
+  addon?: string // 如「加購1日包車 / 每人+NT$900」
+}
+
+// 常見問題
+export interface FAQ {
+  question: string // 問題
+  answer: string // 答案
+}
+
 export interface TourCountry {
   country_id: string
   country_name: string
@@ -80,6 +110,8 @@ export interface TourCountry {
   main_city_name?: string
   is_primary: boolean // 是否為主要國家
 }
+
+export type CoverStyleType = 'original' | 'gemini'
 
 export interface TourFormData {
   tagline: string
@@ -92,6 +124,9 @@ export interface TourFormData {
   departureDate: string
   tourCode: string
   coverImage?: string
+  coverStyle?: CoverStyleType // 封面風格：original（原版）或 gemini（Gemini 風格）
+  price?: string // 價格（如：39,800）
+  priceNote?: string // 價格備註（如：起、/人）
   outboundFlight: FlightInfo
   returnFlight: FlightInfo
   features: Feature[]
@@ -102,6 +137,12 @@ export interface TourFormData {
   showFeatures?: boolean // 是否顯示行程特色區塊
   showLeaderMeeting?: boolean // 是否顯示領隊與集合資訊
   showHotels?: boolean // 是否顯示飯店資訊
+  showPricingDetails?: boolean // 是否顯示詳細團費
+  pricingDetails?: PricingDetails // 詳細團費資訊
+  priceTiers?: PriceTier[] // 價格方案（多種人數價格）
+  showPriceTiers?: boolean // 是否顯示價格方案區塊
+  faqs?: FAQ[] // 常見問題
+  showFaqs?: boolean // 是否顯示常見問題區塊
   itinerarySubtitle: string
   dailyItinerary: DailyItinerary[]
 }

@@ -298,6 +298,21 @@ export interface DailyItineraryDay {
   images?: string[]
 }
 
+// 費用包含/不含項目
+export interface PricingItem {
+  text: string // 項目文字
+  included: boolean // 是否包含
+}
+
+// 詳細團費資訊
+export interface PricingDetails {
+  show_pricing_details?: boolean // 是否顯示詳細團費
+  insurance_amount?: '250' | '300' | '500' | string // 旅遊責任險金額（萬元），可選擇或自訂
+  included_items: PricingItem[] // 費用包含項目
+  excluded_items: PricingItem[] // 費用不含項目
+  notes: string[] // 注意事項
+}
+
 // 行程表版本記錄（存在同一筆資料的 JSON 陣列裡）
 export interface ItineraryVersionRecord {
   id: string // UUID
@@ -329,6 +344,9 @@ export interface Itinerary {
   country: string
   city: string
   status: 'draft' | 'published'
+  cover_style?: 'original' | 'gemini' // 封面風格
+  price?: string // 價格（如：39,800）
+  price_note?: string // 價格備註（如：起、/人）
 
   // 航班資訊
   outbound_flight?: FlightInfo
@@ -357,6 +375,13 @@ export interface Itinerary {
 
   // 版本記錄（像 Excel 分頁）
   version_records?: ItineraryVersionRecord[]
+
+  // 狀態相關欄位
+  is_template?: boolean // 是否為公司範例行程
+  closed_at?: string | null // 結案時間
+
+  // 詳細團費
+  pricing_details?: PricingDetails
 
   created_at: string
   updated_at: string
@@ -463,11 +488,12 @@ export interface Quote {
     infant: number
   }
 
-  categories?: QuoteCategory[] // 費用分類（標準報價單用）
+  categories?: QuoteCategory[] // 費用分類（標準報價單用）- 臨時編輯狀態
   total_cost?: number // 總成本
   total_amount?: number // 總金額
-  version?: number // 版本號
-  versions?: QuoteVersion[] // 版本歷史
+  version?: number // 版本號（向下相容）
+  versions?: QuoteVersion[] // 版本歷史（所有版本都存在這裡）
+  current_version_index?: number // 當前編輯的版本索引（對應 versions 陣列）
   created_at: string
   updated_at: string
 }
@@ -487,9 +513,10 @@ export interface QuickQuoteItem {
 export interface QuoteVersion {
   id: string
   version: number
+  name: string // 版本名稱（如：客戶名稱、報價單名稱）
   categories: QuoteCategory[]
   total_cost: number
-  group_size: number // 團體人數
+  group_size?: number // 團體人數
   accommodation_days: number // 住宿天數
   participant_counts: {
     adult: number

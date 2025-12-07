@@ -1,12 +1,14 @@
 import React, { useMemo, useState } from 'react'
-import { TourFormData, CityOption } from '../types'
+import { TourFormData, CityOption, CoverStyleType } from '../types'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Upload } from 'lucide-react'
+import { Upload, Check } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { toHalfWidth } from '@/lib/utils/text'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -67,6 +69,35 @@ export function CoverInfoSection({
     return images
   }, [data.city, cities])
 
+  // 從 URL 提取檔名（用於刪除舊圖片）
+  const extractFileNameFromUrl = (url: string): string | null => {
+    if (!url) return null
+    // URL 格式: https://xxx.supabase.co/storage/v1/object/public/city-backgrounds/itinerary_xxx.jpg
+    const match = url.match(/city-backgrounds\/([^?]+)/)
+    return match ? match[1] : null
+  }
+
+  // 刪除 Storage 中的圖片
+  const deleteStorageImage = async (url: string) => {
+    const fileName = extractFileNameFromUrl(url)
+    if (!fileName) return
+
+    // 只刪除 itinerary_ 開頭的圖片（避免刪除城市預設圖片）
+    if (!fileName.startsWith('itinerary_')) return
+
+    try {
+      const { error } = await supabase.storage
+        .from('city-backgrounds')
+        .remove([fileName])
+
+      if (error) {
+        console.warn('刪除舊圖片失敗:', error)
+      }
+    } catch (err) {
+      console.warn('刪除舊圖片時發生錯誤:', err)
+    }
+  }
+
   // 上傳圖片
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -86,6 +117,9 @@ export function CoverInfoSection({
 
     setUploading(true)
 
+    // 記錄舊圖片 URL（上傳成功後刪除）
+    const oldCoverImage = data.coverImage
+
     try {
       // 生成唯一檔名（避免中文字元）
       const timestamp = Date.now()
@@ -95,7 +129,7 @@ export function CoverInfoSection({
       const filePath = `${fileName}`
 
       // 上傳到 Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('city-backgrounds')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -106,6 +140,11 @@ export function CoverInfoSection({
 
       // 取得公開網址
       const { data: urlData } = supabase.storage.from('city-backgrounds').getPublicUrl(filePath)
+
+      // 刪除舊的自訂上傳圖片（如果有）
+      if (oldCoverImage) {
+        await deleteStorageImage(oldCoverImage)
+      }
 
       // 更新表單資料
       updateField('coverImage', urlData.publicUrl)
@@ -158,56 +197,112 @@ export function CoverInfoSection({
     }
   }
 
+  // 封面風格選項
+  const coverStyleOptions: { value: CoverStyleType; label: string; description: string }[] = [
+    {
+      value: 'original',
+      label: '經典全屏',
+      description: '全螢幕背景圖片，文字置中，帶動畫效果',
+    },
+    {
+      value: 'gemini',
+      label: 'Gemini 風格',
+      description: '精緻小巧，底部文字佈局，金色主題',
+    },
+  ]
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2">
+    <div className="space-y-2">
+      <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-1">
         封面設定
       </h2>
 
+      {/* 封面風格選擇器 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">標籤文字</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">封面風格</label>
+        <div className="grid grid-cols-2 gap-2">
+          {coverStyleOptions.map((option) => {
+            const isSelected = (data.coverStyle || 'original') === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => updateField('coverStyle', option.value)}
+                className={cn(
+                  'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
+                  isSelected
+                    ? 'border-morandi-gold bg-morandi-gold/5 ring-2 ring-morandi-gold/30'
+                    : 'border-morandi-container hover:border-morandi-gold/50 bg-white'
+                )}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className={cn(
+                    'font-medium text-sm',
+                    isSelected ? 'text-morandi-gold' : 'text-morandi-primary'
+                  )}>
+                    {option.label}
+                  </span>
+                  {isSelected && (
+                    <div className="w-4 h-4 rounded-full bg-morandi-gold flex items-center justify-center">
+                      <Check size={10} className="text-white" />
+                    </div>
+                  )}
+                </div>
+                <span className="text-[11px] text-morandi-secondary leading-tight">{option.description}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-morandi-primary mb-0.5">標籤文字</label>
         <Input
           type="text"
           value={data.tagline || ''}
           onChange={e => updateField('tagline', e.target.value)}
           placeholder="Venturo Travel 2025 秋季精選"
+          className="h-8"
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">主標題</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">主標題</label>
           <Input
             type="text"
             value={data.title || ''}
             onChange={e => updateField('title', e.target.value)}
             placeholder="漫遊福岡"
+            className="h-8"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">副標題</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">副標題</label>
           <Input
             type="text"
             value={data.subtitle || ''}
             onChange={e => updateField('subtitle', e.target.value)}
             placeholder="半自由行"
+            className="h-8"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-0.5">描述</label>
         <Input
           type="text"
           value={data.description || ''}
           onChange={e => updateField('description', e.target.value)}
           placeholder="2日市區自由活動 · 保證入住溫泉飯店 · 柳川遊船 · 阿蘇火山"
+          className="h-8"
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">國家</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">國家</label>
           <Combobox
             value={selectedCountry}
             onChange={newCountry => {
@@ -229,7 +324,7 @@ export function CoverInfoSection({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">城市</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">城市</label>
           <Combobox
             value={data.city || ''}
             onChange={value => updateCity(value)}
@@ -242,34 +337,70 @@ export function CoverInfoSection({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">出發日期</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">出發日期</label>
           <Input
             type="text"
             value={data.departureDate || ''}
             onChange={e => updateField('departureDate', e.target.value)}
             placeholder="2025/10/21"
+            className="h-8"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">行程代碼</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">行程代碼</label>
           <Input
             type="text"
             value={data.tourCode || ''}
             onChange={e => updateField('tourCode', e.target.value)}
             placeholder="25JFO21CIG"
+            className="h-8"
           />
+        </div>
+      </div>
+
+      {/* 價格設定 */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">價格</label>
+          <Input
+            type="text"
+            value={data.price || ''}
+            onChange={e => {
+              // 先全形轉半形，再移除非數字字元
+              const halfWidthValue = toHalfWidth(e.target.value)
+              const rawValue = halfWidthValue.replace(/[^\d]/g, '')
+              // 加入千分位逗號
+              const formattedValue = rawValue ? Number(rawValue).toLocaleString('en-US') : ''
+              updateField('price', formattedValue)
+            }}
+            placeholder="39,800"
+            className="h-8"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-morandi-primary mb-0.5">單位</label>
+          <select
+            value={data.priceNote || '/人'}
+            onChange={e => updateField('priceNote', e.target.value)}
+            className="w-full h-8 px-3 rounded-md border border-input bg-background text-sm"
+          >
+            <option value="/人">/人</option>
+            <option value="起">起</option>
+            <option value="/人起">/人起</option>
+            <option value="">(不顯示)</option>
+          </select>
         </div>
       </div>
 
       {/* 封面圖片選擇 */}
       {cityImages.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-2">
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
             選擇封面圖片 <span className="text-xs text-morandi-secondary">（來自資料庫）</span>
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {cityImages.map((image, index) => (
               <button
                 key={index}
@@ -284,7 +415,7 @@ export function CoverInfoSection({
                 <img
                   src={image.url}
                   alt={image.label}
-                  className="w-full h-32 object-cover"
+                  className="w-full h-24 object-cover"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
@@ -303,10 +434,10 @@ export function CoverInfoSection({
 
       {/* 上傳圖片 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-2">
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
           或上傳自己的圖片
         </label>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <input
             type="file"
             accept="image/*"
@@ -317,15 +448,15 @@ export function CoverInfoSection({
           />
           <label
             htmlFor="cover-image-upload"
-            className={`flex items-center gap-2 px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium cursor-pointer transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm font-medium cursor-pointer transition-colors ${
               uploading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            <Upload size={16} />
+            <Upload size={14} />
             {uploading ? '上傳中...' : '選擇圖片'}
           </label>
           <span className="text-xs text-morandi-secondary">
-            支援 JPG、PNG、WebP，最大 5MB
+            JPG、PNG、WebP，最大 5MB
           </span>
         </div>
       </div>
@@ -333,12 +464,12 @@ export function CoverInfoSection({
       {/* 目前選擇的圖片預覽 */}
       {data.coverImage && (
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-2">目前封面圖片</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">目前封面圖片</label>
           <div className="relative rounded-lg overflow-hidden border-2 border-morandi-gold">
             <img
               src={data.coverImage}
               alt="封面預覽"
-              className="w-full h-48 object-cover"
+              className="w-full h-32 object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.src = 'https://via.placeholder.com/1200x400?text=圖片載入失敗'

@@ -76,13 +76,14 @@ export interface AccommodationSummaryItem {
 export interface VersionRecord {
   id: string
   version: number
+  name?: string // 版本名稱（如：客戶名稱、報價單名稱）- 可選以向下兼容
   categories: CostCategory[]
   total_cost: number
-  group_size: number
+  group_size?: number
   accommodation_days: number
   participant_counts: ParticipantCounts
   selling_prices: SellingPrices
-  note: string
+  note?: string // 版本備註
   created_at: string
 }
 

@@ -17,6 +17,7 @@ import { Tour } from '@/types/tour.types'
 
 interface QuoteWithVersions extends Omit<Quote, 'versions'> {
   versions?: VersionRecord[]
+  current_version_index?: number
 }
 
 interface QuoteHeaderProps {
@@ -203,14 +204,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           <div className="h-4 w-px bg-morandi-container" />
 
           <Button
-            onClick={() => {
-              // 如果沒有版本記錄，第一次儲存要跳出對話框問版本名稱
-              if (!quote?.versions || quote.versions.length === 0) {
-                setIsSaveDialogOpen(true)
-              } else {
-                handleSave()
-              }
-            }}
+            onClick={() => handleSave()}
             disabled={isReadOnly}
             className={cn(
               'h-8 px-3 text-sm transition-all duration-200',
@@ -253,27 +247,30 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 版本歷史
               </div>
 
-              {/* 歷史版本 */}
+              {/* 歷史版本：所有版本都在 versions[] 陣列中 */}
               {quote?.versions && quote.versions.length > 0 ? (
                 <>
                   {quote.versions
-                    .sort((a: VersionRecord, b: VersionRecord) => b.version - a.version)
-                    .map((version: VersionRecord, index: number) => {
-                      const isCurrentEditing = currentEditingVersion === index
+                    .map((version: VersionRecord, originalIndex: number) => ({ version, originalIndex }))
+                    .sort((a, b) => b.version.version - a.version.version)
+                    .map(({ version, originalIndex }) => {
+                      const isCurrentEditing = currentEditingVersion === originalIndex ||
+                        (currentEditingVersion === null && quote.current_version_index === originalIndex)
                       return (
                         <DropdownMenuItem
                           key={version.id}
                           className="flex items-center justify-between py-2 cursor-pointer hover:bg-morandi-container/30 relative"
-                          onMouseEnter={() => setHoveredVersionIndex(index)}
+                          onMouseEnter={() => setHoveredVersionIndex(originalIndex)}
                           onMouseLeave={() => setHoveredVersionIndex(null)}
-                          onClick={() => handleLoadVersion(index, version)}
+                          onClick={() => handleLoadVersion(originalIndex, version)}
                         >
                           <div className="flex flex-col flex-1">
                             <span className="font-medium">
-                              {version.note || `版本 ${version.version}`}
+                              {version.name || `版本 ${version.version}`}
                             </span>
                             <span className="text-xs text-morandi-secondary">
                               {formatDateTime(version.created_at)}
+                              {version.note && ` - ${version.note}`}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -283,11 +280,11 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                             {isCurrentEditing && (
                               <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>
                             )}
-                            {hoveredVersionIndex === index && (
+                            {hoveredVersionIndex === originalIndex && (
                               <button
                                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                   e.stopPropagation()
-                                  handleDeleteVersion(index)
+                                  handleDeleteVersion(originalIndex)
                                 }}
                                 className="p-1 hover:bg-red-100 rounded transition-colors"
                                 title="刪除版本"
@@ -302,7 +299,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 </>
               ) : (
                 <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-                  尚無版本，點擊「另存新版本」創建第一個版本
+                  尚無版本，點擊「儲存」創建第一個版本
                 </div>
               )}
             </DropdownMenuContent>
