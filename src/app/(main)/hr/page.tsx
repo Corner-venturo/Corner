@@ -25,15 +25,12 @@ export default function HRPage() {
   const [isSalaryPaymentDialogOpen, setIsSalaryPaymentDialogOpen] = useState(false)
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  // 初始化時載入員工和工作空間資料
+  // 初始化時載入員工和工作空間資料（只執行一次）
   useEffect(() => {
-    if (users.length === 0) {
-      fetchAll()
-    }
-    if (workspaces.length === 0) {
-      fetchWorkspaces()
-    }
-  }, [users.length, workspaces.length, fetchAll, fetchWorkspaces])
+    fetchAll()
+    fetchWorkspaces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const getStatusLabel = (status: Employee['status']) => {
     const statusMap = {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useItineraryStore } from '@/stores'
+import { useItineraryStore, useAuthStore } from '@/stores'
 import { useRouter } from 'next/navigation'
 import type { TourFormData } from './tour-form/types'
 import type { ItineraryVersionRecord } from '@/stores/types'
@@ -51,6 +51,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
   const [versionNote, setVersionNote] = useState('')
   const [copied, setCopied] = useState(false)
   const { create, update } = useItineraryStore()
+  const { user } = useAuthStore()
   const router = useRouter()
 
   const versionRecords = data.version_records || []
@@ -130,9 +131,10 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
           await update(data.id, { version_records: updatedRecords })
         }
       } else {
-        // 第一次建立
+        // 第一次建立，帶入登入者 ID
         const newItinerary = await create({
           ...convertedData,
+          created_by: user?.id || undefined,
           version_records: [],
         } as Parameters<typeof create>[0])
 

@@ -27,6 +27,24 @@ const formatPrice = (value: string): string => {
   return Number(numericValue).toLocaleString('en-US')
 }
 
+// 根據方案名稱判斷顏色風格
+const getTierColorClass = (label: string, index: number): string => {
+  const labelLower = label.toLowerCase()
+
+  // 單人房差、加價類用灰色
+  if (labelLower.includes('單人房') || labelLower.includes('加價') || labelLower.includes('加購')) {
+    return 'bg-gray-500'
+  }
+
+  // 主方案（第一個或包含「包團」）用金色
+  if (index === 0 || labelLower.includes('包團') || labelLower.includes('團費')) {
+    return 'bg-morandi-gold'
+  }
+
+  // 其他用深色
+  return 'bg-morandi-primary'
+}
+
 export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceTiersSectionProps) {
   const priceTiers = data.priceTiers
 
@@ -66,8 +84,8 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceT
                 'hover:shadow-lg transition-shadow duration-300'
               )}
             >
-              {/* 標籤頭部 */}
-              <div className="bg-morandi-primary text-white py-3 px-4 text-center">
+              {/* 標籤頭部 - 根據方案類型顯示不同顏色 */}
+              <div className={cn(getTierColorClass(tier.label, index), 'text-white py-3 px-4 text-center')}>
                 <h3 className={cn(
                   'font-bold',
                   isMobile ? 'text-lg' : 'text-xl'

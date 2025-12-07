@@ -100,21 +100,16 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
           className="fixed left-0 right-0 z-40 transition-all duration-300 hidden md:block"
           style={{
             // 滾動後使用深色背景，確保清晰可見
-            backgroundColor: scrollOpacity > 0.3
-              ? `rgba(30, 41, 59, ${Math.min(scrollOpacity * 1.2, 0.95)})` // slate-800
+            backgroundColor: scrollOpacity > 0.1
+              ? `rgba(30, 41, 59, ${Math.min(scrollOpacity * 1.5, 0.95)})` // slate-800
               : 'transparent',
             backdropFilter: scrollOpacity > 0.1 ? 'blur(12px)' : 'none',
-            boxShadow: scrollOpacity > 0.5 ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)' : 'none',
+            boxShadow: scrollOpacity > 0.3 ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)' : 'none',
           }}
         >
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between h-16">
-              <div
-                className="text-xl font-bold transition-colors duration-300 text-white"
-                style={{
-                  textShadow: scrollOpacity < 0.3 ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
-                }}
-              >
+              <div className="text-xl font-bold text-white">
                 Corner Travel
               </div>
               <div className="flex items-center gap-6">
@@ -124,10 +119,7 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
                     <a
                       key={link.href}
                       href={link.href}
-                      className="flex items-center gap-1.5 transition-all hover:text-morandi-gold text-white/90 hover:text-white"
-                      style={{
-                        textShadow: scrollOpacity < 0.3 ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
-                      }}
+                      className="flex items-center gap-1.5 transition-all text-white/90 hover:text-morandi-gold"
                     >
                       <IconComponent className="w-4 h-4" />
                       <span className="text-sm font-medium">{link.title}</span>

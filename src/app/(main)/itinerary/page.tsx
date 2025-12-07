@@ -48,11 +48,11 @@ export default function ItineraryPage() {
     return city?.name || cityId
   }, [cities])
 
-  // 根據 created_by ID 查找員工名稱
+  // 根據 created_by ID 查找員工名稱（優先使用 display_name）
   const getEmployeeName = useCallback((employeeId?: string) => {
     if (!employeeId) return '-'
     const employee = employees.find(e => e.id === employeeId)
-    return employee?.chinese_name || employee?.display_name || '-'
+    return employee?.display_name || employee?.chinese_name || '-'
   }, [employees])
   const [searchTerm, setSearchTerm] = useState('')
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)

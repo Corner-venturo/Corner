@@ -11,13 +11,19 @@ export function useTourScrollEffects({ viewMode, isPreview }: ScrollEffectsOptio
   const [scrollOpacity, setScrollOpacity] = useState(0)
   const [attractionsProgress, setAttractionsProgress] = useState(0)
 
-  // 監聽父容器的滾動事件
+  // 監聯滾動事件（同時支援 window 和父容器滾動）
   useEffect(() => {
     let scrollContainer: HTMLElement | null = null
 
-    const handleScroll = (e: Event) => {
+    const handleContainerScroll = (e: Event) => {
       const target = e.target as HTMLElement
       const scrollTop = target.scrollTop
+      const opacity = Math.min(scrollTop / 150, 1)
+      setScrollOpacity(opacity)
+    }
+
+    const handleWindowScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
       const opacity = Math.min(scrollTop / 150, 1)
       setScrollOpacity(opacity)
     }
@@ -33,20 +39,27 @@ export function useTourScrollEffects({ viewMode, isPreview }: ScrollEffectsOptio
       return findScrollableParent(parent)
     }
 
+    // 先監聽 window 滾動（生產環境通常用這個）
+    window.addEventListener('scroll', handleWindowScroll)
+    // 立即執行一次以取得初始值
+    handleWindowScroll()
+
     const timer = setTimeout(() => {
       const topElement = document.getElementById('top')
       if (topElement) {
         scrollContainer = findScrollableParent(topElement)
         if (scrollContainer) {
-          scrollContainer.addEventListener('scroll', handleScroll)
+          // 如果有父容器滾動，也監聽它（預覽模式可能用這個）
+          scrollContainer.addEventListener('scroll', handleContainerScroll)
         }
       }
     }, 100)
 
     return () => {
       clearTimeout(timer)
+      window.removeEventListener('scroll', handleWindowScroll)
       if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', handleScroll)
+        scrollContainer.removeEventListener('scroll', handleContainerScroll)
       }
     }
   }, [])

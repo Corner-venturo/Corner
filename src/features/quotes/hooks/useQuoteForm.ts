@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { logger } from '@/lib/utils/logger'
 import { DEFAULT_CATEGORIES } from '../constants'
 import { Quote } from '@/stores/types'
+import type { CostItem } from '../types'
 
 interface QuoteFormData {
   name: string
@@ -17,6 +18,9 @@ interface QuoteFormData {
   tour_id: string | null
   is_pinned: boolean
   code: string
+  accommodation_days: number
+  departure_date: string | null
+  return_date: string | null
 }
 
 const initialFormData: QuoteFormData = {
@@ -26,6 +30,9 @@ const initialFormData: QuoteFormData = {
   tour_id: null,
   is_pinned: false,
   code: '',
+  accommodation_days: 0,
+  departure_date: null,
+  return_date: null,
 }
 
 interface UseQuoteFormParams {
@@ -45,7 +52,16 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const initFormWithTour = (tour: { id: string; name: string; max_participants?: number | null }) => {
+  const initFormWithTour = (tour: { id: string; name: string; max_participants?: number | null; departure_date?: string; return_date?: string }) => {
+    // 計算天數（住宿天數 = 總天數 - 1）
+    let accommodationDays = 0
+    if (tour.departure_date && tour.return_date) {
+      const startDate = new Date(tour.departure_date)
+      const endDate = new Date(tour.return_date)
+      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+      accommodationDays = Math.max(0, totalDays - 1) // 住宿天數 = 總天數 - 1
+    }
+
     setFormData({
       name: tour.name,
       status: 'proposed',
@@ -53,6 +69,9 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
       tour_id: tour.id,
       is_pinned: false,
       code: '',
+      accommodation_days: accommodationDays,
+      departure_date: tour.departure_date || null,
+      return_date: tour.return_date || null,
     })
   }
 
@@ -74,14 +93,44 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
       const quoteCode =
         formData.is_pinned && formData.code.trim() ? formData.code.trim().toUpperCase() : undefined
 
+      // 根據住宿天數建立住宿項目
+      const accommodationItems: CostItem[] = []
+      const accommodationDays = formData.accommodation_days
+
+      if (accommodationDays > 0) {
+        for (let day = 1; day <= accommodationDays; day++) {
+          accommodationItems.push({
+            id: `accommodation-day${day}-${Date.now()}-${day}`,
+            name: '',
+            quantity: 0,
+            unit_price: 0,
+            total: 0,
+            note: '',
+            day: day,
+            room_type: '',
+          })
+        }
+      }
+
+      // 建立 categories，包含住宿項目
+      const categories = DEFAULT_CATEGORIES.map(cat => {
+        if (cat.id === 'accommodation') {
+          return {
+            ...cat,
+            items: accommodationItems,
+          }
+        }
+        return { ...cat }
+      })
+
       // 新增報價單並取得完整物件
       const newQuoteObj = await addQuote({
         ...formData,
         group_size: groupSize,
         ...(selectedTourId && { tour_id: selectedTourId }),
         ...(quoteCode && { code: quoteCode }),
-        accommodation_days: 0,
-        categories: DEFAULT_CATEGORIES,
+        accommodation_days: accommodationDays,
+        categories: categories,
         total_cost: 0,
         // 補充必填欄位的預設值
         customer_name: '待指定',

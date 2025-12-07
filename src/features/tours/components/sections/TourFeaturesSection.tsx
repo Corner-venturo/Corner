@@ -364,19 +364,19 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
               </button>
             )}
 
-            {/* 圖片容器 - 統一尺寸 */}
+            {/* 圖片容器 - 統一尺寸（純圖片，不含文字） */}
             <motion.div
               key={lightboxIndex}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="w-[85vw] h-[75vh] max-w-4xl bg-black/50 rounded-lg overflow-hidden flex items-center justify-center"
+              className="flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               <img
                 src={lightboxImages[lightboxIndex]}
                 alt={`圖片 ${lightboxIndex + 1}`}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
               />
             </motion.div>
 

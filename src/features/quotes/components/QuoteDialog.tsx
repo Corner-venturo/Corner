@@ -91,12 +91,23 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
               onChange={value => {
                 if (!value) {
                   setFormField('tour_id', null)
+                  setFormField('accommodation_days', 0)
                 } else {
                   const tour = tours.find(t => t.id === value)
                   if (tour) {
                     setFormField('tour_id', value)
                     setFormField('name', tour.name)
                     setFormField('group_size', tour.max_participants || 1)
+
+                    // 計算住宿天數
+                    let accommodationDays = 0
+                    if (tour.departure_date && tour.return_date) {
+                      const startDate = new Date(tour.departure_date)
+                      const endDate = new Date(tour.return_date)
+                      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+                      accommodationDays = Math.max(0, totalDays - 1)
+                    }
+                    setFormField('accommodation_days', accommodationDays)
                   }
                 }
               }}
