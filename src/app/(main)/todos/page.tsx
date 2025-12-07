@@ -80,6 +80,7 @@ export default function TodosPage() {
 
     return todos.filter(todo => {
       // ✅ 可見性篩選 - 只顯示當前用戶相關的待辦 或 公開待辦
+      // 如果使用者尚未登入，暫時顯示所有待辦（等登入後再過濾）
       if (currentUserId) {
         const isCreator = todo.creator === currentUserId
         const isAssignee = todo.assignee === currentUserId
@@ -96,6 +97,7 @@ export default function TodosPage() {
           return false
         }
       }
+      // 如果 currentUserId 為空（尚未登入），不做可見性過濾，繼續執行後續篩選
 
       // 狀態篩選
       if (statusFilter === 'active') {

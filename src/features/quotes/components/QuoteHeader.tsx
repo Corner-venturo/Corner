@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2 } from 'lucide-react'
+import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2, Map } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,13 +11,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import { ParticipantCounts, VersionRecord } from '../types'
+import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
 import { Quote } from '@/types/quote.types'
 import { Tour } from '@/types/tour.types'
+
+interface QuoteWithCategories extends Quote {
+  categories?: CostCategory[]
+}
 
 interface QuoteWithVersions extends Omit<Quote, 'versions'> {
   versions?: VersionRecord[]
   current_version_index?: number
+  categories?: CostCategory[]
 }
 
 interface QuoteHeaderProps {
@@ -39,8 +44,10 @@ interface QuoteHeaderProps {
   handleCreateTour: () => void
   handleGenerateQuotation: () => void
   handleDeleteVersion: (versionIndex: number) => void
+  handleCreateItinerary?: () => void
   currentEditingVersion: number | null
   router: AppRouterInstance
+  accommodationDays?: number
 }
 
 function History({ size, className }: { size: number; className?: string }) {
@@ -82,8 +89,10 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleCreateTour,
   handleGenerateQuotation,
   handleDeleteVersion,
+  handleCreateItinerary,
   currentEditingVersion,
   router,
+  accommodationDays,
 }) => {
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
 
@@ -304,6 +313,18 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* 建立行程表按鈕 */}
+          {handleCreateItinerary && (
+            <Button
+              onClick={handleCreateItinerary}
+              variant="outline"
+              className="h-8 px-3 text-sm"
+            >
+              <Map size={14} className="mr-1.5" />
+              建立行程表
+            </Button>
+          )}
 
           {quote && quote.status === 'proposed' && (
             <Button

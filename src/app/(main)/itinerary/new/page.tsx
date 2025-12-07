@@ -318,6 +318,15 @@ function NewItineraryPageContent() {
   const tourId = searchParams.get('tour_id')
   const itineraryId = searchParams.get('itinerary_id') // 編輯現有行程
   const type = searchParams.get('type') // 'print' or null (web)
+
+  // 從報價單匯入參數
+  const isFromQuote = searchParams.get('from_quote') === 'true'
+  const quoteId = searchParams.get('quote_id')
+  const quoteName = searchParams.get('quote_name')
+  const daysFromQuote = parseInt(searchParams.get('days') || '0')
+  const mealsFromQuote = searchParams.get('meals') ? JSON.parse(searchParams.get('meals') || '[]') : []
+  const hotelsFromQuote = searchParams.get('hotels') ? JSON.parse(searchParams.get('hotels') || '[]') : []
+  const activitiesFromQuote = searchParams.get('activities') ? JSON.parse(searchParams.get('activities') || '[]') : []
   const { items: tours } = useTourStore()
   const { items: itineraries } = useItineraries()
   const { countries, cities } = useRegionsStore()
@@ -648,6 +657,121 @@ function NewItineraryPageContent() {
       }
 
       if (!tourId) {
+        // 檢查是否從報價單匯入
+        if (isFromQuote && daysFromQuote > 0) {
+          // 建立每日行程的骨架
+          const dailyItinerary: DailyItinerary[] = []
+          for (let i = 0; i < daysFromQuote; i++) {
+            const dayNum = i + 1
+            dailyItinerary.push({
+              dayLabel: `Day ${dayNum}`,
+              date: '',
+              title: '',
+              highlight: '',
+              description: '',
+              images: [],
+              activities: [],
+              recommendations: [],
+              meals: {
+                breakfast: dayNum === 1 ? '溫暖的家' : '飯店內早餐',
+                lunch: '敬請自理',
+                dinner: '敬請自理',
+              },
+              accommodation: dayNum === daysFromQuote ? '' : '待確認',
+            })
+          }
+
+          // 匯入餐食資料
+          mealsFromQuote.forEach((meal: { day: number; type: string; name: string; note?: string }) => {
+            const dayIndex = meal.day - 1
+            if (dayIndex >= 0 && dayIndex < dailyItinerary.length) {
+              const mealName = meal.name + (meal.note ? ` (${meal.note})` : '')
+              switch (meal.type) {
+                case '早餐':
+                  dailyItinerary[dayIndex].meals.breakfast = mealName
+                  break
+                case '午餐':
+                  dailyItinerary[dayIndex].meals.lunch = mealName
+                  break
+                case '晚餐':
+                  dailyItinerary[dayIndex].meals.dinner = mealName
+                  break
+              }
+            }
+          })
+
+          // 匯入住宿資料
+          hotelsFromQuote.forEach((hotel: { day: number; name: string; note?: string }) => {
+            const dayIndex = hotel.day - 1
+            if (dayIndex >= 0 && dayIndex < dailyItinerary.length) {
+              dailyItinerary[dayIndex].accommodation = hotel.name + (hotel.note ? ` (${hotel.note})` : '')
+            }
+          })
+
+          // 匯入活動資料
+          activitiesFromQuote.forEach((activity: { day: number; title: string; description?: string }) => {
+            const dayIndex = activity.day - 1
+            if (dayIndex >= 0 && dayIndex < dailyItinerary.length) {
+              dailyItinerary[dayIndex].activities.push({
+                icon: '🎯',
+                title: activity.title,
+                description: activity.description || '',
+                image: '',
+              })
+            }
+          })
+
+          setTourData({
+            tagline: 'Corner Travel 2025',
+            title: quoteName || '',
+            subtitle: '',
+            description: '',
+            departureDate: '',
+            tourCode: '',
+            coverImage: '',
+            country: '',
+            city: '',
+            status: '草稿',
+            outboundFlight: {
+              airline: '',
+              flightNumber: '',
+              departureAirport: 'TPE',
+              departureTime: '',
+              departureDate: '',
+              arrivalAirport: '',
+              arrivalTime: '',
+              duration: '',
+            },
+            returnFlight: {
+              airline: '',
+              flightNumber: '',
+              departureAirport: '',
+              departureTime: '',
+              departureDate: '',
+              arrivalAirport: 'TPE',
+              arrivalTime: '',
+              duration: '',
+            },
+            features: [],
+            focusCards: [],
+            leader: {
+              name: '',
+              domesticPhone: '',
+              overseasPhone: '',
+            },
+            meetingInfo: {
+              time: '',
+              location: '',
+            },
+            itinerarySubtitle: `${daysFromQuote}天${daysFromQuote - 1}夜精彩旅程規劃`,
+            dailyItinerary,
+          })
+          setLoading(false)
+          hasInitializedRef.current = true
+          lastIdRef.current = currentId
+          return
+        }
+
         // 沒有任何 ID，使用空白資料
         setTourData({
           tagline: 'Corner Travel 2025',
@@ -778,7 +902,8 @@ function NewItineraryPageContent() {
     }
 
     initializeTourData()
-  }, [tourId, itineraryId, tours, itineraries, countries, cities])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tourId, itineraryId, tours, itineraries, countries, cities, isFromQuote, daysFromQuote])
 
   // 計算縮放比例（必須在 early return 之前）
   useEffect(() => {

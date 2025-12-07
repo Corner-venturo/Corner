@@ -18,6 +18,9 @@ export const useQuoteState = () => {
   // 追蹤是否已經建立過新版本，避免重複建立
   const hasCreatedNewVersion = useRef(false)
 
+  // 追蹤是否已經從行程匯入過資料（避免被 quote 載入覆蓋）
+  const hasImportedFromItinerary = useRef(false)
+
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
 
@@ -59,8 +62,10 @@ export const useQuoteState = () => {
     }))
     
     // 如果是從行程頁面來的，自動匯入行程資料
-    if (isFromItinerary) {
+    if (isFromItinerary && (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)) {
+      console.log('[useQuoteState] 初始化時匯入行程資料')
       processedCategories = importDataToCategories(processedCategories)
+      hasImportedFromItinerary.current = true
     }
     
     return processedCategories
@@ -126,14 +131,17 @@ export const useQuoteState = () => {
   // 當 quote 載入後，更新所有狀態
   useEffect(() => {
     if (quote) {
-      if (quote.categories) {
+      // 如果已經從行程匯入過資料，不要用資料庫的 categories 覆蓋
+      if (quote.categories && !hasImportedFromItinerary.current) {
         const loadedCategories = quote.categories.map(cat => ({
           ...cat,
           total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
         }))
         setCategories(loadedCategories)
+      } else if (hasImportedFromItinerary.current) {
+        console.log('[useQuoteState] 跳過 categories 載入（已從行程匯入）')
       }
-      if (quote.accommodation_days !== undefined) {
+      if (quote.accommodation_days !== undefined && !hasImportedFromItinerary.current) {
         setAccommodationDays(quote.accommodation_days)
       }
       if (quote.participant_counts) {

@@ -161,20 +161,20 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <Textarea
-          placeholder="新增備註... (Enter 送出，Shift+Enter 換行)"
+          placeholder="新增備註... (Enter 送出)"
           value={newNote}
           onChange={e => setNewNote(e.target.value)}
           onKeyDown={handleNoteKeyDown}
           {...noteCompositionProps}
-          className="text-sm resize-none border-morandi-container/40 focus-visible:ring-morandi-gold focus-visible:border-morandi-gold shadow-sm"
-          rows={3}
+          className="text-sm resize-none border-morandi-container/40 focus-visible:ring-morandi-gold focus-visible:border-morandi-gold shadow-sm !min-h-0 h-9 py-2"
+          rows={1}
         />
         <Button
           size="sm"
           onClick={addNote}
-          className="bg-morandi-gold hover:bg-morandi-gold/90 shadow-sm"
+          className="bg-morandi-gold hover:bg-morandi-gold/90 shadow-sm h-9"
         >
           新增
         </Button>

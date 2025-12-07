@@ -101,6 +101,95 @@ export default function QuoteDetailPage() {
   })
   const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
 
+  // 建立行程表
+  const handleCreateItinerary = useCallback(() => {
+    if (!quote) return
+
+    // 從報價單分類中提取資料
+    const extractMeals = () => {
+      const mealsCategory = categories.find(cat => cat.id === 'meals')
+      if (!mealsCategory || mealsCategory.items.length === 0) return []
+
+      return mealsCategory.items.map(item => {
+        // 解析名稱格式：「Day 1 午餐 - 餐廳名稱」
+        const nameMatch = item.name.match(/Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*-?\s*(.*)/)
+        if (nameMatch) {
+          return {
+            day: parseInt(nameMatch[1]),
+            type: nameMatch[2],
+            name: nameMatch[3].trim() || item.description || '',
+            note: item.notes || '',
+          }
+        }
+        return {
+          day: 1,
+          type: '午餐',
+          name: item.name || item.description || '',
+          note: item.notes || '',
+        }
+      })
+    }
+
+    const extractHotels = () => {
+      const accommodationCategory = categories.find(cat => cat.id === 'accommodation')
+      if (!accommodationCategory || accommodationCategory.items.length === 0) return []
+
+      return accommodationCategory.items.map(item => {
+        const nameMatch = item.name.match(/Day\s*(\d+)(?:-\d+)?\s*住宿/)
+        return {
+          day: nameMatch ? parseInt(nameMatch[1]) : 1,
+          name: item.description || item.name.replace(/Day\s*\d+(?:-\d+)?\s*住宿\s*-?\s*/, '').trim(),
+          note: item.notes || '',
+        }
+      })
+    }
+
+    const extractActivities = () => {
+      const activitiesCategory = categories.find(cat => cat.id === 'activities')
+      if (!activitiesCategory || activitiesCategory.items.length === 0) return []
+
+      return activitiesCategory.items.map(item => {
+        const nameMatch = item.name.match(/Day\s*(\d+)\s*-?\s*(.*)/)
+        if (nameMatch) {
+          return {
+            day: parseInt(nameMatch[1]),
+            title: nameMatch[2].trim(),
+            description: item.description || item.notes || '',
+          }
+        }
+        return {
+          day: 1,
+          title: item.name,
+          description: item.description || item.notes || '',
+        }
+      })
+    }
+
+    const meals = extractMeals()
+    const hotels = extractHotels()
+    const activities = extractActivities()
+    const days = accommodationDays > 0 ? accommodationDays + 1 : 5
+
+    // 建立 URL 參數
+    const params = new URLSearchParams()
+    params.set('from_quote', 'true')
+    params.set('quote_id', quote.id)
+    params.set('quote_name', quote.name || '')
+    params.set('days', days.toString())
+
+    if (meals.length > 0) {
+      params.set('meals', JSON.stringify(meals))
+    }
+    if (hotels.length > 0) {
+      params.set('hotels', JSON.stringify(hotels))
+    }
+    if (activities.length > 0) {
+      params.set('activities', JSON.stringify(activities))
+    }
+
+    router.push(`/itinerary/new?${params.toString()}`)
+  }, [quote, categories, accommodationDays, router])
+
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: VersionRecord) => {
@@ -223,8 +312,10 @@ export default function QuoteDetailPage() {
         handleCreateTour={handleCreateTour}
         handleGenerateQuotation={handleGenerateQuotation}
         handleDeleteVersion={handleDeleteVersion}
+        handleCreateItinerary={handleCreateItinerary}
         currentEditingVersion={currentEditingVersion}
         router={router}
+        accommodationDays={accommodationDays}
       />
 
       <div className="w-full pb-6">

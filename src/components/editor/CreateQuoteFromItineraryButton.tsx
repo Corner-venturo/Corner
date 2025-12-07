@@ -64,11 +64,15 @@ interface CreateQuoteFromItineraryButtonProps {
 }
 
 // 從行程資料提取餐食資訊（排除自理，早餐通常包含在住宿中不計入）
+// 只提取主行程，排除備選行程（isAlternative = true）
 const extractMealsFromItinerary = (tourData: LocalTourData) => {
   const meals: Array<{ day: number; type: string; name: string; note?: string }> = []
 
   if (tourData.dailyItinerary) {
-    tourData.dailyItinerary.forEach((day, index) => {
+    // 只取主行程（非備選）
+    const mainItinerary = tourData.dailyItinerary.filter(day => !day.isAlternative)
+
+    mainItinerary.forEach((day, index) => {
       const dayNumber = index + 1
 
       if (day.meals) {
@@ -90,11 +94,15 @@ const extractMealsFromItinerary = (tourData: LocalTourData) => {
 }
 
 // 從行程資料提取住宿資訊
+// 只提取主行程，排除備選行程（isAlternative = true）
 const extractHotelsFromItinerary = (tourData: LocalTourData) => {
   const hotels: Array<{ day: number; name: string; note?: string }> = []
 
   if (tourData.dailyItinerary) {
-    tourData.dailyItinerary.forEach((day, index) => {
+    // 只取主行程（非備選）
+    const mainItinerary = tourData.dailyItinerary.filter(day => !day.isAlternative)
+
+    mainItinerary.forEach((day, index) => {
       if (day.hotel || day.accommodation) {
         const hotelName = day.hotel || day.accommodation
         if (hotelName && hotelName.trim()) {
@@ -108,11 +116,15 @@ const extractHotelsFromItinerary = (tourData: LocalTourData) => {
 }
 
 // 從行程資料提取景點活動資訊
+// 只提取主行程，排除備選行程（isAlternative = true）
 const extractActivitiesFromItinerary = (tourData: LocalTourData) => {
   const activities: Array<{ day: number; title: string; description?: string }> = []
 
   if (tourData.dailyItinerary) {
-    tourData.dailyItinerary.forEach((day, index) => {
+    // 只取主行程（非備選）
+    const mainItinerary = tourData.dailyItinerary.filter(day => !day.isAlternative)
+
+    mainItinerary.forEach((day, index) => {
       if (day.activities) {
         day.activities.forEach((activity: { title: string; description?: string }) => {
           activities.push({ day: index + 1, title: activity.title, description: activity.description })
@@ -124,10 +136,12 @@ const extractActivitiesFromItinerary = (tourData: LocalTourData) => {
   return activities
 }
 
-// 計算行程天數
+// 計算行程天數（只算主行程，排除備選）
 const calculateDays = (tourData: LocalTourData) => {
   if (tourData.dailyItinerary && tourData.dailyItinerary.length > 0) {
-    return tourData.dailyItinerary.length
+    // 只算主行程（非備選）
+    const mainItinerary = tourData.dailyItinerary.filter(day => !day.isAlternative)
+    return mainItinerary.length
   }
   return tourData.departureDate ? 5 : 1
 }
@@ -138,27 +152,33 @@ const createQuoteFromTourData = (tourData: LocalTourData) => {
   const hotels = extractHotelsFromItinerary(tourData)
   const activities = extractActivitiesFromItinerary(tourData)
   const days = calculateDays(tourData)
+  const nights = days > 0 ? days - 1 : 0
+
+  // 從行程資料取得人數（如果有的話）
+  const groupSize = tourData.groupSize || tourData.group_size || tourData.pax || 1
+  const adultCount = tourData.adultCount || tourData.adult_count || groupSize
 
   const quoteData = {
     name: tourData.title || '未命名行程',
     destination: tourData.city || tourData.country || '未指定',
     start_date: tourData.departureDate ? new Date(tourData.departureDate.replace(/\//g, '-')).toISOString().split('T')[0] : undefined,
     days: days,
-    nights: days > 0 ? days - 1 : 0,
+    nights: nights,
     customer_name: '待指定',
-    group_size: 1,
+    group_size: groupSize,
     status: 'proposed' as const,
     quote_type: 'standard' as const,
     is_active: true,
     is_pinned: false,
     categories: DEFAULT_CATEGORIES,
     total_cost: 0,
+    accommodation_days: nights, // ⭐ 住宿天數 = 晚數
     participant_counts: {
-      adult: 1,
-      child_with_bed: 0,
-      child_no_bed: 0,
-      single_room: 0,
-      infant: 0,
+      adult: adultCount,
+      child_with_bed: tourData.childWithBed || tourData.child_with_bed || 0,
+      child_no_bed: tourData.childNoBed || tourData.child_no_bed || 0,
+      single_room: tourData.singleRoom || tourData.single_room || 0,
+      infant: tourData.infant || 0,
     },
   }
 
@@ -277,6 +297,22 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
       setIsDialogOpen(false)
 
       const { quoteData, mealsData, hotelsData, activitiesData } = createQuoteFromTourData(tourData)
+
+      console.log('[CreateQuote] 提取的資料:', {
+        quoteData,
+        mealsData,
+        hotelsData,
+        activitiesData,
+        tourData: {
+          title: tourData.title,
+          dailyItinerary: tourData.dailyItinerary?.map(d => ({
+            hotel: d.hotel,
+            accommodation: d.accommodation,
+            meals: d.meals,
+          }))
+        }
+      })
+
       const workspaceCode = getWorkspaceCodeFromUser()
       const code = generateCode(workspaceCode, { quoteType: 'standard' }, quotes)
 

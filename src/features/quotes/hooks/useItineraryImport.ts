@@ -59,19 +59,21 @@ export const useItineraryImport = (): UseItineraryImportResult => {
     ? JSON.parse(searchParams.get('activities') || '[]') 
     : []
 
-  // 將餐食資料轉換為報價項目
+  // 將餐食資料轉換為報價項目（排除早餐，因為通常飯店附）
   const convertMealsToQuoteItems = (meals: MealData[]) => {
-    return meals.map((meal, index) => ({
-      id: `meal-${index}`,
-      name: `Day ${meal.day} ${meal.type}`,
-      description: meal.name,
-      quantity: 1,
-      unit_price: 0, // 使用者需要手動設定價格
-      total: 0,
-      notes: `自動帶入：${meal.name}${meal.note ? ` (${meal.note})` : ''}`,
-      order: index,
-      is_group_cost: false
-    }))
+    return meals
+      .filter(meal => meal.type !== '早餐')
+      .map((meal, index) => ({
+        id: `meal-${index}`,
+        name: `Day ${meal.day} ${meal.type} - ${meal.name}`,
+        description: meal.note || '',
+        quantity: 1,
+        unit_price: 0, // 使用者需要手動設定價格
+        total: 0,
+        notes: '',
+        order: index,
+        is_group_cost: false
+      }))
   }
 
   // 將住宿資料轉換為報價項目
@@ -106,12 +108,22 @@ export const useItineraryImport = (): UseItineraryImportResult => {
 
   // 將行程資料匯入到報價分類中
   const importDataToCategories = (categories: CostCategory[]): CostCategory[] => {
+    console.log('[useItineraryImport] importDataToCategories called', {
+      isFromItinerary,
+      hasImportedData,
+      mealsCount: mealsData.length,
+      hotelsCount: hotelsData.length,
+      activitiesCount: activitiesData.length,
+    })
+
     if (!isFromItinerary || hasImportedData || (mealsData.length === 0 && hotelsData.length === 0 && activitiesData.length === 0)) {
+      console.log('[useItineraryImport] Skipping import')
       return categories
     }
 
     // 標記為已匯入，避免重複匯入
     setHasImportedData(true)
+    console.log('[useItineraryImport] Starting import...')
 
     const updatedCategories = [...categories]
 

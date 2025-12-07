@@ -112,6 +112,9 @@ export interface Todo {
   visibility: string[] // 可見人員ID列表 = [creator, assignee]
   is_public?: boolean // 是否公開給全公司（只有建立者+共享者可編輯，其他人只能查看）
 
+  // 行事曆關聯
+  calendar_event_id?: string // 主待辦事項關聯的行事曆事件 ID
+
   // 關聯資料
   related_items: {
     type: 'group' | 'quote' | 'order' | 'invoice' | 'receipt'

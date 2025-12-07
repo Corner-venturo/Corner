@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Calendar, Clock, FileText, X, UserCheck } from 'lucide-react'
+import { Calendar, FileText, X, UserCheck } from 'lucide-react'
 import { AssignmentSectionProps } from './types'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -71,42 +71,46 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
           </div>
         )}
 
-        <div className="flex items-center gap-3">
-          <Calendar size={18} className="text-morandi-secondary" />
-          <span className="text-sm text-morandi-secondary min-w-[60px]">期限:</span>
-          {readOnly ? (
-            <span className={cn('text-sm font-medium', getDeadlineColor())}>
-              {todo.deadline || '未設定'}
-            </span>
-          ) : (
-            <>
-              <Input
-                type="date"
-                value={todo.deadline || ''}
-                onChange={e => onUpdate({ deadline: e.target.value })}
-                className={cn('text-sm font-medium h-8 w-auto', getDeadlineColor())}
-              />
-              {todo.deadline && (
-                <button
-                  onClick={() => onUpdate({ deadline: '' })}
-                  className="p-1 hover:bg-morandi-red/10 rounded text-morandi-secondary hover:text-morandi-red"
-                  title="清除期限"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <Clock size={16} className="text-morandi-secondary" />
-          <span className="text-xs text-morandi-secondary min-w-[50px]">狀態:</span>
-          <div className="flex gap-2 flex-wrap">
+        {/* 期限 + 狀態合併一排 */}
+        <div className="flex items-center gap-4 flex-wrap">
+          {/* 期限 */}
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-morandi-secondary" />
+            {readOnly ? (
+              <span className={cn('text-sm font-medium', getDeadlineColor())}>
+                {todo.deadline || '未設定'}
+              </span>
+            ) : (
+              <>
+                <Input
+                  type="date"
+                  value={todo.deadline || ''}
+                  onChange={e => onUpdate({ deadline: e.target.value })}
+                  className={cn('text-sm font-medium h-8 w-auto', getDeadlineColor())}
+                />
+                {todo.deadline && (
+                  <button
+                    onClick={() => onUpdate({ deadline: '' })}
+                    className="p-1 hover:bg-morandi-red/10 rounded text-morandi-secondary hover:text-morandi-red"
+                    title="清除期限"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* 分隔線 */}
+          <div className="h-6 w-px bg-border" />
+
+          {/* 狀態按鈕 */}
+          <div className="flex gap-1.5 flex-wrap">
             <button
               onClick={() => !readOnly && onUpdate({ status: 'pending' })}
               disabled={readOnly}
               className={cn(
-                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
+                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'pending'
                   ? 'bg-morandi-muted text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-muted/20 text-morandi-secondary',
@@ -120,7 +124,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               onClick={() => !readOnly && onUpdate({ status: 'in_progress' })}
               disabled={readOnly}
               className={cn(
-                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
+                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'in_progress'
                   ? 'bg-morandi-gold text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-gold/20 text-morandi-secondary',
@@ -134,7 +138,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               onClick={() => !readOnly && onUpdate({ status: 'completed' })}
               disabled={readOnly}
               className={cn(
-                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
+                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'completed'
                   ? 'bg-morandi-green text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-green/20 text-morandi-secondary',
@@ -148,7 +152,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               onClick={() => !readOnly && onUpdate({ status: 'cancelled' })}
               disabled={readOnly}
               className={cn(
-                'px-3.5 py-2 text-xs rounded-lg transition-all font-medium',
+                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
                 todo.status === 'cancelled'
                   ? 'bg-morandi-red text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-red/20 text-morandi-secondary',
