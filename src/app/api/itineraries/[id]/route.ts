@@ -86,6 +86,9 @@ export async function GET(
       departureDate: itinerary.departure_date,
       tourCode: itinerary.tour_code,
       coverImage: itinerary.cover_image,
+      coverStyle: itinerary.cover_style,
+      price: itinerary.price,
+      priceNote: itinerary.price_note,
       country: itinerary.country,
       city: itinerary.city,
       status: itinerary.status,
@@ -99,6 +102,21 @@ export async function GET(
       showFeatures: itinerary.show_features,
       showLeaderMeeting: itinerary.show_leader_meeting,
       showHotels: itinerary.show_hotels,
+      // 詳細團費
+      showPricingDetails: itinerary.show_pricing_details,
+      pricingDetails: itinerary.pricing_details,
+      // 價格方案
+      priceTiers: itinerary.price_tiers,
+      showPriceTiers: itinerary.show_price_tiers,
+      // 常見問題
+      faqs: itinerary.faqs,
+      showFaqs: itinerary.show_faqs,
+      // 提醒事項
+      notices: itinerary.notices,
+      showNotices: itinerary.show_notices,
+      // 取消政策
+      cancellationPolicy: itinerary.cancellation_policy,
+      showCancellationPolicy: itinerary.show_cancellation_policy,
       itinerarySubtitle: itinerary.itinerary_subtitle,
       dailyItinerary: itinerary.daily_itinerary,
       versionRecords: itinerary.version_records,
