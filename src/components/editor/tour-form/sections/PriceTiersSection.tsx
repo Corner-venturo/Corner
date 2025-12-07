@@ -6,11 +6,26 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, DollarSign, Users, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Users, GripVertical } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface PriceTiersSectionProps {
   data: TourFormData
   onChange: (data: TourFormData) => void
+}
+
+// 格式化價格（加千分位逗號）
+const formatPrice = (value: string): string => {
+  // 移除非數字字元
+  const numericValue = value.replace(/[^\d]/g, '')
+  if (!numericValue) return ''
+  // 加上千分位逗號
+  return Number(numericValue).toLocaleString('en-US')
+}
+
+// 解析價格（移除逗號）
+const parsePrice = (value: string): string => {
+  return value.replace(/,/g, '')
 }
 
 // 預設價格方案
@@ -103,8 +118,13 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
       {/* 主內容區域 */}
       {data.showPriceTiers && (
         <div className="space-y-4">
-          {/* 價格方案列表 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* 價格方案列表 - 根據數量自適應 */}
+          <div className={cn(
+            'grid gap-4',
+            priceTiers.length === 1 && 'grid-cols-1',
+            priceTiers.length === 2 && 'grid-cols-1 md:grid-cols-2',
+            priceTiers.length >= 3 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+          )}>
             {priceTiers.map((tier, index) => (
               <div
                 key={index}
@@ -155,8 +175,12 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm text-morandi-secondary">NT$</span>
                     <Input
-                      value={tier.price}
-                      onChange={(e) => updatePriceTier(index, { price: e.target.value })}
+                      value={formatPrice(tier.price)}
+                      onChange={(e) => {
+                        // 儲存時移除逗號，只保留數字
+                        const rawValue = parsePrice(e.target.value)
+                        updatePriceTier(index, { price: rawValue })
+                      }}
                       placeholder="34,500"
                       className="flex-1"
                     />

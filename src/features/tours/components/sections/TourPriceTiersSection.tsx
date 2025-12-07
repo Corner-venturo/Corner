@@ -19,6 +19,14 @@ interface TourPriceTiersSectionProps {
   viewMode?: 'desktop' | 'mobile'
 }
 
+// 格式化價格（加千分位逗號）
+const formatPrice = (value: string): string => {
+  if (!value) return ''
+  const numericValue = value.replace(/[^\d]/g, '')
+  if (!numericValue) return value
+  return Number(numericValue).toLocaleString('en-US')
+}
+
 export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceTiersSectionProps) {
   const priceTiers = data.priceTiers
 
@@ -27,6 +35,7 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceT
   }
 
   const isMobile = viewMode === 'mobile'
+  const count = priceTiers.length
 
   return (
     <section className={cn('py-12 bg-white', isMobile && 'py-8')}>
@@ -39,9 +48,14 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceT
           價格方案
         </h2>
 
+        {/* 根據數量自適應版面 */}
         <div className={cn(
           'grid gap-4',
-          isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'
+          isMobile ? 'grid-cols-1' : cn(
+            count === 1 && 'grid-cols-1 max-w-md mx-auto',
+            count === 2 && 'grid-cols-2 max-w-2xl mx-auto',
+            count >= 3 && 'grid-cols-2 lg:grid-cols-3'
+          )
         )}>
           {priceTiers.map((tier, index) => (
             <div
@@ -73,7 +87,7 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceT
                     'font-bold text-morandi-gold',
                     isMobile ? 'text-3xl' : 'text-4xl'
                   )}>
-                    {tier.price || '---'}
+                    {formatPrice(tier.price) || '---'}
                   </span>
                   {tier.priceNote && (
                     <span className="text-sm text-morandi-secondary ml-1">{tier.priceNote}</span>
