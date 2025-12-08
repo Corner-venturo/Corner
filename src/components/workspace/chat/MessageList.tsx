@@ -66,6 +66,17 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
     const employee = employees.find(e => e.id === userId)
     return employee?.display_name || employee?.name || '未知'
   }
+
+  // 合併所有項目為單一列表（必須在 early return 之前）
+  const allItems = useMemo<ListItem[]>(() => {
+    const items: ListItem[] = [
+      ...messages.map(msg => ({ type: 'message' as const, data: msg })),
+      ...advanceLists.map(list => ({ type: 'advanceList' as const, data: list })),
+      ...sharedOrderLists.map(list => ({ type: 'orderList' as const, data: list })),
+    ]
+    return items
+  }, [messages, advanceLists, sharedOrderLists])
+
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
@@ -84,16 +95,6 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
       </div>
     )
   }
-
-  // 合併所有項目為單一列表
-  const allItems = useMemo<ListItem[]>(() => {
-    const items: ListItem[] = [
-      ...messages.map(msg => ({ type: 'message' as const, data: msg })),
-      ...advanceLists.map(list => ({ type: 'advanceList' as const, data: list })),
-      ...sharedOrderLists.map(list => ({ type: 'orderList' as const, data: list })),
-    ]
-    return items
-  }, [messages, advanceLists, sharedOrderLists])
 
   return (
     <div ref={ref} className="flex-1 bg-white" style={{ height: '100%' }}>

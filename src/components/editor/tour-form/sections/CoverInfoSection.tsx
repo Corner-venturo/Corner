@@ -343,7 +343,52 @@ export function CoverInfoSection({
           <Input
             type="text"
             value={data.departureDate || ''}
-            onChange={e => updateField('departureDate', e.target.value)}
+            onChange={e => {
+              // 全形轉半形
+              let value = toHalfWidth(e.target.value)
+              // 移除所有非數字和斜線
+              value = value.replace(/[^\d/]/g, '')
+
+              // 自動辨識格式：20260121 → 2026/01/21
+              if (/^\d{8}$/.test(value)) {
+                value = `${value.slice(0, 4)}/${value.slice(4, 6)}/${value.slice(6, 8)}`
+              }
+              // 自動辨識格式：2026121 → 2026/1/21 或 2026/12/1
+              else if (/^\d{7}$/.test(value)) {
+                // 嘗試解析為 YYYY/M/DD 或 YYYY/MM/D
+                const year = value.slice(0, 4)
+                const rest = value.slice(4)
+                // 優先嘗試 MM/D (如果月份 <= 12)
+                const month1 = rest.slice(0, 2)
+                const day1 = rest.slice(2)
+                if (parseInt(month1) <= 12 && parseInt(day1) >= 1 && parseInt(day1) <= 31) {
+                  value = `${year}/${month1}/${day1}`
+                } else {
+                  // 嘗試 M/DD
+                  const month2 = rest.slice(0, 1)
+                  const day2 = rest.slice(1)
+                  value = `${year}/${month2}/${day2}`
+                }
+              }
+              // 自動辨識格式：202611 → 2026/1/1
+              else if (/^\d{6}$/.test(value)) {
+                value = `${value.slice(0, 4)}/${value.slice(4, 5)}/${value.slice(5, 6)}`
+              }
+
+              updateField('departureDate', value)
+            }}
+            onBlur={e => {
+              // 失焦時格式化：確保月/日都是兩位數
+              const value = e.target.value
+              const match = value.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/)
+              if (match) {
+                const [, year, month, day] = match
+                const formatted = `${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`
+                if (formatted !== value) {
+                  updateField('departureDate', formatted)
+                }
+              }
+            }}
             placeholder="2025/10/21"
             className="h-8"
           />

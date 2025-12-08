@@ -59,6 +59,7 @@ export function ApiSettings() {
     database: 'Supabase 資料庫',
     ocr: 'OCR 辨識服務',
     ai: 'AI 服務',
+    flight: '航班查詢服務',
     payment: '金流服務',
     other: '其他設定',
   }
@@ -67,6 +68,7 @@ export function ApiSettings() {
     database: '🗄️',
     ocr: '📷',
     ai: '🤖',
+    flight: '✈️',
     payment: '💳',
     other: '⚙️',
   }

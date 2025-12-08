@@ -14,7 +14,7 @@ interface ApiConfig {
   docsUrl?: string
   consoleUrl?: string
   usageInfo?: string
-  category: 'database' | 'ocr' | 'ai' | 'payment' | 'other'
+  category: 'database' | 'ocr' | 'ai' | 'payment' | 'flight' | 'other'
 }
 
 // 獲取 API 使用量
@@ -124,6 +124,18 @@ export async function GET() {
       docsUrl: 'https://ai.google.dev/docs',
       usageInfo: geminiUsage || '免費額度：60 次/分鐘（每日約 1,500 次）',
       category: 'ai',
+    },
+
+    // 航班查詢
+    {
+      name: 'AeroDataBox API Key',
+      description: '航班查詢與機場時刻表服務（RapidAPI）',
+      envKey: 'AERODATABOX_API_KEY',
+      value: process.env.AERODATABOX_API_KEY || '',
+      consoleUrl: 'https://rapidapi.com/aedbx-aedbx/api/aerodatabox',
+      docsUrl: 'https://aerodatabox.com/',
+      usageInfo: '免費額度：300 次/月',
+      category: 'flight',
     },
 
     // 應用設定

@@ -75,6 +75,19 @@ export function useTourFormHandlers(
     })
   }
 
+  // 航班資訊批次更新（用於 API 查詢後一次更新多個欄位）
+  const updateFlightFields = (
+    flightType: 'outboundFlight' | 'returnFlight',
+    fields: Record<string, string>
+  ) => {
+    const updatedFlight = { ...data[flightType], ...fields }
+
+    onChange({
+      ...data,
+      [flightType]: updatedFlight,
+    })
+  }
+
   // 特色管理
   const addFeature = () => {
     onChange({
@@ -258,6 +271,7 @@ export function useTourFormHandlers(
     updateCity,
     updateNestedField,
     updateFlightField,
+    updateFlightFields,
     addFeature,
     updateFeature,
     removeFeature,

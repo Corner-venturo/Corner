@@ -112,7 +112,7 @@ export const useQuoteActions = ({
           const firstVersion = {
             id: Date.now().toString(),
             version: 1,
-            name: quote.customer_name || quoteName || '版本 1', // 優先使用客戶名稱
+            name: quoteName || quote.customer_name || '版本 1', // 優先使用行程代碼（quoteName）
             categories: updatedCategories,
             total_cost,
             group_size: groupSize,
@@ -195,7 +195,7 @@ export const useQuoteActions = ({
 
   // 另存新版本
   const handleSaveAsNewVersion = useCallback(
-    (note?: string, setCurrentEditingVersion?: (index: number) => void) => {
+    (newVersionName?: string, setCurrentEditingVersion?: (index: number) => void) => {
       if (!quote) return
 
       try {
@@ -207,17 +207,19 @@ export const useQuoteActions = ({
         const newVersion = maxVersion + 1
 
         // 創建新的版本記錄
+        // 優先使用傳入的 newVersionName，其次使用 versionName state，最後使用預設名稱
+        const finalVersionName = newVersionName || versionName || `版本 ${newVersion}`
         const newVersionRecord = {
           id: Date.now().toString(),
           version: newVersion,
-          name: versionName || `版本 ${newVersion}`, // 版本名稱
+          name: finalVersionName, // 版本名稱
           categories: updatedCategories,
           total_cost,
           group_size: groupSize,
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          note: note || '', // 版本備註
+          note: '', // 版本備註
           created_at: new Date().toISOString(),
         }
 

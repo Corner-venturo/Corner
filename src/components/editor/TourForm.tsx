@@ -144,7 +144,61 @@ export function TourForm({ data, onChange }: TourFormProps) {
 
         {/* 航班資訊 */}
         <div id="section-flight">
-          <FlightInfoSection data={data} updateFlightField={handlers.updateFlightField} />
+          <FlightInfoSection
+            data={data}
+            updateFlightField={handlers.updateFlightField}
+            updateFlightFields={handlers.updateFlightFields}
+            onGenerateDailyItinerary={(days: number, departureDate: string) => {
+              // 解析出發日期
+              const parseDepartureDate = (dateStr: string): Date | null => {
+                if (!dateStr) return null
+                let parts: string[]
+                if (dateStr.includes('/')) {
+                  parts = dateStr.split('/')
+                } else if (dateStr.includes('-')) {
+                  parts = dateStr.split('-')
+                } else {
+                  return null
+                }
+                if (parts.length === 3) {
+                  const [year, month, day] = parts.map(Number)
+                  return new Date(year, month - 1, day)
+                }
+                return null
+              }
+
+              const baseDepartureDate = parseDepartureDate(departureDate)
+              if (!baseDepartureDate) return
+
+              // 計算每天的日期
+              const formatDate = (date: Date): string => {
+                const year = date.getFullYear()
+                const month = String(date.getMonth() + 1).padStart(2, '0')
+                const day = String(date.getDate()).padStart(2, '0')
+                return `${year}/${month}/${day}`
+              }
+
+              // 生成空白的每日行程
+              const newDailyItinerary = Array.from({ length: days }, (_, i) => {
+                const dayDate = new Date(baseDepartureDate)
+                dayDate.setDate(dayDate.getDate() + i)
+                return {
+                  dayLabel: `Day ${i + 1}`,
+                  date: formatDate(dayDate),
+                  title: '',
+                  highlight: '',
+                  description: '',
+                  activities: [],
+                  recommendations: [],
+                  meals: { breakfast: '', lunch: '', dinner: '' },
+                  accommodation: '',
+                  images: [],
+                }
+              })
+
+              onChange({ ...data, dailyItinerary: newDailyItinerary })
+            }}
+          />
         </div>
 
         {/* 行程特色 */}

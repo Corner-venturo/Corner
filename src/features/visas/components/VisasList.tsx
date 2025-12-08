@@ -107,7 +107,7 @@ export function VisasList({
     },
     {
       key: 'vendor',
-      label: '送給誰',
+      label: '送件單位',
       render: (value) => (
         <span className="text-sm text-morandi-secondary">{value || '-'}</span>
       ),
