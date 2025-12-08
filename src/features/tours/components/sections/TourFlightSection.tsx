@@ -50,8 +50,8 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
               <div>
                 <div className="text-xs text-morandi-secondary">去程航班</div>
                 <div className="text-xl font-bold text-morandi-primary">
-                  {data.outboundFlight?.airline || '中華航空'}{' '}
-                  {data.outboundFlight?.flightNumber || 'CI110'}
+                  {data.outboundFlight?.airline || '--'}{' '}
+                  {data.outboundFlight?.flightNumber || '--'}
                 </div>
               </div>
             </div>
@@ -61,13 +61,13 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                 <div className="flex-1">
                   <div className="text-xs text-morandi-secondary mb-1">出發</div>
                   <div className="text-2xl font-bold text-morandi-primary">
-                    {data.outboundFlight?.departureAirport || 'TPE'}
+                    {data.outboundFlight?.departureAirport || '--'}
                   </div>
                   <div className="text-base text-morandi-gold font-semibold">
-                    {data.outboundFlight?.departureTime || '06:50'}
+                    {data.outboundFlight?.departureTime || '--:--'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">
-                    {data.outboundFlight?.departureDate || '10/21'}
+                    {data.outboundFlight?.departureDate || '--/--'}
                   </div>
                 </div>
 
@@ -81,17 +81,17 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                     <div className="flex-1 border-t-2 border-dashed border-morandi-container" />
                   </div>
                   <div className="text-xs font-semibold text-morandi-primary mt-3">
-                    {data.outboundFlight?.duration || '2小時5分'}
+                    {data.outboundFlight?.duration || '--'}
                   </div>
                 </div>
 
                 <div className="flex-1 text-right">
                   <div className="text-xs text-morandi-secondary mb-1">抵達</div>
                   <div className="text-2xl font-bold text-morandi-primary">
-                    {data.outboundFlight?.arrivalAirport || 'FUK'}
+                    {data.outboundFlight?.arrivalAirport || '--'}
                   </div>
                   <div className="text-base text-morandi-gold font-semibold">
-                    {data.outboundFlight?.arrivalTime || '09:55'}
+                    {data.outboundFlight?.arrivalTime || '--:--'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">當地時間</div>
                 </div>
@@ -114,8 +114,8 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
               <div>
                 <div className="text-xs text-morandi-secondary">回程航班</div>
                 <div className="text-xl font-bold text-morandi-primary">
-                  {data.returnFlight?.airline || '中華航空'}{' '}
-                  {data.returnFlight?.flightNumber || 'CI111'}
+                  {data.returnFlight?.airline || '--'}{' '}
+                  {data.returnFlight?.flightNumber || '--'}
                 </div>
               </div>
             </div>
@@ -125,13 +125,13 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                 <div className="flex-1">
                   <div className="text-xs text-morandi-secondary mb-1">出發</div>
                   <div className="text-2xl font-bold text-morandi-primary">
-                    {data.returnFlight?.departureAirport || 'FUK'}
+                    {data.returnFlight?.departureAirport || '--'}
                   </div>
                   <div className="text-base text-morandi-secondary font-semibold">
-                    {data.returnFlight?.departureTime || '11:00'}
+                    {data.returnFlight?.departureTime || '--:--'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">
-                    {data.returnFlight?.departureDate || '10/25'}
+                    {data.returnFlight?.departureDate || '--/--'}
                   </div>
                 </div>
 
@@ -145,17 +145,17 @@ export function TourFlightSection({ data, viewMode }: TourFlightSectionProps) {
                     <div className="flex-1 border-t-2 border-dashed border-morandi-container" />
                   </div>
                   <div className="text-xs font-semibold text-morandi-primary mt-3">
-                    {data.returnFlight?.duration || '2小時30分'}
+                    {data.returnFlight?.duration || '--'}
                   </div>
                 </div>
 
                 <div className="flex-1 text-right">
                   <div className="text-xs text-morandi-secondary mb-1">抵達</div>
                   <div className="text-2xl font-bold text-morandi-primary">
-                    {data.returnFlight?.arrivalAirport || 'TPE'}
+                    {data.returnFlight?.arrivalAirport || '--'}
                   </div>
                   <div className="text-base text-morandi-secondary font-semibold">
-                    {data.returnFlight?.arrivalTime || '12:30'}
+                    {data.returnFlight?.arrivalTime || '--:--'}
                   </div>
                   <div className="text-xs text-morandi-secondary mt-0.5">台灣時間</div>
                 </div>

@@ -64,19 +64,9 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
     arrivalAirport: data.outboundFlight?.arrivalAirport || '',
   })
 
-  // Auto-fill outbound departure date from tour departure date
-  useEffect(() => {
-    if (data.departureDate) {
-      const departureDate = parseDate(data.departureDate)
-      if (departureDate) {
-        const formattedDate = formatDateShort(departureDate)
-        // 只在沒有設定或日期不同時更新
-        if (data.outboundFlight?.departureDate !== formattedDate) {
-          updateFlightField('outboundFlight', 'departureDate', formattedDate)
-        }
-      }
-    }
-  }, [data.departureDate, data.outboundFlight?.departureDate, updateFlightField])
+  // 移除自動帶入航班日期的功能 - 讓業務手動輸入 8 碼日期
+  // 舊邏輯：當封面設定出發日期時，自動帶入去程航班日期
+  // 新邏輯：航班日期需要業務手動輸入（用戶要求）
 
   // 自動計算行程天數（根據出發日期和回程日期）
   const tripDays = useMemo(() => {

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
+import { ImageCropper } from '@/components/ui/image-cropper'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -45,6 +46,9 @@ export function CoverInfoSection({
   const [uploading, setUploading] = useState(false)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [uploadedImageUrl, setUploadedImageUrl] = useState('')
+  // 裁切功能相關狀態
+  const [showCropper, setShowCropper] = useState(false)
+  const [cropImageSrc, setCropImageSrc] = useState('')
 
   // 取得當前選擇城市的圖片
   const cityImages = useMemo(() => {
@@ -98,8 +102,8 @@ export function CoverInfoSection({
     }
   }
 
-  // 上傳圖片
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // 選擇圖片後打開裁切器
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -115,25 +119,36 @@ export function CoverInfoSection({
       return
     }
 
+    // 建立預覽 URL 並打開裁切器
+    const imageUrl = URL.createObjectURL(file)
+    setCropImageSrc(imageUrl)
+    setShowCropper(true)
+
+    // 清除 input 值，讓使用者可以再次選擇同一個檔案
+    event.target.value = ''
+  }
+
+  // 裁切完成後上傳
+  const handleCropComplete = async (croppedBlob: Blob) => {
     setUploading(true)
 
     // 記錄舊圖片 URL（上傳成功後刪除）
     const oldCoverImage = data.coverImage
 
     try {
-      // 生成唯一檔名（避免中文字元）
+      // 生成唯一檔名
       const timestamp = Date.now()
-      const fileExt = file.name.split('.').pop()
       const randomStr = Math.random().toString(36).substring(2, 8)
-      const fileName = `itinerary_${timestamp}_${randomStr}.${fileExt}`
+      const fileName = `itinerary_${timestamp}_${randomStr}.jpg`
       const filePath = `${fileName}`
 
       // 上傳到 Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('city-backgrounds')
-        .upload(filePath, file, {
+        .upload(filePath, croppedBlob, {
           cacheControl: '3600',
           upsert: false,
+          contentType: 'image/jpeg',
         })
 
       if (uploadError) throw uploadError
@@ -152,6 +167,12 @@ export function CoverInfoSection({
       // 儲存圖片網址，準備詢問是否更新資料庫
       setUploadedImageUrl(urlData.publicUrl)
 
+      // 清理預覽 URL
+      if (cropImageSrc) {
+        URL.revokeObjectURL(cropImageSrc)
+      }
+      setCropImageSrc('')
+
       // 如果有選擇城市，詢問是否更新預設圖片
       if (data.city) {
         setShowUpdateDialog(true)
@@ -164,6 +185,15 @@ export function CoverInfoSection({
     } finally {
       setUploading(false)
     }
+  }
+
+  // 關閉裁切器
+  const handleCloseCropper = () => {
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc)
+    }
+    setCropImageSrc('')
+    setShowCropper(false)
   }
 
   // 更新城市預設圖片
@@ -486,7 +516,7 @@ export function CoverInfoSection({
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageUpload}
+            onChange={handleImageSelect}
             disabled={uploading}
             className="hidden"
             id="cover-image-upload"
@@ -501,10 +531,19 @@ export function CoverInfoSection({
             {uploading ? '上傳中...' : '選擇圖片'}
           </label>
           <span className="text-xs text-morandi-secondary">
-            JPG、PNG、WebP，最大 5MB
+            選擇後可裁切調整，最大 5MB
           </span>
         </div>
       </div>
+
+      {/* 圖片裁切器 */}
+      <ImageCropper
+        open={showCropper}
+        onClose={handleCloseCropper}
+        imageSrc={cropImageSrc}
+        aspectRatio={16 / 9}
+        onCropComplete={handleCropComplete}
+      />
 
       {/* 目前選擇的圖片預覽 */}
       {data.coverImage && (
