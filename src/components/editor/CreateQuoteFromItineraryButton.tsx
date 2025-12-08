@@ -496,9 +496,10 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className={`flex items-center gap-2 border-emerald-400 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ${className}`}
+            size="sm"
+            className={`h-8 px-3 flex items-center gap-2 border-emerald-400 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ${className}`}
           >
-            <Calculator className="w-4 h-4" />
+            <Calculator size={14} />
             報價單
             <span className="bg-emerald-500 text-white text-xs px-1.5 py-0.5 rounded-full">
               {linkedQuotes.length}
@@ -558,12 +559,13 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
         onClick={handleButtonClick}
         disabled={isLoading}
         variant="outline"
-        className={`flex items-center gap-2 text-morandi-primary border-morandi-primary hover:bg-morandi-primary hover:text-white transition-colors ${className}`}
+        size="sm"
+        className={`h-8 px-3 flex items-center gap-2 text-morandi-primary border-morandi-primary hover:bg-morandi-primary hover:text-white transition-colors ${className}`}
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 size={14} className="animate-spin" />
         ) : (
-          <Calculator className="w-4 h-4" />
+          <Calculator size={14} />
         )}
         {isLoading ? '處理中...' : '製作報價單'}
       </Button>

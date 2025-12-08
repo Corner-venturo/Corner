@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2, Map } from 'lucide-react'
+import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2, Map, RefreshCw } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,6 +45,7 @@ interface QuoteHeaderProps {
   handleGenerateQuotation: () => void
   handleDeleteVersion: (versionIndex: number) => void
   handleCreateItinerary?: () => void
+  handleSyncToItinerary?: () => void
   currentEditingVersion: number | null
   router: AppRouterInstance
   accommodationDays?: number
@@ -90,6 +91,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleGenerateQuotation,
   handleDeleteVersion,
   handleCreateItinerary,
+  handleSyncToItinerary,
   currentEditingVersion,
   router,
   accommodationDays,
@@ -319,6 +321,18 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             >
               <Map size={14} className="mr-1.5" />
               建立行程表
+            </Button>
+          )}
+
+          {/* 同步到行程表按鈕 - 只有當報價單已連結行程表時才顯示 */}
+          {quote?.itinerary_id && handleSyncToItinerary && (
+            <Button
+              onClick={handleSyncToItinerary}
+              variant="outline"
+              className="h-8 px-3 text-sm border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
+            >
+              <RefreshCw size={14} className="mr-1.5" />
+              同步到行程表
             </Button>
           )}
 

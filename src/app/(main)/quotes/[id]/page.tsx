@@ -8,14 +8,18 @@ import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
+import { useItineraryStore } from '@/stores'
+import { toast } from 'sonner'
 import {
   QuoteHeader,
   CategorySection,
   SellingPriceSection,
   SaveVersionDialog,
+  SyncToItineraryDialog,
   PrintableQuotation,
   QuickQuoteDetail,
 } from '@/features/quotes/components'
+import type { MealDiff } from '@/features/quotes/components'
 
 export default function QuoteDetailPage() {
 
@@ -54,6 +58,9 @@ export default function QuoteDetailPage() {
     addTour,
     router,
   } = quoteState
+
+  // Itinerary store for sync
+  const { items: itineraries, update: updateItinerary } = useItineraryStore()
 
   // Category operations hook
   const categoryOps = useCategoryOperations({
@@ -190,6 +197,136 @@ export default function QuoteDetailPage() {
     router.push(`/itinerary/new?${params.toString()}`)
   }, [quote, categories, accommodationDays, router])
 
+  // 同步到行程表 - 狀態
+  const [isSyncDialogOpen, setIsSyncDialogOpen] = React.useState(false)
+  const [syncDiffs, setSyncDiffs] = React.useState<MealDiff[]>([])
+  const [syncItineraryTitle, setSyncItineraryTitle] = React.useState<string>('')
+
+  // 計算同步差異
+  const calculateSyncDiffs = useCallback(() => {
+    if (!quote?.itinerary_id) return null
+
+    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+    if (!itinerary) return null
+
+    const mealsCategory = categories.find(cat => cat.id === 'meals')
+    if (!mealsCategory || mealsCategory.items.length === 0) return null
+
+    // 解析報價單餐飲
+    type MealType = 'lunch' | 'dinner'
+    const mealUpdates: Record<number, Record<MealType, { name: string; isSelfArranged: boolean }>> = {}
+
+    mealsCategory.items.forEach(item => {
+      const match = item.name.match(/Day\s*(\d+)\s*(午餐|晚餐)\s*-?\s*(.*)/)
+      if (match) {
+        const day = parseInt(match[1])
+        const type = match[2] === '午餐' ? 'lunch' : 'dinner'
+        const name = match[3].trim()
+        const isSelfArranged = item.is_self_arranged || false
+
+        if (!mealUpdates[day]) {
+          mealUpdates[day] = {} as Record<MealType, { name: string; isSelfArranged: boolean }>
+        }
+        mealUpdates[day][type] = { name, isSelfArranged }
+      }
+    })
+
+    // 比對差異
+    const diffs: MealDiff[] = []
+
+    itinerary.daily_itinerary.forEach((day, index) => {
+      const dayNumber = index + 1
+      const updates = mealUpdates[dayNumber]
+      if (!updates) return
+
+      if (updates.lunch) {
+        const newValue = updates.lunch.isSelfArranged ? '自理' : (updates.lunch.name || '')
+        const oldValue = day.meals.lunch || ''
+        if (newValue && newValue !== oldValue) {
+          diffs.push({
+            day: dayNumber,
+            type: 'lunch',
+            typeLabel: '午餐',
+            oldValue,
+            newValue,
+          })
+        }
+      }
+
+      if (updates.dinner) {
+        const newValue = updates.dinner.isSelfArranged ? '自理' : (updates.dinner.name || '')
+        const oldValue = day.meals.dinner || ''
+        if (newValue && newValue !== oldValue) {
+          diffs.push({
+            day: dayNumber,
+            type: 'dinner',
+            typeLabel: '晚餐',
+            oldValue,
+            newValue,
+          })
+        }
+      }
+    })
+
+    return { itinerary, diffs }
+  }, [quote, categories, itineraries])
+
+  // 開啟同步對話框
+  const handleSyncToItinerary = useCallback(() => {
+    if (!quote?.itinerary_id) {
+      toast.error('此報價單沒有連結行程表')
+      return
+    }
+
+    const result = calculateSyncDiffs()
+    if (!result) {
+      toast.error('找不到連結的行程表')
+      return
+    }
+
+    if (result.diffs.length === 0) {
+      toast.info('沒有需要同步的變更')
+      return
+    }
+
+    setSyncDiffs(result.diffs)
+    setSyncItineraryTitle(result.itinerary.title || result.itinerary.tagline || '')
+    setIsSyncDialogOpen(true)
+  }, [quote, calculateSyncDiffs])
+
+  // 確認同步
+  const handleConfirmSync = useCallback(() => {
+    if (!quote?.itinerary_id) return
+
+    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+    if (!itinerary) return
+
+    // 套用差異
+    const updatedDailyItinerary = itinerary.daily_itinerary.map((day, index) => {
+      const dayNumber = index + 1
+      const dayDiffs = syncDiffs.filter(d => d.day === dayNumber)
+      if (dayDiffs.length === 0) return day
+
+      const newMeals = { ...day.meals }
+      dayDiffs.forEach(diff => {
+        if (diff.type === 'lunch') {
+          newMeals.lunch = diff.newValue
+        } else if (diff.type === 'dinner') {
+          newMeals.dinner = diff.newValue
+        }
+      })
+
+      return { ...day, meals: newMeals }
+    })
+
+    // 儲存更新
+    updateItinerary(itinerary.id, {
+      daily_itinerary: updatedDailyItinerary,
+    })
+
+    toast.success('已同步餐飲資料到行程表')
+  }, [quote, itineraries, syncDiffs, updateItinerary])
+
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: VersionRecord) => {
@@ -313,6 +450,7 @@ export default function QuoteDetailPage() {
         handleGenerateQuotation={handleGenerateQuotation}
         handleDeleteVersion={handleDeleteVersion}
         handleCreateItinerary={handleCreateItinerary}
+        handleSyncToItinerary={handleSyncToItinerary}
         currentEditingVersion={currentEditingVersion}
         router={router}
         accommodationDays={accommodationDays}
@@ -402,6 +540,15 @@ export default function QuoteDetailPage() {
         versionName={versionName}
         setVersionName={setVersionName}
         onSave={(note) => handleSaveAsNewVersion(note, setCurrentEditingVersion)}
+      />
+
+      {/* 同步到行程表對話框 */}
+      <SyncToItineraryDialog
+        isOpen={isSyncDialogOpen}
+        onClose={() => setIsSyncDialogOpen(false)}
+        onConfirm={handleConfirmSync}
+        diffs={syncDiffs}
+        itineraryTitle={syncItineraryTitle}
       />
 
       {/* 可列印的報價單 */}

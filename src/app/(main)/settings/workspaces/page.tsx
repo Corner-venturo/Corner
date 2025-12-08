@@ -30,7 +30,7 @@ export default function WorkspacesPage() {
 
   // 計算每個 workspace 的員工數
   const getEmployeeCount = (workspaceId: string) => {
-    return employeeStore.items.filter(emp => emp.workspace_id === workspaceId).length
+    return (employeeStore.items || []).filter(emp => emp.workspace_id === workspaceId).length
   }
 
   const handleCreate = async () => {

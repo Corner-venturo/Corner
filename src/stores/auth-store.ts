@@ -17,6 +17,7 @@ interface AuthState {
     username: string,
     password: string
   ) => Promise<{ success: boolean; message?: string }>
+  refreshUserData: () => Promise<void>
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
   checkPermission: (permission: string) => boolean
@@ -164,6 +165,56 @@ export const useAuthStore = create<AuthState>()(
         const user = get().user
         if (!user) return false
         return user.permissions.includes(permission) || user.permissions.includes('admin')
+      },
+
+      refreshUserData: async () => {
+        const currentUser = get().user
+        if (!currentUser?.id) return
+
+        try {
+          const { supabase } = await import('@/lib/supabase/client')
+          const { data: employeeData, error } = await supabase
+            .from('employees')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single()
+
+          if (error || !employeeData) {
+            logger.warn('⚠️ Failed to refresh user data:', error?.message)
+            return
+          }
+
+          // 如果帳號已停用，自動登出
+          if (employeeData.status === 'terminated') {
+            logger.warn('⚠️ Account terminated, logging out')
+            get().logout()
+            return
+          }
+
+          const updatedUser: User = {
+            id: employeeData.id,
+            employee_number: employeeData.employee_number,
+            english_name: employeeData.english_name,
+            display_name: employeeData.display_name,
+            chinese_name: employeeData.chinese_name || employeeData.display_name,
+            personal_info: employeeData.personal_info || {},
+            job_info: employeeData.job_info || {},
+            salary_info: employeeData.salary_info || {},
+            permissions: employeeData.permissions || [],
+            roles: (employeeData.roles || []) as User['roles'],
+            attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
+            contracts: employeeData.contracts || [],
+            status: employeeData.status as User['status'],
+            workspace_id: employeeData.workspace_id,
+            created_at: employeeData.created_at || new Date().toISOString(),
+            updated_at: employeeData.updated_at || new Date().toISOString(),
+          }
+
+          set({ user: updatedUser })
+          logger.log('✅ User data refreshed:', updatedUser.display_name)
+        } catch (error) {
+          logger.error('💥 Error refreshing user data:', error)
+        }
       },
       
       toggleSidebar: () => set(state => ({ sidebarCollapsed: !state.sidebarCollapsed })),
