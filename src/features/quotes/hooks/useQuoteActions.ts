@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { generateTourCode } from '@/stores/utils/code-generator'
@@ -47,8 +47,35 @@ export const useQuoteActions = ({
   setSaveSuccess,
   setCategories,
 }: UseQuoteActionsProps) => {
+  // 使用 ref 追蹤前一次的 groupSize 和 groupSizeForGuide
+  const prevGroupSizeRef = useRef<number | null>(null)
+  const prevGroupSizeForGuideRef = useRef<number | null>(null)
+
   // 當人數改變時，重新計算所有團體分攤項目
   useEffect(() => {
+    // 只有當 groupSize 或 groupSizeForGuide 真正改變時才執行
+    // 第一次執行時（ref 為 null）也不執行，避免初始渲染時的迴圈
+    if (
+      prevGroupSizeRef.current === null ||
+      prevGroupSizeForGuideRef.current === null
+    ) {
+      prevGroupSizeRef.current = groupSize
+      prevGroupSizeForGuideRef.current = groupSizeForGuide
+      return
+    }
+
+    // 如果值沒有實際改變，不執行更新
+    if (
+      prevGroupSizeRef.current === groupSize &&
+      prevGroupSizeForGuideRef.current === groupSizeForGuide
+    ) {
+      return
+    }
+
+    // 更新 ref
+    prevGroupSizeRef.current = groupSize
+    prevGroupSizeForGuideRef.current = groupSizeForGuide
+
     setCategories(prevCategories => {
       return prevCategories.map(category => {
         if (
@@ -97,7 +124,7 @@ export const useQuoteActions = ({
       })
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [participantCounts, groupSize, groupSizeForGuide]) // 移除 setCategories 避免無限循環
+  }, [groupSize, groupSizeForGuide]) // 只依賴數值，不依賴 participantCounts 對象
 
   // 儲存當前版本（覆蓋）
   // 新邏輯：所有版本都存在 versions[] 陣列，current_version_index 追蹤當前編輯的版本
