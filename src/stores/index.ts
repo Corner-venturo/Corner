@@ -126,6 +126,9 @@ export const useTodoStore = createStore<Todo>('todos')
 // 簽證 Store
 export const useVisaStore = createStore<Visa>('visas', 'V')
 
+// 代辦商成本 Store（記住代辦商+簽證類型的成本）
+export const useVendorCostStore = createStore<import('./types').VendorCost>('vendor_costs')
+
 // 供應商 Store
 export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 

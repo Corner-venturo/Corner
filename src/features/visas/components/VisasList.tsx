@@ -104,10 +104,33 @@ export function VisasList({
       ),
     },
     {
+      key: 'vendor',
+      label: '送件單位',
+      render: (value) => (
+        <span className="text-sm text-morandi-secondary">{value || '-'}</span>
+      ),
+    },
+    {
+      key: 'documents_returned_date',
+      label: '證件歸還',
+      render: (value) => (
+        <span className="text-sm text-morandi-secondary">
+          {value ? new Date(String(value)).toLocaleDateString() : '-'}
+        </span>
+      ),
+    },
+    {
       key: 'fee',
       label: '代辦費',
       render: (value) => (
         <span className="text-sm text-morandi-primary">NT$ {Number(value || 0).toLocaleString()}</span>
+      ),
+    },
+    {
+      key: 'cost',
+      label: '成本',
+      render: (value) => (
+        <span className="text-sm text-morandi-secondary">NT$ {Number(value || 0).toLocaleString()}</span>
       ),
     },
   ]

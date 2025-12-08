@@ -23,6 +23,7 @@ import { useVisasDialog } from '../hooks/useVisasDialog'
 import { VisasList } from './VisasList'
 import { VisasInfoDialog } from './VisasInfoDialog'
 import { AddVisaDialog } from './AddVisaDialog'
+import { SubmitVisaDialog } from './SubmitVisaDialog'
 // ============================================
 // 簽證管理主頁面
 // ============================================
@@ -83,6 +84,7 @@ export default function VisasPage() {
 
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false)
 
   // 旅客比對相關狀態
   const [showCustomerMatchDialog, setShowCustomerMatchDialog] = React.useState(false)
@@ -382,16 +384,15 @@ export default function VisasPage() {
     setCurrentCustomerIndex(0)
   }
 
-  // 批次送件
-  const handleBatchSubmit = async () => {
-    if (!canManageVisas || selectedRows.length === 0) return
-    const today = new Date().toISOString().split('T')[0]
+  // 取得選中的簽證資料
+  const selectedVisas = React.useMemo(() => {
+    return visas.filter(v => selectedRows.includes(v.id))
+  }, [visas, selectedRows])
 
-    for (const id of selectedRows) {
-      await updateVisa(id, { status: 'submitted', actual_submission_date: today })
-    }
-
+  // 送件完成後的處理
+  const handleSubmitComplete = () => {
     setSelectedRows([])
+    toast.success(`已送出 ${selectedRows.length} 筆簽證`)
   }
 
   return (
@@ -412,15 +413,23 @@ export default function VisasPage() {
                   已選擇 {selectedRows.length} 筆簽證
                 </span>
                 <Button
-                  onClick={() => {
-                    const today = new Date().toISOString().split('T')[0]
-                    selectedRows.forEach(id => updateVisa(id, { status: 'submitted', actual_submission_date: today }))
-                    setSelectedRows([])
-                  }}
+                  onClick={() => setIsSubmitDialogOpen(true)}
                   size="sm"
                   variant="secondary"
                 >
                   送
+                </Button>
+                <Button
+                  onClick={() => {
+                    const today = new Date().toISOString().split('T')[0]
+                    selectedRows.forEach(id => updateVisa(id, { documents_returned_date: today }))
+                    setSelectedRows([])
+                    toast.success('已登記證件歸還')
+                  }}
+                  size="sm"
+                  variant="outline"
+                >
+                  還
                 </Button>
                 <Button
                   onClick={() => {
@@ -769,6 +778,14 @@ export default function VisasPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 送件對話框 */}
+      <SubmitVisaDialog
+        open={isSubmitDialogOpen}
+        onClose={() => setIsSubmitDialogOpen(false)}
+        selectedVisas={selectedVisas}
+        onSubmitComplete={handleSubmitComplete}
+      />
     </div>
   )
 }

@@ -50,10 +50,12 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         const roleConfig = getRoleConfig(role)
         const defaultPermissions = roleConfig?.permissions || []
 
-        // 更新 roles（單一角色） 和 permissions（角色預設權限）
+        // 更新 roles（單一角色）、permissions（角色預設權限）和 preferred_features（側邊欄顯示）
+        // preferred_features 設為與 permissions 相同，確保有權限的功能會顯示在側邊欄
         await updateUser(employee.id, {
           roles: [role] as unknown as typeof employee.roles,
           permissions: defaultPermissions as unknown as typeof employee.permissions,
+          preferred_features: defaultPermissions as unknown as typeof employee.preferred_features,
         })
 
         // 同步更新 IndexedDB
@@ -67,6 +69,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
               ...existingEmployee,
               roles: [role],
               permissions: defaultPermissions,
+              preferred_features: defaultPermissions,
               updated_at: new Date().toISOString(),
             } as unknown as Parameters<typeof localDB.put>[1])
           }
@@ -80,8 +83,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             ...user,
             roles: [role] as unknown as typeof user.roles,
             permissions: defaultPermissions as unknown as typeof user.permissions,
+            preferred_features: defaultPermissions as unknown as typeof user.preferred_features,
           })
-
         }
 
         // 重置額外權限
@@ -109,7 +112,11 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
     const saveExtraPermissions = async (permissions: string[]) => {
       setIsSaving(true)
       try {
-        await updateUser(employee.id, { permissions })
+        // 同時更新 permissions 和 preferred_features，確保側邊欄會顯示
+        await updateUser(employee.id, {
+          permissions,
+          preferred_features: permissions,
+        })
 
         // 同步更新 IndexedDB
         try {
@@ -121,6 +128,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             await localDB.put(TABLES.EMPLOYEES, {
               ...existingEmployee,
               permissions: permissions,
+              preferred_features: permissions,
               updated_at: new Date().toISOString(),
             } as unknown as Parameters<typeof localDB.put>[1])
           }
@@ -131,6 +139,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           setUser({
             ...user,
             permissions: permissions as unknown as typeof user.permissions,
+            preferred_features: permissions as unknown as typeof user.preferred_features,
           })
         }
 

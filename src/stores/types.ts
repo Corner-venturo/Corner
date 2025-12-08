@@ -784,6 +784,7 @@ export interface Visa {
   received_date?: string // 收件時間（收到客戶資料的日期）
   expected_issue_date?: string // 預計下件時間
   actual_submission_date?: string // 實際送件時間（勾選送件後記錄）
+  documents_returned_date?: string // 證件歸還時間（代辦商先還證件）
   pickup_date?: string // 取件時間
 
   // 舊欄位保留向後相容
@@ -798,10 +799,21 @@ export interface Visa {
   // 費用
   fee: number // 代辦費
   cost: number // 成本
+  vendor?: string // 代辦商名稱（送件時填寫）
 
   // 其他
   note?: string // 備註
   created_by?: string // 建立者ID
+  created_at: string
+  updated_at: string
+}
+
+// 代辦商成本記錄（記住每個代辦商的各類型簽證成本）
+export interface VendorCost {
+  id: string
+  vendor_name: string // 代辦商名稱
+  visa_type: string // 簽證類型（護照 成人、台胞證等）
+  cost: number // 成本價格
   created_at: string
   updated_at: string
 }
