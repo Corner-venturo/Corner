@@ -15,6 +15,7 @@ interface VisaApplicant {
   is_urgent: boolean
   received_date: string // 收件時間
   expected_issue_date: string // 預計下件時間
+  fee?: number // 代辦費（可手動修改）
   cost: number
 }
 
@@ -295,9 +296,10 @@ export function AddVisaDialog({
 
             <Input
               type="number"
-              value={calculateFee(applicant.country)}
-              readOnly
-              className="w-12 bg-muted text-xs"
+              value={applicant.fee ?? calculateFee(applicant.country)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
+              className="w-16 text-xs"
+              title="代辦費"
             />
 
             <Input

@@ -22,8 +22,9 @@ export function AdvanceListCard({
 }: AdvanceListCardProps) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
 
-  const pendingItems = advanceList.items.filter(item => item.status === 'pending')
-  const totalAmount = advanceList.items.reduce((sum, item) => sum + item.amount, 0)
+  const items = advanceList.items || []
+  const pendingItems = items.filter(item => item.status === 'pending')
+  const totalAmount = items.reduce((sum, item) => sum + item.amount, 0)
   const canProcess = userRole === 'admin' || userRole === 'finance'
 
   const toggleSelection = (itemId: string) => {
@@ -37,7 +38,7 @@ export function AdvanceListCard({
   }
 
   const handleBatchPayment = () => {
-    const itemsToProcess = advanceList.items.filter(item => selectedItems.has(item.id))
+    const itemsToProcess = items.filter(item => selectedItems.has(item.id))
     if (itemsToProcess.length > 0) {
       onCreatePayment('batch', itemsToProcess)
     }
@@ -89,7 +90,7 @@ export function AdvanceListCard({
 
         {/* 項目列表 */}
         <div className="space-y-2">
-          {advanceList.items.map((item, index) => (
+          {items.map((item, index) => (
             <div
               key={item.id}
               className={`flex items-center gap-3 p-2 rounded transition-colors ${
@@ -159,10 +160,10 @@ export function AdvanceListCard({
         )}
 
         {/* 已處理資訊 */}
-        {advanceList.items.some(item => item.status === 'completed') && (
+        {items.some(item => item.status === 'completed') && (
           <div className="mt-3 pt-3 border-t border-morandi-gold/20">
             <div className="text-xs text-morandi-secondary">
-              {advanceList.items.filter(item => item.status === 'completed').length} 筆已處理
+              {items.filter(item => item.status === 'completed').length} 筆已處理
             </div>
           </div>
         )}

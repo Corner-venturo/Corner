@@ -10,6 +10,7 @@ interface VisaApplicant {
   is_urgent: boolean
   received_date: string // 收件時間
   expected_issue_date: string // 預計下件時間
+  fee?: number // 代辦費（可手動修改）
   cost: number
 }
 

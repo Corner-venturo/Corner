@@ -218,7 +218,8 @@ export default function VisasPage() {
     for (const applicant of applicants) {
       if (!applicant.name) continue
 
-      const fee = calculateFee(applicant.country)
+      // 代辦費：優先使用手動輸入的值，否則用自動計算的
+      const fee = applicant.fee ?? calculateFee(applicant.country)
       const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
       await addVisa({
