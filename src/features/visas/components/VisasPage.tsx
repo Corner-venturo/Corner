@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info, UserPlus } from 'lucide-react'
+import React, { useEffect, useRef } from 'react'
+import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info, UserPlus, Upload, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import {
@@ -120,7 +120,10 @@ export default function VisasPage() {
     date_of_birth: '',
     gender: '',
     notes: '',
+    passport_image_url: '',
   })
+  const [isUploadingPassport, setIsUploadingPassport] = React.useState(false)
+  const passportFileInputRef = useRef<HTMLInputElement>(null)
 
   // 權限檢查：清除選擇
   useEffect(() => {
@@ -348,6 +351,44 @@ export default function VisasPage() {
     }))
   }
 
+  // 上傳護照圖片
+  const handlePassportImageUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('請選擇圖片檔案')
+      return
+    }
+
+    setIsUploadingPassport(true)
+    try {
+      const { supabase } = await import('@/lib/supabase/client')
+      const fileExt = file.name.split('.').pop()
+      const fileName = `passport_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+      const filePath = `passport-images/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-files')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        logger.error('上傳護照圖片失敗:', uploadError)
+        toast.error('上傳失敗')
+        return
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('workspace-files')
+        .getPublicUrl(filePath)
+
+      updateNewCustomerForm('passport_image_url', urlData.publicUrl)
+      toast.success('護照圖片上傳成功')
+    } catch (error) {
+      logger.error('上傳護照圖片錯誤:', error)
+      toast.error('上傳過程發生錯誤')
+    } finally {
+      setIsUploadingPassport(false)
+    }
+  }
+
   // 儲存新客戶
   const handleSaveNewCustomer = async () => {
     try {
@@ -362,6 +403,7 @@ export default function VisasPage() {
         passport_number: newCustomerForm.passport_number || null,
         passport_romanization: newCustomerForm.passport_romanization || null,
         passport_expiry_date: newCustomerForm.passport_expiry_date || null,
+        passport_image_url: newCustomerForm.passport_image_url || null,
         date_of_birth: newCustomerForm.date_of_birth || null,
         gender: newCustomerForm.gender || null,
         notes: newCustomerForm.notes || null,
@@ -672,7 +714,7 @@ export default function VisasPage() {
 
       {/* 新增客戶表單對話框 */}
       <Dialog open={showAddCustomerForm} onOpenChange={(open) => !open && setShowAddCustomerForm(false)}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="h-5 w-5 text-morandi-gold" />
@@ -683,108 +725,193 @@ export default function VisasPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto">
-            {/* 姓名（已帶入） */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>姓名</Label>
-                <Input
-                  value={newCustomerForm.name}
-                  onChange={(e) => updateNewCustomerForm('name', e.target.value)}
-                  className="bg-morandi-container/30"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>電話</Label>
-                <Input
-                  value={newCustomerForm.phone}
-                  onChange={(e) => updateNewCustomerForm('phone', e.target.value)}
-                  placeholder="選填"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={newCustomerForm.email}
-                  onChange={(e) => updateNewCustomerForm('email', e.target.value)}
-                  placeholder="選填"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>身分證字號</Label>
-                <Input
-                  value={newCustomerForm.national_id}
-                  onChange={(e) => updateNewCustomerForm('national_id', e.target.value)}
-                  placeholder="選填"
-                />
-              </div>
-            </div>
-
-            <div className="border-t border-border pt-4">
-              <p className="text-xs text-morandi-secondary mb-3">護照資訊（選填）</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>護照號碼</Label>
+          <div className="py-4 grid grid-cols-2 gap-6 max-h-[65vh] overflow-y-auto">
+            {/* 左側：表單欄位 */}
+            <div className="space-y-4">
+              {/* 基本資料 */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">姓名</Label>
                   <Input
-                    value={newCustomerForm.passport_number}
-                    onChange={(e) => updateNewCustomerForm('passport_number', e.target.value)}
+                    value={newCustomerForm.name}
+                    onChange={(e) => updateNewCustomerForm('name', e.target.value)}
+                    className="bg-morandi-container/30 h-9"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">電話</Label>
+                  <Input
+                    value={newCustomerForm.phone}
+                    onChange={(e) => updateNewCustomerForm('phone', e.target.value)}
                     placeholder="選填"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>護照拼音</Label>
-                  <Input
-                    value={newCustomerForm.passport_romanization}
-                    onChange={(e) => updateNewCustomerForm('passport_romanization', e.target.value.toUpperCase())}
-                    placeholder="WANG/XIAOMING"
+                    className="h-9"
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="space-y-2">
-                  <Label>護照效期</Label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Email</Label>
                   <Input
-                    type="date"
-                    value={newCustomerForm.passport_expiry_date}
-                    onChange={(e) => updateNewCustomerForm('passport_expiry_date', e.target.value)}
+                    type="email"
+                    value={newCustomerForm.email}
+                    onChange={(e) => updateNewCustomerForm('email', e.target.value)}
+                    placeholder="選填"
+                    className="h-9"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>出生日期</Label>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">身分證字號</Label>
                   <Input
-                    type="date"
-                    value={newCustomerForm.date_of_birth}
-                    onChange={(e) => updateNewCustomerForm('date_of_birth', e.target.value)}
+                    value={newCustomerForm.national_id}
+                    onChange={(e) => updateNewCustomerForm('national_id', e.target.value)}
+                    placeholder="選填"
+                    className="h-9"
+                  />
+                </div>
+              </div>
+
+              {/* 護照資訊 */}
+              <div className="border-t border-border pt-3">
+                <p className="text-xs text-morandi-secondary mb-2">護照資訊</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">護照號碼</Label>
+                    <Input
+                      value={newCustomerForm.passport_number}
+                      onChange={(e) => updateNewCustomerForm('passport_number', e.target.value)}
+                      placeholder="選填"
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">護照拼音</Label>
+                    <Input
+                      value={newCustomerForm.passport_romanization}
+                      onChange={(e) => updateNewCustomerForm('passport_romanization', e.target.value.toUpperCase())}
+                      placeholder="WANG/XIAOMING"
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">護照效期</Label>
+                    <Input
+                      type="date"
+                      value={newCustomerForm.passport_expiry_date}
+                      onChange={(e) => updateNewCustomerForm('passport_expiry_date', e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">出生日期</Label>
+                    <Input
+                      type="date"
+                      value={newCustomerForm.date_of_birth}
+                      onChange={(e) => updateNewCustomerForm('date_of_birth', e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 其他資料 */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">性別</Label>
+                  <select
+                    value={newCustomerForm.gender}
+                    onChange={(e) => updateNewCustomerForm('gender', e.target.value)}
+                    className="w-full h-9 px-3 border border-border rounded-md bg-background text-sm"
+                  >
+                    <option value="">選填</option>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">備註</Label>
+                  <Input
+                    value={newCustomerForm.notes}
+                    onChange={(e) => updateNewCustomerForm('notes', e.target.value)}
+                    placeholder="選填"
+                    className="h-9"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>性別</Label>
-                <select
-                  value={newCustomerForm.gender}
-                  onChange={(e) => updateNewCustomerForm('gender', e.target.value)}
-                  className="w-full h-10 px-3 border border-border rounded-md bg-background text-sm"
-                >
-                  <option value="">選填</option>
-                  <option value="male">男</option>
-                  <option value="female">女</option>
-                </select>
+            {/* 右側：護照圖片上傳 */}
+            <div className="space-y-3">
+              <Label className="text-xs">護照掃描檔</Label>
+              <div
+                className={`relative border-2 border-dashed rounded-lg transition-colors ${
+                  newCustomerForm.passport_image_url
+                    ? 'border-morandi-gold/50 bg-morandi-gold/5'
+                    : 'border-border hover:border-morandi-gold/50 hover:bg-morandi-container/20'
+                }`}
+                style={{ minHeight: '280px' }}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  const file = e.dataTransfer.files?.[0]
+                  if (file && file.type.startsWith('image/')) {
+                    handlePassportImageUpload(file)
+                  }
+                }}
+              >
+                {newCustomerForm.passport_image_url ? (
+                  <>
+                    <img
+                      src={newCustomerForm.passport_image_url}
+                      alt="護照掃描檔"
+                      className="w-full h-full object-contain rounded-lg"
+                      style={{ maxHeight: '280px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => updateNewCustomerForm('passport_image_url', '')}
+                      className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                      title="移除圖片"
+                    >
+                      <X size={14} />
+                    </button>
+                  </>
+                ) : (
+                  <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
+                    {isUploadingPassport ? (
+                      <Loader2 size={32} className="text-morandi-gold animate-spin" />
+                    ) : (
+                      <>
+                        <Upload size={32} className="text-morandi-secondary/50 mb-2" />
+                        <span className="text-sm text-morandi-secondary">點擊或拖曳上傳護照掃描檔</span>
+                        <span className="text-xs text-morandi-secondary/60 mt-1">支援 JPG、PNG 格式</span>
+                      </>
+                    )}
+                    <input
+                      ref={passportFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          handlePassportImageUpload(file)
+                        }
+                        e.target.value = ''
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
-              <div className="space-y-2">
-                <Label>備註</Label>
-                <Input
-                  value={newCustomerForm.notes}
-                  onChange={(e) => updateNewCustomerForm('notes', e.target.value)}
-                  placeholder="選填"
-                />
-              </div>
+              <p className="text-xs text-morandi-secondary/60">
+                上傳護照掃描檔後，未來可直接調用，不需重新掃描
+              </p>
             </div>
           </div>
 

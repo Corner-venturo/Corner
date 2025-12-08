@@ -39,8 +39,11 @@ export function SimpleDateInput({
   const dateValue = value ? parse(value, 'yyyy-MM-dd', new Date()) : undefined
   const minDate = min ? parse(min, 'yyyy-MM-dd', new Date()) : undefined
 
-  // 格式化顯示文字
-  const displayText = value && dateValue && isValid(dateValue) ? format(dateValue, 'yyyy/MM/dd') : ''
+  // 判斷是否為完整有效日期
+  const isCompleteDate = year.length === 4 && month.length === 2 && day.length === 2 && dateValue && isValid(dateValue)
+
+  // 格式化顯示文字（只有完整日期才顯示）
+  const displayText = isCompleteDate ? format(dateValue!, 'yyyy/MM/dd') : ''
 
   // 從日曆選擇
   const handleCalendarSelect = (date: Date | { from: Date; to?: Date } | undefined) => {
