@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import { TourFormData, DailyItinerary, Activity } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid, Crop } from 'lucide-react'
 import { DailyImagesUploader } from './DailyImagesUploader'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
@@ -71,6 +71,7 @@ interface SortableActivityItemProps {
   isActivityDragOver: boolean
   setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
   activityFileInputRefs: React.MutableRefObject<{ [key: string]: HTMLInputElement | null }>
+  onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
 }
 
 function SortableActivityItem({
@@ -84,6 +85,7 @@ function SortableActivityItem({
   isActivityDragOver,
   setActivityDragOver,
   activityFileInputRefs,
+  onOpenPositionEditor,
 }: SortableActivityItemProps) {
   const {
     attributes,
@@ -153,8 +155,21 @@ function SortableActivityItem({
               <img
                 src={activity.image}
                 alt={activity.title || '活動圖片'}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover cursor-pointer"
+                style={{ objectPosition: activity.imagePosition || 'center' }}
+                onClick={() => onOpenPositionEditor(dayIndex, actIndex)}
+                title="點擊調整顯示位置"
               />
+              {/* 位置調整按鈕 */}
+              <button
+                type="button"
+                onClick={() => onOpenPositionEditor(dayIndex, actIndex)}
+                className="absolute bottom-1 left-1 w-5 h-5 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                title="調整顯示位置"
+              >
+                <Crop size={10} />
+              </button>
+              {/* 移除按鈕 */}
               <button
                 type="button"
                 onClick={() => updateActivity(dayIndex, actIndex, 'image', '')}
@@ -399,6 +414,13 @@ export function DailyItinerarySection({
   // 每天的活動視圖模式（列表 or 網格）
   const [activityViewMode, setActivityViewMode] = useState<Record<number, 'list' | 'grid'>>({})
 
+  // 景點圖片位置調整狀態
+  const [activityPositionEditor, setActivityPositionEditor] = useState<{
+    isOpen: boolean
+    dayIndex: number
+    actIndex: number
+  } | null>(null)
+
   // 圖庫儲存狀態
   const [saveToLibraryDialog, setSaveToLibraryDialog] = useState<{
     isOpen: boolean
@@ -510,6 +532,15 @@ export function DailyItinerarySection({
     }
   }
 
+
+  // 開啟景點圖片位置調整器
+  const handleOpenActivityPositionEditor = (dayIndex: number, actIndex: number) => {
+    setActivityPositionEditor({
+      isOpen: true,
+      dayIndex,
+      actIndex,
+    })
+  }
 
   // 開啟景點選擇器
   const handleOpenAttractionSelector = (dayIndex: number) => {
@@ -875,6 +906,7 @@ export function DailyItinerarySection({
                         isActivityDragOver={isActivityDragOver}
                         setActivityDragOver={setActivityDragOver}
                         activityFileInputRefs={activityFileInputRefs}
+                        onOpenPositionEditor={handleOpenActivityPositionEditor}
                       />
                     )
                   })
@@ -1074,6 +1106,108 @@ export function DailyItinerarySection({
               ) : (
                 '儲存到圖庫'
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 景點圖片位置調整器 */}
+      <Dialog
+        open={activityPositionEditor?.isOpen ?? false}
+        onOpenChange={(open) => {
+          if (!open) setActivityPositionEditor(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crop size={20} className="text-morandi-gold" />
+              調整圖片顯示位置
+            </DialogTitle>
+            <DialogDescription>
+              使用滑桿調整圖片在框內的顯示位置（上下）
+            </DialogDescription>
+          </DialogHeader>
+          {activityPositionEditor && (() => {
+            const activity = data.dailyItinerary?.[activityPositionEditor.dayIndex]?.activities?.[activityPositionEditor.actIndex]
+            if (!activity?.image) return null
+
+            // 解析當前位置百分比（預設 50%）
+            const currentPosition = activity.imagePosition || 'center'
+            let positionValue = 50
+            if (currentPosition === 'top') positionValue = 0
+            else if (currentPosition === 'bottom') positionValue = 100
+            else if (currentPosition.includes('%')) {
+              const match = currentPosition.match(/(\d+)%/)
+              if (match) positionValue = parseInt(match[1])
+            }
+
+            return (
+              <div className="space-y-4 py-4">
+                {/* 預覽區域 */}
+                <div className="relative w-full aspect-video overflow-hidden rounded-lg border border-morandi-container bg-morandi-container/20">
+                  <img
+                    src={activity.image}
+                    alt="預覽"
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: `center ${positionValue}%` }}
+                  />
+                </div>
+
+                {/* Slider 控制 */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm text-morandi-secondary">
+                    <span>頂部</span>
+                    <span>目前：{positionValue}%</span>
+                    <span>底部</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={positionValue}
+                    onChange={(e) => {
+                      const newValue = parseInt(e.target.value)
+                      const newPosition = newValue === 50 ? 'center' : `center ${newValue}%`
+                      updateActivity(activityPositionEditor.dayIndex, activityPositionEditor.actIndex, 'imagePosition', newPosition)
+                    }}
+                    className="w-full h-2 bg-morandi-container rounded-lg appearance-none cursor-pointer accent-morandi-gold"
+                  />
+                </div>
+
+                {/* 快速選擇按鈕 */}
+                <div className="flex gap-2 justify-center">
+                  {[
+                    { label: '頂部', value: 'top' },
+                    { label: '中間', value: 'center' },
+                    { label: '底部', value: 'bottom' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        updateActivity(activityPositionEditor.dayIndex, activityPositionEditor.actIndex, 'imagePosition', option.value)
+                      }}
+                      className={`px-4 py-2 text-sm rounded-lg transition-colors ${
+                        currentPosition === option.value
+                          ? 'bg-morandi-gold text-white'
+                          : 'bg-morandi-container hover:bg-morandi-container/80 text-morandi-primary'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={() => setActivityPositionEditor(null)}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              完成
             </Button>
           </DialogFooter>
         </DialogContent>

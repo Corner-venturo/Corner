@@ -26,6 +26,7 @@ export interface Activity {
   title: string
   description: string
   image?: string
+  imagePosition?: string // 圖片顯示位置，如 "center", "top", "bottom", "center 30%"
   attraction_id?: string // 關聯的景點 ID（從景點選擇器選擇時會設定）
 }
 
