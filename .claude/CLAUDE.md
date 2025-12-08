@@ -1,13 +1,22 @@
 # Claude Code 工作規範 (Venturo 專案)
 
-> **最後更新**: 2025-12-08
+> **最後更新**: 2025-12-09
 > **專案狀態**: 核心功能完成，Realtime 同步系統上線
 
 ---
 
-## 🚨 開發前必讀：程式碼檢查清單
+## 🚨 開發前必讀：架構規範
 
-**重要**: 在修改任何程式碼前，請先閱讀 `docs/CODE_REVIEW_CHECKLIST.md`
+**重要**: 修改程式碼前，請先閱讀以下文件：
+
+1. **`docs/ARCHITECTURE_STANDARDS.md`** ⭐️ 系統架構規範（最重要）
+   - 五層架構定義
+   - 資料隔離規範（workspaceScoped）
+   - 權限控制規範
+   - Store 開發規範
+   - 新功能開發檢查清單
+
+2. **`docs/CODE_REVIEW_CHECKLIST.md`** 程式碼審查清單
 
 ### 五個絕對不能做的事：
 1. **不要用預設值掩蓋 null/undefined** - 例如 `value || 'TP'` 會讓台中同事看到錯誤資料
