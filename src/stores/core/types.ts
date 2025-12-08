@@ -83,6 +83,11 @@ export interface StoreConfig {
   enableSupabase?: boolean
   /** 直接寫入模式（預設 true） */
   fastInsert?: boolean
+  /** 是否依 workspace 隔離資料（預設 false）
+   * 設為 true 時，fetchAll 會自動過濾 workspace_id
+   * Super Admin 可以跨 workspace 查詢
+   */
+  workspaceScoped?: boolean
 }
 
 /**

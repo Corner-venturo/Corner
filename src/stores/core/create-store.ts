@@ -14,6 +14,7 @@ import { BaseEntity } from '@/types'
 import { TableName } from '@/lib/db/schemas'
 import { memoryCache } from '@/lib/cache/memory-cache'
 import { supabase } from '@/lib/supabase/client'
+import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
 
 // 型別定義
 import type { StoreState, StoreConfig, CreateInput, UpdateInput } from './types'
@@ -45,21 +46,32 @@ function generateUUID(): string {
 }
 
 /**
- * 取得當前使用者的 workspace_id
+ * 取得當前使用者的 workspace_id 和 role
  * 從 localStorage 讀取 auth-store 的值，避免循環依賴
  */
-function getCurrentWorkspaceId(): string | null {
-  if (typeof window === 'undefined') return null
+function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRole | null } {
+  if (typeof window === 'undefined') return { workspaceId: null, userRole: null }
   try {
     const authData = localStorage.getItem('auth-storage')
     if (authData) {
       const parsed = JSON.parse(authData)
-      return parsed?.state?.user?.workspace_id || null
+      const user = parsed?.state?.user
+      return {
+        workspaceId: user?.workspace_id || null,
+        userRole: (user?.role as UserRole) || null,
+      }
     }
   } catch {
     // 忽略解析錯誤
   }
-  return null
+  return { workspaceId: null, userRole: null }
+}
+
+/**
+ * 取得當前使用者的 workspace_id（向後相容）
+ */
+function getCurrentWorkspaceId(): string | null {
+  return getCurrentUserContext().workspaceId
 }
 
 /**
@@ -122,10 +134,26 @@ export function createStore<T extends BaseEntity>(
 
         set({ loading: true, error: null })
 
-        const { data, error } = await supabase
-          .from(tableName as any)
+        // 建立基礎查詢
+        let query = supabase
+          .from(tableName as string)
           .select('*')
           .order('created_at', { ascending: false })
+
+        // 🔒 Workspace 隔離：若啟用 workspaceScoped，自動過濾 workspace_id
+        if (config.workspaceScoped) {
+          const { workspaceId, userRole } = getCurrentUserContext()
+
+          // Super Admin 可以跨 workspace 查詢，不加過濾
+          if (!canCrossWorkspace(userRole) && workspaceId) {
+            query = query.eq('workspace_id', workspaceId)
+            logger.log(`🔒 [${tableName}] Workspace 隔離：只查詢 workspace_id=${workspaceId}`)
+          } else if (canCrossWorkspace(userRole)) {
+            logger.log(`🌐 [${tableName}] Super Admin：跨 workspace 查詢`)
+          }
+        }
+
+        const { data, error } = await query
 
         if (error) throw error
 

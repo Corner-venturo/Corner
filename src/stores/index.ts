@@ -32,56 +32,100 @@ import type { Supplier } from '@/types/supplier.types'
 /**
  * 旅遊團 Store
  * 編號格式：T{year}{4位數} (如: T20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useTourStore = createStore<Tour>('tours', 'T')
+export const useTourStore = createStore<Tour>({
+  tableName: 'tours',
+  codePrefix: 'T',
+  workspaceScoped: true,
+})
 
 /**
  * 行程表 Store
  * 編號格式：I{year}{4位數} (如: I20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useItineraryStore = createStore<Itinerary>('itineraries', 'I')
+export const useItineraryStore = createStore<Itinerary>({
+  tableName: 'itineraries',
+  codePrefix: 'I',
+  workspaceScoped: true,
+})
 
 /**
  * 訂單 Store
  * 編號格式：O{year}{4位數} (如: O20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useOrderStore = createStore<Order>('orders', 'O')
+export const useOrderStore = createStore<Order>({
+  tableName: 'orders',
+  codePrefix: 'O',
+  workspaceScoped: true,
+})
 
 /**
  * 客戶 Store
  * 編號格式：C{year}{4位數} (如: C20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useCustomerStore = createStore<Customer>('customers', 'C')
+export const useCustomerStore = createStore<Customer>({
+  tableName: 'customers',
+  codePrefix: 'C',
+  workspaceScoped: true,
+})
 
 /**
  * 報價單 Store
  * 編號格式：Q{year}{4位數} (如: Q20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useQuoteStore = createStore<Quote>('quotes', 'Q')
+export const useQuoteStore = createStore<Quote>({
+  tableName: 'quotes',
+  codePrefix: 'Q',
+  workspaceScoped: true,
+})
 
 /**
  * 請款單 Store
  * 編號格式：PR{year}{4位數} (如: PR20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const usePaymentRequestStore = createStore<PaymentRequest>('payment_requests', 'PR')
+export const usePaymentRequestStore = createStore<PaymentRequest>({
+  tableName: 'payment_requests',
+  codePrefix: 'PR',
+  workspaceScoped: true,
+})
 
 /**
  * 請款項目 Store
  * 無獨立編號，依附於請款單
+ * 🔒 啟用 Workspace 隔離
  */
-export const usePaymentRequestItemStore = createStore<PaymentRequestItem>('payment_request_items')
+export const usePaymentRequestItemStore = createStore<PaymentRequestItem>({
+  tableName: 'payment_request_items',
+  workspaceScoped: true,
+})
 
 /**
  * 出納單 Store
  * 編號格式：DO{year}{4位數} (如: DO20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useDisbursementOrderStore = createStore<DisbursementOrder>('disbursement_orders', 'DO')
+export const useDisbursementOrderStore = createStore<DisbursementOrder>({
+  tableName: 'disbursement_orders',
+  codePrefix: 'DO',
+  workspaceScoped: true,
+})
 
 /**
  * 收款單 Store
  * 編號格式：RO{year}{4位數} (如: RO20240001)
+ * 🔒 啟用 Workspace 隔離
  */
-export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 'RO')
+export const useReceiptOrderStore = createStore<ReceiptOrder>({
+  tableName: 'receipt_orders',
+  codePrefix: 'RO',
+  workspaceScoped: true,
+})
 
 // ============================================
 // 子實體 Stores（無編號）
@@ -91,20 +135,32 @@ export const useReceiptOrderStore = createStore<ReceiptOrder>('receipt_orders', 
  * 團員 Store
  * 無獨立編號，依附於訂單
  * 注意：資料庫表格名稱是 members（不是 order_members）
+ * 🔒 啟用 Workspace 隔離
  */
-export const useMemberStore = createStore<Member>('members')
+export const useMemberStore = createStore<Member>({
+  tableName: 'members',
+  workspaceScoped: true,
+})
 
 /**
  * 報價項目 Store
  * 無獨立編號，依附於報價單
+ * 🔒 啟用 Workspace 隔離
  */
-export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>('quote_items')
+export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>({
+  tableName: 'quote_items',
+  workspaceScoped: true,
+})
 
 /**
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
+ * 🔒 啟用 Workspace 隔離
  */
-export const useTourAddOnStore = createStore<import('./types').TourAddOn>('tour_addons')
+export const useTourAddOnStore = createStore<import('./types').TourAddOn>({
+  tableName: 'tour_addons',
+  workspaceScoped: true,
+})
 
 // ============================================
 // 系統管理 Stores（無編號）
@@ -121,12 +177,22 @@ export const useEmployeeStore = createStore<Employee>('employees')
 // ============================================
 
 // 待辦事項 Store
-export const useTodoStore = createStore<Todo>('todos')
+// 🔒 啟用 Workspace 隔離
+export const useTodoStore = createStore<Todo>({
+  tableName: 'todos',
+  workspaceScoped: true,
+})
 
 // 簽證 Store
-export const useVisaStore = createStore<Visa>('visas', 'V')
+// 🔒 啟用 Workspace 隔離
+export const useVisaStore = createStore<Visa>({
+  tableName: 'visas',
+  codePrefix: 'V',
+  workspaceScoped: true,
+})
 
 // 代辦商成本 Store（記住代辦商+簽證類型的成本）
+// ⚠️ 不啟用 Workspace 隔離（全局共享）
 export const useVendorCostStore = createStore<import('./types').VendorCost>('vendor_costs')
 
 // 供應商 Store
@@ -159,8 +225,11 @@ export { useAttractionStore } from './attraction-store'
 export type { Attraction } from './attraction-store'
 
 // 行事曆事件 Store
-export const useCalendarEventStore =
-  createStore<import('@/types/calendar.types').CalendarEvent>('calendar_events')
+// 🔒 啟用 Workspace 隔離
+export const useCalendarEventStore = createStore<import('@/types/calendar.types').CalendarEvent>({
+  tableName: 'calendar_events',
+  workspaceScoped: true,
+})
 
 // 確認單 Store（航班/住宿）
 export { useConfirmationStore } from './confirmation-store'
