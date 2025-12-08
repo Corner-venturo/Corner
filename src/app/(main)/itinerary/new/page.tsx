@@ -1332,7 +1332,7 @@ function NewItineraryPageContent() {
                 data={{
                   ...tourData,
                   meetingPoints: tourData.meetingInfo ? [tourData.meetingInfo] : [],
-                  hotels: [],
+                  hotels: tourData.hotels || [],
                   countries: [],
                   showFeatures: tourData.showFeatures !== false,
                   showLeaderMeeting: tourData.showLeaderMeeting !== false,
@@ -1354,11 +1354,12 @@ function NewItineraryPageContent() {
                 }}
                 onChange={(newData) => {
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                  const { meetingPoints, hotels, countries, ...restData } = newData;
+                  const { meetingPoints, countries, ...restData } = newData;
                   setTourData({
                     ...restData,
                     status: tourData.status,
                     meetingInfo: meetingPoints?.[0] || { time: '', location: '' },
+                    hotels: newData.hotels || [],
                     showPricingDetails: newData.showPricingDetails,
                     pricingDetails: newData.pricingDetails,
                     // 價格方案
