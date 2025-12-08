@@ -7,11 +7,16 @@ export interface CostItem {
   unit_price: number
   total: number
   note?: string
+  description?: string // 項目描述（如：餐廳名稱、活動說明）
+  notes?: string // 備註（與 note 相容）
+  order?: number // 排序順序
   // 住宿專用：天數和房型數據
   day?: number // 第幾天
   room_type?: string // 房型名稱（如：雙人房、三人房）
   // 交通和領隊導遊專用：團體分攤
   is_group_cost?: boolean // 是否為團體費用
+  // 餐飲專用：自理餐標記
+  is_self_arranged?: boolean // 是否為自理（標記後價格為 0，但會顯示在確認單上）
   // 多身份計價：機票專用
   pricing_type?: 'uniform' | 'by_identity' // uniform: 統一價格, by_identity: 依身份計價
   adult_price?: number // 成人價

@@ -367,6 +367,9 @@ export default function QuoteDetailPage() {
                         handleAddAdultTicket={categoryOps.handleAddAdultTicket}
                         handleAddChildTicket={categoryOps.handleAddChildTicket}
                         handleAddInfantTicket={categoryOps.handleAddInfantTicket}
+                        handleAddLunchMeal={categoryOps.handleAddLunchMeal}
+                        handleAddDinnerMeal={categoryOps.handleAddDinnerMeal}
+                        handleAddActivity={categoryOps.handleAddActivity}
                         handleUpdateItem={categoryOps.handleUpdateItem}
                         handleRemoveItem={categoryOps.handleRemoveItem}
                       />

@@ -67,6 +67,9 @@ interface CategorySectionProps {
   handleAddAdultTicket: (categoryId: string) => void
   handleAddChildTicket: (categoryId: string) => void
   handleAddInfantTicket: (categoryId: string) => void
+  handleAddLunchMeal?: (day?: number) => void
+  handleAddDinnerMeal?: (day?: number) => void
+  handleAddActivity?: (day?: number) => void
   handleUpdateItem: (
     categoryId: string,
     itemId: string,
@@ -88,6 +91,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleAddAdultTicket,
   handleAddChildTicket,
   handleAddInfantTicket,
+  handleAddLunchMeal,
+  handleAddDinnerMeal,
+  handleAddActivity,
   handleUpdateItem,
   handleRemoveItem,
 }) => {
@@ -322,6 +328,51 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               >
                 <Plus size={12} className="mr-1" />
                 其他
+              </Button>
+            </div>
+          ) : category.id === 'meals' && handleAddLunchMeal && handleAddDinnerMeal ? (
+            <div className="flex gap-1 justify-end">
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => handleAddLunchMeal()}
+                disabled={isReadOnly}
+                className={cn(
+                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
+                )}
+              >
+                <Plus size={12} className="mr-1" />
+                午餐
+              </Button>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => handleAddDinnerMeal()}
+                disabled={isReadOnly}
+                className={cn(
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
+                )}
+              >
+                <Plus size={12} className="mr-1" />
+                晚餐
+              </Button>
+            </div>
+          ) : category.id === 'activities' && handleAddActivity ? (
+            <div className="flex gap-1 justify-end">
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => handleAddActivity()}
+                disabled={isReadOnly}
+                className={cn(
+                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
+                )}
+              >
+                <Plus size={12} className="mr-1" />
+                新增
               </Button>
             </div>
           ) : (
