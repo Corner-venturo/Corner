@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Loader2, X, GripVertical, Plus, Move, ZoomIn, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { toast } from 'sonner'
 import {
   DndContext,
   closestCenter,
@@ -459,6 +460,7 @@ export function DailyImagesUploader({
 
         if (uploadError) {
           console.error('上傳失敗:', uploadError)
+          toast.error(`圖片上傳失敗: ${uploadError.message}`)
           continue
         }
 
@@ -476,6 +478,7 @@ export function DailyImagesUploader({
       }
     } catch (error) {
       console.error('上傳錯誤:', error)
+      toast.error(`上傳過程發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)
     } finally {
       setIsUploading(false)
       setUploadProgress(0)

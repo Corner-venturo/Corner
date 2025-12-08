@@ -15,23 +15,31 @@ import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 
 // 從 ISO 時間字串取得顯示用的時間（HH:MM）
-// 直接解析字串中的時間部分，避免時區轉換問題
+// 正確轉換成台灣時區顯示
 const getDisplayTime = (isoString: string, allDay?: boolean): string => {
   if (allDay) return ''
   if (!isoString) return ''
 
-  // 直接從 ISO 字串中擷取時間部分，避免 Date 物件的時區轉換
-  // 格式：2025-01-15T14:30:00+08:00 或 2025-01-15T14:30:00
-  const timeMatch = isoString.match(/T(\d{2}):(\d{2})/)
-  if (!timeMatch) return ''
+  try {
+    // 使用 Date 物件正確解析 ISO 時間並轉換成台灣時區
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) return ''
 
-  const hour = timeMatch[1]
-  const minute = timeMatch[2]
+    // 使用 toLocaleTimeString 取得台灣時區的時間
+    const timeStr = date.toLocaleTimeString('zh-TW', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Taipei',
+    })
 
-  // 如果是 00:00 就不顯示（全天事件）
-  if (hour === '00' && minute === '00') return ''
+    // 如果是 00:00 就不顯示（可能是全天事件）
+    if (timeStr === '00:00') return ''
 
-  return `${hour}:${minute}`
+    return timeStr
+  } catch {
+    return ''
+  }
 }
 
 export function useCalendarEvents() {

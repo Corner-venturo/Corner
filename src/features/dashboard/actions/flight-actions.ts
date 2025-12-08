@@ -357,6 +357,8 @@ export async function searchAirportDeparturesAction(
   const url = `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${cleanAirportCode}/${fromTime}/${toTime}?direction=Departure&withCancelled=true`
 
   try {
+    logger.log(`🔍 查詢機場出發航班: ${url}`)
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -366,14 +368,19 @@ export async function searchAirportDeparturesAction(
     })
 
     if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error')
+      logger.error(`❌ AeroDataBox API Error: ${response.status} - ${errorText}`)
+
       if (response.status === 404) {
         return { error: '找不到該機場的資訊。' }
       }
       if (response.status === 429) {
         return { error: '本月查詢額度已用完，請下個月再試。' }
       }
-      logger.error(`AeroDataBox API Error: ${response.status}`)
-      return { error: '無法查詢機場航班，請稍後再試。' }
+      if (response.status === 401 || response.status === 403) {
+        return { error: 'API 金鑰無效或已過期，請聯絡管理員。' }
+      }
+      return { error: `查詢失敗 (${response.status})，請稍後再試。` }
     }
 
     const apiData = await response.json()
@@ -442,6 +449,8 @@ export async function searchAirportArrivalsAction(
   const url = `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${cleanAirportCode}/${fromTime}/${toTime}?direction=Arrival&withCancelled=true`
 
   try {
+    logger.log(`🔍 查詢機場抵達航班: ${url}`)
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -451,14 +460,19 @@ export async function searchAirportArrivalsAction(
     })
 
     if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error')
+      logger.error(`❌ AeroDataBox API Error: ${response.status} - ${errorText}`)
+
       if (response.status === 404) {
         return { error: '找不到該機場的資訊。' }
       }
       if (response.status === 429) {
         return { error: '本月查詢額度已用完，請下個月再試。' }
       }
-      logger.error(`AeroDataBox API Error: ${response.status}`)
-      return { error: '無法查詢機場航班，請稍後再試。' }
+      if (response.status === 401 || response.status === 403) {
+        return { error: 'API 金鑰無效或已過期，請聯絡管理員。' }
+      }
+      return { error: `查詢失敗 (${response.status})，請稍後再試。` }
     }
 
     const apiData = await response.json()
