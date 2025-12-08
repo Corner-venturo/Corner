@@ -51,29 +51,28 @@ export function AdvanceListCard({
   }
 
   return (
-    <div className="card-morandi-elevated my-3">
-      {/* 標題 */}
-      <div className="flex items-start gap-2 mb-3">
-        <Receipt className="text-morandi-gold shrink-0 mt-1" size={20} />
-        <div className="flex-1">
-          <div className="font-medium text-morandi-primary">{userName} 分享了代墊清單</div>
-          <div className="text-xs text-morandi-secondary mt-1">
-            {new Date(advanceList.created_at).toLocaleString('zh-TW')}
-          </div>
-        </div>
+    <div className="my-2">
+      {/* 標題列 - 類似訊息格式 */}
+      <div className="flex items-center gap-2 mb-2">
+        <Receipt className="text-morandi-gold shrink-0" size={16} />
+        <span className="font-medium text-morandi-primary">{userName}</span>
+        <span className="text-morandi-secondary text-sm">分享了代墊清單</span>
+        <span className="text-xs text-morandi-muted ml-auto">
+          {new Date(advanceList.created_at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        </span>
         {onDelete && (
           <button
             onClick={handleDelete}
-            className="btn-icon-morandi !w-8 !h-8 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="p-1 hover:bg-red-50 hover:text-red-600 rounded transition-colors"
             title="刪除代墊清單"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         )}
       </div>
 
       {/* 代墊項目卡片 */}
-      <div className="bg-gradient-to-br from-morandi-container/5 to-morandi-container/10 rounded-lg p-4 border border-morandi-gold/20">
+      <div className="bg-morandi-container/5 rounded-lg p-3 border border-morandi-gold/20 ml-6">
         {/* 摘要資訊 */}
         <div className="flex items-center justify-between mb-3 pb-3 border-b border-morandi-gold/20">
           <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@
 import { forwardRef, useMemo } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import type { Message, AdvanceList, SharedOrderList } from '@/stores/workspace-store'
+import { useEmployeeStore } from '@/stores'
 import { MessageItem } from './MessageItem'
 import { EmptyState } from './EmptyState'
 import { AdvanceListCard } from '../AdvanceListCard'
@@ -58,6 +59,13 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   },
   ref
 ) {
+  const employees = useEmployeeStore(state => state.items) || []
+
+  // 根據 created_by 查找員工名字
+  const getEmployeeName = (userId: string) => {
+    const employee = employees.find(e => e.id === userId)
+    return employee?.display_name || employee?.name || '未知'
+  }
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
@@ -114,7 +122,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                   <AdvanceListCard
                     key={item.data.id}
                     advanceList={item.data}
-                    userName={item.data.author?.display_name}
+                    userName={item.data.author?.display_name || getEmployeeName(item.data.created_by)}
                     currentUserId={currentUserId || ''}
                     userRole="admin"
                     onCreatePayment={onCreatePayment || (() => {})}
@@ -126,7 +134,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                   <OrderListCard
                     key={item.data.id}
                     orderList={item.data as any}
-                    userName={item.data.author?.display_name}
+                    userName={item.data.author?.display_name || getEmployeeName(item.data.created_by)}
                     currentUserId={currentUserId || ''}
                     userRole="admin"
                     onCreateReceipt={onCreateReceipt || (() => {})}
