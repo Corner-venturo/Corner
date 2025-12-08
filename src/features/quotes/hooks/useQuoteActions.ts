@@ -96,7 +96,8 @@ export const useQuoteActions = ({
         return category
       })
     })
-  }, [participantCounts, groupSize, groupSizeForGuide, setCategories]) // 監聽人數變化
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [participantCounts, groupSize, groupSizeForGuide]) // 移除 setCategories 避免無限循環
 
   // 儲存當前版本（覆蓋）
   // 新邏輯：所有版本都存在 versions[] 陣列，current_version_index 追蹤當前編輯的版本
