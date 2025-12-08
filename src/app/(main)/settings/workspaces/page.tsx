@@ -93,7 +93,7 @@ export default function WorkspacesPage() {
 
       {/* 工作空間列表 */}
       <div className="grid gap-4 md:grid-cols-2">
-        {workspaces?.map(workspace => (
+        {(workspaces || []).map(workspace => (
           <Card
             key={workspace.id}
             className="border-morandi-container/30 p-6 hover:shadow-lg transition-shadow"
