@@ -13,6 +13,7 @@ import { createStore } from '../core/create-store'
 import type { Workspace, Channel, ChannelGroup } from './types'
 import type { BaseEntity } from '@/types'
 import { setCurrentWorkspaceFilter } from '@/lib/workspace-filter'
+import { useAuthStore } from '../auth-store'
 
 type WorkspaceEntity = Workspace & BaseEntity
 
@@ -119,9 +120,22 @@ export const useChannelsStore = () => {
 
       // 🔥 使用 fetchAll 的返回值，而不是 items (避免競爭條件)
       if (workspaces && workspaces.length > 0 && !uiStore.currentWorkspace) {
-        uiStore.setCurrentWorkspace(workspaces[0])
+        // 根據使用者的 workspace_id 選擇對應的工作空間
+        const user = useAuthStore.getState().user
+        const userWorkspaceId = user?.workspace_id
+
+        let selectedWorkspace = workspaces[0] // 預設第一個
+
+        if (userWorkspaceId) {
+          const userWorkspace = workspaces.find(ws => ws.id === userWorkspaceId)
+          if (userWorkspace) {
+            selectedWorkspace = userWorkspace
+          }
+        }
+
+        uiStore.setCurrentWorkspace(selectedWorkspace)
         // 🔥 設定 workspace filter
-        setCurrentWorkspaceFilter(workspaces[0].id)
+        setCurrentWorkspaceFilter(selectedWorkspace.id)
       }
     },
 

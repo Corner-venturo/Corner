@@ -25,6 +25,7 @@ import { VisasInfoDialog } from './VisasInfoDialog'
 import { AddVisaDialog } from './AddVisaDialog'
 import { SubmitVisaDialog } from './SubmitVisaDialog'
 import { EditVisaDialog } from './EditVisaDialog'
+import { ReturnDocumentsDialog } from './ReturnDocumentsDialog'
 import type { Visa } from '@/stores/types'
 // ============================================
 // 簽證管理主頁面
@@ -89,6 +90,7 @@ export default function VisasPage() {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [editingVisa, setEditingVisa] = React.useState<Visa | null>(null)
+  const [isReturnDialogOpen, setIsReturnDialogOpen] = React.useState(false)
 
   // 旅客比對相關狀態
   const [showCustomerMatchDialog, setShowCustomerMatchDialog] = React.useState(false)
@@ -412,67 +414,68 @@ export default function VisasPage() {
           <div className="flex items-center gap-3">
             {/* 批次操作區域 */}
             {canManageVisas && selectedRows.length > 0 ? (
-              <>
-                <span className="text-sm text-morandi-primary">
-                  已選擇 {selectedRows.length} 筆簽證
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-morandi-secondary bg-morandi-container/50 px-3 py-1.5 rounded-full">
+                  已選 <span className="font-semibold text-morandi-primary">{selectedRows.length}</span> 筆
                 </span>
-                <Button
-                  onClick={() => setIsSubmitDialogOpen(true)}
-                  size="sm"
-                  variant="secondary"
+
+                <div className="flex items-center bg-morandi-container/30 rounded-lg p-1 gap-1">
+                  <button
+                    onClick={() => setIsSubmitDialogOpen(true)}
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-amber-500 text-white hover:bg-amber-600 transition-colors"
+                    title="送件給代辦商"
+                  >
+                    送件
+                  </button>
+                  <button
+                    onClick={() => setIsReturnDialogOpen(true)}
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    title="登記證件歸還"
+                  >
+                    歸還
+                  </button>
+                  <button
+                    onClick={() => {
+                      const today = new Date().toISOString().split('T')[0]
+                      selectedRows.forEach(id => {
+                        const visa = visas.find(v => v.id === id)
+                        const updates: Record<string, unknown> = {
+                          status: 'collected',
+                          pickup_date: today,
+                        }
+                        if (!visa?.documents_returned_date) {
+                          updates.documents_returned_date = today
+                        }
+                        updateVisa(id, updates)
+                      })
+                      setSelectedRows([])
+                      toast.success('已取件')
+                    }}
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                    title="取件完成"
+                  >
+                    取件
+                  </button>
+                  <button
+                    onClick={() => {
+                      selectedRows.forEach(id => updateVisa(id, { status: 'rejected' }))
+                      setSelectedRows([])
+                      toast.success('已標記退件')
+                    }}
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-rose-500 text-white hover:bg-rose-600 transition-colors"
+                    title="標記為退件"
+                  >
+                    退件
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setSelectedRows([])}
+                  className="text-sm text-morandi-secondary hover:text-morandi-primary transition-colors"
                 >
-                  送
-                </Button>
-                <Button
-                  onClick={() => {
-                    const today = new Date().toISOString().split('T')[0]
-                    selectedRows.forEach(id => updateVisa(id, { documents_returned_date: today }))
-                    setSelectedRows([])
-                    toast.success('已登記證件歸還')
-                  }}
-                  size="sm"
-                  variant="outline"
-                >
-                  還
-                </Button>
-                <Button
-                  onClick={() => {
-                    const today = new Date().toISOString().split('T')[0]
-                    selectedRows.forEach(id => {
-                      // 找到該筆簽證
-                      const visa = visas.find(v => v.id === id)
-                      // 如果沒有登記證件歸還時間，就同時填上今天
-                      const updates: Record<string, unknown> = {
-                        status: 'collected',
-                        pickup_date: today,
-                      }
-                      if (!visa?.documents_returned_date) {
-                        updates.documents_returned_date = today
-                      }
-                      updateVisa(id, updates)
-                    })
-                    setSelectedRows([])
-                    toast.success('已取件')
-                  }}
-                  size="sm"
-                  variant="default"
-                >
-                  取
-                </Button>
-                <Button
-                  onClick={() => {
-                    selectedRows.forEach(id => updateVisa(id, { status: 'rejected' }))
-                    setSelectedRows([])
-                  }}
-                  size="sm"
-                  variant="destructive"
-                >
-                  退
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setSelectedRows([])}>
-                  取消選擇
-                </Button>
-              </>
+                  取消
+                </button>
+              </div>
             ) : (
               <>
                 <Button
@@ -817,6 +820,17 @@ export default function VisasPage() {
           setEditingVisa(null)
         }}
         visa={editingVisa}
+      />
+
+      {/* 證件歸還對話框 */}
+      <ReturnDocumentsDialog
+        open={isReturnDialogOpen}
+        onClose={() => setIsReturnDialogOpen(false)}
+        selectedVisas={selectedVisas}
+        onComplete={() => {
+          setSelectedRows([])
+          toast.success('已登記證件歸還')
+        }}
       />
     </div>
   )
