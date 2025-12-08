@@ -7,12 +7,11 @@ import type { TourFormData } from './tour-form/types'
 import type { ItineraryVersionRecord } from '@/stores/types'
 import { Button } from '@/components/ui/button'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Dialog,
   DialogContent,
@@ -28,7 +27,7 @@ import {
 } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink } from 'lucide-react'
+import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink, Trash2 } from 'lucide-react'
 import { generateUUID } from '@/lib/utils/uuid'
 
 
@@ -51,6 +50,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [versionNote, setVersionNote] = useState('')
   const [copied, setCopied] = useState(false)
+  const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
   const { create, update } = useItineraryStore()
   const { user } = useAuthStore()
   const router = useRouter()
@@ -200,6 +200,33 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     }
   }
 
+  // 刪除版本
+  const handleDeleteVersion = async (index: number) => {
+    if (!data.id) return
+    if (versionRecords.length <= 0) return
+
+    const versionToDelete = versionRecords[index]
+    const versionName = versionToDelete?.note || `版本 ${versionToDelete?.version || index + 1}`
+
+    if (!confirm(`確定要刪除「${versionName}」嗎？`)) return
+
+    try {
+      const updatedRecords = versionRecords.filter((_, i) => i !== index)
+      await update(data.id, { version_records: updatedRecords })
+
+      // 如果刪除的是當前版本，切回主版本
+      if (currentVersionIndex === index) {
+        onVersionChange(-1)
+      } else if (currentVersionIndex > index) {
+        // 如果刪除的版本在當前版本之前，調整索引
+        onVersionChange(currentVersionIndex - 1, versionRecords[currentVersionIndex - 1])
+      }
+    } catch (error) {
+      console.error('刪除版本失敗:', error)
+      alert('刪除版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+    }
+  }
+
   // 複製連結
   const copyShareLink = () => {
     if (!shareUrl) return
@@ -246,23 +273,72 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
 
         {/* 3. 版本選擇器（編輯模式就顯示）*/}
         {isEditMode && (
-          <Select
-            value={currentVersionIndex.toString()}
-            onValueChange={handleVersionSelect}
-          >
-            <SelectTrigger className="w-auto min-w-[100px] h-8 text-xs border-morandi-container bg-white">
-              <History size={14} className="mr-1.5 text-morandi-secondary" />
-              <SelectValue placeholder="版本" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="-1">{data.tourCode || '原始版本'}</SelectItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 text-xs border-morandi-container bg-white"
+              >
+                <History size={14} className="mr-1.5 text-morandi-secondary" />
+                {getCurrentVersionName()}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64" align="end">
+              <div className="px-2 py-1.5 text-sm font-medium text-morandi-primary border-b border-border">
+                版本歷史
+              </div>
+              {/* 主版本 */}
+              <DropdownMenuItem
+                className="flex items-center justify-between py-2 cursor-pointer"
+                onClick={() => handleVersionSelect('-1')}
+              >
+                <span className="font-medium">{data.tourCode || '原始版本'}</span>
+                {currentVersionIndex === -1 && (
+                  <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
+                )}
+              </DropdownMenuItem>
+              {/* 其他版本 */}
               {versionRecords.map((record, index) => (
-                <SelectItem key={record.id} value={index.toString()}>
-                  {record.note || `版本 ${record.version}`}
-                </SelectItem>
+                <DropdownMenuItem
+                  key={record.id}
+                  className="flex items-center justify-between py-2 cursor-pointer relative"
+                  onMouseEnter={() => setHoveredVersionIndex(index)}
+                  onMouseLeave={() => setHoveredVersionIndex(null)}
+                  onClick={() => handleVersionSelect(index.toString())}
+                >
+                  <div className="flex flex-col flex-1">
+                    <span className="font-medium">{record.note || `版本 ${record.version}`}</span>
+                    <span className="text-xs text-morandi-secondary">
+                      {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {currentVersionIndex === index && (
+                      <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
+                    )}
+                    {hoveredVersionIndex === index && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteVersion(index)
+                        }}
+                        className="p-1 hover:bg-red-100 rounded transition-colors"
+                        title="刪除版本"
+                      >
+                        <Trash2 size={14} className="text-red-500" />
+                      </button>
+                    )}
+                  </div>
+                </DropdownMenuItem>
               ))}
-            </SelectContent>
-          </Select>
+              {versionRecords.length === 0 && (
+                <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
+                  尚無其他版本，點擊「另存」創建新版本
+                </div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* 4. 連結按鈕（編輯模式且有 shareUrl 才顯示）*/}

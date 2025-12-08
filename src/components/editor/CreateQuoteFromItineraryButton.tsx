@@ -259,17 +259,18 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
     return mealsCategory?.items?.length || 0
   }
 
-  // 查找已關聯此行程的報價單
+  // 查找已關聯此行程的報價單（同時檢查 itinerary_id 和舊的 tour_id 以向後相容）
   const linkedQuotes = useMemo(() => {
     if (!itineraryId) return []
-    return quotes.filter(quote => quote.tour_id === itineraryId)
+    return quotes.filter(quote => quote.itinerary_id === itineraryId || quote.tour_id === itineraryId)
   }, [quotes, itineraryId])
 
   // 查找未連動過的報價單
   const availableQuotes = useMemo(() => {
     return quotes.filter(quote =>
       quote.quote_type === 'standard' &&
-      !quote.tour_id
+      !quote.itinerary_id &&
+      !quote.tour_id // 同時檢查舊欄位
     )
   }, [quotes])
 
@@ -319,7 +320,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
       const finalQuoteData = {
         ...quoteData,
         code,
-        ...(itineraryId && { tour_id: itineraryId }),
+        ...(itineraryId && { itinerary_id: itineraryId }), // 使用新的 itinerary_id 欄位
         ...(tourData.tourCode && { tour_code: tourData.tourCode }),
       }
 
@@ -388,7 +389,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
 
       if (itineraryId) {
         await update(selectedQuote.id, {
-          tour_id: itineraryId,
+          itinerary_id: itineraryId, // 使用新的 itinerary_id 欄位
           tour_code: tourData.tourCode,
         })
       }
@@ -437,7 +438,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
 
       if (itineraryId) {
         await update(selectedQuote.id, {
-          tour_id: itineraryId,
+          itinerary_id: itineraryId, // 使用新的 itinerary_id 欄位
           tour_code: tourData.tourCode,
         })
       }
@@ -469,7 +470,8 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
     try {
       setIsLoading(true)
       await update(quoteId, {
-        tour_id: null,
+        itinerary_id: null, // 清除新欄位
+        tour_id: null, // 同時清除舊欄位（向後相容）
         tour_code: null,
       })
       // 重新載入

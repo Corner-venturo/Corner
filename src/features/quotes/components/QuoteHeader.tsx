@@ -242,11 +242,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
           <DropdownMenu>
             <DropdownMenuTrigger
-              disabled={isReadOnly}
-              className={cn(
-                'h-8 px-3 text-sm border-morandi-container text-morandi-secondary hover:bg-morandi-container',
-                isReadOnly && 'cursor-not-allowed opacity-60'
-              )}
+              className="h-8 px-3 text-sm border border-morandi-container text-morandi-secondary hover:bg-morandi-container rounded-md flex items-center"
             >
               <History size={14} className="mr-1.5" />
               版本歷史
@@ -289,7 +285,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                             {isCurrentEditing && (
                               <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>
                             )}
-                            {hoveredVersionIndex === originalIndex && (
+                            {!isReadOnly && hoveredVersionIndex === originalIndex && (
                               <button
                                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                   e.stopPropagation()
