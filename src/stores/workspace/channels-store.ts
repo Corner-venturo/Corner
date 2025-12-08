@@ -92,9 +92,9 @@ export const useChannelsStore = () => {
     // ============================================
     // 資料 (來自 createStore)
     // ============================================
-    workspaces: workspaceStore.items,
-    channels: channelStore.items,
-    channelGroups: channelGroupStore.items,
+    workspaces: workspaceStore.items || [],
+    channels: channelStore.items || [],
+    channelGroups: channelGroupStore.items || [],
 
     // ============================================
     // UI 狀態
