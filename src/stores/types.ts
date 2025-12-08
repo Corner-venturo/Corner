@@ -80,6 +80,7 @@ export interface User {
   status: 'active' | 'probation' | 'leave' | 'terminated'
   avatar?: string
   workspace_id?: string // 所屬工作空間 ID
+  workspace_code?: string // 所屬工作空間代碼（TP, TC 等）- 登入時一併取得
   selected_workspace_id?: string // Super Admin 選擇的工作空間 ID
   hidden_menu_items?: string[] // 隱藏的選單項目 ID
   preferred_features?: string[] // 個人常用功能列表（用於個人化 Sidebar），例如: ["tours", "orders", "calendar"]

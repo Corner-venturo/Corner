@@ -106,7 +106,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           logger.log('✅ Supabase authentication successful')
-          
+
           try {
             const email = `${username}@venturo.com`
             const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -120,6 +120,25 @@ export const useAuthStore = create<AuthState>()(
             }
           } catch (authError) {
             logger.warn('⚠️ Supabase Auth session creation failed:', authError)
+          }
+
+          // 查詢 workspace code（如果有 workspace_id）
+          let workspaceCode: string | undefined = undefined
+          if (employeeData.workspace_id) {
+            try {
+              const { data: workspace } = await supabase
+                .from('workspaces')
+                .select('code, name')
+                .eq('id', employeeData.workspace_id)
+                .single()
+
+              if (workspace) {
+                workspaceCode = workspace.code || workspace.name?.substring(0, 2).toUpperCase()
+                logger.log('✅ Workspace code fetched:', workspaceCode)
+              }
+            } catch (wsError) {
+              logger.warn('⚠️ Failed to fetch workspace code:', wsError)
+            }
           }
 
           const user: User = {
@@ -137,6 +156,7 @@ export const useAuthStore = create<AuthState>()(
             contracts: employeeData.contracts || [],
             status: employeeData.status as User['status'],
             workspace_id: employeeData.workspace_id,
+            workspace_code: workspaceCode, // 登入時取得的 workspace code
             created_at: employeeData.created_at || new Date().toISOString(),
             updated_at: employeeData.updated_at || new Date().toISOString(),
           }
@@ -193,6 +213,24 @@ export const useAuthStore = create<AuthState>()(
             return
           }
 
+          // 查詢 workspace code（如果有 workspace_id）
+          let workspaceCode = currentUser.workspace_code // 保留原有的 code
+          if (employeeData.workspace_id) {
+            try {
+              const { data: workspace } = await supabase
+                .from('workspaces')
+                .select('code, name')
+                .eq('id', employeeData.workspace_id)
+                .single()
+
+              if (workspace) {
+                workspaceCode = workspace.code || workspace.name?.substring(0, 2).toUpperCase()
+              }
+            } catch (wsError) {
+              logger.warn('⚠️ Failed to fetch workspace code:', wsError)
+            }
+          }
+
           const updatedUser: User = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
@@ -208,6 +246,7 @@ export const useAuthStore = create<AuthState>()(
             contracts: employeeData.contracts || [],
             status: employeeData.status as User['status'],
             workspace_id: employeeData.workspace_id,
+            workspace_code: workspaceCode, // 保留或更新 workspace code
             created_at: employeeData.created_at || new Date().toISOString(),
             updated_at: employeeData.updated_at || new Date().toISOString(),
           }

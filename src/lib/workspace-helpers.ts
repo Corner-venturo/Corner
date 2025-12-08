@@ -37,77 +37,86 @@ export function getCurrentWorkspaceId(): string | null {
   return user.workspace_id || null
 }
 
+// 快取 workspaces 資料（避免重複查詢）
+let workspacesCache: WorkspaceWithCode[] | null = null
+let workspacesCacheTime: number = 0
+const CACHE_TTL = 5 * 60 * 1000 // 5 分鐘
+
 /**
  * 取得當前使用者的 workspace code (TP, TC)
- * 由於資料庫沒有 code 欄位，從 name 取前兩個字元作為代碼
+ *
+ * 優先順序：
+ * 1. user.workspace_code（登入時已取得，最可靠）
+ * 2. 從 workspaces store 查詢（備用）
+ * 3. 返回 null（拋錯由呼叫端處理）
  *
  * @returns workspace code 或 null
  */
 export function getCurrentWorkspaceCode(): string | null {
   const { user } = useAuthStore.getState()
-  const workspaceStore = useWorkspaceStoreData.getState()
-  const workspaces = (workspaceStore.items || []) as WorkspaceWithCode[]
 
   if (!user) {
     logger.warn('[getCurrentWorkspaceCode] No user found')
     return null
   }
 
-  // 檢查 workspaces 是否已載入
-  if (workspaces.length === 0) {
-    logger.error('[getCurrentWorkspaceCode] ❌ Workspaces not loaded! Store state:', {
-      hasItems: !!workspaceStore.items,
-      itemsLength: workspaceStore.items?.length,
-      hasFetchAll: !!workspaceStore.fetchAll
-    })
-    // 嘗試載入 workspaces
-    if (workspaceStore.fetchAll) {
-      logger.log('[getCurrentWorkspaceCode] Triggering fetchAll()...')
-      workspaceStore.fetchAll().catch((err: any) => logger.error('fetchAll failed:', err))
-    }
-    return null
+  // ✅ 優先使用登入時取得的 workspace_code（最可靠）
+  if (user.workspace_code) {
+    return user.workspace_code
   }
 
   // 可跨 workspace 的角色需要從前端選擇的 workspace 取得 code
   const userRole = user.roles?.[0] as UserRole
   if (canCrossWorkspace(userRole)) {
+    // Super Admin 需要從 workspaces store 取得
+    const workspaceStore = useWorkspaceStoreData.getState()
+    let workspaces = (workspaceStore.items || []) as WorkspaceWithCode[]
+
+    // 如果 store 沒有資料，嘗試用快取
+    if (workspaces.length === 0 && workspacesCache && Date.now() - workspacesCacheTime < CACHE_TTL) {
+      workspaces = workspacesCache
+    }
+
+    // 如果仍然沒有資料，觸發背景載入
+    if (workspaces.length === 0) {
+      if (workspaceStore.fetchAll) {
+        workspaceStore.fetchAll().then(() => {
+          const newItems = workspaceStore.items as WorkspaceWithCode[]
+          if (newItems && newItems.length > 0) {
+            workspacesCache = newItems
+            workspacesCacheTime = Date.now()
+          }
+        }).catch(() => {})
+      }
+      logger.warn('[getCurrentWorkspaceCode] Super Admin: workspaces not loaded yet')
+      return null
+    }
+
+    // 更新快取
+    workspacesCache = workspaces
+    workspacesCacheTime = Date.now()
+
     // 如果有選擇的 workspace，從 store 取得
     const selectedWorkspaceId = user.selected_workspace_id
     if (selectedWorkspaceId) {
       const workspace = workspaces.find((w: WorkspaceWithCode) => w.id === selectedWorkspaceId)
       if (workspace) {
-        // ✅ 使用 workspace.code 欄位（如 TP, TC）
         return workspace.code || workspace.name.substring(0, 2).toUpperCase()
       }
-      logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user selected workspace ${selectedWorkspaceId} not found`)
     }
 
-    // ✅ 沒有選擇 workspace 時，使用第一個 workspace
-    if (!selectedWorkspaceId && workspaces.length > 0) {
+    // 沒有選擇 workspace 時，使用第一個 workspace
+    if (workspaces.length > 0) {
       const defaultWorkspace = workspaces[0]
-      logger.warn(`[getCurrentWorkspaceCode] Cross-workspace user has no selected workspace, using default: ${defaultWorkspace.name}`)
-      // ✅ 使用 workspace.code 欄位（如 TP, TC）
       return defaultWorkspace.code || defaultWorkspace.name.substring(0, 2).toUpperCase()
     }
 
-    logger.warn('[getCurrentWorkspaceCode] Cross-workspace user has no workspace available')
     return null
   }
 
-  // 一般使用者從自己的 workspace_id 找到對應的 code
-  const workspaceId = user.workspace_id
-  if (!workspaceId) {
-    logger.warn('[getCurrentWorkspaceCode] User has no workspace_id')
-    return null
-  }
-
-  const workspace = workspaces.find((w: WorkspaceWithCode) => w.id === workspaceId)
-  if (workspace) {
-    // ✅ 使用 workspace.code 欄位（如 TP, TC）
-    return workspace.code || workspace.name.substring(0, 2).toUpperCase()
-  }
-
-  logger.warn(`[getCurrentWorkspaceCode] Workspace ${workspaceId} not found in store`)
+  // 一般使用者：user.workspace_code 應該已經有值
+  // 如果沒有，可能是舊的登入 session，需要重新登入
+  logger.warn('[getCurrentWorkspaceCode] User has no workspace_code, please re-login')
   return null
 }
 

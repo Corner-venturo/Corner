@@ -66,18 +66,18 @@ export function MainLayout({ children }: MainLayoutProps) {
       useEffect(() => {
         if (!isClient) return
 
-        // 離線資料庫會在 sync-manager 中自動初始化
-
         // 載入基礎資料（只載入全域需要的資料）
         const loadInitialData = async () => {
           try {
-            // 載入工作空間（全域需要）
-            // 注意：useChannelsStore 是一個 hook，不是 Zustand store
-            // 因此沒有 getState 方法，改用直接導入內部的 store
-            const { useWorkspaceChannels } = await import('@/stores/workspace')
-            // 使用 hook 的方式會在 React 外部無法調用，改用直接調用 store
-            // 這裡暫時跳過，workspaces 會在需要時被自動載入
-          } catch (_error) {}
+            // 載入工作空間（全域需要，用於生成團號等）
+            const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
+            const workspaceStore = useWorkspaceStoreData.getState()
+            if (workspaceStore.items.length === 0 && workspaceStore.fetchAll) {
+              await workspaceStore.fetchAll()
+            }
+          } catch (_error) {
+            console.error('Failed to load workspaces:', _error)
+          }
         }
 
         loadInitialData()

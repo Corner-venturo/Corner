@@ -218,7 +218,7 @@ export function useTourDetails(tour_id: string) {
   const generateTourCode = async (cityCode: string, date: Date, isSpecial?: boolean) => {
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
-      throw new Error('無法取得 workspace code')
+      throw new Error('無法取得 workspace code，請重新登入')
     }
 
     // 獲取現有 tours 來避免重複

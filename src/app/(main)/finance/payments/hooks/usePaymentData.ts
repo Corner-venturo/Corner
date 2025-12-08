@@ -79,7 +79,7 @@ export function usePaymentData() {
       // 生成收款單號
       const workspaceCode = getCurrentWorkspaceCode()
       if (!workspaceCode) {
-        throw new Error('無法取得 workspace code')
+        throw new Error('無法取得 workspace code，請重新登入')
       }
       const receiptNumber = generateReceiptNumber(workspaceCode, item.transaction_date, receipts)
 

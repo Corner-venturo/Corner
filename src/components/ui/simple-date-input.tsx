@@ -35,9 +35,13 @@ export function SimpleDateInput({
   const month = parts[1] || ''
   const day = parts[2] || ''
 
-  // 轉換為 Date 物件
-  const dateValue = value ? parse(value, 'yyyy-MM-dd', new Date()) : undefined
-  const minDate = min ? parse(min, 'yyyy-MM-dd', new Date()) : undefined
+  // 轉換為 Date 物件（只有完整格式才解析）
+  const dateValue = value && value.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? parse(value, 'yyyy-MM-dd', new Date())
+    : undefined
+  const minDate = min && min.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? parse(min, 'yyyy-MM-dd', new Date())
+    : undefined
 
   // 判斷是否為完整有效日期
   const isCompleteDate = year.length === 4 && month.length === 2 && day.length === 2 && dateValue && isValid(dateValue)

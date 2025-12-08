@@ -93,7 +93,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
 
       const workspaceCode = getCurrentWorkspaceCode()
       if (!workspaceCode) {
-        throw new Error('無法取得 workspace code')
+        throw new Error('無法取得 workspace code，請重新登入')
       }
 
       // 為每個收款項目建立收款單

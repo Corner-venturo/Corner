@@ -373,7 +373,7 @@ export const useQuoteActions = ({
     // 生成團號（使用預設地區代碼 'XX'）
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
-      throw new Error('無法取得 workspace code')
+      throw new Error('無法取得 workspace code，請重新登入')
     }
 
     // 獲取現有的 tours 來避免編號衝突
