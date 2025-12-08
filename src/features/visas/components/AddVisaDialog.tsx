@@ -13,8 +13,8 @@ interface VisaApplicant {
   name: string
   country: string
   is_urgent: boolean
-  submission_date: string
-  received_date: string
+  received_date: string // 收件時間
+  expected_issue_date: string // 預計下件時間
   cost: number
 }
 
@@ -279,12 +279,19 @@ export function AddVisaDialog({
 
             <Input
               type="date"
-              value={applicant.submission_date}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'submission_date', e.target.value)}
+              value={applicant.received_date}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'received_date', e.target.value)}
               className="w-32"
+              title="收件時間"
             />
 
-            <Input type="date" value={applicant.received_date} readOnly className="w-32 bg-muted" />
+            <Input
+              type="date"
+              value={applicant.expected_issue_date}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'expected_issue_date', e.target.value)}
+              className="w-32"
+              title="預計下件時間"
+            />
 
             <Input
               type="number"

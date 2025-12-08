@@ -24,6 +24,12 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
   const handleCreateChannel = useCallback(async (tour: Tour) => {
     const { toast } = await import('sonner')
 
+    // 先確認是否要建立頻道
+    const channelName = `${tour.code} ${tour.name}`
+    if (!confirm(`是否要為「${tour.name}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`)) {
+      return
+    }
+
     // 立即顯示載入提示
     const loadingToast = toast.loading('正在建立頻道...')
 

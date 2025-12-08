@@ -781,9 +781,13 @@ export interface Visa {
   status: VisaStatus
 
   // 日期
-  submission_date?: string // 送件時間
-  received_date?: string // 下件時間
+  received_date?: string // 收件時間（收到客戶資料的日期）
+  expected_issue_date?: string // 預計下件時間
+  actual_submission_date?: string // 實際送件時間（勾選送件後記錄）
   pickup_date?: string // 取件時間
+
+  // 舊欄位保留向後相容
+  submission_date?: string // @deprecated 改用 received_date
 
   // 關聯資訊
   order_id: string // 關聯的訂單ID

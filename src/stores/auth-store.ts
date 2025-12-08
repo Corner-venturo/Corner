@@ -173,16 +173,18 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const { supabase } = await import('@/lib/supabase/client')
-          const { data: employeeData, error } = await supabase
+          const { data, error } = await supabase
             .from('employees')
             .select('*')
             .eq('id', currentUser.id)
             .single()
 
-          if (error || !employeeData) {
+          if (error || !data) {
             logger.warn('⚠️ Failed to refresh user data:', error?.message)
             return
           }
+
+          const employeeData = data as any
 
           // 如果帳號已停用，自動登出
           if (employeeData.status === 'terminated') {

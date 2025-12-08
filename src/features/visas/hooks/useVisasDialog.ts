@@ -8,8 +8,8 @@ interface VisaApplicant {
   name: string
   country: string
   is_urgent: boolean
-  submission_date: string
-  received_date: string
+  received_date: string // 收件時間
+  expected_issue_date: string // 預計下件時間
   cost: number
 }
 
@@ -42,8 +42,8 @@ export function useVisasDialog(tours: Tour[]) {
       name: '',
       country: '護照 成人',
       is_urgent: false,
-      submission_date: '',
       received_date: '',
+      expected_issue_date: '',
       cost: 0,
     },
   ])
@@ -97,8 +97,8 @@ export function useVisasDialog(tours: Tour[]) {
         name: '',
         country: '護照 成人',
         is_urgent: false,
-        submission_date: '',
         received_date: '',
+        expected_issue_date: '',
         cost: 0,
       },
     ])
@@ -123,14 +123,14 @@ export function useVisasDialog(tours: Tour[]) {
 
           const updated = { ...a, [field]: value }
 
-          // 如果是送件時間或簽證類型改變，自動計算下件時間
-          if (field === 'submission_date' || field === 'country' || field === 'is_urgent') {
-            if (updated.submission_date) {
+          // 如果是收件時間或簽證類型改變，自動計算預計下件時間
+          if (field === 'received_date' || field === 'country' || field === 'is_urgent') {
+            if (updated.received_date) {
               const visaTypeWithUrgent = updated.is_urgent
                 ? `${updated.country} 急件`
                 : updated.country
-              updated.received_date = calculateReceivedDate(
-                updated.submission_date,
+              updated.expected_issue_date = calculateReceivedDate(
+                updated.received_date,
                 visaTypeWithUrgent
               )
             }
@@ -167,8 +167,8 @@ export function useVisasDialog(tours: Tour[]) {
         name: '',
         country: '護照 成人',
         is_urgent: false,
-        submission_date: '',
         received_date: '',
+        expected_issue_date: '',
         cost: 0,
       },
     ])

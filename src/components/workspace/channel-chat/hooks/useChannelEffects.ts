@@ -1,7 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import type { Channel, Workspace } from '@/stores/workspace-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import { DEFAULT_CHANNEL_NAME } from '../constants'
 
 /**
@@ -64,6 +66,47 @@ export function useChannelEffects(
     ]).catch(error => {
       // Silent error handling
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChannel?.id])
+
+  // Realtime 訂閱：當前頻道的訊息變更時即時更新
+  const channelSubscriptionRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+
+  useEffect(() => {
+    if (!selectedChannel?.id) return
+
+    // 取消舊的訂閱
+    if (channelSubscriptionRef.current) {
+      supabase.removeChannel(channelSubscriptionRef.current)
+    }
+
+    // 建立新的訂閱
+    const channel = supabase
+      .channel(`messages_channel_${selectedChannel.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `channel_id=eq.${selectedChannel.id}`,
+        },
+        (payload) => {
+          logger.log('[Workspace] Realtime 訊息更新:', payload.eventType)
+          // 重新載入訊息
+          loadMessages(selectedChannel.id)
+        }
+      )
+      .subscribe()
+
+    channelSubscriptionRef.current = channel
+
+    return () => {
+      if (channelSubscriptionRef.current) {
+        supabase.removeChannel(channelSubscriptionRef.current)
+        channelSubscriptionRef.current = null
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChannel?.id])
 }

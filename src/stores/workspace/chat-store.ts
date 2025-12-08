@@ -162,6 +162,8 @@ export const useChatStore = () => {
         reactions: {},
         created_at: new Date().toISOString(),
         attachments: attachments.length > 0 ? attachments : [],
+        // 保留 parent_message_id（討論串回覆用）
+        parent_message_id: message.parent_message_id || null,
       }
 
       // 使用 createStore 的 create 方法（自動處理離線/線上）
@@ -183,6 +185,8 @@ export const useChatStore = () => {
         reactions: {},
         created_at: new Date().toISOString(),
         attachments: attachments.length > 0 ? attachments : [],
+        // 保留 parent_message_id（討論串回覆用）
+        parent_message_id: message.parent_message_id || null,
       }
 
       await messageStore.create(newMessage)

@@ -219,8 +219,8 @@ export default function VisasPage() {
         contact_phone: contact_info.contact_phone || '',
         visa_type: applicant.country,
         country: applicant.country,
-        submission_date: applicant.submission_date,
         received_date: applicant.received_date,
+        expected_issue_date: applicant.expected_issue_date,
         fee,
         cost: total_cost,
         status: 'pending',
@@ -388,7 +388,7 @@ export default function VisasPage() {
     const today = new Date().toISOString().split('T')[0]
 
     for (const id of selectedRows) {
-      await updateVisa(id, { status: 'submitted', submission_date: today })
+      await updateVisa(id, { status: 'submitted', actual_submission_date: today })
     }
 
     setSelectedRows([])
@@ -413,7 +413,8 @@ export default function VisasPage() {
                 </span>
                 <Button
                   onClick={() => {
-                    selectedRows.forEach(id => updateVisa(id, { status: 'submitted' }))
+                    const today = new Date().toISOString().split('T')[0]
+                    selectedRows.forEach(id => updateVisa(id, { status: 'submitted', actual_submission_date: today }))
                     setSelectedRows([])
                   }}
                   size="sm"
@@ -471,7 +472,6 @@ export default function VisasPage() {
           { value: 'all', label: '全部', icon: FileText },
           { value: 'pending', label: '待送件', icon: Clock },
           { value: 'submitted', label: '已送件', icon: AlertCircle },
-          { value: 'issued', label: '已下件', icon: CheckCircle },
           { value: 'collected', label: '已取件', icon: FileCheck },
           { value: 'rejected', label: '退件', icon: XCircle },
         ]}

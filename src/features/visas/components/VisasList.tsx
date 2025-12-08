@@ -72,7 +72,21 @@ export function VisasList({
       },
     },
     {
-      key: 'submission_date',
+      key: 'received_date',
+      label: '收件時間',
+      render: (value, rowData) => {
+        const visa = rowData as Visa
+        // 優先用新欄位，向後相容舊欄位
+        const date = value || visa.submission_date
+        return (
+          <span className="text-sm text-morandi-secondary">
+            {date ? new Date(String(date)).toLocaleDateString() : '-'}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'actual_submission_date',
       label: '送件時間',
       render: (value) => (
         <span className="text-sm text-morandi-secondary">
@@ -81,8 +95,8 @@ export function VisasList({
       ),
     },
     {
-      key: 'received_date',
-      label: '下件時間',
+      key: 'expected_issue_date',
+      label: '預計下件',
       render: (value) => (
         <span className="text-sm text-morandi-secondary">
           {value ? new Date(String(value)).toLocaleDateString() : '-'}

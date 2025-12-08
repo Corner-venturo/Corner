@@ -14,21 +14,24 @@ import { FullCalendarEvent } from '../types'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 
-// 從 ISO 時間字串取得顯示用的本地時間（HH:MM）
+// 從 ISO 時間字串取得顯示用的時間（HH:MM）
+// 直接解析字串中的時間部分，避免時區轉換問題
 const getDisplayTime = (isoString: string, allDay?: boolean): string => {
   if (allDay) return ''
   if (!isoString) return ''
 
-  const date = new Date(isoString)
-  if (isNaN(date.getTime())) return ''
+  // 直接從 ISO 字串中擷取時間部分，避免 Date 物件的時區轉換
+  // 格式：2025-01-15T14:30:00+08:00 或 2025-01-15T14:30:00
+  const timeMatch = isoString.match(/T(\d{2}):(\d{2})/)
+  if (!timeMatch) return ''
 
-  const hour = date.getHours()
-  const minute = date.getMinutes()
+  const hour = timeMatch[1]
+  const minute = timeMatch[2]
 
   // 如果是 00:00 就不顯示（全天事件）
-  if (hour === 0 && minute === 0) return ''
+  if (hour === '00' && minute === '00') return ''
 
-  return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+  return `${hour}:${minute}`
 }
 
 export function useCalendarEvents() {
