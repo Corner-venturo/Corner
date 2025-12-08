@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -30,6 +31,7 @@ const employees = [
 ]
 
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
+  const router = useRouter()
   const { items: todos, create: addTodo } = useTodoStore()
   const [selectedTemplate, setSelectedTemplate] = useState('')
   const [taskForm, setTaskForm] = useState({
@@ -254,7 +256,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           size="sm"
           variant="outline"
           onClick={() => {
-            window.location.href = `/todos?expand=${todo.id}`
+            router.push(`/todos?expand=${todo.id}`)
           }}
         >
           <Eye size={14} className="mr-1" />

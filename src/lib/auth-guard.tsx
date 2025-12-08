@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
 import { hasPermissionForRoute } from '@/lib/permissions'
@@ -11,17 +11,44 @@ interface AuthGuardProps {
   requiredPermission?: string
 }
 
+/**
+ * 檢查 auth-token cookie 是否存在
+ * 用於同步 middleware 的 token 清除操作
+ */
+function hasAuthCookie(): boolean {
+  if (typeof document === 'undefined') return false
+  return document.cookie.split(';').some(c => c.trim().startsWith('auth-token='))
+}
+
 export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { user, _hasHydrated, isAuthenticated } = useAuthStore()
+  const { user, _hasHydrated, isAuthenticated, logout } = useAuthStore()
   const redirectingRef = useRef(false) // 防止重複跳轉
+
+  // Token 過期同步：檢查 cookie 是否被 middleware 清除
+  const syncTokenState = useCallback(() => {
+    // 如果前端有登入狀態但 cookie 不存在，代表 token 已過期被 middleware 清除
+    if (isAuthenticated && user?.id && !hasAuthCookie()) {
+      logger.warn('🔐 Token 已過期（cookie 被清除），同步登出前端狀態')
+      logout()
+      return true // 返回 true 表示已處理
+    }
+    return false
+  }, [isAuthenticated, user?.id, logout])
 
   useEffect(() => {
     const checkAuth = async () => {
       // 如果在登入頁面或 unauthorized 頁面，跳過檢查
       if (pathname === '/login' || pathname === '/unauthorized') {
         redirectingRef.current = false
+        return
+      }
+
+      // 檢查 token 是否被 middleware 清除（優先檢查）
+      if (syncTokenState()) {
+        redirectingRef.current = true
+        router.push('/login')
         return
       }
 
@@ -93,6 +120,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
     requiredPermission,
     pathname,
     router,
+    syncTokenState,
   ])
 
 

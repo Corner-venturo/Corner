@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -57,6 +57,7 @@ export default function TodosPage() {
   const { todos, create: addTodo, update: updateTodo, delete: deleteTodo, isLoading: isTodosLoading } = useTodos()
   const { user } = useAuthStore() // 取得當前登入用戶
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [statusFilter, setStatusFilter] = useState('active')
   const [expandedTodo, setExpandedTodo] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -194,7 +195,7 @@ export default function TodosPage() {
                         receipt: '/finance/payments',
                       }[item.type]
                       if (basePath) {
-                        window.location.href = `${basePath}?highlight=${item.id}`
+                        router.push(`${basePath}?highlight=${item.id}`)
                       }
                     }}
                     className="text-xs bg-morandi-gold/20 text-morandi-primary px-2 py-0.5 rounded hover:bg-morandi-gold/30 transition-colors"

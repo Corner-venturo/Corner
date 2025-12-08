@@ -227,7 +227,7 @@ export function hasPermissionForRoute(userPermissions: string[], pathname: strin
   }
 
   // 公開路由不需要權限
-  const publicRoutes = ['/', '/login', '/404']
+  const publicRoutes = ['/', '/login', '/404', '/unauthorized']
   if (publicRoutes.includes(pathname)) {
     return true
   }
@@ -235,11 +235,16 @@ export function hasPermissionForRoute(userPermissions: string[], pathname: strin
   // 獲取所需權限
   const requiredPermissions = getRequiredPermissions(pathname)
 
+  // 安全原則：若無法匹配到任何權限配置，預設拒絕訪問
+  // 這可以防止新增路由時忘記設定權限導致的漏洞
+  if (requiredPermissions.length === 0) {
+    // 記錄未配置的路由以便追蹤
+    console.warn(`[permissions] 路由 ${pathname} 未配置權限，預設拒絕訪問`)
+    return false
+  }
+
   // 檢查用戶是否有任一所需權限
-  return (
-    requiredPermissions.length === 0 ||
-    requiredPermissions.some(permission => userPermissions.includes(permission))
-  )
+  return requiredPermissions.some(permission => userPermissions.includes(permission))
 }
 
 /**

@@ -12,7 +12,8 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -35,6 +36,7 @@ import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
 import type { ReceiptItem } from '@/stores'
 
 export default function PaymentsPage() {
+  const router = useRouter()
 
   // 資料與業務邏輯
   const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
@@ -90,9 +92,9 @@ export default function PaymentsPage() {
   }, [receipts, searchFilters])
 
   // 事件處理
-  const handleViewDetail = (receipt: Receipt) => {
-    window.location.href = `/finance/payments/${receipt.id}`
-  }
+  const handleViewDetail = useCallback((receipt: Receipt) => {
+    router.push(`/finance/payments/${receipt.id}`)
+  }, [router])
 
   const handleSubmit = async (data: { selectedOrderId: string; paymentItems: ReceiptItem[] }) => {
     try {

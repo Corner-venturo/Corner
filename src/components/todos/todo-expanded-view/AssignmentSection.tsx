@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { Calendar, FileText, X, UserCheck } from 'lucide-react'
@@ -9,6 +10,7 @@ import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
 
 export function AssignmentSection({ todo, onUpdate, readOnly = false }: AssignmentSectionProps) {
+  const router = useRouter()
   const { items: employees, fetchAll } = useUserStore()
   const { user } = useAuthStore()
   const [assigneeName, setAssigneeName] = useState<string>('')
@@ -185,7 +187,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                     receipt: '/finance/payments',
                   }[item.type]
                   if (basePath) {
-                    window.location.href = `${basePath}?highlight=${item.id}`
+                    router.push(`${basePath}?highlight=${item.id}`)
                   }
                 }}
                 className="bg-white/60 border border-morandi-gold/20 text-morandi-primary text-xs px-2 py-1 rounded-lg hover:bg-morandi-gold/10 hover:border-morandi-gold/20 transition-all font-medium"

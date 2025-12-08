@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { useOrderStore, useTourStore } from '@/stores'
+import { useOrderStore, useTourStore, useMemberStore } from '@/stores'
 import { ArrowLeft } from 'lucide-react'
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
 import { MemberQuickAdd } from '@/components/members/member-quick-add'
@@ -15,10 +15,16 @@ export default function MemberDetailPage() {
   const orderId = params.orderId as string
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore()
+  const memberStore = useMemberStore()
   const memberTableRef = useRef<MemberTableRef | null>(null)
 
   const order = orders.find(o => o.id === orderId)
   const tour = tours.find(t => t.id === order?.tour_id)
+
+  // 重新載入成員資料（不刷新頁面）
+  const handleMembersAdded = useCallback(() => {
+    memberStore.fetchAll()
+  }, [memberStore])
 
   if (!order) {
     return (
@@ -71,10 +77,7 @@ export default function MemberDetailPage() {
         <MemberQuickAdd
           orderId={orderId}
           departureDate={tour?.departure_date || ''}
-          onMembersAdded={() => {
-            // 重新載入表格
-            window.location.reload()
-          }}
+          onMembersAdded={handleMembersAdded}
         />
       </div>
 
