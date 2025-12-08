@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, Suspense } from 'react'
+import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TourForm } from '@/components/editor/TourForm'
@@ -12,8 +12,10 @@ import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItin
 import { GeminiItineraryForm, type GeminiItineraryData } from '@/features/itinerary/components/GeminiItineraryForm'
 import { GeminiItineraryPreview } from '@/features/itinerary/components/GeminiItineraryPreview'
 import { Button } from '@/components/ui/button'
-import { useTourStore, useRegionsStore } from '@/stores'
+import { useTourStore, useRegionsStore, useItineraryStore, useAuthStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
+import { toast } from 'sonner'
+import { Cloud, CloudOff } from 'lucide-react'
 import type {
   FlightInfo,
   Feature,
@@ -411,6 +413,140 @@ function NewItineraryPageContent() {
     },
   })
   const [loading, setLoading] = useState(true)
+
+  // 自動存檔相關狀態
+  const [isDirty, setIsDirty] = useState(false)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [currentItineraryId, setCurrentItineraryId] = useState<string | null>(itineraryId)
+  const { create: createItinerary, update: updateItinerary } = useItineraryStore()
+  const { user } = useAuthStore()
+  const tourDataRef = useRef(tourData)
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 保持 ref 同步
+  useEffect(() => {
+    tourDataRef.current = tourData
+  }, [tourData])
+
+  // 轉換資料格式（camelCase → snake_case）- 與 PublishButton 一致
+  const convertDataForSave = useCallback(() => {
+    const data = tourDataRef.current
+    return {
+      tour_id: undefined,
+      tagline: data.tagline,
+      title: data.title,
+      subtitle: data.subtitle,
+      description: data.description,
+      departure_date: data.departureDate,
+      tour_code: data.tourCode,
+      cover_image: data.coverImage,
+      cover_style: data.coverStyle || 'original',
+      price: data.price || null,
+      price_note: data.priceNote || null,
+      country: data.country,
+      city: data.city,
+      status: (data.status || 'draft') as 'draft' | 'published',
+      outbound_flight: data.outboundFlight,
+      return_flight: data.returnFlight,
+      features: data.features,
+      focus_cards: data.focusCards,
+      leader: data.leader,
+      meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
+      show_features: data.showFeatures,
+      show_leader_meeting: data.showLeaderMeeting,
+      show_hotels: data.showHotels,
+      show_pricing_details: data.showPricingDetails,
+      pricing_details: data.pricingDetails,
+      price_tiers: data.priceTiers || null,
+      show_price_tiers: data.showPriceTiers || false,
+      faqs: data.faqs || null,
+      show_faqs: data.showFaqs || false,
+      notices: data.notices || null,
+      show_notices: data.showNotices || false,
+      cancellation_policy: data.cancellationPolicy || null,
+      show_cancellation_policy: data.showCancellationPolicy || false,
+      itinerary_subtitle: data.itinerarySubtitle,
+      daily_itinerary: data.dailyItinerary,
+      version_records: data.version_records || [],
+    }
+  }, [])
+
+  // 自動存檔函數
+  const performAutoSave = useCallback(async () => {
+    if (!isDirty) return
+
+    setAutoSaveStatus('saving')
+    try {
+      const convertedData = convertDataForSave()
+
+      if (currentItineraryId) {
+        // 更新現有行程
+        await updateItinerary(currentItineraryId, convertedData)
+      } else {
+        // 第一次建立（需要有標題才存）
+        if (!convertedData.title) {
+          setAutoSaveStatus('idle')
+          return
+        }
+        const newItinerary = await createItinerary({
+          ...convertedData,
+          created_by: user?.id || undefined,
+        } as Parameters<typeof createItinerary>[0])
+
+        if (newItinerary?.id) {
+          setCurrentItineraryId(newItinerary.id)
+          // 更新 URL（不刷新頁面）
+          window.history.replaceState(null, '', `/itinerary/new?itinerary_id=${newItinerary.id}`)
+        }
+      }
+
+      setIsDirty(false)
+      setAutoSaveStatus('saved')
+      // 3 秒後恢復 idle 狀態
+      setTimeout(() => setAutoSaveStatus('idle'), 3000)
+    } catch (error) {
+      console.error('自動存檔失敗:', error)
+      setAutoSaveStatus('error')
+      toast.error('自動存檔失敗，請手動儲存')
+    }
+  }, [isDirty, currentItineraryId, convertDataForSave, updateItinerary, createItinerary, user?.id])
+
+  // 30 秒自動存檔
+  useEffect(() => {
+    if (isDirty) {
+      // 清除舊的計時器
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current)
+      }
+      // 設置新的 30 秒計時器
+      autoSaveTimerRef.current = setTimeout(() => {
+        performAutoSave()
+      }, 30000) // 30 秒
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current)
+      }
+    }
+  }, [isDirty, tourData, performAutoSave])
+
+  // 離開頁面前存檔
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        // 嘗試存檔
+        performAutoSave()
+        // 顯示離開確認
+        e.preventDefault()
+        e.returnValue = '您有未儲存的變更，確定要離開嗎？'
+        return e.returnValue
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty, performAutoSave])
 
   // Print itinerary data
   const [printData, setPrintData] = useState({
@@ -1161,8 +1297,35 @@ function NewItineraryPageContent() {
         <div className="h-full flex">
           {/* 左側：輸入表單 */}
           <div className="w-1/2 bg-white border-r border-gray-200 flex flex-col">
-            <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center border-b border-gray-200">
+            <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-gray-200">
               <h2 className="text-lg font-semibold">編輯表單</h2>
+              {/* 自動存檔狀態指示 */}
+              <div className="flex items-center gap-2 text-sm">
+                {autoSaveStatus === 'saving' && (
+                  <span className="flex items-center gap-1.5 text-white/80">
+                    <Cloud size={14} className="animate-pulse" />
+                    存檔中...
+                  </span>
+                )}
+                {autoSaveStatus === 'saved' && (
+                  <span className="flex items-center gap-1.5 text-white/80">
+                    <Cloud size={14} />
+                    已儲存
+                  </span>
+                )}
+                {autoSaveStatus === 'error' && (
+                  <span className="flex items-center gap-1.5 text-red-200">
+                    <CloudOff size={14} />
+                    存檔失敗
+                  </span>
+                )}
+                {autoSaveStatus === 'idle' && isDirty && (
+                  <span className="flex items-center gap-1.5 text-white/60">
+                    <Cloud size={14} />
+                    未儲存
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto bg-white">
               <TourForm
@@ -1211,6 +1374,8 @@ function NewItineraryPageContent() {
                     cancellationPolicy: newData.cancellationPolicy,
                     showCancellationPolicy: newData.showCancellationPolicy,
                   });
+                  // 標記有變更，觸發自動存檔
+                  setIsDirty(true);
                 }}
               />
             </div>
