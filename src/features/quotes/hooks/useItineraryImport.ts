@@ -76,18 +76,17 @@ export const useItineraryImport = (): UseItineraryImportResult => {
       }))
   }
 
-  // 將住宿資料轉換為報價項目
+  // 將住宿資料轉換為報價項目（使用報價單住宿專用格式）
   const convertHotelsToQuoteItems = (hotels: HotelData[]) => {
     return hotels.map((hotel, index) => ({
-      id: `hotel-${index}`,
-      name: `Day ${hotel.day} 住宿`,
-      description: hotel.name,
-      quantity: 1,
-      unit_price: 0, // 使用者需要手動設定價格
+      id: `hotel-${Date.now()}-${index}`,
+      name: hotel.name, // 飯店名稱
+      quantity: 0, // 房間人數（需手動填寫）
+      unit_price: 0, // 房價（需手動填寫）
       total: 0,
-      notes: `自動帶入：${hotel.name}${hotel.note ? ` (${hotel.note})` : ''}`,
-      order: index,
-      is_group_cost: false
+      note: hotel.note || '',
+      day: hotel.day, // 使用獨立的 day 欄位
+      room_type: '', // 房型（需手動填寫）
     }))
   }
 
