@@ -6,7 +6,6 @@ import { alert, alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-di
 import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
-import type { Employee } from '@/types/models'
 
 interface AccountSettingsProps {
   user: {
@@ -121,25 +120,6 @@ export function AccountSettings({
         await alertError('密碼更新失敗：' + error.message)
         setPasswordUpdateLoading(false)
         return
-      }
-
-      // 3. 同步更新 IndexedDB 的密碼
-      try {
-        const { localDB } = await import('@/lib/db')
-        const { TABLES } = await import('@/lib/db/schemas')
-
-        const employee = await localDB.read<Employee>(TABLES.EMPLOYEES, user.id)
-        if (employee) {
-          await localDB.put(TABLES.EMPLOYEES, {
-            ...employee,
-            password_hash: hashedPassword,
-            last_password_change: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          logger.log('✅ IndexedDB 密碼已更新')
-        }
-      } catch (dbError) {
-        logger.warn('⚠️ IndexedDB 更新失敗（不影響主要功能）:', dbError)
       }
 
       await alertSuccess('密碼更新成功！下次登入需重新驗證。', '更新成功')

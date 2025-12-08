@@ -77,18 +77,11 @@ export function getCurrentWorkspaceCode(): string | null {
       workspaces = workspacesCache
     }
 
-    // 如果仍然沒有資料，觸發背景載入
+    // 如果仍然沒有資料，返回 null（由呼叫端負責確保 workspaces 已載入）
+    // 注意：這是同步函數，無法等待 fetchAll 完成
+    // 呼叫端應該在 useEffect 中先呼叫 workspaceStore.fetchAll()
     if (workspaces.length === 0) {
-      if (workspaceStore.fetchAll) {
-        workspaceStore.fetchAll().then(() => {
-          const newItems = workspaceStore.items as WorkspaceWithCode[]
-          if (newItems && newItems.length > 0) {
-            workspacesCache = newItems
-            workspacesCacheTime = Date.now()
-          }
-        }).catch(() => {})
-      }
-      logger.warn('[getCurrentWorkspaceCode] Super Admin: workspaces not loaded yet')
+      logger.warn('[getCurrentWorkspaceCode] Super Admin: workspaces not loaded yet, please ensure fetchAll() is called first')
       return null
     }
 
@@ -136,8 +129,7 @@ export function getCurrentWorkspace() {
 
   // 檢查 workspaces 是否已載入
   if (workspaces.length === 0) {
-    logger.warn('[getCurrentWorkspace] Workspaces not loaded yet')
-    workspaceStore.fetchAll?.().catch((err: any) => logger.error('fetchAll failed:', err))
+    logger.warn('[getCurrentWorkspace] Workspaces not loaded yet, please ensure fetchAll() is called first')
     return null
   }
 

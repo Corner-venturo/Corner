@@ -220,6 +220,7 @@ export interface Member {
   add_ons?: string[] // 加購項目IDs
   refunds?: string[] // 退費項目IDs
   custom_fields?: Record<string, unknown> // 自定義欄位數據 {fieldId: value}
+  passport_image_url?: string | null // 護照照片 URL
   created_at: string | null
   updated_at: string | null
 }

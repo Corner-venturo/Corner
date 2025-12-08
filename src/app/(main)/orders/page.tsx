@@ -25,7 +25,7 @@ export default function OrdersPage() {
   // 🔥 載入 workspace
   React.useEffect(() => {
     loadWorkspaces()
-  }, [])
+  }, [loadWorkspaces])
 
   const filteredOrders = orders.filter(order => {
     const matchesStatus = statusFilter === 'all' || order.payment_status === statusFilter

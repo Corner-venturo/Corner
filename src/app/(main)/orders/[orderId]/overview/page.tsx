@@ -113,7 +113,7 @@ export default function OrderOverviewPage() {
               </div>
               <div className="flex justify-between items-center py-2">
                 <span className="text-morandi-secondary">預定人數</span>
-                <span className="text-morandi-primary font-medium">{order.member_count}人</span>
+                <span className="text-morandi-primary font-medium">{order.member_count ?? 0}人</span>
               </div>
             </div>
           </div>

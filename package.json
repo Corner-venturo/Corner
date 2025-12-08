@@ -58,7 +58,6 @@
     "date-fns": "^4.1.0",
     "dompurify": "^3.3.0",
     "framer-motion": "^12.23.24",
-    "idb": "^8.0.3",
     "jose": "^6.1.2",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.3",

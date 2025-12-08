@@ -58,25 +58,6 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           preferred_features: defaultPermissions as unknown as typeof employee.preferred_features,
         })
 
-        // 同步更新 IndexedDB
-        try {
-          const { localDB } = await import('@/lib/db')
-          const { TABLES } = await import('@/lib/db/schemas')
-
-          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id)
-          if (existingEmployee) {
-            await localDB.put(TABLES.EMPLOYEES, {
-              ...existingEmployee,
-              roles: [role],
-              permissions: defaultPermissions,
-              preferred_features: defaultPermissions,
-              updated_at: new Date().toISOString(),
-            } as unknown as Parameters<typeof localDB.put>[1])
-          }
-        } catch (_error) {
-          // Ignore error
-        }
-
         // 如果修改的是當前登入用戶，更新 auth-store
         if (user && user.id === employee.id) {
           setUser({
@@ -117,22 +98,6 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           permissions,
           preferred_features: permissions,
         })
-
-        // 同步更新 IndexedDB
-        try {
-          const { localDB } = await import('@/lib/db')
-          const { TABLES } = await import('@/lib/db/schemas')
-
-          const existingEmployee = await localDB.read(TABLES.EMPLOYEES, employee.id)
-          if (existingEmployee) {
-            await localDB.put(TABLES.EMPLOYEES, {
-              ...existingEmployee,
-              permissions: permissions,
-              preferred_features: permissions,
-              updated_at: new Date().toISOString(),
-            } as unknown as Parameters<typeof localDB.put>[1])
-          }
-        } catch (_error) {}
 
         // 如果修改的是當前登入用戶，更新 auth-store
         if (user && user.id === employee.id) {

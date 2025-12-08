@@ -112,31 +112,11 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
   const handleSubmit = async (): Promise<boolean> => {
     if (!formData.customer_name.trim()) return false
 
-    // 確保有 workspace_id（多重 fallback）
-    let finalWorkspaceId = user?.workspace_id || workspaceId
-
-    // 最後的 fallback：從 IndexedDB 的 employees 表讀取
-    if (!finalWorkspaceId && user?.id) {
-      try {
-        const { openDB } = await import('idb')
-        const db = await openDB('VenturoOfflineDB')
-        const tx = db.transaction('employees', 'readonly')
-        const store = tx.objectStore('employees')
-
-        const allEmployees = await store.getAll()
-        const employee = allEmployees.find((emp: { user_id?: string; workspace_id?: string }) => emp.user_id === user.id)
-
-        if (employee?.workspace_id) {
-          finalWorkspaceId = employee.workspace_id
-          logger.log('從 IndexedDB 取得 workspace_id:', finalWorkspaceId)
-        }
-      } catch (error) {
-        logger.error('無法從 IndexedDB 讀取 workspace_id:', error)
-      }
-    }
+    // 確保有 workspace_id
+    const finalWorkspaceId = user?.workspace_id || workspaceId
 
     if (!finalWorkspaceId) {
-      alert('無法取得工作空間資訊，請聯繫管理員')
+      alert('無法取得工作空間資訊，請重新登入')
       logger.error('workspace_id 取得失敗', { user, workspaceId })
       return false
     }

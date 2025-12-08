@@ -87,8 +87,11 @@ class TourService extends BaseService<Tour & BaseEntity> {
     date: Date,
     isSpecial: boolean = false
   ): Promise<string> {
-    // 取得當前 workspace code（有預設值，不會是 null）
-    const workspaceCode = getCurrentWorkspaceCode() || 'TP'
+    // 取得當前 workspace code
+    const workspaceCode = getCurrentWorkspaceCode()
+    if (!workspaceCode) {
+      throw new Error('無法取得 workspace code，請重新登入')
+    }
 
     // 獲取所有現有 tours
     const allTours = await this.list()

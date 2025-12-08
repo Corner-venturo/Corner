@@ -1,15 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Upload, UserPlus, Loader2 } from 'lucide-react'
+import { Upload, UserPlus, Loader2, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PassportUploadZone } from '@/components/shared/passport-upload-zone'
 import { CustomerCombobox } from '@/components/customers/customer-combobox'
+import { MemberExcelImport } from './member-excel-import'
 import { useMemberStore, useCustomerStore } from '@/stores'
 import type { Customer } from '@/types/customer.types'
 import type { Member } from '@/stores/types'
 import { toast } from 'sonner'
+import { supabase } from '@/lib/supabase/client'
 
 interface MemberQuickAddProps {
   orderId: string
@@ -100,6 +102,38 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
   const memberStore = useMemberStore()
   const { items: customers, create: createCustomer } = useCustomerStore()
 
+  // 上傳護照照片到 Supabase Storage
+  const uploadPassportImage = async (file: File, memberId: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileName = `${memberId}_${Date.now()}.${fileExt}`
+      const filePath = `passports/${fileName}`
+
+      const { error } = await supabase.storage
+        .from('member-documents')
+        .upload(filePath, file, { upsert: true })
+
+      if (error) {
+        console.error('上傳護照照片失敗:', error)
+        // 檢查是否是空間不足
+        if (error.message?.includes('quota') || error.message?.includes('limit') || error.message?.includes('exceeded')) {
+          toast.error('雲端儲存空間已滿，護照照片無法儲存。請聯繫管理員升級方案。')
+        }
+        return null
+      }
+
+      // 取得公開 URL
+      const { data: urlData } = supabase.storage
+        .from('member-documents')
+        .getPublicUrl(filePath)
+
+      return urlData?.publicUrl || null
+    } catch (error) {
+      console.error('上傳護照照片失敗:', error)
+      return null
+    }
+  }
+
   const handleUploadPassports = async () => {
     if (passportFiles.length === 0) {
       toast.error('請先選擇護照照片')
@@ -109,8 +143,15 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
     setIsUploading(true)
 
     try {
+      // 取得訂單內現有成員
+      const existingMembers = memberStore.items.filter(m => m.order_id === orderId)
+
       // 批次處理所有照片
-      const results: ParsedMember[] = []
+      interface ParsedResult {
+        parsed: ParsedMember
+        file: File
+      }
+      const results: ParsedResult[] = []
 
       for (const file of passportFiles) {
         // 壓縮圖片
@@ -137,7 +178,7 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
 
         const data = await response.json()
         if (data.success && data.data) {
-          results.push(data.data)
+          results.push({ parsed: data.data, file: compressedFile })
         }
       }
 
@@ -146,12 +187,43 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
         return
       }
 
-      // 為每個辨識結果新增成員 + 顧客
-      for (const parsed of results) {
-        await addMemberAndCustomer(parsed)
+      let updatedCount = 0
+      let newCount = 0
+
+      for (const { parsed, file } of results) {
+        // 先比對訂單內現有成員（用護照號碼或姓名）
+        const matchedMember = existingMembers.find(m =>
+          (parsed.passport_number && m.passport_number === parsed.passport_number) ||
+          (parsed.name && m.name === parsed.name)
+        )
+
+        if (matchedMember) {
+          // 找到現有成員 → 更新資料 + 上傳護照照片
+          const passportUrl = await uploadPassportImage(file, matchedMember.id)
+
+          await memberStore.update(matchedMember.id, {
+            name_en: parsed.name_en || matchedMember.name_en,
+            passport_number: parsed.passport_number || matchedMember.passport_number,
+            passport_expiry: parsed.passport_expiry || matchedMember.passport_expiry,
+            id_number: parsed.id_number || matchedMember.id_number,
+            birthday: parsed.birthday || matchedMember.birthday,
+            gender: parsed.gender || matchedMember.gender,
+            passport_image_url: passportUrl || (matchedMember as any).passport_image_url,
+          } as unknown as Parameters<typeof memberStore.update>[1])
+
+          updatedCount++
+        } else {
+          // 沒找到 → 新增成員
+          await addMemberAndCustomer(parsed, undefined, file)
+          newCount++
+        }
       }
 
-      toast.success(`成功新增 ${results.length} 位成員`)
+      const messages: string[] = []
+      if (updatedCount > 0) messages.push(`更新 ${updatedCount} 位`)
+      if (newCount > 0) messages.push(`新增 ${newCount} 位`)
+      toast.success(messages.join('、') || '處理完成')
+
       setPassportFiles([])
       setMode(null)
       onMembersAdded?.()
@@ -191,7 +263,22 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
   }
 
   // 新增成員 + 自動新增到顧客資料庫
-  const addMemberAndCustomer = async (parsed: ParsedMember, confirmedCustomerId?: string) => {
+  const addMemberAndCustomer = async (parsed: ParsedMember, confirmedCustomerId?: string, passportFile?: File) => {
+    // 🔒 先檢查訂單內是否已有相同成員（避免重複匯入）
+    const existingOrderMembers = memberStore.items.filter(m => m.order_id === orderId)
+    const duplicateInOrder = existingOrderMembers.find(
+      m =>
+        // 護照號碼相同
+        (parsed.passport_number && m.passport_number === parsed.passport_number) ||
+        // 身分證相同
+        (parsed.id_number && m.id_number === parsed.id_number)
+    )
+
+    if (duplicateInOrder) {
+      toast.warning(`${parsed.name} 已在此訂單中，跳過`)
+      return // 跳過，不重複新增
+    }
+
     let customerId: string | undefined
 
     // 如果已經確認過顧客 ID，直接使用
@@ -253,8 +340,8 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
       }
     }
 
-    // 新增到訂單成員
-    await memberStore.create({
+    // 先建立成員取得 ID
+    const newMember = await memberStore.create({
       order_id: orderId,
       name: parsed.name,
       name_en: parsed.name_en,
@@ -268,13 +355,23 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
       add_ons: [],
       refunds: [],
     } as unknown as Parameters<typeof memberStore.create>[0])
+
+    // 如果有護照檔案，上傳並更新 URL
+    if (passportFile && newMember?.id) {
+      const passportUrl = await uploadPassportImage(passportFile, newMember.id)
+      if (passportUrl) {
+        await memberStore.update(newMember.id, {
+          passport_image_url: passportUrl,
+        } as unknown as Parameters<typeof memberStore.update>[1])
+      }
+    }
   }
 
   return (
     <div className="space-y-4">
       {/* 選擇模式 */}
       {!mode && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <Button
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"
@@ -283,6 +380,10 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
             <Upload size={24} />
             <span>上傳護照 (OCR)</span>
           </Button>
+          <MemberExcelImport
+            orderId={orderId}
+            onImportComplete={onMembersAdded}
+          />
           <Button
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"

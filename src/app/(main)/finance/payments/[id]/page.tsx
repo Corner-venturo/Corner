@@ -33,6 +33,7 @@ import { CreateLinkPayDialog } from '../components/CreateLinkPayDialog'
 import { formatDate } from '@/lib/utils'
 import { getReceiptTypeName, getReceiptStatusName, getReceiptStatusColor } from '@/types/receipt.types'
 import { generateReceiptPDF } from '@/lib/pdf/receipt-pdf'
+import { supabase } from '@/lib/supabase/client'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -65,6 +66,36 @@ export default function ReceiptDetailPage({ params }: PageProps) {
     }
   }, [receipts, id])
 
+  // Realtime 訂閱 - 監聽此收款單的變更
+  useEffect(() => {
+    const channel = supabase
+      .channel(`receipt-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'receipts',
+          filter: `id=eq.${id}`,
+        },
+        (payload) => {
+          logger.log('[Realtime] 收款單更新:', payload)
+          if (payload.eventType === 'UPDATE') {
+            const newData = payload.new as typeof receipt
+            setReceipt(newData)
+            setActualAmount(newData?.actual_amount?.toString() || '')
+          } else if (payload.eventType === 'DELETE') {
+            router.push('/finance/payments')
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [id, router])
+
   if (!receipt) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -92,11 +123,47 @@ export default function ReceiptDetailPage({ params }: PageProps) {
     }
 
     try {
+      const confirmedAmount = parseFloat(actualAmount)
+
+      // 1. 更新收款單狀態
       await updateReceipt(receipt.id, {
-        actual_amount: parseFloat(actualAmount),
+        actual_amount: confirmedAmount,
         status: 1, // 已確認
         note: confirmNote ? `${receipt.note ?? ''}\n[會計確認] ${confirmNote}` : receipt.note,
       })
+
+      // 2. 更新關聯訂單的付款狀態
+      if (order) {
+        const { update: updateOrder } = useOrderStore.getState()
+
+        // 計算該訂單所有「已確認」收款單的總金額
+        const orderReceipts = receipts.filter(r => r.order_id === order.id)
+        const totalPaid = orderReceipts.reduce((sum, r) => {
+          // 包含這筆剛確認的收款
+          if (r.id === receipt.id) {
+            return sum + confirmedAmount
+          }
+          // 只計算已確認的收款單
+          return sum + (r.status === 1 ? (r.actual_amount || 0) : 0)
+        }, 0)
+
+        const remainingAmount = Math.max(0, order.total_amount - totalPaid)
+
+        // 判斷付款狀態
+        let paymentStatus: 'unpaid' | 'partial' | 'paid' = 'unpaid'
+        if (totalPaid >= order.total_amount) {
+          paymentStatus = 'paid'
+        } else if (totalPaid > 0) {
+          paymentStatus = 'partial'
+        }
+
+        await updateOrder(order.id, {
+          paid_amount: totalPaid,
+          remaining_amount: remainingAmount,
+          payment_status: paymentStatus,
+        })
+      }
+
       setIsConfirming(false)
       alert('✅ 收款已確認')
     } catch (error) {

@@ -53,7 +53,7 @@ export default function MemberDetailPage() {
           </div>
           <div className="flex items-center space-x-2">
             <span>預定人數:</span>
-            <span className="text-morandi-primary font-medium">{order.member_count}人</span>
+            <span className="text-morandi-primary font-medium">{order.member_count ?? 0}人</span>
           </div>
           <Button
             onClick={() => router.push('/orders')}

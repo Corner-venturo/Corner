@@ -55,7 +55,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
       const available = getAvailableWorkspaces()
       setAvailableWorkspaces(available)
     }
-  }, [workspaces.length])
+  }, [workspaces])
 
   const showWorkspaceSelector = (isSuperAdmin || checkIsSuperAdmin()) && availableWorkspaces.length > 1
 

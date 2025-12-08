@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { useEmployeeStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Plus, Building2, Users, Shield } from 'lucide-react'
+import { toast } from 'sonner'
 
 /**
  * Workspace 管理頁面
@@ -22,11 +23,16 @@ export default function WorkspacesPage() {
     description: '',
   })
 
-  // 載入 workspaces 和 employees 資料
-  useEffect(() => {
+  // 載入資料
+  const loadData = useCallback(() => {
     loadWorkspaces()
     employeeStore.fetchAll()
-  }, [])
+  }, [loadWorkspaces, employeeStore])
+
+  // 載入 workspaces 和 employees 資料
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   // 計算每個 workspace 的員工數
   const getEmployeeCount = (workspaceId: string) => {
@@ -35,7 +41,7 @@ export default function WorkspacesPage() {
 
   const handleCreate = async () => {
     if (!newWorkspace.name) {
-      alert('請填寫工作空間名稱')
+      toast.error('請填寫工作空間名稱')
       return
     }
 
