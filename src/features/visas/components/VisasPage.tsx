@@ -24,6 +24,8 @@ import { VisasList } from './VisasList'
 import { VisasInfoDialog } from './VisasInfoDialog'
 import { AddVisaDialog } from './AddVisaDialog'
 import { SubmitVisaDialog } from './SubmitVisaDialog'
+import { EditVisaDialog } from './EditVisaDialog'
+import type { Visa } from '@/stores/types'
 // ============================================
 // 簽證管理主頁面
 // ============================================
@@ -85,6 +87,8 @@ export default function VisasPage() {
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
+  const [editingVisa, setEditingVisa] = React.useState<Visa | null>(null)
 
   // 旅客比對相關狀態
   const [showCustomerMatchDialog, setShowCustomerMatchDialog] = React.useState(false)
@@ -433,8 +437,22 @@ export default function VisasPage() {
                 </Button>
                 <Button
                   onClick={() => {
-                    selectedRows.forEach(id => updateVisa(id, { status: 'collected' }))
+                    const today = new Date().toISOString().split('T')[0]
+                    selectedRows.forEach(id => {
+                      // 找到該筆簽證
+                      const visa = visas.find(v => v.id === id)
+                      // 如果沒有登記證件歸還時間，就同時填上今天
+                      const updates: Record<string, unknown> = {
+                        status: 'collected',
+                        pickup_date: today,
+                      }
+                      if (!visa?.documents_returned_date) {
+                        updates.documents_returned_date = today
+                      }
+                      updateVisa(id, updates)
+                    })
                     setSelectedRows([])
+                    toast.success('已取件')
                   }}
                   size="sm"
                   variant="default"
@@ -497,6 +515,10 @@ export default function VisasPage() {
           onSelectionChange={setSelectedRows}
           onDelete={deleteVisa}
           onUpdateStatus={(id, status) => updateVisa(id, { status })}
+          onEdit={(visa) => {
+            setEditingVisa(visa)
+            setIsEditDialogOpen(true)
+          }}
         />
       </div>
 
@@ -785,6 +807,16 @@ export default function VisasPage() {
         onClose={() => setIsSubmitDialogOpen(false)}
         selectedVisas={selectedVisas}
         onSubmitComplete={handleSubmitComplete}
+      />
+
+      {/* 編輯對話框 */}
+      <EditVisaDialog
+        open={isEditDialogOpen}
+        onClose={() => {
+          setIsEditDialogOpen(false)
+          setEditingVisa(null)
+        }}
+        visa={editingVisa}
       />
     </div>
   )

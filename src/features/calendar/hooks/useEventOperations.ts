@@ -74,14 +74,26 @@ export function useEventOperations() {
     try {
       // 組合日期和時間（加上本地時區，避免 UTC 轉換問題）
       const tzOffset = '+08:00' // 台灣時區
-      const startDateTime = newEvent.start_time
-        ? `${addEventDialog.selectedDate}T${newEvent.start_time}:00${tzOffset}`
-        : `${addEventDialog.selectedDate}T00:00:00${tzOffset}`
-
+      const isAllDay = !newEvent.start_time && !newEvent.end_time
       const endDate = newEvent.end_date || addEventDialog.selectedDate
-      const endDateTime = newEvent.end_time
-        ? `${endDate}T${newEvent.end_time}:00${tzOffset}`
-        : `${endDate}T23:59:59${tzOffset}`
+
+      let startDateTime: string
+      let endDateTime: string
+
+      if (isAllDay) {
+        // 全天事件：只存日期，不加時間
+        startDateTime = `${addEventDialog.selectedDate}T00:00:00${tzOffset}`
+        endDateTime = `${endDate}T00:00:00${tzOffset}`
+      } else {
+        // 有時間的事件
+        startDateTime = newEvent.start_time
+          ? `${addEventDialog.selectedDate}T${newEvent.start_time}:00${tzOffset}`
+          : `${addEventDialog.selectedDate}T00:00:00${tzOffset}`
+
+        endDateTime = newEvent.end_time
+          ? `${endDate}T${newEvent.end_time}:00${tzOffset}`
+          : `${endDate}T23:59:00${tzOffset}`
+      }
 
       logger.log('[Calendar] 新增事件:', {
         title: newEvent.title,
@@ -94,7 +106,7 @@ export function useEventOperations() {
         description: newEvent.description,
         start: startDateTime,
         end: endDateTime,
-        all_day: !newEvent.start_time && !newEvent.end_time,
+        all_day: isAllDay,
         type: 'other',
         visibility: newEvent.visibility,
         owner_id: user.id,
@@ -154,21 +166,43 @@ export function useEventOperations() {
     const originalEvent = calendarEvents.find(e => e.id === event.id)
     if (!originalEvent) return
 
-    // 解析時間
-    const startDate = originalEvent.start.split('T')[0]
-    const endDate = originalEvent.end?.split('T')[0] || startDate
+    // 解析日期（直接取 YYYY-MM-DD 部分，不做時區轉換）
+    const startDate = originalEvent.start.substring(0, 10)
 
-    // 解析時間部分（處理時區）
+    // 結束日期：如果有 end 就解析，否則用開始日期
+    let endDate = startDate
+    if (originalEvent.end) {
+      endDate = originalEvent.end.substring(0, 10)
+    }
+
+    // 解析時間部分（直接從字串中擷取 HH:MM）
     let startTime = ''
     let endTime = ''
 
-    if (!originalEvent.all_day && originalEvent.start.includes('T')) {
-      const startMatch = originalEvent.start.match(/T(\d{2}:\d{2})/)
-      if (startMatch) startTime = startMatch[1]
-    }
-    if (!originalEvent.all_day && originalEvent.end?.includes('T')) {
-      const endMatch = originalEvent.end.match(/T(\d{2}:\d{2})/)
-      if (endMatch) endTime = endMatch[1]
+    if (!originalEvent.all_day) {
+      // 解析開始時間
+      const startTimeMatch = originalEvent.start.match(/T(\d{2}):(\d{2})/)
+      if (startTimeMatch) {
+        const hour = startTimeMatch[1]
+        const minute = startTimeMatch[2]
+        // 只有非 00:00 才設定時間
+        if (hour !== '00' || minute !== '00') {
+          startTime = `${hour}:${minute}`
+        }
+      }
+
+      // 解析結束時間
+      if (originalEvent.end) {
+        const endTimeMatch = originalEvent.end.match(/T(\d{2}):(\d{2})/)
+        if (endTimeMatch) {
+          const hour = endTimeMatch[1]
+          const minute = endTimeMatch[2]
+          // 只有非 23:59 才設定時間（23:59 是全天事件的預設結束時間）
+          if (!(hour === '23' && minute === '59')) {
+            endTime = `${hour}:${minute}`
+          }
+        }
+      }
     }
 
     setEditEventDialog({
@@ -194,21 +228,33 @@ export function useEventOperations() {
 
     try {
       const tzOffset = '+08:00'
-      const startDateTime = editEventDialog.startTime
-        ? `${editEventDialog.startDate}T${editEventDialog.startTime}:00${tzOffset}`
-        : `${editEventDialog.startDate}T00:00:00${tzOffset}`
-
+      const isAllDay = !editEventDialog.startTime && !editEventDialog.endTime
       const endDate = editEventDialog.endDate || editEventDialog.startDate
-      const endDateTime = editEventDialog.endTime
-        ? `${endDate}T${editEventDialog.endTime}:00${tzOffset}`
-        : `${endDate}T23:59:59${tzOffset}`
+
+      let startDateTime: string
+      let endDateTime: string
+
+      if (isAllDay) {
+        // 全天事件：只存日期，不加時間
+        startDateTime = `${editEventDialog.startDate}T00:00:00${tzOffset}`
+        endDateTime = `${endDate}T00:00:00${tzOffset}`
+      } else {
+        // 有時間的事件
+        startDateTime = editEventDialog.startTime
+          ? `${editEventDialog.startDate}T${editEventDialog.startTime}:00${tzOffset}`
+          : `${editEventDialog.startDate}T00:00:00${tzOffset}`
+
+        endDateTime = editEventDialog.endTime
+          ? `${endDate}T${editEventDialog.endTime}:00${tzOffset}`
+          : `${endDate}T23:59:00${tzOffset}`
+      }
 
       await updateEvent(editEventDialog.eventId, {
         title: editEventDialog.title,
         description: editEventDialog.description,
         start: startDateTime,
         end: endDateTime,
-        all_day: !editEventDialog.startTime && !editEventDialog.endTime,
+        all_day: isAllDay,
         visibility: editEventDialog.visibility,
       })
 

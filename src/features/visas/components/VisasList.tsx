@@ -15,6 +15,7 @@ interface VisasListProps {
   onSelectionChange: (rows: string[]) => void
   onDelete: (id: string) => void
   onUpdateStatus: (id: string, status: Visa['status']) => void
+  onEdit?: (visa: Visa) => void
 }
 
 export function VisasList({
@@ -24,6 +25,7 @@ export function VisasList({
   onSelectionChange,
   onDelete,
   onUpdateStatus,
+  onEdit,
 }: VisasListProps) {
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
@@ -141,6 +143,16 @@ export function VisasList({
 
     return (
       <div className="flex items-center gap-1">
+        <button
+          onClick={e => {
+            e.stopPropagation()
+            onEdit?.(visa)
+          }}
+          className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors"
+          title="編輯"
+        >
+          <Edit2 size={14} />
+        </button>
         <button
           onClick={async e => {
             e.stopPropagation()
