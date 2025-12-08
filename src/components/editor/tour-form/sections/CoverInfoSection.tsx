@@ -548,17 +548,33 @@ export function CoverInfoSection({
       {/* 目前選擇的圖片預覽 */}
       {data.coverImage && (
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">目前封面圖片</label>
-          <div className="relative rounded-lg overflow-hidden border-2 border-morandi-gold">
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            目前封面圖片
+            <span className="text-xs text-morandi-secondary ml-2">（點擊圖片可重新裁切）</span>
+          </label>
+          <div
+            className="relative rounded-lg overflow-hidden border-2 border-morandi-gold cursor-pointer group"
+            onClick={() => {
+              // 點擊現有圖片開啟裁切器
+              setCropImageSrc(data.coverImage)
+              setShowCropper(true)
+            }}
+          >
             <img
               src={data.coverImage}
               alt="封面預覽"
-              className="w-full h-32 object-cover"
+              className="w-full h-32 object-cover transition-all group-hover:brightness-75"
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.src = 'https://via.placeholder.com/1200x400?text=圖片載入失敗'
               }}
             />
+            {/* 編輯提示 */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="bg-black/70 text-white px-3 py-1.5 rounded-lg text-sm font-medium">
+                點擊裁切調整
+              </span>
+            </div>
           </div>
         </div>
       )}

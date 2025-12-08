@@ -228,13 +228,6 @@ function SortableActivityItem({
               上傳圖片
             </button>
           )}
-          <input
-            type="text"
-            value={activity.image || ''}
-            onChange={e => updateActivity(dayIndex, actIndex, 'image', e.target.value)}
-            className="w-32 px-2 py-1 border border-morandi-container rounded text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold/50"
-            placeholder="或貼上圖片網址..."
-          />
           {/* 相關圖片預覽 - 在同一排 */}
           {activity.title && (
             <RelatedImagesPreviewer
