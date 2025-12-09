@@ -357,7 +357,15 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             <Input
               type="text"
               value={data.outboundFlight?.departureDate || ''}
-              onChange={e => updateFlightField('outboundFlight', 'departureDate', e.target.value)}
+              onChange={e => {
+                let value = e.target.value
+                // 如果輸入完整格式 YYYY/MM/DD，自動截取 MM/DD
+                const parts = value.split('/')
+                if (parts.length === 3 && parts[0].length === 4) {
+                  value = `${parts[1]}/${parts[2]}`
+                }
+                updateFlightField('outboundFlight', 'departureDate', value)
+              }}
               className="text-xs h-8"
               placeholder="01/21"
             />
@@ -481,7 +489,15 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             <Input
               type="text"
               value={data.returnFlight?.departureDate || ''}
-              onChange={e => updateFlightField('returnFlight', 'departureDate', e.target.value)}
+              onChange={e => {
+                let value = e.target.value
+                // 如果輸入完整格式 YYYY/MM/DD，自動截取 MM/DD
+                const parts = value.split('/')
+                if (parts.length === 3 && parts[0].length === 4) {
+                  value = `${parts[1]}/${parts[2]}`
+                }
+                updateFlightField('returnFlight', 'departureDate', value)
+              }}
               className="text-xs h-8"
               placeholder="01/25"
             />

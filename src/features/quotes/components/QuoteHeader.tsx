@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, CheckCircle, Plane, FileText, Trash2, Map, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Map, RefreshCw, ArrowLeftRight, FilePlus, Plane } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +14,27 @@ import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
 import { Quote } from '@/types/quote.types'
 import { Tour } from '@/types/tour.types'
+
+// 版本圖示
+function HistoryIcon({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+      <path d="M3 3v5h5"></path>
+      <path d="M12 7v5l4 2"></path>
+    </svg>
+  )
+}
 
 interface QuoteWithCategories extends Quote {
   categories?: CostCategory[]
@@ -46,29 +67,11 @@ interface QuoteHeaderProps {
   handleDeleteVersion: (versionIndex: number) => void
   handleCreateItinerary?: () => void
   handleSyncToItinerary?: () => void
+  onSwitchToQuickQuote?: () => void
+  onStatusChange?: (status: 'proposed' | 'approved', showLinkDialog?: boolean) => void
   currentEditingVersion: number | null
   router: AppRouterInstance
   accommodationDays?: number
-}
-
-function History({ size, className }: { size: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-      <path d="M3 3v5h5"></path>
-      <path d="M12 7v5l4 2"></path>
-    </svg>
-  )
 }
 
 export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
@@ -92,6 +95,8 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleDeleteVersion,
   handleCreateItinerary,
   handleSyncToItinerary,
+  onSwitchToQuickQuote,
+  onStatusChange,
   currentEditingVersion,
   router,
   accommodationDays,
@@ -195,59 +200,104 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           <div className="h-4 w-px bg-morandi-container" />
 
           <div className="flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-sm text-morandi-secondary">狀態</span>
-            <span
-              className={cn(
-                'inline-flex items-center h-8 px-3 rounded text-sm font-medium',
-                quote && quote.status === 'proposed'
-                  ? 'bg-morandi-gold text-white'
-                  : 'bg-morandi-green text-white'
-              )}
-            >
-              {quote?.status === 'proposed'
-                ? '提案'
-                : quote?.status === 'approved'
-                  ? '已核准'
-                  : quote?.status || '提案'}
-            </span>
+            <span className="text-sm text-[var(--morandi-secondary)]">狀態</span>
+            {onStatusChange && !isReadOnly ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={cn(
+                    'inline-flex items-center h-8 px-3 rounded text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity',
+                    quote && quote.status === 'proposed'
+                      ? 'bg-[var(--morandi-gold)] text-white'
+                      : 'bg-[var(--morandi-green)] text-white'
+                  )}
+                >
+                  {quote?.status === 'proposed'
+                    ? '提案'
+                    : quote?.status === 'approved'
+                      ? '成交'
+                      : quote?.status || '提案'}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem
+                    onClick={() => onStatusChange('proposed')}
+                    className={cn(
+                      'cursor-pointer',
+                      quote?.status === 'proposed' && 'bg-[var(--morandi-gold)]/10'
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-[var(--morandi-gold)] mr-2" />
+                    提案
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onStatusChange('approved', true)}
+                    className={cn(
+                      'cursor-pointer',
+                      quote?.status === 'approved' && 'bg-[var(--morandi-green)]/10'
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-[var(--morandi-green)] mr-2" />
+                    成交
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <span
+                className={cn(
+                  'inline-flex items-center h-8 px-3 rounded text-sm font-medium',
+                  quote && quote.status === 'proposed'
+                    ? 'bg-[var(--morandi-gold)] text-white'
+                    : 'bg-[var(--morandi-green)] text-white'
+                )}
+              >
+                {quote?.status === 'proposed'
+                  ? '提案'
+                  : quote?.status === 'approved'
+                    ? '成交'
+                    : quote?.status || '提案'}
+              </span>
+            )}
           </div>
 
           <div className="h-4 w-px bg-morandi-container" />
 
+          {/* 儲存 - SVG only */}
           <Button
             onClick={() => handleSave()}
             disabled={isReadOnly}
+            title="儲存"
             className={cn(
-              'h-8 px-3 text-sm transition-all duration-200',
+              'h-8 w-8 p-0 transition-all duration-200',
               saveSuccess
-                ? 'bg-morandi-green hover:bg-morandi-green text-white'
-                : 'bg-morandi-green hover:bg-morandi-green-hover text-white',
+                ? 'bg-[var(--morandi-green)] hover:bg-[var(--morandi-green)] text-white'
+                : 'bg-[var(--morandi-green)] hover:bg-[var(--morandi-green-hover)] text-white',
               isReadOnly && 'cursor-not-allowed opacity-60'
             )}
           >
-            <Save size={14} className="mr-1.5" />
-            {saveSuccess ? '已儲存' : '儲存'}
+            <Save size={16} />
           </Button>
 
+          {/* 另存 - SVG + 文字 */}
           <Button
             onClick={() => setIsSaveDialogOpen(true)}
             disabled={isReadOnly}
             variant="outline"
+            title="另存新版本"
             className={cn(
-              'h-8 px-3 text-sm',
+              'h-8 px-2.5 text-sm gap-1',
               isReadOnly && 'cursor-not-allowed opacity-60'
             )}
           >
-            <Save size={14} className="mr-1.5" />
-            另存新版本
+            <FilePlus size={14} />
+            另存
           </Button>
 
+          {/* 版本 - SVG + 文字 */}
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="h-8 px-3 text-sm border border-morandi-container text-morandi-secondary hover:bg-morandi-container rounded-md flex items-center"
+              className="h-8 px-2.5 text-sm border border-[var(--morandi-container)] text-[var(--morandi-secondary)] hover:bg-[var(--morandi-container)] rounded-md flex items-center gap-1"
             >
-              <History size={14} className="mr-1.5" />
-              版本歷史
+              <HistoryIcon size={14} />
+              版本
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64" align="end">
               <div className="px-2 py-1 text-sm font-medium text-morandi-primary border-b border-border">
@@ -312,15 +362,16 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* 建立行程表按鈕 */}
+          {/* 行程表 - SVG + 文字 */}
           {handleCreateItinerary && (
             <Button
               onClick={handleCreateItinerary}
               variant="outline"
-              className="h-8 px-3 text-sm"
+              title="建立行程表"
+              className="h-8 px-2.5 text-sm gap-1"
             >
-              <Map size={14} className="mr-1.5" />
-              建立行程表
+              <Map size={14} />
+              行程表
             </Button>
           )}
 
@@ -329,52 +380,37 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             <Button
               onClick={handleSyncToItinerary}
               variant="outline"
-              className="h-8 px-3 text-sm border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
+              title="同步到行程表"
+              className="h-8 px-2.5 text-sm gap-1 border-[var(--morandi-gold)] text-[var(--morandi-gold)] hover:bg-[var(--morandi-gold)] hover:text-white"
             >
-              <RefreshCw size={14} className="mr-1.5" />
-              同步到行程表
+              <RefreshCw size={14} />
+              同步
             </Button>
           )}
 
-          {quote && quote.status === 'proposed' && (
+          {/* 切換 - SVG + 文字 */}
+          {onSwitchToQuickQuote && (
             <Button
-              onClick={handleFinalize}
-              disabled={isReadOnly}
-              className={cn(
-                'h-8 px-3 text-sm bg-morandi-primary hover:bg-morandi-primary/90 text-white',
-                isReadOnly && 'cursor-not-allowed opacity-60'
-              )}
+              onClick={onSwitchToQuickQuote}
+              variant="outline"
+              title="切換到快速報價單"
+              className="h-8 px-2.5 text-sm gap-1"
             >
-              <CheckCircle size={14} className="mr-1.5" />
-              轉為最終版本
+              <ArrowLeftRight size={14} />
+              切換
             </Button>
           )}
 
-          {quote &&
-            quote.status === 'approved' &&
-            (relatedTour ? (
-              // 已有關聯旅遊團：前往該旅遊團
-              <Button
-                onClick={() => router.push(`/tours?highlight=${relatedTour.id}`)}
-                className="h-8 px-3 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                <Plane size={14} className="mr-1.5" />
-                前往旅遊團
-              </Button>
-            ) : (
-              // 沒有關聯旅遊團：建立新旅遊團
-              <Button
-                onClick={handleCreateTour}
-                disabled={isReadOnly}
-                className={cn(
-                  'h-8 px-3 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white',
-                  isReadOnly && 'cursor-not-allowed opacity-60'
-                )}
-              >
-                <Plane size={14} className="mr-1.5" />
-                開旅遊團
-              </Button>
-            ))}
+          {/* 前往旅遊團 - 只有已核准且有關聯旅遊團時顯示 */}
+          {quote && quote.status === 'approved' && relatedTour && (
+            <Button
+              onClick={() => router.push(`/tours?highlight=${relatedTour.id}`)}
+              className="h-8 px-2.5 text-sm gap-1 bg-[var(--morandi-gold)] hover:bg-[var(--morandi-gold-hover)] text-white"
+            >
+              <Plane size={14} />
+              旅遊團
+            </Button>
+          )}
         </div>
       </div>
     </>

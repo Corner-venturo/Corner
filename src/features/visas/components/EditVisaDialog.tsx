@@ -58,12 +58,39 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
   }
 
   const handleSubmit = async () => {
-    if (!visa) return
+    console.log('[EditVisaDialog] handleSubmit called, visa:', visa?.id)
+    if (!visa) {
+      console.log('[EditVisaDialog] No visa, returning')
+      return
+    }
     setIsSubmitting(true)
 
     try {
-      await updateVisa(visa.id, formData)
+      // 將空字串轉換為 null（僅限日期欄位），文字欄位保持空字串
+      const dateFields = ['received_date', 'expected_issue_date', 'actual_submission_date', 'documents_returned_date', 'pickup_date']
+      const cleanedData = Object.fromEntries(
+        Object.entries(formData).map(([key, value]) => [
+          key,
+          // 只有日期欄位才將空字串轉 null
+          dateFields.includes(key) && value === '' ? null : value,
+        ])
+      )
+
+      // 確保必填欄位不是 null
+      if (cleanedData.contact_person === null) {
+        cleanedData.contact_person = ''
+      }
+      if (cleanedData.contact_phone === null) {
+        cleanedData.contact_phone = ''
+      }
+
+      console.log('[EditVisaDialog] Updating visa with:', cleanedData)
+      await updateVisa(visa.id, cleanedData)
+      console.log('[EditVisaDialog] Update successful')
       onClose()
+    } catch (error) {
+      console.error('[EditVisaDialog] 更新簽證失敗:', error)
+      // 錯誤已在 store 中設置，這裡不需要額外處理
     } finally {
       setIsSubmitting(false)
     }

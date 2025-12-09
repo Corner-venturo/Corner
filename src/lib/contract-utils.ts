@@ -74,6 +74,59 @@ function calculateGatherTime(departureTime: string): { hour: string; minute: str
 }
 
 /**
+ * 根據航空公司判斷桃園機場航廈
+ * 參考：https://www.taoyuan-airport.com/airlines
+ */
+function getTerminalByAirline(airline: string): string {
+  // 第一航廈的航空公司
+  const terminal1Airlines = [
+    '國泰航空', 'CX', 'Cathay',
+    '港龍航空', 'KA',
+    '菲律賓航空', 'PR',
+    '越南航空', 'VN',
+    '馬來西亞航空', 'MH',
+    '新加坡航空', 'SQ',
+    '泰國航空', 'TG',
+    '韓亞航空', 'OZ',
+    '大韓航空', 'KE',
+    '日本航空', 'JL', 'JAL',
+    '全日空', 'NH', 'ANA',
+    '阿聯酋航空', 'EK',
+    '土耳其航空', 'TK',
+    '荷蘭皇家航空', 'KL',
+  ]
+
+  // 第二航廈的航空公司
+  const terminal2Airlines = [
+    '中華航空', 'CI', 'China Airlines', '華航',
+    '長榮航空', 'BR', 'EVA', 'EVA Air',
+    '星宇航空', 'JX', 'Starlux',
+    '台灣虎航', 'IT', 'Tigerair',
+    '樂桃航空', 'MM', 'Peach',
+    '捷星航空', 'GK', 'Jetstar',
+    '酷航', 'TR', 'Scoot',
+    '亞洲航空', 'AK', 'D7', 'AirAsia',
+  ]
+
+  const airlineUpper = airline.toUpperCase()
+
+  for (const t1 of terminal1Airlines) {
+    if (airlineUpper.includes(t1.toUpperCase())) {
+      return '桃園國際機場第一航廈'
+    }
+  }
+
+  for (const t2 of terminal2Airlines) {
+    if (airlineUpper.includes(t2.toUpperCase())) {
+      return '桃園國際機場第二航廈'
+    }
+  }
+
+  // 無法判斷時返回空字串
+  return ''
+}
+
+/**
  * 從各種資料來源準備合約資料
  * @param tour 旅遊團資料
  * @param order 訂單資料（用於聯絡人資訊）
@@ -90,26 +143,42 @@ export function prepareContractData(
 ): Partial<ContractData> {
   const today = new Date()
 
-  // 預設集合時間（如果沒有行程表）
-  let gatherHour = '06'
-  let gatherMinute = '00'
+  // 集合資訊預設為空
+  let gatherHour = ''
+  let gatherMinute = ''
   let gatherYear = ''
   let gatherMonth = ''
   let gatherDay = ''
+  let gatherLocation = ''
 
-  // 如果有行程表且有航班資訊
-  if (itinerary?.outbound_flight?.departureTime) {
-    const gatherTime = calculateGatherTime(itinerary.outbound_flight.departureTime)
-    gatherHour = gatherTime.hour
-    gatherMinute = gatherTime.minute
+  // 如果有行程表
+  if (itinerary) {
+    // 優先使用行程表的集合資訊
+    if (itinerary.meeting_info?.location) {
+      gatherLocation = itinerary.meeting_info.location
+    }
 
-    // 從航班日期或旅遊團出發日期取得
-    const departureDate = new Date(tour.departure_date)
-    gatherYear = departureDate.getFullYear().toString()
-    gatherMonth = (departureDate.getMonth() + 1).toString()
-    gatherDay = departureDate.getDate().toString()
+    // 如果有航班資訊，計算集合時間（起飛前3小時）
+    if (itinerary.outbound_flight?.departureTime) {
+      const gatherTime = calculateGatherTime(itinerary.outbound_flight.departureTime)
+      gatherHour = gatherTime.hour
+      gatherMinute = gatherTime.minute
+
+      // 如果沒有設定集合地點，根據航空公司判斷航廈
+      if (!gatherLocation && itinerary.outbound_flight.airline) {
+        gatherLocation = getTerminalByAirline(itinerary.outbound_flight.airline)
+      }
+    }
+
+    // 從旅遊團出發日期取得集合日期
+    if (tour.departure_date) {
+      const departureDate = new Date(tour.departure_date)
+      gatherYear = departureDate.getFullYear().toString()
+      gatherMonth = (departureDate.getMonth() + 1).toString()
+      gatherDay = departureDate.getDate().toString()
+    }
   } else if (tour.departure_date) {
-    // 沒有行程表，使用旅遊團出發日期
+    // 沒有行程表，只帶入出發日期，時間和地點留空
     const departureDate = new Date(tour.departure_date)
     gatherYear = departureDate.getFullYear().toString()
     gatherMonth = (departureDate.getMonth() + 1).toString()
@@ -144,9 +213,7 @@ export function prepareContractData(
     gatherDay,
     gatherHour,
     gatherMinute,
-    gatherLocation: itinerary?.outbound_flight?.departureAirport
-      ? `桃園國際機場` // 可根據機場代碼決定
-      : '',
+    gatherLocation,
 
     // 費用資訊
     totalAmount: order.total_amount?.toString() || '',

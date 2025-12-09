@@ -77,6 +77,8 @@ interface CategorySectionProps {
     value: unknown
   ) => void
   handleRemoveItem: (categoryId: string, itemId: string) => void
+  onOpenMealsImportDialog?: () => void
+  onOpenActivitiesImportDialog?: () => void
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -96,6 +98,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleAddActivity,
   handleUpdateItem,
   handleRemoveItem,
+  onOpenMealsImportDialog,
+  onOpenActivitiesImportDialog,
 }) => {
   const Icon = categoryIcons[category.id]
 
@@ -330,7 +334,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 其他
               </Button>
             </div>
-          ) : category.id === 'meals' && handleAddLunchMeal && handleAddDinnerMeal ? (
+          ) : category.id === 'meals' && handleAddLunchMeal ? (
             <div className="flex gap-1 justify-end">
               <Button
                 variant="ghost"
@@ -343,21 +347,22 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                午餐
+                餐飲
               </Button>
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={() => handleAddDinnerMeal()}
-                disabled={isReadOnly}
-                className={cn(
-                  'text-morandi-secondary hover:bg-morandi-gold/10',
-                  isReadOnly && 'cursor-not-allowed opacity-60'
-                )}
-              >
-                <Plus size={12} className="mr-1" />
-                晚餐
-              </Button>
+              {onOpenMealsImportDialog && (
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={onOpenMealsImportDialog}
+                  disabled={isReadOnly}
+                  className={cn(
+                    'text-morandi-secondary hover:bg-morandi-gold/10',
+                    isReadOnly && 'cursor-not-allowed opacity-60'
+                  )}
+                >
+                  匯入
+                </Button>
+              )}
             </div>
           ) : category.id === 'activities' && handleAddActivity ? (
             <div className="flex gap-1 justify-end">
@@ -374,6 +379,20 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 <Plus size={12} className="mr-1" />
                 新增
               </Button>
+              {onOpenActivitiesImportDialog && (
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={onOpenActivitiesImportDialog}
+                  disabled={isReadOnly}
+                  className={cn(
+                    'text-morandi-secondary hover:bg-morandi-gold/10',
+                    isReadOnly && 'cursor-not-allowed opacity-60'
+                  )}
+                >
+                  匯入
+                </Button>
+              )}
             </div>
           ) : (
             <div className="flex justify-end">

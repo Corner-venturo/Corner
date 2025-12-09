@@ -18,8 +18,14 @@ import {
   SyncToItineraryDialog,
   PrintableQuotation,
   QuickQuoteDetail,
+  LinkTourDialog,
+  LinkItineraryDialog,
+  ImportMealsDialog,
+  ImportActivitiesDialog,
 } from '@/features/quotes/components'
 import type { MealDiff } from '@/features/quotes/components'
+import type { CostItem } from '@/features/quotes/types'
+import type { Itinerary } from '@/stores/types'
 
 export default function QuoteDetailPage() {
 
@@ -54,6 +60,11 @@ export default function QuoteDetailPage() {
     setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
+    // 快速報價單相關
+    quickQuoteItems,
+    setQuickQuoteItems,
+    quickQuoteCustomerInfo,
+    setQuickQuoteCustomerInfo,
     updateQuote,
     addTour,
     router,
@@ -105,6 +116,8 @@ export default function QuoteDetailPage() {
     currentEditingVersion,
     setSaveSuccess,
     setCategories,
+    quickQuoteItems,
+    quickQuoteCustomerInfo,
   })
   const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
 
@@ -347,6 +360,173 @@ export default function QuoteDetailPage() {
 
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
+  // 切換顯示模式：'standard' 團體報價單 | 'quick' 快速報價單
+  const [viewMode, setViewMode] = React.useState<'standard' | 'quick'>('standard')
+  // 關聯旅遊團對話框
+  const [showLinkTourDialog, setShowLinkTourDialog] = React.useState(false)
+  // 關聯行程表對話框
+  const [showLinkItineraryDialog, setShowLinkItineraryDialog] = React.useState(false)
+  // 匯入餐飲對話框
+  const [showImportMealsDialog, setShowImportMealsDialog] = React.useState(false)
+  // 匯入景點對話框
+  const [showImportActivitiesDialog, setShowImportActivitiesDialog] = React.useState(false)
+
+  // 處理狀態變更
+  const handleStatusChange = React.useCallback((status: 'proposed' | 'approved', showLinkDialog?: boolean) => {
+    if (!quote) return
+
+    if (status === 'approved' && showLinkDialog) {
+      // 成交時顯示關聯旅遊團對話框
+      setShowLinkTourDialog(true)
+    } else {
+      // 直接更新狀態
+      updateQuote(quote.id, { status })
+    }
+  }, [quote, updateQuote])
+
+  // 處理新建旅遊團
+  const handleCreateNewTour = React.useCallback(() => {
+    if (!quote) return
+    // 先更新狀態為成交
+    updateQuote(quote.id, { status: 'approved' })
+    // 呼叫原本的建立旅遊團功能
+    handleCreateTour()
+  }, [quote, updateQuote, handleCreateTour])
+
+  // 處理關聯現有旅遊團
+  const handleLinkExistingTour = React.useCallback(async (tour: any) => {
+    if (!quote) return
+    // 更新報價單狀態和關聯旅遊團
+    await updateQuote(quote.id, {
+      status: 'approved',
+      tour_id: tour.id
+    })
+    // 更新旅遊團的 quote_id
+    const { useTourStore } = await import('@/stores')
+    useTourStore.getState().update(tour.id, { quote_id: quote.id })
+    toast.success(`已關聯旅遊團：${tour.code}`)
+  }, [quote, updateQuote])
+
+  // 處理點擊「行程表」按鈕
+  const handleItineraryButtonClick = React.useCallback(() => {
+    if (!quote) return
+    // 如果已經有關聯的行程表，直接跳轉
+    if (quote.itinerary_id) {
+      router.push(`/itinerary/${quote.itinerary_id}`)
+    } else {
+      // 否則顯示選擇對話框
+      setShowLinkItineraryDialog(true)
+    }
+  }, [quote, router])
+
+  // 處理新建行程表
+  const handleCreateNewItinerary = React.useCallback(() => {
+    handleCreateItinerary()
+  }, [handleCreateItinerary])
+
+  // 處理關聯現有行程表
+  const handleLinkExistingItinerary = React.useCallback(async (itinerary: Itinerary) => {
+    if (!quote) return
+    // 更新報價單的 itinerary_id
+    await updateQuote(quote.id, {
+      itinerary_id: itinerary.id
+    })
+    // 更新行程表的 quote_id
+    await updateItinerary(itinerary.id, {
+      quote_id: quote.id
+    })
+    toast.success(`已關聯行程表：${itinerary.code || itinerary.name}`)
+  }, [quote, updateQuote, updateItinerary])
+
+  // 取得行程表的餐飲和景點資料
+  const itineraryMealsData = useMemo(() => {
+    if (!quote?.itinerary_id) return []
+    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+    if (!itinerary?.daily_itinerary) return []
+
+    const meals: Array<{ day: number; type: '早餐' | '午餐' | '晚餐'; name: string }> = []
+    itinerary.daily_itinerary.forEach((day, index) => {
+      const dayNumber = index + 1
+      if (day.meals?.breakfast && !day.meals.breakfast.includes('自理')) {
+        meals.push({ day: dayNumber, type: '早餐', name: day.meals.breakfast })
+      }
+      if (day.meals?.lunch && !day.meals.lunch.includes('自理')) {
+        meals.push({ day: dayNumber, type: '午餐', name: day.meals.lunch })
+      }
+      if (day.meals?.dinner && !day.meals.dinner.includes('自理')) {
+        meals.push({ day: dayNumber, type: '晚餐', name: day.meals.dinner })
+      }
+    })
+    return meals
+  }, [quote, itineraries])
+
+  const itineraryActivitiesData = useMemo(() => {
+    if (!quote?.itinerary_id) return []
+    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+    if (!itinerary?.daily_itinerary) return []
+
+    const activities: Array<{ day: number; title: string; description?: string }> = []
+    itinerary.daily_itinerary.forEach((day, index) => {
+      const dayNumber = index + 1
+      if (day.activities) {
+        day.activities.forEach((activity: { title: string; description?: string }) => {
+          activities.push({
+            day: dayNumber,
+            title: activity.title,
+            description: activity.description,
+          })
+        })
+      }
+    })
+    return activities
+  }, [quote, itineraries])
+
+  // 處理匯入餐飲
+  const handleImportMeals = React.useCallback((items: CostItem[]) => {
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const mealsCategory = newCategories.find(cat => cat.id === 'meals')
+      if (mealsCategory) {
+        mealsCategory.items = [...mealsCategory.items, ...items]
+        mealsCategory.total = mealsCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
+      }
+      return newCategories
+    })
+    toast.success(`已匯入 ${items.length} 筆餐飲`)
+  }, [setCategories])
+
+  // 處理匯入景點
+  const handleImportActivities = React.useCallback((items: CostItem[]) => {
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const activitiesCategory = newCategories.find(cat => cat.id === 'activities')
+      if (activitiesCategory) {
+        activitiesCategory.items = [...activitiesCategory.items, ...items]
+        activitiesCategory.total = activitiesCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
+      }
+      return newCategories
+    })
+    toast.success(`已匯入 ${items.length} 筆景點`)
+  }, [setCategories])
+
+  // 開啟匯入對話框（需要先有關聯的行程表）
+  const handleOpenMealsImportDialog = React.useCallback(() => {
+    if (!quote?.itinerary_id) {
+      toast.error('請先關聯行程表')
+      setShowLinkItineraryDialog(true)
+      return
+    }
+    setShowImportMealsDialog(true)
+  }, [quote])
+
+  const handleOpenActivitiesImportDialog = React.useCallback(() => {
+    if (!quote?.itinerary_id) {
+      toast.error('請先關聯行程表')
+      setShowLinkItineraryDialog(true)
+      return
+    }
+    setShowImportActivitiesDialog(true)
+  }, [quote])
   const [previewParticipantCounts, setPreviewParticipantCounts] =
     React.useState<ParticipantCounts | null>(null)
   const [previewSellingPrices, setPreviewSellingPrices] = React.useState<SellingPrices | null>(null)
@@ -423,9 +603,49 @@ export default function QuoteDetailPage() {
     )
   }
 
-  // ✅ 如果是快速報價單，顯示快速報價單介面
+  // ✅ 如果是快速報價單類型，顯示快速報價單介面
   if (quote.quote_type === 'quick') {
     return <QuickQuoteDetail quote={quote} onUpdate={(data) => updateQuote(quote.id, data)} />
+  }
+
+  // ✅ 如果切換到快速報價單模式，顯示快速報價單介面（但資料存在同一個報價單）
+  if (viewMode === 'quick') {
+    return (
+      <QuickQuoteDetail
+        quote={{
+          ...quote,
+          // 合併快速報價單客戶資訊
+          customer_name: quickQuoteCustomerInfo.customer_name || quote.customer_name,
+          contact_phone: quickQuoteCustomerInfo.contact_phone || quote.contact_phone,
+          contact_address: quickQuoteCustomerInfo.contact_address || quote.contact_address,
+          tour_code: quickQuoteCustomerInfo.tour_code || quote.tour_code,
+          handler_name: quickQuoteCustomerInfo.handler_name || quote.handler_name,
+          issue_date: quickQuoteCustomerInfo.issue_date || quote.issue_date,
+          received_amount: quickQuoteCustomerInfo.received_amount || quote.received_amount,
+          quick_quote_items: quickQuoteItems,
+        } as any}
+        onUpdate={async (data) => {
+          // 更新快速報價單資料到同一個報價單
+          await updateQuote(quote.id, data)
+          // 同步更新本地狀態
+          if (data.quick_quote_items) {
+            setQuickQuoteItems(data.quick_quote_items as any)
+          }
+          if (data.customer_name !== undefined) {
+            setQuickQuoteCustomerInfo(prev => ({ ...prev, ...data } as any))
+          }
+        }}
+        // 傳入切換按鈕
+        viewModeToggle={
+          <button
+            onClick={() => setViewMode('standard')}
+            className="px-3 py-1.5 text-sm bg-morandi-container hover:bg-morandi-container/80 rounded-md transition-colors"
+          >
+            切換到團體報價單
+          </button>
+        }
+      />
+    )
   }
 
   return (
@@ -449,8 +669,10 @@ export default function QuoteDetailPage() {
         handleCreateTour={handleCreateTour}
         handleGenerateQuotation={handleGenerateQuotation}
         handleDeleteVersion={handleDeleteVersion}
-        handleCreateItinerary={handleCreateItinerary}
+        handleCreateItinerary={handleItineraryButtonClick}
         handleSyncToItinerary={handleSyncToItinerary}
+        onSwitchToQuickQuote={() => setViewMode('quick')}
+        onStatusChange={handleStatusChange}
         currentEditingVersion={currentEditingVersion}
         router={router}
         accommodationDays={accommodationDays}
@@ -510,6 +732,8 @@ export default function QuoteDetailPage() {
                         handleAddActivity={categoryOps.handleAddActivity}
                         handleUpdateItem={categoryOps.handleUpdateItem}
                         handleRemoveItem={categoryOps.handleRemoveItem}
+                        onOpenMealsImportDialog={handleOpenMealsImportDialog}
+                        onOpenActivitiesImportDialog={handleOpenActivitiesImportDialog}
                       />
                     ))}
                   </tbody>
@@ -531,6 +755,7 @@ export default function QuoteDetailPage() {
             categories={categories}
           />
         </div>
+
       </div>
 
       {/* 另存新版本對話框 */}
@@ -565,6 +790,39 @@ export default function QuoteDetailPage() {
         accommodationSummary={accommodationSummary}
         tierLabel={previewTierLabel}
         tierPricings={previewTierPricings}
+      />
+
+      {/* 關聯旅遊團對話框 */}
+      <LinkTourDialog
+        isOpen={showLinkTourDialog}
+        onClose={() => setShowLinkTourDialog(false)}
+        onCreateNew={handleCreateNewTour}
+        onLinkExisting={handleLinkExistingTour}
+      />
+
+      {/* 關聯行程表對話框 */}
+      <LinkItineraryDialog
+        isOpen={showLinkItineraryDialog}
+        onClose={() => setShowLinkItineraryDialog(false)}
+        onCreateNew={handleCreateNewItinerary}
+        onLinkExisting={handleLinkExistingItinerary}
+        currentItineraryId={quote?.itinerary_id}
+      />
+
+      {/* 匯入餐飲對話框 */}
+      <ImportMealsDialog
+        isOpen={showImportMealsDialog}
+        onClose={() => setShowImportMealsDialog(false)}
+        meals={itineraryMealsData}
+        onImport={handleImportMeals}
+      />
+
+      {/* 匯入景點對話框 */}
+      <ImportActivitiesDialog
+        isOpen={showImportActivitiesDialog}
+        onClose={() => setShowImportActivitiesDialog(false)}
+        activities={itineraryActivitiesData}
+        onImport={handleImportActivities}
       />
     </div>
   )

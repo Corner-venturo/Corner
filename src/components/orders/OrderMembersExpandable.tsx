@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -92,6 +92,13 @@ export function OrderMembersExpandable({
   const [editMode, setEditMode] = useState<'verify' | 'edit'>('edit')
   const [editFormData, setEditFormData] = useState<Partial<OrderMember>>({})
   const [isSaving, setIsSaving] = useState(false)
+
+  // 護照圖片縮放相關狀態
+  const [imageZoom, setImageZoom] = useState(1)
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
+  const [isImageDragging, setIsImageDragging] = useState(false)
+  const [imageDragStart, setImageDragStart] = useState({ x: 0, y: 0 })
+  const imageContainerRef = useRef<HTMLDivElement>(null)
 
 
   // 定義可編輯欄位的順序（用於方向鍵導航）
@@ -226,6 +233,9 @@ export function OrderMembersExpandable({
       special_meal: member.special_meal || '',
       remarks: member.remarks || '',
     })
+    // 重置圖片縮放狀態
+    setImageZoom(1)
+    setImagePosition({ x: 0, y: 0 })
     setIsEditDialogOpen(true)
   }
 
@@ -827,7 +837,7 @@ export function OrderMembersExpandable({
               order_id: orderId,
               workspace_id: workspaceId,
               customer_id: null, // 稍後背景同步
-              chinese_name: item.customer.name || '',
+              chinese_name: cleanChineseName || '', // 使用清理後的中文名（移除括號內的拼音）
               passport_name: item.customer.passport_romanization || item.customer.english_name || '',
               passport_number: passportNumber,
               passport_expiry: item.customer.passport_expiry_date || null,
@@ -1444,8 +1454,8 @@ export function OrderMembersExpandable({
           setEditFormData({})
         }
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2">
               {editMode === 'verify' ? (
                 <>
@@ -1461,16 +1471,93 @@ export function OrderMembersExpandable({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-6 py-4">
+          <div className="grid grid-cols-2 gap-6 py-4 flex-1 overflow-y-auto">
             {/* 左邊：護照照片 */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
+                {editingMember?.passport_image_url && (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setImageZoom(z => Math.max(0.5, z - 0.25))}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      title="縮小"
+                    >
+                      <ZoomOut size={16} className="text-gray-600" />
+                    </button>
+                    <span className="text-xs text-gray-500 min-w-[3rem] text-center">
+                      {Math.round(imageZoom * 100)}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setImageZoom(z => Math.min(3, z + 0.25))}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      title="放大"
+                    >
+                      <ZoomIn size={16} className="text-gray-600" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageZoom(1)
+                        setImagePosition({ x: 0, y: 0 })
+                      }}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors ml-1"
+                      title="重置"
+                    >
+                      <RotateCcw size={16} className="text-gray-600" />
+                    </button>
+                  </div>
+                )}
+              </div>
               {editingMember?.passport_image_url ? (
-                <img
-                  src={editingMember.passport_image_url}
-                  alt="護照照片"
-                  className="w-full rounded-lg border border-morandi-gold/20"
-                />
+                <div
+                  ref={imageContainerRef}
+                  className="relative overflow-hidden rounded-lg border border-morandi-gold/20 bg-gray-50 cursor-grab active:cursor-grabbing"
+                  style={{ height: '320px' }}
+                  onWheel={(e) => {
+                    e.preventDefault()
+                    const delta = e.deltaY > 0 ? -0.1 : 0.1
+                    setImageZoom(z => Math.min(3, Math.max(0.5, z + delta)))
+                  }}
+                  onMouseDown={(e) => {
+                    if (imageZoom > 1) {
+                      setIsImageDragging(true)
+                      setImageDragStart({ x: e.clientX - imagePosition.x, y: e.clientY - imagePosition.y })
+                    }
+                  }}
+                  onMouseMove={(e) => {
+                    if (isImageDragging && imageZoom > 1) {
+                      setImagePosition({
+                        x: e.clientX - imageDragStart.x,
+                        y: e.clientY - imageDragStart.y,
+                      })
+                    }
+                  }}
+                  onMouseUp={() => setIsImageDragging(false)}
+                  onMouseLeave={() => setIsImageDragging(false)}
+                  onClick={() => {
+                    if (imageZoom === 1) {
+                      setImageZoom(2)
+                    }
+                  }}
+                >
+                  <img
+                    src={editingMember.passport_image_url}
+                    alt="護照照片"
+                    className="w-full h-full object-contain transition-transform duration-100"
+                    style={{
+                      transform: `scale(${imageZoom}) translate(${imagePosition.x / imageZoom}px, ${imagePosition.y / imageZoom}px)`,
+                    }}
+                    draggable={false}
+                  />
+                  {imageZoom === 1 && (
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded pointer-events-none">
+                      點擊放大 / 滾輪縮放
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="w-full h-48 bg-morandi-container/30 rounded-lg flex items-center justify-center text-morandi-secondary">
                   <FileImage size={48} className="opacity-30" />
@@ -1595,17 +1682,18 @@ export function OrderMembersExpandable({
             </div>
           </div>
 
-          {/* 按鈕區域 */}
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          {/* 按鈕區域 - 固定在底部 */}
+          <div className="flex-shrink-0 flex justify-end gap-3 pt-4 pb-2 border-t bg-white">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSaving}>
               取消
             </Button>
             <Button
               onClick={handleSaveEdit}
               disabled={isSaving}
+              size="lg"
               className={editMode === 'verify'
-                ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-morandi-gold hover:bg-morandi-gold/90 text-white'
+                ? 'bg-green-600 hover:bg-green-700 text-white px-8 font-medium'
+                : 'bg-morandi-gold hover:bg-morandi-gold/90 text-white px-8 font-medium'
               }
             >
               {isSaving ? '儲存中...' : editMode === 'verify' ? '確認驗證' : '儲存變更'}

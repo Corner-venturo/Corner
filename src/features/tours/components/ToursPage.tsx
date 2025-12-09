@@ -4,7 +4,7 @@
 
 'use client'
 
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { useTours } from '../hooks/useTours-advanced'
@@ -21,7 +21,7 @@ import {
 import { useAuthStore } from '@/stores/auth-store'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { useOrders, useEmployees, useMembers } from '@/hooks/cloud-hooks'
-import { useRegionsStore } from '@/stores'
+import { useRegionsStore, useItineraryStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { useDialog } from '@/hooks/useDialog'
@@ -34,16 +34,26 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { useTourTableColumns } from './TourTableColumns'
 import { useTourChannelOperations } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
-export const ToursPage: React.FC = () => {
+import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 
+export const ToursPage: React.FC = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user } = useAuthStore()
+
+  // 選擇的行程表和報價單 ID（在表單內選擇）
+  const [selectedItineraryId, setSelectedItineraryId] = useState<string | null>(null)
+  const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
+
+  // 連結文件對話框狀態（合併行程表和報價單）
+  const [documentsDialogTour, setDocumentsDialogTour] = useState<Tour | null>(null)
+
   const { items: orders, create: addOrder } = useOrders()
   const { items: members } = useMembers()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
   const { quotes, updateQuote } = useQuotes()
+  const { items: itineraries, update: updateItinerary } = useItineraryStore()
   const { dialog, openDialog, closeDialog } = useDialog()
 
   // Use custom hooks
@@ -93,6 +103,10 @@ export const ToursPage: React.FC = () => {
   // Lazy load: only load regions and employees when opening create dialog
   const handleOpenCreateDialog = useCallback(
     async (tour: Tour | null = null, fromQuoteId?: string) => {
+      // 重置選擇的行程表和報價單
+      setSelectedItineraryId(null)
+      setSelectedQuoteId(null)
+
       if (countries.length === 0) {
         await fetchRegions()
       }
@@ -188,26 +202,52 @@ export const ToursPage: React.FC = () => {
       let countryCode = ''
       let cityCode = ''
 
-      // Try to find matching city from destinations
-      for (const country of activeCountries) {
-        const citiesInCountry = getCitiesByCountry(country.id)
-          .filter(c => c.is_active)
-          .map(c => ({
-            id: c.id,
-            code: c.airport_code || c.name,
-            name: c.name,
-            country_id: c.country_id,
-          }))
-        const matchedCity = citiesInCountry.find(city => city.name === tour.location)
-        if (matchedCity) {
-          countryCode = country.code
-          cityCode = matchedCity.code
+      // 優先使用資料庫中的 country_id 和 main_city_id 來查找
+      if (tour.country_id && tour.main_city_id) {
+        // 根據 country_id 找到國家
+        const matchedCountry = activeCountries.find(c => c.id === tour.country_id)
+        if (matchedCountry) {
+          countryCode = matchedCountry.code
+          // 載入該國家的城市
+          const citiesInCountry = getCitiesByCountry(matchedCountry.id)
+            .filter(c => c.is_active)
+            .map(c => ({
+              id: c.id,
+              code: c.airport_code || c.name,
+              name: c.name,
+              country_id: c.country_id,
+            }))
           setAvailableCities(citiesInCountry)
-          break
+          // 根據 main_city_id 找到城市
+          const matchedCity = citiesInCountry.find(city => city.id === tour.main_city_id)
+          if (matchedCity) {
+            cityCode = matchedCity.code
+          }
         }
       }
 
-      // If not found, set as custom
+      // 如果用 ID 找不到，fallback 到用 location 文字匹配（舊資料相容）
+      if (!countryCode && tour.location) {
+        for (const country of activeCountries) {
+          const citiesInCountry = getCitiesByCountry(country.id)
+            .filter(c => c.is_active)
+            .map(c => ({
+              id: c.id,
+              code: c.airport_code || c.name,
+              name: c.name,
+              country_id: c.country_id,
+            }))
+          const matchedCity = citiesInCountry.find(city => city.name === tour.location)
+          if (matchedCity) {
+            countryCode = country.code
+            cityCode = matchedCity.code
+            setAvailableCities(citiesInCountry)
+            break
+          }
+        }
+      }
+
+      // If still not found, set as custom
       if (!countryCode) {
         countryCode = '__custom__'
         cityCode = '__custom__'
@@ -292,6 +332,9 @@ export const ToursPage: React.FC = () => {
     actions: actions as any,
     addOrder,
     updateQuote: updateQuote as any,
+    updateItinerary: updateItinerary as any,
+    quotes,
+    itineraries,
     availableCities,
     resetForm,
     closeDialog,
@@ -344,6 +387,8 @@ export const ToursPage: React.FC = () => {
     setDeleteConfirm,
     handleCreateChannel,
     handleUnlockTour,
+    onOpenQuoteDialog: (tour) => setDocumentsDialogTour(tour),
+    onOpenItineraryDialog: (tour) => setDocumentsDialogTour(tour),
   })
 
   const renderExpanded = useCallback(
@@ -406,7 +451,7 @@ export const ToursPage: React.FC = () => {
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="搜尋旅遊團..."
-        onAdd={handleOpenCreateDialog}
+        onAdd={() => handleOpenCreateDialog()}
         addLabel="新增旅遊團"
         tabs={[
           { value: 'all', label: '全部', icon: BarChart3 },
@@ -473,6 +518,8 @@ export const ToursPage: React.FC = () => {
         isOpen={dialog.isOpen}
         onClose={() => {
           resetForm()
+          setSelectedItineraryId(null)
+          setSelectedQuoteId(null)
           closeDialog()
         }}
         mode={dialog.type === 'edit' ? 'edit' : 'create'}
@@ -487,6 +534,10 @@ export const ToursPage: React.FC = () => {
         submitting={submitting}
         formError={formError}
         onSubmit={handleAddTour}
+        selectedItineraryId={selectedItineraryId}
+        setSelectedItineraryId={setSelectedItineraryId}
+        selectedQuoteId={selectedQuoteId}
+        setSelectedQuoteId={setSelectedQuoteId}
       />
 
       {/* Delete confirmation dialog */}
@@ -496,6 +547,15 @@ export const ToursPage: React.FC = () => {
         onClose={() => setDeleteConfirm({ isOpen: false, tour: null })}
         onConfirm={handleDeleteTour}
       />
+
+      {/* Link documents to tour dialog (combined) */}
+      {documentsDialogTour && (
+        <LinkDocumentsToTourDialog
+          isOpen={!!documentsDialogTour}
+          onClose={() => setDocumentsDialogTour(null)}
+          tour={documentsDialogTour}
+        />
+      )}
     </div>
   )
 }

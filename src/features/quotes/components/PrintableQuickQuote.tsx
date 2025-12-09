@@ -80,6 +80,11 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
   const handlePrint = useCallback(() => {
     if (!printContentRef.current) return
 
+    // 暫時修改主頁面標題（macOS 列印對話框會使用這個）
+    const originalTitle = document.title
+    const printTitle = `${quote.customer_name || ''}${quote.tour_code ? '-' + quote.tour_code : ''}-報價單`
+    document.title = printTitle
+
     // 建立隱藏的 iframe
     const iframe = document.createElement('iframe')
     iframe.style.position = 'absolute'
@@ -102,7 +107,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
       <html>
       <head>
         <meta charset="utf-8">
-        <title>報價請款單 - ${quote.customer_name}</title>
+        <title>${quote.customer_name || ''}${quote.tour_code ? '-' + quote.tour_code : ''}-報價單</title>
         <style>
           @page {
             size: A4;
@@ -384,13 +389,14 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
     Promise.all(imagePromises).then(() => {
       setTimeout(() => {
         iframe.contentWindow?.print()
-        // 列印對話框關閉後移除 iframe
+        // 列印對話框關閉後移除 iframe 並恢復標題
         setTimeout(() => {
           document.body.removeChild(iframe)
+          document.title = originalTitle
         }, 1000)
       }, 100)
     })
-  }, [quote.customer_name])
+  }, [quote.customer_name, quote.tour_code])
 
   if (!isOpen || !isMounted) return null
 
@@ -513,6 +519,16 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               )}
             </tbody>
           </table>
+
+          {/* 費用說明 - 只有有資料才顯示 */}
+          {(quote as any).expense_description && (
+            <div style={{ marginBottom: '20px', padding: '12px 16px', backgroundColor: '#FAF7F2', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
+              <div style={{ fontWeight: 600, color: '#6B5B4F', marginBottom: '8px', fontSize: '14px' }}>費用說明</div>
+              <div style={{ color: '#4B5563', fontSize: '13px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                {(quote as any).expense_description}
+              </div>
+            </div>
+          )}
 
           {/* 金額統計 */}
           <div className="summary-box" style={{ backgroundColor: '#FAF7F2', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '12px 16px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: quote.received_amount && quote.received_amount > 0 ? '32px' : '8px', marginBottom: '20px' }}>

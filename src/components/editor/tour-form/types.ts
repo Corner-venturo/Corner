@@ -21,12 +21,19 @@ export interface FocusCard {
   src: string
 }
 
+// 圖片位置設定（支援位置+縮放）
+export interface ImagePositionSettings {
+  x: number      // 水平位置 0-100 (百分比，50 = 置中)
+  y: number      // 垂直位置 0-100 (百分比，50 = 置中)
+  scale: number  // 縮放比例 1-3 (1 = 原始大小)
+}
+
 export interface Activity {
   icon: string
   title: string
   description: string
   image?: string
-  imagePosition?: string // 圖片顯示位置，如 "center", "top", "bottom", "center 30%"
+  imagePosition?: string | ImagePositionSettings // 圖片顯示位置（支援舊字串格式和新物件格式）
   attraction_id?: string // 關聯的景點 ID（從景點選擇器選擇時會設定）
 }
 
@@ -125,6 +132,7 @@ export interface TourFormData {
   departureDate: string
   tourCode: string
   coverImage?: string
+  coverImagePosition?: ImagePositionSettings // 封面圖片位置設定
   coverStyle?: CoverStyleType // 封面風格：original（原版）或 gemini（Gemini 風格）
   price?: string // 價格（如：39,800）
   priceNote?: string // 價格備註（如：起、/人）

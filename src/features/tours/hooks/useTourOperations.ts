@@ -28,6 +28,9 @@ interface UseTourOperationsParams {
   actions: TourActions
   addOrder: (data: CreateInput<Order>) => Promise<Order>
   updateQuote: (id: string, data: UpdateInput<Quote>) => Promise<Quote>
+  updateItinerary: (id: string, data: { tour_id: null; tour_code: null }) => Promise<unknown>
+  quotes: Quote[]
+  itineraries: { id: string; tour_id?: string | null }[]
   availableCities: CityOption[]
   resetForm: () => void
   closeDialog: () => void
@@ -43,6 +46,9 @@ export function useTourOperations(params: UseTourOperationsParams) {
     actions,
     addOrder,
     updateQuote,
+    updateItinerary,
+    quotes,
+    itineraries,
     availableCities,
     resetForm,
     closeDialog,
@@ -94,9 +100,17 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         // Edit mode: update existing tour
         if (dialogType === 'edit' && dialogData) {
+          // Get city ID from availableCities (if not custom)
+          const selectedCity =
+            newTour.countryCode !== '__custom__'
+              ? availableCities.find(c => c.code === newTour.cityCode)
+              : undefined
+
           const tourData = {
             name: newTour.name,
             location: cityName,
+            country_id: selectedCity?.country_id || null,
+            main_city_id: selectedCity?.id || null,
             departure_date: newTour.departure_date,
             return_date: newTour.return_date,
             status: newTour.status,
@@ -207,12 +221,27 @@ export function useTourOperations(params: UseTourOperationsParams) {
       if (!tour) return
 
       try {
+        // 1. 斷開關聯的報價單
+        const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
+        for (const quote of linkedQuotes) {
+          await updateQuote(quote.id, { tour_id: null } as UpdateInput<Quote>)
+        }
+
+        // 2. 斷開關聯的行程表
+        const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
+        for (const itinerary of linkedItineraries) {
+          await updateItinerary(itinerary.id, { tour_id: null, tour_code: null })
+        }
+
+        // 3. 刪除旅遊團
         await actions.delete(tour.id)
+
+        logger.info(`已刪除旅遊團 ${tour.code}，並斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
       } catch (err) {
         logger.error('刪除旅遊團失敗:', err)
       }
     },
-    [actions]
+    [actions, quotes, itineraries, updateQuote, updateItinerary]
   )
 
   const handleArchiveTour = useCallback(

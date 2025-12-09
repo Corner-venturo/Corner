@@ -191,11 +191,11 @@ export const useQuoteCalculations = ({
             category.id === 'activities' ||
             category.id === 'others'
           ) {
-            // 餐飲、活動、其他：成人、小朋友佔床、單人房有，不佔床和嬰兒沒有
+            // 餐飲、活動、其他：成人、小朋友佔床、不佔床、單人房都有，嬰兒沒有
             const itemCost = item.unit_price || 0
             costs.adult += itemCost
             costs.child_with_bed += itemCost
-            // 不佔床不含餐飲和活動
+            costs.child_no_bed += itemCost
             costs.single_room += itemCost
             // 嬰兒不含餐飲和活動
           } else if (category.id === 'group-transport' || category.id === 'guide') {

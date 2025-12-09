@@ -43,31 +43,9 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
-          let displayCode = '-'
-          let codeColor = 'text-morandi-secondary'
-
-          if (quote.tour_id) {
-            const relatedTour = tours.find(t => t.id === quote.tour_id)
-            if (relatedTour?.code) {
-              if (quote.converted_to_tour) {
-                const tourQuotes = quotes
-                  .filter(q => q.tour_id === quote.tour_id && q.converted_to_tour)
-                  .sort(
-                    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-                  )
-                const version = tourQuotes.findIndex(q => q.id === quote.id) + 1
-                displayCode = `${relatedTour.code}-V${version}`
-              } else {
-                displayCode = relatedTour.code
-              }
-              codeColor = 'text-morandi-gold'
-            }
-          } else if (quote.is_pinned && quote.code) {
-            displayCode = quote.code
-            codeColor = 'text-morandi-gold'
-          } else {
-            displayCode = quote.code || '-'
-          }
+          // 簡化邏輯：直接顯示報價單自己的編號
+          const displayCode = quote.code || '-'
+          const codeColor = quote.code ? 'text-morandi-gold' : 'text-morandi-secondary'
 
           return (
             <div className="flex items-center gap-2">
@@ -194,7 +172,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
     <EnhancedTable
       columns={tableColumns}
       data={quotes}
-      searchableFields={['name']}
+      searchableFields={['name', 'customer_name', 'code']}
       searchTerm={searchTerm}
       onRowClick={row => onQuoteClick((row as Quote).id)}
       bordered={true}

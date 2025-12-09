@@ -33,6 +33,9 @@ interface UseTourActionButtonsParams {
   setDeleteConfirm: (state: { isOpen: boolean; tour: Tour | null }) => void
   handleCreateChannel: (tour: Tour) => Promise<void>
   handleUnlockTour: (tour: Tour) => Promise<void>
+  // 新增：打開報價單/行程表連結對話框
+  onOpenQuoteDialog?: (tour: Tour) => void
+  onOpenItineraryDialog?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -47,6 +50,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     setDeleteConfirm,
     handleCreateChannel,
     handleUnlockTour,
+    onOpenQuoteDialog,
+    onOpenItineraryDialog,
   } = params
 
   const renderActions = useCallback(
@@ -98,14 +103,16 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             onClick={e => {
               e.stopPropagation()
               setSelectedTour(tour)
-              if (hasQuote) {
+              if (onOpenQuoteDialog) {
+                onOpenQuoteDialog(tour)
+              } else if (hasQuote) {
                 router.push(`/quotes/${tourQuote.id}`)
               } else {
                 router.push(`/quotes?tour_id=${tour.id}`)
               }
             }}
             className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-            title={hasQuote ? '查看報價單' : '新增報價單'}
+            title="管理報價單"
           >
             <Calculator size={14} />
           </button>
@@ -114,10 +121,15 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              router.push(`/itinerary/${tour.id}`)
+              setSelectedTour(tour)
+              if (onOpenItineraryDialog) {
+                onOpenItineraryDialog(tour)
+              } else {
+                router.push(`/itinerary/${tour.id}`)
+              }
             }}
             className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
-            title="編輯行程表"
+            title="管理行程表"
           >
             <Flag size={14} />
           </button>
@@ -192,6 +204,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       setDeleteConfirm,
       handleCreateChannel,
       handleUnlockTour,
+      onOpenQuoteDialog,
+      onOpenItineraryDialog,
     ]
   )
 

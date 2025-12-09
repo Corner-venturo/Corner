@@ -4,12 +4,12 @@ import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, Check } from 'lucide-react'
+import { Upload, Check, Crop } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
-import { ImageCropper } from '@/components/ui/image-cropper'
+import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -46,9 +46,8 @@ export function CoverInfoSection({
   const [uploading, setUploading] = useState(false)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [uploadedImageUrl, setUploadedImageUrl] = useState('')
-  // 裁切功能相關狀態
-  const [showCropper, setShowCropper] = useState(false)
-  const [cropImageSrc, setCropImageSrc] = useState('')
+  // 位置調整功能相關狀態
+  const [showPositionEditor, setShowPositionEditor] = useState(false)
 
   // 取得當前選擇城市的圖片
   const cityImages = useMemo(() => {
@@ -102,8 +101,8 @@ export function CoverInfoSection({
     }
   }
 
-  // 選擇圖片後打開裁切器
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // 選擇圖片後直接上傳（不裁切）
+  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -119,17 +118,9 @@ export function CoverInfoSection({
       return
     }
 
-    // 建立預覽 URL 並打開裁切器
-    const imageUrl = URL.createObjectURL(file)
-    setCropImageSrc(imageUrl)
-    setShowCropper(true)
-
     // 清除 input 值，讓使用者可以再次選擇同一個檔案
     event.target.value = ''
-  }
 
-  // 裁切完成後上傳
-  const handleCropComplete = async (croppedBlob: Blob) => {
     setUploading(true)
 
     // 記錄舊圖片 URL（上傳成功後刪除）
@@ -139,16 +130,16 @@ export function CoverInfoSection({
       // 生成唯一檔名
       const timestamp = Date.now()
       const randomStr = Math.random().toString(36).substring(2, 8)
-      const fileName = `itinerary_${timestamp}_${randomStr}.jpg`
+      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileName = `itinerary_${timestamp}_${randomStr}.${fileExt}`
       const filePath = `${fileName}`
 
       // 上傳到 Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('city-backgrounds')
-        .upload(filePath, croppedBlob, {
+        .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
-          contentType: 'image/jpeg',
         })
 
       if (uploadError) throw uploadError
@@ -161,17 +152,12 @@ export function CoverInfoSection({
         await deleteStorageImage(oldCoverImage)
       }
 
-      // 更新表單資料
+      // 更新表單資料（圖片 + 重置位置設定）
       updateField('coverImage', urlData.publicUrl)
+      updateField('coverImagePosition', { x: 50, y: 50, scale: 1 })
 
       // 儲存圖片網址，準備詢問是否更新資料庫
       setUploadedImageUrl(urlData.publicUrl)
-
-      // 清理預覽 URL
-      if (cropImageSrc) {
-        URL.revokeObjectURL(cropImageSrc)
-      }
-      setCropImageSrc('')
 
       // 如果有選擇城市，詢問是否更新預設圖片
       if (data.city) {
@@ -187,13 +173,9 @@ export function CoverInfoSection({
     }
   }
 
-  // 關閉裁切器
-  const handleCloseCropper = () => {
-    if (cropImageSrc) {
-      URL.revokeObjectURL(cropImageSrc)
-    }
-    setCropImageSrc('')
-    setShowCropper(false)
+  // 位置調整確認
+  const handlePositionConfirm = (settings: ImagePositionSettings) => {
+    updateField('coverImagePosition', settings)
   }
 
   // 更新城市預設圖片
@@ -536,13 +518,15 @@ export function CoverInfoSection({
         </div>
       </div>
 
-      {/* 圖片裁切器 */}
-      <ImageCropper
-        open={showCropper}
-        onClose={handleCloseCropper}
-        imageSrc={cropImageSrc}
+      {/* 圖片位置調整器 */}
+      <ImagePositionEditor
+        open={showPositionEditor}
+        onClose={() => setShowPositionEditor(false)}
+        imageSrc={data.coverImage || ''}
+        currentPosition={data.coverImagePosition}
+        onConfirm={handlePositionConfirm}
         aspectRatio={16 / 9}
-        onCropComplete={handleCropComplete}
+        title="調整封面圖片"
       />
 
       {/* 目前選擇的圖片預覽 */}
@@ -550,29 +534,38 @@ export function CoverInfoSection({
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
             目前封面圖片
-            <span className="text-xs text-morandi-secondary ml-2">（點擊圖片可重新裁切）</span>
+            <span className="text-xs text-morandi-secondary ml-2">（點擊圖片可調整位置）</span>
           </label>
           <div
             className="relative rounded-lg overflow-hidden border-2 border-morandi-gold cursor-pointer group"
-            onClick={() => {
-              // 點擊現有圖片開啟裁切器
-              setCropImageSrc(data.coverImage)
-              setShowCropper(true)
-            }}
+            onClick={() => setShowPositionEditor(true)}
           >
             <img
               src={data.coverImage}
               alt="封面預覽"
               className="w-full h-32 object-cover transition-all group-hover:brightness-75"
+              style={getImagePositionStyle(data.coverImagePosition)}
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.src = 'https://via.placeholder.com/1200x400?text=圖片載入失敗'
               }}
             />
+            {/* 調整按鈕 */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowPositionEditor(true)
+              }}
+              className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 hover:bg-black/80 rounded text-white text-xs flex items-center gap-1 transition-colors"
+            >
+              <Crop size={12} />
+              調整位置
+            </button>
             {/* 編輯提示 */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               <span className="bg-black/70 text-white px-3 py-1.5 rounded-lg text-sm font-medium">
-                點擊裁切調整
+                點擊調整位置
               </span>
             </div>
           </div>

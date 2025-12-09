@@ -5,6 +5,7 @@ import { useTourStore, useOrderStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories, VersionRecord } from '../types'
 import { useItineraryImport } from './useItineraryImport'
+import { QuickQuoteItem } from '@/types/quote.types'
 
 export const useQuoteState = () => {
   const params = useParams()
@@ -153,8 +154,23 @@ export const useQuoteState = () => {
       if (quote.name) {
         setQuoteName(quote.name)
       }
+      // 快速報價單資料
+      if (quote.quick_quote_items) {
+        setQuickQuoteItems(quote.quick_quote_items as QuickQuoteItem[])
+      }
+      // 快速報價單客戶資訊
+      setQuickQuoteCustomerInfo({
+        customer_name: quote.customer_name || '',
+        contact_phone: quote.contact_phone || '',
+        contact_address: quote.contact_address || '',
+        tour_code: quote.tour_code || relatedTour?.code || '',
+        handler_name: quote.handler_name || 'William',
+        issue_date: quote.issue_date || new Date().toISOString().split('T')[0],
+        received_amount: quote.received_amount || 0,
+        expense_description: (quote as any)?.expense_description || '',
+      })
     }
-  }, [quote?.id]) // 只在 quote.id 改變時執行
+  }, [quote?.id, relatedTour?.code]) // 只在 quote.id 改變時執行
 
   // 總人數：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
   const groupSize =
@@ -191,6 +207,21 @@ export const useQuoteState = () => {
       infant: 0,
     }
   )
+
+  // 快速報價單相關狀態
+  const [quickQuoteItems, setQuickQuoteItems] = useState<QuickQuoteItem[]>(
+    (quote?.quick_quote_items as QuickQuoteItem[]) || []
+  )
+  const [quickQuoteCustomerInfo, setQuickQuoteCustomerInfo] = useState({
+    customer_name: quote?.customer_name || '',
+    contact_phone: quote?.contact_phone || '',
+    contact_address: quote?.contact_address || '',
+    tour_code: quote?.tour_code || relatedTour?.code || '',
+    handler_name: quote?.handler_name || 'William',
+    issue_date: quote?.issue_date || new Date().toISOString().split('T')[0],
+    received_amount: quote?.received_amount || 0,
+    expense_description: (quote as any)?.expense_description || '',
+  })
 
   // 如果找不到報價單，返回列表頁（只有在資料已載入時才判斷）
   useEffect(() => {
@@ -284,6 +315,11 @@ export const useQuoteState = () => {
     setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
+    // 快速報價單相關
+    quickQuoteItems,
+    setQuickQuoteItems,
+    quickQuoteCustomerInfo,
+    setQuickQuoteCustomerInfo,
     updateQuote,
     addTour,
     router,

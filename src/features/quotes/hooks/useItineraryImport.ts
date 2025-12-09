@@ -60,12 +60,13 @@ export const useItineraryImport = (): UseItineraryImportResult => {
     : []
 
   // 將餐食資料轉換為報價項目（排除早餐，因為通常飯店附）
+  // 只帶入餐廳名稱，不加 Day X 前綴
   const convertMealsToQuoteItems = (meals: MealData[]) => {
     return meals
       .filter(meal => meal.type !== '早餐')
       .map((meal, index) => ({
         id: `meal-${index}`,
-        name: `Day ${meal.day} ${meal.type} - ${meal.name}`,
+        name: meal.name, // 只使用餐廳名稱
         description: meal.note || '',
         quantity: 1,
         unit_price: 0, // 使用者需要手動設定價格
@@ -91,15 +92,16 @@ export const useItineraryImport = (): UseItineraryImportResult => {
   }
 
   // 將活動資料轉換為報價項目
+  // 只帶入景點名稱，不加 Day X 前綴
   const convertActivitiesToQuoteItems = (activities: ActivityData[]) => {
     return activities.map((activity, index) => ({
       id: `activity-${index}`,
-      name: `Day ${activity.day} - ${activity.title}`,
+      name: activity.title, // 只使用景點名稱
       description: activity.description || '',
       quantity: 1,
       unit_price: 0, // 使用者需要手動設定價格
       total: 0,
-      notes: `自動帶入：${activity.title}`,
+      notes: '',
       order: index,
       is_group_cost: false
     }))

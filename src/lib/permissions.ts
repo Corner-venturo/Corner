@@ -66,6 +66,13 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     description: '建立和管理報價單',
   },
   {
+    id: 'itinerary',
+    label: '行程管理',
+    category: '全部',
+    routes: ['/itinerary'],
+    description: '行程表建立和管理',
+  },
+  {
     id: 'tours',
     label: '旅遊團管理',
     category: '全部',

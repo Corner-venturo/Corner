@@ -12,7 +12,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit, Upload, FileImage, Trash2 } from 'lucide-react'
+import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit, Upload, FileImage, Trash2, AlertTriangle, Check, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -24,13 +24,14 @@ import {
   CustomerSearchParams,
 } from '@/components/customers/customer-search-dialog'
 import { useCustomers } from '@/hooks/cloud-hooks'
-import type { Customer } from '@/types/customer.types'
+import type { Customer, UpdateCustomerData } from '@/types/customer.types'
+import { toast } from 'sonner'
 
 const STORAGE_KEY = 'customerSearchParams'
 
 export default function CustomersPage() {
   const router = useRouter()
-  const { items: customers, create: addCustomer, delete: deleteCustomer } = useCustomers()
+  const { items: customers, create: addCustomer, delete: deleteCustomer, update: updateCustomer } = useCustomers()
 
   // 搜尋狀態
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false)
@@ -61,6 +62,18 @@ export default function CustomersPage() {
   const [passportFiles, setPassportFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+
+  // 驗證彈窗相關狀態
+  const [isVerifyDialogOpen, setIsVerifyDialogOpen] = useState(false)
+  const [verifyingCustomer, setVerifyingCustomer] = useState<Customer | null>(null)
+  const [verifyFormData, setVerifyFormData] = useState<Partial<UpdateCustomerData>>({})
+  const [isSavingVerify, setIsSavingVerify] = useState(false)
+
+  // 護照圖片縮放相關狀態
+  const [imageZoom, setImageZoom] = useState(1)
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
+  const [isImageDragging, setIsImageDragging] = useState(false)
+  const [imageDragStart, setImageDragStart] = useState({ x: 0, y: 0 })
 
   // 當搜尋參數改變時，保存到 localStorage
   useEffect(() => {
@@ -351,6 +364,45 @@ export default function CustomersPage() {
     router.push(`/customers/${customer.id}`)
   }
 
+  // 打開驗證彈窗
+  const openVerifyDialog = (customer: Customer) => {
+    setVerifyingCustomer(customer)
+    setVerifyFormData({
+      name: customer.name || '',
+      passport_romanization: customer.passport_romanization || '',
+      date_of_birth: customer.date_of_birth || '',
+      gender: customer.gender || '',
+      national_id: customer.national_id || '',
+      passport_number: customer.passport_number || '',
+      passport_expiry_date: customer.passport_expiry_date || '',
+    })
+    // 重置圖片縮放狀態
+    setImageZoom(1)
+    setImagePosition({ x: 0, y: 0 })
+    setIsVerifyDialogOpen(true)
+  }
+
+  // 儲存驗證
+  const handleSaveVerify = async () => {
+    if (!verifyingCustomer) return
+    setIsSavingVerify(true)
+
+    try {
+      await updateCustomer(verifyingCustomer.id, {
+        ...verifyFormData,
+        verification_status: 'verified', // 標記為已驗證
+      } as UpdateCustomerData)
+      toast.success('顧客資料已驗證')
+      setIsVerifyDialogOpen(false)
+      setVerifyingCustomer(null)
+    } catch (error) {
+      toast.error('驗證失敗')
+      console.error('Failed to verify customer:', error)
+    } finally {
+      setIsSavingVerify(false)
+    }
+  }
+
   const hasActiveFilters = Object.keys(searchParams).length > 0
 
   // 表格欄位定義
@@ -530,6 +582,36 @@ export default function CustomersPage() {
             onRowClick={handleRowClick}
             actions={(customer: Customer) => (
               <div className="flex items-center gap-1">
+                {/* 驗證按鈕 - 只有待驗證且有護照圖片的顧客才顯示 */}
+                {customer.verification_status === 'unverified' && customer.passport_image_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="p-1 hover:bg-amber-100 rounded transition-colors"
+                    title="驗證顧客資料"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openVerifyDialog(customer)
+                    }}
+                  >
+                    <AlertTriangle size={14} className="text-amber-500" />
+                  </Button>
+                )}
+                {/* 已驗證標記 */}
+                {customer.verification_status === 'verified' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="p-1 hover:bg-green-100 rounded transition-colors"
+                    title="查看驗證資料"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openVerifyDialog(customer)
+                    }}
+                  >
+                    <Check size={14} className="text-green-500" />
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -797,6 +879,237 @@ export default function CustomersPage() {
           <div className="flex justify-end pt-2 border-t">
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               取消
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 驗證顧客資料彈窗 */}
+      <Dialog open={isVerifyDialogOpen} onOpenChange={(open) => {
+        setIsVerifyDialogOpen(open)
+        if (!open) {
+          setVerifyingCustomer(null)
+          setVerifyFormData({})
+        }
+      }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-2">
+              {verifyingCustomer?.verification_status === 'verified' ? (
+                <>
+                  <Check className="text-green-500" size={20} />
+                  顧客資料（已驗證）
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="text-amber-500" size={20} />
+                  驗證顧客資料
+                </>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-6 py-4 flex-1 overflow-y-auto">
+            {/* 左邊：護照照片 */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
+                {verifyingCustomer?.passport_image_url && (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setImageZoom(z => Math.max(0.5, z - 0.25))}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      title="縮小"
+                    >
+                      <ZoomOut size={16} className="text-gray-600" />
+                    </button>
+                    <span className="text-xs text-gray-500 min-w-[3rem] text-center">
+                      {Math.round(imageZoom * 100)}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setImageZoom(z => Math.min(3, z + 0.25))}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      title="放大"
+                    >
+                      <ZoomIn size={16} className="text-gray-600" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageZoom(1)
+                        setImagePosition({ x: 0, y: 0 })
+                      }}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors ml-1"
+                      title="重置"
+                    >
+                      <RotateCcw size={16} className="text-gray-600" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              {verifyingCustomer?.passport_image_url ? (
+                <div
+                  className="relative overflow-hidden rounded-lg border border-morandi-gold/20 bg-gray-50 cursor-grab active:cursor-grabbing"
+                  style={{ height: '320px' }}
+                  onWheel={(e) => {
+                    e.preventDefault()
+                    const delta = e.deltaY > 0 ? -0.1 : 0.1
+                    setImageZoom(z => Math.min(3, Math.max(0.5, z + delta)))
+                  }}
+                  onMouseDown={(e) => {
+                    if (imageZoom > 1) {
+                      setIsImageDragging(true)
+                      setImageDragStart({ x: e.clientX - imagePosition.x, y: e.clientY - imagePosition.y })
+                    }
+                  }}
+                  onMouseMove={(e) => {
+                    if (isImageDragging && imageZoom > 1) {
+                      setImagePosition({
+                        x: e.clientX - imageDragStart.x,
+                        y: e.clientY - imageDragStart.y,
+                      })
+                    }
+                  }}
+                  onMouseUp={() => setIsImageDragging(false)}
+                  onMouseLeave={() => setIsImageDragging(false)}
+                  onClick={() => {
+                    if (imageZoom === 1) {
+                      setImageZoom(2)
+                    }
+                  }}
+                >
+                  <img
+                    src={verifyingCustomer.passport_image_url}
+                    alt="護照照片"
+                    className="w-full h-full object-contain transition-transform duration-100"
+                    style={{
+                      transform: `scale(${imageZoom}) translate(${imagePosition.x / imageZoom}px, ${imagePosition.y / imageZoom}px)`,
+                    }}
+                    draggable={false}
+                  />
+                  {imageZoom === 1 && (
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded pointer-events-none">
+                      點擊放大 / 滾輪縮放
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-morandi-container/30 rounded-lg flex items-center justify-center text-morandi-secondary">
+                  <FileImage size={48} className="opacity-30" />
+                </div>
+              )}
+              {verifyingCustomer?.verification_status !== 'verified' && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <p className="text-xs text-amber-700">
+                    請仔細核對護照照片與右邊的資料是否一致。驗證完成後，此顧客的資料將被標記為「已驗證」。
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 右邊：表單 */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-morandi-primary">顧客資料</h3>
+
+              {/* 中文姓名 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">中文姓名</label>
+                <input
+                  type="text"
+                  value={verifyFormData.name || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                />
+              </div>
+
+              {/* 護照拼音 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">護照拼音</label>
+                <input
+                  type="text"
+                  value={verifyFormData.passport_romanization || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, passport_romanization: e.target.value.toUpperCase() })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                />
+              </div>
+
+              {/* 出生年月日 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">出生年月日</label>
+                <input
+                  type="date"
+                  value={verifyFormData.date_of_birth || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, date_of_birth: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                />
+              </div>
+
+              {/* 性別 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">性別</label>
+                <select
+                  value={verifyFormData.gender || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, gender: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                >
+                  <option value="">請選擇</option>
+                  <option value="M">男</option>
+                  <option value="F">女</option>
+                </select>
+              </div>
+
+              {/* 身分證號 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">身分證號</label>
+                <input
+                  type="text"
+                  value={verifyFormData.national_id || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, national_id: e.target.value.toUpperCase() })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                />
+              </div>
+
+              {/* 護照號碼 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">護照號碼</label>
+                <input
+                  type="text"
+                  value={verifyFormData.passport_number || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, passport_number: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                />
+              </div>
+
+              {/* 護照效期 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">護照效期</label>
+                <input
+                  type="date"
+                  value={verifyFormData.passport_expiry_date || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, passport_expiry_date: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 按鈕區域 - 固定在底部 */}
+          <div className="flex-shrink-0 flex justify-end gap-3 pt-4 pb-2 border-t bg-white">
+            <Button variant="outline" onClick={() => setIsVerifyDialogOpen(false)} disabled={isSavingVerify}>
+              取消
+            </Button>
+            <Button
+              onClick={handleSaveVerify}
+              disabled={isSavingVerify}
+              size="lg"
+              className={verifyingCustomer?.verification_status === 'verified'
+                ? 'bg-morandi-gold hover:bg-morandi-gold/90 text-white px-8 font-medium'
+                : 'bg-green-600 hover:bg-green-700 text-white px-8 font-medium'
+              }
+            >
+              {isSavingVerify ? '儲存中...' : verifyingCustomer?.verification_status === 'verified' ? '儲存變更' : '確認驗證'}
             </Button>
           </div>
         </DialogContent>

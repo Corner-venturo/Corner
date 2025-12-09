@@ -146,8 +146,9 @@ export function createStore<T extends BaseEntity>(
 
           // Super Admin 可以跨 workspace 查詢，不加過濾
           if (!canCrossWorkspace(userRole) && workspaceId) {
-            query = query.eq('workspace_id', workspaceId)
-            logger.log(`🔒 [${tableName}] Workspace 隔離：只查詢 workspace_id=${workspaceId}`)
+            // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料
+            query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
+            logger.log(`🔒 [${tableName}] Workspace 隔離：查詢 workspace_id=${workspaceId} 或 NULL（舊資料）`)
           } else if (canCrossWorkspace(userRole)) {
             logger.log(`🌐 [${tableName}] Super Admin：跨 workspace 查詢`)
           }

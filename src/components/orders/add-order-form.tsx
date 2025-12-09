@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
-import { useTourStore } from '@/stores'
+import { useTours } from '@/hooks/cloud-hooks'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type { Employee } from '@/stores/types'
@@ -35,7 +35,7 @@ interface AddOrderFormProps {
 }
 
 export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: AddOrderFormProps) {
-  const { items: tours } = useTourStore()
+  const { items: tours } = useTours()
   const { items: employees, fetchAll: fetchEmployees } = useUserStore()
   const { user } = useAuthStore()
 

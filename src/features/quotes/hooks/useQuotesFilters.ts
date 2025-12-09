@@ -31,11 +31,13 @@ export const useQuotesFilters = ({
     const filteredUnpinned = unpinnedQuotes.filter(quote => {
       const matchesStatus = statusFilter === 'all' || quote.status === statusFilter
 
-      // 搜尋 - 搜尋所有文字欄位
+      // 搜尋 - 搜尋所有文字欄位（包含 name 和 customer_name）
       const searchLower = searchTerm.toLowerCase()
       const matchesSearch =
         !searchTerm ||
         quote.name?.toLowerCase().includes(searchLower) ||
+        quote.customer_name?.toLowerCase().includes(searchLower) ||
+        quote.code?.toLowerCase().includes(searchLower) ||
         quote.quote_number?.toLowerCase().includes(searchLower) ||
         quote.status?.toLowerCase().includes(searchLower)
 

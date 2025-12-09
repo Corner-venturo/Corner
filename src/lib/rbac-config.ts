@@ -76,16 +76,21 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     description: '可建立報價單、管理客戶和訂單',
     color: 'text-morandi-gold bg-morandi-gold/10 border-morandi-gold/20',
     permissions: [
-      'todos',           // 待辦事項
-      'payments',        // 收款管理
-      'requests',        // 請款管理
-      'visas',           // 簽證管理
       'calendar',        // 行事曆（預設）
       'workspace',       // 工作空間（預設）
+      'todos',           // 待辦事項（預設）
       'quotes',          // 報價管理（預設）
+      'itinerary',       // 行程管理
       'tours',           // 旅遊團管理（預設）
       'orders',          // 訂單管理（預設）
       'customers',       // 客戶管理（預設）
+      'visas',           // 簽證管理（預設）
+      'accounting',      // 記帳管理
+      'payments',        // 收款管理（預設）
+      'requests',        // 請款管理（預設）
+      'settings',        // 系統設定
+      'confirmations',   // 確認單管理
+      'esims',           // eSIM 管理
     ],
     canManageWorkspace: false,
     canCrossWorkspace: false,
@@ -97,17 +102,23 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     description: '可管理財務、付款和會計相關功能',
     color: 'text-morandi-primary bg-morandi-primary/10 border-morandi-primary/20',
     permissions: [
-      'payments',        // 收款管理
-      'requests',        // 請款管理
-      'cashier',         // 出納管理
-      'vouchers',        // 會計傳票
-      'finance_reports', // 財務報表
       'calendar',        // 行事曆（預設）
       'workspace',       // 工作空間（預設）
+      'todos',           // 待辦事項
       'quotes',          // 報價管理（預設）
       'tours',           // 旅遊團管理（預設）
       'orders',          // 訂單管理（預設）
       'customers',       // 客戶管理（預設）
+      'visas',           // 簽證管理
+      'accounting',      // 記帳管理
+      'payments',        // 收款管理（預設）
+      'requests',        // 請款管理（預設）
+      'disbursement',    // 出納管理
+      'finance_reports', // 財務報表（預設）
+      'vouchers',        // 會計傳票（預設）
+      'database',        // 資料管理
+      'settings',        // 系統設定
+      'reports',         // 報表管理
     ],
     canManageWorkspace: false,
     canCrossWorkspace: false,

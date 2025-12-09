@@ -8,6 +8,18 @@ import { CostCategory, ParticipantCounts, SellingPrices, VersionRecord } from '.
 import { useTourStore } from '@/stores'
 import type { Quote, Tour } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
+import type { QuickQuoteItem } from '@/types/quote.types'
+
+interface QuickQuoteCustomerInfo {
+  customer_name: string
+  contact_phone: string
+  contact_address: string
+  tour_code: string
+  handler_name: string
+  issue_date: string
+  received_amount: number
+  expense_description: string
+}
 
 interface UseQuoteActionsProps {
   quote: Quote | null | undefined
@@ -27,6 +39,9 @@ interface UseQuoteActionsProps {
   currentEditingVersion: number | null
   setSaveSuccess: (value: boolean) => void
   setCategories: React.Dispatch<React.SetStateAction<CostCategory[]>>
+  // 快速報價單相關
+  quickQuoteItems?: QuickQuoteItem[]
+  quickQuoteCustomerInfo?: QuickQuoteCustomerInfo
 }
 
 export const useQuoteActions = ({
@@ -46,6 +61,8 @@ export const useQuoteActions = ({
   currentEditingVersion,
   setSaveSuccess,
   setCategories,
+  quickQuoteItems,
+  quickQuoteCustomerInfo,
 }: UseQuoteActionsProps) => {
   // 使用 ref 追蹤前一次的 groupSize 和 groupSizeForGuide
   const prevGroupSizeRef = useRef<number | null>(null)
@@ -135,6 +152,19 @@ export const useQuoteActions = ({
       try {
         const existingVersions = quote.versions || []
 
+        // 快速報價單資料
+        const quickQuoteData = quickQuoteCustomerInfo ? {
+          customer_name: quickQuoteCustomerInfo.customer_name,
+          contact_phone: quickQuoteCustomerInfo.contact_phone,
+          contact_address: quickQuoteCustomerInfo.contact_address,
+          tour_code: quickQuoteCustomerInfo.tour_code,
+          handler_name: quickQuoteCustomerInfo.handler_name,
+          issue_date: quickQuoteCustomerInfo.issue_date,
+          received_amount: quickQuoteCustomerInfo.received_amount,
+          expense_description: quickQuoteCustomerInfo.expense_description,
+          quick_quote_items: quickQuoteItems || [],
+        } : {}
+
         // 第一次儲存：沒有版本記錄，自動創建 versions[0]
         if (existingVersions.length === 0) {
           const firstVersion = {
@@ -162,7 +192,9 @@ export const useQuoteActions = ({
             accommodation_days: accommodationDays,
             participant_counts: participantCounts,
             selling_prices: sellingPrices,
-          })
+            // 快速報價單資料
+            ...quickQuoteData,
+          } as any)
 
           // 設定當前編輯版本為 0
           if (setCurrentEditingVersion) {
@@ -197,7 +229,9 @@ export const useQuoteActions = ({
             accommodation_days: accommodationDays,
             participant_counts: participantCounts,
             selling_prices: sellingPrices,
-          })
+            // 快速報價單資料
+            ...quickQuoteData,
+          } as any)
         }
 
         setSaveSuccess(true)
@@ -218,6 +252,8 @@ export const useQuoteActions = ({
       currentEditingVersion,
       updateQuote,
       setSaveSuccess,
+      quickQuoteItems,
+      quickQuoteCustomerInfo,
     ]
   )
 

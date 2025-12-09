@@ -31,9 +31,10 @@ import { PrintableQuickQuote } from './PrintableQuickQuote'
 interface QuickQuoteDetailProps {
   quote: Quote
   onUpdate: (data: Partial<Quote>) => Promise<void> | Promise<Quote>
+  viewModeToggle?: React.ReactNode // 可選的切換按鈕（從團體報價單切換過來時使用）
 }
 
-export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpdate }) => {
+export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpdate, viewModeToggle }) => {
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -49,6 +50,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     handler_name: quote.handler_name || 'William',
     issue_date: quote.issue_date || new Date().toISOString().split('T')[0],
     received_amount: quote.received_amount || 0,
+    expense_description: (quote as any).expense_description || '',
   })
 
   // 從 quote_items 表格載入項目
@@ -129,6 +131,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     tour_code: formData.tour_code,
     handler_name: formData.handler_name,
     issue_date: formData.issue_date,
+    expense_description: formData.expense_description,
     total_amount: totalAmount,
     total_cost: totalCost,
     received_amount: formData.received_amount,
@@ -148,6 +151,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         tour_code: formData.tour_code,
         handler_name: formData.handler_name,
         issue_date: formData.issue_date,
+        expense_description: formData.expense_description,
         total_amount: totalAmount,
         total_cost: totalCost,
         received_amount: formData.received_amount,
@@ -231,6 +235,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         tour_code: formData.tour_code,
         handler_name: formData.handler_name,
         issue_date: formData.issue_date,
+        expense_description: formData.expense_description,
         total_amount: totalAmount,
         total_cost: totalCost,
         received_amount: formData.received_amount,
@@ -300,6 +305,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       handler_name: versionData.handler_name || 'William',
       issue_date: versionData.issue_date || new Date().toISOString().split('T')[0],
       received_amount: versionData.received_amount || 0,
+      expense_description: versionData.expense_description || '',
     })
 
     // 更新項目
@@ -353,6 +359,9 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         onBack={() => router.push('/quotes')}
         actions={
           <div className="flex items-center gap-2">
+            {/* 切換到團體報價單按鈕（如果有傳入） */}
+            {viewModeToggle}
+
             {/* 版本歷史下拉選單 - 永遠顯示 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -752,6 +761,25 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           </table>
         </div>
       </div>
+
+      {/* 費用說明 - 只在編輯模式或有內容時顯示 */}
+      {(isEditing || formData.expense_description) && (
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-morandi-primary mb-4">費用說明</h2>
+          {isEditing ? (
+            <textarea
+              value={formData.expense_description}
+              onChange={e => setFormField('expense_description', e.target.value)}
+              placeholder="輸入整體報價說明，例如：含機票、住宿、餐食..."
+              className="w-full min-h-[100px] p-3 border border-border rounded-md text-sm resize-y focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
+            />
+          ) : (
+            <p className="text-sm text-morandi-secondary whitespace-pre-wrap">
+              {formData.expense_description}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* 金額統計 */}
       <div className="bg-card border border-border rounded-xl p-6">

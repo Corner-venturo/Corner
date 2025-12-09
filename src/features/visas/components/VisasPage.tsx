@@ -91,6 +91,10 @@ export default function VisasPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [editingVisa, setEditingVisa] = React.useState<Visa | null>(null)
   const [isReturnDialogOpen, setIsReturnDialogOpen] = React.useState(false)
+  const [isPickupDialogOpen, setIsPickupDialogOpen] = React.useState(false)
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = React.useState(false)
+  const [pickupDate, setPickupDate] = React.useState(new Date().toISOString().split('T')[0])
+  const [rejectDate, setRejectDate] = React.useState(new Date().toISOString().split('T')[0])
 
   // 旅客比對相關狀態
   const [showCustomerMatchDialog, setShowCustomerMatchDialog] = React.useState(false)
@@ -217,11 +221,40 @@ export default function VisasPage() {
       return
     }
 
-    // 批次建立簽證（使用 for...of 確保順序執行）
+    // 批次建立簽證和對應的訂單成員（使用 for...of 確保順序執行）
+    const { useMemberStore } = await import('@/stores')
+    const addMember = useMemberStore.getState().create
+
+    // 先將申請人按名字分組，收集每人的所有簽證類型
+    const applicantMap = new Map<string, {
+      visaTypes: string[]
+      totalFee: number
+      totalCost: number
+    }>()
+
+    for (const applicant of applicants) {
+      if (!applicant.name) continue
+      const fee = applicant.fee ?? calculateFee(applicant.country)
+      const cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
+
+      const existing = applicantMap.get(applicant.name)
+      if (existing) {
+        existing.visaTypes.push(applicant.country)
+        existing.totalFee += fee
+        existing.totalCost += cost
+      } else {
+        applicantMap.set(applicant.name, {
+          visaTypes: [applicant.country],
+          totalFee: fee,
+          totalCost: cost,
+        })
+      }
+    }
+
+    // 1. 建立所有簽證（每筆簽證一條記錄）
     for (const applicant of applicants) {
       if (!applicant.name) continue
 
-      // 代辦費：優先使用手動輸入的值，否則用自動計算的
       const fee = applicant.fee ?? calculateFee(applicant.country)
       const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
@@ -243,6 +276,43 @@ export default function VisasPage() {
         created_by: user.id,
         note: '',
       })
+    }
+
+    // 2. 建立成員（按名字去重，每人只建立一筆，備註記錄所有簽證類型）
+    for (const [name, data] of applicantMap) {
+      const notes = data.visaTypes.join('、')
+
+      await addMember({
+        order_id: targetOrder.id,
+        chinese_name: name,
+        passport_name: null,
+        birth_date: null,
+        passport_number: null,
+        passport_expiry: null,
+        id_number: null,
+        gender: null,
+        age: null,
+        member_type: 'adult',
+        identity: null,
+        special_meal: null,
+        pnr: null,
+        hotel_1_name: null,
+        hotel_1_checkin: null,
+        hotel_1_checkout: null,
+        hotel_2_name: null,
+        hotel_2_checkin: null,
+        hotel_2_checkout: null,
+        cost_price: data.totalCost,
+        flight_cost: null,
+        misc_cost: null,
+        profit: data.totalFee - data.totalCost,
+        deposit_amount: null,
+        deposit_receipt_no: null,
+        balance_amount: data.totalFee,
+        balance_receipt_no: null,
+        customer_id: null,
+        notes,  // 簽證類型記錄在備註
+      } as any)
     }
 
       // 收集所有需要比對的人（聯絡人 + 所有申請人）
@@ -479,20 +549,8 @@ export default function VisasPage() {
                   </button>
                   <button
                     onClick={() => {
-                      const today = new Date().toISOString().split('T')[0]
-                      selectedRows.forEach(id => {
-                        const visa = visas.find(v => v.id === id)
-                        const updates: Record<string, unknown> = {
-                          status: 'collected',
-                          pickup_date: today,
-                        }
-                        if (!visa?.documents_returned_date) {
-                          updates.documents_returned_date = today
-                        }
-                        updateVisa(id, updates)
-                      })
-                      setSelectedRows([])
-                      toast.success('已取件')
+                      setPickupDate(new Date().toISOString().split('T')[0])
+                      setIsPickupDialogOpen(true)
                     }}
                     className="px-3 py-1.5 text-sm font-medium rounded-md bg-morandi-green hover:bg-morandi-green/90 text-white transition-colors"
                     title="取件完成"
@@ -501,9 +559,8 @@ export default function VisasPage() {
                   </button>
                   <button
                     onClick={() => {
-                      selectedRows.forEach(id => updateVisa(id, { status: 'rejected' }))
-                      setSelectedRows([])
-                      toast.success('已標記退件')
+                      setRejectDate(new Date().toISOString().split('T')[0])
+                      setIsRejectDialogOpen(true)
                     }}
                     className="px-3 py-1.5 text-sm font-medium rounded-md bg-morandi-red hover:bg-morandi-red/90 text-white transition-colors"
                     title="標記為退件"
@@ -960,6 +1017,99 @@ export default function VisasPage() {
           toast.success('已登記證件歸還')
         }}
       />
+
+      {/* 取件對話框 */}
+      <Dialog open={isPickupDialogOpen} onOpenChange={setIsPickupDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>批次取件</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-morandi-secondary">
+              已選擇 <span className="font-semibold text-morandi-primary">{selectedRows.length}</span> 筆簽證
+            </p>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">取件日期</label>
+              <Input
+                type="date"
+                value={pickupDate}
+                onChange={e => setPickupDate(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsPickupDialogOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                selectedRows.forEach(id => {
+                  const visa = visas.find(v => v.id === id)
+                  const updates: Record<string, unknown> = {
+                    status: 'collected',
+                    pickup_date: pickupDate,
+                  }
+                  if (!visa?.documents_returned_date) {
+                    updates.documents_returned_date = pickupDate
+                  }
+                  updateVisa(id, updates)
+                })
+                setSelectedRows([])
+                setIsPickupDialogOpen(false)
+                toast.success('已取件')
+              }}
+              className="bg-morandi-green hover:bg-morandi-green/90"
+            >
+              確認取件
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 退件對話框 */}
+      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>批次退件</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-morandi-secondary">
+              已選擇 <span className="font-semibold text-morandi-primary">{selectedRows.length}</span> 筆簽證
+            </p>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">退件日期</label>
+              <Input
+                type="date"
+                value={rejectDate}
+                onChange={e => setRejectDate(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                selectedRows.forEach(id => {
+                  updateVisa(id, {
+                    status: 'rejected',
+                    documents_returned_date: rejectDate,
+                  })
+                })
+                setSelectedRows([])
+                setIsRejectDialogOpen(false)
+                toast.success('已標記退件')
+              }}
+              className="bg-morandi-red hover:bg-morandi-red/90"
+            >
+              確認退件
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

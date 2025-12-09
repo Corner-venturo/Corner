@@ -1,4 +1,6 @@
-import React from 'react'
+'use client'
+
+import React, { useEffect, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,6 +9,8 @@ import { Combobox } from '@/components/ui/combobox'
 import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form'
 import { AlertCircle } from 'lucide-react'
 import { NewTourData } from '../types'
+import { useItineraryStore, useQuoteStore } from '@/stores'
+import type { Itinerary, Quote } from '@/stores/types'
 
 interface TourFormProps {
   isOpen: boolean
@@ -23,6 +27,11 @@ interface TourFormProps {
   submitting: boolean
   formError: string | null
   onSubmit: () => void
+  // 新增：選擇的來源
+  selectedItineraryId?: string | null
+  setSelectedItineraryId?: (id: string | null) => void
+  selectedQuoteId?: string | null
+  setSelectedQuoteId?: (id: string | null) => void
 }
 
 export function TourForm({
@@ -40,7 +49,82 @@ export function TourForm({
   submitting,
   formError,
   onSubmit,
+  selectedItineraryId,
+  setSelectedItineraryId,
+  selectedQuoteId,
+  setSelectedQuoteId,
 }: TourFormProps) {
+  // 載入行程表和報價單資料
+  const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
+  const { items: quotes, fetchAll: fetchQuotes } = useQuoteStore()
+
+  // 打開對話框時載入資料
+  useEffect(() => {
+    if (isOpen && mode === 'create') {
+      fetchItineraries()
+      fetchQuotes()
+    }
+  }, [isOpen, mode, fetchItineraries, fetchQuotes])
+
+  // 過濾可用的行程表（已發布且未關聯旅遊團的）
+  const availableItineraries = useMemo(() => {
+    return itineraries
+      .filter(i => i.status === 'published' && !i.tour_id && !(i as any)._deleted)
+      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+  }, [itineraries])
+
+  // 過濾可用的報價單（標準報價單，未關聯旅遊團的）
+  const availableQuotes = useMemo(() => {
+    return quotes
+      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as any)._deleted)
+      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+  }, [quotes])
+
+  // 處理選擇行程表
+  const handleItinerarySelect = (itineraryId: string) => {
+    if (!itineraryId) {
+      setSelectedItineraryId?.(null)
+      return
+    }
+
+    const itinerary = itineraries.find(i => i.id === itineraryId)
+    if (itinerary) {
+      setSelectedItineraryId?.(itineraryId)
+      // 清除報價單選擇
+      setSelectedQuoteId?.(null)
+      // 自動帶入資料
+      setNewTour(prev => ({
+        ...prev,
+        name: itinerary.title || prev.name,
+        departure_date: itinerary.departure_date
+          ? itinerary.departure_date.replace(/\//g, '-')
+          : prev.departure_date,
+      }))
+    }
+  }
+
+  // 處理選擇報價單
+  const handleQuoteSelect = (quoteId: string) => {
+    if (!quoteId) {
+      setSelectedQuoteId?.(null)
+      return
+    }
+
+    const quote = quotes.find(q => q.id === quoteId)
+    if (quote) {
+      setSelectedQuoteId?.(quoteId)
+      // 清除行程表選擇
+      setSelectedItineraryId?.(null)
+      // 自動帶入資料（Quote 沒有 start_date 欄位，只帶入名稱、價格、人數）
+      setNewTour(prev => ({
+        ...prev,
+        name: quote.name || prev.name,
+        price: Math.round((quote.total_cost ?? 0) / (quote.group_size ?? 1)),
+        max_participants: quote.group_size || prev.max_participants,
+      }))
+    }
+  }
+
   return (
     <Dialog
       open={isOpen}
@@ -81,6 +165,54 @@ export function TourForm({
             <div className="h-full overflow-y-auto">
               <h3 className="text-lg font-medium text-morandi-primary mb-4">旅遊團資訊</h3>
               <div className="space-y-4">
+                {/* 關聯行程表或報價單（僅在新增模式顯示） */}
+                {mode === 'create' && (
+                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">關聯行程表（選填）</label>
+                      <Combobox
+                        options={[
+                          { value: '', label: '獨立旅遊團（無行程表）' },
+                          ...availableItineraries.map(itinerary => ({
+                            value: itinerary.id,
+                            label: `${itinerary.tour_code || '無編號'} - ${itinerary.title || '未命名'}`,
+                          })),
+                        ]}
+                        value={selectedItineraryId || ''}
+                        onChange={handleItinerarySelect}
+                        placeholder="搜尋或選擇行程表..."
+                        emptyMessage="找不到行程表"
+                        className="mt-1"
+                        disabled={!!selectedQuoteId}
+                      />
+                      <p className="text-xs text-morandi-secondary mt-1">
+                        選擇後自動帶入行程資料
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">關聯報價單（選填）</label>
+                      <Combobox
+                        options={[
+                          { value: '', label: '獨立旅遊團（無報價單）' },
+                          ...availableQuotes.map(quote => ({
+                            value: quote.id,
+                            label: `${quote.code || '無編號'} - ${quote.name || '未命名'}`,
+                          })),
+                        ]}
+                        value={selectedQuoteId || ''}
+                        onChange={handleQuoteSelect}
+                        placeholder="搜尋或選擇報價單..."
+                        emptyMessage="找不到報價單"
+                        className="mt-1"
+                        disabled={!!selectedItineraryId}
+                      />
+                      <p className="text-xs text-morandi-secondary mt-1">
+                        選擇後自動帶入報價資料
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">旅遊團名稱</label>
                   <Input

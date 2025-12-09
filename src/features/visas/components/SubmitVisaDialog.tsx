@@ -20,6 +20,7 @@ export function SubmitVisaDialog({
   onSubmitComplete,
 }: SubmitVisaDialogProps) {
   const [vendor, setVendor] = React.useState('')
+  const [submitDate, setSubmitDate] = React.useState(new Date().toISOString().split('T')[0])
   const [costs, setCosts] = React.useState<Record<string, number>>({})
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
@@ -58,6 +59,7 @@ export function SubmitVisaDialog({
   React.useEffect(() => {
     if (open) {
       setVendor('')
+      setSubmitDate(new Date().toISOString().split('T')[0])
       setCosts({})
     }
   }, [open])
@@ -73,21 +75,29 @@ export function SubmitVisaDialog({
     setIsSubmitting(true)
 
     try {
-      const today = new Date().toISOString().split('T')[0]
+      // 先收集需要建立/更新的代辦商成本（按簽證類型去重）
+      const costByType = new Map<string, number>()
+      for (const visa of selectedVisas) {
+        const cost = costs[visa.id] ?? 0
+        // 如果同類型有多筆，取最後一筆的成本
+        costByType.set(visa.visa_type, cost)
+      }
 
       // 1. 更新所有選中的簽證
       for (const visa of selectedVisas) {
         const cost = costs[visa.id] ?? 0
         await updateVisa(visa.id, {
           status: 'submitted',
-          actual_submission_date: today,
+          actual_submission_date: submitDate,
           vendor,
           cost,
         })
+      }
 
-        // 2. 儲存/更新代辦商成本記錄
+      // 2. 儲存/更新代辦商成本記錄（按簽證類型，不重複）
+      for (const [visaType, cost] of costByType) {
         const existingCost = vendorCosts.find(
-          vc => vc.vendor_name === vendor && vc.visa_type === visa.visa_type
+          vc => vc.vendor_name === vendor && vc.visa_type === visaType
         )
 
         if (existingCost) {
@@ -99,7 +109,7 @@ export function SubmitVisaDialog({
           // 建立新記錄
           await createVendorCost({
             vendor_name: vendor,
-            visa_type: visa.visa_type,
+            visa_type: visaType,
             cost,
           })
         }
@@ -137,24 +147,32 @@ export function SubmitVisaDialog({
       maxWidth="lg"
     >
       <div className="space-y-4">
-        {/* 代辦商選擇 */}
-        <div>
-          <label className="text-sm font-medium text-morandi-primary">代辦商</label>
-          <Input
-            value={vendor}
-            onChange={e => setVendor(e.target.value)}
-            placeholder="請輸入或選擇代辦商"
-            className="mt-1"
-            list="vendor-list"
-          />
-          <datalist id="vendor-list">
-            {vendorList.map(v => (
-              <option key={v} value={v} />
-            ))}
-          </datalist>
-          <p className="text-xs text-morandi-secondary mt-1">
-            輸入新的代辦商名稱會自動記住
-          </p>
+        {/* 送件日期與代辦商 */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-morandi-primary">送件日期</label>
+            <Input
+              type="date"
+              value={submitDate}
+              onChange={e => setSubmitDate(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-morandi-primary">代辦商</label>
+            <Input
+              value={vendor}
+              onChange={e => setVendor(e.target.value)}
+              placeholder="輸入或選擇代辦商"
+              className="mt-1"
+              list="vendor-list-submit"
+            />
+            <datalist id="vendor-list-submit">
+              {vendorList.map(v => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
+          </div>
         </div>
 
         {/* 成本填寫 */}
