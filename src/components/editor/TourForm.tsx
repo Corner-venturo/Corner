@@ -235,6 +235,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
             addDailyItinerary={handlers.addDailyItinerary}
             updateDailyItinerary={handlers.updateDailyItinerary}
             removeDailyItinerary={handlers.removeDailyItinerary}
+            swapDailyItinerary={handlers.swapDailyItinerary}
             addActivity={handlers.addActivity}
             updateActivity={handlers.updateActivity}
             removeActivity={handlers.removeActivity}

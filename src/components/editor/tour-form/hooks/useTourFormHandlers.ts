@@ -199,6 +199,16 @@ export function useTourFormHandlers(
     onChange({ ...data, dailyItinerary: newItinerary })
   }
 
+  // 交換每日行程順序
+  const swapDailyItinerary = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= data.dailyItinerary.length) return
+
+    const newItinerary = [...data.dailyItinerary]
+    // 交換兩天的內容
+    ;[newItinerary[fromIndex], newItinerary[toIndex]] = [newItinerary[toIndex], newItinerary[fromIndex]]
+    onChange({ ...data, dailyItinerary: newItinerary })
+  }
+
   // 活動管理
   const addActivity = (dayIndex: number) => {
     const newItinerary = [...data.dailyItinerary]
@@ -287,6 +297,7 @@ export function useTourFormHandlers(
     addDailyItinerary,
     updateDailyItinerary,
     removeDailyItinerary,
+    swapDailyItinerary,
     addActivity,
     updateActivity,
     removeActivity,

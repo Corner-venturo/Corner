@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import { TourFormData, DailyItinerary, Activity, ImagePositionSettings } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid, Crop } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid, Crop, ChevronUp, ChevronDown } from 'lucide-react'
 import { DailyImagesUploader } from './DailyImagesUploader'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
@@ -49,6 +49,7 @@ interface DailyItinerarySectionProps {
   addDailyItinerary: () => void
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   removeDailyItinerary: (index: number) => void
+  swapDailyItinerary?: (fromIndex: number, toIndex: number) => void
   addActivity: (dayIndex: number) => void
   updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
   removeActivity: (dayIndex: number, actIndex: number) => void
@@ -362,6 +363,7 @@ export function DailyItinerarySection({
   addDailyItinerary,
   updateDailyItinerary,
   removeDailyItinerary,
+  swapDailyItinerary,
   addActivity,
   updateActivity,
   removeActivity,
@@ -648,6 +650,37 @@ export function DailyItinerarySection({
           {/* Day 標籤與控制按鈕 */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
+              {/* 上下箭頭排序按鈕 */}
+              {swapDailyItinerary && data.dailyItinerary.length > 1 && (
+                <div className="flex flex-col gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => swapDailyItinerary(dayIndex, dayIndex - 1)}
+                    disabled={dayIndex === 0}
+                    className={`p-0.5 rounded transition-colors ${
+                      dayIndex === 0
+                        ? 'text-morandi-container cursor-not-allowed'
+                        : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                    }`}
+                    title="上移"
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => swapDailyItinerary(dayIndex, dayIndex + 1)}
+                    disabled={dayIndex === data.dailyItinerary.length - 1}
+                    className={`p-0.5 rounded transition-colors ${
+                      dayIndex === data.dailyItinerary.length - 1
+                        ? 'text-morandi-container cursor-not-allowed'
+                        : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                    }`}
+                    title="下移"
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
+              )}
               <span className={`px-3 py-1 text-white text-sm font-bold rounded-full ${
                 day.isAlternative ? 'bg-morandi-secondary' : 'bg-morandi-gold'
               }`}>
