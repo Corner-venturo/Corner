@@ -10,6 +10,7 @@ import { usePaymentRequestStore, usePaymentRequestItemStore, useTourStore } from
 import { formatDate } from '@/lib/utils'
 import { statusLabels, statusColors } from '@/features/finance/requests/types'
 import { logger } from '@/lib/utils/logger'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -55,17 +56,21 @@ export default function RequestDetailPage({ params }: PageProps) {
 
   // 刪除請款單
   const handleDelete = async () => {
-    if (!confirm('確定要刪除此請款單嗎？此操作無法復原。')) {
+    const confirmed = await confirm('確定要刪除此請款單嗎？此操作無法復原。', {
+      title: '刪除請款單',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
     try {
       await deleteRequest(id)
-      alert('✅ 請款單已刪除')
+      await alert('請款單已刪除', 'success')
       router.push('/finance/requests')
     } catch (error) {
       logger.error('刪除請款單失敗:', error)
-      alert('❌ 刪除請款單失敗')
+      await alert('刪除請款單失敗', 'error')
     }
   }
 
@@ -73,10 +78,10 @@ export default function RequestDetailPage({ params }: PageProps) {
   const handleStatusChange = async (newStatus: 'pending' | 'approved' | 'paid') => {
     try {
       await updateRequest(id, { status: newStatus })
-      alert(`✅ 狀態已更新為：${statusLabels[newStatus]}`)
+      await alert(`狀態已更新為：${statusLabels[newStatus]}`, 'success')
     } catch (error) {
       logger.error('更新狀態失敗:', error)
-      alert('❌ 更新狀態失敗')
+      await alert('更新狀態失敗', 'error')
     }
   }
 

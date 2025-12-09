@@ -247,13 +247,30 @@ export function useTourOperations(params: UseTourOperationsParams) {
   const handleArchiveTour = useCallback(
     async (tour: Tour) => {
       try {
+        // 封存時斷開連結，解除封存不需要
+        if (!tour.archived) {
+          // 1. 斷開關聯的報價單
+          const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
+          for (const quote of linkedQuotes) {
+            await updateQuote(quote.id, { tour_id: null } as UpdateInput<Quote>)
+          }
+
+          // 2. 斷開關聯的行程表
+          const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
+          for (const itinerary of linkedItineraries) {
+            await updateItinerary(itinerary.id, { tour_id: null, tour_code: null })
+          }
+
+          logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
+        }
+
         await actions.update(tour.id, { archived: !tour.archived })
         logger.info(tour.archived ? '已解除封存旅遊團' : '已封存旅遊團')
       } catch (err) {
         logger.error('封存/解封旅遊團失敗:', err)
       }
     },
-    [actions]
+    [actions, quotes, itineraries, updateQuote, updateItinerary]
   )
 
   return {

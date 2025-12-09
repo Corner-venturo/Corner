@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { removeChannelMember } from '@/services/workspace-members'
 import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
+import { useChannelStore } from '@/stores/workspace/channel-store'
 import type { Channel, ChannelGroup } from '@/stores/workspace/types'
 import type { ChannelSidebarProps } from './types'
 import { useChannelSidebar } from './useChannelSidebar'
@@ -22,11 +23,14 @@ import { CreateGroupDialog } from './CreateGroupDialog'
 import { CreateChannelDialog } from './CreateChannelDialog'
 import { EditChannelDialog } from './EditChannelDialog'
 import { ChannelList } from './ChannelList'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSidebarProps) {
+  // 🔥 直接訂閱 channel store 的 items，繞過 Facade 的響應式問題
+  const channelStoreItems = useChannelStore(state => state.items)
+
   // Use selective hooks for better performance
   const {
-    channels,
     channelGroups,
     currentWorkspace,
     searchQuery,
@@ -43,6 +47,9 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     loadChannels,
     loading,
   } = useWorkspaceChannels()
+
+  // 🔥 使用 store 的 items 作為 channels（響應式更新）
+  const channels = channelStoreItems as Channel[]
 
   const { channelMembers, loadChannelMembers } = useWorkspaceMembers()
 
@@ -213,7 +220,10 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     const channel = channels.find((ch: Channel) => ch.id === channelId)
     if (!channel) return
 
-    const confirmed = confirm(`確定要離開 #${channel.name} 頻道嗎？`)
+    const confirmed = await confirm(`確定要離開 #${channel.name} 頻道嗎？`, {
+      title: '離開頻道',
+      type: 'warning',
+    })
     if (!confirmed) return
 
     try {
@@ -240,10 +250,14 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
   const toggleChannelPin = async (channelId: string) => {
     const channel = channels.find((ch: Channel) => ch.id === channelId)
-    if (!channel) return
+    if (!channel) {
+      logger.error('toggleChannelPin: channel not found', channelId)
+      return
+    }
 
     try {
-      await updateChannel(channelId, {
+      // 🔥 直接使用 store 的 update，繞過 Facade，確保響應式更新
+      await useChannelStore.getState().update(channelId, {
         is_favorite: !channel.is_favorite,
       })
     } catch (error) {
@@ -353,11 +367,10 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     return members.some(m => m.employeeId === user?.id)
   }
 
-  // Helper function: sort channels by pinned and name
+  // Helper function: sort channels by name
   const sortChannels = (channels: Channel[]) => {
     return [...channels].sort((a: Channel, b: Channel) => {
-      if (a.is_pinned && !b.is_pinned) return -1
-      if (!a.is_pinned && b.is_pinned) return 1
+      // 🔥 已改為獨立「我的最愛」群組，這裡只需依名稱排序
       return a.name.localeCompare(b.name, 'zh-TW')
     })
   }
@@ -372,7 +385,16 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
       )
     : []
 
-  // 2. User-defined groups (exclude archived)
+  // 🔥 2. 我的最愛（is_favorite: true，獨立群組顯示）
+  const favoriteChannels = sortChannels(
+    filteredChannels.filter(
+      (ch: Channel) => ch.is_favorite && !ch.is_archived && checkIsMember(ch.id)
+    )
+  )
+  // 已加入最愛的頻道 ID 列表（用於排除）
+  const favoriteChannelIds = new Set(favoriteChannels.map(ch => ch.id))
+
+  // 3. User-defined groups (exclude archived and favorites)
   const userGroups = channelGroups
     .filter((g: ChannelGroup) => !g.is_system)
     .sort((a: ChannelGroup, b: ChannelGroup) => (a.order || 0) - (b.order || 0))
@@ -380,14 +402,14 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     group,
     channels: sortChannels(
       filteredChannels.filter(
-        ch => ch.group_id === group.id && !ch.is_archived && checkIsMember(ch.id)
+        ch => ch.group_id === group.id && !ch.is_archived && checkIsMember(ch.id) && !favoriteChannelIds.has(ch.id)
       )
     ),
   }))
 
-  // 3. Ungrouped channels (joined but not grouped, exclude archived)
+  // 4. Ungrouped channels (joined but not grouped, exclude archived and favorites)
   const ungroupedChannels = sortChannels(
-    filteredChannels.filter((ch: Channel) => !ch.group_id && !ch.is_archived && checkIsMember(ch.id))
+    filteredChannels.filter((ch: Channel) => !ch.group_id && !ch.is_archived && checkIsMember(ch.id) && !favoriteChannelIds.has(ch.id))
   )
 
   // 4. Unjoined channels (public + not joined, exclude archived)
@@ -427,7 +449,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         workspace_id: currentWorkspace.id,
         name: newChannelName.trim(),
         description: newChannelDescription.trim() || undefined,
-        type: 'private', // 🔥 統一為私密頻道
+        type: newChannelType, // 使用使用者選擇的類型
         created_by: user.id,
       })
 
@@ -460,7 +482,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
       resetCreateChannelDialog()
     } catch (error) {
       logger.error('Failed to create channel:', error)
-      alert('建立頻道失敗')
+      void alert('建立頻道失敗', 'error')
     }
   }
 
@@ -493,6 +515,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
       <ChannelList
         announcementChannels={announcementChannels}
         announcementGroup={announcementGroup}
+        favoriteChannels={favoriteChannels}
         userGroupedChannels={userGroupedChannels}
         ungroupedChannels={ungroupedChannels}
         unjoinedChannels={unjoinedChannels}

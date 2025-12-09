@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import type { Esim } from '@/types/esim.types'
 import { EsimSearchDialog } from '@/features/esims/components/EsimSearchDialog'
 import { EsimCreateDialog } from '@/features/esims/components/EsimCreateDialog'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 export default function EsimsPage() {
   const router = useRouter()
@@ -38,7 +39,11 @@ export default function EsimsPage() {
   })
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('確定要刪除此網卡嗎？')) {
+    const confirmed = await confirm('確定要刪除此網卡嗎？', {
+      title: '刪除網卡',
+      type: 'warning',
+    })
+    if (confirmed) {
       await remove(id)
     }
   }

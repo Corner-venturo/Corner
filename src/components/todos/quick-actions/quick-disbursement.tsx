@@ -21,6 +21,7 @@ import { useRequestOperations } from '@/features/finance/requests/hooks/useReque
 import { categoryOptions } from '@/features/finance/requests/types'
 import { BatchTourSelect } from '@/features/finance/requests/components/BatchTourSelect'
 import { cn } from '@/lib/utils'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface QuickDisbursementProps {
   onSubmit?: () => void
@@ -125,12 +126,12 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     if (mode === 'single') {
       // Single request validation
       if (!formData.tour_id || requestItems.length === 0 || !formData.request_date) {
-        alert('請填寫必填欄位（團體、請款日期、至少一項請款項目）')
+        void alert('請填寫必填欄位（團體、請款日期、至少一項請款項目）', 'warning')
         return
       }
 
       if (!selectedTour) {
-        alert('找不到選中的團體')
+        void alert('找不到選中的團體', 'warning')
         return
       }
 
@@ -143,12 +144,12 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           selectedOrder?.order_number || undefined
         )
 
-        alert('✅ 請款單建立成功')
+        await alert('請款單建立成功', 'success')
         resetForm()
         onSubmit?.()
       } catch (error) {
         logger.error('❌ Create Request Error:', error)
-        alert('❌ 建立失敗，請稍後再試')
+        void alert('建立失敗，請稍後再試', 'error')
       }
     } else {
       // Batch request validation
@@ -157,20 +158,20 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         requestItems.length === 0 ||
         !batchFormData.request_date
       ) {
-        alert('請填寫必填欄位（至少一個團體、請款日期、至少一項請款項目）')
+        void alert('請填寫必填欄位（至少一個團體、請款日期、至少一項請款項目）', 'warning')
         return
       }
 
       try {
         await createBatchRequests(batchFormData, requestItems, selectedTourIds, batchTours)
 
-        alert(`✅ 成功為 ${selectedTourIds.length} 個團體建立請款單`)
+        await alert(`成功為 ${selectedTourIds.length} 個團體建立請款單`, 'success')
         resetBatchForm()
         resetForm() // Also reset items
         onSubmit?.()
       } catch (error) {
         logger.error('❌ Create Batch Request Error:', error)
-        alert('❌ 建立失敗，請稍後再試')
+        void alert('建立失敗，請稍後再試', 'error')
       }
     }
   }

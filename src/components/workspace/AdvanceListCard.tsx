@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Receipt, Check, Trash2 } from 'lucide-react'
 import { AdvanceList } from '@/stores/workspace-store'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface AdvanceListCardProps {
   advanceList: AdvanceList
@@ -44,8 +45,12 @@ export function AdvanceListCard({
     }
   }
 
-  const handleDelete = () => {
-    if (window.confirm('確定要刪除這個代墊清單嗎？（已建立的請款單不會被刪除）')) {
+  const handleDelete = async () => {
+    const confirmed = await confirm('確定要刪除這個代墊清單嗎？（已建立的請款單不會被刪除）', {
+      title: '刪除代墊清單',
+      type: 'warning',
+    })
+    if (confirmed) {
       onDelete?.(advanceList.id)
     }
   }

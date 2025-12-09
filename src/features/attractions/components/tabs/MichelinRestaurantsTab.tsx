@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { cn } from '@/lib/utils'
+import { confirm } from '@/lib/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -99,7 +100,11 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
 
   // 刪除餐廳
   const handleDelete = async (id: string) => {
-    if (!confirm('確定要刪除此餐廳？')) return
+    const confirmed = await confirm('確定要刪除此餐廳？', {
+      title: '刪除餐廳',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       const { error } = await supabase.from('michelin_restaurants').delete().eq('id', id)

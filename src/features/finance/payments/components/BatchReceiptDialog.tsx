@@ -22,6 +22,7 @@ import { useOrderStore, useReceiptOrderStore } from '@/stores'
 import { OrderAllocation, ReceiptPaymentItem, PaymentMethod } from '@/stores/types'
 import { Plus, Trash2, DollarSign, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface BatchReceiptDialogProps {
   open: boolean
@@ -78,7 +79,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   // 新增訂單分配
   const addOrderAllocation = () => {
     if (availableOrders.length === 0) {
-      alert('沒有可用的訂單')
+      void alert('沒有可用的訂單', 'warning')
       return
     }
 
@@ -181,17 +182,17 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   // 儲存
   const handleSave = async () => {
     if (orderAllocations.length === 0) {
-      alert('請至少新增一個訂單分配')
+      void alert('請至少新增一個訂單分配', 'warning')
       return
     }
 
     if (totalPaymentAmount === 0) {
-      alert('收款金額不能為 0')
+      void alert('收款金額不能為 0', 'warning')
       return
     }
 
     if (unallocatedAmount !== 0) {
-      alert(`還有 NT$ ${unallocatedAmount.toLocaleString()} 未分配，請確認分配金額`)
+      void alert(`還有 NT$ ${unallocatedAmount.toLocaleString()} 未分配，請確認分配金額`, 'warning')
       return
     }
 
@@ -207,11 +208,11 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         created_by: '1',
       } as unknown as Parameters<typeof createReceiptOrder>[0])
 
-      alert('✅ 批量收款單建立成功')
+      await alert('批量收款單建立成功', 'success')
       onOpenChange(false)
       resetForm()
     } catch (error) {
-      alert('❌ 建立失敗，請稍後再試')
+      void alert('建立失敗，請稍後再試', 'error')
     }
   }
 

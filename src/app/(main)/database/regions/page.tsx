@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface Country {
   id: string
@@ -149,7 +150,11 @@ export default function RegionsPage() {
 
   // 刪除地區
   const handleDeleteRegion = async (id: string) => {
-    if (!confirm('確定要刪除這個地區嗎？')) return
+    const confirmed = await confirm('確定要刪除這個地區嗎？', {
+      title: '刪除地區',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     const { error } = await supabase.from('regions').delete().eq('id', id)
 

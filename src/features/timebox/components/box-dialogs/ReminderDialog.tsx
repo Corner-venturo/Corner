@@ -12,6 +12,7 @@ import {
   type ReminderData,
   weekDayNames,
 } from '../../hooks/useTimeboxData'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface ReminderDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -60,7 +61,11 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
   const handleDelete = async () => {
     const confirmMessage = `確定要移除此提醒排程嗎？\n\n箱子：${box.name}`
 
-    if (!confirm(confirmMessage)) {
+    const confirmed = await confirm(confirmMessage, {
+      title: '移除提醒排程',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 

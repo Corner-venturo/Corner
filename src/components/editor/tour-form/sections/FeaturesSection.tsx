@@ -3,6 +3,7 @@ import { TourFormData, Feature } from '../types'
 import { iconOptions } from '../constants'
 import { ImageIcon, Loader2, X, Plus, GripVertical } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface FeaturesSectionProps {
   data: TourFormData
@@ -34,7 +35,7 @@ export function FeaturesSection({
     file: File
   ) => {
     if (!file.type.startsWith('image/')) {
-      alert('請選擇圖片檔案')
+      void alert('請選擇圖片檔案', 'warning')
       return
     }
 
@@ -51,7 +52,7 @@ export function FeaturesSection({
 
       if (uploadError) {
         console.error('上傳失敗:', uploadError)
-        alert('圖片上傳失敗')
+        void alert('圖片上傳失敗', 'error')
         return
       }
 
@@ -73,7 +74,7 @@ export function FeaturesSection({
       updateFeature(featureIndex, 'images', currentImages)
     } catch (error) {
       console.error('上傳錯誤:', error)
-      alert('上傳過程發生錯誤')
+      void alert('上傳過程發生錯誤', 'error')
     } finally {
       setUploadingImage(null)
     }
@@ -89,7 +90,7 @@ export function FeaturesSection({
     const remainingSlots = 4 - currentImages.length
 
     if (remainingSlots <= 0) {
-      alert('已達到最大圖片數量（4 張）')
+      void alert('已達到最大圖片數量（4 張）', 'warning')
       return
     }
 
@@ -99,7 +100,7 @@ export function FeaturesSection({
       .slice(0, remainingSlots)
 
     if (imageFiles.length === 0) {
-      alert('請選擇圖片檔案')
+      void alert('請選擇圖片檔案', 'warning')
       return
     }
 
@@ -147,11 +148,11 @@ export function FeaturesSection({
       }
 
       if (successfulUrls.length < imageFiles.length) {
-        alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`)
+        void alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`, 'warning')
       }
     } catch (error) {
       console.error('批量上傳錯誤:', error)
-      alert('上傳過程發生錯誤')
+      void alert('上傳過程發生錯誤', 'error')
     } finally {
       setUploadingImage(null)
     }

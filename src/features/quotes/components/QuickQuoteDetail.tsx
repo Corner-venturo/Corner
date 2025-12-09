@@ -27,6 +27,7 @@ import {
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Quote, QuickQuoteItem, QuoteVersion } from '@/stores/types'
 import { PrintableQuickQuote } from './PrintableQuickQuote'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface QuickQuoteDetailProps {
   quote: Quote
@@ -199,7 +200,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     } catch (error) {
       logger.error('❌ [QuickQuote] 儲存失敗:', error)
       if (showAlert) {
-        alert('儲存失敗：' + (error as Error).message)
+        await alert('儲存失敗：' + (error as Error).message, 'error')
       }
     } finally {
       setIsSaving(false)
@@ -213,7 +214,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   // 另存新版本
   const handleSaveAsNewVersion = async () => {
     if (!versionName.trim()) {
-      alert('請輸入版本名稱')
+      await alert('請輸入版本名稱', 'warning')
       return
     }
 
@@ -252,7 +253,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       logger.log('✅ [QuickQuote] 新版本儲存成功')
     } catch (error) {
       logger.error('❌ [QuickQuote] 儲存版本失敗:', error)
-      alert('版本儲存失敗：' + (error as Error).message)
+      await alert('版本儲存失敗：' + (error as Error).message, 'error')
     } finally {
       setIsSaving(false)
     }
@@ -262,11 +263,15 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   const handleDeleteVersion = async (versionIndex: number) => {
     const versions = quote.versions || []
     if (versions.length <= 1) {
-      alert('至少需要保留一個版本')
+      await alert('至少需要保留一個版本', 'warning')
       return
     }
 
-    if (!confirm(`確定要刪除「${(versions[versionIndex] as any).version_name || `版本 ${versions[versionIndex].version}`}」嗎？`)) {
+    const confirmed = await confirm(`確定要刪除「${(versions[versionIndex] as any).version_name || `版本 ${versions[versionIndex].version}`}」嗎？`, {
+      title: '刪除版本',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
@@ -284,7 +289,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       logger.log('✅ [QuickQuote] 版本刪除成功')
     } catch (error) {
       logger.error('❌ [QuickQuote] 刪除版本失敗:', error)
-      alert('刪除版本失敗')
+      await alert('刪除版本失敗', 'error')
     }
   }
 

@@ -6,6 +6,7 @@ import type { Message, MessageAttachment } from '@/stores/workspace-store'
 import { formatMessageTime, formatFileSize, resolveAttachmentUrl } from './utils'
 import { QUICK_REACTIONS } from './constants'
 import { downloadFile } from '@/lib/files'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface MessageItemProps {
   message: Message
@@ -22,7 +23,7 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete, onRe
     const targetUrl = resolveAttachmentUrl(attachment)
 
     if (!targetUrl) {
-      alert('找不到檔案下載連結')
+      void alert('找不到檔案下載連結', 'error')
       return
     }
 
@@ -75,16 +76,48 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete, onRe
                     ? attachment.size
                     : 0
               const isImage = mimeType.startsWith('image/')
+              const imageUrl = isImage ? resolveAttachmentUrl(attachment) : null
+
+              // 圖片附件 - 顯示縮圖預覽
+              if (isImage && imageUrl) {
+                return (
+                  <div key={index} className="group/attachment">
+                    <a
+                      href={imageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block max-w-sm rounded-lg overflow-hidden border border-morandi-container hover:border-morandi-gold/40 transition-colors"
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={fileName}
+                        className="max-w-full max-h-[300px] object-contain bg-morandi-container/10"
+                        loading="lazy"
+                      />
+                    </a>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-morandi-secondary">
+                      <span className="truncate max-w-[200px]">{fileName}</span>
+                      <span>•</span>
+                      <span>{formatFileSize(fileSize)}</span>
+                      <button
+                        onClick={() => handleDownloadAttachment(attachment)}
+                        className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
+                        title="下載圖片"
+                      >
+                        <Download size={12} className="text-morandi-gold" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              }
+
+              // 非圖片附件 - 顯示檔案卡片
               return (
                 <div
                   key={index}
                   className="inline-flex items-center gap-2 px-3 py-2 bg-morandi-container/10 border border-morandi-container rounded-lg hover:bg-morandi-container/20 transition-colors group/attachment"
                 >
-                  {isImage ? (
-                    <ImageIcon size={16} className="text-morandi-gold shrink-0" />
-                  ) : (
-                    <FileText size={16} className="text-morandi-secondary shrink-0" />
-                  )}
+                  <FileText size={16} className="text-morandi-secondary shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-morandi-primary truncate max-w-[200px]">
                       {fileName}
@@ -163,8 +196,12 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete, onRe
           {/* 刪除按鈕 - 只有作者可以刪除 */}
           {currentUserId === message.author_id && (
             <button
-              onClick={() => {
-                if (confirm('確定要刪除這則訊息嗎？')) {
+              onClick={async () => {
+                const confirmed = await confirm('確定要刪除這則訊息嗎？', {
+                  title: '刪除訊息',
+                  type: 'warning',
+                })
+                if (confirmed) {
                   onDelete(message.id)
                 }
               }}

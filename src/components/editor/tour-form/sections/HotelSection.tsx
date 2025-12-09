@@ -3,6 +3,7 @@ import { logger } from '@/lib/utils/logger'
 import { TourFormData, HotelInfo } from '../types'
 import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface HotelSectionProps {
   data: TourFormData
@@ -44,13 +45,13 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
     // 驗證檔案類型
     if (!file.type.startsWith('image/')) {
-      alert('請選擇圖片檔案')
+      void alert('請選擇圖片檔案', 'warning')
       return
     }
 
     // 驗證檔案大小（5MB）
     if (file.size > 5 * 1024 * 1024) {
-      alert('圖片大小不可超過 5MB')
+      void alert('圖片大小不可超過 5MB', 'warning')
       return
     }
 
@@ -77,10 +78,10 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
       // 更新飯店圖片 URL
       updateHotel(index, 'image', urlData.publicUrl)
 
-      alert('圖片上傳成功！')
+      void alert('圖片上傳成功！', 'success')
     } catch (error) {
       logger.error('上傳失敗:', error)
-      alert('圖片上傳失敗，請稍後再試')
+      void alert('圖片上傳失敗，請稍後再試', 'error')
     } finally {
       setUploadingIndex(null)
       // 清空 input，允許重新上傳相同檔案

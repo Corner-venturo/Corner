@@ -22,6 +22,7 @@ import { useCompanyStore, useAuthStore, type Company } from '@/stores'
 import { useCompanyColumns } from './components/CompanyTableColumns'
 import { CompanyFormDialog } from './components/CompanyFormDialog'
 import type { CreateCompanyData } from '@/types/company.types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 export default function CompaniesPage() {
   const router = useRouter()
@@ -49,10 +50,10 @@ export default function CompaniesPage() {
     try {
       await create(data as Parameters<typeof create>[0])
       setIsDialogOpen(false)
-      alert('✅ 企業客戶新增成功')
+      await alert('企業客戶新增成功', 'success')
     } catch (error) {
       logger.error('新增企業客戶失敗:', error)
-      alert('❌ 新增企業客戶失敗')
+      await alert('新增企業客戶失敗', 'error')
     }
   }
 
@@ -64,10 +65,10 @@ export default function CompaniesPage() {
       await update(editingCompany.id, data)
       setEditingCompany(undefined)
       setIsDialogOpen(false)
-      alert('✅ 企業客戶更新成功')
+      await alert('企業客戶更新成功', 'success')
     } catch (error) {
       logger.error('更新企業客戶失敗:', error)
-      alert('❌ 更新企業客戶失敗')
+      await alert('更新企業客戶失敗', 'error')
     }
   }
 

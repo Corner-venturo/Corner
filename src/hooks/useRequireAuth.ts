@@ -28,6 +28,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useAuthStore } from '@/stores/auth-store'
 import { User } from '@/stores/types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface AuthInfo {
   isAuthenticated: boolean
@@ -46,12 +47,12 @@ export function useRequireAuth(): AuthInfo {
 
   const showLoginRequired = (message = '請先登入') => {
     logger.error('❌ 使用者未登入')
-    alert(message)
+    void alert(message, 'warning')
   }
 
   const showWorkspaceMissing = (message = '無法取得工作空間資訊，請重新登入') => {
     logger.error('❌ 使用者缺少 workspace_id:', { user })
-    alert(message)
+    void alert(message, 'error')
   }
 
   return {
@@ -91,12 +92,12 @@ export function useRequireAuthSync(): AuthInfo {
 
   const showLoginRequired = (message = '請先登入') => {
     logger.error('❌ 使用者未登入')
-    alert(message)
+    void alert(message, 'warning')
   }
 
   const showWorkspaceMissing = (message = '無法取得工作空間資訊，請重新登入') => {
     logger.error('❌ 使用者缺少 workspace_id:', { user })
-    alert(message)
+    void alert(message, 'error')
   }
 
   return {

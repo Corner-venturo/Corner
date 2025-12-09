@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
-import { useTourStore, useEmployeeStore } from '@/stores'
+import { useEmployeeStore } from '@/stores'
+import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -22,6 +23,7 @@ import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
 import { MessageSquare, FileText } from 'lucide-react'
 import { toast } from 'sonner'
+import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 
 const tabs = [
   { value: 'overview', label: '總覽' },
@@ -37,7 +39,8 @@ const tabs = [
 export default function TourDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { items: tours, loading } = useTourStore()
+  const tourId = params.id as string
+  const { tour, loading } = useTourDetails(tourId)
   const { channels, createChannel, currentWorkspace } = useWorkspaceChannels()
   const { user } = useAuthStore()
   const [activeTab, setActiveTab] = useState('overview')
@@ -53,8 +56,6 @@ export default function TourDetailPage() {
   const [channelName, setChannelName] = useState('')
   const [channelDescription, setChannelDescription] = useState('')
   const [selectedMembers, setSelectedMembers] = useState<string[]>([])
-
-  const tour = tours.find(t => t.id === params.id)
 
   // 檢查是否已有工作頻道
   const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour?.id)
@@ -303,6 +304,13 @@ export default function TourDetailPage() {
             )}
           </div>
         }
+      />
+
+      {/* 編輯衝突警告 */}
+      <EditingWarningBanner
+        resourceType="tour"
+        resourceId={params.id as string}
+        resourceName="此旅遊團"
       />
 
       <ContentContainer>{renderTabContent()}</ContentContainer>

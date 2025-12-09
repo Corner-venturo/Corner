@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore } from '@/stores/useTravelInvoiceStore'
+import { alert } from '@/lib/ui/alert-dialog'
 
 export default function InvoiceDetailPage() {
   const params = useParams()
@@ -39,7 +40,7 @@ export default function InvoiceDetailPage() {
       setShowVoidDialog(false)
       setVoidReason('')
     } catch (error) {
-      alert(error instanceof Error ? error.message : '發生未知錯誤')
+      await alert(error instanceof Error ? error.message : '發生未知錯誤', 'error')
     }
   }
 

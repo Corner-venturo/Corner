@@ -13,8 +13,9 @@ import {
 import type { Tour } from '@/types/tour.types'
 type EnvelopeRecord = any
 import { useAuthStore } from '@/stores/auth-store'
-import { useTourStore } from '@/stores'
+import { useTourStore, useQuoteStore } from '@/stores'
 import { generateUUID } from '@/lib/utils/uuid'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface EnvelopeDialogProps {
   isOpen: boolean
@@ -25,6 +26,7 @@ interface EnvelopeDialogProps {
 export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   const { user } = useAuthStore()
   const { update: updateTour } = useTourStore()
+  const { items: quotes } = useQuoteStore()
   const [recipient, setRecipient] = useState('')
   const [recipientAddress, setRecipientAddress] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')
@@ -44,6 +46,17 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         ? user.personal_info.phone[0]
         : user.personal_info?.phone || ''
       setSenderPhone(userPhone || '02-7751-6051')
+
+      // 從關聯的報價單帶入收件人資訊
+      const linkedQuote = quotes.find(q => q.tour_id === tour.id)
+      if (linkedQuote) {
+        // 優先使用聯絡人，否則使用客戶名稱
+        setRecipient(linkedQuote.contact_person || linkedQuote.customer_name || '')
+        // 帶入通訊地址（快速報價單有此欄位）
+        setRecipientAddress(linkedQuote.contact_address || '')
+        // 帶入聯絡電話
+        setRecipientPhone(linkedQuote.contact_phone || '')
+      }
     } else if (!isOpen) {
       // 對話框關閉時重置欄位
       setRecipient('')
@@ -52,16 +65,16 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
       setSenderName('')
       setSenderPhone('')
     }
-  }, [isOpen, user])
+  }, [isOpen, user, tour.id, quotes])
 
   const handlePrint = async () => {
     if (!recipient || !recipientAddress || !recipientPhone) {
-      alert('請填寫完整的收件人資訊')
+      void alert('請填寫完整的收件人資訊', 'warning')
       return
     }
 
     if (!senderName || !senderPhone) {
-      alert('請填寫完整的寄件人資訊(姓名和電話)')
+      void alert('請填寫完整的寄件人資訊(姓名和電話)', 'warning')
       return
     }
 
@@ -101,7 +114,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
     // 產生列印內容
     const printWindow = window.open('', '_blank')
     if (!printWindow) {
-      alert('請允許彈出視窗以進行列印')
+      void alert('請允許彈出視窗以進行列印', 'warning')
       return
     }
 

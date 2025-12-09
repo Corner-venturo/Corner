@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
+import { supabase } from '@/lib/supabase/client'
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle, FileCheck, Info, UserPlus, Upload, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -26,6 +27,7 @@ import { AddVisaDialog } from './AddVisaDialog'
 import { SubmitVisaDialog } from './SubmitVisaDialog'
 import { EditVisaDialog } from './EditVisaDialog'
 import { ReturnDocumentsDialog } from './ReturnDocumentsDialog'
+import { BatchPickupDialog } from './BatchPickupDialog'
 import type { Visa } from '@/stores/types'
 // ============================================
 // 簽證管理主頁面
@@ -80,6 +82,7 @@ export default function VisasPage() {
     tourOptions,
     calculateFee,
     addApplicant,
+    addApplicantForSame,
     removeApplicant,
     updateApplicant,
     resetForm,
@@ -93,6 +96,7 @@ export default function VisasPage() {
   const [isReturnDialogOpen, setIsReturnDialogOpen] = React.useState(false)
   const [isPickupDialogOpen, setIsPickupDialogOpen] = React.useState(false)
   const [isRejectDialogOpen, setIsRejectDialogOpen] = React.useState(false)
+  const [isBatchPickupDialogOpen, setIsBatchPickupDialogOpen] = React.useState(false)
   const [pickupDate, setPickupDate] = React.useState(new Date().toISOString().split('T')[0])
   const [rejectDate, setRejectDate] = React.useState(new Date().toISOString().split('T')[0])
 
@@ -233,9 +237,6 @@ export default function VisasPage() {
     }
 
     // 批次建立簽證和對應的訂單成員（使用 for...of 確保順序執行）
-    const { useMemberStore } = await import('@/stores')
-    const addMember = useMemberStore.getState().create
-
     // 先將申請人按名字分組，收集每人的所有簽證類型
     const applicantMap = new Map<string, {
       visaTypes: string[]
@@ -275,8 +276,8 @@ export default function VisasPage() {
         contact_phone: contact_info.contact_phone || '',
         visa_type: applicant.country,
         country: applicant.country,
-        received_date: applicant.received_date,
-        expected_issue_date: applicant.expected_issue_date,
+        received_date: applicant.received_date || null,  // 空字串轉 null
+        expected_issue_date: applicant.expected_issue_date || null,  // 空字串轉 null
         fee,
         cost: total_cost,
         status: 'pending',
@@ -290,15 +291,26 @@ export default function VisasPage() {
     }
 
     // 2. 建立成員（按名字去重，每人只建立一筆，備註記錄所有簽證類型）
+    // 注意：要寫入 order_members 表（OrderMembersExpandable 讀取的表）
     for (const [name, data] of applicantMap) {
-      const notes = data.visaTypes.join('、')
+      const remarks = data.visaTypes.join('、')
 
-      await addMember({
-        order_id: targetOrder.id,
-        name: name,
-        member_type: 'adult',
-        notes,  // 簽證類型記錄在備註
-      } as any)
+      try {
+        const { error } = await supabase
+          .from('order_members')
+          .insert({
+            order_id: targetOrder.id,
+            chinese_name: name,  // order_members 表用 chinese_name 欄位
+            member_type: 'adult',
+            remarks,  // 簽證類型記錄在備註
+            workspace_id: user.workspace_id,
+          })
+
+        if (error) throw error
+        logger.log(`✅ 成員建立成功: ${name}`)
+      } catch (memberError) {
+        logger.error(`❌ 成員建立失敗: ${name}`, memberError)
+      }
     }
 
       // 收集所有需要比對的人（聯絡人 + 所有申請人）
@@ -463,7 +475,7 @@ export default function VisasPage() {
         date_of_birth: newCustomerForm.date_of_birth || null,
         gender: newCustomerForm.gender || null,
         notes: newCustomerForm.notes || null,
-        source: 'visa',
+        source: 'other',  // 簽證來源，'visa' 不在 check constraint 允許的值中
       } as Parameters<typeof addCustomer>[0])
 
       toast.success(`已新增「${newCustomerForm.name}」到 CRM`)
@@ -573,12 +585,22 @@ export default function VisasPage() {
                   查看簽證資訊
                 </Button>
                 {canManageVisas && (
-                  <Button
-                    onClick={() => setIsDialogOpen(true)}
-                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                  >
-                    新增簽證
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsBatchPickupDialogOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload size={16} />
+                      批次下件
+                    </Button>
+                    <Button
+                      onClick={() => setIsDialogOpen(true)}
+                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                    >
+                      新增簽證
+                    </Button>
+                  </>
                 )}
               </>
             )}
@@ -617,7 +639,10 @@ export default function VisasPage() {
       {/* 新增簽證對話框 */}
       <AddVisaDialog
         open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={() => {
+          setIsDialogOpen(false)
+          resetForm()  // 關閉時重置表單
+        }}
         onSubmit={handleAddVisa}
         contact_info={contact_info}
         setContactInfo={setContactInfo}
@@ -625,6 +650,7 @@ export default function VisasPage() {
         tourOptions={tourOptions}
         calculateFee={calculateFee}
         addApplicant={addApplicant}
+        addApplicantForSame={addApplicantForSame}
         removeApplicant={removeApplicant}
         updateApplicant={updateApplicant}
         canSubmit={!!contact_info.applicant_name && applicants.some(a => a.name)}
@@ -1096,6 +1122,17 @@ export default function VisasPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 批次下件對話框 */}
+      <BatchPickupDialog
+        open={isBatchPickupDialogOpen}
+        onClose={() => setIsBatchPickupDialogOpen(false)}
+        pendingVisas={visas.filter(v => v.status === 'submitted')}
+        onComplete={(updatedVisaIds) => {
+          toast.success(`已完成 ${updatedVisaIds.length} 筆下件`)
+        }}
+        updateVisa={updateVisa}
+      />
     </div>
   )
 }

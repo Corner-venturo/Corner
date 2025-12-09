@@ -38,8 +38,8 @@ let savedCityId = ''
 function parseDayTitleForAttractions(title: string): string[] {
   if (!title) return []
 
-  // 分割符號：→、·、|、、、-、/
-  const separators = /[→·|、\-/]/g
+  // 分割符號：→、⇀、·、|、、、-、/
+  const separators = /[→⇀·|、\-/]/g
   const parts = title.split(separators)
 
   // 過濾掉常見的非景點關鍵字

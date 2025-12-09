@@ -19,6 +19,7 @@ import {
 import type { Company } from '@/stores'
 import type { CreateCompanyData } from '@/types/company.types'
 import { PAYMENT_METHOD_LABELS, PAYMENT_TERMS_OPTIONS } from '@/types/company.types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface CompanyFormDialogProps {
   isOpen: boolean
@@ -109,7 +110,7 @@ export function CompanyFormDialog({
 
   const handleSubmit = async () => {
     if (!formData.company_name.trim()) {
-      alert('請輸入企業名稱')
+      await alert('請輸入企業名稱', 'warning')
       return
     }
 

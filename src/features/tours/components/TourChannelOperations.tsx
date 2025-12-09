@@ -8,6 +8,7 @@ import { useCallback } from 'react'
 import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface TourStoreActions {
   fetchAll: () => Promise<void>
@@ -26,7 +27,11 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
 
     // 先確認是否要建立頻道
     const channelName = `${tour.code} ${tour.name}`
-    if (!confirm(`是否要為「${tour.name}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`)) {
+    const confirmed = await confirm(`是否要為「${tour.name}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`, {
+      title: '建立頻道',
+      type: 'info',
+    })
+    if (!confirmed) {
       return
     }
 
@@ -144,7 +149,11 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
     const { toast } = await import('sonner')
     const { supabase } = await import('@/lib/supabase/client')
 
-    if (!confirm(`確定要解鎖「${tour.name}」嗎？\n\n解鎖後可以繼續編輯和修改此團體。`)) {
+    const confirmed = await confirm(`確定要解鎖「${tour.name}」嗎？\n\n解鎖後可以繼續編輯和修改此團體。`, {
+      title: '解鎖結團',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 

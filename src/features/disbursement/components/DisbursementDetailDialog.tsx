@@ -19,6 +19,7 @@ import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
 import { cn } from '@/lib/utils'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface DisbursementDetailDialogProps {
   order: DisbursementOrder | null
@@ -59,7 +60,11 @@ export function DisbursementDetailDialog({
 
   // 確認出帳
   const handleConfirmPaid = async () => {
-    if (!confirm('確定要將此出納單標記為「已出帳」嗎？')) return
+    const confirmed = await confirm('確定要將此出納單標記為「已出帳」嗎？', {
+      title: '確認出帳',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       // 更新出納單狀態
@@ -76,11 +81,11 @@ export function DisbursementDetailDialog({
         })
       }
 
-      alert('✅ 出納單已標記為已出帳')
+      await alert('出納單已標記為已出帳', 'success')
       onOpenChange(false)
     } catch (error) {
       console.error('更新出納單失敗:', error)
-      alert('❌ 更新出納單失敗')
+      await alert('更新出納單失敗', 'error')
     }
   }
 

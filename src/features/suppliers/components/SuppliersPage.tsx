@@ -12,6 +12,7 @@ import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
 import { useSupplierStore } from '@/stores'
 import type { Supplier } from '@/types/supplier.types'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 export const SuppliersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -62,14 +63,18 @@ export const SuppliersPage: React.FC = () => {
   }, [])
 
   const handleDelete = useCallback(async (supplier: Supplier) => {
-    if (!confirm(`確定要刪除供應商「${supplier.name}」嗎？`)) return
+    const confirmed = await confirm(`確定要刪除供應商「${supplier.name}」嗎？`, {
+      title: '刪除供應商',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       await deleteSupplier(supplier.id)
-      alert('✅ 供應商已刪除')
+      await alert('供應商已刪除', 'success')
     } catch (error) {
       logger.error('❌ Delete Supplier Error:', error)
-      alert('❌ 刪除失敗，請稍後再試')
+      await alert('刪除失敗，請稍後再試', 'error')
     }
   }, [deleteSupplier])
 
@@ -102,7 +107,7 @@ export const SuppliersPage: React.FC = () => {
           bank_account: formData.bank_account,
           notes: formData.note,
         })
-        alert('✅ 供應商更新成功')
+        await alert('供應商更新成功', 'success')
       } else {
         // 新增模式
         await create({
@@ -112,12 +117,12 @@ export const SuppliersPage: React.FC = () => {
           notes: formData.note,
           type: 'other', // 預設型別
         } as Parameters<typeof create>[0])
-        alert('✅ 供應商建立成功')
+        await alert('供應商建立成功', 'success')
       }
       handleCloseDialog()
     } catch (error) {
       logger.error('❌ Save Supplier Error:', error)
-      alert('❌ 儲存失敗，請稍後再試')
+      await alert('儲存失敗，請稍後再試', 'error')
     }
   }, [formData, isEditMode, editingSupplier, create, update, handleCloseDialog])
 

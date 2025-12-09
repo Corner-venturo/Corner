@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useUserStore } from '@/stores/user-store'
 import { cn } from '@/lib/utils'
 import { User, DollarSign, Shield, X, Edit, Save } from 'lucide-react'
+import { alert } from '@/lib/ui/alert-dialog'
 
 // 導入分頁組件
 import { BasicInfoTab } from './tabs/basic-info'
@@ -91,7 +92,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
 
       setIsEditing(false)
     } catch (error) {
-      alert('儲存失敗，請稍後再試')
+      void alert('儲存失敗，請稍後再試', 'error')
     }
   }
 

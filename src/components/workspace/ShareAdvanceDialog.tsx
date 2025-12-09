@@ -6,6 +6,7 @@ import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useUserStore } from '@/stores/user-store'
 import { Combobox } from '@/components/ui/combobox'
 import type { Employee } from '@/types/models'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface AdvanceRow {
   name: string
@@ -82,7 +83,7 @@ export function ShareAdvanceDialog({
     )
 
     if (validRows.length === 0) {
-      alert('請至少填寫一筆完整的代墊項目')
+      void alert('請至少填寫一筆完整的代墊項目', 'warning')
       return
     }
 
@@ -98,7 +99,7 @@ export function ShareAdvanceDialog({
       onSuccess()
       onClose()
     } catch (error) {
-      alert('分享失敗，請稍後再試')
+      void alert('分享失敗，請稍後再試', 'error')
     }
   }
 

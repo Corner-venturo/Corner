@@ -13,6 +13,7 @@ import { DollarSign, TrendingUp, TrendingDown, CreditCard, FileText, Plus, Trash
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface TourPaymentsProps {
   tour: Tour
@@ -244,8 +245,9 @@ export const TourPayments = React.memo(function TourPayments({
     if (invoiceOrderId) {
       const order = tourOrders.find(o => o.id === invoiceOrderId)
       if (order && invoiceTotal > (order.paid_amount ?? 0)) {
-        const confirmed = window.confirm(
-          `發票金額 NT$ ${invoiceTotal.toLocaleString()} 超過已收款金額 NT$ ${(order.paid_amount ?? 0).toLocaleString()}，確定要開立嗎？`
+        const confirmed = await confirm(
+          `發票金額 NT$ ${invoiceTotal.toLocaleString()} 超過已收款金額 NT$ ${(order.paid_amount ?? 0).toLocaleString()}，確定要開立嗎？`,
+          { title: '金額超開提醒', type: 'warning' }
         )
         if (!confirmed) return
       }

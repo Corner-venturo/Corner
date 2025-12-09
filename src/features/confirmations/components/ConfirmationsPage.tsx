@@ -13,6 +13,7 @@ import { ConfirmationsList } from './ConfirmationsList'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 // 狀態篩選器
 const STATUS_FILTERS = [
@@ -70,12 +71,16 @@ export const ConfirmationsPage: React.FC = () => {
       router.push(`/confirmations/${newConf.id}`)
     } catch (error) {
       logger.error('建立失敗:', error)
-      alert('建立失敗')
+      await alert('建立失敗', 'error')
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('確定要刪除這個確認單嗎？')) {
+    const confirmed = await confirm('確定要刪除這個確認單嗎？', {
+      title: '刪除確認單',
+      type: 'warning',
+    })
+    if (confirmed) {
       await remove(id)
     }
   }

@@ -18,6 +18,7 @@ import { Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getFieldCoordinate } from '@/lib/formula-calculator'
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface TourOperationsProps {
   tour: Tour
@@ -128,7 +129,7 @@ export const TourOperations = React.memo(function TourOperations({
     } else {
       // 一般分房，檢查容量
       if (roomValue && isRoomFull(roomValue, member_id)) {
-        alert('該房間已滿，無法分配！')
+        void alert('該房間已滿，無法分配', 'warning')
         return
       }
 
@@ -301,9 +302,13 @@ export const TourOperations = React.memo(function TourOperations({
 
   // 處理欄位刪除
   const handleColumnDelete = useCallback(
-    (columnKey: string) => {
+    async (columnKey: string) => {
       // 確認刪除
-      if (confirm('確定要刪除此欄位嗎？這將會刪除所有團員在此欄位的資料。')) {
+      const confirmed = await confirm('確定要刪除此欄位嗎？這將會刪除所有團員在此欄位的資料。', {
+        title: '刪除欄位',
+        type: 'warning',
+      })
+      if (confirmed) {
         // 從所有團員中移除此欄位的資料
         const updatedMembers = tableMembers.map(member => {
           if (member.customFields) {

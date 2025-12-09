@@ -23,6 +23,7 @@ import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/st
 import { supabase } from '@/lib/supabase/client'
 import { PrintDisbursementPreview } from './PrintDisbursementPreview'
 import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface DisbursementPrintDialogProps {
   order: DisbursementOrder | null
@@ -170,7 +171,7 @@ export function DisbursementPrintDialog({
       })
     } catch (error) {
       console.error('下載 PDF 失敗:', error)
-      alert('下載 PDF 失敗')
+      void alert('下載 PDF 失敗', 'error')
     }
   }, [order, paymentRequests, paymentRequestItems])
 

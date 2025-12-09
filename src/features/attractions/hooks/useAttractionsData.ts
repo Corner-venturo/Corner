@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useAttractionStore } from '@/stores'
 import { Attraction, AttractionFormData } from '../types'
 import { logger } from '@/lib/utils/logger'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 // ============================================
 // Hook: 景點資料管理（使用 Store 架構）
@@ -73,13 +74,17 @@ export function useAttractionsData() {
   // 刪除景點
   const deleteAttraction = useCallback(
     async (id: string) => {
-      if (!confirm('確定要刪除此景點？')) return { success: false, cancelled: true }
+      const confirmed = await confirm('確定要刪除此景點？', {
+        title: '刪除景點',
+        type: 'warning',
+      })
+      if (!confirmed) return { success: false, cancelled: true }
 
       try {
         await store.delete(id)
         return { success: true }
       } catch (error) {
-        alert('刪除失敗')
+        await alert('刪除失敗', 'error')
         return { success: false, error }
       }
     },

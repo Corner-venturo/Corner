@@ -35,6 +35,7 @@ import { useTourTableColumns } from './TourTableColumns'
 import { useTourChannelOperations } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
 import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
+import { ContractDialog } from '@/components/contracts/ContractDialog'
 
 export const ToursPage: React.FC = () => {
   const router = useRouter()
@@ -47,6 +48,13 @@ export const ToursPage: React.FC = () => {
 
   // 連結文件對話框狀態（合併行程表和報價單）
   const [documentsDialogTour, setDocumentsDialogTour] = useState<Tour | null>(null)
+
+  // 合約對話框狀態
+  const [contractDialogState, setContractDialogState] = useState<{
+    isOpen: boolean
+    tour: Tour | null
+    mode: 'create' | 'edit'
+  }>({ isOpen: false, tour: null, mode: 'edit' })
 
   const { items: orders, create: addOrder } = useOrders()
   const { items: members } = useMembers()
@@ -389,6 +397,10 @@ export const ToursPage: React.FC = () => {
     handleUnlockTour,
     onOpenQuoteDialog: (tour) => setDocumentsDialogTour(tour),
     onOpenItineraryDialog: (tour) => setDocumentsDialogTour(tour),
+    onOpenContractDialog: (tour) => {
+      const mode = tour.contract_template ? 'edit' : 'create'
+      setContractDialogState({ isOpen: true, tour, mode })
+    },
   })
 
   const renderExpanded = useCallback(
@@ -554,6 +566,16 @@ export const ToursPage: React.FC = () => {
           isOpen={!!documentsDialogTour}
           onClose={() => setDocumentsDialogTour(null)}
           tour={documentsDialogTour}
+        />
+      )}
+
+      {/* Contract dialog */}
+      {contractDialogState.tour && (
+        <ContractDialog
+          isOpen={contractDialogState.isOpen}
+          onClose={() => setContractDialogState({ isOpen: false, tour: null, mode: 'edit' })}
+          tour={contractDialogState.tour}
+          mode={contractDialogState.mode}
         />
       )}
     </div>

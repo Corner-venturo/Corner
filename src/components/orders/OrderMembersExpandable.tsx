@@ -2,12 +2,14 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw } from 'lucide-react'
+import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useCustomerStore } from '@/stores'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface OrderMember {
   id: string
@@ -96,6 +98,7 @@ export function OrderMembersExpandable({
   // 護照圖片縮放相關狀態
   const [imageZoom, setImageZoom] = useState(1)
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
+  const [imageRotation, setImageRotation] = useState(0) // 旋轉角度 (0, 90, 180, 270)
   const [isImageDragging, setIsImageDragging] = useState(false)
   const [imageDragStart, setImageDragStart] = useState({ x: 0, y: 0 })
   const imageContainerRef = useRef<HTMLDivElement>(null)
@@ -200,12 +203,16 @@ export function OrderMembersExpandable({
       setMemberCountToAdd(1)
     } catch (error) {
       logger.error('新增成員失敗:', error)
-      alert('新增失敗')
+      await alert('新增失敗', 'error')
     }
   }
 
   const handleDeleteMember = async (memberId: string) => {
-    if (!confirm('確定要刪除此成員嗎？')) return
+    const confirmed = await confirm('確定要刪除此成員嗎？', {
+      title: '刪除成員',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       const { error } = await supabase.from('order_members').delete().eq('id', memberId)
@@ -214,7 +221,7 @@ export function OrderMembersExpandable({
       setMembers(members.filter(m => m.id !== memberId))
     } catch (error) {
       logger.error('刪除成員失敗:', error)
-      alert('刪除失敗')
+      await alert('刪除失敗', 'error')
     }
   }
 
@@ -233,10 +240,48 @@ export function OrderMembersExpandable({
       special_meal: member.special_meal || '',
       remarks: member.remarks || '',
     })
-    // 重置圖片縮放狀態
+    // 重置圖片縮放和旋轉狀態
     setImageZoom(1)
     setImagePosition({ x: 0, y: 0 })
+    setImageRotation(0)
     setIsEditDialogOpen(true)
+  }
+
+  // 旋轉圖片並轉成 base64
+  const rotateImage = (imageUrl: string, rotation: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Cannot get canvas context'))
+          return
+        }
+
+        // 90 或 270 度旋轉時，寬高需要交換
+        if (rotation === 90 || rotation === 270) {
+          canvas.width = img.height
+          canvas.height = img.width
+        } else {
+          canvas.width = img.width
+          canvas.height = img.height
+        }
+
+        // 移動到中心點
+        ctx.translate(canvas.width / 2, canvas.height / 2)
+        // 旋轉
+        ctx.rotate((rotation * Math.PI) / 180)
+        // 畫圖片（從中心點偏移回去）
+        ctx.drawImage(img, -img.width / 2, -img.height / 2)
+
+        // 轉成 base64
+        resolve(canvas.toDataURL('image/jpeg', 0.9))
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = imageUrl
+    })
   }
 
   // 儲存編輯/驗證（同步更新 order_members + customers）
@@ -247,8 +292,19 @@ export function OrderMembersExpandable({
     try {
       const customerStore = useCustomerStore.getState()
 
+      // 0. 如果有旋轉，先處理圖片
+      let newPassportImageUrl = editingMember.passport_image_url
+      if (imageRotation !== 0 && editingMember.passport_image_url) {
+        try {
+          newPassportImageUrl = await rotateImage(editingMember.passport_image_url, imageRotation)
+        } catch (err) {
+          logger.error('旋轉圖片失敗:', err)
+          // 繼續儲存其他資料，不因為圖片旋轉失敗而中斷
+        }
+      }
+
       // 1. 更新 order_members
-      const memberUpdateData = {
+      const memberUpdateData: Record<string, unknown> = {
         chinese_name: editFormData.chinese_name,
         passport_name: editFormData.passport_name,
         birth_date: editFormData.birth_date,
@@ -258,6 +314,11 @@ export function OrderMembersExpandable({
         passport_expiry: editFormData.passport_expiry,
         special_meal: editFormData.special_meal,
         remarks: editFormData.remarks,
+      }
+
+      // 如果有旋轉，更新護照圖片
+      if (imageRotation !== 0 && newPassportImageUrl) {
+        memberUpdateData.passport_image_url = newPassportImageUrl
       }
 
       const { error: memberError } = await supabase
@@ -279,10 +340,14 @@ export function OrderMembersExpandable({
           passport_expiry_date: editFormData.passport_expiry,
         }
 
-        // 如果是驗證模式，更新驗證狀態
-        if (editMode === 'verify') {
-          customerUpdateData.verification_status = 'verified'
+        // 如果有旋轉，同步更新顧客護照圖片
+        if (imageRotation !== 0 && newPassportImageUrl) {
+          customerUpdateData.passport_image_url = newPassportImageUrl
         }
+
+        // 儲存時自動更新驗證狀態為 verified（無論是編輯或驗證模式）
+        // 因為使用者已經看過並確認資料了
+        customerUpdateData.verification_status = 'verified'
 
         const { error: customerError } = await supabase
           .from('customers')
@@ -297,13 +362,13 @@ export function OrderMembersExpandable({
         }
       }
 
-      // 3. 更新本地狀態
+      // 3. 更新本地狀態（儲存後即為已驗證）
       setMembers(members.map(m =>
         m.id === editingMember.id
           ? {
               ...m,
               ...memberUpdateData,
-              customer_verification_status: editMode === 'verify' ? 'verified' : m.customer_verification_status,
+              customer_verification_status: 'verified',
             }
           : m
       ))
@@ -311,10 +376,10 @@ export function OrderMembersExpandable({
       // 4. 關閉彈窗
       setIsEditDialogOpen(false)
       setEditingMember(null)
-      alert(editMode === 'verify' ? '✅ 驗證完成！' : '✅ 儲存成功！')
+      void alert(editMode === 'verify' ? '驗證完成！' : '儲存成功！', 'success')
     } catch (error) {
       logger.error('儲存失敗:', error)
-      alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      void alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -472,8 +537,9 @@ export function OrderMembersExpandable({
     sixMonthsBeforeDeparture.setMonth(sixMonthsBeforeDeparture.getMonth() - 6)
 
     if (expiry < sixMonthsBeforeDeparture) {
-      alert(
-        `⚠️ 護照效期警告\n\n護照效期：${expiryDate}\n出發日期：${departureDate}\n\n護照效期不足出發日 6 個月，請提醒客戶更換護照！`
+      void alert(
+        `護照效期警告\n\n護照效期：${expiryDate}\n出發日期：${departureDate}\n\n護照效期不足出發日 6 個月，請提醒客戶更換護照！`,
+        'warning'
       )
     }
   }
@@ -494,7 +560,7 @@ export function OrderMembersExpandable({
       updateField(memberId, 'gender', detectedGender)
     } else if (processedValue.length >= 2) {
       // 如果格式不符且已輸入至少2個字元，提示手動選擇
-      alert('⚠️ 無法自動辨識性別\n\n請手動點擊性別欄位選擇')
+      void alert('無法自動辨識性別\n\n請手動點擊性別欄位選擇', 'info')
     }
   }
 
@@ -584,7 +650,7 @@ export function OrderMembersExpandable({
       setProcessedFiles(prev => [...prev, ...newProcessedFiles])
     } catch (error) {
       logger.error('處理檔案失敗:', error)
-      alert('檔案處理失敗，請重試')
+      void alert('檔案處理失敗，請重試', 'error')
     } finally {
       setIsProcessing(false)
     }
@@ -642,7 +708,7 @@ export function OrderMembersExpandable({
       setProcessedFiles(prev => [...prev, ...newProcessedFiles])
     } catch (error) {
       logger.error('處理檔案失敗:', error)
-      alert('檔案處理失敗，請重試')
+      void alert('檔案處理失敗，請重試', 'error')
     } finally {
       setIsProcessing(false)
     }
@@ -767,11 +833,10 @@ export function OrderMembersExpandable({
           .map(m => `${m.chinese_name}|${m.birth_date}`) || []
       )
 
-      // 載入顧客資料（用於同步比對）
-      const customerStore = useCustomerStore.getState()
-      if (customerStore.items.length === 0) {
-        await customerStore.fetchAll()
-      }
+      // 載入顧客資料（用於同步比對）- 強制重新載入確保資料最新
+      await useCustomerStore.getState().fetchAll()
+      // 取得最新的 items（fetchAll 後 store 會更新）
+      const freshCustomers = useCustomerStore.getState().items
 
       for (let i = 0; i < result.results.length; i++) {
         const item = result.results[i]
@@ -866,8 +931,8 @@ export function OrderMembersExpandable({
 
             // 3. 背景同步顧客（三重比對：護照號碼、身分證、姓名+生日）
             if (newMember && (idNumber || birthDate || passportNumber)) {
-              // 查找現有顧客（三重比對）
-              let existingCustomer = customerStore.items.find(c => {
+              // 查找現有顧客（三重比對）- 使用最新載入的顧客資料
+              let existingCustomer = freshCustomers.find(c => {
                 // 1. 優先用護照號碼比對
                 if (passportNumber && c.passport_number === passportNumber) return true
                 // 2. 其次用身分證比對
@@ -885,16 +950,26 @@ export function OrderMembersExpandable({
                   .from('order_members')
                   .update({ customer_id: existingCustomer.id })
                   .eq('id', newMember.id)
+
+                // 如果現有顧客沒有護照圖片，更新它
+                if (passportImageUrl && !existingCustomer.passport_image_url) {
+                  await supabase
+                    .from('customers')
+                    .update({ passport_image_url: passportImageUrl })
+                    .eq('id', existingCustomer.id)
+                }
+
                 syncedCustomerCount++
                 logger.info(`✅ 顧客已存在，已關聯: ${existingCustomer.name}`)
               } else {
                 // 沒找到，建立新顧客
-                const newCustomer = await customerStore.create({
+                const newCustomer = await useCustomerStore.getState().create({
                   name: item.customer.name || '',
                   english_name: item.customer.english_name || '',
                   passport_number: passportNumber,
                   passport_romanization: item.customer.passport_romanization || '',
                   passport_expiry_date: item.customer.passport_expiry_date || null,
+                  passport_image_url: passportImageUrl,
                   national_id: idNumber,
                   date_of_birth: birthDate,
                   gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
@@ -937,7 +1012,7 @@ export function OrderMembersExpandable({
       if (failedItems.length > 0) {
         message += `\n\n❌ 失敗項目：\n${failedItems.join('\n')}`
       }
-      alert(message)
+      void alert(message, 'success')
 
       // 清空檔案並重新載入成員
       processedFiles.forEach(pf => URL.revokeObjectURL(pf.preview))
@@ -946,7 +1021,7 @@ export function OrderMembersExpandable({
       setIsAddDialogOpen(false)
     } catch (error) {
       logger.error('批次上傳失敗:', error)
-      alert('批次上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      void alert('批次上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setIsUploading(false)
     }
@@ -1116,9 +1191,21 @@ export function OrderMembersExpandable({
                     <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
                   </td>
 
-                  {/* 護照效期 - 唯讀 */}
+                  {/* 護照效期 - 唯讀，含效期狀態提示 */}
                   <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                    <span className="text-xs text-morandi-primary">{member.passport_expiry || '-'}</span>
+                    {(() => {
+                      const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
+                      return (
+                        <span className={cn("text-xs", expiryInfo.className)}>
+                          {expiryInfo.text}
+                          {expiryInfo.statusLabel && (
+                            <span className="ml-1 text-[10px] font-medium">
+                              ({expiryInfo.statusLabel})
+                            </span>
+                          )}
+                        </span>
+                      )
+                    })()}
                   </td>
 
                   {/* 特殊餐食 */}
@@ -1497,16 +1584,22 @@ export function OrderMembersExpandable({
                     >
                       <ZoomIn size={16} className="text-gray-600" />
                     </button>
+                    <div className="w-px h-4 bg-gray-300 mx-1" />
                     <button
                       type="button"
-                      onClick={() => {
-                        setImageZoom(1)
-                        setImagePosition({ x: 0, y: 0 })
-                      }}
-                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors ml-1"
-                      title="重置"
+                      onClick={() => setImageRotation(r => (r - 90 + 360) % 360)}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      title="逆時針旋轉"
                     >
                       <RotateCcw size={16} className="text-gray-600" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageRotation(r => (r + 90) % 360)}
+                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      title="順時針旋轉"
+                    >
+                      <RotateCw size={16} className="text-gray-600" />
                     </button>
                   </div>
                 )}
@@ -1517,7 +1610,7 @@ export function OrderMembersExpandable({
                   className="relative overflow-hidden rounded-lg border border-morandi-gold/20 bg-gray-50 cursor-grab active:cursor-grabbing"
                   style={{ height: '320px' }}
                   onWheel={(e) => {
-                    e.preventDefault()
+                    // 注意：不使用 preventDefault() 因為現代瀏覽器的 wheel 事件是 passive
                     const delta = e.deltaY > 0 ? -0.1 : 0.1
                     setImageZoom(z => Math.min(3, Math.max(0.5, z + delta)))
                   }}
@@ -1548,7 +1641,7 @@ export function OrderMembersExpandable({
                     alt="護照照片"
                     className="w-full h-full object-contain transition-transform duration-100"
                     style={{
-                      transform: `scale(${imageZoom}) translate(${imagePosition.x / imageZoom}px, ${imagePosition.y / imageZoom}px)`,
+                      transform: `scale(${imageZoom}) rotate(${imageRotation}deg) translate(${imagePosition.x / imageZoom}px, ${imagePosition.y / imageZoom}px)`,
                     }}
                     draggable={false}
                   />

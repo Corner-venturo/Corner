@@ -18,6 +18,7 @@ import { Upload, FileSpreadsheet } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import type { CreateReceiptData } from '@/types/receipt.types'
 import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface BatchCreateReceiptDialogProps {
   isOpen: boolean
@@ -68,7 +69,7 @@ export function BatchCreateReceiptDialog({
       setReceipts(parsedReceipts)
     } catch (error) {
       logger.error('解析 Excel 失敗:', error)
-      alert('❌ 解析 Excel 失敗，請檢查檔案格式')
+      void alert('解析 Excel 失敗，請檢查檔案格式', 'error')
     } finally {
       setIsProcessing(false)
     }
@@ -87,7 +88,7 @@ export function BatchCreateReceiptDialog({
 
   const handleSubmit = async () => {
     if (receipts.length === 0) {
-      alert('⚠️ 請先上傳檔案')
+      void alert('請先上傳檔案', 'warning')
       return
     }
 
@@ -96,10 +97,10 @@ export function BatchCreateReceiptDialog({
       setFile(null)
       setReceipts([])
       onClose()
-      alert(`✅ 成功建立 ${receipts.length} 筆收款單`)
+      void alert(`成功建立 ${receipts.length} 筆收款單`, 'success')
     } catch (error) {
       logger.error('批量創建收款單失敗:', error)
-      alert('❌ 批量創建收款單失敗')
+      void alert('批量創建收款單失敗', 'error')
     }
   }
 

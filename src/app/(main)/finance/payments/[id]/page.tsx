@@ -28,6 +28,7 @@ import { useReceiptStore, useOrderStore, useLinkPayLogStore } from '@/stores'
 import { LinkPayLogsTable } from '../components/LinkPayLogsTable'
 import { EditReceiptDialog } from '../components/EditReceiptDialog'
 import { CreateLinkPayDialog } from '../components/CreateLinkPayDialog'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 // Utils
 import { formatDate } from '@/lib/utils'
@@ -118,7 +119,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
   // 會計確認收款
   const handleConfirm = async () => {
     if (!actualAmount || parseFloat(actualAmount) <= 0) {
-      alert('請填入正確的實收金額')
+      await alert('請填入正確的實收金額', 'warning')
       return
     }
 
@@ -165,10 +166,10 @@ export default function ReceiptDetailPage({ params }: PageProps) {
       }
 
       setIsConfirming(false)
-      alert('✅ 收款已確認')
+      await alert('收款已確認', 'success')
     } catch (error) {
       logger.error('確認收款失敗:', error)
-      alert('❌ 確認收款失敗')
+      await alert('確認收款失敗', 'error')
     }
   }
 
@@ -181,17 +182,21 @@ export default function ReceiptDetailPage({ params }: PageProps) {
 
   // 刪除收款單
   const handleDelete = async () => {
-    if (!confirm('確定要刪除此收款單嗎？此操作無法復原。')) {
+    const confirmed = await confirm('確定要刪除此收款單嗎？此操作無法復原。', {
+      title: '刪除收款單',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
     try {
       await deleteReceipt(receipt.id)
-      alert('✅ 收款單已刪除')
+      await alert('收款單已刪除', 'success')
       router.push('/finance/payments')
     } catch (error) {
       logger.error('刪除收款單失敗:', error)
-      alert('❌ 刪除收款單失敗')
+      await alert('刪除收款單失敗', 'error')
     }
   }
 
@@ -200,10 +205,10 @@ export default function ReceiptDetailPage({ params }: PageProps) {
     try {
       await updateReceipt(receipt.id, data)
       setIsEditDialogOpen(false)
-      alert('✅ 收款單已更新')
+      await alert('收款單已更新', 'success')
     } catch (error) {
       logger.error('更新收款單失敗:', error)
-      alert('❌ 更新收款單失敗')
+      await alert('更新收款單失敗', 'error')
     }
   }
 
@@ -216,7 +221,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
       })
     } catch (error) {
       logger.error('生成 PDF 失敗:', error)
-      alert('❌ 生成 PDF 失敗')
+      await alert('生成 PDF 失敗', 'error')
     }
   }
 

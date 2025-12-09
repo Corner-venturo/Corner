@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus, Dumbbell, MessageSquare, Package, Edit, Trash2 } from 'lucide-react'
 import { useTimeboxBoxes, morandiColors, type TimeboxBox } from '../hooks/useTimeboxData'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -73,7 +74,11 @@ export default function BoxManager() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('確定要刪除這個箱子嗎？')) {
+    const confirmed = await confirm('確定要刪除這個箱子嗎？', {
+      title: '刪除箱子',
+      type: 'warning',
+    })
+    if (confirmed) {
       await deleteBox(id)
     }
   }

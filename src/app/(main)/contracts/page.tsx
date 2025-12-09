@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
-import { FileSignature, Edit2, Trash2, Eye, Mail } from 'lucide-react'
+import { FileSignature, Edit2, Trash2, Eye, Mail, Plus } from 'lucide-react'
 import { useTours, useOrders, useMembers } from '@/hooks/cloud-hooks'
 import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -13,6 +13,7 @@ import { DateCell, ActionCell, NumberCell } from '@/components/table-cells'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { ContractViewDialog } from '@/components/contracts/ContractViewDialog'
 import { EnvelopeDialog } from '@/components/contracts/EnvelopeDialog'
+import { SelectTourDialog } from '@/components/contracts/SelectTourDialog'
 
 export default function ContractsPage() {
   const router = useRouter()
@@ -39,6 +40,12 @@ export default function ContractsPage() {
     isOpen: false,
     tour: null,
   })
+  const [selectTourDialog, setSelectTourDialog] = useState(false)
+
+  // 篩選沒有合約的團
+  const toursWithoutContract = useMemo(() => {
+    return tours.filter(tour => !tour.contract_template)
+  }, [tours])
 
   // 篩選旅遊團 - 只顯示有合約的團（或是從 URL 指定的團）
   const contractTours = useMemo(() => {
@@ -50,11 +57,14 @@ export default function ContractsPage() {
     return tours.filter(tour => !!tour.contract_template)
   }, [tours, tourIdParam])
 
-  // 自動打開對話框（如果從旅遊團頁面跳轉過來）
+  // 追蹤是否已經自動打開過對話框
+  const [hasAutoOpened, setHasAutoOpened] = useState(false)
+
+  // 自動打開對話框（如果從旅遊團頁面跳轉過來）- 只在首次載入時執行
   useEffect(() => {
-    if (tourIdParam && tours.length > 0) {
+    if (tourIdParam && tours.length > 0 && !hasAutoOpened) {
       const targetTour = tours.find(tour => tour.id === tourIdParam)
-      if (targetTour && !contractDialog.isOpen) {
+      if (targetTour) {
         // 如果該團已有合約，打開編輯對話框；否則打開新增對話框
         const mode = targetTour.contract_template ? 'edit' : 'create'
         setContractDialog({
@@ -62,9 +72,10 @@ export default function ContractsPage() {
           tour: targetTour,
           mode,
         })
+        setHasAutoOpened(true)
       }
     }
-  }, [tourIdParam, tours, contractDialog.isOpen])
+  }, [tourIdParam, tours, hasAutoOpened])
 
   const handleRowClick = useCallback((tour: Tour) => {
     setContractDialog({
@@ -149,6 +160,11 @@ export default function ContractsPage() {
           contract_archived_date: null,
         })
 
+        // 清除 URL 參數，避免重新整理後又跳出建立合約對話框
+        if (tourIdParam) {
+          router.replace('/contracts')
+        }
+
         toast({
           title: '刪除成功',
           description: `已刪除「${tour.name}」的合約`,
@@ -161,7 +177,7 @@ export default function ContractsPage() {
         })
       }
     },
-    [updateTour, toast]
+    [updateTour, toast, tourIdParam, router]
   )
 
   const renderActions = useCallback(
@@ -195,6 +211,16 @@ export default function ContractsPage() {
     [handleDeleteContract]
   )
 
+  // 選擇團後建立合約
+  const handleSelectTour = useCallback((tour: Tour) => {
+    setSelectTourDialog(false)
+    setContractDialog({
+      isOpen: true,
+      tour,
+      mode: 'create',
+    })
+  }, [])
+
   return (
     <>
       <ListPageLayout
@@ -211,6 +237,8 @@ export default function ContractsPage() {
         onRowClick={handleRowClick}
         renderActions={renderActions}
         bordered={true}
+        onAdd={() => setSelectTourDialog(true)}
+        addLabel="新增合約"
       />
 
       {/* View dialog */}
@@ -240,6 +268,14 @@ export default function ContractsPage() {
           tour={envelopeDialog.tour}
         />
       )}
+
+      {/* Select tour dialog */}
+      <SelectTourDialog
+        isOpen={selectTourDialog}
+        onClose={() => setSelectTourDialog(false)}
+        tours={toursWithoutContract}
+        onSelect={handleSelectTour}
+      />
     </>
   )
 }

@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { X, Calendar } from 'lucide-react'
 import { useTourStore, usePaymentRequestStore } from '@/stores'
 import { useWorkspaceWidgets, AdvanceItem } from '@/stores/workspace-store'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -56,7 +57,7 @@ export function CreatePaymentRequestDialog({
 
   const handleCreate = async () => {
     if (!selectedTourId) {
-      alert('請選擇關聯旅遊團')
+      void alert('請選擇關聯旅遊團', 'warning')
       return
     }
 
@@ -88,7 +89,7 @@ export function CreatePaymentRequestDialog({
       onClose()
     } catch (error) {
       logger.error('建立請款單失敗：', error)
-      alert('建立失敗，請稍後再試')
+      void alert('建立失敗，請稍後再試', 'error')
     }
   }
 

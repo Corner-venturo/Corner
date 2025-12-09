@@ -26,6 +26,7 @@ import {
 import type { MealDiff } from '@/features/quotes/components'
 import type { CostItem } from '@/features/quotes/types'
 import type { Itinerary } from '@/stores/types'
+import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 
 export default function QuoteDetailPage() {
 
@@ -618,8 +619,9 @@ export default function QuoteDetailPage() {
       <QuickQuoteDetail
         quote={{
           ...quote,
-          // 合併快速報價單客戶資訊
+          // 合併快速報價單客戶資訊（團體報價的聯絡資訊會自動帶入）
           customer_name: quickQuoteCustomerInfo.customer_name || quote.customer_name,
+          contact_person: quickQuoteCustomerInfo.contact_person || quote.contact_person,
           contact_phone: quickQuoteCustomerInfo.contact_phone || quote.contact_phone,
           contact_address: quickQuoteCustomerInfo.contact_address || quote.contact_address,
           tour_code: quickQuoteCustomerInfo.tour_code || quote.tour_code,
@@ -654,6 +656,13 @@ export default function QuoteDetailPage() {
 
   return (
     <div className="w-full max-w-full space-y-6 pb-6">
+      {/* 編輯衝突警告 */}
+      <EditingWarningBanner
+        resourceType="quote"
+        resourceId={quote.id}
+        resourceName="此報價單"
+      />
+
       <QuoteHeader
         isSpecialTour={isSpecialTour}
         isReadOnly={isReadOnly}
@@ -680,6 +689,18 @@ export default function QuoteDetailPage() {
         currentEditingVersion={currentEditingVersion}
         router={router}
         accommodationDays={accommodationDays}
+        contactInfo={{
+          contact_person: quote.contact_person || '',
+          contact_phone: quote.contact_phone || '',
+          contact_address: quote.contact_address || '',
+        }}
+        onContactInfoChange={(info) => {
+          updateQuote(quote.id, {
+            contact_person: info.contact_person,
+            contact_phone: info.contact_phone,
+            contact_address: info.contact_address,
+          })
+        }}
       />
 
       <div className="w-full pb-6">

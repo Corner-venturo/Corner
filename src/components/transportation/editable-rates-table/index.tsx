@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { TransportationRate } from '@/types/transportation-rates.types'
+import { alert } from '@/lib/ui/alert-dialog'
 import {
   DndContext,
   closestCenter,
@@ -154,7 +155,7 @@ export function EditableRatesTable({
   // 儲存新增列
   const saveNewRow = async () => {
     if (!newRow.category || !newRow.route) {
-      alert('請至少填寫品項和路線')
+      void alert('請至少填寫品項和路線', 'warning')
       return
     }
 

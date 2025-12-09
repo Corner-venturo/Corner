@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
 import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -108,13 +109,13 @@ export function CoverInfoSection({
 
     // 檢查檔案大小 (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('檔案太大！請選擇小於 5MB 的圖片')
+      void alert('檔案太大！請選擇小於 5MB 的圖片', 'warning')
       return
     }
 
     // 檢查檔案類型
     if (!file.type.startsWith('image/')) {
-      alert('請選擇圖片檔案')
+      void alert('請選擇圖片檔案', 'warning')
       return
     }
 
@@ -163,11 +164,11 @@ export function CoverInfoSection({
       if (data.city) {
         setShowUpdateDialog(true)
       } else {
-        alert('✅ 圖片上傳成功！')
+        void alert('圖片上傳成功！', 'success')
       }
     } catch (error) {
       console.error('上傳失敗:', error)
-      alert('❌ 圖片上傳失敗，請稍後再試')
+      void alert('圖片上傳失敗，請稍後再試', 'error')
     } finally {
       setUploading(false)
     }
@@ -201,11 +202,11 @@ export function CoverInfoSection({
       // 更新本地 store
       await updateCityInStore(selectedCity.id, updateData)
 
-      alert(`✅ 已將圖片設為「${data.city}」的預設圖片 ${imageNumber}！`)
+      void alert(`已將圖片設為「${data.city}」的預設圖片 ${imageNumber}！`, 'success')
       setShowUpdateDialog(false)
     } catch (error) {
       console.error('更新城市圖片失敗:', error)
-      alert('❌ 更新失敗，請稍後再試')
+      void alert('更新失敗，請稍後再試', 'error')
     }
   }
 
@@ -614,7 +615,7 @@ export function CoverInfoSection({
             <Button
               onClick={() => {
                 setShowUpdateDialog(false)
-                alert('✅ 圖片僅用於此行程！')
+                void alert('圖片僅用於此行程！', 'success')
               }}
               variant="outline"
               className="w-full"

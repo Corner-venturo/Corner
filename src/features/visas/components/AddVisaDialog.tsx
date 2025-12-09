@@ -17,6 +17,8 @@ interface VisaApplicant {
   expected_issue_date: string // 預計下件時間
   fee?: number // 代辦費（可手動修改）
   cost: number
+  isAdditional?: boolean // 是否為追加列（同一人的其他簽證）
+  parentId?: string // 追加列的父申請人 ID
 }
 
 interface ContactInfo {
@@ -50,6 +52,7 @@ interface AddVisaDialogProps {
   tourOptions: TourOption[]
   calculateFee: (country: string) => number
   addApplicant: () => void
+  addApplicantForSame: (parentId: string, parentName: string) => void  // 追加同一人的其他簽證
   removeApplicant: (id: string) => void
   updateApplicant: (id: string, field: keyof VisaApplicant, value: unknown) => void
   canSubmit: boolean
@@ -66,6 +69,7 @@ export function AddVisaDialog({
   tourOptions,
   calculateFee,
   addApplicant,
+  addApplicantForSame,
   removeApplicant,
   updateApplicant,
   canSubmit,
@@ -250,11 +254,13 @@ export function AddVisaDialog({
       <div className="space-y-2">
         {applicants.map((applicant, index) => (
           <div key={applicant.id} className="flex gap-2 items-center">
+            {/* 追加列：名字欄位變成唯讀、顯示灰色背景 */}
             <Input
               value={applicant.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'name', e.target.value)}
               placeholder={index === 0 ? '辦理人（自動帶入）' : '辦理人'}
-              className="w-40"
+              className={`w-40 ${applicant.isAdditional ? 'bg-morandi-container/50' : ''}`}
+              readOnly={applicant.isAdditional}
             />
 
             <select
@@ -320,21 +326,40 @@ export function AddVisaDialog({
               <span className="text-xs whitespace-nowrap">急件</span>
             </div>
 
-            <Button
-              type="button"
-              onClick={
-                index === applicants.length - 1 ? addApplicant : () => removeApplicant(applicant.id)
-              }
-              size="sm"
-              className={
-                index === applicants.length - 1
-                  ? 'h-8 w-8 p-0 flex-shrink-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white'
-                  : 'h-8 w-8 p-0 flex-shrink-0 text-morandi-red hover:bg-red-50'
-              }
-              variant={index === applicants.length - 1 ? 'default' : 'ghost'}
-            >
-              {index === applicants.length - 1 ? '+' : '✕'}
-            </Button>
+            {/* 按鈕區：追加 / 新增 / 刪除 */}
+            <div className="flex gap-1 flex-shrink-0">
+              {/* 追加按鈕：所有列都顯示（追加列的 parentId 會傳給 addApplicantForSame） */}
+              <Button
+                type="button"
+                onClick={() => {
+                  // 如果是追加列，用 parentId；否則用自己的 id
+                  const targetId = applicant.isAdditional ? applicant.parentId! : applicant.id
+                  addApplicantForSame(targetId, applicant.name)
+                }}
+                size="sm"
+                className="h-8 px-3 text-xs font-medium bg-morandi-green hover:bg-morandi-green/80 text-white"
+                title="追加同一人的其他簽證"
+              >
+                ＋追加
+              </Button>
+
+              {/* 新增/刪除按鈕 */}
+              <Button
+                type="button"
+                onClick={
+                  index === applicants.length - 1 ? addApplicant : () => removeApplicant(applicant.id)
+                }
+                size="sm"
+                className={
+                  index === applicants.length - 1
+                    ? 'h-8 w-8 p-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                    : 'h-8 w-8 p-0 text-morandi-red hover:bg-red-50'
+                }
+                variant={index === applicants.length - 1 ? 'default' : 'ghost'}
+              >
+                {index === applicants.length - 1 ? '+' : '✕'}
+              </Button>
+            </div>
           </div>
         ))}
       </div>

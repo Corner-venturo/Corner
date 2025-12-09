@@ -12,6 +12,7 @@ import { TransportationRate } from '@/types/transportation-rates.types'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
+import { confirm } from '@/lib/ui/alert-dialog'
 import { Bus, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -55,7 +56,11 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   // 刪除資料
   const handleDelete = async (id: string) => {
-    if (!confirm('確定要刪除這筆車資資料嗎？')) return
+    const confirmed = await confirm('確定要刪除這筆車資資料嗎？', {
+      title: '刪除車資',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     const result = await (supabase.from('transportation_rates') as ReturnType<typeof supabase.from>).delete().eq('id', id)
     const error = result.error

@@ -29,6 +29,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { statusLabels } from '@/features/finance/requests/types'
 import { supabase } from '@/lib/supabase/client'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface CreateDisbursementDialogProps {
   open: boolean
@@ -167,7 +168,7 @@ export function CreateDisbursementDialog({
   // 建立出納單
   const handleCreate = useCallback(async () => {
     if (selectedRequestIds.length === 0) {
-      alert('請選擇至少一張請款單')
+      void alert('請選擇至少一張請款單', 'warning')
       return
     }
 
@@ -206,7 +207,7 @@ export function CreateDisbursementDialog({
       // 重新載入出納單列表
       await fetchDisbursementOrders()
 
-      alert(`✅ 出納單 ${orderNumber} 建立成功`)
+      await alert(`出納單 ${orderNumber} 建立成功`, 'success')
 
       // 重置狀態
       setSelectedRequestIds([])
@@ -217,7 +218,7 @@ export function CreateDisbursementDialog({
     } catch (error) {
       console.error('建立出納單失敗:', error)
       const errorMessage = error instanceof Error ? error.message : '未知錯誤'
-      alert(`❌ 建立出納單失敗: ${errorMessage}`)
+      await alert(`建立出納單失敗: ${errorMessage}`, 'error')
     } finally {
       setIsSubmitting(false)
     }

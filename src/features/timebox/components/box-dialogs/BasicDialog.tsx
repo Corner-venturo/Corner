@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Trash2 } from 'lucide-react'
 import { useTimeboxScheduledBoxes, type TimeboxScheduledBox, type TimeboxBox, weekDayNames } from '../../hooks/useTimeboxData'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface BasicDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -24,7 +25,11 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
   const handleDelete = async () => {
     const confirmMessage = `確定要移除此排程嗎？\n\n箱子：${box.name}\n時間：${formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}`
 
-    if (!confirm(confirmMessage)) {
+    const confirmed = await confirm(confirmMessage, {
+      title: '移除排程',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 

@@ -6,6 +6,8 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { FileSignature, Save, Edit2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTourStore } from '@/stores'
+import { EditingWarningBanner } from '@/components/EditingWarningBanner'
+import { alert } from '@/lib/ui/alert-dialog'
 
 const CONTRACT_TEMPLATE_LABELS: Record<string, string> = {
   template_a: '範本 A',
@@ -44,10 +46,10 @@ export default function ContractDetailPage() {
         contract_content: contractContent,
       })
 
-      alert('合約更新成功!')
+      await alert('合約更新成功!', 'success')
       setIsEditing(false)
     } catch (error) {
-      alert('儲存合約失敗，請稍後再試')
+      await alert('儲存合約失敗，請稍後再試', 'error')
     } finally {
       setSaving(false)
     }
@@ -88,6 +90,13 @@ export default function ContractDetailPage() {
           { label: '合約管理', href: '/contracts' },
           { label: '合約詳情', href: `/contracts/${tourId}` },
         ]}
+      />
+
+      {/* 編輯衝突警告 */}
+      <EditingWarningBanner
+        resourceType="contract"
+        resourceId={tourId}
+        resourceName="此合約"
       />
 
       <div className="flex-1 overflow-auto p-6">

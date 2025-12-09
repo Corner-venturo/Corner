@@ -8,6 +8,7 @@ import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Trash2 } from 'l
 import { cn } from '@/lib/utils'
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
 import { Order } from '@/stores/types'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface ExpandableOrderTableProps {
   orders: Order[]
@@ -62,9 +63,13 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
   const handleDeleteOrder = async (order: Order, e: React.MouseEvent) => {
     e.stopPropagation()
 
-    const confirmMessage = `⚠️ 確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`
+    const confirmMessage = `確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`
 
-    if (!confirm(confirmMessage)) {
+    const confirmed = await confirm(confirmMessage, {
+      title: '刪除訂單',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
@@ -75,7 +80,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
         setExpandedOrders(prev => prev.filter(id => id !== order.id))
       }
     } catch (err) {
-      alert('刪除失敗，請稍後再試')
+      await alert('刪除失敗，請稍後再試', 'error')
     }
   }
 

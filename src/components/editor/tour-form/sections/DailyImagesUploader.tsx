@@ -494,16 +494,165 @@ export function DailyImagesUploader({
     e.target.value = ''
   }
 
-  // 處理拖曳放置
-  const handleDrop = (e: React.DragEvent) => {
+  // 從 URL 下載圖片並上傳到 Supabase
+  const uploadImageFromUrl = async (imageUrl: string): Promise<string | null> => {
+    try {
+      setIsUploading(true)
+      setUploadProgress(10)
+
+      // 下載圖片（可能會遇到 CORS 問題）
+      let response: Response
+      try {
+        response = await fetch(imageUrl, { mode: 'cors' })
+      } catch (fetchError) {
+        // CORS 錯誤 - 嘗試用 no-cors 模式（但這樣無法取得內容）
+        console.warn('CORS 錯誤，無法下載此圖片:', imageUrl)
+        toast.error('此網站不允許下載圖片，請改用右鍵另存圖片後上傳')
+        return null
+      }
+
+      if (!response.ok) {
+        toast.error('無法下載圖片，請改用右鍵另存圖片後上傳')
+        return null
+      }
+
+      setUploadProgress(40)
+      const blob = await response.blob()
+
+      // 檢查是否為有效圖片
+      if (!blob.type.startsWith('image/') && blob.size === 0) {
+        toast.error('下載的內容不是有效圖片')
+        return null
+      }
+
+      // 從 URL 或 content-type 判斷副檔名
+      const contentType = blob.type || 'image/jpeg'
+      const extMap: Record<string, string> = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/gif': 'gif',
+        'image/webp': 'webp',
+        'image/svg+xml': 'svg',
+        'image/bmp': 'bmp',
+        'image/avif': 'avif',
+      }
+      const ext = extMap[contentType] || 'jpg'
+
+      setUploadProgress(60)
+
+      // 上傳到 Supabase
+      const fileName = `day-${dayIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`
+      const filePath = `tour-daily-images/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-files')
+        .upload(filePath, blob, { contentType })
+
+      if (uploadError) {
+        console.error('Supabase 上傳失敗:', uploadError)
+        toast.error('上傳到伺服器失敗')
+        return null
+      }
+
+      setUploadProgress(90)
+
+      const { data } = supabase.storage
+        .from('workspace-files')
+        .getPublicUrl(filePath)
+
+      setUploadProgress(100)
+      return data.publicUrl
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
+      console.error('上傳圖片失敗:', errorMessage)
+      toast.error(`上傳失敗: ${errorMessage}`)
+      return null
+    } finally {
+      setIsUploading(false)
+      setUploadProgress(0)
+    }
+  }
+
+  // 處理拖曳放置（支援本機檔案和網頁圖片 URL）
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragOver(false)
 
+    // 1. 優先嘗試從瀏覽器拖曳的圖片 URL
+    const html = e.dataTransfer.getData('text/html')
+    if (html) {
+      const imgMatch = html.match(/<img[^>]+src=["']([^"']+)["']/i)
+      if (imgMatch && imgMatch[1]) {
+        const imageUrl = imgMatch[1]
+        // 跳過 data: URL 和 blob: URL
+        if (!imageUrl.startsWith('data:') && !imageUrl.startsWith('blob:')) {
+          toast.info('正在下載並上傳圖片...')
+          const uploadedUrl = await uploadImageFromUrl(imageUrl)
+          if (uploadedUrl) {
+            onImagesChange([...images, createDailyImage(uploadedUrl)])
+            toast.success('圖片已上傳')
+          } else {
+            toast.error('圖片上傳失敗')
+          }
+          return
+        }
+      }
+    }
+
+    // 2. 嘗試從 URL 下載並上傳
+    const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif']
+      const lowerUrl = url.toLowerCase()
+      const isImageUrl = imageExtensions.some(ext => lowerUrl.includes(ext)) ||
+                         lowerUrl.includes('image') ||
+                         lowerUrl.includes('photo') ||
+                         lowerUrl.includes('unsplash') ||
+                         lowerUrl.includes('imgur') ||
+                         lowerUrl.includes('pexels') ||
+                         lowerUrl.includes('pixabay') ||
+                         lowerUrl.includes('googleusercontent')
+
+      if (isImageUrl) {
+        toast.info('正在下載並上傳圖片...')
+        const uploadedUrl = await uploadImageFromUrl(url)
+        if (uploadedUrl) {
+          onImagesChange([...images, createDailyImage(uploadedUrl)])
+          toast.success('圖片已上傳')
+        } else {
+          toast.error('圖片上傳失敗')
+        }
+        return
+      }
+    }
+
+    // 3. 處理本機檔案
     const files = e.dataTransfer.files
     if (files && files.length > 0) {
-      handleMultipleUpload(files)
+      const realImageFiles = Array.from(files).filter(
+        file => file.type.startsWith('image/') && file.size > 0
+      )
+      if (realImageFiles.length > 0) {
+        handleMultipleUpload(realImageFiles)
+        return
+      }
     }
+
+    // 4. 嘗試任何 URL（可能是圖片）
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      toast.info('正在嘗試下載並上傳...')
+      const uploadedUrl = await uploadImageFromUrl(url)
+      if (uploadedUrl) {
+        onImagesChange([...images, createDailyImage(uploadedUrl)])
+        toast.success('圖片已上傳')
+      } else {
+        toast.error('無法下載或上傳圖片')
+      }
+      return
+    }
+
+    toast.error('無法識別拖曳的內容，請嘗試直接上傳檔案')
   }
 
   // 刪除圖片

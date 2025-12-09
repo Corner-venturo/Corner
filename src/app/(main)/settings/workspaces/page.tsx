@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Plus, Building2, Users, Shield } from 'lucide-react'
 import { toast } from 'sonner'
+import { alert } from '@/lib/ui/alert-dialog'
 
 /**
  * Workspace 管理頁面
@@ -155,7 +156,7 @@ export default function WorkspacesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => alert('編輯功能開發中')}
+                onClick={() => void alert('編輯功能開發中', 'info')}
                 className="flex-1"
               >
                 編輯

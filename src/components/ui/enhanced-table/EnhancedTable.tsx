@@ -21,7 +21,7 @@ export function EnhancedTable<T extends RowData = RowData>({
   className,
   showFilters: defaultShowFilters = false,
   searchableFields = [] as readonly string[],
-  initialPageSize = 10,
+  initialPageSize = 15,
   searchTerm: externalSearchTerm = '',
   emptyState,
   emptyMessage,

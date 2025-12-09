@@ -15,6 +15,7 @@ import {
   CostCategory,
 } from '../types'
 import { calculateTierPricingCosts } from '../utils/calculateTierPricing'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface SellingPriceSectionProps {
   participantCounts: ParticipantCounts
@@ -73,7 +74,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   const handleAddTier = () => {
     const count = Number(newTierCount)
     if (!count || count <= 0) {
-      alert('請輸入有效的人數')
+      void alert('請輸入有效的人數', 'warning')
       return
     }
 
@@ -193,7 +194,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   }
 
   return (
-    <div className="lg:col-span-3 space-y-3 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+    <div className="lg:col-span-3 space-y-3 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-2 lg:scrollbar-thin">
       {/* 產生報價單按鈕 */}
       <Button
         onClick={() => {
@@ -211,7 +212,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
         產生報價單
       </Button>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm sticky top-6">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
           <thead className="bg-morandi-container/40 border-b border-border/60">
             <tr>

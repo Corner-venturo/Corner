@@ -16,6 +16,7 @@ import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Users, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
+import { alert } from '@/lib/ui/alert-dialog'
 // 使用懶加載避免打包問題
 const QuickReceipt = lazy(() =>
   import('../quick-actions/quick-receipt').then(m => ({ default: m.QuickReceipt }))
@@ -81,7 +82,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
   // 共享待辦的處理函數
   const handleShareTodo = React.useCallback(async () => {
     if (!shareData.targetUserId) {
-      alert('請選擇要共享的成員')
+      void alert('請選擇要共享的成員', 'warning')
       return
     }
 
@@ -102,9 +103,9 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
 
       // 重置表單
       setShareData({ targetUserId: '', permission: 'view', message: '' })
-      alert('待辦事項已成功共享！')
+      await alert('待辦事項已成功共享！', 'success')
     } catch (error) {
-      alert('共享失敗，請稍後再試')
+      void alert('共享失敗，請稍後再試', 'error')
     } finally {
       setIsSharing(false)
     }

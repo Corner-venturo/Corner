@@ -21,6 +21,7 @@ import { ChannelListSection, GroupedChannelList } from './ChannelListSection'
 interface ChannelListProps {
   announcementChannels: Channel[]
   announcementGroup: ChannelGroup | undefined
+  favoriteChannels: Channel[] // 🔥 新增：我的最愛
   userGroupedChannels: Array<{ group: ChannelGroup; channels: Channel[] }>
   ungroupedChannels: Channel[]
   unjoinedChannels: Channel[]
@@ -47,6 +48,7 @@ interface ChannelListProps {
 export function ChannelList({
   announcementChannels,
   announcementGroup,
+  favoriteChannels,
   userGroupedChannels,
   ungroupedChannels,
   unjoinedChannels,
@@ -83,6 +85,7 @@ export function ChannelList({
 
   const allChannels = [
     ...announcementChannels,
+    ...favoriteChannels,
     ...userGroupedChannels.flatMap(g => g.channels),
     ...ungroupedChannels,
     ...unjoinedChannels,
@@ -112,7 +115,27 @@ export function ChannelList({
             />
           )}
 
-          {/* 2. 使用者自訂群組 */}
+          {/* 🔥 2. 我的最愛（starred channels） */}
+          {favoriteChannels.length > 0 && (
+            <ChannelListSection
+              channels={favoriteChannels}
+              selectedChannelId={selectedChannelId}
+              onSelectChannel={onSelectChannel}
+              toggleChannelFavorite={toggleChannelFavorite}
+              onDelete={onDelete}
+              onEdit={onEdit}
+              onJoinChannel={onJoinChannel}
+              onLeaveChannel={onLeaveChannel}
+              isAdmin={isAdmin}
+              checkIsMember={checkIsMember}
+              isExpanded={expandedSections.favorites !== false}
+              onToggleExpanded={() => onToggleExpanded('favorites', !expandedSections.favorites)}
+              title="我的最愛"
+              icon="star"
+            />
+          )}
+
+          {/* 3. 使用者自訂群組 */}
           {userGroupedChannels.map(
             ({ group, channels: groupChannels }) =>
               groupChannels.length > 0 && (

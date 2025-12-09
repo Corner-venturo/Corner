@@ -8,6 +8,7 @@ import { FilePreview } from './FilePreview'
 import { UploadProgress } from './UploadProgress'
 import { QuickActionMenu, createQuickActions, type QuickAction } from './QuickActionMenu'
 import { validateFile } from './utils'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface MessageInputProps {
   channelName: string
@@ -63,7 +64,7 @@ export function MessageInput({
     })
 
     if (errors.length > 0) {
-      alert(errors.join('\n'))
+      void alert(errors.join('\n'), 'error')
     }
 
     if (validFiles.length > 0) {
@@ -94,11 +95,74 @@ export function MessageInput({
     }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragging(false)
 
+    // 1. 優先嘗試從瀏覽器拖曳的圖片 URL
+    const html = e.dataTransfer.getData('text/html')
+    if (html) {
+      const imgMatch = html.match(/<img[^>]+src=["']([^"']+)["']/i)
+      if (imgMatch && imgMatch[1]) {
+        const imageUrl = imgMatch[1]
+        // 跳過 data: URL 和 blob: URL
+        if (!imageUrl.startsWith('data:') && !imageUrl.startsWith('blob:')) {
+          try {
+            // 下載圖片並轉換為 File
+            const response = await fetch(imageUrl, { mode: 'cors' })
+            if (!response.ok) throw new Error('下載失敗')
+            const blob = await response.blob()
+            if (!blob.type.startsWith('image/')) throw new Error('不是圖片')
+            const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'image.jpg'
+            const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
+
+            const validation = validateFile(file)
+            if (validation.valid) {
+              onFilesChange([...attachedFiles, file])
+              return
+            }
+          } catch (err) {
+            console.log('無法下載圖片（可能是 CORS 限制）:', imageUrl)
+            void alert('此網站不允許下載圖片，請改用右鍵另存圖片後上傳', 'warning')
+            return
+          }
+        }
+      }
+    }
+
+    // 2. 嘗試從 URL 下載圖片
+    const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif']
+      const lowerUrl = url.toLowerCase()
+      const isImageUrl = imageExtensions.some(ext => lowerUrl.includes(ext)) ||
+                         lowerUrl.includes('image') ||
+                         lowerUrl.includes('photo')
+
+      if (isImageUrl) {
+        try {
+          const response = await fetch(url, { mode: 'cors' })
+          if (!response.ok) throw new Error('下載失敗')
+          const blob = await response.blob()
+          if (!blob.type.startsWith('image/')) throw new Error('不是圖片')
+          const fileName = url.split('/').pop()?.split('?')[0] || 'image.jpg'
+          const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
+
+          const validation = validateFile(file)
+          if (validation.valid) {
+            onFilesChange([...attachedFiles, file])
+            return
+          }
+        } catch (err) {
+          console.log('無法下載圖片（可能是 CORS 限制）:', url)
+          void alert('此網站不允許下載圖片，請改用右鍵另存圖片後上傳', 'warning')
+          return
+        }
+      }
+    }
+
+    // 3. 處理本機檔案
     const files = Array.from(e.dataTransfer.files)
 
     const validFiles: File[] = []
@@ -114,12 +178,11 @@ export function MessageInput({
     })
 
     if (errors.length > 0) {
-      alert(errors.join('\n'))
+      void alert(errors.join('\n'), 'error')
     }
 
     if (validFiles.length > 0) {
       onFilesChange([...attachedFiles, ...validFiles])
-    } else {
     }
   }
 
@@ -149,7 +212,7 @@ export function MessageInput({
       })
 
       if (errors.length > 0) {
-        alert(errors.join('\n'))
+        void alert(errors.join('\n'), 'error')
       }
 
       if (validFiles.length > 0) {
@@ -279,7 +342,7 @@ export function MessageInput({
                 }
               }
             }}
-            placeholder={`在 #${channelName} 中輸入訊息... (Shift+Enter 換行)`}
+            placeholder={`在 #${channelName} 中輸入訊息...`}
             className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors"
             rows={1}
             style={{

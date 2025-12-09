@@ -158,24 +158,55 @@ export function prepareContractData(
       gatherLocation = itinerary.meeting_info.location
     }
 
-    // 如果有航班資訊，計算集合時間（起飛前3小時）
-    if (itinerary.outbound_flight?.departureTime) {
+    // 優先使用行程表的集合時間
+    if (itinerary.meeting_info?.time) {
+      // meeting_info.time 格式可能是 "08:30" 或 ISO 8601
+      const timeStr = itinerary.meeting_info.time
+      if (timeStr.includes('T')) {
+        // ISO 8601 格式：2026-02-09T08:30:00
+        const meetingDate = new Date(timeStr)
+        gatherYear = meetingDate.getFullYear().toString()
+        gatherMonth = (meetingDate.getMonth() + 1).toString()
+        gatherDay = meetingDate.getDate().toString()
+        gatherHour = meetingDate.getHours().toString().padStart(2, '0')
+        gatherMinute = meetingDate.getMinutes().toString().padStart(2, '0')
+      } else if (timeStr.includes(':')) {
+        // 時間格式：08:30
+        const [hour, minute] = timeStr.split(':')
+        gatherHour = hour.padStart(2, '0')
+        gatherMinute = minute.padStart(2, '0')
+        // 日期仍從出發日期取
+        if (tour.departure_date) {
+          const departureDate = new Date(tour.departure_date)
+          gatherYear = departureDate.getFullYear().toString()
+          gatherMonth = (departureDate.getMonth() + 1).toString()
+          gatherDay = departureDate.getDate().toString()
+        }
+      }
+    } else if (itinerary.outbound_flight?.departureTime) {
+      // 沒有設定集合時間，從航班資訊計算（起飛前3小時）
       const gatherTime = calculateGatherTime(itinerary.outbound_flight.departureTime)
       gatherHour = gatherTime.hour
       gatherMinute = gatherTime.minute
 
-      // 如果沒有設定集合地點，根據航空公司判斷航廈
-      if (!gatherLocation && itinerary.outbound_flight.airline) {
-        gatherLocation = getTerminalByAirline(itinerary.outbound_flight.airline)
+      // 從旅遊團出發日期取得集合日期
+      if (tour.departure_date) {
+        const departureDate = new Date(tour.departure_date)
+        gatherYear = departureDate.getFullYear().toString()
+        gatherMonth = (departureDate.getMonth() + 1).toString()
+        gatherDay = departureDate.getDate().toString()
       }
-    }
-
-    // 從旅遊團出發日期取得集合日期
-    if (tour.departure_date) {
+    } else if (tour.departure_date) {
+      // 沒有集合時間也沒有航班資訊，只帶入出發日期
       const departureDate = new Date(tour.departure_date)
       gatherYear = departureDate.getFullYear().toString()
       gatherMonth = (departureDate.getMonth() + 1).toString()
       gatherDay = departureDate.getDate().toString()
+    }
+
+    // 如果沒有設定集合地點，根據航空公司判斷航廈
+    if (!gatherLocation && itinerary.outbound_flight?.airline) {
+      gatherLocation = getTerminalByAirline(itinerary.outbound_flight.airline)
     }
   } else if (tour.departure_date) {
     // 沒有行程表，只帶入出發日期，時間和地點留空

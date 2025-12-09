@@ -33,9 +33,10 @@ interface UseTourActionButtonsParams {
   setDeleteConfirm: (state: { isOpen: boolean; tour: Tour | null }) => void
   handleCreateChannel: (tour: Tour) => Promise<void>
   handleUnlockTour: (tour: Tour) => Promise<void>
-  // 新增：打開報價單/行程表連結對話框
+  // 新增：打開報價單/行程表/合約連結對話框
   onOpenQuoteDialog?: (tour: Tour) => void
   onOpenItineraryDialog?: (tour: Tour) => void
+  onOpenContractDialog?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -52,6 +53,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     handleUnlockTour,
     onOpenQuoteDialog,
     onOpenItineraryDialog,
+    onOpenContractDialog,
   } = params
 
   const renderActions = useCallback(
@@ -138,7 +140,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              router.push(`/contracts?tour_id=${tour.id}`)
+              if (onOpenContractDialog) {
+                onOpenContractDialog(tour)
+              } else {
+                router.push(`/contracts?tour_id=${tour.id}`)
+              }
             }}
             className="p-1 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
             title="合約管理"

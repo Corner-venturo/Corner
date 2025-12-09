@@ -62,8 +62,11 @@ export async function POST(request: NextRequest) {
     const ocrSpaceKey = process.env.OCR_SPACE_API_KEY
     const googleVisionKeys = getGoogleVisionKeys()
 
-    if (!ocrSpaceKey) {
-      return NextResponse.json({ error: 'OCR API Key 未設定' }, { status: 500 })
+    // 至少需要一個 API Key
+    if (!ocrSpaceKey && googleVisionKeys.length === 0) {
+      return NextResponse.json({
+        error: 'OCR API Key 未設定。請設定 OCR_SPACE_API_KEY 或 GOOGLE_VISION_API_KEYS 環境變數。'
+      }, { status: 500 })
     }
 
     // 檢查 Google Vision 使用量並取得可用的 Key
@@ -76,10 +79,10 @@ export async function POST(request: NextRequest) {
     const results = await Promise.all(
       base64Images.map(async (img) => {
         try {
-          // 同時呼叫兩個 API
+          // 同時呼叫兩個 API（如果有設定的話）
           const [ocrSpaceResult, googleVisionResult] = await Promise.all([
-            // OCR.space - MRZ 辨識
-            callOcrSpace(img.data, ocrSpaceKey),
+            // OCR.space - MRZ 辨識（如果有 key）
+            ocrSpaceKey ? callOcrSpace(img.data, ocrSpaceKey) : Promise.resolve(''),
             // Google Vision - 中文辨識（如果有可用的 key）
             (availableKey && canUseGoogleVision) ? callGoogleVision(img.data, availableKey) : Promise.resolve(null),
           ])
@@ -97,6 +100,7 @@ export async function POST(request: NextRequest) {
             fileName: img.name,
             customer: customerData,
             rawText: ocrSpaceResult,
+            imageBase64: img.data, // 🔥 回傳圖片 base64 給前端儲存
           }
         } catch (error) {
           console.error(`辨識失敗 (${img.name}):`, error)
@@ -180,7 +184,12 @@ async function callGoogleVision(base64Image: string, apiKey: string): Promise<st
         requests: [
           {
             image: { content: base64Data },
-            features: [{ type: 'TEXT_DETECTION', maxResults: 1 }],
+            // 使用 DOCUMENT_TEXT_DETECTION 對文件類圖片辨識效果更好
+            features: [{ type: 'DOCUMENT_TEXT_DETECTION', maxResults: 1 }],
+            // 提示包含繁體中文和英文，提高中文辨識率
+            imageContext: {
+              languageHints: ['zh-TW', 'en'],
+            },
           },
         ],
       }),
@@ -223,11 +232,13 @@ function validateChineseNameByPinyin(chineseName: string, romanization: string):
     // 常見複合母音音節
     'YING', 'YANG', 'WANG', 'WONG', 'CHANG', 'ZHANG', 'CHUNG', 'ZHONG', 'CHUANG', 'ZHUANG',
     'CHIANG', 'JIANG', 'CHIEN', 'JIAN', 'CHIEH', 'JIE', 'CHIAO', 'JIAO', 'CHING', 'JING',
+    'CHENG', 'ZHENG', 'CHEN', 'ZHEN', // 鄭、陳等常見姓
     'HUANG', 'HSIANG', 'XIANG', 'HSIAO', 'XIAO', 'HSIEH', 'XIE', 'HSIUNG', 'XIONG',
     'KUANG', 'GUANG', 'KUAN', 'GUAN', 'KWANG',
     'LIANG', 'LING', 'LUNG', 'LONG',
     'SHENG', 'SHANG', 'SHUANG', 'SHUI',
     'TSUNG', 'TSENG', 'TZENG', 'TSAI', 'TZAI',
+    'YUAN', 'YUEN', // 元、媛等常見名
     // 常見三字母音節
     'WEN', 'WAN', 'WEI', 'WAI', 'YEN', 'YAN', 'YAO', 'YIN', 'YOU', 'YUN', 'YUE',
     'CHU', 'CHA', 'CHE', 'CHI', 'CHO', 'CHE',
@@ -360,12 +371,41 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   // ========== 第一行 MRZ：解析姓名和國籍 ==========
   // 格式：P<國籍姓氏<<名字<<<<<...
   // 範例：P<TWNLIN<<LI<HUI<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  // 嘗試從兩個來源解析（OCR.space 優先，Google Vision 備用）
-  let mrzLine1Match = cleanText.match(/P[<I]([A-Z]{3})([A-Z<]+)/i)
-  if (!mrzLine1Match && cleanGoogleText) {
-    mrzLine1Match = cleanGoogleText.match(/P[<I]([A-Z]{3})([A-Z<]+)/i)
+  // 範例2：P<TWNHSIAO<<CHENG<LIN<<<<<<<<<<<<<<<<<<<<<
+  // 改進：優先使用 Google Vision 的 MRZ（更準確），OCR.space 作為備用
+  // 原因：OCR.space 容易把某些字母漏掉（例如 LEE → EE）
+  // MRZ Line 1 總是 44 字元，以 P< 開頭
+  let mrzLine1Match: RegExpMatchArray | null = null
+
+  // 優先嘗試 Google Vision（更準確）
+  if (cleanGoogleText) {
+    mrzLine1Match = cleanGoogleText.match(/P<([A-Z]{3})([A-Z<]{2,39})/i)
     if (mrzLine1Match) {
-      console.log('📝 從 Google Vision 解析 MRZ Line 1')
+      console.log('📝 從 Google Vision 解析 MRZ Line 1（優先使用）')
+    }
+  }
+
+  // 如果 Google Vision 沒找到，才用 OCR.space
+  if (!mrzLine1Match) {
+    mrzLine1Match = cleanText.match(/P<([A-Z]{3})([A-Z<]{2,39})/i)
+    if (mrzLine1Match) {
+      console.log('📝 從 OCR.space 解析 MRZ Line 1（備用）')
+    }
+  }
+
+  // 備用方案：如果上面沒找到，嘗試更寬鬆的匹配（處理 OCR 誤讀 < 為 I 的情況）
+  if (!mrzLine1Match) {
+    // 有些 OCR 會把 < 讀成 I 或其他字元
+    const relaxedMatch = cleanText.match(/P[<I\|]([A-Z]{3})([A-Z<I\|]{2,39})/i) ||
+                        cleanGoogleText?.match(/P[<I\|]([A-Z]{3})([A-Z<I\|]{2,39})/i)
+    if (relaxedMatch) {
+      // 將誤讀的 I 或 | 還原成 <
+      mrzLine1Match = [
+        relaxedMatch[0],
+        relaxedMatch[1],
+        relaxedMatch[2].replace(/[I\|]/g, '<')
+      ] as RegExpMatchArray
+      console.log('📝 使用寬鬆模式解析 MRZ Line 1，已修正誤讀字元')
     }
   }
 
@@ -378,12 +418,16 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     const parts = namePart.split('<<')
     if (parts.length >= 2) {
       const surname = parts[0].replace(/</g, '')
-      const givenNames = parts[1].replace(/</g, '').trim() // 移除空格
+      // 名字中的 < 表示音節分隔，替換成 - 以便後續計算字數
+      const givenNamesWithDash = parts[1].replace(/</g, '-').replace(/-+$/, '').trim()
+      const givenNamesClean = givenNamesWithDash.replace(/-/g, '')
 
-      // 護照拼音：姓/名，不含空格和連字號
-      customerData.passport_romanization = `${surname}/${givenNames.replace(/-/g, '')}`
-      customerData.english_name = `${surname} ${givenNames.replace(/-/g, '')}`
-      customerData.name = `${surname} ${givenNames.replace(/-/g, '')}`
+      // 護照拼音：姓/名，不含連字號（定位系統需要）
+      customerData.passport_romanization = `${surname}/${givenNamesClean}`
+      // 內部用：保留連字號以便計算字數
+      ;(customerData as Record<string, unknown>)._romanization_with_dash = `${surname}/${givenNamesWithDash}`
+      customerData.english_name = `${surname} ${givenNamesClean}`
+      customerData.name = `${surname} ${givenNamesClean}`
     } else if (parts.length === 1) {
       // 只有姓氏
       const surname = parts[0].replace(/</g, '')
@@ -398,10 +442,28 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   // 格式：護照號碼(9)+檢查碼(1)+國籍(3)+生日YYMMDD(6)+檢查碼(1)+性別(1)+效期YYMMDD(6)+檢查碼(1)+身分證或其他
   // 範例：3141148363TWN6012111F2610254G220796971<<<32
 
-  // 更寬鬆的正則：找連續的數字+字母組合
-  const mrzLine2Match = cleanText.match(
-    /(\d{9})(\d)([A-Z]{3})(\d{6})(\d)([MF])(\d{6})(\d)([A-Z0-9<]+)/i
-  )
+  // 優先使用 Google Vision（更準確），OCR.space 作為備用
+  let mrzLine2Match: RegExpMatchArray | null = null
+
+  // 優先嘗試 Google Vision
+  if (cleanGoogleText) {
+    mrzLine2Match = cleanGoogleText.match(
+      /(\d{9})(\d)([A-Z]{3})(\d{6})(\d)([MF])(\d{6})(\d)([A-Z0-9<]+)/i
+    )
+    if (mrzLine2Match) {
+      console.log('📝 從 Google Vision 解析 MRZ Line 2（優先使用）')
+    }
+  }
+
+  // 如果 Google Vision 沒找到，才用 OCR.space
+  if (!mrzLine2Match) {
+    mrzLine2Match = cleanText.match(
+      /(\d{9})(\d)([A-Z]{3})(\d{6})(\d)([MF])(\d{6})(\d)([A-Z0-9<]+)/i
+    )
+    if (mrzLine2Match) {
+      console.log('📝 從 OCR.space 解析 MRZ Line 2（備用）')
+    }
+  }
 
   if (mrzLine2Match) {
     customerData.passport_number = mrzLine2Match[1]
@@ -439,9 +501,11 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   } else {
     console.log('❌ MRZ Line 2 解析失敗，嘗試備用方案')
 
-    // 備用方案：嘗試從護照資訊區域抓取
+    // 備用方案：嘗試從護照資訊區域抓取（兩個來源都試）
+    const textToSearch = cleanText || cleanGoogleText
+
     // 找護照號碼（9碼數字）
-    const passportMatch = cleanText.match(/(\d{9})/g)
+    const passportMatch = textToSearch.match(/(\d{9})/g)
     if (passportMatch && passportMatch.length > 0) {
       // 第一個 9 碼數字通常是護照號碼
       customerData.passport_number = passportMatch[0]
@@ -449,7 +513,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     }
 
     // 找身分證號（1英文+9數字）
-    const nationalIdMatch = cleanText.match(/[A-Z][12]\d{8}/i)
+    const nationalIdMatch = textToSearch.match(/[A-Z][12]\d{8}/i)
     if (nationalIdMatch) {
       customerData.national_id = nationalIdMatch[0]
       // 從身分證第二碼判斷性別
@@ -458,28 +522,61 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     }
 
     // 找日期格式（DD MMM YYYY 或 YYYY-MM-DD）
-    const dateMatches = ocrSpaceText.match(/(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/gi)
-    if (dateMatches) {
-      const monthMap: { [key: string]: string } = {
-        JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
-        JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12'
-      }
+    // 改進：使用標籤來區分效期和發照日期
+    const dateTextSource = ocrSpaceText || googleVisionText || ''
 
-      for (const dateStr of dateMatches) {
-        const match = dateStr.match(/(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/i)
-        if (match) {
-          const day = match[1].padStart(2, '0')
-          const month = monthMap[match[2].toUpperCase()]
-          const year = match[3]
-          const formattedDate = `${year}-${month}-${day}`
+    // 先找標籤對應的日期
+    const expiryMatch = dateTextSource.match(/(?:expiry|有效期|截止|效期)[^\d]*(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/i)
+    const issueMatch = dateTextSource.match(/(?:issue|發照|發給)[^\d]*(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/i)
+    const birthMatch = dateTextSource.match(/(?:birth|出生)[^\d]*(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/i)
 
-          // 判斷是生日還是效期（效期通常在 2020 以後）
-          if (parseInt(year) >= 2020 && !customerData.passport_expiry_date) {
-            customerData.passport_expiry_date = formattedDate
-            console.log('✅ 備用方案找到效期:', formattedDate)
-          } else if (parseInt(year) < 2010 && !customerData.date_of_birth) {
-            customerData.date_of_birth = formattedDate
-            console.log('✅ 備用方案找到生日:', formattedDate)
+    const monthMap: { [key: string]: string } = {
+      JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
+      JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12'
+    }
+
+    const formatDate = (m: RegExpMatchArray) => {
+      const day = m[1].padStart(2, '0')
+      const month = monthMap[m[2].toUpperCase()]
+      const year = m[3]
+      return `${year}-${month}-${day}`
+    }
+
+    if (expiryMatch && !customerData.passport_expiry_date) {
+      customerData.passport_expiry_date = formatDate(expiryMatch)
+      console.log('✅ 備用方案找到效期 (標籤):', customerData.passport_expiry_date)
+    }
+    if (birthMatch && !customerData.date_of_birth) {
+      customerData.date_of_birth = formatDate(birthMatch)
+      console.log('✅ 備用方案找到生日 (標籤):', customerData.date_of_birth)
+    }
+
+    // 如果標籤沒找到，再用日期推斷（但排除發照日期）
+    if (!customerData.passport_expiry_date || !customerData.date_of_birth) {
+      const allDateMatches = dateTextSource.match(/(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/gi)
+      if (allDateMatches) {
+        // 排除已經找到的日期和發照日期
+        const issueDateStr = issueMatch ? formatDate(issueMatch) : null
+
+        for (const dateStr of allDateMatches) {
+          const match = dateStr.match(/(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/i)
+          if (match) {
+            const formattedDate = formatDate(match)
+            const year = parseInt(match[3])
+
+            // 跳過發照日期
+            if (formattedDate === issueDateStr) continue
+
+            // 效期：2024 以後的日期（更嚴格）
+            if (year >= 2024 && !customerData.passport_expiry_date) {
+              customerData.passport_expiry_date = formattedDate
+              console.log('✅ 備用方案找到效期 (推斷):', formattedDate)
+            }
+            // 生日：1920-2015 之間
+            else if (year >= 1920 && year <= 2015 && !customerData.date_of_birth) {
+              customerData.date_of_birth = formattedDate
+              console.log('✅ 備用方案找到生日 (推斷):', formattedDate)
+            }
           }
         }
       }
@@ -491,46 +588,83 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   let chineseNameConfidence = 'high' // high, medium, low
   if (googleVisionText) {
     // Google Vision 對中文辨識較好，優先從這裡抓中文名
-    // 排除詞彙清單
-    const excludeWords = ['護照', '中華', '民國', '姓名', '國籍', '性別', '出生', '日期', '效期', '機關', '外交部', '台灣', '發照', '截止', '型式', '代碼', '持照', '簽名', '身分', '證號', '地址', '地點', '機關', '有效']
+    // 排除詞彙清單（擴充）
+    // 包含：護照欄位、身分證欄位（父母、住址、配偶等）、地名、機關名稱
+    const excludeWords = [
+      // 護照欄位
+      '護照', '中華', '民國', '姓名', '國籍', '性別', '出生', '日期', '效期', '機關',
+      '外交部', '台灣', '發照', '截止', '型式', '代碼', '持照', '簽名', '身分', '證號',
+      '地址', '地點', '有效', '領事', '事務', '局長', '署長', '部長', '主任', '科長',
+      '號碼', '編號', '頁碼', '登記', '註冊', '申請', '核發', '換發', '補發', '延期',
+      '年月日', '出生地', '發照日', '截止日',
+      // 身分證欄位（重要！避免抓到父母/配偶/住址等）
+      '父', '母', '配偶', '役別', '住址', '出生地', '發證', '換發', '補發',
+      '臺北', '臺中', '臺南', '高雄', '新北', '桃園', '新竹', '嘉義', '彰化',
+      '台北市', '新北市', '桃園市', '台中市', '台南市', '高雄市',
+      // 地名（可能出現在住址或出生地）
+      '中國', '台北', '高雄', '台中', '台南', '新北', '桃園', '新竹', '嘉義', '彰化',
+      '基隆', '宜蘭', '花蓮', '台東', '苗栗', '南投', '雲林', '屏東', '澎湖', '金門', '連江',
+      // 緊急聯絡人欄位
+      '緊急', '聯絡', '聯絡人'
+    ]
     // 常見 OCR 錯字（這些字很少出現在人名中）
-    const suspiciousChars = ['仔', '佬', '的', '是', '在', '了', '有', '個', '這', '那', '和', '與', '或']
+    const suspiciousChars = ['仔', '佬', '的', '是', '在', '了', '有', '個', '這', '那', '和', '與', '或', '為', '被', '把', '給', '讓', '著', '過']
+
+    console.log('🔍 開始解析中文名，Google Vision 原文:', googleVisionText.substring(0, 500))
+
+    // 策略 0 (新增): 直接找 "姓名" 或 "Name" 標籤後緊鄰的中文名
+    // 台灣護照格式: 姓名 / Name (Surname, Given names)
+    //              王薇琦
+    //              WANG, WEI-CHI
+    const nameBlockMatch = googleVisionText.match(/(?:姓名|姓\s*名|Name)[^\n]*[\n\r]+([\u4e00-\u9fff]{2,4})/i)
+    if (nameBlockMatch) {
+      const candidate = nameBlockMatch[1]
+      if (!excludeWords.some(word => candidate.includes(word))) {
+        chineseName = candidate
+        chineseNameConfidence = 'high'
+        console.log('✅ Google Vision 找到中文名 (姓名標籤後):', candidate)
+      }
+    }
 
     // 策略 1: 找 Name/姓名 區塊後面緊鄰的中文名
     // 護照格式通常是: /Name (Surname, Given names)\n中文名\n英文名
-    const lines = googleVisionText.split('\n')
-    let foundNameSection = false
+    if (!chineseName) {
+      const lines = googleVisionText.split('\n')
+      let foundNameSection = false
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim()
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim()
 
-      // 偵測 Name 區塊的開始
-      if (/Name|姓名|Given names/i.test(line)) {
-        foundNameSection = true
-        continue
-      }
-
-      // 在 Name 區塊後，找第一個有效的中文名
-      if (foundNameSection) {
-        const chineseMatch = line.match(/^([\u4e00-\u9fff]{2,4})$/)
-        if (chineseMatch) {
-          const candidate = chineseMatch[1]
-          if (!excludeWords.some(word => candidate.includes(word))) {
-            chineseName = candidate
-            console.log('✅ Google Vision 找到中文名 (Name區塊後):', candidate)
-            break
-          }
+        // 偵測 Name 區塊的開始
+        if (/Name|姓名|Given names/i.test(line)) {
+          foundNameSection = true
+          continue
         }
 
-        // 如果遇到英文名（大寫字母開頭，含逗號），表示中文名應該在這之前或這一行
-        if (/^[A-Z]+,\s*[A-Z-]+/.test(line)) {
-          // 檢查同一行是否有中文
-          const inlineChineseMatch = line.match(/([\u4e00-\u9fff]{2,4})/)
-          if (inlineChineseMatch && !excludeWords.some(word => inlineChineseMatch[1].includes(word))) {
-            chineseName = inlineChineseMatch[1]
-            console.log('✅ Google Vision 找到中文名 (與英文同行):', chineseName)
+        // 在 Name 區塊後，找第一個有效的中文名
+        if (foundNameSection) {
+          const chineseMatch = line.match(/^([\u4e00-\u9fff]{2,4})$/)
+          if (chineseMatch) {
+            const candidate = chineseMatch[1]
+            if (!excludeWords.some(word => candidate.includes(word))) {
+              chineseName = candidate
+              chineseNameConfidence = 'high' // 策略1找到的信心度高
+              console.log('✅ Google Vision 找到中文名 (Name區塊後):', candidate)
+              break
+            }
           }
-          break // 已經過了中文名的位置
+
+          // 如果遇到英文名（大寫字母開頭，含逗號），表示中文名應該在這之前或這一行
+          if (/^[A-Z]+,\s*[A-Z-]+/.test(line)) {
+            // 檢查同一行是否有中文
+            const inlineChineseMatch = line.match(/([\u4e00-\u9fff]{2,4})/)
+            if (inlineChineseMatch && !excludeWords.some(word => inlineChineseMatch[1].includes(word))) {
+              chineseName = inlineChineseMatch[1]
+              chineseNameConfidence = 'high'
+              console.log('✅ Google Vision 找到中文名 (與英文同行):', chineseName)
+            }
+            break // 已經過了中文名的位置
+          }
         }
       }
     }
@@ -540,42 +674,36 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       // 從護照拼音取得姓氏 (例如 "LIN/LI-HUI" -> "LIN")
       const surname = customerData.passport_romanization.split('/')[0]?.toUpperCase()
       if (surname) {
-        // 找英文姓氏在文字中的位置
-        const surnameIndex = googleVisionText.toUpperCase().indexOf(surname)
-        if (surnameIndex > 0) {
-          // 取英文姓氏前面 50 個字元，找中文名
-          const beforeSurname = googleVisionText.substring(Math.max(0, surnameIndex - 50), surnameIndex)
-          const chineseMatches = beforeSurname.match(/[\u4e00-\u9fff]{2,4}/g)
+        // 找英文姓氏在文字中的位置（用逗號格式，如 "WANG, WEI"）
+        const englishNamePattern = new RegExp(`${surname}[,\\s]+[A-Z-]+`, 'i')
+        const englishNameMatch = googleVisionText.match(englishNamePattern)
+        if (englishNameMatch) {
+          const matchIndex = googleVisionText.indexOf(englishNameMatch[0])
+          // 取英文姓氏前面 80 個字元，找中文名
+          const beforeEnglish = googleVisionText.substring(Math.max(0, matchIndex - 80), matchIndex)
+          // 找最後一個 2-4 字的中文詞（排除排除詞）
+          const chineseMatches = beforeEnglish.match(/[\u4e00-\u9fff]{2,4}/g)
           if (chineseMatches) {
-            // 取最後一個（最接近英文名的）
-            const candidate = chineseMatches[chineseMatches.length - 1]
-            if (!excludeWords.some(word => candidate.includes(word))) {
-              chineseName = candidate
-              console.log('✅ Google Vision 找到中文名 (英文名前):', candidate)
+            // 從後往前找，取第一個不是排除詞的
+            for (let i = chineseMatches.length - 1; i >= 0; i--) {
+              const candidate = chineseMatches[i]
+              if (!excludeWords.some(word => candidate.includes(word))) {
+                chineseName = candidate
+                chineseNameConfidence = 'medium' // 策略2信心度中等
+                console.log('✅ Google Vision 找到中文名 (英文名前):', candidate)
+                break
+              }
             }
           }
         }
       }
     }
 
-    // 策略 3: 備用方案 - 找所有中文字，排除常見詞彙後取第一個看起來像人名的
+    // 策略 3: 備用方案 - 但標記為低信心度，需要人工確認
+    // 改進：不再隨便抓，而是跳過這步驟，讓使用者手動輸入
     if (!chineseName) {
-      const chineseNames = googleVisionText.match(/[\u4e00-\u9fff]{2,4}/g)
-      if (chineseNames) {
-        // 過濾掉排除詞彙
-        const validNames = chineseNames.filter(name =>
-          !excludeWords.some(word => name.includes(word)) &&
-          name.length >= 2 && name.length <= 4
-        )
-        // 跳過前幾個可能是標題的詞，取後面的
-        if (validNames.length > 2) {
-          chineseName = validNames[2] // 跳過可能的標題詞
-          console.log('✅ Google Vision 找到中文名 (備用-跳過標題):', chineseName)
-        } else if (validNames.length > 0) {
-          chineseName = validNames[0]
-          console.log('✅ Google Vision 找到中文名 (備用):', chineseName)
-        }
-      }
+      console.log('⚠️ 無法從護照影像中可靠辨識中文名，將使用拼音')
+      chineseNameConfidence = 'none'
     }
 
     // 檢查中文名是否可疑（含有常見 OCR 錯字）
@@ -584,12 +712,21 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       chineseNameConfidence = 'low'
     }
 
-    // 用拼音交叉驗證中文名字數
-    if (chineseName && customerData.passport_romanization) {
-      const validation = validateChineseNameByPinyin(chineseName, customerData.passport_romanization)
+    // 用拼音交叉驗證中文名字數（更嚴格）
+    // 使用帶連字號的版本來正確計算音節數
+    const romanizationForValidation = (customerData as Record<string, unknown>)._romanization_with_dash as string || customerData.passport_romanization
+    if (chineseName && romanizationForValidation) {
+      const validation = validateChineseNameByPinyin(chineseName, romanizationForValidation)
       if (!validation.valid) {
         console.log(`⚠️ 中文名字數不符: 預期 ${validation.expectedLength} 字, 實際 ${chineseName.length} 字`)
-        chineseNameConfidence = 'low'
+        // 如果字數差太多，直接放棄這個中文名
+        if (Math.abs(validation.expectedLength - chineseName.length) > 1) {
+          console.log('❌ 字數差異過大，放棄使用此中文名')
+          chineseName = ''
+          chineseNameConfidence = 'none'
+        } else {
+          chineseNameConfidence = 'low'
+        }
       }
     }
   }
@@ -615,27 +752,40 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   }
 
   // ========== 決定最終姓名 ==========
-  // 如果中文名可靠，優先使用中文名
-  // 如果中文名不可靠（含可疑字元），則用「中文名 (拼音)」標記待確認
+  // 根據信心度決定顯示方式
+  // high: 直接使用中文名
+  // medium: 使用中文名，但加上 ⚠️ 標記
+  // low: 使用「中文名(拼音)⚠️」格式
+  // none: 只使用拼音
   if (chineseName && chineseNameConfidence === 'high') {
     customerData.name = chineseName
     if (englishName) {
       customerData.english_name = englishName
     }
+    console.log('✅ 使用高信心度中文名:', chineseName)
+  } else if (chineseName && chineseNameConfidence === 'medium') {
+    // 中等信心度，加上標記提醒確認
+    customerData.name = `${chineseName}⚠️`
+    if (englishName) {
+      customerData.english_name = englishName
+    }
+    console.log('⚠️ 使用中信心度中文名:', chineseName)
   } else if (chineseName && chineseNameConfidence === 'low') {
-    // 中文名可能有誤，加上拼音方便核對
+    // 低信心度，加上拼音方便核對
     if (customerData.passport_romanization) {
-      customerData.name = `${chineseName}(${customerData.passport_romanization})`
+      customerData.name = `${chineseName}(${customerData.passport_romanization})⚠️`
       console.log('⚠️ 中文名不可靠，使用組合格式:', customerData.name)
     } else {
-      customerData.name = chineseName
+      customerData.name = `${chineseName}⚠️`
     }
     if (englishName) {
       customerData.english_name = englishName
     }
   } else if (customerData.passport_romanization) {
-    // 沒有中文名，使用 MRZ 拼音
-    customerData.name = customerData.passport_romanization.replace('/', ' ')
+    // 沒有可靠的中文名，使用 MRZ 拼音（格式化為易讀形式）
+    const [surname, givenName] = customerData.passport_romanization.split('/')
+    customerData.name = givenName ? `${surname} ${givenName}` : surname
+    customerData.english_name = customerData.name
     console.log('📝 使用 MRZ 拼音作為姓名:', customerData.name)
   } else if (englishName) {
     customerData.name = englishName
@@ -645,6 +795,9 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   if (!customerData.name) {
     customerData.name = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '')
   }
+
+  // 移除內部用的臨時欄位（不存入資料庫）
+  delete (customerData as Record<string, unknown>)._romanization_with_dash
 
   console.log('📋 最終解析結果:', customerData)
   return customerData

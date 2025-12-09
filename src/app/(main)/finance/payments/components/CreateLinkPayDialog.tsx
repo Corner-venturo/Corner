@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useLinkPayLogStore } from '@/stores'
 import { formatDateForInput } from '@/lib/utils'
 import type { Receipt } from '@/types/receipt.types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface CreateLinkPayDialogProps {
   isOpen: boolean
@@ -79,7 +80,7 @@ export function CreateLinkPayDialog({
         end_date: data.end_date,
       } as any)
 
-      alert('✅ LinkPay 付款連結已建立！')
+      void alert('LinkPay 付款連結已建立！', 'success')
       onClose()
 
       // 重置表單
@@ -90,7 +91,7 @@ export function CreateLinkPayDialog({
       })
     } catch (error) {
       logger.error('建立 LinkPay 失敗:', error)
-      alert('❌ 建立 LinkPay 失敗')
+      void alert('建立 LinkPay 失敗', 'error')
     } finally {
       setIsSubmitting(false)
     }

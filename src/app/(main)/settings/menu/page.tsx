@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useUserStore } from '@/stores/user-store'
 import { MENU_ITEMS, MENU_CATEGORIES, getMenuItemsByCategory } from '@/constants/menu-items'
 import type { MenuItem } from '@/constants/menu-items'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 export default function MenuSettingsPage() {
   const { user } = useAuthStore()
@@ -43,17 +44,21 @@ export default function MenuSettingsPage() {
       await updateUser(user.id, {
         hidden_menu_items: hiddenMenuItems,
       })
-      alert('選單設定已儲存')
+      await alert('選單設定已儲存', 'success')
     } catch (error) {
-      alert('儲存失敗，請稍後再試')
+      await alert('儲存失敗，請稍後再試', 'error')
     } finally {
       setIsSaving(false)
     }
   }
 
   // 重設為預設值（全部顯示）
-  const handleReset = () => {
-    if (confirm('確定要重設為預設值嗎？所有選單都會顯示。')) {
+  const handleReset = async () => {
+    const confirmed = await confirm('確定要重設為預設值嗎？所有選單都會顯示。', {
+      title: '重設選單',
+      type: 'warning',
+    })
+    if (confirmed) {
       setHiddenMenuItems([])
     }
   }

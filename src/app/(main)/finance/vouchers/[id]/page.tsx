@@ -10,6 +10,7 @@ import { useVoucherEntryStore } from '@/stores/voucher-entry-store'
 import { useAccountingSubjectStore } from '@/stores/accounting-subject-store'
 import { DateCell, StatusCell } from '@/components/table-cells'
 import { cn } from '@/lib/utils'
+import { confirm, alert, prompt } from '@/lib/ui/alert-dialog'
 
 export default function VoucherDetailPage() {
   const router = useRouter()
@@ -58,20 +59,27 @@ export default function VoucherDetailPage() {
   // 過帳
   const handlePost = async () => {
     if (!voucher) return
-    if (!confirm('確定要過帳此傳票嗎？過帳後將無法修改。')) return
+    const confirmed = await confirm('確定要過帳此傳票嗎？過帳後將無法修改。', {
+      title: '過帳確認',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     await updateVoucher(voucher.id, {
       status: 'posted',
       posted_at: new Date().toISOString(),
     })
 
-    alert('過帳成功')
+    await alert('過帳成功', 'success')
   }
 
   // 作廢
   const handleVoid = async () => {
     if (!voucher) return
-    const reason = prompt('請輸入作廢原因：')
+    const reason = await prompt('請輸入作廢原因：', {
+      title: '作廢傳票',
+      placeholder: '輸入原因...',
+    })
     if (!reason) return
 
     await updateVoucher(voucher.id, {
@@ -80,18 +88,22 @@ export default function VoucherDetailPage() {
       void_reason: reason,
     })
 
-    alert('作廢成功')
+    await alert('作廢成功', 'success')
   }
 
   // 刪除
   const handleDelete = async () => {
     if (!voucher) return
     if (voucher.status === 'posted') {
-      alert('已過帳的傳票無法刪除，請先作廢')
+      await alert('已過帳的傳票無法刪除，請先作廢', 'error')
       return
     }
 
-    if (!confirm('確定要刪除此傳票嗎？此操作無法復原。')) return
+    const confirmed = await confirm('確定要刪除此傳票嗎？此操作無法復原。', {
+      title: '刪除傳票',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     await deleteVoucher(voucher.id)
     router.push('/finance/vouchers')

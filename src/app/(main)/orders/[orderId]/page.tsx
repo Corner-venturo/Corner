@@ -13,6 +13,7 @@ import { TourCosts } from '@/components/tours/tour-costs'
 import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
 import { MemberQuickAdd } from '@/components/members/member-quick-add'
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
+import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 
 // 訂單詳細頁面的分頁配置
 const tabs = [
@@ -119,6 +120,13 @@ export default function OrderDetailPage() {
             開代轉
           </Button>
         }
+      />
+
+      {/* 編輯衝突警告 */}
+      <EditingWarningBanner
+        resourceType="order"
+        resourceId={orderId}
+        resourceName="此訂單"
       />
 
       <div>{renderTabContent()}</div>

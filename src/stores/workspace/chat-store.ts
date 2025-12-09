@@ -210,6 +210,29 @@ export const useChatStore = () => {
     },
 
     deleteMessage: async (messageId: string) => {
+      // 🔥 先找到訊息，取得附件路徑
+      const message = messageStore.items.find(m => m.id === messageId)
+
+      // 刪除 Storage 上的附件檔案
+      if (message?.attachments && message.attachments.length > 0) {
+        const paths = message.attachments
+          .map(att => att.path)
+          .filter((path): path is string => !!path)
+
+        if (paths.length > 0) {
+          const { error } = await supabase.storage
+            .from('workspace-files')
+            .remove(paths)
+
+          if (error) {
+            logger.warn('刪除附件檔案失敗:', error)
+            // 繼續刪除訊息，不阻止流程
+          } else {
+            logger.log(`✅ 已刪除 ${paths.length} 個附件檔案`)
+          }
+        }
+      }
+
       await messageStore.delete(messageId)
 
       // 更新 UI 狀態

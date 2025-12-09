@@ -24,33 +24,44 @@ interface TourItinerarySectionProps {
 
 // 將標題中的文字符號轉換成 SVG 圖標
 function renderTitleWithIcons(title: string, viewMode: 'desktop' | 'mobile') {
-  const parts = title.split(/(\s→\s|\s·\s|\s\|\s|\s⭐\s)/g)
+  // 支援有空格和沒空格的符號：→ ⇀ · | ⭐
+  const parts = title.split(/(\s*→\s*|\s*⇀\s*|\s*·\s*|\s*\|\s*|\s*⭐\s*)/g)
   const iconSize = viewMode === 'mobile' ? 10 : 16
 
   return parts.map((part, index) => {
-    if (part === ' → ') {
+    const trimmedPart = part.trim()
+    if (trimmedPart === '→' || trimmedPart === '⇀') {
       return (
         <ArrowRight
           key={index}
           size={iconSize}
-          className="inline-block text-morandi-primary align-middle"
-          style={{ verticalAlign: 'middle', marginTop: '-1px', margin: viewMode === 'mobile' ? '0 1px' : '0 2px' }}
+          className="inline-block text-morandi-primary"
+          style={{ verticalAlign: 'middle', margin: viewMode === 'mobile' ? '0 2px' : '0 4px' }}
         />
       )
-    } else if (part === ' ⭐ ') {
+    } else if (trimmedPart === '⭐') {
       return (
         <Sparkles
           key={index}
           size={iconSize}
-          className="inline-block text-morandi-gold align-middle"
-          style={{ verticalAlign: 'middle', marginTop: '-1px', margin: viewMode === 'mobile' ? '0 1px' : '0 2px' }}
+          className="inline-block text-morandi-gold"
+          style={{ verticalAlign: 'middle', margin: viewMode === 'mobile' ? '0 2px' : '0 4px' }}
         />
       )
-    } else if (part === ' · ' || part === ' | ') {
-      return <span key={index} className="text-morandi-secondary" style={{ margin: viewMode === 'mobile' ? '0 1px' : '0 2px' }}>{part.trim()}</span>
-    } else {
+    } else if (trimmedPart === '·' || trimmedPart === '|') {
+      return (
+        <span
+          key={index}
+          className="text-morandi-secondary inline-block"
+          style={{ verticalAlign: 'middle', margin: viewMode === 'mobile' ? '0 2px' : '0 4px' }}
+        >
+          {trimmedPart}
+        </span>
+      )
+    } else if (part) {
       return <span key={index}>{part}</span>
     }
+    return null
   })
 }
 

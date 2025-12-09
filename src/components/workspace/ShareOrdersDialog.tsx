@@ -7,6 +7,7 @@ import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Order } from '@/stores/types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface ShareOrdersDialogProps {
   channelId: string
@@ -97,7 +98,7 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
 
   const handleShare = async () => {
     if (selectedOrders.size === 0) {
-      alert('請至少選擇一筆訂單')
+      void alert('請至少選擇一筆訂單', 'warning')
       return
     }
 
@@ -113,7 +114,7 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
       onSuccess()
       onClose()
     } catch (error) {
-      alert('分享訂單失敗，請稍後再試')
+      void alert('分享訂單失敗，請稍後再試', 'error')
     }
   }
 

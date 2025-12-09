@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { Plus, Trash2, GripVertical, Printer } from 'lucide-react'
 import { toast } from 'sonner'
+import { confirm } from '@/lib/ui/alert-dialog'
 import {
   DndContext,
   closestCenter,
@@ -45,6 +46,9 @@ interface OrderMember {
   pnr: string | null
 }
 
+// 訂單編號對應表
+type OrderCodeMap = Record<string, string>
+
 interface MemberFieldValue {
   [memberId: string]: {
     [fieldName: string]: string
@@ -62,7 +66,8 @@ function SortableRow({
   customFields,
   getFieldValue,
   updateFieldValue,
-  isDragMode
+  isDragMode,
+  orderCode
 }: {
   member: OrderMember
   index: number
@@ -70,6 +75,7 @@ function SortableRow({
   getFieldValue: (memberId: string, fieldName: string) => string
   updateFieldValue: (memberId: string, fieldName: string, value: string) => void
   isDragMode: boolean
+  orderCode: string
 }) {
   const {
     attributes,
@@ -102,7 +108,7 @@ function SortableRow({
       )}
 
       <td className="px-3 py-2 text-xs text-morandi-text-light">
-        {member.order_id.slice(0, 8)}...
+        {orderCode || '-'}
       </td>
       <td className="px-3 py-2">{member.chinese_name || '-'}</td>
       <td className="px-3 py-2">{member.passport_name || '-'}</td>
@@ -130,6 +136,7 @@ function SortableRow({
 
 export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
   const [members, setMembers] = useState<OrderMember[]>([])
+  const [orderCodes, setOrderCodes] = useState<OrderCodeMap>({})
   const [customFields, setCustomFields] = useState<string[]>([])
   const [fieldValues, setFieldValues] = useState<MemberFieldValue>({})
   const [loading, setLoading] = useState(true)
@@ -153,15 +160,22 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
   const loadMembers = async () => {
     try {
-      // 1. 找出所有屬於這個團的訂單
+      // 1. 找出所有屬於這個團的訂單（包含 order_number）
       const { data: orders, error: ordersError } = await supabase
         .from('orders')
-        .select('id')
+        .select('id, order_number')
         .eq('tour_id', tour.id)
 
       if (ordersError) throw ordersError
 
       const orderIds = orders?.map((o: { id: string }) => o.id) || []
+
+      // 建立 order_id -> order_number 對應表
+      const codeMap: OrderCodeMap = {}
+      orders?.forEach((o: { id: string; order_number: string | null }) => {
+        codeMap[o.id] = o.order_number || '-'
+      })
+      setOrderCodes(codeMap)
 
       if (orderIds.length === 0) {
         setMembers([])
@@ -260,7 +274,11 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
 
   // 刪除自訂欄位
   const handleDeleteField = async (fieldName: string) => {
-    if (!confirm(`確定要刪除「${fieldName}」欄位嗎？所有資料將一併刪除。`)) {
+    const confirmed = await confirm(`確定要刪除「${fieldName}」欄位嗎？所有資料將一併刪除。`, {
+      title: '刪除欄位',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
@@ -449,6 +467,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
                       getFieldValue={getFieldValue}
                       updateFieldValue={updateFieldValue}
                       isDragMode={isDragMode}
+                      orderCode={orderCodes[member.order_id] || '-'}
                     />
                   ))}
                 </tbody>

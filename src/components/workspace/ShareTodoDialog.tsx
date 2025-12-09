@@ -18,6 +18,7 @@ import { Send, CheckCircle2, AlertCircle, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import type { Todo } from '@/stores/types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface ShareTodoDialogProps {
   channelId: string
@@ -86,7 +87,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
 
       onSuccess()
     } catch (error) {
-      alert('分享失敗，請稍後再試')
+      void alert('分享失敗，請稍後再試', 'error')
     } finally {
       setIsSubmitting(false)
     }

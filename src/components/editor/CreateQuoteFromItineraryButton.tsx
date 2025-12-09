@@ -26,6 +26,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 
 // 取得當前 workspace code 的輔助函數
@@ -337,7 +338,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
       }
     } catch (error) {
       console.error('建立報價單失敗:', error)
-      alert('建立報價單失敗，請重試')
+      void alert('建立報價單失敗，請重試', 'error')
     } finally {
       setIsLoading(false)
     }
@@ -411,7 +412,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
       router.push(`/quotes/${selectedQuote.id}?${urlParams.toString()}`)
     } catch (error) {
       console.error('連結報價單失敗:', error)
-      alert(`連結報價單失敗：${error instanceof Error ? error.message : '未知錯誤'}`)
+      void alert(`連結報價單失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error')
     } finally {
       setIsLoading(false)
     }
@@ -457,7 +458,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
       router.push(`/quotes/${selectedQuote.id}?${urlParams.toString()}`)
     } catch (error) {
       console.error('建立新版本失敗:', error)
-      alert(`建立新版本失敗：${error instanceof Error ? error.message : '未知錯誤'}`)
+      void alert(`建立新版本失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error')
     } finally {
       setIsLoading(false)
     }
@@ -465,7 +466,11 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
 
   // 取消關聯
   const handleUnlink = async (quoteId: string) => {
-    if (!confirm('確定要取消此報價單與行程的關聯嗎？')) return
+    const confirmed = await confirm('確定要取消此報價單與行程的關聯嗎？', {
+      title: '取消關聯',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       setIsLoading(true)
@@ -478,7 +483,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
       await fetchAll()
     } catch (error) {
       console.error('取消關聯失敗:', error)
-      alert(`取消關聯失敗：${error instanceof Error ? error.message : '未知錯誤'}`)
+      void alert(`取消關聯失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error')
     } finally {
       setIsLoading(false)
     }

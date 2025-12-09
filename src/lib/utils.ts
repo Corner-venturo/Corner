@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { format } from 'date-fns'
+import { alert } from '@/lib/ui/alert-dialog'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -37,7 +38,7 @@ export function getGenderFromIdNumber(idNumber: string): 'M' | 'F' | '' {
   if (!validateIdNumber(idNumber)) {
     // 非台灣身分證字號，跳出通知
     if (typeof window !== 'undefined' && idNumber.length > 0) {
-      alert('此身分證字號格式不符合台灣身分證系統，請手動輸入性別')
+      void alert('此身分證字號格式不符合台灣身分證系統，請手動輸入性別', 'info')
     }
     return ''
   }

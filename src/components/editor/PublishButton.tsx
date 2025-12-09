@@ -28,6 +28,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink, Trash2 } from 'lucide-react'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { generateUUID } from '@/lib/utils/uuid'
 
 
@@ -145,7 +146,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       }
     } catch (error) {
       console.error('儲存失敗:', error)
-      alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      await alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setSaving(false)
     }
@@ -154,7 +155,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
   // 另存新版本
   const saveAsNewVersion = async () => {
     if (!data.id) {
-      alert('請先儲存行程表才能另存新版本')
+      await alert('請先儲存行程表才能另存新版本', 'warning')
       return
     }
 
@@ -183,7 +184,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       onVersionChange(updatedRecords.length - 1, newVersion)
     } catch (error) {
       console.error('另存新版本失敗:', error)
-      alert('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      await alert('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setSaving(false)
     }
@@ -208,7 +209,11 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     const versionToDelete = versionRecords[index]
     const versionName = versionToDelete?.note || `版本 ${versionToDelete?.version || index + 1}`
 
-    if (!confirm(`確定要刪除「${versionName}」嗎？`)) return
+    const confirmed = await confirm(`確定要刪除「${versionName}」嗎？`, {
+      title: '刪除版本',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       const updatedRecords = versionRecords.filter((_, i) => i !== index)
@@ -223,7 +228,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       }
     } catch (error) {
       console.error('刪除版本失敗:', error)
-      alert('刪除版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      await alert('刪除版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     }
   }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import { FileSignature, Save, Printer } from 'lucide-react'
+import { FileSignature, Save, Printer, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -16,18 +16,18 @@ import { useContractForm } from './useContractForm'
 import { ContractFormFields } from './ContractFormFields'
 
 const CONTRACT_TEMPLATES = [
-  { value: 'domestic' as ContractTemplate, label: '國內旅遊定型化契約（1120908修訂版）' },
-  { value: 'international' as ContractTemplate, label: '國外旅遊定型化契約（1120908修訂版）' },
+  { value: 'domestic' as ContractTemplate, label: '國內旅遊定型化契約' },
+  { value: 'international' as ContractTemplate, label: '國外旅遊定型化契約' },
   {
     value: 'individual_international' as ContractTemplate,
-    label: '國外個別旅遊定型化契約（1120908修訂版）',
+    label: '國外個別旅遊定型化契約',
   },
 ]
 
 const CONTRACT_TEMPLATE_LABELS = {
-  domestic: '國內旅遊定型化契約（1120908修訂版）',
-  international: '國外旅遊定型化契約（1120908修訂版）',
-  individual_international: '國外個別旅遊定型化契約（1120908修訂版）',
+  domestic: '國內旅遊定型化契約',
+  international: '國外旅遊定型化契約',
+  individual_international: '國外個別旅遊定型化契約',
 }
 
 export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogProps) {
@@ -75,13 +75,22 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden [&>button]:hidden">
+        <DialogHeader className="flex-shrink-0 relative">
           <DialogTitle className="flex items-center gap-2">
             <FileSignature size={20} />
             {mode === 'create' ? '建立合約' : '編輯合約'}
           </DialogTitle>
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-0 top-0 p-2 rounded-md hover:bg-gray-100 transition-colors"
+          >
+            <X size={18} />
+            <span className="sr-only">關閉</span>
+          </button>
         </DialogHeader>
+        <div className="flex-1 overflow-y-auto">
 
         <div className="space-y-6 py-4">
           {/* 旅遊團資訊 */}
@@ -230,8 +239,9 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             </div>
           </div>
         </div>
+        </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0 border-t pt-4 mt-4">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             取消
           </Button>

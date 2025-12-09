@@ -290,7 +290,7 @@ export function Sidebar() {
       const rect = element.getBoundingClientRect()
       setDropdownPosition({
         top: rect.top,
-        left: rect.right + 10,
+        left: rect.right + 4, // 縮小間隙，讓滑鼠更容易移動到子選單
       })
       setHoveredItem(item.href)
     }
@@ -303,8 +303,12 @@ export function Sidebar() {
     timeoutRef.current = setTimeout(() => {
       if (!isDropdownHovered) {
         setHoveredItem(null)
+        // 同時收起側邊欄（如果是摺疊模式）
+        if (sidebarCollapsed) {
+          setIsSidebarHovered(false)
+        }
       }
-    }, 150) // 增加延遲時間，讓滑鼠有足夠時間移到子選單
+    }, 300) // 增加延遲時間，讓滑鼠有足夠時間移到子選單
   }
 
   const handleClick = (item: MenuItem, element: HTMLElement) => {
@@ -321,7 +325,7 @@ export function Sidebar() {
     const rect = element.getBoundingClientRect()
     setDropdownPosition({
       top: rect.top,
-      left: rect.right + 10,
+      left: rect.right + 4, // 縮小間隙，讓滑鼠更容易移動到子選單
     })
 
     // 固定展開
@@ -349,7 +353,7 @@ export function Sidebar() {
       if (sidebarCollapsed) {
         setIsSidebarHovered(false)
       }
-    }, 150)
+    }, 300)
   }
 
   const is_active = (href: string) => {
@@ -742,9 +746,11 @@ export function Sidebar() {
                   'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
               )}
               onClick={() => {
-                // 點擊子項目後關閉下拉選單
+                // 點擊子項目後關閉下拉選單並收起側邊欄
                 setClickedItem(null)
                 setHoveredItem(null)
+                setIsSidebarHovered(false)
+                setIsDropdownHovered(false)
               }}
             >
               <child.icon size={16} className="mr-3" />

@@ -14,6 +14,7 @@ import {
 import { Tour } from '@/types/tour.types'
 import { ContractData } from '@/lib/contract-utils'
 import DOMPurify from 'dompurify'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface ContractViewDialogProps {
   isOpen: boolean
@@ -108,7 +109,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
   const handlePrint = async () => {
     if (!contractHtml) {
-      alert('無合約資料可列印')
+      void alert('無合約資料可列印', 'warning')
       return
     }
 
@@ -118,7 +119,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
       // 開啟新視窗並列印
       const printWindow = window.open('', '_blank')
       if (!printWindow) {
-        alert('請允許彈出視窗以進行列印')
+        void alert('請允許彈出視窗以進行列印', 'warning')
         return
       }
 
@@ -135,7 +136,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
       }
     } catch (error) {
       logger.error('列印錯誤:', error)
-      alert('列印合約時發生錯誤，請稍後再試')
+      void alert('列印合約時發生錯誤，請稍後再試', 'error')
     } finally {
       setPrinting(false)
     }

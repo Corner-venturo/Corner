@@ -66,6 +66,19 @@ const WORKSPACE_SCOPED_TABLES = [
   'tour_addons',
 ]
 
+// 表格對應的 code prefix（用於自動生成編號）
+const TABLE_CODE_PREFIX: Record<string, string> = {
+  tours: 'T',
+  itineraries: 'I',
+  orders: 'O',
+  customers: 'C',
+  quotes: 'Q',
+  payment_requests: 'PR',
+  disbursement_orders: 'DO',
+  receipt_orders: 'RO',
+  visas: 'V',
+}
+
 // 建立雲端 Hook 的工廠函數
 export function createCloudHook<T extends BaseEntity>(
   tableName: string,
@@ -90,18 +103,11 @@ export function createCloudHook<T extends BaseEntity>(
     // 🔒 Workspace 隔離：根據當前使用者過濾資料
     if (isWorkspaceScoped) {
       const { workspaceId, userRole } = getCurrentUserContext()
-      console.log(`📊 [${tableName}] 用戶上下文: workspaceId=${workspaceId}, userRole=${userRole}`)
 
       // Super Admin 可以跨 workspace 查詢，不加過濾
       if (!canCrossWorkspace(userRole) && workspaceId) {
         // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料
         query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
-        console.log(`🔒 [${tableName}] Workspace 隔離：查詢 workspace_id=${workspaceId} 或 NULL（舊資料）`)
-      } else if (canCrossWorkspace(userRole)) {
-        console.log(`🌐 [${tableName}] Super Admin：跨 workspace 查詢`)
-      } else {
-        // 沒有 workspace_id 的情況，不加過濾（預設查所有）
-        console.log(`⚠️ [${tableName}] 無 workspace_id，不加過濾（查所有資料）`)
       }
     }
 
@@ -123,7 +129,6 @@ export function createCloudHook<T extends BaseEntity>(
       throw new Error(errorMessage)
     }
 
-    console.log(`✅ [${tableName}] 查詢成功，取得 ${data?.length || 0} 筆資料`)
     return (data || []) as unknown as T[]
   }
 
@@ -151,12 +156,38 @@ export function createCloudHook<T extends BaseEntity>(
         workspace_id = workspaceId
       }
 
+      // 自動生成 code（如果該表格需要且未提供）
+      const codePrefix = TABLE_CODE_PREFIX[tableName]
+      let generatedCode: string | undefined
+      if (codePrefix && !dataRecord.code) {
+        // 從資料庫查詢最大 code，確保唯一性
+        const { data: maxCodeResult } = await supabase
+          .from(tableName as any)
+          .select('code')
+          .like('code', `${codePrefix}%`)
+          .order('code', { ascending: false })
+          .limit(1)
+          .single()
+
+        let nextNumber = 1
+        if (maxCodeResult?.code) {
+          // 提取數字部分，例如 'C000032' -> 32
+          const numericPart = (maxCodeResult.code as string).replace(codePrefix, '')
+          const currentMax = parseInt(numericPart, 10)
+          if (!isNaN(currentMax)) {
+            nextNumber = currentMax + 1
+          }
+        }
+        generatedCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
+      }
+
       const newItem = {
         ...data,
         id: generateUUID(),
         created_at: now,
         updated_at: now,
         ...(isWorkspaceScoped && workspace_id ? { workspace_id } : {}),
+        ...(generatedCode ? { code: generatedCode } : {}),
       } as T
 
       // 樂觀更新

@@ -17,6 +17,7 @@ import { RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import type { FastMoveProduct, Esim } from '@/types/esim.types'
 import type { Order } from '@/types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 // 產品地區選項
 const PRODUCT_REGIONS = [
@@ -242,7 +243,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           selectedTour = defaultEsimTour
         } else {
           // 提示需要先建立預設網卡團
-          alert(`請先建立 ${defaultEsimCode} 網卡團，或在表單中選擇團號`)
+          await alert(`請先建立 ${defaultEsimCode} 網卡團，或在表單中選擇團號`, 'warning')
           return
         }
       }

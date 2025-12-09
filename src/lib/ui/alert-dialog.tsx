@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 type AlertType = 'info' | 'success' | 'warning' | 'error'
 
@@ -27,27 +28,57 @@ interface ConfirmState {
   type: AlertType
   title?: string
   message: string
+  htmlContent?: string // 支援 HTML 內容
   confirmText?: string
   cancelText?: string
   onConfirm?: () => void
   onCancel?: () => void
 }
 
+interface PromptState {
+  isOpen: boolean
+  title?: string
+  message: string
+  placeholder?: string
+  defaultValue?: string
+  inputType?: 'text' | 'password'
+  confirmText?: string
+  cancelText?: string
+  value: string
+  onConfirm?: (value: string) => void
+  onCancel?: () => void
+}
+
 interface DialogStore {
   alert: AlertState
   confirm: ConfirmState
+  prompt: PromptState
   showAlert: (message: string, type?: AlertType, title?: string) => Promise<void>
   showConfirm: (
     message: string,
     options?: {
       type?: AlertType
       title?: string
+      htmlContent?: string
       confirmText?: string
       cancelText?: string
     }
   ) => Promise<boolean>
+  showPrompt: (
+    message: string,
+    options?: {
+      title?: string
+      placeholder?: string
+      defaultValue?: string
+      inputType?: 'text' | 'password'
+      confirmText?: string
+      cancelText?: string
+    }
+  ) => Promise<string | null>
   closeAlert: () => void
   closeConfirm: (confirmed: boolean) => void
+  closePrompt: (confirmed: boolean) => void
+  setPromptValue: (value: string) => void
 }
 
 const useDialogStore = create<DialogStore>((set, get) => ({
@@ -60,6 +91,11 @@ const useDialogStore = create<DialogStore>((set, get) => ({
     isOpen: false,
     type: 'warning',
     message: '',
+  },
+  prompt: {
+    isOpen: false,
+    message: '',
+    value: '',
   },
   showAlert: (message, type = 'info', title) => {
     return new Promise(resolve => {
@@ -85,6 +121,7 @@ const useDialogStore = create<DialogStore>((set, get) => ({
           type: options.type || 'warning',
           title: options.title,
           message,
+          htmlContent: options.htmlContent,
           confirmText: options.confirmText || '確認',
           cancelText: options.cancelText || '取消',
           onConfirm: () => {
@@ -107,6 +144,41 @@ const useDialogStore = create<DialogStore>((set, get) => ({
   closeConfirm: confirmed => {
     set(state => ({
       confirm: { ...state.confirm, isOpen: false },
+    }))
+  },
+  showPrompt: (message, options = {}) => {
+    return new Promise(resolve => {
+      set({
+        prompt: {
+          isOpen: true,
+          title: options.title,
+          message,
+          placeholder: options.placeholder || '',
+          defaultValue: options.defaultValue || '',
+          inputType: options.inputType || 'text',
+          confirmText: options.confirmText || '確認',
+          cancelText: options.cancelText || '取消',
+          value: options.defaultValue || '',
+          onConfirm: (value: string) => {
+            get().closePrompt(true)
+            resolve(value)
+          },
+          onCancel: () => {
+            get().closePrompt(false)
+            resolve(null)
+          },
+        },
+      })
+    })
+  },
+  closePrompt: confirmed => {
+    set(state => ({
+      prompt: { ...state.prompt, isOpen: false },
+    }))
+  },
+  setPromptValue: (value: string) => {
+    set(state => ({
+      prompt: { ...state.prompt, value },
     }))
   },
 }))
@@ -145,9 +217,9 @@ function AlertDialogComponent() {
           <div className="flex items-start gap-3">
             <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
             <div className="flex-1">
-              {alert.title && (
-                <DialogTitle className="text-morandi-primary mb-2">{alert.title}</DialogTitle>
-              )}
+              <DialogTitle className={alert.title ? "text-morandi-primary mb-2" : "sr-only"}>
+                {alert.title || '提示'}
+              </DialogTitle>
               <DialogDescription className="text-morandi-secondary whitespace-pre-wrap">
                 {alert.message}
               </DialogDescription>
@@ -171,22 +243,32 @@ function ConfirmDialogComponent() {
   const { confirm, closeConfirm } = useDialogStore()
   const config = typeConfig[confirm.type]
 
+  // 根據是否有 HTML 內容決定對話框寬度
+  const dialogWidth = confirm.htmlContent ? 'max-w-2xl' : 'max-w-md'
+
   return (
     <Dialog open={confirm.isOpen} onOpenChange={open => !open && confirm.onCancel?.()}>
-      <DialogContent className="max-w-md">
+      <DialogContent className={`${dialogWidth} z-[10001]`}>
         <DialogHeader>
           <div className="flex items-start gap-3">
             <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
             <div className="flex-1">
-              {confirm.title && (
-                <DialogTitle className="text-morandi-primary mb-2">{confirm.title}</DialogTitle>
-              )}
+              <DialogTitle className={confirm.title ? "text-morandi-primary mb-2" : "sr-only"}>
+                {confirm.title || '確認'}
+              </DialogTitle>
               <DialogDescription className="text-morandi-secondary whitespace-pre-wrap">
                 {confirm.message}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
+        {/* HTML 內容區域 */}
+        {confirm.htmlContent && (
+          <div
+            className="mt-2"
+            dangerouslySetInnerHTML={{ __html: confirm.htmlContent }}
+          />
+        )}
         <DialogFooter className="gap-2">
           <Button
             variant="outline"
@@ -207,12 +289,65 @@ function ConfirmDialogComponent() {
   )
 }
 
+function PromptDialogComponent() {
+  const { prompt, setPromptValue } = useDialogStore()
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && prompt.value.trim()) {
+      prompt.onConfirm?.(prompt.value)
+    }
+  }
+
+  return (
+    <Dialog open={prompt.isOpen} onOpenChange={open => !open && prompt.onCancel?.()}>
+      <DialogContent className="max-w-md z-[10001]">
+        <DialogHeader>
+          <DialogTitle className={prompt.title ? "text-morandi-primary" : "sr-only"}>
+            {prompt.title || '輸入'}
+          </DialogTitle>
+          <DialogDescription className="text-morandi-secondary">
+            {prompt.message}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-2">
+          <Input
+            type={prompt.inputType || 'text'}
+            value={prompt.value}
+            onChange={e => setPromptValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={prompt.placeholder}
+            className="border-border focus:border-morandi-gold focus:ring-morandi-gold/20"
+            autoFocus
+          />
+        </div>
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outline"
+            onClick={() => prompt.onCancel?.()}
+            className="border-border hover:border-morandi-gold/20"
+          >
+            {prompt.cancelText}
+          </Button>
+          <Button
+            onClick={() => prompt.onConfirm?.(prompt.value)}
+            disabled={!prompt.value.trim()}
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
+          >
+            {prompt.confirmText}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // 全局對話框容器
 export function GlobalDialogs() {
   return (
     <>
       <AlertDialogComponent />
       <ConfirmDialogComponent />
+      <PromptDialogComponent />
     </>
   )
 }
@@ -224,14 +359,37 @@ export const alert = (message: string, type: AlertType = 'info', title?: string)
 
 export const confirm = (
   message: string,
-  options?: {
+  typeOrOptions?: AlertType | {
     type?: AlertType
     title?: string
+    htmlContent?: string
+    confirmText?: string
+    cancelText?: string
+  },
+  htmlContent?: string
+) => {
+  // 支援簡易呼叫: confirm(message, type, htmlContent)
+  if (typeof typeOrOptions === 'string') {
+    return useDialogStore.getState().showConfirm(message, {
+      type: typeOrOptions,
+      htmlContent,
+    })
+  }
+  return useDialogStore.getState().showConfirm(message, typeOrOptions)
+}
+
+export const prompt = (
+  message: string,
+  options?: {
+    title?: string
+    placeholder?: string
+    defaultValue?: string
+    inputType?: 'text' | 'password'
     confirmText?: string
     cancelText?: string
   }
 ) => {
-  return useDialogStore.getState().showConfirm(message, options)
+  return useDialogStore.getState().showPrompt(message, options)
 }
 
 // 便捷方法

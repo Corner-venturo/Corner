@@ -223,8 +223,26 @@ export function createStore<T extends BaseEntity>(
         }
 
         if (codePrefix && !(data as Record<string, unknown>).code) {
-          const count = get().items.length
-          ;(insertData as Record<string, unknown>).code = `${codePrefix}${String(count + 1).padStart(6, '0')}`
+          // 從資料庫查詢最大 code，確保唯一性
+          const { data: maxCodeResult } = await supabase
+            .from(tableName as any)
+            .select('code')
+            .like('code', `${codePrefix}%`)
+            .order('code', { ascending: false })
+            .limit(1)
+            .single()
+
+          let nextNumber = 1
+          if (maxCodeResult?.code) {
+            // 提取數字部分，例如 'C000032' -> 32
+            const numericPart = maxCodeResult.code.replace(codePrefix, '')
+            const currentMax = parseInt(numericPart, 10)
+            if (!isNaN(currentMax)) {
+              nextNumber = currentMax + 1
+            }
+          }
+
+          ;(insertData as Record<string, unknown>).code = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
         }
 
         const { data: newItem, error } = await supabase

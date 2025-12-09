@@ -16,6 +16,7 @@ import { useTourStore, useRegionsStore, useItineraryStore, useAuthStore } from '
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { toast } from 'sonner'
 import { Cloud, CloudOff } from 'lucide-react'
+import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 import type {
   FlightInfo,
   Feature,
@@ -1291,6 +1292,15 @@ function NewItineraryPageContent() {
           </div>
         }
       />
+
+      {/* 編輯衝突警告 */}
+      {currentItineraryId && (
+        <EditingWarningBanner
+          resourceType="itinerary"
+          resourceId={currentItineraryId}
+          resourceName="此行程"
+        />
+      )}
 
       {/* ========== 主要內容區域 ========== */}
       <div className="flex-1 overflow-hidden">

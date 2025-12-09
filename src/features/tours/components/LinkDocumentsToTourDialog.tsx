@@ -34,7 +34,7 @@ import {
   Unlink,
   Search,
 } from 'lucide-react'
-import { useItineraryStore, useQuoteStore } from '@/stores'
+import { useItineraryStore, useQuoteStore, useTourStore } from '@/stores'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Itinerary, Quote } from '@/stores/types'
@@ -72,6 +72,9 @@ export function LinkDocumentsToTourDialog({
     loading: loadingQuotes,
   } = useQuoteStore()
 
+  // 旅遊團 Store（用於查詢報價單連結的旅遊團名稱）
+  const { items: tours } = useTourStore()
+
   // 行程表狀態
   const [isCreatingItinerary, setIsCreatingItinerary] = useState(false)
   const [isLinkingItinerary, setIsLinkingItinerary] = useState(false)
@@ -100,20 +103,38 @@ export function LinkDocumentsToTourDialog({
   }, [itineraries, tour.id])
 
   const availableItineraries = useMemo(() => {
+    const isSearching = itinerarySearchQuery.trim().length > 0
+    const query = itinerarySearchQuery.toLowerCase()
+
+    // 基本過濾：未刪除、不是當前旅遊團已連結的
     let filtered = itineraries
-      .filter(i => !(i as any)._deleted)
+      .filter(i => !(i as any)._deleted && i.tour_id !== tour.id)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
 
+    // 先依篩選類型過濾
     if (itineraryFilterType === 'template') {
       filtered = filtered.filter(i => i.is_template === true)
     } else if (itineraryFilterType === 'non-template') {
-      filtered = filtered.filter(i => i.is_template !== true && !i.tour_id)
+      if (isSearching) {
+        // 搜尋時：顯示所有非範本（包含已綁定其他團的）
+        filtered = filtered.filter(i => i.is_template !== true)
+      } else {
+        // 預設：只顯示未綁定的非範本
+        filtered = filtered.filter(i => i.is_template !== true && !i.tour_id)
+      }
     } else {
-      filtered = filtered.filter(i => i.is_template === true || !i.tour_id)
+      // all 模式
+      if (isSearching) {
+        // 搜尋時：顯示所有（範本或非範本，包含已綁定其他團的）
+        // 不做額外過濾
+      } else {
+        // 預設：只顯示範本或未綁定的
+        filtered = filtered.filter(i => i.is_template === true || !i.tour_id)
+      }
     }
 
-    if (itinerarySearchQuery.trim()) {
-      const query = itinerarySearchQuery.toLowerCase()
+    // 搜尋關鍵字過濾
+    if (isSearching) {
       filtered = filtered.filter(i =>
         (i.title?.toLowerCase().includes(query)) ||
         (i.tour_code?.toLowerCase().includes(query)) ||
@@ -122,7 +143,7 @@ export function LinkDocumentsToTourDialog({
     }
 
     return filtered
-  }, [itineraries, itineraryFilterType, itinerarySearchQuery])
+  }, [itineraries, itineraryFilterType, itinerarySearchQuery, tour.id])
 
   const handleCreateItinerary = async () => {
     try {
@@ -153,6 +174,7 @@ export function LinkDocumentsToTourDialog({
       setIsLinkingItinerary(true)
 
       if (itinerary.is_template) {
+        // 從範本建立新行程表 → 跳轉
         const newItinerary = await createItinerary({
           ...itinerary,
           id: undefined,
@@ -167,12 +189,12 @@ export function LinkDocumentsToTourDialog({
           router.push(`/itinerary/new?id=${newItinerary.id}`)
         }
       } else {
+        // 連結現有行程表 → 不跳轉，只更新列表
         await updateItinerary(itinerary.id, {
           tour_id: tour.id,
           tour_code: tour.code,
         })
-        onClose()
-        router.push(`/itinerary/new?id=${itinerary.id}`)
+        await fetchItineraries()
       }
     } catch (error) {
       console.error('連結行程表失敗:', error)
@@ -209,20 +231,34 @@ export function LinkDocumentsToTourDialog({
   }, [quotes, tour.id])
 
   const availableQuotes = useMemo(() => {
+    const isSearching = quoteSearchQuery.trim().length > 0
+    const query = quoteSearchQuery.toLowerCase()
+
+    // 基本過濾：標準報價單、未刪除、不是當前旅遊團已連結的
     let filtered = quotes
-      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as any)._deleted)
+      .filter(q => q.quote_type === 'standard' && !(q as any)._deleted && q.tour_id !== tour.id)
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-    if (quoteSearchQuery.trim()) {
-      const query = quoteSearchQuery.toLowerCase()
+    if (isSearching) {
+      // 搜尋時：顯示所有報價單（包含已綁定其他團的）
       filtered = filtered.filter(q =>
         (q.name?.toLowerCase().includes(query)) ||
         (q.code?.toLowerCase().includes(query))
       )
+    } else {
+      // 預設：只顯示未綁定的報價單
+      filtered = filtered.filter(q => !q.tour_id)
     }
 
     return filtered
-  }, [quotes, quoteSearchQuery])
+  }, [quotes, quoteSearchQuery, tour.id])
+
+  // 取得報價單連結的旅遊團名稱
+  const getLinkedTourName = (tourId: string | null | undefined): string | null => {
+    if (!tourId) return null
+    const linkedTour = tours.find(t => t.id === tourId)
+    return linkedTour ? linkedTour.name : '未知旅遊團'
+  }
 
   const handleCreateQuote = async () => {
     try {
@@ -254,8 +290,7 @@ export function LinkDocumentsToTourDialog({
     try {
       setIsLinkingQuote(true)
       await updateQuote(quote.id, { tour_id: tour.id })
-      onClose()
-      router.push(`/quotes/${quote.id}`)
+      await fetchQuotes() // 重新載入以更新列表
     } catch (error) {
       console.error('連結報價單失敗:', error)
     } finally {
@@ -283,18 +318,18 @@ export function LinkDocumentsToTourDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()} modal={true}>
-      <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="max-w-5xl max-h-[85vh] flex flex-col overflow-hidden">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>管理文件</DialogTitle>
           <DialogDescription>
             為「{tour.name}」管理行程表與報價單
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-6 mt-4 overflow-hidden">
+        <div className="grid grid-cols-2 gap-6 mt-4 flex-1 min-h-0 overflow-hidden">
           {/* ========== 左邊：行程表 ========== */}
-          <div className="space-y-4 overflow-hidden flex flex-col">
-            <div className="flex items-center gap-2 pb-2 border-b border-morandi-container">
+          <div className="flex flex-col overflow-hidden min-h-0">
+            <div className="flex items-center gap-2 pb-2 border-b border-morandi-container flex-shrink-0">
               <FileText className="w-5 h-5 text-morandi-primary" />
               <span className="font-medium text-morandi-primary">行程表</span>
             </div>
@@ -303,7 +338,7 @@ export function LinkDocumentsToTourDialog({
             <button
               onClick={handleCreateItinerary}
               disabled={isCreatingItinerary}
-              className="w-full flex items-center gap-3 p-3 rounded-lg border border-dashed border-morandi-primary/30 bg-morandi-primary/5 hover:bg-morandi-primary/10 hover:border-morandi-primary/50 transition-colors text-left disabled:opacity-50"
+              className="w-full flex items-center gap-3 p-3 mt-4 rounded-lg border border-dashed border-morandi-primary/30 bg-morandi-primary/5 hover:bg-morandi-primary/10 hover:border-morandi-primary/50 transition-colors text-left disabled:opacity-50 flex-shrink-0"
             >
               <div className="w-7 h-7 rounded bg-morandi-primary/20 flex items-center justify-center shrink-0">
                 {isCreatingItinerary ? (
@@ -317,7 +352,7 @@ export function LinkDocumentsToTourDialog({
 
             {/* 已關聯的行程表 */}
             {linkedItineraries.length > 0 && (
-              <div>
+              <div className="flex-shrink-0 mt-4">
                 <div className="text-xs font-medium text-morandi-secondary mb-2">已關聯</div>
                 <div className="space-y-1.5">
                   {linkedItineraries.map(itinerary => (
@@ -362,8 +397,8 @@ export function LinkDocumentsToTourDialog({
             )}
 
             {/* 連結現有行程表 */}
-            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-              <div className="flex items-center justify-between mb-2">
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0 mt-4">
+              <div className="flex items-center justify-between mb-2 flex-shrink-0">
                 <span className="text-xs font-medium text-morandi-secondary">連結現有</span>
                 <div className="flex items-center gap-1.5">
                   <div className="relative">
@@ -394,19 +429,30 @@ export function LinkDocumentsToTourDialog({
                 </div>
               ) : availableItineraries.length > 0 ? (
                 <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
-                  {availableItineraries.map(itinerary => (
-                    <button
-                      key={itinerary.id}
-                      onClick={() => handleLinkItinerary(itinerary)}
-                      disabled={isLinkingItinerary}
-                      className="w-full flex items-center justify-between p-2 rounded-lg border border-morandi-container bg-white hover:bg-morandi-container/30 transition-colors text-left disabled:opacity-50 text-sm"
-                    >
-                      <div className="flex-1 min-w-0">
+                  {availableItineraries.map(itinerary => {
+                    const isLinkedToOtherTour = !!itinerary.tour_id && !itinerary.is_template
+                    const linkedTourName = getLinkedTourName(itinerary.tour_id)
+
+                    return (
+                      <button
+                        key={itinerary.id}
+                        onClick={() => !isLinkedToOtherTour && handleLinkItinerary(itinerary)}
+                        disabled={isLinkingItinerary || isLinkedToOtherTour}
+                        className={`w-full flex flex-col p-2 rounded-lg border transition-colors text-left text-sm ${
+                          isLinkedToOtherTour
+                            ? 'border-morandi-container/50 bg-morandi-container/20 cursor-not-allowed opacity-60'
+                            : 'border-morandi-container bg-white hover:bg-morandi-container/30 disabled:opacity-50'
+                        }`}
+                      >
                         <div className="flex items-center gap-2">
                           {itinerary.tour_code && (
-                            <span className="font-mono text-xs text-morandi-gold">{itinerary.tour_code}</span>
+                            <span className={`font-mono text-xs ${isLinkedToOtherTour ? 'text-morandi-secondary' : 'text-morandi-gold'}`}>
+                              {itinerary.tour_code}
+                            </span>
                           )}
-                          <span className="text-morandi-text truncate">{itinerary.title || '未命名'}</span>
+                          <span className={`truncate ${isLinkedToOtherTour ? 'text-morandi-secondary' : 'text-morandi-text'}`}>
+                            {itinerary.title || '未命名'}
+                          </span>
                           {itinerary.is_template && (
                             <span className="text-[10px] bg-morandi-primary/10 text-morandi-primary px-1 py-0.5 rounded">
                               範例
@@ -424,9 +470,15 @@ export function LinkDocumentsToTourDialog({
                             <span>{itinerary.daily_itinerary.length} 天</span>
                           )}
                         </div>
-                      </div>
-                    </button>
-                  ))}
+                        {isLinkedToOtherTour && linkedTourName && (
+                          <div className="text-[10px] text-morandi-secondary mt-1 flex items-center gap-1">
+                            <span>已連結：</span>
+                            <span className="text-morandi-primary/70 truncate">{linkedTourName}</span>
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-6 text-morandi-secondary text-xs border border-dashed border-morandi-container rounded-lg">
@@ -437,8 +489,8 @@ export function LinkDocumentsToTourDialog({
           </div>
 
           {/* ========== 右邊：報價單 ========== */}
-          <div className="space-y-4 overflow-hidden flex flex-col">
-            <div className="flex items-center gap-2 pb-2 border-b border-morandi-container">
+          <div className="flex flex-col overflow-hidden min-h-0">
+            <div className="flex items-center gap-2 pb-2 border-b border-morandi-container flex-shrink-0">
               <Calculator className="w-5 h-5 text-morandi-gold" />
               <span className="font-medium text-morandi-primary">報價單</span>
             </div>
@@ -447,7 +499,7 @@ export function LinkDocumentsToTourDialog({
             <button
               onClick={handleCreateQuote}
               disabled={isCreatingQuote}
-              className="w-full flex items-center gap-3 p-3 rounded-lg border border-dashed border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 hover:border-morandi-gold/50 transition-colors text-left disabled:opacity-50"
+              className="w-full flex items-center gap-3 p-3 mt-4 rounded-lg border border-dashed border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 hover:border-morandi-gold/50 transition-colors text-left disabled:opacity-50 flex-shrink-0"
             >
               <div className="w-7 h-7 rounded bg-morandi-gold/20 flex items-center justify-center shrink-0">
                 {isCreatingQuote ? (
@@ -461,7 +513,7 @@ export function LinkDocumentsToTourDialog({
 
             {/* 已關聯的報價單 */}
             {linkedQuotes.length > 0 && (
-              <div>
+              <div className="flex-shrink-0 mt-4">
                 <div className="text-xs font-medium text-morandi-secondary mb-2">已關聯</div>
                 <div className="space-y-1.5">
                   {linkedQuotes.map(quote => (
@@ -511,8 +563,8 @@ export function LinkDocumentsToTourDialog({
             )}
 
             {/* 連結現有報價單 */}
-            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-              <div className="flex items-center justify-between mb-2">
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0 mt-4">
+              <div className="flex items-center justify-between mb-2 flex-shrink-0">
                 <span className="text-xs font-medium text-morandi-secondary">連結現有</span>
                 <div className="relative">
                   <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary" />
@@ -531,24 +583,43 @@ export function LinkDocumentsToTourDialog({
                 </div>
               ) : availableQuotes.length > 0 ? (
                 <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
-                  {availableQuotes.map(quote => (
-                    <button
-                      key={quote.id}
-                      onClick={() => handleLinkQuote(quote)}
-                      disabled={isLinkingQuote}
-                      className="w-full flex items-center justify-between p-2 rounded-lg border border-morandi-container bg-white hover:bg-morandi-container/30 transition-colors text-left disabled:opacity-50 text-sm"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-morandi-gold">{quote.code}</span>
-                        <span className="text-morandi-text truncate">{quote.name || '未命名'}</span>
-                        {quote.versions && quote.versions.length > 0 && (
-                          <span className="text-[10px] bg-morandi-container text-morandi-secondary px-1 py-0.5 rounded">
-                            {quote.versions.length} 版
+                  {availableQuotes.map(quote => {
+                    const isLinkedToOtherTour = !!quote.tour_id
+                    const linkedTourName = getLinkedTourName(quote.tour_id)
+
+                    return (
+                      <button
+                        key={quote.id}
+                        onClick={() => !isLinkedToOtherTour && handleLinkQuote(quote)}
+                        disabled={isLinkingQuote || isLinkedToOtherTour}
+                        className={`w-full flex flex-col p-2 rounded-lg border transition-colors text-left text-sm ${
+                          isLinkedToOtherTour
+                            ? 'border-morandi-container/50 bg-morandi-container/20 cursor-not-allowed opacity-60'
+                            : 'border-morandi-container bg-white hover:bg-morandi-container/30 disabled:opacity-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`font-mono text-xs ${isLinkedToOtherTour ? 'text-morandi-secondary' : 'text-morandi-gold'}`}>
+                            {quote.code}
                           </span>
+                          <span className={`truncate ${isLinkedToOtherTour ? 'text-morandi-secondary' : 'text-morandi-text'}`}>
+                            {quote.name || '未命名'}
+                          </span>
+                          {quote.versions && quote.versions.length > 0 && (
+                            <span className="text-[10px] bg-morandi-container text-morandi-secondary px-1 py-0.5 rounded">
+                              {quote.versions.length} 版
+                            </span>
+                          )}
+                        </div>
+                        {isLinkedToOtherTour && linkedTourName && (
+                          <div className="text-[10px] text-morandi-secondary mt-1 flex items-center gap-1">
+                            <span>已連結：</span>
+                            <span className="text-morandi-primary/70 truncate">{linkedTourName}</span>
+                          </div>
                         )}
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-6 text-morandi-secondary text-xs border border-dashed border-morandi-container rounded-lg">

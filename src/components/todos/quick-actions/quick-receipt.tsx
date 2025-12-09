@@ -18,9 +18,14 @@ import { useOrderStore, useTourStore } from '@/stores'
 import { Combobox } from '@/components/ui/combobox'
 import { usePaymentData } from '@/app/(main)/finance/payments/hooks/usePaymentData'
 import type { ReceiptItem } from '@/stores'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface QuickReceiptProps {
   onSubmit?: () => void
+  /** 預設選中的團體 ID */
+  defaultTourId?: string
+  /** 預設選中的訂單 ID */
+  defaultOrderId?: string
 }
 
 const RECEIPT_TYPES = {
@@ -40,13 +45,22 @@ const paymentMethods = [
   { value: RECEIPT_TYPES.LINK_PAY, label: 'LinkPay' },
 ]
 
-export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
+export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickReceiptProps) {
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore()
   const { handleCreateReceipt } = usePaymentData()
 
-  const [selectedTourId, setSelectedTourId] = useState<string>('')
-  const [selectedOrderId, setSelectedOrderId] = useState<string>('')
+  const [selectedTourId, setSelectedTourId] = useState<string>(defaultTourId || '')
+  const [selectedOrderId, setSelectedOrderId] = useState<string>(defaultOrderId || '')
+
+  // 🔥 當 default 值變化時更新選中的值
+  React.useEffect(() => {
+    if (defaultTourId) setSelectedTourId(defaultTourId)
+  }, [defaultTourId])
+
+  React.useEffect(() => {
+    if (defaultOrderId) setSelectedOrderId(defaultOrderId)
+  }, [defaultOrderId])
 
   // 使用 ReceiptItem 格式
   const [paymentItem, setPaymentItem] = useState<Partial<ReceiptItem>>({
@@ -87,12 +101,12 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
   // 儲存
   const handleSave = async () => {
     if (!selectedOrderId) {
-      alert('請選擇訂單')
+      void alert('請選擇訂單', 'warning')
       return
     }
 
     if (!paymentItem.amount || paymentItem.amount === 0) {
-      alert('收款金額不能為 0')
+      void alert('收款金額不能為 0', 'warning')
       return
     }
 
@@ -102,12 +116,12 @@ export function QuickReceipt({ onSubmit }: QuickReceiptProps) {
         paymentItems: [paymentItem as ReceiptItem],
       })
 
-      alert('✅ 收款單建立成功')
+      await alert('收款單建立成功', 'success')
       onSubmit?.()
       resetForm()
     } catch (error) {
       logger.error('❌ Save Error:', error)
-      alert('❌ 建立失敗，請稍後再試')
+      void alert('建立失敗，請稍後再試', 'error')
     }
   }
 

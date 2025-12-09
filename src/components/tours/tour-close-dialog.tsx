@@ -11,6 +11,7 @@ import { PaymentRequest } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Plus, X } from 'lucide-react'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface Employee {
   id: string
@@ -187,7 +188,11 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       return
     }
 
-    if (!confirm(`確定要結團嗎？結團後將無法修改。\n\n業務業績：${salesTotal}%\nOP 獎金：${opTotal}%`)) {
+    const confirmed = await confirm(`確定要結團嗎？結團後將無法修改。\n\n業務業績：${salesTotal}%\nOP 獎金：${opTotal}%`, {
+      title: '結團確認',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 

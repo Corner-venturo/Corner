@@ -12,6 +12,8 @@ interface VisaApplicant {
   expected_issue_date: string // 預計下件時間
   fee?: number // 代辦費（可手動修改）
   cost: number
+  isAdditional?: boolean // 是否為追加列（同一人的其他簽證）
+  parentId?: string // 追加列的父申請人 ID
 }
 
 /**
@@ -105,6 +107,40 @@ export function useVisasDialog(tours: Tour[]) {
     ])
   }, [])
 
+  // 追加同一人的其他簽證（插入在該申請人下方）
+  const addApplicantForSame = useCallback((parentId: string, parentName: string) => {
+    setApplicants(prev => {
+      const parentIndex = prev.findIndex(a => a.id === parentId)
+      if (parentIndex === -1) return prev
+
+      const parent = prev[parentIndex]
+      const defaultCountry = '護照 成人'
+      // 追加列的收件日期 = 父列的預計下件日期（等前一件下來才能送）
+      const newReceivedDate = parent.expected_issue_date || ''
+      // 根據新的收件日期和簽證類型計算預計下件日期
+      const expectedDate = newReceivedDate
+        ? calculateReceivedDate(newReceivedDate, defaultCountry)
+        : ''
+
+      const newApplicant: VisaApplicant = {
+        id: Date.now().toString(),
+        name: parentName, // 帶入同一人名字
+        country: defaultCountry, // 預設另一種類型
+        is_urgent: false,
+        received_date: newReceivedDate, // 收件日期 = 父列的下件日期
+        expected_issue_date: expectedDate, // 自動計算預計下件日期
+        cost: 0,
+        isAdditional: true, // 標記為追加列
+        parentId: parentId,
+      }
+
+      // 插入在該申請人的下一個位置
+      const newList = [...prev]
+      newList.splice(parentIndex + 1, 0, newApplicant)
+      return newList
+    })
+  }, [calculateReceivedDate])
+
   // 移除辦理人
   const removeApplicant = useCallback(
     (id: string) => {
@@ -186,6 +222,7 @@ export function useVisasDialog(tours: Tour[]) {
     calculateReceivedDate,
     calculateFee,
     addApplicant,
+    addApplicantForSame,
     removeApplicant,
     updateApplicant,
     resetForm,

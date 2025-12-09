@@ -5,6 +5,7 @@ import { InputIME } from '@/components/ui/input-ime'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Sparkles, Loader2, ImageIcon } from 'lucide-react'
 import { useRegionsStore } from '@/stores'
+import { alert } from '@/lib/ui/alert-dialog'
 
 // 型別定義
 interface DailyScheduleItem {
@@ -190,11 +191,11 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         }
       } else {
         console.error('Image generation failed:', result.error)
-        alert(`圖片生成失敗：${result.error || '未知錯誤'}`)
+        void alert(`圖片生成失敗：${result.error || '未知錯誤'}`, 'error')
       }
     } catch (error) {
       console.error('Image generation error:', error)
-      alert('圖片生成發生錯誤，請稍後再試')
+      void alert('圖片生成發生錯誤，請稍後再試', 'error')
     }
 
     setGeneratingImage(null)

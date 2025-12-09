@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Check, AlertCircle, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ROLES, type UserRole, getAllRoles, getRoleConfig } from '@/lib/rbac-config'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface PermissionsTabProps {
   employee: Employee
@@ -89,7 +90,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         setShowSavedMessage(true)
         setTimeout(() => setShowSavedMessage(false), UI_DELAYS.SUCCESS_MESSAGE)
       } catch (error) {
-        alert('儲存失敗，請稍後再試')
+        void alert('儲存失敗，請稍後再試', 'error')
       } finally {
         setIsSaving(false)
       }
@@ -125,7 +126,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         setShowSavedMessage(true)
         setTimeout(() => setShowSavedMessage(false), UI_DELAYS.SUCCESS_MESSAGE)
       } catch (error) {
-        alert('儲存失敗，請稍後再試')
+        void alert('儲存失敗，請稍後再試', 'error')
       } finally {
         setIsSaving(false)
       }

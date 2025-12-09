@@ -5,6 +5,7 @@ import { X, DollarSign, Calendar } from 'lucide-react'
 import { useReceiptOrderStore } from '@/stores'
 import type { CreateInput } from '@/stores/core/types'
 import type { ReceiptOrder } from '@/types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface CreateReceiptDialogProps {
   order: {
@@ -51,7 +52,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
       onClose()
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
-      alert(`建立收款單失敗：${errorMessage}`)
+      void alert(`建立收款單失敗：${errorMessage}`, 'error')
     }
   }
 

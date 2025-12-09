@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Channel } from '@/stores/workspace-store'
 import { CHANNEL_SWITCH_DELAY, ALERT_MESSAGES } from '../constants'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 /**
  * 管理頻道切換、刪除、更新等操作
@@ -33,7 +34,7 @@ export function useChannelOperations(
     }
 
     if (!editChannelName.trim()) {
-      alert(ALERT_MESSAGES.CHANNEL_NAME_REQUIRED)
+      await alert(ALERT_MESSAGES.CHANNEL_NAME_REQUIRED, 'warning')
       return
     }
 
@@ -43,9 +44,9 @@ export function useChannelOperations(
         description: editChannelDescription.trim() || undefined,
       })
       setShowSettingsDialog(false)
-      alert(ALERT_MESSAGES.UPDATE_SUCCESS)
+      await alert(ALERT_MESSAGES.UPDATE_SUCCESS, 'success')
     } catch (error) {
-      alert(ALERT_MESSAGES.UPDATE_FAILED)
+      await alert(ALERT_MESSAGES.UPDATE_FAILED, 'error')
     }
   }
 
@@ -54,8 +55,12 @@ export function useChannelOperations(
       return
     }
 
-    const confirmed = confirm(
-      `${ALERT_MESSAGES.DELETE_CHANNEL_CONFIRM.replace('頻道', `#${selectedChannel.name} 頻道`)}`
+    const confirmed = await confirm(
+      `${ALERT_MESSAGES.DELETE_CHANNEL_CONFIRM.replace('頻道', `#${selectedChannel.name} 頻道`)}`,
+      {
+        title: '刪除頻道',
+        type: 'warning',
+      }
     )
 
     if (confirmed) {
@@ -63,9 +68,9 @@ export function useChannelOperations(
         await deleteChannel(selectedChannel.id)
         selectChannel(null)
         setShowSettingsDialog(false)
-        alert(ALERT_MESSAGES.CHANNEL_DELETED)
+        await alert(ALERT_MESSAGES.CHANNEL_DELETED, 'success')
       } catch (error) {
-        alert(ALERT_MESSAGES.DELETE_FAILED)
+        await alert(ALERT_MESSAGES.DELETE_FAILED, 'error')
       }
     }
   }

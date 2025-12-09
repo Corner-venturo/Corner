@@ -18,6 +18,7 @@ import { formatDate } from '@/lib/utils'
 import { statusLabels, statusColors, categoryOptions, getNextStatuses } from '../types'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
 import { logger } from '@/lib/utils/logger'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface RequestDetailDialogProps {
   request: PaymentRequest | null
@@ -77,17 +78,21 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
   // 刪除請款單
   const handleDelete = async () => {
-    if (!confirm('確定要刪除此請款單嗎？此操作無法復原。')) {
+    const confirmed = await confirm('確定要刪除此請款單嗎？此操作無法復原。', {
+      title: '刪除請款單',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
     try {
       await deleteRequest(request.id)
-      alert('✅ 請款單已刪除')
+      await alert('請款單已刪除', 'success')
       onOpenChange(false)
     } catch (error) {
       logger.error('刪除請款單失敗:', error)
-      alert('❌ 刪除請款單失敗')
+      await alert('刪除請款單失敗', 'error')
     }
   }
 
@@ -95,17 +100,17 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   const handleStatusChange = async (newStatus: 'pending' | 'approved' | 'paid') => {
     try {
       await updateRequest(request.id, { status: newStatus })
-      alert(`✅ 狀態已更新為：${statusLabels[newStatus]}`)
+      await alert(`狀態已更新為：${statusLabels[newStatus]}`, 'success')
     } catch (error) {
       logger.error('更新狀態失敗:', error)
-      alert('❌ 更新狀態失敗')
+      await alert('更新狀態失敗', 'error')
     }
   }
 
   // 新增項目
   const handleAddItem = async () => {
     if (!newItem.description || newItem.unit_price <= 0) {
-      alert('請填寫說明和單價')
+      await alert('請填寫說明和單價', 'warning')
       return
     }
 
@@ -134,7 +139,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       })
     } catch (error) {
       logger.error('新增項目失敗:', error)
-      alert('❌ 新增項目失敗')
+      await alert('新增項目失敗', 'error')
     }
   }
 
@@ -163,20 +168,24 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       setEditingItemId(null)
     } catch (error) {
       logger.error('更新項目失敗:', error)
-      alert('❌ 更新項目失敗')
+      await alert('更新項目失敗', 'error')
     }
   }
 
   // 刪除項目
   const handleDeleteItem = async (itemId: string) => {
-    if (!confirm('確定要刪除此項目嗎？')) return
+    const confirmed = await confirm('確定要刪除此項目嗎？', {
+      title: '刪除項目',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       await paymentRequestService.deleteItem(request.id, itemId)
       await fetchRequestItems()
     } catch (error) {
       logger.error('刪除項目失敗:', error)
-      alert('❌ 刪除項目失敗')
+      await alert('刪除項目失敗', 'error')
     }
   }
 

@@ -408,7 +408,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           <EnhancedTable
             columns={taskColumns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
             data={tourTasks}
-            initialPageSize={10}
+            initialPageSize={15}
             showFilters={false}
           />
         ) : (

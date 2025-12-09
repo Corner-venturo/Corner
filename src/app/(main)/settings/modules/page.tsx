@@ -28,6 +28,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { Workspace } from '@/types/models'
@@ -158,11 +159,11 @@ export default function ModulesManagementPage() {
 
     if (!module) return
 
-    if (
-      !confirm(
-        `確定要停用 ${MODULE_INFO[moduleName].name} 嗎？\n\n停用後相關功能將無法使用。`
-      )
-    ) {
+    const confirmed = await confirm(
+      `確定要停用 ${MODULE_INFO[moduleName].name} 嗎？\n\n停用後相關功能將無法使用。`,
+      { title: '停用模組', type: 'warning' }
+    )
+    if (!confirmed) {
       return
     }
 

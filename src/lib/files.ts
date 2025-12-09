@@ -1,3 +1,5 @@
+import { alert } from '@/lib/ui/alert-dialog'
+
 interface DownloadFileOptions {
   retries?: number
   onError?: (error: unknown) => void
@@ -47,7 +49,7 @@ export async function downloadFile(
 
       if (attempt > retries) {
         onError?.(error)
-        alert('檔案下載失敗，請稍後再試。')
+        void alert('檔案下載失敗，請稍後再試', 'error')
         throw error
       }
 

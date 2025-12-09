@@ -93,7 +93,43 @@ export function CreateChannelDialog({
             />
           </div>
 
-          {/* 移除公開/私密選項，統一為私密頻道 */}
+          {/* 頻道類型選擇 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
+              頻道類型
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => onChannelTypeChange('public')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-colors',
+                  channelType === 'public'
+                    ? 'bg-morandi-gold/10 border-morandi-gold text-morandi-primary'
+                    : 'border-morandi-gold/20 text-morandi-secondary hover:bg-morandi-secondary/5'
+                )}
+              >
+                <Hash size={16} />
+                <span className="text-sm">公開頻道</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onChannelTypeChange('private')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-colors',
+                  channelType === 'private'
+                    ? 'bg-morandi-gold/10 border-morandi-gold text-morandi-primary'
+                    : 'border-morandi-gold/20 text-morandi-secondary hover:bg-morandi-secondary/5'
+                )}
+              >
+                <Lock size={16} />
+                <span className="text-sm">私密頻道</span>
+              </button>
+            </div>
+            <p className="text-xs text-morandi-secondary mt-1">
+              {channelType === 'public' ? '所有成員都可以看到並加入' : '只有被邀請的成員可以看到'}
+            </p>
+          </div>
 
           {/* 成員選擇 */}
           <div>

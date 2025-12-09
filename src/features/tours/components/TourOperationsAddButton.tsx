@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourExtraFields } from '../types'
+import { prompt } from '@/lib/ui/alert-dialog'
 
 interface TourOperationsAddButtonProps {
   tour: Tour
@@ -80,7 +81,7 @@ function TourOperationsAddDialog({
   setTourExtraFields,
 }: TourOperationsAddDialogProps) {
   const handleOptionSelect = useCallback(
-    (option: string) => {
+    async (option: string) => {
       const tour_id = tour.id
 
       // Initialize field state for this tour if not exists
@@ -117,7 +118,10 @@ function TourOperationsAddDialog({
           break
 
         case 'blank':
-          const fieldName = prompt('請輸入欄位名稱:')
+          const fieldName = await prompt('請輸入欄位名稱', {
+            title: '新增自訂欄位',
+            placeholder: '輸入名稱...',
+          })
           if (fieldName && fieldName.trim()) {
             const fieldId = Date.now().toString()
             setTourExtraFields(prev => ({

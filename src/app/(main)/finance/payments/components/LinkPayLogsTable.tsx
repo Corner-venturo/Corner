@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
 import type { LinkPayLog } from '@/types/receipt.types'
 import { LinkPayStatus, LINKPAY_STATUS_LABELS } from '@/types/receipt.types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface LinkPayLogsTableProps {
   logs: LinkPayLog[]
@@ -34,7 +35,7 @@ export function LinkPayLogsTable({ logs }: LinkPayLogsTableProps) {
       setTimeout(() => setCopiedId(null), 2000)
     } catch (error) {
       logger.error('複製失敗:', error)
-      alert('複製失敗')
+      void alert('複製失敗', 'error')
     }
   }
 

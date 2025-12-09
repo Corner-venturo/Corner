@@ -14,6 +14,7 @@ import {
   type WorkoutExercise,
   weekDayNames,
 } from '../../hooks/useTimeboxData'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface WorkoutDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -109,7 +110,11 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
   }
 
   const handleDeleteExercise = async (exerciseId: string) => {
-    if (!confirm('確定要刪除此動作嗎？')) return
+    const confirmed = await confirm('確定要刪除此動作嗎？', {
+      title: '刪除動作',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     const updatedExercises = workoutData.exercises.filter(ex => ex.id !== exerciseId)
     await updateScheduledBox(scheduledBox.id, {
@@ -153,7 +158,11 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
   }
 
   const handleDelete = async () => {
-    if (!confirm(`確定要移除此訓練排程嗎？\n\n箱子：${box.name}`)) return
+    const confirmed = await confirm(`確定要移除此訓練排程嗎？\n\n箱子：${box.name}`, {
+      title: '移除訓練排程',
+      type: 'warning',
+    })
+    if (!confirmed) return
     await deleteScheduledBox(scheduledBox.id)
     onClose()
   }

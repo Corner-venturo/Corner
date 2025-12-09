@@ -37,6 +37,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { alert } from '@/lib/ui/alert-dialog'
 
 // 擴展型別（與 AttractionSelector 一致）
 interface AttractionWithCity extends Attraction {
@@ -442,7 +443,7 @@ export function DailyItinerarySection({
     file: File
   ) => {
     if (!file.type.startsWith('image/')) {
-      alert('請選擇圖片檔案')
+      void alert('請選擇圖片檔案', 'warning')
       return
     }
 
@@ -459,7 +460,7 @@ export function DailyItinerarySection({
 
       if (uploadError) {
         console.error('上傳失敗:', uploadError)
-        alert('圖片上傳失敗')
+        void alert('圖片上傳失敗', 'error')
         return
       }
 
@@ -481,7 +482,7 @@ export function DailyItinerarySection({
       setLibraryImageName(activityTitle)
     } catch (error) {
       console.error('上傳錯誤:', error)
-      alert('上傳過程發生錯誤')
+      void alert('上傳過程發生錯誤', 'error')
     } finally {
       setUploadingActivityImage(null)
     }
@@ -710,6 +711,28 @@ export function DailyItinerarySection({
                   title="插入箭頭"
                 >
                   <ArrowRight size={14} className="text-morandi-primary" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.querySelector(
+                      `#title-input-${dayIndex}`
+                    ) as HTMLInputElement
+                    if (input) {
+                      const cursorPos = input.selectionStart || day.title.length
+                      const newValue =
+                        day.title.slice(0, cursorPos) + ' ⇀ ' + day.title.slice(cursorPos)
+                      updateDailyItinerary(dayIndex, 'title', newValue)
+                      setTimeout(() => {
+                        input.focus()
+                        input.setSelectionRange(cursorPos + 3, cursorPos + 3)
+                      }, 0)
+                    }
+                  }}
+                  className="px-2 py-0.5 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入鉤箭頭"
+                >
+                  ⇀
                 </button>
                 <button
                   type="button"

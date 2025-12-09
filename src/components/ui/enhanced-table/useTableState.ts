@@ -11,7 +11,7 @@ export function useTableState<T>({
   data,
   searchTerm = '',
   searchableFields = [],
-  initialPageSize = 10,
+  initialPageSize = 15,
 }: UseTableStateProps<T>) {
   const [sortColumn, setSortColumn] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')

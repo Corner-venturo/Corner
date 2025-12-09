@@ -12,6 +12,7 @@ import { DestinationSelector } from '@/components/shared/destination-selector'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface QuickGroupProps {
   onSubmit?: () => void
@@ -53,22 +54,22 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
   const handleSubmit = async () => {
     if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
-      alert('請填寫必填欄位（團名、出發日期、返回日期）')
+      void alert('請填寫必填欄位（團名、出發日期、返回日期）', 'warning')
       return
     }
 
     if (!newTour.countryCode) {
-      alert('請選擇國家/地區')
+      void alert('請選擇國家/地區', 'warning')
       return
     }
 
     if (newTour.countryCode !== '__custom__' && !newTour.cityCode) {
-      alert('請選擇城市')
+      void alert('請選擇城市', 'warning')
       return
     }
 
     if (newTour.countryCode === '__custom__' && !newTour.customLocation) {
-      alert('請輸入自訂目的地')
+      void alert('請輸入自訂目的地', 'warning')
       return
     }
 
@@ -133,10 +134,10 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         total_amount: 0,
       })
 
-      alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！')
+      await alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！', 'success')
       onSubmit?.()
     } catch (error) {
-      alert('建立失敗，請稍後再試')
+      void alert('建立失敗，請稍後再試', 'error')
     } finally {
       setSubmitting(false)
     }

@@ -17,6 +17,7 @@ import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/us
 import { useOrderStore, useTourStore } from '@/stores'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface InvoiceDialogProps {
   open: boolean
@@ -197,8 +198,9 @@ export function InvoiceDialog({
 
     // 檢查超開提醒
     if (currentOrder && totalAmount > (currentOrder.paid_amount ?? 0)) {
-      const confirmed = window.confirm(
-        `發票金額 NT$ ${totalAmount.toLocaleString()} 超過已收款金額 NT$ ${(currentOrder.paid_amount ?? 0).toLocaleString()}，確定要開立嗎？`
+      const confirmed = await confirm(
+        `發票金額 NT$ ${totalAmount.toLocaleString()} 超過已收款金額 NT$ ${(currentOrder.paid_amount ?? 0).toLocaleString()}，確定要開立嗎？`,
+        { title: '金額超開提醒', type: 'warning' }
       )
       if (!confirmed) return
     }

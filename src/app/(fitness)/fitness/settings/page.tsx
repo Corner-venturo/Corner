@@ -5,24 +5,32 @@ import { LogOut, Trash2, Info, User } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
 import { useAuthStore } from '@/stores/auth-store'
 import { localDB } from '@/lib/db'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 export default function FitnessSettingsPage() {
   const router = useRouter()
   const { user, logout } = useAuthStore()
 
   const handleLogout = async () => {
-    if (confirm('確定要登出嗎？')) {
+    const confirmed = await confirm('確定要登出嗎？', {
+      title: '登出',
+      type: 'warning',
+    })
+    if (confirmed) {
       await logout()
       router.push('/login')
     }
   }
 
   const handleClearData = async () => {
-    if (
-      confirm(
-        '⚠️ 警告：這將清除所有本地健身資料（訓練記錄、身體數據、目標等）。\n\n此操作無法復原，確定要繼續嗎？'
-      )
-    ) {
+    const confirmed = await confirm(
+      '⚠️ 警告：這將清除所有本地健身資料（訓練記錄、身體數據、目標等）。\n\n此操作無法復原，確定要繼續嗎？',
+      {
+        title: '清除本地資料',
+        type: 'warning',
+      }
+    )
+    if (confirmed) {
       try {
         // 清除健身相關的 localStorage 資料
         // 健身模組目前使用 localStorage 儲存資料，未來可能會改用 IndexedDB
@@ -34,11 +42,11 @@ export default function FitnessSettingsPage() {
           localStorage.removeItem(key)
         })
 
-        alert('本地資料已清除')
+        await alert('本地資料已清除', 'success')
         router.push('/fitness')
       } catch (error) {
         console.error('清除資料失敗:', error)
-        alert('清除資料失敗，請稍後再試')
+        await alert('清除資料失敗，請稍後再試', 'error')
       }
     }
   }

@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { sendMessageAction } from '../actions/message-actions'
 import { Send } from 'lucide-react'
 import type { Channel } from '@/stores/workspace/types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface MessageInputProps {
   channel: Channel | null;
@@ -24,7 +25,7 @@ export function MessageInput({ channel }: MessageInputProps) {
 
       if (result?.error) {
         // In a real app, show a toast notification
-        alert(result.error)
+        void alert(result.error, 'error')
       } else {
         setContent('') // Clear input on successful send
       }

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CalendarPlus, Search, Loader2 } from 'lucide-react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface FlightInfoSectionProps {
   data: TourFormData
@@ -139,7 +140,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
     const dateStr = data.outboundFlight?.departureDate // 格式 MM/DD
 
     if (!flightNumber) {
-      alert('請先輸入航班號碼')
+      void alert('請先輸入航班號碼', 'warning')
       return
     }
 
@@ -163,7 +164,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
     try {
       const result = await searchFlightAction(flightNumber, fullDate)
       if (result.error) {
-        alert(result.error)
+        void alert(result.error, 'error')
         return
       }
       if (result.data) {
@@ -189,7 +190,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
         }
       }
     } catch {
-      alert('查詢航班時發生錯誤')
+      void alert('查詢航班時發生錯誤', 'error')
     } finally {
       setLoadingOutbound(false)
     }
@@ -201,7 +202,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
     const dateStr = data.returnFlight?.departureDate // 格式 MM/DD
 
     if (!flightNumber) {
-      alert('請先輸入航班號碼')
+      void alert('請先輸入航班號碼', 'warning')
       return
     }
 
@@ -228,7 +229,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
     try {
       const result = await searchFlightAction(flightNumber, fullDate)
       if (result.error) {
-        alert(result.error)
+        void alert(result.error, 'error')
         return
       }
       if (result.data) {
@@ -254,7 +255,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
         }
       }
     } catch {
-      alert('查詢航班時發生錯誤')
+      void alert('查詢航班時發生錯誤', 'error')
     } finally {
       setLoadingReturn(false)
     }

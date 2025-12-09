@@ -6,6 +6,7 @@ import { Attraction, AttractionFormData } from '../types'
 import type { Country, Region, City } from '@/stores/region-store'
 import { supabase } from '@/lib/supabase/client'
 import { Upload, X, Loader2, ChevronUp, ChevronDown, Minus } from 'lucide-react'
+import { prompt, alert } from '@/lib/ui/alert-dialog'
 
 // 圖片位置類型
 type ImagePosition = 'top' | 'center' | 'bottom'
@@ -178,7 +179,7 @@ export function AttractionsDialog({
       for (const file of Array.from(files)) {
         // 檢查檔案類型
         if (!file.type.startsWith('image/')) {
-          alert(`${file.name} 不是圖片檔案`)
+          void alert(`${file.name} 不是圖片檔案`, 'warning')
           continue
         }
 
@@ -194,7 +195,7 @@ export function AttractionsDialog({
 
         if (uploadError) {
           console.error('上傳失敗:', uploadError)
-          alert(`${file.name} 上傳失敗`)
+          void alert(`${file.name} 上傳失敗`, 'error')
           continue
         }
 
@@ -212,7 +213,7 @@ export function AttractionsDialog({
       setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
     } catch (error) {
       console.error('上傳錯誤:', error)
-      alert('上傳過程發生錯誤')
+      void alert('上傳過程發生錯誤', 'error')
     } finally {
       setIsUploading(false)
       // 清空 input，讓同一檔案可以再次上傳
@@ -247,8 +248,11 @@ export function AttractionsDialog({
   }
 
   // 新增網址圖片
-  const handleAddUrlImage = () => {
-    const url = prompt('請輸入圖片網址：')
+  const handleAddUrlImage = async () => {
+    const url = await prompt('請輸入圖片網址', {
+      title: '新增圖片',
+      placeholder: 'https://...',
+    })
     if (url && url.trim()) {
       const allImages = [...uploadedImages, url.trim()]
       setUploadedImages(allImages)

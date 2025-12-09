@@ -6,6 +6,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import type { SortableChannelItemProps } from './types'
 import { DELETE_TOUR_CHANNEL_PASSWORD } from '@/lib/constants/workspace-settings'
+import { prompt, alert } from '@/lib/ui/alert-dialog'
 
 export function SortableChannelItem({
   channel,
@@ -127,11 +128,11 @@ export function SortableChannelItem({
 
                   // 如果是旅遊團頻道，需要輸入密碼
                   if (isTourChannel) {
-                    const password = prompt(
-                      '⚠️ 刪除旅遊團頻道需要密碼確認\n\n' +
-                        `即將刪除：${channel.name}\n` +
-                        '此操作無法復原，請輸入密碼：'
-                    )
+                    const password = await prompt(`即將刪除：${channel.name}\n此操作無法復原，請輸入密碼確認`, {
+                      title: '刪除旅遊團頻道',
+                      inputType: 'password',
+                      placeholder: '請輸入密碼',
+                    })
 
                     // 使用者取消
                     if (password === null) {
@@ -140,7 +141,7 @@ export function SortableChannelItem({
 
                     // 驗證密碼
                     if (password !== DELETE_TOUR_CHANNEL_PASSWORD) {
-                      alert('❌ 密碼錯誤')
+                      await alert('密碼錯誤', 'error')
                       return
                     }
                   }

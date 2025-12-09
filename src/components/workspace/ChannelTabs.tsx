@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MessageSquare, Plus, FileText, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { prompt, confirm } from '@/lib/ui/alert-dialog'
 import { CanvasEditor } from './CanvasEditor'
 import { Channel } from '@/stores/workspace-store'
 
@@ -44,8 +45,11 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
   )
 
   // 新增畫布
-  const handleAddCanvas = () => {
-    const name = prompt('請輸入畫布名稱：')
+  const handleAddCanvas = async () => {
+    const name = await prompt('請輸入畫布名稱', {
+      title: '新增畫布',
+      placeholder: '輸入名稱...',
+    })
     if (!name || !name.trim()) return
 
     const newCanvas: Canvas = {
@@ -59,12 +63,16 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
   }
 
   // 刪除畫布
-  const handleDeleteCanvas = (canvasId: string, e: React.MouseEvent) => {
+  const handleDeleteCanvas = async (canvasId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     const canvas = canvases.find(c => c.id === canvasId)
     if (!canvas) return
 
-    if (!confirm(`確定要刪除畫布「${canvas.name}」嗎？`)) return
+    const confirmed = await confirm(`確定要刪除畫布「${canvas.name}」嗎？`, {
+      title: '刪除畫布',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     const newCanvases = canvases.filter(c => c.id !== canvasId)
     saveCanvases(newCanvases)

@@ -7,6 +7,7 @@ import { FileSignature, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTourStore } from '@/stores'
 import { ContractTemplate } from '@/types/tour.types'
+import { alert } from '@/lib/ui/alert-dialog'
 
 const CONTRACT_TEMPLATES = [
   { value: 'template_a' as ContractTemplate, label: '範本 A' },
@@ -35,7 +36,7 @@ export default function CreateContractPage() {
 
   const handleSave = async () => {
     if (!selectedTemplate) {
-      alert('請選擇合約範本')
+      await alert('請選擇合約範本', 'warning')
       return
     }
 
@@ -47,10 +48,10 @@ export default function CreateContractPage() {
         contract_created_at: new Date().toISOString(),
       })
 
-      alert('合約建立成功!')
+      await alert('合約建立成功!', 'success')
       router.push(`/contracts/${tourId}`)
     } catch (error) {
-      alert('儲存合約失敗，請稍後再試')
+      await alert('儲存合約失敗，請稍後再試', 'error')
     } finally {
       setSaving(false)
     }

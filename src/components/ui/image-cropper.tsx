@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface ImageCropperProps {
   open: boolean
@@ -111,7 +112,7 @@ export function ImageCropper({
       onClose()
     } catch (error) {
       console.error('裁切圖片失敗:', error)
-      alert('裁切圖片失敗，請重試')
+      void alert('裁切圖片失敗，請重試', 'error')
     } finally {
       setIsProcessing(false)
     }

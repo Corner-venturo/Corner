@@ -6,6 +6,7 @@ import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useUserStore, useAuthStore } from '@/stores'
 import { User, UserPlus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface MemberSidebarProps {
   isOpen: boolean
@@ -111,7 +112,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       setSearchQuery('')
       setShowAddMemberDialog(false)
     } catch (error) {
-      alert('新增成員失敗，請稍後再試')
+      void alert('新增成員失敗，請稍後再試', 'error')
     } finally {
       setIsAdding(false)
     }

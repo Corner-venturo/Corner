@@ -1,9 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, Trash2, Map, RefreshCw, ArrowLeftRight, FilePlus, Plane } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Map, RefreshCw, ArrowLeftRight, FilePlus, Plane, Contact } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +53,12 @@ interface QuoteWithVersions extends Omit<Quote, 'versions'> {
   categories?: CostCategory[]
 }
 
+interface ContactInfo {
+  contact_person: string
+  contact_phone: string
+  contact_address: string
+}
+
 interface QuoteHeaderProps {
   isSpecialTour: boolean
   isReadOnly: boolean
@@ -72,6 +85,9 @@ interface QuoteHeaderProps {
   currentEditingVersion: number | null
   router: AppRouterInstance
   accommodationDays?: number
+  // 聯絡資訊
+  contactInfo?: ContactInfo
+  onContactInfoChange?: (info: ContactInfo) => void
 }
 
 export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
@@ -100,8 +116,35 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   currentEditingVersion,
   router,
   accommodationDays,
+  contactInfo,
+  onContactInfoChange,
 }) => {
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
+  const [tempContactInfo, setTempContactInfo] = useState<ContactInfo>({
+    contact_person: '',
+    contact_phone: '',
+    contact_address: '',
+  })
+
+  // 檢查是否有聯絡資訊
+  const hasContactInfo = contactInfo && (contactInfo.contact_person || contactInfo.contact_phone || contactInfo.contact_address)
+
+  // 打開對話框時載入現有資料
+  const handleOpenContactDialog = () => {
+    setTempContactInfo({
+      contact_person: contactInfo?.contact_person || '',
+      contact_phone: contactInfo?.contact_phone || '',
+      contact_address: contactInfo?.contact_address || '',
+    })
+    setIsContactDialogOpen(true)
+  }
+
+  // 儲存聯絡資訊
+  const handleSaveContactInfo = () => {
+    onContactInfoChange?.(tempContactInfo)
+    setIsContactDialogOpen(false)
+  }
 
   return (
     <>
@@ -160,6 +203,24 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             )}
             placeholder="輸入團體名稱"
           />
+
+          {/* 聯絡資訊按鈕 */}
+          {onContactInfoChange && (
+            <button
+              onClick={handleOpenContactDialog}
+              disabled={isReadOnly}
+              className={cn(
+                'p-1.5 rounded-lg transition-colors',
+                hasContactInfo
+                  ? 'bg-morandi-gold/20 text-morandi-gold hover:bg-morandi-gold/30'
+                  : 'bg-morandi-container hover:bg-morandi-container/80 text-morandi-secondary',
+                isReadOnly && 'cursor-not-allowed opacity-60'
+              )}
+              title={hasContactInfo ? '編輯聯絡資訊' : '新增聯絡資訊'}
+            >
+              <Contact size={16} />
+            </button>
+          )}
         </div>
 
         {/* 右區：功能區域 (原中+右合併) */}
@@ -413,6 +474,72 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           )}
         </div>
       </div>
+
+      {/* 聯絡資訊對話框 */}
+      <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Contact size={20} className="text-morandi-gold" />
+              客戶聯絡資訊
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary block mb-1">
+                聯絡人
+              </label>
+              <input
+                type="text"
+                value={tempContactInfo.contact_person}
+                onChange={e => setTempContactInfo(prev => ({ ...prev, contact_person: e.target.value }))}
+                placeholder="請輸入聯絡人姓名"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-morandi-primary block mb-1">
+                聯絡電話
+              </label>
+              <input
+                type="text"
+                value={tempContactInfo.contact_phone}
+                onChange={e => setTempContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
+                placeholder="請輸入聯絡電話"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-morandi-primary block mb-1">
+                通訊地址
+              </label>
+              <input
+                type="text"
+                value={tempContactInfo.contact_address}
+                onChange={e => setTempContactInfo(prev => ({ ...prev, contact_address: e.target.value }))}
+                placeholder="請輸入通訊地址"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
+              />
+            </div>
+
+            <div className="text-xs text-morandi-secondary bg-morandi-container/30 p-3 rounded-lg">
+              提示：此資訊會用於合約和信封列印，切換快速報價時也會自動帶入
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsContactDialogOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={handleSaveContactInfo} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+              儲存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

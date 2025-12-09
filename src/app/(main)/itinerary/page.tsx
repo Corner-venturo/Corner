@@ -255,6 +255,8 @@ export default function ItineraryPage() {
   const isItineraryClosed = useCallback((itinerary: Itinerary) => {
     // 手動結案
     if (itinerary.closed_at) return true
+    // 公司範例不會因為日期過期而結案
+    if (itinerary.is_template) return false
     // 日期過期自動結案
     if (itinerary.departure_date) {
       const departureDate = new Date(itinerary.departure_date)
@@ -440,49 +442,60 @@ export default function ItineraryPage() {
                 <Copy size={14} />
               </button>
 
-              {/* 結案相關操作 */}
-              {isClosed ? (
+              {/* 公司範例：永遠顯示取消範例按鈕 */}
+              {isTemplate && (
                 <button
                   onClick={e => {
                     e.stopPropagation()
-                    handleReopen(itinerary.id)
+                    handleSetTemplate(itinerary.id, false)
                   }}
-                  className="p-1 text-blue-500/60 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                  title="重新開啟"
+                  className="p-1 text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors"
+                  title="取消公司範例"
                 >
-                  <RotateCcw size={14} />
+                  <Building2 size={14} />
                 </button>
-              ) : (
-                <>
-                  {/* 設為/取消公司範例 */}
-                  <button
-                    onClick={e => {
-                      e.stopPropagation()
-                      handleSetTemplate(itinerary.id, !isTemplate)
-                    }}
-                    className={cn(
-                      'p-1 rounded transition-colors',
-                      isTemplate
-                        ? 'text-purple-600 hover:text-purple-700 hover:bg-purple-50'
-                        : 'text-morandi-secondary hover:text-purple-600 hover:bg-purple-50'
-                    )}
-                    title={isTemplate ? '取消公司範例' : '設為公司範例'}
-                  >
-                    <Building2 size={14} />
-                  </button>
+              )}
 
-                  {/* 結案按鈕 */}
+              {/* 非公司範例的結案相關操作 */}
+              {!isTemplate && (
+                isClosed ? (
                   <button
                     onClick={e => {
                       e.stopPropagation()
-                      handleClose(itinerary.id)
+                      handleReopen(itinerary.id)
                     }}
-                    className="p-1 text-morandi-secondary hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                    title="結案"
+                    className="p-1 text-blue-500/60 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    title="重新開啟"
                   >
-                    <CheckCircle2 size={14} />
+                    <RotateCcw size={14} />
                   </button>
-                </>
+                ) : (
+                  <>
+                    {/* 設為公司範例 */}
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        handleSetTemplate(itinerary.id, true)
+                      }}
+                      className="p-1 text-morandi-secondary hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                      title="設為公司範例"
+                    >
+                      <Building2 size={14} />
+                    </button>
+
+                    {/* 結案按鈕 */}
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        handleClose(itinerary.id)
+                      }}
+                      className="p-1 text-morandi-secondary hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                      title="結案"
+                    >
+                      <CheckCircle2 size={14} />
+                    </button>
+                  </>
+                )
               )}
 
               {/* 封存操作 */}

@@ -15,6 +15,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { confirm } from '@/lib/ui/alert-dialog'
 
 interface AccountsManagementDialogProps {
   isOpen: boolean
@@ -39,7 +40,11 @@ export function AccountsManagementDialog({
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const handleDelete = async (id: string, name: string) => {
-    if (confirm(`確定要刪除帳戶「${name}」嗎？\n\n此操作無法復原。`)) {
+    const confirmed = await confirm(`確定要刪除帳戶「${name}」嗎？\n\n此操作無法復原。`, {
+      title: '刪除帳戶',
+      type: 'warning',
+    })
+    if (confirmed) {
       setDeletingId(id)
       await deleteAccount(id)
       setDeletingId(null)

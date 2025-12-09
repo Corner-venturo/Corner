@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { cn } from '@/lib/utils'
+import { confirm } from '@/lib/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -106,7 +107,11 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
 
   // 刪除體驗
   const handleDelete = async (id: string) => {
-    if (!confirm('確定要刪除此體驗？')) return
+    const confirmed = await confirm('確定要刪除此體驗？', {
+      title: '刪除體驗',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
     try {
       const { error } = await supabase.from('premium_experiences').delete().eq('id', id)

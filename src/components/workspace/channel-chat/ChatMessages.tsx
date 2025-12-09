@@ -6,6 +6,7 @@ import { validateFile } from '../chat/utils'
 import { Paperclip } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Message, AdvanceList, SharedOrderList, AdvanceItem } from '@/stores/workspace'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface MessageListTheme {
   colors: {
@@ -145,50 +146,69 @@ export function ChatMessages({
       // 從 HTML 中提取 img src
       if (html) {
         const match = html.match(/<img[^>]+src=["']([^"']+)["']/i)
-        if (match) {
-          imageUrl = match[1]
+        if (match && match[1]) {
+          // 跳過 data: URL 和 blob: URL
+          if (!match[1].startsWith('data:') && !match[1].startsWith('blob:')) {
+            imageUrl = match[1]
+          }
         }
       }
 
       // 如果沒有從 HTML 取得，嘗試直接用 URL
       if (!imageUrl && text) {
-        const urlMatch = text.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i)
-        if (urlMatch) {
-          imageUrl = text.trim()
+        const trimmedText = text.trim()
+        if (trimmedText.startsWith('http://') || trimmedText.startsWith('https://')) {
+          // 檢查是否像圖片 URL
+          const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif']
+          const lowerUrl = trimmedText.toLowerCase()
+          const isImageUrl = imageExtensions.some(ext => lowerUrl.includes(ext)) ||
+                             lowerUrl.includes('image') ||
+                             lowerUrl.includes('photo')
+          if (isImageUrl) {
+            imageUrl = trimmedText
+          }
         }
       }
 
       if (imageUrl) {
+        console.log('🔥 嘗試下載網頁圖片:', imageUrl)
         try {
-          const response = await fetch(imageUrl)
+          const response = await fetch(imageUrl, { mode: 'cors' })
           if (!response.ok) throw new Error('無法下載圖片')
 
           const blob = await response.blob()
 
+          // 檢查是否為有效圖片
+          if (!blob.type.startsWith('image/') && blob.size === 0) {
+            throw new Error('下載的內容不是有效圖片')
+          }
+
           const urlParts = imageUrl.split('/')
           let fileName = urlParts[urlParts.length - 1].split('?')[0] || 'image'
-          if (!fileName.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+          if (!fileName.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|avif)$/i)) {
             const ext = blob.type.split('/')[1] || 'png'
             fileName = `image.${ext}`
           }
 
-          const file = new File([blob], fileName, { type: blob.type })
+          const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
           const validation = validateFile(file)
 
           if (validation.valid) {
             validFiles.push(file)
+            console.log('🔥 成功下載並轉換為檔案:', fileName)
           } else if (validation.error) {
             errors.push(validation.error)
           }
-        } catch {
-          errors.push('無法直接下載此圖片（可能有跨域限制），請右鍵另存圖片後再上傳')
+        } catch (err) {
+          console.warn('🔥 無法下載圖片（可能是 CORS 限制）:', imageUrl)
+          errors.push('此網站不允許下載圖片，請改用右鍵另存圖片後上傳')
         }
       }
     }
 
     if (errors.length > 0) {
       console.log('🔥 Errors:', errors)
-      alert(errors.join('\n'))
+      void alert(errors.join('\n'), 'error')
     }
 
     console.log('🔥 validFiles count:', validFiles.length)

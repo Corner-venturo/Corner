@@ -11,6 +11,7 @@ import {
 } from '../hooks/useTimeboxData'
 import ScheduledBoxItem from './ScheduledBoxItem'
 import BoxSelector from './BoxSelector'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface TimeGridProps {
   weekDays: Date[]
@@ -149,7 +150,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     const { dayOfWeek, start_time } = selectorTarget
 
     if (hasConflict(dayOfWeek, start_time, duration)) {
-      alert('此時段已有其他箱子，請選擇其他時間')
+      void alert('此時段已有其他箱子，請選擇其他時間', 'warning')
       return
     }
 

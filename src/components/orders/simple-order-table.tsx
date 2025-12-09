@@ -10,6 +10,7 @@ import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order } from '@/stores/types'
 import { OrderMembersExpandable } from './OrderMembersExpandable'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface SimpleOrderTableProps {
   orders: Order[]
@@ -31,16 +32,20 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   const handleDeleteOrder = async (order: Order, e: React.MouseEvent) => {
     e.stopPropagation()
 
-    const confirmMessage = `⚠️ 確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`
+    const confirmMessage = `確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`
 
-    if (!confirm(confirmMessage)) {
+    const confirmed = await confirm(confirmMessage, {
+      title: '刪除訂單',
+      type: 'warning',
+    })
+    if (!confirmed) {
       return
     }
 
     try {
       await deleteOrder(order.id)
     } catch (err) {
-      alert('刪除失敗，請稍後再試')
+      await alert('刪除失敗，請稍後再試', 'error')
     }
   }
 

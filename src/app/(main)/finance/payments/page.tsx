@@ -18,6 +18,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Plus, Search, FileDown, Layers, Eye } from 'lucide-react'
+import { alert } from '@/lib/ui/alert-dialog'
 
 // Components
 import { ReceiptSearchDialog } from './components'
@@ -102,7 +103,7 @@ export default function PaymentsPage() {
       setIsDialogOpen(false)
     } catch (error) {
       logger.error('建立收款單失敗:', error)
-      alert('建立收款單失敗')
+      void alert('建立收款單失敗', 'error')
     }
   }
 

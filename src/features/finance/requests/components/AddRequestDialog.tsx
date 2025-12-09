@@ -20,6 +20,7 @@ import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
 import { categoryOptions } from '../types'
 import { cn } from '@/lib/utils'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface AddRequestDialogProps {
   open: boolean
@@ -101,7 +102,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
   const handleSubmit = async () => {
     if (!formData.tour_id || validItems.length === 0 || !formData.request_date) {
-      alert('請填寫必填欄位（團體、請款日期、至少一項有效請款項目）')
+      void alert('請填寫必填欄位（團體、請款日期、至少一項有效請款項目）', 'warning')
       return
     }
 
@@ -109,7 +110,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     const selectedOrder = orders.find(o => o.id === formData.order_id)
 
     if (!selectedTour) {
-      alert('找不到選中的團體')
+      void alert('找不到選中的團體', 'error')
       return
     }
 
@@ -122,13 +123,13 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
         selectedOrder?.order_number || undefined
       )
 
-      alert('✅ 請款單建立成功')
+      await alert('請款單建立成功', 'success')
       resetForm()
       onOpenChange(false)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
       logger.error('❌ Create Request Error:', errorMessage, error)
-      alert(`❌ 建立失敗: ${errorMessage}`)
+      await alert(`建立失敗: ${errorMessage}`, 'error')
     }
   }
 

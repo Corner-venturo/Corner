@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { QuickReceipt } from '@/components/todos/quick-actions/quick-receipt'
 import { useOrders, useTours, useMembers } from '@/hooks/cloud-hooks'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react'
@@ -22,6 +23,13 @@ export default function OrdersPage() {
   const [tourFilter, _setTourFilter] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+
+  // 🔥 快速收款對話框狀態
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false)
+  const [selectedOrderForReceipt, setSelectedOrderForReceipt] = useState<{
+    orderId: string
+    tourId: string
+  } | null>(null)
 
   // 🔥 載入 workspace（只執行一次）
   React.useEffect(() => {
@@ -212,7 +220,12 @@ export default function OrdersPage() {
                     onClick={() => {
                       const order = orders.find(o => o.id === todo.order_id)
                       if (order) {
-                        router.push(`/orders/${order.id}`)
+                        // 🔥 開啟快速收款對話框，而不是跳轉
+                        setSelectedOrderForReceipt({
+                          orderId: order.id,
+                          tourId: order.tour_id,
+                        })
+                        setIsReceiptDialogOpen(true)
                       }
                     }}
                   >
@@ -248,6 +261,23 @@ export default function OrdersPage() {
             <DialogTitle>新增訂單</DialogTitle>
           </DialogHeader>
           <AddOrderForm onSubmit={handleAddOrder} onCancel={() => setIsAddDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      {/* 🔥 快速收款對話框 */}
+      <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>快速收款</DialogTitle>
+          </DialogHeader>
+          <QuickReceipt
+            defaultTourId={selectedOrderForReceipt?.tourId}
+            defaultOrderId={selectedOrderForReceipt?.orderId}
+            onSubmit={() => {
+              setIsReceiptDialogOpen(false)
+              setSelectedOrderForReceipt(null)
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>

@@ -129,6 +129,9 @@ export const useQuoteState = () => {
     }
   })
 
+  // 追蹤是否已經載入過砍次表，避免重複載入覆蓋用戶編輯
+  const hasLoadedTierPricings = useRef(false)
+
   // 當 quote 載入後，更新所有狀態
   useEffect(() => {
     if (quote) {
@@ -169,9 +172,13 @@ export const useQuoteState = () => {
         received_amount: quote.received_amount || 0,
         expense_description: (quote as any)?.expense_description || '',
       })
-      // 載入砍次表資料
-      if ((quote as any).tier_pricings) {
-        setTierPricings((quote as any).tier_pricings)
+      // 載入砍次表資料（只在第一次載入時執行）
+      if (!hasLoadedTierPricings.current) {
+        const savedTierPricings = (quote as any).tier_pricings
+        if (savedTierPricings && Array.isArray(savedTierPricings)) {
+          setTierPricings(savedTierPricings)
+        }
+        hasLoadedTierPricings.current = true
       }
     }
   }, [quote?.id, relatedTour?.code]) // 只在 quote.id 改變時執行

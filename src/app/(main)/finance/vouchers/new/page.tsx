@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select'
 import type { AccountingSubject, CreateVoucherEntryData } from '@/types/accounting-pro.types'
 import { cn } from '@/lib/utils'
+import { alert } from '@/lib/ui/alert-dialog'
 
 interface VoucherEntryRow {
   id: string
@@ -85,7 +86,7 @@ export default function NewVoucherPage() {
   // 刪除分錄行
   const removeEntryRow = (id: string) => {
     if (entries.length <= 2) {
-      alert('至少需要兩筆分錄')
+      void alert('至少需要兩筆分錄', 'warning')
       return
     }
     setEntries(entries.filter(e => e.id !== id))
@@ -119,23 +120,23 @@ export default function NewVoucherPage() {
   const handleSave = async () => {
     // 驗證
     if (!voucherDate) {
-      alert('請選擇傳票日期')
+      await alert('請選擇傳票日期', 'warning')
       return
     }
 
     if (!isBalanced) {
-      alert('借貸不平衡，無法儲存')
+      await alert('借貸不平衡，無法儲存', 'warning')
       return
     }
 
     const hasEmptySubject = entries.some(e => !e.subject_id && (e.debit || e.credit))
     if (hasEmptySubject) {
-      alert('請為所有分錄選擇會計科目')
+      await alert('請為所有分錄選擇會計科目', 'warning')
       return
     }
 
     if (!user?.workspace_id) {
-      alert('無法取得工作空間資訊')
+      await alert('無法取得工作空間資訊', 'error')
       return
     }
 
@@ -185,11 +186,11 @@ export default function NewVoucherPage() {
         await createEntry(entryData)
       }
 
-      alert('傳票儲存成功')
+      await alert('傳票儲存成功', 'success')
       router.push(`/finance/vouchers/${voucher.id}`)
     } catch (error) {
       console.error('建立傳票失敗:', error)
-      alert('建立傳票失敗，請稍後再試')
+      await alert('建立傳票失敗，請稍後再試', 'error')
     }
   }
 
