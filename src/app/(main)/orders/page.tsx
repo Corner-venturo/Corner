@@ -203,7 +203,7 @@ export default function OrdersPage() {
         }
       />
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto flex flex-col">
         {/* 待辦事項提醒 */}
         {todos.length > 0 && (
           <div className="mb-6">
@@ -251,7 +251,7 @@ export default function OrdersPage() {
         )}
 
         {/* 訂單列表 */}
-        <SimpleOrderTable className="min-h-full" orders={filteredOrders as Order[]} showTourInfo={true} />
+        <SimpleOrderTable className="flex-1" orders={filteredOrders as Order[]} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}

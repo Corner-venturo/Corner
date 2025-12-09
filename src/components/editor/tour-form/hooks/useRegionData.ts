@@ -51,18 +51,20 @@ export function useRegionData(data: { country?: string }) {
     if (!data.country) return
 
     // 初始化 selectedCountry（如果 state 和 data 不同）
-    // 移除 hasInitializedCodeRef 限制，確保資料變更時能正確同步
     if (selectedCountry !== data.country) {
       setSelectedCountry(data.country)
     }
 
-    // 查找對應的 country code
+    // 查找對應的 country code（每次 data.country 改變時都要重新查找）
     const matchedCountry = countries.find(c => c.name === data.country)
-    if (matchedCountry?.code && !hasInitializedCodeRef.current) {
-      setSelectedCountryCode(matchedCountry.code)
+    if (matchedCountry?.code) {
+      // 只有當 code 不同時才更新，避免無限循環
+      if (selectedCountryCode !== matchedCountry.code) {
+        setSelectedCountryCode(matchedCountry.code)
+      }
       hasInitializedCodeRef.current = true
     }
-  }, [countries, data.country, selectedCountry])
+  }, [countries, data.country, selectedCountry, selectedCountryCode])
 
   // 同步：當 data.country 從外部改變時同步（例如用戶選擇了新國家）
   React.useEffect(() => {

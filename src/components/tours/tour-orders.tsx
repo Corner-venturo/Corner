@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Tour, Order } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
-import { ExpandableOrderTable } from '@/components/orders/expandable-order-table'
+import { SimpleOrderTable } from '@/components/orders/simple-order-table'
+import type { Order as OrderType } from '@/types/order.types'
 
 interface TourOrdersProps {
   tour: Tour
@@ -44,12 +45,10 @@ export function TourOrders({ tour }: TourOrdersProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <ExpandableOrderTable
-        orders={orders as Parameters<typeof ExpandableOrderTable>[0]['orders']}
-        showTourInfo={false}
-        tourDepartureDate={tour.departure_date}
-      />
-    </div>
+    <SimpleOrderTable
+      orders={orders as OrderType[]}
+      showTourInfo={false}
+      className="flex-1"
+    />
   )
 }

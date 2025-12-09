@@ -253,7 +253,7 @@ export default function TourDetailPage() {
   const buttonConfig = getButtonConfig()
 
   return (
-    <>
+    <div className="h-full flex flex-col">
       <ResponsiveHeader
         title={`${tour.name} (${tour.code})`}
         tabs={tabs}
@@ -313,7 +313,11 @@ export default function TourDetailPage() {
         resourceName="此旅遊團"
       />
 
-      <ContentContainer>{renderTabContent()}</ContentContainer>
+      {activeTab === 'orders' ? (
+        <div className="flex-1 overflow-auto flex flex-col">{renderTabContent()}</div>
+      ) : (
+        <ContentContainer>{renderTabContent()}</ContentContainer>
+      )}
 
       {/* 結團對話框 */}
       <TourCloseDialog
@@ -347,6 +351,6 @@ export default function TourDetailPage() {
         onClose={handleCloseChannelDialog}
         onCreate={handleConfirmCreateChannel}
       />
-    </>
+    </div>
   )
 }

@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useItineraries, useEmployees } from '@/hooks/cloud-hooks'
 import { useRegionsStore } from '@/stores/region-store'
+import { useAuthStore } from '@/stores/auth-store'
 import type { Itinerary } from '@/stores/types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 
@@ -21,12 +23,26 @@ const COMPANY_PASSWORD = '83212711'
 
 export default function ItineraryPage() {
   const router = useRouter()
-  const { items: itineraries, delete: deleteItinerary, update: updateItinerary } = useItineraries()
+  const { items: itineraries, delete: deleteItinerary, update: updateItinerary, create: createItinerary } = useItineraries()
   const { items: employees } = useEmployees()
+  const { user } = useAuthStore()
   const regionsStore = useRegionsStore()
   const countries = regionsStore.countries
   const cities = regionsStore.cities
+
+  // 所有 useState hooks 集中在一起
   const [statusFilter, setStatusFilter] = useState<string>('全部')
+  const [authorFilter, setAuthorFilter] = useState<string>('') // 預設空字串表示當前登入者
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
+  const [passwordInput, setPasswordInput] = useState('')
+  const [pendingEditId, setPendingEditId] = useState<string | null>(null)
+  const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false)
+  const [duplicateSource, setDuplicateSource] = useState<Itinerary | null>(null)
+  const [duplicateTourCode, setDuplicateTourCode] = useState('')
+  const [duplicateTitle, setDuplicateTitle] = useState('')
+  const [isDuplicating, setIsDuplicating] = useState(false)
 
   // 載入地區資料（只執行一次）
   React.useEffect(() => {
@@ -54,13 +70,6 @@ export default function ItineraryPage() {
     const employee = employees.find(e => e.id === employeeId)
     return employee?.display_name || employee?.chinese_name || '-'
   }, [employees])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
-
-  // 密碼解鎖對話框狀態
-  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
-  const [passwordInput, setPasswordInput] = useState('')
-  const [pendingEditId, setPendingEditId] = useState<string | null>(null)
 
   // 打開類型選擇對話框
   const handleOpenTypeSelect = useCallback(() => {
@@ -85,10 +94,57 @@ export default function ItineraryPage() {
     router.push('/itinerary/new?type=gemini')
   }
 
-  // 複製行程
-  const handleDuplicate = useCallback(async (id: string) => {
-    // 待實作: 複製邏輯
+  // 打開複製行程對話框
+  const handleOpenDuplicateDialog = useCallback((itinerary: Itinerary) => {
+    setDuplicateSource(itinerary)
+    setDuplicateTourCode('')
+    setDuplicateTitle('')
+    setIsDuplicateDialogOpen(true)
   }, [])
+
+  // 執行複製行程
+  const handleDuplicateSubmit = useCallback(async () => {
+    if (!duplicateSource) return
+    if (!duplicateTourCode.trim() || !duplicateTitle.trim()) {
+      await alertError('請填寫行程編號和行程名稱')
+      return
+    }
+
+    setIsDuplicating(true)
+    try {
+      // 複製所有欄位，但排除 id, created_at, updated_at 並覆蓋 tour_code, title, created_by
+      const {
+        id: _id,
+        created_at: _createdAt,
+        updated_at: _updatedAt,
+        created_by: _createdBy, // 作者改為當前登入者
+        tour_id: _tourId, // 複製的行程不關聯原有的團
+        is_template: _isTemplate, // 複製的行程不是公司範例
+        closed_at: _closedAt, // 複製的行程不是結案狀態
+        archived_at: _archivedAt, // 複製的行程不是封存狀態
+        ...restData
+      } = duplicateSource
+
+      const newItinerary = {
+        ...restData,
+        tour_code: duplicateTourCode.trim(),
+        title: duplicateTitle.trim(),
+        status: 'draft' as const, // 複製的行程預設為草稿
+        created_by: user?.id, // 作者為當前登入者
+      }
+
+      await createItinerary(newItinerary)
+      await alertSuccess('行程已複製成功！')
+      setIsDuplicateDialogOpen(false)
+      setDuplicateSource(null)
+      setDuplicateTourCode('')
+      setDuplicateTitle('')
+    } catch (error) {
+      await alertError('複製失敗，請稍後再試')
+    } finally {
+      setIsDuplicating(false)
+    }
+  }, [duplicateSource, duplicateTourCode, duplicateTitle, createItinerary, user?.id])
 
   // 封存行程
   const handleArchive = useCallback(
@@ -434,7 +490,7 @@ export default function ItineraryPage() {
               <button
                 onClick={e => {
                   e.stopPropagation()
-                  handleDuplicate(itinerary.id)
+                  handleOpenDuplicateDialog(itinerary)
                 }}
                 className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
                 title="複製行程"
@@ -539,7 +595,7 @@ export default function ItineraryPage() {
         },
       },
     ],
-    [handleDelete, handleDuplicate, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getCountryName, getCityName]
+    [handleDelete, handleOpenDuplicateDialog, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getCountryName, getCityName]
   )
 
   // 過濾資料
@@ -573,6 +629,12 @@ export default function ItineraryPage() {
         filtered = filtered.filter(item => !item.archived_at && !item.is_template)
     }
 
+    // 作者篩選
+    const effectiveAuthorFilter = authorFilter === '' ? user?.id : authorFilter
+    if (effectiveAuthorFilter && effectiveAuthorFilter !== 'all') {
+      filtered = filtered.filter(item => item.created_by === effectiveAuthorFilter)
+    }
+
     // 搜尋 - 搜尋所有文字欄位
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase()
@@ -588,7 +650,7 @@ export default function ItineraryPage() {
     }
 
     return filtered
-  }, [itineraries, statusFilter, searchTerm, isItineraryClosed])
+  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id])
 
   return (
     <div className="h-full flex flex-col">
@@ -601,22 +663,44 @@ export default function ItineraryPage() {
         onAdd={handleOpenTypeSelect}
         addLabel="新增行程"
       >
-        {/* 狀態篩選 */}
-        <div className="flex gap-2">
-          {statusFilters.map(filter => (
-            <button
-              key={filter}
-              onClick={() => setStatusFilter(filter)}
-              className={cn(
-                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
-                statusFilter === filter
-                  ? 'bg-morandi-gold text-white'
-                  : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
-              )}
+        {/* 狀態篩選 + 作者篩選 */}
+        <div className="flex items-center gap-4">
+          <div className="flex gap-2">
+            {statusFilters.map(filter => (
+              <button
+                key={filter}
+                onClick={() => setStatusFilter(filter)}
+                className={cn(
+                  'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
+                  statusFilter === filter
+                    ? 'bg-morandi-gold text-white'
+                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
+                )}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          {/* 作者篩選 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-morandi-secondary">作者：</span>
+            <select
+              value={authorFilter}
+              onChange={e => setAuthorFilter(e.target.value)}
+              className="px-3 py-1 text-sm rounded-lg border border-morandi-border bg-white text-morandi-primary focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
             >
-              {filter}
-            </button>
-          ))}
+              <option value="">我的行程</option>
+              <option value="all">全部作者</option>
+              {employees
+                .filter(emp => itineraries.some(it => it.created_by === emp.id))
+                .map(emp => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
+                  </option>
+                ))}
+            </select>
+          </div>
         </div>
       </ResponsiveHeader>
 
@@ -683,6 +767,61 @@ export default function ItineraryPage() {
             </Button>
             <Button onClick={handlePasswordSubmit}>
               確認
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 複製行程對話框 */}
+      <Dialog open={isDuplicateDialogOpen} onOpenChange={setIsDuplicateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>複製行程</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-morandi-secondary">
+              正在複製：<span className="font-medium text-morandi-primary">{duplicateSource?.title}</span>
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="duplicateTourCode">行程編號 *</Label>
+              <Input
+                id="duplicateTourCode"
+                placeholder="請輸入新的行程編號"
+                value={duplicateTourCode}
+                onChange={e => setDuplicateTourCode(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="duplicateTitle">行程名稱 *</Label>
+              <Input
+                id="duplicateTitle"
+                placeholder="請輸入新的行程名稱"
+                value={duplicateTitle}
+                onChange={e => setDuplicateTitle(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && duplicateTourCode.trim() && duplicateTitle.trim()) {
+                    handleDuplicateSubmit()
+                  }
+                }}
+              />
+            </div>
+            <p className="text-xs text-morandi-muted">
+              其他資料（封面、行程內容、圖片等）將會完整複製。
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDuplicateDialogOpen(false)}
+              disabled={isDuplicating}
+            >
+              取消
+            </Button>
+            <Button
+              onClick={handleDuplicateSubmit}
+              disabled={isDuplicating || !duplicateTourCode.trim() || !duplicateTitle.trim()}
+            >
+              {isDuplicating ? '複製中...' : '確認複製'}
             </Button>
           </DialogFooter>
         </DialogContent>

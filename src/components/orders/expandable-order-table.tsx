@@ -87,12 +87,12 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
   return (
     <div
       className={cn(
-        'border border-border rounded-lg overflow-hidden bg-card shadow-sm flex flex-col',
+        'overflow-hidden flex flex-col w-full min-h-[400px]',
         className
       )}
     >
-      <div className="overflow-x-auto flex-1">
-        <table className="w-full h-full">
+      <div className="overflow-x-auto flex-1 -mx-6 -mt-6">
+        <table className="w-full">
           <thead className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20">
             <tr className="relative">
               <th className="text-left py-2.5 px-4 text-xs relative">
