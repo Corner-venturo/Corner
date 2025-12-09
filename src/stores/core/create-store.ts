@@ -206,16 +206,20 @@ export function createStore<T extends BaseEntity>(
         // 生成 UUID（如果未提供）
         const id = (data as Record<string, unknown>).id || generateUUID()
 
-        // 自動注入 workspace_id（如果未提供）
-        const workspace_id = (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()
-
         // 生成 code（如果有 prefix）
-        const insertData = {
+        const insertData: Record<string, unknown> = {
           ...data,
           id,
-          ...(workspace_id && { workspace_id }),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+        }
+
+        // 只有啟用 workspaceScoped 的表才自動注入 workspace_id
+        if (config.workspaceScoped) {
+          const workspace_id = (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()
+          if (workspace_id) {
+            insertData.workspace_id = workspace_id
+          }
         }
 
         if (codePrefix && !(data as Record<string, unknown>).code) {
