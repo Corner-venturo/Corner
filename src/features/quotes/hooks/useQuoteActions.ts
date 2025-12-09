@@ -4,7 +4,7 @@ import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { logger } from '@/lib/utils/logger'
-import { CostCategory, ParticipantCounts, SellingPrices, VersionRecord } from '../types'
+import { CostCategory, ParticipantCounts, SellingPrices, VersionRecord, TierPricing } from '../types'
 import { useTourStore } from '@/stores'
 import type { Quote, Tour } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
@@ -42,6 +42,8 @@ interface UseQuoteActionsProps {
   // 快速報價單相關
   quickQuoteItems?: QuickQuoteItem[]
   quickQuoteCustomerInfo?: QuickQuoteCustomerInfo
+  // 砍次表相關
+  tierPricings?: TierPricing[]
 }
 
 export const useQuoteActions = ({
@@ -63,6 +65,7 @@ export const useQuoteActions = ({
   setCategories,
   quickQuoteItems,
   quickQuoteCustomerInfo,
+  tierPricings,
 }: UseQuoteActionsProps) => {
   // 使用 ref 追蹤前一次的 groupSize 和 groupSizeForGuide
   const prevGroupSizeRef = useRef<number | null>(null)
@@ -165,6 +168,9 @@ export const useQuoteActions = ({
           quick_quote_items: quickQuoteItems || [],
         } : {}
 
+        // 砍次表資料
+        const tierPricingsData = tierPricings || []
+
         // 第一次儲存：沒有版本記錄，自動創建 versions[0]
         if (existingVersions.length === 0) {
           const firstVersion = {
@@ -192,6 +198,8 @@ export const useQuoteActions = ({
             accommodation_days: accommodationDays,
             participant_counts: participantCounts,
             selling_prices: sellingPrices,
+            // 砍次表資料
+            tier_pricings: tierPricingsData,
             // 快速報價單資料
             ...quickQuoteData,
           } as any)
@@ -229,6 +237,8 @@ export const useQuoteActions = ({
             accommodation_days: accommodationDays,
             participant_counts: participantCounts,
             selling_prices: sellingPrices,
+            // 砍次表資料
+            tier_pricings: tierPricingsData,
             // 快速報價單資料
             ...quickQuoteData,
           } as any)
@@ -254,6 +264,7 @@ export const useQuoteActions = ({
       setSaveSuccess,
       quickQuoteItems,
       quickQuoteCustomerInfo,
+      tierPricings,
     ]
   )
 

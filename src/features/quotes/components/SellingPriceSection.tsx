@@ -193,7 +193,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   }
 
   return (
-    <div className="lg:col-span-3 space-y-3">
+    <div className="lg:col-span-3 space-y-3 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
       {/* 產生報價單按鈕 */}
       <Button
         onClick={() => {

@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { CostCategory, ParticipantCounts, SellingPrices, costCategories, VersionRecord } from '../types'
+import { CostCategory, ParticipantCounts, SellingPrices, costCategories, VersionRecord, TierPricing } from '../types'
 import { useItineraryImport } from './useItineraryImport'
 import { QuickQuoteItem } from '@/types/quote.types'
 
@@ -169,6 +169,10 @@ export const useQuoteState = () => {
         received_amount: quote.received_amount || 0,
         expense_description: (quote as any)?.expense_description || '',
       })
+      // 載入砍次表資料
+      if ((quote as any).tier_pricings) {
+        setTierPricings((quote as any).tier_pricings)
+      }
     }
   }, [quote?.id, relatedTour?.code]) // 只在 quote.id 改變時執行
 
@@ -222,6 +226,11 @@ export const useQuoteState = () => {
     received_amount: quote?.received_amount || 0,
     expense_description: (quote as any)?.expense_description || '',
   })
+
+  // 砍次表狀態 - 從 quote 載入或初始化為空陣列
+  const [tierPricings, setTierPricings] = useState<TierPricing[]>(
+    (quote as any)?.tier_pricings || []
+  )
 
   // 如果找不到報價單，返回列表頁（只有在資料已載入時才判斷）
   useEffect(() => {
@@ -320,6 +329,9 @@ export const useQuoteState = () => {
     setQuickQuoteItems,
     quickQuoteCustomerInfo,
     setQuickQuoteCustomerInfo,
+    // 砍次表相關
+    tierPricings,
+    setTierPricings,
     updateQuote,
     addTour,
     router,

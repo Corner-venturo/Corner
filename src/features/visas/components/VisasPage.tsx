@@ -295,11 +295,8 @@ export default function VisasPage() {
 
       await addMember({
         order_id: targetOrder.id,
-        chinese_name: name,
+        name: name,
         member_type: 'adult',
-        cost_price: data.totalCost,
-        profit: data.totalFee - data.totalCost,
-        balance_amount: data.totalFee,
         notes,  // 簽證類型記錄在備註
       } as any)
     }

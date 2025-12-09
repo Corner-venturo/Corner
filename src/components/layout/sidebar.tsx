@@ -72,7 +72,7 @@ const menuItems: MenuItem[] = [
     href: '/itinerary',
     label: '行程管理',
     icon: Flag,
-    requiredPermission: 'business',
+    requiredPermission: 'itinerary',
   },
   {
     href: '/tours',

@@ -65,6 +65,9 @@ export default function QuoteDetailPage() {
     setQuickQuoteItems,
     quickQuoteCustomerInfo,
     setQuickQuoteCustomerInfo,
+    // 砍次表相關
+    tierPricings,
+    setTierPricings,
     updateQuote,
     addTour,
     router,
@@ -118,6 +121,7 @@ export default function QuoteDetailPage() {
     setCategories,
     quickQuoteItems,
     quickQuoteCustomerInfo,
+    tierPricings,
   })
   const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
 
@@ -753,6 +757,8 @@ export default function QuoteDetailPage() {
             handleGenerateQuotation={handleGenerateQuotation}
             accommodationSummary={accommodationSummary}
             categories={categories}
+            tierPricings={tierPricings}
+            setTierPricings={setTierPricings}
           />
         </div>
 
