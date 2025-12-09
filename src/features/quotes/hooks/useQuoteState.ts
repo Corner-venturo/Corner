@@ -61,14 +61,38 @@ export const useQuoteState = () => {
       ...cat,
       total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
     }))
-    
+
     // 如果是從行程頁面來的，自動匯入行程資料
     if (isFromItinerary && (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)) {
       console.log('[useQuoteState] 初始化時匯入行程資料')
       processedCategories = importDataToCategories(processedCategories)
       hasImportedFromItinerary.current = true
     }
-    
+
+    // 修復住宿天數與項目不一致的問題：
+    // 如果 accommodation_days > 0 但住宿項目為空，根據天數初始化空的住宿項目
+    const savedAccommodationDays = quote?.accommodation_days || 0
+    if (savedAccommodationDays > 0) {
+      const accommodationCategory = processedCategories.find(cat => cat.id === 'accommodation')
+      if (accommodationCategory && accommodationCategory.items.length === 0) {
+        console.log('[useQuoteState] 修復住宿資料：根據天數初始化住宿項目', savedAccommodationDays)
+        const newItems = []
+        for (let day = 1; day <= savedAccommodationDays; day++) {
+          newItems.push({
+            id: `accommodation-day${day}-${Date.now()}-${day}`,
+            name: '', // 飯店名稱（待填）
+            quantity: 0,
+            unit_price: 0,
+            total: 0,
+            note: '',
+            day: day,
+            room_type: '',
+          })
+        }
+        accommodationCategory.items = newItems
+      }
+    }
+
     return processedCategories
   })
 

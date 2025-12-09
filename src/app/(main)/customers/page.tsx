@@ -169,6 +169,17 @@ export default function CustomersPage() {
       )
     }
 
+    // 排序：未驗證的在最上面，其他按編號降序
+    result = result.sort((a, b) => {
+      // 先按驗證狀態排序：unverified 優先
+      const aUnverified = a.verification_status !== 'verified'
+      const bUnverified = b.verification_status !== 'verified'
+      if (aUnverified && !bUnverified) return -1
+      if (!aUnverified && bUnverified) return 1
+      // 同狀態下按編號降序（新的在前面）
+      return (b.code || '').localeCompare(a.code || '')
+    })
+
     return result
   }, [customers, searchParams])
 

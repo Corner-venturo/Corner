@@ -80,6 +80,7 @@ interface QuoteHeaderProps {
   handleDeleteVersion: (versionIndex: number) => void
   handleCreateItinerary?: () => void
   handleSyncToItinerary?: () => void
+  handleSyncAccommodationFromItinerary?: () => void
   onSwitchToQuickQuote?: () => void
   onStatusChange?: (status: 'proposed' | 'approved', showLinkDialog?: boolean) => void
   currentEditingVersion: number | null
@@ -111,6 +112,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleDeleteVersion,
   handleCreateItinerary,
   handleSyncToItinerary,
+  handleSyncAccommodationFromItinerary,
   onSwitchToQuickQuote,
   onStatusChange,
   currentEditingVersion,
@@ -436,17 +438,32 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             </Button>
           )}
 
-          {/* 同步到行程表按鈕 - 只有當報價單已連結行程表時才顯示 */}
-          {quote?.itinerary_id && handleSyncToItinerary && (
-            <Button
-              onClick={handleSyncToItinerary}
-              variant="outline"
-              title="同步到行程表"
-              className="h-8 px-2.5 text-sm gap-1 border-[var(--morandi-gold)] text-[var(--morandi-gold)] hover:bg-[var(--morandi-gold)] hover:text-white"
-            >
-              <RefreshCw size={14} />
-              同步
-            </Button>
+          {/* 同步按鈕 - 只有當報價單已連結行程表時才顯示 */}
+          {quote?.itinerary_id && (handleSyncToItinerary || handleSyncAccommodationFromItinerary) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  title="同步資料"
+                  className="h-8 px-2.5 text-sm gap-1 border-[var(--morandi-gold)] text-[var(--morandi-gold)] hover:bg-[var(--morandi-gold)] hover:text-white"
+                >
+                  <RefreshCw size={14} />
+                  同步
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {handleSyncAccommodationFromItinerary && (
+                  <DropdownMenuItem onClick={handleSyncAccommodationFromItinerary}>
+                    從行程同步住宿
+                  </DropdownMenuItem>
+                )}
+                {handleSyncToItinerary && (
+                  <DropdownMenuItem onClick={handleSyncToItinerary}>
+                    同步餐飲到行程表
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           {/* 切換 - SVG + 文字 */}

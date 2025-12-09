@@ -345,6 +345,101 @@ export default function QuoteDetailPage() {
     toast.success('已同步餐飲資料到行程表')
   }, [quote, itineraries, syncDiffs, updateItinerary])
 
+  // 從行程表同步住宿名稱（行程表 → 報價單）
+  const handleSyncAccommodationFromItinerary = useCallback(() => {
+    if (!quote?.itinerary_id) {
+      toast.error('此報價單沒有連結行程表')
+      return
+    }
+
+    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+    if (!itinerary?.daily_itinerary) {
+      toast.error('找不到連結的行程表')
+      return
+    }
+
+    // 從行程表取得住宿資料
+    const itineraryHotels: Array<{ day: number; name: string }> = []
+    itinerary.daily_itinerary.forEach((day, index) => {
+      const dayNumber = index + 1
+      // 住宿在 accommodation 欄位
+      const hotelName = day.accommodation || ''
+      if (hotelName) {
+        itineraryHotels.push({ day: dayNumber, name: hotelName })
+      }
+    })
+
+    if (itineraryHotels.length === 0) {
+      toast.info('行程表沒有住宿資料')
+      return
+    }
+
+    // 更新報價單的住宿項目
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const accommodationCategory = newCategories.find(cat => cat.id === 'accommodation')
+      if (!accommodationCategory) return prev
+
+      // 找出需要的最大天數
+      const maxDay = Math.max(...itineraryHotels.map(h => h.day), accommodationDays)
+
+      // 建立天數對應的住宿 map
+      const existingByDay: Record<number, typeof accommodationCategory.items[0]> = {}
+      accommodationCategory.items.forEach(item => {
+        if (item.day) {
+          existingByDay[item.day] = item
+        }
+      })
+
+      // 更新或新增住宿項目
+      const updatedItems: typeof accommodationCategory.items = []
+      let hasChanges = false
+
+      for (let day = 1; day <= maxDay; day++) {
+        const itineraryHotel = itineraryHotels.find(h => h.day === day)
+        const existingItem = existingByDay[day]
+
+        if (existingItem) {
+          // 已有此天的住宿項目
+          if (itineraryHotel && existingItem.name !== itineraryHotel.name) {
+            // 行程有飯店名稱且與現有不同 → 更新
+            updatedItems.push({ ...existingItem, name: itineraryHotel.name })
+            hasChanges = true
+          } else {
+            // 保持不變
+            updatedItems.push(existingItem)
+          }
+        } else if (itineraryHotel) {
+          // 沒有此天的住宿項目，但行程有飯店 → 新增
+          updatedItems.push({
+            id: `accommodation-day${day}-${Date.now()}`,
+            name: itineraryHotel.name,
+            quantity: 0,
+            unit_price: 0,
+            total: 0,
+            note: '',
+            day: day,
+            room_type: '',
+          })
+          hasChanges = true
+        }
+      }
+
+      if (!hasChanges) {
+        toast.info('住宿名稱已是最新')
+        return prev
+      }
+
+      accommodationCategory.items = updatedItems
+      // 更新天數
+      if (maxDay > accommodationDays) {
+        setAccommodationDays(maxDay)
+      }
+      toast.success(`已從行程表同步 ${itineraryHotels.length} 天住宿`)
+      return newCategories
+    })
+  }, [quote, itineraries, categories, accommodationDays, setCategories, setAccommodationDays])
+
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: VersionRecord) => {
@@ -684,6 +779,7 @@ export default function QuoteDetailPage() {
         handleDeleteVersion={handleDeleteVersion}
         handleCreateItinerary={handleItineraryButtonClick}
         handleSyncToItinerary={handleSyncToItinerary}
+        handleSyncAccommodationFromItinerary={handleSyncAccommodationFromItinerary}
         onSwitchToQuickQuote={() => setViewMode('quick')}
         onStatusChange={handleStatusChange}
         currentEditingVersion={currentEditingVersion}

@@ -127,6 +127,30 @@ export function ThreadPanel({
   )
 }
 
+// 將文字中的網址轉換成可點擊的連結
+function renderMessageContent(content: string) {
+  const urlRegex = /(https?:\/\/[^\s<]+[^\s<.,;:!?\])'"。，；：！？」』）】])/gi
+  const parts = content.split(urlRegex)
+
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      urlRegex.lastIndex = 0
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-morandi-gold hover:text-morandi-gold/80 hover:underline break-all"
+        >
+          {part}
+        </a>
+      )
+    }
+    return part
+  })
+}
+
 interface MessageItemProps {
   message: Message
   isParent?: boolean
@@ -166,7 +190,7 @@ function MessageItem({ message, isParent, currentUserId }: MessageItemProps) {
           'mt-1 text-sm text-morandi-primary break-words whitespace-pre-wrap',
           isParent && 'font-medium'
         )}>
-          {message.content}
+          {renderMessageContent(message.content)}
         </div>
       </div>
     </div>

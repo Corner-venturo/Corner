@@ -8,6 +8,32 @@ import { QUICK_REACTIONS } from './constants'
 import { downloadFile } from '@/lib/files'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
+// 將文字中的網址轉換成可點擊的連結
+function renderMessageContent(content: string) {
+  // 網址正則表達式
+  const urlRegex = /(https?:\/\/[^\s<]+[^\s<.,;:!?\])'"。，；：！？」』）】])/gi
+  const parts = content.split(urlRegex)
+
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      // 重設 lastIndex 因為 global flag
+      urlRegex.lastIndex = 0
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-morandi-gold hover:text-morandi-gold/80 hover:underline break-all"
+        >
+          {part}
+        </a>
+      )
+    }
+    return part
+  })
+}
+
 interface MessageItemProps {
   message: Message
   currentUserId?: string
@@ -56,7 +82,7 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete, onRe
 
         {/* 訊息文字 */}
         <div className="text-morandi-primary text-[15px] whitespace-pre-wrap leading-[1.46668] break-words">
-          {message.content}
+          {renderMessageContent(message.content)}
         </div>
 
         {/* 附件列表 */}
