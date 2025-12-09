@@ -1,3 +1,4 @@
+npm warn exec The following package was not found and will be installed: supabase@2.65.7
 export type Json =
   | string
   | number
@@ -527,6 +528,30 @@ export type Database = {
           },
         ]
       }
+      api_usage: {
+        Row: {
+          api_name: string
+          id: string
+          month: string
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          api_name: string
+          id?: string
+          month: string
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          api_name?: string
+          id?: string
+          month?: string
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       api_usage_log: {
         Row: {
           api_service: string
@@ -572,6 +597,7 @@ export type Database = {
           region_id: string | null
           tags: string[] | null
           thumbnail: string | null
+          type: string | null
           updated_at: string | null
           website: string | null
           workspace_id: string
@@ -599,6 +625,7 @@ export type Database = {
           region_id?: string | null
           tags?: string[] | null
           thumbnail?: string | null
+          type?: string | null
           updated_at?: string | null
           website?: string | null
           workspace_id: string
@@ -626,6 +653,7 @@ export type Database = {
           region_id?: string | null
           tags?: string[] | null
           thumbnail?: string | null
+          type?: string | null
           updated_at?: string | null
           website?: string | null
           workspace_id?: string
@@ -1091,6 +1119,66 @@ export type Database = {
           },
         ]
       }
+      channel_threads: {
+        Row: {
+          _deleted: boolean | null
+          _needs_sync: boolean | null
+          _synced_at: string | null
+          channel_id: string
+          created_at: string | null
+          created_by: string
+          id: string
+          is_archived: boolean | null
+          last_reply_at: string | null
+          name: string
+          reply_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          _deleted?: boolean | null
+          _needs_sync?: boolean | null
+          _synced_at?: string | null
+          channel_id: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_archived?: boolean | null
+          last_reply_at?: string | null
+          name: string
+          reply_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          _deleted?: boolean | null
+          _needs_sync?: boolean | null
+          _synced_at?: string | null
+          channel_id?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_archived?: boolean | null
+          last_reply_at?: string | null
+          name?: string
+          reply_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_threads_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_threads_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channels: {
         Row: {
           _deleted: boolean | null
@@ -1437,7 +1525,7 @@ export type Database = {
       }
       company_assets: {
         Row: {
-          category: string
+          asset_type: string | null
           created_at: string | null
           description: string | null
           file_path: string
@@ -1445,12 +1533,13 @@ export type Database = {
           id: string
           mime_type: string | null
           name: string
+          restricted: boolean | null
           updated_at: string | null
           uploaded_by: string | null
           uploaded_by_name: string | null
         }
         Insert: {
-          category: string
+          asset_type?: string | null
           created_at?: string | null
           description?: string | null
           file_path: string
@@ -1458,12 +1547,13 @@ export type Database = {
           id?: string
           mime_type?: string | null
           name: string
+          restricted?: boolean | null
           updated_at?: string | null
           uploaded_by?: string | null
           uploaded_by_name?: string | null
         }
         Update: {
-          category?: string
+          asset_type?: string | null
           created_at?: string | null
           description?: string | null
           file_path?: string
@@ -1471,6 +1561,7 @@ export type Database = {
           id?: string
           mime_type?: string | null
           name?: string
+          restricted?: boolean | null
           updated_at?: string | null
           uploaded_by?: string | null
           uploaded_by_name?: string | null
@@ -1761,6 +1852,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_en: string
+          region: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1773,6 +1865,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_en: string
+          region?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1785,6 +1878,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_en?: string
+          region?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1810,12 +1904,16 @@ export type Database = {
           last_order_date: string | null
           name: string
           national_id: string | null
+          nationality: string | null
+          nickname: string | null
           notes: string | null
           passport_expiry_date: string | null
+          passport_image_url: string | null
           passport_number: string | null
           passport_romanization: string | null
           phone: string | null
           referred_by: string | null
+          sex: string | null
           source: string | null
           tax_id: string | null
           total_orders: number | null
@@ -1846,12 +1944,16 @@ export type Database = {
           last_order_date?: string | null
           name: string
           national_id?: string | null
+          nationality?: string | null
+          nickname?: string | null
           notes?: string | null
           passport_expiry_date?: string | null
+          passport_image_url?: string | null
           passport_number?: string | null
           passport_romanization?: string | null
           phone?: string | null
           referred_by?: string | null
+          sex?: string | null
           source?: string | null
           tax_id?: string | null
           total_orders?: number | null
@@ -1882,12 +1984,16 @@ export type Database = {
           last_order_date?: string | null
           name?: string
           national_id?: string | null
+          nationality?: string | null
+          nickname?: string | null
           notes?: string | null
           passport_expiry_date?: string | null
+          passport_image_url?: string | null
           passport_number?: string | null
           passport_romanization?: string | null
           phone?: string | null
           referred_by?: string | null
+          sex?: string | null
           source?: string | null
           tax_id?: string | null
           total_orders?: number | null
@@ -1911,12 +2017,16 @@ export type Database = {
       disbursement_orders: {
         Row: {
           amount: number
-          code: string
+          code: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string | null
+          disbursement_date: string | null
           handled_at: string | null
           handled_by: string | null
           id: string
           notes: string | null
+          order_number: string | null
           payment_method: string | null
           payment_request_ids: string[] | null
           status: string | null
@@ -1926,12 +2036,16 @@ export type Database = {
         }
         Insert: {
           amount: number
-          code: string
+          code?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string | null
+          disbursement_date?: string | null
           handled_at?: string | null
           handled_by?: string | null
-          id: string
+          id?: string
           notes?: string | null
+          order_number?: string | null
           payment_method?: string | null
           payment_request_ids?: string[] | null
           status?: string | null
@@ -1941,12 +2055,16 @@ export type Database = {
         }
         Update: {
           amount?: number
-          code?: string
+          code?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string | null
+          disbursement_date?: string | null
           handled_at?: string | null
           handled_by?: string | null
           id?: string
           notes?: string | null
+          order_number?: string | null
           payment_method?: string | null
           payment_request_ids?: string[] | null
           status?: string | null
@@ -2404,35 +2522,122 @@ export type Database = {
           },
         ]
       }
+      image_library: {
+        Row: {
+          attraction_id: string | null
+          category: string | null
+          city_id: string | null
+          country_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          file_path: string
+          file_size: number | null
+          height: number | null
+          id: string
+          mime_type: string | null
+          name: string
+          public_url: string
+          tags: string[] | null
+          updated_at: string
+          width: number | null
+          workspace_id: string
+        }
+        Insert: {
+          attraction_id?: string | null
+          category?: string | null
+          city_id?: string | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path: string
+          file_size?: number | null
+          height?: number | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          public_url: string
+          tags?: string[] | null
+          updated_at?: string
+          width?: number | null
+          workspace_id: string
+        }
+        Update: {
+          attraction_id?: string | null
+          category?: string | null
+          city_id?: string | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path?: string
+          file_size?: number | null
+          height?: number | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          public_url?: string
+          tags?: string[] | null
+          updated_at?: string
+          width?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "image_library_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       itineraries: {
         Row: {
           _deleted: boolean | null
           _needs_sync: boolean | null
           _synced_at: string | null
+          archived_at: string | null
           author_name: string | null
+          cancellation_policy: string[] | null
           city: string | null
+          closed_at: string | null
           code: string | null
           country: string | null
           cover_image: string | null
+          cover_style: string | null
           created_at: string
           created_by: string | null
           daily_itinerary: Json | null
           departure_date: string | null
           description: string | null
+          faqs: Json | null
           features: Json | null
           focus_cards: Json | null
           hotels: Json | null
           id: string
           is_latest: boolean | null
+          is_template: boolean | null
           itinerary_subtitle: string | null
           leader: Json | null
           meeting_info: Json | null
+          notices: string[] | null
           outbound_flight: Json | null
           parent_id: string | null
+          price: string | null
+          price_note: string | null
+          price_tiers: Json | null
+          pricing_details: Json | null
           return_flight: Json | null
+          show_cancellation_policy: boolean | null
+          show_faqs: boolean | null
           show_features: boolean | null
           show_hotels: boolean | null
           show_leader_meeting: boolean | null
+          show_notices: boolean | null
+          show_price_tiers: boolean | null
+          show_pricing_details: boolean | null
           status: string | null
           subtitle: string | null
           tagline: string | null
@@ -2442,36 +2647,53 @@ export type Database = {
           updated_at: string
           updated_by: string | null
           version: number | null
+          version_records: Json | null
           workspace_id: string | null
         }
         Insert: {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          archived_at?: string | null
           author_name?: string | null
+          cancellation_policy?: string[] | null
           city?: string | null
+          closed_at?: string | null
           code?: string | null
           country?: string | null
           cover_image?: string | null
+          cover_style?: string | null
           created_at?: string
           created_by?: string | null
           daily_itinerary?: Json | null
           departure_date?: string | null
           description?: string | null
+          faqs?: Json | null
           features?: Json | null
           focus_cards?: Json | null
           hotels?: Json | null
           id?: string
           is_latest?: boolean | null
+          is_template?: boolean | null
           itinerary_subtitle?: string | null
           leader?: Json | null
           meeting_info?: Json | null
+          notices?: string[] | null
           outbound_flight?: Json | null
           parent_id?: string | null
+          price?: string | null
+          price_note?: string | null
+          price_tiers?: Json | null
+          pricing_details?: Json | null
           return_flight?: Json | null
+          show_cancellation_policy?: boolean | null
+          show_faqs?: boolean | null
           show_features?: boolean | null
           show_hotels?: boolean | null
           show_leader_meeting?: boolean | null
+          show_notices?: boolean | null
+          show_price_tiers?: boolean | null
+          show_pricing_details?: boolean | null
           status?: string | null
           subtitle?: string | null
           tagline?: string | null
@@ -2481,36 +2703,53 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           version?: number | null
+          version_records?: Json | null
           workspace_id?: string | null
         }
         Update: {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          archived_at?: string | null
           author_name?: string | null
+          cancellation_policy?: string[] | null
           city?: string | null
+          closed_at?: string | null
           code?: string | null
           country?: string | null
           cover_image?: string | null
+          cover_style?: string | null
           created_at?: string
           created_by?: string | null
           daily_itinerary?: Json | null
           departure_date?: string | null
           description?: string | null
+          faqs?: Json | null
           features?: Json | null
           focus_cards?: Json | null
           hotels?: Json | null
           id?: string
           is_latest?: boolean | null
+          is_template?: boolean | null
           itinerary_subtitle?: string | null
           leader?: Json | null
           meeting_info?: Json | null
+          notices?: string[] | null
           outbound_flight?: Json | null
           parent_id?: string | null
+          price?: string | null
+          price_note?: string | null
+          price_tiers?: Json | null
+          pricing_details?: Json | null
           return_flight?: Json | null
+          show_cancellation_policy?: boolean | null
+          show_faqs?: boolean | null
           show_features?: boolean | null
           show_hotels?: boolean | null
           show_leader_meeting?: boolean | null
+          show_notices?: boolean | null
+          show_price_tiers?: boolean | null
+          show_pricing_details?: boolean | null
           status?: string | null
           subtitle?: string | null
           tagline?: string | null
@@ -2520,6 +2759,7 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           version?: number | null
+          version_records?: Json | null
           workspace_id?: string | null
         }
         Relationships: [
@@ -2679,6 +2919,7 @@ export type Database = {
           notes: string | null
           order_id: string | null
           passport_expiry: string | null
+          passport_image_url: string | null
           passport_number: string | null
           phone: string | null
           refunds: string[] | null
@@ -2714,6 +2955,7 @@ export type Database = {
           notes?: string | null
           order_id?: string | null
           passport_expiry?: string | null
+          passport_image_url?: string | null
           passport_number?: string | null
           phone?: string | null
           refunds?: string[] | null
@@ -2749,6 +2991,7 @@ export type Database = {
           notes?: string | null
           order_id?: string | null
           passport_expiry?: string | null
+          passport_image_url?: string | null
           passport_number?: string | null
           phone?: string | null
           refunds?: string[] | null
@@ -2792,7 +3035,9 @@ export type Database = {
           edited_at: string | null
           id: string
           is_pinned: boolean | null
+          parent_message_id: string | null
           reactions: Json | null
+          thread_id: string | null
           updated_at: string | null
           updated_by: string | null
           workspace_id: string | null
@@ -2811,7 +3056,9 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_pinned?: boolean | null
+          parent_message_id?: string | null
           reactions?: Json | null
+          thread_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
@@ -2830,7 +3077,9 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_pinned?: boolean | null
+          parent_message_id?: string | null
           reactions?: Json | null
+          thread_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
@@ -2855,6 +3104,20 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "channel_threads"
             referencedColumns: ["id"]
           },
           {
@@ -3150,6 +3413,7 @@ export type Database = {
           misc_cost: number | null
           order_id: string
           passport_expiry: string | null
+          passport_image_url: string | null
           passport_name: string | null
           passport_number: string | null
           pnr: string | null
@@ -3189,6 +3453,7 @@ export type Database = {
           misc_cost?: number | null
           order_id: string
           passport_expiry?: string | null
+          passport_image_url?: string | null
           passport_name?: string | null
           passport_number?: string | null
           pnr?: string | null
@@ -3228,6 +3493,7 @@ export type Database = {
           misc_cost?: number | null
           order_id?: string
           passport_expiry?: string | null
+          passport_image_url?: string | null
           passport_name?: string | null
           passport_number?: string | null
           pnr?: string | null
@@ -3457,6 +3723,7 @@ export type Database = {
           code: string
           created_at: string | null
           created_by: string | null
+          created_by_name: string | null
           id: string
           items: Json | null
           note: string | null
@@ -3485,6 +3752,7 @@ export type Database = {
           code: string
           created_at?: string | null
           created_by?: string | null
+          created_by_name?: string | null
           id?: string
           items?: Json | null
           note?: string | null
@@ -3513,6 +3781,7 @@ export type Database = {
           code?: string
           created_at?: string | null
           created_by?: string | null
+          created_by_name?: string | null
           id?: string
           items?: Json | null
           note?: string | null
@@ -4375,6 +4644,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           created_by_name: string | null
+          current_version_index: number | null
           customer_email: string | null
           customer_id: string | null
           customer_name: string
@@ -4382,6 +4652,7 @@ export type Database = {
           days: number | null
           destination: string | null
           end_date: string | null
+          expense_description: string | null
           group_size: number | null
           handler_name: string | null
           id: string
@@ -4389,6 +4660,7 @@ export type Database = {
           is_active: boolean | null
           is_pinned: boolean | null
           issue_date: string | null
+          itinerary_id: string | null
           main_city_id: string | null
           name: string | null
           nights: number | null
@@ -4403,6 +4675,7 @@ export type Database = {
           shared_with_workspaces: string[] | null
           start_date: string | null
           status: string | null
+          tier_pricings: Json | null
           total_amount: number | null
           total_cost: number | null
           tour_code: string | null
@@ -4428,6 +4701,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_name?: string | null
+          current_version_index?: number | null
           customer_email?: string | null
           customer_id?: string | null
           customer_name: string
@@ -4435,6 +4709,7 @@ export type Database = {
           days?: number | null
           destination?: string | null
           end_date?: string | null
+          expense_description?: string | null
           group_size?: number | null
           handler_name?: string | null
           id: string
@@ -4442,6 +4717,7 @@ export type Database = {
           is_active?: boolean | null
           is_pinned?: boolean | null
           issue_date?: string | null
+          itinerary_id?: string | null
           main_city_id?: string | null
           name?: string | null
           nights?: number | null
@@ -4456,6 +4732,7 @@ export type Database = {
           shared_with_workspaces?: string[] | null
           start_date?: string | null
           status?: string | null
+          tier_pricings?: Json | null
           total_amount?: number | null
           total_cost?: number | null
           tour_code?: string | null
@@ -4481,6 +4758,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_name?: string | null
+          current_version_index?: number | null
           customer_email?: string | null
           customer_id?: string | null
           customer_name?: string
@@ -4488,6 +4766,7 @@ export type Database = {
           days?: number | null
           destination?: string | null
           end_date?: string | null
+          expense_description?: string | null
           group_size?: number | null
           handler_name?: string | null
           id?: string
@@ -4495,6 +4774,7 @@ export type Database = {
           is_active?: boolean | null
           is_pinned?: boolean | null
           issue_date?: string | null
+          itinerary_id?: string | null
           main_city_id?: string | null
           name?: string | null
           nights?: number | null
@@ -4509,6 +4789,7 @@ export type Database = {
           shared_with_workspaces?: string[] | null
           start_date?: string | null
           status?: string | null
+          tier_pricings?: Json | null
           total_amount?: number | null
           total_cost?: number | null
           tour_code?: string | null
@@ -5337,6 +5618,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          settings: Json
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          settings?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       templates: {
         Row: {
           category: string
@@ -5425,6 +5736,7 @@ export type Database = {
         Row: {
           color: string
           created_at: string | null
+          default_content: Json | null
           equipment: string | null
           id: string
           name: string
@@ -5438,6 +5750,7 @@ export type Database = {
         Insert: {
           color: string
           created_at?: string | null
+          default_content?: Json | null
           equipment?: string | null
           id?: string
           name: string
@@ -5451,6 +5764,7 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string | null
+          default_content?: Json | null
           equipment?: string | null
           id?: string
           name?: string
@@ -5462,6 +5776,63 @@ export type Database = {
           weight?: number | null
         }
         Relationships: []
+      }
+      timebox_scheduled_boxes: {
+        Row: {
+          box_id: string
+          completed: boolean
+          created_at: string
+          data: Json | null
+          day_of_week: number
+          duration: number
+          id: string
+          start_time: string
+          updated_at: string
+          user_id: string
+          week_id: string
+        }
+        Insert: {
+          box_id: string
+          completed?: boolean
+          created_at?: string
+          data?: Json | null
+          day_of_week: number
+          duration: number
+          id?: string
+          start_time: string
+          updated_at?: string
+          user_id: string
+          week_id: string
+        }
+        Update: {
+          box_id?: string
+          completed?: boolean
+          created_at?: string
+          data?: Json | null
+          day_of_week?: number
+          duration?: number
+          id?: string
+          start_time?: string
+          updated_at?: string
+          user_id?: string
+          week_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timebox_scheduled_boxes_box_id_fkey"
+            columns: ["box_id"]
+            isOneToOne: false
+            referencedRelation: "timebox_boxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timebox_scheduled_boxes_week_id_fkey"
+            columns: ["week_id"]
+            isOneToOne: false
+            referencedRelation: "timebox_weeks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       timebox_schedules: {
         Row: {
@@ -5704,6 +6075,59 @@ export type Database = {
             foreignKeyName: "tour_addons_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_departure_data: {
+        Row: {
+          bus_info: Json | null
+          created_at: string | null
+          created_by: string | null
+          emergency_contact: Json | null
+          flight_info: Json | null
+          guide_info: Json | null
+          hotel_info: Json | null
+          id: string
+          notes: string | null
+          tour_id: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          bus_info?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          emergency_contact?: Json | null
+          flight_info?: Json | null
+          guide_info?: Json | null
+          hotel_info?: Json | null
+          id?: string
+          notes?: string | null
+          tour_id: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          bus_info?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          emergency_contact?: Json | null
+          flight_info?: Json | null
+          guide_info?: Json | null
+          hotel_info?: Json | null
+          id?: string
+          notes?: string | null
+          tour_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_departure_data_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: true
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -6196,6 +6620,144 @@ export type Database = {
           },
         ]
       }
+      travel_invoices: {
+        Row: {
+          allowance_amount: number | null
+          allowance_date: string | null
+          allowance_items: Json | null
+          allowance_no: string | null
+          allowanced_by: string | null
+          barcode: string | null
+          buyer_email: string | null
+          buyer_info: Json
+          buyer_mobile: string | null
+          buyer_name: string
+          buyer_ubn: string | null
+          created_at: string
+          created_by: string
+          id: string
+          invoice_date: string
+          invoice_number: string | null
+          items: Json
+          merchant_id: string | null
+          order_id: string | null
+          qrcode_l: string | null
+          qrcode_r: string | null
+          random_num: string | null
+          status: string
+          tax_type: string
+          total_amount: number
+          tour_id: string | null
+          transaction_no: string
+          updated_at: string
+          void_date: string | null
+          void_reason: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          allowance_amount?: number | null
+          allowance_date?: string | null
+          allowance_items?: Json | null
+          allowance_no?: string | null
+          allowanced_by?: string | null
+          barcode?: string | null
+          buyer_email?: string | null
+          buyer_info?: Json
+          buyer_mobile?: string | null
+          buyer_name: string
+          buyer_ubn?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          invoice_date: string
+          invoice_number?: string | null
+          items?: Json
+          merchant_id?: string | null
+          order_id?: string | null
+          qrcode_l?: string | null
+          qrcode_r?: string | null
+          random_num?: string | null
+          status?: string
+          tax_type?: string
+          total_amount: number
+          tour_id?: string | null
+          transaction_no: string
+          updated_at?: string
+          void_date?: string | null
+          void_reason?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          allowance_amount?: number | null
+          allowance_date?: string | null
+          allowance_items?: Json | null
+          allowance_no?: string | null
+          allowanced_by?: string | null
+          barcode?: string | null
+          buyer_email?: string | null
+          buyer_info?: Json
+          buyer_mobile?: string | null
+          buyer_name?: string
+          buyer_ubn?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          invoice_date?: string
+          invoice_number?: string | null
+          items?: Json
+          merchant_id?: string | null
+          order_id?: string | null
+          qrcode_l?: string | null
+          qrcode_r?: string | null
+          random_num?: string | null
+          status?: string
+          tax_type?: string
+          total_amount?: number
+          tour_id?: string | null
+          transaction_no?: string
+          updated_at?: string
+          void_date?: string | null
+          void_reason?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_invoices_allowanced_by_fkey"
+            columns: ["allowanced_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_invoices_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_invoices_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_invoices_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usa_esta: {
         Row: {
           applicant_name_zh: string
@@ -6617,10 +7179,38 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_costs: {
+        Row: {
+          cost: number
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          vendor_name: string
+          visa_type: string
+        }
+        Insert: {
+          cost?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          vendor_name: string
+          visa_type: string
+        }
+        Update: {
+          cost?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          vendor_name?: string
+          visa_type?: string
+        }
+        Relationships: []
+      }
       visas: {
         Row: {
           _needs_sync: boolean | null
           _synced_at: string | null
+          actual_submission_date: string | null
           applicant_name: string
           code: string
           contact_person: string
@@ -6629,6 +7219,8 @@ export type Database = {
           country: string
           created_at: string | null
           created_by: string | null
+          documents_returned_date: string | null
+          expected_issue_date: string | null
           fee: number | null
           id: string
           is_active: boolean | null
@@ -6642,12 +7234,14 @@ export type Database = {
           tour_id: string
           updated_at: string | null
           updated_by: string | null
+          vendor: string | null
           visa_type: string
           workspace_id: string
         }
         Insert: {
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          actual_submission_date?: string | null
           applicant_name: string
           code: string
           contact_person: string
@@ -6656,6 +7250,8 @@ export type Database = {
           country: string
           created_at?: string | null
           created_by?: string | null
+          documents_returned_date?: string | null
+          expected_issue_date?: string | null
           fee?: number | null
           id?: string
           is_active?: boolean | null
@@ -6669,12 +7265,14 @@ export type Database = {
           tour_id: string
           updated_at?: string | null
           updated_by?: string | null
+          vendor?: string | null
           visa_type: string
           workspace_id: string
         }
         Update: {
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          actual_submission_date?: string | null
           applicant_name?: string
           code?: string
           contact_person?: string
@@ -6683,6 +7281,8 @@ export type Database = {
           country?: string
           created_at?: string | null
           created_by?: string | null
+          documents_returned_date?: string | null
+          expected_issue_date?: string | null
           fee?: number | null
           id?: string
           is_active?: boolean | null
@@ -6696,6 +7296,7 @@ export type Database = {
           tour_id?: string
           updated_at?: string | null
           updated_by?: string | null
+          vendor?: string | null
           visa_type?: string
           workspace_id?: string
         }
@@ -7130,6 +7731,17 @@ export type Database = {
       can_manage_workspace: {
         Args: { target_workspace_id: string }
         Returns: boolean
+      }
+      create_atomic_transaction: {
+        Args: {
+          p_account_id: string
+          p_amount: number
+          p_category_id: string
+          p_description: string
+          p_transaction_date: string
+          p_transaction_type: string
+        }
+        Returns: undefined
       }
       get_current_user_workspace: { Args: never; Returns: string }
       get_user_workspace_id: { Args: never; Returns: string }
