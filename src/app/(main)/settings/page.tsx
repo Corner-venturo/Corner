@@ -28,8 +28,10 @@ export default function SettingsPage() {
   const { currentTheme, setTheme } = useThemeStore()
   const { user, logout } = useAuthStore()
 
-  // 判斷是否為管理員（super_admin 或 admin）
-  const isAdmin = user?.permissions?.includes('super_admin') || user?.permissions?.includes('admin')
+  // 判斷是否有系統設定權限（super_admin、admin 或 settings 權限）
+  const hasSettingsAccess = user?.permissions?.includes('super_admin') ||
+    user?.permissions?.includes('admin') ||
+    user?.permissions?.includes('settings')
 
   const {
     showPasswordSection,
@@ -110,8 +112,8 @@ export default function SettingsPage() {
             setPasswordUpdateLoading={setPasswordUpdateLoading}
           />
 
-          {/* ===== 以下僅管理員可見 ===== */}
-          {isAdmin && (
+          {/* ===== 以下僅有設定權限者可見 ===== */}
+          {hasSettingsAccess && (
             <>
               {/* API 設定 */}
               <ApiSettings />

@@ -40,6 +40,9 @@ interface SellingPriceSectionProps {
   ) => void
   accommodationSummary: AccommodationSummaryItem[]
   categories: CostCategory[]
+  // 新增：從外部傳入 tierPricings 來持久化儲存
+  tierPricings?: TierPricing[]
+  setTierPricings?: React.Dispatch<React.SetStateAction<TierPricing[]>>
 }
 
 export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
@@ -52,9 +55,13 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   handleGenerateQuotation,
   accommodationSummary,
   categories,
+  tierPricings: externalTierPricings,
+  setTierPricings: externalSetTierPricings,
 }) => {
-  // 檻次表狀態
-  const [tierPricings, setTierPricings] = useState<TierPricing[]>([])
+  // 檻次表狀態 - 優先使用外部傳入的，否則用本地 state（向後相容）
+  const [localTierPricings, setLocalTierPricings] = useState<TierPricing[]>([])
+  const tierPricings = externalTierPricings ?? localTierPricings
+  const setTierPricings = externalSetTierPricings ?? setLocalTierPricings
   const [newTierCount, setNewTierCount] = useState<string>('')
 
   // 全形轉半形數字

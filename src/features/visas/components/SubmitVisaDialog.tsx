@@ -107,11 +107,17 @@ export function SubmitVisaDialog({
           }
         } else {
           // 建立新記錄
-          await createVendorCost({
-            vendor_name: vendor,
-            visa_type: visaType,
-            cost,
-          })
+          try {
+            console.log('[SubmitVisaDialog] 建立代辦商成本:', { vendor_name: vendor, visa_type: visaType, cost })
+            await createVendorCost({
+              vendor_name: vendor,
+              visa_type: visaType,
+              cost,
+            })
+            console.log('[SubmitVisaDialog] 代辦商成本建立成功')
+          } catch (err) {
+            console.error('[SubmitVisaDialog] 代辦商成本建立失敗:', err)
+          }
         }
       }
 

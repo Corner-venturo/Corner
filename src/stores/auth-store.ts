@@ -3,6 +3,32 @@ import { persist } from 'zustand/middleware'
 import { User } from './types'
 import { generateToken, type AuthPayload } from '@/lib/auth'
 import { logger } from '@/lib/utils/logger'
+import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
+
+/**
+ * 根據員工的角色，合併角色預設權限和資料庫中的額外權限
+ * 這確保了當 rbac-config.ts 更新時，員工會自動獲得新的權限
+ */
+function mergePermissionsWithRoles(
+  dbPermissions: string[],
+  roles: UserRole[]
+): string[] {
+  const allPermissions = new Set<string>(dbPermissions)
+
+  // 合併所有角色的預設權限
+  roles.forEach(role => {
+    const roleConfig = getRoleConfig(role)
+    if (roleConfig) {
+      if (roleConfig.permissions.includes('*')) {
+        allPermissions.add('*')
+      } else {
+        roleConfig.permissions.forEach(p => allPermissions.add(p))
+      }
+    }
+  })
+
+  return Array.from(allPermissions)
+}
 
 interface AuthState {
   user: User | null
@@ -141,6 +167,13 @@ export const useAuthStore = create<AuthState>()(
             }
           }
 
+          // 合併角色預設權限和資料庫權限
+          const userRoles = (employeeData.roles || []) as UserRole[]
+          const mergedPermissions = mergePermissionsWithRoles(
+            employeeData.permissions || [],
+            userRoles
+          )
+
           const user: User = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
@@ -150,8 +183,8 @@ export const useAuthStore = create<AuthState>()(
             personal_info: employeeData.personal_info || {},
             job_info: employeeData.job_info || {},
             salary_info: employeeData.salary_info || {},
-            permissions: employeeData.permissions || [],
-            roles: (employeeData.roles || []) as User['roles'],
+            permissions: mergedPermissions, // 使用合併後的權限
+            roles: userRoles as User['roles'],
             attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
             contracts: employeeData.contracts || [],
             status: employeeData.status as User['status'],
@@ -164,8 +197,8 @@ export const useAuthStore = create<AuthState>()(
           const authPayload: AuthPayload = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
-            permissions: employeeData.permissions || [],
-            role: employeeData.permissions?.includes('admin') ? 'admin' : 'employee',
+            permissions: mergedPermissions, // 使用合併後的權限
+            role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
           }
 
           const token = generateToken(authPayload)
@@ -231,6 +264,13 @@ export const useAuthStore = create<AuthState>()(
             }
           }
 
+          // 合併角色預設權限和資料庫權限
+          const userRoles = (employeeData.roles || []) as UserRole[]
+          const mergedPermissions = mergePermissionsWithRoles(
+            employeeData.permissions || [],
+            userRoles
+          )
+
           const updatedUser: User = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
@@ -240,8 +280,8 @@ export const useAuthStore = create<AuthState>()(
             personal_info: employeeData.personal_info || {},
             job_info: employeeData.job_info || {},
             salary_info: employeeData.salary_info || {},
-            permissions: employeeData.permissions || [],
-            roles: (employeeData.roles || []) as User['roles'],
+            permissions: mergedPermissions, // 使用合併後的權限
+            roles: userRoles as User['roles'],
             attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
             contracts: employeeData.contracts || [],
             status: employeeData.status as User['status'],

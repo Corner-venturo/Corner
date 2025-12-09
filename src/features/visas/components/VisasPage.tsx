@@ -186,14 +186,25 @@ export default function VisasPage() {
       targetOrder = orders.find(o => o.id === contact_info.order_id)
       if (!targetOrder) return
     } else {
-      // 重新查詢該團的訂單數量（確保最新）
+      // 查詢該團最大的訂單編號（避免刪除後編號重複）
       const { supabase } = await import('@/lib/supabase/client')
-      const { count } = await supabase
+      const { data: lastOrder } = await supabase
         .from('orders')
-        .select('*', { count: 'exact', head: true })
+        .select('order_number')
         .eq('tour_id', selectedTour.id)
+        .order('order_number', { ascending: false })
+        .limit(1)
+        .single()
 
-      const nextNumber = ((count || 0) + 1).toString().padStart(3, '0')
+      let nextNum = 1
+      if (lastOrder?.order_number) {
+        // 從最後一個訂單編號提取數字部分
+        const match = lastOrder.order_number.match(/-(\d+)$/)
+        if (match) {
+          nextNum = parseInt(match[1], 10) + 1
+        }
+      }
+      const nextNumber = nextNum.toString().padStart(3, '0')
       const order_number = `${selectedTour.code}-${nextNumber}`
 
       targetOrder = await addOrder({
@@ -285,32 +296,10 @@ export default function VisasPage() {
       await addMember({
         order_id: targetOrder.id,
         chinese_name: name,
-        passport_name: null,
-        birth_date: null,
-        passport_number: null,
-        passport_expiry: null,
-        id_number: null,
-        gender: null,
-        age: null,
         member_type: 'adult',
-        identity: null,
-        special_meal: null,
-        pnr: null,
-        hotel_1_name: null,
-        hotel_1_checkin: null,
-        hotel_1_checkout: null,
-        hotel_2_name: null,
-        hotel_2_checkin: null,
-        hotel_2_checkout: null,
         cost_price: data.totalCost,
-        flight_cost: null,
-        misc_cost: null,
         profit: data.totalFee - data.totalCost,
-        deposit_amount: null,
-        deposit_receipt_no: null,
         balance_amount: data.totalFee,
-        balance_receipt_no: null,
-        customer_id: null,
         notes,  // 簽證類型記錄在備註
       } as any)
     }

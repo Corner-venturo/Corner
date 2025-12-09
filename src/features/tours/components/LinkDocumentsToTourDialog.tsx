@@ -282,7 +282,7 @@ export function LinkDocumentsToTourDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()} modal={true}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>管理文件</DialogTitle>
@@ -379,7 +379,7 @@ export function LinkDocumentsToTourDialog({
                     <SelectTrigger className="w-[90px] h-7 text-xs">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" sideOffset={4}>
                       <SelectItem value="all">全部</SelectItem>
                       <SelectItem value="template">公司範例</SelectItem>
                       <SelectItem value="non-template">非公司範例</SelectItem>
