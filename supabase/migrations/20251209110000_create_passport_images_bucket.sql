@@ -9,19 +9,24 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
+-- 刪除舊的 policy（如果存在）
+DROP POLICY IF EXISTS "Public read access for passport images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can upload passport images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can delete passport images" ON storage.objects;
+
 -- 允許任何人讀取（因為是 public bucket）
-CREATE POLICY IF NOT EXISTS "Public read access for passport images"
+CREATE POLICY "Public read access for passport images"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'passport-images');
 
 -- 允許已登入用戶上傳
-CREATE POLICY IF NOT EXISTS "Authenticated users can upload passport images"
+CREATE POLICY "Authenticated users can upload passport images"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'passport-images');
 
 -- 允許已登入用戶刪除
-CREATE POLICY IF NOT EXISTS "Authenticated users can delete passport images"
+CREATE POLICY "Authenticated users can delete passport images"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (bucket_id = 'passport-images');
