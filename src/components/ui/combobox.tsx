@@ -101,14 +101,15 @@ export function Combobox<T = unknown>({
   const dropdownRef = React.useRef<HTMLDivElement>(null)
   const optionRefs = React.useRef<(HTMLButtonElement | null)[]>([])
 
-  // 當 value 改變時，更新搜尋值為對應的 label
-  // 只依賴 value，避免 options 引用變化導致無限循環
+  // 當 value 或 options 改變時，更新搜尋值為對應的 label
+  // 如果找不到匹配的 option，保留原本的 value 作為顯示
   React.useEffect(() => {
     const selectedOption = options.find(opt => opt.value === value)
-    const newLabel = selectedOption?.label || ''
+    // 如果找到匹配的 option，用其 label；否則保留原本的 value（讓城市名稱顯示出來）
+    const newLabel = selectedOption?.label || value || ''
     // 只在 label 真的改變時才更新，避免不必要的 re-render
     setSearchValue(prev => (prev !== newLabel ? newLabel : prev))
-  }, [value]) // 移除 options 依賴
+  }, [value, options]) // 加回 options 依賴，確保 options 變化時能正確更新
 
   // 篩選選項
   const filteredOptions = React.useMemo(() => {
