@@ -19,8 +19,8 @@ export function useTourFormHandlers(
     // 從資料庫找城市資料
     const cityData = cities.find((c: any) => c.name === city)
 
-    // 優先使用 Supabase Storage 的圖片
-    let coverImage = data.coverImage // 保留現有圖片
+    // 預設為空，讓系統從城市資料庫抓取
+    let coverImage = ''
 
     if (cityData) {
       // 如果有主要圖片（primary_image = 1 用 background_image_url，= 2 用 background_image_url_2）
@@ -34,6 +34,11 @@ export function useTourFormHandlers(
     // 如果資料庫沒有圖片，退回到 cityImages 常數
     if (!coverImage && cityImages[city]) {
       coverImage = cityImages[city]
+    }
+
+    // 如果城市沒有圖片，保留現有圖片
+    if (!coverImage) {
+      coverImage = data.coverImage || ''
     }
 
     onChange({

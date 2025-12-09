@@ -97,10 +97,11 @@ export function calculateTierPricingCosts(
         category.id === 'activities' ||
         category.id === 'others'
       ) {
-        // 餐飲、活動、其他
+        // 餐飲、活動、其他 - 不佔床也要計算（除了住宿，其他費用都一樣）
         const itemCost = item.unit_price || 0
         costs.adult += itemCost
         costs.child_with_bed += itemCost
+        costs.child_no_bed += itemCost
         costs.single_room += itemCost
       } else if (category.id === 'group-transport' || category.id === 'guide') {
         // 團體分攤、領隊導遊 - 關鍵：用新的總人數重新計算分攤費用
