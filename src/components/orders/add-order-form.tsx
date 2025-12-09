@@ -81,7 +81,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
     }
   }, [currentUserName, isEmbedded])
 
-  // 篩選業務人員（roles 包含 'sales'，如果沒有則顯示全部）
+  // 篩選業務人員（roles 包含 'sales'）
   const salesPersons = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
       const empWithSync = emp as EmployeeWithSync
@@ -96,7 +96,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
     return salesOnly.length > 0 ? salesOnly : activeEmployees
   }, [employees])
 
-  // 篩選助理（roles 包含 'assistant'，如果沒有則顯示全部）
+  // 篩選助理（roles 包含 'assistant'）
   const assistants = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
       const empWithSync = emp as EmployeeWithSync

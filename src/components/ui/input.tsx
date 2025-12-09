@@ -62,11 +62,8 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         onKeyDown(e)
       }
 
-      // 只在非中文輸入狀態下處理 Enter
-      if (e.key === 'Enter' && !isComposingRef.current && !e.defaultPrevented) {
-        e.preventDefault()
-        e.currentTarget.blur()
-      }
+      // 注意：不要在這裡 preventDefault()，否則會阻止 form submit
+      // 如果需要特定行為，應該由外部的 onKeyDown 處理
     }
 
     return (

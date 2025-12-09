@@ -166,13 +166,13 @@ export const useChatStore = () => {
         parent_message_id: message.parent_message_id || null,
       }
 
+      // 🔥 樂觀更新：先更新 UI，再發送到資料庫
+      // 這樣用戶可以立即看到自己的訊息
+      const currentMessages = uiStore.channelMessages[newMessage.channel_id] || []
+      uiStore.setCurrentChannelMessages(newMessage.channel_id, [...currentMessages, newMessage])
+
       // 使用 createStore 的 create 方法（自動處理離線/線上）
       await messageStore.create(newMessage)
-
-      // 🔥 使用緩存函數（避免重複計算）
-      const channelMessages = getChannelMessages(messageStore.items, newMessage.channel_id)
-
-      uiStore.setCurrentChannelMessages(newMessage.channel_id, channelMessages)
     },
 
     addMessage: async (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => {

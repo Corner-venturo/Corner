@@ -492,9 +492,9 @@ export function OrderMembersExpandable({
                 passport_expiry_date: item.customer.passport_expiry_date || null,
                 national_id: item.customer.national_id || '',
                 date_of_birth: item.customer.date_of_birth || null,
-                sex: item.customer.sex || '',
+                gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
                 phone: item.customer.phone || '',
-                code: '',
+                // code 會由 store 自動生成
                 is_vip: false,
                 is_active: true,
                 total_spent: 0,
@@ -515,7 +515,7 @@ export function OrderMembersExpandable({
               passport_expiry: item.customer.passport_expiry_date || null,
               birth_date: item.customer.date_of_birth || null,
               id_number: item.customer.national_id || '',
-              gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : '',
+              gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
               identity: '大人',
               member_type: 'adult', // 必要欄位
             }

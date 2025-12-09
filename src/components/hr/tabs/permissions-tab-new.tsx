@@ -18,9 +18,9 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
     const { user, setUser } = useAuthStore()
     const { update: updateUser } = useUserStore()
 
-    // 主要角色（單選）
-    const [selectedRole, setSelectedRole] = useState<UserRole | null>(
-      (employee.roles?.[0] as UserRole) || null
+    // 角色（複選）
+    const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(
+      (employee.roles as UserRole[]) || []
     )
 
     // 額外權限（可複選，用於特殊需求）
@@ -32,28 +32,42 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
     const [showSavedMessage, setShowSavedMessage] = useState(false)
 
     useEffect(() => {
-      // 從 employee.roles 取第一個作為主要角色
-      const mainRole = employee.roles?.[0] as UserRole || null
-      setSelectedRole(mainRole)
+      setSelectedRoles((employee.roles as UserRole[]) || [])
       setExtraPermissions(employee.permissions || [])
     }, [employee.roles, employee.permissions])
 
-    const handleRoleChange = async (newRole: UserRole) => {
-      setSelectedRole(newRole)
-      await saveRole(newRole)
+    const handleRoleToggle = async (role: UserRole) => {
+      const newRoles = selectedRoles.includes(role)
+        ? selectedRoles.filter(r => r !== role)
+        : [...selectedRoles, role]
+
+      // 至少要有一個角色
+      if (newRoles.length === 0) {
+        return
+      }
+
+      setSelectedRoles(newRoles)
+      await saveRoles(newRoles)
     }
 
-    const saveRole = async (role: UserRole) => {
+    const saveRoles = async (roles: UserRole[]) => {
       setIsSaving(true)
       try {
-        // 取得角色預設權限
-        const roleConfig = getRoleConfig(role)
-        const defaultPermissions = roleConfig?.permissions || []
+        // 合併所有角色的預設權限
+        const allPermissions = new Set<string>()
+        roles.forEach(role => {
+          const roleConfig = getRoleConfig(role)
+          if (roleConfig?.permissions.includes('*')) {
+            allPermissions.add('*')
+          } else {
+            roleConfig?.permissions.forEach(p => allPermissions.add(p))
+          }
+        })
+        const defaultPermissions = Array.from(allPermissions)
 
-        // 更新 roles（單一角色）、permissions（角色預設權限）和 preferred_features（側邊欄顯示）
-        // preferred_features 設為與 permissions 相同，確保有權限的功能會顯示在側邊欄
+        // 更新 roles（複選）、permissions（合併權限）和 preferred_features
         await updateUser(employee.id, {
-          roles: [role] as unknown as typeof employee.roles,
+          roles: roles as unknown as typeof employee.roles,
           permissions: defaultPermissions as unknown as typeof employee.permissions,
           preferred_features: defaultPermissions as unknown as typeof employee.preferred_features,
         })
@@ -62,13 +76,13 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         if (user && user.id === employee.id) {
           setUser({
             ...user,
-            roles: [role] as unknown as typeof user.roles,
+            roles: roles as unknown as typeof user.roles,
             permissions: defaultPermissions as unknown as typeof user.permissions,
             preferred_features: defaultPermissions as unknown as typeof user.preferred_features,
           })
         }
 
-        // 重置額外權限
+        // 更新額外權限
         setExtraPermissions(defaultPermissions)
 
         // 顯示儲存成功訊息
@@ -123,8 +137,19 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
       },
     }))
 
-    const roleConfig = selectedRole ? getRoleConfig(selectedRole) : null
-    const rolePermissions = roleConfig?.permissions || []
+    // 取得第一個角色的配置（用於顯示）
+    const primaryRole = selectedRoles[0] || null
+    const roleConfig = primaryRole ? getRoleConfig(primaryRole) : null
+
+    // 合併所有已選角色的權限
+    const rolePermissions = (() => {
+      const allPerms = new Set<string>()
+      selectedRoles.forEach(role => {
+        const config = getRoleConfig(role)
+        config?.permissions.forEach(p => allPerms.add(p))
+      })
+      return Array.from(allPerms)
+    })()
 
     // 按類別分組權限
     const permissionsByCategory = SYSTEM_PERMISSIONS.reduce(
@@ -158,25 +183,26 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           </div>
         )}
 
-        {/* 角色選擇（單選） */}
+        {/* 角色選擇（複選） */}
         <div className="bg-white rounded-lg border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <h4 className="font-semibold text-lg text-morandi-primary">選擇職位角色</h4>
+            <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">可複選</span>
             <div className="group relative">
               <Info size={16} className="text-morandi-secondary cursor-help" />
               <div className="absolute left-0 top-6 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                角色決定該員工的職位和預設權限。選擇角色後，系統會自動配置相應的功能權限。
+                員工可以擁有多個角色。例如：超級管理員同時也可以是業務。
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {getAllRoles().map(role => {
-              const isSelected = selectedRole === role.id
+              const isSelected = selectedRoles.includes(role.id)
               return (
                 <div
                   key={role.id}
-                  onClick={() => handleRoleChange(role.id)}
+                  onClick={() => handleRoleToggle(role.id)}
                   className={cn(
                     'p-4 rounded-lg border-2 cursor-pointer transition-all',
                     isSelected
@@ -188,13 +214,13 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                     <div className="flex items-center gap-2">
                       <div
                         className={cn(
-                          'w-5 h-5 rounded-full border-2 flex items-center justify-center',
+                          'w-5 h-5 rounded border-2 flex items-center justify-center',
                           isSelected
                             ? 'border-morandi-gold bg-morandi-gold'
                             : 'border-gray-300'
                         )}
                       >
-                        {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
+                        {isSelected && <Check size={12} className="text-white" />}
                       </div>
                       <h5 className="font-medium text-morandi-primary">{role.label}</h5>
                     </div>
@@ -214,14 +240,14 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           </div>
         </div>
 
-        {/* 角色預設權限（唯讀顯示） */}
-        {roleConfig && (
+        {/* 已選角色的權限（唯讀顯示） */}
+        {selectedRoles.length > 0 && (
           <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-4">
             <div className="flex items-start gap-2 mb-3">
               <AlertCircle size={18} className="text-morandi-primary mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <h5 className="font-medium text-morandi-primary mb-1">
-                  {roleConfig.label} 擁有以下功能權限
+                  已選角色：{selectedRoles.map(r => getRoleConfig(r)?.label).join('、')}
                 </h5>
                 <p className="text-sm text-morandi-secondary mb-3">
                   這些權限由角色自動配置，如需調整請變更角色或在下方新增額外權限
@@ -229,7 +255,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                 <div className="flex flex-wrap gap-2">
                   {rolePermissions.includes('*') ? (
                     <span className="px-3 py-1 bg-morandi-primary/10 border border-morandi-primary/20 rounded-full text-sm text-morandi-primary font-medium">
-                      ⭐ 所有權限
+                      所有權限
                     </span>
                   ) : (
                     rolePermissions.map(perm => {

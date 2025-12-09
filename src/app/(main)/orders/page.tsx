@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { useOrders, useTours } from '@/hooks/cloud-hooks'
+import { useOrders, useTours, useMembers } from '@/hooks/cloud-hooks'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
@@ -16,16 +16,18 @@ export default function OrdersPage() {
   const router = useRouter()
   const { items: orders, create: addOrder } = useOrders()
   const { items: tours } = useTours()
+  const { create: addMember } = useMembers()
   const { currentWorkspace, loadWorkspaces } = useWorkspaceChannels()
   const [statusFilter, setStatusFilter] = useState('all')
   const [tourFilter, _setTourFilter] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  // 🔥 載入 workspace
+  // 🔥 載入 workspace（只執行一次）
   React.useEffect(() => {
     loadWorkspaces()
-  }, [loadWorkspaces])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const filteredOrders = orders.filter(order => {
     const matchesStatus = statusFilter === 'all' || order.payment_status === statusFilter
@@ -110,7 +112,7 @@ export default function OrdersPage() {
     return result
   }, [orders, tours])
 
-  const handleAddOrder = (orderData: {
+  const handleAddOrder = async (orderData: {
     tour_id: string
     contact_person: string
     sales_person: string
@@ -126,7 +128,7 @@ export default function OrdersPage() {
     const nextOrderNumber = tourOrders.length + 1
     const orderNumber = `${selectedTour.code}-${nextOrderNumber.toString().padStart(2, '0')}`
 
-    addOrder({
+    const newOrder = await addOrder({
       order_number: orderNumber,
       tour_id: orderData.tour_id,
       code: selectedTour.code,
@@ -144,6 +146,18 @@ export default function OrdersPage() {
       notes: null,
       customer_id: null,
     } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
+
+    // 自動建立空白成員記錄
+    if (newOrder && orderData.member_count > 0) {
+      const memberPromises = Array.from({ length: orderData.member_count }, () =>
+        addMember({
+          name: '',
+          order_id: newOrder.id,
+          tour_id: orderData.tour_id,
+        })
+      )
+      await Promise.all(memberPromises)
+    }
 
     setIsAddDialogOpen(false)
   }

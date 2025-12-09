@@ -12,6 +12,7 @@ import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
 import { SalaryPaymentDialog, SalaryPaymentData } from '@/components/hr/salary-payment-dialog'
 import { Users, Edit2, Trash2, UserX, DollarSign } from 'lucide-react'
+import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
@@ -162,6 +163,32 @@ export default function HRPage() {
         render: (_value, employee: Employee) => (
           <span className="text-sm">{employee.job_info?.position || '未設定'}</span>
         ),
+      },
+      {
+        key: 'roles',
+        label: '身份角色',
+        sortable: false,
+        render: (_value, employee: Employee) => {
+          const roles = employee.roles as UserRole[] | undefined
+          if (!roles || roles.length === 0) {
+            return <span className="text-morandi-muted text-sm">未設定</span>
+          }
+          return (
+            <div className="flex flex-wrap gap-1">
+              {roles.map(role => {
+                const config = getRoleConfig(role)
+                return (
+                  <span
+                    key={role}
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium border ${config?.color || 'text-gray-600 bg-gray-50 border-gray-200'}`}
+                  >
+                    {config?.label || role}
+                  </span>
+                )
+              })}
+            </div>
+          )
+        },
       },
       {
         key: 'personal_info',

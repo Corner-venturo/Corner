@@ -70,10 +70,9 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
     // 2. 只顯示活躍狀態
     if (emp.status !== 'active') return false
 
-    // 3. 🔥 只顯示真正的「員工」（有 employee 角色標籤）
-    // 未來可能會有客戶、訪客等非員工帳號，這裡需要過濾
-    const isEmployee = emp.roles?.includes('employee') || emp.roles?.includes('admin')
-    if (!isEmployee) return false
+    // 3. 🔥 排除工程師帳號（LIAO）
+    // 工程師帳號不應該被加入頻道成員
+    if (emp.employee_number === 'liao00' || emp.english_name?.toLowerCase() === 'liao') return false
 
     // 4. 搜尋過濾
     if (searchQuery !== '') {

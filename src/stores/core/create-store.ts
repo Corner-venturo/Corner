@@ -161,8 +161,15 @@ export function createStore<T extends BaseEntity>(
         set({ items, loading: false })
         return items
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '無法載入資料'
-        logger.error(`[${tableName}] fetchAll 失敗:`, error)
+        // 處理各種錯誤格式
+        let errorMessage = '無法載入資料'
+        if (error instanceof Error) {
+          errorMessage = error.message
+        } else if (error && typeof error === 'object') {
+          const err = error as Record<string, unknown>
+          errorMessage = (err.message as string) || (err.error as string) || JSON.stringify(error)
+        }
+        logger.error(`[${tableName}] fetchAll 失敗:`, errorMessage)
         set({ error: errorMessage, loading: false })
         return []
       }

@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Plus, Send, Smile, Paperclip } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FilePreview } from './FilePreview'
@@ -268,15 +267,35 @@ export function MessageInput({
         </div>
 
         <div className="flex-1 relative" ref={messageInputRef} onPaste={handlePaste}>
-          <Input
+          <textarea
             value={value}
             onChange={e => onChange(e.target.value)}
-            placeholder={`在 #${channelName} 中輸入訊息...`}
-            className="pr-10 bg-white border-morandi-container"
+            onKeyDown={e => {
+              // Shift+Enter 換行，Enter 送出
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                if (value.trim() || attachedFiles.length > 0) {
+                  onSubmit(e as unknown as React.FormEvent)
+                }
+              }
+            }}
+            placeholder={`在 #${channelName} 中輸入訊息... (Shift+Enter 換行)`}
+            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors"
+            rows={1}
+            style={{
+              height: 'auto',
+              minHeight: '40px',
+            }}
+            onInput={e => {
+              // 自動調整高度
+              const target = e.target as HTMLTextAreaElement
+              target.style.height = 'auto'
+              target.style.height = Math.min(target.scrollHeight, 120) + 'px'
+            }}
           />
           <button
             type="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-morandi-secondary hover:text-morandi-gold transition-colors pointer-events-auto z-10"
+            className="absolute right-2 top-3 p-1 text-morandi-secondary hover:text-morandi-gold transition-colors pointer-events-auto z-10"
           >
             <Smile size={16} />
           </button>

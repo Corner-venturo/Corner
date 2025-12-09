@@ -465,14 +465,14 @@ export default function VisasPage() {
                 <div className="flex items-center bg-morandi-container/30 rounded-lg p-1 gap-1">
                   <button
                     onClick={() => setIsSubmitDialogOpen(true)}
-                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-amber-500 text-white hover:bg-amber-600 transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-morandi-gold hover:bg-morandi-gold-hover text-white transition-colors"
                     title="送件給代辦商"
                   >
                     送件
                   </button>
                   <button
                     onClick={() => setIsReturnDialogOpen(true)}
-                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-morandi-primary hover:bg-morandi-primary/90 text-white transition-colors"
                     title="登記證件歸還"
                   >
                     歸還
@@ -494,7 +494,7 @@ export default function VisasPage() {
                       setSelectedRows([])
                       toast.success('已取件')
                     }}
-                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-morandi-green hover:bg-morandi-green/90 text-white transition-colors"
                     title="取件完成"
                   >
                     取件
@@ -505,7 +505,7 @@ export default function VisasPage() {
                       setSelectedRows([])
                       toast.success('已標記退件')
                     }}
-                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-rose-500 text-white hover:bg-rose-600 transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md bg-morandi-red hover:bg-morandi-red/90 text-white transition-colors"
                     title="標記為退件"
                   >
                     退件

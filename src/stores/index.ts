@@ -135,11 +135,10 @@ export const useReceiptOrderStore = createStore<ReceiptOrder>({
  * 團員 Store
  * 無獨立編號，依附於訂單
  * 注意：資料庫表格名稱是 members（不是 order_members）
- * 🔒 啟用 Workspace 隔離
+ * 透過 order_id 關聯到訂單，不需要直接 workspace 隔離
  */
 export const useMemberStore = createStore<Member>({
   tableName: 'members',
-  workspaceScoped: true,
 })
 
 /**

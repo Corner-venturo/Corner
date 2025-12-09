@@ -43,10 +43,13 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
   const [passwordUpdateLoading, setPasswordUpdateLoading] = useState(false)
 
   const handleSave = async () => {
-    const updates: any = { ...formData }
-
-    if (formData.english_name !== employee.english_name) {
-      updates.employee_number = userStoreHelpers.generateUserNumber(formData.english_name)
+    // 只更新允許修改的欄位，不要修改 employee_number
+    const updates: Partial<Employee> = {
+      display_name: formData.display_name,
+      chinese_name: formData.chinese_name,
+      english_name: formData.english_name,
+      personal_info: formData.personal_info,
+      job_info: formData.job_info,
     }
 
     try {
