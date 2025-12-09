@@ -1,8 +1,8 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -12,6 +12,7 @@ import { useCustomerStore } from '@/stores'
 interface OrderMember {
   id: string
   order_id: string
+  customer_id?: string | null
   identity?: string | null
   chinese_name?: string | null
   passport_name?: string | null
@@ -41,6 +42,17 @@ interface OrderMember {
   cost_price?: number | null
   selling_price?: number | null
   profit?: number | null
+  passport_image_url?: string | null
+  // 關聯的顧客驗證狀態（從 join 查詢取得）
+  customer_verification_status?: string | null
+}
+
+// PDF 轉 JPG 需要的類型
+interface ProcessedFile {
+  file: File
+  preview: string
+  originalName: string
+  isPdf: boolean
 }
 
 interface OrderMembersExpandableProps {
@@ -65,15 +77,20 @@ export function OrderMembersExpandable({
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
 
   // 護照上傳相關狀態
-  const [passportFiles, setPassportFiles] = useState<File[]>([])
+  const [processedFiles, setProcessedFiles] = useState<ProcessedFile[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  // 照片預覽相關狀態
+  const [previewMember, setPreviewMember] = useState<OrderMember | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
 
   // 定義可編輯欄位的順序（用於方向鍵導航）
   const editableFields = showIdentityColumn
-    ? ['identity', 'chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal', 'pnr']
-    : ['chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal', 'pnr']
+    ? ['identity', 'chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal']
+    : ['chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal']
 
   // 載入成員資料和出發日期
   useEffect(() => {
@@ -99,14 +116,42 @@ export function OrderMembersExpandable({
   const loadMembers = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
+      // 載入訂單成員
+      const { data: membersData, error: membersError } = await supabase
         .from('order_members')
         .select('*')
         .eq('order_id', orderId)
         .order('created_at', { ascending: true })
 
-      if (error) throw error
-      setMembers(data || [])
+      if (membersError) throw membersError
+
+      // 收集所有有 customer_id 的成員
+      const customerIds = (membersData || [])
+        .map(m => m.customer_id)
+        .filter(Boolean) as string[]
+
+      // 如果有 customer_id，批次查詢顧客驗證狀態
+      let customerStatusMap: Record<string, string> = {}
+      if (customerIds.length > 0) {
+        const { data: customersData } = await supabase
+          .from('customers')
+          .select('id, verification_status')
+          .in('id', customerIds)
+
+        if (customersData) {
+          customerStatusMap = Object.fromEntries(
+            customersData.map(c => [c.id, c.verification_status || ''])
+          )
+        }
+      }
+
+      // 合併驗證狀態到成員
+      const membersWithStatus = (membersData || []).map(m => ({
+        ...m,
+        customer_verification_status: m.customer_id ? customerStatusMap[m.customer_id] || null : null,
+      }))
+
+      setMembers(membersWithStatus)
     } catch (error) {
       logger.error('載入成員失敗:', error)
     } finally {
@@ -347,11 +392,85 @@ export function OrderMembersExpandable({
     updateField(memberId, field, processedValue ? parseFloat(processedValue) : 0)
   }
 
+  // ========== PDF 轉 JPG 函數 ==========
+  const convertPdfToImages = async (pdfFile: File): Promise<File[]> => {
+    // 動態載入 PDF.js
+    const pdfjsLib = await import('pdfjs-dist')
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+
+    const arrayBuffer = await pdfFile.arrayBuffer()
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+
+    const images: File[] = []
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const scale = 2 // 放大 2 倍以獲得更清晰的圖片
+      const viewport = page.getViewport({ scale })
+
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      canvas.width = viewport.width
+      canvas.height = viewport.height
+
+      await page.render({
+        canvasContext: context!,
+        viewport: viewport,
+      }).promise
+
+      // 轉成 Blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.85)
+      })
+
+      const fileName = `${pdfFile.name.replace('.pdf', '')}_page${i}.jpg`
+      const imageFile = new File([blob], fileName, { type: 'image/jpeg' })
+      images.push(imageFile)
+    }
+
+    return images
+  }
+
   // ========== 護照上傳相關函數 ==========
-  const handlePassportFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePassportFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (files) {
-      setPassportFiles(prev => [...prev, ...Array.from(files)])
+    if (!files || files.length === 0) return
+
+    setIsProcessing(true)
+    try {
+      const newProcessedFiles: ProcessedFile[] = []
+
+      for (const file of Array.from(files)) {
+        if (file.type === 'application/pdf') {
+          // PDF 轉 JPG
+          const images = await convertPdfToImages(file)
+          for (const img of images) {
+            const preview = URL.createObjectURL(img)
+            newProcessedFiles.push({
+              file: img,
+              preview,
+              originalName: file.name,
+              isPdf: true,
+            })
+          }
+        } else if (file.type.startsWith('image/')) {
+          // 圖片直接加入
+          const preview = URL.createObjectURL(file)
+          newProcessedFiles.push({
+            file,
+            preview,
+            originalName: file.name,
+            isPdf: false,
+          })
+        }
+      }
+
+      setProcessedFiles(prev => [...prev, ...newProcessedFiles])
+    } catch (error) {
+      logger.error('處理檔案失敗:', error)
+      alert('檔案處理失敗，請重試')
+    } finally {
+      setIsProcessing(false)
     }
   }
 
@@ -367,22 +486,58 @@ export function OrderMembersExpandable({
     setIsDragging(false)
   }
 
-  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+  const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragging(false)
 
     const files = e.dataTransfer.files
-    if (files) {
-      const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
-      if (imageFiles.length > 0) {
-        setPassportFiles(prev => [...prev, ...imageFiles])
+    if (!files || files.length === 0) return
+
+    setIsProcessing(true)
+    try {
+      const newProcessedFiles: ProcessedFile[] = []
+
+      for (const file of Array.from(files)) {
+        if (file.type === 'application/pdf') {
+          // PDF 轉 JPG
+          const images = await convertPdfToImages(file)
+          for (const img of images) {
+            const preview = URL.createObjectURL(img)
+            newProcessedFiles.push({
+              file: img,
+              preview,
+              originalName: file.name,
+              isPdf: true,
+            })
+          }
+        } else if (file.type.startsWith('image/')) {
+          // 圖片直接加入
+          const preview = URL.createObjectURL(file)
+          newProcessedFiles.push({
+            file,
+            preview,
+            originalName: file.name,
+            isPdf: false,
+          })
+        }
       }
+
+      setProcessedFiles(prev => [...prev, ...newProcessedFiles])
+    } catch (error) {
+      logger.error('處理檔案失敗:', error)
+      alert('檔案處理失敗，請重試')
+    } finally {
+      setIsProcessing(false)
     }
   }
 
   const handleRemovePassportFile = (index: number) => {
-    setPassportFiles(prev => prev.filter((_, i) => i !== index))
+    setProcessedFiles(prev => {
+      // 清理 preview URL
+      URL.revokeObjectURL(prev[index].preview)
+      return prev.filter((_, i) => i !== index)
+    })
   }
 
   // 壓縮圖片（確保小於 800KB）
@@ -444,14 +599,15 @@ export function OrderMembersExpandable({
 
   // 批次上傳護照並建立成員
   const handleBatchUpload = async () => {
-    if (passportFiles.length === 0) return
+    if (processedFiles.length === 0) return
+    if (isUploading) return // 防止重複點擊
 
     setIsUploading(true)
     try {
       // 壓縮所有圖片
       const compressedFiles = await Promise.all(
-        passportFiles.map(async (file) => {
-          return await compressImage(file)
+        processedFiles.map(async (pf) => {
+          return await compressImage(pf.file)
         })
       )
 
@@ -473,59 +629,149 @@ export function OrderMembersExpandable({
 
       const result = await response.json()
 
-      // 批次建立成員和顧客
+      // 統計
       let successCount = 0
+      let duplicateCount = 0
+      let syncedCustomerCount = 0
       const failedItems: string[] = []
+      const duplicateItems: string[] = []
+
+      // 載入現有成員（用於重複檢查）
+      const { data: existingMembers } = await supabase
+        .from('order_members')
+        .select('passport_number, id_number, chinese_name, birth_date')
+        .eq('order_id', orderId)
+
+      const existingPassports = new Set(existingMembers?.map(m => m.passport_number).filter(Boolean) || [])
+      const existingIdNumbers = new Set(existingMembers?.map(m => m.id_number).filter(Boolean) || [])
+      // 用「中文名+生日」作為備用比對 key（避免護照號碼沒辨識到時漏掉）
+      const existingNameBirthKeys = new Set(
+        existingMembers
+          ?.filter(m => m.chinese_name && m.birth_date)
+          .map(m => `${m.chinese_name}|${m.birth_date}`) || []
+      )
+
+      // 載入顧客資料（用於同步比對）
       const customerStore = useCustomerStore.getState()
+      if (customerStore.items.length === 0) {
+        await customerStore.fetchAll()
+      }
 
       for (const item of result.results) {
         if (item.success && item.customer) {
-          try {
-            // 1. 建立顧客（如果有姓名）
-            let customerId: string | null = null
-            if (item.customer.name && item.customer.name.trim()) {
-              const newCustomer = await customerStore.create({
-                name: item.customer.name,
-                english_name: item.customer.english_name || '',
-                passport_number: item.customer.passport_number || '',
-                passport_romanization: item.customer.passport_romanization || '',
-                passport_expiry_date: item.customer.passport_expiry_date || null,
-                national_id: item.customer.national_id || '',
-                date_of_birth: item.customer.date_of_birth || null,
-                gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
-                phone: item.customer.phone || '',
-                // code 會由 store 自動生成
-                is_vip: false,
-                is_active: true,
-                total_spent: 0,
-                total_orders: 0,
-                verification_status: 'unverified',
-              } as any)
-              customerId = newCustomer?.id || null
-            }
+          const passportNumber = item.customer.passport_number || ''
+          const idNumber = item.customer.national_id || ''
+          const birthDate = item.customer.date_of_birth || null
+          const chineseName = item.customer.name || ''
+          // 移除括號內的拼音（例如「朱仔(CHU/WENYU)」→「朱仔」）
+          const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
+          const nameBirthKey = cleanChineseName && birthDate ? `${cleanChineseName}|${birthDate}` : ''
 
-            // 2. 建立訂單成員
+          // 1. 檢查訂單成員是否重複（用護照號碼、身分證、或中文名+生日）
+          let isDuplicate = false
+          let duplicateReason = ''
+
+          if (passportNumber && existingPassports.has(passportNumber)) {
+            isDuplicate = true
+            duplicateReason = '護照號碼重複'
+          } else if (idNumber && existingIdNumbers.has(idNumber)) {
+            isDuplicate = true
+            duplicateReason = '身分證號重複'
+          } else if (nameBirthKey && existingNameBirthKeys.has(nameBirthKey)) {
+            isDuplicate = true
+            duplicateReason = '姓名+生日重複'
+          }
+
+          if (isDuplicate) {
+            duplicateCount++
+            duplicateItems.push(`${chineseName || item.fileName} (${duplicateReason})`)
+            continue // 跳過重複的
+          }
+
+          try {
+            // 2. 建立訂單成員（不建立顧客）
             const memberData = {
               order_id: orderId,
               workspace_id: workspaceId,
-              customer_id: customerId,
+              customer_id: null, // 稍後背景同步
               chinese_name: item.customer.name || '',
               passport_name: item.customer.passport_romanization || item.customer.english_name || '',
-              passport_number: item.customer.passport_number || '',
+              passport_number: passportNumber,
               passport_expiry: item.customer.passport_expiry_date || null,
-              birth_date: item.customer.date_of_birth || null,
-              id_number: item.customer.national_id || '',
+              birth_date: birthDate,
+              id_number: idNumber,
               gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
               identity: '大人',
-              member_type: 'adult', // 必要欄位
+              member_type: 'adult',
             }
 
-            const { error } = await supabase
+            const { data: newMember, error } = await supabase
               .from('order_members')
               .insert(memberData)
+              .select()
+              .single()
 
             if (error) throw error
+
+            // 更新本地快取（避免同一批次重複）
+            if (passportNumber) existingPassports.add(passportNumber)
+            if (idNumber) existingIdNumbers.add(idNumber)
+            if (nameBirthKey) existingNameBirthKeys.add(nameBirthKey)
+
             successCount++
+
+            // 3. 背景同步顧客（三重比對：護照號碼、身分證、姓名+生日）
+            if (newMember && (idNumber || birthDate || passportNumber)) {
+              // 查找現有顧客（三重比對）
+              let existingCustomer = customerStore.items.find(c => {
+                // 1. 優先用護照號碼比對
+                if (passportNumber && c.passport_number === passportNumber) return true
+                // 2. 其次用身分證比對
+                if (idNumber && c.national_id === idNumber) return true
+                // 3. 備用：姓名+生日比對（移除括號內的拼音）
+                if (cleanChineseName && birthDate &&
+                    c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
+                    c.date_of_birth === birthDate) return true
+                return false
+              })
+
+              if (existingCustomer) {
+                // 找到現有顧客，關聯
+                await supabase
+                  .from('order_members')
+                  .update({ customer_id: existingCustomer.id })
+                  .eq('id', newMember.id)
+                syncedCustomerCount++
+                logger.info(`✅ 顧客已存在，已關聯: ${existingCustomer.name}`)
+              } else {
+                // 沒找到，建立新顧客
+                const newCustomer = await customerStore.create({
+                  name: item.customer.name || '',
+                  english_name: item.customer.english_name || '',
+                  passport_number: passportNumber,
+                  passport_romanization: item.customer.passport_romanization || '',
+                  passport_expiry_date: item.customer.passport_expiry_date || null,
+                  national_id: idNumber,
+                  date_of_birth: birthDate,
+                  gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
+                  phone: '',
+                  is_vip: false,
+                  is_active: true,
+                  total_spent: 0,
+                  total_orders: 0,
+                  verification_status: 'unverified',
+                } as any)
+
+                if (newCustomer) {
+                  await supabase
+                    .from('order_members')
+                    .update({ customer_id: newCustomer.id })
+                    .eq('id', newMember.id)
+                  syncedCustomerCount++
+                  logger.info(`✅ 新建顧客: ${newCustomer.name}`)
+                }
+              }
+            }
           } catch (error) {
             logger.error(`建立成員失敗 (${item.fileName}):`, error)
             failedItems.push(`${item.fileName} (建立失敗)`)
@@ -536,14 +782,22 @@ export function OrderMembersExpandable({
       }
 
       // 顯示結果
-      let message = `✅ 成功辨識 ${result.successful}/${result.total} 張護照\n✅ 成功建立 ${successCount} 位成員\n\n⚠️ 重要提醒：\n• OCR 辨識的資料已標記為「待驗證」\n• 請務必人工檢查護照資訊是否正確`
+      let message = `✅ 成功辨識 ${result.successful}/${result.total} 張護照\n✅ 成功建立 ${successCount} 位成員`
+      if (syncedCustomerCount > 0) {
+        message += `\n✅ 已同步 ${syncedCustomerCount} 位顧客資料`
+      }
+      if (duplicateCount > 0) {
+        message += `\n\n⚠️ 跳過 ${duplicateCount} 位重複成員：\n${duplicateItems.join('\n')}`
+      }
+      message += `\n\n📋 重要提醒：\n• OCR 資料已標記為「待驗證」\n• 請務必人工檢查護照資訊`
       if (failedItems.length > 0) {
         message += `\n\n❌ 失敗項目：\n${failedItems.join('\n')}`
       }
       alert(message)
 
       // 清空檔案並重新載入成員
-      setPassportFiles([])
+      processedFiles.forEach(pf => URL.revokeObjectURL(pf.preview))
+      setProcessedFiles([])
       await loadMembers()
       setIsAddDialogOpen(false)
     } catch (error) {
@@ -617,7 +871,7 @@ export function OrderMembersExpandable({
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   出生年月日
                 </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">性別</th>
+                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 w-[60px]">性別</th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   身分證號
                 </th>
@@ -629,10 +883,6 @@ export function OrderMembersExpandable({
                 </th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   特殊餐食
-                </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">PNR</th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
-                  機票費用
                 </th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   應付金額
@@ -682,26 +932,48 @@ export function OrderMembersExpandable({
                     </td>
                   )}
 
-                  {/* 中文姓名 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-                    <input
-                      type="text"
-                      value={member.chinese_name || ''}
-                      onChange={e => updateField(member.id, 'chinese_name', e.target.value)}
-                      onCompositionStart={() => setIsComposing(true)}
-                      onCompositionEnd={(e) => {
-                        setIsComposing(false)
-                        setTimeout(() => {
-                          updateField(member.id, 'chinese_name', e.currentTarget.value)
-                        }, 0)
-                      }}
-                      onKeyDown={e => handleKeyDown(e, memberIndex, 'chinese_name')}
-                      data-member={member.id}
-                      data-field="chinese_name"
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                      placeholder=""
-                    />
+                  {/* 中文姓名 - 點擊可查看護照照片，待驗證顯示紅色 */}
+                  <td className={cn(
+                    "border border-morandi-gold/20 px-2 py-1",
+                    member.customer_verification_status === 'unverified' ? 'bg-red-50' : 'bg-white'
+                  )}>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="text"
+                        value={member.chinese_name || ''}
+                        onChange={e => updateField(member.id, 'chinese_name', e.target.value)}
+                        onCompositionStart={() => setIsComposing(true)}
+                        onCompositionEnd={(e) => {
+                          setIsComposing(false)
+                          setTimeout(() => {
+                            updateField(member.id, 'chinese_name', e.currentTarget.value)
+                          }, 0)
+                        }}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'chinese_name')}
+                        data-member={member.id}
+                        data-field="chinese_name"
+                        className={cn(
+                          "flex-1 bg-transparent text-xs",
+                          member.customer_verification_status === 'unverified' && 'text-red-600 font-medium'
+                        )}
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder=""
+                        title={member.customer_verification_status === 'unverified' ? '⚠️ 待驗證 - 請檢查顧客資料' : ''}
+                      />
+                      {member.passport_image_url && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPreviewMember(member)
+                            setIsPreviewOpen(true)
+                          }}
+                          className="p-0.5 text-morandi-gold hover:text-morandi-gold/80 transition-colors"
+                          title="查看護照照片"
+                        >
+                          <Eye size={12} />
+                        </button>
+                      )}
+                    </div>
                   </td>
 
                   {/* 護照拼音 */}
@@ -829,39 +1101,6 @@ export function OrderMembersExpandable({
                       onKeyDown={e => handleKeyDown(e, memberIndex, 'special_meal')}
                       data-member={member.id}
                       data-field="special_meal"
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                    />
-                  </td>
-
-                  {/* PNR */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-                    <input
-                      type="text"
-                      value={member.pnr || ''}
-                      onChange={e => updateField(member.id, 'pnr', e.target.value)}
-                      onCompositionStart={() => setIsComposing(true)}
-                      onCompositionEnd={(e) => {
-                        setIsComposing(false)
-                        setTimeout(() => {
-                          updateField(member.id, 'pnr', e.currentTarget.value)
-                        }, 0)
-                      }}
-                      onKeyDown={e => handleKeyDown(e, memberIndex, 'pnr')}
-                      data-member={member.id}
-                      data-field="pnr"
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                    />
-                  </td>
-
-                  {/* 機票費用 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={member.flight_cost || ''}
-                      onChange={e => handleNumberInput(member.id, 'flight_cost', e.target.value)}
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
@@ -1028,6 +1267,8 @@ export function OrderMembersExpandable({
                 className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-all ${
                   isDragging
                     ? 'border-morandi-gold bg-morandi-gold/20 scale-105'
+                    : isProcessing
+                    ? 'border-morandi-blue bg-morandi-blue/10'
                     : 'border-morandi-secondary/30 bg-morandi-container/20 hover:bg-morandi-container/40'
                 }`}
                 onDragOver={handleDragOver}
@@ -1035,49 +1276,71 @@ export function OrderMembersExpandable({
                 onDrop={handleDrop}
               >
                 <div className="flex flex-col items-center justify-center py-4">
-                  <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
-                  <p className="text-sm text-morandi-primary">
-                    <span className="font-semibold">點擊上傳</span> 或拖曳檔案
-                  </p>
-                  <p className="text-xs text-morandi-secondary">支援 JPG, PNG（可多選）</p>
+                  {isProcessing ? (
+                    <>
+                      <div className="w-6 h-6 mb-2 border-2 border-morandi-gold border-t-transparent rounded-full animate-spin" />
+                      <p className="text-sm text-morandi-primary">處理檔案中...</p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
+                      <p className="text-sm text-morandi-primary">
+                        <span className="font-semibold">點擊上傳</span> 或拖曳檔案
+                      </p>
+                      <p className="text-xs text-morandi-secondary">支援 JPG, PNG, PDF（可多選）</p>
+                    </>
+                  )}
                 </div>
                 <input
                   id="member-passport-upload"
                   type="file"
                   className="hidden"
-                  accept="image/*"
+                  accept="image/*,.pdf,application/pdf"
                   multiple
                   onChange={handlePassportFileChange}
-                  disabled={isUploading}
+                  disabled={isUploading || isProcessing}
                 />
               </label>
 
-              {/* 已選檔案列表 */}
-              {passportFiles.length > 0 && (
+              {/* 已選檔案列表（含縮圖） */}
+              {processedFiles.length > 0 && (
                 <div className="space-y-2">
                   <div className="text-xs text-morandi-secondary mb-2">
-                    已選擇 {passportFiles.length} 個檔案：
+                    已選擇 {processedFiles.length} 張圖片：
                   </div>
-                  <div className="max-h-32 overflow-y-auto space-y-2">
-                    {passportFiles.map((file, index) => (
+                  <div className="max-h-48 overflow-y-auto space-y-2">
+                    {processedFiles.map((pf, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-2 bg-morandi-container/20 rounded"
+                        className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded"
                       >
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <FileImage size={14} className="text-morandi-gold flex-shrink-0" />
-                          <span className="text-xs text-morandi-primary truncate">
-                            {file.name}
-                          </span>
-                          <span className="text-xs text-morandi-secondary flex-shrink-0">
-                            ({(file.size / 1024).toFixed(1)} KB)
+                        {/* 縮圖 */}
+                        <img
+                          src={pf.preview}
+                          alt={pf.file.name}
+                          className="w-12 h-12 object-cover rounded flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            {pf.isPdf ? (
+                              <FileText size={12} className="text-morandi-red flex-shrink-0" />
+                            ) : (
+                              <FileImage size={12} className="text-morandi-gold flex-shrink-0" />
+                            )}
+                            <span className="text-xs text-morandi-primary truncate">
+                              {pf.file.name}
+                            </span>
+                          </div>
+                          <span className="text-xs text-morandi-secondary">
+                            {(pf.file.size / 1024).toFixed(1)} KB
+                            {pf.isPdf && <span className="ml-1 text-morandi-red">(從 PDF 轉換)</span>}
                           </span>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemovePassportFile(index)}
-                          className="h-6 w-6 p-0 hover:bg-red-100"
+                          className="h-6 w-6 p-0 hover:bg-red-100 flex-shrink-0"
                           disabled={isUploading}
                         >
                           <Trash2 size={12} className="text-morandi-red" />
@@ -1091,7 +1354,7 @@ export function OrderMembersExpandable({
                     disabled={isUploading}
                     className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white"
                   >
-                    {isUploading ? '辨識中...' : `辨識並建立 ${passportFiles.length} 位成員`}
+                    {isUploading ? '辨識中...' : `辨識並建立 ${processedFiles.length} 位成員`}
                   </Button>
                 </div>
               )}
@@ -1103,6 +1366,26 @@ export function OrderMembersExpandable({
               取消
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 護照照片預覽對話框 */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {previewMember?.chinese_name || previewMember?.passport_name || '護照照片'}
+            </DialogTitle>
+          </DialogHeader>
+          {previewMember?.passport_image_url && (
+            <div className="flex justify-center">
+              <img
+                src={previewMember.passport_image_url}
+                alt="護照照片"
+                className="max-w-full max-h-[70vh] object-contain rounded-lg"
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

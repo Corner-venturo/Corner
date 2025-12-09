@@ -20,18 +20,13 @@ export function useSettingsState() {
     setIsPageReady(true)
   }, [])
 
-  // 檢查快取狀態
+  // 檢查快取狀態（純雲端架構，不再使用 IndexedDB）
   const checkCacheStatus = async () => {
     try {
-      const { DB_NAME, TABLE_SCHEMAS } = await import('@/lib/db/schemas')
-
-      // 檢查資料庫是否存在
-      const databases = await indexedDB.databases?.()
-      const dbExists = databases?.some(db => db.name === DB_NAME) ?? false
-
+      // 純雲端架構，不再使用本地快取
       setCacheInfo({
-        dbExists,
-        tableCount: TABLE_SCHEMAS.length,
+        dbExists: false,
+        tableCount: 0,
       })
     } catch (error) {
       logger.error('檢查快取狀態失敗:', error)

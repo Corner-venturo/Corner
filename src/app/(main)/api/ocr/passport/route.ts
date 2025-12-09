@@ -198,12 +198,147 @@ async function callGoogleVision(base64Image: string, apiKey: string): Promise<st
 }
 
 /**
+ * 用拼音驗證中文名是否合理
+ * 台灣護照拼音規則：每個中文字對應一個拼音音節
+ * 例如：CHU/WENYU → 朱(CHU) 玟(WEN) 伃(YU) = 3個字
+ */
+function validateChineseNameByPinyin(chineseName: string, romanization: string): { valid: boolean; expectedLength: number } {
+  if (!romanization || !chineseName) {
+    return { valid: true, expectedLength: 0 } // 無法驗證
+  }
+
+  // 從護照拼音計算預期的字數
+  // 格式: SURNAME/GIVENNAME 或 SURNAME/GIVEN-NAME
+  const parts = romanization.toUpperCase().split('/')
+  if (parts.length !== 2) {
+    return { valid: true, expectedLength: 0 }
+  }
+
+  const surname = parts[0]
+  const givenName = parts[1]
+
+  // 台灣護照拼音常見音節模式（用於精確計算）
+  // 這些是常見的台灣威妥瑪拼音音節
+  const commonSyllables = [
+    // 常見複合母音音節
+    'YING', 'YANG', 'WANG', 'WONG', 'CHANG', 'ZHANG', 'CHUNG', 'ZHONG', 'CHUANG', 'ZHUANG',
+    'CHIANG', 'JIANG', 'CHIEN', 'JIAN', 'CHIEH', 'JIE', 'CHIAO', 'JIAO', 'CHING', 'JING',
+    'HUANG', 'HSIANG', 'XIANG', 'HSIAO', 'XIAO', 'HSIEH', 'XIE', 'HSIUNG', 'XIONG',
+    'KUANG', 'GUANG', 'KUAN', 'GUAN', 'KWANG',
+    'LIANG', 'LING', 'LUNG', 'LONG',
+    'SHENG', 'SHANG', 'SHUANG', 'SHUI',
+    'TSUNG', 'TSENG', 'TZENG', 'TSAI', 'TZAI',
+    // 常見三字母音節
+    'WEN', 'WAN', 'WEI', 'WAI', 'YEN', 'YAN', 'YAO', 'YIN', 'YOU', 'YUN', 'YUE',
+    'CHU', 'CHA', 'CHE', 'CHI', 'CHO', 'CHE',
+    'SHU', 'SHA', 'SHE', 'SHI', 'SHO',
+    'ZHU', 'ZHA', 'ZHE', 'ZHI', 'ZHO',
+    'ANG', 'ENG', 'ING', 'ONG', 'UNG',
+    'HUA', 'HUI', 'HAO', 'HOU', 'HAN', 'HEN', 'HUN',
+    'KAI', 'KEI', 'KUI', 'KAN', 'KEN', 'KUN', 'KAO', 'KOU',
+    'GAI', 'GEI', 'GUI', 'GAN', 'GEN', 'GUN', 'GAO', 'GOU',
+    'LAI', 'LEI', 'LUI', 'LAN', 'LEN', 'LUN', 'LAO', 'LOU', 'LIN', 'LIU',
+    'MAI', 'MEI', 'MAN', 'MEN', 'MIN', 'MOU', 'MAN',
+    'NAI', 'NEI', 'NAN', 'NEN', 'NIN', 'NOU',
+    'PAI', 'PEI', 'PAN', 'PEN', 'PIN', 'POU',
+    'TAI', 'TEI', 'TAN', 'TEN', 'TIN', 'TOU', 'TUN',
+    'DAI', 'DEI', 'DAN', 'DEN', 'DIN', 'DOU', 'DUN',
+    'SAI', 'SAN', 'SEN', 'SIN', 'SOU', 'SUN',
+    'ZAI', 'ZAN', 'ZEN', 'ZIN', 'ZOU', 'ZUN',
+    'CAI', 'CAN', 'CEN', 'CIN', 'COU', 'CUN',
+    'FAN', 'FEN', 'FOU', 'FUN',
+    'RAN', 'REN', 'ROU', 'RUN', 'RUI',
+    // 兩字母音節
+    'AN', 'EN', 'AI', 'EI', 'AO', 'OU', 'YA', 'YE', 'YI', 'YO', 'YU',
+    'WA', 'WO', 'WU',
+    'BA', 'BI', 'BO', 'BU', 'BE',
+    'PA', 'PI', 'PO', 'PU', 'PE',
+    'MA', 'MI', 'MO', 'MU', 'ME',
+    'FA', 'FI', 'FO', 'FU', 'FE',
+    'DA', 'DI', 'DO', 'DU', 'DE',
+    'TA', 'TI', 'TO', 'TU', 'TE',
+    'NA', 'NI', 'NO', 'NU', 'NE',
+    'LA', 'LI', 'LO', 'LU', 'LE',
+    'GA', 'GI', 'GO', 'GU', 'GE',
+    'KA', 'KI', 'KO', 'KU', 'KE',
+    'HA', 'HI', 'HO', 'HU', 'HE',
+    'JA', 'JI', 'JO', 'JU', 'JE',
+    'QA', 'QI', 'QO', 'QU', 'QE',
+    'XA', 'XI', 'XO', 'XU', 'XE',
+    'ZA', 'ZI', 'ZO', 'ZU', 'ZE',
+    'CA', 'CI', 'CO', 'CU', 'CE',
+    'SA', 'SI', 'SO', 'SU', 'SE',
+    'RA', 'RI', 'RO', 'RU', 'RE',
+  ]
+
+  // 使用貪婪匹配計算音節數
+  const countSyllables = (s: string): number => {
+    // 如果有連字號，直接按連字號分割
+    if (s.includes('-')) {
+      return s.split('-').filter(Boolean).length
+    }
+
+    s = s.toUpperCase()
+    let count = 0
+    let remaining = s
+
+    while (remaining.length > 0) {
+      let matched = false
+      // 從長到短嘗試匹配
+      for (let len = Math.min(6, remaining.length); len >= 2; len--) {
+        const prefix = remaining.substring(0, len)
+        if (commonSyllables.includes(prefix)) {
+          count++
+          remaining = remaining.substring(len)
+          matched = true
+          break
+        }
+      }
+      // 如果沒有匹配到已知音節，假設是單字母或未知音節
+      if (!matched) {
+        // 嘗試用母音作為音節結束的標記
+        const vowelMatch = remaining.match(/^[^AEIOU]*[AEIOU]+[NG]*/i)
+        if (vowelMatch) {
+          count++
+          remaining = remaining.substring(vowelMatch[0].length)
+        } else if (remaining.length > 0) {
+          // 剩餘部分算一個音節
+          count++
+          break
+        }
+      }
+    }
+
+    return Math.max(count, 1) // 至少1個音節
+  }
+
+  // 計算預期字數
+  const surnameChars = countSyllables(surname)
+  const givenNameChars = countSyllables(givenName)
+  const expectedLength = surnameChars + givenNameChars
+
+  const actualLength = chineseName.length
+
+  // 驗證邏輯：
+  // 1. 實際字數 = 預期字數 → 完全正確
+  // 2. 實際字數 > 預期字數 → 可能是複姓或計算誤差，接受
+  // 3. 實際字數 < 預期字數 → 可能 OCR 漏字，不接受
+  const valid = actualLength >= expectedLength
+
+  console.log(`🔍 拼音驗證: ${romanization} → 姓 "${surname}"(${surnameChars}字) + 名 "${givenName}"(${givenNameChars}字) = 預期 ${expectedLength} 字, 實際 "${chineseName}" ${actualLength} 字, ${valid ? '✓' : '✗'}`)
+
+  return { valid, expectedLength }
+}
+
+/**
  * 解析護照 OCR 文字
  * 合併 OCR.space（MRZ）和 Google Vision（中文）的結果
  */
 function parsePassportText(ocrSpaceText: string, googleVisionText: string | null, fileName: string) {
   // 移除所有空白和換行，方便比對
   const cleanText = ocrSpaceText.replace(/\s+/g, '')
+  // 也處理 Google Vision 的文字（作為備用來源）
+  const cleanGoogleText = googleVisionText?.replace(/\s+/g, '') || ''
 
   // 基本資料結構
   const customerData: {
@@ -225,7 +360,15 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   // ========== 第一行 MRZ：解析姓名和國籍 ==========
   // 格式：P<國籍姓氏<<名字<<<<<...
   // 範例：P<TWNLIN<<LI<HUI<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  const mrzLine1Match = cleanText.match(/P[<I]([A-Z]{3})([A-Z<]+)/i)
+  // 嘗試從兩個來源解析（OCR.space 優先，Google Vision 備用）
+  let mrzLine1Match = cleanText.match(/P[<I]([A-Z]{3})([A-Z<]+)/i)
+  if (!mrzLine1Match && cleanGoogleText) {
+    mrzLine1Match = cleanGoogleText.match(/P[<I]([A-Z]{3})([A-Z<]+)/i)
+    if (mrzLine1Match) {
+      console.log('📝 從 Google Vision 解析 MRZ Line 1')
+    }
+  }
+
   if (mrzLine1Match) {
     const countryCode = mrzLine1Match[1]
     const namePart = mrzLine1Match[2]
@@ -345,10 +488,13 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
 
   // ========== 從 Google Vision 結果抓中文名 ==========
   let chineseName = ''
+  let chineseNameConfidence = 'high' // high, medium, low
   if (googleVisionText) {
     // Google Vision 對中文辨識較好，優先從這裡抓中文名
     // 排除詞彙清單
     const excludeWords = ['護照', '中華', '民國', '姓名', '國籍', '性別', '出生', '日期', '效期', '機關', '外交部', '台灣', '發照', '截止', '型式', '代碼', '持照', '簽名', '身分', '證號', '地址', '地點', '機關', '有效']
+    // 常見 OCR 錯字（這些字很少出現在人名中）
+    const suspiciousChars = ['仔', '佬', '的', '是', '在', '了', '有', '個', '這', '那', '和', '與', '或']
 
     // 策略 1: 找 Name/姓名 區塊後面緊鄰的中文名
     // 護照格式通常是: /Name (Surname, Given names)\n中文名\n英文名
@@ -431,6 +577,21 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
         }
       }
     }
+
+    // 檢查中文名是否可疑（含有常見 OCR 錯字）
+    if (chineseName && suspiciousChars.some(char => chineseName.includes(char))) {
+      console.log('⚠️ 中文名含可疑字元:', chineseName)
+      chineseNameConfidence = 'low'
+    }
+
+    // 用拼音交叉驗證中文名字數
+    if (chineseName && customerData.passport_romanization) {
+      const validation = validateChineseNameByPinyin(chineseName, customerData.passport_romanization)
+      if (!validation.valid) {
+        console.log(`⚠️ 中文名字數不符: 預期 ${validation.expectedLength} 字, 實際 ${chineseName.length} 字`)
+        chineseNameConfidence = 'low'
+      }
+    }
   }
 
   // ========== 從 OCR.space 結果抓英文名 ==========
@@ -454,12 +615,28 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   }
 
   // ========== 決定最終姓名 ==========
-  // 優先使用中文名，沒有就用英文名
-  if (chineseName) {
+  // 如果中文名可靠，優先使用中文名
+  // 如果中文名不可靠（含可疑字元），則用「中文名 (拼音)」標記待確認
+  if (chineseName && chineseNameConfidence === 'high') {
     customerData.name = chineseName
     if (englishName) {
       customerData.english_name = englishName
     }
+  } else if (chineseName && chineseNameConfidence === 'low') {
+    // 中文名可能有誤，加上拼音方便核對
+    if (customerData.passport_romanization) {
+      customerData.name = `${chineseName}(${customerData.passport_romanization})`
+      console.log('⚠️ 中文名不可靠，使用組合格式:', customerData.name)
+    } else {
+      customerData.name = chineseName
+    }
+    if (englishName) {
+      customerData.english_name = englishName
+    }
+  } else if (customerData.passport_romanization) {
+    // 沒有中文名，使用 MRZ 拼音
+    customerData.name = customerData.passport_romanization.replace('/', ' ')
+    console.log('📝 使用 MRZ 拼音作為姓名:', customerData.name)
   } else if (englishName) {
     customerData.name = englishName
   }

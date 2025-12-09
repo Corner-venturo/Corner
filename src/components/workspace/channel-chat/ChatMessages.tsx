@@ -114,32 +114,31 @@ export function ChatMessages({
     e.stopPropagation()
     setIsDragging(false)
 
+    console.log('🔥 handleDrop triggered')
+
     const droppedFiles = Array.from(e.dataTransfer.files)
     const validFiles: File[] = []
     const errors: string[] = []
 
-    console.log('[ChatMessages] handleDrop - droppedFiles:', droppedFiles.length)
+    console.log('🔥 droppedFiles count:', droppedFiles.length)
 
     // 處理直接拖曳的檔案
     droppedFiles.forEach(file => {
-      console.log('[ChatMessages] Validating file:', file.name, file.type, file.size)
+      console.log('🔥 Processing file:', file.name, file.type, file.size)
       const validation = validateFile(file)
       if (validation.valid) {
         validFiles.push(file)
-        console.log('[ChatMessages] File validated successfully:', file.name)
+        console.log('🔥 File valid:', file.name)
       } else if (validation.error) {
         errors.push(validation.error)
-        console.log('[ChatMessages] File validation failed:', validation.error)
+        console.log('🔥 File invalid:', validation.error)
       }
     })
 
     // 🔥 處理從網頁拖曳的圖片 URL（Windows 和 Mac 都支援）
     if (droppedFiles.length === 0) {
-      // 嘗試取得圖片 URL
       const html = e.dataTransfer.getData('text/html')
       const text = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
-
-      console.log('[ChatMessages] No files, trying to extract image URL from HTML/text')
 
       let imageUrl: string | null = null
 
@@ -148,7 +147,6 @@ export function ChatMessages({
         const match = html.match(/<img[^>]+src=["']([^"']+)["']/i)
         if (match) {
           imageUrl = match[1]
-          console.log('[ChatMessages] Found image URL from HTML:', imageUrl)
         }
       }
 
@@ -157,25 +155,19 @@ export function ChatMessages({
         const urlMatch = text.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i)
         if (urlMatch) {
           imageUrl = text.trim()
-          console.log('[ChatMessages] Found image URL from text:', imageUrl)
         }
       }
 
       if (imageUrl) {
         try {
-          // 下載圖片並轉換為 File
-          console.log('[ChatMessages] Fetching image from URL:', imageUrl)
           const response = await fetch(imageUrl)
           if (!response.ok) throw new Error('無法下載圖片')
 
           const blob = await response.blob()
-          console.log('[ChatMessages] Image fetched, blob type:', blob.type, 'size:', blob.size)
 
-          // 從 URL 取得檔名
           const urlParts = imageUrl.split('/')
           let fileName = urlParts[urlParts.length - 1].split('?')[0] || 'image'
           if (!fileName.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-            // 根據 MIME 類型加上副檔名
             const ext = blob.type.split('/')[1] || 'png'
             fileName = `image.${ext}`
           }
@@ -185,29 +177,28 @@ export function ChatMessages({
 
           if (validation.valid) {
             validFiles.push(file)
-            console.log('[ChatMessages] Web image validated successfully:', file.name)
           } else if (validation.error) {
             errors.push(validation.error)
-            console.log('[ChatMessages] Web image validation failed:', validation.error)
           }
-        } catch (err) {
-          // CORS 錯誤時，提示用戶
-          console.error('[ChatMessages] Failed to fetch image:', err)
+        } catch {
           errors.push('無法直接下載此圖片（可能有跨域限制），請右鍵另存圖片後再上傳')
         }
       }
     }
 
     if (errors.length > 0) {
+      console.log('🔥 Errors:', errors)
       alert(errors.join('\n'))
     }
 
+    console.log('🔥 validFiles count:', validFiles.length)
+    console.log('🔥 current attachedFiles:', attachedFiles.length)
+
     if (validFiles.length > 0) {
-      console.log('[ChatMessages] Adding files to attachedFiles, count:', validFiles.length)
-      console.log('[ChatMessages] Current attachedFiles:', attachedFiles.length)
+      console.log('🔥 Calling onFilesChange with', [...attachedFiles, ...validFiles].length, 'files')
       onFilesChange([...attachedFiles, ...validFiles])
     } else {
-      console.log('[ChatMessages] No valid files to add')
+      console.log('🔥 No valid files to add')
     }
   }
 
