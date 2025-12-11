@@ -101,7 +101,15 @@ export const CompanyAssetsPage: React.FC = () => {
     if (!confirmed) return
 
     try {
-      await supabase.storage.from('company-assets').remove([asset.file_path])
+      const response = await fetch(
+        `/api/storage/upload?bucket=company-assets&path=${encodeURIComponent(asset.file_path)}`,
+        { method: 'DELETE' }
+      )
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || '刪除檔案失敗')
+      }
+
       const { error } = await supabase.from('company_assets').delete().eq('id', asset.id)
       if (error) throw error
 
@@ -140,6 +148,35 @@ export const CompanyAssetsPage: React.FC = () => {
     []
   )
 
+  const uploadFile = async (file: File, filePath: string): Promise<void> => {
+    const formDataToSend = new FormData()
+    formDataToSend.append('file', file)
+    formDataToSend.append('bucket', 'company-assets')
+    formDataToSend.append('path', filePath)
+
+    const response = await fetch('/api/storage/upload', {
+      method: 'POST',
+      body: formDataToSend,
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || '上傳失敗')
+    }
+  }
+
+  const deleteFile = async (filePath: string): Promise<void> => {
+    const response = await fetch(
+      `/api/storage/upload?bucket=company-assets&path=${encodeURIComponent(filePath)}`,
+      { method: 'DELETE' }
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || '刪除失敗')
+    }
+  }
+
   const handleSubmit = useCallback(async () => {
     if (!formData.name.trim()) {
       await alert('請輸入資料名稱', 'warning')
@@ -162,17 +199,13 @@ export const CompanyAssetsPage: React.FC = () => {
         }
 
         if (formData.file) {
-          await supabase.storage.from('company-assets').remove([editingAsset.file_path])
+          await deleteFile(editingAsset.file_path)
 
           const fileExt = formData.file.name.split('.').pop()
           const safeFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
           const filePath = `assets/${safeFileName}`
 
-          const { error: uploadError } = await supabase.storage
-            .from('company-assets')
-            .upload(filePath, formData.file)
-
-          if (uploadError) throw uploadError
+          await uploadFile(formData.file, filePath)
 
           updateData.file_path = filePath
           updateData.file_size = formData.file.size
@@ -193,11 +226,7 @@ export const CompanyAssetsPage: React.FC = () => {
         const safeFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
         const filePath = `assets/${safeFileName}`
 
-        const { error: uploadError } = await supabase.storage
-          .from('company-assets')
-          .upload(filePath, file)
-
-        if (uploadError) throw uploadError
+        await uploadFile(file, filePath)
 
         const userName =
           user?.display_name || user?.chinese_name || user?.personal_info?.email || 'Unknown'

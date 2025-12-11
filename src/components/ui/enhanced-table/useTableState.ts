@@ -61,14 +61,16 @@ export function useTableState<T>({
   }, [data, searchTerm, searchableFields, filters, sortColumn, sortDirection])
 
   // 分頁邏輯
-  const totalPages = Math.ceil(processedData.length / pageSize)
+  const totalPages = Math.ceil(processedData.length / pageSize) || 1
   const startIndex = (currentPage - 1) * pageSize
   const paginatedData = processedData.slice(startIndex, startIndex + pageSize)
 
-  // 重置頁面當資料變化時
+  // 當目前頁面超過總頁數時，調整到最後一頁（而非強制回第一頁）
   useEffect(() => {
-    setCurrentPage(1)
-  }, [processedData.length])
+    if (currentPage > totalPages) {
+      setCurrentPage(Math.max(1, totalPages))
+    }
+  }, [currentPage, totalPages])
 
   const handleSort = (columnKey: string) => {
     const newDirection = sortColumn === columnKey && sortDirection === 'asc' ? 'desc' : 'asc'
