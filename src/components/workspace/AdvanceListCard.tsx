@@ -56,14 +56,14 @@ export function AdvanceListCard({
   }
 
   return (
-    <div className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
+    <div className="flex gap-3 group hover:bg-morandi-container/5 px-1 py-1.5 rounded transition-colors">
       {/* 用戶頭像 */}
       <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
         {userName?.charAt(0) || '?'}
       </div>
 
       {/* 內容區 */}
-      <div className="flex-1 min-w-0 relative pt-0.5">
+      <div className="flex-1 min-w-0 relative pt-0.5 pr-1">
         {/* 標題列 */}
         <div className="flex items-baseline gap-2 mb-0.5">
           <span className="font-semibold text-morandi-primary text-[15px]">{userName}</span>

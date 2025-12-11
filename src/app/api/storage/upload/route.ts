@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const allowedBuckets = ['company-assets', 'passport-images', 'member-documents']
+    const allowedBuckets = ['company-assets', 'passport-images', 'member-documents', 'user-avatars']
     if (!allowedBuckets.includes(bucket)) {
       return NextResponse.json(
         { error: 'Invalid bucket' },
@@ -77,7 +77,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const allowedBuckets = ['company-assets', 'passport-images', 'member-documents']
+    const allowedBuckets = ['company-assets', 'passport-images', 'member-documents', 'user-avatars']
     if (!allowedBuckets.includes(bucket)) {
       return NextResponse.json(
         { error: 'Invalid bucket' },

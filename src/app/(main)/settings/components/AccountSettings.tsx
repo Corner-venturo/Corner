@@ -1,11 +1,13 @@
+import { useState, useRef } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Lock, EyeOff, Eye } from 'lucide-react'
+import { Lock, EyeOff, Eye, Camera, User, Loader2 } from 'lucide-react'
 import { alert, alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
+import { supabase } from '@/lib/supabase/client'
 
 interface AccountSettingsProps {
   user: {
@@ -16,6 +18,7 @@ interface AccountSettingsProps {
     english_name?: string
     name?: string
     email?: string
+    avatar_url?: string | null
   } | null
   showPasswordSection: boolean
   setShowPasswordSection: (show: boolean) => void
@@ -38,6 +41,68 @@ export function AccountSettings({
   passwordUpdateLoading,
   setPasswordUpdateLoading,
 }: AccountSettingsProps) {
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(user?.avatar_url || null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !user) return
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      await alertWarning('只支援 JPG、PNG、GIF、WebP 格式的圖片')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      await alertWarning('檔案大小不能超過 5MB')
+      return
+    }
+
+    setAvatarUploading(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.employee_number}_${Date.now()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('bucket', 'user-avatars')
+      formData.append('path', filePath)
+
+      const response = await fetch('/api/storage/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || '上傳失敗')
+      }
+
+      const { publicUrl } = await response.json()
+
+      const { error: updateError } = await supabase
+        .from('employees')
+        .update({ avatar_url: publicUrl })
+        .eq('employee_number', user.employee_number)
+
+      if (updateError) throw updateError
+
+      setCurrentAvatarUrl(publicUrl)
+      await alertSuccess('頭像上傳成功')
+    } catch (error) {
+      logger.error('頭像上傳失敗:', error)
+      await alertError('頭像上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+    } finally {
+      setAvatarUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   const handlePasswordUpdate = async () => {
     const auth = useRequireAuthSync()
 
@@ -141,6 +206,50 @@ export function AccountSettings({
       </div>
 
       <div className="space-y-6">
+        {/* 個人頭像區塊 */}
+        <div className="p-6 border border-border rounded-lg bg-card">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-morandi-container flex items-center justify-center border-2 border-morandi-gold/20">
+                  {currentAvatarUrl ? (
+                    <img
+                      src={currentAvatarUrl}
+                      alt="頭像"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-10 h-10 text-morandi-secondary" />
+                  )}
+                </div>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={avatarUploading}
+                  className="absolute -bottom-1 -right-1 w-8 h-8 bg-morandi-gold hover:bg-morandi-gold-hover rounded-full flex items-center justify-center text-white shadow-md transition-colors disabled:opacity-50"
+                >
+                  {avatarUploading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4" />
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">個人頭像</h3>
+                <p className="text-sm text-morandi-secondary">點擊相機圖示更換頭像</p>
+                <p className="text-xs text-morandi-muted mt-1">支援 JPG、PNG、GIF、WebP，最大 5MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 修改密碼區塊 */}
         <div className="p-6 border border-border rounded-lg bg-card">
           <div className="flex items-center justify-between mb-3">
