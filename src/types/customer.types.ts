@@ -31,7 +31,8 @@ export interface Customer extends BaseEntity {
   gender?: string | null // 性別
   company?: string | null // 公司名稱
   tax_id?: string | null // 統編
-  is_vip: boolean | null // 是否為 VIP
+  member_type: MemberType // 會員類型：potential（潛在）/ member（普通）/ vip
+  is_vip: boolean | null // 是否為 VIP（保留向下相容）
   vip_level?: VipLevel | string | null // VIP 等級
   source?: CustomerSource | string | null // 客戶來源
   referred_by?: string | null // 推薦人
@@ -54,6 +55,14 @@ export type VerificationStatus =
   | 'verified' // 已驗證
   | 'unverified' // 待驗證
   | 'rejected' // 已拒絕
+
+/**
+ * MemberType - 會員類型
+ */
+export type MemberType =
+  | 'potential' // 潛在客戶（僅 Email 註冊，未綁定身分證）
+  | 'member' // 普通會員（已綁定身分證）
+  | 'vip' // VIP 會員（依消費金額/次數計算）
 
 /**
  * VipLevel - VIP 等級
@@ -105,6 +114,7 @@ export interface CreateCustomerData {
   gender?: string
   company?: string
   tax_id?: string
+  member_type?: MemberType // 預設為 member
   is_vip: boolean
   vip_level?: VipLevel
   source?: CustomerSource
@@ -138,6 +148,7 @@ export interface UpdateCustomerData {
   gender?: string | null
   company?: string | null
   tax_id?: string | null
+  member_type?: MemberType // 會員類型
   is_vip?: boolean | null
   vip_level?: VipLevel | string | null
   source?: CustomerSource | string | null
@@ -155,6 +166,7 @@ export interface UpdateCustomerData {
  * CustomerFilter - 客戶篩選條件
  */
 export interface CustomerFilter {
+  member_type?: MemberType | MemberType[] // 會員類型篩選
   is_vip?: boolean
   vip_level?: VipLevel | VipLevel[]
   source?: CustomerSource | CustomerSource[]
@@ -174,6 +186,7 @@ export interface CustomerListItem {
   name: string
   phone: string
   email?: string
+  member_type: MemberType // 會員類型
   is_vip: boolean
   vip_level?: VipLevel
   total_orders?: number

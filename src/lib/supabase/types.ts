@@ -1901,6 +1901,7 @@ export type Database = {
           is_active: boolean | null
           is_vip: boolean | null
           last_order_date: string | null
+          member_type: string
           name: string
           national_id: string | null
           nationality: string | null
@@ -1941,6 +1942,7 @@ export type Database = {
           is_active?: boolean | null
           is_vip?: boolean | null
           last_order_date?: string | null
+          member_type?: string
           name: string
           national_id?: string | null
           nationality?: string | null
@@ -1981,6 +1983,7 @@ export type Database = {
           is_active?: boolean | null
           is_vip?: boolean | null
           last_order_date?: string | null
+          member_type?: string
           name?: string
           national_id?: string | null
           nationality?: string | null
