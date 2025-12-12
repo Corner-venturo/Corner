@@ -21,7 +21,7 @@
     "audit:file-size": "./scripts/check-file-size.sh",
     "audit:any-usage": "./scripts/check-any-usage.sh",
     "audit:code-quality": "npm run audit:file-size && npm run audit:any-usage && npm run type-check && npm run lint",
-    "prepare": "husky install",
+    "prepare": "node -e \"if(process.env.CI !== 'true') require('child_process').execSync('npx husky install', {stdio: 'inherit'})\"",
     "setup:local": "./setup-local.sh",
     "db:init": "tsx scripts/init-db.ts",
     "db:export": "node scripts/export-db.js",
