@@ -7,6 +7,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { useOrderStore, useTourStore } from '@/stores'
+import type { Order } from '@/stores/types'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
@@ -135,7 +136,7 @@ export default function OrderDetailPage() {
       <InvoiceDialog
         open={isInvoiceDialogOpen}
         onOpenChange={setIsInvoiceDialogOpen}
-        fixedOrder={order}
+        fixedOrder={order as Order}
         fixedTour={tour}
       />
     </>

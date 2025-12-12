@@ -53,7 +53,8 @@ export const CompanyAssetsPage: React.FC = () => {
 
       // 過濾受限資源（非管理者/會計看不到）
       const filteredData = (data || []).filter(asset => {
-        if (!asset.restricted) return true
+        const assetWithRestricted = asset as typeof asset & { restricted?: boolean }
+        if (!assetWithRestricted.restricted) return true
         return isAdminOrAccountant
       })
 
@@ -231,15 +232,16 @@ export const CompanyAssetsPage: React.FC = () => {
         const userName =
           user?.display_name || user?.chinese_name || user?.personal_info?.email || 'Unknown'
 
-        const { error: dbError } = await supabase.from('company_assets').insert({
+         
+        const { error: dbError } = await (supabase as any).from('company_assets').insert({
           name: formData.name,
-          asset_type: formData.asset_type,
+          category: formData.asset_type, // 使用 category 欄位而非 asset_type
           file_path: filePath,
           file_size: file.size,
           mime_type: file.type,
           uploaded_by: user?.id || null,
           uploaded_by_name: userName,
-          restricted: formData.restricted,
+          description: formData.restricted ? '受限資源' : null,
         })
 
         if (dbError) throw dbError

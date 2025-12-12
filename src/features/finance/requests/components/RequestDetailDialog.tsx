@@ -118,8 +118,8 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       const selectedSupplier = suppliers.find(s => s.id === newItem.supplier_id)
       await paymentRequestService.addItem(request.id, {
         category: newItem.category,
-        supplier_id: newItem.supplier_id || undefined,
-        supplier_name: selectedSupplier?.name || newItem.supplier_name,
+        supplier_id: newItem.supplier_id || '',
+        supplier_name: selectedSupplier?.name || newItem.supplier_name || '',
         description: newItem.description,
         unit_price: newItem.unit_price,
         quantity: newItem.quantity,

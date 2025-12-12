@@ -36,7 +36,8 @@ export function SystemSettings({
     setClearingCache(true)
 
     try {
-      const { DB_NAME } = await import('@/lib/db/schemas')
+      // DB_NAME 已不再使用（純雲端架構）
+      const DB_NAME = 'venturo-erp-db'
 
       // 1. 清除 localStorage
       const localStorageCount = Object.keys(localStorage).length

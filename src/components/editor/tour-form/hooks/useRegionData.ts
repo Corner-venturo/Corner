@@ -2,84 +2,152 @@ import React from 'react'
 import { useRegionsStore } from '@/stores'
 import { CityOption } from '../types'
 
+/**
+ * 🎯 軍事級別的地區資料管理 Hook
+ *
+ * 功能：
+ * - 自動載入國家和城市資料
+ * - 管理國家/城市選擇狀態
+ * - 處理國家代碼和名稱的對應關係
+ * - 防止競態條件和狀態不一致
+ *
+ * 修復項目：
+ * 1. ✅ 修復 initialCountryCode 的依賴問題
+ * 2. ✅ 處理 countries 異步載入的競態條件
+ * 3. ✅ 簡化狀態同步邏輯，避免衝突
+ * 4. ✅ 添加錯誤處理和日誌
+ */
 export function useRegionData(data: { country?: string }) {
-  const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || '')
-  const [selectedCountryCode, setSelectedCountryCode] = React.useState<string>('')
   const { countries, cities, fetchAll } = useRegionsStore()
 
-  // 懶載入：進入表單時載入 regions（只執行一次）
-  const hasFetchedRef = React.useRef(false)
-  // 追蹤是否已經初始化過 country code
-  const hasInitializedCodeRef = React.useRef(false)
+  // 狀態管理
+  const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || '')
+  const [selectedCountryCode, setSelectedCountryCode] = React.useState<string>('')
 
+  // Refs 用於追蹤狀態
+  const hasFetchedRef = React.useRef(false)
+  const isInitializedRef = React.useRef(false)
+
+  // 📦 階段1：懶載入 regions 資料（只執行一次）
   React.useEffect(() => {
     if (countries.length === 0 && !hasFetchedRef.current) {
       hasFetchedRef.current = true
+      console.log('[useRegionData] 開始載入國家和城市資料')
       fetchAll()
     }
   }, [countries.length, fetchAll])
 
-  // 從 countries 取得所有國家列表
+  // 📦 階段2：當 countries 載入完成後，初始化 country code
+  React.useEffect(() => {
+    // 必須等待 countries 載入完成
+    if (countries.length === 0) return
+
+    // 如果沒有 data.country，清空狀態
+    if (!data.country) {
+      if (selectedCountry !== '') setSelectedCountry('')
+      if (selectedCountryCode !== '') setSelectedCountryCode('')
+      isInitializedRef.current = true
+      return
+    }
+
+    // 查找對應的國家
+    const matchedCountry = countries.find(c => c.name === data.country)
+
+    if (!matchedCountry) {
+      console.warn(`[useRegionData] 找不到國家: ${data.country}`)
+      if (selectedCountryCode !== '') setSelectedCountryCode('')
+      return
+    }
+
+    if (!matchedCountry.code) {
+      console.warn(`[useRegionData] 國家 ${data.country} 缺少 code`)
+      if (selectedCountryCode !== '') setSelectedCountryCode('')
+      return
+    }
+
+    // 同步 selectedCountry
+    if (selectedCountry !== data.country) {
+      console.log(`[useRegionData] 同步 selectedCountry: ${data.country}`)
+      setSelectedCountry(data.country)
+    }
+
+    // 同步 selectedCountryCode
+    if (selectedCountryCode !== matchedCountry.code) {
+      console.log(`[useRegionData] 設定 countryCode: ${matchedCountry.code} for ${data.country}`)
+      setSelectedCountryCode(matchedCountry.code)
+    }
+
+    isInitializedRef.current = true
+  }, [countries, data.country, selectedCountry, selectedCountryCode])
+
+  // 📦 計算衍生資料
+
+  // 所有啟用的國家列表
   const allDestinations = React.useMemo(() => {
-    return countries.filter(c => c.is_active).map(c => ({ id: c.id, code: c.code || '', name: c.name }))
+    const result = countries
+      .filter(c => c.is_active)
+      .map(c => ({
+        id: c.id,
+        code: c.code || '',
+        name: c.name
+      }))
+    console.log(`[useRegionData] allDestinations 計算完成: ${result.length} 個國家`)
+    return result
   }, [countries])
 
-  // 建立國家名稱到代碼的對照
+  // 國家名稱到代碼的對照表
   const countryNameToCode = React.useMemo(() => {
     const map: Record<string, string> = {}
     allDestinations.forEach(dest => {
-      map[dest.name] = dest.code
+      if (dest.code) {
+        map[dest.name] = dest.code
+      }
     })
     return map
   }, [allDestinations])
 
   // 根據選中的國家代碼取得城市列表
   const availableCities = React.useMemo<CityOption[]>(() => {
-    if (!selectedCountryCode) return []
-    // 根據 country code 找到對應的 country_id
+    if (!selectedCountryCode) {
+      console.log('[useRegionData] selectedCountryCode 為空，返回空城市列表')
+      return []
+    }
+
+    // 根據 country code 找到對應的 country
     const country = countries.find(c => c.code === selectedCountryCode)
-    if (!country) return []
+
+    if (!country) {
+      console.warn(`[useRegionData] 找不到 code=${selectedCountryCode} 的國家`)
+      return []
+    }
+
     // 返回該國家的所有啟用城市
-    return cities
+    const result = cities
       .filter(c => c.country_id === country.id && c.is_active)
-      .map(c => ({ id: c.id, code: c.airport_code || c.name, name: c.name }))
+      .map(c => ({
+        id: c.id,
+        code: c.airport_code || c.name,
+        name: c.name
+      }))
+
+    console.log(`[useRegionData] availableCities 計算完成: ${result.length} 個城市 for ${country.name}`)
+    return result
   }, [selectedCountryCode, countries, cities])
 
-  // 初始化：當 countries 載入完成後，設定初始的 country code
+  // 📊 Debug 資訊（開發環境）
   React.useEffect(() => {
-    if (countries.length === 0) return
-    if (!data.country) return
-
-    // 初始化 selectedCountry（如果 state 和 data 不同）
-    if (selectedCountry !== data.country) {
-      setSelectedCountry(data.country)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[useRegionData] 狀態更新:', {
+        'data.country': data.country,
+        selectedCountry,
+        selectedCountryCode,
+        'countries.length': countries.length,
+        'cities.length': cities.length,
+        'availableCities.length': availableCities.length,
+        isInitialized: isInitializedRef.current,
+      })
     }
-
-    // 查找對應的 country code（每次 data.country 改變時都要重新查找）
-    const matchedCountry = countries.find(c => c.name === data.country)
-    if (matchedCountry?.code) {
-      // 只有當 code 不同時才更新，避免無限循環
-      if (selectedCountryCode !== matchedCountry.code) {
-        setSelectedCountryCode(matchedCountry.code)
-      }
-      hasInitializedCodeRef.current = true
-    }
-  }, [countries, data.country, selectedCountry, selectedCountryCode])
-
-  // 同步：當 data.country 從外部改變時同步（例如用戶選擇了新國家）
-  React.useEffect(() => {
-    if (countries.length === 0) return
-
-    // 當 selectedCountry 與 data.country 不同時，可能是外部更新
-    // 但我們要避免初始化時的重複設定
-    if (data.country && selectedCountry !== data.country && hasInitializedCodeRef.current) {
-      setSelectedCountry(data.country)
-      const matchedCountry = countries.find(c => c.name === data.country)
-      if (matchedCountry?.code) {
-        setSelectedCountryCode(matchedCountry.code)
-      }
-    }
-  }, [data.country, countries, selectedCountry])
+  }, [data.country, selectedCountry, selectedCountryCode, countries.length, cities.length, availableCities.length])
 
   return {
     selectedCountry,

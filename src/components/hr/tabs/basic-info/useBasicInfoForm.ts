@@ -110,12 +110,10 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
 
       const { supabase } = await import('@/lib/supabase/client')
 
-      const result: any = await supabase
+      const { error } = await supabase
         .from('employees')
         .update({ password_hash: hashedPassword })
         .eq('employee_number', employee.employee_number)
-
-      const { error } = result
 
       if (error) {
         alert('密碼更新失敗：' + error.message)

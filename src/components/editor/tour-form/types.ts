@@ -3,7 +3,7 @@ export interface FlightInfo {
   flightNumber: string
   departureAirport: string
   departureTime: string
-  departureDate: string
+  departureDate?: string // 與 stores/types.ts 一致，出發日期為可選
   arrivalAirport: string
   arrivalTime: string
   duration?: string
@@ -134,8 +134,8 @@ export interface TourFormData {
   coverImage?: string
   coverImagePosition?: ImagePositionSettings // 封面圖片位置設定
   coverStyle?: CoverStyleType // 封面風格：original（原版）或 gemini（Gemini 風格）
-  price?: string // 價格（如：39,800）
-  priceNote?: string // 價格備註（如：起、/人）
+  price?: string | null // 價格（如：39,800）
+  priceNote?: string | null // 價格備註（如：起、/人）
   outboundFlight: FlightInfo
   returnFlight: FlightInfo
   features: Feature[]
@@ -148,13 +148,13 @@ export interface TourFormData {
   showHotels?: boolean // 是否顯示飯店資訊
   showPricingDetails?: boolean // 是否顯示詳細團費
   pricingDetails?: PricingDetails // 詳細團費資訊
-  priceTiers?: PriceTier[] // 價格方案（多種人數價格）
+  priceTiers?: PriceTier[] | null // 價格方案（多種人數價格）
   showPriceTiers?: boolean // 是否顯示價格方案區塊
-  faqs?: FAQ[] // 常見問題
+  faqs?: FAQ[] | null // 常見問題
   showFaqs?: boolean // 是否顯示常見問題區塊
-  notices?: string[] // 提醒事項
+  notices?: string[] | null // 提醒事項
   showNotices?: boolean // 是否顯示提醒事項區塊
-  cancellationPolicy?: string[] // 取消政策
+  cancellationPolicy?: string[] | null // 取消政策
   showCancellationPolicy?: boolean // 是否顯示取消政策區塊
   itinerarySubtitle: string
   dailyItinerary: DailyItinerary[]

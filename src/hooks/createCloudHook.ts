@@ -5,6 +5,10 @@ import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
+import type { Database } from '@/lib/supabase/types'
+
+// 從 Database 類型提取所有表格名稱
+type TableName = keyof Database['public']['Tables']
 
 // 基礎實體型別（與 @/types/base.types.ts 的 BaseEntity 一致）
 interface BaseEntity {
@@ -49,13 +53,14 @@ interface CloudHookReturn<T extends BaseEntity> {
 }
 
 // 需要 workspace 隔離的表格列表
+// ✅ 軍事級別修復：所有表格都已添加 workspace_id 支援
 const WORKSPACE_SCOPED_TABLES = [
   'tours',
   'orders',
   'customers',
   'quotes',
   'quote_items',
-  'itineraries',
+  'itineraries', // ✅ 2025-12-10: workspace_id 已添加，RLS 已更新
   'payment_requests',
   'payment_request_items',
   'disbursement_orders',
@@ -81,7 +86,7 @@ const TABLE_CODE_PREFIX: Record<string, string> = {
 
 // 建立雲端 Hook 的工廠函數
 export function createCloudHook<T extends BaseEntity>(
-  tableName: string,
+  tableName: TableName,
   options?: {
     orderBy?: { column: string; ascending?: boolean }
     select?: string
@@ -95,8 +100,8 @@ export function createCloudHook<T extends BaseEntity>(
 
   // Supabase fetcher
   async function fetcher(): Promise<T[]> {
-    // 使用類型斷言處理動態表格名稱
-    let query = supabase.from(tableName as any).select(
+    // tableName 已被限制為有效的表格名稱
+    let query = supabase.from(tableName).select(
       options?.select || '*'
     )
 
@@ -162,7 +167,7 @@ export function createCloudHook<T extends BaseEntity>(
       if (codePrefix && !dataRecord.code) {
         // 從資料庫查詢最大 code，確保唯一性
         const { data: maxCodeResult } = await supabase
-          .from(tableName as any)
+          .from(tableName)
           .select('code')
           .like('code', `${codePrefix}%`)
           .order('code', { ascending: false })
@@ -170,9 +175,10 @@ export function createCloudHook<T extends BaseEntity>(
           .single()
 
         let nextNumber = 1
-        if (maxCodeResult?.code) {
+        const codeResult = maxCodeResult as { code?: string } | null
+        if (codeResult?.code) {
           // 提取數字部分，例如 'C000032' -> 32
-          const numericPart = (maxCodeResult.code as string).replace(codePrefix, '')
+          const numericPart = codeResult.code.replace(codePrefix, '')
           const currentMax = parseInt(numericPart, 10)
           if (!isNaN(currentMax)) {
             nextNumber = currentMax + 1
@@ -194,7 +200,7 @@ export function createCloudHook<T extends BaseEntity>(
       mutate(SWR_KEY, [...items, newItem], false)
 
       try {
-        const { error } = await supabase.from(tableName as any).insert(
+        const { error } = await supabase.from(tableName).insert(
           newItem as Record<string, unknown>
         )
         if (error) throw error
@@ -222,7 +228,7 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await supabase.from(tableName as any)
+        const { error } = await supabase.from(tableName)
           .update(updatedData as Record<string, unknown>)
           .eq('id', id)
         if (error) throw error
@@ -244,7 +250,7 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await supabase.from(tableName as any)
+        const { error } = await supabase.from(tableName)
           .delete()
           .eq('id', id)
         if (error) throw error

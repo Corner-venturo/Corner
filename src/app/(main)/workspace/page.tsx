@@ -22,7 +22,7 @@ export default function WorkspacePage() {
     }
 
     init()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 🔥 Step 2: 當 workspace 載入後，載入 channels 和 groups（只執行一次）
@@ -37,7 +37,7 @@ export default function WorkspacePage() {
     }
 
     loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [currentWorkspace?.id])
 
   return (

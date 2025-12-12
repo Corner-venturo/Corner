@@ -51,7 +51,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     handler_name: quote.handler_name || 'William',
     issue_date: quote.issue_date || new Date().toISOString().split('T')[0],
     received_amount: quote.received_amount || 0,
-    expense_description: (quote as any).expense_description || '',
+    expense_description: (quote as typeof quote & { expense_description?: string }).expense_description || '',
   })
 
   // 從 quote_items 表格載入項目
@@ -61,7 +61,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   useEffect(() => {
     // ✅ 快速報價單項目只從 quote.quick_quote_items 欄位讀取
     if (quote.quick_quote_items && Array.isArray(quote.quick_quote_items)) {
-      setItems(quote.quick_quote_items as QuickQuoteItem[])
+      setItems(quote.quick_quote_items)
     } else {
       // 如果沒有項目，設為空陣列
       setItems([])
@@ -95,7 +95,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   }
 
   // 計算總成本
-  const totalCost = items.reduce((sum, item) => sum + ((item as any).cost || 0) * item.quantity, 0)
+  const totalCost = items.reduce((sum, item) => sum + (item.cost || 0) * item.quantity, 0)
 
   // 計算利潤
   const totalProfit = totalAmount - totalCost
@@ -120,25 +120,36 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     )
   }
 
-  // 準備版本資料的通用函數
-  const prepareVersionData = (versionNumber: number, versionName: string) => ({
+  // 準備版本資料的通用函數（QuickQuote 專用）
+  // 返回完整的 QuoteVersion 類型
+  const prepareVersionData = (versionNumber: number, versionName: string): QuoteVersion => ({
     id: Date.now().toString(),
-    quote_id: quote.id,
     version: versionNumber,
-    version_name: versionName,
-    customer_name: formData.customer_name,
-    contact_phone: formData.contact_phone,
-    contact_address: formData.contact_address,
-    tour_code: formData.tour_code,
-    handler_name: formData.handler_name,
-    issue_date: formData.issue_date,
-    expense_description: formData.expense_description,
-    total_amount: totalAmount,
+    name: versionName, // QuoteVersion uses 'name' not 'version_name'
+    // QuickQuote 不使用以下欄位，但為了類型兼容性添加默認值
+    categories: [],
     total_cost: totalCost,
-    received_amount: formData.received_amount,
-    balance_amount: totalAmount - formData.received_amount,
-    items: items,
-    created_at: new Date().toISOString(),
+    accommodation_days: 0,
+    participant_counts: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
+    selling_prices: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
+    // 以下是額外的 QuickQuote 專用欄位（透過 as any 擴展）
+    ...(({
+      quote_id: quote.id,
+      customer_name: formData.customer_name,
+      contact_phone: formData.contact_phone,
+      contact_address: formData.contact_address,
+      tour_code: formData.tour_code,
+      handler_name: formData.handler_name,
+      issue_date: formData.issue_date,
+      expense_description: formData.expense_description,
+      total_amount: totalAmount,
+      received_amount: formData.received_amount,
+      balance_amount: totalAmount - formData.received_amount,
+      items: items,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+       
+    }) as any),
   })
 
   // 儲存變更
@@ -169,9 +180,9 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           ...updatedVersions[currentEditingVersion],
           ...prepareVersionData(
             updatedVersions[currentEditingVersion].version,
-            (updatedVersions[currentEditingVersion] as any).version_name || `版本 ${updatedVersions[currentEditingVersion].version}`
+            updatedVersions[currentEditingVersion].name || `版本 ${updatedVersions[currentEditingVersion].version}`
           ),
-        } as QuoteVersion
+        }
 
         await onUpdate({
           ...baseUpdate,
@@ -185,7 +196,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         await onUpdate({
           ...baseUpdate,
           version: 1,
-          versions: [firstVersion as unknown as QuoteVersion],
+          versions: [firstVersion],
         })
         setCurrentEditingVersion(0)
       } else {
@@ -243,7 +254,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         balance_amount: totalAmount - formData.received_amount,
         quick_quote_items: items,
         version: newVersionNumber,
-        versions: newVersions as unknown as QuoteVersion[],
+        versions: newVersions,
       })
 
       // 設定當前編輯版本為新版本
@@ -267,7 +278,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       return
     }
 
-    const confirmed = await confirm(`確定要刪除「${(versions[versionIndex] as any).version_name || `版本 ${versions[versionIndex].version}`}」嗎？`, {
+    const confirmed = await confirm(`確定要刪除「${versions[versionIndex].name || `版本 ${versions[versionIndex].version}`}」嗎？`, {
       title: '刪除版本',
       type: 'warning',
     })
@@ -299,7 +310,17 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
     if (versionIndex < 0 || versionIndex >= versions.length) return
 
-    const versionData = versions[versionIndex] as any
+    const versionData = versions[versionIndex] as QuoteVersion & {
+      customer_name?: string
+      contact_phone?: string
+      contact_address?: string
+      tour_code?: string
+      handler_name?: string
+      issue_date?: string
+      received_amount?: number
+      expense_description?: string
+      items?: QuickQuoteItem[]
+    }
 
     // 更新表單資料
     setFormData({
@@ -346,14 +367,14 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   // 列印
   const handlePrint = async () => {
     window.print()
+    setShowPrintPreview(false)
 
-    // 列印後自動更新狀態為「已請款」
-    try {
-      await onUpdate({ status: 'billed' as any })
-      setShowPrintPreview(false)
-    } catch (error) {
-      logger.error('更新狀態失敗:', error)
-    }
+    // Note: 如需在列印後自動更新狀態，請取消註解以下代碼
+    // try {
+    //   await onUpdate({ status: 'approved' })
+    // } catch (error) {
+    //   logger.error('更新狀態失敗:', error)
+    // }
   }
 
   return (

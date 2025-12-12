@@ -62,14 +62,11 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
     setIsSaving(true)
     setSaveSuccess(false)
 
-    const entryData: any = {
+    const entryData = {
       chapter_number: chapter.id,
       ...formData,
       is_completed: markAsCompleted,
-    }
-
-    if (markAsCompleted) {
-      entryData.completed_at = new Date().toISOString()
+      completed_at: markAsCompleted ? new Date().toISOString() : undefined,
     }
 
     try {

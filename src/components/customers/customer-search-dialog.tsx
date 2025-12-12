@@ -72,7 +72,7 @@ export function CustomerSearchDialog({
     onClose()
   }
 
-  const updateParam = (key: keyof CustomerSearchParams, value: any) => {
+  const updateParam = (key: keyof CustomerSearchParams, value: CustomerSearchParams[keyof CustomerSearchParams]) => {
     setSearchParams(prev => ({ ...prev, [key]: value }))
   }
 

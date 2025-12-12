@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Tour } from '@/types/tour.types'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const supabase = supabaseClient as any
 import { toast } from 'sonner'
 import { Plus, X, FileText } from 'lucide-react'

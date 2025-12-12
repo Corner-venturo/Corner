@@ -49,7 +49,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const members = (data || []).map((member: any) => ({
+     
+    const members = (data || []).map((member: Record<string, any>) => ({
       id: member.id as string,
       workspaceId: member.workspace_id as string,
       channelId: member.channel_id as string,

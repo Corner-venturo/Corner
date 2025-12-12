@@ -1,7 +1,61 @@
 # Claude Code 工作規範 (Venturo 專案)
 
-> **最後更新**: 2025-12-09
-> **專案狀態**: 核心功能完成，Realtime 同步系統上線
+> **最後更新**: 2025-12-11
+> **專案狀態**: 核心功能完成，代碼品質強化中
+
+---
+
+## 🚨🚨🚨 絕對禁止規則 (Zero Tolerance) 🚨🚨🚨
+
+### ❌ 四大禁令 - 違反立即停止
+
+| 禁令 | 說明 | 後果 |
+|------|------|------|
+| **禁止 any** | 不准使用 `: any`、`as any`、`<any>` | 必須使用明確類型 |
+| **禁止大型文件** | 組件 < 300 行、Hook < 200 行 | 必須拆分 |
+| **禁止忽略資料庫** | 修改功能前必須檢查 Supabase 表格結構 | 必須確認欄位存在 |
+| **禁止盲目修改** | 每次修改前必須先讀取並理解現有代碼 | 必須先 Read 再 Edit |
+
+### ✅ 正確做法
+
+```typescript
+// ❌ 錯誤：使用 any
+const data: any = response
+const items = data as any[]
+
+// ✅ 正確：明確類型
+interface ApiResponse { items: Customer[] }
+const data: ApiResponse = response
+const items: Customer[] = data.items
+
+// ❌ 錯誤：大型組件 (>300 行)
+// CustomerPage.tsx - 2000 行
+
+// ✅ 正確：拆分成多個小文件
+// CustomerPage.tsx - 150 行 (主頁面)
+// hooks/useCustomerSearch.ts - 130 行
+// hooks/useImageEditor.ts - 200 行
+// components/CustomerTable.tsx - 250 行
+```
+
+### 📋 新功能開發檢查清單
+
+**寫代碼前必須確認：**
+- [ ] 相關的 Supabase 表格結構是否正確？
+- [ ] 需要的欄位是否存在？
+- [ ] TypeScript 類型定義是否完整？
+- [ ] 是否可以複用現有組件/Hook？
+
+**寫代碼時必須遵守：**
+- [ ] 單一文件不超過 300 行
+- [ ] 不使用 any 類型
+- [ ] 使用現有的可重用組件
+- [ ] 錯誤要有適當處理
+
+**寫完代碼後必須驗證：**
+- [ ] `npm run type-check` 通過
+- [ ] `npm run lint` 通過
+- [ ] 功能正常運作
 
 ---
 
@@ -42,7 +96,7 @@
 ### 專案資訊
 ```
 專案名稱: Venturo (旅遊團管理系統)
-工作目錄: /Users/william/Projects/venturo-new
+工作目錄: /Users/williamchien/Projects/venturo-erp
 開發端口: 3000
 技術棧:   Next.js 15.5.4 + React 19 + TypeScript 5 + Zustand 5 + Supabase
 ```
@@ -89,9 +143,50 @@ import { DateCell, StatusCell, ActionCell } from '@/components/table-cells';
 - **型別**: kebab-case + `.types.ts`
 
 ### 型別安全
-- **禁止**: `as any`
+- **禁止**: `as any`、`: any`、`<any>`
 - **盡量避免**: `as unknown`
 - **使用**: 正確的 TypeScript 型別定義
+
+### 📏 文件大小限制 (嚴格執行)
+
+| 文件類型 | 最大行數 | 說明 |
+|---------|---------|------|
+| 組件 (.tsx) | 300 行 | 超過必須拆分 |
+| Hook (.ts) | 200 行 | 超過必須拆分 |
+| 工具函數 | 150 行 | 超過必須拆分 |
+| 類型定義 | 500 行 | 超過必須拆分成多個文件 |
+
+**拆分策略：**
+```
+大型組件 → 提取 Hooks + 子組件
+CustomerPage.tsx (2000行)
+  ↓ 拆分成
+├── page.tsx (150行) - 主頁面，組合所有模組
+├── hooks/
+│   ├── useCustomerSearch.ts (130行)
+│   ├── useImageEditor.ts (200行)
+│   └── usePassportUpload.ts (200行)
+└── components/
+    ├── CustomerTable.tsx (250行)
+    └── CustomerDialog.tsx (200行)
+```
+
+### 🔧 自動化檢查工具
+
+```bash
+# 檢查代碼品質 (建議每次提交前執行)
+npm run audit:code-quality
+
+# 單獨檢查
+npm run audit:file-size    # 檢查文件大小
+npm run audit:any-usage    # 檢查 any 使用
+npm run type-check         # TypeScript 檢查
+npm run lint               # ESLint 檢查
+```
+
+**Pre-commit Hook 已啟用：**
+- 提交時自動執行所有檢查
+- 任何違規都會阻止提交
 
 ---
 
@@ -114,7 +209,7 @@ import { DateCell, StatusCell, ActionCell } from '@/components/table-cells';
 
 ### 開發
 ```bash
-cd /Users/william/Projects/venturo-new
+cd /Users/williamchien/Projects/venturo-erp
 npm run dev          # 啟動開發伺服器 (port 3000)
 npm run build        # 建置專案
 npm run lint         # 執行 ESLint
@@ -136,22 +231,12 @@ find . -name "*-store.ts"  # 查找所有 stores
 - ✅ Table Cell 組件庫 (8 個組件)
 - ✅ useListPageState Hook
 - ✅ 應用到 Quotes/Contracts/Itinerary 頁面
-- **總計減少**: 215 行代碼 (-24%)
 
-### Phase 3-4: Realtime 即時同步系統
-- ✅ Realtime Manager 核心架構
-- ✅ Channels 和 Messages 即時同步
-- ✅ 修正所有 stores 的 setTimeout 問題
-- ✅ 改為「按需訂閱」模式（進入頁面才訂閱）
-- ✅ 支援 50 個資料表的 Realtime
-- ✅ 離線優先策略 + 衝突解決
-- ✅ 權限即時更新系統
-
-**關鍵改進**:
-- 🔄 多裝置同步：公司刪除的資料，家裡立即消失
-- ⚡ 即時更新：團隊成員的變更 < 100ms 同步
-- 📱 離線支援：斷網時可操作，網路恢復自動同步
-- 🔒 權限更新：管理員變更權限，使用者立即生效
+### Phase 3: RLS 完整系統
+- ✅ 完整的 RLS 策略（業務資料隔離）
+- ✅ Helper functions（get_current_user_workspace、is_super_admin）
+- ✅ workspace 級別資料隔離
+- ✅ Super admin 跨 workspace 存取
 
 ---
 
@@ -180,29 +265,25 @@ find . -name "*-store.ts"  # 查找所有 stores
 
 ### 主要文檔位置
 ```
-README.md                                  - 專案總覽
-VENTURO_ARCHITECTURE_HEALTH_CHECK.md      - 架構健檢
-COMPLETE_REALTIME_OFFLINE_LOGIC.md        - Realtime 完整邏輯（最新）
-ALL_TABLES_REALTIME_STATUS.md             - 所有 50 個表格狀態
-PHASE2_COMPONENT_APPLICATION_COMPLETE.md  - 組件重構報告
+README.md                            - 專案總覽
+docs/ARCHITECTURE_STANDARDS.md       - 系統架構規範
+docs/CODE_REVIEW_CHECKLIST.md        - 程式碼審查清單
 ```
 
 ### 關鍵檔案
 ```
 # 狀態管理
-src/stores/core/create-store-new.ts        - Store 工廠函數
 src/stores/types.ts                        - 所有型別定義
-
-# Realtime 系統
-src/lib/realtime/realtime-manager.ts       - Realtime 訂閱管理
-src/lib/realtime/createRealtimeHook.ts     - Hook 工廠函數
-src/hooks/use-realtime-hooks.ts            - 所有表格的 Realtime Hooks
 
 # 組件系統
 src/components/table-cells/index.tsx       - 表格單元格組件
 src/components/layout/list-page-layout.tsx - 列表頁佈局
 src/hooks/useListPageState.ts              - 列表頁狀態管理
 src/lib/status-config.ts                   - 狀態配置
+
+# 類型定義
+src/lib/supabase/types.ts                  - Supabase 自動生成類型
+src/types/                                 - 業務類型定義
 ```
 
 ---
@@ -299,77 +380,87 @@ SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
 
 ### 🔐 RLS (Row Level Security) 規範
 
-**Venturo 原則上不使用 RLS，但有例外（2025-12-03 更新）**
+**Venturo 使用 RLS 進行資料隔離（2025-12-11 更新）**
 
 #### 基本原則
 
-大部分表格禁用 RLS，原因如下：
-1. **內部管理系統** - 員工都是信任的，不需要資料庫層強制隔離
-2. **簡化架構** - 避免 RLS 帶來的複雜度和 Debug 困難
-3. **提升效能** - 減少每次查詢的權限檢查開銷
-4. **彈性需求** - 主管可能需要跨 workspace 查詢資料
+**業務資料表格啟用 RLS，共用資料表格禁用 RLS**
 
-#### ⚠️ 啟用 RLS 的例外表格
+#### RLS 架構
 
-以下表格因為包含用戶個人敏感資料，**必須啟用 RLS**：
+```
+啟用 RLS 的表格（業務資料）：
+- orders, tours, customers, payments, quotes, contracts
+- itineraries, visas, tasks, todos
+- channels, messages, calendar_events
+- 等業務相關表格
 
-| 表格 | 原因 | Policy |
-|------|------|--------|
-| `user_preferences` | 用戶個人偏好設定 | 用戶只能存取自己的資料 |
+禁用 RLS 的表格（全公司共用）：
+- workspaces, employees, user_roles
+- destinations, airlines, hotels, suppliers
+- cities, countries, attractions
+- 等基礎資料表格
+```
 
-#### Venturo 權限控制架構
+#### Helper Functions
 
-```typescript
-Layer 1: Supabase Auth (登入驗證)
-         ↓
-Layer 2: RLS (敏感個人資料表 - user_preferences 等)
-         ↓
-Layer 3: employees.permissions (功能權限控制)
-         ↓
-Layer 4: employees.workspace_id (資料隔離 - 前端 filter)
-         ↓
-Layer 5: user.roles (角色標籤 - admin, tour_leader 等)
+```sql
+-- 取得當前用戶的 workspace_id
+get_current_user_workspace()
+
+-- 檢查是否為超級管理員
+is_super_admin()
+
+-- 取得當前員工 ID
+get_current_employee_id()
+
+-- 設定當前 workspace（前端登入時呼叫）
+set_current_workspace(p_workspace_id text)
 ```
 
 #### 創建新表時的標準模板
 
 ```sql
--- 一般業務表格：禁用 RLS
-CREATE TABLE public.new_table (...);
-ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
+-- 業務資料表格（啟用 RLS）
+CREATE TABLE public.new_table (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id uuid REFERENCES public.workspaces(id),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
 
--- 用戶個人資料表格：啟用 RLS
-CREATE TABLE public.user_xxx (...);
-ALTER TABLE public.user_xxx ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can manage their own data"
-ON public.user_xxx FOR ALL
-USING (auth.uid() = user_id)
-WITH CHECK (auth.uid() = user_id);
+-- 啟用 RLS
+ALTER TABLE public.new_table ENABLE ROW LEVEL SECURITY;
+
+-- 建立 policies
+CREATE POLICY "new_table_select" ON public.new_table FOR SELECT
+USING (workspace_id = get_current_user_workspace() OR is_super_admin());
+
+CREATE POLICY "new_table_insert" ON public.new_table FOR INSERT
+WITH CHECK (workspace_id = get_current_user_workspace());
+
+CREATE POLICY "new_table_update" ON public.new_table FOR UPDATE
+USING (workspace_id = get_current_user_workspace() OR is_super_admin());
+
+CREATE POLICY "new_table_delete" ON public.new_table FOR DELETE
+USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 ```
 
-#### 權限處理範例
+#### 權限層級
 
 ```typescript
-// 一般員工：看自己 workspace 的所有資料
-fetchOrders({ workspace_id: user.workspace_id })
+// 一般員工：RLS 自動過濾到自己 workspace
+fetchOrders() // RLS 會自動套用 workspace_id filter
 
-// 領隊：只能看自己帶的團
-if (user.roles.includes('tour_leader')) {
-  fetchOrders({ tour_leader_id: user.id })
-}
-
-// Super Admin：可以跨 workspace 查看
-if (user.permissions.includes('super_admin')) {
-  fetchOrders({}) // 不使用 workspace_id filter
-}
+// Super Admin：RLS 允許看所有
+// is_super_admin() 會返回 true，繞過 workspace 限制
 ```
 
 ### Migration 記錄（自動更新）
 | 日期 | Migration 檔案 | 目的 | 狀態 |
 |------|---------------|------|------|
-| 2025-12-03 | `20251203122651_fix_user_preferences_rls.sql` | user_preferences 啟用 RLS | ✅ 已執行 |
-| 2025-11-12 | `20251112080525_complete_rls_implementation.sql` | 完整 RLS 權限控制系統 | ✅ 已執行 |
-| 2025-10-27 | `20251027000000_add_channel_order.sql` | 新增 channels.order 欄位用於拖曳排序 | ✅ 已執行 |
+| 2025-12-11 | `20251211120000_enable_complete_rls_system.sql` | 啟用完整 RLS 系統 | ⏳ 待執行 |
+| 2025-12-10 | `20251210_add_workspace_to_itineraries.sql` | 為 itineraries 添加 workspace 支援 | ⏳ 待執行 |
 
 ### 詳細文檔
 完整的 Supabase 工作流程請參考：
@@ -377,108 +468,127 @@ if (user.permissions.includes('super_admin')) {
 
 ---
 
+## 🔧 TypeScript 類型修復流程
+
+### 問題：types.ts 缺少表格定義
+
+當 `npm run type-check` 報錯說某個表格不存在於 `Database['public']['Tables']` 時，表示 `src/lib/supabase/types.ts` 缺少該表格的類型定義。
+
+### 原因
+
+`types.ts` 是由 Supabase CLI 自動生成的，但有時：
+1. 遷移已創建但未推送到遠端資料庫
+2. 遠端資料庫有表格但未重新生成類型
+3. 手動添加的表格未同步
+
+### 解決方案
+
+#### 方案 A：重新生成類型（推薦）
+
+```bash
+# 1. 確保遷移已推送
+npm run db:migrate
+
+# 2. 重新生成類型
+SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
+  npx supabase gen types typescript --project-id pfqvdacxowpgfamuvnsn > src/lib/supabase/types.ts
+
+# 3. 驗證
+npm run type-check
+```
+
+#### 方案 B：手動添加類型（當遷移無法執行時）
+
+在 `src/lib/supabase/types.ts` 的 `Tables` 區塊結尾處（`workspaces` 表格之後、`Views` 之前）添加缺少的表格定義：
+
+```typescript
+// 在 workspaces 的 Relationships 結束 } 之後添加
+// === 手動添加的缺少表格類型 (日期) ===
+new_table_name: {
+  Row: {
+    id: string
+    // ... 所有欄位
+    created_at: string
+    updated_at: string
+  }
+  Insert: {
+    id?: string
+    // ... 可選欄位用 ?
+    created_at?: string
+    updated_at?: string
+  }
+  Update: {
+    id?: string
+    // ... 所有欄位都是可選的
+    created_at?: string
+    updated_at?: string
+  }
+  Relationships: []
+}
+```
+
+### 查找表格結構的方法
+
+1. **從遷移檔案**：查看 `supabase/migrations/` 中對應的 SQL 檔案
+2. **從 Supabase Dashboard**：直接查看資料庫結構
+3. **從代碼使用處**：搜尋 `.from('table_name')` 看使用了哪些欄位
+
+### 已手動添加的表格/欄位（2025-12-11）
+
+| 表格/欄位 | 位置 | 說明 |
+|---------|------|------|
+| `api_usage` | types.ts | API 使用量追蹤 |
+| `image_library` | types.ts | 圖庫資料表 |
+| `system_settings` | types.ts | 系統設定 |
+| `travel_invoices` | types.ts | 代轉發票 |
+| `vendor_costs` | types.ts | 代辦商成本 |
+| `timebox_scheduled_boxes` | types.ts | Timebox 排程項目 |
+| `customers.passport_image_url` | types.ts | 客戶護照圖片 URL |
+| `order_members.passport_image_url` | types.ts | 訂單成員護照圖片 URL |
+| `User.name`, `User.email` | stores/types.ts | 便捷屬性 |
+| `User.roles` 添加 `super_admin` | stores/types.ts | 角色類型 |
+| `itineraries.quote_id` | types.ts | 行程表關聯報價單 ID |
+| `FlightInfo.departureDate` 改為可選 | tour-form/types.ts | 與 stores/types.ts 一致 |
+
+### 注意事項
+
+- 手動添加的類型只是**暫時解決方案**
+- 最終應該推送遷移並重新生成類型
+- 手動添加時要確保欄位類型與遷移 SQL 一致
+
+---
+
 ## 🔄 Realtime 同步規範
 
-### 核心原則：按需訂閱 (On-Demand Subscription)
+### 核心原則：直接從 Supabase 取資料
 
-**✅ 正確行為**：
-```typescript
-// 情境：同事新增了行事曆
-1. 你還沒去看行事曆頁面 → 沒訂閱 → 什麼都不會發生 ✅
-2. 你打開行事曆頁面 → 觸發訂閱 → 立即下載同事新增的資料 ✅
-3. 你離開行事曆頁面 → 取消訂閱 ✅
-```
-
-**❌ 錯誤行為**（已修正）：
-```typescript
-1. 你登入系統 → 所有 50 個表格立即訂閱 ❌
-2. 同事新增行事曆 → 你收到推送（即使你沒在看） ❌
-3. 浪費連線數（2000+ 連線 vs 200 上限） ❌
-```
-
-### 使用方式
-
-#### 1. 在頁面中加入 Realtime Hook
+**目前架構**：無離線優先、無 IndexedDB，直接從 Supabase 即時取資料
 
 ```typescript
-// src/app/calendar/page.tsx
-import { useRealtimeForCalendarEvents } from '@/hooks/use-realtime-hooks';
-
-export default function CalendarPage() {
-  // ✅ 進入頁面時訂閱，離開時自動取消
-  useRealtimeForCalendarEvents();
-
-  const events = useCalendarEventStore(state => state.items);
-
-  return <div>...</div>;
-}
+// 標準資料取得方式
+const { data } = await supabase
+  .from('orders')
+  .select('*')
+  .eq('workspace_id', workspaceId)
 ```
 
-#### 2. 永久訂閱（系統表格）
+### Realtime 訂閱（可選）
+
+如需即時更新，可使用 Supabase Realtime：
 
 ```typescript
-// 僅限以下表格需要永久訂閱：
-- user_roles      (權限變更需立即生效)
-- workspaces      (工作空間設定)
-- employees       (員工資料)
-
-// 在 auth-store 或 app layout 中訂閱
-useEffect(() => {
-  realtimeManager.subscribe({
-    table: 'user_roles',
-    filter: `user_id=eq.${user.id}`,
-    subscriptionId: 'user-role-permanent',
-    handlers: {
-      onUpdate: (newRole) => {
-        updatePermissions(newRole);
-        toast.success('你的權限已更新！');
-      }
-    }
-  });
-}, [user.id]);
+// 訂閱表格變更
+const subscription = supabase
+  .channel('orders-changes')
+  .on('postgres_changes', {
+    event: '*',
+    schema: 'public',
+    table: 'orders'
+  }, (payload) => {
+    // 處理變更
+  })
+  .subscribe()
 ```
-
-### 連線數估算
-
-```
-單一使用者：2-4 個連線（當前頁面 + 永久訂閱）
-20 員工 × 2 裝置 × 2.5 頁面：平均 100 個連線
-免費上限：200 個連線
-占用率：50% ✅ 安全範圍
-```
-
-### 離線優先策略
-
-```typescript
-// fetchAll 流程
-Step 1: 立即載入 IndexedDB（0.1 秒）→ 顯示畫面
-Step 2: 背景同步 Supabase（只下載變更）→ 靜默更新
-Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
-
-// 離線新增
-1. 資料存入 IndexedDB
-2. 標記 _needs_sync: true
-3. 網路恢復時自動上傳
-```
-
-### 衝突解決
-
-```typescript
-// LastWrite 策略：最後寫入者獲勝
-if (remoteItem.updated_at > localItem.updated_at) {
-  // 使用遠端版本
-  await indexedDB.put(remoteItem);
-} else {
-  // 保留本地版本，上傳到 Supabase
-  await supabase.update(localItem);
-}
-```
-
-### 詳細文檔
-
-完整的 Realtime 邏輯請參考：
-- `COMPLETE_REALTIME_OFFLINE_LOGIC.md` - 完整流程圖和實作細節
-- `ALL_TABLES_REALTIME_STATUS.md` - 50 個表格的支援狀態
 
 ---
 

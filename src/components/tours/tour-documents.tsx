@@ -37,7 +37,7 @@ interface TourDocumentsProps {
 }
 
 export function TourDocuments({ orderFilter }: TourDocumentsProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [newDocument, setNewDocument] = useState({
     name: '',

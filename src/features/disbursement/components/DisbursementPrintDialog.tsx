@@ -66,8 +66,8 @@ export function DisbursementPrintDialog({
           .select('*')
           .in('request_id', requestIds)
 
-        setPaymentRequests(requests || [])
-        setPaymentRequestItems(items || [])
+        setPaymentRequests((requests || []) as unknown as PaymentRequest[])
+        setPaymentRequestItems((items || []) as unknown as PaymentRequestItem[])
       } catch (error) {
         console.error('載入資料失敗:', error)
       } finally {

@@ -83,7 +83,7 @@ export function WeatherWidget() {
         setError(result.error)
         setWeather(null)
       } else {
-        setWeather(result.data)
+        setWeather(result.data ?? null)
       }
     })
   }

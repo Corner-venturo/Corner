@@ -72,8 +72,8 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
           try {
             const savedData = JSON.parse(tour.contract_content)
             // 如果已儲存的旅客資訊為空，嘗試從報價單補上（欄位名是 customer_name, contact_phone, contact_address）
-            if (!savedData.travelerName && (linkedQuote as any)?.customer_name) {
-              savedData.travelerName = (linkedQuote as any).customer_name
+            if (!savedData.travelerName && linkedQuote?.customer_name) {
+              savedData.travelerName = linkedQuote.customer_name
             }
             if (!savedData.travelerAddress && linkedQuote?.contact_address) {
               savedData.travelerAddress = linkedQuote.contact_address
@@ -94,7 +94,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
                 reviewYear: new Date().getFullYear().toString(),
                 reviewMonth: (new Date().getMonth() + 1).toString(),
                 reviewDay: new Date().getDate().toString(),
-                travelerName: (linkedQuote as any).customer_name || '',
+                travelerName: linkedQuote.customer_name || '',
                 travelerAddress: linkedQuote.contact_address || '',
                 travelerIdNumber: '',
                 travelerPhone: linkedQuote.contact_phone || '',
@@ -125,7 +125,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             reviewYear: new Date().getFullYear().toString(),
             reviewMonth: (new Date().getMonth() + 1).toString(),
             reviewDay: new Date().getDate().toString(),
-            travelerName: (linkedQuote as any).customer_name || '',
+            travelerName: linkedQuote.customer_name || '',
             travelerAddress: linkedQuote.contact_address || '',
             travelerIdNumber: '',
             travelerPhone: linkedQuote.contact_phone || '',
@@ -228,7 +228,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             reviewMonth: (new Date().getMonth() + 1).toString(),
             reviewDay: new Date().getDate().toString(),
             // 優先使用報價單的聯絡資訊（欄位名是 customer_name, contact_phone, contact_address）
-            travelerName: (linkedQuote as any)?.customer_name || '',
+            travelerName: linkedQuote?.customer_name || '',
             travelerAddress: linkedQuote?.contact_address || '',
             travelerIdNumber: '',
             travelerPhone: linkedQuote?.contact_phone || '',
@@ -250,7 +250,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isOpen, mode, tour.id, itinerary?.id, linkedQuote?.id])
 
   const handleFieldChange = (field: keyof ContractData, value: string) => {

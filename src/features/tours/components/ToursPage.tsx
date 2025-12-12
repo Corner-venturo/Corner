@@ -32,7 +32,7 @@ import { TourExpandedView } from './TourExpandedView'
 import { TourMobileCard } from './TourMobileCard'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { useTourTableColumns } from './TourTableColumns'
-import { useTourChannelOperations } from './TourChannelOperations'
+import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
 import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
@@ -275,7 +275,7 @@ export const ToursPage: React.FC = () => {
         description: tour.description || '',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [dialog.type, dialog.data, activeCountries])
 
   // Handle navigation from quote
@@ -336,11 +336,12 @@ export const ToursPage: React.FC = () => {
   }, [setNewTour, setAvailableCities, setNewOrder, setFormError])
 
   // Use tour operations hook
+   
   const operations = useTourOperations({
-    actions: actions as any,
-    addOrder,
-    updateQuote: updateQuote as any,
-    updateItinerary: updateItinerary as any,
+    actions,
+    addOrder: addOrder as any,
+    updateQuote,
+    updateItinerary,
     quotes,
     itineraries,
     availableCities,
@@ -349,7 +350,7 @@ export const ToursPage: React.FC = () => {
     setSubmitting,
     setFormError,
     dialogType: dialog.type || 'create',
-    dialogData: dialog.data as any,
+    dialogData: (dialog.data as Tour) || null,
   })
 
   const handleAddTour = useCallback(() => {
@@ -381,9 +382,9 @@ export const ToursPage: React.FC = () => {
   }, [operations, deleteConfirm.tour, setDeleteConfirm])
 
   // Use extracted hooks for table columns, channel operations, and action buttons
-  const columns = useTourTableColumns({ orders: orders as any, getStatusColor })
+  const columns = useTourTableColumns({ orders, getStatusColor })
 
-  const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions: actions as any })
+  const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({ actions: actions as unknown as TourStoreActions })
 
   const { renderActions } = useTourActionButtons({
     quotes,
@@ -409,12 +410,12 @@ export const ToursPage: React.FC = () => {
       return (
       <TourExpandedView
         tour={tour}
-        orders={orders as any}
+        orders={orders}
         activeTabs={activeTabs}
         setActiveTab={setActiveTab}
         openDialog={openDialog}
-        tourExtraFields={tourExtraFields as any}
-        setTourExtraFields={setTourExtraFields as any}
+        tourExtraFields={tourExtraFields}
+        setTourExtraFields={setTourExtraFields}
         triggerAddOnAdd={triggerAddOnAdd}
         setTriggerAddOnAdd={setTriggerAddOnAdd}
         triggerPaymentAdd={triggerPaymentAdd}

@@ -27,7 +27,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
   // 載入現有資料
   useEffect(() => {
     if (scheduledBox.data) {
-      const reminderData = scheduledBox.data as ReminderData
+      const reminderData = scheduledBox.data as unknown as ReminderData
       setText(reminderData.text || '')
     }
   }, [scheduledBox.data])
@@ -38,7 +38,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
       lastUpdated: new Date().toISOString(),
     }
 
-    await updateScheduledBox(scheduledBox.id, { data: reminderData })
+    await updateScheduledBox(scheduledBox.id, { data: reminderData as unknown as Record<string, unknown> })
     onClose()
   }
 
@@ -49,7 +49,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
         lastUpdated: new Date().toISOString(),
       }
       await updateScheduledBox(scheduledBox.id, {
-        data: reminderData,
+        data: reminderData as unknown as Record<string, unknown>,
         completed: true,
       })
     } else if (!scheduledBox.completed) {
@@ -79,7 +79,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
 
   const getLastUpdated = () => {
     if (scheduledBox.data) {
-      const reminderData = scheduledBox.data as ReminderData
+      const reminderData = scheduledBox.data as unknown as ReminderData
       if (reminderData.lastUpdated) {
         return new Date(reminderData.lastUpdated).toLocaleString('zh-TW')
       }

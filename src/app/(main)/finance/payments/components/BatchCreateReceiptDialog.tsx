@@ -48,7 +48,8 @@ export function BatchCreateReceiptDialog({
       const data = await selectedFile.arrayBuffer()
       const workbook = XLSX.read(data)
       const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-      const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet)
+       
+      const jsonData: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet)
 
       const parsedReceipts: CreateReceiptData[] = jsonData.map(row => ({
         workspace_id: workspaceId,

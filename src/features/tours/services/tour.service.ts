@@ -22,10 +22,12 @@ class TourService extends BaseService<Tour & BaseEntity> {
       getAll: () => store.items as unknown as (Tour & BaseEntity)[],
       getById: (id: string) => store.items.find(t => t.id === id) as unknown as (Tour & BaseEntity) | undefined,
       add: async (tour: Tour & BaseEntity) => {
+         
         const result = await store.create(tour as any)
         return (result || tour) as unknown as Tour & BaseEntity
       },
       update: async (id: string, data: Partial<Tour>) => {
+         
         await store.update(id, data as any)
       },
       delete: async (id: string) => {

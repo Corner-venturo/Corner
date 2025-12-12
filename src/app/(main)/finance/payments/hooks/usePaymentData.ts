@@ -84,6 +84,7 @@ export function usePaymentData() {
       const receiptNumber = generateReceiptNumber(workspaceCode, item.transaction_date, receipts)
 
       // 建立收款單
+       
       const receipt = await createReceipt({
         receipt_number: receiptNumber,
         workspace_id: user.workspace_id || '',
@@ -110,6 +111,7 @@ export function usePaymentData() {
         created_by: user.id,
         updated_by: user.id,
       } as any)
+       
 
       // ✅ 自動產生會計傳票（如果啟用會計模組）
       if (hasAccounting && !isExpired && user.workspace_id) {

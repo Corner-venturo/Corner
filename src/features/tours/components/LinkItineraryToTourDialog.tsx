@@ -56,13 +56,20 @@ export function LinkItineraryToTourDialog({
 
   // 已關聯此旅遊團的行程表
   const linkedItineraries = useMemo(() => {
-    return itineraries.filter(i => i.tour_id === tour.id && !(i as any)._deleted)
+    // Filter out soft-deleted items if _deleted flag exists
+    return itineraries.filter(i => {
+      const item = i as Itinerary & { _deleted?: boolean }
+      return i.tour_id === tour.id && !item._deleted
+    })
   }, [itineraries, tour.id])
 
   // 未關聯任何旅遊團的行程表（可用於連結）- 依篩選條件
   const availableItineraries = useMemo(() => {
     let filtered = itineraries
-      .filter(i => !(i as any)._deleted)
+      .filter(i => {
+        const item = i as Itinerary & { _deleted?: boolean }
+        return !item._deleted
+      })
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
 
     // 公司範例可以被多團連結，非公司範例只能被一團連結
@@ -95,6 +102,7 @@ export function LinkItineraryToTourDialog({
     try {
       setIsCreating(true)
 
+      // Create itinerary with minimal required fields
       const newItinerary = await create({
         title: tour.name,
         tour_id: tour.id,
@@ -103,7 +111,15 @@ export function LinkItineraryToTourDialog({
         departure_date: tour.departure_date || '',
         city: tour.location || '',
         daily_itinerary: [],
-      } as any)
+        // Required fields with defaults
+        tagline: '',
+        subtitle: '',
+        description: '',
+        cover_image: '',
+        country: '',
+        features: [],
+        focus_cards: [],
+      } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
       if (newItinerary?.id) {
         onClose()
@@ -125,14 +141,14 @@ export function LinkItineraryToTourDialog({
       // 如果是非公司範例，更新 tour_id
       if (itinerary.is_template) {
         // 公司範例：複製一份新的行程表給這個團
+        const { id, created_at, updated_at, ...templateData } = itinerary
         const newItinerary = await create({
-          ...itinerary,
-          id: undefined,
+          ...templateData,
           tour_id: tour.id,
           tour_code: tour.code,
           is_template: false, // 複製出來的不是範例
           title: itinerary.title || tour.name,
-        } as any)
+        } as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
         if (newItinerary?.id) {
           onClose()
@@ -167,8 +183,8 @@ export function LinkItineraryToTourDialog({
     try {
       setIsUnlinking(true)
       await update(itinerary.id, {
-        tour_id: null,
-        tour_code: null,
+        tour_id: undefined,
+        tour_code: undefined,
       })
       await fetchAll()
     } catch (error) {

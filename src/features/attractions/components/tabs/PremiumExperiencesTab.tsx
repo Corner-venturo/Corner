@@ -140,7 +140,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
     if (!editingExperience) return
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error } = await (supabase as any)
         .from('premium_experiences')
         .update(updatedData)

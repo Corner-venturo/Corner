@@ -528,7 +528,7 @@ export function DailyItinerarySection({
       }
     } catch (error) {
       console.error('儲存錯誤:', error)
-      toast.error(`儲存過程發生錯誤: ${error.message}`)
+      toast.error(`儲存過程發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)
     } finally {
       setIsSavingToLibrary(false)
       setSaveToLibraryDialog(null)

@@ -37,7 +37,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
         支票: 'check',
       }
 
-      const receiptData: CreateInput<ReceiptOrder> = {
+      const receiptData = {
         code: '',
         order_id: order.id,
         receipt_date: receiptDate,
@@ -45,7 +45,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
         amount: parseFloat(amount),
         notes: note,
         handled_by: null,
-      }
+      } as unknown as CreateInput<ReceiptOrder>
 
       const receipt = await createReceipt(receiptData)
       onSuccess(receipt.id)

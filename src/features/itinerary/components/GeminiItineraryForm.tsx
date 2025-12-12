@@ -70,7 +70,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
     if (countries.length === 0) {
       fetchCountries()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 當國家改變時載入城市
@@ -81,7 +81,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         fetchCitiesByCountry(country.id)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [data.country])
 
   const updateField = <K extends keyof GeminiItineraryData>(field: K, value: GeminiItineraryData[K]) => {

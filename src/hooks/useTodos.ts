@@ -58,7 +58,7 @@ async function fetchTodos(): Promise<Todo[]> {
     throw new Error(error.message)
   }
 
-  return (data || []) as Todo[]
+  return (data || []) as unknown as Todo[]
 }
 
 // ===== 主要 Hook =====
@@ -103,7 +103,7 @@ export function useTodos() {
     const now = new Date().toISOString()
 
     // 自動注入 workspace_id（如果未提供）
-    const workspace_id = todoData.workspace_id || getCurrentWorkspaceId()
+    const workspace_id = (todoData as { workspace_id?: string }).workspace_id || getCurrentWorkspaceId()
 
     const newTodo = {
       ...todoData,
@@ -119,7 +119,8 @@ export function useTodos() {
     mutate(TODOS_KEY, [...todos, newTodo], false)
 
     try {
-      const { error } = await supabase.from('todos').insert(newTodo)
+       
+      const { error } = await (supabase as any).from('todos').insert(newTodo)
       if (error) throw error
 
       // 成功後重新驗證

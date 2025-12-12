@@ -8,6 +8,7 @@ import {
   useTimeboxScheduledBoxes,
   formatDateString,
   type TimeboxScheduledBox,
+  type TimeboxWeek,
 } from '../hooks/useTimeboxData'
 import ScheduledBoxItem from './ScheduledBoxItem'
 import BoxSelector from './BoxSelector'
@@ -77,10 +78,9 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       createWeek({
         user_id: userId,
         week_start: weekStartStr,
-        week_end: weekEndStr,
         name: null,
         archived: false,
-      })
+      } as Omit<TimeboxWeek, 'id' | 'created_at' | 'updated_at'>)
     }
   }, [userId, weekDays, weeks, createWeek])
 

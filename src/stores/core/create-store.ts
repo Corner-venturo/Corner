@@ -135,8 +135,9 @@ export function createStore<T extends BaseEntity>(
         set({ loading: true, error: null })
 
         // 建立基礎查詢
-        let query = supabase
-          .from(tableName as string)
+         
+        let query = (supabase as any)
+          .from(tableName)
           .select('*')
           .order('created_at', { ascending: false })
 
@@ -158,7 +159,7 @@ export function createStore<T extends BaseEntity>(
 
         if (error) throw error
 
-        const items = (data || []) as T[]
+        const items = (data || []) as unknown as T[]
         set({ items, loading: false })
         return items
       } catch (error) {
@@ -181,6 +182,7 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
+         
         const { data, error } = await supabase
           .from(tableName as any)
           .select('*')
@@ -190,7 +192,7 @@ export function createStore<T extends BaseEntity>(
         if (error) throw error
 
         set({ loading: false })
-        return data as T
+        return data as unknown as T
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '讀取失敗'
         set({ error: errorMessage, loading: false })
@@ -224,6 +226,7 @@ export function createStore<T extends BaseEntity>(
 
         if (codePrefix && !(data as Record<string, unknown>).code) {
           // 從資料庫查詢最大 code，確保唯一性
+           
           const { data: maxCodeResult } = await supabase
             .from(tableName as any)
             .select('code')
@@ -233,9 +236,10 @@ export function createStore<T extends BaseEntity>(
             .single()
 
           let nextNumber = 1
-          if (maxCodeResult?.code) {
+          const codeResult = maxCodeResult as { code?: string } | null
+          if (codeResult?.code) {
             // 提取數字部分，例如 'C000032' -> 32
-            const numericPart = maxCodeResult.code.replace(codePrefix, '')
+            const numericPart = codeResult.code.replace(codePrefix, '')
             const currentMax = parseInt(numericPart, 10)
             if (!isNaN(currentMax)) {
               nextNumber = currentMax + 1
@@ -245,6 +249,7 @@ export function createStore<T extends BaseEntity>(
           ;(insertData as Record<string, unknown>).code = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
         }
 
+         
         const { data: newItem, error } = await supabase
           .from(tableName as any)
           .insert(insertData as any)
@@ -253,13 +258,14 @@ export function createStore<T extends BaseEntity>(
 
         if (error) throw error
 
+        const createdItem = newItem as unknown as T
         // 樂觀更新 UI
         set(state => ({
-          items: [newItem as T, ...state.items],
+          items: [createdItem, ...state.items],
           loading: false,
         }))
 
-        return newItem as T
+        return createdItem
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '建立失敗'
         set({ error: errorMessage, loading: false })
@@ -285,13 +291,14 @@ export function createStore<T extends BaseEntity>(
 
         if (error) throw error
 
+        const result = updatedItem as unknown as T
         // 樂觀更新 UI
         set(state => ({
-          items: state.items.map(item => (item.id === id ? updatedItem as T : item)),
+          items: state.items.map(item => (item.id === id ? result : item)),
           loading: false,
         }))
 
-        return updatedItem as T
+        return result
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '更新失敗'
         set({ error: errorMessage, loading: false })

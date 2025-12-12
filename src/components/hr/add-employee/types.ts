@@ -22,8 +22,8 @@ export interface EmployeeFormData {
   }
   salary_info: {
     base_salary: number
-    allowances: any[]
-    salaryHistory: any[]
+    allowances: { name: string; amount: number }[]
+    salaryHistory: { date: string; amount: number; reason?: string }[]
   }
 }
 

@@ -115,7 +115,7 @@ export function CurrencyWidget() {
   // 初始化外幣金額
   useEffect(() => {
     setForeignAmount(calculateForeign(twdAmount))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []) // 只在組件掛載時執行一次
 
   const currencyInfo = DEFAULT_RATES[selectedCurrency]

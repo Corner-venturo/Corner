@@ -201,6 +201,7 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
           // 找到現有成員 → 更新資料 + 上傳護照照片
           const passportUrl = await uploadPassportImage(file, matchedMember.id)
 
+          // passport_image_url exists in DB but not in Member type yet
           await memberStore.update(matchedMember.id, {
             name_en: parsed.name_en || matchedMember.name_en,
             passport_number: parsed.passport_number || matchedMember.passport_number,
@@ -208,8 +209,8 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
             id_number: parsed.id_number || matchedMember.id_number,
             birthday: parsed.birthday || matchedMember.birthday,
             gender: parsed.gender || matchedMember.gender,
-            passport_image_url: passportUrl || (matchedMember as any).passport_image_url,
-          } as unknown as Parameters<typeof memberStore.update>[1])
+            ...(passportUrl && { passport_image_url: passportUrl }),
+          } as Parameters<typeof memberStore.update>[1])
 
           updatedCount++
         } else {

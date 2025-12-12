@@ -30,7 +30,7 @@ export default function HRPage() {
   useEffect(() => {
     fetchAll()
     fetchWorkspaces()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   const getStatusLabel = (status: Employee['status']) => {

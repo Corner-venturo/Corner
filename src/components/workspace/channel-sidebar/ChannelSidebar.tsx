@@ -131,7 +131,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
 
     void loadChannelMembers(currentWorkspace.id, selectedChannelId)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [selectedChannelId, currentWorkspace?.id])
 
   const handleRemoveMember = async () => {

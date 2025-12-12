@@ -97,7 +97,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
           const quote = row as Quote
           return (
             <span className="text-sm text-morandi-secondary">
-              {(quote as any).created_by_name || quote.handler_name || '-'}
+              {quote.created_by_name || quote.handler_name || '-'}
             </span>
           )
         },

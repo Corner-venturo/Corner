@@ -24,7 +24,7 @@ import {
   CustomerSearchParams,
 } from '@/components/customers/customer-search-dialog'
 import { useCustomers } from '@/hooks/cloud-hooks'
-import type { Customer, UpdateCustomerData } from '@/types/customer.types'
+import type { Customer, UpdateCustomerData, CreateCustomerData } from '@/types/customer.types'
 import { toast } from 'sonner'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -383,7 +383,8 @@ export default function CustomersPage() {
           const nationalId = ocrData.national_id
           const dateOfBirth = ocrData.date_of_birth
           // 取得乾淨的中文名（移除警告符號）
-          const chineseName = ocrData.name?.replace(/[⚠️\(\)（）]/g, '').split('/')[0]?.trim()
+          // eslint-disable-next-line no-misleading-character-class
+          const chineseName = ocrData.name?.replace(/[⚠️()（）]/g, '').split('/')[0]?.trim()
 
           console.log(`🔍 處理護照: ${passportNumber}, 身分證: ${nationalId}, 生日: ${dateOfBirth}, 姓名: ${chineseName}`)
 
@@ -503,7 +504,7 @@ export default function CustomersPage() {
                   national_id: nationalId || existingCustomer.national_id,
                   date_of_birth: dateOfBirth || existingCustomer.date_of_birth,
                   verification_status: 'unverified', // 更新後需重新驗證
-                } as any)
+                } as UpdateCustomerData)
                 updateCount++
                 console.log(`✅ 已更新客戶護照: ${existingCustomer.name}`)
               } else {
@@ -512,7 +513,8 @@ export default function CustomersPage() {
               }
             } else {
               // ➕ 建立新客戶
-              await addCustomer({
+               
+              await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
                 ...ocrData,
                 is_vip: false,
                 is_active: true,
@@ -520,7 +522,7 @@ export default function CustomersPage() {
                 total_orders: 0,
                 passport_image_url: item.imageBase64 || null,
                 verification_status: 'unverified',
-              } as any)
+              })
               successCount++
             }
 
@@ -566,13 +568,15 @@ export default function CustomersPage() {
   const handleAddCustomer = async () => {
     if (!newCustomer.name.trim() || !newCustomer.phone.trim()) return
 
-    await addCustomer({
+     
+    await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
       ...newCustomer,
       // code 由 Store 自動生成（不要傳入空字串）
       is_vip: false,
       is_active: true,
       total_spent: 0,
-    } as any)
+      verification_status: 'unverified',
+    })
 
     setNewCustomer({
       name: '',
@@ -1859,8 +1863,8 @@ export default function CustomersPage() {
                   <label className="block text-xs font-medium text-morandi-secondary mb-1">外號/稱謂</label>
                   <input
                     type="text"
-                    value={(verifyFormData as any).nickname || ''}
-                    onChange={e => setVerifyFormData({ ...verifyFormData, nickname: e.target.value } as any)}
+                    value={verifyFormData.nickname || ''}
+                    onChange={e => setVerifyFormData({ ...verifyFormData, nickname: e.target.value })}
                     placeholder="如：小王、王姐"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
                   />

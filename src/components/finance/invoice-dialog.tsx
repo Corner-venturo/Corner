@@ -99,7 +99,7 @@ export function InvoiceDialog({
           buyerEmail: '',
           buyerMobile: order.contact_phone || '',
         })
-        setCustomNo(generateCustomNo(order.id, order.order_number))
+        setCustomNo(generateCustomNo(order.id, order.order_number ?? ''))
       }
     }
   }, [selectedOrderId, fixedOrder, allOrders, invoices])

@@ -56,6 +56,7 @@ export const TABLES = {
   ATTRACTIONS: 'attractions',
   RECEIPTS: 'receipts',
   LINKPAY_LOGS: 'linkpay_logs',
+  VENDOR_COSTS: 'vendor_costs',
 } as const
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES]

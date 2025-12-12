@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ESIM_STATUSES } from '@/types/esim.types'
-import type { EsimSearchFilters } from '@/types/esim.types'
+import type { EsimSearchFilters, EsimStatus } from '@/types/esim.types'
 
 interface EsimSearchDialogProps {
   open: boolean
@@ -112,7 +112,7 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
             <Label htmlFor="status">狀態</Label>
             <Select
               value={filters.status?.toString()}
-              onValueChange={value => setFilters({ ...filters, status: Number(value) as any })}
+              onValueChange={value => setFilters({ ...filters, status: Number(value) as EsimStatus })}
             >
               <SelectTrigger id="status">
                 <SelectValue placeholder="選擇狀態" />

@@ -342,7 +342,6 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
                 </Button>
                 {previewMember.passport_image_url ? (
                   <div className="relative w-full max-h-[70vh] overflow-auto">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={previewMember.passport_image_url}
                       alt={`${previewMember.name || previewMember.chinese_name} 的護照`}

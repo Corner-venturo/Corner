@@ -148,11 +148,11 @@ export default function ReceiptDetailPage({ params }: PageProps) {
           return sum + (r.status === 1 ? (r.actual_amount || 0) : 0)
         }, 0)
 
-        const remainingAmount = Math.max(0, order.total_amount - totalPaid)
+        const remainingAmount = Math.max(0, (order.total_amount ?? 0) - totalPaid)
 
         // 判斷付款狀態
         let paymentStatus: 'unpaid' | 'partial' | 'paid' = 'unpaid'
-        if (totalPaid >= order.total_amount) {
+        if (totalPaid >= (order.total_amount ?? 0)) {
           paymentStatus = 'paid'
         } else if (totalPaid > 0) {
           paymentStatus = 'partial'
@@ -201,7 +201,7 @@ export default function ReceiptDetailPage({ params }: PageProps) {
   }
 
   // 編輯收款單
-  const handleEdit = async (data: any) => {
+  const handleEdit = async (data: Partial<typeof receipt>) => {
     try {
       await updateReceipt(receipt.id, data)
       setIsEditDialogOpen(false)

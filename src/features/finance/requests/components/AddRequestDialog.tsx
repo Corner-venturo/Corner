@@ -72,7 +72,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       }
       loadData().catch((err: unknown) => logger.error('載入資料失敗:', err))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [open])
 
   // Generate upcoming Thursdays for request date (20 weeks = ~5 months)

@@ -30,7 +30,7 @@ export const useQuoteState = () => {
     if (workspaces.length === 0) {
       loadWorkspaces()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 自動載入 quotes（如果還沒載入）
@@ -38,7 +38,7 @@ export const useQuoteState = () => {
     if (quotes.length === 0) {
       loadQuotes()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 檢查是否為特殊團報價單
@@ -188,17 +188,19 @@ export const useQuoteState = () => {
       // 快速報價單客戶資訊
       setQuickQuoteCustomerInfo({
         customer_name: quote.customer_name || '',
+        contact_person: quote.contact_person || '',
         contact_phone: quote.contact_phone || '',
         contact_address: quote.contact_address || '',
         tour_code: quote.tour_code || relatedTour?.code || '',
         handler_name: quote.handler_name || 'William',
         issue_date: quote.issue_date || new Date().toISOString().split('T')[0],
         received_amount: quote.received_amount || 0,
-        expense_description: (quote as any)?.expense_description || '',
+        expense_description: (quote as typeof quote & { expense_description?: string })?.expense_description || '',
       })
       // 載入砍次表資料（只在第一次載入時執行）
       if (!hasLoadedTierPricings.current) {
-        const savedTierPricings = (quote as any).tier_pricings
+        const quoteWithTierPricings = quote as typeof quote & { tier_pricings?: TierPricing[] }
+        const savedTierPricings = quoteWithTierPricings.tier_pricings
         if (savedTierPricings && Array.isArray(savedTierPricings)) {
           setTierPricings(savedTierPricings)
         }
@@ -249,19 +251,21 @@ export const useQuoteState = () => {
   )
   const [quickQuoteCustomerInfo, setQuickQuoteCustomerInfo] = useState({
     customer_name: quote?.customer_name || '',
+    contact_person: quote?.contact_person || '',
     contact_phone: quote?.contact_phone || '',
     contact_address: quote?.contact_address || '',
     tour_code: quote?.tour_code || relatedTour?.code || '',
     handler_name: quote?.handler_name || 'William',
     issue_date: quote?.issue_date || new Date().toISOString().split('T')[0],
     received_amount: quote?.received_amount || 0,
-    expense_description: (quote as any)?.expense_description || '',
+    expense_description: (quote as typeof quote & { expense_description?: string })?.expense_description || '',
   })
 
   // 砍次表狀態 - 從 quote 載入或初始化為空陣列
-  const [tierPricings, setTierPricings] = useState<TierPricing[]>(
-    (quote as any)?.tier_pricings || []
-  )
+  const [tierPricings, setTierPricings] = useState<TierPricing[]>(() => {
+    const quoteWithTierPricings = quote as typeof quote & { tier_pricings?: TierPricing[] }
+    return quoteWithTierPricings?.tier_pricings || []
+  })
 
   // 如果找不到報價單，返回列表頁（只有在資料已載入時才判斷）
   useEffect(() => {

@@ -11,7 +11,7 @@ import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
 import { cn } from '@/lib/utils'
-import type { Order } from '@/types/order.types'
+import type { Order, Member } from '@/stores/types'
 
 export default function OrdersPage() {
   const router = useRouter()
@@ -34,7 +34,7 @@ export default function OrdersPage() {
   // 🔥 載入 workspace（只執行一次）
   React.useEffect(() => {
     loadWorkspaces()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [])
 
   const filteredOrders = orders.filter(order => {
@@ -161,8 +161,7 @@ export default function OrdersPage() {
         addMember({
           name: '',
           order_id: newOrder.id,
-          tour_id: orderData.tour_id,
-        })
+        } as Omit<Member, 'id' | 'created_at' | 'updated_at'>)
       )
       await Promise.all(memberPromises)
     }

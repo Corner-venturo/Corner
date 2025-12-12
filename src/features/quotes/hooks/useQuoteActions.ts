@@ -4,9 +4,9 @@ import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { logger } from '@/lib/utils/logger'
-import { CostCategory, ParticipantCounts, SellingPrices, VersionRecord, TierPricing } from '../types'
+import { CostCategory, ParticipantCounts, SellingPrices, TierPricing } from '../types'
 import { useTourStore } from '@/stores'
-import type { Quote, Tour } from '@/stores/types'
+import type { Quote, Tour, QuoteVersion } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
 
@@ -24,8 +24,7 @@ interface QuickQuoteCustomerInfo {
 interface UseQuoteActionsProps {
   quote: Quote | null | undefined
   updateQuote: (id: string, data: Partial<Quote>) => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  addTour: (data: any) => Promise<Tour | undefined>
+  addTour: (data: CreateInput<Tour>) => Promise<Tour | undefined>
   router: ReturnType<typeof useRouter>
   updatedCategories: CostCategory[]
   total_cost: number
@@ -143,7 +142,7 @@ export const useQuoteActions = ({
         return category
       })
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [groupSize, groupSizeForGuide]) // 只依賴數值，不依賴 participantCounts 對象
 
   // 儲存當前版本（覆蓋）
@@ -189,10 +188,10 @@ export const useQuoteActions = ({
 
           updateQuote(quote.id, {
             name: quoteName,
-            versions: [firstVersion] as any,
+            versions: [firstVersion],
             current_version_index: 0,
             // categories 作為臨時編輯狀態，同步更新
-            categories: updatedCategories as any,
+            categories: updatedCategories,
             total_cost,
             group_size: groupSize,
             accommodation_days: accommodationDays,
@@ -202,7 +201,7 @@ export const useQuoteActions = ({
             tier_pricings: tierPricingsData,
             // 快速報價單資料
             ...quickQuoteData,
-          } as any)
+          })
 
           // 設定當前編輯版本為 0
           if (setCurrentEditingVersion) {
@@ -211,7 +210,7 @@ export const useQuoteActions = ({
         } else {
           // 已有版本：更新 currentEditingVersion 對應的版本
           const versionIndex = currentEditingVersion ?? (quote.current_version_index ?? 0)
-          const updatedVersions = [...existingVersions] as any[]
+          const updatedVersions: QuoteVersion[] = [...existingVersions]
 
           if (versionIndex >= 0 && versionIndex < updatedVersions.length) {
             updatedVersions[versionIndex] = {
@@ -231,7 +230,7 @@ export const useQuoteActions = ({
             versions: updatedVersions,
             current_version_index: versionIndex,
             // categories 作為臨時編輯狀態，同步更新
-            categories: updatedCategories as any,
+            categories: updatedCategories,
             total_cost,
             group_size: groupSize,
             accommodation_days: accommodationDays,
@@ -241,7 +240,7 @@ export const useQuoteActions = ({
             tier_pricings: tierPricingsData,
             // 快速報價單資料
             ...quickQuoteData,
-          } as any)
+          })
         }
 
         setSaveSuccess(true)
@@ -275,8 +274,8 @@ export const useQuoteActions = ({
 
       try {
         // 計算新的版本號（取得版本歷史中的最大版本號 + 1）
-        const existingVersions = (quote.versions || []) as any[]
-        const maxVersion = existingVersions.reduce((max: number, v: any) =>
+        const existingVersions = quote.versions || []
+        const maxVersion = existingVersions.reduce((max: number, v: QuoteVersion) =>
           Math.max(max, v.version || 0), 0
         )
         const newVersion = maxVersion + 1
@@ -302,14 +301,14 @@ export const useQuoteActions = ({
         const newVersionIndex = existingVersions.length
         const newVersions = [...existingVersions, newVersionRecord]
         updateQuote(quote.id, {
-          categories: updatedCategories as any,
+          categories: updatedCategories,
           total_cost,
           group_size: groupSize,
           name: quoteName,
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          versions: newVersions as any,
+          versions: newVersions,
           current_version_index: newVersionIndex, // 自動切換到新版本
         })
 
@@ -357,8 +356,8 @@ export const useQuoteActions = ({
     if (!quote) return
 
     // 先保存當前版本為新版本
-    const existingVersions = (quote.versions || []) as any[]
-    const maxVersion = existingVersions.reduce((max: number, v: any) =>
+    const existingVersions = quote.versions || []
+    const maxVersion = existingVersions.reduce((max: number, v: QuoteVersion) =>
       Math.max(max, v.version || 0), 0
     )
     const newVersion = maxVersion + 1
@@ -380,14 +379,14 @@ export const useQuoteActions = ({
     // 更新狀態為最終版本
     updateQuote(quote.id, {
       status: 'approved',
-      categories: updatedCategories as any,
+      categories: updatedCategories,
       total_cost,
       group_size: groupSize,
       name: quoteName,
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices,
-      versions: [...existingVersions, finalizeVersionRecord] as any,
+      versions: [...existingVersions, finalizeVersionRecord],
     })
 
     // 自動跳轉到旅遊團新增頁面，並帶上報價單ID
@@ -410,8 +409,8 @@ export const useQuoteActions = ({
     if (!quote) return
 
     // 先保存目前的報價單狀態為新版本
-    const existingVersions = (quote.versions || []) as any[]
-    const maxVersion = existingVersions.reduce((max: number, v: any) =>
+    const existingVersions = quote.versions || []
+    const maxVersion = existingVersions.reduce((max: number, v: QuoteVersion) =>
       Math.max(max, v.version || 0), 0
     )
     const newVersion = maxVersion + 1
@@ -433,7 +432,7 @@ export const useQuoteActions = ({
     // 更新報價單狀態為最終版本
     updateQuote(quote.id, {
       status: 'approved',
-      versions: [...existingVersions, createTourVersionRecord] as any,
+      versions: [...existingVersions, createTourVersionRecord],
     })
 
     // 創建旅遊團

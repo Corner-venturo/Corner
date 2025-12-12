@@ -94,7 +94,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     }
 
     // 使用 itemStore 新增項目
-    const createdItem = await itemStore.create(item as Parameters<typeof itemStore.create>[0])
+    const createdItem = await itemStore.create(item as unknown as Parameters<typeof itemStore.create>[0])
 
     // 更新 request 的總金額
     const allItems = [...existingItems, createdItem as PaymentRequestItem]

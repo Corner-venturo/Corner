@@ -68,7 +68,7 @@ export function RelatedImagesPreviewer({
       let queryBuilder = supabase
         .from('image_library')
         .select('id, name, public_url, tags')
-        .eq('workspace_id', workspaceId)
+        .eq('workspace_id', workspaceId ?? '')
         .eq('category', 'activity')
 
       // 搜尋策略：精確匹配景點名稱，或包含關鍵字的圖片
@@ -86,7 +86,7 @@ export function RelatedImagesPreviewer({
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('image_library')
           .select('id, name, public_url, tags')
-          .eq('workspace_id', workspaceId)
+          .eq('workspace_id', workspaceId ?? '')
           .eq('category', 'activity')
           .ilike('name', `%${keywords[0]}%`)
           .order('created_at', { ascending: false })
@@ -99,17 +99,17 @@ export function RelatedImagesPreviewer({
         }
         
         // 使用回退搜尋結果
-        const filteredImages = (fallbackData || []).filter(img => 
+        const filteredImages = (fallbackData || []).filter(img =>
           img.public_url !== currentImageUrl
-        )
+        ).map(img => ({ ...img, tags: img.tags ?? [] }))
         setRelatedImages(filteredImages)
         return
       }
 
       // 排除當前使用的圖片
-      const filteredImages = (data || []).filter(img => 
+      const filteredImages = (data || []).filter(img =>
         img.public_url !== currentImageUrl
-      )
+      ).map(img => ({ ...img, tags: img.tags ?? [] }))
 
       setRelatedImages(filteredImages)
     } catch (error) {

@@ -64,7 +64,7 @@ export default function VisasPage() {
       ])
     }
     loadData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [])
 
   // 篩選管理
@@ -149,7 +149,7 @@ export default function VisasPage() {
         return updated
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [contact_info.applicant_name, applicants.length])
 
   // 處理批次新增簽證
@@ -276,8 +276,8 @@ export default function VisasPage() {
         contact_phone: contact_info.contact_phone || '',
         visa_type: applicant.country,
         country: applicant.country,
-        received_date: applicant.received_date || null,  // 空字串轉 null
-        expected_issue_date: applicant.expected_issue_date || null,  // 空字串轉 null
+        received_date: applicant.received_date || undefined,  // 空字串轉 undefined
+        expected_issue_date: applicant.expected_issue_date || undefined,  // 空字串轉 undefined
         fee,
         cost: total_cost,
         status: 'pending',
@@ -407,6 +407,7 @@ export default function VisasPage() {
       date_of_birth: '',
       gender: '',
       notes: '',
+      passport_image_url: '',
     })
     setShowAddCustomerForm(true)
   }

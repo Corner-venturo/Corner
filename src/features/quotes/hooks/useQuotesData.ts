@@ -29,7 +29,7 @@ export const useQuotesData = () => {
       // fetchRegions()
     }, 100)
     return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []) // 只執行一次，避免無限循環
 
   const handleDuplicateQuote = async (quote_id: string, e?: React.MouseEvent) => {

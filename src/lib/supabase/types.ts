@@ -1,4 +1,3 @@
-npm warn exec The following package was not found and will be installed: supabase@2.65.7
 export type Json =
   | string
   | number
@@ -2629,6 +2628,7 @@ export type Database = {
           price_note: string | null
           price_tiers: Json | null
           pricing_details: Json | null
+          quote_id: string | null
           return_flight: Json | null
           show_cancellation_policy: boolean | null
           show_faqs: boolean | null
@@ -2685,6 +2685,7 @@ export type Database = {
           price_note?: string | null
           price_tiers?: Json | null
           pricing_details?: Json | null
+          quote_id?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -2741,6 +2742,7 @@ export type Database = {
           price_note?: string | null
           price_tiers?: Json | null
           pricing_details?: Json | null
+          quote_id?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null

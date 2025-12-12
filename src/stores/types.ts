@@ -18,6 +18,9 @@ export interface User {
   english_name: string
   display_name: string
   chinese_name: string // 中文姓名（本名）
+  // 便捷屬性（向下相容）
+  name?: string // display_name 的別名
+  email?: string // personal_info.email 的便捷存取
   personal_info: {
     national_id: string
     birthday: string
@@ -49,7 +52,7 @@ export interface User {
     }[]
   }
   permissions: string[]
-  roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant')[] // 附加身份標籤（不影響權限），支援多重身份
+  roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[] // 附加身份標籤（不影響權限），支援多重身份
   attendance: {
     leave_records: {
       id: string
@@ -294,6 +297,12 @@ export interface DailyMeals {
   dinner: string
 }
 
+// 每日圖片（支援位置調整）
+export interface DailyImage {
+  url: string
+  position?: string // object-position 值，如 "center", "center top", "center 30%"
+}
+
 export interface DailyItineraryDay {
   dayLabel: string // 如: "Day 1"
   date: string // 如: "10/21 (二)"
@@ -304,7 +313,7 @@ export interface DailyItineraryDay {
   recommendations: string[]
   meals: DailyMeals
   accommodation: string
-  images?: string[]
+  images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
 }
 
 // 費用包含/不含項目
@@ -338,11 +347,27 @@ export interface ItineraryVersionRecord {
   created_at: string
 }
 
+/**
+ * 🎯 軍事級別 Itinerary 類型定義
+ *
+ * 修復項目：
+ * ✅ 添加 workspace_id 支援多租戶隔離
+ * ✅ 添加 updated_by 審計追蹤
+ * ✅ 完整的 TSDoc 註解
+ */
 export interface Itinerary {
+  // 基礎欄位
   id: string
+  code?: string // 行程編號（如：I20240001）
   tour_id?: string // 關聯的團 ID（選填，因為可能只是草稿）
+  quote_id?: string // 關聯的報價單 ID（選填）
+
+  // 🔒 多租戶支援
+  workspace_id?: string // Workspace ID（多租戶隔離）
 
   // 封面資訊
+  name?: string // 行程名稱（向後相容別名，等同 title）
+  destination?: string // 目的地（向後相容）
   tagline: string
   title: string
   subtitle: string
@@ -354,8 +379,8 @@ export interface Itinerary {
   city: string
   status: 'draft' | 'published'
   cover_style?: 'original' | 'gemini' // 封面風格
-  price?: string // 價格（如：39,800）
-  price_note?: string // 價格備註（如：起、/人）
+  price?: string | null // 價格（如：39,800）
+  price_note?: string | null // 價格備註（如：起、/人）
 
   // 航班資訊
   outbound_flight?: FlightInfo
@@ -394,25 +419,32 @@ export interface Itinerary {
   show_pricing_details?: boolean
 
   // 價格方案（多種人數價格）
-  price_tiers?: PriceTier[]
+  price_tiers?: PriceTier[] | null
   show_price_tiers?: boolean
 
   // 常見問題
-  faqs?: FAQ[]
+  faqs?: FAQ[] | null
   show_faqs?: boolean
 
   // 提醒事項
-  notices?: string[]
+  notices?: string[] | null
   show_notices?: boolean
 
   // 取消政策
-  cancellation_policy?: string[]
+  cancellation_policy?: string[] | null
   show_cancellation_policy?: boolean
 
+  // 🔍 審計追蹤欄位
   created_at: string
   updated_at: string
-  created_by?: string
+  created_by?: string // 建立者的 employee ID
+  updated_by?: string // 最後修改者的 employee ID
   archived_at?: string | null
+
+  // 離線同步支援
+  _deleted?: boolean
+  _needs_sync?: boolean
+  _synced_at?: string
 }
 
 // 價格方案（如 4人包團、6人包團、8人包團）
@@ -428,6 +460,40 @@ export interface PriceTier {
 export interface FAQ {
   question: string // 問題
   answer: string // 答案
+}
+
+// 砍次表價格（用於比較不同人數的報價）
+export interface TierPricing {
+  id: string // 唯一識別
+  participant_count: number // 總人數（用於重新計算成本）
+  participant_counts: {
+    adult: number
+    child_with_bed: number
+    child_no_bed: number
+    single_room: number
+    infant: number
+  } // 各身份人數分布
+  identity_costs: {
+    adult: number
+    child_with_bed: number
+    child_no_bed: number
+    single_room: number
+    infant: number
+  } // 重新計算的各身份成本
+  selling_prices: {
+    adult: number
+    child_with_bed: number
+    child_no_bed: number
+    single_room: number
+    infant: number
+  } // 各身份售價
+  identity_profits: {
+    adult: number
+    child_with_bed: number
+    child_no_bed: number
+    single_room: number
+    infant: number
+  } // 各身份利潤
 }
 
 // Order 類型已移至 @/types/order.types.ts
@@ -476,6 +542,8 @@ export interface Quote {
   quote_number?: string // 報價單號碼 (QUOTE-2025-0001) - 向下相容
   quote_type: 'standard' | 'quick' // ✅ 報價單類型（標準報價單 / 快速報價單）
   name?: string // 團體名稱（標準報價單必填，快速報價單選填）
+  destination?: string // 目的地（向後相容）
+  days?: number // 天數（向後相容）
   status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
   // draft: 草稿
   // proposed: 提案
@@ -499,6 +567,7 @@ export interface Quote {
   contact_address?: string // 通訊地址（快速報價單用）
   tour_code?: string // 團體編號（快速報價單用）
   handler_name?: string // 承辦業務（快速報價單用）
+  created_by_name?: string // 建立人姓名（冗餘欄位，便於顯示）
   issue_date?: string // 開單日期（快速報價單用）
   received_amount?: number // 已收金額（快速報價單用）
   balance_amount?: number // 應收餘額（快速報價單用，自動計算）
@@ -536,6 +605,8 @@ export interface Quote {
   version?: number // 版本號（向下相容）
   versions?: QuoteVersion[] // 版本歷史（所有版本都存在這裡）
   current_version_index?: number // 當前編輯的版本索引（對應 versions 陣列）
+  tier_pricings?: TierPricing[] // 砍次表（不同人數對應不同價格）
+  expense_description?: string // 費用說明（快速報價單用）
   created_at: string
   updated_at: string
 }
@@ -547,6 +618,7 @@ export interface QuickQuoteItem {
   id: string
   description: string // 摘要
   quantity: number // 數量
+  cost?: number // 成本（編輯時可選填，列印時隱藏）
   unit_price: number // 單價
   amount: number // 金額（quantity * unit_price）
   notes: string // 備註
@@ -555,7 +627,7 @@ export interface QuickQuoteItem {
 export interface QuoteVersion {
   id: string
   version: number
-  name: string // 版本名稱（如：客戶名稱、報價單名稱）
+  name?: string // 版本名稱（如：客戶名稱、報價單名稱）- 可選以向下兼容
   categories: QuoteCategory[]
   total_cost: number
   group_size?: number // 團體人數
@@ -576,6 +648,7 @@ export interface QuoteVersion {
   } // 多身份售價
   note?: string // 修改說明
   created_at: string
+  updated_at?: string // 版本更新時間（選填）
 }
 
 export interface QuoteCategory {
@@ -600,8 +673,8 @@ export interface QuoteItem {
   adult_price?: number // 成人價
   child_price?: number // 小朋友價
   infant_price?: number // 嬰兒價
-  created_at: string
-  updated_at: string
+  created_at?: string // 可選，向後相容
+  updated_at?: string // 可選，向後相容
 }
 
 // === 供應商管理系統 ===
@@ -888,3 +961,6 @@ export interface CompanyContact {
 
 // 系統功能權限清單 - 從統一配置自動生成
 export { SYSTEM_PERMISSIONS, FEATURE_PERMISSIONS } from '@/lib/permissions'
+
+// Store 工具型別（重新導出）
+export type { CreateInput, UpdateInput } from './core/types'

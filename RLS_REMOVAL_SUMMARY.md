@@ -223,13 +223,43 @@ is_super_admin() → boolean
 - [x] 所有表格的 RLS 已禁用
 - [x] 所有 RLS policies 已刪除
 - [x] Global CLAUDE.md 已更新
-- [x] Project CLAUDE.md 已更新
-- [ ] Migration 執行完成（等待連線）
+- [x] Project CLAUDE.md 已更新（2025-12-11 最終更新）
+- [x] Migration 執行完成
+  - [x] 20251115060000_final_disable_all_rls.sql
+  - [x] 20251205040000_disable_itineraries_rls.sql
+  - [ ] 20251211000000_disable_all_remaining_rls.sql（待執行）
 - [ ] 功能測試通過
   - [ ] 登入/登出正常
   - [ ] 資料查詢正常
   - [ ] 新建資料正常
   - [ ] Workspace filter 正常運作
+
+---
+
+## 🔧 2025-12-11 更新
+
+### 發現問題
+Supabase Dashboard 顯示 107 個 RLS 錯誤：
+- 錯誤類型：「Policy Exists RLS Disabled」
+- 受影響表格：advance_lists, bulletins, channel_groups, channels, cities, countries, itineraries, messages 等
+
+### 原因分析
+某些表格的 RLS 被意外啟用，但沒有對應的 policies，導致 Supabase 報錯。
+
+### 解決方案
+創建了最終的 RLS 清理 migration：
+- 檔案：`supabase/migrations/20251211000000_disable_all_remaining_rls.sql`
+- 功能：
+  1. 禁用所有業務表格的 RLS
+  2. 刪除所有殘留的 RLS policies
+  3. 驗證結果並輸出報告
+
+### 更新規範
+更新了 `.claude/CLAUDE.md` 的 RLS 規範：
+- 移除「user_preferences 需要 RLS」的例外
+- 明確說明：**所有表格都禁用 RLS**
+- 更新了權限控制架構圖（移除 Layer 2: RLS）
+- 更新了新建表格的標準模板
 
 ---
 

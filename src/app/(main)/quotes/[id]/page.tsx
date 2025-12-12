@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
-import type { Tour } from '@/types/tour.types'
+import type { Tour as TourType } from '@/types/tour.types'
 import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
@@ -25,7 +25,8 @@ import {
 } from '@/features/quotes/components'
 import type { MealDiff } from '@/features/quotes/components'
 import type { CostItem } from '@/features/quotes/types'
-import type { Itinerary } from '@/stores/types'
+import type { Itinerary, CreateInput, Tour } from '@/stores/types'
+// TourType imported above from @/types/tour.types
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 
 export default function QuoteDetailPage() {
@@ -106,7 +107,7 @@ export default function QuoteDetailPage() {
   const actions = useQuoteActions({
     quote,
     updateQuote,
-    addTour,
+    addTour: addTour as unknown as (data: CreateInput<Tour>) => Promise<Tour | undefined>,
     router,
     updatedCategories,
     total_cost,
@@ -494,7 +495,7 @@ export default function QuoteDetailPage() {
   }, [quote, updateQuote, handleCreateTour])
 
   // 處理關聯現有旅遊團
-  const handleLinkExistingTour = React.useCallback(async (tour: any) => {
+  const handleLinkExistingTour = React.useCallback(async (tour: { id: string; code: string }) => {
     if (!quote) return
     // 更新報價單狀態和關聯旅遊團
     await updateQuote(quote.id, {
@@ -724,16 +725,16 @@ export default function QuoteDetailPage() {
           issue_date: quickQuoteCustomerInfo.issue_date || quote.issue_date,
           received_amount: quickQuoteCustomerInfo.received_amount || quote.received_amount,
           quick_quote_items: quickQuoteItems,
-        } as any}
+        }}
         onUpdate={async (data) => {
           // 更新快速報價單資料到同一個報價單
           await updateQuote(quote.id, data)
           // 同步更新本地狀態
           if (data.quick_quote_items) {
-            setQuickQuoteItems(data.quick_quote_items as any)
+            setQuickQuoteItems(data.quick_quote_items)
           }
           if (data.customer_name !== undefined) {
-            setQuickQuoteCustomerInfo(prev => ({ ...prev, ...data } as any))
+            setQuickQuoteCustomerInfo(prev => ({ ...prev, ...data }))
           }
         }}
         // 傳入切換按鈕

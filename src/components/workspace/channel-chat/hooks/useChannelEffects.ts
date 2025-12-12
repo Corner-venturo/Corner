@@ -40,7 +40,7 @@ export function useChannelEffects(
     if (currentWorkspace?.id) {
       loadChannels(currentWorkspace.id)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [currentWorkspace?.id])
 
   // 選擇預設頻道（只從已加入的頻道中選擇）
@@ -50,7 +50,7 @@ export function useChannelEffects(
       const defaultChannel = joinedChannels.find(c => c.name === DEFAULT_CHANNEL_NAME) || joinedChannels[0]
       selectChannel(defaultChannel)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [joinedChannels.length, selectedChannel?.id])
 
   // 載入頻道資料（訊息、代墊清單、訂單清單）
@@ -66,7 +66,7 @@ export function useChannelEffects(
     ]).catch(error => {
       // Silent error handling
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [selectedChannel?.id])
 
   // Realtime 訂閱：當前頻道的訊息變更時即時更新
@@ -107,6 +107,6 @@ export function useChannelEffects(
         channelSubscriptionRef.current = null
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [selectedChannel?.id])
 }

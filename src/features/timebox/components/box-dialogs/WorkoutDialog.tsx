@@ -37,7 +37,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
   // 即時獲取最新的 scheduledBox 資料
   const currentScheduledBox = scheduledBoxes.find(sb => sb.id === scheduledBox.id) || scheduledBox
-  const workoutData = (currentScheduledBox.data as WorkoutData) || { exercises: [] }
+  const workoutData = (currentScheduledBox.data as unknown as WorkoutData) || { exercises: [] }
 
   const resetForm = () => {
     setExerciseForm({
@@ -69,7 +69,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
       exercises: [...(workoutData.exercises || []), newExercise],
     }
 
-    await updateScheduledBox(scheduledBox.id, { data: updatedData })
+    await updateScheduledBox(scheduledBox.id, { data: updatedData as unknown as Record<string, unknown> })
 
     setTimeout(() => {
       resetForm()

@@ -15,6 +15,7 @@ export interface Customer extends BaseEntity {
   code: string // 客戶編號
   name: string // 客戶姓名
   english_name?: string | null // 英文姓名
+  nickname?: string | null // 外號/稱謂（如：小王、王姐）
   phone: string | null // 主要電話
   alternative_phone?: string | null // 備用電話
   email?: string | null // Email
@@ -85,9 +86,10 @@ export type CustomerSource =
  * CreateCustomerData - 建立客戶所需資料
  */
 export interface CreateCustomerData {
-  code: string
+  code?: string // 可選，Store 自動生成
   name: string
   english_name?: string
+  nickname?: string
   phone: string
   alternative_phone?: string
   email?: string
@@ -98,6 +100,7 @@ export interface CreateCustomerData {
   passport_number?: string
   passport_romanization?: string
   passport_expiry_date?: string
+  passport_image_url?: string | null
   date_of_birth?: string
   gender?: string
   company?: string
@@ -108,6 +111,8 @@ export interface CreateCustomerData {
   referred_by?: string
   notes?: string
   is_active: boolean
+  total_spent?: number
+  total_orders?: number
   verification_status?: VerificationStatus
 }
 
@@ -117,6 +122,7 @@ export interface CreateCustomerData {
 export interface UpdateCustomerData {
   name?: string
   english_name?: string | null
+  nickname?: string | null
   phone?: string | null
   alternative_phone?: string | null
   email?: string | null
@@ -127,6 +133,7 @@ export interface UpdateCustomerData {
   passport_number?: string | null
   passport_romanization?: string | null
   passport_expiry_date?: string | null
+  passport_image_url?: string | null
   date_of_birth?: string | null
   gender?: string | null
   company?: string | null

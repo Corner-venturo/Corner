@@ -64,7 +64,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   // 根據 created_by 查找員工名字
   const getEmployeeName = (userId: string) => {
     const employee = employees.find(e => e.id === userId)
-    return employee?.display_name || employee?.name || '未知'
+    return employee?.display_name || (employee as { name?: string } | undefined)?.name || '未知'
   }
 
   // 合併所有項目為單一列表（必須在 early return 之前）

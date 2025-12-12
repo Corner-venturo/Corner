@@ -1,0 +1,107 @@
+/**
+ * OCR Recognition Hook
+ * 管理護照 OCR 辨識功能
+ */
+
+import { useState, useCallback } from 'react'
+import { toast } from 'sonner'
+import type { UpdateCustomerData } from '@/types/customer.types'
+
+interface OcrResult {
+  name?: string
+  passport_romanization?: string
+  date_of_birth?: string
+  sex?: string
+  gender?: string
+  passport_number?: string
+  passport_expiry_date?: string
+  national_id?: string
+}
+
+interface OcrApiResponse {
+  results?: Array<{
+    success: boolean
+    customer?: OcrResult
+  }>
+}
+
+export function useOcrRecognition() {
+  const [isRecognizing, setIsRecognizing] = useState(false)
+
+  /**
+   * 辨識護照圖片
+   * @param imageSource - 可以是 URL 或 File 物件
+   * @param onSuccess - 辨識成功時的回調函數
+   */
+  const recognizePassport = useCallback(async (
+    imageSource: string | File,
+    onSuccess: (data: Partial<UpdateCustomerData>) => void
+  ) => {
+    setIsRecognizing(true)
+    try {
+      let file: File
+
+      // 如果是 base64 URL，轉換為 File
+      if (typeof imageSource === 'string') {
+        const response = await fetch(imageSource)
+        const blob = await response.blob()
+        file = new File([blob], 'passport.jpg', { type: 'image/jpeg' })
+      } else {
+        file = imageSource
+      }
+
+      // 呼叫 OCR API
+      const formData = new FormData()
+      formData.append('files', file)
+
+      const ocrResponse = await fetch('/api/ocr/passport', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!ocrResponse.ok) {
+        throw new Error('OCR 辨識失敗')
+      }
+
+      const result: OcrApiResponse = await ocrResponse.json()
+
+      if (result.results?.[0]?.success && result.results[0].customer) {
+        const ocrData = result.results[0].customer
+
+        // 性別判斷：優先用 OCR 結果，再用身分證字號第二碼備援
+        let gender = ocrData.sex || ocrData.gender
+        if (!gender && ocrData.national_id) {
+          const secondChar = ocrData.national_id.charAt(1)
+          if (secondChar === '1') gender = '男'
+          else if (secondChar === '2') gender = '女'
+        }
+
+        // 組合辨識結果
+        const recognizedData: Partial<UpdateCustomerData> = {
+          name: ocrData.name,
+          passport_romanization: ocrData.passport_romanization,
+          date_of_birth: ocrData.date_of_birth,
+          gender,
+          passport_number: ocrData.passport_number,
+          passport_expiry_date: ocrData.passport_expiry_date,
+          national_id: ocrData.national_id,
+        }
+
+        onSuccess(recognizedData)
+        toast.success('辨識成功！請檢查資料')
+      } else {
+        toast.error('無法辨識護照資訊，請手動輸入')
+      }
+    } catch (error) {
+      console.error('OCR 辨識失敗:', error)
+      toast.error('辨識失敗，請重試')
+    } finally {
+      setIsRecognizing(false)
+    }
+  }, [])
+
+  return {
+    isRecognizing,
+    recognizePassport,
+  }
+}

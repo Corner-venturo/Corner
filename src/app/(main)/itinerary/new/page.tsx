@@ -24,6 +24,7 @@ import type {
   LeaderInfo,
   MeetingPoint,
   DailyItinerary,
+  HotelInfo,
 } from '@/components/editor/tour-form/types'
 import type { ItineraryVersionRecord, PricingDetails, PriceTier, FAQ } from '@/stores/types'
 import {
@@ -47,8 +48,8 @@ interface LocalTourData {
   tourCode: string
   coverImage?: string
   coverStyle?: 'original' | 'gemini' // 封面風格
-  price?: string // 價格
-  priceNote?: string // 價格備註
+  price?: string | null // 價格
+  priceNote?: string | null // 價格備註
   country: string
   city: string
   status: string
@@ -58,6 +59,7 @@ interface LocalTourData {
   focusCards: FocusCard[]
   leader: LeaderInfo
   meetingInfo: MeetingPoint
+  hotels?: HotelInfo[] // 飯店資訊
   itinerarySubtitle: string
   dailyItinerary: DailyItinerary[]
   showFeatures?: boolean
@@ -1039,7 +1041,7 @@ function NewItineraryPageContent() {
     }
 
     initializeTourData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [tourId, itineraryId, tours, itineraries, countries, cities, isFromQuote, daysFromQuote])
 
   // 計算縮放比例（必須在 early return 之前）
@@ -1363,7 +1365,7 @@ function NewItineraryPageContent() {
                   showCancellationPolicy: tourData.showCancellationPolicy || false,
                 }}
                 onChange={(newData) => {
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                   
                   const { meetingPoints, countries, ...restData } = newData;
                   setTourData({
                     ...restData,
@@ -1373,16 +1375,16 @@ function NewItineraryPageContent() {
                     showPricingDetails: newData.showPricingDetails,
                     pricingDetails: newData.pricingDetails,
                     // 價格方案
-                    priceTiers: newData.priceTiers,
+                    priceTiers: newData.priceTiers ?? undefined,
                     showPriceTiers: newData.showPriceTiers,
                     // 常見問題
-                    faqs: newData.faqs,
+                    faqs: newData.faqs ?? undefined,
                     showFaqs: newData.showFaqs,
                     // 提醒事項
-                    notices: newData.notices,
+                    notices: newData.notices ?? undefined,
                     showNotices: newData.showNotices,
                     // 取消政策
-                    cancellationPolicy: newData.cancellationPolicy,
+                    cancellationPolicy: newData.cancellationPolicy ?? undefined,
                     showCancellationPolicy: newData.showCancellationPolicy,
                   });
                   // 標記有變更，觸發自動存檔

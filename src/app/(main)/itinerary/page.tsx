@@ -47,7 +47,7 @@ export default function ItineraryPage() {
   // 載入地區資料（只執行一次）
   React.useEffect(() => {
     regionsStore.fetchAll()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 根據 ID 取得國家名稱
@@ -391,8 +391,8 @@ export default function ItineraryPage() {
               </span>
             )
           }
-          // 一般狀態（支援中英文 status）
-          if (itinerary.status === 'published' || itinerary.status === '已發布') {
+          // 一般狀態
+          if (itinerary.status === 'published') {
             return (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-green/10 text-morandi-green">
                 已發布
@@ -433,8 +433,8 @@ export default function ItineraryPage() {
           const isArchived = !!itinerary.archived_at
           const isClosed = isItineraryClosed(itinerary)
           const isTemplate = itinerary.is_template
-          const isPublished = itinerary.status === 'published' || itinerary.status === '已發布'
-          const isDraft = itinerary.status === 'draft' || itinerary.status === '草稿' || !itinerary.status
+          const isPublished = itinerary.status === 'published'
+          const isDraft = itinerary.status === 'draft' || !itinerary.status
 
           return (
             <div className="flex items-center gap-1">
@@ -605,15 +605,15 @@ export default function ItineraryPage() {
     // 狀態篩選（移除封存分頁，改用新的五種分頁）
     switch (statusFilter) {
       case '草稿':
-        // 草稿：未發布、未結案、未封存（支援中英文 status）
+        // 草稿：未發布、未結案、未封存
         filtered = filtered.filter(
-          item => (item.status === 'draft' || item.status === '草稿') && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === 'draft' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
         )
         break
       case '已發布':
-        // 已發布：已發布、未結案、未封存、非公司範例（支援中英文 status）
+        // 已發布：已發布、未結案、未封存、非公司範例
         filtered = filtered.filter(
-          item => (item.status === 'published' || item.status === '已發布') && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === 'published' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
         )
         break
       case '公司範例':

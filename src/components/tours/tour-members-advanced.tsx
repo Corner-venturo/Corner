@@ -4,7 +4,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const supabase = supabaseClient as any
 import { Tour } from '@/types/tour.types'
 import { Button } from '@/components/ui/button'

@@ -9,6 +9,7 @@ interface StarRatingProps {
   onChange?: (value: number) => void
   max?: number
   readonly?: boolean
+  disabled?: boolean // 別名 for readonly
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
@@ -18,9 +19,11 @@ export function StarRating({
   onChange,
   max = 5,
   readonly = false,
+  disabled = false,
   size = 'md',
   className,
 }: StarRatingProps) {
+  const isReadonly = readonly || disabled
   const sizeClasses = {
     sm: 'w-3 h-3',
     md: 'w-4 h-4',
@@ -37,12 +40,12 @@ export function StarRating({
           <button
             key={starValue}
             type="button"
-            disabled={readonly}
-            onClick={() => !readonly && onChange?.(starValue)}
+            disabled={isReadonly}
+            onClick={() => !isReadonly && onChange?.(starValue)}
             className={cn(
               'transition-colors',
-              !readonly && 'hover:text-morandi-gold',
-              readonly && 'cursor-default'
+              !isReadonly && 'hover:text-morandi-gold',
+              isReadonly && 'cursor-default'
             )}
           >
             <Star

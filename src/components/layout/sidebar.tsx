@@ -435,7 +435,7 @@ export function Sidebar() {
     }
 
     return filterMenuByPermissions(menuItems)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [user?.id, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   const visiblePersonalToolItems = useMemo(() => {
@@ -459,7 +459,7 @@ export function Sidebar() {
     }
 
     return filterMenuByPermissions(personalToolItems)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [user?.id, isSuperAdmin, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   return (

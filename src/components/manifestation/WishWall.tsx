@@ -21,7 +21,7 @@ export function WishWall() {
 
   const fetchWishes = async () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const result = await (supabase as any)
         .from('manifestation_entries')
         .select('id, shared_wish, created_at')

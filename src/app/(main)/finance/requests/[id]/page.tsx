@@ -37,7 +37,7 @@ export default function RequestDetailPage({ params }: PageProps) {
       setIsLoading(false)
     }
     loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 更新 request 當 store 變化時

@@ -55,10 +55,11 @@ export const morandiColors = {
  */
 export function getMonandiColor(path: string): string {
   const keys = path.split('.')
-  let value: any = morandiColors
+  let value: Record<string, unknown> | string = morandiColors as Record<string, unknown>
 
   for (const key of keys) {
-    value = value[key]
+    if (typeof value === 'string') break
+    value = value[key] as Record<string, unknown> | string
     if (value === undefined) {
       // Fallback to primary color if path not found
       return morandiColors.primary

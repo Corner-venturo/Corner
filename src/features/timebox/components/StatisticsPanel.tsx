@@ -67,7 +67,7 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
           totalWorkoutTime += sb.duration
 
           if (boxType === 'workout' && sb.data) {
-            const workoutData = sb.data as WorkoutData
+            const workoutData = sb.data as unknown as WorkoutData
             if (workoutData.totalVolume) {
               totalWorkoutVolume += workoutData.totalVolume
             }

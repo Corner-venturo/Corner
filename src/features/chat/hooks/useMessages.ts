@@ -35,7 +35,7 @@ export function useMessages(channelId: string) {
 
         if (error) throw error
 
-        setMessages(data as Message[] || [])
+        setMessages((data as unknown as Message[]) || [])
       } catch (err) {
         logger.error('Error fetching initial messages:', err)
         setError('Failed to load messages.')

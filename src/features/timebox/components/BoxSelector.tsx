@@ -27,7 +27,7 @@ interface BoxSelectorProps {
 
 export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: BoxSelectorProps) {
   const [selectedBox, setSelectedBox] = useState<string | null>(null)
-  const [duration, setDuration] = useState(timeInterval)
+  const [duration, setDuration] = useState<number>(timeInterval)
 
   // 生成持續時間選項
   const durationOptions = []

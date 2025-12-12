@@ -9,12 +9,12 @@ import { NewTourData } from '../types'
 import { OrderFormData } from '@/components/orders/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import type { Order } from '@/types'
-import type { Quote } from '@/types/quote.types'
+import type { Quote } from '@/stores/types'
 
 interface TourActions {
   create: (data: CreateInput<Tour>) => Promise<Tour>
   update: (id: string, data: UpdateInput<Tour>) => Promise<Tour>
-  delete: (id: string) => Promise<void>
+  delete: (id: string) => Promise<boolean | void>
 }
 
 interface CityOption {
@@ -28,7 +28,7 @@ interface UseTourOperationsParams {
   actions: TourActions
   addOrder: (data: CreateInput<Order>) => Promise<Order>
   updateQuote: (id: string, data: UpdateInput<Quote>) => Promise<Quote>
-  updateItinerary: (id: string, data: { tour_id: null; tour_code: null }) => Promise<unknown>
+  updateItinerary: (id: string, data: { tour_id?: undefined; tour_code?: undefined }) => Promise<unknown>
   quotes: Quote[]
   itineraries: { id: string; tour_id?: string | null }[]
   availableCities: CityOption[]
@@ -224,13 +224,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 1. 斷開關聯的報價單
         const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
         for (const quote of linkedQuotes) {
-          await updateQuote(quote.id, { tour_id: null } as UpdateInput<Quote>)
+          await updateQuote(quote.id, { tour_id: undefined })
         }
 
         // 2. 斷開關聯的行程表
         const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
         for (const itinerary of linkedItineraries) {
-          await updateItinerary(itinerary.id, { tour_id: null, tour_code: null })
+          await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined })
         }
 
         // 3. 刪除旅遊團
@@ -252,13 +252,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
           // 1. 斷開關聯的報價單
           const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
           for (const quote of linkedQuotes) {
-            await updateQuote(quote.id, { tour_id: null } as UpdateInput<Quote>)
+            await updateQuote(quote.id, { tour_id: undefined })
           }
 
           // 2. 斷開關聯的行程表
           const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
           for (const itinerary of linkedItineraries) {
-            await updateItinerary(itinerary.id, { tour_id: null, tour_code: null })
+            await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined })
           }
 
           logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)

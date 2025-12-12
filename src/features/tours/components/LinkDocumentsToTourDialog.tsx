@@ -99,7 +99,11 @@ export function LinkDocumentsToTourDialog({
   // ========== 行程表相關 ==========
 
   const linkedItineraries = useMemo(() => {
-    return itineraries.filter(i => i.tour_id === tour.id && !(i as any)._deleted)
+    // Filter out soft-deleted items if _deleted flag exists
+    return itineraries.filter(i => {
+      const item = i as Itinerary & { _deleted?: boolean }
+      return i.tour_id === tour.id && !item._deleted
+    })
   }, [itineraries, tour.id])
 
   const availableItineraries = useMemo(() => {
@@ -108,7 +112,10 @@ export function LinkDocumentsToTourDialog({
 
     // 基本過濾：未刪除、不是當前旅遊團已連結的
     let filtered = itineraries
-      .filter(i => !(i as any)._deleted && i.tour_id !== tour.id)
+      .filter(i => {
+        const item = i as Itinerary & { _deleted?: boolean }
+        return !item._deleted && i.tour_id !== tour.id
+      })
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
 
     // 先依篩選類型過濾
@@ -148,6 +155,7 @@ export function LinkDocumentsToTourDialog({
   const handleCreateItinerary = async () => {
     try {
       setIsCreatingItinerary(true)
+      // Create itinerary with minimal required fields
       const newItinerary = await createItinerary({
         title: tour.name,
         tour_id: tour.id,
@@ -156,7 +164,15 @@ export function LinkDocumentsToTourDialog({
         departure_date: tour.departure_date || '',
         city: tour.location || '',
         daily_itinerary: [],
-      } as any)
+        // Required fields with defaults
+        tagline: '',
+        subtitle: '',
+        description: '',
+        cover_image: '',
+        country: '',
+        features: [],
+        focus_cards: [],
+      } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
       if (newItinerary?.id) {
         onClose()
@@ -175,14 +191,14 @@ export function LinkDocumentsToTourDialog({
 
       if (itinerary.is_template) {
         // 從範本建立新行程表 → 跳轉
+        const { id, created_at, updated_at, ...templateData } = itinerary
         const newItinerary = await createItinerary({
-          ...itinerary,
-          id: undefined,
+          ...templateData,
           tour_id: tour.id,
           tour_code: tour.code,
           is_template: false,
           title: itinerary.title || tour.name,
-        } as any)
+        } as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
         if (newItinerary?.id) {
           onClose()
@@ -208,8 +224,8 @@ export function LinkDocumentsToTourDialog({
     try {
       setIsUnlinkingItinerary(true)
       await updateItinerary(itinerary.id, {
-        tour_id: null,
-        tour_code: null,
+        tour_id: undefined,
+        tour_code: undefined,
       })
       await fetchItineraries()
     } catch (error) {
@@ -227,7 +243,11 @@ export function LinkDocumentsToTourDialog({
   // ========== 報價單相關 ==========
 
   const linkedQuotes = useMemo(() => {
-    return quotes.filter(q => q.tour_id === tour.id && !(q as any)._deleted)
+    // Filter out soft-deleted items if _deleted flag exists
+    return quotes.filter(q => {
+      const item = q as Quote & { _deleted?: boolean }
+      return q.tour_id === tour.id && !item._deleted
+    })
   }, [quotes, tour.id])
 
   const availableQuotes = useMemo(() => {
@@ -236,7 +256,10 @@ export function LinkDocumentsToTourDialog({
 
     // 基本過濾：標準報價單、未刪除、不是當前旅遊團已連結的
     let filtered = quotes
-      .filter(q => q.quote_type === 'standard' && !(q as any)._deleted && q.tour_id !== tour.id)
+      .filter(q => {
+        const item = q as Quote & { _deleted?: boolean }
+        return q.quote_type === 'standard' && !item._deleted && q.tour_id !== tour.id
+      })
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
     if (isSearching) {
@@ -265,6 +288,7 @@ export function LinkDocumentsToTourDialog({
       setIsCreatingQuote(true)
       const code = generateCode('TP', { quoteType: 'standard' }, quotes)
 
+      // Create quote with minimal required fields
       const newQuote = await createQuote({
         code,
         name: tour.name,
@@ -273,7 +297,7 @@ export function LinkDocumentsToTourDialog({
         tour_id: tour.id,
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
-      } as any)
+      } as Omit<Quote, 'id' | 'created_at' | 'updated_at'>)
 
       if (newQuote?.id) {
         onClose()
@@ -302,7 +326,7 @@ export function LinkDocumentsToTourDialog({
     e.stopPropagation()
     try {
       setIsUnlinkingQuote(true)
-      await updateQuote(quote.id, { tour_id: null })
+      await updateQuote(quote.id, { tour_id: undefined })
       await fetchQuotes()
     } catch (error) {
       console.error('斷開連結失敗:', error)

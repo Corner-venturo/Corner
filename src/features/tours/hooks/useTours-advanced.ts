@@ -86,7 +86,8 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     mutate(TOURS_KEY, [newTour, ...allTours], false)
 
     try {
-      const { error } = await supabase.from('tours').insert(newTour as unknown as Record<string, unknown>)
+       
+      const { error } = await (supabase as any).from('tours').insert(newTour)
       if (error) throw error
 
       mutate(TOURS_KEY)

@@ -2,6 +2,8 @@
  * PNR (Passenger Name Record) 型別定義
  */
 
+import type { EnhancedSSR, EnhancedOSI } from '@/lib/pnr-parser'
+
 export interface PNR {
   id: string;
   record_locator: string; // Amadeus 6位訂位代號
@@ -20,8 +22,8 @@ export interface PNR {
   segments: PNRSegment[];
 
   // SSR/OSI (JSON格式儲存)
-  special_requests: any[] | null;  // 實際為 EnhancedSSR[]
-  other_info: any[] | null;        // 實際為 EnhancedOSI[]
+  special_requests: EnhancedSSR[] | null;
+  other_info: EnhancedOSI[] | null;
 
   // 狀態
   status: 'active' | 'ticketed' | 'cancelled' | 'completed';
@@ -60,8 +62,8 @@ export interface CreatePNRInput {
   ticketing_deadline?: Date | null;
   cancellation_deadline?: Date | null;
   segments: PNRSegment[];
-  special_requests?: any[];  // EnhancedSSR[]
-  other_info?: any[];        // EnhancedOSI[]
+  special_requests?: EnhancedSSR[];
+  other_info?: EnhancedOSI[];
   status?: PNR['status'];
   notes?: string;
   created_by?: string;

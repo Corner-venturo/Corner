@@ -42,9 +42,7 @@ const tourTabs = [
   { id: 'tasks', label: '指派任務', icon: Edit2 },
 ]
 
-interface TourExtraFields {
-  [tourId: string]: Record<string, unknown>
-}
+import { TourExtraFields } from '../types'
 
 interface TourExpandedViewProps {
   tour: Tour
@@ -52,8 +50,8 @@ interface TourExpandedViewProps {
   activeTabs: Record<string, string>
   setActiveTab: (tourId: string, tabId: string) => void
   openDialog: (type: string, data?: Tour) => void
-  tourExtraFields: TourExtraFields
-  setTourExtraFields: React.Dispatch<React.SetStateAction<TourExtraFields>>
+  tourExtraFields: Record<string, TourExtraFields>
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, TourExtraFields>>>
   triggerAddOnAdd: Record<string, boolean>
   setTriggerAddOnAdd: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   triggerPaymentAdd: Record<string, boolean>
@@ -222,7 +220,7 @@ export function TourExpandedView({
         )}
         {activeTabs[tour.id] === 'members' && <TourMembers tour={tour} />}
         {activeTabs[tour.id] === 'operations' && (
-          <TourOperations tour={tour} extraFields={tourExtraFields[tour.id] as any} />
+          <TourOperations tour={tour} extraFields={tourExtraFields[tour.id]} />
         )}
         {activeTabs[tour.id] === 'addons' && (
           <TourAddOns

@@ -20,7 +20,8 @@ import { TourNavigation } from '@/features/tours/components/sections/TourNavigat
 import { COMPANY } from '@/lib/constants/company'
 
 interface TourPageProps {
-  data: any
+   
+  data: any // TourData 結構複雜且被多個組件共用，暫時保留 any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'
 }

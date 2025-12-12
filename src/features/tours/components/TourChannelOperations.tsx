@@ -10,7 +10,7 @@ import { logger } from '@/lib/utils/logger'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { confirm } from '@/lib/ui/alert-dialog'
 
-interface TourStoreActions {
+export interface TourStoreActions {
   fetchAll: () => Promise<void>
 }
 
@@ -158,6 +158,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
     }
 
     try {
+       
       const { error } = await (supabase as any)
         .from('tours')
         .update({

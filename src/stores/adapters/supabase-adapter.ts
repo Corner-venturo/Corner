@@ -25,10 +25,9 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase as any)
-        .from(this.tableName)
+      // Dynamic table name - TypeScript requires literal types, but we use runtime values
+      let query = supabase
+        .from(this.tableName as any) // Table name is validated by TableName type
         .select('*')
         .order('created_at', { ascending: true })
 
@@ -47,7 +46,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
       if (error) throw error
 
-      const items = (data || []) as T[]
+      const items = (data || []) as unknown as T[]
       logger.log(`☁️ [${this.tableName}] Supabase fetchAll:`, items.length, '筆')
 
       return items
@@ -67,18 +66,18 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: insertedData, error } = await (supabase as any)
-        .from(this.tableName)
+      // Dynamic table name - TypeScript requires literal types, but we use runtime values
+      const { data: insertedData, error } = await supabase
+        .from(this.tableName as any) // Table name is validated by TableName type
         .insert(data)
         .select()
         .single()
 
       if (error) throw error
 
-      logger.log(`☁️ [${this.tableName}] Supabase insert:`, insertedData.id)
-      return insertedData as T
+      const result = insertedData as unknown as T
+      logger.log(`☁️ [${this.tableName}] Supabase insert:`, (result as { id: string }).id)
+      return result
     } catch (error) {
       logger.error(`❌ [${this.tableName}] Supabase insert 失敗:`, error)
       throw error
@@ -95,13 +94,12 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).from(this.tableName).select('*').eq('id', id).single()
+      // Dynamic table name - TypeScript requires literal types, but we use runtime values
+      const { data, error } = await supabase.from(this.tableName as any).select('*').eq('id', id).single()
 
       if (error) throw error
 
-      return data as T
+      return data as unknown as T
     } catch (error) {
       logger.warn(`⚠️ [${this.tableName}] Supabase getById 失敗:`, error)
       throw error
@@ -151,9 +149,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       // 清理資料，移除未知欄位
       const cleanedItem = this.cleanDataForTable(item as unknown as Record<string, unknown>)
 
-      // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any).from(this.tableName).upsert(cleanedItem)
+      // Dynamic table name - TypeScript requires literal types, but we use runtime values
+      const { error } = await supabase.from(this.tableName as any).upsert(cleanedItem)
 
       if (error) {
         logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
@@ -192,9 +189,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       const cleanedData = this.cleanDataForTable(data)
 
       const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any).from(this.tableName).update(cleanedData).eq('id', id)
+      // Dynamic table name - TypeScript requires literal types, but we use runtime values
+      const { error } = await supabase.from(this.tableName as any).update(cleanedData).eq('id', id)
 
       if (error) throw error
 
@@ -215,9 +211,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - using TableName type from schemas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any).from(this.tableName).delete().eq('id', id)
+      // Dynamic table name - TypeScript requires literal types, but we use runtime values
+      const { error } = await supabase.from(this.tableName as any).delete().eq('id', id)
 
       if (error) throw error
 

@@ -30,7 +30,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
         fetchEmployees()
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isOpen])
 
   // 計算當前頻道的成員（含員工資料）

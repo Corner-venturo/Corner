@@ -17,7 +17,7 @@ export function useTourFormHandlers(
   // 更新城市時自動設定封面圖片（從 Supabase 取得）
   const updateCity = (city: string) => {
     // 從資料庫找城市資料
-    const cityData = cities.find((c: any) => c.name === city)
+    const cityData = cities.find((c) => c.name === city)
 
     // 預設為空，讓系統從城市資料庫抓取
     let coverImage = ''
@@ -101,7 +101,7 @@ export function useTourFormHandlers(
     })
   }
 
-  const updateFeature = (index: number, field: string, value: string) => {
+  const updateFeature = (index: number, field: string, value: string | string[]) => {
     const newFeatures = [...data.features]
     newFeatures[index] = { ...newFeatures[index], [field]: value }
     onChange({ ...data, features: newFeatures })
@@ -276,7 +276,7 @@ export function useTourFormHandlers(
   const removeDayImage = (dayIndex: number, imageIndex: number) => {
     const newItinerary = [...data.dailyItinerary]
     newItinerary[dayIndex].images = (newItinerary[dayIndex].images || []).filter(
-      (_: string, i: number) => i !== imageIndex
+      (_, i: number) => i !== imageIndex
     )
     onChange({ ...data, dailyItinerary: newItinerary })
   }

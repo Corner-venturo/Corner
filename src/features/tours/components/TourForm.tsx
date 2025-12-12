@@ -69,14 +69,14 @@ export function TourForm({
   // 過濾可用的行程表（已發布且未關聯旅遊團的）
   const availableItineraries = useMemo(() => {
     return itineraries
-      .filter(i => i.status === 'published' && !i.tour_id && !(i as any)._deleted)
+      .filter(i => i.status === 'published' && !i.tour_id && !(i as { _deleted?: boolean })._deleted)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [itineraries])
 
   // 過濾可用的報價單（標準報價單，未關聯旅遊團的）
   const availableQuotes = useMemo(() => {
     return quotes
-      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as any)._deleted)
+      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as { _deleted?: boolean })._deleted)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [quotes])
 

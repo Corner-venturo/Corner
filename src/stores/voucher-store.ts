@@ -22,7 +22,7 @@ import type { Voucher } from '@/types/accounting-pro.types'
  * ```
  */
 export const useVoucherStore = createStore<Voucher>({
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   tableName: 'vouchers' as any,
   codePrefix: 'V',
   enableSupabase: true,

@@ -113,7 +113,8 @@ export function TourItinerarySection({
   )
 
   // 創建點擊處理函數
-  const handleActivityClick = (activity: any) => {
+  const handleActivityClick = (activity: { title?: string; description?: string; image?: string }) => {
+    if (!activity.title) return
     setSelectedActivity({
       title: activity.title,
       description: activity.description,

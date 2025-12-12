@@ -8,7 +8,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Quote } from '@/types/quote.types'
+import { Quote } from '@/stores/types'
 
 interface QuickQuoteItem {
   id: string
@@ -44,7 +44,8 @@ const getInitialFormData = (): QuickQuoteFormData => ({
 const STORAGE_KEY = 'venturo_quick_quote_draft'
 
 interface UseQuickQuoteFormParams {
-  addQuote: (data: any) => Promise<any>
+   
+  addQuote: (data: any) => Promise<Quote | undefined>
 }
 
 export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
@@ -74,7 +75,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
   // 當 user 載入後，自動填入 handler_name（如果目前是空的）
   useEffect(() => {
     if (user && !formData.handler_name) {
-      const defaultName = user.display_name || user.chinese_name || (user as any).email || ''
+      const defaultName = user.display_name || user.chinese_name || user.email || ''
       setFormData(prev => ({ ...prev, handler_name: defaultName }))
     }
   }, [user, formData.handler_name])
@@ -94,7 +95,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
     const resetData = getInitialFormData()
     // 保留當前登入者的名稱
     if (user) {
-      resetData.handler_name = user.display_name || user.chinese_name || (user as any).email || ''
+      resetData.handler_name = user.display_name || user.chinese_name || user.email || ''
     }
     setFormData(resetData)
     if (typeof window !== 'undefined') {

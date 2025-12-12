@@ -40,16 +40,16 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('manifestation_entries')
+      // TypeScript requires literal table names, but manifestation_entries is not in Database type
+      const { data, error } = await supabase
+        .from('manifestation_entries' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('chapter_number', { ascending: true })
 
       if (error) throw error
 
-      set({ entries: (data as ManifestationEntry[]) || [], isLoading: false })
+      set({ entries: (data as unknown as ManifestationEntry[]) || [], isLoading: false })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '獲取記錄失敗',
@@ -69,9 +69,9 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('manifestation_entries')
+      // TypeScript requires literal table names, but manifestation_entries is not in Database type
+      const { data, error } = await supabase
+        .from('manifestation_entries' as any)
         .select('*')
         .eq('user_id', user.id)
         .eq('chapter_number', chapterNumber)
@@ -84,7 +84,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         throw error
       }
 
-      set({ currentEntry: (data as ManifestationEntry) || null, isLoading: false })
+      set({ currentEntry: (data as unknown as ManifestationEntry) || null, isLoading: false })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '獲取章節記錄失敗',
@@ -111,26 +111,27 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         updated_at: new Date().toISOString(),
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('manifestation_entries')
+      // TypeScript requires literal table names, but manifestation_entries is not in Database type
+      const { data, error } = await supabase
+        .from('manifestation_entries' as any)
         .insert(newEntry)
         .select()
         .single()
 
       if (error) throw error
 
+      const result = data as unknown as ManifestationEntry
       // 更新本地狀態
       set(state => ({
-        entries: [...state.entries, data as ManifestationEntry],
-        currentEntry: data as ManifestationEntry,
+        entries: [...state.entries, result],
+        currentEntry: result,
         isLoading: false,
       }))
 
       // 重新獲取進度
       get().fetchProgress()
 
-      return data
+      return result
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '創建記錄失敗',
@@ -145,9 +146,9 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('manifestation_entries')
+      // TypeScript requires literal table names, but manifestation_entries is not in Database type
+      const { data, error } = await supabase
+        .from('manifestation_entries' as any)
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
@@ -158,10 +159,11 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
 
       if (error) throw error
 
+      const result = data as unknown as ManifestationEntry
       // 更新本地狀態
       set(state => ({
-        entries: state.entries.map(e => (e.id === id ? data as ManifestationEntry : e)),
-        currentEntry: state.currentEntry?.id === id ? data as ManifestationEntry : state.currentEntry,
+        entries: state.entries.map(e => (e.id === id ? result : e)),
+        currentEntry: state.currentEntry?.id === id ? result : state.currentEntry,
         isLoading: false,
       }))
 
@@ -185,8 +187,8 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any).from('manifestation_entries').delete().eq('id', id)
+      // TypeScript requires literal table names, but manifestation_entries is not in Database type
+      const { error } = await supabase.from('manifestation_entries' as any).delete().eq('id', id)
 
       if (error) throw error
 
@@ -216,9 +218,9 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     if (!user) return
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('manifestation_user_progress')
+      // TypeScript requires literal table names, but manifestation_user_progress is not in Database type
+      const { data, error } = await supabase
+        .from('manifestation_user_progress' as any)
         .select('*')
         .eq('user_id', user.id)
         .single()

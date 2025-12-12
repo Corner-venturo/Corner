@@ -71,6 +71,7 @@ export function CreateLinkPayDialog({
       const { data } = await response.json()
 
       // 儲存 LinkPay 記錄到資料庫
+       
       await createLinkPayLog({
         receipt_id: receipt.id,
         linkpay_order_number: data.linkpay_order_number,
@@ -79,6 +80,7 @@ export function CreateLinkPayDialog({
         link: data.link,
         end_date: data.end_date,
       } as any)
+       
 
       void alert('LinkPay 付款連結已建立！', 'success')
       onClose()

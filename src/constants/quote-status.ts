@@ -5,27 +5,27 @@
 
 import type { Quote } from '@/stores/types'
 
+type QuoteStatus = Quote['status']
+
 // 報價單狀態對照
-export const QUOTE_STATUS_LABELS = {
+export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   draft: '草稿',
   proposed: '提案',
   revised: '修改中',
   approved: '已核准',
   converted: '已轉單',
   rejected: '已拒絕',
-  billed: '已請款',
-} as any
+}
 
 // 報價單狀態顏色
-export const QUOTE_STATUS_COLORS = {
+export const QUOTE_STATUS_COLORS: Record<QuoteStatus, string> = {
   draft: 'bg-morandi-secondary text-white',
   proposed: 'bg-morandi-gold text-white',
   revised: 'bg-blue-500 text-white',
   approved: 'bg-morandi-green text-white',
   converted: 'bg-morandi-primary text-white',
   rejected: 'bg-morandi-red text-white',
-  billed: 'bg-purple-500 text-white',
-} as any
+}
 
 // 狀態篩選選項
 export const QUOTE_STATUS_FILTERS = [

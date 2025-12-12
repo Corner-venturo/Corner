@@ -54,8 +54,17 @@ interface LocalTourData {
   country: string
   city: string
   status: string
-  dailyItinerary: any[]
-  [key: string]: any
+  dailyItinerary: Array<{
+    isAlternative?: boolean
+    meals?: { breakfast?: string; lunch?: string; dinner?: string }
+    hotel?: string
+    accommodation?: string
+    activities?: Array<{ title?: string; name?: string; description?: string }>
+    note?: string
+    description?: string
+  }>
+   
+  [key: string]: any // 允許額外屬性
 }
 
 interface CreateQuoteFromItineraryButtonProps {
@@ -127,8 +136,11 @@ const extractActivitiesFromItinerary = (tourData: LocalTourData) => {
 
     mainItinerary.forEach((day, index) => {
       if (day.activities) {
-        day.activities.forEach((activity: { title: string; description?: string }) => {
-          activities.push({ day: index + 1, title: activity.title, description: activity.description })
+        day.activities.forEach((activity) => {
+          const title = activity.title || activity.name || ''
+          if (title) {
+            activities.push({ day: index + 1, title, description: activity.description })
+          }
         })
       }
     })
@@ -475,9 +487,9 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
     try {
       setIsLoading(true)
       await update(quoteId, {
-        itinerary_id: null, // 清除新欄位
-        tour_id: null, // 同時清除舊欄位（向後相容）
-        tour_code: null,
+        itinerary_id: undefined, // 清除新欄位
+        tour_id: undefined, // 同時清除舊欄位（向後相容）
+        tour_code: undefined,
       })
       // 重新載入
       await fetchAll()

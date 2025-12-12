@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type { MessageAttachment } from '@/stores/workspace-store'
+import type { Message } from '@/stores/workspace/types'
 
 export function useMessageOperations() {
   const { sendMessage, updateMessageReactions, deleteMessage } = useWorkspaceChat()
@@ -30,7 +31,7 @@ export function useMessageOperations() {
   )
 
   const handleReaction = useCallback(
-    async (messageId: string, emoji: string, messages: any[]) => {
+    async (messageId: string, emoji: string, messages: Message[]) => {
       if (!user) return
 
       const message = messages.find(m => m.id === messageId)

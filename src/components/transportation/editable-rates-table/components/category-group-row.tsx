@@ -34,7 +34,7 @@ interface CategoryGroupRowProps {
   setIsAdding: (isAdding: boolean) => void
   setNewRow: (row: Partial<TransportationRate>) => void
   handleItemDragEnd: (categoryKey: string, event: DragEndEvent) => Promise<void>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   sensors: SensorDescriptor<any>[]
 }
 

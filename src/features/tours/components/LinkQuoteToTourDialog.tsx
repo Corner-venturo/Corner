@@ -47,13 +47,13 @@ export function LinkQuoteToTourDialog({
 
   // 已關聯此旅遊團的報價單
   const linkedQuotes = useMemo(() => {
-    return quotes.filter(q => q.tour_id === tour.id && !(q as any)._deleted)
+    return quotes.filter(q => q.tour_id === tour.id && !(q as { _deleted?: boolean })._deleted)
   }, [quotes, tour.id])
 
   // 未關聯任何旅遊團的報價單（可用於連結）
   const availableQuotes = useMemo(() => {
     return quotes
-      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as any)._deleted)
+      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as { _deleted?: boolean })._deleted)
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }, [quotes])
 
@@ -64,6 +64,7 @@ export function LinkQuoteToTourDialog({
 
       const code = generateCode('TP', { quoteType: 'standard' }, quotes)
 
+       
       const newQuote = await create({
         code,
         name: tour.name,
@@ -73,6 +74,7 @@ export function LinkQuoteToTourDialog({
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
       } as any)
+       
 
       if (newQuote?.id) {
         onClose()

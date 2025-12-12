@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
-import { Quote } from '@/types/quote.types'
+import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
 
 // 版本圖示
@@ -43,11 +43,12 @@ function HistoryIcon({ size, className }: { size: number; className?: string }) 
   )
 }
 
-interface QuoteWithCategories extends Quote {
+// 使用 CostCategory 而非 QuoteCategory，因為編輯器使用 CostCategory
+type QuoteWithCategories = Omit<StoreQuote, 'categories'> & {
   categories?: CostCategory[]
 }
 
-interface QuoteWithVersions extends Omit<Quote, 'versions'> {
+type QuoteWithVersions = Omit<StoreQuote, 'versions' | 'categories'> & {
   versions?: VersionRecord[]
   current_version_index?: number
   categories?: CostCategory[]

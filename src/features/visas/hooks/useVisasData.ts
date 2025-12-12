@@ -43,7 +43,7 @@ export function useVisasData() {
       if (order_id && applicant_name) {
         const memberToDelete = members.find(
           m => m.order_id === order_id &&
-               (m.chinese_name === applicant_name || m.name === applicant_name)
+               ((m as typeof m & { chinese_name?: string }).chinese_name === applicant_name || m.name === applicant_name)
         )
         if (memberToDelete) {
           await deleteMember(memberToDelete.id)

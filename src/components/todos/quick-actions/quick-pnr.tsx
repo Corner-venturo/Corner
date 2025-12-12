@@ -287,7 +287,7 @@ AP TPE 02-2712-8888`}
       {!parsedData && (
         <Button
           onClick={handleParse}
-          disabled={isParsing || !rawPNR.trim() || (validation && !validation.isValid)}
+          disabled={isParsing || !rawPNR.trim() || !!(validation && !validation.isValid)}
           className={`w-full shadow-md h-9 text-xs transition-colors ${
             validation?.isValid 
               ? 'bg-morandi-success hover:bg-morandi-success/90'

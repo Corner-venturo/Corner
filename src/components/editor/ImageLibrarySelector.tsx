@@ -65,7 +65,7 @@ export function ImageLibrarySelector({
       const { data, error } = await supabase
         .from('image_library')
         .select('id, name, public_url, category, tags, created_at')
-        .eq('workspace_id', workspaceId)
+        .eq('workspace_id', workspaceId ?? '')
         .eq('category', category)
         .order('created_at', { ascending: false })
         .limit(50)
@@ -76,7 +76,11 @@ export function ImageLibrarySelector({
         return
       }
 
-      setImages(data || [])
+      setImages((data || []).map(item => ({
+        ...item,
+        category: item.category ?? '',
+        tags: item.tags ?? []
+      })))
     } catch (error) {
       console.error('載入圖庫錯誤:', error)
       toast.error('載入圖庫發生錯誤')

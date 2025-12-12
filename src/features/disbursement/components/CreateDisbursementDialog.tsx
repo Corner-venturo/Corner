@@ -178,15 +178,15 @@ export function CreateDisbursementDialog({
       const orderNumber = await generateDisbursementNumber(disbursement_orders)
 
       // 直接使用 Supabase 建立出納單（繞過 store 的 workspace_id 檢查）
-      const { data, error } = await supabase
+       
+      const { data, error } = await (supabase as any)
         .from('disbursement_orders')
         .insert({
-          order_number: orderNumber,
-          disbursement_date: disbursementDate,
-          payment_request_ids: selectedRequestIds,
-          total_amount: selectedAmount,
+          id: crypto.randomUUID(),
+          code: orderNumber,
+          amount: selectedAmount,
           status: 'pending',
-          created_by: user.id,
+          created_by: user?.id || null,
           workspace_id: user?.workspace_id || null,
         })
         .select()

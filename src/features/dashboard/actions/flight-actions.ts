@@ -48,6 +48,27 @@ export interface AirportFlightItem {
   gate?: string
 }
 
+// API 回傳的航班資料格式
+interface ApiFlightData {
+  number?: string
+  airline?: { iata?: string; name?: string }
+  departure?: {
+    airport?: { iata?: string; name?: string }
+    scheduledTime?: { local?: string; utc?: string }
+    revisedTime?: { local?: string; utc?: string }
+    terminal?: string
+    gate?: string
+  }
+  arrival?: {
+    airport?: { iata?: string; name?: string }
+    scheduledTime?: { local?: string; utc?: string }
+    revisedTime?: { local?: string; utc?: string }
+    terminal?: string
+    gate?: string
+  }
+  status?: string
+}
+
 /**
  * 取得 AeroDataBox API Key
  */
@@ -387,7 +408,7 @@ export async function searchAirportDeparturesAction(
     const departures = apiData.departures || []
 
     // 轉換資料格式
-    let flights: AirportFlightItem[] = departures.map((flight: any) => {
+    let flights: AirportFlightItem[] = departures.map((flight: ApiFlightData) => {
       const depTime = flight.departure?.scheduledTime?.local || flight.departure?.scheduledTime?.utc
       const estTime = flight.departure?.revisedTime?.local || flight.departure?.revisedTime?.utc
       const airlineCode = flight.airline?.iata || ''
@@ -478,7 +499,7 @@ export async function searchAirportArrivalsAction(
     const apiData = await response.json()
     const arrivals = apiData.arrivals || []
 
-    let flights: AirportFlightItem[] = arrivals.map((flight: any) => {
+    let flights: AirportFlightItem[] = arrivals.map((flight: ApiFlightData) => {
       const arrTime = flight.arrival?.scheduledTime?.local || flight.arrival?.scheduledTime?.utc
       const estTime = flight.arrival?.revisedTime?.local || flight.arrival?.revisedTime?.utc
       const airlineCode = flight.airline?.iata || ''

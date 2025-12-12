@@ -14,9 +14,9 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 }
-// eslint-disable-next-line no-undef
+ 
 ;(global as any).localStorage = localStorageMock
 
 // Mock IndexedDB
-// eslint-disable-next-line no-undef
+ 
 ;(global as any).indexedDB = {}
