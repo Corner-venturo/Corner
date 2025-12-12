@@ -166,19 +166,19 @@ export function createCloudHook<T extends BaseEntity>(
       let generatedCode: string | undefined
       if (codePrefix && !dataRecord.code) {
         // 從資料庫查詢最大 code，確保唯一性
-        const { data: maxCodeResult } = await supabase
+        // 注意：不使用 .single()，因為空結果會導致錯誤
+        const { data: maxCodeResults } = await supabase
           .from(tableName)
           .select('code')
           .like('code', `${codePrefix}%`)
           .order('code', { ascending: false })
           .limit(1)
-          .single()
 
         let nextNumber = 1
-        const codeResult = maxCodeResult as { code?: string } | null
-        if (codeResult?.code) {
+        const codeResults = maxCodeResults as Array<{ code?: string }> | null
+        if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
           // 提取數字部分，例如 'C000032' -> 32
-          const numericPart = codeResult.code.replace(codePrefix, '')
+          const numericPart = codeResults[0].code.replace(codePrefix, '')
           const currentMax = parseInt(numericPart, 10)
           if (!isNaN(currentMax)) {
             nextNumber = currentMax + 1
