@@ -189,8 +189,9 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           versions: updatedVersions,
         })
       } else if (existingVersions.length === 0) {
-        // 第一次儲存：自動建立版本 1，版本名稱使用客戶名稱
-        const versionName = formData.customer_name || '版本 1'
+        // 第一次儲存：自動建立版本 1
+        // 優先使用行程代號（從旅遊團轉過來），其次客戶名稱，最後預設「版本 1」
+        const versionName = formData.tour_code || formData.customer_name || '版本 1'
         const firstVersion = prepareVersionData(1, versionName)
 
         await onUpdate({
