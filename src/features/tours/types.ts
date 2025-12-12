@@ -14,6 +14,7 @@ export interface NewTourData {
   isSpecial: boolean
   max_participants: number
   description?: string
+  enable_checkin?: boolean // 是否開啟報到功能
 }
 
 export interface TourExtraFields {

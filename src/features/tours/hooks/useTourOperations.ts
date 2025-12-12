@@ -117,6 +117,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
             price: newTour.price,
             max_participants: newTour.max_participants,
             description: newTour.description,
+            enable_checkin: newTour.enable_checkin || false,
           }
 
           await actions.update(dialogData.id, tourData)
@@ -151,6 +152,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
           profit: 0,
           current_participants: 0,
           quote_id: fromQuoteId || undefined,
+          enable_checkin: newTour.enable_checkin || false,
         }
 
         const createdTour = await actions.create(tourData)

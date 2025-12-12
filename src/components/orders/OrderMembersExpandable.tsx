@@ -1107,6 +1107,9 @@ export function OrderMembersExpandable({
                   特殊餐食
                 </th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
+                  訂房代號
+                </th>
+                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   應付金額
                 </th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
@@ -1229,6 +1232,27 @@ export function OrderMembersExpandable({
                       data-field="special_meal"
                       className="w-full bg-transparent text-xs"
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                    />
+                  </td>
+
+                  {/* 訂房代號 */}
+                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+                    <input
+                      type="text"
+                      value={member.hotel_confirmation || ''}
+                      onChange={e => updateField(member.id, 'hotel_confirmation', e.target.value)}
+                      onCompositionStart={() => setIsComposing(true)}
+                      onCompositionEnd={(e) => {
+                        setIsComposing(false)
+                        setTimeout(() => {
+                          updateField(member.id, 'hotel_confirmation', e.currentTarget.value)
+                        }, 0)
+                      }}
+                      data-member={member.id}
+                      data-field="hotel_confirmation"
+                      className="w-full bg-transparent text-xs font-mono"
+                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      placeholder="輸入訂房代號"
                     />
                   </td>
 

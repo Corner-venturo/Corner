@@ -359,12 +359,16 @@ export default function ItineraryPage() {
         key: 'days',
         label: '天數',
         sortable: true,
-        render: (_value, itinerary) => (
-          <span className="text-sm text-morandi-secondary">
-            {itinerary.daily_itinerary?.length || 0} 天{' '}
-            {Math.max(0, (itinerary.daily_itinerary?.length || 0) - 1)} 夜
-          </span>
-        ),
+        render: (_value, itinerary) => {
+          // 排除備案，只計算主行程天數
+          const dailyItinerary = itinerary.daily_itinerary as Array<{ isAlternative?: boolean }> | undefined
+          const mainDays = dailyItinerary?.filter(d => !d.isAlternative).length || 0
+          return (
+            <span className="text-sm text-morandi-secondary">
+              {mainDays} 天 {Math.max(0, mainDays - 1)} 夜
+            </span>
+          )
+        },
       },
       {
         key: 'status',
