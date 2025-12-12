@@ -275,6 +275,41 @@ export const useQuoteState = () => {
     }
   }, [quote, quotes.length, router])
 
+  // 追蹤是否已經自動儲存過行程匯入的資料
+  const hasAutoSavedImportedData = useRef(false)
+
+  // 自動儲存從行程表匯入的資料（非新建版本模式）
+  // 這確保切換快速/團體模式時資料不會丟失
+  useEffect(() => {
+    if (
+      isFromItinerary &&
+      !shouldCreateNewVersion &&
+      quote &&
+      hasImportedFromItinerary.current &&
+      !hasAutoSavedImportedData.current &&
+      (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)
+    ) {
+      hasAutoSavedImportedData.current = true
+      console.log('[useQuoteState] 自動儲存從行程匯入的資料')
+
+      // 儲存匯入的資料到資料庫
+      updateQuote(quote.id, {
+        categories: categories,
+        accommodation_days: hotelsData.length > 0 ? Math.max(accommodationDays, hotelsData.length) : accommodationDays,
+      }).then(() => {
+        console.log('[useQuoteState] 行程資料已自動儲存')
+        // 清除 URL 參數
+        const url = new URL(window.location.href)
+        url.searchParams.delete('from_itinerary')
+        url.searchParams.delete('meals')
+        url.searchParams.delete('hotels')
+        url.searchParams.delete('activities')
+        url.searchParams.delete('link_itinerary')
+        window.history.replaceState({}, '', url.pathname)
+      })
+    }
+  }, [isFromItinerary, shouldCreateNewVersion, quote, categories, mealsData, hotelsData, activitiesData, accommodationDays, updateQuote])
+
   // 自動建立新版本（從行程頁面帶入資料時）
   useEffect(() => {
     if (
