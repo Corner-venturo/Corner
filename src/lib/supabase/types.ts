@@ -3408,6 +3408,9 @@ export type Database = {
           hotel_2_checkin: string | null
           hotel_2_checkout: string | null
           hotel_2_name: string | null
+          hotel_confirmation: string | null
+          checked_in: boolean | null
+          checked_in_at: string | null
           id: string
           id_number: string | null
           identity: string | null
@@ -3448,6 +3451,9 @@ export type Database = {
           hotel_2_checkin?: string | null
           hotel_2_checkout?: string | null
           hotel_2_name?: string | null
+          hotel_confirmation?: string | null
+          checked_in?: boolean | null
+          checked_in_at?: string | null
           id?: string
           id_number?: string | null
           identity?: string | null
@@ -3488,6 +3494,9 @@ export type Database = {
           hotel_2_checkin?: string | null
           hotel_2_checkout?: string | null
           hotel_2_name?: string | null
+          hotel_confirmation?: string | null
+          checked_in?: boolean | null
+          checked_in_at?: string | null
           id?: string
           id_number?: string | null
           identity?: string | null
@@ -6294,6 +6303,8 @@ export type Database = {
           closed_by: string | null
           closing_date: string | null
           closing_status: string | null
+          enable_checkin: boolean | null
+          checkin_qrcode: string | null
           code: string
           contract_archived_date: string | null
           contract_completed: boolean | null
@@ -6336,6 +6347,8 @@ export type Database = {
           closed_by?: string | null
           closing_date?: string | null
           closing_status?: string | null
+          enable_checkin?: boolean | null
+          checkin_qrcode?: string | null
           code: string
           contract_archived_date?: string | null
           contract_completed?: boolean | null
@@ -6378,6 +6391,8 @@ export type Database = {
           closed_by?: string | null
           closing_date?: string | null
           closing_status?: string | null
+          enable_checkin?: boolean | null
+          checkin_qrcode?: string | null
           code?: string
           contract_archived_date?: string | null
           contract_completed?: boolean | null

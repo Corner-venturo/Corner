@@ -33,6 +33,9 @@ interface OrderMember {
   hotel_2_name?: string | null
   hotel_2_checkin?: string | null
   hotel_2_checkout?: string | null
+  hotel_confirmation?: string | null
+  checked_in?: boolean | null
+  checked_in_at?: string | null
   transport_cost?: number | null
   misc_cost?: number | null
   total_payable?: number | null

@@ -203,7 +203,12 @@ export interface Member {
   hotel_2_name: string | null
   hotel_2_checkin: string | null
   hotel_2_checkout: string | null
+  hotel_confirmation: string | null // 訂房確認代號
   assigned_room?: string // 向下相容
+
+  // 報到資訊
+  checked_in: boolean | null // 是否已報到
+  checked_in_at: string | null // 報到時間
 
   // 財務資訊
   cost_price: number | null // 成本價

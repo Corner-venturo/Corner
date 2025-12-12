@@ -38,10 +38,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
   useEffect(() => {
     const fetchCompanyLogo = async () => {
       try {
+        // 查詢 file_path 包含 logos/ 的資產（公司 LOGO 存放在 logos/ 資料夾）
         const { data: assets, error } = await supabase
           .from('company_assets')
           .select('file_path')
-          .eq('category', 'logos')
+          .like('file_path', 'logos/%')
           .limit(1)
           .single()
 

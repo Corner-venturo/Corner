@@ -49,6 +49,10 @@ export interface Tour extends BaseEntity {
   closing_date?: string | null // 結團日期
   closed_by?: string | null // 結團操作人員 ID
 
+  // 報到功能欄位
+  enable_checkin?: boolean | null // 是否開啟報到功能
+  checkin_qrcode?: string | null // 團體報到 QR Code 內容
+
   // 同步欄位
   _deleted?: boolean | null // 軟刪除標記
   _needs_sync?: boolean | null // 需要同步
