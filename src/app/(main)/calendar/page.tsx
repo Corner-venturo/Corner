@@ -1,9 +1,16 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import { Plus, Building2 } from 'lucide-react'
 import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   CalendarGrid,
   CalendarStyles,
@@ -22,7 +29,13 @@ import {
 export default function CalendarPage() {
 
   // Custom hooks for calendar logic
-  const { filteredEvents } = useCalendarEvents()
+  const {
+    filteredEvents,
+    isSuperAdmin,
+    workspaces,
+    selectedWorkspaceId,
+    onWorkspaceFilterChange,
+  } = useCalendarEvents()
   const { calendarRef, handlePrevMonth, handleNextMonth, handleToday, getCurrentMonthYear } =
     useCalendarNavigation()
 
@@ -95,6 +108,27 @@ export default function CalendarPage() {
               >
                 今天
               </Button>
+
+              {/* 超級管理員專用：Workspace 篩選器 */}
+              {isSuperAdmin && workspaces && workspaces.length > 0 && (
+                <Select
+                  value={selectedWorkspaceId || 'all'}
+                  onValueChange={(value) => onWorkspaceFilterChange(value === 'all' ? null : value)}
+                >
+                  <SelectTrigger className="h-9 w-[140px] border-morandi-blue/30 bg-card">
+                    <Building2 size={14} className="mr-1.5 text-morandi-blue" />
+                    <SelectValue placeholder="全部分公司" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部分公司</SelectItem>
+                    {workspaces.map((ws: { id: string; name: string }) => (
+                      <SelectItem key={ws.id} value={ws.id}>
+                        {ws.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
 
               <CalendarSettingsDialog />
 

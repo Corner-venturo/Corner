@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useEffect, useRef } from 'react'
+import { useMemo, useCallback, useEffect, useRef, useState } from 'react'
 import {
   useTourStore,
   useOrderStore,
@@ -8,11 +8,25 @@ import {
   useCalendarEventStore,
   useAuthStore,
   useEmployeeStore,
+  useWorkspaceStore,
 } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
+
+// 定義 CalendarEvent 類型（從 store 推斷）
+interface CalendarEvent {
+  id: string
+  title: string
+  start: string
+  end?: string
+  all_day?: boolean
+  visibility?: 'personal' | 'company'
+  description?: string
+  created_by?: string
+  workspace_id?: string
+}
 
 // 從 ISO 時間字串取得顯示用的時間（HH:MM）
 // 正確轉換成台灣時區顯示
@@ -51,6 +65,20 @@ export function useCalendarEvents() {
   const { items: calendarEvents, fetchAll: fetchCalendarEvents } = useCalendarEventStore()
   const { user } = useAuthStore()
   const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
+  const { workspaces, loadWorkspaces } = useWorkspaceStore()
+
+  // Workspace 篩選狀態（只有超級管理員能用）
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null)
+  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+
+  // 初始化時從 localStorage 讀取篩選狀態
+  useEffect(() => {
+    if (isSuperAdmin) {
+      const saved = localStorage.getItem('calendar_workspace_filter')
+      setSelectedWorkspaceId(saved)
+      loadWorkspaces()
+    }
+  }, [isSuperAdmin, loadWorkspaces])
 
   // 確保資料已載入
   const initializedRef = useRef(false)
@@ -175,7 +203,14 @@ export function useCalendarEvents() {
   // 轉換公司事項為日曆事件
   const companyCalendarEvents: FullCalendarEvent[] = useMemo(() => {
     return (calendarEvents || [])
-      .filter(event => event.visibility === 'company')
+      .filter(event => {
+        if (event.visibility !== 'company') return false
+        // 超級管理員且有選擇特定 workspace，則只顯示該 workspace 的事項
+        if (isSuperAdmin && selectedWorkspaceId) {
+          return (event as CalendarEvent).workspace_id === selectedWorkspaceId
+        }
+        return true
+      })
       .map(event => {
         const color = getEventColor('company')
 
@@ -302,8 +337,23 @@ export function useCalendarEvents() {
     })
   }, [allEvents, settings])
 
+  // 切換 workspace 篩選
+  const handleWorkspaceFilterChange = useCallback((workspaceId: string | null) => {
+    setSelectedWorkspaceId(workspaceId)
+    if (workspaceId) {
+      localStorage.setItem('calendar_workspace_filter', workspaceId)
+    } else {
+      localStorage.removeItem('calendar_workspace_filter')
+    }
+  }, [])
+
   return {
     filteredEvents,
     allEvents,
+    // Workspace 篩選相關（只有超級管理員可用）
+    isSuperAdmin,
+    workspaces,
+    selectedWorkspaceId,
+    onWorkspaceFilterChange: handleWorkspaceFilterChange,
   }
 }
