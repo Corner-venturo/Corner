@@ -3,9 +3,9 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Hash, Lock, Check } from 'lucide-react'
+import { Hash, Lock, Check, Globe, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useEmployeeStore } from '@/stores'
+import { useEmployeeStore, useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 
 interface CreateChannelDialogProps {
@@ -13,10 +13,12 @@ interface CreateChannelDialogProps {
   channelName: string
   channelDescription: string
   channelType: 'public' | 'private'
+  channelScope?: 'workspace' | 'company_wide' // 新增：頻道範圍
   selectedMembers: string[] // 新增：選中的成員 ID
   onChannelNameChange: (name: string) => void
   onChannelDescriptionChange: (desc: string) => void
   onChannelTypeChange: (type: 'public' | 'private') => void
+  onChannelScopeChange?: (scope: 'workspace' | 'company_wide') => void // 新增：範圍變更回調
   onMembersChange: (members: string[]) => void // 新增：成員變更回調
   onClose: () => void
   onCreate: () => void
@@ -27,26 +29,46 @@ export function CreateChannelDialog({
   channelName,
   channelDescription,
   channelType,
+  channelScope = 'workspace',
   selectedMembers,
   onChannelNameChange,
   onChannelDescriptionChange,
   onChannelTypeChange,
+  onChannelScopeChange,
   onMembersChange,
   onClose,
   onCreate,
 }: CreateChannelDialogProps) {
   const { user } = useAuthStore()
   const employees = useEmployeeStore(state => state.items)
+  const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
-  // 載入員工列表
+  // 檢查是否為超級管理員
+  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+
+  // 載入員工列表和工作空間
   useEffect(() => {
-    if (isOpen && employees.length === 0) {
-      useEmployeeStore.getState().fetchAll()
+    if (isOpen) {
+      if (employees.length === 0) {
+        useEmployeeStore.getState().fetchAll()
+      }
+      if (isSuperAdmin && workspaces.length === 0) {
+        loadWorkspaces()
+      }
     }
-  }, [isOpen, employees.length])
+  }, [isOpen, employees.length, isSuperAdmin, workspaces.length, loadWorkspaces])
 
-  // 當前 workspace 的員工
-  const workspaceEmployees = employees.filter(emp => (emp as unknown as { workspace_id?: string }).workspace_id === user?.workspace_id)
+  // 根據範圍顯示員工列表
+  const displayEmployees = channelScope === 'company_wide'
+    ? employees // 全集團：顯示所有員工
+    : employees.filter(emp => (emp as unknown as { workspace_id?: string }).workspace_id === user?.workspace_id)
+
+  // 取得員工所屬的 workspace 名稱
+  const getWorkspaceName = (workspaceId: string | undefined) => {
+    if (!workspaceId) return ''
+    const ws = workspaces.find(w => w.id === workspaceId)
+    return ws?.name || ''
+  }
 
   // 切換成員選擇
   const toggleMember = (employeeId: string) => {
@@ -131,15 +153,70 @@ export function CreateChannelDialog({
             </p>
           </div>
 
+          {/* 超級管理員專用：頻道範圍選擇 */}
+          {isSuperAdmin && onChannelScopeChange && (
+            <div>
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
+                頻道範圍
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChannelScopeChange('workspace')
+                    // 切換範圍時清空已選成員（除了自己）
+                    onMembersChange([user?.id || ''])
+                  }}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-colors',
+                    channelScope === 'workspace'
+                      ? 'bg-morandi-blue/10 border-morandi-blue text-morandi-primary'
+                      : 'border-morandi-blue/20 text-morandi-secondary hover:bg-morandi-secondary/5'
+                  )}
+                >
+                  <Building2 size={16} />
+                  <span className="text-sm">分公司</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChannelScopeChange('company_wide')
+                    // 切換範圍時清空已選成員（除了自己）
+                    onMembersChange([user?.id || ''])
+                  }}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-colors',
+                    channelScope === 'company_wide'
+                      ? 'bg-morandi-blue/10 border-morandi-blue text-morandi-primary'
+                      : 'border-morandi-blue/20 text-morandi-secondary hover:bg-morandi-secondary/5'
+                  )}
+                >
+                  <Globe size={16} />
+                  <span className="text-sm">全集團</span>
+                </button>
+              </div>
+              <p className="text-xs text-morandi-secondary mt-1">
+                {channelScope === 'workspace'
+                  ? '只能邀請同分公司的成員'
+                  : '可以邀請所有分公司的成員'}
+              </p>
+            </div>
+          )}
+
           {/* 成員選擇 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
               邀請成員
+              {channelScope === 'company_wide' && (
+                <span className="ml-2 text-xs text-morandi-blue">(全集團)</span>
+              )}
             </label>
             <div className="space-y-1 max-h-48 overflow-y-auto border border-morandi-gold/20 rounded-lg p-2">
-              {workspaceEmployees.map(employee => {
+              {displayEmployees.map(employee => {
                 const isCreator = employee.id === user?.id
                 const isSelected = selectedMembers.includes(employee.id)
+                const empWorkspaceId = (employee as unknown as { workspace_id?: string }).workspace_id
+                const workspaceName = channelScope === 'company_wide' ? getWorkspaceName(empWorkspaceId) : ''
 
                 return (
                   <button
@@ -168,6 +245,9 @@ export function CreateChannelDialog({
                     <span className="flex-1">
                       {employee.chinese_name || employee.display_name || employee.email}
                       {isCreator && <span className="text-xs ml-2">(建立者)</span>}
+                      {workspaceName && (
+                        <span className="text-xs ml-2 text-morandi-blue">({workspaceName})</span>
+                      )}
                     </span>
                   </button>
                 )

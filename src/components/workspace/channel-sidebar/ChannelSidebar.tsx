@@ -90,6 +90,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     setNewChannelDescription,
     newChannelType,
     setNewChannelType,
+    newChannelScope,
+    setNewChannelScope,
     selectedMembers,
     setSelectedMembers,
     resetCreateChannelDialog,
@@ -444,14 +446,15 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     }
 
     try {
-      // 建立頻道（統一為 private，只有被邀請的人看得到）
+      // 建立頻道
       const newChannel = await createChannel({
         workspace_id: currentWorkspace.id,
         name: newChannelName.trim(),
         description: newChannelDescription.trim() || undefined,
-        type: newChannelType, // 使用使用者選擇的類型
+        type: newChannelType,
+        scope: newChannelScope, // 全集團或分公司
         created_by: user.id,
-      })
+      } as Parameters<typeof createChannel>[0])
 
       // 🔥 批次加入選中的成員
       if (newChannel?.id) {
@@ -554,10 +557,12 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         channelName={newChannelName}
         channelDescription={newChannelDescription}
         channelType={newChannelType}
+        channelScope={newChannelScope}
         selectedMembers={selectedMembers}
         onChannelNameChange={setNewChannelName}
         onChannelDescriptionChange={setNewChannelDescription}
         onChannelTypeChange={setNewChannelType}
+        onChannelScopeChange={setNewChannelScope}
         onMembersChange={setSelectedMembers}
         onClose={resetCreateChannelDialog}
         onCreate={handleCreateChannel}

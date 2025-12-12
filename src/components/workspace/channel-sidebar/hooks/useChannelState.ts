@@ -29,6 +29,7 @@ export function useChannelState() {
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelDescription, setNewChannelDescription] = useState('')
   const [newChannelType, setNewChannelType] = useState<'public' | 'private'>('public')
+  const [newChannelScope, setNewChannelScope] = useState<'workspace' | 'company_wide'>('workspace')
   const [selectedMembers, setSelectedMembers] = useState<string[]>([])
 
   // Edit channel dialog state
@@ -43,6 +44,7 @@ export function useChannelState() {
     setNewChannelName('')
     setNewChannelDescription('')
     setNewChannelType('public')
+    setNewChannelScope('workspace')
     setSelectedMembers([])
   }, [])
 
@@ -134,6 +136,8 @@ export function useChannelState() {
     setNewChannelDescription,
     newChannelType,
     setNewChannelType,
+    newChannelScope,
+    setNewChannelScope,
     selectedMembers,
     setSelectedMembers,
     resetCreateChannelDialog,
