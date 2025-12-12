@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { useItineraries, useEmployees } from '@/hooks/cloud-hooks'
 import { useRegionsStore } from '@/stores/region-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 
@@ -26,9 +27,20 @@ export default function ItineraryPage() {
   const { items: itineraries, delete: deleteItinerary, update: updateItinerary, create: createItinerary } = useItineraries()
   const { items: employees } = useEmployees()
   const { user } = useAuthStore()
+  const { workspaces, loadWorkspaces } = useWorkspaceStore()
   const regionsStore = useRegionsStore()
   const countries = regionsStore.countries
   const cities = regionsStore.cities
+
+  // 檢查是否為超級管理員
+  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+
+  // 超級管理員載入 workspaces
+  useEffect(() => {
+    if (isSuperAdmin && workspaces.length === 0) {
+      loadWorkspaces()
+    }
+  }, [isSuperAdmin, workspaces.length, loadWorkspaces])
 
   // 所有 useState hooks 集中在一起
   const [statusFilter, setStatusFilter] = useState<string>('全部')
@@ -634,6 +646,14 @@ export default function ItineraryPage() {
       filtered = filtered.filter(item => item.created_by === effectiveAuthorFilter)
     }
 
+    // 超級管理員：分公司篩選
+    if (isSuperAdmin) {
+      const workspaceFilter = typeof window !== 'undefined' ? localStorage.getItem('itinerary_workspace_filter') : null
+      if (workspaceFilter && workspaceFilter !== 'all') {
+        filtered = filtered.filter(item => (item as Itinerary & { workspace_id?: string }).workspace_id === workspaceFilter)
+      }
+    }
+
     // 搜尋 - 搜尋所有文字欄位
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase()
@@ -649,7 +669,7 @@ export default function ItineraryPage() {
     }
 
     return filtered
-  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id])
+  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id, isSuperAdmin])
 
   return (
     <div className="h-full flex flex-col">
@@ -692,7 +712,12 @@ export default function ItineraryPage() {
               <option value="">我的行程</option>
               <option value="all">全部作者</option>
               {employees
-                .filter(emp => itineraries.some(it => it.created_by === emp.id))
+                .filter(emp =>
+                  // 排除當前使用者（已有「我的行程」選項）
+                  emp.id !== user?.id &&
+                  // 只顯示有建立過行程的員工
+                  itineraries.some(it => it.created_by === emp.id)
+                )
                 .map(emp => (
                   <option key={emp.id} value={emp.id}>
                     {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
@@ -700,6 +725,35 @@ export default function ItineraryPage() {
                 ))}
             </select>
           </div>
+
+          {/* 超級管理員專用：分公司篩選 */}
+          {isSuperAdmin && workspaces.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Building2 size={14} className="text-morandi-blue" />
+              <span className="text-sm text-morandi-secondary">分公司：</span>
+              <select
+                value={localStorage.getItem('itinerary_workspace_filter') || 'all'}
+                onChange={e => {
+                  const value = e.target.value
+                  if (value === 'all') {
+                    localStorage.removeItem('itinerary_workspace_filter')
+                  } else {
+                    localStorage.setItem('itinerary_workspace_filter', value)
+                  }
+                  // 重新整理頁面以套用篩選
+                  window.location.reload()
+                }}
+                className="px-3 py-1 text-sm rounded-lg border border-morandi-blue/30 bg-white text-morandi-primary focus:outline-none focus:ring-2 focus:ring-morandi-blue/50"
+              >
+                <option value="all">全部分公司</option>
+                {workspaces.map((ws: { id: string; name: string }) => (
+                  <option key={ws.id} value={ws.id}>
+                    {ws.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </ResponsiveHeader>
 
