@@ -82,11 +82,6 @@ export default function ItineraryPage() {
     router.push('/itinerary/new')
   }
 
-  // 選擇紙本行程表
-  const handleSelectPrint = () => {
-    setIsTypeSelectOpen(false)
-    router.push('/itinerary/new?type=print')
-  }
 
   // 選擇 Gemini AI 行程表
   const handleSelectGemini = () => {
@@ -721,13 +716,6 @@ export default function ItineraryPage() {
             >
               <div className="text-lg font-bold">網頁版行程表</div>
               <div className="text-xs opacity-80">可編輯的動態行程表（適合線上分享）</div>
-            </Button>
-            <Button
-              onClick={handleSelectPrint}
-              className="w-full h-20 flex-col bg-morandi-green hover:bg-morandi-green/90 text-white"
-            >
-              <div className="text-lg font-bold">紙本行程表</div>
-              <div className="text-xs opacity-80">精美列印版本（適合印刷給客戶）</div>
             </Button>
             <Button
               onClick={handleSelectGemini}
