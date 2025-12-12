@@ -393,18 +393,21 @@ export interface Itinerary {
 
   // 行程特色
   features: ItineraryFeature[]
+  show_features?: boolean
 
   // 精選景點
   focus_cards: FocusCard[]
 
   // 領隊資訊
   leader?: LeaderInfo
+  show_leader_meeting?: boolean
 
   // 集合資訊
   meeting_info?: MeetingInfo
 
   // 飯店資訊
   hotels?: HotelInfo[]
+  show_hotels?: boolean
 
   // 行程副標題
   itinerary_subtitle?: string
