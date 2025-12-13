@@ -705,7 +705,6 @@ export default function ItineraryPage() {
 
           {/* 作者篩選 */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-morandi-secondary">作者：</span>
             <select
               value={authorFilter}
               onChange={e => setAuthorFilter(e.target.value)}
@@ -732,7 +731,6 @@ export default function ItineraryPage() {
           {isSuperAdmin && workspaces.length > 0 && (
             <div className="flex items-center gap-2">
               <Building2 size={14} className="text-morandi-blue" />
-              <span className="text-sm text-morandi-secondary">分公司：</span>
               <select
                 value={localStorage.getItem('itinerary_workspace_filter') || 'all'}
                 onChange={e => {

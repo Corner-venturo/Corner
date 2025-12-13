@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { Card } from '@/components/ui/card'
-import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Tour } from '@/stores/types'
 import { useOrderStore } from '@/stores'
@@ -129,62 +128,60 @@ export const TourOverview = React.memo(function TourOverview({
 
   return (
     <div className="space-y-6">
-      {/* 基本資訊卡片 */}
-      <ContentContainer>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-semibold text-morandi-primary mb-4">基本資訊</h3>
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <MapPin size={16} className="mr-3 text-morandi-secondary" />
-                <span className="text-morandi-primary">目的地：{tour.location}</span>
-              </div>
-              <div className="flex items-center">
-                <Calendar size={16} className="mr-3 text-morandi-secondary" />
-                <span className="text-morandi-primary">
-                  出發：{tour.departure_date} 至 {tour.return_date}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <FileText size={16} className="mr-3 text-morandi-secondary" />
-                <span className="text-morandi-primary">團號：{tour.code}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="mr-3 text-morandi-secondary">狀態：</span>
-                <span
-                  className={cn(
-                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                    getStatusBadge(tour.status ?? '')
-                  )}
-                >
-                  {tour.status}
-                </span>
-              </div>
+      {/* 基本資訊區塊 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="text-lg font-semibold text-morandi-primary mb-4">基本資訊</h3>
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <MapPin size={16} className="mr-3 text-morandi-secondary" />
+              <span className="text-morandi-primary">目的地：{tour.location}</span>
             </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-morandi-primary mb-4">快速操作</h3>
-            <div className="space-y-2">
-              <Button className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white justify-start">
-                <FileText size={16} className="mr-2" />
-                編輯基本資料
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <CheckCircle size={16} className="mr-2" />
-                更新合約狀態
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <DollarSign size={16} className="mr-2" />
-                查看財務報表
-              </Button>
+            <div className="flex items-center">
+              <Calendar size={16} className="mr-3 text-morandi-secondary" />
+              <span className="text-morandi-primary">
+                出發：{tour.departure_date} 至 {tour.return_date}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <FileText size={16} className="mr-3 text-morandi-secondary" />
+              <span className="text-morandi-primary">團號：{tour.code}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="mr-3 text-morandi-secondary">狀態：</span>
+              <span
+                className={cn(
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                  getStatusBadge(tour.status ?? '')
+                )}
+              >
+                {tour.status}
+              </span>
             </div>
           </div>
         </div>
-      </ContentContainer>
+
+        <div>
+          <h3 className="text-lg font-semibold text-morandi-primary mb-4">快速操作</h3>
+          <div className="space-y-2">
+            <Button className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white justify-start">
+              <FileText size={16} className="mr-2" />
+              編輯基本資料
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <CheckCircle size={16} className="mr-2" />
+              更新合約狀態
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <DollarSign size={16} className="mr-2" />
+              查看財務報表
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* 財務概況 */}
-      <ContentContainer>
+      <div>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">財務概況</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {overviewCards.map((card, index) => (
@@ -201,17 +198,17 @@ export const TourOverview = React.memo(function TourOverview({
             </Card>
           ))}
         </div>
-      </ContentContainer>
+      </div>
 
-      {/* 收支明細 - 實際數據由收款記錄和成本支出計算 */}
-      <ContentContainer>
+      {/* 收支說明 */}
+      <div>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">收支說明</h3>
         <div className="space-y-3 text-morandi-secondary text-sm">
           <p>• 總收入：從「收款紀錄」頁面查看實際收款明細</p>
           <p>• 總支出：從「成本支出」頁面查看實際支出明細</p>
           <p>• 淨利潤：總收入 - 總支出</p>
         </div>
-      </ContentContainer>
+      </div>
     </div>
   )
 })

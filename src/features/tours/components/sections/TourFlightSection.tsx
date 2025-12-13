@@ -160,73 +160,75 @@ function ChineseFlightCard({
 
       {/* 頂部標題區 */}
       <div
-        className="relative z-10 px-6 py-4 border-b border-[#2c2623]/5 flex flex-wrap justify-between items-center gap-4"
+        className={`relative z-10 border-b border-[#2c2623]/5 flex flex-wrap justify-between items-center ${isMobile ? 'px-3 py-2 gap-2' : 'px-6 py-4 gap-4'}`}
         style={{
           background: isOutbound
             ? 'linear-gradient(to right, #f5f0e8, #faf7f2, transparent)'
             : 'linear-gradient(to right, #eff6f3, #f7fcf9, transparent)'
         }}
       >
-        <div className="flex items-center gap-4">
+        <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-4'}`}>
           {/* 航空公司圖標 */}
           <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm"
+            className={`rounded-lg flex items-center justify-center text-white shadow-sm ${isMobile ? 'w-8 h-8' : 'w-10 h-10'}`}
             style={{ backgroundColor: accentColor }}
           >
             <Plane
-              className={`w-5 h-5 ${isOutbound ? '-rotate-45' : 'rotate-[135deg]'}`}
+              className={`-rotate-90 ${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`}
             />
           </div>
 
           {/* 航班資訊 */}
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#2c2623] tracking-wide">
+              <span className={`font-bold text-[#2c2623] tracking-wide ${isMobile ? 'text-sm' : 'text-lg'}`}>
                 {flight?.airline || '--'} {flight?.flightNumber || '--'}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full border border-[#2c2623]/10 text-[#756d66] bg-white/50">
+              <span className={`px-2 py-0.5 rounded-full border border-[#2c2623]/10 text-[#756d66] bg-white/50 ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
                 {labelText}
               </span>
             </div>
-            <span className="text-xs text-[#756d66] tracking-wider">
-              {flight?.aircraftType || '客機'} · 經濟艙
-            </span>
+            {!isMobile && (
+              <span className="text-xs text-[#756d66] tracking-wider">
+                {flight?.aircraftType || '客機'} · 經濟艙
+              </span>
+            )}
           </div>
         </div>
 
         {/* 日期 */}
-        <div className="flex items-center gap-2 text-[#2c2623]/70 bg-white/40 px-3 py-1 rounded-md border border-[#2c2623]/5">
-          <Calendar className="w-4 h-4" />
-          <span className="text-sm font-medium tracking-widest">
+        <div className={`flex items-center gap-1 text-[#2c2623]/70 bg-white/40 rounded-md border border-[#2c2623]/5 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'}`}>
+          <Calendar className={isMobile ? 'w-3 h-3' : 'w-4 h-4'} />
+          <span className={`font-medium tracking-widest ${isMobile ? 'text-[10px]' : 'text-sm'}`}>
             {flight?.departureDate || '--/--'}
           </span>
         </div>
       </div>
 
       {/* 主要內容區 */}
-      <div className={`relative z-10 ${isMobile ? 'px-4 py-6' : 'px-8 py-10'}`}>
-        <div className={`flex ${isMobile ? 'flex-col gap-6' : 'flex-row'} items-center justify-between`}>
+      <div className={`relative z-10 ${isMobile ? 'px-3 py-4' : 'px-8 py-10'}`}>
+        <div className="flex flex-row items-center justify-between">
           {/* 出發城市 */}
-          <div className={`flex flex-col ${isMobile ? 'items-center text-center' : 'items-start text-left'} min-w-[100px]`}>
+          <div className={`flex flex-col ${isMobile ? 'items-start text-left min-w-[60px]' : 'items-start text-left min-w-[100px]'}`}>
             <span
-              className={`${isMobile ? 'text-3xl' : 'text-4xl'} font-serif font-bold tracking-tighter mb-2`}
+              className={`${isMobile ? 'text-xl' : 'text-4xl'} font-serif font-bold tracking-tighter mb-1`}
               style={{ color: accentColor }}
             >
               {flight?.departureTime || '--:--'}
             </span>
-            <span className="text-xl font-serif text-[#2c2623] font-bold mb-1">
+            <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-serif text-[#2c2623] font-bold mb-0.5`}>
               {extractCityName(flight?.departureAirport)}
             </span>
-            <span className="text-sm text-[#756d66] tracking-wide">
+            <span className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-[#756d66] tracking-wide`}>
               {flight?.terminal || '國際機場'}
             </span>
           </div>
 
           {/* 飛行路線圖示 */}
-          <div className={`flex-1 w-full relative ${isMobile ? 'h-[80px]' : 'h-[100px]'} flex items-center justify-center px-2`}>
+          <div className={`flex-1 w-full relative ${isMobile ? 'h-[50px]' : 'h-[100px]'} flex items-center justify-center px-1`}>
             {/* 飛行時間標籤 */}
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#fdfbf7] border border-[#2c2623]/10 px-3 py-1 rounded-full text-xs font-bold text-[#756d66] shadow-sm z-20 tracking-widest flex items-center gap-1">
-              <Clock className="w-3 h-3" />
+            <div className={`absolute -top-2 left-1/2 -translate-x-1/2 bg-[#fdfbf7] border border-[#2c2623]/10 rounded-full font-bold text-[#756d66] shadow-sm z-20 tracking-widest flex items-center gap-1 ${isMobile ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs'}`}>
+              <Clock className={isMobile ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
               {flight?.duration || '--'}
             </div>
 
@@ -246,9 +248,9 @@ function ChineseFlightCard({
               />
             </svg>
 
-            {/* 中央飛機圖標 - 去程右上飛，回程左上飛 */}
+            {/* 中央飛機圖標 - 全部朝上 */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border border-[#2c2623]/15 rounded-full flex items-center justify-center shadow-sm z-10">
-              <Plane className={`w-5 h-5 text-[#2c2623] ${isOutbound ? '-rotate-45' : 'rotate-[225deg]'}`} />
+              <Plane className="w-5 h-5 text-[#2c2623] -rotate-90" />
             </div>
 
             {/* 波浪虛線 - 右半邊 */}
@@ -273,21 +275,21 @@ function ChineseFlightCard({
           </div>
 
           {/* 抵達城市 */}
-          <div className={`flex flex-col ${isMobile ? 'items-center text-center' : 'items-end text-right'} min-w-[100px]`}>
-            <span className={`${isMobile ? 'text-3xl' : 'text-4xl'} font-serif font-bold text-[#2c2623] tracking-tighter mb-2`}>
+          <div className={`flex flex-col ${isMobile ? 'items-end text-right min-w-[60px]' : 'items-end text-right min-w-[100px]'}`}>
+            <span className={`${isMobile ? 'text-xl' : 'text-4xl'} font-serif font-bold text-[#2c2623] tracking-tighter mb-1`}>
               {flight?.arrivalTime || '--:--'}
             </span>
-            <span className="text-xl font-serif text-[#2c2623] font-bold mb-1">
+            <span className={`${isMobile ? 'text-sm' : 'text-xl'} font-serif text-[#2c2623] font-bold mb-0.5`}>
               {extractCityName(flight?.arrivalAirport)}
             </span>
-            <span className="text-sm text-[#756d66] tracking-wide">
+            <span className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-[#756d66] tracking-wide`}>
               {flight?.arrivalTerminal || '當地時間'}
             </span>
           </div>
         </div>
 
         {/* 底部標籤區 */}
-        <div className={`flex flex-wrap gap-3 ${isMobile ? 'justify-center' : 'justify-start'} mt-8 pt-4 border-t border-[#2c2623]/5 border-dashed`}>
+        <div className={`flex flex-wrap gap-2 ${isMobile ? 'justify-center mt-4 pt-3' : 'justify-start mt-8 pt-4'} border-t border-[#2c2623]/5 border-dashed`}>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2c2623]/5 text-[#756d66] rounded text-xs font-medium tracking-widest border border-[#2c2623]/10">
             <Luggage className="w-3 h-3" />
             行李直掛
@@ -472,7 +474,7 @@ function JapaneseFlightCard({
                     className="w-8 h-8 rounded-full flex items-center justify-center shadow-md"
                     style={{ backgroundColor: accentColor }}
                   >
-                    <Plane className="w-4 h-4 text-white -rotate-12" />
+                    <Plane className="w-4 h-4 text-white -rotate-90" />
                   </div>
                 </motion.div>
 

@@ -258,16 +258,7 @@ export function TourItinerarySection({
                       {coverStyle !== 'nature' && coverStyle !== 'serene' && (
                         <DecorativeDivider variant="simple" />
                       )}
-                      {viewMode === 'mobile' ? (
-                        // 手機版：使用滿版滑動輪播組件
-                        <MobileActivityCarousel
-                          activities={day.activities.map(a => ({
-                            title: a.title,
-                            description: a.description,
-                            image: a.image || '',
-                          }))}
-                        />
-                      ) : (coverStyle === 'nature' || coverStyle === 'serene') ? (
+                      {(coverStyle === 'nature' || coverStyle === 'serene') ? (
                         // 日式和風風格：根據景點數量調整排版
                         day.activities.length === 1 ? (
                           // 只有一個景點：滿版顯示
@@ -345,8 +336,17 @@ export function TourItinerarySection({
                             )
                           })()
                         )
+                      ) : viewMode === 'mobile' ? (
+                        // 非日式風格手機版：使用滿版滑動輪播組件
+                        <MobileActivityCarousel
+                          activities={day.activities.map(a => ({
+                            title: a.title,
+                            description: a.description,
+                            image: a.image || '',
+                          }))}
+                        />
                       ) : (
-                        // 桌面版：智能排版 - 根據圖片數量自動調整
+                        // 非日式風格桌面版：智能排版 - 根據圖片數量自動調整
                         (() => {
                           const withImage = day.activities.filter(a => a.image && a.image.trim() !== '')
                           const withoutImage = day.activities.filter(a => !a.image || a.image.trim() === '')
@@ -548,8 +548,8 @@ export function TourItinerarySection({
                   )}
 
                   {/* 餐食區塊 */}
-                  {(coverStyle === 'nature' || coverStyle === 'serene') && viewMode !== 'mobile' ? (
-                    // 日式和風風格餐食卡片
+                  {(coverStyle === 'nature' || coverStyle === 'serene') ? (
+                    // 日式和風風格餐食卡片（桌面版+手機版都用）
                     <JapaneseMealsCard
                       meals={{
                         breakfast: day.meals?.breakfast || '敬請自理',
@@ -620,8 +620,8 @@ export function TourItinerarySection({
                   )}
 
                   {day.accommodation && (
-                    (coverStyle === 'nature' || coverStyle === 'serene') && viewMode !== 'mobile' ? (
-                      // 日式和風風格住宿卡片
+                    (coverStyle === 'nature' || coverStyle === 'serene') ? (
+                      // 日式和風風格住宿卡片（桌面版+手機版都用）
                       <JapaneseAccommodationCard
                         name={day.accommodation}
                         url={day.accommodationUrl}

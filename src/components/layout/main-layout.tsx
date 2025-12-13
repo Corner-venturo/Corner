@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { Sidebar } from './sidebar'
-import { MobileBottomNav } from './mobile-bottom-nav'
+import { MobileHeader } from './mobile-header'
+import { MobileSidebar } from './mobile-sidebar'
 import { cn } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation'
@@ -27,6 +28,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   // 啟用滑動導航（手機模式）
   useSwipeNavigation()
@@ -112,15 +114,21 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* 左下象限 - 側邊欄（桌面模式 >= lg） */}
       <Sidebar />
 
-      {/* 底部導航欄（手機模式 < lg） */}
-      <MobileBottomNav />
+      {/* 手機版頂部標題列（手機模式 < lg） */}
+      <MobileHeader onMenuClick={() => setMobileSidebarOpen(true)} />
+
+      {/* 手機版側邊欄（手機模式 < lg） */}
+      <MobileSidebar
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
 
       {/* 右下象限 - 主內容區域 */}
       <main
         className={cn(
           'fixed right-0 transition-all overflow-hidden',
-          // 手機模式 (< lg)：全寬，從頂部開始，底部扣除導航欄
-          'top-0 bottom-16 left-0',
+          // 手機模式 (< lg)：全寬，頂部扣除標題列高度（h-14 = 56px）
+          'top-14 bottom-0 left-0',
           // 桌面模式 (>= lg)：扣除 sidebar 寬度，有 top header
           'lg:top-[72px] lg:bottom-0',
           !isClient ? 'lg:left-16' : sidebarCollapsed ? 'lg:left-16' : 'lg:left-[190px]'

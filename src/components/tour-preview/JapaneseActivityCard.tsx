@@ -41,7 +41,7 @@ export function JapaneseActivityCard({
     >
       {/* 圖片區塊 */}
       {image && (
-        <div className="h-64 sm:h-80 overflow-hidden relative">
+        <div className="h-48 sm:h-64 md:h-80 overflow-hidden relative">
           <Image
             src={image}
             alt={title}
@@ -56,7 +56,7 @@ export function JapaneseActivityCard({
       )}
 
       {/* 內容區塊 */}
-      <div className="p-6 sm:p-8 bg-white relative">
+      <div className="p-4 sm:p-6 md:p-8 bg-white relative">
         {/* 和紙紋理背景 */}
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
@@ -68,7 +68,7 @@ export function JapaneseActivityCard({
         <div className="relative z-10">
           {/* 標題 - 帶左邊框裝飾 */}
           <h2
-            className="text-2xl sm:text-3xl font-bold tracking-widest mb-5 relative pl-4"
+            className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide sm:tracking-widest mb-3 sm:mb-5 relative pl-3 sm:pl-4"
             style={{
               color: '#5D4037',
               fontFamily: '"Zen Old Mincho", serif'
@@ -85,7 +85,7 @@ export function JapaneseActivityCard({
           {/* 說明文字 */}
           {description && (
             <p
-              className="text-[15px] sm:text-base leading-loose text-justify font-medium"
+              className="text-xs sm:text-[15px] md:text-base leading-relaxed sm:leading-loose text-justify font-medium"
               style={{ color: 'rgba(93, 64, 55, 0.8)' }}
             >
               {description}

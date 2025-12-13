@@ -11,7 +11,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit, Upload, FileImage, Trash2, AlertTriangle, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, Crop, RefreshCw, Save, FlipHorizontal } from 'lucide-react'
+import { Mail, Phone, MapPin, CreditCard, Search, X, Plus, Edit, Upload, FileImage, Trash2, AlertTriangle, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, Crop, RefreshCw, Save, FlipHorizontal, Key } from 'lucide-react'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -93,6 +93,11 @@ export default function CustomersPage() {
   // 顧客詳情對話框
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+
+  // 重置密碼對話框
+  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [isResettingPassword, setIsResettingPassword] = useState(false)
 
   // 當搜尋參數改變時，保存到 localStorage
   useEffect(() => {
@@ -778,6 +783,55 @@ export default function CustomersPage() {
       toast.error('裁剪失敗')
     }
   }, [verifyingCustomer?.passport_image_url, cropRect])
+
+  // 重置會員密碼
+  const handleResetPassword = async () => {
+    if (!selectedCustomer?.email || !newPassword) {
+      toast.error('請輸入新密碼')
+      return
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('密碼至少需要 6 個字元')
+      return
+    }
+
+    const confirmed = await confirm({
+      title: '確認重置密碼',
+      message: `確定要將 ${selectedCustomer.name} 的密碼重置為新密碼嗎？`,
+      confirmText: '確認重置',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) return
+
+    setIsResettingPassword(true)
+    try {
+      const res = await fetch('/api/auth/admin-reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: selectedCustomer.email,
+          new_password: newPassword,
+        }),
+      })
+
+      const result = await res.json()
+
+      if (!res.ok) {
+        throw new Error(result.error || '重置密碼失敗')
+      }
+
+      toast.success('密碼已重置成功')
+      setIsResetPasswordDialogOpen(false)
+      setNewPassword('')
+    } catch (error) {
+      console.error('Reset password error:', error)
+      toast.error(error instanceof Error ? error.message : '重置密碼失敗')
+    } finally {
+      setIsResettingPassword(false)
+    }
+  }
 
   // 再次 OCR 辨識（使用裁剪後的圖片）
   const handleReOcr = async () => {
@@ -2093,6 +2147,16 @@ export default function CustomersPage() {
                 >
                   關閉
                 </Button>
+                {selectedCustomer.email && (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setIsResetPasswordDialogOpen(true)}
+                  >
+                    <Key size={16} className="mr-2" />
+                    重置密碼
+                  </Button>
+                )}
                 <Button
                   size="lg"
                   onClick={() => {
@@ -2107,6 +2171,66 @@ export default function CustomersPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 重置密碼對話框 */}
+      <Dialog open={isResetPasswordDialogOpen} onOpenChange={(open) => {
+        setIsResetPasswordDialogOpen(open)
+        if (!open) {
+          setNewPassword('')
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Key size={20} className="text-morandi-gold" />
+              重置會員密碼
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="py-4 space-y-4">
+            <div>
+              <p className="text-sm text-morandi-secondary mb-2">
+                為 <span className="font-medium text-morandi-primary">{selectedCustomer?.name}</span> 設定新密碼
+              </p>
+              <p className="text-xs text-gray-500 mb-4">
+                Email: {selectedCustomer?.email}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-morandi-secondary mb-1">
+                新密碼
+              </label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="請輸入新密碼（至少 6 個字元）"
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsResetPasswordDialogOpen(false)
+                setNewPassword('')
+              }}
+            >
+              取消
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={isResettingPassword || !newPassword || newPassword.length < 6}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              {isResettingPassword ? '重置中...' : '確認重置'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -28,7 +28,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
   const isMobile = viewMode === 'mobile'
 
   return (
-    <section className="relative min-h-[85vh] overflow-hidden bg-[#f9f9f7]">
+    <section className={`relative overflow-hidden bg-[#f9f9f7] ${isMobile ? 'min-h-0' : 'min-h-[85vh]'}`}>
       {/* 和紙紋理背景 */}
       <div
         className="absolute inset-0 pointer-events-none z-0 opacity-60 mix-blend-multiply"
@@ -45,11 +45,11 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
       <div className="absolute bottom-[10%] left-[-10%] w-[30vw] h-[30vw] rounded-full border border-[#30abe8]/5 pointer-events-none z-0" />
 
       {/* 主要內容 */}
-      <div className={`relative z-10 h-full ${isMobile ? 'px-4 pt-8 pb-16' : 'px-8 md:px-12 pt-12 pb-20'}`}>
-        <div className={`max-w-[1200px] mx-auto flex ${isMobile ? 'flex-col gap-8' : 'flex-row gap-12 md:gap-24'} items-center min-h-[75vh]`}>
+      <div className={`relative z-10 h-full ${isMobile ? 'px-3 py-4' : 'px-8 md:px-12 pt-12 pb-20'}`}>
+        <div className={`max-w-[1200px] mx-auto flex flex-row ${isMobile ? 'gap-3 items-stretch' : 'gap-12 md:gap-24 items-center min-h-[75vh]'}`}>
 
           {/* 左側：垂直文字區塊 */}
-          <div className={`flex gap-6 ${isMobile ? 'h-[280px] order-2' : 'md:gap-12 h-[500px]'} justify-center`}>
+          <div className={`flex ${isMobile ? 'gap-1 shrink-0' : 'gap-4 md:gap-6 h-[500px]'} justify-center`}>
             {/* 向下箭頭 */}
             {!isMobile && (
               <div className="flex flex-col gap-8 justify-end pb-8">
@@ -61,34 +61,42 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
               </div>
             )}
 
-            {/* 主標題 - 垂直排列 */}
+            {/* 主標題 - 垂直排列（從左到右換行） */}
             <h1
               className={`text-[#2c3e50] font-black tracking-[0.1em] leading-normal select-none ${
-                isMobile ? 'text-3xl' : 'text-4xl md:text-6xl'
+                isMobile ? 'text-lg' : 'text-4xl md:text-6xl'
               }`}
               style={{
-                writingMode: 'vertical-rl',
+                writingMode: 'vertical-lr',
                 textOrientation: 'mixed',
                 fontFamily: "'Noto Sans TC', sans-serif"
               }}
             >
               {data.title}
-              {data.subtitle && (
-                <>
-                  <span className="text-[#30abe8]">・</span>
-                  <span className="text-[#30abe8]">{data.subtitle}</span>
-                </>
-              )}
             </h1>
 
-            {/* 描述 - 垂直排列 */}
-            {data.description && (
-              <p
-                className={`text-[#637c88] font-light tracking-[0.2em] leading-loose select-none border-r border-[#30abe8]/20 ${
-                  isMobile ? 'text-xs pr-4 pt-8' : 'text-sm md:text-base pr-6 md:pr-8 pt-12'
+            {/* 副標題 - 獨立一行，字體小 40% */}
+            {data.subtitle && (
+              <h2
+                className={`text-[#30abe8] font-bold tracking-[0.1em] leading-normal select-none ${
+                  isMobile ? 'text-sm' : 'text-2xl md:text-4xl'
                 }`}
                 style={{
-                  writingMode: 'vertical-rl',
+                  writingMode: 'vertical-lr',
+                  textOrientation: 'mixed',
+                  fontFamily: "'Noto Sans TC', sans-serif"
+                }}
+              >
+                {data.subtitle}
+              </h2>
+            )}
+
+            {/* 描述 - 垂直排列（從左到右換行）- 手機版隱藏 */}
+            {data.description && !isMobile && (
+              <p
+                className="text-[#637c88] font-light tracking-[0.2em] leading-loose select-none border-l border-[#30abe8]/20 text-sm md:text-base pl-6 md:pl-8 pt-12"
+                style={{
+                  writingMode: 'vertical-lr',
                   textOrientation: 'mixed'
                 }}
               >
@@ -98,10 +106,10 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
           </div>
 
           {/* 右側：主圖區塊 */}
-          <div className={`flex-1 w-full relative group ${isMobile ? 'order-1' : ''}`}>
+          <div className={`relative group ${isMobile ? 'flex-1' : 'flex-1 w-full'}`}>
             <div className={`relative w-full overflow-hidden shadow-2xl shadow-[#30abe8]/10 ${
               isMobile
-                ? 'aspect-[4/5] rounded-t-[60px] rounded-b-lg'
+                ? 'aspect-[4/5] rounded-t-[30px] rounded-b-lg'
                 : 'aspect-[3/4] max-h-[650px] rounded-t-[100px] rounded-b-lg'
             }`}>
               {/* 藍色疊加層 */}
@@ -114,14 +122,29 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                 className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
               />
 
-              {/* 位置標籤 */}
-              <div className={`absolute z-20 flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-white/50 rounded-full ${
-                isMobile ? 'bottom-4 left-4 px-3 py-1.5' : 'bottom-6 left-6 px-4 py-2'
+              {/* 底部標籤區：位置 + tagline */}
+              <div className={`absolute z-20 flex items-center gap-2 ${
+                isMobile ? 'bottom-4 left-4' : 'bottom-6 left-6'
               }`}>
-                <MapPin size={isMobile ? 14 : 18} className="text-[#30abe8]" />
-                <span className={`font-bold tracking-wider text-[#2c3e50] uppercase ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
-                  {data.city || data.country || 'Destination'}
-                </span>
+                {/* 位置標籤 */}
+                <div className={`flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-white/50 rounded-full ${
+                  isMobile ? 'px-3 py-1.5' : 'px-4 py-2'
+                }`}>
+                  <MapPin size={isMobile ? 14 : 18} className="text-[#30abe8]" />
+                  <span className={`font-bold tracking-wider text-[#2c3e50] uppercase ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+                    {data.city || data.country || 'Destination'}
+                  </span>
+                </div>
+                {/* Tagline 標籤 */}
+                {data.tagline && (
+                  <div className={`bg-white/80 backdrop-blur-sm border border-white/50 rounded-full ${
+                    isMobile ? 'px-3 py-1.5' : 'px-4 py-2'
+                  }`}>
+                    <span className={`font-medium tracking-wider text-[#2c3e50] ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+                      {data.tagline}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

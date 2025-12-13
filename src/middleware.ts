@@ -65,6 +65,7 @@ export async function middleware(request: NextRequest) {
     '/api/itineraries', // 公開行程 API（給 /view 頁面使用）
     '/api/my', // App API（使用 Bearer token 驗證）
     '/api/trips', // App API（使用 Bearer token 驗證）
+    '/api/eyeline', // 旅人眼線 API（使用 Bearer token 驗證）
     '/view', // 公開行程檢視頁面
     '/_next',
     '/favicon.ico',

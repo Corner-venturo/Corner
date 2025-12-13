@@ -117,7 +117,6 @@ function SortableRow({
         {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
       </td>
       <td className="px-3 py-2">{member.passport_number || '-'}</td>
-      <td className="px-3 py-2 text-xs">{member.special_meal || '-'}</td>
       {customFields.map(field => (
         <td key={field} className="px-3 py-2 bg-white">
           <input
@@ -437,7 +436,6 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
                   <th className="px-3 py-2 text-left font-medium text-morandi-secondary text-xs">生日</th>
                   <th className="px-3 py-2 text-left font-medium text-morandi-secondary text-xs w-16">性別</th>
                   <th className="px-3 py-2 text-left font-medium text-morandi-secondary text-xs">護照號碼</th>
-                  <th className="px-3 py-2 text-left font-medium text-morandi-secondary text-xs">特殊餐食</th>
                   {customFields.map(field => (
                     <th key={field} className="px-3 py-2 text-left font-medium text-morandi-secondary text-xs bg-morandi-gold/10 relative group">
                       <div className="flex items-center justify-between gap-2">

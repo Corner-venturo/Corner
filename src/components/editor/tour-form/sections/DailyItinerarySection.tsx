@@ -1090,21 +1090,41 @@ export function DailyItinerarySection({
           </div>
 
           {/* 每日圖片 */}
-          <DailyImagesUploader
-            dayIndex={dayIndex}
-            images={day.images || []}
-            onImagesChange={(newImages) => {
-              updateDailyItinerary(dayIndex, 'images', newImages)
-            }}
-            allTourImages={
-              // 收集整個行程的所有每日照片
-              data.dailyItinerary?.flatMap(d =>
-                (d.images || []).map(img =>
-                  typeof img === 'string' ? img : img.url
-                )
-              ) || []
-            }
-          />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={day.showDailyImages !== false}
+                  onChange={e => updateDailyItinerary(dayIndex, 'showDailyImages', e.target.checked)}
+                  className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
+                />
+                <span className="text-sm font-medium text-morandi-primary">每日圖片</span>
+              </label>
+              {day.showDailyImages !== false && (day.images?.length || 0) > 0 && (
+                <span className="text-xs text-morandi-secondary">
+                  {day.images?.length} 張
+                </span>
+              )}
+            </div>
+            {day.showDailyImages !== false && (
+              <DailyImagesUploader
+                dayIndex={dayIndex}
+                images={day.images || []}
+                onImagesChange={(newImages) => {
+                  updateDailyItinerary(dayIndex, 'images', newImages)
+                }}
+                allTourImages={
+                  // 收集整個行程的所有每日照片
+                  data.dailyItinerary?.flatMap(d =>
+                    (d.images || []).map(img =>
+                      typeof img === 'string' ? img : img.url
+                    )
+                  ) || []
+                }
+              />
+            )}
+          </div>
         </div>
       ))}
 

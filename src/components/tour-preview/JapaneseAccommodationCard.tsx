@@ -66,19 +66,13 @@ export function JapaneseAccommodationCard({
         }}
       >
         {/* 左側圖標 */}
-        <div className="flex flex-col items-center justify-center min-w-[40px] sm:min-w-[50px] md:min-w-[60px]">
+        <div className="flex items-center justify-center min-w-[40px] sm:min-w-[50px] md:min-w-[60px]">
           <div
             className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg text-white flex items-center justify-center shadow-md"
             style={{ backgroundColor: primaryColor }}
           >
             <Bed className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
-          <span
-            className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold mt-1"
-            style={{ color: 'rgba(93, 64, 55, 0.7)' }}
-          >
-            住宿
-          </span>
         </div>
 
         {/* 中間飯店名稱 */}

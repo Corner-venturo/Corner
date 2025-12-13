@@ -371,21 +371,32 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
       <div className="bg-[#F9F5ED] p-3 rounded-lg space-y-2 border border-[#E0D8CC]">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-sm text-[#3D2914]">去程航班</h3>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleSearchOutbound}
-            disabled={loadingOutbound || !data.outboundFlight?.flightNumber}
-            className="h-7 text-xs gap-1"
-          >
-            {loadingOutbound ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <Search size={12} />
-            )}
-            查詢航班
-          </Button>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={data.outboundFlight?.hasMeal || false}
+                onChange={e => updateFlightField('outboundFlight', 'hasMeal', e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+              />
+              <span className="text-xs text-morandi-secondary">餐食</span>
+            </label>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleSearchOutbound}
+              disabled={loadingOutbound || !data.outboundFlight?.flightNumber}
+              className="h-7 text-xs gap-1"
+            >
+              {loadingOutbound ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Search size={12} />
+              )}
+              查詢航班
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-4 gap-2">
           {/* 第一行：航空公司、航班號碼、日期、查詢按鈕區 */}
@@ -405,24 +416,13 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
               航班號碼
             </label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                value={data.outboundFlight?.flightNumber || ''}
-                onChange={e => updateFlightField('outboundFlight', 'flightNumber', e.target.value)}
-                className="text-xs h-8 flex-1"
-                placeholder="BR158"
-              />
-              <label className="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-                <input
-                  type="checkbox"
-                  checked={data.outboundFlight?.hasMeal || false}
-                  onChange={e => updateFlightField('outboundFlight', 'hasMeal', e.target.checked)}
-                  className="w-3 h-3 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
-                />
-                <span className="text-[10px] text-morandi-secondary">餐食</span>
-              </label>
-            </div>
+            <Input
+              type="text"
+              value={data.outboundFlight?.flightNumber || ''}
+              onChange={e => updateFlightField('outboundFlight', 'flightNumber', e.target.value)}
+              className="text-xs h-8"
+              placeholder="BR158"
+            />
           </div>
           <div>
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
@@ -514,21 +514,32 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
       <div className="bg-[#F5F0EB] p-3 rounded-lg space-y-2 border border-[#E0D8CC]">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-sm text-[#3D2914]">回程航班</h3>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleSearchReturn}
-            disabled={loadingReturn || !data.returnFlight?.flightNumber}
-            className="h-7 text-xs gap-1"
-          >
-            {loadingReturn ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <Search size={12} />
-            )}
-            查詢航班
-          </Button>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={data.returnFlight?.hasMeal || false}
+                onChange={e => updateFlightField('returnFlight', 'hasMeal', e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+              />
+              <span className="text-xs text-morandi-secondary">餐食</span>
+            </label>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleSearchReturn}
+              disabled={loadingReturn || !data.returnFlight?.flightNumber}
+              className="h-7 text-xs gap-1"
+            >
+              {loadingReturn ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Search size={12} />
+              )}
+              查詢航班
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-4 gap-2">
           {/* 第一行：航空公司、航班號碼、日期、飛行時間 */}
@@ -548,24 +559,13 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
               航班號碼
             </label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                value={data.returnFlight?.flightNumber || ''}
-                onChange={e => updateFlightField('returnFlight', 'flightNumber', e.target.value)}
-                className="text-xs h-8 flex-1"
-                placeholder="BR157"
-              />
-              <label className="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-                <input
-                  type="checkbox"
-                  checked={data.returnFlight?.hasMeal || false}
-                  onChange={e => updateFlightField('returnFlight', 'hasMeal', e.target.checked)}
-                  className="w-3 h-3 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
-                />
-                <span className="text-[10px] text-morandi-secondary">餐食</span>
-              </label>
-            </div>
+            <Input
+              type="text"
+              value={data.returnFlight?.flightNumber || ''}
+              onChange={e => updateFlightField('returnFlight', 'flightNumber', e.target.value)}
+              className="text-xs h-8"
+              placeholder="BR157"
+            />
           </div>
           <div>
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">

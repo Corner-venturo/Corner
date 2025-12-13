@@ -63,6 +63,7 @@ export interface DailyItinerary {
   accommodationUrl?: string // 飯店官網或訂房連結
   accommodationRating?: number // 飯店星級（1-5）
   images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
+  showDailyImages?: boolean // 是否顯示每日圖片區塊（預設 true）
   isAlternative?: boolean // 是否為建議方案（替代行程），如 Day 3-B, Day 3-C
 }
 
