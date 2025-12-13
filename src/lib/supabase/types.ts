@@ -2026,6 +2026,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           date_of_birth: string | null
+          dietary_restrictions: string | null
           email: string | null
           emergency_contact: Json | null
           english_name: string | null
@@ -2040,7 +2041,6 @@ export type Database = {
           nationality: string | null
           nickname: string | null
           notes: string | null
-          dietary_restrictions: string | null
           passport_expiry_date: string | null
           passport_image_url: string | null
           passport_number: string | null
@@ -2070,6 +2070,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           date_of_birth?: string | null
+          dietary_restrictions?: string | null
           email?: string | null
           emergency_contact?: Json | null
           english_name?: string | null
@@ -2084,7 +2085,6 @@ export type Database = {
           nationality?: string | null
           nickname?: string | null
           notes?: string | null
-          dietary_restrictions?: string | null
           passport_expiry_date?: string | null
           passport_image_url?: string | null
           passport_number?: string | null
@@ -2114,6 +2114,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           date_of_birth?: string | null
+          dietary_restrictions?: string | null
           email?: string | null
           emergency_contact?: Json | null
           english_name?: string | null
@@ -2128,7 +2129,6 @@ export type Database = {
           nationality?: string | null
           nickname?: string | null
           notes?: string | null
-          dietary_restrictions?: string | null
           passport_expiry_date?: string | null
           passport_image_url?: string | null
           passport_number?: string | null
@@ -8519,6 +8519,10 @@ export type Database = {
       get_user_project_ids: { Args: { uid: string }; Returns: string[] }
       get_user_workspace_id: { Args: never; Returns: string }
       has_permission: { Args: { permission_name: string }; Returns: boolean }
+      increment_points: {
+        Args: { customer_id_param: string; points_param: number }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       refresh_all_region_stats: { Args: never; Returns: undefined }
