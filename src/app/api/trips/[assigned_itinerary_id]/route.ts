@@ -32,6 +32,10 @@ interface RouteParams {
  *     assigned_date: string,
  *     status: string,
  *     notes: string | null,
+ *     visa_status: string | null,        // 簽證狀態
+ *     esim_url: string | null,           // eSIM 下載連結
+ *     payment_details: object | null,    // 付款詳情 JSON
+ *     room_allocation: object | null,    // 房間分配 JSON
  *     itinerary: {
  *       id: string,
  *       title: string,
@@ -124,7 +128,7 @@ export async function GET(request: NextRequest, context: RouteParams) {
       )
     }
 
-    // 3. 取得 assigned_itinerary 資訊
+    // 3. 取得 assigned_itinerary 資訊（包含訂單管理欄位）
     const { data: assignedItinerary, error: assignedError } = await supabase
       .from('customer_assigned_itineraries')
       .select(`
@@ -133,7 +137,11 @@ export async function GET(request: NextRequest, context: RouteParams) {
         itinerary_id,
         assigned_date,
         status,
-        notes
+        notes,
+        visa_status,
+        esim_url,
+        payment_details,
+        room_allocation
       `)
       .eq('id', assigned_itinerary_id)
       .single()
@@ -322,12 +330,17 @@ export async function GET(request: NextRequest, context: RouteParams) {
       })
     )
 
-    // 10. 組合完整回應
+    // 10. 組合完整回應（包含訂單管理資訊）
     const response = {
       assigned_itinerary_id: assignedItinerary.id,
       assigned_date: assignedItinerary.assigned_date,
       status: assignedItinerary.status,
       notes: assignedItinerary.notes,
+      // 訂單管理資訊
+      visa_status: assignedItinerary.visa_status,
+      esim_url: assignedItinerary.esim_url,
+      payment_details: assignedItinerary.payment_details,
+      room_allocation: assignedItinerary.room_allocation,
       itinerary: {
         ...itinerary,
         days: daysWithItems,
