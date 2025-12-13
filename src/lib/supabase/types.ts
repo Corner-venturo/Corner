@@ -1951,36 +1951,48 @@ export type Database = {
           assigned_date: string
           created_at: string
           customer_id: string
+          esim_url: string | null
           id: string
           itinerary_id: string
           notes: string | null
           order_id: string | null
+          payment_details: Json | null
+          room_allocation: Json | null
           status: string
           updated_at: string
+          visa_status: string | null
           workspace_id: string | null
         }
         Insert: {
           assigned_date: string
           created_at?: string
           customer_id: string
+          esim_url?: string | null
           id?: string
           itinerary_id: string
           notes?: string | null
           order_id?: string | null
+          payment_details?: Json | null
+          room_allocation?: Json | null
           status?: string
           updated_at?: string
+          visa_status?: string | null
           workspace_id?: string | null
         }
         Update: {
           assigned_date?: string
           created_at?: string
           customer_id?: string
+          esim_url?: string | null
           id?: string
           itinerary_id?: string
           notes?: string | null
           order_id?: string | null
+          payment_details?: Json | null
+          room_allocation?: Json | null
           status?: string
           updated_at?: string
+          visa_status?: string | null
           workspace_id?: string | null
         }
         Relationships: [
