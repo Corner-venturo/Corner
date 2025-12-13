@@ -35,6 +35,7 @@ import { TourHandoverPrint } from './tour-handover-print'
 interface OrderMember {
   id: string
   order_id: string
+  customer_id: string | null
   chinese_name: string | null
   passport_name: string | null
   birth_date: string | null
@@ -45,6 +46,9 @@ interface OrderMember {
   special_meal: string | null
   pnr: string | null
 }
+
+// 飲食禁忌對應表 (customer_id -> dietary_restrictions)
+type CustomerDietaryMap = Record<string, string>
 
 // 訂單編號對應表
 type OrderCodeMap = Record<string, string>
@@ -143,6 +147,9 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
   const [newFieldName, setNewFieldName] = useState('')
   const [isDragMode, setIsDragMode] = useState(false)
   const [showPrintPreview, setShowPrintPreview] = useState(false)
+  // 飲食禁忌狀態
+  const [dietaryMap, setDietaryMap] = useState<CustomerDietaryMap>({})
+  const [originalDietaryMap, setOriginalDietaryMap] = useState<CustomerDietaryMap>({})
 
   // 拖曳感應器
   const sensors = useSensors(

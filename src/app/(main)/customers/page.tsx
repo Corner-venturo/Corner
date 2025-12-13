@@ -796,12 +796,14 @@ export default function CustomersPage() {
       return
     }
 
-    const confirmed = await confirm({
-      title: '確認重置密碼',
-      message: `確定要將 ${selectedCustomer.name} 的密碼重置為新密碼嗎？`,
-      confirmText: '確認重置',
-      cancelText: '取消',
-    })
+    const confirmed = await confirm(
+      `確定要將 ${selectedCustomer.name} 的密碼重置為新密碼嗎？`,
+      {
+        title: '確認重置密碼',
+        confirmText: '確認重置',
+        cancelText: '取消',
+      }
+    )
 
     if (!confirmed) return
 
