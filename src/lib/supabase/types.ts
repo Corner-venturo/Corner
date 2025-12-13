@@ -2047,6 +2047,8 @@ export type Database = {
           is_active: boolean | null
           is_vip: boolean | null
           last_order_date: string | null
+          linked_at: string | null
+          linked_method: string | null
           member_type: string
           name: string
           national_id: string | null
@@ -2091,6 +2093,8 @@ export type Database = {
           is_active?: boolean | null
           is_vip?: boolean | null
           last_order_date?: string | null
+          linked_at?: string | null
+          linked_method?: string | null
           member_type?: string
           name: string
           national_id?: string | null
@@ -2135,6 +2139,8 @@ export type Database = {
           is_active?: boolean | null
           is_vip?: boolean | null
           last_order_date?: string | null
+          linked_at?: string | null
+          linked_method?: string | null
           member_type?: string
           name?: string
           national_id?: string | null
@@ -6919,6 +6925,207 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_room_assignments: {
+        Row: {
+          bed_number: number | null
+          created_at: string | null
+          id: string
+          order_member_id: string
+          room_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          bed_number?: number | null
+          created_at?: string | null
+          id?: string
+          order_member_id: string
+          room_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          bed_number?: number | null
+          created_at?: string | null
+          id?: string
+          order_member_id?: string
+          room_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_room_assignments_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
+            referencedRelation: "order_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_room_assignments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "tour_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_room_assignments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "tour_rooms_status"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_rooms: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          display_order: number | null
+          hotel_name: string
+          id: string
+          night_number: number
+          notes: string | null
+          room_number: string | null
+          room_type: string
+          tour_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          hotel_name: string
+          id?: string
+          night_number?: number
+          notes?: string | null
+          room_number?: string | null
+          room_type: string
+          tour_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          hotel_name?: string
+          id?: string
+          night_number?: number
+          notes?: string | null
+          room_number?: string | null
+          room_type?: string
+          tour_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_rooms_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_vehicle_assignments: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_member_id: string
+          seat_number: number | null
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_member_id: string
+          seat_number?: number | null
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_member_id?: string
+          seat_number?: number | null
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_vehicle_assignments_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
+            referencedRelation: "order_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_vehicle_assignments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "tour_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_vehicle_assignments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "tour_vehicles_status"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_vehicles: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          display_order: number | null
+          driver_name: string | null
+          driver_phone: string | null
+          id: string
+          license_plate: string | null
+          notes: string | null
+          tour_id: string
+          updated_at: string | null
+          vehicle_name: string
+          vehicle_type: string | null
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          license_plate?: string | null
+          notes?: string | null
+          tour_id: string
+          updated_at?: string | null
+          vehicle_name: string
+          vehicle_type?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          license_plate?: string | null
+          notes?: string | null
+          tour_id?: string
+          updated_at?: string | null
+          vehicle_name?: string
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_vehicles_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tours: {
         Row: {
           _deleted: boolean | null
@@ -8508,7 +8715,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tour_rooms_status: {
+        Row: {
+          assigned_count: number | null
+          capacity: number | null
+          display_order: number | null
+          hotel_name: string | null
+          id: string | null
+          is_full: boolean | null
+          night_number: number | null
+          notes: string | null
+          remaining_beds: number | null
+          room_number: string | null
+          room_type: string | null
+          tour_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_rooms_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_vehicles_status: {
+        Row: {
+          assigned_count: number | null
+          capacity: number | null
+          display_order: number | null
+          driver_name: string | null
+          driver_phone: string | null
+          id: string | null
+          is_full: boolean | null
+          license_plate: string | null
+          notes: string | null
+          remaining_seats: number | null
+          tour_id: string | null
+          vehicle_name: string | null
+          vehicle_type: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_vehicles_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       can_manage_workspace: {
