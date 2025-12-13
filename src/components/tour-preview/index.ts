@@ -18,3 +18,9 @@ export type { AttractionCardProps } from './AttractionCard'
 export { MobileActivityCarousel } from './MobileActivityCarousel'
 
 export { DesktopActivityCarousel } from './DesktopActivityCarousel'
+
+export { JapaneseActivityCard } from './JapaneseActivityCard'
+
+export { JapaneseAccommodationCard } from './JapaneseAccommodationCard'
+
+export { JapaneseMealsCard } from './JapaneseMealsCard'

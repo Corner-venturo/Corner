@@ -7,6 +7,7 @@ export interface FlightInfo {
   arrivalAirport: string
   arrivalTime: string
   duration?: string
+  hasMeal?: boolean // 是否提供機上餐食
 }
 
 export interface Feature {
@@ -59,6 +60,8 @@ export interface DailyItinerary {
   recommendations: string[]
   meals: Meals
   accommodation: string
+  accommodationUrl?: string // 飯店官網或訂房連結
+  accommodationRating?: number // 飯店星級（1-5）
   images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
   isAlternative?: boolean // 是否為建議方案（替代行程），如 Day 3-B, Day 3-C
 }
@@ -120,7 +123,18 @@ export interface TourCountry {
   is_primary: boolean // 是否為主要國家
 }
 
-export type CoverStyleType = 'original' | 'gemini'
+// 封面風格類型：
+// - original: 經典全螢幕置中（金色漸層）
+// - gemini: 緊湊底部對齊（莫蘭迪金色）
+// - nature: 綠色慢旅風格（垂直文字 + 重疊圖片卡）
+// - serene: 藍色靜謐風格（日期浮水印效果）
+export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+
+// 航班卡片風格類型：
+// - original: 經典莫蘭迪金色風格
+// - chinese: 中國風書法風格
+// - japanese: 日式和紙風格（帶目的地圖片）
+export type FlightStyleType = 'original' | 'chinese' | 'japanese'
 
 export interface TourFormData {
   tagline: string
@@ -139,6 +153,7 @@ export interface TourFormData {
   priceNote?: string | null // 價格備註（如：起、/人）
   outboundFlight: FlightInfo
   returnFlight: FlightInfo
+  flightStyle?: FlightStyleType // 航班卡片風格
   features: Feature[]
   focusCards: FocusCard[]
   leader: LeaderInfo

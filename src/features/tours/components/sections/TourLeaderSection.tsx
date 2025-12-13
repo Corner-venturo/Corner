@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { SectionTitle } from './SectionTitle'
 
 interface TourDisplayData {
   leader?: {
@@ -12,12 +13,15 @@ interface TourDisplayData {
   } | null
 }
 
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+
 interface TourLeaderSectionProps {
   data: TourDisplayData
   viewMode: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
-export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
+export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: TourLeaderSectionProps) {
   return (
     <section id="contact" className={viewMode === 'mobile' ? 'bg-white pt-6 pb-8' : 'bg-white pt-8 pb-16'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
@@ -25,17 +29,12 @@ export function TourLeaderSection({ data, viewMode }: TourLeaderSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={viewMode === 'mobile' ? 'text-center mb-6' : 'text-center mb-12'}
         >
-          <h2
-            className={
-              viewMode === 'mobile'
-                ? 'text-xl font-bold text-morandi-primary mb-2'
-                : 'text-4xl font-bold text-morandi-primary mb-4'
-            }
-          >
-            領隊與集合資訊
-          </h2>
+          <SectionTitle
+            title="領隊與集合資訊"
+            coverStyle={coverStyle}
+            className={viewMode === 'mobile' ? 'mb-6' : 'mb-12'}
+          />
         </motion.div>
 
         <div className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto'}>

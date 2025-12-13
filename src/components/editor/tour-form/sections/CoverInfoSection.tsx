@@ -210,17 +210,31 @@ export function CoverInfoSection({
     }
   }
 
-  // 封面風格選項
-  const coverStyleOptions: { value: CoverStyleType; label: string; description: string }[] = [
+  // 封面風格選項（四種款式）
+  const coverStyleOptions: { value: CoverStyleType; label: string; description: string; color: string }[] = [
     {
       value: 'original',
       label: '經典全屏',
-      description: '全螢幕背景圖片，文字置中，帶動畫效果',
+      description: '全螢幕背景圖片，文字置中，金色漸層動畫',
+      color: '#f59e0b', // amber
     },
     {
       value: 'gemini',
       label: 'Gemini 風格',
-      description: '精緻小巧，底部文字佈局，金色主題',
+      description: '精緻小巧，底部文字佈局，莫蘭迪金色',
+      color: '#c9aa7c', // morandi gold
+    },
+    {
+      value: 'nature',
+      label: '日式和風',
+      description: '日式極簡風，垂直文字，和紙紋理背景',
+      color: '#30abe8', // japan blue
+    },
+    {
+      value: 'serene',
+      label: '浮水印風',
+      description: '藍色寧靜風，大型日期浮水印，優雅字體',
+      color: '#4a6fa5', // serene blue
     },
   ]
 
@@ -230,7 +244,7 @@ export function CoverInfoSection({
         封面設定
       </h2>
 
-      {/* 封面風格選擇器 */}
+      {/* 封面風格選擇器（四種款式） */}
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">封面風格</label>
         <div className="grid grid-cols-2 gap-2">
@@ -244,24 +258,40 @@ export function CoverInfoSection({
                 className={cn(
                   'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
                   isSelected
-                    ? 'border-morandi-gold bg-morandi-gold/5 ring-2 ring-morandi-gold/30'
-                    : 'border-morandi-container hover:border-morandi-gold/50 bg-white'
+                    ? 'ring-2 ring-offset-1 bg-white'
+                    : 'border-morandi-container hover:border-opacity-70 bg-white'
                 )}
+                style={{
+                  borderColor: isSelected ? option.color : undefined,
+                  ...(isSelected ? { ['--tw-ring-color' as string]: `${option.color}40` } : {})
+                }}
               >
                 <div className="flex items-center justify-between w-full">
-                  <span className={cn(
-                    'font-medium text-sm',
-                    isSelected ? 'text-morandi-gold' : 'text-morandi-primary'
-                  )}>
-                    {option.label}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {/* 主題色圓點 */}
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: option.color }}
+                    />
+                    <span className={cn(
+                      'font-medium text-sm',
+                      isSelected ? 'text-morandi-primary' : 'text-morandi-primary'
+                    )}
+                    style={{ color: isSelected ? option.color : undefined }}
+                    >
+                      {option.label}
+                    </span>
+                  </div>
                   {isSelected && (
-                    <div className="w-4 h-4 rounded-full bg-morandi-gold flex items-center justify-center">
+                    <div
+                      className="w-4 h-4 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: option.color }}
+                    >
                       <Check size={10} className="text-white" />
                     </div>
                   )}
                 </div>
-                <span className="text-[11px] text-morandi-secondary leading-tight">{option.description}</span>
+                <span className="text-[10px] text-morandi-secondary leading-tight mt-0.5">{option.description}</span>
               </button>
             )
           })}

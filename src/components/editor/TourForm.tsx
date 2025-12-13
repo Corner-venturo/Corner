@@ -16,7 +16,7 @@ import { PricingDetailsSection } from './tour-form/sections/PricingDetailsSectio
 import { PriceTiersSection } from './tour-form/sections/PriceTiersSection'
 import { FAQSection } from './tour-form/sections/FAQSection'
 import { NoticesPolicySection } from './tour-form/sections/NoticesPolicySection'
-import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle, AlertCircle } from 'lucide-react'
+import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle, AlertCircle, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface TourFormProps {
@@ -29,7 +29,7 @@ const navItems = [
   { id: 'section-cover', label: '封面', icon: Image },
   { id: 'section-flight', label: '航班', icon: Plane },
   { id: 'section-features', label: '特色', icon: Star },
-  { id: 'section-itinerary', label: '行程', icon: MapPin },
+  { id: 'section-itinerary', label: '行程', icon: MapPin, hasDayNav: true },
   { id: 'section-leader', label: '領隊', icon: Users },
   { id: 'section-hotel', label: '飯店', icon: Building2 },
   { id: 'section-pricing', label: '團費', icon: DollarSign },
@@ -37,10 +37,39 @@ const navItems = [
   { id: 'section-notices', label: '須知', icon: AlertCircle },
 ]
 
+// 計算 dayLabel 的函數 - 處理建議方案編號
+function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[] {
+  if (!itinerary) return []
+  const labels: string[] = []
+  let currentDayNumber = 0
+  let alternativeCount = 0
+
+  for (const day of itinerary) {
+    if (day.isAlternative) {
+      alternativeCount++
+      const suffix = String.fromCharCode(65 + alternativeCount) // B, C, D...
+      labels.push(`D${currentDayNumber}-${suffix}`)
+    } else {
+      currentDayNumber++
+      alternativeCount = 0
+      labels.push(`D${currentDayNumber}`)
+    }
+  }
+
+  return labels
+}
+
 export function TourForm({ data, onChange }: TourFormProps) {
   const { user } = useAuthStore()
   const [activeSection, setActiveSection] = useState('section-cover')
+  const [showDayNav, setShowDayNav] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // 計算天數標籤
+  const dayLabels = calculateDayLabels(data.dailyItinerary)
+
+  // 行程備份（用於復原功能）
+  const [itineraryBackup, setItineraryBackup] = useState<TourFormData['dailyItinerary'] | null>(null)
 
   const {
     selectedCountry,
@@ -100,10 +129,66 @@ export function TourForm({ data, onChange }: TourFormProps) {
     <div ref={containerRef}>
       {/* 快速導覽列 */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-morandi-container/30 px-4 py-2">
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = activeSection === item.id
+            const isItinerary = item.id === 'section-itinerary'
+            const hasDays = dayLabels.length > 0
+
+            // 行程區塊：特殊處理，有下拉選單
+            if (isItinerary) {
+              return (
+                <div key={item.id} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => hasDays ? setShowDayNav(!showDayNav) : scrollToSection(item.id)}
+                    className={cn(
+                      'flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all',
+                      isActive || showDayNav
+                        ? 'bg-morandi-gold text-white'
+                        : 'bg-morandi-container/20 text-morandi-secondary hover:bg-morandi-container/40'
+                    )}
+                  >
+                    <Icon size={12} />
+                    {item.label}
+                    {hasDays && <ChevronDown size={10} className={cn('transition-transform', showDayNav && 'rotate-180')} />}
+                  </button>
+
+                  {/* 下拉選單 */}
+                  {showDayNav && hasDays && (
+                    <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-morandi-container/30 p-2 z-50 min-w-[200px]">
+                      <div className="grid grid-cols-5 gap-1">
+                        {dayLabels.map((label, index) => {
+                          const day = data.dailyItinerary?.[index]
+                          const isAlternative = day?.isAlternative
+                          return (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => {
+                                scrollToSection(`day-${index}`)
+                                setShowDayNav(false)
+                              }}
+                              className={cn(
+                                'px-2 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-all text-center',
+                                isAlternative
+                                  ? 'bg-morandi-secondary/10 text-morandi-secondary hover:bg-morandi-secondary/20'
+                                  : 'bg-morandi-gold/10 text-morandi-gold hover:bg-morandi-gold/20'
+                              )}
+                              title={day?.title || `第 ${index + 1} 天`}
+                            >
+                              {label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            }
+
             return (
               <button
                 key={item.id}
@@ -148,7 +233,20 @@ export function TourForm({ data, onChange }: TourFormProps) {
             data={data}
             updateFlightField={handlers.updateFlightField}
             updateFlightFields={handlers.updateFlightFields}
+            updateField={handlers.updateField}
+            canUndoItinerary={itineraryBackup !== null && itineraryBackup.length > 0}
+            onUndoItinerary={() => {
+              if (itineraryBackup) {
+                onChange({ ...data, dailyItinerary: itineraryBackup })
+                setItineraryBackup(null)
+              }
+            }}
             onGenerateDailyItinerary={(days: number, departureDate: string) => {
+              // 備份當前行程（用於復原）
+              if (data.dailyItinerary && data.dailyItinerary.length > 0) {
+                setItineraryBackup([...data.dailyItinerary])
+              }
+
               // 解析出發日期
               const parseDepartureDate = (dateStr: string): Date | null => {
                 if (!dateStr) return null

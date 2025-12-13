@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { SectionTitle } from './SectionTitle'
 
 interface HotelData {
   image?: string // 舊版單張圖片（向後相容）
@@ -14,9 +15,12 @@ interface TourData {
   hotels?: HotelData[]
 }
 
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+
 interface TourHotelsSectionProps {
   data: TourData
   viewMode: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
 // 取得飯店圖片（相容新舊版）
@@ -92,7 +96,7 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
   )
 }
 
-export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
+export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: TourHotelsSectionProps) {
   const hotels = data.hotels || []
 
   if (!data.showHotels && hotels.length === 0) {
@@ -118,17 +122,12 @@ export function TourHotelsSection({ data, viewMode }: TourHotelsSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
         >
-          <h2
-            className={
-              viewMode === 'mobile'
-                ? 'text-2xl font-bold text-morandi-primary mb-4'
-                : 'text-4xl font-bold text-morandi-primary mb-4'
-            }
-          >
-            飯店資訊
-          </h2>
+          <SectionTitle
+            title="飯店資訊"
+            coverStyle={coverStyle}
+            className="mb-12"
+          />
         </motion.div>
 
         <div className={`grid ${getGridClass()} gap-8 mx-auto`}>

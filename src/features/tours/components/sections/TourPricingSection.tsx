@@ -2,6 +2,7 @@
 
 import { Check, X, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SectionTitle } from './SectionTitle'
 
 interface PricingItem {
   text: string
@@ -16,15 +17,18 @@ interface PricingDetails {
   notes: string[]
 }
 
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+
 interface TourPricingSectionProps {
   data: {
     showPricingDetails?: boolean
     pricingDetails?: PricingDetails
   }
   viewMode?: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
-export function TourPricingSection({ data, viewMode = 'desktop' }: TourPricingSectionProps) {
+export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourPricingSectionProps) {
   const pricingDetails = data.pricingDetails
 
   if (!data.showPricingDetails || !pricingDetails) {
@@ -36,12 +40,11 @@ export function TourPricingSection({ data, viewMode = 'desktop' }: TourPricingSe
   return (
     <section className={cn('py-12 bg-morandi-container/30', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className={cn(
-          'font-bold text-morandi-primary mb-8',
-          isMobile ? 'text-xl' : 'text-2xl'
-        )}>
-          團費說明
-        </h2>
+        <SectionTitle
+          title="團費說明"
+          coverStyle={coverStyle}
+          className="mb-8"
+        />
 
         <div className={cn(
           'grid gap-6',

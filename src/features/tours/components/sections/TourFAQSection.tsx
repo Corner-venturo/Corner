@@ -3,11 +3,14 @@
 import { cn } from '@/lib/utils'
 import { MessageCircleQuestion, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { SectionTitle } from './SectionTitle'
 
 interface FAQ {
   question: string
   answer: string
 }
+
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
 
 interface TourFAQSectionProps {
   data: {
@@ -15,9 +18,10 @@ interface TourFAQSectionProps {
     faqs?: FAQ[]
   }
   viewMode?: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
-export function TourFAQSection({ data, viewMode = 'desktop' }: TourFAQSectionProps) {
+export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourFAQSectionProps) {
   const faqs = data.faqs
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
 
@@ -34,13 +38,11 @@ export function TourFAQSection({ data, viewMode = 'desktop' }: TourFAQSectionPro
   return (
     <section className={cn('py-12 bg-morandi-container/20', isMobile && 'py-8')}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className={cn(
-          'font-bold text-morandi-primary mb-8 flex items-center gap-3',
-          isMobile ? 'text-xl' : 'text-2xl'
-        )}>
-          <MessageCircleQuestion className={cn('text-morandi-gold', isMobile ? 'w-5 h-5' : 'w-6 h-6')} />
-          常見問題
-        </h2>
+        <SectionTitle
+          title="常見問題"
+          coverStyle={coverStyle}
+          className="mb-8"
+        />
 
         <div className="space-y-3">
           {faqs.map((faq, index) => (

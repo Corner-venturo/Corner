@@ -36,11 +36,13 @@ export default function ItineraryPage() {
   const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   // 超級管理員載入 workspaces
+  // 注意：不要把 loadWorkspaces 放在依賴陣列，避免無限迴圈
   useEffect(() => {
     if (isSuperAdmin && workspaces.length === 0) {
       loadWorkspaces()
     }
-  }, [isSuperAdmin, workspaces.length, loadWorkspaces])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuperAdmin])
 
   // 所有 useState hooks 集中在一起
   const [statusFilter, setStatusFilter] = useState<string>('全部')

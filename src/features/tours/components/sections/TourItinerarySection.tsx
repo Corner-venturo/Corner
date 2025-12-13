@@ -9,10 +9,14 @@ import {
   DecorativeDivider,
   MobileActivityCarousel,
   DesktopActivityCarousel,
+  JapaneseActivityCard,
+  JapaneseAccommodationCard,
+  JapaneseMealsCard,
 } from '@/components/tour-preview'
 import { ArrowRight, Sparkles, X } from 'lucide-react'
 import Image from 'next/image'
 import { TourFormData } from '@/components/editor/tour-form/types'
+import { SectionTitle } from './SectionTitle'
 
 interface TourItinerarySectionProps {
   data: TourFormData
@@ -20,6 +24,7 @@ interface TourItinerarySectionProps {
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene'
 }
 
 // 將標題中的文字符號轉換成 SVG 圖標
@@ -96,6 +101,7 @@ export function TourItinerarySection({
   activeDayIndex,
   dayRefs,
   handleDayNavigate,
+  coverStyle = 'original',
 }: TourItinerarySectionProps) {
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
   const dayLabels = calculateDayLabels(dailyItinerary)
@@ -132,17 +138,12 @@ export function TourItinerarySection({
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={viewMode === 'mobile' ? 'text-center mb-4' : 'text-center mb-12'}
         >
-          <h2
-            className={
-              viewMode === 'mobile'
-                ? 'text-2xl font-bold text-morandi-primary'
-                : 'text-4xl font-bold text-morandi-primary mb-4'
-            }
-          >
-            詳細行程
-          </h2>
+          <SectionTitle
+            title="詳細行程"
+            coverStyle={coverStyle}
+            className={viewMode === 'mobile' ? 'mb-4' : 'mb-12'}
+          />
         </motion.div>
 
         <div>
@@ -161,52 +162,79 @@ export function TourItinerarySection({
                       : 'relative overflow-hidden rounded-[36px] border border-morandi-container/30 bg-white/95 p-8 shadow-lg backdrop-blur-sm'
                   }
                 >
-                  <div className={cn(
-                    "relative overflow-hidden rounded-2xl bg-gradient-to-r from-morandi-gold/10 via-morandi-gold/5 to-transparent p-4",
-                    viewMode === 'mobile' ? 'mb-4' : 'mb-6'
-                  )}>
-                    <div className="absolute -top-4 -left-4 w-24 h-24 bg-morandi-gold/20 rounded-full blur-2xl" />
-                    {viewMode === 'mobile' ? (
-                      <div className="relative flex items-center gap-3">
-                        <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="small" />
-                        {day.isAlternative && (
-                          <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-[10px] rounded-full">
-                            建議方案
-                          </span>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          {day.date && <DateSubtitle date={day.date} />}
-                          {day.title && (
-                            <h3 className="text-[10px] font-semibold leading-relaxed text-morandi-primary flex items-center flex-wrap mt-1">
-                              {renderTitleWithIcons(day.title, viewMode)}
-                            </h3>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="relative flex items-center gap-3 md:gap-4 mb-2 md:mb-3">
-                          <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="default" />
+                  {/* 日式和風風格的標題區塊 */}
+                  {coverStyle === 'nature' ? (
+                    <div className={cn(
+                      "relative mb-4 md:mb-6",
+                      viewMode === 'mobile' ? 'px-4' : ''
+                    )}>
+                      <DayLabel
+                        dayLabel={dayLabels[index]}
+                        isAlternative={day.isAlternative}
+                        coverStyle="nature"
+                        title={day.title}
+                      />
+                      {day.isAlternative && (
+                        <span className="ml-4 px-2 py-0.5 bg-[#30abe8]/10 text-[#30abe8] text-xs rounded-full">
+                          建議方案
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    /* 預設風格的標題區塊 */
+                    <div className={cn(
+                      "relative overflow-hidden rounded-2xl bg-gradient-to-r from-morandi-gold/10 via-morandi-gold/5 to-transparent p-4",
+                      viewMode === 'mobile' ? 'mb-4' : 'mb-6'
+                    )}>
+                      <div className="absolute -top-4 -left-4 w-24 h-24 bg-morandi-gold/20 rounded-full blur-2xl" />
+                      {viewMode === 'mobile' ? (
+                        <div className="relative flex items-center gap-3">
+                          <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="small" />
                           {day.isAlternative && (
-                            <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+                            <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-[10px] rounded-full">
                               建議方案
                             </span>
                           )}
-                          {day.date && <DateSubtitle date={day.date} />}
+                          <div className="flex-1 min-w-0">
+                            {day.date && <DateSubtitle date={day.date} />}
+                            {day.title && (
+                              <h3 className="text-[10px] font-semibold leading-relaxed text-morandi-primary flex items-center flex-wrap mt-1">
+                                {renderTitleWithIcons(day.title, viewMode)}
+                              </h3>
+                            )}
+                          </div>
                         </div>
-                        {day.title && (
-                          <h3 className="relative text-xl font-bold leading-relaxed text-morandi-primary">
-                            {renderTitleWithIcons(day.title, viewMode)}
-                          </h3>
-                        )}
-                      </>
-                    )}
-                  </div>
+                      ) : (
+                        <>
+                          <div className="relative flex items-center gap-3 md:gap-4 mb-2 md:mb-3">
+                            <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="default" />
+                            {day.isAlternative && (
+                              <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
+                                建議方案
+                              </span>
+                            )}
+                            {day.date && <DateSubtitle date={day.date} />}
+                          </div>
+                          {day.title && (
+                            <h3 className="relative text-xl font-bold leading-relaxed text-morandi-primary">
+                              {renderTitleWithIcons(day.title, viewMode)}
+                            </h3>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
 
                   {day.highlight && (
-                    <div className="mb-6 flex items-start gap-2 px-4 py-3 rounded-xl bg-amber-50/80 border border-amber-200/50">
-                      <Sparkles size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm md:text-base font-medium leading-relaxed text-amber-800">
+                    <div className={cn(
+                      "flex items-start gap-2 rounded-xl bg-amber-50/80 border border-amber-200/50",
+                      viewMode === 'mobile' ? 'mb-4 px-3 py-2' : 'mb-6 px-4 py-3'
+                    )}>
+                      <Sparkles size={viewMode === 'mobile' ? 14 : 16} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                      <p className={cn(
+                        "font-medium leading-relaxed text-amber-800",
+                        viewMode === 'mobile' ? 'text-xs' : 'text-sm md:text-base'
+                      )}>
                         {day.highlight}
                       </p>
                     </div>
@@ -222,8 +250,14 @@ export function TourItinerarySection({
                   )}
 
                   {day.activities && day.activities.length > 0 && (
-                    <div className="mb-6 space-y-3 overflow-hidden">
-                      <DecorativeDivider variant="simple" />
+                    <div className={cn(
+                      "space-y-3 overflow-hidden",
+                      viewMode === 'mobile' ? 'mb-4' : 'mb-6'
+                    )}>
+                      {/* 日式風格不需要分隔線 */}
+                      {coverStyle !== 'nature' && coverStyle !== 'serene' && (
+                        <DecorativeDivider variant="simple" />
+                      )}
                       {viewMode === 'mobile' ? (
                         // 手機版：使用滿版滑動輪播組件
                         <MobileActivityCarousel
@@ -233,6 +267,84 @@ export function TourItinerarySection({
                             image: a.image || '',
                           }))}
                         />
+                      ) : (coverStyle === 'nature' || coverStyle === 'serene') ? (
+                        // 日式和風風格：根據景點數量調整排版
+                        day.activities.length === 1 ? (
+                          // 只有一個景點：滿版顯示
+                          <JapaneseActivityCard
+                            title={day.activities[0].title}
+                            description={day.activities[0].description || ''}
+                            image={day.activities[0].image}
+                            onClick={() => handleActivityClick(day.activities[0])}
+                          />
+                        ) : (
+                          // 多個景點：根據數量智能排版
+                          (() => {
+                            const count = day.activities.length
+                            // 計算最後一排的數量
+                            const remainder = count % 3
+                            const hasLastRow = remainder > 0 && count > 3
+
+                            if (!hasLastRow || count <= 3) {
+                              // 2-3 個景點，或剛好整除，直接網格排列
+                              return (
+                                <div className={cn(
+                                  "grid gap-6",
+                                  count === 2 && "grid-cols-1 md:grid-cols-2",
+                                  count >= 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                                )}>
+                                  {day.activities.map((activity, actIndex) => (
+                                    <JapaneseActivityCard
+                                      key={`activity-${actIndex}`}
+                                      title={activity.title}
+                                      description={activity.description || ''}
+                                      image={activity.image}
+                                      onClick={() => handleActivityClick(activity)}
+                                    />
+                                  ))}
+                                </div>
+                              )
+                            }
+
+                            // 有餘數：分開處理前面整排和最後一排
+                            const mainCount = count - remainder
+                            const mainActivities = day.activities.slice(0, mainCount)
+                            const lastActivities = day.activities.slice(mainCount)
+
+                            return (
+                              <div className="space-y-6">
+                                {/* 前面整排 */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                  {mainActivities.map((activity, actIndex) => (
+                                    <JapaneseActivityCard
+                                      key={`activity-${actIndex}`}
+                                      title={activity.title}
+                                      description={activity.description || ''}
+                                      image={activity.image}
+                                      onClick={() => handleActivityClick(activity)}
+                                    />
+                                  ))}
+                                </div>
+                                {/* 最後一排：置中排列 */}
+                                <div className={cn(
+                                  "grid gap-6 justify-center",
+                                  remainder === 1 && "grid-cols-1 max-w-md mx-auto",
+                                  remainder === 2 && "grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto"
+                                )}>
+                                  {lastActivities.map((activity, actIndex) => (
+                                    <JapaneseActivityCard
+                                      key={`activity-last-${actIndex}`}
+                                      title={activity.title}
+                                      description={activity.description || ''}
+                                      image={activity.image}
+                                      onClick={() => handleActivityClick(activity)}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )
+                          })()
+                        )
                       ) : (
                         // 桌面版：智能排版 - 根據圖片數量自動調整
                         (() => {
@@ -402,17 +514,32 @@ export function TourItinerarySection({
                   )}
 
                   {day.recommendations && day.recommendations.length > 0 && (
-                    <div className="mb-8 rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-inner">
-                      <h4 className="mb-3 flex items-center gap-2 text-lg font-semibold text-emerald-900">
+                    <div className={cn(
+                      "rounded-2xl sm:rounded-3xl border border-emerald-200 bg-emerald-50/80 shadow-inner",
+                      viewMode === 'mobile' ? 'mb-4 p-3' : 'mb-8 p-6'
+                    )}>
+                      <h4 className={cn(
+                        "flex items-center gap-2 font-semibold text-emerald-900",
+                        viewMode === 'mobile' ? 'mb-2 text-sm' : 'mb-3 text-lg'
+                      )}>
                         推薦行程
                       </h4>
-                      <ul className="space-y-2 text-emerald-800">
+                      <ul className={cn(
+                        "text-emerald-800",
+                        viewMode === 'mobile' ? 'space-y-1.5' : 'space-y-2'
+                      )}>
                         {day.recommendations.map((rec: string, recIndex: number) => (
                           <li
                             key={recIndex}
-                            className="flex items-start gap-2 text-sm leading-relaxed"
+                            className={cn(
+                              "flex items-start gap-2 leading-relaxed",
+                              viewMode === 'mobile' ? 'text-xs' : 'text-sm'
+                            )}
                           >
-                            <span className="mt-1 h-2 w-2 rounded-full bg-emerald-500"></span>
+                            <span className={cn(
+                              "rounded-full bg-emerald-500 flex-shrink-0",
+                              viewMode === 'mobile' ? 'mt-1 h-1.5 w-1.5' : 'mt-1 h-2 w-2'
+                            )}></span>
                             <span>{rec}</span>
                           </li>
                         ))}
@@ -420,81 +547,119 @@ export function TourItinerarySection({
                     </div>
                   )}
 
-                  <div className={cn(
-                    "grid",
-                    viewMode === 'mobile' 
-                      ? 'grid-cols-3 gap-1' 
-                      : 'grid-cols-1 md:grid-cols-3 gap-4'
-                  )}>
+                  {/* 餐食區塊 */}
+                  {(coverStyle === 'nature' || coverStyle === 'serene') && viewMode !== 'mobile' ? (
+                    // 日式和風風格餐食卡片
+                    <JapaneseMealsCard
+                      meals={{
+                        breakfast: day.meals?.breakfast || '敬請自理',
+                        lunch: day.meals?.lunch || '敬請自理',
+                        dinner: day.meals?.dinner || '敬請自理',
+                      }}
+                    />
+                  ) : (
+                    // 原版餐食樣式
                     <div className={cn(
-                      "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
+                      "grid",
                       viewMode === 'mobile'
-                        ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
-                        : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
-                    )}>
-                      <p className={cn(
-                        "text-morandi-secondary/80 mb-1",
-                        viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
-                      )}>早餐</p>
-                      <p className={cn(
-                        "font-semibold text-morandi-primary",
-                        viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
-                      )}>
-                        {day.meals?.breakfast || '敬請自理'}
-                      </p>
-                    </div>
-                    <div className={cn(
-                      "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
-                      viewMode === 'mobile'
-                        ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
-                        : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
-                    )}>
-                      <p className={cn(
-                        "text-morandi-secondary/80 mb-1",
-                        viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
-                      )}>午餐</p>
-                      <p className={cn(
-                        "font-semibold text-morandi-primary",
-                        viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
-                      )}>
-                        {day.meals?.lunch || '敬請自理'}
-                      </p>
-                    </div>
-                    <div className={cn(
-                      "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
-                      viewMode === 'mobile'
-                        ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
-                        : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
-                    )}>
-                      <p className={cn(
-                        "text-morandi-secondary/80 mb-1",
-                        viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
-                      )}>晚餐</p>
-                      <p className={cn(
-                        "font-semibold text-morandi-primary",
-                        viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
-                      )}>
-                        {day.meals?.dinner || '敬請自理'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {day.accommodation && (
-                    <div className={cn(
-                      "mt-6 border border-morandi-gold/30 bg-morandi-gold/10 text-morandi-primary shadow-inner",
-                      viewMode === 'mobile' ? 'rounded-xl p-3' : 'rounded-2xl px-4 py-3'
+                        ? 'grid-cols-3 gap-1'
+                        : 'grid-cols-1 md:grid-cols-3 gap-4'
                     )}>
                       <div className={cn(
-                        "flex items-baseline gap-x-3",
-                        viewMode === 'mobile' ? 'text-xs' : 'text-sm'
+                        "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
+                        viewMode === 'mobile'
+                          ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
+                          : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
                       )}>
-                        <span className="font-medium tracking-wide text-morandi-secondary flex-shrink-0">住宿</span>
-                        <span className={cn(
-                          "font-semibold flex-1 text-center",
-                          viewMode === 'mobile' ? '' : 'text-base'
-                        )}>{day.accommodation}</span>
+                        <p className={cn(
+                          "text-morandi-secondary/80 mb-1",
+                          viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
+                        )}>早餐</p>
+                        <p className={cn(
+                          "font-semibold text-morandi-primary",
+                          viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
+                        )}>
+                          {day.meals?.breakfast || '敬請自理'}
+                        </p>
+                      </div>
+                      <div className={cn(
+                        "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
+                        viewMode === 'mobile'
+                          ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
+                          : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
+                      )}>
+                        <p className={cn(
+                          "text-morandi-secondary/80 mb-1",
+                          viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
+                        )}>午餐</p>
+                        <p className={cn(
+                          "font-semibold text-morandi-primary",
+                          viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
+                        )}>
+                          {day.meals?.lunch || '敬請自理'}
+                        </p>
+                      </div>
+                      <div className={cn(
+                        "border border-morandi-gold/30 bg-morandi-gold/5 transition-all hover:shadow-md",
+                        viewMode === 'mobile'
+                          ? 'rounded-lg px-1.5 py-1.5 flex flex-col'
+                          : 'rounded-2xl px-4 py-4 flex flex-col items-center text-center min-h-[80px] justify-center'
+                      )}>
+                        <p className={cn(
+                          "text-morandi-secondary/80 mb-1",
+                          viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
+                        )}>晚餐</p>
+                        <p className={cn(
+                          "font-semibold text-morandi-primary",
+                          viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
+                        )}>
+                          {day.meals?.dinner || '敬請自理'}
+                        </p>
                       </div>
                     </div>
+                  )}
+
+                  {day.accommodation && (
+                    (coverStyle === 'nature' || coverStyle === 'serene') && viewMode !== 'mobile' ? (
+                      // 日式和風風格住宿卡片
+                      <JapaneseAccommodationCard
+                        name={day.accommodation}
+                        url={day.accommodationUrl}
+                        rating={day.accommodationRating}
+                        className="mt-4 sm:mt-6"
+                      />
+                    ) : (
+                      // 原版住宿樣式
+                      <div className={cn(
+                        "border border-morandi-gold/30 bg-morandi-gold/10 text-morandi-primary shadow-inner",
+                        viewMode === 'mobile' ? 'mt-3 rounded-lg p-2' : 'mt-6 rounded-2xl px-4 py-3'
+                      )}>
+                        <div className={cn(
+                          "flex items-baseline gap-x-3",
+                          viewMode === 'mobile' ? 'text-xs' : 'text-sm'
+                        )}>
+                          <span className="font-medium tracking-wide text-morandi-secondary flex-shrink-0">住宿</span>
+                          {day.accommodationUrl ? (
+                            <a
+                              href={day.accommodationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                "font-semibold flex-1 text-center hover:underline transition-all",
+                                viewMode === 'mobile' ? '' : 'text-base'
+                              )}
+                            >
+                              {day.accommodation}
+                            </a>
+                          ) : (
+                            <span className={cn(
+                              "font-semibold flex-1 text-center",
+                              viewMode === 'mobile' ? '' : 'text-base'
+                            )}>{day.accommodation}</span>
+                          )}
+                        </div>
+                      </div>
+                    )
                   )}
 
                   {/* 每日圖片輪播 - 放在住宿下方 */}

@@ -51,8 +51,10 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
     <div
       className={cn(
         'fixed top-0 right-0 h-[72px] bg-background z-[200] flex items-center justify-between px-6',
-        'left-0 md:left-16'
+        'left-0',
+        sidebarCollapsed ? 'md:left-16' : 'md:left-[190px]'
       )}
+      style={{ transition: 'left 300ms ease-in-out' }}
     >
       {/* 分割線 */}
       <div

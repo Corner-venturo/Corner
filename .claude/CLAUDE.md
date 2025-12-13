@@ -15,6 +15,7 @@
 | **禁止大型文件** | 組件 < 300 行、Hook < 200 行 | 必須拆分 |
 | **禁止忽略資料庫** | 修改功能前必須檢查 Supabase 表格結構 | 必須確認欄位存在 |
 | **禁止盲目修改** | 每次修改前必須先讀取並理解現有代碼 | 必須先 Read 再 Edit |
+| **禁止自訂版面** | 列表頁面必須使用標準組件 | 必須用 EnhancedTable |
 
 ### ✅ 正確做法
 
@@ -36,6 +37,22 @@ const items: Customer[] = data.items
 // hooks/useCustomerSearch.ts - 130 行
 // hooks/useImageEditor.ts - 200 行
 // components/CustomerTable.tsx - 250 行
+
+// ❌ 錯誤：自訂列表版面
+<div className="custom-table">...</div>
+<table className="my-table">...</table>
+
+// ✅ 正確：使用標準組件
+import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+
+// 列表頁面標準結構：
+<div className="h-full flex flex-col">
+  <ResponsiveHeader title="XXX管理" icon={Icon} ... />
+  <div className="flex-1 overflow-auto">
+    <EnhancedTable columns={columns} data={data} ... />
+  </div>
+</div>
 ```
 
 ### 📋 新功能開發檢查清單

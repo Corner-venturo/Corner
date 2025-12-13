@@ -318,6 +318,8 @@ export interface DailyItineraryDay {
   recommendations: string[]
   meals: DailyMeals
   accommodation: string
+  accommodationUrl?: string // 飯店官網或訂房連結
+  accommodationRating?: number // 飯店星級（1-5）
   images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
 }
 
@@ -383,7 +385,7 @@ export interface Itinerary {
   country: string
   city: string
   status: 'draft' | 'published'
-  cover_style?: 'original' | 'gemini' // 封面風格
+  cover_style?: 'original' | 'gemini' | 'nature' | 'serene' // 封面風格
   price?: string | null // 價格（如：39,800）
   price_note?: string | null // 價格備註（如：起、/人）
 

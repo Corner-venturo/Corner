@@ -645,6 +645,7 @@ export function DailyItinerarySection({
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
         <div
           key={dayIndex}
+          id={`day-${dayIndex}`}
           className="p-6 border border-morandi-container rounded-2xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-white to-morandi-container/10 shadow-sm"
         >
           {/* Day 標籤與控制按鈕 */}
@@ -1047,15 +1048,45 @@ export function DailyItinerarySection({
           </div>
 
           {/* 住宿 */}
-          <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">住宿</label>
-            <input
-              type="text"
-              value={day.accommodation || ''}
-              onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
-              placeholder="ASO RESORT GRANDVRIO HOTEL"
-            />
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">住宿名稱</label>
+              <input
+                type="text"
+                value={day.accommodation || ''}
+                onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
+                className="w-full px-2 py-1 border rounded text-sm"
+                placeholder="飯店名稱"
+              />
+            </div>
+            <div className="w-24">
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">星級</label>
+              <select
+                value={day.accommodationRating ?? 5}
+                onChange={e => {
+                  const val = e.target.value
+                  updateDailyItinerary(dayIndex, 'accommodationRating', val === '0' ? 0 : Number(val))
+                }}
+                className="w-full px-2 py-1 border rounded text-sm"
+              >
+                <option value={5}>5星</option>
+                <option value={4}>4星</option>
+                <option value={3}>3星</option>
+                <option value={2}>2星</option>
+                <option value={1}>1星</option>
+                <option value={0}>特色旅宿</option>
+              </select>
+            </div>
+            <div className="flex-1 min-w-[180px]">
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">飯店連結</label>
+              <input
+                type="url"
+                value={day.accommodationUrl || ''}
+                onChange={e => updateDailyItinerary(dayIndex, 'accommodationUrl', e.target.value)}
+                className="w-full px-2 py-1 border rounded text-sm"
+                placeholder="https://..."
+              />
+            </div>
           </div>
 
           {/* 每日圖片 */}

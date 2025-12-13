@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { Users } from 'lucide-react'
+import { SectionTitle } from './SectionTitle'
 
 interface PriceTier {
   label: string
@@ -11,12 +12,15 @@ interface PriceTier {
   addon?: string
 }
 
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+
 interface TourPriceTiersSectionProps {
   data: {
     showPriceTiers?: boolean
     priceTiers?: PriceTier[]
   }
   viewMode?: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
 // 格式化價格（加千分位逗號）
@@ -45,7 +49,7 @@ const getTierColorClass = (label: string, index: number): string => {
   return 'bg-morandi-primary'
 }
 
-export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceTiersSectionProps) {
+export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourPriceTiersSectionProps) {
   const priceTiers = data.priceTiers
 
   if (!data.showPriceTiers || !priceTiers || priceTiers.length === 0) {
@@ -58,13 +62,11 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop' }: TourPriceT
   return (
     <section className={cn('py-12 bg-white', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className={cn(
-          'font-bold text-morandi-primary mb-8 flex items-center gap-3',
-          isMobile ? 'text-xl' : 'text-2xl'
-        )}>
-          <Users className={cn('text-morandi-gold', isMobile ? 'w-5 h-5' : 'w-6 h-6')} />
-          價格方案
-        </h2>
+        <SectionTitle
+          title="價格方案"
+          coverStyle={coverStyle}
+          className="mb-8"
+        />
 
         {/* 根據數量自適應版面 */}
         <div className={cn(

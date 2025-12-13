@@ -2,15 +2,13 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useMemo, useEffect } from 'react'
-import { MapPin, Building2, Map, Edit } from 'lucide-react'
+import { MapPin, Map, Star, Globe } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 
@@ -19,13 +17,9 @@ interface Country {
   name: string
   name_en: string
   code: string | null
-  emoji: string | null
   has_regions: boolean | null
   display_order: number | null
   is_active: boolean | null
-  created_at: string | null
-  updated_at: string | null
-  [key: string]: unknown
 }
 
 interface Region {
@@ -36,9 +30,6 @@ interface Region {
   description: string | null
   display_order: number | null
   is_active: boolean | null
-  created_at: string | null
-  updated_at: string | null
-  [key: string]: unknown
 }
 
 interface City {
@@ -47,34 +38,25 @@ interface City {
   region_id: string | null
   name: string
   name_en: string | null
-  description: string | null
-  timezone: string | null
-  display_order: number | null
   is_active: boolean | null
+  is_major: boolean | null
   background_image_url: string | null
-  background_image_url_2: string | null
-  primary_image: number | null
-  airport_code: string | null
-  created_at: string | null
-  updated_at: string | null
-  [key: string]: unknown
 }
+
+type TabType = 'countries' | 'regions'
 
 export default function RegionsPage() {
   const [countries, setCountries] = useState<Country[]>([])
   const [regions, setRegions] = useState<Region[]>([])
   const [cities, setCities] = useState<City[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('countries')
-  const [selectedCountryFilter, setSelectedCountryFilter] = useState('all')
-  const [selectedRegionCountryFilter, setSelectedRegionCountryFilter] = useState('all')
 
-  // 編輯城市對話框
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [editingCity, setEditingCity] = useState<City | null>(null)
-  const [editForm, setEditForm] = useState({
-    background_image_url: '',
-  })
+  // 分頁
+  const [activeTab, setActiveTab] = useState<TabType>('countries')
+
+  // 城市管理視窗
+  const [isCitiesDialogOpen, setIsCitiesDialogOpen] = useState(false)
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
 
   // 載入資料
   const fetchData = async () => {
@@ -90,9 +72,9 @@ export default function RegionsPage() {
     if (regionsRes.error) logger.error('Error fetching regions:', regionsRes.error)
     if (citiesRes.error) logger.error('Error fetching cities:', citiesRes.error)
 
-    if (countriesRes.data) setCountries(countriesRes.data)
-    if (regionsRes.data) setRegions(regionsRes.data)
-    if (citiesRes.data) setCities(citiesRes.data)
+    if (countriesRes.data) setCountries(countriesRes.data as Country[])
+    if (regionsRes.data) setRegions(regionsRes.data as Region[])
+    if (citiesRes.data) setCities(citiesRes.data as City[])
     setLoading(false)
   }
 
@@ -100,25 +82,18 @@ export default function RegionsPage() {
     fetchData()
   }, [])
 
-  // 開啟編輯對話框
-  const handleEditCity = (city: City) => {
-    setEditingCity(city)
-    setEditForm({
-      background_image_url: city.background_image_url || '',
-    })
-    setIsEditDialogOpen(true)
+  // 開啟城市管理視窗
+  const handleOpenCitiesDialog = (country: Country) => {
+    setSelectedCountry(country)
+    setIsCitiesDialogOpen(true)
   }
 
-  // 儲存編輯
-  const handleSaveCity = async () => {
-    if (!editingCity) return
-
+  // 切換城市主要狀態
+  const handleToggleMajor = async (cityId: string, currentStatus: boolean) => {
     const { error } = await supabase
       .from('cities')
-      .update({
-        background_image_url: editForm.background_image_url || null,
-      })
-      .eq('id', editingCity.id)
+      .update({ is_major: !currentStatus })
+      .eq('id', cityId)
 
     if (error) {
       logger.error('Error updating city:', error)
@@ -126,9 +101,10 @@ export default function RegionsPage() {
       return
     }
 
-    toast.success('更新成功')
-    setIsEditDialogOpen(false)
-    fetchData()
+    // 更新本地狀態
+    setCities(prev => prev.map(c =>
+      c.id === cityId ? { ...c, is_major: !currentStatus } : c
+    ))
   }
 
   // 切換地區狀態
@@ -168,62 +144,108 @@ export default function RegionsPage() {
     fetchData()
   }
 
-  // 國家表格
-  const countryColumns: TableColumn[] = useMemo(
+  // 取得選中國家的城市
+  const countryCities = useMemo(() => {
+    if (!selectedCountry) return []
+    return cities.filter(c => c.country_id === selectedCountry.id)
+  }, [cities, selectedCountry])
+
+  // 按地區分組城市
+  const citiesByRegion = useMemo(() => {
+    const grouped: Record<string, City[]> = { '': [] }
+
+    countryCities.forEach(city => {
+      const regionId = city.region_id || ''
+      if (!grouped[regionId]) {
+        grouped[regionId] = []
+      }
+      grouped[regionId].push(city)
+    })
+
+    return grouped
+  }, [countryCities])
+
+  // 取得地區名稱
+  const getRegionName = (regionId: string) => {
+    if (!regionId) return '未分類'
+    const region = regions.find(r => r.id === regionId)
+    return region?.name || regionId
+  }
+
+  // 國家表格欄位
+  const countryColumns: TableColumn<Country>[] = useMemo(
     () => [
-      {
-        key: 'emoji',
-        label: '',
-        render: (value: unknown) => <span className="text-2xl">{(value as string) || '🌍'}</span>,
-      },
       {
         key: 'name',
         label: '國家名稱',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: unknown) => (
+        render: (_value, row) => (
           <div>
-            <div className="font-medium text-morandi-primary">{value as string}</div>
-            <div className="text-xs text-morandi-secondary">{(row as Country).name_en}</div>
+            <div className="font-medium text-foreground">{row.name}</div>
+            <div className="text-xs text-muted-foreground">{row.name_en}</div>
           </div>
         ),
       },
       {
         key: 'code',
         label: '代碼',
-        sortable: true,
+        render: (_value, row) => (
+          <span className="text-sm font-mono">{row.code || '-'}</span>
+        ),
       },
       {
         key: 'has_regions',
-        label: '有地區分類',
-        render: (value: unknown) => (
-          <span className={value ? 'text-green-600' : 'text-gray-400'}>
-            {value ? '是' : '否'}
+        label: '有地區',
+        render: (_value, row) => (
+          <span className={row.has_regions ? 'text-green-600' : 'text-muted-foreground'}>
+            {row.has_regions ? '是' : '否'}
           </span>
         ),
       },
       {
         key: 'is_active',
         label: '狀態',
-        render: (value: unknown) => (
-          <span className={value ? 'text-green-600' : 'text-gray-400'}>
-            {value ? '啟用' : '停用'}
+        render: (_value, row) => (
+          <span className={row.is_active ? 'text-green-600' : 'text-muted-foreground'}>
+            {row.is_active ? '啟用' : '停用'}
           </span>
         ),
       },
+      {
+        key: 'id',
+        label: '城市',
+        render: (_value, row) => {
+          const cityCount = cities.filter(c => c.country_id === row.id).length
+          const majorCount = cities.filter(c => c.country_id === row.id && c.is_major).length
+          return (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleOpenCitiesDialog(row)}
+              className="h-8 px-3 text-xs"
+            >
+              {cityCount} 城市
+              {majorCount > 0 && (
+                <span className="ml-1 text-amber-600">({majorCount} 主要)</span>
+              )}
+            </Button>
+          )
+        },
+      },
     ],
-    []
+    [cities]
   )
 
-  // 地區表格
-  const regionColumns: TableColumn[] = useMemo(
+  // 地區表格欄位
+  const regionColumns: TableColumn<Region>[] = useMemo(
     () => [
       {
         key: 'country_id',
         label: '國家',
-        render: (value: unknown) => {
-          const country = countries.find(c => c.id === value)
-          return <span>{country?.emoji} {country?.name || (value as string)}</span>
+        render: (_value, row) => {
+          const country = countries.find(c => c.id === row.country_id)
+          return <span>{country?.name || row.country_id}</span>
         },
       },
       {
@@ -231,48 +253,48 @@ export default function RegionsPage() {
         label: '地區名稱',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: unknown) => (
+        render: (_value, row) => (
           <div>
-            <div className="font-medium text-morandi-primary">{value as string}</div>
-            <div className="text-xs text-morandi-secondary">{(row as Region).name_en}</div>
+            <div className="font-medium text-foreground">{row.name}</div>
+            <div className="text-xs text-muted-foreground">{row.name_en}</div>
           </div>
         ),
       },
       {
         key: 'description',
         label: '描述',
-        render: (value: unknown) => (
-          <span className="text-sm text-morandi-secondary truncate max-w-xs block">
-            {(value as string) || '-'}
+        render: (_value, row) => (
+          <span className="text-sm text-muted-foreground truncate max-w-xs block">
+            {row.description || '-'}
           </span>
         ),
       },
       {
         key: 'is_active',
         label: '狀態',
-        render: (value: unknown) => (
-          <span className={value ? 'text-green-600' : 'text-gray-400'}>
-            {value ? '啟用' : '停用'}
+        render: (_value, row) => (
+          <span className={row.is_active ? 'text-green-600' : 'text-muted-foreground'}>
+            {row.is_active ? '啟用' : '停用'}
           </span>
         ),
       },
       {
-        key: 'actions',
+        key: 'id',
         label: '操作',
-        render: (_value: unknown, row: unknown) => (
+        render: (_value, row) => (
           <div className="flex gap-2">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleToggleRegionStatus((row as Region).id, (row as Region).is_active ?? false)}
+              onClick={() => handleToggleRegionStatus(row.id, row.is_active ?? false)}
               className="h-8 px-2 text-xs"
             >
-              {(row as Region).is_active ? '停用' : '啟用'}
+              {row.is_active ? '停用' : '啟用'}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleDeleteRegion((row as Region).id)}
+              onClick={() => handleDeleteRegion(row.id)}
               className="h-8 px-2 text-xs text-red-500 hover:text-red-600"
             >
               刪除
@@ -282,97 +304,6 @@ export default function RegionsPage() {
       },
     ],
     [countries]
-  )
-
-  // 篩選地區資料
-  const filteredRegions = useMemo(() => {
-    if (!selectedRegionCountryFilter || selectedRegionCountryFilter === 'all') return regions
-    return regions.filter(region => region.country_id === selectedRegionCountryFilter)
-  }, [regions, selectedRegionCountryFilter])
-
-  // 篩選城市資料
-  const filteredCities = useMemo(() => {
-    if (!selectedCountryFilter || selectedCountryFilter === 'all') return cities
-    return cities.filter(city => city.country_id === selectedCountryFilter)
-  }, [cities, selectedCountryFilter])
-
-  // 城市表格
-  const cityColumns: TableColumn[] = useMemo(
-    () => [
-      {
-        key: 'country_id',
-        label: '國家',
-        render: (value: unknown) => {
-          const country = countries.find(c => c.id === value)
-          return <span>{country?.emoji} {country?.name || (value as string)}</span>
-        },
-      },
-      {
-        key: 'region_id',
-        label: '地區',
-        render: (value: unknown) => {
-          if (!value) return <span className="text-gray-400">-</span>
-          const region = regions.find(r => r.id === value)
-          return <span>{region?.name || (value as string)}</span>
-        },
-      },
-      {
-        key: 'name',
-        label: '城市名稱',
-        sortable: true,
-        filterable: true,
-        render: (value: unknown, row: unknown) => (
-          <div>
-            <div className="font-medium text-morandi-primary">{value as string}</div>
-            <div className="text-xs text-morandi-secondary">{(row as City).name_en}</div>
-          </div>
-        ),
-      },
-      {
-        key: 'background_image_url',
-        label: '封面圖',
-        render: (value: unknown) => {
-          if (!value) {
-            return <span className="text-xs text-gray-400">未設定</span>
-          }
-          return (
-            <img
-              src={value as string}
-              alt="封面圖"
-              className="w-16 h-10 object-cover rounded"
-              onError={(e) => {
-                e.currentTarget.src = ''
-                e.currentTarget.alt = '圖片載入失敗'
-              }}
-            />
-          )
-        },
-      },
-      {
-        key: 'is_active',
-        label: '狀態',
-        render: (value: unknown) => (
-          <span className={value ? 'text-green-600' : 'text-gray-400'}>
-            {value ? '啟用' : '停用'}
-          </span>
-        ),
-      },
-      {
-        key: 'actions',
-        label: '操作',
-        render: (_value: unknown, row: unknown) => (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleEditCity(row as City)}
-            className="h-8 w-8 p-0"
-          >
-            <Edit size={16} />
-          </Button>
-        ),
-      },
-    ],
-    [countries, regions]
   )
 
   return (
@@ -386,48 +317,17 @@ export default function RegionsPage() {
           { label: '地區管理', href: '/database/regions' },
         ]}
         tabs={[
-          { value: 'countries', label: '國家', icon: Building2 },
+          { value: 'countries', label: '國家', icon: Globe },
           { value: 'regions', label: '地區', icon: Map },
-          { value: 'cities', label: '城市', icon: MapPin },
         ]}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
-        filters={
-          activeTab === 'cities' ? (
-            <Select value={selectedCountryFilter} onValueChange={setSelectedCountryFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="所有國家" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">所有國家</SelectItem>
-                {countries.map(country => (
-                  <SelectItem key={country.id} value={country.id}>
-                    {country.emoji} {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : activeTab === 'regions' ? (
-            <Select value={selectedRegionCountryFilter} onValueChange={setSelectedRegionCountryFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="所有國家" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">所有國家</SelectItem>
-                {countries.map(country => (
-                  <SelectItem key={country.id} value={country.id}>
-                    {country.emoji} {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : undefined
-        }
+        onTabChange={(tabId) => setActiveTab(tabId as TabType)}
       />
 
+      {/* 表格內容 */}
       <div className="flex-1 overflow-auto">
         {activeTab === 'countries' && (
-          <EnhancedTable
+          <EnhancedTable<Country>
             columns={countryColumns}
             data={countries}
             isLoading={loading}
@@ -435,66 +335,70 @@ export default function RegionsPage() {
           />
         )}
         {activeTab === 'regions' && (
-          <EnhancedTable
+          <EnhancedTable<Region>
             columns={regionColumns}
-            data={filteredRegions}
+            data={regions}
             isLoading={loading}
             emptyMessage="尚無地區資料"
           />
         )}
-        {activeTab === 'cities' && (
-          <EnhancedTable
-            columns={cityColumns}
-            data={filteredCities}
-            isLoading={loading}
-            emptyMessage="尚無城市資料"
-          />
-        )}
       </div>
 
-      {/* 編輯城市對話框 */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      {/* 城市管理視窗 */}
+      <Dialog open={isCitiesDialogOpen} onOpenChange={setIsCitiesDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>編輯城市 - {editingCity?.name}</DialogTitle>
+            <DialogTitle>
+              {selectedCountry?.name} - 主要城市設定
+            </DialogTitle>
           </DialogHeader>
 
-          {editingCity && (
+          {countryCities.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              此國家尚無城市資料
+            </div>
+          ) : (
             <div className="space-y-6">
-              {/* 封面圖 */}
-              <div>
-                <Label>封面圖 URL</Label>
-                <Input
-                  value={editForm.background_image_url}
-                  onChange={e => setEditForm({ ...editForm, background_image_url: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
-                />
-                <p className="text-xs text-morandi-secondary mt-1">
-                  建立行程時會自動使用此封面圖
-                </p>
-                {editForm.background_image_url && (
-                  <div className="mt-2">
-                    <img
-                      src={editForm.background_image_url}
-                      alt="預覽"
-                      className="w-full h-40 object-cover rounded"
-                      onError={e => {
-                        e.currentTarget.src = ''
-                        e.currentTarget.alt = '圖片載入失敗'
-                      }}
-                    />
+              {Object.entries(citiesByRegion).map(([regionId, regionCities]) => (
+                <div key={regionId || 'no-region'}>
+                  {/* 地區標題 */}
+                  <div className="text-sm font-medium text-muted-foreground mb-2 pb-1 border-b">
+                    {getRegionName(regionId)} ({regionCities.length})
                   </div>
-                )}
-              </div>
 
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  取消
-                </Button>
-                <Button onClick={handleSaveCity}>儲存</Button>
-              </div>
+                  {/* 城市列表 - 勾選式 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {regionCities.map(city => (
+                      <label
+                        key={city.id}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-muted/50 transition-colors"
+                      >
+                        <Checkbox
+                          checked={city.is_major ?? false}
+                          onCheckedChange={() => handleToggleMajor(city.id, city.is_major ?? false)}
+                        />
+                        <span className="text-sm">
+                          {city.name}
+                        </span>
+                        {city.is_major && (
+                          <Star size={12} className="text-amber-500 fill-amber-500 ml-auto" />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
+
+          <div className="flex justify-between items-center pt-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              已選 {countryCities.filter(c => c.is_major).length} 個主要城市
+            </div>
+            <Button onClick={() => setIsCitiesDialogOpen(false)}>
+              完成
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

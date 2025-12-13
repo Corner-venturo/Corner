@@ -1277,8 +1277,10 @@ export type Database = {
           display_order: number | null
           id: string
           is_active: boolean | null
+          is_major: boolean | null
           name: string
           name_en: string | null
+          parent_city_id: string | null
           primary_image: number | null
           region_id: string | null
           timezone: string | null
@@ -1294,8 +1296,10 @@ export type Database = {
           display_order?: number | null
           id: string
           is_active?: boolean | null
+          is_major?: boolean | null
           name: string
           name_en?: string | null
+          parent_city_id?: string | null
           primary_image?: number | null
           region_id?: string | null
           timezone?: string | null
@@ -1311,8 +1315,10 @@ export type Database = {
           display_order?: number | null
           id?: string
           is_active?: boolean | null
+          is_major?: boolean | null
           name?: string
           name_en?: string | null
+          parent_city_id?: string | null
           primary_image?: number | null
           region_id?: string | null
           timezone?: string | null

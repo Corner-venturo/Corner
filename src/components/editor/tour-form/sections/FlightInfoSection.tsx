@@ -1,23 +1,28 @@
 import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
-import { TourFormData } from '../types'
+import { TourFormData, FlightStyleType } from '../types'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { CalendarPlus, Search, Loader2 } from 'lucide-react'
+import { CalendarPlus, Search, Loader2, Plane, Undo2 } from 'lucide-react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
+import { cn } from '@/lib/utils'
 
 interface FlightInfoSectionProps {
   data: TourFormData
   updateFlightField: (
     flightType: 'outboundFlight' | 'returnFlight',
     field: string,
-    value: string
+    value: string | boolean
   ) => void
   updateFlightFields?: (
     flightType: 'outboundFlight' | 'returnFlight',
     fields: Record<string, string>
   ) => void
   onGenerateDailyItinerary?: (days: number, departureDate: string) => void
+  updateField?: (field: keyof TourFormData, value: FlightStyleType) => void
+  // 復原功能
+  canUndoItinerary?: boolean
+  onUndoItinerary?: () => void
 }
 
 // 日期格式轉換輔助函式
@@ -54,7 +59,14 @@ function formatDateFull(date: Date): string {
   return `${year}/${month}/${day}`
 }
 
-export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary }: FlightInfoSectionProps) {
+// 航班風格選項
+const flightStyleOptions: { value: FlightStyleType; label: string; description: string }[] = [
+  { value: 'original', label: '經典金色', description: '莫蘭迪金色風格' },
+  { value: 'chinese', label: '中國風', description: '書法水墨風格' },
+  { value: 'japanese', label: '日式和風', description: '和紙風格＋圖片' },
+]
+
+export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary, updateField, canUndoItinerary, onUndoItinerary }: FlightInfoSectionProps) {
   // 航班查詢狀態
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
@@ -267,6 +279,42 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
         航班資訊
       </h2>
 
+      {/* 航班卡片風格選擇 */}
+      {updateField && (
+        <div className="bg-gradient-to-r from-slate-50 to-slate-100/50 p-3 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Plane className="w-4 h-4 text-slate-500" />
+            <span className="text-xs font-medium text-slate-600">航班卡片風格</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {flightStyleOptions.map((option) => {
+              const isSelected = (data.flightStyle || 'original') === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => updateField('flightStyle', option.value)}
+                  className={cn(
+                    'flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
+                    isSelected
+                      ? 'border-morandi-gold bg-morandi-gold/10'
+                      : 'border-transparent bg-white hover:border-slate-300'
+                  )}
+                >
+                  <span className={cn(
+                    'text-xs font-bold',
+                    isSelected ? 'text-morandi-gold' : 'text-slate-700'
+                  )}>
+                    {option.label}
+                  </span>
+                  <span className="text-[10px] text-slate-500">{option.description}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 行程天數自動計算 */}
       {tripDays > 0 && data.departureDate && (
         <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 p-3 rounded-lg border border-morandi-gold/30">
@@ -291,16 +339,30 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
               })()}
             </div>
             <div className="h-6 w-px bg-morandi-container"></div>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleGenerateDailyItinerary}
-              disabled={!onGenerateDailyItinerary}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white text-xs gap-1"
-            >
-              <CalendarPlus size={14} />
-              自動產生 {tripDays} 天行程
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleGenerateDailyItinerary}
+                disabled={!onGenerateDailyItinerary}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white text-xs gap-1"
+              >
+                <CalendarPlus size={14} />
+                自動產生 {tripDays} 天行程
+              </Button>
+              {canUndoItinerary && onUndoItinerary && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={onUndoItinerary}
+                  className="text-xs gap-1 border-orange-300 text-orange-600 hover:bg-orange-50"
+                >
+                  <Undo2 size={14} />
+                  復原
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -343,13 +405,24 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
               航班號碼
             </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.flightNumber || ''}
-              onChange={e => updateFlightField('outboundFlight', 'flightNumber', e.target.value)}
-              className="text-xs h-8"
-              placeholder="BR158"
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={data.outboundFlight?.flightNumber || ''}
+                onChange={e => updateFlightField('outboundFlight', 'flightNumber', e.target.value)}
+                className="text-xs h-8 flex-1"
+                placeholder="BR158"
+              />
+              <label className="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+                <input
+                  type="checkbox"
+                  checked={data.outboundFlight?.hasMeal || false}
+                  onChange={e => updateFlightField('outboundFlight', 'hasMeal', e.target.checked)}
+                  className="w-3 h-3 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                />
+                <span className="text-[10px] text-morandi-secondary">餐食</span>
+              </label>
+            </div>
           </div>
           <div>
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
@@ -475,13 +548,24 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
               航班號碼
             </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.flightNumber || ''}
-              onChange={e => updateFlightField('returnFlight', 'flightNumber', e.target.value)}
-              className="text-xs h-8"
-              placeholder="BR157"
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={data.returnFlight?.flightNumber || ''}
+                onChange={e => updateFlightField('returnFlight', 'flightNumber', e.target.value)}
+                className="text-xs h-8 flex-1"
+                placeholder="BR157"
+              />
+              <label className="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+                <input
+                  type="checkbox"
+                  checked={data.returnFlight?.hasMeal || false}
+                  onChange={e => updateFlightField('returnFlight', 'hasMeal', e.target.checked)}
+                  className="w-3 h-3 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                />
+                <span className="text-[10px] text-morandi-secondary">餐食</span>
+              </label>
+            </div>
           </div>
           <div>
             <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">

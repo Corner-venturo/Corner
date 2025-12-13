@@ -2,6 +2,9 @@
 
 import { cn } from '@/lib/utils'
 import { AlertCircle, FileX } from 'lucide-react'
+import { SectionTitle } from './SectionTitle'
+
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
 
 interface TourNoticesSectionProps {
   data: {
@@ -11,9 +14,10 @@ interface TourNoticesSectionProps {
     cancellationPolicy?: string[]
   }
   viewMode?: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
-export function TourNoticesSection({ data, viewMode = 'desktop' }: TourNoticesSectionProps) {
+export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourNoticesSectionProps) {
   const notices = data.notices || []
   const cancellationPolicy = data.cancellationPolicy || []
 
@@ -36,16 +40,12 @@ export function TourNoticesSection({ data, viewMode = 'desktop' }: TourNoticesSe
           {/* 提醒事項 */}
           {hasNotices && (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <h2 className={cn(
-                'font-bold text-morandi-primary mb-6 flex items-center gap-3',
-                isMobile ? 'text-lg' : 'text-xl'
-              )}>
-                <AlertCircle className={cn('text-amber-500', isMobile ? 'w-5 h-5' : 'w-6 h-6')} />
-                <span>
-                  提醒事項
-                  <span className="text-xs font-normal text-morandi-secondary ml-2">NOTICES</span>
-                </span>
-              </h2>
+              <SectionTitle
+                title="提醒事項"
+                subtitle="NOTICES"
+                coverStyle={coverStyle}
+                className="mb-6"
+              />
 
               <ul className="space-y-3">
                 {notices.map((notice, index) => (
@@ -69,16 +69,12 @@ export function TourNoticesSection({ data, viewMode = 'desktop' }: TourNoticesSe
           {/* 取消政策 */}
           {hasCancellation && (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <h2 className={cn(
-                'font-bold text-morandi-primary mb-6 flex items-center gap-3',
-                isMobile ? 'text-lg' : 'text-xl'
-              )}>
-                <FileX className={cn('text-red-400', isMobile ? 'w-5 h-5' : 'w-6 h-6')} />
-                <span>
-                  取消政策
-                  <span className="text-xs font-normal text-morandi-secondary ml-2">CANCELLATION</span>
-                </span>
-              </h2>
+              <SectionTitle
+                title="取消政策"
+                subtitle="CANCELLATION"
+                coverStyle={coverStyle}
+                className="mb-6"
+              />
 
               <ul className="space-y-4">
                 {cancellationPolicy.map((policy, index) => (

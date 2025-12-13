@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
+import { SectionTitle } from './SectionTitle'
 
 interface TourFeature {
   icon: string
@@ -11,6 +12,8 @@ interface TourFeature {
   iconComponent?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
 }
 
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+
 interface TourData {
   features?: TourFeature[]
   [key: string]: unknown
@@ -19,9 +22,10 @@ interface TourData {
 interface TourFeaturesSectionProps {
   data: TourData
   viewMode: 'desktop' | 'mobile'
+  coverStyle?: CoverStyleType
 }
 
-export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps) {
+export function TourFeaturesSection({ data, viewMode, coverStyle = 'original' }: TourFeaturesSectionProps) {
   const features = data.features || []
   const [lightboxImages, setLightboxImages] = useState<string[]>([])
   const [lightboxIndex, setLightboxIndex] = useState(0)
@@ -49,19 +53,11 @@ export function TourFeaturesSection({ data, viewMode }: TourFeaturesSectionProps
   return (
     <section className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-white' : 'pt-8 pb-16 bg-white'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className={viewMode === 'mobile' ? 'text-center mb-6' : 'text-center mb-12'}
-        >
-          <h2
-            className={viewMode === 'mobile' ? 'text-2xl font-bold' : 'text-4xl font-bold'}
-            style={{ color: morandiColors.text.primary }}
-          >
-            行程特色
-          </h2>
-        </motion.div>
+        <SectionTitle
+          title="行程特色"
+          coverStyle={coverStyle}
+          className={viewMode === 'mobile' ? 'mb-6' : 'mb-12'}
+        />
 
         <div
           className={

@@ -7,6 +7,8 @@ import { useTourScrollEffects } from '@/features/tours/hooks/useTourScrollEffect
 import { useTourItineraryNav } from '@/features/tours/hooks/useTourItineraryNav'
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
+import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
+import { TourHeroSerene } from '@/features/tours/components/sections/TourHeroSerene'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
@@ -76,10 +78,14 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         viewMode={viewMode}
       />
 
-      {/* Hero Section - 根據 coverStyle 切換 */}
+      {/* Hero Section - 根據 coverStyle 切換四種風格 */}
       <div id="top">
         {data.coverStyle === 'gemini' ? (
           <TourHeroGemini data={data} viewMode={viewMode} />
+        ) : data.coverStyle === 'nature' ? (
+          <TourHeroNature data={data} viewMode={viewMode} />
+        ) : data.coverStyle === 'serene' ? (
+          <TourHeroSerene data={data} viewMode={viewMode} />
         ) : (
           <TourHeroSection data={data} viewMode={viewMode} />
         )}
@@ -92,7 +98,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Flight Section */}
       <div id="flight">
-        <TourFlightSection data={data} viewMode={viewMode} />
+        <TourFlightSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
       </div>
 
       {/* Features Section - 只有當 features 有資料時才顯示 */}
@@ -104,7 +110,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           </div>
 
           <div id="features">
-            <TourFeaturesSection data={data} viewMode={viewMode} />
+            <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
           </div>
 
           {/* Divider */}
@@ -124,6 +130,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           activeDayIndex={activeDayIndex}
           dayRefs={dayRefs}
           handleDayNavigate={handleDayNavigate}
+          coverStyle={data.coverStyle}
         />
       </div>
 
@@ -137,7 +144,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* Leader and Meeting Section - 有資料才顯示 */}
       {(data.leader?.name || data.leader?.phone || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)) && (
         <div id="leader">
-          <TourLeaderSection data={data} viewMode={viewMode} />
+          <TourLeaderSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
         </div>
       )}
 
@@ -151,7 +158,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* Hotels Section */}
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
         <div id="hotels">
-          <TourHotelsSection data={data} viewMode={viewMode} />
+          <TourHotelsSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
         </div>
       )}
 
@@ -164,7 +171,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Price Tiers Section (4人、6人、8人包團) */}
       <div id="price-tiers">
-        <TourPriceTiersSection data={data} viewMode={viewMode} />
+        <TourPriceTiersSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
       </div>
 
       {/* Divider - Pricing Details */}
@@ -176,7 +183,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Pricing Details Section (費用包含/不含) */}
       <div id="pricing">
-        <TourPricingSection data={data} viewMode={viewMode} />
+        <TourPricingSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
       </div>
 
       {/* Divider - FAQ */}
@@ -188,7 +195,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* FAQ Section */}
       <div id="faq">
-        <TourFAQSection data={data} viewMode={viewMode} />
+        <TourFAQSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
       </div>
 
       {/* Divider - Notices */}
@@ -201,7 +208,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Notices & Cancellation Section */}
       <div id="notices">
-        <TourNoticesSection data={data} viewMode={viewMode} />
+        <TourNoticesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
       </div>
 
       {/* Footer */}

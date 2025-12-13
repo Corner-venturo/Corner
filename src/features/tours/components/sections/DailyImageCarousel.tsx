@@ -39,22 +39,20 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
     return img.url && img.url.trim() !== ''
   }) || []
 
-  if (validImages.length === 0) {
-    return null
-  }
-
   const showControls = validImages.length > 1
 
-  // 無限循環：滑動到指定 index
+  // 滑動到指定 index
   const scrollToIndex = (index: number) => {
     if (!scrollRef.current || validImages.length <= 1) return
 
-    // 無限循環邏輯
     const total = validImages.length
     const nextIndex = ((index % total) + total) % total
 
     const container = scrollRef.current
-    const cardWidth = container.offsetWidth * 0.7 // 70% 寬度
+    const firstCard = container.querySelector('[data-card]') as HTMLElement
+    if (!firstCard) return
+
+    const cardWidth = firstCard.offsetWidth
     const gap = 12
     const scrollPosition = nextIndex * (cardWidth + gap)
 
@@ -71,7 +69,10 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
     if (!container || validImages.length <= 1) return
 
     const handleScroll = () => {
-      const cardWidth = container.offsetWidth * 0.7
+      const firstCard = container.querySelector('[data-card]') as HTMLElement
+      if (!firstCard) return
+
+      const cardWidth = firstCard.offsetWidth
       const gap = 12
       const index = Math.round(container.scrollLeft / (cardWidth + gap))
       setCurrentIndex(Math.max(0, Math.min(index, validImages.length - 1)))
@@ -80,6 +81,10 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
   }, [validImages.length])
+
+  if (validImages.length === 0) {
+    return null
+  }
 
   // 點擊圖片時顯示照片牆
   const handleImageClick = () => {
@@ -92,10 +97,10 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
   if (validImages.length === 1) {
     return (
       <>
-        <div className="relative mb-8 mt-6">
+        <div className="relative mb-6 sm:mb-8 mt-4 sm:mt-6">
           <div
             className={cn(
-              "overflow-hidden rounded-[28px] border border-white/60 bg-white shadow-2xl ring-1 ring-morandi-border/20",
+              "overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/60 bg-white shadow-2xl ring-1 ring-morandi-border/20",
               allTourImages.length >= 4 && "cursor-pointer"
             )}
             onClick={handleImageClick}
@@ -128,10 +133,10 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
     )
   }
 
-  // 多張圖片：中間完整 + 左右露半邊的輪播
+  // 多張圖片：可滾動的輪播
   return (
     <>
-      <div className="relative mb-8 mt-6">
+      <div className="relative mb-6 sm:mb-8 mt-4 sm:mt-6">
         {/* 輪播容器 */}
         <div
           ref={scrollRef}
@@ -141,24 +146,20 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
             scrollSnapType: 'x mandatory'
           }}
         >
-          <div
-            className="flex gap-3"
-            style={{
-              paddingLeft: '15%',
-              paddingRight: '15%'
-            }}
-          >
+          <div className="flex gap-2 sm:gap-3">
             {validImages.map((image, index) => (
               <div
                 key={`${getImageUrl(image)}-${index}`}
+                data-card
                 className={cn(
-                  "flex-shrink-0 overflow-hidden rounded-[20px] border border-white/60 bg-white shadow-xl ring-1 ring-morandi-border/20 transition-all duration-300",
+                  "flex-shrink-0 overflow-hidden rounded-[16px] sm:rounded-[20px] border border-white/60 bg-white shadow-xl ring-1 ring-morandi-border/20 transition-all duration-300",
                   allTourImages.length >= 4 && "cursor-pointer",
-                  index === currentIndex ? "scale-100 opacity-100" : "scale-95 opacity-70"
+                  index === currentIndex ? "scale-100 opacity-100" : "scale-[0.98] opacity-80"
                 )}
                 style={{
-                  width: '70%',
-                  scrollSnapAlign: 'center'
+                  width: 'calc(100% - 24px)',
+                  maxWidth: '500px',
+                  scrollSnapAlign: 'start'
                 }}
                 onClick={handleImageClick}
               >
@@ -191,10 +192,10 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 e.stopPropagation()
                 scrollToIndex(currentIndex - 1)
               }}
-              className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white z-10"
+              className="absolute left-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white z-10"
               aria-label="上一張圖片"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button
               type="button"
@@ -202,17 +203,17 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 e.stopPropagation()
                 scrollToIndex(currentIndex + 1)
               }}
-              className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white z-10"
+              className="absolute right-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white z-10"
               aria-label="下一張圖片"
             >
-              <ChevronRight size={20} />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </>
         )}
 
         {/* 分頁指示器 */}
         {showControls && (
-          <div className="mt-4 flex justify-center gap-2">
+          <div className="mt-3 sm:mt-4 flex justify-center gap-1.5 sm:gap-2">
             {validImages.map((_, index) => (
               <button
                 key={index}

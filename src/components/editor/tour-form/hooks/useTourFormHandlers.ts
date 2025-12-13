@@ -60,15 +60,15 @@ export function useTourFormHandlers(
   const updateFlightField = (
     flightType: 'outboundFlight' | 'returnFlight',
     field: string,
-    value: string
+    value: string | boolean
   ) => {
     const updatedFlight = { ...data[flightType], [field]: value }
 
-    // 自動計算飛行時間
-    const baseTimeDiff = timezoneOffset[selectedCountry] || 0
-    // 回程時差方向相反（從目的地飛回台灣，要減去時差）
-    const timeDiff = flightType === 'returnFlight' ? -baseTimeDiff : baseTimeDiff
-    if (field === 'departureTime' || field === 'arrivalTime') {
+    // 自動計算飛行時間（僅針對時間欄位，不處理 boolean 欄位如 hasMeal）
+    if (typeof value === 'string' && (field === 'departureTime' || field === 'arrivalTime')) {
+      const baseTimeDiff = timezoneOffset[selectedCountry] || 0
+      // 回程時差方向相反（從目的地飛回台灣，要減去時差）
+      const timeDiff = flightType === 'returnFlight' ? -baseTimeDiff : baseTimeDiff
       const depTime = field === 'departureTime' ? value : updatedFlight.departureTime
       const arrTime = field === 'arrivalTime' ? value : updatedFlight.arrivalTime
       updatedFlight.duration = calculateFlightDuration(depTime, arrTime, timeDiff)
