@@ -95,6 +95,34 @@ function getDayOfWeek(dateStr: string | undefined): string {
   }
 }
 
+// 判斷是否為實際的最後一天（考慮替代行程）
+function isLastMainDay(itinerary: TourFormData['dailyItinerary'], currentIndex: number): boolean {
+  // 找出最後一個「非替代行程」的索引
+  let lastMainDayIndex = -1
+  for (let i = itinerary.length - 1; i >= 0; i--) {
+    if (!itinerary[i].isAlternative) {
+      lastMainDayIndex = i
+      break
+    }
+  }
+
+  // 如果當前是最後一個主行程，則為最後一天
+  if (currentIndex === lastMainDayIndex) return true
+
+  // 如果當前是替代行程，檢查其對應的主行程是否為最後一天
+  // 替代行程（如 Day 3-B）跟隨在主行程（Day 3）之後，也視為最後一天
+  if (itinerary[currentIndex].isAlternative) {
+    // 向前找到對應的主行程
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      if (!itinerary[i].isAlternative) {
+        return i === lastMainDayIndex
+      }
+    }
+  }
+
+  return false
+}
+
 export function TourItinerarySectionLuxury({
   data,
   viewMode,
@@ -524,8 +552,8 @@ export function TourItinerarySectionLuxury({
                         </div>
                       </div>
 
-                      {/* 住宿 - 最後一天不顯示 */}
-                      {index < dailyItinerary.length - 1 && (
+                      {/* 住宿 - 最後一天（包含替代行程）不顯示 */}
+                      {!isLastMainDay(dailyItinerary, index) && (
                         <div
                           className="relative pl-6 border-l"
                           style={{ borderColor: '#E5E7EB' }}
