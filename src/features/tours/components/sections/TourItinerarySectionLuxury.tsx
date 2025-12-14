@@ -223,8 +223,8 @@ export function TourItinerarySectionLuxury({
           {dailyItinerary.map((day, index) => {
             const dayColor = DAY_COLORS[index % DAY_COLORS.length]
             const dayNumber = dayLabels[index].replace('Day ', '')
-            // 檢查圖片來源：1. day.images 2. activities 裡的 image
-            const dayImages = day.images && day.images.length > 0 ? day.images : []
+            // 檢查圖片來源：1. day.images（需 showDailyImages=true） 2. activities 裡的 image
+            const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
             const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
             // 合併所有圖片來源，統一轉換為 string 格式
             const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)

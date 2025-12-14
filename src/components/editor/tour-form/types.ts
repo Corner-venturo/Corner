@@ -66,7 +66,7 @@ export interface DailyItinerary {
   accommodationRating?: number // 飯店星級（1-5）
   isSameAccommodation?: boolean // 是否續住（與前一天相同住宿）
   images?: (string | DailyImage)[] // 支援舊格式 string 和新格式 DailyImage
-  showDailyImages?: boolean // 是否顯示每日圖片區塊（預設 true）
+  showDailyImages?: boolean // 是否顯示每日圖片區塊（預設 false）
   isAlternative?: boolean // 是否為建議方案（替代行程），如 Day 3-B, Day 3-C
   locationLabel?: string // Luxury 模板專用：地點標籤（如「京都」、「大阪」）
 }
