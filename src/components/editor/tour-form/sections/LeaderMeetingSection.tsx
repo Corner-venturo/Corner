@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { TourFormData, MeetingPoint } from '../types'
 import { Plus, X } from 'lucide-react'
 
@@ -6,6 +6,38 @@ interface LeaderMeetingSectionProps {
   data: TourFormData
   updateNestedField: (parent: string, field: string, value: unknown) => void
   updateField: (field: string, value: unknown) => void
+}
+
+// 計算起飛前三小時的集合時間
+function calculateMeetingTime(departureDate: string | undefined, departureTime: string | undefined): string {
+  if (!departureDate || !departureTime) return ''
+
+  try {
+    // 解析日期 (格式: YYYY-MM-DD 或 YYYY/MM/DD)
+    const dateStr = departureDate.replace(/\//g, '-')
+    // 解析時間 (格式: HH:MM)
+    const [hours, minutes] = departureTime.split(':').map(Number)
+
+    if (isNaN(hours) || isNaN(minutes)) return ''
+
+    // 建立完整日期時間
+    const departure = new Date(`${dateStr}T${departureTime}:00`)
+    if (isNaN(departure.getTime())) return ''
+
+    // 減去3小時
+    departure.setHours(departure.getHours() - 3)
+
+    // 格式化輸出: YYYY/MM/DD HH:MM
+    const year = departure.getFullYear()
+    const month = String(departure.getMonth() + 1).padStart(2, '0')
+    const day = String(departure.getDate()).padStart(2, '0')
+    const hour = String(departure.getHours()).padStart(2, '0')
+    const minute = String(departure.getMinutes()).padStart(2, '0')
+
+    return `${year}/${month}/${day} ${hour}:${minute}`
+  } catch {
+    return ''
+  }
 }
 
 export function LeaderMeetingSection({
@@ -16,8 +48,29 @@ export function LeaderMeetingSection({
   // 確保 meetingPoints 是陣列
   const meetingPoints = data.meetingPoints || []
 
+  // 追蹤是否已自動填入過
+  const hasAutoFilledRef = useRef(false)
+
+  // 當有領隊資料且沒有集合地點時，自動新增一個並帶入時間
+  useEffect(() => {
+    const hasLeaderName = data.leader?.name && data.leader.name.trim() !== ''
+    const hasMeetingPoints = meetingPoints.length > 0
+    const hasFlightInfo = data.outboundFlight?.departureTime && data.departureDate
+
+    // 只在有領隊、沒有集合點、有航班資訊、且尚未自動填入過時執行
+    if (hasLeaderName && !hasMeetingPoints && hasFlightInfo && !hasAutoFilledRef.current) {
+      const meetingTime = calculateMeetingTime(data.departureDate, data.outboundFlight.departureTime)
+      if (meetingTime) {
+        hasAutoFilledRef.current = true
+        updateField('meetingPoints', [{ time: meetingTime, location: '' }])
+      }
+    }
+  }, [data.leader?.name, data.outboundFlight?.departureTime, data.departureDate, meetingPoints.length, updateField])
+
   const addMeetingPoint = () => {
-    updateField('meetingPoints', [...meetingPoints, { time: '', location: '' }])
+    // 新增集合點時，自動帶入起飛前三小時
+    const meetingTime = calculateMeetingTime(data.departureDate, data.outboundFlight?.departureTime)
+    updateField('meetingPoints', [...meetingPoints, { time: meetingTime || '', location: '' }])
   }
 
   const updateMeetingPoint = (index: number, field: keyof MeetingPoint, value: string) => {
