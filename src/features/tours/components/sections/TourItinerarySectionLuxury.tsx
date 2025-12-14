@@ -545,6 +545,20 @@ export function TourItinerarySectionLuxury({
                               className="bg-white p-4 shadow-sm rounded-sm border"
                               style={{ borderColor: '#f0f0f0' }}
                             >
+                              {/* 續住標示 */}
+                              {day.isSameAccommodation && (
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div
+                                    className="w-4 h-4 rounded border-2 flex items-center justify-center"
+                                    style={{ borderColor: LUXURY.secondary, backgroundColor: `${LUXURY.secondary}15` }}
+                                  >
+                                    <svg className="w-3 h-3" style={{ color: LUXURY.secondary }} fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-xs" style={{ color: LUXURY.secondary }}>續住</span>
+                                </div>
+                              )}
                               <div
                                 className="font-bold text-lg mb-1"
                                 style={{
